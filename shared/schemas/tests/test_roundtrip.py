@@ -15,22 +15,15 @@ import pytest
 # Import generated models
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
-from debrief_schemas import (
-    SensorContact,
-    ReferenceLocation,
-    PlotMetadata,
-    ToolMetadata,
-)
+from debrief_schemas import ReferenceLocation
 
 FIXTURES_DIR = Path(__file__).parent.parent / "src" / "fixtures"
 VALID_DIR = FIXTURES_DIR / "valid"
 
-# Entity types that don't have the nested array limitation
+# Entity types that don't have the nested array limitation (tracer bullet: reference-location only)
+# TrackFeature excluded due to LinkML nested array limitation with GeoJSON coordinates
 ROUNDTRIP_ENTITY_MAP = {
-    "sensor-contact": SensorContact,
     "reference-location": ReferenceLocation,
-    "plot-metadata": PlotMetadata,
-    "tool-metadata": ToolMetadata,
 }
 
 
@@ -87,31 +80,12 @@ class TestPythonRoundTrip:
         roundtripped = json.loads(json_str)
 
         # Check required fields based on entity type
-        if entity_type == "sensor-contact":
-            assert "type" in roundtripped
-            assert "id" in roundtripped
-            assert "geometry" in roundtripped
-            assert "properties" in roundtripped
-            assert "parent_track_id" in roundtripped["properties"]
-
-        elif entity_type == "reference-location":
+        if entity_type == "reference-location":
             assert "type" in roundtripped
             assert "id" in roundtripped
             assert "geometry" in roundtripped
             assert "properties" in roundtripped
             assert "name" in roundtripped["properties"]
-
-        elif entity_type == "plot-metadata":
-            assert "id" in roundtripped
-            assert "title" in roundtripped
-            assert "created" in roundtripped
-            assert "updated" in roundtripped
-
-        elif entity_type == "tool-metadata":
-            assert "id" in roundtripped
-            assert "name" in roundtripped
-            assert "description" in roundtripped
-            assert "version" in roundtripped
 
 
 class TestModelDumpModes:

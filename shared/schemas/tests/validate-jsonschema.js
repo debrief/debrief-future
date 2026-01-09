@@ -23,13 +23,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const SCHEMAS_DIR = join(__dirname, "..", "src", "generated", "json-schema");
 const FIXTURES_DIR = join(__dirname, "..", "src", "fixtures");
 
-// Entity type mapping from fixture prefix to schema name
+// Entity type mapping from fixture prefix to schema name (tracer bullet: 2 entities)
 const ENTITY_MAP = {
   "track-feature": "TrackFeature",
-  "sensor-contact": "SensorContact",
   "reference-location": "ReferenceLocation",
-  "plot-metadata": "PlotMetadata",
-  "tool-metadata": "ToolMetadata",
 };
 
 /**

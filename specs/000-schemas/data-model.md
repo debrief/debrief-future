@@ -1,4 +1,4 @@
-# Data Model: Schema Foundation
+# Data Model: Schema Foundation (Tracer Bullet)
 
 **Feature**: 000-schemas | **Date**: 2026-01-09
 **Purpose**: Define entity structures, relationships, and validation rules for the Debrief schema foundation.
@@ -7,24 +7,21 @@
 
 ## Overview
 
-This document defines the five core entity types required by the Schema Foundation feature. All entities follow GeoJSON conventions where applicable and include maritime-specific extensions.
+This is a **tracer bullet** implementation defining two core entity types. All entities follow GeoJSON conventions and include maritime-specific extensions.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         PlotMetadata                             │
-│  (STAC Item properties for a Debrief plot)                      │
-├─────────────────────────────────────────────────────────────────┤
-│ Contains:                                                        │
-│   ├── TrackFeature[]        (vessel tracks)                     │
-│   ├── SensorContact[]       (sensor detections, linked to track)│
-│   └── ReferenceLocation[]   (fixed reference points)            │
+│                     TrackFeature                                │
+│  (GeoJSON Feature representing a vessel track)                  │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
-│                         ToolMetadata                             │
-│  (describes available analysis tools)                            │
+│                   ReferenceLocation                             │
+│  (GeoJSON Feature for fixed reference points)                   │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+Future iterations will add: SensorContact, PlotMetadata, ToolMetadata.
 
 ---
 
@@ -112,77 +109,6 @@ A GeoJSON Feature representing a vessel track with timestamped positions.
 
 ---
 
-## Entity: SensorContact
-
-A GeoJSON Feature representing a sensor detection, linked to a parent track.
-
-### Fields
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `type` | `"Feature"` | Yes | GeoJSON type discriminator |
-| `id` | `string` | Yes | Unique identifier (UUID) |
-| `geometry` | `Point` | Yes | Contact position as GeoJSON Point |
-| `properties` | `SensorContactProperties` | Yes | Contact metadata |
-
-### SensorContactProperties
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `parent_track_id` | `string` | Yes | ID of parent TrackFeature |
-| `sensor_type` | `SensorTypeEnum` | Yes | Type of sensor |
-| `time` | `datetime` | Yes | Detection timestamp (ISO8601) |
-| `bearing` | `number` | No | Bearing in degrees (0-360) |
-| `bearing_error` | `number` | No | Bearing error in degrees |
-| `range` | `number` | No | Range in nautical miles |
-| `range_error` | `number` | No | Range error in nautical miles |
-| `frequency` | `number` | No | Frequency in Hz (for acoustic) |
-| `label` | `string` | No | User-assigned label |
-| `color` | `string` | No | Display color |
-
-### SensorTypeEnum
-
-| Value | Description |
-|-------|-------------|
-| `SONAR_ACTIVE` | Active sonar |
-| `SONAR_PASSIVE` | Passive sonar |
-| `RADAR` | Radar |
-| `ESM` | Electronic Support Measures |
-| `VISUAL` | Visual observation |
-| `AIS` | Automatic Identification System |
-| `OTHER` | Other sensor type |
-
-### Validation Rules
-
-1. `parent_track_id` must reference an existing TrackFeature
-2. `bearing` must be in range [0, 360)
-3. `range` must be non-negative if present
-4. If `bearing` is provided without `range`, contact is a bearing-only detection
-
-### Example (Valid)
-
-```json
-{
-  "type": "Feature",
-  "id": "contact-001",
-  "geometry": {
-    "type": "Point",
-    "coordinates": [-4.95, 50.05]
-  },
-  "properties": {
-    "parent_track_id": "track-001",
-    "sensor_type": "SONAR_PASSIVE",
-    "time": "2026-01-09T10:30:00Z",
-    "bearing": 135,
-    "bearing_error": 2,
-    "frequency": 150,
-    "label": "Possible submarine"
-  }
-}
-```
-
----
-
 ## Entity: ReferenceLocation
 
 A GeoJSON Feature for fixed reference points (exercise area markers, waypoints, etc.).
@@ -245,184 +171,13 @@ A GeoJSON Feature for fixed reference points (exercise area markers, waypoints, 
 
 ---
 
-## Entity: PlotMetadata
-
-STAC Item properties for a Debrief plot. Extends STAC Item conventions.
-
-### Fields
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | `string` | Yes | Unique plot identifier |
-| `title` | `string` | Yes | Human-readable plot title |
-| `description` | `string` | No | Plot description |
-| `datetime` | `datetime` | No | Single datetime (if not range) |
-| `start_datetime` | `datetime` | No | Start of temporal extent |
-| `end_datetime` | `datetime` | No | End of temporal extent |
-| `created` | `datetime` | Yes | Plot creation timestamp |
-| `updated` | `datetime` | Yes | Last update timestamp |
-| `source_files` | `SourceFile[]` | Yes | List of source files |
-| `platform_ids` | `string[]` | No | Platforms included in plot |
-| `exercise_name` | `string` | No | Exercise/operation name |
-| `classification` | `string` | No | Security classification |
-
-### SourceFile
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `filename` | `string` | Yes | Original filename |
-| `format` | `string` | Yes | File format (e.g., "REP", "CSV") |
-| `loaded_at` | `datetime` | Yes | When file was loaded |
-| `sha256` | `string` | Yes | SHA256 hash of file contents |
-| `asset_href` | `string` | Yes | Path to asset in STAC catalog |
-
-### Validation Rules
-
-1. Either `datetime` OR (`start_datetime` AND `end_datetime`) must be present
-2. If both start/end present, `start_datetime` <= `end_datetime`
-3. `source_files` must have at least one entry
-4. `created` <= `updated`
-
-### Example (Valid)
-
-```json
-{
-  "id": "plot-2026-001",
-  "title": "Exercise Neptune Analysis",
-  "description": "Post-exercise analysis of submarine tracking",
-  "start_datetime": "2026-01-09T08:00:00Z",
-  "end_datetime": "2026-01-09T18:00:00Z",
-  "created": "2026-01-10T09:00:00Z",
-  "updated": "2026-01-10T09:00:00Z",
-  "source_files": [
-    {
-      "filename": "ownship.rep",
-      "format": "REP",
-      "loaded_at": "2026-01-10T09:00:00Z",
-      "sha256": "abc123...",
-      "asset_href": "./assets/ownship.rep"
-    }
-  ],
-  "platform_ids": ["HMS-EXAMPLE"],
-  "exercise_name": "Neptune 26-1"
-}
-```
-
----
-
-## Entity: ToolMetadata
-
-Describes an analysis tool available in the calc service.
-
-### Fields
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | `string` | Yes | Unique tool identifier |
-| `name` | `string` | Yes | Human-readable tool name |
-| `description` | `string` | Yes | Tool description |
-| `version` | `string` | Yes | Tool version |
-| `category` | `ToolCategoryEnum` | Yes | Tool category |
-| `selection_context` | `SelectionContextEnum[]` | Yes | Required selection types |
-| `input_schema` | `object` | No | JSON Schema for tool inputs |
-| `output_schema` | `object` | No | JSON Schema for tool outputs |
-| `icon` | `string` | No | Icon identifier |
-
-### ToolCategoryEnum
-
-| Value | Description |
-|-------|-------------|
-| `GEOMETRY` | Geometric calculations |
-| `KINEMATICS` | Speed, course, bearing calculations |
-| `TACTICAL` | Tactical analysis |
-| `EXPORT` | Data export |
-| `TRANSFORM` | Data transformation |
-
-### SelectionContextEnum
-
-| Value | Description |
-|-------|-------------|
-| `SINGLE_TRACK` | Single track selected |
-| `MULTIPLE_TRACKS` | Multiple tracks selected |
-| `TIME_PERIOD` | Time period selected |
-| `TRACK_SEGMENT` | Track segment selected |
-| `SENSOR_CONTACT` | Sensor contact selected |
-| `FEATURE_SET` | Arbitrary feature set selected |
-
-### Validation Rules
-
-1. `selection_context` must have at least one entry
-2. `version` should follow semantic versioning (not enforced but recommended)
-
-### Example (Valid)
-
-```json
-{
-  "id": "calc-range-bearing",
-  "name": "Range and Bearing",
-  "description": "Calculate range and bearing between two points on selected tracks",
-  "version": "1.0.0",
-  "category": "GEOMETRY",
-  "selection_context": ["MULTIPLE_TRACKS", "TIME_PERIOD"],
-  "input_schema": {
-    "type": "object",
-    "properties": {
-      "reference_track": {"type": "string"},
-      "target_track": {"type": "string"},
-      "time": {"type": "string", "format": "date-time"}
-    },
-    "required": ["reference_track", "target_track", "time"]
-  },
-  "output_schema": {
-    "type": "object",
-    "properties": {
-      "range_nm": {"type": "number"},
-      "bearing_deg": {"type": "number"}
-    }
-  }
-}
-```
-
----
-
 ## Relationships
 
 ```
 TrackFeature
     │
-    ├─────< SensorContact (parent_track_id → TrackFeature.id)
-    │
     └─────< ReferenceLocation (temporal overlap via valid_from/valid_until)
-
-PlotMetadata
-    │
-    ├─────< TrackFeature (contained in plot's FeatureCollection)
-    ├─────< SensorContact (contained in plot's FeatureCollection)
-    └─────< ReferenceLocation (contained in plot's FeatureCollection)
-
-ToolMetadata (standalone, references SelectionContextEnum for applicability)
 ```
-
----
-
-## State Transitions
-
-### PlotMetadata Lifecycle
-
-```
-┌──────────┐    load file    ┌──────────┐    add track    ┌──────────┐
-│  EMPTY   │ ───────────────>│  LOADED  │ ───────────────>│  ACTIVE  │
-└──────────┘                 └──────────┘                 └──────────┘
-                                                                │
-                                  ┌─────────────────────────────┘
-                                  │  add analysis result
-                                  v
-                             ┌──────────┐    export     ┌──────────┐
-                             │ ANALYZED │ ────────────> │ EXPORTED │
-                             └──────────┘               └──────────┘
-```
-
-*Note: State is implicit based on contents, not an explicit field.*
 
 ---
 

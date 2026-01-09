@@ -101,14 +101,11 @@ def generate_jsonschema() -> bool:
         output_file.write_text(result.stdout)
         print(f"  ✓ Generated: {output_file}")
 
-        # Generate per-entity schemas
+        # Generate per-entity schemas (tracer bullet: track + reference-location only)
         full_schema = json.loads(result.stdout)
         entity_types = [
             "TrackFeature",
-            "SensorContact",
             "ReferenceLocation",
-            "PlotMetadata",
-            "ToolMetadata",
         ]
         for entity in entity_types:
             if entity in full_schema.get("$defs", {}):

@@ -4,13 +4,12 @@ LinkML master schemas and generated artifacts for Debrief v4.x maritime tactical
 
 ## Overview
 
-This package provides schema definitions for five core entity types:
+This is a **tracer bullet** implementation providing schema definitions for two core entity types:
 
 - **TrackFeature** - GeoJSON Feature representing vessel tracks
-- **SensorContact** - GeoJSON Feature for sensor detections
 - **ReferenceLocation** - GeoJSON Feature for fixed reference points
-- **PlotMetadata** - STAC Item properties for Debrief plots
-- **ToolMetadata** - Metadata for analysis tools
+
+Additional entity types (SensorContact, PlotMetadata, ToolMetadata) will be added in future iterations.
 
 ## Generated Artifacts
 
@@ -25,7 +24,7 @@ From the LinkML master schemas, we generate:
 ### Python (Pydantic)
 
 ```python
-from debrief_schemas import TrackFeature, SensorContact
+from debrief_schemas import TrackFeature, ReferenceLocation
 
 # Validate track data
 track = TrackFeature(**track_dict)

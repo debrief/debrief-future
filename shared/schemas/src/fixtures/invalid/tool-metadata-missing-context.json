@@ -1,8 +1,0 @@
-{
-  "id": "calc-invalid-001",
-  "name": "Invalid Tool",
-  "description": "This tool has no selection context",
-  "version": "1.0.0",
-  "category": "GEOMETRY",
-  "selection_context": []
-}

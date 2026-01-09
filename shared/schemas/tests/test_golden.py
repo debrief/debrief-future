@@ -25,23 +25,17 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
 from debrief_schemas import (
     TrackFeature,
-    SensorContact,
     ReferenceLocation,
-    PlotMetadata,
-    ToolMetadata,
 )
 
 FIXTURES_DIR = Path(__file__).parent.parent / "src" / "fixtures"
 VALID_DIR = FIXTURES_DIR / "valid"
 INVALID_DIR = FIXTURES_DIR / "invalid"
 
-# Entity type mapping from fixture prefix to model class
+# Entity type mapping from fixture prefix to model class (tracer bullet: 2 entities)
 ENTITY_MAP = {
     "track-feature": TrackFeature,
-    "sensor-contact": SensorContact,
     "reference-location": ReferenceLocation,
-    "plot-metadata": PlotMetadata,
-    "tool-metadata": ToolMetadata,
 }
 
 

@@ -13,26 +13,6 @@ export enum TrackTypeEnum {
     SOLUTION = "SOLUTION",
 };
 /**
-* Type of sensor that produced a contact
-*/
-export enum SensorTypeEnum {
-    
-    /** Active sonar */
-    SONAR_ACTIVE = "SONAR_ACTIVE",
-    /** Passive sonar */
-    SONAR_PASSIVE = "SONAR_PASSIVE",
-    /** Radar */
-    RADAR = "RADAR",
-    /** Electronic Support Measures */
-    ESM = "ESM",
-    /** Visual observation */
-    VISUAL = "VISUAL",
-    /** Automatic Identification System */
-    AIS = "AIS",
-    /** Other sensor type */
-    OTHER = "OTHER",
-};
-/**
 * Type of reference location
 */
 export enum LocationTypeEnum {
@@ -50,40 +30,6 @@ export enum LocationTypeEnum {
     /** Generic reference point */
     REFERENCE = "REFERENCE",
 };
-/**
-* Category of analysis tool
-*/
-export enum ToolCategoryEnum {
-    
-    /** Geometric calculations */
-    GEOMETRY = "GEOMETRY",
-    /** Speed, course, bearing calculations */
-    KINEMATICS = "KINEMATICS",
-    /** Tactical analysis */
-    TACTICAL = "TACTICAL",
-    /** Data export */
-    EXPORT = "EXPORT",
-    /** Data transformation */
-    TRANSFORM = "TRANSFORM",
-};
-/**
-* Type of selection context required by a tool
-*/
-export enum SelectionContextEnum {
-    
-    /** Single track selected */
-    SINGLE_TRACK = "SINGLE_TRACK",
-    /** Multiple tracks selected */
-    MULTIPLE_TRACKS = "MULTIPLE_TRACKS",
-    /** Time period selected */
-    TIME_PERIOD = "TIME_PERIOD",
-    /** Track segment selected */
-    TRACK_SEGMENT = "TRACK_SEGMENT",
-    /** Sensor contact selected */
-    SENSOR_CONTACT = "SENSOR_CONTACT",
-    /** Arbitrary feature set selected */
-    FEATURE_SET = "FEATURE_SET",
-};
 
 
 /**
@@ -100,23 +46,6 @@ export interface TimestampedPosition {
     course?: number,
     /** Speed in knots */
     speed?: number,
-}
-
-
-/**
- * Metadata about a source file loaded into a plot
- */
-export interface SourceFile {
-    /** Original filename */
-    filename: string,
-    /** File format (e.g., "REP", "CSV") */
-    format: string,
-    /** When file was loaded */
-    loaded_at: string,
-    /** SHA256 hash of file contents */
-    sha256: string,
-    /** Path to asset in STAC catalog */
-    asset_href: string,
 }
 
 
@@ -194,48 +123,6 @@ export interface TrackFeature {
 
 
 /**
- * Properties for a SensorContact
- */
-export interface SensorContactProperties {
-    /** ID of parent TrackFeature */
-    parent_track_id: string,
-    /** Type of sensor */
-    sensor_type: string,
-    /** Detection timestamp (ISO8601) */
-    time: string,
-    /** Bearing in degrees (0-360) */
-    bearing?: number,
-    /** Bearing error in degrees */
-    bearing_error?: number,
-    /** Range in nautical miles */
-    range?: number,
-    /** Range error in nautical miles */
-    range_error?: number,
-    /** Frequency in Hz (for acoustic) */
-    frequency?: number,
-    /** User-assigned label */
-    label?: string,
-    /** Display color (CSS color string) */
-    color?: string,
-}
-
-
-/**
- * GeoJSON Feature representing a sensor detection
- */
-export interface SensorContact {
-    /** GeoJSON type discriminator */
-    type: string,
-    /** Unique identifier (UUID recommended) */
-    id: string,
-    /** Contact position as GeoJSON Point */
-    geometry: GeoJSONPoint,
-    /** Contact metadata */
-    properties: SensorContactProperties,
-}
-
-
-/**
  * Properties for a ReferenceLocation
  */
 export interface ReferenceLocationProperties {
@@ -268,62 +155,6 @@ export interface ReferenceLocation {
     geometry: GeoJSONPoint,
     /** Reference metadata */
     properties: ReferenceLocationProperties,
-}
-
-
-/**
- * STAC Item properties for a Debrief plot
- */
-export interface PlotMetadata {
-    /** Unique plot identifier */
-    id: string,
-    /** Human-readable plot title */
-    title: string,
-    /** Plot description */
-    description?: string,
-    /** Single datetime (if not range) */
-    datetime?: string,
-    /** Start of temporal extent */
-    start_datetime?: string,
-    /** End of temporal extent */
-    end_datetime?: string,
-    /** Plot creation timestamp */
-    created: string,
-    /** Last update timestamp */
-    updated: string,
-    /** List of source files */
-    source_files: SourceFile[],
-    /** Platforms included in plot */
-    platform_ids?: string[],
-    /** Exercise/operation name */
-    exercise_name?: string,
-    /** Security classification */
-    classification?: string,
-}
-
-
-/**
- * Describes an analysis tool available in the calc service
- */
-export interface ToolMetadata {
-    /** Unique tool identifier */
-    id: string,
-    /** Human-readable tool name */
-    name: string,
-    /** Tool description */
-    description: string,
-    /** Tool version (semver recommended) */
-    version: string,
-    /** Tool category */
-    category: string,
-    /** Required selection types */
-    selection_context: string,
-    /** JSON Schema for tool inputs (as JSON string) */
-    input_schema?: string,
-    /** JSON Schema for tool outputs (as JSON string) */
-    output_schema?: string,
-    /** Icon identifier */
-    icon?: string,
 }
 
 

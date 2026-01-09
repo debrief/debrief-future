@@ -2,7 +2,8 @@ id: https://debrief.info/schemas/common
 name: common
 title: Debrief Common Types
 description: >-
-  Common types, enums, and base classes used across all Debrief schemas.
+  Common types, enums, and base classes used across Debrief schemas.
+  Tracer bullet implementation with core types only.
 
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -31,24 +32,6 @@ enums:
       SOLUTION:
         description: Solution/analysis track
 
-  SensorTypeEnum:
-    description: Type of sensor that produced a contact
-    permissible_values:
-      SONAR_ACTIVE:
-        description: Active sonar
-      SONAR_PASSIVE:
-        description: Passive sonar
-      RADAR:
-        description: Radar
-      ESM:
-        description: Electronic Support Measures
-      VISUAL:
-        description: Visual observation
-      AIS:
-        description: Automatic Identification System
-      OTHER:
-        description: Other sensor type
-
   LocationTypeEnum:
     description: Type of reference location
     permissible_values:
@@ -64,36 +47,6 @@ enums:
         description: Port/harbor
       REFERENCE:
         description: Generic reference point
-
-  ToolCategoryEnum:
-    description: Category of analysis tool
-    permissible_values:
-      GEOMETRY:
-        description: Geometric calculations
-      KINEMATICS:
-        description: Speed, course, bearing calculations
-      TACTICAL:
-        description: Tactical analysis
-      EXPORT:
-        description: Data export
-      TRANSFORM:
-        description: Data transformation
-
-  SelectionContextEnum:
-    description: Type of selection context required by a tool
-    permissible_values:
-      SINGLE_TRACK:
-        description: Single track selected
-      MULTIPLE_TRACKS:
-        description: Multiple tracks selected
-      TIME_PERIOD:
-        description: Time period selected
-      TRACK_SEGMENT:
-        description: Track segment selected
-      SENSOR_CONTACT:
-        description: Sensor contact selected
-      FEATURE_SET:
-        description: Arbitrary feature set selected
 
 # ============================================================================
 # Types
@@ -140,24 +93,3 @@ classes:
         description: Speed in knots
         range: float
         minimum_value: 0
-
-  SourceFile:
-    description: Metadata about a source file loaded into a plot
-    attributes:
-      filename:
-        description: Original filename
-        required: true
-      format:
-        description: File format (e.g., "REP", "CSV")
-        required: true
-      loaded_at:
-        description: When file was loaded
-        range: datetime
-        required: true
-      sha256:
-        description: SHA256 hash of file contents
-        required: true
-        pattern: "^[a-f0-9]{64}$"
-      asset_href:
-        description: Path to asset in STAC catalog
-        required: true

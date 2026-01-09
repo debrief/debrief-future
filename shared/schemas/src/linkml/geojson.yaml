@@ -2,8 +2,8 @@ id: https://debrief.info/schemas/geojson
 name: geojson
 title: Debrief GeoJSON Profile
 description: >-
-  GeoJSON Feature types for maritime tracks, sensor contacts, and reference
-  locations. Extends standard GeoJSON with Debrief-specific properties.
+  GeoJSON Feature types for maritime tracks and reference locations.
+  Tracer bullet implementation with core entity types only.
 
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -127,71 +127,6 @@ classes:
         multivalued: true
         minimum_cardinality: 4
         maximum_cardinality: 4
-
-# ============================================================================
-# SensorContact
-# ============================================================================
-
-  SensorContactProperties:
-    description: Properties for a SensorContact
-    attributes:
-      parent_track_id:
-        description: ID of parent TrackFeature
-        required: true
-      sensor_type:
-        description: Type of sensor
-        range: SensorTypeEnum
-        required: true
-      time:
-        description: Detection timestamp (ISO8601)
-        range: datetime
-        required: true
-      bearing:
-        description: Bearing in degrees (0-360)
-        range: float
-        minimum_value: 0
-        maximum_value: 360
-      bearing_error:
-        description: Bearing error in degrees
-        range: float
-        minimum_value: 0
-      range:
-        description: Range in nautical miles
-        range: float
-        minimum_value: 0
-      range_error:
-        description: Range error in nautical miles
-        range: float
-        minimum_value: 0
-      frequency:
-        description: Frequency in Hz (for acoustic)
-        range: float
-        minimum_value: 0
-      label:
-        description: User-assigned label
-      color:
-        description: Display color (CSS color string)
-        range: CSSColor
-
-  SensorContact:
-    description: GeoJSON Feature representing a sensor detection
-    attributes:
-      type:
-        description: GeoJSON type discriminator
-        range: string
-        required: true
-        equals_string: "Feature"
-      id:
-        description: Unique identifier (UUID recommended)
-        required: true
-      geometry:
-        description: Contact position as GeoJSON Point
-        range: GeoJSONPoint
-        required: true
-      properties:
-        description: Contact metadata
-        range: SensorContactProperties
-        required: true
 
 # ============================================================================
 # ReferenceLocation

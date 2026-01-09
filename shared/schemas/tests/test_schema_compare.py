@@ -5,6 +5,8 @@ Verifies that generated schemas maintain structural consistency:
 - Required fields match between LinkML and Pydantic
 - Enum values are consistent across generators
 - Type definitions align between generated artifacts
+
+Tracer bullet implementation: TrackFeature and ReferenceLocation only.
 """
 
 import json
@@ -15,13 +17,10 @@ import pytest
 GENERATED_DIR = Path(__file__).parent.parent / "src" / "generated"
 JSONSCHEMA_DIR = GENERATED_DIR / "json-schema"
 
-# Entity schemas to compare
+# Entity schemas to compare (tracer bullet: 2 entities)
 ENTITY_SCHEMAS = [
     "TrackFeature",
-    "SensorContact",
     "ReferenceLocation",
-    "PlotMetadata",
-    "ToolMetadata",
 ]
 
 
@@ -75,19 +74,6 @@ class TestEnumConsistency:
         assert set(enum_values) == set(expected), \
             f"TrackTypeEnum values mismatch: {enum_values} vs {expected}"
 
-    def test_sensor_type_enum_values(self):
-        """SensorTypeEnum should have consistent values."""
-        main_schema = json.loads(
-            (JSONSCHEMA_DIR / "debrief.schema.json").read_text()
-        )
-
-        sensor_type_def = main_schema.get("$defs", {}).get("SensorTypeEnum", {})
-        enum_values = sensor_type_def.get("enum", [])
-
-        expected = ["SONAR_ACTIVE", "SONAR_PASSIVE", "RADAR", "ESM", "VISUAL", "AIS", "OTHER"]
-        assert set(enum_values) == set(expected), \
-            f"SensorTypeEnum values mismatch: {enum_values} vs {expected}"
-
     def test_location_type_enum_values(self):
         """LocationTypeEnum should have consistent values."""
         main_schema = json.loads(
@@ -100,19 +86,6 @@ class TestEnumConsistency:
         expected = ["WAYPOINT", "EXERCISE_AREA", "DANGER_AREA", "ANCHORAGE", "PORT", "REFERENCE"]
         assert set(enum_values) == set(expected), \
             f"LocationTypeEnum values mismatch: {enum_values} vs {expected}"
-
-    def test_tool_category_enum_values(self):
-        """ToolCategoryEnum should have consistent values."""
-        main_schema = json.loads(
-            (JSONSCHEMA_DIR / "debrief.schema.json").read_text()
-        )
-
-        category_def = main_schema.get("$defs", {}).get("ToolCategoryEnum", {})
-        enum_values = category_def.get("enum", [])
-
-        expected = ["GEOMETRY", "KINEMATICS", "TACTICAL", "EXPORT", "TRANSFORM"]
-        assert set(enum_values) == set(expected), \
-            f"ToolCategoryEnum values mismatch: {enum_values} vs {expected}"
 
 
 class TestRequiredFields:
@@ -130,41 +103,17 @@ class TestRequiredFields:
         for field in expected:
             assert field in required, f"TrackFeature should require {field}"
 
-    def test_sensor_contact_required_fields(self):
-        """SensorContact should require type, id, geometry, properties."""
+    def test_reference_location_required_fields(self):
+        """ReferenceLocation should require type, id, geometry, properties."""
         schema = json.loads(
-            (JSONSCHEMA_DIR / "SensorContact.schema.json").read_text()
+            (JSONSCHEMA_DIR / "ReferenceLocation.schema.json").read_text()
         )
 
         required = schema.get("required", [])
         expected = ["type", "id", "geometry", "properties"]
 
         for field in expected:
-            assert field in required, f"SensorContact should require {field}"
-
-    def test_plot_metadata_required_fields(self):
-        """PlotMetadata should require id, title, created, updated, source_files."""
-        schema = json.loads(
-            (JSONSCHEMA_DIR / "PlotMetadata.schema.json").read_text()
-        )
-
-        required = schema.get("required", [])
-        expected = ["id", "title", "created", "updated", "source_files"]
-
-        for field in expected:
-            assert field in required, f"PlotMetadata should require {field}"
-
-    def test_tool_metadata_required_fields(self):
-        """ToolMetadata should require id, name, description, version, category, selection_context."""
-        schema = json.loads(
-            (JSONSCHEMA_DIR / "ToolMetadata.schema.json").read_text()
-        )
-
-        required = schema.get("required", [])
-        expected = ["id", "name", "description", "version", "category", "selection_context"]
-
-        for field in expected:
-            assert field in required, f"ToolMetadata should require {field}"
+            assert field in required, f"ReferenceLocation should require {field}"
 
 
 if __name__ == "__main__":

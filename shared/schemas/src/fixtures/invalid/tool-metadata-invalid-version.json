@@ -1,8 +1,0 @@
-{
-  "id": "calc-invalid-002",
-  "name": "Invalid Version Tool",
-  "description": "This tool has invalid version format",
-  "version": "bad-version",
-  "category": "GEOMETRY",
-  "selection_context": ["SINGLE_TRACK"]
-}

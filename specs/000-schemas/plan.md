@@ -5,7 +5,9 @@
 
 ## Summary
 
-Establish the schema foundation for Debrief v4.x by creating LinkML master schemas for five core entity types (TrackFeature, SensorContact, ReferenceLocation, PlotMetadata, ToolMetadata), configuring generators for Pydantic, JSON Schema, and TypeScript, and implementing the three-pronged adherence testing strategy (golden fixtures, round-trip, schema comparison) required by the Constitution.
+**Tracer bullet implementation** establishing the schema foundation for Debrief v4.x by creating LinkML master schemas for two core entity types (**TrackFeature** and **ReferenceLocation**), configuring generators for Pydantic, JSON Schema, and TypeScript, and implementing adherence testing (golden fixtures, round-trip, schema comparison) required by the Constitution.
+
+Future iterations will add: SensorContact, PlotMetadata, ToolMetadata.
 
 ## Technical Context
 
@@ -17,7 +19,7 @@ Establish the schema foundation for Debrief v4.x by creating LinkML master schem
 **Project Type**: Shared library within monorepo (uv workspace for Python, pnpm workspace for TypeScript)
 **Performance Goals**: Schema generation completes in <10 seconds; validation of typical fixture in <100ms
 **Constraints**: Offline-capable (no network dependencies), zero manual edits to generated files, single `make generate` command propagates changes
-**Scale/Scope**: 5 entity types, approximately 10-20 fields per entity, 10+ golden fixtures (2 valid + 2 invalid per type minimum)
+**Scale/Scope**: 2 entity types (tracer bullet), approximately 10-20 fields per entity, 8 golden fixtures (2 valid + 2 invalid per type)
 
 ## Constitution Check
 

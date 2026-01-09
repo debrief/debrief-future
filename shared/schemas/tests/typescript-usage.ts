@@ -3,19 +3,15 @@
  *
  * This file demonstrates how to use the generated TypeScript interfaces
  * with actual fixture data, ensuring type safety at compile time.
+ *
+ * Tracer bullet implementation: TrackFeature and ReferenceLocation only.
  */
 
 import {
   TrackFeature,
-  SensorContact,
   ReferenceLocation,
-  PlotMetadata,
-  ToolMetadata,
   TrackTypeEnum,
-  SensorTypeEnum,
   LocationTypeEnum,
-  ToolCategoryEnum,
-  SelectionContextEnum,
   TimestampedPosition,
   GeoJSONPoint,
   GeoJSONLineString,
@@ -65,31 +61,6 @@ const trackFeature: TrackFeature = {
 };
 
 // ============================================================================
-// SensorContact Usage
-// ============================================================================
-
-const contactGeometry: GeoJSONPoint = {
-  type: "Point",
-  coordinates: [-4.5678, 50.1234],
-};
-
-const sensorContact: SensorContact = {
-  type: "Feature",
-  id: "contact-001",
-  geometry: contactGeometry,
-  properties: {
-    parent_track_id: "track-001",
-    sensor_type: SensorTypeEnum.SONAR_PASSIVE,
-    time: "2024-03-15T10:15:00Z",
-    bearing: 45,
-    bearing_error: 2.5,
-    frequency: 150,
-    label: "Contact Alpha",
-    color: "#FF0000",
-  },
-};
-
-// ============================================================================
 // ReferenceLocation Usage
 // ============================================================================
 
@@ -114,46 +85,6 @@ const referenceLocation: ReferenceLocation = {
 };
 
 // ============================================================================
-// PlotMetadata Usage
-// ============================================================================
-
-const plotMetadata: PlotMetadata = {
-  id: "plot-001",
-  title: "Exercise Alpha - Day 1",
-  description: "First day of Exercise Alpha operations",
-  start_datetime: "2024-03-15T00:00:00Z",
-  end_datetime: "2024-03-15T23:59:59Z",
-  created: "2024-03-15T08:00:00Z",
-  updated: "2024-03-15T12:00:00Z",
-  source_files: [
-    {
-      filename: "track_data.rep",
-      format: "REP",
-      loaded_at: "2024-03-15T08:00:00Z",
-      sha256: "a".repeat(64),
-      asset_href: "./assets/track_data.rep",
-    },
-  ],
-  platform_ids: ["HMS-EXAMPLE", "HMS-OTHER"],
-  exercise_name: "Exercise Alpha",
-  classification: "UNCLASSIFIED",
-};
-
-// ============================================================================
-// ToolMetadata Usage
-// ============================================================================
-
-const toolMetadata: ToolMetadata = {
-  id: "calc-range-bearing",
-  name: "Range & Bearing Calculator",
-  description: "Calculate range and bearing between two points",
-  version: "1.0.0",
-  category: ToolCategoryEnum.GEOMETRY,
-  selection_context: SelectionContextEnum.MULTIPLE_TRACKS,
-  icon: "compass",
-};
-
-// ============================================================================
 // Type Guards and Utilities
 // ============================================================================
 
@@ -168,14 +99,14 @@ function isTrackFeature(obj: unknown): obj is TrackFeature {
   );
 }
 
-function isSensorContact(obj: unknown): obj is SensorContact {
+function isReferenceLocation(obj: unknown): obj is ReferenceLocation {
   return (
     typeof obj === "object" &&
     obj !== null &&
     "type" in obj &&
-    (obj as SensorContact).type === "Feature" &&
+    (obj as ReferenceLocation).type === "Feature" &&
     "properties" in obj &&
-    "sensor_type" in (obj as SensorContact).properties
+    "location_type" in (obj as ReferenceLocation).properties
   );
 }
 
@@ -183,8 +114,8 @@ function isSensorContact(obj: unknown): obj is SensorContact {
 // Verification
 // ============================================================================
 
-console.log("TypeScript Type Usage Verification");
-console.log("==================================\n");
+console.log("TypeScript Type Usage Verification (Tracer Bullet)");
+console.log("==================================================\n");
 
 console.log("TrackFeature:");
 console.log(`  ID: ${trackFeature.id}`);
@@ -192,25 +123,9 @@ console.log(`  Platform: ${trackFeature.properties.platform_name}`);
 console.log(`  Type: ${trackFeature.properties.track_type}`);
 console.log(`  Positions: ${trackFeature.properties.positions.length}`);
 
-console.log("\nSensorContact:");
-console.log(`  ID: ${sensorContact.id}`);
-console.log(`  Parent: ${sensorContact.properties.parent_track_id}`);
-console.log(`  Sensor: ${sensorContact.properties.sensor_type}`);
-console.log(`  Bearing: ${sensorContact.properties.bearing}°`);
-
 console.log("\nReferenceLocation:");
 console.log(`  ID: ${referenceLocation.id}`);
 console.log(`  Name: ${referenceLocation.properties.name}`);
 console.log(`  Type: ${referenceLocation.properties.location_type}`);
-
-console.log("\nPlotMetadata:");
-console.log(`  ID: ${plotMetadata.id}`);
-console.log(`  Title: ${plotMetadata.title}`);
-console.log(`  Sources: ${plotMetadata.source_files.length}`);
-
-console.log("\nToolMetadata:");
-console.log(`  ID: ${toolMetadata.id}`);
-console.log(`  Name: ${toolMetadata.name}`);
-console.log(`  Category: ${toolMetadata.category}`);
 
 console.log("\n✓ All types compile and work correctly");
