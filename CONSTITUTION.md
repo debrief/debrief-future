@@ -72,7 +72,32 @@ This constitution establishes the immutable principles governing all development
 
 ---
 
-## Article VII: Documentation
+## Article VII: Test-Driven AI Collaboration
+
+**Tests define "done" for AI-assisted work — in code and beyond.**
+
+When working with LLMs, clear acceptance criteria keep AI contributions on track and verifiable.
+
+### For Code
+1. **Tests before implementation** — define expected behaviour as executable tests before asking AI to implement.
+2. **Tests are the spec** — AI should be able to verify its own work against provided tests.
+3. **Failing tests guide iteration** — when tests fail, AI has concrete feedback to improve.
+
+### For Planning and Design
+1. **Acceptance criteria for documents** — define what "good" looks like before asking AI to draft.
+2. **Checklists as tests** — provide verification checklists that AI can self-assess against.
+3. **Examples as fixtures** — show examples of successful outputs to establish the standard.
+
+### For All AI Tasks
+1. **Definition of done first** — before any AI task, define how completion will be verified.
+2. **Verifiable outputs** — prefer outputs that can be checked (tested, validated, compared) over those requiring subjective judgment.
+3. **Iterate on failures** — when output doesn't meet criteria, provide specific feedback for AI to retry.
+
+This principle ensures AI contributions are measurable, consistent, and aligned with project standards.
+
+---
+
+## Article VIII: Documentation
 
 **If it's not documented, it doesn't exist.**
 
@@ -83,7 +108,7 @@ This constitution establishes the immutable principles governing all development
 
 ---
 
-## Article VIII: Dependencies
+## Article IX: Dependencies
 
 **Every dependency is a liability. Choose wisely.**
 
@@ -93,7 +118,7 @@ This constitution establishes the immutable principles governing all development
 
 ---
 
-## Article IX: Security
+## Article X: Security
 
 **Defence context demands defence-grade discipline.**
 
@@ -102,7 +127,7 @@ This constitution establishes the immutable principles governing all development
 
 ---
 
-## Article X: Internationalisation
+## Article XI: Internationalisation
 
 **NATO interoperability requires multilingual support.**
 
@@ -111,7 +136,7 @@ This constitution establishes the immutable principles governing all development
 
 ---
 
-## Article XI: Community Engagement
+## Article XII: Community Engagement
 
 **Build in the open. Invite feedback early and often.**
 
@@ -123,7 +148,7 @@ This constitution establishes the immutable principles governing all development
 
 ---
 
-## Article XII: Contribution Standards
+## Article XIII: Contribution Standards
 
 **Quality is non-negotiable.**
 
@@ -138,7 +163,7 @@ This constitution establishes the immutable principles governing all development
 
 ---
 
-## Article XIII: Pre-Release Freedom
+## Article XIV: Pre-Release Freedom
 
 **Until v4.0.0, we move fast.**
 
@@ -148,7 +173,7 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 2. **Schema evolution expected** — the data model will change as we learn.
 3. **Deprecation rules suspended** — features may be added and removed without deprecation periods.
 
-**Trigger point:** Upon release of v4.0.0, Articles II (schema versioning), VII (changelog), and XII (contribution standards) become strictly enforced for all subsequent releases.
+**Trigger point:** Upon release of v4.0.0, Articles II (schema versioning), VIII (changelog), and XIII (contribution standards) become strictly enforced for all subsequent releases.
 
 ---
 
@@ -161,4 +186,4 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 
 ---
 
-*Document version: 1.0 — January 2026*
+*Document version: 1.1 — January 2026*
