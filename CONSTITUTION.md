@@ -111,7 +111,19 @@ This constitution establishes the immutable principles governing all development
 
 ---
 
-## Article XI: Contribution Standards
+## Article XI: Community Engagement
+
+**Build in the open. Invite feedback early and often.**
+
+1. **Public by default** — development progress, roadmaps, and challenges are visible to stakeholders.
+2. **Beta previews** — user-facing features are deployed for feedback before finalisation.
+3. **Deliberate feedback pauses** — development includes structured periods to gather and incorporate community input.
+4. **Accessible discussion** — each feature preview has a dedicated space for stakeholder feedback.
+5. **Responsive engagement** — feedback is acknowledged, summarised, and visibly influences development.
+
+---
+
+## Article XII: Contribution Standards
 
 **Quality is non-negotiable.**
 
@@ -126,7 +138,7 @@ This constitution establishes the immutable principles governing all development
 
 ---
 
-## Article XII: Pre-Release Freedom
+## Article XIII: Pre-Release Freedom
 
 **Until v4.0.0, we move fast.**
 
@@ -136,7 +148,7 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 2. **Schema evolution expected** — the data model will change as we learn.
 3. **Deprecation rules suspended** — features may be added and removed without deprecation periods.
 
-**Trigger point:** Upon release of v4.0.0, Articles II (schema versioning), VII (changelog), and XI (deprecation periods) become strictly enforced for all subsequent releases.
+**Trigger point:** Upon release of v4.0.0, Articles II (schema versioning), VII (changelog), and XII (contribution standards) become strictly enforced for all subsequent releases.
 
 ---
 
