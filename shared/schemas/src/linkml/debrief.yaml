@@ -1,0 +1,37 @@
+id: https://debrief.info/schemas/debrief
+name: debrief
+title: Debrief Maritime Analysis Schemas
+description: >-
+  LinkML schemas for Debrief v4.x maritime tactical analysis platform.
+  Defines GeoJSON profile extensions for tracks, sensor contacts, and
+  reference locations, plus STAC metadata and tool definitions.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+  geojson: https://purl.org/geojson/vocab#
+  stac: https://stac-extensions.github.io/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+  # Module imports will be added as schemas are created
+  # - common
+  # - geojson
+  # - stac
+  # - tools
+
+# Placeholder classes - will be replaced when module schemas are created
+classes:
+  # Base placeholder to allow initial generation
+  DebriefEntity:
+    description: Base class for all Debrief entities
+    abstract: true
+    attributes:
+      id:
+        description: Unique identifier
+        required: true
+
+# Enums will be defined in common.yaml and imported

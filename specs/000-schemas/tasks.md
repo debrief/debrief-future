@@ -36,11 +36,11 @@ shared/schemas/
 
 **Purpose**: Project initialization and build tooling
 
-- [ ] T001 Create shared/schemas/ directory structure per plan.md
-- [ ] T002 Create shared/schemas/pyproject.toml with uv workspace config, LinkML and Pydantic v2 dependencies
-- [ ] T003 [P] Create shared/schemas/package.json with pnpm config, AJV and TypeScript dependencies
-- [ ] T004 [P] Create shared/schemas/Makefile with generate, test, and clean targets
-- [ ] T005 [P] Create shared/schemas/scripts/generate.py to orchestrate all generators
+- [x] T001 Create shared/schemas/ directory structure per plan.md
+- [x] T002 Create shared/schemas/pyproject.toml with uv workspace config, LinkML and Pydantic v2 dependencies
+- [x] T003 [P] Create shared/schemas/package.json with pnpm config, AJV and TypeScript dependencies
+- [x] T004 [P] Create shared/schemas/Makefile with generate, test, and clean targets
+- [x] T005 [P] Create shared/schemas/scripts/generate.py to orchestrate all generators
 
 ---
 
@@ -50,13 +50,13 @@ shared/schemas/
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T006 Create shared/schemas/src/linkml/debrief.yaml root schema with prefixes and imports
-- [ ] T007 [P] Create shared/schemas/src/generated/python/.gitkeep placeholder
-- [ ] T008 [P] Create shared/schemas/src/generated/json-schema/.gitkeep placeholder
-- [ ] T009 [P] Create shared/schemas/src/generated/typescript/.gitkeep placeholder
-- [ ] T010 [P] Create shared/schemas/src/fixtures/valid/.gitkeep placeholder
-- [ ] T011 [P] Create shared/schemas/src/fixtures/invalid/.gitkeep placeholder
-- [ ] T012 Verify `make generate` runs without error (empty generation)
+- [x] T006 Create shared/schemas/src/linkml/debrief.yaml root schema with prefixes and imports
+- [x] T007 [P] Create shared/schemas/src/generated/python/.gitkeep placeholder
+- [x] T008 [P] Create shared/schemas/src/generated/json-schema/.gitkeep placeholder
+- [x] T009 [P] Create shared/schemas/src/generated/typescript/.gitkeep placeholder
+- [x] T010 [P] Create shared/schemas/src/fixtures/valid/.gitkeep placeholder
+- [x] T011 [P] Create shared/schemas/src/fixtures/invalid/.gitkeep placeholder
+- [x] T012 Verify `make generate` runs without error (empty generation)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 

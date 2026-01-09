@@ -1,0 +1,10 @@
+{
+    "$id": "https://debrief.info/schemas/debrief",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "metamodel_version": "1.7.0",
+    "title": "debrief",
+    "type": "object",
+    "version": null
+}
+
