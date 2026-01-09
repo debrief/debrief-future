@@ -82,6 +82,8 @@ def generate_pydantic() -> bool:
 
 def generate_jsonschema() -> bool:
     """Generate JSON Schema from LinkML schema."""
+    import json
+
     if not MASTER_SCHEMA.exists():
         print(f"  ✗ Master schema not found: {MASTER_SCHEMA}")
         return False
@@ -98,6 +100,28 @@ def generate_jsonschema() -> bool:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
         output_file.write_text(result.stdout)
         print(f"  ✓ Generated: {output_file}")
+
+        # Generate per-entity schemas
+        full_schema = json.loads(result.stdout)
+        entity_types = [
+            "TrackFeature",
+            "SensorContact",
+            "ReferenceLocation",
+            "PlotMetadata",
+            "ToolMetadata",
+        ]
+        for entity in entity_types:
+            if entity in full_schema.get("$defs", {}):
+                entity_schema = {
+                    "$schema": "https://json-schema.org/draft/2019-09/schema",
+                    "$id": f"https://debrief.info/schemas/{entity}",
+                    **full_schema["$defs"][entity],
+                    "$defs": full_schema.get("$defs", {}),
+                }
+                entity_file = JSONSCHEMA_OUT / f"{entity}.schema.json"
+                entity_file.write_text(json.dumps(entity_schema, indent=2))
+                print(f"  ✓ Generated: {entity_file}")
+
         return True
     except subprocess.CalledProcessError as e:
         print(f"  ✗ gen-json-schema failed: {e.stderr}")

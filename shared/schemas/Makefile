@@ -30,12 +30,13 @@ test: test-python test-typescript
 
 test-python:
 	@echo "Running Python tests..."
-	pytest tests/ -v
+	uv run pytest tests/ -v
 	@echo "✓ Python tests passed"
 
 test-typescript:
 	@echo "Running TypeScript tests..."
-	pnpm test
+	pnpm exec node tests/validate-jsonschema.js
+	pnpm exec tsc --noEmit --project src/generated/typescript/tsconfig.json
 	@echo "✓ TypeScript tests passed"
 
 # === Validation Targets ===

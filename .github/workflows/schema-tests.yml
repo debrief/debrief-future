@@ -1,0 +1,89 @@
+name: Schema Tests
+
+on:
+  push:
+    branches: [main, "000-schemas"]
+    paths:
+      - 'shared/schemas/**'
+      - '.github/workflows/schema-tests.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'shared/schemas/**'
+      - '.github/workflows/schema-tests.yml'
+
+defaults:
+  run:
+    working-directory: shared/schemas
+
+jobs:
+  python-tests:
+    name: Python Schema Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run schema generation
+        run: uv run python scripts/generate.py
+
+      - name: Verify no uncommitted changes after generation
+        run: |
+          git diff --exit-code src/generated/ || {
+            echo "::error::Generated files are out of sync with schema definitions"
+            echo "Run 'make generate' and commit the changes"
+            exit 1
+          }
+
+      - name: Run golden fixture tests
+        run: uv run pytest tests/test_golden.py -v
+
+      - name: Run round-trip tests
+        run: uv run pytest tests/test_roundtrip.py -v
+
+      - name: Run schema comparison tests
+        run: uv run pytest tests/test_schema_compare.py -v
+
+  javascript-tests:
+    name: JavaScript Schema Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run JSON Schema validation
+        run: pnpm exec node tests/validate-jsonschema.js
+
+      - name: Verify TypeScript compilation
+        run: pnpm exec tsc --noEmit --project src/generated/typescript/tsconfig.json
+
+  all-tests:
+    name: All Schema Tests Pass
+    needs: [python-tests, javascript-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All schema tests passed"

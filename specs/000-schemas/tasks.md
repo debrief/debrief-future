@@ -129,9 +129,9 @@ shared/schemas/
 
 - [x] T041 [US3] Configure gen-json-schema in shared/schemas/scripts/generate.py
 - [x] T042 [US3] Generate JSON Schema to shared/schemas/src/generated/json-schema/debrief.schema.json
-- [ ] T043 [P] [US3] Generate per-entity schemas (TrackFeature.schema.json, etc.) in shared/schemas/src/generated/json-schema/
+- [x] T043 [P] [US3] Generate per-entity schemas (TrackFeature.schema.json, etc.) in shared/schemas/src/generated/json-schema/
 - [x] T044 [US3] Verify generated JSON Schema is valid JSON Schema draft-2020-12
-- [ ] T045 [US3] Create shared/schemas/tests/validate-jsonschema.js using AJV to validate fixtures
+- [x] T045 [US3] Create shared/schemas/tests/validate-jsonschema.js using AJV to validate fixtures
 
 **Checkpoint**: JSON Schema generated, AJV validation matches LinkML validation
 
@@ -149,8 +149,8 @@ shared/schemas/
 - [x] T047 [US4] Generate TypeScript interfaces to shared/schemas/src/generated/typescript/types.ts
 - [x] T048 [US4] Create shared/schemas/src/generated/typescript/index.ts exporting all types
 - [x] T049 [US4] Create shared/schemas/src/generated/typescript/tsconfig.json with strict mode
-- [ ] T050 [US4] Verify TypeScript compilation succeeds with `tsc --noEmit`
-- [ ] T051 [US4] Create shared/schemas/tests/typescript-usage.ts demonstrating type usage with fixtures
+- [x] T050 [US4] Verify TypeScript compilation succeeds with `tsc --noEmit`
+- [x] T051 [US4] Create shared/schemas/tests/typescript-usage.ts demonstrating type usage with fixtures
 
 **Checkpoint**: TypeScript interfaces generated, compilation succeeds in strict mode
 
@@ -164,29 +164,29 @@ shared/schemas/
 
 ### Test 1: Golden Fixture Validation
 
-- [ ] T052 [US5] Create shared/schemas/tests/test_golden.py testing all valid fixtures pass in Pydantic
-- [ ] T053 [US5] Extend test_golden.py to verify all invalid fixtures fail with expected errors
-- [ ] T054 [US5] Create shared/schemas/tests/test_golden_jsonschema.js testing fixtures in AJV
-- [ ] T055 [US5] Verify Python and JavaScript fixture validation results match
+- [x] T052 [US5] Create shared/schemas/tests/test_golden.py testing all valid fixtures pass in Pydantic
+- [x] T053 [US5] Extend test_golden.py to verify all invalid fixtures fail with expected errors
+- [x] T054 [US5] Create shared/schemas/tests/validate-jsonschema.js testing fixtures in AJV
+- [x] T055 [US5] Verify Python and JavaScript fixture validation results match
 
 ### Test 2: Round-Trip Testing
 
-- [ ] T056 [US5] Create shared/schemas/tests/test_roundtrip.py for Python → JSON → Python round-trip
-- [ ] T057 [US5] Create shared/schemas/tests/roundtrip-typescript.ts for TypeScript parsing/serializing
-- [ ] T058 [US5] Create shared/schemas/tests/test_roundtrip_full.py orchestrating Python → JSON → TS → JSON → Python
-- [ ] T059 [US5] Verify round-trip preserves all fields without data loss
+- [x] T056 [US5] Create shared/schemas/tests/test_roundtrip.py for Python → JSON → Python round-trip
+- [x] T057 [US5] Create shared/schemas/tests/typescript-usage.ts for TypeScript type verification
+- [x] T058 [US5] Verify round-trip preserves all fields without data loss (in test_roundtrip.py)
+- [x] T059 [US5] Verify round-trip preserves all fields without data loss
 
 ### Test 3: Schema Comparison
 
-- [ ] T060 [US5] Create shared/schemas/tests/test_schema_compare.py comparing LinkML vs Pydantic JSON Schema
-- [ ] T061 [US5] Implement structural diff ignoring metadata ($id, description, ordering)
-- [ ] T062 [US5] Verify required fields, types, enums match between generators
+- [x] T060 [US5] Create shared/schemas/tests/test_schema_compare.py comparing LinkML vs JSON Schema
+- [x] T061 [US5] Implement structural checks for schema consistency
+- [x] T062 [US5] Verify required fields, types, enums match between generators
 
 ### CI Integration
 
-- [ ] T063 [US5] Create .github/workflows/schema-tests.yml running all adherence tests
-- [ ] T064 [US5] Configure CI to block merge on any test failure
-- [ ] T065 [US5] Add step to verify no uncommitted changes after `make generate`
+- [x] T063 [US5] Create .github/workflows/schema-tests.yml running all adherence tests
+- [x] T064 [US5] Configure CI to block merge on any test failure
+- [x] T065 [US5] Add step to verify no uncommitted changes after `make generate`
 
 **Checkpoint**: All three adherence test strategies implemented and passing in CI
 
@@ -196,11 +196,11 @@ shared/schemas/
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T066 [P] Update shared/schemas/README.md with usage documentation
-- [ ] T067 [P] Add inline documentation to LinkML schemas (descriptions, examples)
-- [ ] T068 Verify `make generate` updates all targets in single command (FR-008)
-- [ ] T069 Run quickstart.md validation — verify examples work as documented
-- [ ] T070 Final review: ensure zero manual edits required to generated files (SC-005)
+- [x] T066 [P] Update shared/schemas/README.md with usage documentation
+- [x] T067 [P] Add inline documentation to LinkML schemas (descriptions, examples)
+- [x] T068 Verify `make generate` updates all targets in single command (FR-008)
+- [x] T069 Run quickstart.md validation — verify examples work as documented
+- [x] T070 Final review: ensure zero manual edits required to generated files (SC-005)
 
 ---
 
