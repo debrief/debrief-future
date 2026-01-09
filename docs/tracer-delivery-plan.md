@@ -10,16 +10,21 @@
 
 ```
 debrief/
-├── schemas/                    # LinkML master schemas + generators
-│   ├── src/
-│   │   ├── linkml/            # Master .yaml schemas
-│   │   ├── generated/
-│   │   │   ├── python/        # Pydantic models
-│   │   │   ├── json-schema/   # JSON Schema exports
-│   │   │   └── typescript/    # TypeScript interfaces
-│   │   └── fixtures/          # Golden test data
-│   ├── tests/                 # Adherence tests (all three strategies)
-│   └── pyproject.toml
+├── shared/
+│   ├── schemas/                # LinkML master schemas + generators
+│   │   ├── src/
+│   │   │   ├── linkml/        # Master .yaml schemas
+│   │   │   ├── generated/
+│   │   │   │   ├── python/    # Pydantic models
+│   │   │   │   ├── json-schema/
+│   │   │   │   └── typescript/
+│   │   │   └── fixtures/      # Golden test data
+│   │   ├── tests/             # Adherence tests (all three strategies)
+│   │   └── pyproject.toml
+│   │
+│   └── components/             # Shared React components (map, timeline, etc.)
+│       ├── src/
+│       └── package.json
 │
 ├── services/
 │   ├── mcp-common/            # Shared MCP utilities (singleton)
@@ -77,7 +82,30 @@ debrief/
 └── LICENSE
 ```
 
+## Folder Purposes
+
+| Folder | Purpose |
+|--------|---------|
+| `/shared/` | Libraries consumed by other packages (schemas, UI components) |
+| `/services/` | Python services that run independently |
+| `/apps/` | Deployable frontends |
+| `/contrib/` | Organisation-specific extensions |
+| `/docs/` | Detailed documentation |
+
 ## Extension Model
+
+**Singleton services** — one instance, shared by all:
+- `stac` — STAC catalog operations
+- `config` — user state management  
+- `mcp-common` — shared MCP infrastructure
+
+**Extensible services** — core in `/services/`, org-specific in `/contrib/`:
+- `io` — file format handlers
+- `calc` — analysis tools
+
+Organisations can either:
+1. Add their extensions to `/contrib/{org}/` in the main repo
+2. Maintain a separate repo with the same structure
 
 **Singleton services** — one instance, shared by all:
 - `stac` — STAC catalog operations
@@ -189,7 +217,7 @@ Display and interaction.
 
 Three complementary approaches:
 
-1. **Golden fixtures** — `/schemas/fixtures/` contains canonical valid/invalid JSON. Each language loads and validates.
+1. **Golden fixtures** — `/shared/schemas/fixtures/` contains canonical valid/invalid JSON. Each language loads and validates.
 
 2. **Round-trip tests** — Python generates data → JSON → TypeScript deserializes → serializes → Python validates. Proves interoperability.
 

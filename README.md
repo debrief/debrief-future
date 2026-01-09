@@ -41,7 +41,9 @@ Key principles:
 
 ```
 debrief/
-├── schemas/           # LinkML master schemas + generators
+├── shared/            # Libraries consumed by other packages
+│   ├── schemas/       # LinkML + generated Pydantic/JSON Schema/TypeScript
+│   └── components/    # Shared React components (map, timeline, etc.)
 ├── services/          # Core services (stac, io, calc, config, mcp-common)
 ├── contrib/           # Organisation-specific extensions
 ├── apps/              # Electron loader, VS Code extension

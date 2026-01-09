@@ -32,6 +32,17 @@ Changes propagate automatically. No drift between Python and TypeScript represen
 
 ## Component Overview
 
+### Shared Libraries
+
+Located in `/shared/`, consumed by services and apps:
+
+| Library | Purpose |
+|---------|---------|
+| `schemas` | LinkML master schemas, generated Pydantic/JSON Schema/TypeScript |
+| `components` | Shared React components (map, timeline, feature list) |
+
+The components library enables UI consistency across Electron apps, VS Code extension webviews, and browser deployments.
+
 ### Singleton Services
 
 These exist once, shared across all deployments:
@@ -92,7 +103,7 @@ Debrief defines conventions for GeoJSON properties:
 - Sensor contacts link to parent tracks
 - Analysis results reference input features
 
-Full profile documented in `/schemas/`.
+Full profile documented in `/shared/schemas/`.
 
 ## Integration Layer
 
