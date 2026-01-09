@@ -108,12 +108,12 @@ shared/schemas/
 
 ### Implementation for User Story 2
 
-- [ ] T035 [US2] Configure gen-pydantic in shared/schemas/scripts/generate.py with --extra-fields forbid --black
-- [ ] T036 [US2] Generate Pydantic models to shared/schemas/src/generated/python/debrief_schemas/__init__.py
-- [ ] T037 [US2] Create shared/schemas/src/generated/python/debrief_schemas/py.typed marker for PEP 561
-- [ ] T038 [US2] Verify generated models import without error in Python
-- [ ] T039 [US2] Verify TrackFeature model accepts valid fixture data
-- [ ] T040 [US2] Verify TrackFeature model rejects invalid fixture data with ValidationError
+- [x] T035 [US2] Configure gen-pydantic in shared/schemas/scripts/generate.py with --extra-fields forbid --black
+- [x] T036 [US2] Generate Pydantic models to shared/schemas/src/generated/python/debrief_schemas/__init__.py
+- [x] T037 [US2] Create shared/schemas/src/generated/python/debrief_schemas/py.typed marker for PEP 561
+- [x] T038 [US2] Verify generated models import without error in Python
+- [x] T039 [US2] Verify TrackFeature model accepts valid fixture data
+- [x] T040 [US2] Verify TrackFeature model rejects invalid fixture data with ValidationError
 
 **Checkpoint**: Pydantic models generated and validated against fixtures
 
@@ -127,10 +127,10 @@ shared/schemas/
 
 ### Implementation for User Story 3
 
-- [ ] T041 [US3] Configure gen-json-schema in shared/schemas/scripts/generate.py
-- [ ] T042 [US3] Generate JSON Schema to shared/schemas/src/generated/json-schema/debrief.schema.json
+- [x] T041 [US3] Configure gen-json-schema in shared/schemas/scripts/generate.py
+- [x] T042 [US3] Generate JSON Schema to shared/schemas/src/generated/json-schema/debrief.schema.json
 - [ ] T043 [P] [US3] Generate per-entity schemas (TrackFeature.schema.json, etc.) in shared/schemas/src/generated/json-schema/
-- [ ] T044 [US3] Verify generated JSON Schema is valid JSON Schema draft-2020-12
+- [x] T044 [US3] Verify generated JSON Schema is valid JSON Schema draft-2020-12
 - [ ] T045 [US3] Create shared/schemas/tests/validate-jsonschema.js using AJV to validate fixtures
 
 **Checkpoint**: JSON Schema generated, AJV validation matches LinkML validation
@@ -145,10 +145,10 @@ shared/schemas/
 
 ### Implementation for User Story 4
 
-- [ ] T046 [US4] Configure gen-typescript in shared/schemas/scripts/generate.py
-- [ ] T047 [US4] Generate TypeScript interfaces to shared/schemas/src/generated/typescript/types.ts
-- [ ] T048 [US4] Create shared/schemas/src/generated/typescript/index.ts exporting all types
-- [ ] T049 [US4] Create shared/schemas/src/generated/typescript/tsconfig.json with strict mode
+- [x] T046 [US4] Configure gen-typescript in shared/schemas/scripts/generate.py
+- [x] T047 [US4] Generate TypeScript interfaces to shared/schemas/src/generated/typescript/types.ts
+- [x] T048 [US4] Create shared/schemas/src/generated/typescript/index.ts exporting all types
+- [x] T049 [US4] Create shared/schemas/src/generated/typescript/tsconfig.json with strict mode
 - [ ] T050 [US4] Verify TypeScript compilation succeeds with `tsc --noEmit`
 - [ ] T051 [US4] Create shared/schemas/tests/typescript-usage.ts demonstrating type usage with fixtures
 
