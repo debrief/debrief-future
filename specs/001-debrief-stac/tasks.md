@@ -27,12 +27,12 @@
 
 **Purpose**: Initialize debrief-stac service with proper Python packaging
 
-- [ ] T001 Create service directory structure at services/stac/
-- [ ] T002 Initialize pyproject.toml with uv workspace configuration at services/stac/pyproject.toml
-- [ ] T003 [P] Create package __init__.py with version info at services/stac/src/debrief_stac/__init__.py
-- [ ] T004 [P] Configure pytest and test structure at services/stac/tests/conftest.py
-- [ ] T005 Add debrief-stac to root uv workspace in pyproject.toml
-- [ ] T006 [P] Create py.typed marker for type hints at services/stac/src/debrief_stac/py.typed
+- [x] T001 Create service directory structure at services/stac/
+- [x] T002 Initialize pyproject.toml with uv workspace configuration at services/stac/pyproject.toml
+- [x] T003 [P] Create package __init__.py with version info at services/stac/src/debrief_stac/__init__.py
+- [x] T004 [P] Configure pytest and test structure at services/stac/tests/conftest.py
+- [x] T005 Add debrief-stac to root uv workspace in pyproject.toml
+- [x] T006 [P] Create py.typed marker for type hints at services/stac/src/debrief_stac/py.typed
 
 **Checkpoint**: Package installable via `uv pip install -e services/stac`
 
@@ -44,10 +44,10 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Define PlotMetadata Pydantic model at services/stac/src/debrief_stac/models.py
-- [ ] T008 Define STAC-specific exceptions (CatalogExistsError, PlotNotFoundError, etc.) at services/stac/src/debrief_stac/exceptions.py
-- [ ] T009 [P] Create type aliases for STAC structures at services/stac/src/debrief_stac/types.py
-- [ ] T010 [P] Create shared fixtures for tests (temp directories, sample metadata) at services/stac/tests/fixtures.py
+- [x] T007 Define PlotMetadata Pydantic model at services/stac/src/debrief_stac/models.py
+- [x] T008 Define STAC-specific exceptions (CatalogExistsError, PlotNotFoundError, etc.) at services/stac/src/debrief_stac/exceptions.py
+- [x] T009 [P] Create type aliases for STAC structures at services/stac/src/debrief_stac/types.py
+- [x] T010 [P] Create shared fixtures for tests (temp directories, sample metadata) at services/stac/tests/fixtures.py
 
 **Checkpoint**: Foundation ready - user story implementation can begin
 
@@ -63,16 +63,16 @@
 
 > **Write tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T011 [P] [US1] Unit test for create_catalog success case at services/stac/tests/test_catalog.py
-- [ ] T012 [P] [US1] Unit test for create_catalog with existing catalog (should fail) at services/stac/tests/test_catalog.py
-- [ ] T013 [P] [US1] Unit test for create_catalog permission error at services/stac/tests/test_catalog.py
+- [x] T011 [P] [US1] Unit test for create_catalog success case at services/stac/tests/test_catalog.py
+- [x] T012 [P] [US1] Unit test for create_catalog with existing catalog (should fail) at services/stac/tests/test_catalog.py
+- [x] T013 [P] [US1] Unit test for create_catalog permission error at services/stac/tests/test_catalog.py
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Implement create_catalog() function at services/stac/src/debrief_stac/catalog.py
-- [ ] T015 [US1] Add STAC catalog.json generation with correct spec version at services/stac/src/debrief_stac/catalog.py
-- [ ] T016 [US1] Add validation for directory existence and permissions at services/stac/src/debrief_stac/catalog.py
-- [ ] T017 [US1] Add open_catalog() function to load existing catalog at services/stac/src/debrief_stac/catalog.py
+- [x] T014 [US1] Implement create_catalog() function at services/stac/src/debrief_stac/catalog.py
+- [x] T015 [US1] Add STAC catalog.json generation with correct spec version at services/stac/src/debrief_stac/catalog.py
+- [x] T016 [US1] Add validation for directory existence and permissions at services/stac/src/debrief_stac/catalog.py
+- [x] T017 [US1] Add open_catalog() function to load existing catalog at services/stac/src/debrief_stac/catalog.py
 
 **Checkpoint**: Can create and open local STAC catalogs
 
@@ -86,16 +86,16 @@
 
 ### Tests for User Story 2
 
-- [ ] T018 [P] [US2] Unit test for create_plot with valid metadata at services/stac/tests/test_plot.py
-- [ ] T019 [P] [US2] Unit test for create_plot updates catalog links at services/stac/tests/test_plot.py
-- [ ] T020 [P] [US2] Unit test for create_plot with title and description at services/stac/tests/test_plot.py
+- [x] T018 [P] [US2] Unit test for create_plot with valid metadata at services/stac/tests/test_plot.py
+- [x] T019 [P] [US2] Unit test for create_plot updates catalog links at services/stac/tests/test_plot.py
+- [x] T020 [P] [US2] Unit test for create_plot with title and description at services/stac/tests/test_plot.py
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Implement create_plot() function at services/stac/src/debrief_stac/plot.py
-- [ ] T022 [US2] Generate STAC Item structure with properties from PlotMetadata at services/stac/src/debrief_stac/plot.py
-- [ ] T023 [US2] Update catalog links to include new plot at services/stac/src/debrief_stac/plot.py
-- [ ] T024 [US2] Create plot directory with item.json at services/stac/src/debrief_stac/plot.py
+- [x] T021 [US2] Implement create_plot() function at services/stac/src/debrief_stac/plot.py
+- [x] T022 [US2] Generate STAC Item structure with properties from PlotMetadata at services/stac/src/debrief_stac/plot.py
+- [x] T023 [US2] Update catalog links to include new plot at services/stac/src/debrief_stac/plot.py
+- [x] T024 [US2] Create plot directory with item.json at services/stac/src/debrief_stac/plot.py
 
 **Checkpoint**: Can create plots within catalogs
 
@@ -109,15 +109,15 @@
 
 ### Tests for User Story 3
 
-- [ ] T025 [P] [US3] Unit test for read_plot returns complete STAC Item at services/stac/tests/test_plot.py
-- [ ] T026 [P] [US3] Unit test for read_plot with non-existent ID raises NotFoundError at services/stac/tests/test_plot.py
-- [ ] T027 [P] [US3] Unit test for read_plot includes asset hrefs at services/stac/tests/test_plot.py
+- [x] T025 [P] [US3] Unit test for read_plot returns complete STAC Item at services/stac/tests/test_plot.py
+- [x] T026 [P] [US3] Unit test for read_plot with non-existent ID raises NotFoundError at services/stac/tests/test_plot.py
+- [x] T027 [P] [US3] Unit test for read_plot includes asset hrefs at services/stac/tests/test_plot.py
 
 ### Implementation for User Story 3
 
-- [ ] T028 [US3] Implement read_plot() function at services/stac/src/debrief_stac/plot.py
-- [ ] T029 [US3] Add plot ID resolution from catalog links at services/stac/src/debrief_stac/plot.py
-- [ ] T030 [US3] Load and validate STAC Item JSON at services/stac/src/debrief_stac/plot.py
+- [x] T028 [US3] Implement read_plot() function at services/stac/src/debrief_stac/plot.py
+- [x] T029 [US3] Add plot ID resolution from catalog links at services/stac/src/debrief_stac/plot.py
+- [x] T030 [US3] Load and validate STAC Item JSON at services/stac/src/debrief_stac/plot.py
 
 **Checkpoint**: Can read plots by ID from catalog
 
@@ -131,19 +131,19 @@
 
 ### Tests for User Story 4
 
-- [ ] T031 [P] [US4] Unit test for add_features creates FeatureCollection asset at services/stac/tests/test_features.py
-- [ ] T032 [P] [US4] Unit test for add_features appends to existing FeatureCollection at services/stac/tests/test_features.py
-- [ ] T033 [P] [US4] Unit test for add_features updates plot bbox at services/stac/tests/test_features.py
-- [ ] T034 [P] [US4] Unit test for add_features validates against Pydantic models at services/stac/tests/test_features.py
+- [x] T031 [P] [US4] Unit test for add_features creates FeatureCollection asset at services/stac/tests/test_features.py
+- [x] T032 [P] [US4] Unit test for add_features appends to existing FeatureCollection at services/stac/tests/test_features.py
+- [x] T033 [P] [US4] Unit test for add_features updates plot bbox at services/stac/tests/test_features.py
+- [x] T034 [P] [US4] Unit test for add_features validates against Pydantic models at services/stac/tests/test_features.py
 
 ### Implementation for User Story 4
 
-- [ ] T035 [US4] Implement add_features() function at services/stac/src/debrief_stac/features.py
-- [ ] T036 [US4] Create FeatureCollection asset with role "data" at services/stac/src/debrief_stac/features.py
-- [ ] T037 [US4] Implement feature appending to existing FeatureCollection at services/stac/src/debrief_stac/features.py
-- [ ] T038 [US4] Implement bbox calculation from feature geometries at services/stac/src/debrief_stac/features.py
-- [ ] T039 [US4] Update STAC Item bbox and datetime range at services/stac/src/debrief_stac/features.py
-- [ ] T040 [US4] Validate features using generated Pydantic models (TrackFeature, ReferenceLocation) at services/stac/src/debrief_stac/features.py
+- [x] T035 [US4] Implement add_features() function at services/stac/src/debrief_stac/features.py
+- [x] T036 [US4] Create FeatureCollection asset with role "data" at services/stac/src/debrief_stac/features.py
+- [x] T037 [US4] Implement feature appending to existing FeatureCollection at services/stac/src/debrief_stac/features.py
+- [x] T038 [US4] Implement bbox calculation from feature geometries at services/stac/src/debrief_stac/features.py
+- [x] T039 [US4] Update STAC Item bbox and datetime range at services/stac/src/debrief_stac/features.py
+- [x] T040 [US4] Validate features using generated Pydantic models (TrackFeature, ReferenceLocation) at services/stac/src/debrief_stac/features.py
 
 **Checkpoint**: Can add validated GeoJSON features to plots
 

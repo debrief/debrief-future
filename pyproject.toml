@@ -1,0 +1,15 @@
+[project]
+name = "debrief"
+version = "4.0.0"
+description = "Debrief v4.x - Maritime tactical analysis platform"
+requires-python = ">=3.11"
+
+[tool.uv.workspace]
+members = [
+    "shared/schemas",
+    "services/stac",
+]
+
+[tool.uv.sources]
+debrief-schemas = { workspace = true }
+debrief-stac = { workspace = true }
