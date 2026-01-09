@@ -107,19 +107,6 @@ Organisations can either:
 1. Add their extensions to `/contrib/{org}/` in the main repo
 2. Maintain a separate repo with the same structure
 
-**Singleton services** — one instance, shared by all:
-- `stac` — STAC catalog operations
-- `config` — user state management  
-- `mcp-common` — shared MCP infrastructure
-
-**Extensible services** — core in `/services/`, org-specific in `/contrib/`:
-- `io` — file format handlers
-- `calc` — analysis tools
-
-Organisations can either:
-1. Add their extensions to `/contrib/{org}/` in the main repo
-2. Maintain a separate repo with the same structure
-
 ## Tooling
 
 | Concern | Choice |
@@ -187,6 +174,10 @@ Electron orchestration.
 - Calls debrief-stac → writes to plot
 - Copies source file to assets, records PROV
 
+**Beta preview:** Storybook deployment of UI components (file picker, store selector).
+
+**Feedback pause:** 1 week to gather input on load workflow UX.
+
 **Exit criteria:** Right-click REP file → choose destination → file loaded into STAC plot with provenance.
 
 ### Stage 5: debrief-calc
@@ -210,6 +201,10 @@ Display and interaction.
 - Selection model
 - Tool discovery via debrief-calc MCP
 - Execute tool → write result → refresh display
+
+**Beta preview:** Pre-release extension published to VS Code Marketplace.
+
+**Feedback pause:** 1 week to gather input on map display, selection UX, tool invocation.
 
 **Exit criteria:** Full workflow demonstrable end-to-end.
 
@@ -242,6 +237,39 @@ Stage 6 (vscode) ← depends on stac, calc, config
 ```
 
 Note: Stages 2, 3, and 5 could partially overlap once Stage 1 establishes patterns.
+
+## Community Engagement
+
+Each stage with user-facing output includes a **beta preview** and **feedback pause** per Constitution Article XI.
+
+### Feedback Points
+
+| Stage | Beta Preview | Feedback Focus |
+|-------|--------------|----------------|
+| Stage 4 (Loader) | Storybook: file picker, store selector UI | UX for load workflow |
+| Stage 6 (VS Code) | Deployed extension (pre-release) | Map display, selection, tool invocation |
+
+### Feedback Rhythm
+
+For each feedback point:
+
+1. **Deploy beta preview** — Storybook components or pre-release extension
+2. **Auto-generate GitHub Discussion** — requirements, strategy, specific feedback prompts
+3. **Announce on LinkedIn** — drive stakeholders to preview + Discussion
+4. **1-week feedback pause** — deliberate hold on feature development
+5. **AI summarises feedback** — digest of themes, questions, suggestions
+6. **Incorporate refinements** — address feedback before proceeding
+7. **Document decisions** — capture what changed and why
+
+### Early Engagement (Pre-UI)
+
+Stages 0-3 produce no user-facing UI, but can still engage stakeholders:
+
+- **"What's Coming" blog posts** — share schema designs, architecture decisions
+- **Technical deep dives** — explain STAC structure, GeoJSON profile
+- **Diagrams and flowcharts** — visualise data flow before code exists
+
+This builds audience and invites early input on foundational decisions.
 
 ## Risks
 
