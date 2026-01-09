@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "id": "contact-001",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-4.95, 50.05]
+  },
+  "properties": {
+    "parent_track_id": "track-001",
+    "sensor_type": "SONAR_PASSIVE",
+    "time": "2026-01-09T10:30:00Z",
+    "bearing": 135,
+    "bearing_error": 2,
+    "frequency": 150,
+    "label": "Possible submarine"
+  }
+}

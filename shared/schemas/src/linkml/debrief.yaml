@@ -17,21 +17,14 @@ default_range: string
 
 imports:
   - linkml:types
-  # Module imports will be added as schemas are created
-  # - common
-  # - geojson
-  # - stac
-  # - tools
+  - common
+  - geojson
+  - stac
+  - tools
 
-# Placeholder classes - will be replaced when module schemas are created
-classes:
-  # Base placeholder to allow initial generation
-  DebriefEntity:
-    description: Base class for all Debrief entities
-    abstract: true
-    attributes:
-      id:
-        description: Unique identifier
-        required: true
-
-# Enums will be defined in common.yaml and imported
+# Root schema imports all modules - no additional classes needed here.
+# All entity definitions are in their respective module files:
+#   - common.yaml: Enums, base types (TimestampedPosition, SourceFile)
+#   - geojson.yaml: TrackFeature, SensorContact, ReferenceLocation
+#   - stac.yaml: PlotMetadata
+#   - tools.yaml: ToolMetadata

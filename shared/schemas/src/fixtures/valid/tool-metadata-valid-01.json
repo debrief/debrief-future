@@ -1,0 +1,24 @@
+{
+  "id": "calc-range-bearing",
+  "name": "Range and Bearing",
+  "description": "Calculate range and bearing between two points on selected tracks",
+  "version": "1.0.0",
+  "category": "GEOMETRY",
+  "selection_context": ["MULTIPLE_TRACKS", "TIME_PERIOD"],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "reference_track": {"type": "string"},
+      "target_track": {"type": "string"},
+      "time": {"type": "string", "format": "date-time"}
+    },
+    "required": ["reference_track", "target_track", "time"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "range_nm": {"type": "number"},
+      "bearing_deg": {"type": "number"}
+    }
+  }
+}

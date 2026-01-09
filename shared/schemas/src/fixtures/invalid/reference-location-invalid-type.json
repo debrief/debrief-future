@@ -1,0 +1,12 @@
+{
+  "type": "Feature",
+  "id": "ref-invalid-002",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-5.5, 50.0]
+  },
+  "properties": {
+    "name": "Invalid Location",
+    "location_type": "UNKNOWN_TYPE"
+  }
+}

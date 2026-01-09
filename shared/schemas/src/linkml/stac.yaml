@@ -1,0 +1,77 @@
+id: https://debrief.info/schemas/stac
+name: stac
+title: Debrief STAC Extensions
+description: >-
+  STAC Item property extensions for Debrief plots. Defines PlotMetadata
+  that extends standard STAC Item properties with maritime analysis context.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+  stac: https://stac-extensions.github.io/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+  - common
+
+# ============================================================================
+# PlotMetadata
+# ============================================================================
+
+classes:
+  PlotMetadata:
+    description: STAC Item properties for a Debrief plot
+    attributes:
+      id:
+        description: Unique plot identifier
+        required: true
+      title:
+        description: Human-readable plot title
+        required: true
+      description:
+        description: Plot description
+      datetime:
+        description: Single datetime (if not range)
+        range: datetime
+      start_datetime:
+        description: Start of temporal extent
+        range: datetime
+      end_datetime:
+        description: End of temporal extent
+        range: datetime
+      created:
+        description: Plot creation timestamp
+        range: datetime
+        required: true
+      updated:
+        description: Last update timestamp
+        range: datetime
+        required: true
+      source_files:
+        description: List of source files
+        range: SourceFile
+        multivalued: true
+        required: true
+        minimum_cardinality: 1
+      platform_ids:
+        description: Platforms included in plot
+        multivalued: true
+      exercise_name:
+        description: Exercise/operation name
+      classification:
+        description: Security classification
+    rules:
+      - preconditions:
+          slot_conditions:
+            datetime:
+              value_presence: ABSENT
+        postconditions:
+          slot_conditions:
+            start_datetime:
+              required: true
+            end_datetime:
+              required: true
+        description: If datetime is absent, both start_datetime and end_datetime are required

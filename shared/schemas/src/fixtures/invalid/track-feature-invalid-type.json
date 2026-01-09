@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "id": "track-invalid-002",
+  "geometry": {
+    "type": "LineString",
+    "coordinates": [
+      [-5.0, 50.0],
+      [-4.9, 50.1]
+    ]
+  },
+  "properties": {
+    "platform_id": "HMS-EXAMPLE",
+    "track_type": "INVALID_TYPE",
+    "start_time": "2026-01-09T10:00:00Z",
+    "end_time": "2026-01-09T12:00:00Z",
+    "positions": [
+      {"time": "2026-01-09T10:00:00Z", "coordinates": [-5.0, 50.0]},
+      {"time": "2026-01-09T12:00:00Z", "coordinates": [-4.9, 50.1]}
+    ]
+  }
+}

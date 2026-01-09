@@ -70,31 +70,31 @@ shared/schemas/
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] Define common types (enums, base classes) in shared/schemas/src/linkml/common.yaml
-- [ ] T014 [P] [US1] Define TrackFeature schema in shared/schemas/src/linkml/geojson.yaml
-- [ ] T015 [P] [US1] Define SensorContact schema in shared/schemas/src/linkml/geojson.yaml
-- [ ] T016 [P] [US1] Define ReferenceLocation schema in shared/schemas/src/linkml/geojson.yaml
-- [ ] T017 [P] [US1] Define PlotMetadata schema in shared/schemas/src/linkml/stac.yaml
-- [ ] T018 [P] [US1] Define ToolMetadata schema in shared/schemas/src/linkml/tools.yaml
-- [ ] T019 [US1] Update shared/schemas/src/linkml/debrief.yaml to import all schema modules
-- [ ] T020 [US1] Verify LinkML schemas compile with `linkml-validate --schema debrief.yaml`
+- [x] T013 [US1] Define common types (enums, base classes) in shared/schemas/src/linkml/common.yaml
+- [x] T014 [P] [US1] Define TrackFeature schema in shared/schemas/src/linkml/geojson.yaml
+- [x] T015 [P] [US1] Define SensorContact schema in shared/schemas/src/linkml/geojson.yaml
+- [x] T016 [P] [US1] Define ReferenceLocation schema in shared/schemas/src/linkml/geojson.yaml
+- [x] T017 [P] [US1] Define PlotMetadata schema in shared/schemas/src/linkml/stac.yaml
+- [x] T018 [P] [US1] Define ToolMetadata schema in shared/schemas/src/linkml/tools.yaml
+- [x] T019 [US1] Update shared/schemas/src/linkml/debrief.yaml to import all schema modules
+- [x] T020 [US1] Verify LinkML schemas compile with `linkml-validate --schema debrief.yaml`
 
 ### Golden Fixtures for User Story 1
 
-- [ ] T021 [P] [US1] Create valid TrackFeature fixture in shared/schemas/src/fixtures/valid/track-feature-valid-01.json
-- [ ] T022 [P] [US1] Create valid TrackFeature fixture in shared/schemas/src/fixtures/valid/track-feature-valid-02.json
-- [ ] T023 [P] [US1] Create invalid TrackFeature fixture in shared/schemas/src/fixtures/invalid/track-feature-missing-required.json
-- [ ] T024 [P] [US1] Create invalid TrackFeature fixture in shared/schemas/src/fixtures/invalid/track-feature-invalid-type.json
-- [ ] T025 [P] [US1] Create valid SensorContact fixture in shared/schemas/src/fixtures/valid/sensor-contact-valid-01.json
-- [ ] T026 [P] [US1] Create valid SensorContact fixture in shared/schemas/src/fixtures/valid/sensor-contact-valid-02.json
-- [ ] T027 [P] [US1] Create invalid SensorContact fixtures in shared/schemas/src/fixtures/invalid/sensor-contact-*.json (2 files)
-- [ ] T028 [P] [US1] Create valid ReferenceLocation fixtures in shared/schemas/src/fixtures/valid/reference-location-*.json (2 files)
-- [ ] T029 [P] [US1] Create invalid ReferenceLocation fixtures in shared/schemas/src/fixtures/invalid/reference-location-*.json (2 files)
-- [ ] T030 [P] [US1] Create valid PlotMetadata fixtures in shared/schemas/src/fixtures/valid/plot-metadata-*.json (2 files)
-- [ ] T031 [P] [US1] Create invalid PlotMetadata fixtures in shared/schemas/src/fixtures/invalid/plot-metadata-*.json (2 files)
-- [ ] T032 [P] [US1] Create valid ToolMetadata fixtures in shared/schemas/src/fixtures/valid/tool-metadata-*.json (2 files)
-- [ ] T033 [P] [US1] Create invalid ToolMetadata fixtures in shared/schemas/src/fixtures/invalid/tool-metadata-*.json (2 files)
-- [ ] T034 [US1] Validate all fixtures against LinkML schema using linkml-validate
+- [x] T021 [P] [US1] Create valid TrackFeature fixture in shared/schemas/src/fixtures/valid/track-feature-valid-01.json
+- [x] T022 [P] [US1] Create valid TrackFeature fixture in shared/schemas/src/fixtures/valid/track-feature-valid-02.json
+- [x] T023 [P] [US1] Create invalid TrackFeature fixture in shared/schemas/src/fixtures/invalid/track-feature-missing-required.json
+- [x] T024 [P] [US1] Create invalid TrackFeature fixture in shared/schemas/src/fixtures/invalid/track-feature-invalid-type.json
+- [x] T025 [P] [US1] Create valid SensorContact fixture in shared/schemas/src/fixtures/valid/sensor-contact-valid-01.json
+- [x] T026 [P] [US1] Create valid SensorContact fixture in shared/schemas/src/fixtures/valid/sensor-contact-valid-02.json
+- [x] T027 [P] [US1] Create invalid SensorContact fixtures in shared/schemas/src/fixtures/invalid/sensor-contact-*.json (2 files)
+- [x] T028 [P] [US1] Create valid ReferenceLocation fixtures in shared/schemas/src/fixtures/valid/reference-location-*.json (2 files)
+- [x] T029 [P] [US1] Create invalid ReferenceLocation fixtures in shared/schemas/src/fixtures/invalid/reference-location-*.json (2 files)
+- [x] T030 [P] [US1] Create valid PlotMetadata fixtures in shared/schemas/src/fixtures/valid/plot-metadata-*.json (2 files)
+- [x] T031 [P] [US1] Create invalid PlotMetadata fixtures in shared/schemas/src/fixtures/invalid/plot-metadata-*.json (2 files)
+- [x] T032 [P] [US1] Create valid ToolMetadata fixtures in shared/schemas/src/fixtures/valid/tool-metadata-*.json (2 files)
+- [x] T033 [P] [US1] Create invalid ToolMetadata fixtures in shared/schemas/src/fixtures/invalid/tool-metadata-*.json (2 files)
+- [x] T034 [US1] Validate all fixtures against LinkML schema using linkml-validate
 
 **Checkpoint**: LinkML schemas complete, all 5 entities defined, 20+ golden fixtures created
 

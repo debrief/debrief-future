@@ -1,0 +1,245 @@
+id: https://debrief.info/schemas/geojson
+name: geojson
+title: Debrief GeoJSON Profile
+description: >-
+  GeoJSON Feature types for maritime tracks, sensor contacts, and reference
+  locations. Extends standard GeoJSON with Debrief-specific properties.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+  geojson: https://purl.org/geojson/vocab#
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+  - common
+
+# ============================================================================
+# GeoJSON Geometry Types
+# ============================================================================
+
+classes:
+  GeoJSONPoint:
+    description: GeoJSON Point geometry
+    attributes:
+      type:
+        description: Geometry type discriminator
+        range: string
+        required: true
+        equals_string: "Point"
+      coordinates:
+        description: "[longitude, latitude] in degrees"
+        range: float
+        multivalued: true
+        required: true
+        minimum_cardinality: 2
+        maximum_cardinality: 2
+
+  GeoJSONLineString:
+    description: GeoJSON LineString geometry
+    attributes:
+      type:
+        description: Geometry type discriminator
+        range: string
+        required: true
+        equals_string: "LineString"
+      coordinates:
+        description: Array of [longitude, latitude] pairs
+        range: float
+        multivalued: true
+        required: true
+
+  GeoJSONPolygon:
+    description: GeoJSON Polygon geometry
+    attributes:
+      type:
+        description: Geometry type discriminator
+        range: string
+        required: true
+        equals_string: "Polygon"
+      coordinates:
+        description: Array of linear rings (arrays of [lon, lat] pairs)
+        range: float
+        multivalued: true
+        required: true
+
+# ============================================================================
+# TrackFeature
+# ============================================================================
+
+  TrackProperties:
+    description: Properties for a TrackFeature
+    attributes:
+      platform_id:
+        description: Platform/vessel identifier
+        required: true
+      platform_name:
+        description: Human-readable platform name
+      track_type:
+        description: Type of track
+        range: TrackTypeEnum
+        required: true
+      start_time:
+        description: Track start time (ISO8601)
+        range: datetime
+        required: true
+      end_time:
+        description: Track end time (ISO8601)
+        range: datetime
+        required: true
+      positions:
+        description: Array of timestamped positions
+        range: TimestampedPosition
+        multivalued: true
+        required: true
+        minimum_cardinality: 2
+      source_file:
+        description: Original source file path
+      color:
+        description: Display color (CSS color string)
+        range: CSSColor
+
+  TrackFeature:
+    description: GeoJSON Feature representing a vessel track
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Unique identifier (UUID recommended)
+        required: true
+      geometry:
+        description: Track path as GeoJSON LineString
+        range: GeoJSONLineString
+        required: true
+      properties:
+        description: Track metadata
+        range: TrackProperties
+        required: true
+      bbox:
+        description: Bounding box [minLon, minLat, maxLon, maxLat]
+        range: float
+        multivalued: true
+        minimum_cardinality: 4
+        maximum_cardinality: 4
+
+# ============================================================================
+# SensorContact
+# ============================================================================
+
+  SensorContactProperties:
+    description: Properties for a SensorContact
+    attributes:
+      parent_track_id:
+        description: ID of parent TrackFeature
+        required: true
+      sensor_type:
+        description: Type of sensor
+        range: SensorTypeEnum
+        required: true
+      time:
+        description: Detection timestamp (ISO8601)
+        range: datetime
+        required: true
+      bearing:
+        description: Bearing in degrees (0-360)
+        range: float
+        minimum_value: 0
+        maximum_value: 360
+      bearing_error:
+        description: Bearing error in degrees
+        range: float
+        minimum_value: 0
+      range:
+        description: Range in nautical miles
+        range: float
+        minimum_value: 0
+      range_error:
+        description: Range error in nautical miles
+        range: float
+        minimum_value: 0
+      frequency:
+        description: Frequency in Hz (for acoustic)
+        range: float
+        minimum_value: 0
+      label:
+        description: User-assigned label
+      color:
+        description: Display color (CSS color string)
+        range: CSSColor
+
+  SensorContact:
+    description: GeoJSON Feature representing a sensor detection
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Unique identifier (UUID recommended)
+        required: true
+      geometry:
+        description: Contact position as GeoJSON Point
+        range: GeoJSONPoint
+        required: true
+      properties:
+        description: Contact metadata
+        range: SensorContactProperties
+        required: true
+
+# ============================================================================
+# ReferenceLocation
+# ============================================================================
+
+  ReferenceLocationProperties:
+    description: Properties for a ReferenceLocation
+    attributes:
+      name:
+        description: Reference location name
+        required: true
+      location_type:
+        description: Type of reference
+        range: LocationTypeEnum
+        required: true
+      description:
+        description: Additional description
+      symbol:
+        description: Map symbol identifier
+      color:
+        description: Display color (CSS color string)
+        range: CSSColor
+      valid_from:
+        description: Start of validity period
+        range: datetime
+      valid_until:
+        description: End of validity period
+        range: datetime
+
+  ReferenceLocation:
+    description: GeoJSON Feature for fixed reference points
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Unique identifier
+        required: true
+      geometry:
+        description: Location (Point) or area (Polygon)
+        range: GeoJSONPoint
+        required: true
+        # Note: In full implementation, this would be a union type
+        # allowing Point or Polygon. LinkML handles this via
+        # any_of or abstract geometry class.
+      properties:
+        description: Reference metadata
+        range: ReferenceLocationProperties
+        required: true

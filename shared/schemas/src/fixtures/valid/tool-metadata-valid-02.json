@@ -1,0 +1,9 @@
+{
+  "id": "calc-cpa",
+  "name": "Closest Point of Approach",
+  "description": "Calculate CPA between two tracks over a time range",
+  "version": "1.2.0",
+  "category": "KINEMATICS",
+  "selection_context": ["MULTIPLE_TRACKS"],
+  "icon": "cpa-icon"
+}

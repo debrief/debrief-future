@@ -1,0 +1,11 @@
+{
+  "type": "Feature",
+  "id": "ref-invalid-001",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-5.5, 50.0]
+  },
+  "properties": {
+    "location_type": "WAYPOINT"
+  }
+}

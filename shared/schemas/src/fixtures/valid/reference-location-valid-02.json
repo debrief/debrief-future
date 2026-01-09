@@ -1,0 +1,15 @@
+{
+  "type": "Feature",
+  "id": "ref-002",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-6.0, 51.5]
+  },
+  "properties": {
+    "name": "Exercise Area Bravo",
+    "location_type": "EXERCISE_AREA",
+    "valid_from": "2026-01-09T08:00:00Z",
+    "valid_until": "2026-01-09T18:00:00Z",
+    "color": "#00FF00"
+  }
+}

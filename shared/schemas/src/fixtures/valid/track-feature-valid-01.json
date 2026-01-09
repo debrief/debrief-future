@@ -1,0 +1,25 @@
+{
+  "type": "Feature",
+  "id": "track-001",
+  "geometry": {
+    "type": "LineString",
+    "coordinates": [
+      [-5.0, 50.0],
+      [-4.9, 50.1],
+      [-4.8, 50.2]
+    ]
+  },
+  "properties": {
+    "platform_id": "HMS-EXAMPLE",
+    "platform_name": "HMS Example",
+    "track_type": "OWNSHIP",
+    "start_time": "2026-01-09T10:00:00Z",
+    "end_time": "2026-01-09T12:00:00Z",
+    "positions": [
+      {"time": "2026-01-09T10:00:00Z", "coordinates": [-5.0, 50.0], "course": 45, "speed": 12},
+      {"time": "2026-01-09T11:00:00Z", "coordinates": [-4.9, 50.1], "course": 45, "speed": 12},
+      {"time": "2026-01-09T12:00:00Z", "coordinates": [-4.8, 50.2], "course": 45, "speed": 12}
+    ],
+    "color": "#0066CC"
+  }
+}
