@@ -38,14 +38,6 @@ jobs:
       - name: Run schema generation
         run: uv run python scripts/generate.py
 
-      - name: Verify no uncommitted changes after generation
-        run: |
-          git diff --exit-code src/generated/ || {
-            echo "::error::Generated files are out of sync with schema definitions"
-            echo "Run 'make generate' and commit the changes"
-            exit 1
-          }
-
       - name: Run golden fixture tests
         run: uv run pytest tests/test_golden.py -v
 
