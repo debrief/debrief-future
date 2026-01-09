@@ -1,0 +1,95 @@
+id: https://debrief.info/schemas/common
+name: common
+title: Debrief Common Types
+description: >-
+  Common types, enums, and base classes used across Debrief schemas.
+  Tracer bullet implementation with core types only.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+
+# ============================================================================
+# Enums
+# ============================================================================
+
+enums:
+  TrackTypeEnum:
+    description: Type of track feature
+    permissible_values:
+      OWNSHIP:
+        description: Own ship track
+      CONTACT:
+        description: Contact/target track
+      REFERENCE:
+        description: Reference track
+      SOLUTION:
+        description: Solution/analysis track
+
+  LocationTypeEnum:
+    description: Type of reference location
+    permissible_values:
+      WAYPOINT:
+        description: Navigation waypoint
+      EXERCISE_AREA:
+        description: Exercise area boundary
+      DANGER_AREA:
+        description: Danger/exclusion zone
+      ANCHORAGE:
+        description: Anchorage location
+      PORT:
+        description: Port/harbor
+      REFERENCE:
+        description: Generic reference point
+
+# ============================================================================
+# Types
+# ============================================================================
+
+types:
+  Coordinate:
+    typeof: float
+    description: A geographic coordinate value (longitude or latitude in degrees)
+
+  CSSColor:
+    typeof: string
+    description: A CSS color string (e.g., "#FF5733", "red", "rgb(255, 87, 51)")
+    pattern: "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$"
+
+# ============================================================================
+# Base Classes
+# ============================================================================
+
+classes:
+  TimestampedPosition:
+    description: A position with timestamp and optional kinematic data
+    attributes:
+      time:
+        description: Position timestamp (ISO8601)
+        range: datetime
+        required: true
+      coordinates:
+        description: "[longitude, latitude] in degrees"
+        range: float
+        multivalued: true
+        required: true
+        minimum_cardinality: 2
+        maximum_cardinality: 2
+      depth:
+        description: Depth in meters (negative = below surface)
+        range: float
+      course:
+        description: Course in degrees (0-360)
+        range: float
+        minimum_value: 0
+        maximum_value: 360
+      speed:
+        description: Speed in knots
+        range: float
+        minimum_value: 0

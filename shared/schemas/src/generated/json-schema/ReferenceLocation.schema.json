@@ -1,0 +1,378 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "https://debrief.info/schemas/ReferenceLocation",
+  "additionalProperties": false,
+  "description": "GeoJSON Feature for fixed reference points",
+  "properties": {
+    "geometry": {
+      "$ref": "#/$defs/GeoJSONPoint",
+      "description": "Location (Point) or area (Polygon)"
+    },
+    "id": {
+      "description": "Unique identifier",
+      "type": "string"
+    },
+    "properties": {
+      "$ref": "#/$defs/ReferenceLocationProperties",
+      "description": "Reference metadata"
+    },
+    "type": {
+      "const": "Feature",
+      "description": "GeoJSON type discriminator",
+      "type": "string"
+    }
+  },
+  "required": [
+    "type",
+    "id",
+    "geometry",
+    "properties"
+  ],
+  "title": "ReferenceLocation",
+  "type": "object",
+  "$defs": {
+    "GeoJSONLineString": {
+      "additionalProperties": false,
+      "description": "GeoJSON LineString geometry",
+      "properties": {
+        "coordinates": {
+          "description": "Array of [longitude, latitude] pairs",
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "type": {
+          "const": "LineString",
+          "description": "Geometry type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "GeoJSONLineString",
+      "type": "object"
+    },
+    "GeoJSONPoint": {
+      "additionalProperties": false,
+      "description": "GeoJSON Point geometry",
+      "properties": {
+        "coordinates": {
+          "description": "[longitude, latitude] in degrees",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "type": {
+          "const": "Point",
+          "description": "Geometry type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "GeoJSONPoint",
+      "type": "object"
+    },
+    "GeoJSONPolygon": {
+      "additionalProperties": false,
+      "description": "GeoJSON Polygon geometry",
+      "properties": {
+        "coordinates": {
+          "description": "Array of linear rings (arrays of [lon, lat] pairs)",
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "type": {
+          "const": "Polygon",
+          "description": "Geometry type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "GeoJSONPolygon",
+      "type": "object"
+    },
+    "LocationTypeEnum": {
+      "description": "Type of reference location",
+      "enum": [
+        "WAYPOINT",
+        "EXERCISE_AREA",
+        "DANGER_AREA",
+        "ANCHORAGE",
+        "PORT",
+        "REFERENCE"
+      ],
+      "title": "LocationTypeEnum",
+      "type": "string"
+    },
+    "ReferenceLocation": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature for fixed reference points",
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONPoint",
+          "description": "Location (Point) or area (Polygon)"
+        },
+        "id": {
+          "description": "Unique identifier",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/ReferenceLocationProperties",
+          "description": "Reference metadata"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "ReferenceLocation",
+      "type": "object"
+    },
+    "ReferenceLocationProperties": {
+      "additionalProperties": false,
+      "description": "Properties for a ReferenceLocation",
+      "properties": {
+        "color": {
+          "description": "Display color (CSS color string)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "description": "Additional description",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "location_type": {
+          "$ref": "#/$defs/LocationTypeEnum",
+          "description": "Type of reference"
+        },
+        "name": {
+          "description": "Reference location name",
+          "type": "string"
+        },
+        "symbol": {
+          "description": "Map symbol identifier",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "valid_from": {
+          "description": "Start of validity period",
+          "format": "date-time",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "valid_until": {
+          "description": "End of validity period",
+          "format": "date-time",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "location_type"
+      ],
+      "title": "ReferenceLocationProperties",
+      "type": "object"
+    },
+    "TimestampedPosition": {
+      "additionalProperties": false,
+      "description": "A position with timestamp and optional kinematic data",
+      "properties": {
+        "coordinates": {
+          "description": "[longitude, latitude] in degrees",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "course": {
+          "description": "Course in degrees (0-360)",
+          "maximum": 360,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "depth": {
+          "description": "Depth in meters (negative = below surface)",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "speed": {
+          "description": "Speed in knots",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "time": {
+          "description": "Position timestamp (ISO8601)",
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "time",
+        "coordinates"
+      ],
+      "title": "TimestampedPosition",
+      "type": "object"
+    },
+    "TrackFeature": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature representing a vessel track",
+      "properties": {
+        "bbox": {
+          "description": "Bounding box [minLon, minLat, maxLon, maxLat]",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONLineString",
+          "description": "Track path as GeoJSON LineString"
+        },
+        "id": {
+          "description": "Unique identifier (UUID recommended)",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/TrackProperties",
+          "description": "Track metadata"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "TrackFeature",
+      "type": "object"
+    },
+    "TrackProperties": {
+      "additionalProperties": false,
+      "description": "Properties for a TrackFeature",
+      "properties": {
+        "color": {
+          "description": "Display color (CSS color string)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "end_time": {
+          "description": "Track end time (ISO8601)",
+          "format": "date-time",
+          "type": "string"
+        },
+        "platform_id": {
+          "description": "Platform/vessel identifier",
+          "type": "string"
+        },
+        "platform_name": {
+          "description": "Human-readable platform name",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "positions": {
+          "description": "Array of timestamped positions",
+          "items": {
+            "$ref": "#/$defs/TimestampedPosition"
+          },
+          "minItems": 2,
+          "type": "array"
+        },
+        "source_file": {
+          "description": "Original source file path",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "start_time": {
+          "description": "Track start time (ISO8601)",
+          "format": "date-time",
+          "type": "string"
+        },
+        "track_type": {
+          "$ref": "#/$defs/TrackTypeEnum",
+          "description": "Type of track"
+        }
+      },
+      "required": [
+        "platform_id",
+        "track_type",
+        "start_time",
+        "end_time",
+        "positions"
+      ],
+      "title": "TrackProperties",
+      "type": "object"
+    },
+    "TrackTypeEnum": {
+      "description": "Type of track feature",
+      "enum": [
+        "OWNSHIP",
+        "CONTACT",
+        "REFERENCE",
+        "SOLUTION"
+      ],
+      "title": "TrackTypeEnum",
+      "type": "string"
+    }
+  }
+}

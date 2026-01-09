@@ -1,0 +1,23 @@
+{
+  "type": "Feature",
+  "id": "track-002",
+  "geometry": {
+    "type": "LineString",
+    "coordinates": [
+      [-6.0, 51.0],
+      [-5.8, 51.2]
+    ]
+  },
+  "bbox": [-6.0, 51.0, -5.8, 51.2],
+  "properties": {
+    "platform_id": "CONTACT-ALPHA",
+    "track_type": "CONTACT",
+    "start_time": "2026-01-09T10:30:00Z",
+    "end_time": "2026-01-09T11:30:00Z",
+    "positions": [
+      {"time": "2026-01-09T10:30:00Z", "coordinates": [-6.0, 51.0]},
+      {"time": "2026-01-09T11:30:00Z", "coordinates": [-5.8, 51.2], "depth": -50}
+    ],
+    "source_file": "contact_alpha.rep"
+  }
+}

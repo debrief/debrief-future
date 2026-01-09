@@ -73,3 +73,10 @@ Three approaches required:
 1. **Golden fixtures** — canonical valid/invalid JSON in `/shared/schemas/fixtures/`
 2. **Round-trip tests** — Python → JSON → TypeScript → JSON → Python
 3. **Schema comparison** — Pydantic-generated JSON Schema must match LinkML-generated
+
+## Active Technologies
+- Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS) (000-schemas)
+- N/A (schema package produces generated code, not persisted data) (000-schemas)
+
+## Recent Changes
+- 000-schemas: Added Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS)

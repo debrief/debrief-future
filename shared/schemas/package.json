@@ -1,0 +1,43 @@
+{
+  "name": "@debrief/schemas",
+  "version": "0.1.0",
+  "description": "TypeScript interfaces and JSON Schema for Debrief v4.x",
+  "type": "module",
+  "main": "src/generated/typescript/index.js",
+  "types": "src/generated/typescript/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/generated/typescript/index.d.ts",
+      "import": "./src/generated/typescript/index.js"
+    },
+    "./json-schema/*": "./src/generated/json-schema/*"
+  },
+  "files": [
+    "src/generated/typescript",
+    "src/generated/json-schema"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "validate": "node tests/validate-jsonschema.js"
+  },
+  "keywords": [
+    "debrief",
+    "geojson",
+    "maritime",
+    "schemas",
+    "typescript"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
