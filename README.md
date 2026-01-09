@@ -1,5 +1,7 @@
 # Debrief
 
+> *Getting analysis done, since 1995.*
+
 Modernisation of Debrief maritime analysis platform (v4.x).
 
 ## Status
@@ -17,7 +19,7 @@ Debrief is a maritime tactical analysis tool used for post-exercise reconstructi
 - Temporal and spatial analysis of engagements
 - Standardised reporting
 
-## Why a rebuild?
+## Why a Rebuild?
 
 The legacy application is built on Eclipse RCP, a platform in decline. The modernisation:
 
@@ -26,9 +28,19 @@ The legacy application is built on Eclipse RCP, a platform in decline. The moder
 - Uses open standards (GeoJSON, STAC) for data portability
 - Supports multiple frontends: VS Code extension, Electron apps, Jupyter notebooks
 
-## Architecture
+For the full strategic context, see [VISION.md](VISION.md).
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for design decisions and component structure.
+## Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [VISION.md](VISION.md) | Strategic context — why we're rebuilding, value proposition, roadmap |
+| [CONSTITUTION.md](CONSTITUTION.md) | Governing principles — the non-negotiable rules for all development |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Technical design — component structure, technology choices |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to participate — code standards, review process |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
+
+## Architecture
 
 Key principles:
 
@@ -36,6 +48,8 @@ Key principles:
 - **Schema-first** — LinkML master schemas generate Pydantic, JSON Schema, and TypeScript
 - **STAC for storage** — plots stored as STAC Items with GeoJSON payloads
 - **MCP for integration** — services exposed via Model Context Protocol
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for full details.
 
 ## Repository Structure
 
@@ -48,15 +62,23 @@ debrief/
 ├── contrib/           # Organisation-specific extensions
 ├── apps/              # Electron loader, VS Code extension
 └── docs/              # Detailed documentation
+    └── plans/         # Implementation plans
 ```
+
+## Current Plan
+
+The tracer bullet implementation validates the architecture with a thin end-to-end thread. See [docs/plans/tracer-bullet.md](docs/plans/tracer-bullet.md) for details.
 
 ## Getting Started
 
-*Coming soon* — tracer bullet implementation in progress.
+*Coming soon* — setup instructions will be added as implementation progresses.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+We welcome contributions. Please read:
+
+1. [CONSTITUTION.md](CONSTITUTION.md) — understand the governing principles
+2. [CONTRIBUTING.md](CONTRIBUTING.md) — learn how to participate
 
 ## License
 
