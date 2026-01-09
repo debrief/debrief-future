@@ -231,7 +231,7 @@
 - [x] T068 [P] Create README.md with usage examples at services/stac/README.md
 - [x] T069 Run coverage report, ensure >90% coverage
 - [x] T070 [P] Add type hints throughout codebase
-- [ ] T071 Validate STAC output against stac-validator at services/stac/tests/test_stac_validation.py
+- [x] T071 Validate STAC output against stac-validator at services/stac/tests/test_stac_validation.py
 
 ---
 
