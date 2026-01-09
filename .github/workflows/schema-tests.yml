@@ -2,7 +2,7 @@ name: Schema Tests
 
 on:
   push:
-    branches: [main, "000-schemas"]
+    branches: [main, "000-schemas", "claude/*"]
     paths:
       - 'shared/schemas/**'
       - '.github/workflows/schema-tests.yml'
