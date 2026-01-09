@@ -11,7 +11,7 @@ This document defines how Future Debrief engages with stakeholders throughout de
 | Maritime analysis community | Using the tool, providing feedback | LinkedIn, YouTube demos, beta previews |
 | Atlas (existing Debrief users) | Capability updates, adoption planning | Blog, LinkedIn |
 
-All content is public by default — community benefits from wider adoption and visibility.
+All content is public by default — DSTL benefits from wider adoption and visibility.
 
 ## Project Ownership
 
@@ -63,6 +63,16 @@ Interactive previews using Storybook and SPAs.
 - Workflow previews (lightweight SPAs)
 - Feature-specific URLs for targeted feedback
 
+**Automated Discussion Thread:** Each feature preview automatically generates a GitHub Discussion thread containing:
+1. **Requirements summary** — what the feature aims to achieve (from feature spec)
+2. **Strategy taken** — key design/implementation decisions (from implementation plan)
+3. **Feedback prompts** — specific questions or areas where input is valuable
+4. **Link to preview** — direct URL to try the feature
+
+Content is pulled from the feature's specification and plan documents, ensuring consistency between internal planning and external communication.
+
+This gives stakeholders a structured place to comment, ask questions, and suggest improvements.
+
 ## Content Flow
 
 ### Planning Phase
@@ -82,11 +92,13 @@ Feature in progress
     ↓
 Beta preview deployed (Storybook/SPA)
     ↓
-"Try it now" LinkedIn post → drives to beta URL
+GitHub Discussion auto-generated (requirements, strategy, feedback prompts)
+    ↓
+"Try it now" LinkedIn post → drives to beta URL + Discussion
     ↓
 1-week feedback pause (deliberate)
     ↓
-Feedback collected and reviewed
+Feedback collected from Discussion thread
     ↓
 Refinements incorporated
 ```
@@ -106,24 +118,26 @@ LinkedIn post → links to blog and video
 
 ## Content Generation
 
-Content is a byproduct of development, not extra work:
+Content is a byproduct of development, not extra work. AI drafts all content from source documents.
 
-| Development Activity | Content Output |
-|---------------------|----------------|
-| Feature planning | Sequence diagrams → "What's Coming" post |
-| Architecture decisions | Flowcharts → "Technical" deep dive |
-| E2E test runs | Screen recordings → demo videos |
-| Releases | Release notes → "Releases" post |
-| Beta deployment | Interactive preview → feedback opportunity |
+| Development Activity | Content Output | AI Action |
+|---------------------|----------------|-----------|
+| Feature planning | "What's Coming" blog post | Draft from spec + diagrams |
+| Architecture decisions | "Technical" deep dive | Draft from ADR/decision doc |
+| Beta preview deployment | GitHub Discussion thread | Auto-generate from spec + plan |
+| E2E test runs | Demo video | Capture automated; AI drafts description |
+| Releases | "Releases" blog post | Draft from changelog + release notes |
 
-**Approach:** AI-assisted drafting. Provide bullet points, AI drafts posts/articles for review.
+**Human role:** Review drafts, approve/edit, publish. Engage in discussions.
+
+**Approach:** AI-first content creation. AI drafts all content from development artifacts (specs, plans, changelogs). Human reviews and publishes. Human engages directly in feedback discussions; AI monitors and summarises.
 
 ## Feedback Mechanisms
 
 ### Beta Previews
-- **GitHub Issues**: Structured feedback with labels (`feedback`, `beta`, feature name)
-- **Discussion threads**: Open-ended conversation in GitHub Discussions
-- **In-app feedback**: Simple feedback widget in beta previews linking to issue template
+- **Auto-generated Discussion thread**: Each preview creates a GitHub Discussion with requirements, strategy, and feedback prompts
+- **GitHub Issues**: Structured bug reports / specific feature requests (linked from Discussion)
+- **In-app feedback**: Simple widget in beta previews linking to the Discussion thread
 
 ### General Feedback
 - **GitHub Issues**: Bug reports, feature requests
@@ -133,10 +147,19 @@ Content is a byproduct of development, not extra work:
 ### Feedback Pause Protocol
 During deliberate feedback pauses:
 1. Deploy beta preview
-2. Post "Try it now" on LinkedIn with specific questions
-3. Monitor GitHub issues/discussions for 1 week
-4. Summarise feedback in internal note
-5. Prioritise refinements before continuing
+2. Discussion thread auto-generated with feedback prompts
+3. Post "Try it now" on LinkedIn with link to Discussion
+4. AI monitors Discussion for 1 week, produces daily/end-of-week digest
+5. Human reviews digest, engages on key threads
+6. AI summarises actionable feedback
+7. Prioritise refinements before continuing
+
+### Ongoing Feedback Monitoring
+Outside of formal feedback pauses, AI periodically:
+- Scans open Discussions for new comments
+- Flags questions that need human response
+- Produces weekly summary of community activity
+- Highlights emerging themes or repeated requests
 
 ## Metrics
 
@@ -175,16 +198,32 @@ Expected rhythm during tracer bullet phase:
 
 ## Responsibilities
 
-| Task | Owner |
-|------|-------|
-| Development milestones | Deep Blue C |
-| Content drafting (AI-assisted) | Deep Blue C + AI |
-| Blog publishing | Deep Blue C |
-| LinkedIn posting | Deep Blue C |
-| YouTube upload | Deep Blue C |
-| Beta deployment | Automated (CI) |
-| Feedback review | Deep Blue C |
-| Metrics review | Deep Blue C (monthly) |
+| Task | Owner | AI Role |
+|------|-------|---------|
+| Development milestones | Deep Blue C | — |
+| Blog post drafting | AI | Draft from specs/plans; human review |
+| LinkedIn post drafting | AI | Draft from blog content; human review |
+| Discussion thread content | AI | Auto-generate from spec + plan |
+| Video narration scripts | AI | Draft script; human records |
+| Publishing (blog, social, YouTube) | Deep Blue C | — |
+| Beta deployment | Automated (CI) | — |
+| Feedback engagement | Deep Blue C | — |
+| Feedback monitoring & summary | AI | Regular digest of new Discussion comments |
+| Metrics review | Deep Blue C | AI can pull raw numbers |
+
+### AI-Assisted Workflow
+
+**Content creation:**
+1. Milestone reached or feature planned
+2. AI drafts content (blog post, LinkedIn teaser, Discussion thread) from source documents
+3. Human reviews, edits if needed, publishes
+
+**Feedback monitoring:**
+1. AI periodically scans GitHub Discussions for new comments
+2. AI produces summary digest: key themes, questions raised, actionable suggestions
+3. Human reviews digest, engages directly where needed
+
+This minimises manual authoring while keeping human judgment on publication and stakeholder engagement.
 
 ## Tools
 
@@ -192,12 +231,15 @@ Expected rhythm during tracer bullet phase:
 |---------|------|
 | Blog | GitHub Pages (Jekyll or Hugo) |
 | Beta previews | Storybook (static build) + SPAs |
+| Discussion generation | GitHub Actions (auto-create on preview deploy) |
+| Content drafting | LLM (Claude) — drafts from specs/plans |
+| Feedback monitoring | LLM (Claude) — scans Discussions, produces digests |
 | Video capture (automated) | Playwright trace / screen recording in CI |
 | Video capture (narrated) | OBS or similar |
 | Video hosting | YouTube (existing Debrief channel) |
 | Social | LinkedIn |
 | Analytics | GitHub insights + YouTube Studio + LinkedIn analytics |
-| Feedback | GitHub Issues + Discussions |
+| Feedback | GitHub Discussions (auto-generated per feature) + Issues |
 
 ---
 
