@@ -10,8 +10,12 @@ from pathlib import Path
 
 import pytest
 
-from debrief_stac.catalog import create_catalog, open_catalog
+from datetime import datetime, timezone, timedelta
+
+from debrief_stac.catalog import create_catalog, list_plots, open_catalog
 from debrief_stac.exceptions import CatalogExistsError, CatalogNotFoundError
+from debrief_stac.models import PlotMetadata
+from debrief_stac.plot import create_plot
 from debrief_stac.types import STAC_VERSION
 
 
@@ -150,3 +154,88 @@ class TestOpenCatalog:
 
         with pytest.raises(CatalogNotFoundError):
             open_catalog(catalog_path)
+
+
+class TestListPlots:
+    """Tests for list_plots() function - User Story 6."""
+
+    def test_list_plots_returns_all_plots(self, temp_dir: Path) -> None:
+        """T049: Given a catalog with multiple plots,
+        When list_plots() is called, Then all plots are returned.
+        """
+        catalog_path = create_catalog(temp_dir / "catalog")
+
+        # Create 3 plots
+        create_plot(catalog_path, PlotMetadata(title="Plot 1"), plot_id="plot-1")
+        create_plot(catalog_path, PlotMetadata(title="Plot 2"), plot_id="plot-2")
+        create_plot(catalog_path, PlotMetadata(title="Plot 3"), plot_id="plot-3")
+
+        plots = list_plots(catalog_path)
+
+        assert len(plots) == 3
+        plot_ids = [p.id for p in plots]
+        assert "plot-1" in plot_ids
+        assert "plot-2" in plot_ids
+        assert "plot-3" in plot_ids
+
+    def test_list_plots_empty_catalog(self, temp_dir: Path) -> None:
+        """T050: Given an empty catalog,
+        When list_plots() is called, Then empty list is returned.
+        """
+        catalog_path = create_catalog(temp_dir / "catalog")
+
+        plots = list_plots(catalog_path)
+
+        assert plots == []
+
+    def test_list_plots_sorted_by_datetime_descending(self, temp_dir: Path) -> None:
+        """T051: Given plots with varying dates,
+        When listed, Then plots are sorted by datetime descending.
+        """
+        catalog_path = create_catalog(temp_dir / "catalog")
+
+        # Create plots with specific datetimes
+        now = datetime.now(timezone.utc)
+        old = now - timedelta(days=30)
+        older = now - timedelta(days=60)
+
+        create_plot(
+            catalog_path,
+            PlotMetadata(title="Old Plot", timestamp=old),
+            plot_id="old"
+        )
+        create_plot(
+            catalog_path,
+            PlotMetadata(title="Newest Plot", timestamp=now),
+            plot_id="newest"
+        )
+        create_plot(
+            catalog_path,
+            PlotMetadata(title="Oldest Plot", timestamp=older),
+            plot_id="oldest"
+        )
+
+        plots = list_plots(catalog_path)
+
+        # Verify sorted newest first
+        assert len(plots) == 3
+        assert plots[0].id == "newest"
+        assert plots[1].id == "old"
+        assert plots[2].id == "oldest"
+
+    def test_list_plots_includes_summary_info(self, temp_dir: Path) -> None:
+        """list_plots returns PlotSummary with id, title, datetime."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        create_plot(
+            catalog_path,
+            PlotMetadata(title="Test Plot", description="A test"),
+            plot_id="test-plot"
+        )
+
+        plots = list_plots(catalog_path)
+
+        assert len(plots) == 1
+        plot = plots[0]
+        assert plot.id == "test-plot"
+        assert plot.title == "Test Plot"
+        assert plot.timestamp is not None

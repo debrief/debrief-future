@@ -24,7 +24,7 @@ def add_features(
     catalog_path: CatalogPath,
     plot_id: str,
     features: Sequence[GeoJSONFeature],
-) -> None:
+) -> int:
     """Add GeoJSON features to a plot's FeatureCollection.
 
     If the plot doesn't have a FeatureCollection asset yet, one is created.
@@ -36,13 +36,17 @@ def add_features(
         plot_id: ID of the plot to add features to
         features: List of GeoJSON Feature dictionaries
 
+    Returns:
+        Total number of features in the FeatureCollection after adding
+
     Raises:
         PlotNotFoundError: If the plot doesn't exist
         ValueError: If features are invalid GeoJSON
 
     Example:
         >>> features = [{"type": "Feature", "geometry": {...}, "properties": {...}}]
-        >>> add_features("/data/catalog", "my-plot", features)
+        >>> count = add_features("/data/catalog", "my-plot", features)
+        >>> print(f"Total features: {count}")
     """
     catalog_path = Path(catalog_path)
 
@@ -93,6 +97,8 @@ def add_features(
 
     # Save updated item
     _save_plot(catalog_path, plot_id, item)
+
+    return len(fc["features"])
 
 
 def _validate_feature(feature: GeoJSONFeature) -> None:

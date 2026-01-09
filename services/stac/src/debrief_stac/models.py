@@ -30,6 +30,7 @@ class PlotMetadata(BaseModel):
     )
 
     model_config = {
+        "populate_by_name": True,
         "json_schema_extra": {
             "examples": [
                 {
@@ -56,6 +57,8 @@ class PlotSummary(BaseModel):
     title: str = Field(..., description="Plot title")
     timestamp: dt = Field(..., description="Plot timestamp", alias="datetime")
     feature_count: int = Field(default=0, ge=0, description="Number of features")
+
+    model_config = {"populate_by_name": True}
 
 
 class AssetProvenance(BaseModel):

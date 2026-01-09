@@ -5,10 +5,12 @@ This module provides functions for creating and managing local STAC catalogs.
 """
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
 from debrief_stac.exceptions import CatalogExistsError, CatalogNotFoundError
+from debrief_stac.models import PlotSummary
 from debrief_stac.types import (
     STAC_VERSION,
     CatalogPath,
@@ -148,3 +150,76 @@ def _add_item_link(catalog_data: STACCatalog, item_id: str, item_href: str) -> N
         "type": "application/geo+json",
         "title": item_id
     })
+
+
+def list_plots(path: CatalogPath) -> list[PlotSummary]:
+    """List all plots in a catalog with summary information.
+
+    Returns plots sorted by datetime descending (newest first).
+
+    Args:
+        path: Path to the catalog directory
+
+    Returns:
+        List of PlotSummary objects with id, title, datetime, feature_count
+
+    Raises:
+        CatalogNotFoundError: If no catalog exists at the path
+
+    Example:
+        >>> plots = list_plots("/data/analysis")
+        >>> for plot in plots:
+        ...     print(f"{plot.title} ({plot.id})")
+    """
+    catalog_path = Path(path)
+    catalog_data = open_catalog(catalog_path)
+
+    summaries: list[PlotSummary] = []
+
+    # Find all item links
+    for link in catalog_data.get("links", []):
+        if link.get("rel") != "item":
+            continue
+
+        # Load the item
+        item_href = link.get("href", "")
+        item_path = catalog_path / item_href
+
+        if not item_path.exists():
+            continue
+
+        with open(item_path) as f:
+            item_data = json.load(f)
+
+        # Extract summary info
+        properties = item_data.get("properties", {})
+        dt_str = properties.get("datetime")
+
+        # Parse datetime
+        if dt_str:
+            dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+        else:
+            dt = datetime.now()
+
+        # Count features if available
+        feature_count = 0
+        if "features" in item_data.get("assets", {}):
+            features_href = item_data["assets"]["features"].get("href", "")
+            features_path = item_path.parent / features_href
+            if features_path.exists():
+                with open(features_path) as f:
+                    fc = json.load(f)
+                    feature_count = len(fc.get("features", []))
+
+        summary = PlotSummary(
+            id=item_data.get("id", ""),
+            title=properties.get("title", "Untitled"),
+            timestamp=dt,
+            feature_count=feature_count,
+        )
+        summaries.append(summary)
+
+    # Sort by datetime descending (newest first)
+    summaries.sort(key=lambda s: s.timestamp, reverse=True)
+
+    return summaries

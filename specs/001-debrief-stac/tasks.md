@@ -157,17 +157,17 @@
 
 ### Tests for User Story 5
 
-- [ ] T041 [P] [US5] Unit test for add_asset copies file to assets directory at services/stac/tests/test_assets.py
-- [ ] T042 [P] [US5] Unit test for add_asset creates STAC asset reference at services/stac/tests/test_assets.py
-- [ ] T043 [P] [US5] Unit test for add_asset records provenance metadata at services/stac/tests/test_assets.py
+- [x] T041 [P] [US5] Unit test for add_asset copies file to assets directory at services/stac/tests/test_assets.py
+- [x] T042 [P] [US5] Unit test for add_asset creates STAC asset reference at services/stac/tests/test_assets.py
+- [x] T043 [P] [US5] Unit test for add_asset records provenance metadata at services/stac/tests/test_assets.py
 
 ### Implementation for User Story 5
 
-- [ ] T044 [US5] Implement add_asset() function at services/stac/src/debrief_stac/assets.py
-- [ ] T045 [US5] Copy source file to plot's assets directory at services/stac/src/debrief_stac/assets.py
-- [ ] T046 [US5] Create STAC asset entry with role "source" and media type at services/stac/src/debrief_stac/assets.py
-- [ ] T047 [US5] Record provenance metadata (source path, load timestamp, tool version) at services/stac/src/debrief_stac/assets.py
-- [ ] T048 [US5] Update STAC Item assets dictionary at services/stac/src/debrief_stac/assets.py
+- [x] T044 [US5] Implement add_asset() function at services/stac/src/debrief_stac/assets.py
+- [x] T045 [US5] Copy source file to plot's assets directory at services/stac/src/debrief_stac/assets.py
+- [x] T046 [US5] Create STAC asset entry with role "source" and media type at services/stac/src/debrief_stac/assets.py
+- [x] T047 [US5] Record provenance metadata (source path, load timestamp, tool version) at services/stac/src/debrief_stac/assets.py
+- [x] T048 [US5] Update STAC Item assets dictionary at services/stac/src/debrief_stac/assets.py
 
 **Checkpoint**: Can add source files with provenance tracking
 
@@ -181,15 +181,15 @@
 
 ### Tests for User Story 6
 
-- [ ] T049 [P] [US6] Unit test for list_plots returns all plots at services/stac/tests/test_catalog.py
-- [ ] T050 [P] [US6] Unit test for list_plots with empty catalog at services/stac/tests/test_catalog.py
-- [ ] T051 [P] [US6] Unit test for list_plots sorts by datetime descending at services/stac/tests/test_catalog.py
+- [x] T049 [P] [US6] Unit test for list_plots returns all plots at services/stac/tests/test_catalog.py
+- [x] T050 [P] [US6] Unit test for list_plots with empty catalog at services/stac/tests/test_catalog.py
+- [x] T051 [P] [US6] Unit test for list_plots sorts by datetime descending at services/stac/tests/test_catalog.py
 
 ### Implementation for User Story 6
 
-- [ ] T052 [US6] Implement list_plots() function at services/stac/src/debrief_stac/catalog.py
-- [ ] T053 [US6] Extract plot summaries (ID, title, datetime, feature count) at services/stac/src/debrief_stac/catalog.py
-- [ ] T054 [US6] Implement datetime-descending sort at services/stac/src/debrief_stac/catalog.py
+- [x] T052 [US6] Implement list_plots() function at services/stac/src/debrief_stac/catalog.py
+- [x] T053 [US6] Extract plot summaries (ID, title, datetime, feature count) at services/stac/src/debrief_stac/catalog.py
+- [x] T054 [US6] Implement datetime-descending sort at services/stac/src/debrief_stac/catalog.py
 
 **Checkpoint**: Can browse catalog contents
 
@@ -203,20 +203,20 @@
 
 ### Tests for User Story 7
 
-- [ ] T055 [P] [US7] Unit test for MCP tool registration at services/stac/tests/test_mcp.py
-- [ ] T056 [P] [US7] Unit test for create_catalog MCP tool at services/stac/tests/test_mcp.py
-- [ ] T057 [P] [US7] Unit test for MCP error responses with validation details at services/stac/tests/test_mcp.py
+- [x] T055 [P] [US7] Unit test for MCP tool registration at services/stac/tests/test_mcp.py
+- [x] T056 [P] [US7] Unit test for create_catalog MCP tool at services/stac/tests/test_mcp.py
+- [x] T057 [P] [US7] Unit test for MCP error responses with validation details at services/stac/tests/test_mcp.py
 
 ### Implementation for User Story 7
 
-- [ ] T058 [US7] Create MCP server scaffold using mcp-common at services/stac/src/debrief_stac/mcp_server.py
-- [ ] T059 [US7] Expose create_catalog as MCP tool at services/stac/src/debrief_stac/mcp_server.py
-- [ ] T060 [US7] Expose create_plot as MCP tool at services/stac/src/debrief_stac/mcp_server.py
-- [ ] T061 [US7] Expose read_plot as MCP tool at services/stac/src/debrief_stac/mcp_server.py
-- [ ] T062 [US7] Expose add_features as MCP tool at services/stac/src/debrief_stac/mcp_server.py
-- [ ] T063 [US7] Expose add_asset as MCP tool at services/stac/src/debrief_stac/mcp_server.py
-- [ ] T064 [US7] Expose list_plots as MCP tool at services/stac/src/debrief_stac/mcp_server.py
-- [ ] T065 [US7] Document MCP tool input/output schemas at services/stac/src/debrief_stac/mcp_server.py
+- [x] T058 [US7] Create MCP server scaffold using mcp-common at services/stac/src/debrief_stac/mcp_server.py
+- [x] T059 [US7] Expose create_catalog as MCP tool at services/stac/src/debrief_stac/mcp_server.py
+- [x] T060 [US7] Expose create_plot as MCP tool at services/stac/src/debrief_stac/mcp_server.py
+- [x] T061 [US7] Expose read_plot as MCP tool at services/stac/src/debrief_stac/mcp_server.py
+- [x] T062 [US7] Expose add_features as MCP tool at services/stac/src/debrief_stac/mcp_server.py
+- [x] T063 [US7] Expose add_asset as MCP tool at services/stac/src/debrief_stac/mcp_server.py
+- [x] T064 [US7] Expose list_plots as MCP tool at services/stac/src/debrief_stac/mcp_server.py
+- [x] T065 [US7] Document MCP tool input/output schemas at services/stac/src/debrief_stac/mcp_server.py
 
 **Checkpoint**: All operations accessible via MCP
 
@@ -226,11 +226,11 @@
 
 **Purpose**: Integration testing, documentation, and quality assurance
 
-- [ ] T066 [P] Integration test: full workflow (create catalog → create plot → add features → add asset → read) at services/stac/tests/test_integration.py
-- [ ] T067 [P] Add docstrings to all public functions
-- [ ] T068 [P] Create README.md with usage examples at services/stac/README.md
-- [ ] T069 Run coverage report, ensure >90% coverage
-- [ ] T070 [P] Add type hints throughout codebase
+- [x] T066 [P] Integration test: full workflow (create catalog → create plot → add features → add asset → read) at services/stac/tests/test_integration.py
+- [x] T067 [P] Add docstrings to all public functions
+- [x] T068 [P] Create README.md with usage examples at services/stac/README.md
+- [x] T069 Run coverage report, ensure >90% coverage
+- [x] T070 [P] Add type hints throughout codebase
 - [ ] T071 Validate STAC output against stac-validator at services/stac/tests/test_stac_validation.py
 
 ---
