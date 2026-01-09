@@ -63,13 +63,7 @@ def generate_pydantic() -> bool:
 
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        # Format with black if available
-        try:
-            import black
-            formatted = black.format_str(result.stdout, mode=black.Mode(line_length=100))
-            output_file.write_text(formatted)
-        except ImportError:
-            output_file.write_text(result.stdout)
+        output_file.write_text(result.stdout)
         print(f"  ✓ Generated: {output_file}")
         return True
     except subprocess.CalledProcessError as e:
