@@ -1,0 +1,75 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+**Future Debrief** — ground-up rebuild of Debrief maritime tactical analysis platform (v4.x). Currently in pre-implementation planning phase; no code exists yet.
+
+Key architectural decisions:
+- **Thick services, thin frontends** — domain logic in Python, frontends (VS Code, Electron, Jupyter) handle orchestration only
+- **Schema-first** — LinkML master schemas generate Pydantic, JSON Schema, TypeScript
+- **STAC for storage** — plots stored as STAC Items with GeoJSON payloads
+- **MCP for integration** — services exposed via Model Context Protocol
+
+## Planned Repository Structure
+
+```
+debrief/
+├── shared/
+│   ├── schemas/       # LinkML + generated Pydantic/JSON Schema/TypeScript
+│   └── components/    # Shared React components (map, timeline)
+├── services/
+│   ├── mcp-common/    # Shared MCP utilities (singleton)
+│   ├── stac/          # STAC catalog ops (singleton)
+│   ├── config/        # User state, XDG config (singleton)
+│   ├── io/            # File format handlers (extensible)
+│   └── calc/          # Analysis tools (extensible)
+├── contrib/           # Organisation-specific extensions
+├── apps/
+│   ├── loader/        # Electron mini-app
+│   └── vscode/        # VS Code extension
+└── docs/
+```
+
+## Build Sequence (Tracer Bullet)
+
+0. **Schemas** — LinkML models, generators, adherence tests
+1. **debrief-stac** — local STAC catalog operations
+2. **debrief-io** — REP file parsing to GeoJSON
+3. **debrief-config** — shared user state (Python + TypeScript)
+4. **Loader** — Electron app for file loading
+5. **debrief-calc** — context-sensitive analysis tools
+6. **VS Code Extension** — display, selection, tool invocation
+
+## Governing Principles (from CONSTITUTION.md)
+
+- **Offline by default** — all core functionality works without network
+- **Schema tests mandatory** — derived schemas must pass adherence tests before merge
+- **Provenance always** — every transformation records lineage
+- **Services never touch UI** — return data only
+- **Tests required** — no service code merged without tests
+- **Specs before code** — no implementation without written specification
+
+## Tooling (Planned)
+
+| Concern | Choice |
+|---------|--------|
+| Master schema | LinkML |
+| Python packaging | uv workspaces |
+| TypeScript packaging | pnpm workspaces |
+| User config | XDG Base Directory |
+
+## Key Documents
+
+- `CONSTITUTION.md` — immutable development principles (supersedes all other docs)
+- `ARCHITECTURE.md` — technical design decisions
+- `VISION.md` — strategic context
+- `docs/tracer-delivery-plan.md` — implementation roadmap
+
+## Schema Test Strategy
+
+Three approaches required:
+1. **Golden fixtures** — canonical valid/invalid JSON in `/shared/schemas/fixtures/`
+2. **Round-trip tests** — Python → JSON → TypeScript → JSON → Python
+3. **Schema comparison** — Pydantic-generated JSON Schema must match LinkML-generated
