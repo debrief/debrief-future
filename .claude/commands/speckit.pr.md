@@ -76,7 +76,19 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Tasks: `specs/[feature]/tasks.md`
    ```
 
-6. **Collect evidence artifacts**:
+6. **Generate or verify media content**:
+   - Check for `FEATURE_DIR/media/` directory
+   - If shipped-post.md is missing or incomplete:
+     - Read Content Specialist agent from `.claude/agents/media/content.md`
+     - Spawn Content Specialist via Task tool with:
+       - Feature summary from spec.md
+       - Evidence artifacts from evidence/
+       - Lessons learned from implementation
+     - Generate shipped-post.md following the Shipped Post template
+     - Generate linkedin-shipped.md (150-200 words)
+   - Save media content to `FEATURE_DIR/media/`
+
+7. **Collect evidence artifacts**:
    - Check for `FEATURE_DIR/evidence/` directory
    - If exists, list all files and incorporate into PR description:
      - `.md` files: Include content directly (formatted)
@@ -86,13 +98,13 @@ You **MUST** consider the user input before proceeding (if not empty).
      - `.csv` files: Convert to markdown tables
    - If evidence directory is missing or empty, add a note: "⚠️ No evidence artifacts captured. Consider running evidence collection tasks."
 
-7. **Check git and branch status**:
+8. **Check git and branch status**:
    - Verify all changes are committed
    - Check current branch name
    - Determine target branch (usually `main` or as specified in arguments)
    - If there are uncommitted changes, STOP and ask user to commit first
 
-8. **Create the pull request**:
+9. **Create the pull request**:
    - Use `gh pr create` with generated title and body
    - Use HEREDOC for body to preserve formatting:
 
@@ -104,17 +116,21 @@ You **MUST** consider the user input before proceeding (if not empty).
    )"
    ```
 
-9. **Handle existing PR**:
+10. **Handle existing PR**:
    - If a PR already exists for this branch, offer to UPDATE it instead:
      - Use `gh pr edit` to update title and body
    - Display the PR URL to the user
 
-10. **Report**:
+11. **Report**:
     - Display the PR URL
     - Show summary of what was included:
       - Number of completed tasks referenced
       - Evidence artifacts included
       - Any warnings about missing evidence
+    - **Media content status**:
+      - List media files created/updated in `FEATURE_DIR/media/`
+      - Remind user: "Blog posts are ready for review in media/ directory"
+      - Provide next steps: "Copy shipped-post.md to debrief.github.io/_posts/ and linkedin-shipped.md for social sharing"
 
 ## Evidence Integration Guidelines
 
@@ -169,6 +185,45 @@ When incorporating evidence into the PR:
 
 </details>
 ```
+
+## Media Content Integration
+
+When creating media content for the shipped feature:
+
+### Shipped Post Generation
+
+Spawn the Content Specialist agent via Task tool:
+
+```text
+subagent_type: "general-purpose"
+prompt: |
+  You are the Content Specialist for Future Debrief.
+
+  [Include .claude/agents/media/content.md content]
+
+  Create a Shipped Post for:
+  - Feature: [name from spec.md]
+  - What was built: [summary from evidence/usage-example.md]
+  - Test results: [from evidence/test-summary.md]
+  - Key decisions: [from research.md if exists]
+
+  Follow the Shipped Post template exactly.
+```
+
+### LinkedIn Summary
+
+Generate alongside the shipped post:
+- 150-200 words
+- Hook opening (not "I'm excited to announce...")
+- Key accomplishment highlight
+- Link placeholder: `[Read the full post: LINK]`
+- Tags: `#FutureDebrief #MaritimeAnalysis #OpenSource`
+
+### Output Files
+
+Save to `FEATURE_DIR/media/`:
+- `shipped-post.md` - Full blog post
+- `linkedin-shipped.md` - LinkedIn summary
 
 ## Error Handling
 

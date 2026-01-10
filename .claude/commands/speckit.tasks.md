@@ -46,7 +46,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
    - Phase 3+: One phase per user story (in priority order from spec.md)
    - Each phase includes: story goal, independent test criteria, tests (if requested), implementation tasks
-   - Final Phase: Polish & cross-cutting concerns (MUST include evidence collection tasks)
+   - Final Phase: Polish & cross-cutting concerns (MUST include evidence collection AND media content tasks)
    - All tasks must follow the strict checklist format (see Task Generation Rules below)
    - Clear file paths for each task
    - Dependencies section showing story completion order
@@ -148,7 +148,7 @@ Every task MUST strictly follow this format:
 - **Phase 3+**: User Stories in priority order (P1, P2, P3...)
   - Within each story: Tests (if requested) → Models → Services → Endpoints → Integration
   - Each phase should be a complete, independently testable increment
-- **Final Phase**: Polish & Cross-Cutting Concerns (MUST include evidence collection)
+- **Final Phase**: Polish & Cross-Cutting Concerns (MUST include evidence collection AND media content)
 
 ## Evidence Planning Rules
 
@@ -198,6 +198,20 @@ For the Polish phase, ALWAYS generate these tasks:
    - [ ] TXXX [P] Capture [specific artifact] in specs/[feature]/evidence/[filename]
    ```
 
+4. **Shipped Post Task** (REQUIRED - for media announcement):
+   ```markdown
+   - [ ] TXXX Create shipped blog post in specs/[feature]/media/shipped-post.md
+   ```
+   Use Content Specialist agent (`.claude/agents/media/content.md`) to generate:
+   - Shipped Post following the template
+   - Include: What We Built, Screenshots (if applicable), Lessons Learned, What's Next
+
+5. **LinkedIn Shipped Summary Task** (REQUIRED):
+   ```markdown
+   - [ ] TXXX [P] Create LinkedIn shipped summary in specs/[feature]/media/linkedin-shipped.md
+   ```
+   150-200 words, hook opening, link to full post
+
 ### Evidence Quality Guidelines
 
 Good evidence should be:
@@ -212,6 +226,7 @@ Good evidence should be:
 ## Evidence Requirements
 
 **Evidence Directory**: `specs/002-debrief-io/evidence/`
+**Media Directory**: `specs/002-debrief-io/media/`
 
 ### Planned Artifacts
 
@@ -221,4 +236,51 @@ Good evidence should be:
 | usage-example.md | Python code parsing REP file | After parser complete |
 | cli-demo.txt | Terminal session showing parse command | After CLI works |
 | sample-output.json | GeoJSON output from boat1.rep | After parsing works |
+
+### Media Content
+
+| Artifact | Description | Created When |
+|----------|-------------|--------------|
+| media/planning-post.md | Blog post announcing the feature | During /speckit.plan |
+| media/linkedin-planning.md | LinkedIn summary for planning | During /speckit.plan |
+| media/shipped-post.md | Blog post celebrating completion | During Polish phase |
+| media/linkedin-shipped.md | LinkedIn summary for shipped | During Polish phase |
+```
+
+## Media Content Rules
+
+**Purpose**: Create blog posts and social content to announce planning and celebrate shipped features.
+
+### Media Agents
+
+Use the agents in `.claude/agents/media/` via the Task tool:
+
+1. **Content Specialist** (`.claude/agents/media/content.md`):
+   - Planning posts (announce what we're building)
+   - Shipped posts (celebrate what we built)
+   - LinkedIn summaries
+   - Voice & tone guidelines
+
+2. **Technical Specialist** (`.claude/agents/media/technical.md`):
+   - Technical context for posts
+   - Diagram descriptions
+   - Architecture summaries
+
+### Spawning Media Agents
+
+To create media content, spawn a subagent via Task tool:
+
+```text
+Task tool call:
+  subagent_type: "general-purpose"
+  prompt: |
+    You are the Content Specialist for Future Debrief.
+
+    [Include full content of .claude/agents/media/content.md]
+
+    Create a [Planning/Shipped] Post for:
+    - Feature: [name]
+    - Goal: [from spec.md]
+    - Key accomplishments: [from evidence/]
+    - Lessons learned: [notable challenges/decisions]
 ```

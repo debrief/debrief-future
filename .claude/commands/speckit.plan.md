@@ -33,7 +33,18 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Phase 1: Update agent context by running the agent script
    - Re-evaluate Constitution Check post-design
 
-4. **Stop and report**: Command ends after Phase 2 planning. Report branch, IMPL_PLAN path, and generated artifacts.
+4. **Media content - Planning Post**: After design artifacts are complete, create a planning announcement:
+   - Read the Content Specialist agent definition from `.claude/agents/media/content.md`
+   - Use the Task tool with `subagent_type: "general-purpose"` to spawn the Content Specialist
+   - Provide the specialist with:
+     - Feature name and goal from spec.md
+     - Key technical decisions from research.md
+     - Architecture overview from plan.md
+   - Request a "Planning Post" following the template in the agent definition
+   - Save the draft post to `FEATURE_DIR/media/planning-post.md`
+   - Generate a LinkedIn summary and save to `FEATURE_DIR/media/linkedin-planning.md`
+
+5. **Stop and report**: Command ends after planning. Report branch, IMPL_PLAN path, generated artifacts, and media content drafts.
 
 ## Phases
 
@@ -82,6 +93,34 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Preserve manual additions between markers
 
 **Output**: data-model.md, /contracts/*, quickstart.md, agent-specific file
+
+### Phase 2: Media Content Creation
+
+**Prerequisites:** Phase 1 complete (design artifacts exist)
+
+1. **Create media directory**: `mkdir -p FEATURE_DIR/media/`
+
+2. **Spawn Content Specialist** via Task tool:
+   - Read `.claude/agents/media/content.md` for agent definition
+   - Provide context:
+     ```text
+     Feature: [name from spec.md]
+     Goal: [goal statement from spec.md]
+     Key Decisions: [from research.md]
+     Architecture: [summary from plan.md]
+     Audience: DSTL scientists, potential contributors, defence maritime analysis community
+     ```
+   - Request: "Write a Planning Post announcing this feature"
+
+3. **Generate planning post**: Save to `FEATURE_DIR/media/planning-post.md`
+   - Must follow the Planning Post template from content.md
+   - Include sections: What We're Building, How It Fits, Key Decisions, What We'd Love Feedback On
+
+4. **Generate LinkedIn summary**: Save to `FEATURE_DIR/media/linkedin-planning.md`
+   - 150-200 words, strong hook, link placeholder
+   - Follow LinkedIn template from content.md
+
+**Output**: media/planning-post.md, media/linkedin-planning.md
 
 ## Key rules
 
