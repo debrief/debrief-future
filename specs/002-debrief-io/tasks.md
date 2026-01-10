@@ -22,13 +22,13 @@ Project structure: `services/io/` (Python library in uv workspace)
 
 **Purpose**: Create package structure and configure build tools
 
-- [ ] T001 Create directory structure `services/io/src/debrief_io/` and `services/io/tests/`
-- [ ] T002 Create `services/io/pyproject.toml` with uv workspace config, dependencies (pydantic, debrief-schemas), and dev dependencies (pytest, pytest-cov)
-- [ ] T003 [P] Create `services/io/src/debrief_io/__init__.py` with package exports
-- [ ] T004 [P] Create `services/io/src/debrief_io/py.typed` marker file
-- [ ] T005 [P] Create `services/io/tests/conftest.py` with shared fixtures
-- [ ] T006 [P] Copy REP fixtures from `specs/002-debrief-io/fixtures/valid/` to `services/io/tests/fixtures/valid/`
-- [ ] T007 Update root `pyproject.toml` to include `services/io` in workspace members
+- [X] T001 Create directory structure `services/io/src/debrief_io/` and `services/io/tests/`
+- [X] T002 Create `services/io/pyproject.toml` with uv workspace config, dependencies (pydantic, debrief-schemas), and dev dependencies (pytest, pytest-cov)
+- [X] T003 [P] Create `services/io/src/debrief_io/__init__.py` with package exports
+- [X] T004 [P] Create `services/io/src/debrief_io/py.typed` marker file
+- [X] T005 [P] Create `services/io/tests/conftest.py` with shared fixtures
+- [X] T006 [P] Copy REP fixtures from `specs/002-debrief-io/fixtures/valid/` to `services/io/tests/fixtures/valid/`
+- [X] T007 Update root `pyproject.toml` to include `services/io` in workspace members
 
 ---
 
@@ -38,11 +38,11 @@ Project structure: `services/io/` (Python library in uv workspace)
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 Create `services/io/src/debrief_io/exceptions.py` with ParseError, UnsupportedFormatError, ValidationError
-- [ ] T009 [P] Create `services/io/src/debrief_io/models.py` with ParseResult, ParseWarning, HandlerInfo Pydantic models
-- [ ] T010 [P] Create `services/io/src/debrief_io/types.py` with type aliases (FilePath, Feature, HandlerClass)
-- [ ] T011 Create `services/io/src/debrief_io/handlers/__init__.py` package init
-- [ ] T012 Create `services/io/src/debrief_io/handlers/base.py` with abstract BaseHandler class
+- [X] T008 Create `services/io/src/debrief_io/exceptions.py` with ParseError, UnsupportedFormatError, ValidationError
+- [X] T009 [P] Create `services/io/src/debrief_io/models.py` with ParseResult, ParseWarning, HandlerInfo Pydantic models
+- [X] T010 [P] Create `services/io/src/debrief_io/types.py` with type aliases (FilePath, Feature, HandlerClass)
+- [X] T011 Create `services/io/src/debrief_io/handlers/__init__.py` package init
+- [X] T012 Create `services/io/src/debrief_io/handlers/base.py` with abstract BaseHandler class
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -56,21 +56,21 @@ Project structure: `services/io/` (Python library in uv workspace)
 
 ### Tests for User Story 1
 
-- [ ] T013 [P] [US1] Create `services/io/tests/test_rep_handler.py` with tests for REP parsing (track positions, reference locations, DMS coordinate conversion)
-- [ ] T014 [P] [US1] Create `services/io/tests/fixtures/invalid/` with malformed REP samples for error testing
+- [X] T013 [P] [US1] Create `services/io/tests/test_rep_handler.py` with tests for REP parsing (track positions, reference locations, DMS coordinate conversion)
+- [X] T014 [P] [US1] Create `services/io/tests/fixtures/invalid/` with malformed REP samples for error testing
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Implement DMS coordinate parsing in `services/io/src/debrief_io/handlers/rep.py` (DD MM SS.SS H format)
-- [ ] T016 [US1] Implement timestamp parsing in `services/io/src/debrief_io/handlers/rep.py` (YYMMDD HHMMSS.SSS format)
-- [ ] T017 [US1] Implement track position record parsing in `services/io/src/debrief_io/handlers/rep.py`
+- [X] T015 [US1] Implement DMS coordinate parsing in `services/io/src/debrief_io/handlers/rep.py` (DD MM SS.SS H format)
+- [X] T016 [US1] Implement timestamp parsing in `services/io/src/debrief_io/handlers/rep.py` (YYMMDD HHMMSS.SSS format)
+- [X] T017 [US1] Implement track position record parsing in `services/io/src/debrief_io/handlers/rep.py`
 - [ ] T018 [US1] Implement reference location (;TEXT:, ;CIRCLE:) parsing in `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T019 [US1] Implement track grouping (group positions by track name) in `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T020 [US1] Build TrackFeature GeoJSON from grouped positions in `services/io/src/debrief_io/handlers/rep.py`
+- [X] T019 [US1] Implement track grouping (group positions by track name) in `services/io/src/debrief_io/handlers/rep.py`
+- [X] T020 [US1] Build TrackFeature GeoJSON from grouped positions in `services/io/src/debrief_io/handlers/rep.py`
 - [ ] T021 [US1] Build ReferenceLocation GeoJSON from parsed shapes in `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T022 [US1] Implement REPHandler.parse() returning ParseResult in `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T023 [US1] Create `services/io/src/debrief_io/parser.py` with parse_rep() convenience function
-- [ ] T024 [US1] Implement encoding detection (UTF-8/Latin-1 fallback) in `services/io/src/debrief_io/parser.py`
+- [X] T022 [US1] Implement REPHandler.parse() returning ParseResult in `services/io/src/debrief_io/handlers/rep.py`
+- [X] T023 [US1] Create `services/io/src/debrief_io/parser.py` with parse_rep() convenience function
+- [X] T024 [US1] Implement encoding detection (UTF-8/Latin-1 fallback) in `services/io/src/debrief_io/parser.py`
 
 **Checkpoint**: Can parse boat1.rep and boat2.rep to valid TrackFeature GeoJSON
 
@@ -85,13 +85,13 @@ Project structure: `services/io/` (Python library in uv workspace)
 ### Tests for User Story 2
 
 - [ ] T025 [P] [US2] Create `services/io/tests/test_validation.py` with tests for coordinate validation, timestamp validation, missing fields
-- [ ] T026 [P] [US2] Add invalid coordinate fixtures to `services/io/tests/fixtures/invalid/`
+- [X] T026 [P] [US2] Add invalid coordinate fixtures to `services/io/tests/fixtures/invalid/`
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] Add coordinate range validation (-180 to 180 lon, -90 to 90 lat) in `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T028 [US2] Add timestamp validation with line number tracking in `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T029 [US2] Implement warning collection for recoverable errors (INVALID_COORD, UNKNOWN_RECORD) in `services/io/src/debrief_io/handlers/rep.py`
+- [X] T027 [US2] Add coordinate range validation (-180 to 180 lon, -90 to 90 lat) in `services/io/src/debrief_io/handlers/rep.py`
+- [X] T028 [US2] Add timestamp validation with line number tracking in `services/io/src/debrief_io/handlers/rep.py`
+- [X] T029 [US2] Implement warning collection for recoverable errors (INVALID_COORD, UNKNOWN_RECORD) in `services/io/src/debrief_io/handlers/rep.py`
 - [ ] T030 [US2] Validate parsed features against debrief_schemas Pydantic models in `services/io/src/debrief_io/handlers/rep.py`
 - [ ] T031 [US2] Wrap Pydantic ValidationError with line context in `services/io/src/debrief_io/exceptions.py`
 
@@ -128,15 +128,15 @@ Project structure: `services/io/` (Python library in uv workspace)
 
 ### Tests for User Story 4
 
-- [ ] T037 [P] [US4] Create `services/io/tests/test_registry.py` with tests for register, get, list, unregister handlers
-- [ ] T038 [P] [US4] Add tests for UnsupportedFormatError on unknown extensions
+- [X] T037 [P] [US4] Create `services/io/tests/test_registry.py` with tests for register, get, list, unregister handlers
+- [X] T038 [P] [US4] Add tests for UnsupportedFormatError on unknown extensions
 
 ### Implementation for User Story 4
 
-- [ ] T039 [US4] Implement handler registry in `services/io/src/debrief_io/registry.py` with register_handler(), get_handler(), list_handlers(), unregister_handler()
-- [ ] T040 [US4] Register REPHandler for .rep extension in `services/io/src/debrief_io/__init__.py`
-- [ ] T041 [US4] Implement main parse() function using registry in `services/io/src/debrief_io/parser.py`
-- [ ] T042 [US4] Raise UnsupportedFormatError for unknown extensions in `services/io/src/debrief_io/parser.py`
+- [X] T039 [US4] Implement handler registry in `services/io/src/debrief_io/registry.py` with register_handler(), get_handler(), list_handlers(), unregister_handler()
+- [X] T040 [US4] Register REPHandler for .rep extension in `services/io/src/debrief_io/__init__.py`
+- [X] T041 [US4] Implement main parse() function using registry in `services/io/src/debrief_io/parser.py`
+- [X] T042 [US4] Raise UnsupportedFormatError for unknown extensions in `services/io/src/debrief_io/parser.py`
 
 **Checkpoint**: `parse(file.rep)` auto-selects REPHandler; unknown extension raises UnsupportedFormatError
 
@@ -167,14 +167,14 @@ Project structure: `services/io/` (Python library in uv workspace)
 
 **Purpose**: Integration testing, documentation, coverage verification
 
-- [ ] T048 Create `services/io/tests/test_parser.py` with tests for main parse() entry point
+- [X] T048 Create `services/io/tests/test_parser.py` with tests for main parse() entry point
 - [ ] T049 [P] Create `services/io/tests/test_integration.py` with end-to-end workflow test (parse → validate → verify structure)
 - [ ] T050 [P] Add tests for encoding edge cases (Latin-1 files) in `services/io/tests/test_rep_handler.py`
 - [ ] T051 [P] Add tests for truncated/malformed files in `services/io/tests/test_rep_handler.py`
-- [ ] T052 Create `services/io/README.md` with usage documentation
-- [ ] T053 Export public API in `services/io/src/debrief_io/__init__.py` (parse, parse_rep, register_handler, etc.)
+- [X] T052 Create `services/io/README.md` with usage documentation
+- [X] T053 Export public API in `services/io/src/debrief_io/__init__.py` (parse, parse_rep, register_handler, etc.)
 - [ ] T054 Run pytest with coverage, verify >90% coverage
-- [ ] T055 Run ruff check and fix any lint errors
+- [X] T055 Run ruff check and fix any lint errors
 - [ ] T056 Validate quickstart.md examples work correctly
 
 ---

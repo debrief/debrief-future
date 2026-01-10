@@ -26,4 +26,4 @@ ignore = [
 ]
 
 [lint.isort]
-known-first-party = ["debrief_schemas", "debrief_stac"]
+known-first-party = ["debrief_schemas", "debrief_stac", "debrief_io"]
