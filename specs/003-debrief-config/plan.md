@@ -50,7 +50,10 @@ specs/003-debrief-config/
 ├── data-model.md        # Phase 1 output
 ├── quickstart.md        # Phase 1 output
 ├── contracts/           # Phase 1 output
-└── tasks.md             # Phase 2 output (NOT created by /speckit.plan)
+├── media/               # Phase 2 output
+│   ├── planning-post.md # Blog post draft
+│   └── linkedin-planning.md # LinkedIn summary
+└── tasks.md             # Phase 3 output (/speckit.tasks)
 ```
 
 ### Source Code (repository root)
@@ -128,4 +131,6 @@ packages/config/          # TypeScript library (new pnpm workspace)
 | Data Model | [data-model.md](./data-model.md) | Complete |
 | API Contract | [contracts/api.md](./contracts/api.md) | Complete |
 | Quickstart | [quickstart.md](./quickstart.md) | Complete |
+| Planning Post | [media/planning-post.md](./media/planning-post.md) | Complete |
+| LinkedIn Summary | [media/linkedin-planning.md](./media/linkedin-planning.md) | Complete |
 | Tasks | tasks.md | Pending (/speckit.tasks) |
