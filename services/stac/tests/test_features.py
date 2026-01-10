@@ -119,11 +119,7 @@ class TestAddFeatures:
         add_features(catalog_path, plot_id, features1)
 
         # Add reference point outside track bbox
-        features2 = [make_sample_reference_location(
-            feature_id="ref-outside",
-            lon=-6.0,
-            lat=51.0
-        )]
+        features2 = [make_sample_reference_location(feature_id="ref-outside", lon=-6.0, lat=51.0)]
         add_features(catalog_path, plot_id, features2)
 
         item = read_plot(catalog_path, plot_id)

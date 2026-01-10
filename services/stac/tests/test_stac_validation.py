@@ -15,6 +15,7 @@ try:
     import urllib.request
 
     from stac_validator import stac_validator
+
     urllib.request.urlopen("https://schemas.stacspec.org", timeout=2)
     NETWORK_AVAILABLE = True
 except Exception:
@@ -22,8 +23,7 @@ except Exception:
     stac_validator = None
 
 network_required = pytest.mark.skipif(
-    not NETWORK_AVAILABLE,
-    reason="Network unavailable - stac-validator requires schema fetch"
+    not NETWORK_AVAILABLE, reason="Network unavailable - stac-validator requires schema fetch"
 )
 
 
@@ -183,8 +183,8 @@ class TestSTACFullWorkflowValidation:
         # Create multiple plots with full data
         for i in range(3):
             metadata = PlotMetadata(
-                title=f"Analysis Plot {i+1}",
-                description=f"Plot {i+1} description",
+                title=f"Analysis Plot {i + 1}",
+                description=f"Plot {i + 1} description",
             )
             plot_id = create_plot(catalog_path, metadata)
 

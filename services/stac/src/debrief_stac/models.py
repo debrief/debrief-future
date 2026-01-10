@@ -25,7 +25,7 @@ class PlotMetadata(BaseModel):
     timestamp: dt = Field(
         default_factory=lambda: dt.now(UTC),
         description="Plot timestamp (ISO8601)",
-        alias="datetime"
+        alias="datetime",
     )
 
     model_config = {
@@ -35,10 +35,10 @@ class PlotMetadata(BaseModel):
                 {
                     "title": "Exercise Alpha Analysis",
                     "description": "Track analysis from Exercise Alpha, Day 1",
-                    "datetime": "2026-01-09T12:00:00Z"
+                    "datetime": "2026-01-09T12:00:00Z",
                 }
             ]
-        }
+        },
     }
 
 
@@ -73,10 +73,6 @@ class AssetProvenance(BaseModel):
 
     source_path: str = Field(..., description="Original source file path")
     load_timestamp: dt = Field(
-        default_factory=lambda: dt.now(UTC),
-        description="When the asset was loaded"
+        default_factory=lambda: dt.now(UTC), description="When the asset was loaded"
     )
-    tool_version: str = Field(
-        default="0.1.0",
-        description="debrief-stac version"
-    )
+    tool_version: str = Field(default="0.1.0", description="debrief-stac version")

@@ -77,8 +77,7 @@ class TestAddAsset:
 
         # Find the source asset
         source_assets = [
-            (k, v) for k, v in item["assets"].items()
-            if ASSET_ROLE_SOURCE in v.get("roles", [])
+            (k, v) for k, v in item["assets"].items() if ASSET_ROLE_SOURCE in v.get("roles", [])
         ]
         assert len(source_assets) == 1
 
@@ -101,17 +100,12 @@ class TestAddAsset:
         source_file = temp_dir / "custom.rep"
         source_file.write_text("Custom content")
 
-        add_asset(
-            catalog_path, plot_id, source_file,
-            asset_key="my-custom-source"
-        )
+        add_asset(catalog_path, plot_id, source_file, asset_key="my-custom-source")
 
         item = read_plot(catalog_path, plot_id)
         assert "my-custom-source" in item["assets"]
 
-    def test_add_multiple_assets(
-        self, temp_dir: Path, sample_plot_metadata: PlotMetadata
-    ) -> None:
+    def test_add_multiple_assets(self, temp_dir: Path, sample_plot_metadata: PlotMetadata) -> None:
         """Multiple assets can be added to a plot."""
         catalog_path = create_catalog(temp_dir / "catalog")
         plot_id = create_plot(catalog_path, sample_plot_metadata)

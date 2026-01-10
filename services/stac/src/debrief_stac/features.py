@@ -68,10 +68,7 @@ def add_features(
             fc: GeoJSONFeatureCollection = json.load(f)
     else:
         # Create new
-        fc = {
-            "type": "FeatureCollection",
-            "features": []
-        }
+        fc = {"type": "FeatureCollection", "features": []}
 
     # Append new features
     fc["features"].extend(features)
@@ -85,7 +82,7 @@ def add_features(
         "href": f"./{features_filename}",
         "type": MEDIA_TYPE_GEOJSON,
         "title": "GeoJSON Features",
-        "roles": [ASSET_ROLE_DATA]
+        "roles": [ASSET_ROLE_DATA],
     }
 
     # Update bbox
@@ -215,11 +212,13 @@ def _bbox_to_polygon(bbox: BoundingBox) -> dict:
 
     return {
         "type": "Polygon",
-        "coordinates": [[
-            [min_lon, min_lat],
-            [max_lon, min_lat],
-            [max_lon, max_lat],
-            [min_lon, max_lat],
-            [min_lon, min_lat],  # Close the ring
-        ]]
+        "coordinates": [
+            [
+                [min_lon, min_lat],
+                [max_lon, min_lat],
+                [max_lon, max_lat],
+                [min_lon, max_lat],
+                [min_lon, min_lat],  # Close the ring
+            ]
+        ],
     }

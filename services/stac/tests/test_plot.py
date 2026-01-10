@@ -67,17 +67,12 @@ class TestCreatePlot:
         assert len(item_links) == 1
         assert plot_id in item_links[0]["href"]
 
-    def test_create_plot_with_title_and_description(
-        self, temp_dir: Path
-    ) -> None:
+    def test_create_plot_with_title_and_description(self, temp_dir: Path) -> None:
         """T020: Given PlotMetadata with title and description,
         When plot is created, Then STAC Item properties include them.
         """
         catalog_path = create_catalog(temp_dir / "catalog")
-        metadata = PlotMetadata(
-            title="My Analysis",
-            description="Detailed track analysis"
-        )
+        metadata = PlotMetadata(title="My Analysis", description="Detailed track analysis")
 
         plot_id = create_plot(catalog_path, metadata)
 
@@ -96,11 +91,7 @@ class TestCreatePlot:
         """create_plot with custom plot_id uses that ID."""
         catalog_path = create_catalog(temp_dir / "catalog")
 
-        plot_id = create_plot(
-            catalog_path,
-            sample_plot_metadata,
-            plot_id="my-custom-plot"
-        )
+        plot_id = create_plot(catalog_path, sample_plot_metadata, plot_id="my-custom-plot")
 
         assert plot_id == "my-custom-plot"
         assert (catalog_path / "my-custom-plot" / "item.json").exists()

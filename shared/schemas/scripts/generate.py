@@ -57,7 +57,8 @@ def generate_pydantic() -> bool:
 
     cmd = [
         "gen-pydantic",
-        "--extra-fields", "forbid",
+        "--extra-fields",
+        "forbid",
         str(MASTER_SCHEMA),
     ]
 

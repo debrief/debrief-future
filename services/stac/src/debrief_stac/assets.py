@@ -86,7 +86,7 @@ def add_asset(
         "type": media_type,
         "title": source_path.name,
         "roles": [ASSET_ROLE_SOURCE],
-        "debrief:provenance": provenance.model_dump(mode="json")
+        "debrief:provenance": provenance.model_dump(mode="json"),
     }
 
     # Save updated item

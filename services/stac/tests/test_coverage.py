@@ -404,11 +404,13 @@ class TestListPlotsEdgeCases:
 
         # Manually add a link to non-existent item
         catalog = open_catalog(catalog_path)
-        catalog["links"].append({
-            "rel": "item",
-            "href": "./nonexistent/item.json",
-            "type": "application/geo+json",
-        })
+        catalog["links"].append(
+            {
+                "rel": "item",
+                "href": "./nonexistent/item.json",
+                "type": "application/geo+json",
+            }
+        )
         with open(catalog_path / "catalog.json", "w") as f:
             json.dump(catalog, f)
 

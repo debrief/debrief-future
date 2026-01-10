@@ -28,7 +28,7 @@ def make_sample_track_feature(
                 [-5.0, 50.0],
                 [-5.1, 50.1],
                 [-5.2, 50.2],
-            ]
+            ],
         },
         "properties": {
             "platform_id": platform_id,
@@ -41,23 +41,23 @@ def make_sample_track_feature(
                     "time": "2026-01-09T10:00:00Z",
                     "coordinates": [-5.0, 50.0],
                     "course": 45.0,
-                    "speed": 12.0
+                    "speed": 12.0,
                 },
                 {
                     "time": "2026-01-09T11:00:00Z",
                     "coordinates": [-5.1, 50.1],
                     "course": 47.0,
-                    "speed": 11.5
+                    "speed": 11.5,
                 },
                 {
                     "time": "2026-01-09T12:00:00Z",
                     "coordinates": [-5.2, 50.2],
                     "course": 50.0,
-                    "speed": 13.0
-                }
-            ]
+                    "speed": 13.0,
+                },
+            ],
         },
-        "bbox": [-5.2, 50.0, -5.0, 50.2]
+        "bbox": [-5.2, 50.0, -5.0, 50.2],
     }
 
 
@@ -74,15 +74,8 @@ def make_sample_reference_location(
     return {
         "type": "Feature",
         "id": feature_id,
-        "geometry": {
-            "type": "Point",
-            "coordinates": [lon, lat]
-        },
-        "properties": {
-            "name": name,
-            "location_type": "WAYPOINT",
-            "description": "Test waypoint"
-        }
+        "geometry": {"type": "Point", "coordinates": [lon, lat]},
+        "properties": {"name": name, "location_type": "WAYPOINT", "description": "Test waypoint"},
     }
 
 
@@ -100,10 +93,7 @@ def make_sample_feature_collection(
             make_sample_reference_location(),
         ]
 
-    return {
-        "type": "FeatureCollection",
-        "features": features
-    }
+    return {"type": "FeatureCollection", "features": features}
 
 
 def make_sample_stac_catalog(
@@ -119,7 +109,7 @@ def make_sample_stac_catalog(
         "links": [
             {"rel": "root", "href": "./catalog.json", "type": "application/json"},
             {"rel": "self", "href": "./catalog.json", "type": "application/json"},
-        ]
+        ],
     }
 
 
@@ -147,5 +137,5 @@ def make_sample_stac_item(
             {"rel": "parent", "href": "../catalog.json", "type": "application/json"},
             {"rel": "self", "href": "./item.json", "type": "application/json"},
         ],
-        "assets": {}
+        "assets": {},
     }

@@ -72,23 +72,11 @@ def create_plot(
             "datetime": metadata.timestamp.isoformat(),
         },
         "links": [
-            {
-                "rel": "root",
-                "href": "../catalog.json",
-                "type": "application/json"
-            },
-            {
-                "rel": "parent",
-                "href": "../catalog.json",
-                "type": "application/json"
-            },
-            {
-                "rel": "self",
-                "href": "./item.json",
-                "type": "application/geo+json"
-            },
+            {"rel": "root", "href": "../catalog.json", "type": "application/json"},
+            {"rel": "parent", "href": "../catalog.json", "type": "application/json"},
+            {"rel": "self", "href": "./item.json", "type": "application/geo+json"},
         ],
-        "assets": {}
+        "assets": {},
     }
 
     # Add description if provided

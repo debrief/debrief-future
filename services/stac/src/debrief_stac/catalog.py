@@ -64,17 +64,9 @@ def create_catalog(
         "id": catalog_id,
         "description": description,
         "links": [
-            {
-                "rel": "root",
-                "href": "./catalog.json",
-                "type": "application/json"
-            },
-            {
-                "rel": "self",
-                "href": "./catalog.json",
-                "type": "application/json"
-            },
-        ]
+            {"rel": "root", "href": "./catalog.json", "type": "application/json"},
+            {"rel": "self", "href": "./catalog.json", "type": "application/json"},
+        ],
     }
 
     # Write catalog.json
@@ -143,12 +135,9 @@ def _add_item_link(catalog_data: STACCatalog, item_id: str, item_href: str) -> N
         if link.get("rel") == "item" and link.get("href") == item_href:
             return  # Already exists
 
-    catalog_data["links"].append({
-        "rel": "item",
-        "href": item_href,
-        "type": "application/geo+json",
-        "title": item_id
-    })
+    catalog_data["links"].append(
+        {"rel": "item", "href": item_href, "type": "application/geo+json", "title": item_id}
+    )
 
 
 def list_plots(path: CatalogPath) -> list[PlotSummary]:
@@ -195,11 +184,7 @@ def list_plots(path: CatalogPath) -> list[PlotSummary]:
         dt_str = properties.get("datetime")
 
         # Parse datetime
-        dt = (
-            datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
-            if dt_str
-            else datetime.now()
-        )
+        dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00")) if dt_str else datetime.now()
 
         # Count features if available
         feature_count = 0
