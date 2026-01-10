@@ -7,7 +7,6 @@ This module provides functions for creating and managing local STAC catalogs.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from debrief_stac.exceptions import CatalogExistsError, CatalogNotFoundError
 from debrief_stac.models import PlotSummary
@@ -20,7 +19,7 @@ from debrief_stac.types import (
 
 def create_catalog(
     path: CatalogPath,
-    catalog_id: Optional[str] = None,
+    catalog_id: str | None = None,
     description: str = "Debrief analysis catalog",
 ) -> Path:
     """Create a new local STAC catalog at the specified path.
@@ -196,10 +195,11 @@ def list_plots(path: CatalogPath) -> list[PlotSummary]:
         dt_str = properties.get("datetime")
 
         # Parse datetime
-        if dt_str:
-            dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
-        else:
-            dt = datetime.now()
+        dt = (
+            datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+            if dt_str
+            else datetime.now()
+        )
 
         # Count features if available
         feature_count = 0

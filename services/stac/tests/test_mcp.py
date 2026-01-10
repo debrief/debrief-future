@@ -1,12 +1,8 @@
 """Tests for MCP tool exposure (User Story 7)."""
 
-import json
 from pathlib import Path
-from typing import Any
 
-import pytest
-
-from debrief_stac.mcp_server import mcp, TOOL_NAMES
+from debrief_stac.mcp_server import TOOL_NAMES, mcp
 
 
 class TestMCPToolRegistration:
@@ -94,8 +90,8 @@ class TestMCPErrorResponses:
     def test_add_features_invalid_geojson_error(self, tmp_path: Path) -> None:
         """Test that add_features returns error for invalid GeoJSON."""
         from debrief_stac.catalog import create_catalog
-        from debrief_stac.models import PlotMetadata
         from debrief_stac.mcp_server import mcp_add_features
+        from debrief_stac.models import PlotMetadata
         from debrief_stac.plot import create_plot
 
         catalog_path = create_catalog(tmp_path / "catalog")

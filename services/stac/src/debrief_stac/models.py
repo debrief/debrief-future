@@ -5,9 +5,8 @@ These models define the metadata structures used when creating
 and managing STAC Items (plots) within catalogs.
 """
 
+from datetime import UTC
 from datetime import datetime as dt
-from datetime import timezone
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -22,9 +21,9 @@ class PlotMetadata(BaseModel):
     """
 
     title: str = Field(..., min_length=1, description="Plot title")
-    description: Optional[str] = Field(default=None, description="Plot description")
+    description: str | None = Field(default=None, description="Plot description")
     timestamp: dt = Field(
-        default_factory=lambda: dt.now(timezone.utc),
+        default_factory=lambda: dt.now(UTC),
         description="Plot timestamp (ISO8601)",
         alias="datetime"
     )
@@ -74,7 +73,7 @@ class AssetProvenance(BaseModel):
 
     source_path: str = Field(..., description="Original source file path")
     load_timestamp: dt = Field(
-        default_factory=lambda: dt.now(timezone.utc),
+        default_factory=lambda: dt.now(UTC),
         description="When the asset was loaded"
     )
     tool_version: str = Field(

@@ -6,11 +6,10 @@ Following TDD: Write tests first, ensure they fail, then implement.
 
 import json
 import os
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
-
-from datetime import datetime, timezone, timedelta
 
 from debrief_stac.catalog import create_catalog, list_plots, open_catalog
 from debrief_stac.exceptions import CatalogExistsError, CatalogNotFoundError
@@ -195,7 +194,7 @@ class TestListPlots:
         catalog_path = create_catalog(temp_dir / "catalog")
 
         # Create plots with specific datetimes
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         old = now - timedelta(days=30)
         older = now - timedelta(days=60)
 

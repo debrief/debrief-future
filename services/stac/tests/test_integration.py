@@ -3,8 +3,6 @@
 import json
 from pathlib import Path
 
-import pytest
-
 
 class TestFullWorkflow:
     """Integration test for complete debrief-stac workflow."""
@@ -214,7 +212,7 @@ class TestFullWorkflow:
 
         # Verify catalog links are correct
         catalog = open_catalog(catalog_path)
-        item_links = [l for l in catalog["links"] if l["rel"] == "item"]
+        item_links = [link for link in catalog["links"] if link["rel"] == "item"]
         assert len(item_links) == 3
 
         # Verify each link points to valid item

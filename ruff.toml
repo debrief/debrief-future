@@ -1,0 +1,29 @@
+# Project-wide Ruff configuration for Debrief v4.x
+# All Python packages in the workspace inherit these rules
+
+# Python 3.11+ target
+target-version = "py311"
+line-length = 100
+
+# Exclude generated code
+exclude = [
+    "shared/schemas/src/generated/",
+]
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # Pyflakes (unused imports, undefined names)
+    "I",    # isort (import sorting)
+    "W",    # pycodestyle warnings
+    "UP",   # pyupgrade (Python version upgrades)
+    "B",    # flake8-bugbear (common bugs)
+    "SIM",  # flake8-simplify (simplifications)
+]
+
+ignore = [
+    "E501",  # line too long - handled by formatter
+]
+
+[lint.isort]
+known-first-party = ["debrief_schemas", "debrief_stac"]

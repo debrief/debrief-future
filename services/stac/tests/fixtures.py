@@ -5,7 +5,7 @@ This module provides reusable test data for GeoJSON features,
 STAC structures, and sample metadata.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from debrief_stac.types import GeoJSONFeature, GeoJSONFeatureCollection
 
@@ -130,7 +130,7 @@ def make_sample_stac_item(
 ) -> dict:
     """Create a sample STAC Item structure."""
     if dt is None:
-        dt = datetime.now(timezone.utc)
+        dt = datetime.now(UTC)
 
     return {
         "type": "Feature",

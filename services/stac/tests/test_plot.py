@@ -63,7 +63,7 @@ class TestCreatePlot:
         catalog_data = open_catalog(catalog_path)
 
         # Verify item link added
-        item_links = [l for l in catalog_data["links"] if l["rel"] == "item"]
+        item_links = [link for link in catalog_data["links"] if link["rel"] == "item"]
         assert len(item_links) == 1
         assert plot_id in item_links[0]["href"]
 

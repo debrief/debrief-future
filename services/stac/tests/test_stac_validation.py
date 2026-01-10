@@ -12,8 +12,9 @@ import pytest
 
 # Check if network is available for stac-validator tests
 try:
-    from stac_validator import stac_validator
     import urllib.request
+
+    from stac_validator import stac_validator
     urllib.request.urlopen("https://schemas.stacspec.org", timeout=2)
     NETWORK_AVAILABLE = True
 except Exception:
@@ -279,7 +280,7 @@ class TestSTACStructuralValidation:
             assert "href" in link
 
         # Check item links exist
-        item_links = [l for l in catalog["links"] if l["rel"] == "item"]
+        item_links = [link for link in catalog["links"] if link["rel"] == "item"]
         assert len(item_links) == 1
 
     def test_item_has_required_fields(self, tmp_path: Path) -> None:
@@ -384,7 +385,7 @@ class TestSTACStructuralValidation:
         with open(catalog_path / plot_id / "item.json") as f:
             item = json.load(f)
 
-        link_rels = [l["rel"] for l in item["links"]]
+        link_rels = [link["rel"] for link in item["links"]]
         assert "self" in link_rels
         assert "parent" in link_rels
         assert "root" in link_rels

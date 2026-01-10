@@ -4,10 +4,7 @@ Tests for asset operations (User Story 5).
 Following TDD: Write tests first, ensure they fail, then implement.
 """
 
-import tempfile
 from pathlib import Path
-
-import pytest
 
 from debrief_stac.assets import add_asset
 from debrief_stac.catalog import create_catalog

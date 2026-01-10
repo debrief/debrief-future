@@ -10,6 +10,11 @@ members = [
     "services/stac",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.8.0",
+]
+
 [tool.uv.sources]
 debrief-schemas = { workspace = true }
 debrief-stac = { workspace = true }

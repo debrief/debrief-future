@@ -12,11 +12,11 @@ Usage:
         debrief-stac-mcp
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
-from debrief_stac.catalog import create_catalog, list_plots, open_catalog
+from debrief_stac.catalog import create_catalog, list_plots
 from debrief_stac.exceptions import (
     CatalogExistsError,
     CatalogNotFoundError,
@@ -42,7 +42,7 @@ mcp = FastMCP("debrief-stac")
 
 def mcp_create_catalog(
     path: str,
-    catalog_id: Optional[str] = None,
+    catalog_id: str | None = None,
     description: str = "Debrief analysis catalog",
 ) -> dict[str, Any]:
     """Create a new local STAC catalog.
@@ -69,8 +69,8 @@ def mcp_create_catalog(
 def mcp_create_plot(
     catalog_path: str,
     title: str,
-    description: Optional[str] = None,
-    plot_id: Optional[str] = None,
+    description: str | None = None,
+    plot_id: str | None = None,
 ) -> dict[str, Any]:
     """Create a new plot (STAC Item) within a catalog.
 
@@ -147,8 +147,8 @@ def mcp_add_asset(
     catalog_path: str,
     plot_id: str,
     source_path: str,
-    asset_key: Optional[str] = None,
-    media_type: Optional[str] = None,
+    asset_key: str | None = None,
+    media_type: str | None = None,
 ) -> dict[str, Any]:
     """Add a source file as an asset to a plot.
 
@@ -206,7 +206,7 @@ def mcp_list_plots(catalog_path: str) -> dict[str, Any]:
 @mcp.tool()
 def create_catalog_tool(
     path: str,
-    catalog_id: Optional[str] = None,
+    catalog_id: str | None = None,
     description: str = "Debrief analysis catalog",
 ) -> dict[str, Any]:
     """Create a new local STAC catalog at the specified path.
@@ -226,8 +226,8 @@ def create_catalog_tool(
 def create_plot_tool(
     catalog_path: str,
     title: str,
-    description: Optional[str] = None,
-    plot_id: Optional[str] = None,
+    description: str | None = None,
+    plot_id: str | None = None,
 ) -> dict[str, Any]:
     """Create a new plot (STAC Item) within an existing catalog.
 
@@ -284,8 +284,8 @@ def add_asset_tool(
     catalog_path: str,
     plot_id: str,
     source_path: str,
-    asset_key: Optional[str] = None,
-    media_type: Optional[str] = None,
+    asset_key: str | None = None,
+    media_type: str | None = None,
 ) -> dict[str, Any]:
     """Add a source file as an asset to a plot with provenance tracking.
 

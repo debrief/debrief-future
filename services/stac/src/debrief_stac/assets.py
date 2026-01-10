@@ -8,13 +8,11 @@ with provenance tracking per Constitution Article III.
 import mimetypes
 import shutil
 from pathlib import Path
-from typing import Optional
 
 from debrief_stac.models import AssetProvenance
 from debrief_stac.plot import _save_plot, read_plot
 from debrief_stac.types import (
     ASSET_ROLE_SOURCE,
-    MEDIA_TYPE_JSON,
     AssetPath,
     CatalogPath,
 )
@@ -24,8 +22,8 @@ def add_asset(
     catalog_path: CatalogPath,
     plot_id: str,
     source_path: AssetPath,
-    asset_key: Optional[str] = None,
-    media_type: Optional[str] = None,
+    asset_key: str | None = None,
+    media_type: str | None = None,
 ) -> str:
     """Add a source file as an asset to a plot.
 

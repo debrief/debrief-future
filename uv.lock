@@ -481,6 +481,15 @@ name = "debrief"
 version = "4.0.0"
 source = { virtual = "." }
 
+[package.optional-dependencies]
+dev = [
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "ruff", marker = "extra == 'dev'", specifier = ">=0.8.0" }]
+provides-extras = ["dev"]
+
 [[package]]
 name = "debrief-schemas"
 version = "0.1.0"

@@ -8,7 +8,6 @@ which are represented as STAC Items within a catalog.
 import json
 import uuid
 from pathlib import Path
-from typing import Optional
 
 from debrief_stac.catalog import _add_item_link, _save_catalog, open_catalog
 from debrief_stac.exceptions import PlotNotFoundError
@@ -23,7 +22,7 @@ from debrief_stac.types import (
 def create_plot(
     catalog_path: CatalogPath,
     metadata: PlotMetadata,
-    plot_id: Optional[str] = None,
+    plot_id: str | None = None,
 ) -> str:
     """Create a new plot (STAC Item) within a catalog.
 
