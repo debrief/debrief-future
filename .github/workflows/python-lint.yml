@@ -29,14 +29,8 @@ jobs:
         with:
           version: "latest"
 
-      - name: Set up Python
-        run: uv python install 3.11
-
-      - name: Install ruff
-        run: uv pip install ruff --system
-
       - name: Run ruff check
-        run: ruff check .
+        run: uvx ruff check .
 
       - name: Run ruff format check
-        run: ruff format --check .
+        run: uvx ruff format --check .
