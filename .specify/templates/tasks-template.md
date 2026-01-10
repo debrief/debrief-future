@@ -12,6 +12,56 @@ description: "Task list template for feature implementation"
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+---
+
+## Evidence Requirements
+
+> **Purpose**: Capture artifacts that demonstrate the feature works as expected. These are used in PR descriptions, documentation, and future blog posts.
+
+**Evidence Directory**: `specs/[###-feature-name]/evidence/`
+
+### Evidence Types
+
+| Type | Format | When to Capture | Example |
+|------|--------|-----------------|---------|
+| **Test Output** | `.txt`, `.md` | After test suite passes | `pytest-output.txt`, `test-summary.md` |
+| **CLI Demo** | `.txt`, `.gif` | After CLI features work | `cli-demo.txt`, `usage.gif` |
+| **Screenshot** | `.png`, `.jpg` | After UI renders correctly | `dashboard.png`, `before-after.png` |
+| **API Response** | `.json` | After endpoint works | `sample-response.json` |
+| **Performance** | `.md`, `.csv` | After benchmarks run | `benchmarks.md`, `metrics.csv` |
+| **Architecture** | `.md`, `.mermaid` | After design is implemented | `data-flow.md`, `sequence.mermaid` |
+
+### Minimum Evidence Per Feature
+
+Every completed feature MUST include:
+
+1. **Test Summary** (`evidence/test-summary.md`):
+   - Total tests: passed/failed/skipped
+   - Coverage percentage (if applicable)
+   - Key test scenarios verified
+
+2. **Usage Example** (`evidence/usage-example.md` or `evidence/usage-demo.txt`):
+   - A concrete example of using the feature
+   - Expected output/behavior
+   - Can be CLI output, API call, or code snippet
+
+3. **Feature-Specific Evidence** (varies by feature type):
+   - CLI tools: Terminal session showing commands and output
+   - APIs: Sample request/response JSON
+   - UI: Screenshots of key states
+   - Libraries: Code example with output
+   - Data processing: Before/after data samples
+
+### Evidence Collection Tasks
+
+Include these as final tasks in the Polish phase:
+
+```markdown
+- [ ] TXXX Capture test summary in specs/[feature]/evidence/test-summary.md
+- [ ] TXXX Record usage example in specs/[feature]/evidence/usage-example.md
+- [ ] TXXX [Add feature-specific evidence task]
+```
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
@@ -157,6 +207,17 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX Security hardening
 - [ ] TXXX Run quickstart.md validation
 
+### Evidence Collection (REQUIRED)
+
+> **Purpose**: Capture artifacts for PR description and future documentation
+
+- [ ] TXXX Create evidence directory: specs/[feature]/evidence/
+- [ ] TXXX Capture test summary with pass/fail counts in evidence/test-summary.md
+- [ ] TXXX Record usage example demonstrating feature in evidence/usage-example.md
+- [ ] TXXX [Add feature-specific evidence - screenshots, CLI output, API samples, etc.]
+
+**Checkpoint**: Evidence collected - ready for PR creation via `/speckit.pr`
+
 ---
 
 ## Dependencies & Execution Order
@@ -249,3 +310,5 @@ With multiple developers:
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+- **Evidence is required** - capture artifacts that prove the feature works
+- Run `/speckit.pr` after all tasks complete to create PR with evidence
