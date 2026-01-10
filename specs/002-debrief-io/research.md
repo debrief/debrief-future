@@ -235,50 +235,96 @@ def parse_track(lines: list[str]) -> TrackFeature:
 
 ## REP Format Specification
 
+**Reference**: [Debrief File Formats Documentation](https://debrief.github.io/tutorial/reference.html#replay_file_format)
+
 ### Overview
 
-REP (Replay) is Debrief's legacy file format for storing track and reference data. It is a line-based text format with record type indicators.
+REP (Replay) is Debrief's legacy file format for storing track and reference data. It originated from the Royal Navy's Replay application and is the primary data interchange format for Debrief.
 
-### Record Types
+### Track Position Record
 
-| Type | Description | Fields |
-|------|-------------|--------|
-| `;` | Comment | Ignored |
-| `//` | Track header | platform_id, track_type, color |
-| `;NARRATIVE` | Narrative text | timestamp, text |
-| Position | Track position | timestamp, lat, lon, course, speed, depth |
-| `REF:` | Reference location | name, lat, lon, type |
-| `SENSOR:` | Sensor contact | timestamp, bearing, range, parent_track |
+The main record type is a whitespace-separated position fix:
+
+```
+YYMMDD HHMMSS.SSS TRACKNAME SYMBOL DD MM SS.SS H DDD MM SS.SS H CCC.C SSS.S DEPTH [LABEL]
+```
+
+| Field | Format | Description |
+|-------|--------|-------------|
+| Date | `YYMMDD` | Year (2-digit), month, day |
+| Time | `HHMMSS.SSS` | Hours, minutes, seconds with milliseconds |
+| Track Name | String | Platform/vessel identifier (no spaces) |
+| Symbol | `@X` or `@XY` | Symbol code (e.g., `@A`, `@C`, `@D`) |
+| Latitude | `DD MM SS.SS H` | Degrees, minutes, seconds, hemisphere (N/S) |
+| Longitude | `DDD MM SS.SS H` | Degrees, minutes, seconds, hemisphere (E/W) |
+| Course | `CCC.C` | Course in degrees (0-360) |
+| Speed | `SSS.S` | Speed in knots |
+| Depth | Integer | Depth in meters (0 for surface) |
+| Label | String | Optional label text |
+
+### Special Record Types
+
+| Prefix | Description | Format |
+|--------|-------------|--------|
+| `;` | Comment | Ignored (unless followed by keyword) |
+| `;NARRATIVE:` | Narrative entry | `YYMMDD HHMMSS.SSS TRACKNAME TEXT` |
+| `;RECT:` | Rectangle shape | `SYMBOL LAT1 LON1 LAT2 LON2 LABEL` |
+| `;LINE:` | Line shape | `SYMBOL LAT1 LON1 LAT2 LON2 LABEL` |
+| `;CIRCLE:` | Circle shape | `SYMBOL LAT LON RADIUS LABEL` |
+| `;TEXT:` | Text annotation | `SYMBOL LAT LON LABEL` |
+| `;VECTOR:` | Vector shape | `SYMBOL LAT LON RANGE BEARING LABEL` |
 
 ### Example REP Content
 
 ```
-;; Sample Debrief REP file
-//OWNSHIP TYPE:OWNSHIP COLOR:RED
-951212 120000 50.5 -1.2 045 12.5 0
-951212 120100 50.52 -1.18 047 12.8 0
-951212 120200 50.54 -1.16 046 12.6 0
+;; Ship track data from exercise
+951212 050300.000 COLLINGWOOD @A 21 53 39.19 N 21 35 37.59 W   0.3   3.5      0
+951212 050400.000 COLLINGWOOD @A 21 53 43.69 N 21 35 37.55 W 359.6   3.5      0
+951212 050500.000 COLLINGWOOD @A 21 53 48.10 N 21 35 37.60 W 358.5   3.5      0
 
-//CONTACT_1 TYPE:CONTACT COLOR:BLUE
-951212 120030 50.48 -1.25 180 8.0 0
-951212 120130 50.46 -1.27 182 7.8 0
+;NARRATIVE: 951212 050000.000 NELSON COMEX SERIAL 16D
+;NARRATIVE: 951212 050100.100 NELSON INTEND WIDE AREA SEARCH
 
-REF:ALPHA 50.6 -1.0 WAYPOINT
+;CIRCLE: @D 21.8 0 0 N 21.0 0 0 W 2000 reference circle
+;TEXT: @E 21.7 0 0 N 21.5 0 0 W waypoint alpha
 ```
 
-### Coordinate Format
+### Coordinate Format Details
 
-- Latitude: Decimal degrees, positive = North
-- Longitude: Decimal degrees, positive = East
-- Timestamp: YYMMDD HHMMSS (6-digit date, 6-digit time)
+**Degrees-Minutes-Seconds (DMS)**:
+- Latitude: `DD MM SS.SS H` where H is N or S
+- Longitude: `DDD MM SS.SS H` where H is E or W
+- Spaces separate degree, minute, second components
+- Seconds include decimal fraction
 
-### Notes
+**Conversion to Decimal Degrees**:
+```python
+def dms_to_decimal(deg: float, min: float, sec: float, hemisphere: str) -> float:
+    decimal = deg + min/60 + sec/3600
+    if hemisphere in ('S', 'W'):
+        decimal = -decimal
+    return decimal
+```
 
-- Lines starting with `;` are comments (except `;NARRATIVE`)
-- Track headers start with `//`
-- Position lines are space-separated values
-- Reference locations start with `REF:`
-- Sensor contacts start with `SENSOR:`
+### Symbol Codes
+
+Symbol codes control display appearance:
+- Single letter: `@A`, `@B`, `@C`, etc. - basic symbols
+- Extended: `@XY` where X is symbol, Y is style/color modifier
+
+### Timestamp Format
+
+- Date: 2-digit year (95 = 1995, 26 = 2026)
+- Time: HHMMSS with optional .SSS milliseconds
+- No timezone specified - assumed UTC
+
+### File Conventions
+
+- File extension: `.rep` or `.REP`
+- Encoding: Typically ASCII/Latin-1, modern files may be UTF-8
+- Line endings: CRLF (Windows) or LF (Unix) accepted
+- Whitespace: Tabs or spaces as field delimiters
+- Empty lines: Ignored
 
 ## Performance Considerations
 
