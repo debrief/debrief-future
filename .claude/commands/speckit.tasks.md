@@ -41,24 +41,38 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 4. **Generate tasks.md**: Use `.specify/templates/tasks-template.md` as structure, fill with:
    - Correct feature name from plan.md
+   - **Evidence Requirements section** (see Evidence Planning Rules below)
    - Phase 1: Setup tasks (project initialization)
    - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
    - Phase 3+: One phase per user story (in priority order from spec.md)
    - Each phase includes: story goal, independent test criteria, tests (if requested), implementation tasks
-   - Final Phase: Polish & cross-cutting concerns
+   - Final Phase: Polish & cross-cutting concerns (MUST include evidence collection tasks)
    - All tasks must follow the strict checklist format (see Task Generation Rules below)
    - Clear file paths for each task
    - Dependencies section showing story completion order
    - Parallel execution examples per story
    - Implementation strategy section (MVP first, incremental delivery)
 
-5. **Report**: Output path to generated tasks.md and summary:
+5. **Plan evidence artifacts**: Determine what evidence should be captured to demonstrate the feature works:
+   - **Test evidence**: What test output/summary will prove correctness?
+   - **Usage evidence**: What example demonstrates the feature in action?
+   - **Feature-specific evidence**: Based on feature type:
+     - CLI tools → Terminal session recordings, command output
+     - APIs → Sample request/response JSON
+     - UI components → Screenshots of key states
+     - Data processing → Before/after data samples
+     - Libraries → Code examples with output
+   - Add specific evidence collection tasks to the Polish phase
+
+6. **Report**: Output path to generated tasks.md and summary:
    - Total task count
    - Task count per user story
    - Parallel opportunities identified
    - Independent test criteria for each story
+   - **Evidence artifacts planned** (list what will be captured)
    - Suggested MVP scope (typically just User Story 1)
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
+   - Reminder: Run `/speckit.pr` after implementation to create PR with evidence
 
 Context for task generation: $ARGUMENTS
 
@@ -134,4 +148,77 @@ Every task MUST strictly follow this format:
 - **Phase 3+**: User Stories in priority order (P1, P2, P3...)
   - Within each story: Tests (if requested) → Models → Services → Endpoints → Integration
   - Each phase should be a complete, independently testable increment
-- **Final Phase**: Polish & Cross-Cutting Concerns
+- **Final Phase**: Polish & Cross-Cutting Concerns (MUST include evidence collection)
+
+## Evidence Planning Rules
+
+**Purpose**: Plan artifacts that demonstrate the feature works. These are used in PR descriptions, documentation, and blog posts.
+
+### Evidence Directory Structure
+
+```text
+specs/[###-feature-name]/evidence/
+├── test-summary.md      # REQUIRED: Test pass/fail counts, coverage
+├── usage-example.md     # REQUIRED: Concrete usage demonstration
+└── [feature-specific]   # Varies by feature type
+```
+
+### Determining Feature-Specific Evidence
+
+Based on the feature type detected from spec.md and plan.md:
+
+| Feature Type | Evidence to Plan | Example Files |
+|--------------|------------------|---------------|
+| **CLI Tool** | Command examples with output | `cli-demo.txt`, `help-output.txt` |
+| **API/Service** | Request/response samples | `api-sample.json`, `endpoints.md` |
+| **Library/SDK** | Code examples with results | `usage-example.py`, `output.txt` |
+| **Data Processing** | Before/after samples | `input-sample.json`, `output-sample.json` |
+| **UI Component** | Screenshots of states | `initial.png`, `completed.png` |
+| **Parser/Converter** | Input/output file pairs | `sample-input.rep`, `parsed-output.json` |
+| **Integration** | End-to-end flow demo | `integration-flow.md`, `sequence.mermaid` |
+
+### Evidence Task Generation
+
+For the Polish phase, ALWAYS generate these tasks:
+
+1. **Test Summary Task** (REQUIRED):
+   ```markdown
+   - [ ] TXXX Capture test results in specs/[feature]/evidence/test-summary.md
+   ```
+   Content should include: total tests, passed, failed, coverage %, key scenarios.
+
+2. **Usage Example Task** (REQUIRED):
+   ```markdown
+   - [ ] TXXX Create usage demonstration in specs/[feature]/evidence/usage-example.md
+   ```
+   Content should include: code/command example, expected output, explanation.
+
+3. **Feature-Specific Tasks** (based on feature type):
+   ```markdown
+   - [ ] TXXX [P] Capture [specific artifact] in specs/[feature]/evidence/[filename]
+   ```
+
+### Evidence Quality Guidelines
+
+Good evidence should be:
+- **Reproducible**: Others can follow the example and get the same result
+- **Concise**: Shows the key behavior without unnecessary complexity
+- **Visual when possible**: Screenshots, diagrams, or formatted output
+- **Self-contained**: Includes all context needed to understand it
+
+### Example Evidence Section in tasks.md
+
+```markdown
+## Evidence Requirements
+
+**Evidence Directory**: `specs/002-debrief-io/evidence/`
+
+### Planned Artifacts
+
+| Artifact | Description | Captured When |
+|----------|-------------|---------------|
+| test-summary.md | pytest results with 47 tests | After all tests pass |
+| usage-example.md | Python code parsing REP file | After parser complete |
+| cli-demo.txt | Terminal session showing parse command | After CLI works |
+| sample-output.json | GeoJSON output from boat1.rep | After parsing works |
+```

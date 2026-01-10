@@ -1,5 +1,10 @@
 ---
 description: Execute the implementation plan by processing and executing all tasks defined in tasks.md
+handoffs:
+  - label: Create Pull Request
+    agent: speckit.pr
+    prompt: Create PR with evidence from implementation
+    send: true
 ---
 
 ## User Input
@@ -102,6 +107,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Task dependencies**: Sequential vs parallel execution rules
    - **Task details**: ID, description, file paths, parallel markers [P]
    - **Execution flow**: Order and dependency requirements
+   - **Evidence requirements**: Check for Evidence Requirements section and note what artifacts to capture
 
 6. Execute implementation following the task plan:
    - **Phase-by-phase execution**: Complete each phase before moving to the next
@@ -116,6 +122,11 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Core development**: Implement models, services, CLI commands, endpoints
    - **Integration work**: Database connections, middleware, logging, external services
    - **Polish and validation**: Unit tests, performance optimization, documentation
+   - **Evidence collection**: During Polish phase, capture evidence artifacts as specified in tasks.md:
+     - Create `FEATURE_DIR/evidence/` directory
+     - Capture test-summary.md with test results
+     - Create usage-example.md demonstrating the feature
+     - Capture any feature-specific artifacts (screenshots, API samples, CLI output, etc.)
 
 8. Progress tracking and error handling:
    - Report progress after each completed task
@@ -131,5 +142,17 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Validate that tests pass and coverage meets requirements
    - Confirm the implementation follows the technical plan
    - Report final status with summary of completed work
+
+10. **Evidence verification and PR preparation**:
+    - Verify evidence directory exists: `FEATURE_DIR/evidence/`
+    - Check that required evidence files are present:
+      - `evidence/test-summary.md` - REQUIRED
+      - `evidence/usage-example.md` - REQUIRED
+      - Feature-specific artifacts as defined in tasks.md
+    - If evidence is missing, WARN the user and recommend completing evidence tasks
+    - If all evidence is present:
+      - Commit any uncommitted changes
+      - Push to the feature branch
+      - Prompt user: "Implementation complete with evidence. Run `/speckit.pr` to create a pull request with the collected evidence."
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit.tasks` first to regenerate the task list.
