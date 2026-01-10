@@ -1,12 +1,12 @@
 [project]
-name = "debrief-schemas"
+name = "debrief-stac"
 version = "0.1.0"
-description = "LinkML schemas and generated models for Debrief v4.x"
+description = "Local STAC catalog operations for Debrief v4.x"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Debrief Team" }]
-keywords = ["linkml", "pydantic", "geojson", "maritime", "schemas"]
+keywords = ["stac", "geojson", "maritime", "catalog"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -18,17 +18,18 @@ classifiers = [
 ]
 
 dependencies = [
-    "linkml>=1.7.0",
-    "linkml-runtime>=1.7.0",
     "pydantic>=2.0.0",
+    "debrief-schemas",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
-    "black>=23.0.0",
     "ruff>=0.1.0",
+]
+mcp = [
+    "mcp>=1.0.0",
 ]
 
 [build-system]
@@ -36,15 +37,20 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/generated/python/debrief_schemas"]
+packages = ["src/debrief_stac"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
+addopts = "-v --tb=short"
 
 # Ruff config inherited from root ruff.toml
 
-[tool.black]
-line-length = 100
-target-version = ["py311"]
+[tool.coverage.run]
+source = ["src/debrief_stac"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true

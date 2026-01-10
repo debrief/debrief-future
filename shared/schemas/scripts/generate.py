@@ -57,7 +57,8 @@ def generate_pydantic() -> bool:
 
     cmd = [
         "gen-pydantic",
-        "--extra-fields", "forbid",
+        "--extra-fields",
+        "forbid",
         str(MASTER_SCHEMA),
     ]
 
@@ -189,7 +190,7 @@ def main():
     )
     args = parser.parse_args()
 
-    print(f"Schema generation for Debrief v4.x")
+    print("Schema generation for Debrief v4.x")
     print(f"Master schema: {MASTER_SCHEMA}")
     print()
 
@@ -210,9 +211,8 @@ def main():
         if not generate_typescript():
             success = False
 
-    if args.validate_fixtures:
-        if not validate_fixtures():
-            success = False
+    if args.validate_fixtures and not validate_fixtures():
+        success = False
 
     print()
     if success:

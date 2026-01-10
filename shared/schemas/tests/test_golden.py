@@ -13,19 +13,19 @@ but represent correct GeoJSON data.
 """
 
 import json
+
+# Import generated models
+import sys
 import warnings
 from pathlib import Path
-from typing import Any
 
 import pytest
 from pydantic import ValidationError
 
-# Import generated models
-import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
 from debrief_schemas import (
-    TrackFeature,
     ReferenceLocation,
+    TrackFeature,
 )
 
 FIXTURES_DIR = Path(__file__).parent.parent / "src" / "fixtures"
@@ -103,7 +103,8 @@ class TestValidFixtures:
             if is_known_geometry_limitation(entity_type, e):
                 warnings.warn(
                     f"{fixture_path.name}: Validation failed due to LinkML "
-                    "nested array limitation (known issue with GeoJSON coordinates)"
+                    "nested array limitation (known issue with GeoJSON coordinates)",
+                    stacklevel=2,
                 )
             else:
                 raise

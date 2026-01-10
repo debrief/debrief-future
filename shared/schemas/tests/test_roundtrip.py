@@ -7,13 +7,13 @@ Tests that:
 """
 
 import json
-from pathlib import Path
-from typing import Any
-
-import pytest
 
 # Import generated models
 import sys
+from pathlib import Path
+
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
 from debrief_schemas import ReferenceLocation
 
