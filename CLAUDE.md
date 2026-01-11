@@ -81,6 +81,8 @@ Three approaches required:
 - N/A (pure transformation service - no persistence) (002-debrief-io)
 - Python 3.11+ (primary), TypeScript 5.x (mirror library) + Pydantic >=2.0.0 (Python), platformdirs (XDG paths), zod (TypeScript validation) (003-debrief-config)
 - JSON file at XDG config location (~/.config/debrief/config.json on Linux) (003-debrief-config)
+- Markdown (command prompts and templates) + None (pure markdown files interpreted by Claude Code) (004-speckit-ui-workflow)
+- N/A (no persistent data - modifies workflow templates) (004-speckit-ui-workflow)
 
 ## Recent Changes
 - 000-schemas: Added Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS)
