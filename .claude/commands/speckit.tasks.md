@@ -1,13 +1,9 @@
 ---
-description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts.
-handoffs: 
-  - label: Analyze For Consistency
-    agent: speckit.analyze
-    prompt: Run a project analysis for consistency
-    send: true
-  - label: Implement Project
+description: Generate a detailed task breakdown from spec.md and plan.md. Creates tasks.md with phased implementation checklist including evidence collection, media content, and PR creation.
+handoffs:
+  - label: Implement Tasks
     agent: speckit.implement
-    prompt: Start the implementation in phases
+    prompt: Execute the generated task plan
     send: true
 ---
 
@@ -21,23 +17,11 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. **Setup**: Run `.specify/scripts/bash/check-prerequisites.sh --json` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+1. **Setup**: Run `.specify/scripts/bash/check-prerequisites.sh --json --require-plan --include-plan` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute.
 
-2. **Load design documents**: Read from FEATURE_DIR:
-   - **Required**: plan.md (tech stack, libraries, structure), spec.md (user stories with priorities)
-   - **Optional**: data-model.md (entities), contracts/ (API endpoints), research.md (decisions), quickstart.md (test scenarios)
-   - Note: Not all projects have all documents. Generate tasks based on what's available.
+2. **Read plan.md** from FEATURE_DIR for implementation approach and architecture.
 
-3. **Execute task generation workflow**:
-   - Load plan.md and extract tech stack, libraries, project structure
-   - Load spec.md and extract user stories with their priorities (P1, P2, P3, etc.)
-   - If data-model.md exists: Extract entities and map to user stories
-   - If contracts/ exists: Map endpoints to user stories
-   - If research.md exists: Extract decisions for setup tasks
-   - Generate tasks organized by user story (see Task Generation Rules below)
-   - Generate dependency graph showing user story completion order
-   - Create parallel execution examples per user story
-   - Validate task completeness (each user story has all needed tasks, independently testable)
+3. **Read spec.md** from FEATURE_DIR for user stories and acceptance criteria.
 
 4. **Generate tasks.md**: Use `.specify/templates/tasks-template.md` as structure, fill with:
    - Correct feature name from plan.md
@@ -46,7 +30,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
    - Phase 3+: One phase per user story (in priority order from spec.md)
    - Each phase includes: story goal, independent test criteria, tests (if requested), implementation tasks
-   - Final Phase: Polish & cross-cutting concerns (MUST include evidence collection AND media content tasks)
+   - Final Phase: Polish & cross-cutting concerns (MUST include evidence collection, media content, AND PR creation tasks)
    - All tasks must follow the strict checklist format (see Task Generation Rules below)
    - Clear file paths for each task
    - Dependencies section showing story completion order
@@ -70,85 +54,60 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Parallel opportunities identified
    - Independent test criteria for each story
    - **Evidence artifacts planned** (list what will be captured)
+   - **PR task included**: Confirm final task triggers /speckit.pr
    - Suggested MVP scope (typically just User Story 1)
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
-   - Reminder: Run `/speckit.pr` after implementation to create PR with evidence
 
 Context for task generation: $ARGUMENTS
 
-The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context.
-
 ## Task Generation Rules
 
-**CRITICAL**: Tasks MUST be organized by user story to enable independent implementation and testing.
-
-**Tests are OPTIONAL**: Only generate test tasks if explicitly requested in the feature specification or if user requests TDD approach.
-
-### Checklist Format (REQUIRED)
+### Strict Checklist Format
 
 Every task MUST strictly follow this format:
 
-```text
-- [ ] [TaskID] [P?] [Story?] Description with file path
+```
+- [ ] T### [optional-labels] Description `path/to/file.ext`
 ```
 
-**Format Components**:
+Components:
+- `- [ ]` — Markdown checkbox (required)
+- `T###` — Task ID with 3-digit number (required, e.g., T001, T042, T100)
+- `[labels]` — Optional labels in square brackets:
+  - `[P]` — Can run in parallel with other [P] tasks in same phase
+  - `[test]` — Test task
+  - `[P][test]` — Parallel test task
+- Description — Brief description of what to do
+- `` `path` `` — File path in backticks (required for file-creating tasks)
 
-1. **Checkbox**: ALWAYS start with `- [ ]` (markdown checkbox)
-2. **Task ID**: Sequential number (T001, T002, T003...) in execution order
-3. **[P] marker**: Include ONLY if task is parallelizable (different files, no dependencies on incomplete tasks)
-4. **[Story] label**: REQUIRED for user story phase tasks only
-   - Format: [US1], [US2], [US3], etc. (maps to user stories from spec.md)
-   - Setup phase: NO story label
-   - Foundational phase: NO story label  
-   - User Story phases: MUST have story label
-   - Polish phase: NO story label
-5. **Description**: Clear action with exact file path
+### Valid Examples
 
-**Examples**:
+```markdown
+- [ ] T001 Create project structure `src/debrief_io/__init__.py`
+- [ ] T002 [P] Add type definitions `src/debrief_io/types.py`
+- [ ] T003 [P] Add constants `src/debrief_io/constants.py`
+- [ ] T004 [test] Write parser unit tests `tests/test_parser.py`
+- [ ] T005 [P][test] Write validator tests `tests/test_validator.py`
+```
 
-- ✅ CORRECT: `- [ ] T001 Create project structure per implementation plan`
-- ✅ CORRECT: `- [ ] T005 [P] Implement authentication middleware in src/middleware/auth.py`
-- ✅ CORRECT: `- [ ] T012 [P] [US1] Create User model in src/models/user.py`
-- ✅ CORRECT: `- [ ] T014 [US1] Implement UserService in src/services/user_service.py`
-- ❌ WRONG: `- [ ] Create User model` (missing ID and Story label)
-- ❌ WRONG: `T001 [US1] Create model` (missing checkbox)
-- ❌ WRONG: `- [ ] [US1] Create User model` (missing Task ID)
-- ❌ WRONG: `- [ ] T001 [US1] Create model` (missing file path)
+### Invalid Examples (DO NOT USE)
 
-### Task Organization
+```markdown
+- [ ] Create project structure  ❌ Missing task ID
+- [ ] T1 Create structure       ❌ Task ID must be 3 digits
+- [ ] T001: Create structure    ❌ No colon after task ID
+- T001 Create structure         ❌ Missing checkbox
+- [ ] T001 Create structure     ❌ Missing file path for file task
+```
 
-1. **From User Stories (spec.md)** - PRIMARY ORGANIZATION:
-   - Each user story (P1, P2, P3...) gets its own phase
-   - Map all related components to their story:
-     - Models needed for that story
-     - Services needed for that story
-     - Endpoints/UI needed for that story
-     - If tests requested: Tests specific to that story
-   - Mark story dependencies (most stories should be independent)
+### Phase Order
 
-2. **From Contracts**:
-   - Map each contract/endpoint → to the user story it serves
-   - If tests requested: Each contract → contract test task [P] before implementation in that story's phase
-
-3. **From Data Model**:
-   - Map each entity to the user story(ies) that need it
-   - If entity serves multiple stories: Put in earliest story or Setup phase
-   - Relationships → service layer tasks in appropriate story phase
-
-4. **From Setup/Infrastructure**:
-   - Shared infrastructure → Setup phase (Phase 1)
-   - Foundational/blocking tasks → Foundational phase (Phase 2)
-   - Story-specific setup → within that story's phase
-
-### Phase Structure
-
-- **Phase 1**: Setup (project initialization)
-- **Phase 2**: Foundational (blocking prerequisites - MUST complete before user stories)
+- **Phase 1**: Setup (project scaffolding, config files)
+- **Phase 2**: Foundation (shared code that blocks all stories)
 - **Phase 3+**: User Stories in priority order (P1, P2, P3...)
   - Within each story: Tests (if requested) → Models → Services → Endpoints → Integration
   - Each phase should be a complete, independently testable increment
-- **Final Phase**: Polish & Cross-Cutting Concerns (MUST include evidence collection AND media content)
+- **Final Phase**: Polish & Cross-Cutting Concerns (MUST include evidence collection, media content, AND PR creation)
 
 ## Evidence Planning Rules
 
@@ -158,9 +117,9 @@ Every task MUST strictly follow this format:
 
 ```text
 specs/[###-feature-name]/evidence/
-├── test-summary.md      # REQUIRED: Test pass/fail counts, coverage
-├── usage-example.md     # REQUIRED: Concrete usage demonstration
-└── [feature-specific]   # Varies by feature type
+├── test-summary.md     # REQUIRED: Test pass/fail counts, coverage
+├── usage-example.md    # REQUIRED: Concrete usage demonstration
+└── [feature-specific]  # Varies by feature type
 ```
 
 ### Determining Feature-Specific Evidence
@@ -212,6 +171,17 @@ For the Polish phase, ALWAYS generate these tasks:
    ```
    150-200 words, hook opening, link to full post
 
+6. **PR Creation Task** (REQUIRED - must be final task):
+   ```markdown
+   - [ ] TXXX Create PR and publish blog: run /speckit.pr
+   ```
+   This task MUST be the final task in tasks.md. It:
+   - Creates the feature PR in debrief-future
+   - Publishes shipped-post.md to debrief.github.io
+   - Returns both PR URLs for review
+   
+   **Dependencies:** All other tasks must be complete before this runs.
+
 ### Evidence Quality Guidelines
 
 Good evidence should be:
@@ -245,6 +215,13 @@ Good evidence should be:
 | media/linkedin-planning.md | LinkedIn summary for planning | During /speckit.plan |
 | media/shipped-post.md | Blog post celebrating completion | During Polish phase |
 | media/linkedin-shipped.md | LinkedIn summary for shipped | During Polish phase |
+
+### PR Creation
+
+| Action | Description | Created When |
+|--------|-------------|--------------|
+| Feature PR | PR in debrief-future with evidence | Final task in Polish phase |
+| Blog PR | PR in debrief.github.io with post | Triggered by /speckit.pr |
 ```
 
 ## Media Content Rules
@@ -283,4 +260,30 @@ Task tool call:
     - Goal: [from spec.md]
     - Key accomplishments: [from evidence/]
     - Lessons learned: [notable challenges/decisions]
+```
+
+## Complete Example: Polish Phase
+
+After applying all rules, a generated Polish phase should look like:
+
+```markdown
+## Phase 5: Polish & Cross-Cutting Concerns
+
+### Evidence Collection
+
+- [ ] T501 Capture test results in specs/002-debrief-io/evidence/test-summary.md
+- [ ] T502 Create usage demonstration in specs/002-debrief-io/evidence/usage-example.md
+- [ ] T503 [P] Capture CLI demo in specs/002-debrief-io/evidence/cli-demo.txt
+- [ ] T504 [P] Capture sample output in specs/002-debrief-io/evidence/sample-output.json
+
+### Media Content
+
+- [ ] T505 Create shipped blog post in specs/002-debrief-io/media/shipped-post.md
+- [ ] T506 [P] Create LinkedIn shipped summary in specs/002-debrief-io/media/linkedin-shipped.md
+
+### PR Creation
+
+- [ ] T507 Create PR and publish blog: run /speckit.pr
+
+**Task T507 must run last. It depends on all evidence and media tasks being complete.**
 ```
