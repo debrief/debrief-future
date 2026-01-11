@@ -1,11 +1,9 @@
 """Tests for path resolution module."""
 
-import os
 import sys
 from pathlib import Path
 
 import pytest
-
 from debrief_config.paths import get_config_dir, get_config_file, get_lock_file
 
 
@@ -33,6 +31,7 @@ class TestGetConfigDir:
 
         # Force reimport to pick up new env var
         import importlib
+
         import debrief_config.paths
         importlib.reload(debrief_config.paths)
 

@@ -9,7 +9,6 @@ from pathlib import Path
 
 from .exceptions import InvalidCatalogError
 
-
 # Required fields per STAC Catalog specification
 REQUIRED_FIELDS = {"type", "stac_version", "id", "description", "links"}
 
@@ -41,7 +40,7 @@ def validate_stac_catalog(path: Path | str) -> None:
     try:
         data = json.loads(catalog_json.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
-        raise InvalidCatalogError(str(path), f"Invalid JSON: {e}")
+        raise InvalidCatalogError(str(path), f"Invalid JSON: {e}") from e
 
     # Check it's a dictionary
     if not isinstance(data, dict):

@@ -7,12 +7,9 @@ Provides safe concurrent access to the config file using:
 
 import json
 import logging
-from pathlib import Path
-from typing import Any
 
 from filelock import FileLock, Timeout
 
-from .exceptions import ConfigCorruptError
 from .models import Config
 from .paths import get_config_file, get_lock_file
 

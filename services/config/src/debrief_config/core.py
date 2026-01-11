@@ -3,7 +3,7 @@
 Provides the main API for managing STAC store registrations and user preferences.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from .exceptions import StoreExistsError, StoreNotFoundError
@@ -56,7 +56,7 @@ def register_store(
         registration = StoreRegistration(
             path=path_str,
             name=name.strip(),
-            last_accessed=datetime.now(timezone.utc),
+            last_accessed=datetime.now(UTC),
             notes=notes,
         )
 

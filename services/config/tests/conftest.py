@@ -1,9 +1,7 @@
 """Shared pytest fixtures for debrief-config tests."""
 
 import json
-import os
 from pathlib import Path
-from typing import Generator
 
 import pytest
 
@@ -20,6 +18,7 @@ def isolated_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
     # Force reimport of paths module to pick up new env var
     import importlib
+
     import debrief_config.paths
     importlib.reload(debrief_config.paths)
 

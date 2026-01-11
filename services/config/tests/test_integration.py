@@ -3,8 +3,6 @@
 import json
 from pathlib import Path
 
-import pytest
-
 from debrief_config import (
     get_config_file,
     list_stores,

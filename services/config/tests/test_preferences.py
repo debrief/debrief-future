@@ -1,9 +1,7 @@
 """Tests for user preferences functionality."""
 
-from pathlib import Path
 
 import pytest
-
 from debrief_config import (
     delete_preference,
     get_preference,

@@ -1,7 +1,6 @@
 """Pydantic models for debrief-config."""
 
 from datetime import datetime
-from typing import Union
 
 from pydantic import BaseModel, Field
 
@@ -20,7 +19,7 @@ class StoreRegistration(BaseModel):
 
 
 # Type alias for preference values
-PreferenceValue = Union[str, int, float, bool, None]
+PreferenceValue = str | int | float | bool | None
 
 
 class Config(BaseModel):

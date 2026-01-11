@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import pytest
-
 from debrief_config import (
     InvalidCatalogError,
     StoreExistsError,
