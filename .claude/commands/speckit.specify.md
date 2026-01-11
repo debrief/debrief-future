@@ -84,6 +84,33 @@ Given that feature description, do this:
          - No reasonable default exists
        - **LIMIT: Maximum 3 [NEEDS CLARIFICATION] markers total**
        - Prioritize clarifications by impact: scope > security/privacy > user experience > technical details
+
+    3a. **Detect UI Feature** (case-insensitive matching):
+
+       **UI Trigger Keywords** (if ANY present → include UI section):
+       - dialog, screen, form, wizard, app, window, button
+       - UI, interface, desktop, mobile, panel, modal
+       - picker, selector, dropdown, menu, dashboard
+
+       **Service Keywords** (indicate non-UI, but DO NOT override UI triggers):
+       - API, service, backend, parser, processor
+       - handler, worker, queue, batch
+
+       **CLI Keywords** (indicate non-UI, DO NOT trigger UI section):
+       - command, terminal, CLI, shell, console
+
+       **Detection Logic**:
+       ```
+       IF any UI_KEYWORD found in description (case-insensitive):
+           INCLUDE "User Interface Flow" section from template
+       ELSE:
+           EXCLUDE "User Interface Flow" section
+       ```
+
+       **Precedence Rule**: UI keywords ALWAYS take precedence. A description with both "API" and "dashboard" INCLUDES the UI section because "dashboard" is a UI indicator.
+
+       **Edge Case**: When uncertain, INCLUDE the UI section (false positive preferred over false negative - user can remove it if not needed).
+
     4. Fill User Scenarios & Testing section
        If no clear user flow: ERROR "Cannot determine user scenarios"
     5. Generate Functional Requirements
@@ -97,6 +124,10 @@ Given that feature description, do this:
     8. Return: SUCCESS (spec ready for planning)
 
 5. Write the specification to SPEC_FILE using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings.
+
+   **UI Section Handling**:
+   - If UI feature detected (step 3a): INCLUDE the "User Interface Flow" section with all subsections filled
+   - If NOT a UI feature: OMIT the "User Interface Flow" section entirely (do not include it with placeholders)
 
 6. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
 
@@ -128,15 +159,24 @@ Given that feature description, do this:
       - [ ] Dependencies and assumptions identified
       
       ## Feature Readiness
-      
+
       - [ ] All functional requirements have clear acceptance criteria
       - [ ] User scenarios cover primary flows
       - [ ] Feature meets measurable outcomes defined in Success Criteria
       - [ ] No implementation details leak into specification
-      
+
+      ## UI Feature Validation *(only if User Interface Flow section present)*
+
+      - [ ] Decision Analysis section completed with primary goal and key decisions
+      - [ ] Screen Progression table covers the happy path (at least 3 steps)
+      - [ ] UI States defined for empty, loading, error, and success conditions
+      - [ ] User decision inputs are identified (what information helps users decide)
+
       ## Notes
-      
+
       - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`
+      - **UI Feature Validation items only apply if the spec contains a "User Interface Flow" section**
+      - Specs without UI sections should skip the UI Feature Validation checklist entirely
       ```
 
    b. **Run Validation Check**: Review the spec against each checklist item:

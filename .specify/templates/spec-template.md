@@ -100,6 +100,83 @@
 - **[Entity 1]**: [What it represents, key attributes without implementation]
 - **[Entity 2]**: [What it represents, relationships to other entities]
 
+## User Interface Flow *(optional - include for UI features)*
+
+<!--
+  INCLUDE THIS SECTION when the feature involves:
+  - Dialogs, wizards, or forms
+  - Desktop or mobile apps
+  - Visual interfaces (panels, modals, dropdowns)
+  - Any user-facing screens
+
+  EXCLUDE THIS SECTION for:
+  - Backend services and APIs
+  - Parsers, processors, or handlers
+  - CLI commands and terminal interfaces
+  - Libraries without visual components
+-->
+
+### Decision Analysis
+
+<!--
+  What decisions must the user make? What information helps them decide?
+-->
+
+- **Primary Goal**: [What is the user trying to accomplish?]
+- **Key Decision(s)**:
+  1. [First decision the user must make]
+  2. [Second decision, if any]
+- **Decision Inputs**: [What information helps the user decide? What context is shown?]
+
+### Screen Progression
+
+<!--
+  How does the user move through the interface? What are the main states?
+-->
+
+| Step | Screen/State | User Action | Result |
+|------|--------------|-------------|--------|
+| 1 | [Initial state] | [What user does] | [What happens] |
+| 2 | [Next state] | [What user does] | [What happens] |
+| 3 | [Final state] | [What user does] | [Completion] |
+
+### UI States
+
+<!--
+  What does the interface look like in different conditions?
+-->
+
+- **Empty State**: [What appears when there's no data/content?]
+- **Loading State**: [What appears during processing?]
+- **Error State**: [What appears when something goes wrong?]
+- **Success State**: [What appears when the action completes?]
+
+<!--
+EXAMPLE - User Interface Flow for a file upload dialog:
+
+### Decision Analysis
+- **Primary Goal**: Upload a document to the system
+- **Key Decision(s)**:
+  1. Which file to upload
+  2. Which folder/category to place it in
+  3. Whether to replace existing file (if duplicate)
+- **Decision Inputs**: File browser shows current folder, file size, last modified date
+
+### Screen Progression
+
+| Step | Screen/State | User Action | Result |
+|------|--------------|-------------|--------|
+| 1 | Initial dialog | Click "Browse" | File picker opens |
+| 2 | File selected | Click "Upload" | Progress bar appears |
+| 3 | Upload complete | Click "Done" | Dialog closes, file appears in list |
+
+### UI States
+- **Empty State**: "No file selected. Click Browse to choose a file."
+- **Loading State**: Progress bar with percentage and cancel button
+- **Error State**: Red banner with error message and "Try Again" button
+- **Success State**: Green checkmark with "Upload complete" message
+-->
+
 ## Success Criteria *(mandatory)*
 
 <!--
