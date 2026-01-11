@@ -79,6 +79,8 @@ Three approaches required:
 - N/A (schema package produces generated code, not persisted data) (000-schemas)
 - Python 3.11+ + Pydantic >=2.0.0, debrief-schemas (workspace), mcp >=1.0.0 (optional) (002-debrief-io)
 - N/A (pure transformation service - no persistence) (002-debrief-io)
+- Python 3.11+ (primary), TypeScript 5.x (mirror library) + Pydantic >=2.0.0 (Python), platformdirs (XDG paths), zod (TypeScript validation) (003-debrief-config)
+- JSON file at XDG config location (~/.config/debrief/config.json on Linux) (003-debrief-config)
 
 ## Recent Changes
 - 000-schemas: Added Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS)
