@@ -80,6 +80,58 @@ Stakeholders and community members can preview and provide feedback on the Loade
 - What happens during processing if the application is closed unexpectedly?
   - Partial writes are cleaned up on next launch; no corrupted plots are left in the catalog.
 
+## User Interface Flow
+
+### Decision Analysis
+
+- **Primary Goal**: Load a maritime data file into a STAC catalog plot for analysis
+- **Key Decision(s)**:
+  1. Where to store the data (which STAC store)
+  2. Whether to create a new plot or add to an existing one
+  3. (If existing) Which plot to add data to
+- **Decision Inputs**: [NEEDS CLARIFICATION: What information helps users choose the right destination?]
+
+### Dialog Structure
+
+[NEEDS CLARIFICATION: What is the dialog workflow structure - single screen, wizard, or other?]
+
+### Screen Progression
+
+| Step | Screen/State | User Action | System Response |
+|------|--------------|-------------|-----------------|
+| 1    | Initial      | Opens file with Loader | Display destination options |
+| 2    | [TBD]        | [TBD] | [TBD] |
+| 3    | Processing   | Confirms selection | Show progress indicator |
+| 4    | Complete     | Views result | Show success with plot location |
+
+### UI States
+
+- **Empty**: No STAC stores configured - show setup guidance with documentation link
+- **Loading**: Progress indicator during file parsing and catalog write operations
+- **Error**: Red notification with specific error message and actionable resolution steps
+- **Success**: Confirmation message with link/path to the newly populated plot
+
+### Wireframe Sketch
+
+```
+┌─────────────────────────────────────────────┐
+│  Debrief Loader                        [X]  │
+├─────────────────────────────────────────────┤
+│                                             │
+│  Loading: sample-track.rep                  │
+│  ─────────────────────────────              │
+│                                             │
+│  [Structure to be determined through        │
+│   clarification - options include:          │
+│   - Single screen with all options          │
+│   - Two-step wizard                         │
+│   - Store-first then plot selection]        │
+│                                             │
+│                                             │
+│                     [ Cancel ]  [ Load ]    │
+└─────────────────────────────────────────────┘
+```
+
 ## Requirements
 
 ### Functional Requirements
