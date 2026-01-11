@@ -1,5 +1,5 @@
 ---
-description: Create a pull request with a well-structured title, description, and evidence artifacts from the completed implementation.
+description: Create a pull request with a well-structured title, description, and evidence artifacts from the completed implementation. Also publishes blog post to debrief.github.io.
 handoffs:
   - label: View PR
     agent: none
@@ -86,7 +86,7 @@ You **MUST** consider the user input before proceeding (if not empty).
        - Lessons learned from implementation
      - Generate shipped-post.md following the Shipped Post template
      - Generate linkedin-shipped.md (150-200 words)
-   - Save media content to `FEATURE_DIR/media/`
+     - Save media content to `FEATURE_DIR/media/`
 
 7. **Collect evidence artifacts**:
    - Check for `FEATURE_DIR/evidence/` directory
@@ -117,20 +117,128 @@ You **MUST** consider the user input before proceeding (if not empty).
    ```
 
 10. **Handle existing PR**:
-   - If a PR already exists for this branch, offer to UPDATE it instead:
-     - Use `gh pr edit` to update title and body
-   - Display the PR URL to the user
+    - If a PR already exists for this branch, offer to UPDATE it instead:
+      - Use `gh pr edit` to update title and body
+    - Display the PR URL to the user
 
-11. **Report**:
-    - Display the PR URL
-    - Show summary of what was included:
-      - Number of completed tasks referenced
-      - Evidence artifacts included
-      - Any warnings about missing evidence
-    - **Media content status**:
-      - List media files created/updated in `FEATURE_DIR/media/`
-      - Remind user: "Blog posts are ready for review in media/ directory"
-      - Provide next steps: "Copy shipped-post.md to debrief.github.io/_posts/ and linkedin-shipped.md for social sharing"
+11. **Capture feature PR URL**:
+    - Store the PR URL for use in blog post PR
+    - Extract PR number for cross-referencing
+
+12. **Check for publishable media content**:
+    - Look for `FEATURE_DIR/media/shipped-post.md`
+    - If missing, skip to step 16 (final report)
+    - If present, proceed with cross-repo publishing
+
+13. **Execute cross-repo blog publishing**:
+    - Read Jekyll Specialist agent from `.claude/agents/media/jekyll.md`
+    - Follow the Cross-Repo Publishing Workflow documented there
+    - Execute the publishing script:
+
+    ```bash
+    # Create temp workspace
+    WORK_DIR=$(mktemp -d)
+    trap "rm -rf $WORK_DIR" EXIT
+
+    # Clone website repo
+    gh repo clone debrief/debrief.github.io "$WORK_DIR/website" -- --depth 1 --quiet
+    cd "$WORK_DIR/website"
+
+    # Generate identifiers
+    POST_DATE=$(date +%Y-%m-%d)
+    SLUG=$(echo "$FEATURE_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9-' | cut -c1-50)
+    BRANCH="future-debrief/${POST_DATE}-${SLUG}"
+    FILENAME="${POST_DATE}-${SLUG}.md"
+
+    # Extract title
+    TITLE=$(grep -m1 '^title:' "$FEATURE_DIR/media/shipped-post.md" | sed 's/title: *["]*//;s/["]*$//')
+
+    # Create branch
+    git checkout -b "$BRANCH"
+    ```
+
+14. **Transform and publish post**:
+    - Transform front matter from internal format to `future-post` layout
+    - Apply transformations:
+      - `layout: post` → `layout: future-post`
+      - `category: shipped` → `track: "Shipped · {feature-name}"`
+      - `author: ian` → `author: Ian`
+      - Add `reading_time` (calculate: ceil(word_count / 200))
+      - Add `excerpt` (first paragraph, max 150 chars)
+    - Update image paths: `./images/` → `/assets/images/future-debrief/{slug}/`
+    - Copy images if `FEATURE_DIR/media/images/` exists
+    - Commit, push, and create PR:
+
+    ```bash
+    git add _posts/ assets/
+    git commit -m "Add Future Debrief post: $TITLE"
+    git push -u origin "$BRANCH" --quiet
+
+    BLOG_PR_URL=$(gh pr create \
+        --repo debrief/debrief.github.io \
+        --title "Future Debrief: $TITLE" \
+        --body "## New Blog Post
+
+    **Title:** $TITLE
+    **Date:** $POST_DATE
+    **Component:** $FEATURE_NAME
+
+    ## Preview
+
+    Once merged, visible at: https://debrief.github.io/future/blog/
+
+    ## Related
+
+    - Feature PR: $FEATURE_PR_URL
+
+    ---
+    *Auto-generated from [debrief-future](https://github.com/debrief/debrief-future)*" \
+        --base master)
+    ```
+
+15. **Handle blog publishing errors**:
+    - If `gh` not installed: Skip, warn user
+    - If not authenticated: Skip, show `gh auth login` instructions
+    - If branch exists: Append timestamp and retry
+    - If any other error: Skip with warning, never fail the main PR
+    - **Critical:** Blog publishing failures must never fail the feature PR
+
+16. **Final report with both PRs**:
+
+    Display to user:
+
+    ```
+    ✅ Feature PR created:
+       {FEATURE_PR_URL}
+
+    ✅ Blog post PR created:
+       {BLOG_PR_URL}
+
+    ## Next Steps
+
+    1. Review and merge the feature PR
+    2. Review and merge the blog PR
+    3. Post will appear at: https://debrief.github.io/future/blog/
+
+    ## LinkedIn Summary
+
+    Ready at: specs/{feature}/media/linkedin-shipped.md
+    Copy and post after blog PR is merged.
+    ```
+
+    If blog publishing was skipped:
+
+    ```
+    ✅ Feature PR created:
+       {FEATURE_PR_URL}
+
+    ⚠️  Blog publishing skipped: {reason}
+
+    To publish manually:
+    1. Copy specs/{feature}/media/shipped-post.md
+    2. Transform front matter (see .claude/agents/media/jekyll.md)
+    3. Create PR in debrief/debrief.github.io
+    ```
 
 ## Evidence Integration Guidelines
 
@@ -231,6 +339,7 @@ Save to `FEATURE_DIR/media/`:
 - **Not authenticated**: Run `gh auth login` first
 - **No upstream branch**: Push first with `git push -u origin <branch>`
 - **Missing evidence**: Proceed with warning, but strongly recommend capturing evidence
+- **Blog publishing fails**: Continue with feature PR, report error, provide manual instructions
 
 ## Notes
 
@@ -238,3 +347,4 @@ Save to `FEATURE_DIR/media/`:
 - Evidence makes PRs more reviewable and documents behavior for future reference
 - Screenshots and demos are especially valuable for UI changes or complex behaviors
 - The PR description serves as documentation that persists with the codebase
+- Blog posts are automatically published to debrief.github.io when shipped-post.md exists
