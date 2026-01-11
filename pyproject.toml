@@ -9,6 +9,7 @@ members = [
     "shared/schemas",
     "services/stac",
     "services/io",
+    "services/config",
 ]
 
 [project.optional-dependencies]
@@ -20,3 +21,4 @@ dev = [
 debrief-schemas = { workspace = true }
 debrief-stac = { workspace = true }
 debrief-io = { workspace = true }
+debrief-config = { workspace = true }

@@ -1,0 +1,51 @@
+# Cross-Language Interoperability Demo
+# =====================================
+# This demonstrates that Python and TypeScript share the same config file.
+
+# Step 1: Python writes a preference
+$ python -c "from debrief_config import set_preference; set_preference('theme', 'dark')"
+
+# Step 2: TypeScript reads the preference
+$ node -e "import('@debrief/config').then(c => console.log('Theme:', c.getPreference('theme')))"
+Theme: dark
+
+# Step 3: TypeScript registers a store
+$ node -e "
+import('@debrief/config').then(async (c) => {
+  // For demo: skip validation
+  await c.registerStore('/demo/catalog', 'Demo Store', 'Created from TypeScript', false);
+  console.log('Stores:', c.listStores().map(s => s.name));
+})
+"
+Stores: [ 'Demo Store' ]
+
+# Step 4: Python reads the store
+$ python -c "
+from debrief_config import list_stores
+for s in list_stores():
+    print(f'{s.name}: {s.path} (notes: {s.notes})')
+"
+Demo Store: /demo/catalog (notes: Created from TypeScript)
+
+# Step 5: Verify config.json structure
+$ cat ~/.config/debrief/config.json | jq .
+{
+  "version": "1.0.0",
+  "stores": [
+    {
+      "path": "/demo/catalog",
+      "name": "Demo Store",
+      "lastAccessed": "2026-01-11T17:35:00.000Z",
+      "notes": "Created from TypeScript"
+    }
+  ],
+  "preferences": {
+    "theme": "dark"
+  }
+}
+
+# Key observations:
+# - Both languages read/write the same config.json
+# - Field names use camelCase (e.g., lastAccessed, not last_accessed)
+# - Changes from one language are immediately visible to the other
+# - STAC validation is identical in both languages

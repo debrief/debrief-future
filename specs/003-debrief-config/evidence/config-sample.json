@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "stores": [
+    {
+      "path": "/data/exercise-2024",
+      "name": "Exercise 2024",
+      "lastAccessed": "2026-01-11T10:30:00.000Z",
+      "notes": "Main analysis catalog for naval exercises"
+    },
+    {
+      "path": "/data/historical-tracks",
+      "name": "Historical Tracks",
+      "lastAccessed": "2026-01-10T14:20:00.000Z",
+      "notes": null
+    }
+  ],
+  "preferences": {
+    "theme": "dark",
+    "fontSize": 14,
+    "showGrid": true,
+    "defaultStore": "/data/exercise-2024",
+    "recentFiles": null
+  }
+}
