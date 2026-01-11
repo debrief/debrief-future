@@ -33,6 +33,7 @@ class TestGetConfigDir:
         import importlib
 
         import debrief_config.paths
+
         importlib.reload(debrief_config.paths)
 
         result = debrief_config.paths.get_config_dir(ensure_exists=True)

@@ -26,9 +26,7 @@ class TestRegisterStore:
 
     def test_register_with_notes(self, sample_stac_catalog: Path) -> None:
         """Should store optional notes."""
-        store = register_store(
-            sample_stac_catalog, "Test", notes="Important catalog"
-        )
+        store = register_store(sample_stac_catalog, "Test", notes="Important catalog")
         assert store.notes == "Important catalog"
 
     def test_register_invalid_catalog(self, invalid_stac_catalog: Path) -> None:
@@ -67,9 +65,7 @@ class TestListStores:
         stores = list_stores()
         assert stores == []
 
-    def test_list_registered_stores(
-        self, sample_stac_catalog: Path, tmp_path: Path
-    ) -> None:
+    def test_list_registered_stores(self, sample_stac_catalog: Path, tmp_path: Path) -> None:
         """Should return all registered stores."""
         # Create a second valid catalog
         catalog2 = tmp_path / "catalog2"

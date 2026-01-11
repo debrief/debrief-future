@@ -38,12 +38,7 @@ class TestValidateStacCatalog:
         catalog_dir = tmp_path / "no-type"
         catalog_dir.mkdir()
         (catalog_dir / "catalog.json").write_text(
-            json.dumps({
-                "stac_version": "1.0.0",
-                "id": "test",
-                "description": "Test",
-                "links": []
-            })
+            json.dumps({"stac_version": "1.0.0", "id": "test", "description": "Test", "links": []})
         )
 
         with pytest.raises(InvalidCatalogError, match="Missing required fields"):
@@ -54,13 +49,15 @@ class TestValidateStacCatalog:
         catalog_dir = tmp_path / "wrong-type"
         catalog_dir.mkdir()
         (catalog_dir / "catalog.json").write_text(
-            json.dumps({
-                "type": "Feature",
-                "stac_version": "1.0.0",
-                "id": "test",
-                "description": "Test",
-                "links": []
-            })
+            json.dumps(
+                {
+                    "type": "Feature",
+                    "stac_version": "1.0.0",
+                    "id": "test",
+                    "description": "Test",
+                    "links": [],
+                }
+            )
         )
 
         with pytest.raises(InvalidCatalogError, match="type must be 'Catalog'"):
@@ -71,13 +68,15 @@ class TestValidateStacCatalog:
         catalog_dir = tmp_path / "bad-links"
         catalog_dir.mkdir()
         (catalog_dir / "catalog.json").write_text(
-            json.dumps({
-                "type": "Catalog",
-                "stac_version": "1.0.0",
-                "id": "test",
-                "description": "Test",
-                "links": "not-an-array"
-            })
+            json.dumps(
+                {
+                    "type": "Catalog",
+                    "stac_version": "1.0.0",
+                    "id": "test",
+                    "description": "Test",
+                    "links": "not-an-array",
+                }
+            )
         )
 
         with pytest.raises(InvalidCatalogError, match="links must be an array"):

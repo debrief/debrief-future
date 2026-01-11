@@ -14,9 +14,7 @@ from debrief_config import (
 class TestStoreWorkflow:
     """End-to-end tests for store registration workflow."""
 
-    def test_full_workflow(
-        self, sample_stac_catalog: Path, tmp_path: Path
-    ) -> None:
+    def test_full_workflow(self, sample_stac_catalog: Path, tmp_path: Path) -> None:
         """Test complete register → list → remove workflow."""
         # Create second catalog
         catalog2 = tmp_path / "catalog2"
@@ -50,9 +48,7 @@ class TestStoreWorkflow:
         remove_store(catalog2)
         assert list_stores() == []
 
-    def test_config_persists_to_file(
-        self, sample_stac_catalog: Path
-    ) -> None:
+    def test_config_persists_to_file(self, sample_stac_catalog: Path) -> None:
         """Config should be written to disk."""
         register_store(sample_stac_catalog, "Persistent")
 
@@ -63,9 +59,7 @@ class TestStoreWorkflow:
         assert len(data["stores"]) == 1
         assert data["stores"][0]["name"] == "Persistent"
 
-    def test_config_survives_reload(
-        self, sample_stac_catalog: Path
-    ) -> None:
+    def test_config_survives_reload(self, sample_stac_catalog: Path) -> None:
         """Stores should persist across config reloads."""
         register_store(sample_stac_catalog, "Survives Reload")
 
@@ -74,9 +68,7 @@ class TestStoreWorkflow:
         assert len(stores) == 1
         assert stores[0].name == "Survives Reload"
 
-    def test_json_format_correct(
-        self, sample_stac_catalog: Path
-    ) -> None:
+    def test_json_format_correct(self, sample_stac_catalog: Path) -> None:
         """Config JSON should use camelCase for cross-language compatibility."""
         register_store(sample_stac_catalog, "JSON Format Test")
 

@@ -20,6 +20,7 @@ def isolated_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     import importlib
 
     import debrief_config.paths
+
     importlib.reload(debrief_config.paths)
 
     return config_base / "debrief"
@@ -36,11 +37,7 @@ def temp_config_dir(isolated_config: Path) -> Path:
 def temp_config_file(temp_config_dir: Path) -> Path:
     """Create a temporary config file with defaults."""
     config_file = temp_config_dir / "config.json"
-    config_file.write_text(json.dumps({
-        "version": "1.0.0",
-        "stores": [],
-        "preferences": {}
-    }))
+    config_file.write_text(json.dumps({"version": "1.0.0", "stores": [], "preferences": {}}))
     return config_file
 
 
@@ -51,13 +48,17 @@ def sample_stac_catalog(tmp_path: Path) -> Path:
     catalog_dir.mkdir(parents=True, exist_ok=True)
 
     catalog_json = catalog_dir / "catalog.json"
-    catalog_json.write_text(json.dumps({
-        "type": "Catalog",
-        "stac_version": "1.0.0",
-        "id": "sample-catalog",
-        "description": "A sample STAC catalog for testing",
-        "links": []
-    }))
+    catalog_json.write_text(
+        json.dumps(
+            {
+                "type": "Catalog",
+                "stac_version": "1.0.0",
+                "id": "sample-catalog",
+                "description": "A sample STAC catalog for testing",
+                "links": [],
+            }
+        )
+    )
 
     return catalog_dir
 
@@ -69,9 +70,13 @@ def invalid_stac_catalog(tmp_path: Path) -> Path:
     catalog_dir.mkdir(parents=True, exist_ok=True)
 
     catalog_json = catalog_dir / "catalog.json"
-    catalog_json.write_text(json.dumps({
-        "type": "Feature",  # Wrong type
-        "id": "invalid"
-    }))
+    catalog_json.write_text(
+        json.dumps(
+            {
+                "type": "Feature",  # Wrong type
+                "id": "invalid",
+            }
+        )
+    )
 
     return catalog_dir

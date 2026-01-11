@@ -1,6 +1,5 @@
 """Tests for user preferences functionality."""
 
-
 import pytest
 from debrief_config import (
     delete_preference,
