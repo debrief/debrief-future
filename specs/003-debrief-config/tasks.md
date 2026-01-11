@@ -49,17 +49,17 @@
 
 ### Python Service Setup
 
-- [ ] T001 Create Python service directory structure `services/config/`
-- [ ] T002 Create pyproject.toml with dependencies `services/config/pyproject.toml`
-- [ ] T003 [P] Create package __init__.py `services/config/src/debrief_config/__init__.py`
-- [ ] T004 [P] Create README.md `services/config/README.md`
+- [x] T001 Create Python service directory structure `services/config/`
+- [x] T002 Create pyproject.toml with dependencies `services/config/pyproject.toml`
+- [x] T003 [P] Create package __init__.py `services/config/src/debrief_config/__init__.py`
+- [x] T004 [P] Create README.md `services/config/README.md`
 
 ### TypeScript Package Setup
 
-- [ ] T005 [P] Create TypeScript package directory structure `shared/config-ts/`
-- [ ] T006 [P] Create package.json with dependencies `shared/config-ts/package.json`
-- [ ] T007 [P] Create tsconfig.json `shared/config-ts/tsconfig.json`
-- [ ] T008 [P] Create vitest.config.ts `shared/config-ts/vitest.config.ts`
+- [x] T005 [P] Create TypeScript package directory structure `shared/config-ts/`
+- [x] T006 [P] Create package.json with dependencies `shared/config-ts/package.json`
+- [x] T007 [P] Create tsconfig.json `shared/config-ts/tsconfig.json`
+- [x] T008 [P] Create vitest.config.ts `shared/config-ts/vitest.config.ts`
 
 **Checkpoint**: Both project scaffolds exist, dependencies installable
 
@@ -73,14 +73,14 @@
 
 ### Python Core Models
 
-- [ ] T009 Create exceptions module `services/config/src/debrief_config/exceptions.py`
-- [ ] T010 [P] Create Pydantic models (Config, StoreRegistration) `services/config/src/debrief_config/models.py`
+- [x] T009 Create exceptions module `services/config/src/debrief_config/exceptions.py`
+- [x] T010 [P] Create Pydantic models (Config, StoreRegistration) `services/config/src/debrief_config/models.py`
 
 ### TypeScript Core Types
 
-- [ ] T011 [P] Create TypeScript types `shared/config-ts/src/types.ts`
-- [ ] T012 [P] Create Zod schemas `shared/config-ts/src/schemas.ts`
-- [ ] T013 [P] Create exception classes `shared/config-ts/src/errors.ts`
+- [x] T011 [P] Create TypeScript types `shared/config-ts/src/types.ts`
+- [x] T012 [P] Create Zod schemas `shared/config-ts/src/schemas.ts`
+- [x] T013 [P] Create exception classes `shared/config-ts/src/errors.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can begin
 
@@ -94,15 +94,15 @@
 
 ### Tests for US4
 
-- [ ] T014 [test] Write Python path resolution tests `services/config/tests/test_paths.py`
-- [ ] T015 [P][test] Write TypeScript path resolution tests `shared/config-ts/tests/paths.test.ts`
+- [x] T014 [test] Write Python path resolution tests `services/config/tests/test_paths.py`
+- [x] T015 [P][test] Write TypeScript path resolution tests `shared/config-ts/tests/paths.test.ts`
 
 ### Implementation for US4
 
-- [ ] T016 [US4] Implement Python paths module with platformdirs `services/config/src/debrief_config/paths.py`
-- [ ] T017 [US4] Implement TypeScript paths module with custom platform logic `shared/config-ts/src/paths.ts`
-- [ ] T018 [US4] Add XDG_CONFIG_HOME override support (Python) `services/config/src/debrief_config/paths.py`
-- [ ] T019 [P][US4] Add XDG_CONFIG_HOME override support (TypeScript) `shared/config-ts/src/paths.ts`
+- [x] T016 [US4] Implement Python paths module with platformdirs `services/config/src/debrief_config/paths.py`
+- [x] T017 [US4] Implement TypeScript paths module with custom platform logic `shared/config-ts/src/paths.ts`
+- [x] T018 [US4] Add XDG_CONFIG_HOME override support (Python) `services/config/src/debrief_config/paths.py`
+- [x] T019 [P][US4] Add XDG_CONFIG_HOME override support (TypeScript) `shared/config-ts/src/paths.ts`
 
 **Checkpoint**: Config paths resolve correctly on all platforms
 
@@ -116,17 +116,17 @@
 
 ### Tests for US1/US2
 
-- [ ] T020 [test] Write Python store registration tests `services/config/tests/test_core.py`
-- [ ] T021 [P][test] Write Python STAC validation tests `services/config/tests/test_validation.py`
+- [x] T020 [test] Write Python store registration tests `services/config/tests/test_core.py`
+- [x] T021 [P][test] Write Python STAC validation tests `services/config/tests/test_validation.py`
 
 ### Implementation for US1/US2
 
-- [ ] T022 [US1] Implement STAC catalog validation `services/config/src/debrief_config/validation.py`
-- [ ] T023 [US1] Implement config file read/write with atomic writes `services/config/src/debrief_config/storage.py`
-- [ ] T024 [US1] Implement register_store() function `services/config/src/debrief_config/core.py`
-- [ ] T025 [US2] Implement list_stores() function `services/config/src/debrief_config/core.py`
-- [ ] T026 [US1/US2] Export public API from __init__.py `services/config/src/debrief_config/__init__.py`
-- [ ] T027 [test] Write integration tests for store workflow `services/config/tests/test_integration.py`
+- [x] T022 [US1] Implement STAC catalog validation `services/config/src/debrief_config/validation.py`
+- [x] T023 [US1] Implement config file read/write with atomic writes `services/config/src/debrief_config/storage.py`
+- [x] T024 [US1] Implement register_store() function `services/config/src/debrief_config/core.py`
+- [x] T025 [US2] Implement list_stores() function `services/config/src/debrief_config/core.py`
+- [x] T026 [US1/US2] Export public API from __init__.py `services/config/src/debrief_config/__init__.py`
+- [x] T027 [test] Write integration tests for store workflow `services/config/tests/test_integration.py`
 
 **Checkpoint**: Python store registration and listing works end-to-end
 
@@ -140,17 +140,17 @@
 
 ### Tests for US5
 
-- [ ] T028 [test] Write TypeScript config read tests `shared/config-ts/tests/config.test.ts`
-- [ ] T029 [P][test] Write TypeScript store registration tests `shared/config-ts/tests/stores.test.ts`
+- [x] T028 [test] Write TypeScript config read tests `shared/config-ts/tests/config.test.ts`
+- [x] T029 [P][test] Write TypeScript store registration tests `shared/config-ts/tests/stores.test.ts`
 
 ### Implementation for US5
 
-- [ ] T030 [US5] Implement config file read with file locking `shared/config-ts/src/storage.ts`
-- [ ] T031 [US5] Implement listStores() function `shared/config-ts/src/config.ts`
-- [ ] T032 [US5] Implement registerStore() function `shared/config-ts/src/config.ts`
-- [ ] T033 [US5] Implement STAC validation `shared/config-ts/src/validation.ts`
-- [ ] T034 [US5] Export public API from index.ts `shared/config-ts/src/index.ts`
-- [ ] T035 [test] Write cross-language integration tests `shared/config-ts/tests/integration.test.ts`
+- [x] T030 [US5] Implement config file read with file locking `shared/config-ts/src/storage.ts`
+- [x] T031 [US5] Implement listStores() function `shared/config-ts/src/config.ts`
+- [x] T032 [US5] Implement registerStore() function `shared/config-ts/src/config.ts`
+- [x] T033 [US5] Implement STAC validation `shared/config-ts/src/validation.ts`
+- [x] T034 [US5] Export public API from index.ts `shared/config-ts/src/index.ts`
+- [x] T035 [test] Write cross-language integration tests `shared/config-ts/tests/integration.test.ts`
 
 **Checkpoint**: TypeScript can read/write config, interoperates with Python
 
@@ -164,15 +164,15 @@
 
 ### Tests for US3
 
-- [ ] T036 [test] Write Python remove_store tests `services/config/tests/test_core.py`
-- [ ] T037 [P][test] Write TypeScript removeStore tests `shared/config-ts/tests/stores.test.ts`
+- [x] T036 [test] Write Python remove_store tests `services/config/tests/test_core.py`
+- [x] T037 [P][test] Write TypeScript removeStore tests `shared/config-ts/tests/stores.test.ts`
 
 ### Implementation for US3
 
-- [ ] T038 [US3] Implement remove_store() in Python `services/config/src/debrief_config/core.py`
-- [ ] T039 [US3] Implement removeStore() in TypeScript `shared/config-ts/src/config.ts`
-- [ ] T040 [US3] Update public API exports (Python) `services/config/src/debrief_config/__init__.py`
-- [ ] T041 [P][US3] Update public API exports (TypeScript) `shared/config-ts/src/index.ts`
+- [x] T038 [US3] Implement remove_store() in Python `services/config/src/debrief_config/core.py`
+- [x] T039 [US3] Implement removeStore() in TypeScript `shared/config-ts/src/config.ts`
+- [x] T040 [US3] Update public API exports (Python) `services/config/src/debrief_config/__init__.py`
+- [x] T041 [P][US3] Update public API exports (TypeScript) `shared/config-ts/src/index.ts`
 
 **Checkpoint**: Store removal works from both languages
 
@@ -186,17 +186,17 @@
 
 ### Tests for US6
 
-- [ ] T042 [test] Write Python preferences tests `services/config/tests/test_preferences.py`
-- [ ] T043 [P][test] Write TypeScript preferences tests `shared/config-ts/tests/preferences.test.ts`
+- [x] T042 [test] Write Python preferences tests `services/config/tests/test_preferences.py`
+- [x] T043 [P][test] Write TypeScript preferences tests `shared/config-ts/tests/preferences.test.ts`
 
 ### Implementation for US6
 
-- [ ] T044 [US6] Implement get_preference() in Python `services/config/src/debrief_config/core.py`
-- [ ] T045 [US6] Implement set_preference() in Python `services/config/src/debrief_config/core.py`
-- [ ] T046 [US6] Implement getPreference() in TypeScript `shared/config-ts/src/config.ts`
-- [ ] T047 [US6] Implement setPreference() in TypeScript `shared/config-ts/src/config.ts`
-- [ ] T048 [US6] Update public API exports (Python) `services/config/src/debrief_config/__init__.py`
-- [ ] T049 [P][US6] Update public API exports (TypeScript) `shared/config-ts/src/index.ts`
+- [x] T044 [US6] Implement get_preference() in Python `services/config/src/debrief_config/core.py`
+- [x] T045 [US6] Implement set_preference() in Python `services/config/src/debrief_config/core.py`
+- [x] T046 [US6] Implement getPreference() in TypeScript `shared/config-ts/src/config.ts`
+- [x] T047 [US6] Implement setPreference() in TypeScript `shared/config-ts/src/config.ts`
+- [x] T048 [US6] Update public API exports (Python) `services/config/src/debrief_config/__init__.py`
+- [x] T049 [P][US6] Update public API exports (TypeScript) `shared/config-ts/src/index.ts`
 
 **Checkpoint**: Preferences work from both languages
 
@@ -208,23 +208,23 @@
 
 ### Documentation
 
-- [ ] T050 Update Python README with usage examples `services/config/README.md`
-- [ ] T051 [P] Create TypeScript README `shared/config-ts/README.md`
-- [ ] T052 [P] Run and verify quickstart.md examples `specs/003-debrief-config/quickstart.md`
+- [x] T050 Update Python README with usage examples `services/config/README.md`
+- [x] T051 [P] Create TypeScript README `shared/config-ts/README.md`
+- [x] T052 [P] Run and verify quickstart.md examples `specs/003-debrief-config/quickstart.md`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T053 Create evidence directory `specs/003-debrief-config/evidence/`
-- [ ] T054 Capture pytest results in `specs/003-debrief-config/evidence/test-summary.md`
-- [ ] T055 [P] Capture vitest results in `specs/003-debrief-config/evidence/test-summary.md`
-- [ ] T056 Create usage demonstration `specs/003-debrief-config/evidence/usage-example.md`
-- [ ] T057 [P] Capture cross-language demo `specs/003-debrief-config/evidence/cross-language-demo.txt`
-- [ ] T058 [P] Capture sample config.json `specs/003-debrief-config/evidence/config-sample.json`
+- [x] T053 Create evidence directory `specs/003-debrief-config/evidence/`
+- [x] T054 Capture pytest results in `specs/003-debrief-config/evidence/test-summary.md`
+- [x] T055 [P] Capture vitest results in `specs/003-debrief-config/evidence/test-summary.md`
+- [x] T056 Create usage demonstration `specs/003-debrief-config/evidence/usage-example.md`
+- [x] T057 [P] Capture cross-language demo `specs/003-debrief-config/evidence/cross-language-demo.txt`
+- [x] T058 [P] Capture sample config.json `specs/003-debrief-config/evidence/config-sample.json`
 
 ### Media Content (REQUIRED)
 
-- [ ] T059 Create shipped blog post `specs/003-debrief-config/media/shipped-post.md`
-- [ ] T060 [P] Create LinkedIn shipped summary `specs/003-debrief-config/media/linkedin-shipped.md`
+- [x] T059 Create shipped blog post `specs/003-debrief-config/media/shipped-post.md`
+- [x] T060 [P] Create LinkedIn shipped summary `specs/003-debrief-config/media/linkedin-shipped.md`
 
 ### PR Creation (REQUIRED - MUST BE FINAL)
 
