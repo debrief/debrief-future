@@ -48,9 +48,9 @@
 
 **Purpose**: Review current state and prepare for modifications
 
-- [ ] T001 Review current spec-template.md structure `.specify/templates/spec-template.md`
-- [ ] T002 [P] Review current speckit.specify.md command `.claude/commands/speckit.specify.md`
-- [ ] T003 [P] Create evidence directory `specs/004-speckit-ui-workflow/evidence/`
+- [x] T001 Review current spec-template.md structure `.specify/templates/spec-template.md`
+- [x] T002 [P] Review current speckit.specify.md command `.claude/commands/speckit.specify.md`
+- [x] T003 [P] Create evidence directory `specs/004-speckit-ui-workflow/evidence/`
 
 ---
 
@@ -60,11 +60,11 @@
 
 **⚠️ CRITICAL**: This phase adds the content that will be conditionally included by the specify command
 
-- [ ] T004 Add "User Interface Flow" section marked as optional `.specify/templates/spec-template.md`
-- [ ] T005 Add Decision Analysis subsection with guidance comments `.specify/templates/spec-template.md`
-- [ ] T006 [P] Add Screen Progression subsection with table format `.specify/templates/spec-template.md`
-- [ ] T007 [P] Add UI States subsection (empty, loading, error, success) `.specify/templates/spec-template.md`
-- [ ] T008 Add commented example of completed UI section `.specify/templates/spec-template.md`
+- [x] T004 Add "User Interface Flow" section marked as optional `.specify/templates/spec-template.md`
+- [x] T005 Add Decision Analysis subsection with guidance comments `.specify/templates/spec-template.md`
+- [x] T006 [P] Add Screen Progression subsection with table format `.specify/templates/spec-template.md`
+- [x] T007 [P] Add UI States subsection (empty, loading, error, success) `.specify/templates/spec-template.md`
+- [x] T008 Add commented example of completed UI section `.specify/templates/spec-template.md`
 
 **Checkpoint**: Template has UI section ready for conditional inclusion
 
@@ -78,18 +78,18 @@
 
 ### Implementation for User Stories 1 & 2
 
-- [ ] T009 Add keyword lists (UI, Service, CLI triggers) to speckit.specify.md `.claude/commands/speckit.specify.md`
-- [ ] T010 Add feature detection logic checking description against UI keywords `.claude/commands/speckit.specify.md`
-- [ ] T011 Add conditional generation: include UI section when UI keywords detected `.claude/commands/speckit.specify.md`
-- [ ] T012 Add case-insensitive keyword matching `.claude/commands/speckit.specify.md`
-- [ ] T013 Document detection behavior in execution flow section `.claude/commands/speckit.specify.md`
+- [x] T009 Add keyword lists (UI, Service, CLI triggers) to speckit.specify.md `.claude/commands/speckit.specify.md`
+- [x] T010 Add feature detection logic checking description against UI keywords `.claude/commands/speckit.specify.md`
+- [x] T011 Add conditional generation: include UI section when UI keywords detected `.claude/commands/speckit.specify.md`
+- [x] T012 Add case-insensitive keyword matching `.claude/commands/speckit.specify.md`
+- [x] T013 Document detection behavior in execution flow section `.claude/commands/speckit.specify.md`
 
 ### Manual Test Cases for US1 & US2
 
-- [ ] T014 Test: `/speckit.specify Create a file upload dialog` → UI section present
-- [ ] T015 [P] Test: `/speckit.specify Create a settings wizard` → UI section present
-- [ ] T016 [P] Test: `/speckit.specify Create a file parser service` → NO UI section
-- [ ] T017 [P] Test: `/speckit.specify Create an API endpoint handler` → NO UI section
+- [x] T014 Test: `/speckit.specify Create a file upload dialog` → UI section present
+- [x] T015 [P] Test: `/speckit.specify Create a settings wizard` → UI section present
+- [x] T016 [P] Test: `/speckit.specify Create a file parser service` → NO UI section
+- [x] T017 [P] Test: `/speckit.specify Create an API endpoint handler` → NO UI section
 
 **Checkpoint**: Basic detection works - UI features get UI section, services don't
 
@@ -103,15 +103,15 @@
 
 ### Implementation for User Story 3
 
-- [ ] T018 Add precedence rule: UI indicators override service indicators `.claude/commands/speckit.specify.md`
-- [ ] T019 Add CLI detection: "command", "terminal", "CLI" should NOT trigger UI section `.claude/commands/speckit.specify.md`
-- [ ] T020 Add edge case handling for ambiguous descriptions (prefer inclusion) `.claude/commands/speckit.specify.md`
+- [x] T018 Add precedence rule: UI indicators override service indicators `.claude/commands/speckit.specify.md`
+- [x] T019 Add CLI detection: "command", "terminal", "CLI" should NOT trigger UI section `.claude/commands/speckit.specify.md`
+- [x] T020 Add edge case handling for ambiguous descriptions (prefer inclusion) `.claude/commands/speckit.specify.md`
 
 ### Manual Test Cases for US3
 
-- [ ] T021 Test: `/speckit.specify Create an API with admin dashboard` → UI section present
-- [ ] T022 [P] Test: `/speckit.specify Create a CLI command for export` → NO UI section
-- [ ] T023 [P] Test: `/speckit.specify Create a terminal interface` → NO UI section
+- [x] T021 Test: `/speckit.specify Create an API with admin dashboard` → UI section present
+- [x] T022 [P] Test: `/speckit.specify Create a CLI command for export` → NO UI section
+- [x] T023 [P] Test: `/speckit.specify Create a terminal interface` → NO UI section
 
 **Checkpoint**: Hybrid detection works correctly with precedence rules
 
@@ -125,10 +125,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T024 Add conditional UI validation items to Specification Quality Validation section `.claude/commands/speckit.specify.md`
-- [ ] T025 Add item: "Decision analysis complete" (only when UI section present) `.claude/commands/speckit.specify.md`
-- [ ] T026 [P] Add item: "Screen progression covers happy path minimum" (only when UI section present) `.claude/commands/speckit.specify.md`
-- [ ] T027 Document conditional validation logic `.claude/commands/speckit.specify.md`
+- [x] T024 Add conditional UI validation items to Specification Quality Validation section `.claude/commands/speckit.specify.md`
+- [x] T025 Add item: "Decision analysis complete" (only when UI section present) `.claude/commands/speckit.specify.md`
+- [x] T026 [P] Add item: "Screen progression covers happy path minimum" (only when UI section present) `.claude/commands/speckit.specify.md`
+- [x] T027 Document conditional validation logic `.claude/commands/speckit.specify.md`
 
 **Checkpoint**: Validation adapts based on UI section presence
 
@@ -142,11 +142,11 @@
 
 ### Verification for User Story 5
 
-- [ ] T028 Verify spec 000-schemas passes validation (no UI section required) `specs/000-schemas/spec.md`
-- [ ] T029 [P] Verify spec 001-debrief-stac passes validation `specs/001-debrief-stac/spec.md`
-- [ ] T030 [P] Verify spec 002-debrief-io passes validation `specs/002-debrief-io/spec.md`
-- [ ] T031 [P] Verify spec 003-debrief-config passes validation `specs/003-debrief-config/spec.md`
-- [ ] T032 Document backward compatibility in quickstart.md updates `specs/004-speckit-ui-workflow/quickstart.md`
+- [x] T028 Verify spec 000-schemas passes validation (no UI section required) `specs/000-schemas/spec.md`
+- [x] T029 [P] Verify spec 001-debrief-stac passes validation `specs/001-debrief-stac/spec.md`
+- [x] T030 [P] Verify spec 002-debrief-io passes validation `specs/002-debrief-io/spec.md`
+- [x] T031 [P] Verify spec 003-debrief-config passes validation `specs/003-debrief-config/spec.md`
+- [x] T032 Document backward compatibility in quickstart.md updates `specs/004-speckit-ui-workflow/quickstart.md`
 
 **Checkpoint**: All existing specs remain valid - backward compatibility confirmed
 
@@ -158,26 +158,26 @@
 
 ### Documentation Updates
 
-- [ ] T033 Update quickstart.md with actual test results `specs/004-speckit-ui-workflow/quickstart.md`
-- [ ] T034 [P] Review and polish spec-template.md comments for clarity `.specify/templates/spec-template.md`
-- [ ] T035 [P] Review and polish speckit.specify.md documentation `.claude/commands/speckit.specify.md`
+- [x] T033 Update quickstart.md with actual test results `specs/004-speckit-ui-workflow/quickstart.md`
+- [x] T034 [P] Review and polish spec-template.md comments for clarity `.specify/templates/spec-template.md`
+- [x] T035 [P] Review and polish speckit.specify.md documentation `.claude/commands/speckit.specify.md`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T036 Capture test summary with pass/fail for all manual tests `specs/004-speckit-ui-workflow/evidence/test-summary.md`
-- [ ] T037 Create usage demonstration with UI and non-UI examples `specs/004-speckit-ui-workflow/evidence/usage-example.md`
-- [ ] T038 [P] Capture sample UI spec output `specs/004-speckit-ui-workflow/evidence/ui-spec-sample.md`
-- [ ] T039 [P] Capture sample service spec output (no UI) `specs/004-speckit-ui-workflow/evidence/service-spec-sample.md`
-- [ ] T040 [P] Capture sample hybrid spec output `specs/004-speckit-ui-workflow/evidence/hybrid-spec-sample.md`
+- [x] T036 Capture test summary with pass/fail for all manual tests `specs/004-speckit-ui-workflow/evidence/test-summary.md`
+- [x] T037 Create usage demonstration with UI and non-UI examples `specs/004-speckit-ui-workflow/evidence/usage-example.md`
+- [x] T038 [P] Capture sample UI spec output `specs/004-speckit-ui-workflow/evidence/ui-spec-sample.md`
+- [x] T039 [P] Capture sample service spec output (no UI) `specs/004-speckit-ui-workflow/evidence/service-spec-sample.md`
+- [x] T040 [P] Capture sample hybrid spec output `specs/004-speckit-ui-workflow/evidence/hybrid-spec-sample.md`
 
 ### Media Content (REQUIRED)
 
-- [ ] T041 Create shipped blog post `specs/004-speckit-ui-workflow/media/shipped-post.md`
-- [ ] T042 [P] Create LinkedIn shipped summary `specs/004-speckit-ui-workflow/media/linkedin-shipped.md`
+- [x] T041 Create shipped blog post `specs/004-speckit-ui-workflow/media/shipped-post.md`
+- [x] T042 [P] Create LinkedIn shipped summary `specs/004-speckit-ui-workflow/media/linkedin-shipped.md`
 
 ### PR Creation (REQUIRED - FINAL TASK)
 
-- [ ] T043 Create PR and publish blog: run /speckit.pr
+- [x] T043 Create PR and publish blog: run /speckit.pr
 
 **Task T043 must run last. It depends on all evidence and media tasks being complete.**
 
