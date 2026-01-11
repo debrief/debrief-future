@@ -16,6 +16,7 @@ This application integrates three foundational services (debrief-config, debrief
 ### Session 2026-01-11
 
 - Q: What is the dialog workflow structure? → A: Two-step wizard with store-first approach. Step 1 selects STAC store, Step 2 has tabbed interface ("Add to Existing" / "Create New") with custom UI per tab.
+- Q: What information helps users choose the right destination? → A: Standard info display - Store name + path + plot count (Step 1), Plot name + created date + feature count (Step 2).
 
 ## User Scenarios & Testing
 
@@ -95,7 +96,9 @@ Stakeholders and community members can preview and provide feedback on the Loade
   1. Where to store the data (which STAC store)
   2. Whether to create a new plot or add to an existing one
   3. (If existing) Which plot to add data to
-- **Decision Inputs**: [NEEDS CLARIFICATION: What information helps users choose the right destination?]
+- **Decision Inputs**:
+  - **Step 1 (Store Selection)**: Store name, file path, number of existing plots
+  - **Step 2 (Plot Selection)**: Plot name, created date, feature count
 
 ### Dialog Structure
 
@@ -143,9 +146,11 @@ This structure prioritizes the destination decision first, then reveals context-
 │  ┌─────────────────────────────────────┐    │
 │  │ ○ Local Analysis Store              │    │
 │  │   /home/user/debrief/local-catalog  │    │
+│  │   3 plots                           │    │
 │  ├─────────────────────────────────────┤    │
 │  │ ● Project Alpha Store               │    │
 │  │   /shared/projects/alpha/catalog    │    │
+│  │   12 plots                          │    │
 │  └─────────────────────────────────────┘    │
 │                                             │
 │                     [ Cancel ]  [ Next > ]  │
@@ -162,14 +167,46 @@ This structure prioritizes the destination decision first, then reveals context-
 │  Store: Project Alpha Store                 │
 │  ─────────────────────────────              │
 │                                             │
-│  ┌──────────────┬─────────────┐             │
-│  │ Add to Existing │ Create New │            │
-│  ├──────────────────────────────┴──────┐    │
+│  ┌──────────────────┬─────────────┐         │
+│  │ Add to Existing  │ Create New  │         │
+│  ├──────────────────┴─────────────┴────┐    │
 │  │                                     │    │
-│  │  [Tab-specific content here]        │    │
+│  │  ○ Exercise Bravo                   │    │
+│  │    Created: 2026-01-10 · 45 features│    │
+│  │  ● Operation Neptune                │    │
+│  │    Created: 2026-01-08 · 128 features   │
+│  │  ○ Training Run 3                   │    │
+│  │    Created: 2026-01-05 · 23 features│    │
 │  │                                     │    │
-│  │  - Add to Existing: plot list       │    │
-│  │  - Create New: name/description     │    │
+│  └─────────────────────────────────────┘    │
+│                                             │
+│              [ < Back ]  [ Cancel ] [ Load ]│
+└─────────────────────────────────────────────┘
+```
+
+**Step 2 - Create New tab:**
+```
+┌─────────────────────────────────────────────┐
+│  Debrief Loader                        [X]  │
+├─────────────────────────────────────────────┤
+│                                             │
+│  Loading: sample-track.rep                  │
+│  Store: Project Alpha Store                 │
+│  ─────────────────────────────              │
+│                                             │
+│  ┌──────────────────┬─────────────┐         │
+│  │ Add to Existing  │ Create New  │         │
+│  ├──────────────────┴─────────────┴────┐    │
+│  │                                     │    │
+│  │  Plot name:                         │    │
+│  │  ┌─────────────────────────────┐    │    │
+│  │  │ New Analysis Plot           │    │    │
+│  │  └─────────────────────────────┘    │    │
+│  │                                     │    │
+│  │  Description (optional):            │    │
+│  │  ┌─────────────────────────────┐    │    │
+│  │  │                             │    │    │
+│  │  └─────────────────────────────┘    │    │
 │  │                                     │    │
 │  └─────────────────────────────────────┘    │
 │                                             │
