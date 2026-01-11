@@ -1,246 +1,130 @@
 # Communications Strategy
 
-This document defines how Future Debrief engages with stakeholders throughout development.
+> Work in the open. Be genuinely useful. Let the work speak.
 
-## Audiences
+This document captures the communications approach for Future Debrief — not a marketing plan, but a way of sharing progress that respects the audience and builds trust.
 
-| Audience | Interest | Primary Channel |
-|----------|----------|-----------------|
-| DSTL / defence customers | Funding, adoption, capability planning | Blog, LinkedIn, beta previews |
-| Open source community | Contributing, similar projects | GitHub, blog technical posts |
-| Maritime analysis community | Using the tool, providing feedback | LinkedIn, YouTube demos, beta previews |
-| Atlas (existing Debrief users) | Capability updates, adoption planning | Blog, LinkedIn |
+## Core Principle
 
-All content is public by default — DSTL benefits from wider adoption and visibility.
+**Kathy Sierra**: Don't promote the product. Help people imagine being better at what they already care about.
 
-## Project Ownership
+The audience — DSTL scientists and analysts — want to:
+1. Deliver insights that influence real operational decisions
+2. Be recognised for their work
+3. Build tools and capabilities others rely on
+4. Be the expert others consult
 
-Future Debrief is developed by **Deep Blue C Ltd**.
+Content should show them succeeding at these things. Future Debrief is the means, not the message.
+
+## Relationship Stance
+
+**Trusted colleague, not vendor.**
+
+Ian has worked with DSTL for years. The relationship is collegial, not commercial. Content should feel like a peer sharing interesting progress, not a supplier pitching services.
+
+This means:
+- No sales tactics or persuasion techniques
+- No manufactured urgency
+- No calls to action beyond "here's the work, have a look"
+- Genuine enablement, not strategic influence
 
 ## Channels
 
-### GitHub (Hub)
-- **Repository**: Source code, issues, discussions
-- **Project board**: Development progress visible to all
-- **Releases**: Formal version announcements
-- **Pages**: Blog and beta previews hosted here
+| Channel | Purpose | Cadence |
+|---------|---------|---------|
+| **GitHub** (home) | Where the work lives. Canonical source of truth. | Continuous |
+| **GitHub Pages blog** | Progress posts, milestones, vision pieces | When there's something worth sharing |
+| **LinkedIn** | Amplification to professional network | Points to blog posts |
+| **YouTube** | Video demonstrations, walkthroughs | When visuals add value |
 
-### Blog (GitHub Pages)
-`debrief.github.io/debrief-future/`
+GitHub is home. Everything else points back to it.
 
-The central content hub. All detailed content lives here.
+## Three Content Tracks
 
-**Categories:**
-- **Progress** — what got done
-- **Roadmap** — what's coming
-- **Technical** — deep dives, architecture decisions
-- **Demos** — video walkthroughs (embedded from YouTube)
-- **Releases** — formal version announcements
+Content serves one of three purposes:
 
-**Structure:** Chronological feed with category navigation.
+### Track 1: Momentum — "Something is growing"
+Evidence that the project is alive and moving. This is where most content lives now.
+- Progress posts showing what got built
+- Problems encountered and solved
+- Decisions being made
 
-### LinkedIn (Push)
-Short-form posts that drive traffic to blog and beta previews.
+### Track 2: Credibility — "Approaching full capabilities"
+Evidence that the platform is substantial. Only claim this when earned.
+- Feature parity milestones
+- End-to-end workflows working
+- Quality and reliability evidence
 
-- Teasers for new blog posts
-- "What's Coming" announcements
-- "Try the Beta" calls to action
-- Milestone celebrations
+### Track 3: Desire — "New things become possible"
+Imagination fuel — what readers could do that they can't today. Use sparingly until Tracks 1 and 2 support it.
+- Mockups of future capabilities
+- Aggregate analysis possibilities
+- Python extensibility scenarios
 
-### YouTube (Existing Debrief channel)
-Video content, standalone but linked from blog.
+**Current phase**: Primarily Track 1, with Ian's existing credibility carrying occasional Track 3.
 
-- Demo walkthroughs (narrated for major milestones)
-- Automated E2E test recordings (routine features)
-- Architecture explainers
+## What to Share
 
-### Beta Previews (GitHub Pages)
-`debrief.github.io/debrief-future/beta/`
+**Worth sharing:**
+- What was built, concretely
+- Problems encountered and how they were solved
+- Decisions and trade-offs being considered
+- Uncertainty about what comes next
+- Interesting technical details
 
-Interactive previews using Storybook and SPAs.
+**Not worth sharing:**
+- Routine commits without narrative
+- Plans without progress
+- Hype without substance
 
-- Component previews (Storybook)
-- Workflow previews (lightweight SPAs)
-- Feature-specific URLs for targeted feedback
+## Content Standards
 
-**Automated Discussion Thread:** Each feature preview automatically generates a GitHub Discussion thread containing:
-1. **Requirements summary** — what the feature aims to achieve (from feature spec)
-2. **Strategy taken** — key design/implementation decisions (from implementation plan)
-3. **Feedback prompts** — specific questions or areas where input is valuable
-4. **Link to preview** — direct URL to try the feature
+See `.claude/agents/media/content.md` for detailed guidance on:
+- Voice and tone
+- What to include and avoid
+- Post templates by type
+- LinkedIn formatting
 
-Content is pulled from the feature's specification and plan documents, ensuring consistency between internal planning and external communication.
+Key rules:
+- First person, conversational
+- Lead with substance
+- Include problems and uncertainty
+- No superlatives or marketing language
+- End when the content ends
 
-This gives stakeholders a structured place to comment, ask questions, and suggest improvements.
+## Publishing Rhythm
 
-## Content Flow
+No fixed schedule. Publish when there's something genuinely worth sharing.
 
-### Planning Phase
-```
-Feature planned
-    ↓
-Sequence diagrams / flowcharts created
-    ↓
-"What's Coming" blog post (with diagrams)
-    ↓
-LinkedIn teaser → drives to blog
-```
+Natural rhythm tends toward:
+- **Monday**: Planning posts — what's coming next (invites feedback before implementation)
+- **Friday**: Progress posts — what got done
 
-### Development Phase
-```
-Feature in progress
-    ↓
-Beta preview deployed (Storybook/SPA)
-    ↓
-GitHub Discussion auto-generated (requirements, strategy, feedback prompts)
-    ↓
-"Try it now" LinkedIn post → drives to beta URL + Discussion
-    ↓
-1-week feedback pause (deliberate)
-    ↓
-Feedback collected from Discussion thread
-    ↓
-Refinements incorporated
-```
+But don't force content to fit a schedule. Silence is better than filler.
 
-### Delivery Phase
-```
-Milestone reached
-    ↓
-E2E test captured as video (automated or narrated)
-    ↓
-Video uploaded to YouTube
-    ↓
-Blog post written (embedded video, release notes)
-    ↓
-LinkedIn post → links to blog and video
-```
+## Feedback Approach
 
-## Content Generation
+**Invite curiosity, don't solicit engagement.**
 
-Content is a byproduct of development, not extra work. AI drafts all content from source documents.
+GitHub Discussions is the feedback channel. Link to specific discussions when there's a genuine open question — not as a generic call to action.
 
-| Development Activity | Content Output | AI Action |
-|---------------------|----------------|-----------|
-| Feature planning | "What's Coming" blog post | Draft from spec + diagrams |
-| Architecture decisions | "Technical" deep dive | Draft from ADR/decision doc |
-| Beta preview deployment | GitHub Discussion thread | Auto-generate from spec + plan |
-| E2E test runs | Demo video | Capture automated; AI drafts description |
-| Releases | "Releases" blog post | Draft from changelog + release notes |
+Let readers choose to engage. If the work is interesting, they will.
 
-**Human role:** Review drafts, approve/edit, publish. Engage in discussions.
+## Success Metrics
 
-**Approach:** AI-first content creation. AI drafts all content from development artifacts (specs, plans, changelogs). Human reviews and publishes. Human engages directly in feedback discussions; AI monitors and summarises.
+Not impressions, followers, or engagement rates.
 
-## Feedback Mechanisms
+Success is:
+- Scientists imagine themselves using Future Debrief
+- Technical leadership sees strategic value
+- Organic conversations happen without prompting
+- When funding discussions come, people already understand the project
 
-### Beta Previews
-- **Auto-generated Discussion thread**: Each preview creates a GitHub Discussion with requirements, strategy, and feedback prompts
-- **GitHub Issues**: Structured bug reports / specific feature requests (linked from Discussion)
-- **In-app feedback**: Simple widget in beta previews linking to the Discussion thread
+## What This Strategy Is Not
 
-### General Feedback
-- **GitHub Issues**: Bug reports, feature requests
-- **GitHub Discussions**: Questions, ideas, community conversation
-- **LinkedIn comments**: Lightweight engagement, redirect substantive feedback to GitHub
+- Not a marketing funnel
+- Not a content calendar to be filled
+- Not an influence campaign
+- Not a way to generate leads
 
-### Feedback Pause Protocol
-During deliberate feedback pauses:
-1. Deploy beta preview
-2. Discussion thread auto-generated with feedback prompts
-3. Post "Try it now" on LinkedIn with link to Discussion
-4. AI monitors Discussion for 1 week, produces daily/end-of-week digest
-5. Human reviews digest, engages on key threads
-6. AI summarises actionable feedback
-7. Prioritise refinements before continuing
-
-### Ongoing Feedback Monitoring
-Outside of formal feedback pauses, AI periodically:
-- Scans open Discussions for new comments
-- Flags questions that need human response
-- Produces weekly summary of community activity
-- Highlights emerging themes or repeated requests
-
-## Metrics
-
-### Engagement (monthly review)
-| Metric | Source | Target |
-|--------|--------|--------|
-| Blog page views | GitHub Pages analytics / simple analytics | Trend upward |
-| YouTube video views | YouTube Studio | >100 per demo |
-| LinkedIn post engagement | LinkedIn analytics | >5% engagement rate |
-| GitHub stars | Repository | Trend upward |
-| GitHub forks | Repository | Track community interest |
-
-### Feedback Quality (per beta cycle)
-| Metric | Source |
-|--------|--------|
-| Issues opened during feedback pause | GitHub Issues |
-| Discussion threads created | GitHub Discussions |
-| Unique contributors to feedback | GitHub |
-
-### Community Health (quarterly review)
-| Metric | Source |
-|--------|--------|
-| External contributors | GitHub |
-| Organisations using `/contrib/` | Manual tracking |
-| Questions answered by community (not maintainer) | GitHub Discussions |
-
-## Cadence
-
-**Milestone-driven, not calendar-driven** — post when there's something to show.
-
-Expected rhythm during tracer bullet phase:
-- Blog post every 2-4 weeks (as milestones land)
-- LinkedIn post weekly (mix of teasers, progress, engagement)
-- YouTube video per major feature demo
-- Beta preview per user-facing feature
-
-## Responsibilities
-
-| Task | Owner | AI Role |
-|------|-------|---------|
-| Development milestones | Deep Blue C | — |
-| Blog post drafting | AI | Draft from specs/plans; human review |
-| LinkedIn post drafting | AI | Draft from blog content; human review |
-| Discussion thread content | AI | Auto-generate from spec + plan |
-| Video narration scripts | AI | Draft script; human records |
-| Publishing (blog, social, YouTube) | Deep Blue C | — |
-| Beta deployment | Automated (CI) | — |
-| Feedback engagement | Deep Blue C | — |
-| Feedback monitoring & summary | AI | Regular digest of new Discussion comments |
-| Metrics review | Deep Blue C | AI can pull raw numbers |
-
-### AI-Assisted Workflow
-
-**Content creation:**
-1. Milestone reached or feature planned
-2. AI drafts content (blog post, LinkedIn teaser, Discussion thread) from source documents
-3. Human reviews, edits if needed, publishes
-
-**Feedback monitoring:**
-1. AI periodically scans GitHub Discussions for new comments
-2. AI produces summary digest: key themes, questions raised, actionable suggestions
-3. Human reviews digest, engages directly where needed
-
-This minimises manual authoring while keeping human judgment on publication and stakeholder engagement.
-
-## Tools
-
-| Purpose | Tool |
-|---------|------|
-| Blog | GitHub Pages (Jekyll or Hugo) |
-| Beta previews | Storybook (static build) + SPAs |
-| Discussion generation | GitHub Actions (auto-create on preview deploy) |
-| Content drafting | LLM (Claude) — drafts from specs/plans |
-| Feedback monitoring | LLM (Claude) — scans Discussions, produces digests |
-| Video capture (automated) | Playwright trace / screen recording in CI |
-| Video capture (narrated) | OBS or similar |
-| Video hosting | YouTube (existing Debrief channel) |
-| Social | LinkedIn |
-| Analytics | GitHub insights + YouTube Studio + LinkedIn analytics |
-| Feedback | GitHub Discussions (auto-generated per feature) + Issues |
-
----
-
-*Document version: 1.0 — January 2026*
+It's simply: do good work visibly, be available when people are curious.
