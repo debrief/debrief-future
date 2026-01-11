@@ -11,6 +11,12 @@ The Loader Mini-App is a lightweight desktop application that orchestrates the f
 
 This application integrates three foundational services (debrief-config, debrief-io, debrief-stac) into a cohesive user experience for data ingestion.
 
+## Clarifications
+
+### Session 2026-01-11
+
+- Q: What is the dialog workflow structure? → A: Two-step wizard with store-first approach. Step 1 selects STAC store, Step 2 has tabbed interface ("Add to Existing" / "Create New") with custom UI per tab.
+
 ## User Scenarios & Testing
 
 ### User Story 1 - Load File into New Plot (Priority: P1)
@@ -93,16 +99,26 @@ Stakeholders and community members can preview and provide feedback on the Loade
 
 ### Dialog Structure
 
-[NEEDS CLARIFICATION: What is the dialog workflow structure - single screen, wizard, or other?]
+Two-step wizard with store-first approach:
+
+1. **Step 1 - Select Store**: User chooses which STAC store to use as the destination
+2. **Step 2 - Configure Plot**: Tabbed interface with two options:
+   - **"Add to Existing" tab**: Shows list of existing plots in selected store for selection
+   - **"Create New" tab**: Shows form for new plot creation (name, description, etc.)
+
+This structure prioritizes the destination decision first, then reveals context-appropriate options based on the selected store.
 
 ### Screen Progression
 
 | Step | Screen/State | User Action | System Response |
 |------|--------------|-------------|-----------------|
-| 1    | Initial      | Opens file with Loader | Display destination options |
-| 2    | [TBD]        | [TBD] | [TBD] |
-| 3    | Processing   | Confirms selection | Show progress indicator |
-| 4    | Complete     | Views result | Show success with plot location |
+| 1    | Store Selection | Opens file with Loader | Display list of configured STAC stores |
+| 2    | Store Selection | Selects a store | Enable "Next" button, show store details |
+| 3    | Plot Configuration | Clicks "Next" | Show tabbed interface (Add to Existing / Create New) |
+| 4    | Plot Configuration | Selects tab and configures | Show relevant options for selected tab |
+| 5    | Plot Configuration | Clicks "Load" | Validate selection, begin processing |
+| 6    | Processing | Views progress | Show progress indicator with status messages |
+| 7    | Complete | Views result | Show success confirmation with plot location |
 
 ### UI States
 
@@ -113,6 +129,7 @@ Stakeholders and community members can preview and provide feedback on the Loade
 
 ### Wireframe Sketch
 
+**Step 1 - Store Selection:**
 ```
 ┌─────────────────────────────────────────────┐
 │  Debrief Loader                        [X]  │
@@ -121,14 +138,42 @@ Stakeholders and community members can preview and provide feedback on the Loade
 │  Loading: sample-track.rep                  │
 │  ─────────────────────────────              │
 │                                             │
-│  [Structure to be determined through        │
-│   clarification - options include:          │
-│   - Single screen with all options          │
-│   - Two-step wizard                         │
-│   - Store-first then plot selection]        │
+│  Select destination store:                  │
 │                                             │
+│  ┌─────────────────────────────────────┐    │
+│  │ ○ Local Analysis Store              │    │
+│  │   /home/user/debrief/local-catalog  │    │
+│  ├─────────────────────────────────────┤    │
+│  │ ● Project Alpha Store               │    │
+│  │   /shared/projects/alpha/catalog    │    │
+│  └─────────────────────────────────────┘    │
 │                                             │
-│                     [ Cancel ]  [ Load ]    │
+│                     [ Cancel ]  [ Next > ]  │
+└─────────────────────────────────────────────┘
+```
+
+**Step 2 - Plot Configuration (tabbed):**
+```
+┌─────────────────────────────────────────────┐
+│  Debrief Loader                        [X]  │
+├─────────────────────────────────────────────┤
+│                                             │
+│  Loading: sample-track.rep                  │
+│  Store: Project Alpha Store                 │
+│  ─────────────────────────────              │
+│                                             │
+│  ┌──────────────┬─────────────┐             │
+│  │ Add to Existing │ Create New │            │
+│  ├──────────────────────────────┴──────┐    │
+│  │                                     │    │
+│  │  [Tab-specific content here]        │    │
+│  │                                     │    │
+│  │  - Add to Existing: plot list       │    │
+│  │  - Create New: name/description     │    │
+│  │                                     │    │
+│  └─────────────────────────────────────┘    │
+│                                             │
+│              [ < Back ]  [ Cancel ] [ Load ]│
 └─────────────────────────────────────────────┘
 ```
 
