@@ -17,108 +17,43 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+1. **Setup**: Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute.
 
-2. **Check checklists status** (if FEATURE_DIR/checklists/ exists):
-   - Scan all checklist files in the checklists/ directory
-   - For each checklist, count:
-     - Total items: All lines matching `- [ ]` or `- [X]` or `- [x]`
-     - Completed items: Lines matching `- [X]` or `- [x]`
-     - Incomplete items: Lines matching `- [ ]`
-   - Create a status table:
+2. **Verify prerequisites**:
+   - Confirm tasks.md exists in FEATURE_DIR
+   - Check that spec.md and plan.md exist for context
+   - Verify we're on the correct feature branch
 
-     ```text
-     | Checklist | Total | Completed | Incomplete | Status |
-     |-----------|-------|-----------|------------|--------|
-     | ux.md     | 12    | 12        | 0          | ✓ PASS |
-     | test.md   | 8     | 5         | 3          | ✗ FAIL |
-     | security.md | 6   | 6         | 0          | ✓ PASS |
-     ```
+3. **Load implementation context**:
+   - Read spec.md for feature goals and acceptance criteria
+   - Read plan.md for technical approach and architecture
+   - Read tasks.md for the task breakdown
 
-   - Calculate overall status:
-     - **PASS**: All checklists have 0 incomplete items
-     - **FAIL**: One or more checklists have incomplete items
-
-   - **If any checklist is incomplete**:
-     - Display the table with incomplete item counts
-     - **STOP** and ask: "Some checklists are incomplete. Do you want to proceed with implementation anyway? (yes/no)"
-     - Wait for user response before continuing
-     - If user says "no" or "wait" or "stop", halt execution
-     - If user says "yes" or "proceed" or "continue", proceed to step 3
-
-   - **If all checklists are complete**:
-     - Display the table showing all checklists passed
-     - Automatically proceed to step 3
-
-3. Load and analyze the implementation context:
-   - **REQUIRED**: Read tasks.md for the complete task list and execution plan
-   - **REQUIRED**: Read plan.md for tech stack, architecture, and file structure
-   - **IF EXISTS**: Read data-model.md for entities and relationships
-   - **IF EXISTS**: Read contracts/ for API specifications and test requirements
-   - **IF EXISTS**: Read research.md for technical decisions and constraints
-   - **IF EXISTS**: Read quickstart.md for integration scenarios
-
-4. **Project Setup Verification**:
-   - **REQUIRED**: Create/verify ignore files based on actual project setup:
-
-   **Detection & Creation Logic**:
-   - Check if the following command succeeds to determine if the repository is a git repo (create/verify .gitignore if so):
-
-     ```sh
-     git rev-parse --git-dir 2>/dev/null
-     ```
-
-   - Check if Dockerfile* exists or Docker in plan.md → create/verify .dockerignore
-   - Check if .eslintrc* exists → create/verify .eslintignore
-   - Check if eslint.config.* exists → ensure the config's `ignores` entries cover required patterns
-   - Check if .prettierrc* exists → create/verify .prettierignore
-   - Check if .npmrc or package.json exists → create/verify .npmignore (if publishing)
-   - Check if terraform files (*.tf) exist → create/verify .terraformignore
-   - Check if .helmignore needed (helm charts present) → create/verify .helmignore
-
-   **If ignore file already exists**: Verify it contains essential patterns, append missing critical patterns only
-   **If ignore file missing**: Create with full pattern set for detected technology
-
-   **Common Patterns by Technology** (from plan.md tech stack):
-   - **Node.js/JavaScript/TypeScript**: `node_modules/`, `dist/`, `build/`, `*.log`, `.env*`
-   - **Python**: `__pycache__/`, `*.pyc`, `.venv/`, `venv/`, `dist/`, `*.egg-info/`
-   - **Java**: `target/`, `*.class`, `*.jar`, `.gradle/`, `build/`
-   - **C#/.NET**: `bin/`, `obj/`, `*.user`, `*.suo`, `packages/`
-   - **Go**: `*.exe`, `*.test`, `vendor/`, `*.out`
-   - **Ruby**: `.bundle/`, `log/`, `tmp/`, `*.gem`, `vendor/bundle/`
-   - **PHP**: `vendor/`, `*.log`, `*.cache`, `*.env`
-   - **Rust**: `target/`, `debug/`, `release/`, `*.rs.bk`, `*.rlib`, `*.prof*`, `.idea/`, `*.log`, `.env*`
-   - **Kotlin**: `build/`, `out/`, `.gradle/`, `.idea/`, `*.class`, `*.jar`, `*.iml`, `*.log`, `.env*`
-   - **C++**: `build/`, `bin/`, `obj/`, `out/`, `*.o`, `*.so`, `*.a`, `*.exe`, `*.dll`, `.idea/`, `*.log`, `.env*`
-   - **C**: `build/`, `bin/`, `obj/`, `out/`, `*.o`, `*.a`, `*.so`, `*.exe`, `Makefile`, `config.log`, `.idea/`, `*.log`, `.env*`
-   - **Swift**: `.build/`, `DerivedData/`, `*.swiftpm/`, `Packages/`
-   - **R**: `.Rproj.user/`, `.Rhistory`, `.RData`, `.Ruserdata`, `*.Rproj`, `packrat/`, `renv/`
-   - **Universal**: `.DS_Store`, `Thumbs.db`, `*.tmp`, `*.swp`, `.vscode/`, `.idea/`
-
-   **Tool-Specific Patterns**:
-   - **Docker**: `node_modules/`, `.git/`, `Dockerfile*`, `.dockerignore`, `*.log*`, `.env*`, `coverage/`
-   - **ESLint**: `node_modules/`, `dist/`, `build/`, `coverage/`, `*.min.js`
-   - **Prettier**: `node_modules/`, `dist/`, `build/`, `coverage/`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`
-   - **Terraform**: `.terraform/`, `*.tfstate*`, `*.tfvars`, `.terraform.lock.hcl`
-   - **Kubernetes/k8s**: `*.secret.yaml`, `secrets/`, `.kube/`, `kubeconfig*`, `*.key`, `*.crt`
-
-5. Parse tasks.md structure and extract:
-   - **Task phases**: Setup, Tests, Core, Integration, Polish
+4. **Parse task structure** from tasks.md:
+   - **Phase identification**: Setup, Foundation, User Stories, Polish
    - **Task dependencies**: Sequential vs parallel execution rules
    - **Task details**: ID, description, file paths, parallel markers [P]
    - **Execution flow**: Order and dependency requirements
    - **Evidence requirements**: Check for Evidence Requirements section and note what artifacts to capture
+   - **Slash command tasks**: Identify tasks containing `: run /` pattern
+
+5. **Understand task types**:
+   - **File creation tasks**: Have backtick paths, create/modify files
+   - **Test tasks**: Marked with `[test]`, verify behavior
+   - **Parallel tasks**: Marked with `[P]`, can run concurrently within phase
+   - **Evidence tasks**: Create artifacts in `evidence/` directory
+   - **Media tasks**: Create content in `media/` directory
+   - **Slash command tasks**: Contain `: run /command`, execute the specified command
 
 6. Execute implementation following the task plan:
    - **Phase-by-phase execution**: Complete each phase before moving to the next
-   - **Respect dependencies**: Run sequential tasks in order, parallel tasks [P] can run together  
-   - **Follow TDD approach**: Execute test tasks before their corresponding implementation tasks
-   - **File-based coordination**: Tasks affecting the same files must run sequentially
-   - **Validation checkpoints**: Verify each phase completion before proceeding
+   - **Sequential tasks**: Execute in order, respecting dependencies
+   - **Parallel tasks [P]**: Can be executed together within the same phase
+   - **Test tasks [test]**: Run tests to verify implementation
+   - **Slash command tasks**: Execute the specified command (see Slash Command Execution below)
 
-7. Implementation execution rules:
-   - **Setup first**: Initialize project structure, dependencies, configuration
-   - **Tests before code**: If you need to write tests for contracts, entities, and integration scenarios
+7. **Implementation patterns by task type**:
+   - **Setup tasks**: Project scaffolding, configuration files, directory structure
    - **Core development**: Implement models, services, CLI commands, endpoints
    - **Integration work**: Database connections, middleware, logging, external services
    - **Polish and validation**: Unit tests, performance optimization, documentation
@@ -127,19 +62,17 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Capture test-summary.md with test results
      - Create usage-example.md demonstrating the feature
      - Capture any feature-specific artifacts (screenshots, API samples, CLI output, etc.)
+   - **Media content**: Create blog posts and LinkedIn summaries using Content Specialist agent
 
 8. Progress tracking and error handling:
    - Report progress after each completed task
-   - Halt execution if any non-parallel task fails
-   - For parallel tasks [P], continue with successful tasks, report failed ones
-   - Provide clear error messages with context for debugging
-   - Suggest next steps if implementation cannot proceed
-   - **IMPORTANT** For completed tasks, make sure to mark the task off as [X] in the tasks file.
+   - Mark tasks complete in tasks.md by changing `- [ ]` to `- [x]`
+   - On errors: Document the issue, attempt resolution, or flag for user input
+   - For blocking issues: Stop and report clearly what's needed
 
-9. Completion validation:
-   - Verify all required tasks are completed
-   - Check that implemented features match the original specification
-   - Validate that tests pass and coverage meets requirements
+9. **Final verification**:
+   - Run all tests to confirm implementation works
+   - Verify all acceptance criteria from spec.md are met
    - Confirm the implementation follows the technical plan
    - Report final status with summary of completed work
 
@@ -149,10 +82,188 @@ You **MUST** consider the user input before proceeding (if not empty).
       - `evidence/test-summary.md` - REQUIRED
       - `evidence/usage-example.md` - REQUIRED
       - Feature-specific artifacts as defined in tasks.md
-    - If evidence is missing, WARN the user and recommend completing evidence tasks
-    - If all evidence is present:
+    - Verify media directory exists: `FEATURE_DIR/media/`
+    - Check that required media files are present:
+      - `media/shipped-post.md` - REQUIRED
+      - `media/linkedin-shipped.md` - REQUIRED
+    - If evidence or media is missing, WARN the user and recommend completing those tasks
+    - If all evidence and media is present:
       - Commit any uncommitted changes
       - Push to the feature branch
-      - Prompt user: "Implementation complete with evidence. Run `/speckit.pr` to create a pull request with the collected evidence."
+      - Execute the final PR creation task (if present in tasks.md)
+
+## Slash Command Task Execution
+
+Some tasks invoke slash commands rather than creating files. These tasks have the format:
+
+```markdown
+- [ ] TXXX Description: run /command-name
+```
+
+### Recognizing Slash Command Tasks
+
+A task is a slash command task if the description contains `: run /` followed by a command name.
+
+Examples:
+- `Create PR and publish blog: run /speckit.pr` → execute `/speckit.pr`
+- `Generate documentation: run /docs.generate` → execute `/docs.generate`
+
+### Execution Process
+
+When you encounter a slash command task:
+
+1. **Complete all prerequisite tasks first**
+   - Slash command tasks typically depend on evidence and media content being ready
+   - Verify all earlier tasks in the phase are complete
+
+2. **Extract the command**
+   - Parse the command name after `run /`
+   - Example: `"Create PR and publish blog: run /speckit.pr"` → `/speckit.pr`
+
+3. **Execute the command**
+   - Invoke it as if the user typed it directly
+   - For `/speckit.pr`: This creates the feature PR and publishes the blog post
+   - The command will perform its full workflow and return results
+
+4. **Capture the output**
+   - Store any URLs, status messages, or results returned by the command
+   - These become part of the implementation report
+
+5. **Mark task complete**
+   - Change `- [ ]` to `- [x]` in tasks.md after successful execution
+
+6. **Report the results**
+   - Include command output in your progress report
+   - For `/speckit.pr`, report both PR URLs:
+     ```
+     ✅ Feature PR: https://github.com/debrief/debrief-future/pull/XX
+     ✅ Blog PR: https://github.com/debrief/debrief.github.io/pull/YY
+     ```
+
+### Example Execution
+
+```markdown
+Task in tasks.md:
+- [ ] T507 Create PR and publish blog: run /speckit.pr
+
+Execution steps:
+1. Verify T501-T506 are complete (evidence + media tasks)
+2. Parse command: /speckit.pr
+3. Execute /speckit.pr
+4. Command output:
+   ✅ Feature PR created: https://github.com/debrief/debrief-future/pull/12
+   ✅ Blog PR created: https://github.com/debrief/debrief.github.io/pull/24
+5. Update tasks.md:
+   - [x] T507 Create PR and publish blog: run /speckit.pr
+6. Report to user with both URLs
+```
+
+### Error Handling for Slash Commands
+
+| Error | Action |
+|-------|--------|
+| Command not found | Report error, mark task as blocked |
+| Command fails partially | Report what succeeded, what failed |
+| Prerequisites missing | List missing prerequisites, do not execute |
+| Network/auth errors | Report error, suggest manual retry |
+
+**Important:** 
+- Never skip slash command tasks — they complete the workflow
+- Order matters — PR task must run after all evidence and media tasks
+- Partial success is acceptable — if blog publishing fails but feature PR succeeds, report both and continue
+
+## Task Execution Guidelines
+
+### File Creation Tasks
+
+For tasks with file paths in backticks:
+```markdown
+- [ ] T001 Create parser module `src/debrief_io/parser.py`
+```
+
+1. Create the file at the specified path
+2. Implement the functionality described
+3. Follow patterns established in plan.md
+4. Mark complete when file exists and is functional
+
+### Test Tasks
+
+For tasks marked with `[test]`:
+```markdown
+- [ ] T015 [test] Write parser unit tests `tests/test_parser.py`
+```
+
+1. Create test file with comprehensive test cases
+2. Cover happy path and edge cases
+3. Run tests to verify they pass
+4. Mark complete when all tests pass
+
+### Parallel Tasks
+
+For tasks marked with `[P]`:
+```markdown
+- [ ] T002 [P] Add type definitions `src/types.py`
+- [ ] T003 [P] Add constants `src/constants.py`
+```
+
+These can be executed in any order or simultaneously within the same phase.
+
+### Evidence Tasks
+
+For tasks in the evidence collection section:
+```markdown
+- [ ] T401 Capture test results in specs/002-debrief-io/evidence/test-summary.md
+```
+
+1. Run the relevant tests or commands
+2. Capture the output in the specified format
+3. Save to the evidence directory
+4. Mark complete when file exists with valid content
+
+### Media Tasks
+
+For tasks creating blog posts or social content:
+```markdown
+- [ ] T405 Create shipped blog post in specs/002-debrief-io/media/shipped-post.md
+```
+
+1. Read Content Specialist agent from `.claude/agents/media/content.md`
+2. Spawn Content Specialist via Task tool
+3. Provide feature context from spec.md and evidence/
+4. Generate content following the Shipped Post template
+5. Save to media directory
+6. Mark complete when file exists with valid front matter
+
+## Completion Report
+
+After all tasks are complete, provide a summary:
+
+```markdown
+## Implementation Complete
+
+### Tasks Completed
+- Phase 1 (Setup): X/X tasks
+- Phase 2 (Foundation): X/X tasks
+- Phase 3 (User Story 1): X/X tasks
+- Phase N (Polish): X/X tasks
+
+### Evidence Captured
+- test-summary.md ✓
+- usage-example.md ✓
+- [feature-specific artifacts] ✓
+
+### Media Content Created
+- shipped-post.md ✓
+- linkedin-shipped.md ✓
+
+### PRs Created
+- Feature PR: [URL]
+- Blog PR: [URL]
+
+### Next Steps
+1. Review and merge the feature PR
+2. Review and merge the blog PR
+3. Post LinkedIn summary after blog is live
+```
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit.tasks` first to regenerate the task list.
