@@ -1,11 +1,11 @@
-Two languages, one config file, zero disagreement about where your data lives.
+Most Node.js XDG libraries get macOS paths wrong.
 
-This week we're planning debrief-config: a shared configuration service for Future Debrief that lets our Python maritime analysis services and Electron UI read from the same JSON file. When you register a STAC catalog in the UI, the Python tools find it immediately. No sync, no API calls, no duplication.
+Building a config service for Future Debrief that needs to share state between Python services and an Electron UI. Both read and write the same JSON file — when you register a STAC catalog from Python, it appears in the loader dropdown immediately.
 
-The interesting wrinkle: popular Node.js libraries for XDG config paths get macOS wrong (~/Library/Preferences instead of ~/Library/Application Support). Rather than fight platform inconsistencies, we wrote a 20-line implementation that matches Python's platformdirs exactly.
+Python's `platformdirs` handles cross-platform paths correctly. The popular Node.js option (`env-paths`) uses `~/Library/Preferences` on macOS instead of `~/Library/Application Support`. Twenty lines of manual path resolution was simpler than working around that mismatch.
 
-We're sharing the spec and design artifacts before writing code. If you've solved cross-platform config in dual-language projects, or spotted something we've missed, we'd genuinely like to hear it.
+Small piece of infrastructure, but foundational. Everything that needs to remember settings or discover available stores will use this.
 
-Read the planning post and join the discussion: [LINK]
+https://github.com/debrief/debrief-future/tree/main/specs/003-debrief-config
 
 #FutureDebrief #MaritimeAnalysis #OpenSource

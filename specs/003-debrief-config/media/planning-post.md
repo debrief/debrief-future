@@ -1,50 +1,46 @@
 ---
 layout: post
-title: "Planning: debrief-config"
+title: "Config Service: Sharing state between Python and TypeScript"
 date: 2026-01-10
 author: ian
-category: planning
+category: progress
 tags: [tracer-bullet, config]
 ---
 
-## What We're Building
+The next piece of the tracer bullet is surprisingly mundane: where does Debrief store its settings?
 
-This week we're tackling a problem that sounds simple but has some interesting cross-platform wrinkles: **where does Debrief store its settings?**
+I'm building a config service that manages the list of STAC stores you've registered and your preferences. The wrinkle is that both Python services and the Electron loader need to read and write the same data. When you register a catalog from a Python MCP tool, it needs to appear in the loader's dropdown immediately.
 
-The debrief-config service manages shared user state - specifically, the list of STAC stores you've registered and your preferences. The twist is that we need this to work from both Python services and the Electron loader app. When you register a STAC catalog from a Python MCP service, that registration needs to appear instantly in the loader's dropdown. Both languages will read and write the same JSON config file, stored in the platform-appropriate location: `~/.config/debrief/` on Linux, `~/Library/Application Support/debrief/` on macOS, and `%APPDATA%\debrief\` on Windows.
+The solution is straightforward — both languages share a JSON config file in the platform-appropriate location: `~/.config/debrief/` on Linux, `~/Library/Application Support/debrief/` on macOS, `%APPDATA%\debrief\` on Windows.
 
-This is a small service (roughly 500 lines of Python, 300 lines of TypeScript), but it's foundational. Every other component that needs to remember user settings or know about available data stores will use this.
+## The path parity problem
 
-## How It Fits
+For Python, `platformdirs` handles XDG paths correctly on all platforms. It has 47 million weekly downloads and zero dependencies.
 
-In the tracer bullet sequence, debrief-config sits at Stage 3 - after schemas, STAC operations, and file parsing, but before the Electron loader. It's the bridge that lets the TypeScript frontend discover what the Python backend knows about. Without it, you'd have to manually tell the loader about every catalog you create - which defeats the point of a seamless workflow.
+For TypeScript, the obvious library is `env-paths`. But it gets macOS wrong — it uses `~/Library/Preferences` instead of `~/Library/Application Support`. If the paths don't match, Python and TypeScript can't share the same file.
 
-## Key Decisions
+I wrote a 20-line manual implementation instead. It maps platforms to paths the same way `platformdirs` does. Twenty lines of code felt better than fighting a library that doesn't quite fit.
 
-We've done the research and made some calls. Here's what we've landed on:
+## Concurrent access
 
-- **Python XDG paths**: Using `platformdirs` (47M weekly downloads, zero dependencies, maintained by PyPA). It handles all the cross-platform path resolution we need.
+Two processes might write to config at the same time — the Python service registering a store while the Electron loader saves a preference. Without coordination, one write could clobber the other.
 
-- **TypeScript XDG paths**: Writing our own 20-line implementation. Why? The obvious choice (`env-paths`) uses `~/Library/Preferences` on macOS, but `platformdirs` uses `~/Library/Application Support`. If the paths don't match, Python and TypeScript can't share the same config file. Twenty lines of code is a small price for guaranteed path parity.
+The approach: atomic write plus lock file. When writing config, write to a temp file first, then atomically rename it. A lock file prevents simultaneous writes. This keeps the config file human-readable (unlike SQLite) while preventing corruption.
 
-- **Concurrency handling**: Atomic write plus lock file. When you write config, we write to a temp file first, then atomically rename it. A lock file prevents two processes from writing at the same time. This keeps the config file human-readable (unlike SQLite) while preventing corruption.
+Using `filelock` for Python and `proper-lockfile` for Node.js — both handle stale lock detection if a process crashes while holding the lock.
 
-- **Schema approach**: Pydantic models only, not LinkML. Config is internal application state, not domain data. Our existing services (debrief-stac, debrief-io) already follow this pattern for internal structures. LinkML is for data that crosses system boundaries - config doesn't.
+## Schema decision
 
-- **Testing**: pytest for Python, Vitest with memfs for TypeScript. Both use mocked filesystems so we can test all platform paths without needing three different machines.
+I considered putting the config schema in LinkML to match the domain data approach. But config is internal application state, not data that crosses system boundaries. The existing services (debrief-stac, debrief-io) already use Pydantic directly for internal structures. Following that pattern.
 
-## What We'd Love Feedback On
+## Open questions
 
-We're confident about the technical approach, but there are a few design questions we'd value input on:
+A few things I'm not certain about:
 
-1. **Default store behaviour**: Should there be a "default store" preference that gets auto-selected in the loader? Or is that premature optimisation?
+- Should there be a "default store" preference that auto-selects in the loader? Or is that adding features before they're needed?
+- When listing stores, should I re-validate that each catalog still exists? Catches moved/deleted catalogs but adds latency.
+- Config has a `version` field for future migrations. What happens when v2 arrives — silent upgrade, backup old file, prompt user?
 
-2. **Store validation timing**: We currently validate that a path points to a valid STAC catalog when you register it. Should we also re-validate on every `list_stores()` call (slower but catches moved/deleted catalogs)?
+Small service — roughly 500 lines of Python, 300 lines of TypeScript. But it's foundational. Every component that needs to remember settings or discover available stores will use this.
 
-3. **Config versioning**: We're adding a `version` field to the config format. What should happen when we need to migrate to v2? Silent auto-upgrade? Backup old file? Prompt user?
-
-4. **TypeScript API naming**: Python uses `snake_case` (`register_store`, `list_stores`). TypeScript convention is `camelCase` (`registerStore`, `listStores`). We're planning to follow language conventions rather than force parity. Any strong opinions?
-
-If you've built cross-platform config systems before, or have preferences about any of the above, we'd genuinely like to hear from you.
-
--> [Join the discussion](https://github.com/debrief/debrief-future/discussions)
+-> [See the spec and design artifacts](https://github.com/debrief/debrief-future/tree/main/specs/003-debrief-config)
