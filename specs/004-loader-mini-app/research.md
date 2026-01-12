@@ -180,8 +180,22 @@ Debrief Loader.app/
 
 **Service Interaction Model**:
 - **debrief-io**: Stateless — spawn per parse request, or keep warm for session
-- **debrief-stac**: Single long-running instance — catalog path passed with each request
+- **debrief-stac**: Single long-running instance — initialized with ALL configured store paths (enables cross-catalog search/operations); target store specified per write request
 - **debrief-config**: TypeScript library imported directly (no IPC)
+
+**debrief-stac Initialization**:
+```typescript
+// On app startup, pass all configured stores to debrief-stac
+const stores = debriefConfig.getStores(); // [{name, path}, ...]
+stacService.initialize({ stores });
+
+// Operations specify which store to target
+stacService.listPlots({ store: 'Project Alpha' });
+stacService.addFeatures({ store: 'Project Alpha', plot: '...', features: [...] });
+
+// Future: cross-catalog queries
+stacService.searchPlots({ query: 'Neptune', stores: 'all' });
+```
 
 **Alternatives Considered**:
 | Alternative | Rejected Because |
@@ -267,7 +281,7 @@ All technical unknowns resolved. Key decisions:
 |-------|----------|
 | Python IPC | JSON-RPC over stdio child processes |
 | Service deployment | Bundled in Electron app at known paths |
-| Service model | Single debrief-stac instance, catalog path per request |
+| Service model | Single debrief-stac instance with all stores; target per request |
 | debrief-config scope | User data only (STAC store locations) |
 | I18N | react-i18next with JSON bundles |
 | File associations | electron-builder config |
