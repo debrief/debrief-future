@@ -153,30 +153,109 @@ fileAssociations:
 
 ---
 
-### 6. Python Service Discovery
+### 6. Service Bundling & Deployment
 
-**Question**: How does the Electron app find the Python service executables?
+**Question**: How does the Electron app locate and run the Python services?
 
-**Decision**: Bundle Python services as package scripts, discover via debrief-config paths
+**Decision**: Bundle Python services inside the Electron app at known relative paths
 
 **Rationale**:
-- debrief-config (Stage 3) already manages paths and configuration
-- Python packages installed via uv provide entry points
-- Electron app queries debrief-config for service locations
-- Graceful fallback if services not installed (show setup instructions)
+- Services are integral to the app — they should ship together
+- Known relative paths eliminate discovery complexity
+- Single debrief-stac instance handles all catalog operations (path passed per call)
+- debrief-config scope is limited to user data (STAC store locations), not Debrief internals
+
+**Architecture**:
+```
+Debrief Loader.app/
+├── Contents/
+│   ├── MacOS/
+│   │   └── Debrief Loader      # Electron executable
+│   └── Resources/
+│       ├── app/                 # Renderer bundle
+│       └── services/            # Bundled Python services
+│           ├── debrief-io       # Frozen executable (PyInstaller)
+│           └── debrief-stac     # Frozen executable (PyInstaller)
+```
+
+**Service Interaction Model**:
+- **debrief-io**: Stateless — spawn per parse request, or keep warm for session
+- **debrief-stac**: Single long-running instance — catalog path passed with each request
+- **debrief-config**: TypeScript library imported directly (no IPC)
 
 **Alternatives Considered**:
 | Alternative | Rejected Because |
 |-------------|------------------|
-| Hardcoded paths | Breaks portability, different install locations |
-| Bundled Python runtime | Massive app size, update complexity |
-| User-configured paths | Poor UX, error-prone |
+| Separate install | Poor UX, version mismatch risk, "works on my machine" issues |
+| Discover via PATH | Unreliable, different environments |
+| Store paths in debrief-config | Conflates user data config with app internals |
 
 **Implementation Notes**:
-- On startup: `debrief-config get-service-paths` returns JSON with service locations
-- Services expected at: `debrief-io`, `debrief-stac` entry points
-- If not found: display "Services not installed" with setup link
-- Cache service paths for session duration
+- Use PyInstaller to create single-file executables for each service
+- Executables live at `process.resourcesPath + '/services/debrief-io'` (etc.)
+- Build pipeline produces platform-specific service binaries
+- Services versioned together with Electron app release
+
+---
+
+### 7. First-Run Experience (No Stores Configured)
+
+**Question**: What happens when user has no STAC stores configured?
+
+**Decision**: Prompt user to either create a local store or add a remote server (future)
+
+**Rationale**:
+- Don't assume local storage is preferred — organisations may use central servers
+- Give user explicit choice rather than silently creating directories
+- "Create local store" is the recommended/default option for individual users
+- "Add remote server" placeholder for future capability
+
+**Flow**:
+```
+┌─────────────────────────────────────────────┐
+│  Debrief Loader                        [X]  │
+├─────────────────────────────────────────────┤
+│                                             │
+│  Loading: sample-track.rep                  │
+│  ─────────────────────────────              │
+│                                             │
+│  ⚠️  No STAC stores configured              │
+│                                             │
+│  To load this file, you need a destination  │
+│  store. Choose an option:                   │
+│                                             │
+│  ┌─────────────────────────────────────┐    │
+│  │ 📁 Create local store               │    │
+│  │    Set up a new catalog on this     │    │
+│  │    computer (recommended)           │    │
+│  ├─────────────────────────────────────┤    │
+│  │ 🌐 Connect to remote server         │    │
+│  │    Add an existing STAC server      │    │
+│  │    (coming soon)                    │    │
+│  └─────────────────────────────────────┘    │
+│                                             │
+│                              [ Cancel ]     │
+└─────────────────────────────────────────────┘
+```
+
+**"Create local store" sub-flow**:
+- Suggest default location: `~/Documents/Debrief/local-catalog`
+- Allow user to browse/change location
+- Create catalog structure via debrief-stac
+- Register in debrief-config
+- Return to main wizard with new store selected
+
+**Alternatives Considered**:
+| Alternative | Rejected Because |
+|-------------|------------------|
+| Auto-create default store | Presumptuous — orgs may not want local data |
+| Block until manually configured | Poor UX, requires leaving the app |
+| Show error only | Not actionable, frustrating |
+
+**Implementation Notes**:
+- Check `debrief-config.getStores().length === 0` on startup
+- "Connect to remote" disabled with "(coming soon)" until remote STAC support added
+- Default path uses platform-appropriate Documents folder via Electron's `app.getPath('documents')`
 
 ---
 
@@ -187,10 +266,13 @@ All technical unknowns resolved. Key decisions:
 | Topic | Decision |
 |-------|----------|
 | Python IPC | JSON-RPC over stdio child processes |
+| Service deployment | Bundled in Electron app at known paths |
+| Service model | Single debrief-stac instance, catalog path per request |
+| debrief-config scope | User data only (STAC store locations) |
 | I18N | react-i18next with JSON bundles |
 | File associations | electron-builder config |
 | Storybook deploy | GitHub Pages via Actions |
 | Partial write cleanup | Write-ahead marker file |
-| Service discovery | Query debrief-config |
+| No stores configured | Prompt to create local or add remote |
 
 **Ready to proceed to Phase 1: Design & Contracts**
