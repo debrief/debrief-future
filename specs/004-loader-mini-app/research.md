@@ -180,22 +180,35 @@ Debrief Loader.app/
 
 **Service Interaction Model**:
 - **debrief-io**: Stateless — spawn per parse request, or keep warm for session
-- **debrief-stac**: Single long-running instance — initialized with ALL configured store paths (enables cross-catalog search/operations); target store specified per write request
-- **debrief-config**: TypeScript library imported directly (no IPC)
+- **debrief-stac**: Single long-running instance — reads store list from shared config file (always current); target store specified per request
+- **debrief-config**: TypeScript library imported directly (no IPC); Python implementation shares same config file
 
-**debrief-stac Initialization**:
+**Shared Config Architecture**:
+```
+~/.config/debrief/config.json
+├── Written by: debrief-config (TypeScript) in Electron app
+├── Read by: debrief-config (Python) in debrief-stac
+└── Always in sync — no initialization or refresh needed
+```
+
+**Usage**:
 ```typescript
-// On app startup, pass all configured stores to debrief-stac
-const stores = debriefConfig.getStores(); // [{name, path}, ...]
-stacService.initialize({ stores });
+// Electron app adds a store
+debriefConfig.addStore({ name: 'New Store', path: '/path/to/catalog' });
+// → writes to ~/.config/debrief/config.json
 
-// Operations specify which store to target
-stacService.listPlots({ store: 'Project Alpha' });
-stacService.addFeatures({ store: 'Project Alpha', plot: '...', features: [...] });
+// debrief-stac sees it immediately (reads from same file)
+stacService.listPlots({ store: 'New Store' });  // works instantly
 
 // Future: cross-catalog queries
 stacService.searchPlots({ query: 'Neptune', stores: 'all' });
 ```
+
+This means:
+- No initialization message to debrief-stac
+- No re-init when user adds/removes stores mid-session
+- Single source of truth (the config file)
+- debrief-stac uses its Python debrief-config to read store locations
 
 **Alternatives Considered**:
 | Alternative | Rejected Because |
@@ -281,7 +294,7 @@ All technical unknowns resolved. Key decisions:
 |-------|----------|
 | Python IPC | JSON-RPC over stdio child processes |
 | Service deployment | Bundled in Electron app at known paths |
-| Service model | Single debrief-stac instance with all stores; target per request |
+| Service model | Single debrief-stac instance; reads stores from shared config file |
 | debrief-config scope | User data only (STAC store locations) |
 | I18N | react-i18next with JSON bundles |
 | File associations | electron-builder config |
