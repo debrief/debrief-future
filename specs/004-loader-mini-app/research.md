@@ -180,35 +180,30 @@ Debrief Loader.app/
 
 **Service Interaction Model**:
 - **debrief-io**: Stateless — spawn per parse request, or keep warm for session
-- **debrief-stac**: Single long-running instance — reads store list from shared config file (always current); target store specified per request
-- **debrief-config**: TypeScript library imported directly (no IPC); Python implementation shares same config file
+- **debrief-stac**: Single long-running instance — receives store paths with each request (no config dependency); caches internally, invalidates if paths change
+- **debrief-config**: TypeScript library imported directly (no IPC)
 
-**Shared Config Architecture**:
-```
-~/.config/debrief/config.json
-├── Written by: debrief-config (TypeScript) in Electron app
-├── Read by: debrief-config (Python) in debrief-stac
-└── Always in sync — no initialization or refresh needed
-```
-
-**Usage**:
+**Store Path Passing**:
 ```typescript
-// Electron app adds a store
-debriefConfig.addStore({ name: 'New Store', path: '/path/to/catalog' });
-// → writes to ~/.config/debrief/config.json
+// Electron app reads stores from config
+const storePaths = debriefConfig.getStores().map(s => s.path);
 
-// debrief-stac sees it immediately (reads from same file)
-stacService.listPlots({ store: 'New Store' });  // works instantly
+// Pass paths with each debrief-stac request
+stacService.listPlots({ stores: storePaths, target: 'Project Alpha' });
+stacService.addFeatures({ stores: storePaths, target: 'Project Alpha', ... });
 
 // Future: cross-catalog queries
-stacService.searchPlots({ query: 'Neptune', stores: 'all' });
+stacService.searchPlots({ stores: storePaths, query: 'Neptune' });
+
+// User adds a store mid-session → next call includes new path
+// debrief-stac detects paths changed → invalidates cache
 ```
 
 This means:
-- No initialization message to debrief-stac
-- No re-init when user adds/removes stores mid-session
-- Single source of truth (the config file)
-- debrief-stac uses its Python debrief-config to read store locations
+- debrief-stac has no config file dependency
+- Could be reused by other tools with different config approaches
+- Cache invalidation is simple: hash paths array, compare on each request
+- Electron app is the single source of truth for "which stores to use"
 
 **Alternatives Considered**:
 | Alternative | Rejected Because |
@@ -294,7 +289,7 @@ All technical unknowns resolved. Key decisions:
 |-------|----------|
 | Python IPC | JSON-RPC over stdio child processes |
 | Service deployment | Bundled in Electron app at known paths |
-| Service model | Single debrief-stac instance; reads stores from shared config file |
+| Service model | Single debrief-stac instance; store paths passed per request (no config dependency) |
 | debrief-config scope | User data only (STAC store locations) |
 | I18N | react-i18next with JSON bundles |
 | File associations | electron-builder config |
