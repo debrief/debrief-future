@@ -180,30 +180,32 @@ Debrief Loader.app/
 
 **Service Interaction Model**:
 - **debrief-io**: Stateless — spawn per parse request, or keep warm for session
-- **debrief-stac**: Single long-running instance — receives store paths with each request (no config dependency); caches internally, invalidates if paths change
+- **debrief-stac**: Single long-running instance — configured with store paths on startup and when paths change; normal requests don't include paths
 - **debrief-config**: TypeScript library imported directly (no IPC)
 
-**Store Path Passing**:
+**Store Configuration Pattern**:
 ```typescript
-// Electron app reads stores from config
+// On startup: configure debrief-stac with current stores
 const storePaths = debriefConfig.getStores().map(s => s.path);
+await stacService.configure({ stores: storePaths });
 
-// Pass paths with each debrief-stac request
-stacService.listPlots({ stores: storePaths, target: 'Project Alpha' });
-stacService.addFeatures({ stores: storePaths, target: 'Project Alpha', ... });
+// Normal operations - clean, no paths needed
+stacService.listPlots({ target: 'Project Alpha' });
+stacService.addFeatures({ target: 'Project Alpha', ... });
 
 // Future: cross-catalog queries
-stacService.searchPlots({ stores: storePaths, query: 'Neptune' });
+stacService.searchPlots({ query: 'Neptune' });
 
-// User adds a store mid-session → next call includes new path
-// debrief-stac detects paths changed → invalidates cache
+// When user adds/removes a store: re-configure
+debriefConfig.addStore({ name: 'New Store', path: '/new/path' });
+await stacService.configure({ stores: debriefConfig.getStores().map(s => s.path) });
 ```
 
 This means:
 - debrief-stac has no config file dependency
 - Could be reused by other tools with different config approaches
-- Cache invalidation is simple: hash paths array, compare on each request
-- Electron app is the single source of truth for "which stores to use"
+- Electron app explicitly signals when stores change (cleaner than per-request hashing)
+- Normal requests stay simple and lightweight
 
 **Alternatives Considered**:
 | Alternative | Rejected Because |
@@ -289,7 +291,7 @@ All technical unknowns resolved. Key decisions:
 |-------|----------|
 | Python IPC | JSON-RPC over stdio child processes |
 | Service deployment | Bundled in Electron app at known paths |
-| Service model | Single debrief-stac instance; store paths passed per request (no config dependency) |
+| Service model | Single debrief-stac instance; configure() on startup and when stores change |
 | debrief-config scope | User data only (STAC store locations) |
 | I18N | react-i18next with JSON bundles |
 | File associations | electron-builder config |
