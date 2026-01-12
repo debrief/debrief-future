@@ -1,0 +1,17 @@
+.add-existing-tab {
+  padding: 16px 0;
+}
+
+.add-existing-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.add-existing-empty,
+.add-existing-loading {
+  text-align: center;
+  padding: 32px 16px;
+  color: #6b7280;
+  font-size: 14px;
+}

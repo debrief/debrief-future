@@ -1,0 +1,33 @@
+.wizard-header {
+  padding: 16px 20px 0;
+  background: #fff;
+}
+
+.wizard-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px;
+}
+
+.wizard-context {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wizard-file {
+  font-size: 14px;
+  color: #666;
+}
+
+.wizard-store {
+  font-size: 13px;
+  color: #888;
+}
+
+.wizard-divider {
+  border: none;
+  border-top: 1px solid #e5e5e5;
+  margin: 16px 0 0;
+}
