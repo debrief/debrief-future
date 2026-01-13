@@ -187,7 +187,7 @@
 
 - [x] T072 [US3] Create GitHub Actions workflow for Storybook build on push
 - [x] T073 [US3] Configure deployment to GitHub Pages (`/loader-storybook/`)
-- [ ] T074 [US3] Add link to GitHub Discussion for feedback collection
+- [x] T074 [US3] Add link to GitHub Discussion for feedback collection
 
 **Checkpoint**: ✅ Storybook configured and deployment workflow ready
 
@@ -227,12 +227,12 @@
 ### Build & Distribution
 
 - [x] T087 Configure electron-builder for Linux, macOS, Windows
-- [ ] T088 [P] Add platform-specific icons and metadata
-- [ ] T089 Configure auto-updater infrastructure (future use)
+- [x] T088 [P] Add platform-specific icons and metadata
+- [x] T089 Configure auto-updater infrastructure (future use)
 
 ### Documentation
 
-- [ ] T090 Validate quickstart.md against actual implementation
+- [x] T090 Validate quickstart.md against actual implementation
 - [x] T091 Add inline JSDoc comments to exported functions
 
 ### Evidence Collection (REQUIRED)
@@ -242,7 +242,7 @@
 - [x] T094 Record usage example demonstrating file load in `evidence/usage-example.md`
 - [x] T095 Capture wizard screenshots for all steps in `evidence/screenshots/`
 - [ ] T096 Record Playwright trace of complete workflow in `evidence/e2e-trace.zip`
-- [ ] T097 Screenshot error states with actionable messages in `evidence/screenshots/`
+- [x] T097 Screenshot error states with actionable messages in `evidence/screenshots/`
 
 ### Runtime Verification (REQUIRED for Electron apps)
 
@@ -275,10 +275,19 @@
 | Phase 2: Foundational | 21 | 21 | 100% |
 | Phase 3: US1 | 22 | 22 | 100% |
 | Phase 4: US2 | 8 | 8 | 100% |
-| Phase 5: US3 | 12 | 13 | 92% |
+| Phase 5: US3 | 13 | 13 | 100% |
 | Phase 6: First-Run | 6 | 6 | 100% |
-| Phase 7: Polish | 10 | 20 | 50% |
-| **Total** | **89** | **100** | **89%** |
+| Phase 7: Polish | 16 | 21 | 76% |
+| **Total** | **96** | **101** | **95%** |
+
+### Deferred Tasks (Require Electron Runtime)
+
+The following tasks require a working Electron runtime environment with Python services:
+
+- T096: Playwright E2E trace (requires full application stack)
+- T098-T101: Runtime verification screenshots
+
+These can be completed during integration testing when the full environment is available.
 
 ---
 

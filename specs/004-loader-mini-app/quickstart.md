@@ -55,14 +55,22 @@ cp .env.example .env.local
 ### 3. Start Development Server
 
 ```bash
-# Start Electron in development mode
+# Start Vite dev server only (for renderer development)
 pnpm dev
+
+# Start full Electron app in development mode
+pnpm electron:dev
 ```
 
-This starts:
+The `electron:dev` script starts:
 - Vite dev server for React hot reload
-- Electron main process with auto-restart
-- Storybook available at http://localhost:6006
+- Electron main process (waits for Vite to be ready)
+
+For Storybook component preview:
+```bash
+pnpm storybook
+# Available at http://localhost:6006
+```
 
 ## Project Structure
 

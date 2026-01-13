@@ -9,6 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist/main",
     "rootDir": "src/main",
+    "composite": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -22,5 +23,5 @@
     }
   },
   "include": ["src/main/**/*", "src/preload/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }

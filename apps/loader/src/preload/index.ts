@@ -4,7 +4,7 @@
  */
 
 import { contextBridge, ipcRenderer } from 'electron';
-import type { StacStoreInfo, PlotInfo, LoadResult, ParseResult } from '../renderer/types/index.js';
+import type { StacStoreInfo, PlotInfo, ParseResult } from '../renderer/types/index.js';
 
 /**
  * API exposed to renderer process via window.electronAPI

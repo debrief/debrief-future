@@ -8,7 +8,6 @@ import type {
   JsonRpcRequest,
   JsonRpcResponse,
   JsonRpcError,
-  JsonRpcErrorCodes,
 } from '../types/ipc.js';
 
 let requestId = 0;
