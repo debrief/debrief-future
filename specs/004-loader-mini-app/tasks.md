@@ -240,9 +240,16 @@
 - [x] T092 Create evidence directory: `specs/004-loader-mini-app/evidence/`
 - [x] T093 Capture test summary with pass/fail counts in `evidence/test-summary.md`
 - [x] T094 Record usage example demonstrating file load in `evidence/usage-example.md`
-- [ ] T095 Capture wizard screenshots for all steps in `evidence/screenshots/`
+- [x] T095 Capture wizard screenshots for all steps in `evidence/screenshots/`
 - [ ] T096 Record Playwright trace of complete workflow in `evidence/e2e-trace.zip`
 - [ ] T097 Screenshot error states with actionable messages in `evidence/screenshots/`
+
+### Runtime Verification (REQUIRED for Electron apps)
+
+- [ ] T098 Run Electron app in dev mode (`pnpm electron:dev`) and verify startup
+- [ ] T099 [P] Capture runtime screenshot of actual Electron window (store selection)
+- [ ] T100 [P] Capture runtime screenshot of actual Electron window (plot configuration)
+- [ ] T101 Verify app handles missing Python services gracefully (shows error, doesn't crash)
 
 **Checkpoint**: Evidence collected - ready for PR creation via `/speckit.pr`
 
@@ -270,8 +277,8 @@
 | Phase 4: US2 | 8 | 8 | 100% |
 | Phase 5: US3 | 12 | 13 | 92% |
 | Phase 6: First-Run | 6 | 6 | 100% |
-| Phase 7: Polish | 10 | 16 | 63% |
-| **Total** | **89** | **96** | **93%** |
+| Phase 7: Polish | 10 | 20 | 50% |
+| **Total** | **89** | **100** | **89%** |
 
 ---
 
