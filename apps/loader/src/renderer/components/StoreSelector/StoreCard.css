@@ -1,0 +1,90 @@
+.store-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.store-card:hover:not(.store-card-disabled) {
+  border-color: #93c5fd;
+  background-color: #f8fafc;
+}
+
+.store-card:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.store-card-selected {
+  border-color: #2563eb;
+  background-color: #eff6ff;
+}
+
+.store-card-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f9fafb;
+}
+
+.store-card-radio {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d1d5db;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.store-card-selected .store-card-radio {
+  border-color: #2563eb;
+}
+
+.store-card-radio-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color 0.15s;
+}
+
+.store-card-radio-dot-selected {
+  background: #2563eb;
+}
+
+.store-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.store-card-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 2px;
+}
+
+.store-card-path {
+  font-size: 13px;
+  color: #6b7280;
+  word-break: break-all;
+  margin-bottom: 4px;
+}
+
+.store-card-meta {
+  font-size: 12px;
+}
+
+.store-card-plots {
+  color: #9ca3af;
+}
+
+.store-card-error {
+  color: #dc2626;
+}

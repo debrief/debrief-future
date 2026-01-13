@@ -1,0 +1,79 @@
+{
+  "app": {
+    "title": "Debrief Loader",
+    "loading": "Loading: {{fileName}}"
+  },
+  "common": {
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "load": "Load",
+    "close": "Close",
+    "retry": "Retry"
+  },
+  "stores": {
+    "title": "Select destination store",
+    "empty": "No STAC stores configured",
+    "plotCount": "{{count}} plot",
+    "plotCount_plural": "{{count}} plots",
+    "inaccessible": "Store not accessible"
+  },
+  "plots": {
+    "title": "Configure plot",
+    "tabAddExisting": "Add to Existing",
+    "tabCreateNew": "Create New",
+    "selectPlot": "Select a plot",
+    "empty": "No plots in this store",
+    "featureCount": "{{count}} feature",
+    "featureCount_plural": "{{count}} features",
+    "created": "Created: {{date}}"
+  },
+  "newPlot": {
+    "name": "Plot name",
+    "namePlaceholder": "Enter plot name",
+    "nameRequired": "Plot name is required",
+    "nameExists": "A plot with this name already exists",
+    "description": "Description (optional)",
+    "descriptionPlaceholder": "Enter description"
+  },
+  "progress": {
+    "title": "Processing",
+    "parsing": "Parsing file...",
+    "creatingPlot": "Creating plot...",
+    "addingFeatures": "Adding features...",
+    "copyingAsset": "Copying source file...",
+    "finalizing": "Finalizing..."
+  },
+  "success": {
+    "title": "Load Complete",
+    "message": "Successfully loaded {{featureCount}} features into \"{{plotName}}\"",
+    "storeName": "Store: {{storeName}}",
+    "provenanceRecorded": "Provenance recorded"
+  },
+  "errors": {
+    "title": "Error",
+    "unknown": "An unexpected error occurred",
+    "parseError": "Failed to parse file",
+    "storeError": "Store access error",
+    "writeError": "Failed to write data",
+    "serviceError": "Service unavailable",
+    "resolution": "Suggested resolution: {{suggestion}}"
+  },
+  "noStores": {
+    "title": "No stores configured",
+    "message": "You need at least one STAC store to save your data.",
+    "createLocal": "Create local store",
+    "connectRemote": "Connect to remote",
+    "comingSoon": "(coming soon)",
+    "localStoreCreated": "Local store created successfully"
+  },
+  "createStore": {
+    "title": "Create local store",
+    "selectFolder": "Select folder",
+    "storeName": "Store name",
+    "storeNamePlaceholder": "My Local Store",
+    "create": "Create",
+    "defaultPath": "Default: {{path}}"
+  }
+}

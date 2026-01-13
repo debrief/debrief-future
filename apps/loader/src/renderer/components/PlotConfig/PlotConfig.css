@@ -1,0 +1,57 @@
+.plot-config {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: #fff;
+}
+
+.plot-config-content {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.plot-config-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #374151;
+  margin: 0 0 12px;
+}
+
+.plot-config-tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 0;
+}
+
+.plot-config-tab {
+  flex: 1;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  margin-bottom: -1px;
+}
+
+.plot-config-tab:hover {
+  color: #374151;
+}
+
+.plot-config-tab:focus {
+  outline: none;
+  background: #f9fafb;
+}
+
+.plot-config-tab-active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+.plot-config-panel {
+  padding-top: 0;
+}
