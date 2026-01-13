@@ -46,6 +46,7 @@ async function createWindow(): Promise<void> {
     console.log('[main] Loading dev server at http://localhost:5173');
     try {
       await mainWindow.loadURL('http://localhost:5173');
+      console.log('[main] Dev server loaded successfully');
       mainWindow.webContents.openDevTools();
     } catch (err) {
       console.error('[main] Failed to load dev server:', err);
@@ -60,6 +61,14 @@ async function createWindow(): Promise<void> {
     console.log('[main] Window ready to show');
     mainWindow?.show();
   });
+
+  // Fallback: show window after a short delay if ready-to-show doesn't fire
+  setTimeout(() => {
+    if (mainWindow && !mainWindow.isVisible()) {
+      console.log('[main] Forcing window to show (fallback)');
+      mainWindow.show();
+    }
+  }, 2000);
 
   mainWindow.on('closed', () => {
     mainWindow = null;
