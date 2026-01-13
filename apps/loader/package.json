@@ -84,15 +84,6 @@
         "filter": ["**/*"]
       }
     ],
-    "fileAssociations": [
-      {
-        "ext": "rep",
-        "name": "REP Data File",
-        "description": "Debrief REP maritime data file",
-        "role": "Editor",
-        "icon": "build/icons/rep-file"
-      }
-    ],
     "linux": {
       "target": [
         "AppImage",
@@ -118,7 +109,6 @@
       "target": [
         "nsis"
       ],
-      "icon": "build/icons/icon.ico",
       "signAndEditExecutable": false
     },
     "nsis": {
