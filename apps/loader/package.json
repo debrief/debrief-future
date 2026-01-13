@@ -77,11 +77,6 @@
         "from": "packaging/dist/services",
         "to": "services",
         "filter": ["**/*"]
-      },
-      {
-        "from": "packaging/dist/python",
-        "to": "python",
-        "filter": ["**/*"]
       }
     ],
     "linux": {

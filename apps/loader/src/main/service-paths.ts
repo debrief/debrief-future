@@ -2,7 +2,7 @@
  * Service path resolution for Python services.
  *
  * In development, services are invoked via PATH (requires pip install).
- * In production, services are bundled as shiv archives with embedded Python.
+ * In production, services are bundled as PyInstaller executables.
  */
 
 import { app } from 'electron';
@@ -33,7 +33,7 @@ export function isDev(): boolean {
  * Resolves the command to spawn a Python service.
  *
  * In development: { executable: 'debrief-stac', args: [] }
- * In production:  { executable: '/path/to/python', args: ['/path/to/service.pyz'] }
+ * In production:  { executable: '/path/to/services/debrief-stac.exe', args: [] }
  *
  * @param name - Service name (e.g., 'debrief-stac', 'debrief-io')
  * @returns ServiceCommand with executable and args
@@ -47,18 +47,17 @@ export function getServiceCommand(name: string): ServiceCommand {
   }
 
   if (!app.isPackaged) {
-    // Development: use PATH lookup (requires: pip install -e ./services/stac etc.)
+    // Development: use PATH lookup (requires: uv run or pip install -e)
     return { executable: name, args: [] };
   }
 
-  // Production: use bundled Python + shiv archive
-  const pythonExe = process.platform === 'win32' ? 'python.exe' : 'bin/python3';
-  const pythonPath = join(process.resourcesPath, 'python', pythonExe);
-  const archivePath = join(process.resourcesPath, 'services', `${name}.pyz`);
+  // Production: use bundled PyInstaller executable
+  const ext = process.platform === 'win32' ? '.exe' : '';
+  const exePath = join(process.resourcesPath, 'services', `${name}${ext}`);
 
   return {
-    executable: pythonPath,
-    args: [archivePath],
+    executable: exePath,
+    args: [],
   };
 }
 
