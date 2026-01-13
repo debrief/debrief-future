@@ -80,14 +80,23 @@ def build_pyinstaller_exe(
     """Build a PyInstaller executable for a service."""
     name = service["name"]
     module = service["module"]
-    service_path = repo_root / service["path"]
 
     output_dir = dist_dir / "services"
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    build_dir = dist_dir / "build" / name
+    build_dir.mkdir(parents=True, exist_ok=True)
+
     print(f"  Building {name}...")
 
-    # Use uv run to execute pyinstaller in the workspace environment
+    # Create a temporary entry point script for PyInstaller
+    entry_script = build_dir / f"{name}_entry.py"
+    entry_script.write_text(f"""#!/usr/bin/env python3
+from {module} import main
+if __name__ == "__main__":
+    main()
+""")
+
     ext = ".exe" if sys.platform == "win32" else ""
 
     cmd = [
@@ -95,8 +104,8 @@ def build_pyinstaller_exe(
         "--onefile",
         "--name", name,
         "--distpath", str(output_dir),
-        "--workpath", str(dist_dir / "build" / name),
-        "--specpath", str(dist_dir / "build"),
+        "--workpath", str(build_dir),
+        "--specpath", str(build_dir),
         "--clean",
         "--noconfirm",
         # Hidden imports for pydantic
@@ -106,8 +115,10 @@ def build_pyinstaller_exe(
         "--hidden-import", "pydantic.deprecated.decorator",
         "--collect-all", "pydantic",
         "--collect-all", "pydantic_core",
-        # The entry point
-        "-m", module,
+        # Hidden imports for our modules
+        "--hidden-import", module.rsplit(".", 1)[0],  # e.g., debrief_stac
+        # The entry point script
+        str(entry_script),
     ]
 
     result = subprocess.run(
