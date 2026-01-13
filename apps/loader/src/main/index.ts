@@ -13,9 +13,16 @@ import { setupStacHandlers, initializeStac } from './ipc/stac.js';
 
 let mainWindow: BrowserWindow | null = null;
 
-const isDev = process.env.NODE_ENV === 'development';
+// Detect dev mode: check for Vite dev server or explicit NODE_ENV
+const isDev = process.env.NODE_ENV === 'development' ||
+              process.env.ELECTRON_IS_DEV === '1' ||
+              !app.isPackaged;
+
+console.log('[main] Starting Debrief Loader, isDev:', isDev);
 
 async function createWindow(): Promise<void> {
+  console.log('[main] Creating window...');
+
   mainWindow = new BrowserWindow({
     width: 500,
     height: 600,
@@ -26,7 +33,7 @@ async function createWindow(): Promise<void> {
       preload: join(__dirname, '../preload/index.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true,
+      sandbox: false, // Required for preload to work in dev
     },
     titleBarStyle: 'default',
     show: false,
@@ -36,13 +43,21 @@ async function createWindow(): Promise<void> {
 
   // Load the renderer
   if (isDev) {
-    await mainWindow.loadURL('http://localhost:5173');
-    mainWindow.webContents.openDevTools();
+    console.log('[main] Loading dev server at http://localhost:5173');
+    try {
+      await mainWindow.loadURL('http://localhost:5173');
+      mainWindow.webContents.openDevTools();
+    } catch (err) {
+      console.error('[main] Failed to load dev server:', err);
+    }
   } else {
-    await mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
+    const indexPath = join(__dirname, '../renderer/index.html');
+    console.log('[main] Loading production file:', indexPath);
+    await mainWindow.loadFile(indexPath);
   }
 
   mainWindow.once('ready-to-show', () => {
+    console.log('[main] Window ready to show');
     mainWindow?.show();
   });
 
@@ -52,8 +67,14 @@ async function createWindow(): Promise<void> {
 }
 
 async function initialize(): Promise<void> {
-  // Check for and cleanup any interrupted operations
-  await checkAndCleanup();
+  console.log('[main] Initializing...');
+
+  // Check for and cleanup any interrupted operations (non-critical)
+  try {
+    await checkAndCleanup();
+  } catch (err) {
+    console.warn('[main] Cleanup check failed (non-critical):', err);
+  }
 
   // Setup IPC handlers for Python services
   setupConfigHandlers(ipcMain);
@@ -63,14 +84,20 @@ async function initialize(): Promise<void> {
   // Create the main window
   await createWindow();
 
-  // Initialize debrief-stac with configured store paths
-  await initializeStac();
+  // Initialize debrief-stac with configured store paths (non-critical)
+  try {
+    await initializeStac();
+  } catch (err) {
+    console.warn('[main] STAC initialization failed (services may not be available):', err);
+  }
 
   // Handle file path from command line (non-macOS)
   const filePath = extractFilePath(process.argv);
   if (filePath && mainWindow) {
     mainWindow.webContents.send('file-opened', filePath);
   }
+
+  console.log('[main] Initialization complete');
 }
 
 // Single instance lock
@@ -92,7 +119,9 @@ if (!gotTheLock) {
     }
   });
 
-  app.whenReady().then(initialize);
+  app.whenReady().then(initialize).catch((err) => {
+    console.error('[main] Failed to initialize:', err);
+  });
 }
 
 // macOS: Handle file open events
