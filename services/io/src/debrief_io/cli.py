@@ -8,7 +8,7 @@ Used by Electron app for file parsing operations.
 import hashlib
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -64,7 +64,7 @@ def handle_parse_file(params: dict[str, Any]) -> dict[str, Any]:
         "metadata": {
             "parser": result.handler,
             "version": __version__,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "source_hash": compute_hash(file_path),
         },
     }
