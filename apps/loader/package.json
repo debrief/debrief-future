@@ -2,7 +2,7 @@
   "name": "debrief-loader",
   "version": "0.1.0",
   "description": "Debrief file loading orchestration application",
-  "main": "dist/main/index.js",
+  "main": "dist/main/index.cjs",
   "type": "module",
   "scripts": {
     "dev": "vite",

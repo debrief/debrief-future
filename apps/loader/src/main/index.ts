@@ -23,7 +23,7 @@ async function createWindow(): Promise<void> {
     minHeight: 500,
     resizable: true,
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, '../preload/index.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
