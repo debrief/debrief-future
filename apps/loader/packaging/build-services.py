@@ -97,6 +97,9 @@ if __name__ == "__main__":
 
     ext = ".exe" if sys.platform == "win32" else ""
 
+    # Get the package name (e.g., debrief_stac from debrief_stac.cli)
+    pkg_name = module.rsplit(".", 1)[0]
+
     cmd = [
         "uv", "run", "pyinstaller",
         "--onefile",
@@ -113,8 +116,9 @@ if __name__ == "__main__":
         "--hidden-import", "pydantic.deprecated.decorator",
         "--collect-all", "pydantic",
         "--collect-all", "pydantic_core",
-        # Hidden imports for our modules
-        "--hidden-import", module.rsplit(".", 1)[0],  # e.g., debrief_stac
+        # Collect our workspace packages
+        "--collect-all", pkg_name,
+        "--collect-all", "debrief_schemas",
         # The entry point script
         str(entry_script),
     ]
