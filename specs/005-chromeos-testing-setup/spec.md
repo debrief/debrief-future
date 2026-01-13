@@ -476,8 +476,8 @@ The demo environment requires automated tests to ensure it remains available and
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  Layer 7: End-to-End Workflow                                               │
-│  "Can open Debrief and load a file from STAC"                               │
-│  Browser automation (Playwright) → noVNC → full user journey                │
+│  "Can create STAC, load REP, verify workflow"                               │
+│  CLI integration tests + visual smoke test + manual checklist               │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Layer 6: Data Pipeline                                                     │
 │  "Can load a REP file into a STAC"                                          │
@@ -726,100 +726,133 @@ print(\"GeoJSON output: valid\")
 
 ### Layer 7: End-to-End Workflow
 
-**Purpose**: Verify complete user journey through the GUI.
+**Purpose**: Verify complete user workflows work correctly.
 
-**Implementation**: Browser automation connecting to noVNC.
+**Challenge**: VNC presents the desktop as a single `<canvas>` element — just pixels, no DOM. Browser automation tools like Playwright cannot query elements inside the VNC session. Coordinate-based clicking is brittle and breaks when layout changes.
 
-```typescript
-// tests/e2e/demo-workflow.spec.ts
-import { test, expect } from '@playwright/test';
+**Solution**: Test the **code paths** the GUI invokes, verify **observable side effects**, and capture a **visual smoke test** for evidence.
 
-test.describe('Demo Environment E2E', () => {
+#### 7a: Integration Tests (CLI-driven)
 
-  test.beforeEach(async ({ page }) => {
-    // Navigate to noVNC
-    await page.goto('https://debrief-demo.fly.dev/');
+These tests invoke the same functions the desktop integration calls, then verify outcomes:
 
-    // Connect to VNC
-    await page.click('button:has-text("Connect")');
+| Test | What It Exercises | Observable Outcome |
+|------|-------------------|-------------------|
+| Create local STAC | `debrief_config.create_local_stac()` | Folder + catalog.json exist |
+| Load REP to STAC | `debrief_io.load_rep_to_stac()` | STAC item JSON created |
+| List STAC contents | `debrief_stac.list_items()` | Returns loaded items |
 
-    // Enter password if required
-    const passwordInput = page.locator('input[type="password"]');
-    if (await passwordInput.isVisible()) {
-      await passwordInput.fill(process.env.VNC_PASSWORD!);
-      await page.click('button:has-text("Submit")');
-    }
+```bash
+# tests/integration/test_stac_workflow.sh
+fly ssh console --app debrief-demo --command "
+  set -e
 
-    // Wait for desktop to load
-    await expect(page.locator('canvas#noVNC_canvas')).toBeVisible();
-    await page.waitForTimeout(3000); // Allow desktop to fully render
-  });
+  # Clean slate
+  rm -rf /config/.local/share/debrief/stac-test
 
-  test('can open file manager and see sample files', async ({ page }) => {
-    // Click file manager icon (coordinates depend on desktop layout)
-    await page.click('canvas#noVNC_canvas', { position: { x: 50, y: 50 } });
-    await page.waitForTimeout(2000);
+  # Test 1: Create local STAC (same function GUI calls)
+  /opt/debrief/venv/bin/python -c '
+from debrief_config import create_local_stac
 
-    // Take screenshot for verification
-    await page.screenshot({ path: 'test-results/file-manager.png' });
+catalog = create_local_stac(
+    path=\"/config/.local/share/debrief/stac-test\",
+    name=\"Integration Test Catalog\"
+)
+print(f\"Created: {catalog.path}\")
+'
 
-    // Visual regression or OCR verification would go here
-  });
+  # Verify side effects
+  test -d /config/.local/share/debrief/stac-test || { echo 'FAIL: STAC dir not created'; exit 1; }
+  test -f /config/.local/share/debrief/stac-test/catalog.json || { echo 'FAIL: catalog.json missing'; exit 1; }
+  echo 'PASS: STAC folder structure created'
 
-  test('can right-click REP file and see Debrief option', async ({ page }) => {
-    // Navigate to Documents folder
-    // Right-click on .rep file
-    // Verify context menu contains "Open in Debrief"
+  # Test 2: Load REP into STAC (same function GUI calls)
+  /opt/debrief/venv/bin/python -c '
+from debrief_io import load_rep_to_stac
 
-    // This requires either:
-    // 1. Visual comparison with expected screenshot
-    // 2. OCR to read menu text
-    // 3. Synthetic input recording/playback
-  });
+item = load_rep_to_stac(
+    rep_path=\"/config/Documents/Debrief Samples/example-track.rep\",
+    stac_path=\"/config/.local/share/debrief/stac-test\"
+)
+print(f\"Created item: {item.id}\")
+'
 
-  test('can open Debrief and load file from STAC', async ({ page }) => {
-    // Open Debrief application
-    // Navigate to STAC catalog
-    // Load a track
-    // Verify map displays track
+  # Verify STAC item was created
+  ITEM_COUNT=\$(ls /config/.local/share/debrief/stac-test/items/*.json 2>/dev/null | wc -l)
+  test \$ITEM_COUNT -gt 0 || { echo 'FAIL: No STAC items created'; exit 1; }
+  echo \"PASS: STAC items created: \$ITEM_COUNT\"
 
-    // Screenshot comparison for verification
-    await page.screenshot({ path: 'test-results/debrief-loaded.png' });
-  });
-});
+  # Test 3: Verify item structure
+  /opt/debrief/venv/bin/python -c '
+import json
+import glob
+import sys
+
+items = glob.glob(\"/config/.local/share/debrief/stac-test/items/*.json\")
+for item_path in items:
+    with open(item_path) as f:
+        item = json.load(f)
+    assert item[\"type\"] == \"Feature\", \"Not a GeoJSON Feature\"
+    assert \"geometry\" in item, \"Missing geometry\"
+    assert \"properties\" in item, \"Missing properties\"
+    print(f\"PASS: {item[\"id\"]} is valid STAC item\")
+'
+
+  # Cleanup
+  rm -rf /config/.local/share/debrief/stac-test
+  echo 'All integration tests passed'
+"
 ```
 
-**Challenges with Layer 7**:
-- VNC is a canvas — no DOM to query
-- Requires coordinate-based clicking or image recognition
-- Tests are brittle if desktop layout changes
-- Consider using `vncdotool` with image templates instead
+#### 7b: Visual Smoke Test
 
-**Alternative: VNC Screenshot Comparison**:
-```python
-# tests/e2e/test_visual.py
-import vncdotool.client
+Capture a screenshot to verify the desktop renders (not blank/crashed):
+
+```bash
+# tests/integration/test_visual_smoke.sh
+fly ssh console --app debrief-demo --command "
+  set -e
+  export DISPLAY=:1
+
+  # Capture screenshot
+  scrot /tmp/desktop-smoke.png
+
+  # Verify it's not blank (has multiple colors)
+  /opt/debrief/venv/bin/python -c '
 from PIL import Image
-import imagehash
 
-def test_desktop_visual_state():
-    """Compare desktop screenshot against known-good baseline."""
-    client = vncdotool.client.VNCDoToolClient()
-    client.connect('debrief-demo.fly.dev:5900')
-    client.password(os.environ['VNC_PASSWORD'])
+img = Image.open(\"/tmp/desktop-smoke.png\")
+colors = img.getcolors(maxcolors=1000)
 
-    # Capture current state
-    client.captureScreen('current.png')
+if colors is None or len(colors) > 10:
+    print(\"PASS: Desktop has visual content\")
+else:
+    print(f\"FAIL: Desktop appears blank (only {len(colors)} colors)\")
+    exit(1)
+'
 
-    # Compare with baseline
-    current = Image.open('current.png')
-    baseline = Image.open('baselines/desktop-ready.png')
+  echo 'Visual smoke test passed'
+"
 
-    hash_current = imagehash.phash(current)
-    hash_baseline = imagehash.phash(baseline)
+# Optionally pull screenshot for CI artifacts
+fly ssh sftp get /tmp/desktop-smoke.png desktop-smoke.png
+```
 
-    # Allow small differences (threshold of 5)
-    assert hash_current - hash_baseline < 5, "Desktop appearance changed unexpectedly"
+#### 7c: Manual Verification Checklist
+
+For aspects that cannot be reliably automated, generate a checklist with evidence:
+
+```markdown
+## Manual Verification Required
+
+Screenshot captured: desktop-smoke.png
+
+### Checklist
+- [ ] Desktop shows XFCE environment
+- [ ] File manager icon visible in panel/desktop
+- [ ] Sample files visible in Documents folder
+- [ ] Right-click menu includes "Open in Debrief"
+- [ ] Debrief application launches when file opened
 ```
 
 ---
@@ -834,7 +867,9 @@ def test_desktop_visual_state():
 | Layer 4: Components | On deploy | ~30s | GitHub Actions post-deploy |
 | Layer 5: Desktop Integration | On deploy | ~30s | GitHub Actions post-deploy |
 | Layer 6: Data Pipeline | On deploy, daily | ~60s | GitHub Actions scheduled |
-| Layer 7: E2E Workflow | On deploy, weekly | ~5min | GitHub Actions scheduled |
+| Layer 7a: Integration Tests | On deploy | ~2min | GitHub Actions post-deploy |
+| Layer 7b: Visual Smoke Test | On deploy | ~30s | GitHub Actions post-deploy |
+| Layer 7c: Manual Checklist | On deploy | N/A | Human review of artifacts |
 
 ### CI Workflow for Tests
 
@@ -854,30 +889,60 @@ jobs:
   test-layers-1-3:
     name: Availability & Connectivity
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
       - name: Layer 1 - URL Availability
+        id: url
         run: |
-          status=$(curl -sSf -o /dev/null -w '%{http_code}' https://debrief-demo.fly.dev/)
+          status=$(curl -sSf -o /dev/null -w '%{http_code}' https://debrief-demo.fly.dev/ || echo "000")
+          echo "status=$status" >> $GITHUB_OUTPUT
+          if [ "$status" != "200" ]; then
+            echo "::error::Demo unavailable: HTTP $status"
+            exit 1
+          fi
           echo "HTTP Status: $status"
-          [ "$status" = "200" ]
 
       - name: Layer 2 - Service Running
+        id: service
         run: |
-          fly status --app debrief-demo
+          STATUS=$(fly status --app debrief-demo --json | jq -r '.Machines[0].state // "unknown"')
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          if [ "$STATUS" != "started" ]; then
+            echo "::error::Container state is '$STATUS', expected 'started'"
+            exit 1
+          fi
+          echo "Container state: $STATUS"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: Layer 3 - VNC Connectivity
+        id: vnc
         run: |
           pip install websocket-client
-          python tests/test_vnc_connect.py
+          python tests/demo/test_vnc_connect.py
+        env:
+          DEMO_URL: https://debrief-demo.fly.dev
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Layer 1-3 Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Layer | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| URL Availability | ${{ steps.url.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Service Running | ${{ steps.service.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| VNC Connectivity | ${{ steps.vnc.outcome }} |" >> $GITHUB_STEP_SUMMARY
 
   test-layers-4-6:
     name: Components & Integration
     runs-on: ubuntu-latest
     needs: test-layers-1-3
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -885,43 +950,132 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Layer 4 - Components Installed
-        run: fly ssh console --app debrief-demo --command "/opt/debrief/bin/test-components.sh"
+        id: components
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          fly ssh console --app debrief-demo \
+            --command "timeout 120 /opt/debrief/bin/test-components.sh" 2>&1 | tee layer4.log
+          echo "Exit code: $?"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: Layer 5 - Desktop Integration
-        run: fly ssh console --app debrief-demo --command "/opt/debrief/bin/test-desktop.sh"
+        id: desktop
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          fly ssh console --app debrief-demo \
+            --command "timeout 120 /opt/debrief/bin/test-desktop.sh" 2>&1 | tee layer5.log
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: Layer 6 - Data Pipeline
-        run: fly ssh console --app debrief-demo --command "/opt/debrief/bin/test-pipeline.sh"
+        id: pipeline
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          fly ssh console --app debrief-demo \
+            --command "timeout 120 /opt/debrief/bin/test-pipeline.sh" 2>&1 | tee layer6.log
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-layers-4-6
+          path: "*.log"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Layer 4-6 Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Layer | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Components | ${{ steps.components.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Desktop Integration | ${{ steps.desktop.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Data Pipeline | ${{ steps.pipeline.outcome }} |" >> $GITHUB_STEP_SUMMARY
 
   test-layer-7:
     name: E2E Workflow
     runs-on: ubuntu-latest
     needs: test-layers-4-6
-    if: github.event_name != 'schedule' || github.event.schedule == '0 0 * * 0'  # Weekly only
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Playwright
-        run: npx playwright install --with-deps chromium
+      - name: Setup Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Layer 7 - E2E Tests
-        run: npx playwright test tests/e2e/
+      - name: Layer 7a - Integration Tests
+        id: integration
+        timeout-minutes: 10
+        run: |
+          set -o pipefail
+          fly ssh console --app debrief-demo \
+            --command "timeout 300 /opt/debrief/bin/test-stac-workflow.sh" 2>&1 | tee layer7a.log
         env:
-          VNC_PASSWORD: ${{ secrets.VNC_PASSWORD }}
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
-      - name: Upload Screenshots
+      - name: Layer 7b - Visual Smoke Test
+        id: visual
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          fly ssh console --app debrief-demo \
+            --command "timeout 60 /opt/debrief/bin/test-visual-smoke.sh" 2>&1 | tee layer7b.log
+          # Pull screenshot for artifacts
+          fly ssh sftp get --app debrief-demo /tmp/desktop-smoke.png desktop-smoke.png || true
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Generate manual checklist
+        if: always()
+        run: |
+          echo "## Layer 7 Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Test | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ steps.integration.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Visual Smoke Test | ${{ steps.visual.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Manual Verification Checklist" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Desktop shows XFCE environment" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] File manager icon visible" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Sample files in Documents folder" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Right-click menu includes 'Open in Debrief'" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-screenshots
-          path: test-results/
+          name: layer-7-evidence
+          path: |
+            *.log
+            desktop-smoke.png
 ```
+
+### Error Propagation
+
+Test failures inside the container propagate back to CI via exit codes:
+
+```
+Container test script          Fly SSH               GitHub Actions
+┌─────────────────────┐       ┌─────────────┐       ┌─────────────────┐
+│ set -e              │       │             │       │                 │
+│ test fails          │──────▶│ exit code 1 │──────▶│ step fails      │
+│ exit 1              │       │             │       │ job fails       │
+└─────────────────────┘       └─────────────┘       │ workflow fails  │
+                                                    └─────────────────┘
+```
+
+Key patterns for reliable error propagation:
+
+1. **Use `set -e`** in test scripts — any failing command exits immediately
+2. **Use `set -o pipefail`** in CI — ensures piped commands propagate errors
+3. **Use `timeout`** — prevents hung commands from blocking CI indefinitely
+4. **Explicit exit codes** — `exit 1` on failure, `exit 0` on success
+5. **Log capture** — `tee` output to files for debugging failed runs
 
 ### Status Dashboard (Optional)
 
@@ -954,8 +1108,9 @@ This could be auto-generated by CI and published to GitHub Pages or a gist.
 - **SC-006**: Artifact includes functional Python venv that works without additional pip install.
 - **SC-007**: Monthly Fly.io cost stays under $10 with typical intermittent usage pattern.
 - **SC-008**: Base Docker image requires rebuild less than once per month.
-- **SC-009**: Automated tests for layers 1-6 run on every deploy and pass.
-- **SC-010**: Layer 7 E2E tests run weekly and provide screenshot evidence.
+- **SC-009**: Automated tests for layers 1-7b run on every deploy and pass.
+- **SC-010**: Layer 7 integration tests verify STAC creation and REP loading via CLI.
+- **SC-013**: Visual smoke test captures desktop screenshot and verifies non-blank rendering.
 - **SC-011**: Test failures trigger notifications (GitHub Actions, email, or Slack).
 - **SC-012**: Stakeholders can view demo health status before attempting to connect.
 
