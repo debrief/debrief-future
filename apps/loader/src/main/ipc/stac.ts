@@ -6,12 +6,13 @@
 import { IpcMain } from 'electron';
 import { ServiceManager, spawnAndRequest } from './jsonrpc.js';
 import { getStorePaths } from './config.js';
+import { getServicePath } from '../service-paths.js';
 import type { PlotInfo } from '../../renderer/types/store.js';
 import type { GeoJSONFeature } from '../../renderer/types/results.js';
 import type { ProvenanceMetadata } from '../types/ipc.js';
 
-// Path to debrief-stac executable
-const DEBRIEF_STAC_PATH = process.env.DEBRIEF_STAC_PATH || 'debrief-stac';
+// Path to debrief-stac executable (resolved for dev/production)
+const DEBRIEF_STAC_PATH = getServicePath('debrief-stac');
 
 // Single service instance
 let stacService: ServiceManager | null = null;
