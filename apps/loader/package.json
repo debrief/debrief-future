@@ -6,10 +6,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
-    "build:mac": "tsc && vite build && electron-builder --mac",
-    "build:win": "tsc && vite build && electron-builder --win",
-    "build:linux": "tsc && vite build && electron-builder --linux",
+    "build": "npm run build:services && tsc && vite build && electron-builder",
+    "build:mac": "npm run build:services -- --platform darwin && tsc && vite build && electron-builder --mac",
+    "build:win": "npm run build:services -- --platform win32 && tsc && vite build && electron-builder --win",
+    "build:linux": "npm run build:services -- --platform linux && tsc && vite build && electron-builder --linux",
+    "build:services": "python packaging/build-services.py",
     "build:renderer": "vite build",
     "build:main": "tsc -p tsconfig.main.json",
     "preview": "vite preview",
@@ -70,6 +71,18 @@
     },
     "files": [
       "dist/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "packaging/dist/services",
+        "to": "services",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "packaging/dist/python",
+        "to": "python",
+        "filter": ["**/*"]
+      }
     ],
     "fileAssociations": [
       {

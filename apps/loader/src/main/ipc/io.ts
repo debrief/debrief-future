@@ -5,11 +5,11 @@
 
 import { IpcMain } from 'electron';
 import { spawnAndRequest } from './jsonrpc.js';
-import { getServicePath } from '../service-paths.js';
+import { getServiceCommand } from '../service-paths.js';
 import type { ParseResult, GeoJSONFeature } from '../../renderer/types/results.js';
 
-// Path to debrief-io executable (resolved for dev/production)
-const DEBRIEF_IO_PATH = getServicePath('debrief-io');
+// Command to invoke debrief-io (resolved for dev/production)
+const DEBRIEF_IO_CMD = getServiceCommand('debrief-io');
 
 interface ParseFileResponse {
   features: GeoJSONFeature[];
@@ -27,8 +27,8 @@ interface ParseFileResponse {
 export async function parseFile(filePath: string): Promise<ParseResult> {
   try {
     const result = await spawnAndRequest<ParseFileResponse>(
-      DEBRIEF_IO_PATH,
-      [],
+      DEBRIEF_IO_CMD.executable,
+      DEBRIEF_IO_CMD.args,
       'parse_file',
       { file_path: filePath }
     );

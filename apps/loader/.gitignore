@@ -1,1 +1,5 @@
 storybook-static/
+
+# Python service packaging
+packaging/dist/
+packaging/build/

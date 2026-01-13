@@ -6,13 +6,13 @@
 import { IpcMain } from 'electron';
 import { ServiceManager, spawnAndRequest } from './jsonrpc.js';
 import { getStorePaths } from './config.js';
-import { getServicePath } from '../service-paths.js';
+import { getServiceCommand } from '../service-paths.js';
 import type { PlotInfo } from '../../renderer/types/store.js';
 import type { GeoJSONFeature } from '../../renderer/types/results.js';
 import type { ProvenanceMetadata } from '../types/ipc.js';
 
-// Path to debrief-stac executable (resolved for dev/production)
-const DEBRIEF_STAC_PATH = getServicePath('debrief-stac');
+// Command to invoke debrief-stac (resolved for dev/production)
+const DEBRIEF_STAC_CMD = getServiceCommand('debrief-stac');
 
 // Single service instance
 let stacService: ServiceManager | null = null;
@@ -22,7 +22,7 @@ let stacService: ServiceManager | null = null;
  */
 function getService(): ServiceManager {
   if (!stacService) {
-    stacService = new ServiceManager(DEBRIEF_STAC_PATH);
+    stacService = new ServiceManager(DEBRIEF_STAC_CMD.executable, DEBRIEF_STAC_CMD.args);
   }
   return stacService;
 }
@@ -184,7 +184,7 @@ export async function copyAsset(
  */
 export async function initStore(path: string, name: string): Promise<void> {
   // Use one-shot spawn for initialization
-  await spawnAndRequest(DEBRIEF_STAC_PATH, [], 'init_catalog', {
+  await spawnAndRequest(DEBRIEF_STAC_CMD.executable, DEBRIEF_STAC_CMD.args, 'init_catalog', {
     path,
     name,
   });
