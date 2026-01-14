@@ -5,7 +5,7 @@
 #   make build-services  Build just the Python service archives
 #   make clean           Clean all build artifacts
 
-.PHONY: build-loader build-services build-loader-win build-loader-mac build-loader-linux clean help
+.PHONY: build-loader build-services build-loader-win build-loader-mac build-loader-linux clean lint lint-fix help
 
 # Default target
 help:
@@ -16,6 +16,8 @@ help:
 	@echo "  make build-loader-mac   Build Loader app for macOS"
 	@echo "  make build-loader-linux Build Loader app for Linux"
 	@echo "  make build-services     Build Python service archives only"
+	@echo "  make lint               Check Python code (ruff check + format)"
+	@echo "  make lint-fix           Auto-fix Python lint issues"
 	@echo "  make clean              Clean all build artifacts"
 	@echo ""
 	@echo "Prerequisites:"
@@ -54,3 +56,17 @@ clean:
 	rm -rf apps/loader/packaging/build
 	rm -rf apps/loader/node_modules/.vite
 	@echo "Clean complete."
+
+# Python linting (matches CI)
+lint:
+	@echo "Checking Python code..."
+	uvx ruff check .
+	uvx ruff format --check .
+	@echo "Lint passed."
+
+# Auto-fix Python lint issues
+lint-fix:
+	@echo "Fixing Python code..."
+	uvx ruff check --fix .
+	uvx ruff format .
+	@echo "Lint fixes applied."
