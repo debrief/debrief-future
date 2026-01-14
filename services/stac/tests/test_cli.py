@@ -7,10 +7,7 @@ particularly edge cases not covered by lower-level unit tests.
 
 from pathlib import Path
 
-import pytest
-
 from debrief_stac.cli import handle_copy_asset, handle_create_plot, handle_init_catalog
-from debrief_stac.models import PlotMetadata
 from debrief_stac.plot import read_plot
 
 

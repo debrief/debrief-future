@@ -7,10 +7,8 @@ Used by Electron app for STAC catalog operations.
 
 import json
 import sys
-from datetime import datetime, timezone
 from typing import Any
 
-from debrief_stac import __version__
 from debrief_stac.assets import add_asset
 from debrief_stac.catalog import create_catalog, list_plots
 from debrief_stac.exceptions import (
@@ -130,7 +128,7 @@ def handle_add_features(params: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Missing required parameter: plot_id")
 
     # Add features to plot
-    total_count = add_features(store_path, plot_id, features)
+    add_features(store_path, plot_id, features)
 
     # Generate provenance ID (hash of source info)
     import hashlib
