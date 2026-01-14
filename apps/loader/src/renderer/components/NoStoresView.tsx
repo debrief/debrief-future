@@ -20,12 +20,14 @@ export function NoStoresView({ onStoreCreated }: NoStoresViewProps) {
   const [error, setError] = useState<string | null>(null);
 
   const handleSelectFolder = useCallback(async () => {
-    // In a full implementation, this would use Electron's dialog.showOpenDialog
-    // For now, we'll use the default documents path
-    const docsPath = await window.electronAPI.getDocumentsPath();
-    const fullPath = await window.electronAPI.joinPath(docsPath, 'debrief-catalog');
-    setStorePath(fullPath);
-  }, []);
+    // Open system folder picker, defaulting to documents or previously selected path
+    const defaultPath = storePath || undefined;
+    const selectedPath = await window.electronAPI.showFolderDialog(defaultPath);
+
+    if (selectedPath) {
+      setStorePath(selectedPath);
+    }
+  }, [storePath]);
 
   const handleCreate = useCallback(async () => {
     if (!storeName.trim() || !storePath.trim()) {

@@ -202,7 +202,8 @@ def handle_init_catalog(params: dict[str, Any]) -> dict[str, Any]:
     if not name:
         raise ValueError("Missing required parameter: name")
 
-    create_catalog(path, catalog_id=name)
+    # Use directory name as catalog_id (default), user's name as title
+    create_catalog(path, title=name)
 
     return {
         "path": path,

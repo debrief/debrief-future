@@ -67,6 +67,8 @@ const electronAPI = {
   getDocumentsPath: (): Promise<string> => ipcRenderer.invoke('app:getDocumentsPath'),
   joinPath: (...segments: string[]): Promise<string> =>
     ipcRenderer.invoke('app:joinPath', ...segments),
+  showFolderDialog: (defaultPath?: string): Promise<string | null> =>
+    ipcRenderer.invoke('app:showFolderDialog', defaultPath),
 };
 
 // Expose API to renderer

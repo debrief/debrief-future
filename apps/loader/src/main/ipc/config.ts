@@ -3,7 +3,7 @@
  * Provides access to user configuration (STAC store locations).
  */
 
-import { app, IpcMain } from 'electron';
+import { app, dialog, IpcMain } from 'electron';
 import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
 import type { StacStoreInfo } from '../../renderer/types/store.js';
@@ -161,5 +161,19 @@ export function setupConfigHandlers(ipc: IpcMain): void {
 
   ipc.handle('app:joinPath', (_event, ...segments: string[]) => {
     return join(...segments);
+  });
+
+  ipc.handle('app:showFolderDialog', async (_event, defaultPath?: string) => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory', 'createDirectory'],
+      defaultPath: defaultPath || app.getPath('documents'),
+      title: 'Select folder for STAC catalog',
+    });
+
+    if (result.canceled || result.filePaths.length === 0) {
+      return null;
+    }
+
+    return result.filePaths[0];
   });
 }

@@ -6,7 +6,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'path';
 import { extractFilePath, handleOpenFile, setMainWindow } from './file-association.js';
-import { checkAndCleanup } from './cleanup.js';
+import { checkAndCleanup, setupCleanupHandlers } from './cleanup.js';
 import { setupConfigHandlers } from './ipc/config.js';
 import { setupIoHandlers } from './ipc/io.js';
 import { setupStacHandlers, initializeStac } from './ipc/stac.js';
@@ -89,6 +89,7 @@ async function initialize(): Promise<void> {
   setupConfigHandlers(ipcMain);
   setupIoHandlers(ipcMain);
   setupStacHandlers(ipcMain);
+  setupCleanupHandlers(ipcMain);
 
   // Create the main window
   await createWindow();
