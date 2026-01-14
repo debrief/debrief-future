@@ -130,6 +130,33 @@ export function App() {
     dispatch({ type: 'SELECT_STORE', store });
   }, []);
 
+  const handleStoreRecreate = useCallback(
+    async (store: StacStoreInfo) => {
+      try {
+        // Recreate the catalog at the same path
+        await window.electronAPI.initStore(store.path, store.name);
+        // Refresh the stores list to update accessibility
+        refreshStores();
+      } catch (err) {
+        console.error('Failed to recreate store:', err);
+      }
+    },
+    [refreshStores]
+  );
+
+  const handleStoreRemove = useCallback(
+    async (store: StacStoreInfo) => {
+      try {
+        await window.electronAPI.removeStore(store.id);
+        // Refresh the stores list
+        refreshStores();
+      } catch (err) {
+        console.error('Failed to remove store:', err);
+      }
+    },
+    [refreshStores]
+  );
+
   const handleNext = useCallback(() => {
     dispatch({ type: 'NEXT_STEP' });
   }, []);
@@ -239,6 +266,8 @@ export function App() {
           stores={state.availableStores}
           selectedStore={state.selectedStore}
           onSelect={handleStoreSelect}
+          onRecreate={handleStoreRecreate}
+          onRemove={handleStoreRemove}
           onNext={handleNext}
           onCancel={handleCancel}
         />

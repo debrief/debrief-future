@@ -12,6 +12,8 @@ interface StoreSelectorProps {
   stores: StacStoreInfo[];
   selectedStore: StacStoreInfo | null;
   onSelect: (store: StacStoreInfo) => void;
+  onRecreate: (store: StacStoreInfo) => void;
+  onRemove: (store: StacStoreInfo) => void;
   onNext: () => void;
   onCancel: () => void;
 }
@@ -20,6 +22,8 @@ export function StoreSelector({
   stores,
   selectedStore,
   onSelect,
+  onRecreate,
+  onRemove,
   onNext,
   onCancel,
 }: StoreSelectorProps) {
@@ -37,6 +41,8 @@ export function StoreSelector({
               store={store}
               selected={selectedStore?.id === store.id}
               onSelect={() => onSelect(store)}
+              onRecreate={onRecreate}
+              onRemove={onRemove}
             />
           ))}
         </div>

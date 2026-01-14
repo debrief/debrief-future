@@ -133,12 +133,26 @@ export async function addStore(
 }
 
 /**
+ * Removes a store from the configuration.
+ */
+export async function removeStore(storeId: string): Promise<void> {
+  const config = await readConfig();
+  config.stores = config.stores.filter((s) => s.id !== storeId);
+  await writeConfig(config);
+}
+
+/**
  * Gets all store paths for debrief-stac configuration.
  */
 export async function getStorePaths(): Promise<string[]> {
   const config = await readConfig();
   return config.stores.map((s) => s.path);
 }
+
+// TODO: Add "Manage Stores" tab in the future for:
+// - Renaming stores
+// - Reordering stores
+// - Bulk cleanup of inaccessible stores
 
 /**
  * Sets up IPC handlers for config operations.
@@ -154,6 +168,10 @@ export function setupConfigHandlers(ipc: IpcMain): void {
       return addStore(store);
     }
   );
+
+  ipc.handle('config:removeStore', async (_event, storeId: string) => {
+    return removeStore(storeId);
+  });
 
   ipc.handle('app:getDocumentsPath', () => {
     return app.getPath('documents');

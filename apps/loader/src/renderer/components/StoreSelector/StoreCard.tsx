@@ -10,9 +10,11 @@ interface StoreCardProps {
   store: StacStoreInfo;
   selected: boolean;
   onSelect: () => void;
+  onRecreate?: (store: StacStoreInfo) => void;
+  onRemove?: (store: StacStoreInfo) => void;
 }
 
-export function StoreCard({ store, selected, onSelect }: StoreCardProps) {
+export function StoreCard({ store, selected, onSelect, onRecreate, onRemove }: StoreCardProps) {
   const { t } = useTranslation();
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -22,6 +24,16 @@ export function StoreCard({ store, selected, onSelect }: StoreCardProps) {
         onSelect();
       }
     }
+  };
+
+  const handleRecreate = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onRecreate?.(store);
+  };
+
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onRemove?.(store);
   };
 
   return (
@@ -48,9 +60,27 @@ export function StoreCard({ store, selected, onSelect }: StoreCardProps) {
               {t('stores.plotCount', { count: store.plotCount })}
             </span>
           ) : (
-            <span className="store-card-error">
-              {t('stores.inaccessible')}: {store.accessError}
-            </span>
+            <>
+              <span className="store-card-error">
+                {t('stores.inaccessible')}: {store.accessError}
+              </span>
+              <div className="store-card-actions">
+                <button
+                  type="button"
+                  className="store-card-btn store-card-btn-recreate"
+                  onClick={handleRecreate}
+                >
+                  {t('stores.recreate')}
+                </button>
+                <button
+                  type="button"
+                  className="store-card-btn store-card-btn-remove"
+                  onClick={handleRemove}
+                >
+                  {t('stores.remove')}
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>

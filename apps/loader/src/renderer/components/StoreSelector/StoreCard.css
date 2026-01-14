@@ -88,3 +88,39 @@
 .store-card-error {
   color: #dc2626;
 }
+
+.store-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.store-card-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.store-card-btn-recreate {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+}
+
+.store-card-btn-recreate:hover {
+  background-color: #1d4ed8;
+}
+
+.store-card-btn-remove {
+  background-color: transparent;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.store-card-btn-remove:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}

@@ -14,6 +14,7 @@ const electronAPI = {
   getStores: (): Promise<StacStoreInfo[]> => ipcRenderer.invoke('config:getStores'),
   addStore: (store: Omit<StacStoreInfo, 'id' | 'plotCount' | 'accessible'>): Promise<StacStoreInfo> =>
     ipcRenderer.invoke('config:addStore', store),
+  removeStore: (storeId: string): Promise<void> => ipcRenderer.invoke('config:removeStore', storeId),
 
   // IO service
   parseFile: (filePath: string): Promise<ParseResult> => ipcRenderer.invoke('io:parseFile', filePath),

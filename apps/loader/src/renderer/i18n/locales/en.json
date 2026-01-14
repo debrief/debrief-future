@@ -17,7 +17,9 @@
     "empty": "No STAC stores configured",
     "plotCount": "{{count}} plot",
     "plotCount_plural": "{{count}} plots",
-    "inaccessible": "Store not accessible"
+    "inaccessible": "Store not accessible",
+    "recreate": "Recreate",
+    "remove": "Remove"
   },
   "plots": {
     "title": "Configure plot",
