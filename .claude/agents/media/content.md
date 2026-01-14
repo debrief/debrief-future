@@ -21,7 +21,7 @@ Structure:
 layout: future-post
 title: "Planning: [Feature Name]"
 date: YYYY-MM-DD
-track: "Planning · This Week"
+track: [momentum]
 author: Ian
 reading_time: N
 tags: [tracer-bullet, relevant-component]
@@ -57,7 +57,7 @@ Structure:
 layout: future-post
 title: "Shipped: [Feature Name]"
 date: YYYY-MM-DD
-track: "Shipped · [component-name]"
+track: [credibility]
 author: Ian
 reading_time: N
 tags: [tracer-bullet, relevant-component]
@@ -93,20 +93,27 @@ All Future Debrief posts use `future-post` layout with these fields:
 | `layout` | Yes | Always `future-post` |
 | `title` | Yes | Post title, include type prefix (Planning:/Shipped:) |
 | `date` | Yes | YYYY-MM-DD format |
-| `track` | Yes | Category with context (see Track Values below) |
+| `track` | Yes | Array of track values: `momentum`, `credibility`, `desire` |
 | `author` | Yes | Always `Ian` (capitalized) |
 | `reading_time` | Yes | Minutes to read (calculate: word_count / 200, rounded up) |
 | `tags` | Yes | Array of lowercase, hyphenated tags |
 | `excerpt` | Yes | Max 150 characters, for listings and social |
 
-### Track Values
+### Track Value Selection
 
-| Post Type | Track Value |
-|-----------|-------------|
-| Planning | `"Planning · This Week"` |
-| Shipped | `"Shipped · [component]"` (e.g., `"Shipped · debrief-io"`) |
-| Technical | `"Technical · Deep Dive"` |
-| Milestone | `"Momentum · [milestone]"` (e.g., `"Momentum · Tracer Complete"`) |
+Posts must include one or more track values from:
+
+| Track | Use When |
+|-------|----------|
+| `momentum` | Announcing plans, sharing progress, work in motion |
+| `credibility` | Delivering features, hitting milestones, proving capability |
+| `desire` | Painting the future, roadmap items, vision pieces |
+
+**Examples:**
+- Planning post: `track: [momentum]`
+- Shipped post: `track: [credibility]`
+- Major milestone with roadmap implications: `track: [credibility, desire]`
+- Progress update showing ongoing work: `track: [momentum]`
 
 ## LinkedIn Summaries
 
@@ -147,7 +154,7 @@ Posts are authored in `debrief-future` and published to `debrief.github.io` by t
 - `author: Ian` (capitalized)
 - Include `reading_time` (calculate: word_count / 200, rounded up)
 - Include `excerpt` (max 150 characters)
-- Include `track` with format: `"Type · Context"`
+- Include `track` as array with valid values: `momentum`, `credibility`, `desire`
 
 **You focus on:**
 - Compelling content
@@ -167,7 +174,7 @@ Before marking a post complete:
 
 - [ ] Front matter has all required fields
 - [ ] `layout: future-post` (not `post` or `future-default`)
-- [ ] `track` follows the format: `"Type · Context"`
+- [ ] `track` is array with valid values (momentum, credibility, desire)
 - [ ] `author: Ian` (capitalized)
 - [ ] `reading_time` calculated and included
 - [ ] `excerpt` under 150 characters
