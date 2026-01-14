@@ -5,7 +5,7 @@
 
 import { app, IpcMain } from 'electron';
 import { promises as fs } from 'fs';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import type { StacStoreInfo } from '../../renderer/types/store.js';
 
 const CONFIG_FILE = 'config.json';
@@ -33,7 +33,7 @@ function getConfigPath(): string {
  */
 async function ensureConfigDir(): Promise<void> {
   const configPath = getConfigPath();
-  const configDir = configPath.substring(0, configPath.lastIndexOf('/'));
+  const configDir = dirname(configPath);
   await fs.mkdir(configDir, { recursive: true });
 }
 
