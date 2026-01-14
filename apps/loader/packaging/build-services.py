@@ -36,6 +36,14 @@ SERVICES = [
     },
 ]
 
+# Workspace package source paths (for PyInstaller --paths)
+WORKSPACE_SRC_PATHS = [
+    "shared/schemas/src",
+    "services/stac/src",
+    "services/io/src",
+    "services/config/src",
+]
+
 
 def get_repo_root() -> Path:
     """Get the repository root directory."""
@@ -116,12 +124,18 @@ if __name__ == "__main__":
         "--hidden-import", "pydantic.deprecated.decorator",
         "--collect-all", "pydantic",
         "--collect-all", "pydantic_core",
-        # Collect our workspace packages
-        "--collect-all", pkg_name,
-        "--collect-all", "debrief_schemas",
-        # The entry point script
-        str(entry_script),
+        # Hidden imports for our workspace packages
+        "--hidden-import", pkg_name,
+        "--hidden-import", "debrief_schemas",
+        "--hidden-import", "debrief_config",
     ]
+
+    # Add paths to workspace source directories so PyInstaller can find them
+    for src_path in WORKSPACE_SRC_PATHS:
+        cmd.extend(["--paths", str(repo_root / src_path)])
+
+    # Add the entry point script
+    cmd.append(str(entry_script))
 
     result = subprocess.run(
         cmd,

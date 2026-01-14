@@ -22,3 +22,9 @@ debrief-schemas = { workspace = true }
 debrief-stac = { workspace = true }
 debrief-io = { workspace = true }
 debrief-config = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pydantic>=2.12.5",
+    "pyinstaller>=6.18.0",
+]
