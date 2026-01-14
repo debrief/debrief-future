@@ -1,5 +1,8 @@
 /**
  * Store selector component for wizard step 1.
+ *
+ * TODO: Add "Create new store" button/link that opens the NoStoresView panel,
+ * allowing users to add a new store even when stores already exist.
  */
 
 import { useTranslation } from 'react-i18next';
