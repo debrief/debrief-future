@@ -65,6 +65,8 @@ const electronAPI = {
   // App info
   getPlatform: (): string => process.platform,
   getDocumentsPath: (): Promise<string> => ipcRenderer.invoke('app:getDocumentsPath'),
+  joinPath: (...segments: string[]): Promise<string> =>
+    ipcRenderer.invoke('app:joinPath', ...segments),
 };
 
 // Expose API to renderer

@@ -23,7 +23,8 @@ export function NoStoresView({ onStoreCreated }: NoStoresViewProps) {
     // In a full implementation, this would use Electron's dialog.showOpenDialog
     // For now, we'll use the default documents path
     const docsPath = await window.electronAPI.getDocumentsPath();
-    setStorePath(`${docsPath}/debrief-catalog`);
+    const fullPath = await window.electronAPI.joinPath(docsPath, 'debrief-catalog');
+    setStorePath(fullPath);
   }, []);
 
   const handleCreate = useCallback(async () => {

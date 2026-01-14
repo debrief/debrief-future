@@ -181,13 +181,23 @@ export async function copyAsset(
 
 /**
  * Initializes a new STAC catalog at the given path.
+ * If catalog already exists, treats it as success (idempotent).
  */
 export async function initStore(path: string, name: string): Promise<void> {
-  // Use one-shot spawn for initialization
-  await spawnAndRequest(DEBRIEF_STAC_CMD.executable, DEBRIEF_STAC_CMD.args, 'init_catalog', {
-    path,
-    name,
-  });
+  try {
+    // Use one-shot spawn for initialization
+    await spawnAndRequest(DEBRIEF_STAC_CMD.executable, DEBRIEF_STAC_CMD.args, 'init_catalog', {
+      path,
+      name,
+    });
+  } catch (err) {
+    // If catalog already exists, that's fine - use it
+    const message = err instanceof Error ? err.message : String(err);
+    if (!message.includes('already exists')) {
+      throw err;
+    }
+    // Catalog exists, proceed normally
+  }
 
   // Reconfigure to include new store
   await reconfigureStac();

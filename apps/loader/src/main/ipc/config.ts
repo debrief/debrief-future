@@ -158,4 +158,8 @@ export function setupConfigHandlers(ipc: IpcMain): void {
   ipc.handle('app:getDocumentsPath', () => {
     return app.getPath('documents');
   });
+
+  ipc.handle('app:joinPath', (_event, ...segments: string[]) => {
+    return join(...segments);
+  });
 }
