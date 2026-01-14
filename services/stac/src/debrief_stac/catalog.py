@@ -20,6 +20,7 @@ from debrief_stac.types import (
 def create_catalog(
     path: CatalogPath,
     catalog_id: str | None = None,
+    title: str | None = None,
     description: str = "Debrief analysis catalog",
 ) -> Path:
     """Create a new local STAC catalog at the specified path.
@@ -30,6 +31,7 @@ def create_catalog(
     Args:
         path: Directory path where the catalog will be created
         catalog_id: Unique identifier for the catalog (defaults to directory name)
+        title: Human-readable title for the catalog (optional, for display)
         description: Human-readable description of the catalog
 
     Returns:
@@ -40,7 +42,7 @@ def create_catalog(
         PermissionError: If the path is not writable
 
     Example:
-        >>> catalog_path = create_catalog("/data/analysis", catalog_id="exercise-alpha")
+        >>> catalog_path = create_catalog("/data/analysis", title="My Analysis Store")
         >>> print(f"Catalog created at: {catalog_path}")
     """
     catalog_path = Path(path)
@@ -68,6 +70,10 @@ def create_catalog(
             {"rel": "self", "href": "./catalog.json", "type": "application/json"},
         ],
     }
+
+    # Add optional title if provided
+    if title:
+        catalog_data["title"] = title
 
     # Write catalog.json
     with open(catalog_json_path, "w") as f:
