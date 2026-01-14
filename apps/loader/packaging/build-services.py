@@ -108,25 +108,40 @@ if __name__ == "__main__":
     pkg_name = module.rsplit(".", 1)[0]
 
     cmd = [
-        "uv", "run", "pyinstaller",
+        "uv",
+        "run",
+        "pyinstaller",
         "--onefile",
-        "--name", name,
-        "--distpath", str(output_dir),
-        "--workpath", str(build_dir),
-        "--specpath", str(build_dir),
+        "--name",
+        name,
+        "--distpath",
+        str(output_dir),
+        "--workpath",
+        str(build_dir),
+        "--specpath",
+        str(build_dir),
         "--clean",
         "--noconfirm",
         # Hidden imports for pydantic
-        "--hidden-import", "pydantic",
-        "--hidden-import", "pydantic_core",
-        "--hidden-import", "pydantic.deprecated",
-        "--hidden-import", "pydantic.deprecated.decorator",
-        "--collect-all", "pydantic",
-        "--collect-all", "pydantic_core",
+        "--hidden-import",
+        "pydantic",
+        "--hidden-import",
+        "pydantic_core",
+        "--hidden-import",
+        "pydantic.deprecated",
+        "--hidden-import",
+        "pydantic.deprecated.decorator",
+        "--collect-all",
+        "pydantic",
+        "--collect-all",
+        "pydantic_core",
         # Hidden imports for our workspace packages
-        "--hidden-import", pkg_name,
-        "--hidden-import", "debrief_schemas",
-        "--hidden-import", "debrief_config",
+        "--hidden-import",
+        pkg_name,
+        "--hidden-import",
+        "debrief_schemas",
+        "--hidden-import",
+        "debrief_config",
     ]
 
     # Add paths to workspace source directories so PyInstaller can find them
@@ -179,9 +194,7 @@ def ensure_tools_installed(repo_root: Path) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Build Python services for Electron bundling"
-    )
+    parser = argparse.ArgumentParser(description="Build Python services for Electron bundling")
     parser.add_argument(
         "--platform",
         choices=["linux", "darwin", "win32"],

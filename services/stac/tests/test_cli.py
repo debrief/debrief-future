@@ -26,10 +26,12 @@ class TestHandleCopyAsset:
         handle_init_catalog({"path": str(catalog_path), "name": "Test Catalog"})
 
         # Create plot
-        result = handle_create_plot({
-            "store_path": str(catalog_path),
-            "name": "Test Plot",
-        })
+        result = handle_create_plot(
+            {
+                "store_path": str(catalog_path),
+                "name": "Test Plot",
+            }
+        )
         plot_id = result["plot_id"]
 
         # Create two source files
@@ -39,18 +41,22 @@ class TestHandleCopyAsset:
         file2.write_text("Boat 2 track data")
 
         # Add both files to the same plot
-        handle_copy_asset({
-            "store_path": str(catalog_path),
-            "plot_id": plot_id,
-            "source_path": str(file1),
-            "asset_role": "source-data",
-        })
-        handle_copy_asset({
-            "store_path": str(catalog_path),
-            "plot_id": plot_id,
-            "source_path": str(file2),
-            "asset_role": "source-data",
-        })
+        handle_copy_asset(
+            {
+                "store_path": str(catalog_path),
+                "plot_id": plot_id,
+                "source_path": str(file1),
+                "asset_role": "source-data",
+            }
+        )
+        handle_copy_asset(
+            {
+                "store_path": str(catalog_path),
+                "plot_id": plot_id,
+                "source_path": str(file2),
+                "asset_role": "source-data",
+            }
+        )
 
         # Read the plot and verify BOTH assets exist
         item = read_plot(catalog_path, plot_id)
@@ -78,20 +84,24 @@ class TestHandleCopyAsset:
         catalog_path = temp_dir / "catalog"
 
         handle_init_catalog({"path": str(catalog_path), "name": "Test"})
-        result = handle_create_plot({
-            "store_path": str(catalog_path),
-            "name": "Plot",
-        })
+        result = handle_create_plot(
+            {
+                "store_path": str(catalog_path),
+                "name": "Plot",
+            }
+        )
         plot_id = result["plot_id"]
 
         source_file = temp_dir / "data.rep"
         source_file.write_text("Data content")
 
-        result = handle_copy_asset({
-            "store_path": str(catalog_path),
-            "plot_id": plot_id,
-            "source_path": str(source_file),
-        })
+        result = handle_copy_asset(
+            {
+                "store_path": str(catalog_path),
+                "plot_id": plot_id,
+                "source_path": str(source_file),
+            }
+        )
 
         assert "asset_path" in result
         assert "asset_href" in result
