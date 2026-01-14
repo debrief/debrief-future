@@ -1,0 +1,25 @@
+.store-selector {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: #fff;
+}
+
+.store-selector-content {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.store-selector-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #374151;
+  margin: 0 0 12px;
+}
+
+.store-selector-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

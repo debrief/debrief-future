@@ -83,6 +83,8 @@ Three approaches required:
 - JSON file at XDG config location (~/.config/debrief/config.json on Linux) (003-debrief-config)
 - Markdown (command prompts and templates) + None (pure markdown files interpreted by Claude Code) (004-speckit-ui-workflow)
 - N/A (no persistent data - modifies workflow templates) (004-speckit-ui-workflow)
+- TypeScript 5.x (Electron main + React renderer) + Electron 28+, React 18+, debrief-config (TypeScript), debrief-io (Python via IPC), debrief-stac (Python via IPC) (004-loader-mini-app)
+- N/A (all persistence via debrief-stac service) (004-loader-mini-app)
 
 ## Recent Changes
 - 000-schemas: Added Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS)

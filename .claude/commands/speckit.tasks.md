@@ -135,6 +135,7 @@ Based on the feature type detected from spec.md and plan.md:
 | **UI Component** | Screenshots of states | `initial.png`, `completed.png` |
 | **Parser/Converter** | Input/output file pairs | `sample-input.rep`, `parsed-output.json` |
 | **Integration** | End-to-end flow demo | `integration-flow.md`, `sequence.mermaid` |
+| **Electron/Desktop App** | Runtime smoke test, app window screenshots, graceful error handling | `runtime-startup.png`, `runtime-workflow.png`, `e2e-trace.zip` |
 
 ### Evidence Task Generation
 
@@ -171,7 +172,18 @@ For the Polish phase, ALWAYS generate these tasks:
    ```
    150-200 words, hook opening, link to full post
 
-6. **PR Creation Task** (REQUIRED - must be final task):
+6. **Runtime Verification Task** (REQUIRED for Electron/Desktop apps):
+   ```markdown
+   - [ ] TXXX Run app in dev mode and verify startup
+   - [ ] TXXX [P] Capture runtime screenshot of actual app window
+   - [ ] TXXX Verify app handles missing services gracefully (shows error, doesn't crash)
+   ```
+   Must run the actual application, not just Storybook/component tests. Verifies:
+   - App launches without crashing
+   - UI renders correctly in real Electron window
+   - Error handling works when dependencies are unavailable
+
+7. **PR Creation Task** (REQUIRED - must be final task):
    ```markdown
    - [ ] TXXX Create PR and publish blog: run /speckit.pr
    ```
@@ -179,7 +191,7 @@ For the Polish phase, ALWAYS generate these tasks:
    - Creates the feature PR in debrief-future
    - Publishes shipped-post.md to debrief.github.io
    - Returns both PR URLs for review
-   
+
    **Dependencies:** All other tasks must be complete before this runs.
 
 ### Evidence Quality Guidelines
@@ -262,7 +274,7 @@ Task tool call:
     - Lessons learned: [notable challenges/decisions]
 ```
 
-## Complete Example: Polish Phase
+## Complete Example: Polish Phase (CLI/Library)
 
 After applying all rules, a generated Polish phase should look like:
 
@@ -286,4 +298,35 @@ After applying all rules, a generated Polish phase should look like:
 - [ ] T507 Create PR and publish blog: run /speckit.pr
 
 **Task T507 must run last. It depends on all evidence and media tasks being complete.**
+```
+
+## Complete Example: Polish Phase (Electron/Desktop App)
+
+For Electron apps, include runtime verification:
+
+```markdown
+## Phase 7: Polish & Cross-Cutting Concerns
+
+### Evidence Collection
+
+- [ ] T092 Capture test results in specs/004-loader/evidence/test-summary.md
+- [ ] T093 Create usage demonstration in specs/004-loader/evidence/usage-example.md
+- [ ] T094 [P] Capture Storybook screenshots in specs/004-loader/evidence/screenshots/
+
+### Runtime Verification (REQUIRED for Electron apps)
+
+- [ ] T095 Run Electron app in dev mode (`pnpm electron:dev`) and verify startup
+- [ ] T096 [P] Capture runtime screenshot of actual Electron window
+- [ ] T097 Verify app handles missing services gracefully (shows error, doesn't crash)
+
+### Media Content
+
+- [ ] T098 Create shipped blog post in specs/004-loader/media/shipped-post.md
+- [ ] T099 [P] Create LinkedIn shipped summary in specs/004-loader/media/linkedin-shipped.md
+
+### PR Creation
+
+- [ ] T100 Create PR and publish blog: run /speckit.pr
+
+**Task T100 must run last. Runtime verification ensures the app works beyond just component tests.**
 ```
