@@ -171,10 +171,15 @@ def handle_copy_asset(params: dict[str, Any]) -> dict[str, Any]:
     if not source_path:
         raise ValueError("Missing required parameter: source_path")
 
-    asset_key = add_asset(store_path, plot_id, source_path, asset_key=asset_role)
-
     # Build asset path from catalog structure
     from pathlib import Path
+
+    # Generate unique asset key from role and filename stem
+    # e.g., "source-data-boat1" for boat1.rep with role "source-data"
+    source_filename = Path(source_path).stem
+    asset_key = f"{asset_role}-{source_filename}"
+
+    add_asset(store_path, plot_id, source_path, asset_key=asset_key)
 
     asset_href = f"./assets/{Path(source_path).name}"
     full_path = str(Path(store_path) / plot_id / "assets" / Path(source_path).name)
