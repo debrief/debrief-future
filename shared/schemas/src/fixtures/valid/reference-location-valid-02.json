@@ -6,6 +6,7 @@
     "coordinates": [-6.0, 51.5]
   },
   "properties": {
+    "kind": "POINT",
     "name": "Exercise Area Bravo",
     "location_type": "EXERCISE_AREA",
     "valid_from": "2026-01-09T08:00:00Z",

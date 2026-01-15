@@ -153,6 +153,7 @@ class TrackBuilder:
                 "coordinates": coordinates,
             },
             "properties": {
+                "kind": "TRACK",
                 "platform_id": self.platform_id,
                 "platform_name": self.platform_id,
                 "track_type": "CONTACT",  # Default, can be overridden

@@ -1,4 +1,14 @@
 /**
+* Discriminator for GeoJSON feature types
+*/
+export enum FeatureKindEnum {
+    
+    /** Vessel track (LineString geometry) */
+    TRACK = "TRACK",
+    /** Reference point/location (Point geometry) */
+    POINT = "POINT",
+};
+/**
 * Type of track feature
 */
 export enum TrackTypeEnum {
@@ -86,6 +96,8 @@ export interface GeoJSONPolygon {
  * Properties for a TrackFeature
  */
 export interface TrackProperties {
+    /** Feature type discriminator */
+    kind: string,
     /** Platform/vessel identifier */
     platform_id: string,
     /** Human-readable platform name */
@@ -126,6 +138,8 @@ export interface TrackFeature {
  * Properties for a ReferenceLocation
  */
 export interface ReferenceLocationProperties {
+    /** Feature type discriminator */
+    kind: string,
     /** Reference location name */
     name: string,
     /** Type of reference */

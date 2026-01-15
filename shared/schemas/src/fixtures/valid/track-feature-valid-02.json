@@ -10,6 +10,7 @@
   },
   "bbox": [-6.0, 51.0, -5.8, 51.2],
   "properties": {
+    "kind": "TRACK",
     "platform_id": "CONTACT-ALPHA",
     "track_type": "CONTACT",
     "start_time": "2026-01-09T10:30:00Z",

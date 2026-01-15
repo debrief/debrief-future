@@ -6,6 +6,7 @@
     "coordinates": [-5.5, 50.0]
   },
   "properties": {
+    "kind": "POINT",
     "name": "Alpha Waypoint",
     "location_type": "WAYPOINT",
     "description": "Start of exercise track",

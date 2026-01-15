@@ -10,6 +10,7 @@
     ]
   },
   "properties": {
+    "kind": "TRACK",
     "platform_id": "HMS-EXAMPLE",
     "platform_name": "HMS Example",
     "track_type": "OWNSHIP",

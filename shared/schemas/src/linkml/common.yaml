@@ -20,6 +20,14 @@ imports:
 # ============================================================================
 
 enums:
+  FeatureKindEnum:
+    description: Discriminator for GeoJSON feature types
+    permissible_values:
+      TRACK:
+        description: Vessel track (LineString geometry)
+      POINT:
+        description: Reference point/location (Point geometry)
+
   TrackTypeEnum:
     description: Type of track feature
     permissible_values:
