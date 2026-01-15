@@ -102,6 +102,13 @@ A new analyst installs the extension but has no STAC stores configured. They use
 - **FR-015**: Extension MUST allow users to add and remove STAC store registrations
 - **FR-016**: Extension MUST support map navigation (pan, zoom) while viewing plots
 - **FR-017**: Extension MUST persist view state (last opened catalog, map position) across sessions
+- **FR-018**: Extension MUST provide basic keyboard shortcuts (Ctrl+A select all, Delete clear selection, arrow keys pan)
+- **FR-019**: Extension MUST display track labels at the start point of each track on the map
+- **FR-020**: Extension MUST allow users to customize track colors via context menu
+- **FR-021**: Extension MUST store user-customized track colors in plot metadata
+- **FR-022**: Extension MUST open plots with map view fitted to all track bounds
+- **FR-023**: Extension MUST provide PNG export of current map view
+- **FR-024**: Extension MUST expose settings (glow effect, default colors) via VS Code settings.json
 
 ### Key Entities
 
@@ -122,76 +129,102 @@ A new analyst installs the extension but has no STAC stores configured. They use
 The extension uses VS Code's standard extension patterns: a sidebar view for navigation and webview panels for rich content display.
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  VS Code Window                                                             │
-├────────┬────────────────────────────────────────────────────────────────────┤
-│        │                                                                    │
-│ Activity│                    Editor Area                                    │
-│  Bar   │  ┌─────────────────────────────────────────────────────────────┐  │
-│        │  │                                                             │  │
-│ ┌────┐ │  │                    Map Panel (Webview)                      │  │
-│ │ 🗂️ │ │  │                                                             │  │
-│ └────┘ │  │    ┌─────────────────────────────────────────────────┐     │  │
-│ ┌────┐ │  │    │                                                 │     │  │
-│ │ 🔍 │ │  │    │              Interactive Map                    │     │  │
-│ └────┘ │  │    │                                                 │     │  │
-│ ┌────┐ │  │    │     Track A ═══════════════════►               │     │  │
-│ │ ⚓ │◄├──┤    │                                                 │     │  │
-│ └────┘ │  │    │          Track B ─────────────────►            │     │  │
-│ Debrief│  │    │                    ◉ Reference                  │     │  │
-│  Icon  │  │    │                                                 │     │  │
-│        │  │    └─────────────────────────────────────────────────┘     │  │
-│        │  │                                                             │  │
-│        │  │    [Zoom +] [Zoom -] [Fit Bounds]    Selection: 2 tracks   │  │
-│        │  └─────────────────────────────────────────────────────────────┘  │
-│        │                                                                    │
-├────────┼────────────────────────────────────────────────────────────────────┤
-│        │                                                                    │
-│ Sidebar│                    Panel Area (collapsible)                        │
-│        │  ┌─────────────────────────────────────────────────────────────┐  │
-│        │  │  TOOLS                                               [─][×] │  │
-│        │  │  ─────────────────────────────────────────────────────────  │  │
-│        │  │  Available for selection (2 tracks):                        │  │
-│        │  │  ┌─────────────────────────────────────────────────────┐   │  │
-│        │  │  │ Calculate Range & Bearing          [Execute]        │   │  │
-│        │  │  │ Compute relative positions between selected tracks  │   │  │
-│        │  │  └─────────────────────────────────────────────────────┘   │  │
-│        │  └─────────────────────────────────────────────────────────────┘  │
-└────────┴────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│  VS Code Window                                                                  │
+├────────┬───────────────────────┬─────────────────────────────────────────────────┤
+│        │                       │                                                 │
+│ Activity│  Debrief Sidebar     │              Editor Area                        │
+│  Bar   │                       │  ┌───────────────────────────────────────────┐  │
+│        │ ┌───────────────────┐ │  │                                           │  │
+│ ┌────┐ │ │ CATALOGS      [+] │ │  │           Map Panel (Webview)             │  │
+│ │ 🗂️ │ │ │ ▼ Local Data      │ │  │                                           │  │
+│ └────┘ │ │   📊 Exercise A   │ │  │  Track A ════════════════►  (glow)       │  │
+│ ┌────┐ │ │   📊 Exercise B   │ │  │                                           │  │
+│ │ 🔍 │ │ ├───────────────────┤ │  │       Track B ─────────────►             │  │
+│ └────┘ │ │ TIME RANGE        │ │  │                   ◉ Reference             │  │
+│ ┌────┐ │ │ ◀════●══════════▶ │ │  │                                           │  │
+│ │ ⚓ │◄├─│ 09:30  11:45 14:00│ │  │  ┌─────────────────────┐                  │  │
+│ └────┘ │ ├───────────────────┤ │  │  │ HMS Defender        │                  │  │
+│ Debrief│ │ TOOLS (2 tracks)  │ │  │  │ Platform: Destroyer │                  │  │
+│  Icon  │ │ 📐 Range & Brg [▶]│ │  │  └─────────────────────┘                  │  │
+│        │ │ 📏 CPA        [▶]│ │  │                                           │  │
+│        │ ├───────────────────┤ │  │  [🔍+] [🔍-] [🎯 Fit]    Selection: 1    │  │
+│        │ │ LAYERS            │ │  └───────────────────────────────────────────┘  │
+│        │ │ ☑ HMS Defender    │ │                                                 │
+│        │ │ ☑ USS Freedom     │ │                                                 │
+│        │ │ ☑ Range (result)  │ │                                                 │
+│        │ └───────────────────┘ │                                                 │
+└────────┴───────────────────────┴─────────────────────────────────────────────────┘
 ```
 
-### Sidebar: Catalog Browser
+**Layout Key Points**:
+- All controls consolidated in sidebar for single-pane workflow
+- Map panel maximizes screen real estate for visualization
+- Multiple plot tabs supported in editor area
+- No bottom panel needed—tools and layers in sidebar
 
-Located in the VS Code sidebar when the Debrief icon is clicked. Uses native VS Code TreeView for familiar navigation.
+### Sidebar: Debrief Control Panel
+
+Located in the VS Code sidebar when the Debrief icon is clicked. Contains four collapsible sections providing complete control over the analysis workflow.
 
 ```
 ┌─────────────────────────────────┐
-│  DEBRIEF CATALOGS          [+] │  ← Add Store button
+│  CATALOGS                  [+] │  ← Add Store button
 ├─────────────────────────────────┤
-│                                 │
 │  ▼ 📁 Local Exercise Data       │  ← Store (expandable)
 │    ├─ 📊 Exercise Alpha         │  ← Plot (clickable)
-│    │     2024-03-15 09:30       │    Timestamp shown
+│    │     2024-03-15 09:30       │
 │    ├─ 📊 Exercise Beta          │
-│    │     2024-03-14 14:00       │
 │    └─ 📊 Training Run 1         │
-│          2024-03-10 08:00       │
-│                                 │
-│  ▶ 📁 Archived Plots            │  ← Collapsed store
-│                                 │
-│  ─────────────────────────────  │
-│  ⚙️ Manage Stores...            │  ← Settings link
-│                                 │
+│  ▶ 📁 Archived Plots            │
+├─────────────────────────────────┤
+│  TIME RANGE                [▼] │  ← Collapsible header
+├─────────────────────────────────┤
+│  ◀═══════●═══════════════════▶ │  ← Time slider
+│  09:30       11:45       14:00 │
+│  [Full Range] [Fit to Selection]│
+├─────────────────────────────────┤
+│  TOOLS                     [▼] │  ← Context-sensitive
+├─────────────────────────────────┤
+│  Selection: 2 tracks            │
+│  ┌───────────────────────────┐ │
+│  │ 📐 Range & Bearing   [▶] │ │  ← Execute button
+│  │ 📏 Closest Approach  [▶] │ │
+│  │ 🔄 Relative Motion   [▶] │ │
+│  └───────────────────────────┘ │
+├─────────────────────────────────┤
+│  LAYERS                    [▼] │  ← Layer management
+├─────────────────────────────────┤
+│  ☑ 🚢 HMS Defender (source)    │  ← Visibility toggle
+│  ☑ 🚢 USS Freedom (source)     │
+│  ☑ 📐 Range & Bearing (result) │  ← Result layer
+│  [Clear Results]               │
 └─────────────────────────────────┘
 ```
 
-**Interaction Details**:
+**Catalog Browser Interactions**:
 - Single-click on store → Expand/collapse
 - Single-click on plot → Open in map panel
 - Double-click on plot → Open and fit map bounds to plot extent
 - Right-click on store → Context menu (Remove, Refresh)
 - Right-click on plot → Context menu (Open, Show in Explorer)
 - [+] button → Quick add store dialog
+
+**Time Range Interactions**:
+- Drag slider handles to filter visible time range
+- [Full Range] resets to complete data extent
+- [Fit to Selection] zooms time to selected tracks
+
+**Tools Panel Interactions**:
+- Tools list updates based on current selection context
+- Click [▶] to execute tool
+- Disabled when no valid selection
+
+**Layers Panel Interactions**:
+- Checkbox toggles layer visibility
+- Drag to reorder layers
+- Right-click for rename/delete options
+- [Clear Results] removes all computed layers
 
 ### Map Panel (Webview)
 
@@ -232,9 +265,15 @@ The primary workspace showing geospatial data. Opens as an editor tab.
 
 **Visual Design - Track Colors**:
 - Unselected tracks: Muted colors (grays, light blues) with thin stroke
-- Selected tracks: Bright, distinct colors (red, blue, green) with thick stroke
-- Hover state: Slight glow/highlight effect
-- Result layers: Dashed lines or distinct markers to differentiate from source tracks
+- Selected tracks: Bright, distinct colors (red, blue, green) with thick stroke + **animated glow effect**
+- Hover state: Slight highlight effect (lighter glow than selection)
+- Result layers: Dashed lines with distinct markers to differentiate from source tracks
+
+**Selection Glow Effect**:
+- Subtle pulsing glow around selected tracks (2-3 second cycle)
+- Glow color matches track color at reduced opacity
+- Provides clear visual feedback without obscuring track geometry
+- Can be disabled in settings for performance-sensitive environments
 
 **Selection Interactions**:
 | Action | Result |
@@ -358,21 +397,38 @@ Error:         [⚠️ Failed - Retry]    ← Red, clickable
 - **Error State**: Red notification banner with error message and "Retry" or "Dismiss" actions
 - **Success State**: Green notification "Analysis complete" that auto-dismisses, map shows new results
 
-### Design Review Questions
+### Design Decisions (Resolved)
 
-The following questions should be addressed during design review:
+The following design decisions were made during review on 2026-01-15:
 
-1. **Sidebar vs. Panel**: Should the catalog browser remain in the sidebar, or would a dedicated panel provide better usability for users with many stores?
+| # | Question | Decision | Rationale |
+|---|----------|----------|-----------|
+| 1 | Catalog browser location | **Sidebar** | Standard VS Code pattern, familiar to users |
+| 2 | Selection feedback | **Color + glow effect** | Enhanced visibility with animated highlight |
+| 3 | Time range control | **Sidebar, permanently visible** | Always accessible for time-based analysis |
+| 4 | Tools panel location | **Sidebar secondary view** | Integrated experience, always visible |
+| 5 | Multi-plot support | **Multiple tabs** | Standard VS Code behavior, enables comparison |
+| 6 | Result layer management | **Sidebar layer panel** | Full control: visibility, reorder, delete |
+| 7 | Keyboard shortcuts | **Basic shortcuts** | Ctrl+A select all, Delete clears, arrows pan |
+| 8 | Track labels | **Labels at start** | Small label at track start point |
+| 9 | Track colors | **User-customizable** | Change via context menu, stored in metadata |
+| 10 | Initial map view | **Fit all tracks** | Zoom to fit all tracks with padding |
+| 11 | Export capabilities | **Image export only** | Export map view as PNG for reports |
+| 12 | Settings location | **VS Code settings** | Use settings.json, syncs across devices |
 
-2. **Selection Feedback**: Is the proposed color differentiation (muted vs. bright) sufficient, or should selected tracks also have additional indicators (markers at endpoints, selection handles)?
+**Key Architectural Decision**: The sidebar serves as the primary control center, containing:
+- Catalog browser (top)
+- Time range slider (middle)
+- Tools panel (below time slider)
+- Layer management panel (bottom)
 
-3. **Time Range Control**: Should the time slider be always visible (takes space) or collapsible/on-demand?
-
-4. **Tool Panel Location**: Bottom panel (proposed) vs. sidebar secondary view vs. floating panel?
-
-5. **Multi-Plot Support**: Should users be able to open multiple plots in separate tabs, or one plot at a time?
-
-6. **Result Layer Management**: How should users distinguish between original data and computed results? Toggle visibility? Separate layer list?
+**Additional Design Notes**:
+- Keyboard shortcuts follow VS Code conventions (Ctrl+A, Delete, arrow keys)
+- Tracks display small labels at start points for identification
+- Users can customize track colors via right-click context menu
+- Map opens fitted to all track bounds with padding
+- PNG export available for including map views in reports
+- Extension settings live in VS Code's settings.json
 
 ## Success Criteria *(mandatory)*
 

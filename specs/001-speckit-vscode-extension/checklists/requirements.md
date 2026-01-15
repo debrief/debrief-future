@@ -37,36 +37,38 @@
 - [x] UI States defined for empty, loading, error, and success conditions
 - [x] User decision inputs are identified (what information helps users decide)
 
-## UI Design Review *(requires stakeholder sign-off)*
+## UI Design Review *(completed)*
 
-- [ ] Extension layout wireframe reviewed and approved
-- [ ] Catalog browser tree view design reviewed
-- [ ] Map panel layout and toolbar reviewed
-- [ ] Selection interaction model approved (click, shift+click, ctrl+click)
-- [ ] Tools panel location and layout reviewed
-- [ ] Empty and error state designs reviewed
-- [ ] Design review questions addressed (6 questions in spec)
+- [x] Extension layout wireframe reviewed and approved
+- [x] Catalog browser tree view design reviewed
+- [x] Map panel layout and toolbar reviewed
+- [x] Selection interaction model approved (click, shift+click, ctrl+click)
+- [x] Tools panel location and layout reviewed
+- [x] Empty and error state designs reviewed
+- [x] All 12 design review questions addressed
 
-## Design Review Questions Status
+## Design Review Decisions
 
-| # | Question | Status | Decision |
-|---|----------|--------|----------|
-| 1 | Sidebar vs. Panel for catalog browser | Pending | - |
-| 2 | Selection feedback (color vs. additional indicators) | Pending | - |
-| 3 | Time range control visibility | Pending | - |
-| 4 | Tool panel location | Pending | - |
-| 5 | Multi-plot support | Pending | - |
-| 6 | Result layer management | Pending | - |
+| # | Question | Decision |
+|---|----------|----------|
+| 1 | Catalog browser location | Sidebar |
+| 2 | Selection feedback | Color + glow effect |
+| 3 | Time range control | Sidebar, permanently visible |
+| 4 | Tools panel location | Sidebar secondary view |
+| 5 | Multi-plot support | Multiple tabs |
+| 6 | Result layer management | Sidebar layer panel |
+| 7 | Keyboard shortcuts | Basic shortcuts |
+| 8 | Track labels | Labels at start |
+| 9 | Track colors | User-customizable |
+| 10 | Initial map view | Fit all tracks |
+| 11 | Export capabilities | Image export only |
+| 12 | Settings location | VS Code settings |
 
 ## Notes
 
 - All specification quality items pass validation
-- **UI Design Review section requires stakeholder discussion before `/speckit.plan`**
-- Enhanced with detailed ASCII wireframes for:
-  - Overall extension layout
-  - Catalog browser sidebar
-  - Map panel with tracks and toolbar
-  - Tools panel with execution states
-  - Empty and error states
-- 6 design review questions identified for discussion
-- Spec ready for design review meeting, then `/speckit.clarify` or `/speckit.plan`
+- All 12 UI design review questions resolved on 2026-01-15
+- 24 functional requirements defined (FR-001 through FR-024)
+- 8 measurable success criteria align with tracer bullet exit criteria
+- Detailed ASCII wireframes for all major UI components
+- **Spec ready for `/speckit.clarify` or `/speckit.plan`**
