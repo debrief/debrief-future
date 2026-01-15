@@ -23,7 +23,9 @@ def tools():
 
 
 @tools.command("list")
-@click.option("--input", "input_file", type=click.Path(exists=True), help="Filter by input file kind")
+@click.option(
+    "--input", "input_file", type=click.Path(exists=True), help="Filter by input file kind"
+)
 @pass_context
 def list_tools(ctx: Context, input_file: str | None):
     """
@@ -48,26 +50,26 @@ def list_tools(ctx: Context, input_file: str | None):
         tool_list = registry.find_tools(kinds=filter_kinds) if filter_kinds else registry.list_all()
 
         if ctx.json_mode:
-            formatter.json_output({
-                "tools": [t.to_metadata() for t in tool_list],
-                "count": len(tool_list)
-            })
+            formatter.json_output(
+                {"tools": [t.to_metadata() for t in tool_list], "count": len(tool_list)}
+            )
         else:
             if not tool_list:
                 formatter.info("No tools found matching criteria.")
             else:
                 rows = []
                 for tool in tool_list:
-                    rows.append([
-                        tool.name,
-                        tool.context_type.value,
-                        ", ".join(tool.input_kinds),
-                        tool.description[:50] + "..." if len(tool.description) > 50 else tool.description
-                    ])
-                formatter.table(
-                    ["Name", "Context", "Input Kinds", "Description"],
-                    rows
-                )
+                    rows.append(
+                        [
+                            tool.name,
+                            tool.context_type.value,
+                            ", ".join(tool.input_kinds),
+                            tool.description[:50] + "..."
+                            if len(tool.description) > 50
+                            else tool.description,
+                        ]
+                    )
+                formatter.table(["Name", "Context", "Input Kinds", "Description"], rows)
 
         formatter.finish()
 
@@ -108,10 +110,17 @@ def describe_tool(ctx: Context, tool_name: str):
 
 @tools.command("run")
 @click.argument("tool_name")
-@click.option("--input", "input_file", type=click.Path(exists=True), required=True,
-              help="Input GeoJSON file")
-@click.option("--param", "-p", "params", multiple=True, type=(str, str),
-              help="Tool parameter as key value pair")
+@click.option(
+    "--input", "input_file", type=click.Path(exists=True), required=True, help="Input GeoJSON file"
+)
+@click.option(
+    "--param",
+    "-p",
+    "params",
+    multiple=True,
+    type=(str, str),
+    help="Tool parameter as key value pair",
+)
 @pass_context
 def run_tool(ctx: Context, tool_name: str, input_file: str, params: tuple):
     """
@@ -147,13 +156,19 @@ def run_tool(ctx: Context, tool_name: str, input_file: str, params: tuple):
         # Build context based on tool requirements
         if tool.context_type == ContextType.SINGLE:
             if len(features) != 1:
-                formatter.error(f"Tool '{tool_name}' requires exactly 1 feature, got {len(features)}", "INVALID_CONTEXT")
+                formatter.error(
+                    f"Tool '{tool_name}' requires exactly 1 feature, got {len(features)}",
+                    "INVALID_CONTEXT",
+                )
                 formatter.finish()
                 sys.exit(2)
             context = SelectionContext(type=ContextType.SINGLE, features=features)
         elif tool.context_type == ContextType.MULTI:
             if len(features) < 2:
-                formatter.error(f"Tool '{tool_name}' requires 2+ features, got {len(features)}", "INVALID_CONTEXT")
+                formatter.error(
+                    f"Tool '{tool_name}' requires 2+ features, got {len(features)}",
+                    "INVALID_CONTEXT",
+                )
                 formatter.finish()
                 sys.exit(2)
             context = SelectionContext(type=ContextType.MULTI, features=features)
@@ -172,10 +187,7 @@ def run_tool(ctx: Context, tool_name: str, input_file: str, params: tuple):
 
         if result.success:
             # Output as GeoJSON FeatureCollection
-            output = {
-                "type": "FeatureCollection",
-                "features": result.features
-            }
+            output = {"type": "FeatureCollection", "features": result.features}
             print(json.dumps(output, indent=2))
         else:
             formatter.error(result.error.message, result.error.code)

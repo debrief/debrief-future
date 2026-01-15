@@ -36,7 +36,7 @@ def run(
     tool_name: str,
     context: SelectionContext,
     params: dict[str, Any] | None = None,
-    validate_output: bool = True
+    validate_output: bool = True,
 ) -> ToolResult:
     """
     Execute a tool on the given selection context.
@@ -78,7 +78,7 @@ def run(
             tool_name=tool.name,
             tool_version=tool.version,
             source_features=context.features,
-            parameters=params
+            parameters=params,
         )
 
         for feature in output_features:
@@ -92,10 +92,7 @@ def run(
         duration_ms = (time.perf_counter() - start_time) * 1000
 
         return ToolResult(
-            tool=tool_name,
-            success=True,
-            features=output_features,
-            duration_ms=duration_ms
+            tool=tool_name, success=True, features=output_features, duration_ms=duration_ms
         )
 
     except ToolNotFoundError as e:
@@ -103,12 +100,8 @@ def run(
         return ToolResult(
             tool=tool_name,
             success=False,
-            error=ToolError(
-                code="TOOL_NOT_FOUND",
-                message=e.message,
-                details=e.details
-            ),
-            duration_ms=duration_ms
+            error=ToolError(code="TOOL_NOT_FOUND", message=e.message, details=e.details),
+            duration_ms=duration_ms,
         )
 
     except InvalidContextError as e:
@@ -116,12 +109,8 @@ def run(
         return ToolResult(
             tool=tool_name,
             success=False,
-            error=ToolError(
-                code="INVALID_CONTEXT",
-                message=e.message,
-                details=e.details
-            ),
-            duration_ms=duration_ms
+            error=ToolError(code="INVALID_CONTEXT", message=e.message, details=e.details),
+            duration_ms=duration_ms,
         )
 
     except KindMismatchError as e:
@@ -129,12 +118,8 @@ def run(
         return ToolResult(
             tool=tool_name,
             success=False,
-            error=ToolError(
-                code="KIND_MISMATCH",
-                message=e.message,
-                details=e.details
-            ),
-            duration_ms=duration_ms
+            error=ToolError(code="KIND_MISMATCH", message=e.message, details=e.details),
+            duration_ms=duration_ms,
         )
 
     except ValidationError as e:
@@ -142,12 +127,8 @@ def run(
         return ToolResult(
             tool=tool_name,
             success=False,
-            error=ToolError(
-                code="VALIDATION_FAILED",
-                message=e.message,
-                details=e.details
-            ),
-            duration_ms=duration_ms
+            error=ToolError(code="VALIDATION_FAILED", message=e.message, details=e.details),
+            duration_ms=duration_ms,
         )
 
     except Exception as e:
@@ -158,23 +139,16 @@ def run(
             error=ToolError(
                 code="EXECUTION_ERROR",
                 message=f"Tool '{tool_name}' execution failed: {str(e)}",
-                details={
-                    "error_type": type(e).__name__,
-                    "error_message": str(e)
-                }
+                details={"error_type": type(e).__name__, "error_message": str(e)},
             ),
-            duration_ms=duration_ms
+            duration_ms=duration_ms,
         )
 
 
 def _validate_context_type(tool: Tool, context: SelectionContext) -> None:
     """Validate that context type matches tool requirements."""
     if tool.context_type != context.type:
-        raise InvalidContextError(
-            tool.name,
-            tool.context_type.value,
-            context.type.value
-        )
+        raise InvalidContextError(tool.name, tool.context_type.value, context.type.value)
 
 
 def _validate_kinds(tool: Tool, context: SelectionContext) -> None:
@@ -200,9 +174,7 @@ def _validate_kinds(tool: Tool, context: SelectionContext) -> None:
 
 
 def _execute_handler(
-    tool: Tool,
-    context: SelectionContext,
-    params: dict[str, Any]
+    tool: Tool, context: SelectionContext, params: dict[str, Any]
 ) -> list[dict[str, Any]]:
     """Execute the tool handler and return output features."""
     if tool.handler is None:
@@ -213,8 +185,7 @@ def _execute_handler(
 
         if not isinstance(result, list):
             raise ExecutionError(
-                tool.name,
-                TypeError(f"Handler must return list, got {type(result).__name__}")
+                tool.name, TypeError(f"Handler must return list, got {type(result).__name__}")
             )
 
         return result

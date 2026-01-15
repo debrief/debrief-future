@@ -55,8 +55,13 @@ class TestToolMetadataFormat:
         meta = tool.to_metadata()
 
         required_fields = [
-            "name", "description", "version",
-            "input_kinds", "output_kind", "context_type", "parameters"
+            "name",
+            "description",
+            "version",
+            "input_kinds",
+            "output_kind",
+            "context_type",
+            "parameters",
         ]
         for field in required_fields:
             assert field in meta, f"Missing field: {field}"

@@ -19,10 +19,7 @@ def single_track_fixture():
 @pytest.fixture
 def single_track_context(single_track_fixture):
     """Create a context from the single track fixture."""
-    return SelectionContext(
-        type=ContextType.SINGLE,
-        features=[single_track_fixture]
-    )
+    return SelectionContext(type=ContextType.SINGLE, features=[single_track_fixture])
 
 
 class TestHaversineDistance:
@@ -63,7 +60,7 @@ class TestCalculateTrackStats:
         # Two points 1 hour apart, approximately 60nm apart (1 degree latitude)
         coords = [
             [0.0, 50.0, 0, 0],
-            [0.0, 51.0, 0, 3600000]  # 1 hour = 3600000 ms
+            [0.0, 51.0, 0, 3600000],  # 1 hour = 3600000 ms
         ]
         stats = _calculate_track_stats(coords)
 

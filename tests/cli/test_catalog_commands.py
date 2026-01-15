@@ -22,14 +22,8 @@ def config_with_stores(tmp_path, monkeypatch):
 
     config = {
         "stores": {
-            "test-store": {
-                "type": "local",
-                "path": "/tmp/test-catalog"
-            },
-            "remote-store": {
-                "type": "remote",
-                "url": "https://example.com/stac"
-            }
+            "test-store": {"type": "local", "path": "/tmp/test-catalog"},
+            "remote-store": {"type": "remote", "url": "https://example.com/stac"},
         }
     }
     config_file.write_text(json.dumps(config))
@@ -111,7 +105,9 @@ class TestCatalogGet:
         assert result.exit_code == 5
 
     def test_get_known_store(self, runner, config_with_stores):
-        result = runner.invoke(cli, ["catalog", "get", "--store", "test-store", "--item", "item-001"])
+        result = runner.invoke(
+            cli, ["catalog", "get", "--store", "test-store", "--item", "item-001"]
+        )
 
         assert result.exit_code == 0
         assert "test-store" in result.output

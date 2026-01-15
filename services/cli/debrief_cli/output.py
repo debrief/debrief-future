@@ -57,9 +57,7 @@ class OutputFormatter:
     def table(self, headers: list[str], rows: list[list[str]]) -> None:
         """Output a table."""
         if self.json_mode:
-            self._data["rows"] = [
-                dict(zip(headers, row, strict=True)) for row in rows
-            ]
+            self._data["rows"] = [dict(zip(headers, row, strict=True)) for row in rows]
         else:
             # Calculate column widths
             widths = [len(h) for h in headers]
@@ -108,7 +106,9 @@ def format_tool_metadata(tool_meta: dict[str, Any], verbose: bool = False) -> st
         lines.append("\nParameters:")
         for param in tool_meta["parameters"]:
             req = " (required)" if param.get("required") else ""
-            default = f" [default: {param.get('default')}]" if param.get("default") is not None else ""
+            default = (
+                f" [default: {param.get('default')}]" if param.get("default") is not None else ""
+            )
             lines.append(f"  --{param['name']}: {param['description']}{req}{default}")
             if param.get("choices"):
                 lines.append(f"    choices: {', '.join(str(c) for c in param['choices'])}")

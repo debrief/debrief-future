@@ -50,7 +50,7 @@ class TestMCPToolExecution:
 
         features = [
             {"type": "Feature", "properties": {"kind": "track"}, "geometry": None},
-            {"type": "Feature", "properties": {"kind": "track"}, "geometry": None}
+            {"type": "Feature", "properties": {"kind": "track"}, "geometry": None},
         ]
         context = SelectionContext(type=ContextType.MULTI, features=features)
 
@@ -90,5 +90,6 @@ class TestMCPWithoutSDK:
 
     def test_has_mcp_flag(self):
         from debrief_calc.mcp.server import HAS_MCP
+
         # If we got here, MCP is installed
         assert HAS_MCP is True

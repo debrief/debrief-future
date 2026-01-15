@@ -19,10 +19,7 @@ def tracks_pair_fixture():
 @pytest.fixture
 def multi_track_context(tracks_pair_fixture):
     """Create a context from the tracks pair fixture."""
-    return SelectionContext(
-        type=ContextType.MULTI,
-        features=tracks_pair_fixture["features"]
-    )
+    return SelectionContext(type=ContextType.MULTI, features=tracks_pair_fixture["features"])
 
 
 class TestCalculateBearing:
@@ -133,7 +130,7 @@ class TestRangeBearingEdgeCases:
             "type": "Feature",
             "id": "track-1",
             "properties": {"kind": "track"},
-            "geometry": {"type": "LineString", "coordinates": [[-4.0, 50.0], [-3.9, 50.1]]}
+            "geometry": {"type": "LineString", "coordinates": [[-4.0, 50.0], [-3.9, 50.1]]},
         }
         context = SelectionContext(type=ContextType.MULTI, features=[feature, feature])
 
@@ -146,13 +143,13 @@ class TestRangeBearingEdgeCases:
             "type": "Feature",
             "id": "track-1",
             "properties": {"kind": "track"},
-            "geometry": {"type": "LineString", "coordinates": []}
+            "geometry": {"type": "LineString", "coordinates": []},
         }
         feature2 = {
             "type": "Feature",
             "id": "track-2",
             "properties": {"kind": "track"},
-            "geometry": {"type": "LineString", "coordinates": [[-4.0, 50.0]]}
+            "geometry": {"type": "LineString", "coordinates": [[-4.0, 50.0]]},
         }
         context = SelectionContext(type=ContextType.MULTI, features=[feature1, feature2])
 

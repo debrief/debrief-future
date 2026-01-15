@@ -32,6 +32,7 @@ class ContextType(str, Enum):
         REGION: Geographic bounds (bbox or polygon)
         NONE: No selection required
     """
+
     SINGLE = "single"
     MULTI = "multi"
     REGION = "region"
@@ -40,6 +41,7 @@ class ContextType(str, Enum):
 
 class SourceRef(BaseModel):
     """Reference to a source feature used in provenance tracking."""
+
     id: str = Field(..., description="Source feature ID")
     kind: str = Field(..., description="Source feature kind")
 
@@ -51,11 +53,14 @@ class Provenance(BaseModel):
     Records the tool, version, timestamp, and source features that
     produced a given output, enabling full traceability per Constitution III.1.
     """
+
     tool: str = Field(..., description="Tool that produced this feature")
     version: str = Field(..., description="Tool version")
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="Execution timestamp")
     sources: list[SourceRef] = Field(default_factory=list, description="Input features used")
-    parameters: dict[str, Any] = Field(default_factory=dict, description="Parameters passed to tool")
+    parameters: dict[str, Any] = Field(
+        default_factory=dict, description="Parameters passed to tool"
+    )
 
 
 class ToolParameter(BaseModel):
@@ -65,6 +70,7 @@ class ToolParameter(BaseModel):
     Supports string, number, boolean, and enum types with optional
     default values and choices for enum parameters.
     """
+
     name: str = Field(..., description="Parameter identifier")
     type: str = Field(..., description="Data type: string, number, boolean, enum")
     description: str = Field(..., description="Human-readable description")
@@ -98,9 +104,12 @@ class ToolError(BaseModel):
         VALIDATION_FAILED: Input or output failed schema validation
         EXECUTION_ERROR: Tool handler raised an exception
     """
+
     code: str = Field(..., description="Error code")
     message: str = Field(..., description="Human-readable error message")
-    details: dict[str, Any] | None = Field(default=None, description="Additional context-specific details")
+    details: dict[str, Any] | None = Field(
+        default=None, description="Additional context-specific details"
+    )
 
 
 class ToolResult(BaseModel):
@@ -110,9 +119,12 @@ class ToolResult(BaseModel):
     Contains either successful output features with provenance,
     or error information explaining the failure.
     """
+
     tool: str = Field(..., description="Name of tool that produced this result")
     success: bool = Field(..., description="Whether execution succeeded")
-    features: list[dict[str, Any]] | None = Field(default=None, description="Output GeoJSON features")
+    features: list[dict[str, Any]] | None = Field(
+        default=None, description="Output GeoJSON features"
+    )
     error: ToolError | None = Field(default=None, description="Error details if not success")
     duration_ms: float = Field(..., description="Execution time in milliseconds")
 
@@ -134,9 +146,14 @@ class SelectionContext(BaseModel):
     - The features selected (for single/multi)
     - The geographic bounds (for region)
     """
+
     type: ContextType = Field(..., description="The context classification")
-    features: list[dict[str, Any]] = Field(default_factory=list, description="Selected GeoJSON features")
-    bounds: list[float] | None = Field(default=None, description="Geographic bounds [minx, miny, maxx, maxy]")
+    features: list[dict[str, Any]] = Field(
+        default_factory=list, description="Selected GeoJSON features"
+    )
+    bounds: list[float] | None = Field(
+        default=None, description="Geographic bounds [minx, miny, maxx, maxy]"
+    )
 
     @field_validator("bounds")
     @classmethod
@@ -174,14 +191,19 @@ class Tool(BaseModel):
     their output (output kind). The handler function implements the
     actual analysis logic.
     """
+
     name: str = Field(..., description="Unique identifier (kebab-case)")
     description: str = Field(..., description="Human-readable description")
     version: str = Field(default="1.0.0", description="Semantic version")
     input_kinds: list[str] = Field(..., description="Feature kinds this tool accepts")
     output_kind: str = Field(..., description="Kind of features produced")
     context_type: ContextType = Field(..., description="Selection context requirement")
-    parameters: list[ToolParameter] = Field(default_factory=list, description="Configurable parameters")
-    handler: Callable | None = Field(default=None, exclude=True, description="Python function implementing the tool")
+    parameters: list[ToolParameter] = Field(
+        default_factory=list, description="Configurable parameters"
+    )
+    handler: Callable | None = Field(
+        default=None, exclude=True, description="Python function implementing the tool"
+    )
 
     model_config = {"arbitrary_types_allowed": True}
 

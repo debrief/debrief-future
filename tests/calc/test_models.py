@@ -52,9 +52,7 @@ class TestProvenance:
 
     def test_create_provenance(self):
         prov = Provenance(
-            tool="track-stats",
-            version="1.0.0",
-            sources=[SourceRef(id="track-001", kind="track")]
+            tool="track-stats", version="1.0.0", sources=[SourceRef(id="track-001", kind="track")]
         )
         assert prov.tool == "track-stats"
         assert prov.version == "1.0.0"
@@ -74,39 +72,24 @@ class TestToolParameter:
     """Tests for ToolParameter model."""
 
     def test_create_string_parameter(self):
-        param = ToolParameter(
-            name="unit",
-            type="string",
-            description="Measurement unit"
-        )
+        param = ToolParameter(name="unit", type="string", description="Measurement unit")
         assert param.name == "unit"
         assert param.type == "string"
         assert param.required is False
 
     def test_create_enum_parameter_with_choices(self):
         param = ToolParameter(
-            name="format",
-            type="enum",
-            description="Output format",
-            choices=["json", "csv", "xml"]
+            name="format", type="enum", description="Output format", choices=["json", "csv", "xml"]
         )
         assert param.choices == ["json", "csv", "xml"]
 
     def test_enum_parameter_requires_choices(self):
         with pytest.raises(PydanticValidationError):
-            ToolParameter(
-                name="format",
-                type="enum",
-                description="Output format"
-            )
+            ToolParameter(name="format", type="enum", description="Output format")
 
     def test_invalid_type_rejected(self):
         with pytest.raises(PydanticValidationError):
-            ToolParameter(
-                name="test",
-                type="invalid",
-                description="Test"
-            )
+            ToolParameter(name="test", type="invalid", description="Test")
 
     def test_valid_types_accepted(self):
         for param_type in ["string", "number", "boolean", "enum"]:
@@ -121,10 +104,7 @@ class TestToolError:
     """Tests for ToolError model."""
 
     def test_create_tool_error(self):
-        error = ToolError(
-            code="TOOL_NOT_FOUND",
-            message="Tool 'unknown' not found"
-        )
+        error = ToolError(code="TOOL_NOT_FOUND", message="Tool 'unknown' not found")
         assert error.code == "TOOL_NOT_FOUND"
         assert error.message == "Tool 'unknown' not found"
         assert error.details is None
@@ -133,7 +113,7 @@ class TestToolError:
         error = ToolError(
             code="KIND_MISMATCH",
             message="Kind mismatch",
-            details={"expected": ["track"], "actual": ["zone"]}
+            details={"expected": ["track"], "actual": ["zone"]},
         )
         assert error.details == {"expected": ["track"], "actual": ["zone"]}
 
@@ -146,7 +126,7 @@ class TestToolResult:
             tool="track-stats",
             success=True,
             features=[{"type": "Feature", "properties": {}, "geometry": None}],
-            duration_ms=42.5
+            duration_ms=42.5,
         )
         assert result.success is True
         assert len(result.features) == 1
@@ -157,7 +137,7 @@ class TestToolResult:
             tool="track-stats",
             success=False,
             error=ToolError(code="EXECUTION_ERROR", message="Failed"),
-            duration_ms=10.0
+            duration_ms=10.0,
         )
         assert result.success is False
         assert result.error is not None
@@ -165,19 +145,11 @@ class TestToolResult:
 
     def test_success_requires_features(self):
         with pytest.raises(PydanticValidationError):
-            ToolResult(
-                tool="test",
-                success=True,
-                duration_ms=10.0
-            )
+            ToolResult(tool="test", success=True, duration_ms=10.0)
 
     def test_failure_requires_error(self):
         with pytest.raises(PydanticValidationError):
-            ToolResult(
-                tool="test",
-                success=False,
-                duration_ms=10.0
-            )
+            ToolResult(tool="test", success=False, duration_ms=10.0)
 
 
 class TestSelectionContext:
@@ -210,10 +182,7 @@ class TestSelectionContext:
             SelectionContext(type=ContextType.MULTI, features=[feature])
 
     def test_region_context(self):
-        context = SelectionContext(
-            type=ContextType.REGION,
-            bounds=[-5.0, 49.0, -3.0, 51.0]
-        )
+        context = SelectionContext(type=ContextType.REGION, bounds=[-5.0, 49.0, -3.0, 51.0])
         assert context.type == ContextType.REGION
         assert context.bounds == [-5.0, 49.0, -3.0, 51.0]
 
@@ -247,7 +216,7 @@ class TestTool:
             description="Calculate track statistics",
             input_kinds=["track"],
             output_kind="analysis-result",
-            context_type=ContextType.SINGLE
+            context_type=ContextType.SINGLE,
         )
         assert tool.name == "track-stats"
         assert tool.version == "1.0.0"  # default
@@ -259,7 +228,7 @@ class TestTool:
                 description="Test",
                 input_kinds=["track"],
                 output_kind="result",
-                context_type=ContextType.SINGLE
+                context_type=ContextType.SINGLE,
             )
 
     def test_name_must_start_with_letter(self):
@@ -269,7 +238,7 @@ class TestTool:
                 description="Test",
                 input_kinds=["track"],
                 output_kind="result",
-                context_type=ContextType.SINGLE
+                context_type=ContextType.SINGLE,
             )
 
     def test_input_kinds_must_not_be_empty(self):
@@ -279,7 +248,7 @@ class TestTool:
                 description="Test",
                 input_kinds=[],
                 output_kind="result",
-                context_type=ContextType.SINGLE
+                context_type=ContextType.SINGLE,
             )
 
     def test_accepts_kind(self):
@@ -288,7 +257,7 @@ class TestTool:
             description="Test",
             input_kinds=["track", "zone"],
             output_kind="result",
-            context_type=ContextType.SINGLE
+            context_type=ContextType.SINGLE,
         )
         assert tool.accepts_kind("track") is True
         assert tool.accepts_kind("zone") is True
@@ -300,7 +269,7 @@ class TestTool:
             description="Test",
             input_kinds=["track"],
             output_kind="result",
-            context_type=ContextType.SINGLE
+            context_type=ContextType.SINGLE,
         )
         assert tool.accepts_context(ContextType.SINGLE) is True
         assert tool.accepts_context(ContextType.MULTI) is False
@@ -313,9 +282,7 @@ class TestTool:
             input_kinds=["track"],
             output_kind="analysis-result",
             context_type=ContextType.SINGLE,
-            parameters=[
-                ToolParameter(name="unit", type="string", description="Unit")
-            ]
+            parameters=[ToolParameter(name="unit", type="string", description="Unit")],
         )
         meta = tool.to_metadata()
         assert meta["name"] == "track-stats"

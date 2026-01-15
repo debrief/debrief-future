@@ -16,6 +16,7 @@ try:
     from mcp.server import Server
     from mcp.server.stdio import stdio_server
     from mcp.types import TextContent, Tool
+
     HAS_MCP = True
 except ImportError:
     HAS_MCP = False
@@ -53,32 +54,34 @@ def create_server() -> Server:
 
         tools = []
         for tool in registry.list_all():
-            tools.append(Tool(
-                name=f"calc_{tool.name.replace('-', '_')}",
-                description=tool.description,
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "features": {
-                            "type": "array",
-                            "description": "GeoJSON features to analyze",
-                            "items": {"type": "object"}
+            tools.append(
+                Tool(
+                    name=f"calc_{tool.name.replace('-', '_')}",
+                    description=tool.description,
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "features": {
+                                "type": "array",
+                                "description": "GeoJSON features to analyze",
+                                "items": {"type": "object"},
+                            },
+                            "bounds": {
+                                "type": "array",
+                                "description": "Geographic bounds [minx, miny, maxx, maxy] for region context",
+                                "items": {"type": "number"},
+                                "minItems": 4,
+                                "maxItems": 4,
+                            },
+                            "params": {
+                                "type": "object",
+                                "description": "Tool-specific parameters",
+                                "additionalProperties": True,
+                            },
                         },
-                        "bounds": {
-                            "type": "array",
-                            "description": "Geographic bounds [minx, miny, maxx, maxy] for region context",
-                            "items": {"type": "number"},
-                            "minItems": 4,
-                            "maxItems": 4
-                        },
-                        "params": {
-                            "type": "object",
-                            "description": "Tool-specific parameters",
-                            "additionalProperties": True
-                        }
-                    }
-                }
-            ))
+                    },
+                )
+            )
 
         return tools
 
@@ -94,16 +97,17 @@ def create_server() -> Server:
         try:
             tool = registry.get_tool(tool_name)
         except Exception as e:
-            return [TextContent(
-                type="text",
-                text=json.dumps({
-                    "success": False,
-                    "error": {
-                        "code": ERROR_TOOL_NOT_FOUND,
-                        "message": str(e)
-                    }
-                })
-            )]
+            return [
+                TextContent(
+                    type="text",
+                    text=json.dumps(
+                        {
+                            "success": False,
+                            "error": {"code": ERROR_TOOL_NOT_FOUND, "message": str(e)},
+                        }
+                    ),
+                )
+            ]
 
         # Build context from arguments
         features = arguments.get("features", [])
@@ -130,38 +134,47 @@ def create_server() -> Server:
             result = run(tool_name, context, params)
 
             if result.success:
-                return [TextContent(
-                    type="text",
-                    text=json.dumps({
-                        "success": True,
-                        "features": result.features,
-                        "duration_ms": result.duration_ms
-                    })
-                )]
+                return [
+                    TextContent(
+                        type="text",
+                        text=json.dumps(
+                            {
+                                "success": True,
+                                "features": result.features,
+                                "duration_ms": result.duration_ms,
+                            }
+                        ),
+                    )
+                ]
             else:
-                return [TextContent(
-                    type="text",
-                    text=json.dumps({
-                        "success": False,
-                        "error": {
-                            "code": result.error.code,
-                            "message": result.error.message,
-                            "details": result.error.details
-                        }
-                    })
-                )]
+                return [
+                    TextContent(
+                        type="text",
+                        text=json.dumps(
+                            {
+                                "success": False,
+                                "error": {
+                                    "code": result.error.code,
+                                    "message": result.error.message,
+                                    "details": result.error.details,
+                                },
+                            }
+                        ),
+                    )
+                ]
 
         except Exception as e:
-            return [TextContent(
-                type="text",
-                text=json.dumps({
-                    "success": False,
-                    "error": {
-                        "code": ERROR_EXECUTION_FAILED,
-                        "message": str(e)
-                    }
-                })
-            )]
+            return [
+                TextContent(
+                    type="text",
+                    text=json.dumps(
+                        {
+                            "success": False,
+                            "error": {"code": ERROR_EXECUTION_FAILED, "message": str(e)},
+                        }
+                    ),
+                )
+            ]
 
     return server
 
@@ -173,16 +186,13 @@ async def serve():
 
     server = create_server()
     async with stdio_server() as (read_stream, write_stream):
-        await server.run(
-            read_stream,
-            write_stream,
-            server.create_initialization_options()
-        )
+        await server.run(read_stream, write_stream, server.create_initialization_options())
 
 
 def main():
     """Entry point for MCP server."""
     import asyncio
+
     asyncio.run(serve())
 
 

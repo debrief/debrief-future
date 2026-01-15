@@ -39,7 +39,7 @@ def _calculate_range(lon1: float, lat1: float, lon2: float, lat2: float) -> floa
 
     dlon = lon2 - lon1
     dlat = lat2 - lat1
-    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
     c = 2 * math.asin(math.sqrt(a))
 
     # Earth radius in nautical miles
@@ -81,9 +81,9 @@ def _find_closest_point(target_time: float, coordinates: list[list[float]]) -> l
             type="enum",
             description="Where to calculate range/bearing",
             choices=["endpoints", "midpoint", "all"],
-            default="all"
+            default="all",
         )
-    ]
+    ],
 )
 def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dict[str, Any]]:
     """
@@ -118,21 +118,23 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dic
         range_nm = _calculate_range(start1[0], start1[1], start2[0], start2[1])
         bearing = _calculate_bearing(start1[0], start1[1], start2[0], start2[1])
 
-        results.append({
-            "type": "Feature",
-            "id": f"rb-start-{uuid.uuid4().hex[:8]}",
-            "properties": {
-                "measurement_type": "start",
-                "range_nm": round(range_nm, 2),
-                "bearing_deg": round(bearing, 1),
-                "from_track": track1.get("id", "track-1"),
-                "to_track": track2.get("id", "track-2")
-            },
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [[start1[0], start1[1]], [start2[0], start2[1]]]
+        results.append(
+            {
+                "type": "Feature",
+                "id": f"rb-start-{uuid.uuid4().hex[:8]}",
+                "properties": {
+                    "measurement_type": "start",
+                    "range_nm": round(range_nm, 2),
+                    "bearing_deg": round(bearing, 1),
+                    "from_track": track1.get("id", "track-1"),
+                    "to_track": track2.get("id", "track-2"),
+                },
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[start1[0], start1[1]], [start2[0], start2[1]]],
+                },
             }
-        })
+        )
 
     # Calculate at midpoint
     if sample_points in ("midpoint", "all"):
@@ -143,21 +145,23 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dic
         range_nm = _calculate_range(mid1[0], mid1[1], mid2[0], mid2[1])
         bearing = _calculate_bearing(mid1[0], mid1[1], mid2[0], mid2[1])
 
-        results.append({
-            "type": "Feature",
-            "id": f"rb-mid-{uuid.uuid4().hex[:8]}",
-            "properties": {
-                "measurement_type": "midpoint",
-                "range_nm": round(range_nm, 2),
-                "bearing_deg": round(bearing, 1),
-                "from_track": track1.get("id", "track-1"),
-                "to_track": track2.get("id", "track-2")
-            },
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [[mid1[0], mid1[1]], [mid2[0], mid2[1]]]
+        results.append(
+            {
+                "type": "Feature",
+                "id": f"rb-mid-{uuid.uuid4().hex[:8]}",
+                "properties": {
+                    "measurement_type": "midpoint",
+                    "range_nm": round(range_nm, 2),
+                    "bearing_deg": round(bearing, 1),
+                    "from_track": track1.get("id", "track-1"),
+                    "to_track": track2.get("id", "track-2"),
+                },
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[mid1[0], mid1[1]], [mid2[0], mid2[1]]],
+                },
             }
-        })
+        )
 
     # Calculate at end
     if sample_points in ("endpoints", "all"):
@@ -166,20 +170,22 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dic
         range_nm = _calculate_range(end1[0], end1[1], end2[0], end2[1])
         bearing = _calculate_bearing(end1[0], end1[1], end2[0], end2[1])
 
-        results.append({
-            "type": "Feature",
-            "id": f"rb-end-{uuid.uuid4().hex[:8]}",
-            "properties": {
-                "measurement_type": "end",
-                "range_nm": round(range_nm, 2),
-                "bearing_deg": round(bearing, 1),
-                "from_track": track1.get("id", "track-1"),
-                "to_track": track2.get("id", "track-2")
-            },
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [[end1[0], end1[1]], [end2[0], end2[1]]]
+        results.append(
+            {
+                "type": "Feature",
+                "id": f"rb-end-{uuid.uuid4().hex[:8]}",
+                "properties": {
+                    "measurement_type": "end",
+                    "range_nm": round(range_nm, 2),
+                    "bearing_deg": round(bearing, 1),
+                    "from_track": track1.get("id", "track-1"),
+                    "to_track": track2.get("id", "track-2"),
+                },
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[end1[0], end1[1]], [end2[0], end2[1]]],
+                },
             }
-        })
+        )
 
     return results

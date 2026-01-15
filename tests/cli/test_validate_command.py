@@ -40,11 +40,9 @@ def invalid_geojson_file(tmp_path):
 def feature_without_kind(tmp_path):
     """Create a valid GeoJSON Feature without kind attribute."""
     file_path = tmp_path / "no_kind.geojson"
-    file_path.write_text(json.dumps({
-        "type": "Feature",
-        "properties": {"name": "test"},
-        "geometry": None
-    }))
+    file_path.write_text(
+        json.dumps({"type": "Feature", "properties": {"name": "test"}, "geometry": None})
+    )
     return file_path
 
 

@@ -23,6 +23,7 @@ _STORES: dict[str, dict] = {}
 def _get_config_path() -> Path:
     """Get the XDG config path for Debrief."""
     import os
+
     xdg_config = os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")
     return Path(xdg_config) / "debrief" / "config.json"
 
@@ -60,10 +61,7 @@ def list_stores(ctx: Context):
         stores = _load_stores()
 
         if ctx.json_mode:
-            formatter.json_output({
-                "stores": list(stores.keys()),
-                "count": len(stores)
-            })
+            formatter.json_output({"stores": list(stores.keys()), "count": len(stores)})
         else:
             if not stores:
                 formatter.info("No STAC stores configured.")
@@ -107,11 +105,13 @@ def list_items(ctx: Context, store: str):
 
         # Placeholder: In full implementation, use debrief-stac to list items
         if ctx.json_mode:
-            formatter.json_output({
-                "store": store,
-                "items": [],
-                "message": "debrief-stac integration not yet implemented"
-            })
+            formatter.json_output(
+                {
+                    "store": store,
+                    "items": [],
+                    "message": "debrief-stac integration not yet implemented",
+                }
+            )
         else:
             formatter.info(f"Store: {store}")
             formatter.info("Note: Full STAC browsing requires debrief-stac package")
@@ -147,11 +147,13 @@ def get_item(ctx: Context, store: str, item: str):
 
         # Placeholder: In full implementation, use debrief-stac to get item
         if ctx.json_mode:
-            formatter.json_output({
-                "store": store,
-                "item": item,
-                "message": "debrief-stac integration not yet implemented"
-            })
+            formatter.json_output(
+                {
+                    "store": store,
+                    "item": item,
+                    "message": "debrief-stac integration not yet implemented",
+                }
+            )
         else:
             formatter.info(f"Store: {store}")
             formatter.info(f"Item: {item}")

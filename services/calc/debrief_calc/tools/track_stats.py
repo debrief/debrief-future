@@ -28,7 +28,7 @@ def _haversine_distance(lon1: float, lat1: float, lon2: float, lat2: float) -> f
     # Haversine formula
     dlon = lon2 - lon1
     dlat = lat2 - lat1
-    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
     c = 2 * math.asin(math.sqrt(a))
 
     # Earth radius in nautical miles
@@ -40,19 +40,14 @@ def _haversine_distance(lon1: float, lat1: float, lon2: float, lat2: float) -> f
 def _calculate_track_stats(coordinates: list[list[float]]) -> dict[str, Any]:
     """Calculate statistics from track coordinates."""
     if not coordinates:
-        return {
-            "point_count": 0,
-            "duration_hours": 0,
-            "distance_nm": 0,
-            "average_speed_kts": 0
-        }
+        return {"point_count": 0, "duration_hours": 0, "distance_nm": 0, "average_speed_kts": 0}
 
     point_count = len(coordinates)
 
     # Calculate total distance
     total_distance = 0.0
     for i in range(1, len(coordinates)):
-        prev = coordinates[i-1]
+        prev = coordinates[i - 1]
         curr = coordinates[i]
         # Coordinates are [lon, lat, elevation?, time?]
         total_distance += _haversine_distance(prev[0], prev[1], curr[0], curr[1])
@@ -73,7 +68,7 @@ def _calculate_track_stats(coordinates: list[list[float]]) -> dict[str, Any]:
         "point_count": point_count,
         "duration_hours": round(duration_hours, 2),
         "distance_nm": round(total_distance, 2),
-        "average_speed_kts": round(average_speed, 2)
+        "average_speed_kts": round(average_speed, 2),
     }
 
 
@@ -89,9 +84,9 @@ def _calculate_track_stats(coordinates: list[list[float]]) -> dict[str, Any]:
             type="enum",
             description="Unit for distance measurements",
             choices=["nm", "km", "mi"],
-            default="nm"
+            default="nm",
         )
-    ]
+    ],
 )
 def track_stats(context: SelectionContext, params: dict[str, Any]) -> list[dict[str, Any]]:
     """
@@ -124,12 +119,9 @@ def track_stats(context: SelectionContext, params: dict[str, Any]) -> list[dict[
         "properties": {
             "source_track": feature.get("id", "unknown"),
             "source_name": feature.get("properties", {}).get("name", "unknown"),
-            "statistics": stats
+            "statistics": stats,
         },
-        "geometry": {
-            "type": "Point",
-            "coordinates": centroid
-        }
+        "geometry": {"type": "Point", "coordinates": centroid},
     }
 
     return [result_feature]

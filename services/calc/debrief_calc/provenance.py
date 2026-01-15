@@ -18,7 +18,7 @@ def create_provenance(
     tool_version: str,
     source_features: list[dict[str, Any]],
     parameters: dict[str, Any] | None = None,
-    timestamp: datetime | None = None
+    timestamp: datetime | None = None,
 ) -> Provenance:
     """
     Create a Provenance instance from tool execution context.
@@ -45,14 +45,11 @@ def create_provenance(
         version=tool_version,
         timestamp=timestamp or datetime.utcnow(),
         sources=sources,
-        parameters=parameters or {}
+        parameters=parameters or {},
     )
 
 
-def attach_provenance(
-    feature: dict[str, Any],
-    provenance: Provenance
-) -> dict[str, Any]:
+def attach_provenance(feature: dict[str, Any], provenance: Provenance) -> dict[str, Any]:
     """
     Attach provenance information to a GeoJSON feature.
 
@@ -74,7 +71,7 @@ def attach_provenance(
         "version": provenance.version,
         "timestamp": provenance.timestamp.isoformat() + "Z",
         "sources": [{"id": s.id, "kind": s.kind} for s in provenance.sources],
-        "parameters": provenance.parameters
+        "parameters": provenance.parameters,
     }
 
     return feature

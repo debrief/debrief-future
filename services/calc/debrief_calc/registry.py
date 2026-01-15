@@ -80,9 +80,7 @@ class ToolRegistry:
         return self._tools[name]
 
     def find_tools(
-        self,
-        context_type: ContextType | None = None,
-        kinds: set[str] | None = None
+        self, context_type: ContextType | None = None, kinds: set[str] | None = None
     ) -> list[Tool]:
         """
         Find tools matching the given criteria.
@@ -182,7 +180,7 @@ def tool(
     output_kind: str,
     context_type: ContextType,
     version: str = "1.0.0",
-    parameters: list[ToolParameter] | None = None
+    parameters: list[ToolParameter] | None = None,
 ) -> Callable:
     """
     Decorator to register a function as a tool.
@@ -218,6 +216,7 @@ def tool(
     Returns:
         Decorator function that registers the tool
     """
+
     def decorator(func: Callable) -> Callable:
         # Create the Tool instance
         tool_instance = Tool(
@@ -228,7 +227,7 @@ def tool(
             output_kind=output_kind,
             context_type=context_type,
             parameters=parameters or [],
-            handler=func
+            handler=func,
         )
 
         # Register in the global registry

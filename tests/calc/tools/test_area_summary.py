@@ -19,10 +19,7 @@ def zone_fixture():
 @pytest.fixture
 def region_context():
     """Create a region context with bounds."""
-    return SelectionContext(
-        type=ContextType.REGION,
-        bounds=[-5.0, 49.5, -3.0, 51.0]
-    )
+    return SelectionContext(type=ContextType.REGION, bounds=[-5.0, 49.5, -3.0, 51.0])
 
 
 class TestPointInBbox:
@@ -132,10 +129,7 @@ class TestAreaSummaryEdgeCases:
 
     def test_small_area(self):
         # Very small bounding box
-        context = SelectionContext(
-            type=ContextType.REGION,
-            bounds=[-4.01, 50.0, -4.0, 50.01]
-        )
+        context = SelectionContext(type=ContextType.REGION, bounds=[-4.01, 50.0, -4.0, 50.01])
         results = area_summary(context, {})
 
         assert len(results) == 1

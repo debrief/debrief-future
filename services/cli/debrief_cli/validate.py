@@ -52,12 +52,9 @@ def validate(ctx: Context, file: str, strict: bool):
 
         if errors:
             if ctx.json_mode:
-                formatter.json_output({
-                    "status": "failed",
-                    "file": file,
-                    "errors": errors,
-                    "error_count": len(errors)
-                })
+                formatter.json_output(
+                    {"status": "failed", "file": file, "errors": errors, "error_count": len(errors)}
+                )
             else:
                 formatter.error(f"Validation failed with {len(errors)} error(s):")
                 for error in errors[:10]:  # Show first 10 errors
@@ -69,11 +66,9 @@ def validate(ctx: Context, file: str, strict: bool):
             sys.exit(3)
         else:
             if ctx.json_mode:
-                formatter.json_output({
-                    "status": "passed",
-                    "file": file,
-                    "feature_count": _count_features(data)
-                })
+                formatter.json_output(
+                    {"status": "passed", "file": file, "feature_count": _count_features(data)}
+                )
             else:
                 formatter.success(f"Validation passed: {file}")
                 formatter.info(f"  Features: {_count_features(data)}")

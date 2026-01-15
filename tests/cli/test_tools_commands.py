@@ -83,10 +83,9 @@ class TestToolsRun:
     """Tests for 'tools run' command."""
 
     def test_run_track_stats(self, runner, single_track_path):
-        result = runner.invoke(cli, [
-            "tools", "run", "track-stats",
-            "--input", str(single_track_path)
-        ])
+        result = runner.invoke(
+            cli, ["tools", "run", "track-stats", "--input", str(single_track_path)]
+        )
 
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -95,10 +94,9 @@ class TestToolsRun:
         assert data["features"][0]["properties"]["kind"] == "track-statistics"
 
     def test_run_range_bearing(self, runner, tracks_pair_path):
-        result = runner.invoke(cli, [
-            "tools", "run", "range-bearing",
-            "--input", str(tracks_pair_path)
-        ])
+        result = runner.invoke(
+            cli, ["tools", "run", "range-bearing", "--input", str(tracks_pair_path)]
+        )
 
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -106,30 +104,36 @@ class TestToolsRun:
         assert len(data["features"]) == 3  # start, mid, end
 
     def test_run_with_parameters(self, runner, tracks_pair_path):
-        result = runner.invoke(cli, [
-            "tools", "run", "range-bearing",
-            "--input", str(tracks_pair_path),
-            "-p", "sample_points", "midpoint"
-        ])
+        result = runner.invoke(
+            cli,
+            [
+                "tools",
+                "run",
+                "range-bearing",
+                "--input",
+                str(tracks_pair_path),
+                "-p",
+                "sample_points",
+                "midpoint",
+            ],
+        )
 
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert len(data["features"]) == 1
 
     def test_run_nonexistent_tool(self, runner, single_track_path):
-        result = runner.invoke(cli, [
-            "tools", "run", "nonexistent",
-            "--input", str(single_track_path)
-        ])
+        result = runner.invoke(
+            cli, ["tools", "run", "nonexistent", "--input", str(single_track_path)]
+        )
 
         assert result.exit_code == 4
 
     def test_run_wrong_context(self, runner, tracks_pair_path):
         # track-stats requires SINGLE, but tracks-pair has 2 features
-        result = runner.invoke(cli, [
-            "tools", "run", "track-stats",
-            "--input", str(tracks_pair_path)
-        ])
+        result = runner.invoke(
+            cli, ["tools", "run", "track-stats", "--input", str(tracks_pair_path)]
+        )
 
         assert result.exit_code == 2
         assert "feature" in result.output.lower()

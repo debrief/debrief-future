@@ -24,9 +24,9 @@ def single_track_context():
             "coordinates": [
                 [-4.5, 50.2, 0, 1705305600000],
                 [-4.4, 50.3, 0, 1705309200000],
-                [-4.3, 50.4, 0, 1705312800000]
-            ]
-        }
+                [-4.3, 50.4, 0, 1705312800000],
+            ],
+        },
     }
     return SelectionContext(type=ContextType.SINGLE, features=[feature])
 
@@ -40,11 +40,8 @@ def multi_track_context():
         "properties": {"kind": "track", "name": "Alpha"},
         "geometry": {
             "type": "LineString",
-            "coordinates": [
-                [-5.0, 50.0, 0, 1705305600000],
-                [-4.5, 50.2, 0, 1705309200000]
-            ]
-        }
+            "coordinates": [[-5.0, 50.0, 0, 1705305600000], [-4.5, 50.2, 0, 1705309200000]],
+        },
     }
     feature2 = {
         "type": "Feature",
@@ -52,11 +49,8 @@ def multi_track_context():
         "properties": {"kind": "track", "name": "Bravo"},
         "geometry": {
             "type": "LineString",
-            "coordinates": [
-                [-4.0, 50.5, 0, 1705305600000],
-                [-4.5, 50.3, 0, 1705309200000]
-            ]
-        }
+            "coordinates": [[-4.0, 50.5, 0, 1705305600000], [-4.5, 50.3, 0, 1705309200000]],
+        },
     }
     return SelectionContext(type=ContextType.MULTI, features=[feature1, feature2])
 
@@ -64,10 +58,7 @@ def multi_track_context():
 @pytest.fixture
 def region_context():
     """Create a region selection context."""
-    return SelectionContext(
-        type=ContextType.REGION,
-        bounds=[-5.0, 49.5, -3.0, 51.0]
-    )
+    return SelectionContext(type=ContextType.REGION, bounds=[-5.0, 49.5, -3.0, 51.0])
 
 
 class TestRunSuccess:
@@ -158,7 +149,7 @@ class TestRunErrors:
             "type": "Feature",
             "id": "zone-001",
             "properties": {"kind": "zone"},
-            "geometry": None
+            "geometry": None,
         }
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
 

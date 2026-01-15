@@ -68,8 +68,13 @@ def _validate_feature(feature: dict[str, Any]) -> list[str]:
     elif geometry is not None:
         geom_type = geometry.get("type")
         valid_geom_types = {
-            "Point", "MultiPoint", "LineString", "MultiLineString",
-            "Polygon", "MultiPolygon", "GeometryCollection"
+            "Point",
+            "MultiPoint",
+            "LineString",
+            "MultiLineString",
+            "Polygon",
+            "MultiPolygon",
+            "GeometryCollection",
         }
         if geom_type not in valid_geom_types:
             errors.append(f"Invalid geometry type: {geom_type}")
@@ -81,9 +86,7 @@ def _validate_feature(feature: dict[str, Any]) -> list[str]:
 
 
 def validate_tool_output(
-    features: list[dict[str, Any]],
-    expected_kind: str,
-    tool_name: str
+    features: list[dict[str, Any]], expected_kind: str, tool_name: str
 ) -> None:
     """
     Validate tool output features against requirements.
@@ -107,10 +110,7 @@ def validate_tool_output(
         # Validate GeoJSON structure
         geojson_errors = _validate_feature(feature)
         for error in geojson_errors:
-            validation_errors.append({
-                "feature_index": i,
-                "error": error
-            })
+            validation_errors.append({"feature_index": i, "error": error})
 
         # Skip further checks if basic structure is invalid
         if geojson_errors:
@@ -121,56 +121,45 @@ def validate_tool_output(
         # Check kind attribute
         kind = properties.get("kind")
         if kind is None:
-            validation_errors.append({
-                "feature_index": i,
-                "error": "Feature.properties.kind is required"
-            })
+            validation_errors.append(
+                {"feature_index": i, "error": "Feature.properties.kind is required"}
+            )
         elif kind != expected_kind:
-            validation_errors.append({
-                "feature_index": i,
-                "error": f"Expected kind '{expected_kind}', got '{kind}'"
-            })
+            validation_errors.append(
+                {"feature_index": i, "error": f"Expected kind '{expected_kind}', got '{kind}'"}
+            )
 
         # Check provenance
         provenance = properties.get("provenance")
         if provenance is None:
-            validation_errors.append({
-                "feature_index": i,
-                "error": "Feature.properties.provenance is required"
-            })
+            validation_errors.append(
+                {"feature_index": i, "error": "Feature.properties.provenance is required"}
+            )
         elif not isinstance(provenance, dict):
-            validation_errors.append({
-                "feature_index": i,
-                "error": "Feature.properties.provenance must be a dictionary"
-            })
+            validation_errors.append(
+                {"feature_index": i, "error": "Feature.properties.provenance must be a dictionary"}
+            )
         else:
             # Validate provenance structure
             if "tool" not in provenance:
-                validation_errors.append({
-                    "feature_index": i,
-                    "error": "provenance.tool is required"
-                })
+                validation_errors.append(
+                    {"feature_index": i, "error": "provenance.tool is required"}
+                )
             if "version" not in provenance:
-                validation_errors.append({
-                    "feature_index": i,
-                    "error": "provenance.version is required"
-                })
+                validation_errors.append(
+                    {"feature_index": i, "error": "provenance.version is required"}
+                )
             if "timestamp" not in provenance:
-                validation_errors.append({
-                    "feature_index": i,
-                    "error": "provenance.timestamp is required"
-                })
+                validation_errors.append(
+                    {"feature_index": i, "error": "provenance.timestamp is required"}
+                )
             if "sources" not in provenance:
-                validation_errors.append({
-                    "feature_index": i,
-                    "error": "provenance.sources is required"
-                })
+                validation_errors.append(
+                    {"feature_index": i, "error": "provenance.sources is required"}
+                )
 
     if validation_errors:
-        raise ValidationError(
-            f"Tool '{tool_name}' produced invalid output",
-            validation_errors
-        )
+        raise ValidationError(f"Tool '{tool_name}' produced invalid output", validation_errors)
 
 
 def validate_feature_kind(feature: dict[str, Any], accepted_kinds: list[str]) -> str | None:

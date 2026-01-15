@@ -21,7 +21,7 @@ def sample_tool():
         input_kinds=["track"],
         output_kind="result",
         context_type=ContextType.SINGLE,
-        handler=lambda ctx, params: []
+        handler=lambda ctx, params: [],
     )
 
 
@@ -34,7 +34,7 @@ def multi_tool():
         input_kinds=["track"],
         output_kind="comparison",
         context_type=ContextType.MULTI,
-        handler=lambda ctx, params: []
+        handler=lambda ctx, params: [],
     )
 
 
@@ -47,7 +47,7 @@ def zone_tool():
         input_kinds=["zone"],
         output_kind="zone-stats",
         context_type=ContextType.SINGLE,
-        handler=lambda ctx, params: []
+        handler=lambda ctx, params: [],
     )
 
 
@@ -111,24 +111,20 @@ class TestToolRegistry:
         assert len(zone_tools) == 1
         assert zone_tools[0].name == "zone-tool"
 
-    def test_find_tools_by_context_and_kinds(self, fresh_registry, sample_tool, multi_tool, zone_tool):
+    def test_find_tools_by_context_and_kinds(
+        self, fresh_registry, sample_tool, multi_tool, zone_tool
+    ):
         fresh_registry.register(sample_tool)
         fresh_registry.register(multi_tool)
         fresh_registry.register(zone_tool)
 
         # Single context + track kind -> only test-tool
-        tools = fresh_registry.find_tools(
-            context_type=ContextType.SINGLE,
-            kinds={"track"}
-        )
+        tools = fresh_registry.find_tools(context_type=ContextType.SINGLE, kinds={"track"})
         assert len(tools) == 1
         assert tools[0].name == "test-tool"
 
         # Single context + zone kind -> only zone-tool
-        tools = fresh_registry.find_tools(
-            context_type=ContextType.SINGLE,
-            kinds={"zone"}
-        )
+        tools = fresh_registry.find_tools(context_type=ContextType.SINGLE, kinds={"zone"})
         assert len(tools) == 1
         assert tools[0].name == "zone-tool"
 
@@ -188,6 +184,7 @@ class TestToolDecorator:
     def test_decorator_registers_tool(self, fresh_registry):
         # Use a fresh registry to avoid pollution
         from debrief_calc import registry as global_registry
+
         _ = len(global_registry)  # Verify registry is accessible
 
         # Note: We can't easily test the decorator without modifying global state
@@ -201,7 +198,7 @@ class TestToolDecorator:
             input_kinds=["track"],
             output_kind="result",
             context_type=ContextType.SINGLE,
-            handler=my_handler
+            handler=my_handler,
         )
         fresh_registry.register(tool_instance)
 
@@ -220,10 +217,10 @@ class TestToolDecorator:
                     name="unit",
                     type="enum",
                     description="Distance unit",
-                    choices=["nm", "km", "mi"]
+                    choices=["nm", "km", "mi"],
                 )
             ],
-            handler=lambda ctx, params: []
+            handler=lambda ctx, params: [],
         )
         fresh_registry.register(tool_instance)
 
@@ -243,7 +240,7 @@ class TestFindToolsEdgeCases:
             input_kinds=["track", "zone"],
             output_kind="result",
             context_type=ContextType.SINGLE,
-            handler=lambda ctx, params: []
+            handler=lambda ctx, params: [],
         )
         fresh_registry.register(multi_kind_tool)
 

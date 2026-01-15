@@ -56,9 +56,9 @@ def _calculate_bbox_area_sq_nm(bbox: list[float]) -> float:
             name="include_centroid",
             type="boolean",
             description="Include centroid point in output",
-            default=True
+            default=True,
         )
-    ]
+    ],
 )
 def area_summary(context: SelectionContext, params: dict[str, Any]) -> list[dict[str, Any]]:
     """
@@ -86,6 +86,7 @@ def area_summary(context: SelectionContext, params: dict[str, Any]) -> list[dict
 
     # Calculate dimensions
     import math
+
     avg_lat = (miny + maxy) / 2
     width_nm = (maxx - minx) * 60 * math.cos(math.radians(avg_lat))
     height_nm = (maxy - miny) * 60
@@ -98,20 +99,14 @@ def area_summary(context: SelectionContext, params: dict[str, Any]) -> list[dict
                 "area_sq_nm": round(area_sq_nm, 2),
                 "width_nm": round(width_nm, 2),
                 "height_nm": round(height_nm, 2),
-                "centroid": [round(centroid_lon, 4), round(centroid_lat, 4)]
+                "centroid": [round(centroid_lon, 4), round(centroid_lat, 4)],
             },
-            "bounds": bounds
+            "bounds": bounds,
         },
         "geometry": {
             "type": "Polygon",
-            "coordinates": [[
-                [minx, miny],
-                [maxx, miny],
-                [maxx, maxy],
-                [minx, maxy],
-                [minx, miny]
-            ]]
-        }
+            "coordinates": [[[minx, miny], [maxx, miny], [maxx, maxy], [minx, maxy], [minx, miny]]],
+        },
     }
 
     return [result_feature]

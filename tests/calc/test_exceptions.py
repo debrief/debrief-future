@@ -110,7 +110,7 @@ class TestValidationError:
     def test_create_error_with_errors(self):
         errors = [
             {"field": "properties.kind", "error": "required"},
-            {"field": "geometry", "error": "invalid"}
+            {"field": "geometry", "error": "invalid"},
         ]
         error = ValidationError("Validation failed", errors)
         assert len(error.validation_errors) == 2
