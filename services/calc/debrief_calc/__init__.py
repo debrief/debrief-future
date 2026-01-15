@@ -29,6 +29,9 @@ from debrief_calc.models import (
 )
 from debrief_calc.registry import registry, tool
 
+# Import tools to register them with the registry
+from debrief_calc import tools as _tools  # noqa: F401
+
 __version__ = "0.1.0"
 
 __all__ = [
