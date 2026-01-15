@@ -128,23 +128,23 @@
 
 ### Implementation for User Story 5
 
-- [ ] T040 [US5] Create services/cli/main.py with Click app entry point
-- [ ] T041 [US5] Create services/cli/output.py with OutputFormatter for human/JSON output
-- [ ] T042 [US5] Implement global --json flag handling
-- [ ] T043 [US5] Create services/cli/tools.py with `tools` command group
-- [ ] T044 [US5] Implement `tools list` command with --input and --store/--item options
-- [ ] T045 [US5] Implement `tools describe <tool>` command
-- [ ] T046 [US5] Implement `tools run <tool>` command with --input, --store/--item, --param options
-- [ ] T047 [US5] Create services/cli/validate.py with `validate` command
-- [ ] T048 [US5] Create services/cli/catalog.py with `catalog` command group
-- [ ] T049 [US5] Implement `catalog stores` command
-- [ ] T050 [US5] Implement `catalog list --store <name>` command
-- [ ] T051 [US5] Implement `catalog get --store <name> --item <id>` command
-- [ ] T052 [US5] Implement exit codes per spec (0, 2, 3, 4, 5)
-- [ ] T053 [US5] Add --help text for all commands and subcommands
-- [ ] T054 [US5] Write tests for tools commands in tests/cli/test_tools_commands.py
-- [ ] T055 [US5] Write tests for validate command in tests/cli/test_validate_command.py
-- [ ] T056 [US5] Write tests for catalog commands in tests/cli/test_catalog_commands.py
+- [x] T040 [US5] Create services/cli/main.py with Click app entry point
+- [x] T041 [US5] Create services/cli/output.py with OutputFormatter for human/JSON output
+- [x] T042 [US5] Implement global --json flag handling
+- [x] T043 [US5] Create services/cli/tools.py with `tools` command group
+- [x] T044 [US5] Implement `tools list` command with --input and --store/--item options
+- [x] T045 [US5] Implement `tools describe <tool>` command
+- [x] T046 [US5] Implement `tools run <tool>` command with --input, --store/--item, --param options
+- [x] T047 [US5] Create services/cli/validate.py with `validate` command
+- [x] T048 [US5] Create services/cli/catalog.py with `catalog` command group
+- [x] T049 [US5] Implement `catalog stores` command
+- [x] T050 [US5] Implement `catalog list --store <name>` command
+- [x] T051 [US5] Implement `catalog get --store <name> --item <id>` command
+- [x] T052 [US5] Implement exit codes per spec (0, 2, 3, 4, 5)
+- [x] T053 [US5] Add --help text for all commands and subcommands
+- [x] T054 [US5] Write tests for tools commands in tests/cli/test_tools_commands.py
+- [x] T055 [US5] Write tests for validate command in tests/cli/test_validate_command.py
+- [x] T056 [US5] Write tests for catalog commands in tests/cli/test_catalog_commands.py
 
 **Checkpoint**: CLI verification complete — all debrief-calc features testable via command line
 
@@ -158,13 +158,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T057 [US3] Create services/calc/mcp/__init__.py
-- [ ] T058 [US3] Create services/calc/mcp/server.py with MCP server setup
-- [ ] T059 [US3] Implement `list_tools` MCP tool per contracts/mcp-tools.md
-- [ ] T060 [US3] Implement `describe_tool` MCP tool per contracts/mcp-tools.md
-- [ ] T061 [US3] Implement `run_tool` MCP tool per contracts/mcp-tools.md
-- [ ] T062 [US3] Implement MCP error codes (TOOL_NOT_FOUND, INVALID_CONTEXT, KIND_MISMATCH, EXECUTION_FAILED)
-- [ ] T063 [US3] Write integration tests for MCP server in tests/calc/test_mcp.py
+- [x] T057 [US3] Create services/calc/mcp/__init__.py
+- [x] T058 [US3] Create services/calc/mcp/server.py with MCP server setup
+- [x] T059 [US3] Implement `list_tools` MCP tool per contracts/mcp-tools.md
+- [x] T060 [US3] Implement `describe_tool` MCP tool per contracts/mcp-tools.md
+- [x] T061 [US3] Implement `run_tool` MCP tool per contracts/mcp-tools.md
+- [x] T062 [US3] Implement MCP error codes (TOOL_NOT_FOUND, INVALID_CONTEXT, KIND_MISMATCH, EXECUTION_FAILED)
+- [x] T063 [US3] Write integration tests for MCP server in tests/calc/test_mcp.py
 
 **Checkpoint**: MCP integration complete — remote tool access works
 
@@ -178,10 +178,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T064 [US4] Enhance Tool model with detailed parameter introspection
-- [ ] T065 [US4] Implement ToolRegistry.describe() returning complete metadata
-- [ ] T066 [US4] Add parameter documentation to all built-in tools
-- [ ] T067 [US4] Write tests for metadata completeness in tests/calc/test_metadata.py
+- [x] T064 [US4] Enhance Tool model with detailed parameter introspection
+- [x] T065 [US4] Implement ToolRegistry.describe() returning complete metadata
+- [x] T066 [US4] Add parameter documentation to all built-in tools
+- [x] T067 [US4] Write tests for metadata completeness in tests/calc/test_metadata.py
 
 **Checkpoint**: Tool metadata complete — self-documenting tools
 
