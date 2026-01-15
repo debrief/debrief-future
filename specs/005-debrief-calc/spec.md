@@ -21,6 +21,7 @@ As an analyst working with maritime track data, I need to discover which analysi
 2. **Given** a user has selected multiple tracks, **When** they query available tools, **Then** they receive a list of tools that operate on multi-track selections
 3. **Given** a user has selected a geographic region, **When** they query available tools, **Then** they receive a list of tools that operate on regional analysis
 4. **Given** a user has no selection, **When** they query available tools, **Then** they receive an empty list or tools that operate without selection context
+5. **Given** a user has selected features of a specific kind (e.g., "track", "zone"), **When** they query available tools, **Then** only tools that accept that feature kind are returned
 
 ---
 
@@ -34,10 +35,11 @@ As an analyst, I need to execute an analysis tool on my current selection and re
 
 **Acceptance Scenarios**:
 
-1. **Given** a user has selected appropriate data for a tool, **When** they execute the tool, **Then** they receive results as valid GeoJSON features
-2. **Given** a user executes a tool requiring two tracks, **When** both tracks are selected, **Then** the tool executes successfully and returns comparison results
+1. **Given** a user has selected appropriate data for a tool, **When** they execute the tool, **Then** they receive results as valid GeoJSON features with the appropriate `kind` attribute set
+2. **Given** a user executes a tool requiring two tracks, **When** both tracks are selected, **Then** the tool executes successfully and returns comparison results with the output kind specified by the tool
 3. **Given** a user executes a tool, **When** the tool completes, **Then** provenance information is included indicating the source data and tool used
 4. **Given** a user executes a tool with invalid selection context, **When** the tool is invoked, **Then** they receive a clear error message explaining the mismatch
+5. **Given** a user executes a tool on features of an incompatible kind, **When** the tool validates input, **Then** they receive an error indicating the kind mismatch
 
 ---
 
@@ -67,8 +69,9 @@ As an analyst, I need to understand what parameters a tool accepts and what outp
 
 **Acceptance Scenarios**:
 
-1. **Given** a user queries a specific tool, **When** they request metadata, **Then** they receive the tool's name, description, required selection context, and output format
+1. **Given** a user queries a specific tool, **When** they request metadata, **Then** they receive the tool's name, description, required selection context, accepted input kinds, output kind, and output format
 2. **Given** a tool has configurable parameters, **When** a user queries metadata, **Then** parameter names, types, and default values are included
+3. **Given** an LLM Supervisor queries tool metadata, **When** it needs to determine applicable tools, **Then** the accepted input kinds and output kind are available for decision-making
 
 ---
 
@@ -93,14 +96,19 @@ As an analyst, I need to understand what parameters a tool accepts and what outp
 - **FR-008**: System MUST implement at least 3 representative tools demonstrating diverse selection contexts
 - **FR-009**: System MUST return descriptive error messages when tool execution fails or context is invalid
 - **FR-010**: System MUST expose tool metadata including name, description, selection requirements, and parameter definitions
+- **FR-011**: Tool definitions MUST specify which feature kinds they accept as input (e.g., "track", "zone", "point")
+- **FR-012**: Tool definitions MUST specify the feature kind of their output, enabling downstream systems to determine rendering and business logic
+- **FR-013**: System MUST filter available tools based on the `kind` attribute of selected features
+- **FR-014**: All tool outputs MUST include the appropriate `kind` attribute in feature.properties as specified by the tool definition
 
 ### Key Entities
 
-- **Tool**: An analysis operation that accepts selection context and returns GeoJSON results. Has metadata (name, description, version), selection context requirements, configurable parameters, and output specification.
-- **Tool Registry**: A catalog of available tools that supports queries by selection context type. Enables tool discovery.
-- **Selection Context**: The user's current data selection that determines which tools are applicable. Types include single track, multiple tracks, point selection, and regional bounds.
-- **Tool Result**: The output of a tool execution, serialized as GeoJSON features with provenance metadata.
-- **Tool Metadata**: Descriptive information about a tool including its name, purpose, required inputs, parameters, and expected outputs.
+- **Tool**: An analysis operation that accepts selection context and returns GeoJSON results. Has metadata (name, description, version), selection context requirements, accepted input kinds, output kind, configurable parameters, and output specification.
+- **Tool Registry**: A catalog of available tools that supports queries by selection context type and feature kind. Enables tool discovery based on what the user has selected.
+- **Selection Context**: The user's current data selection that determines which tools are applicable. Types include single track, multiple tracks, point selection, and regional bounds. Each selected feature has a `kind` attribute that further constrains applicable tools.
+- **Tool Result**: The output of a tool execution, serialized as GeoJSON features with provenance metadata and the appropriate `kind` attribute set in feature.properties.
+- **Tool Metadata**: Descriptive information about a tool including its name, purpose, required inputs, accepted input kinds, output kind, parameters, and expected outputs.
+- **Feature Kind**: A discriminator attribute (`kind`) in feature.properties that identifies the type of feature (e.g., "track", "zone", "bearing", "range-ring"). Used by tools to declare compatibility and by other systems (rendering, tree views, LLM Supervisor) to determine appropriate handling.
 
 ## Success Criteria *(mandatory)*
 
@@ -113,15 +121,20 @@ As an analyst, I need to understand what parameters a tool accepts and what outp
 - **SC-005**: At least 3 representative tools are available demonstrating single-track, multi-track, and regional analysis contexts
 - **SC-006**: Remote clients can discover and execute tools via MCP with identical results to direct invocation
 - **SC-007**: Invalid tool invocations return descriptive error messages that identify the specific problem
+- **SC-008**: 100% of tool outputs include a valid `kind` attribute that matches the tool's declared output kind
+- **SC-009**: Tool discovery correctly filters results based on selected feature kinds (no tools shown for incompatible kinds)
 
 ## Assumptions
 
 - Tool metadata schema has been defined in Stage 0 (schemas) and is available for use
-- GeoJSON profile from Stage 0 defines the valid structure for tool outputs
+- GeoJSON profile from Stage 0 defines the valid structure for tool outputs, including the `kind` attribute in feature.properties
+- The `kind` attribute is a required field in feature.properties that differentiates feature types
+- A defined set of valid `kind` values exists in the schema (e.g., "track", "zone", "point", "bearing", "range-ring")
 - MCP patterns from mcp-common provide the foundation for remote tool access
 - Selection context types align with those used in the frontend applications (VS Code extension, Loader)
 - Initial release focuses on synchronous tool execution; async/background execution is out of scope
 - Tool parameter validation uses the schemas infrastructure from Stage 0
+- Future LLM Supervisor integration will use tool kind metadata for automated tool selection
 
 ## Dependencies
 

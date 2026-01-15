@@ -34,3 +34,12 @@
 - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`
 - UI Feature Validation section not applicable (this is a backend service, not a UI feature)
 - Spec is ready for next phase
+
+## Clarification History
+
+- **2026-01-15**: Added `kind` attribute support per user clarification:
+  - Tools declare accepted input kinds and output kind in metadata
+  - Tool discovery filters by feature kind
+  - All outputs include appropriate `kind` attribute
+  - Enables future LLM Supervisor integration for automated tool selection
+  - Supports downstream rendering and business logic decisions
