@@ -1,0 +1,290 @@
+/* Debrief Map Styles */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-size: var(--vscode-font-size, 13px);
+  color: var(--vscode-foreground, #cccccc);
+  background: var(--vscode-editor-background, #1e1e1e);
+}
+
+#map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Floating Toolbar */
+.floating-toolbar {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--vscode-editor-background, #1e1e1e);
+  border: 1px solid var(--vscode-panel-border, #454545);
+  border-radius: 4px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.toolbar-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: var(--vscode-foreground, #cccccc);
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.toolbar-btn:hover {
+  background: var(--vscode-toolbar-hoverBackground, #3c3c3c);
+}
+
+.toolbar-btn:active {
+  background: var(--vscode-toolbar-activeBackground, #505050);
+}
+
+/* Welcome View */
+.welcome-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--vscode-editor-background, #1e1e1e);
+}
+
+.welcome-view.hidden {
+  display: none;
+}
+
+.welcome-content {
+  text-align: center;
+  max-width: 400px;
+  padding: 40px;
+}
+
+.welcome-content h1 {
+  font-size: 24px;
+  font-weight: normal;
+  margin: 0 0 20px 0;
+  color: var(--vscode-foreground, #cccccc);
+}
+
+.welcome-content p {
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+  margin: 0 0 20px 0;
+}
+
+.welcome-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 30px 0;
+  text-align: left;
+}
+
+.welcome-content li {
+  padding: 8px 0;
+  color: var(--vscode-foreground, #cccccc);
+}
+
+.welcome-content kbd {
+  padding: 2px 6px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 0.9em;
+  background: var(--vscode-keybindingLabel-background, #464646);
+  border: 1px solid var(--vscode-keybindingLabel-border, #3c3c3c);
+  border-radius: 3px;
+}
+
+/* Recent Plots */
+#recent-plots {
+  margin-top: 20px;
+  text-align: left;
+}
+
+#recent-plots h3 {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+  margin: 0 0 10px 0;
+}
+
+.recent-plot-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  margin: 4px 0;
+  background: var(--vscode-list-hoverBackground, #2a2d2e);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.recent-plot-item:hover {
+  background: var(--vscode-list-activeSelectionBackground, #094771);
+}
+
+.recent-plot-item .icon {
+  margin-right: 8px;
+}
+
+.recent-plot-item .name {
+  flex: 1;
+}
+
+.recent-plot-item .time {
+  font-size: 0.9em;
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+/* Track Styles */
+.track-line {
+  stroke-width: 2;
+  fill: none;
+}
+
+.track-line.selected {
+  stroke-width: 4;
+}
+
+.track-line.hover {
+  stroke-width: 3;
+}
+
+/* Selection Glow Effect */
+@keyframes selection-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px currentColor);
+    opacity: 1;
+  }
+  50% {
+    filter: drop-shadow(0 0 8px currentColor);
+    opacity: 0.8;
+  }
+}
+
+.track-selected {
+  animation: selection-glow 2.5s ease-in-out infinite;
+}
+
+.glow-disabled .track-selected {
+  animation: none;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+/* Track Labels */
+.track-label {
+  background: var(--vscode-editor-background, #1e1e1e);
+  border: 1px solid var(--vscode-panel-border, #454545);
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--vscode-foreground, #cccccc);
+}
+
+/* Track Tooltip */
+.track-tooltip {
+  background: var(--vscode-editorHoverWidget-background, #252526);
+  border: 1px solid var(--vscode-editorHoverWidget-border, #454545);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+  max-width: 250px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.track-tooltip .tooltip-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.track-tooltip .tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.track-tooltip .tooltip-label {
+  color: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+.track-tooltip .tooltip-value {
+  color: var(--vscode-foreground, #cccccc);
+}
+
+/* Reference Location Marker */
+.location-marker {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--vscode-foreground, #cccccc);
+  background: var(--vscode-editor-background, #1e1e1e);
+}
+
+.location-marker.selected {
+  background: var(--vscode-focusBorder, #0078d4);
+  border-color: var(--vscode-focusBorder, #0078d4);
+}
+
+/* Result Layers */
+.result-line {
+  stroke-dasharray: 8, 4;
+  stroke-width: 2;
+  fill: none;
+}
+
+.result-marker {
+  fill: var(--vscode-charts-orange, #d18616);
+  stroke: var(--vscode-editor-background, #1e1e1e);
+  stroke-width: 1;
+}
+
+/* Leaflet Overrides */
+.leaflet-container {
+  background: var(--vscode-editor-background, #1e1e1e);
+}
+
+.leaflet-control-scale-line {
+  background: var(--vscode-editor-background, #1e1e1e);
+  border-color: var(--vscode-panel-border, #454545);
+  color: var(--vscode-foreground, #cccccc);
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--vscode-editorHoverWidget-background, #252526);
+  border-radius: 4px;
+  color: var(--vscode-foreground, #cccccc);
+}
+
+.leaflet-popup-tip {
+  background: var(--vscode-editorHoverWidget-background, #252526);
+}

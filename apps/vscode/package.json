@@ -1,0 +1,383 @@
+{
+  "name": "debrief-vscode",
+  "displayName": "Debrief Maritime Analysis",
+  "description": "Maritime tactical analysis extension for VS Code - browse STAC catalogs, display plots on maps, and run analysis tools",
+  "version": "0.1.0",
+  "publisher": "debrief",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Visualization",
+    "Data Science"
+  ],
+  "keywords": [
+    "maritime",
+    "analysis",
+    "STAC",
+    "GeoJSON",
+    "maps"
+  ],
+  "activationEvents": [
+    "onFileSystem:stac",
+    "onView:debrief.stacExplorer",
+    "onCommand:debrief.openPlot"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "debrief.openPlot",
+        "title": "Open Plot",
+        "category": "Debrief",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "debrief.closePlot",
+        "title": "Close Plot",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.addStore",
+        "title": "Add STAC Store",
+        "category": "Debrief",
+        "icon": "$(add)"
+      },
+      {
+        "command": "debrief.removeStore",
+        "title": "Remove Store",
+        "category": "Debrief",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "debrief.refreshStore",
+        "title": "Refresh",
+        "category": "Debrief",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "debrief.selectAll",
+        "title": "Select All Tracks",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.clearSelection",
+        "title": "Clear Selection",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.fitToAll",
+        "title": "Fit to All Tracks",
+        "category": "Debrief",
+        "icon": "$(screen-full)"
+      },
+      {
+        "command": "debrief.fitToSelection",
+        "title": "Fit to Selection",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.zoomIn",
+        "title": "Zoom In",
+        "category": "Debrief",
+        "icon": "$(zoom-in)"
+      },
+      {
+        "command": "debrief.zoomOut",
+        "title": "Zoom Out",
+        "category": "Debrief",
+        "icon": "$(zoom-out)"
+      },
+      {
+        "command": "debrief.exportPng",
+        "title": "Export as PNG",
+        "category": "Debrief",
+        "icon": "$(export)"
+      },
+      {
+        "command": "debrief.executeTool",
+        "title": "Execute Tool",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.cancelToolExecution",
+        "title": "Cancel",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.toggleLayerVisibility",
+        "title": "Toggle Visibility",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.removeResultLayer",
+        "title": "Remove Layer",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.clearAllResults",
+        "title": "Clear All Results",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.changeTrackColor",
+        "title": "Change Color",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.setTimeRange",
+        "title": "Set Time Range",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.resetTimeRange",
+        "title": "Full Range",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.updateStorePath",
+        "title": "Update Path",
+        "category": "Debrief"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "debrief.selectAll",
+        "key": "ctrl+a",
+        "mac": "cmd+a",
+        "when": "debrief.mapFocused"
+      },
+      {
+        "command": "debrief.clearSelection",
+        "key": "escape",
+        "when": "debrief.mapFocused && debrief.hasSelection"
+      },
+      {
+        "command": "debrief.clearSelection",
+        "key": "delete",
+        "when": "debrief.mapFocused && debrief.hasSelection"
+      },
+      {
+        "command": "debrief.fitToAll",
+        "key": "ctrl+0",
+        "mac": "cmd+0",
+        "when": "debrief.mapFocused"
+      },
+      {
+        "command": "debrief.zoomIn",
+        "key": "ctrl+=",
+        "mac": "cmd+=",
+        "when": "debrief.mapFocused"
+      },
+      {
+        "command": "debrief.zoomOut",
+        "key": "ctrl+-",
+        "mac": "cmd+-",
+        "when": "debrief.mapFocused"
+      },
+      {
+        "command": "debrief.openPlot",
+        "key": "ctrl+shift+o",
+        "mac": "cmd+shift+o"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "debrief",
+          "title": "Debrief",
+          "icon": "resources/debrief-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "debrief": [
+        {
+          "id": "debrief.timeRange",
+          "name": "Time Range",
+          "type": "webview"
+        },
+        {
+          "id": "debrief.tools",
+          "name": "Tools"
+        },
+        {
+          "id": "debrief.layers",
+          "name": "Layers"
+        }
+      ],
+      "explorer": [
+        {
+          "id": "debrief.stacExplorer",
+          "name": "STAC Stores"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "debrief.stacExplorer",
+        "contents": "No STAC stores configured.\n[Add Store](command:debrief.addStore)\nA STAC store is a folder containing maritime plot data."
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "debrief.addStore",
+          "when": "view == debrief.stacExplorer",
+          "group": "navigation"
+        },
+        {
+          "command": "debrief.clearAllResults",
+          "when": "view == debrief.layers && debrief.hasResultLayers"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "debrief.removeStore",
+          "when": "view == debrief.stacExplorer && viewItem == store",
+          "group": "3_modify"
+        },
+        {
+          "command": "debrief.refreshStore",
+          "when": "view == debrief.stacExplorer && viewItem == store",
+          "group": "1_navigation"
+        },
+        {
+          "command": "debrief.updateStorePath",
+          "when": "view == debrief.stacExplorer && viewItem == storeInvalid",
+          "group": "3_modify"
+        },
+        {
+          "command": "debrief.openPlot",
+          "when": "view == debrief.stacExplorer && viewItem == plot",
+          "group": "1_navigation"
+        },
+        {
+          "command": "debrief.removeResultLayer",
+          "when": "view == debrief.layers && viewItem == resultLayer",
+          "group": "3_modify"
+        },
+        {
+          "command": "debrief.changeTrackColor",
+          "when": "view == debrief.layers && viewItem == track",
+          "group": "2_style"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "debrief.closePlot",
+          "when": "debrief.plotOpen"
+        },
+        {
+          "command": "debrief.selectAll",
+          "when": "debrief.plotOpen"
+        },
+        {
+          "command": "debrief.clearSelection",
+          "when": "debrief.plotOpen && debrief.hasSelection"
+        },
+        {
+          "command": "debrief.fitToAll",
+          "when": "debrief.plotOpen"
+        },
+        {
+          "command": "debrief.fitToSelection",
+          "when": "debrief.plotOpen && debrief.hasSelection"
+        },
+        {
+          "command": "debrief.exportPng",
+          "when": "debrief.plotOpen"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Debrief",
+      "properties": {
+        "debrief.selection.glowEffect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable animated glow effect on selected tracks"
+        },
+        "debrief.tracks.defaultColors": {
+          "type": "array",
+          "default": [
+            "#e41a1c",
+            "#377eb8",
+            "#4daf4a",
+            "#984ea3",
+            "#ff7f00",
+            "#ffff33",
+            "#a65628",
+            "#f781bf"
+          ],
+          "description": "Default color palette for tracks"
+        },
+        "debrief.map.renderer": {
+          "type": "string",
+          "enum": [
+            "canvas",
+            "svg"
+          ],
+          "default": "canvas",
+          "description": "Map renderer (canvas recommended for performance)"
+        },
+        "debrief.calc.pythonPath": {
+          "type": "string",
+          "default": "python",
+          "description": "Path to Python executable for debrief-calc"
+        },
+        "debrief.calc.connectionTimeout": {
+          "type": "number",
+          "default": 5000,
+          "description": "MCP connection timeout in milliseconds"
+        },
+        "debrief.recentPlots.maxCount": {
+          "type": "number",
+          "default": 10,
+          "description": "Maximum number of recent plots to remember"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run compile",
+    "compile": "pnpm run compile:extension && pnpm run compile:webview",
+    "compile:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife",
+    "watch": "pnpm run watch:extension & pnpm run watch:webview",
+    "watch:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
+    "watch:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife --watch",
+    "dev": "concurrently \"pnpm run watch:extension\" \"pnpm run watch:webview\"",
+    "lint": "eslint src --ext ts",
+    "lint:fix": "eslint src --ext ts --fix",
+    "test": "pnpm run test:unit && pnpm run test:integration",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vscode-test",
+    "test:e2e": "playwright test",
+    "package": "vsce package --no-dependencies",
+    "pretest": "pnpm run compile"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.8",
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vscode/test-electron": "^2.3.8",
+    "@vscode/vsce": "^2.22.0",
+    "concurrently": "^8.2.2",
+    "esbuild": "^0.19.8",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.2",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "leaflet-image": "^0.4.0"
+  }
+}
