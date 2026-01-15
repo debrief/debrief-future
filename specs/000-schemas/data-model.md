@@ -25,6 +25,21 @@ Future iterations will add: SensorContact, PlotMetadata, ToolMetadata.
 
 ---
 
+## Feature Kind Discriminator
+
+All features include a `kind` field in their properties to enable schema-based type identification. This allows consumers to dispatch to the correct schema based on a single field check, rather than inferring type from geometry or checking for type-specific fields.
+
+See [ADR-001: Feature Kind Discriminator](/docs/adr/001-feature-kind-discriminator.md) for design rationale.
+
+### FeatureKindEnum
+
+| Value | Description | Properties Schema |
+|-------|-------------|-------------------|
+| `TRACK` | Vessel track (LineString geometry) | `TrackProperties` |
+| `POINT` | Reference location (Point geometry) | `ReferenceLocationProperties` |
+
+---
+
 ## Entity: TrackFeature
 
 A GeoJSON Feature representing a vessel track with timestamped positions.
@@ -43,6 +58,7 @@ A GeoJSON Feature representing a vessel track with timestamped positions.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
+| `kind` | `"TRACK"` | Yes | Feature type discriminator |
 | `platform_id` | `string` | Yes | Platform/vessel identifier |
 | `platform_name` | `string` | No | Human-readable platform name |
 | `track_type` | `TrackTypeEnum` | Yes | Type of track (see enum below) |
@@ -93,6 +109,7 @@ A GeoJSON Feature representing a vessel track with timestamped positions.
     ]
   },
   "properties": {
+    "kind": "TRACK",
     "platform_id": "HMS-EXAMPLE",
     "platform_name": "HMS Example",
     "track_type": "OWNSHIP",
@@ -126,6 +143,7 @@ A GeoJSON Feature for fixed reference points (exercise area markers, waypoints, 
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
+| `kind` | `"POINT"` | Yes | Feature type discriminator |
 | `name` | `string` | Yes | Reference location name |
 | `location_type` | `LocationTypeEnum` | Yes | Type of reference |
 | `description` | `string` | No | Additional description |
@@ -161,6 +179,7 @@ A GeoJSON Feature for fixed reference points (exercise area markers, waypoints, 
     "coordinates": [-5.5, 50.0]
   },
   "properties": {
+    "kind": "POINT",
     "name": "Alpha Waypoint",
     "location_type": "WAYPOINT",
     "description": "Start of exercise track",
