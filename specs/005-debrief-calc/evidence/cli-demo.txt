@@ -1,0 +1,128 @@
+# CLI Demo: debrief-cli
+
+## Main Help
+
+$ debrief-cli --help
+Usage: debrief-cli [OPTIONS] COMMAND [ARGS]...
+
+  Debrief CLI - Command-line tools for maritime tactical analysis.
+
+  Provides access to analysis tools, validation, and STAC catalog browsing.
+
+  Exit codes:   0 - Success   2 - Invalid arguments   3 - Validation failed
+  4 - Execution failed   5 - Store not found
+
+Options:
+  --json     Output in JSON format
+  --version  Show the version and exit.
+  --help     Show this message and exit.
+
+Commands:
+  catalog   Browse STAC catalogs.
+  tools     Discover and run analysis tools.
+  validate  Validate a GeoJSON file.
+
+---
+
+## Tool Discovery
+
+$ debrief-cli tools list
+Name          | Context | Input Kinds           | Description
+-------------------------------------------------------------------------------------------------------
+area-summary  | region  | zone, region, polygon | Summarize the geographic extent and properties of ...
+range-bearing | multi   | track                 | Calculate range and bearing between two tracks at ...
+track-stats   | single  | track                 | Calculate statistics for a single track including ...
+
+---
+
+## Tool Description
+
+$ debrief-cli tools describe track-stats
+Name: track-stats
+Description: Calculate statistics for a single track including point count, duration, distance, and average speed
+Version: 1.0.0
+Context Type: single
+Input Kinds: track
+Output Kind: track-statistics
+
+Parameters:
+  --distance_unit: Unit for distance measurements [default: nm]
+    choices: nm, km, mi
+
+---
+
+## Tool Execution
+
+$ debrief-cli tools run track-stats --input tests/calc/fixtures/track-single.geojson
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "stats-eae11311",
+      "properties": {
+        "source_track": "track-001",
+        "source_name": "HMS Example",
+        "statistics": {
+          "point_count": 9,
+          "duration_hours": 8.0,
+          "distance_nm": 56.89,
+          "average_speed_kts": 7.11
+        },
+        "kind": "track-statistics",
+        "provenance": {
+          "tool": "track-stats",
+          "version": "1.0.0",
+          "timestamp": "2026-01-15T16:49:20.623153Z",
+          "sources": [
+            {
+              "id": "track-001",
+              "kind": "track"
+            }
+          ],
+          "parameters": {}
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-4.1, 50.6]
+      }
+    }
+  ]
+}
+
+---
+
+## Validation
+
+$ debrief-cli validate tests/calc/fixtures/track-single.geojson
+✓ Validation passed: tests/calc/fixtures/track-single.geojson
+  Features: 1
+
+---
+
+## JSON Output Mode
+
+$ debrief-cli --json tools list
+{
+  "rows": [
+    {
+      "Name": "area-summary",
+      "Context": "region",
+      "Input Kinds": "zone, region, polygon",
+      "Description": "Summarize the geographic extent and properties of a region"
+    },
+    {
+      "Name": "range-bearing",
+      "Context": "multi",
+      "Input Kinds": "track",
+      "Description": "Calculate range and bearing between two tracks at sample points"
+    },
+    {
+      "Name": "track-stats",
+      "Context": "single",
+      "Input Kinds": "track",
+      "Description": "Calculate statistics for a single track"
+    }
+  ]
+}

@@ -17,7 +17,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Callable, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 import re
 
 
@@ -79,12 +79,11 @@ class ToolParameter(BaseModel):
             raise ValueError(f"type must be one of {valid_types}")
         return v
 
-    @field_validator("choices")
-    @classmethod
-    def validate_choices(cls, v: Optional[list], info) -> Optional[list]:
-        if info.data.get("type") == "enum" and not v:
+    @model_validator(mode="after")
+    def validate_enum_choices(self) -> "ToolParameter":
+        if self.type == "enum" and not self.choices:
             raise ValueError("choices must be provided when type is 'enum'")
-        return v
+        return self
 
 
 class ToolError(BaseModel):
@@ -116,19 +115,13 @@ class ToolResult(BaseModel):
     error: Optional[ToolError] = Field(default=None, description="Error details if not success")
     duration_ms: float = Field(..., description="Execution time in milliseconds")
 
-    @field_validator("features")
-    @classmethod
-    def validate_features_on_success(cls, v: Optional[list], info) -> Optional[list]:
-        if info.data.get("success") and v is None:
+    @model_validator(mode="after")
+    def validate_result_consistency(self) -> "ToolResult":
+        if self.success and self.features is None:
             raise ValueError("features must be provided when success is True")
-        return v
-
-    @field_validator("error")
-    @classmethod
-    def validate_error_on_failure(cls, v: Optional[ToolError], info) -> Optional[ToolError]:
-        if not info.data.get("success") and v is None:
+        if not self.success and self.error is None:
             raise ValueError("error must be provided when success is False")
-        return v
+        return self
 
 
 class SelectionContext(BaseModel):
@@ -144,24 +137,22 @@ class SelectionContext(BaseModel):
     features: list[dict[str, Any]] = Field(default_factory=list, description="Selected GeoJSON features")
     bounds: Optional[list[float]] = Field(default=None, description="Geographic bounds [minx, miny, maxx, maxy]")
 
-    @field_validator("features")
-    @classmethod
-    def validate_features_count(cls, v: list, info) -> list:
-        ctx_type = info.data.get("type")
-        if ctx_type == ContextType.SINGLE and len(v) != 1:
-            raise ValueError("features must have exactly 1 item when type is 'single'")
-        if ctx_type == ContextType.MULTI and len(v) < 2:
-            raise ValueError("features must have 2+ items when type is 'multi'")
-        return v
-
     @field_validator("bounds")
     @classmethod
-    def validate_bounds_for_region(cls, v: Optional[list], info) -> Optional[list]:
-        if info.data.get("type") == ContextType.REGION and v is None:
-            raise ValueError("bounds must be provided when type is 'region'")
+    def validate_bounds_format(cls, v: Optional[list]) -> Optional[list]:
         if v is not None and len(v) != 4:
             raise ValueError("bounds must be [minx, miny, maxx, maxy]")
         return v
+
+    @model_validator(mode="after")
+    def validate_context_requirements(self) -> "SelectionContext":
+        if self.type == ContextType.SINGLE and len(self.features) != 1:
+            raise ValueError("features must have exactly 1 item when type is 'single'")
+        if self.type == ContextType.MULTI and len(self.features) < 2:
+            raise ValueError("features must have 2+ items when type is 'multi'")
+        if self.type == ContextType.REGION and self.bounds is None:
+            raise ValueError("bounds must be provided when type is 'region'")
+        return self
 
     def get_kinds(self) -> set[str]:
         """Extract unique kinds from selected features."""

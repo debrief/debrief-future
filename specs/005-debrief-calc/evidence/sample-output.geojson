@@ -1,0 +1,39 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "stats-53d62108",
+      "properties": {
+        "source_track": "track-001",
+        "source_name": "HMS Example",
+        "statistics": {
+          "point_count": 9,
+          "duration_hours": 8.0,
+          "distance_nm": 56.89,
+          "average_speed_kts": 7.11
+        },
+        "kind": "track-statistics",
+        "provenance": {
+          "tool": "track-stats",
+          "version": "1.0.0",
+          "timestamp": "2026-01-15T16:49:50.091930Z",
+          "sources": [
+            {
+              "id": "track-001",
+              "kind": "track"
+            }
+          ],
+          "parameters": {}
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.1,
+          50.599999999999994
+        ]
+      }
+    }
+  ]
+}

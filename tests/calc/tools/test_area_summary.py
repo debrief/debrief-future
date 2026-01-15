@@ -117,9 +117,9 @@ class TestAreaSummaryEdgeCases:
     """Edge case tests for area-summary tool."""
 
     def test_invalid_bounds_returns_empty(self):
-        context = SelectionContext(type=ContextType.REGION, bounds=[1, 2])  # Invalid
-        # Note: This will fail validation before reaching the tool
-        # We test the tool directly
+        # Test that tool handles None bounds gracefully
+        # Note: SelectionContext with REGION type requires bounds,
+        # so we test the tool function directly with None bounds
         from debrief_calc.tools.area_summary import area_summary as fn
         from unittest.mock import MagicMock
 

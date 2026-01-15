@@ -191,24 +191,24 @@
 
 **Purpose**: Final quality improvements and evidence collection
 
-- [ ] T068 Run all tests and verify 100% pass rate
-- [ ] T069 Validate quickstart.md examples work as documented
-- [ ] T070 Code cleanup and docstring completion
-- [ ] T071 Verify all tool outputs include kind attribute (SC-008)
-- [ ] T072 Verify tool discovery filters correctly by kind (SC-009)
+- [x] T068 Run all tests and verify 100% pass rate
+- [x] T069 Validate quickstart.md examples work as documented
+- [x] T070 Code cleanup and docstring completion
+- [x] T071 Verify all tool outputs include kind attribute (SC-008)
+- [x] T072 Verify tool discovery filters correctly by kind (SC-009)
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T073 Create evidence directory: specs/005-debrief-calc/evidence/
-- [ ] T074 Capture test summary in evidence/test-summary.md (pass/fail counts, coverage)
-- [ ] T075 Record CLI usage demo in evidence/cli-demo.txt
-- [ ] T076 Capture sample GeoJSON output with provenance in evidence/sample-output.geojson
-- [ ] T077 Record Python API usage example in evidence/python-example.md
+- [x] T073 Create evidence directory: specs/005-debrief-calc/evidence/
+- [x] T074 Capture test summary in evidence/test-summary.md (pass/fail counts, coverage)
+- [x] T075 Record CLI usage demo in evidence/cli-demo.txt
+- [x] T076 Capture sample GeoJSON output with provenance in evidence/sample-output.geojson
+- [x] T077 Record Python API usage example in evidence/python-example.md
 
 ### Media Content
 
-- [ ] T078 Update planning-post.md to shipped-post.md with implementation results
-- [ ] T079 Update linkedin-planning.md to linkedin-shipped.md
+- [x] T078 Update planning-post.md to shipped-post.md with implementation results
+- [x] T079 Update linkedin-planning.md to linkedin-shipped.md
 
 ### Final Steps
 
