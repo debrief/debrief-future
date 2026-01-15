@@ -37,12 +37,12 @@
 
 **Purpose**: Project initialization and directory structure
 
-- [ ] T001 Create services/calc/ directory structure per plan.md
-- [ ] T002 Create services/cli/ directory structure per plan.md
-- [ ] T003 [P] Create pyproject.toml for debrief-calc package in services/calc/
-- [ ] T004 [P] Create pyproject.toml for debrief-cli package in services/cli/
-- [ ] T005 Create tests/calc/ and tests/cli/ directory structure
-- [ ] T006 [P] Create GeoJSON test fixtures in tests/calc/fixtures/ (track-single.geojson, tracks-pair.geojson, zone-region.geojson)
+- [x] T001 Create services/calc/ directory structure per plan.md
+- [x] T002 Create services/cli/ directory structure per plan.md
+- [x] T003 [P] Create pyproject.toml for debrief-calc package in services/calc/
+- [x] T004 [P] Create pyproject.toml for debrief-cli package in services/cli/
+- [x] T005 Create tests/calc/ and tests/cli/ directory structure
+- [x] T006 [P] Create GeoJSON test fixtures in tests/calc/fixtures/ (track-single.geojson, tracks-pair.geojson, zone-region.geojson)
 
 **Checkpoint**: Project scaffolding complete, ready for foundation work
 
@@ -54,17 +54,17 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Create ContextType enum in services/calc/models.py (SINGLE, MULTI, REGION, NONE)
-- [ ] T008 Create SelectionContext model in services/calc/models.py with type, features, and kind filtering
-- [ ] T009 [P] Create ToolParameter model in services/calc/models.py with name, type, default, required, description
-- [ ] T010 [P] Create Provenance model in services/calc/models.py with tool, version, timestamp, sources, parameters
-- [ ] T011 Create Tool model in services/calc/models.py with metadata, context_type, input_kinds, output_kind, parameters, handler
-- [ ] T012 Create ToolResult model in services/calc/models.py with tool, success, features, error, duration_ms, provenance
-- [ ] T013 Create ToolError model in services/calc/models.py with code, message, details
-- [ ] T014 Create exception hierarchy in services/calc/exceptions.py (DebriefCalcError base, ToolNotFoundError, InvalidContextError, KindMismatchError, ValidationError, ExecutionError)
-- [ ] T015 Create validation.py with validate_geojson() and validate_tool_output() functions
-- [ ] T016 Write unit tests for all models in tests/calc/test_models.py
-- [ ] T017 Write unit tests for exceptions in tests/calc/test_exceptions.py
+- [x] T007 Create ContextType enum in services/calc/models.py (SINGLE, MULTI, REGION, NONE)
+- [x] T008 Create SelectionContext model in services/calc/models.py with type, features, and kind filtering
+- [x] T009 [P] Create ToolParameter model in services/calc/models.py with name, type, default, required, description
+- [x] T010 [P] Create Provenance model in services/calc/models.py with tool, version, timestamp, sources, parameters
+- [x] T011 Create Tool model in services/calc/models.py with metadata, context_type, input_kinds, output_kind, parameters, handler
+- [x] T012 Create ToolResult model in services/calc/models.py with tool, success, features, error, duration_ms, provenance
+- [x] T013 Create ToolError model in services/calc/models.py with code, message, details
+- [x] T014 Create exception hierarchy in services/calc/exceptions.py (DebriefCalcError base, ToolNotFoundError, InvalidContextError, KindMismatchError, ValidationError, ExecutionError)
+- [x] T015 Create validation.py with validate_geojson() and validate_tool_output() functions
+- [x] T016 Write unit tests for all models in tests/calc/test_models.py
+- [x] T017 Write unit tests for exceptions in tests/calc/test_exceptions.py
 
 **Checkpoint**: Foundation ready — user story implementation can begin
 
@@ -78,14 +78,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T018 [US1] Create registry.py with ToolRegistry class and @tool() decorator
-- [ ] T019 [US1] Implement ToolRegistry.register() for tool registration
-- [ ] T020 [US1] Implement ToolRegistry.find_tools() filtering by context_type
-- [ ] T021 [US1] Implement ToolRegistry.find_tools() filtering by feature kinds
-- [ ] T022 [US1] Implement ToolRegistry.get_tool() to retrieve single tool by name
-- [ ] T023 [US1] Implement ToolRegistry.list_all() to return all registered tools
-- [ ] T024 [US1] Export public API in services/calc/__init__.py (registry, models)
-- [ ] T025 [US1] Write unit tests for registry in tests/calc/test_registry.py
+- [x] T018 [US1] Create registry.py with ToolRegistry class and @tool() decorator
+- [x] T019 [US1] Implement ToolRegistry.register() for tool registration
+- [x] T020 [US1] Implement ToolRegistry.find_tools() filtering by context_type
+- [x] T021 [US1] Implement ToolRegistry.find_tools() filtering by feature kinds
+- [x] T022 [US1] Implement ToolRegistry.get_tool() to retrieve single tool by name
+- [x] T023 [US1] Implement ToolRegistry.list_all() to return all registered tools
+- [x] T024 [US1] Export public API in services/calc/__init__.py (registry, models)
+- [x] T025 [US1] Write unit tests for registry in tests/calc/test_registry.py
 
 **Checkpoint**: Tool discovery works — can query tools by context and kind
 
@@ -99,20 +99,20 @@
 
 ### Implementation for User Story 2
 
-- [ ] T026 [US2] Create executor.py with run() function accepting tool_name, features, params
-- [ ] T027 [US2] Implement input validation in executor (context type, kind compatibility)
-- [ ] T028 [US2] Implement provenance.py with create_provenance() function
-- [ ] T029 [US2] Implement output validation ensuring kind attribute is set
-- [ ] T030 [US2] Implement error handling returning ToolResult with error details
-- [ ] T031 [P] [US2] Create tools/track_stats.py — single track analysis tool
-- [ ] T032 [P] [US2] Create tools/range_bearing.py — two-track comparison tool
-- [ ] T033 [P] [US2] Create tools/area_summary.py — regional analysis tool
-- [ ] T034 [US2] Create tools/__init__.py to auto-register built-in tools
-- [ ] T035 [US2] Write unit tests for executor in tests/calc/test_executor.py
-- [ ] T036 [US2] Write unit tests for provenance in tests/calc/test_provenance.py
-- [ ] T037 [P] [US2] Write unit tests for track_stats in tests/calc/tools/test_track_stats.py
-- [ ] T038 [P] [US2] Write unit tests for range_bearing in tests/calc/tools/test_range_bearing.py
-- [ ] T039 [P] [US2] Write unit tests for area_summary in tests/calc/tools/test_area_summary.py
+- [x] T026 [US2] Create executor.py with run() function accepting tool_name, features, params
+- [x] T027 [US2] Implement input validation in executor (context type, kind compatibility)
+- [x] T028 [US2] Implement provenance.py with create_provenance() function
+- [x] T029 [US2] Implement output validation ensuring kind attribute is set
+- [x] T030 [US2] Implement error handling returning ToolResult with error details
+- [x] T031 [P] [US2] Create tools/track_stats.py — single track analysis tool
+- [x] T032 [P] [US2] Create tools/range_bearing.py — two-track comparison tool
+- [x] T033 [P] [US2] Create tools/area_summary.py — regional analysis tool
+- [x] T034 [US2] Create tools/__init__.py to auto-register built-in tools
+- [x] T035 [US2] Write unit tests for executor in tests/calc/test_executor.py
+- [x] T036 [US2] Write unit tests for provenance in tests/calc/test_provenance.py
+- [x] T037 [P] [US2] Write unit tests for track_stats in tests/calc/tools/test_track_stats.py
+- [x] T038 [P] [US2] Write unit tests for range_bearing in tests/calc/tools/test_range_bearing.py
+- [x] T039 [P] [US2] Write unit tests for area_summary in tests/calc/tools/test_area_summary.py
 
 **Checkpoint**: Tool execution works — can run tools and get valid GeoJSON results
 
