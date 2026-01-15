@@ -73,6 +73,11 @@ classes:
   TrackProperties:
     description: Properties for a TrackFeature
     attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "TRACK"
       platform_id:
         description: Platform/vessel identifier
         required: true
@@ -135,6 +140,11 @@ classes:
   ReferenceLocationProperties:
     description: Properties for a ReferenceLocation
     attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "POINT"
       name:
         description: Reference location name
         required: true

@@ -96,6 +96,20 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
      'source_file': '/home/user/debrief-future/shared/schemas/src/linkml/debrief.yaml',
      'title': 'Debrief Maritime Analysis Schemas'} )
 
+class FeatureKindEnum(str, Enum):
+    """
+    Discriminator for GeoJSON feature types
+    """
+    TRACK = "TRACK"
+    """
+    Vessel track (LineString geometry)
+    """
+    POINT = "POINT"
+    """
+    Reference point/location (Point geometry)
+    """
+
+
 class TrackTypeEnum(str, Enum):
     """
     Type of track feature
@@ -225,6 +239,8 @@ class TrackProperties(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
+    kind: Literal["TRACK"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'ReferenceLocationProperties'],
+         'equals_string': 'TRACK'} })
     platform_id: str = Field(default=..., description="""Platform/vessel identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     platform_name: Optional[str] = Field(default=None, description="""Human-readable platform name""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     track_type: TrackTypeEnum = Field(default=..., description="""Type of track""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
@@ -259,6 +275,8 @@ class ReferenceLocationProperties(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
+    kind: Literal["POINT"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties', 'ReferenceLocationProperties'],
+         'equals_string': 'POINT'} })
     name: str = Field(default=..., description="""Reference location name""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
     location_type: LocationTypeEnum = Field(default=..., description="""Type of reference""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
     description: Optional[str] = Field(default=None, description="""Additional description""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
