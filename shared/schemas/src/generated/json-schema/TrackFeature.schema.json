@@ -43,6 +43,15 @@
   "title": "TrackFeature",
   "type": "object",
   "$defs": {
+    "FeatureKindEnum": {
+      "description": "Discriminator for GeoJSON feature types",
+      "enum": [
+        "TRACK",
+        "POINT"
+      ],
+      "title": "FeatureKindEnum",
+      "type": "string"
+    },
     "GeoJSONLineString": {
       "additionalProperties": false,
       "description": "GeoJSON LineString geometry",
@@ -180,6 +189,11 @@
             "null"
           ]
         },
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "POINT",
+          "description": "Feature type discriminator"
+        },
         "location_type": {
           "$ref": "#/$defs/LocationTypeEnum",
           "description": "Type of reference"
@@ -213,6 +227,7 @@
         }
       },
       "required": [
+        "kind",
         "name",
         "location_type"
       ],
@@ -329,6 +344,11 @@
           "format": "date-time",
           "type": "string"
         },
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "TRACK",
+          "description": "Feature type discriminator"
+        },
         "platform_id": {
           "description": "Platform/vessel identifier",
           "type": "string"
@@ -366,6 +386,7 @@
         }
       },
       "required": [
+        "kind",
         "platform_id",
         "track_type",
         "start_time",

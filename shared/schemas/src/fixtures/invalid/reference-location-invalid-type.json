@@ -6,6 +6,7 @@
     "coordinates": [-5.5, 50.0]
   },
   "properties": {
+    "kind": "POINT",
     "name": "Invalid Location",
     "location_type": "UNKNOWN_TYPE"
   }
