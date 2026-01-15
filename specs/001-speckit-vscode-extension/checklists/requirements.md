@@ -7,7 +7,7 @@
 
 ## Content Quality
 
-- [x] No implementation details (languages, frameworks, APIs)
+- [x] No implementation details (languages, frameworks, APIs) - *except Leaflet per design decision*
 - [x] Focused on user value and business needs
 - [x] Written for non-technical stakeholders
 - [x] All mandatory sections completed
@@ -40,18 +40,17 @@
 ## UI Design Review *(completed)*
 
 - [x] Extension layout wireframe reviewed and approved
-- [x] Catalog browser tree view design reviewed
-- [x] Map panel layout and toolbar reviewed
+- [x] Sidebar design reviewed (Time, Tools, Layers - no Catalogs)
+- [x] Map panel layout with floating toolbar reviewed
 - [x] Selection interaction model approved (click, shift+click, ctrl+click)
-- [x] Tools panel location and layout reviewed
 - [x] Empty and error state designs reviewed
-- [x] All 12 design review questions addressed
+- [x] All 18 design review questions addressed
 
-## Design Review Decisions
+## Design Review Decisions (18 total)
 
 | # | Question | Decision |
 |---|----------|----------|
-| 1 | Catalog browser location | Sidebar |
+| 1 | ~~Catalog browser location~~ | ~~Sidebar~~ *(superseded by #13)* |
 | 2 | Selection feedback | Color + glow effect |
 | 3 | Time range control | Sidebar, permanently visible |
 | 4 | Tools panel location | Sidebar secondary view |
@@ -63,12 +62,19 @@
 | 10 | Initial map view | Fit all tracks |
 | 11 | Export capabilities | Image export only |
 | 12 | Settings location | VS Code settings |
+| 13 | Data loading method | Explorer + Command palette |
+| 14 | Map library | Leaflet |
+| 15 | Toolbar position | Floating over map (top-left) |
+| 16 | Scale control | On map (bottom-right) |
+| 17 | Selection display | VS Code Outline panel |
+| 18 | Welcome state | Show recent plots |
 
 ## Notes
 
 - All specification quality items pass validation
-- All 12 UI design review questions resolved on 2026-01-15
-- 24 functional requirements defined (FR-001 through FR-024)
+- All 18 UI design review questions resolved on 2026-01-15
+- 31 functional requirements defined (FR-001 through FR-031)
 - 8 measurable success criteria align with tracer bullet exit criteria
 - Detailed ASCII wireframes for all major UI components
-- **Spec ready for `/speckit.clarify` or `/speckit.plan`**
+- Leaflet specified as map library (technology constraint accepted)
+- **Spec ready for `/speckit.plan`**

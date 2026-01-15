@@ -109,6 +109,13 @@ A new analyst installs the extension but has no STAC stores configured. They use
 - **FR-022**: Extension MUST open plots with map view fitted to all track bounds
 - **FR-023**: Extension MUST provide PNG export of current map view
 - **FR-024**: Extension MUST expose settings (glow effect, default colors) via VS Code settings.json
+- **FR-025**: Extension MUST register STAC stores as virtual folders in VS Code Explorer panel
+- **FR-026**: Extension MUST support drag-and-drop of plots from Explorer to open them
+- **FR-027**: Extension MUST provide "Debrief: Open Plot" command in Command Palette
+- **FR-028**: Extension MUST display a scale control on the map
+- **FR-029**: Extension MUST show selected tracks in VS Code's Outline panel
+- **FR-030**: Extension MUST display a welcome screen with recent plots when no plot is open
+- **FR-031**: Extension MUST track recently opened plots for quick access
 
 ### Key Entities
 
@@ -121,94 +128,102 @@ A new analyst installs the extension but has no STAC stores configured. They use
 
 ## User Interface Design
 
-> **Design Review Required**: This section describes the proposed UI layout and interactions.
-> Review and approve before proceeding to implementation planning.
+> **Design Review Status**: Wireframes reviewed and approved on 2026-01-15.
 
 ### Extension Layout Overview
 
-The extension uses VS Code's standard extension patterns: a sidebar view for navigation and webview panels for rich content display.
+The extension uses VS Code's standard extension patterns: Explorer panel for data browsing, a sidebar view for analysis controls, and webview panels for map display.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────┐
 │  VS Code Window                                                                  │
 ├────────┬───────────────────────┬─────────────────────────────────────────────────┤
 │        │                       │                                                 │
-│ Activity│  Debrief Sidebar     │              Editor Area                        │
-│  Bar   │                       │  ┌───────────────────────────────────────────┐  │
-│        │ ┌───────────────────┐ │  │                                           │  │
-│ ┌────┐ │ │ CATALOGS      [+] │ │  │           Map Panel (Webview)             │  │
-│ │ 🗂️ │ │ │ ▼ Local Data      │ │  │                                           │  │
-│ └────┘ │ │   📊 Exercise A   │ │  │  Track A ════════════════►  (glow)       │  │
-│ ┌────┐ │ │   📊 Exercise B   │ │  │                                           │  │
-│ │ 🔍 │ │ ├───────────────────┤ │  │       Track B ─────────────►             │  │
-│ └────┘ │ │ TIME RANGE        │ │  │                   ◉ Reference             │  │
-│ ┌────┐ │ │ ◀════●══════════▶ │ │  │                                           │  │
-│ │ ⚓ │◄├─│ 09:30  11:45 14:00│ │  │  ┌─────────────────────┐                  │  │
-│ └────┘ │ ├───────────────────┤ │  │  │ HMS Defender        │                  │  │
-│ Debrief│ │ TOOLS (2 tracks)  │ │  │  │ Platform: Destroyer │                  │  │
-│  Icon  │ │ 📐 Range & Brg [▶]│ │  │  └─────────────────────┘                  │  │
-│        │ │ 📏 CPA        [▶]│ │  │                                           │  │
-│        │ ├───────────────────┤ │  │  [🔍+] [🔍-] [🎯 Fit]    Selection: 1    │  │
-│        │ │ LAYERS            │ │  └───────────────────────────────────────────┘  │
+│ Activity│  Explorer            │              Editor Area                        │
+│  Bar   │  (with STAC stores)  │  ┌───────────────────────────────────────────┐  │
+│        │ ┌───────────────────┐ │  │  ┌─────────────────────────┐             │  │
+│ ┌────┐ │ │ ▼ 📁 Project Files │ │  │  │ [🔍+] [🔍-] [🎯] [📷] │ ← Floating  │  │
+│ │ 🗂️◄├─│ │ ▼ 📁 STAC: Local   │ │  │  └─────────────────────────┘   toolbar  │  │
+│ └────┘ │ │   📊 Exercise A    │ │  │                                         │  │
+│ ┌────┐ │ │   📊 Exercise B    │ │  │  HMS Defender ════════════►  (glow)    │  │
+│ │ 🔍 │ │ │ ▶ 📁 STAC: Archive │ │  │       Track B ─────────────►           │  │
+│ └────┘ │ └───────────────────┘ │  │                   ◉ Reference           │  │
+│ ┌────┐ │                       │  │                                         │  │
+│ │ ⚓ │ │  Debrief Sidebar      │  │                        ┌────────────┐   │  │
+│ └────┘ │ ┌───────────────────┐ │  │                        │ ├─┤ 500m  │   │  │
+│ Debrief│ │ TIME RANGE        │ │  │                        └────────────┘   │  │
+│  Icon  │ │ ◀════●══════════▶ │ │  │                          ↑ Scale       │  │
+│        │ ├───────────────────┤ │  └───────────────────────────────────────────┘  │
+│        │ │ TOOLS (2 tracks)  │ │                                                 │
+│        │ │ 📐 Range & Brg [▶]│ │                                                 │
+│        │ ├───────────────────┤ │                                                 │
+│        │ │ LAYERS            │ │                                                 │
 │        │ │ ☑ HMS Defender    │ │                                                 │
 │        │ │ ☑ USS Freedom     │ │                                                 │
-│        │ │ ☑ Range (result)  │ │                                                 │
 │        │ └───────────────────┘ │                                                 │
 └────────┴───────────────────────┴─────────────────────────────────────────────────┘
 ```
 
 **Layout Key Points**:
-- All controls consolidated in sidebar for single-pane workflow
-- Map panel maximizes screen real estate for visualization
-- Multiple plot tabs supported in editor area
-- No bottom panel needed—tools and layers in sidebar
+- STAC stores appear in VS Code Explorer panel (drag or double-click to open)
+- Command palette provides quick access: `Debrief: Open Plot`
+- Debrief sidebar contains only analysis controls (Time, Tools, Layers)
+- Selection shown in VS Code's Outline panel
+- Map toolbar floats over map canvas (top-left)
+- Scale control on map (bottom-right)
+
+### Data Loading
+
+Plots are loaded via two methods:
+
+**1. Explorer Panel**:
+- STAC stores appear as virtual folders prefixed "STAC:"
+- Drag plot onto editor area, or double-click to open
+- Right-click for context menu (Open, Show in Finder/Explorer)
+
+**2. Command Palette**:
+- `Ctrl+Shift+P` → "Debrief: Open Plot"
+- Searchable quick pick of all plots across registered stores
+- Recently opened plots appear first
 
 ### Sidebar: Debrief Control Panel
 
-Located in the VS Code sidebar when the Debrief icon is clicked. Contains four collapsible sections providing complete control over the analysis workflow.
+Located in the VS Code sidebar when the Debrief icon is clicked. Contains three collapsible sections for analysis workflow.
 
 ```
 ┌─────────────────────────────────┐
-│  CATALOGS                  [+] │  ← Add Store button
-├─────────────────────────────────┤
-│  ▼ 📁 Local Exercise Data       │  ← Store (expandable)
-│    ├─ 📊 Exercise Alpha         │  ← Plot (clickable)
-│    │     2024-03-15 09:30       │
-│    ├─ 📊 Exercise Beta          │
-│    └─ 📊 Training Run 1         │
-│  ▶ 📁 Archived Plots            │
-├─────────────────────────────────┤
 │  TIME RANGE                [▼] │  ← Collapsible header
 ├─────────────────────────────────┤
-│  ◀═══════●═══════════════════▶ │  ← Time slider
+│                                 │
+│  ◀═══════●═══════════════════▶ │  ← Dual-handle slider
 │  09:30       11:45       14:00 │
+│                                 │
 │  [Full Range] [Fit to Selection]│
+│                                 │
 ├─────────────────────────────────┤
 │  TOOLS                     [▼] │  ← Context-sensitive
 ├─────────────────────────────────┤
+│                                 │
 │  Selection: 2 tracks            │
 │  ┌───────────────────────────┐ │
-│  │ 📐 Range & Bearing   [▶] │ │  ← Execute button
+│  │ 📐 Range & Bearing   [▶] │ │
 │  │ 📏 Closest Approach  [▶] │ │
 │  │ 🔄 Relative Motion   [▶] │ │
 │  └───────────────────────────┘ │
+│                                 │
 ├─────────────────────────────────┤
 │  LAYERS                    [▼] │  ← Layer management
 ├─────────────────────────────────┤
-│  ☑ 🚢 HMS Defender (source)    │  ← Visibility toggle
+│                                 │
+│  ☑ 🚢 HMS Defender (source)    │
 │  ☑ 🚢 USS Freedom (source)     │
-│  ☑ 📐 Range & Bearing (result) │  ← Result layer
+│  ───────────────────────────── │  ← Separator
+│  ☑ 📐 Range & Bearing (result) │
+│                                 │
 │  [Clear Results]               │
+│                                 │
 └─────────────────────────────────┘
 ```
-
-**Catalog Browser Interactions**:
-- Single-click on store → Expand/collapse
-- Single-click on plot → Open in map panel
-- Double-click on plot → Open and fit map bounds to plot extent
-- Right-click on store → Context menu (Remove, Refresh)
-- Right-click on plot → Context menu (Open, Show in Explorer)
-- [+] button → Quick add store dialog
 
 **Time Range Interactions**:
 - Drag slider handles to filter visible time range
@@ -228,40 +243,45 @@ Located in the VS Code sidebar when the Debrief icon is clicked. Contains four c
 
 ### Map Panel (Webview)
 
-The primary workspace showing geospatial data. Opens as an editor tab.
+The primary workspace showing geospatial data. Opens as an editor tab. Uses Leaflet for map rendering.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  📊 Exercise Alpha                                    [×]       │  ← Tab title
+│  📊 Exercise Alpha                              [×]             │
 ├─────────────────────────────────────────────────────────────────┤
 │  ┌───────────────────────────────────────────────────────────┐  │
+│  │  ┌─────────────────────────┐                              │  │
+│  │  │ [🔍+] [🔍-] [🎯] [📷]  │  ← Floating toolbar          │  │
+│  │  └─────────────────────────┘    (top-left)                │  │
 │  │                                                           │  │
-│  │                    Map Canvas                             │  │
+│  │   HMS Defender ════════════════════════►                  │  │
+│  │   ↑ label        ╲                                        │  │
+│  │                   ╲  (glow effect on selected)            │  │
 │  │                                                           │  │
-│  │   HMS Defender ════════════════════════►                  │  │  ← Track (thick = selected)
-│  │                   (hover: tooltip)                        │  │
-│  │        USS Freedom ─────────────────►                     │  │  ← Track (thin = unselected)
+│  │        USS Freedom ─────────────────►                     │  │
 │  │                                                           │  │
-│  │                         ◉ Alpha Point                     │  │  ← Reference location
+│  │                         ◉ Alpha Point                     │  │
 │  │                                                           │  │
 │  │  ┌─────────────────────┐                                  │  │
 │  │  │ HMS Defender        │  ← Tooltip on hover              │  │
 │  │  │ Platform: Destroyer │                                  │  │
 │  │  │ Points: 1,247       │                                  │  │
+│  │  │ Time: 09:30 - 14:00 │                                  │  │
 │  │  └─────────────────────┘                                  │  │
 │  │                                                           │  │
+│  │                                    ┌──────────────┐       │  │
+│  │                                    │ ├──┤ 500m    │       │  │
+│  │                                    └──────────────┘       │  │
+│  │                                      ↑ Scale control      │  │
 │  └───────────────────────────────────────────────────────────┘  │
-│                                                                 │
-│  ┌─────────────────────────────────────────────────────────┐    │
-│  │ 🔍+ │ 🔍- │ 🎯 Fit │ 🗺️ Layers ▼ │     Selection: 1 track │    │  ← Toolbar
-│  └─────────────────────────────────────────────────────────┘    │
-│                                                                 │
-│  ┌─────────────────────────────────────────────────────────┐    │
-│  │ ◀ ════════════●══════════════════════════════════ ▶     │    │  ← Time range slider
-│  │   09:30                  11:45                   14:00  │    │    (optional, P2)
-│  └─────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+**Toolbar Buttons**:
+- 🔍+ Zoom in
+- 🔍- Zoom out
+- 🎯 Fit to bounds (zoom to show all tracks)
+- 📷 Export as PNG
 
 **Visual Design - Track Colors**:
 - Unselected tracks: Muted colors (grays, light blues) with thin stroke
@@ -327,28 +347,47 @@ Error:         [⚠️ Failed - Retry]    ← Red, clickable
 
 ### Empty & Error States
 
-**No Stores Configured**:
+**Welcome State (No Plot Open)**:
 ```
-┌─────────────────────────────────┐
-│  DEBRIEF CATALOGS               │
-├─────────────────────────────────┤
-│                                 │
-│      📭 No catalogs found       │
-│                                 │
-│   Add a STAC store to browse    │
-│   your maritime plot data.      │
-│                                 │
-│      [+ Add Store]              │
-│                                 │
-│   Learn more about STAC stores  │
-│                                 │
-└─────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│                                                                 │
+│                     ⚓ Debrief                                  │
+│                                                                 │
+│              Open a plot to get started                         │
+│                                                                 │
+│     • Drag a plot from Explorer onto this area                  │
+│     • Or use  Ctrl+Shift+P → "Debrief: Open Plot"              │
+│                                                                 │
+│              ────────────────────────────                       │
+│                                                                 │
+│              Recent plots:                                      │
+│              📊 Exercise Alpha (2 hours ago)                    │
+│              📊 Training Run 1 (yesterday)                      │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-**Store Path Invalid**:
+**No STAC Stores Registered**:
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│                     📭 No data stores found                     │
+│                                                                 │
+│     Register a STAC store to browse your plot data.             │
+│                                                                 │
+│                   [+ Add Store]                                 │
+│                                                                 │
+│     A STAC store is a folder containing maritime plot data.     │
+│     Learn more about STAC stores →                              │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Store Path Invalid** (in Explorer):
 ```
 ┌─────────────────────────────────┐
-│  ▼ 📁 Local Exercise Data       │
+│  ▼ 📁 STAC: Local Data          │
 │    ⚠️ Path not found            │
 │    /old/path/to/catalog         │
 │    [Remove] [Update Path]       │
@@ -358,12 +397,14 @@ Error:         [⚠️ Failed - Retry]    ← Red, clickable
 **Tool Execution Error**:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  ⚠️ Tool execution failed                              [Dismiss] │
+│  ⚠️ Range & Bearing Calculator failed                 [Dismiss] │
+├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  Range & Bearing Calculator encountered an error:               │
-│  "Tracks have no overlapping time range"                        │
+│  Error: Tracks have no overlapping time range                   │
 │                                                                 │
-│  Suggestion: Select tracks from the same time period.           │
+│  💡 Suggestion: Select tracks from the same time period,        │
+│     or adjust the time range filter in the sidebar.             │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -403,7 +444,7 @@ The following design decisions were made during review on 2026-01-15:
 
 | # | Question | Decision | Rationale |
 |---|----------|----------|-----------|
-| 1 | Catalog browser location | **Sidebar** | Standard VS Code pattern, familiar to users |
+| 1 | ~~Catalog browser location~~ | ~~Sidebar~~ | *Superseded by #13* |
 | 2 | Selection feedback | **Color + glow effect** | Enhanced visibility with animated highlight |
 | 3 | Time range control | **Sidebar, permanently visible** | Always accessible for time-based analysis |
 | 4 | Tools panel location | **Sidebar secondary view** | Integrated experience, always visible |
@@ -415,12 +456,19 @@ The following design decisions were made during review on 2026-01-15:
 | 10 | Initial map view | **Fit all tracks** | Zoom to fit all tracks with padding |
 | 11 | Export capabilities | **Image export only** | Export map view as PNG for reports |
 | 12 | Settings location | **VS Code settings** | Use settings.json, syncs across devices |
+| 13 | Data loading method | **Explorer + Command palette** | Catalogs not in sidebar; use Explorer drag or Cmd+P |
+| 14 | Map library | **Leaflet** | Lightweight, well-documented, plugin ecosystem |
+| 15 | Toolbar position | **Floating over map (top-left)** | Maximizes map canvas, familiar pattern |
+| 16 | Scale control | **On map (bottom-right)** | Standard Leaflet control position |
+| 17 | Selection display | **VS Code Outline panel** | Native VS Code integration, no custom UI |
+| 18 | Welcome state | **Show recent plots** | Quick access to recently opened data |
 
-**Key Architectural Decision**: The sidebar serves as the primary control center, containing:
-- Catalog browser (top)
-- Time range slider (middle)
-- Tools panel (below time slider)
+**Key Architectural Decision**: The sidebar contains only analysis controls:
+- Time range slider (top)
+- Tools panel (middle)
 - Layer management panel (bottom)
+
+Data browsing happens in VS Code's Explorer panel (STAC stores as virtual folders).
 
 **Additional Design Notes**:
 - Keyboard shortcuts follow VS Code conventions (Ctrl+A, Delete, arrow keys)
@@ -428,6 +476,7 @@ The following design decisions were made during review on 2026-01-15:
 - Users can customize track colors via right-click context menu
 - Map opens fitted to all track bounds with padding
 - PNG export available for including map views in reports
+- Leaflet provides map rendering with scale control
 - Extension settings live in VS Code's settings.json
 
 ## Success Criteria *(mandatory)*
@@ -450,6 +499,7 @@ The following design decisions were made during review on 2026-01-15:
 - The debrief-calc service is available locally for tool discovery and execution
 - Plots contain valid GeoJSON data conforming to the Debrief schema
 - Users have sufficient local storage to hold STAC catalogs and tool results
+- **Technology choice**: Leaflet will be used for map rendering (per design decision #14)
 
 ## Dependencies
 
