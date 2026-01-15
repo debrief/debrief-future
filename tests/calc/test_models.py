@@ -1,19 +1,19 @@
 """Unit tests for debrief-calc models."""
 
-import pytest
 from datetime import datetime
-from pydantic import ValidationError as PydanticValidationError
 
+import pytest
 from debrief_calc.models import (
     ContextType,
+    Provenance,
     SelectionContext,
+    SourceRef,
     Tool,
+    ToolError,
     ToolParameter,
     ToolResult,
-    ToolError,
-    Provenance,
-    SourceRef,
 )
+from pydantic import ValidationError as PydanticValidationError
 
 
 class TestContextType:

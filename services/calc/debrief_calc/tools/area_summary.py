@@ -6,8 +6,8 @@ Summarizes features within a geographic region (bounding box or polygon).
 
 from __future__ import annotations
 
-from typing import Any
 import uuid
+from typing import Any
 
 from debrief_calc.models import ContextType, SelectionContext, ToolParameter
 from debrief_calc.registry import tool

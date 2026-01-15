@@ -1,10 +1,9 @@
 """Unit tests for debrief-calc registry."""
 
 import pytest
-
-from debrief_calc.models import ContextType, Tool, ToolParameter, SelectionContext
-from debrief_calc.registry import ToolRegistry, tool
 from debrief_calc.exceptions import ToolNotFoundError
+from debrief_calc.models import ContextType, SelectionContext, Tool, ToolParameter
+from debrief_calc.registry import ToolRegistry
 
 
 @pytest.fixture
@@ -189,7 +188,7 @@ class TestToolDecorator:
     def test_decorator_registers_tool(self, fresh_registry):
         # Use a fresh registry to avoid pollution
         from debrief_calc import registry as global_registry
-        initial_count = len(global_registry)
+        _ = len(global_registry)  # Verify registry is accessible
 
         # Note: We can't easily test the decorator without modifying global state
         # So we test registration manually instead

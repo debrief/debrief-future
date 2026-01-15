@@ -1,11 +1,11 @@
 """Unit tests for area-summary tool."""
 
-import pytest
 import json
 from pathlib import Path
 
+import pytest
 from debrief_calc.models import ContextType, SelectionContext
-from debrief_calc.tools.area_summary import area_summary, _point_in_bbox, _calculate_bbox_area_sq_nm
+from debrief_calc.tools.area_summary import _calculate_bbox_area_sq_nm, _point_in_bbox, area_summary
 
 
 @pytest.fixture
@@ -120,8 +120,9 @@ class TestAreaSummaryEdgeCases:
         # Test that tool handles None bounds gracefully
         # Note: SelectionContext with REGION type requires bounds,
         # so we test the tool function directly with None bounds
-        from debrief_calc.tools.area_summary import area_summary as fn
         from unittest.mock import MagicMock
+
+        from debrief_calc.tools.area_summary import area_summary as fn
 
         mock_context = MagicMock()
         mock_context.bounds = None

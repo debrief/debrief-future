@@ -8,12 +8,10 @@ from __future__ import annotations
 
 import json
 import sys
-from pathlib import Path
 
 import click
 
-from debrief_cli.main import pass_context, Context
-from debrief_cli.output import OutputFormatter
+from debrief_cli.main import Context, pass_context
 
 
 @click.command()
@@ -96,9 +94,8 @@ def _check_kind_attribute(data: dict) -> list[str]:
         for i, feature in enumerate(data.get("features", [])):
             if not feature.get("properties", {}).get("kind"):
                 errors.append(f"features[{i}]: missing 'kind' attribute in properties")
-    elif data.get("type") == "Feature":
-        if not data.get("properties", {}).get("kind"):
-            errors.append("Feature missing 'kind' attribute in properties")
+    elif data.get("type") == "Feature" and not data.get("properties", {}).get("kind"):
+        errors.append("Feature missing 'kind' attribute in properties")
 
     return errors
 

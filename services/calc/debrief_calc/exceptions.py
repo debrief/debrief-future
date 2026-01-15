@@ -6,13 +6,13 @@ all debrief-calc errors with a single except clause while still allowing
 specific error handling when needed.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 
 class DebriefCalcError(Exception):
     """Base exception for all debrief-calc errors."""
 
-    def __init__(self, message: str, details: Optional[dict[str, Any]] = None):
+    def __init__(self, message: str, details: dict[str, Any] | None = None):
         super().__init__(message)
         self.message = message
         self.details = details or {}
@@ -87,7 +87,7 @@ class KindMismatchError(DebriefCalcError):
 class ValidationError(DebriefCalcError):
     """Raised when input or output fails schema validation."""
 
-    def __init__(self, message: str, validation_errors: Optional[list[dict[str, Any]]] = None):
+    def __init__(self, message: str, validation_errors: list[dict[str, Any]] | None = None):
         super().__init__(
             message,
             {"validation_errors": validation_errors or []}

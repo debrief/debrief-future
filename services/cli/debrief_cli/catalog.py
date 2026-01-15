@@ -13,9 +13,7 @@ from pathlib import Path
 
 import click
 
-from debrief_cli.main import pass_context, Context
-from debrief_cli.output import OutputFormatter
-
+from debrief_cli.main import Context, pass_context
 
 # Placeholder for store configuration
 # In full implementation, this would come from debrief-config via XDG config

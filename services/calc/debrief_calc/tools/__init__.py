@@ -11,9 +11,7 @@ Built-in tools:
 """
 
 # Import tools to trigger registration via @tool decorator
-from debrief_calc.tools import track_stats
-from debrief_calc.tools import range_bearing
-from debrief_calc.tools import area_summary
+from debrief_calc.tools import area_summary, range_bearing, track_stats
 
 __all__ = [
     "track_stats",

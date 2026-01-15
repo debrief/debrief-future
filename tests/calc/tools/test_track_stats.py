@@ -1,11 +1,11 @@
 """Unit tests for track-stats tool."""
 
-import pytest
 import json
 from pathlib import Path
 
+import pytest
 from debrief_calc.models import ContextType, SelectionContext
-from debrief_calc.tools.track_stats import track_stats, _haversine_distance, _calculate_track_stats
+from debrief_calc.tools.track_stats import _calculate_track_stats, _haversine_distance, track_stats
 
 
 @pytest.fixture

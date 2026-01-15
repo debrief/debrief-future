@@ -1,6 +1,5 @@
 """Integration tests for MCP server."""
 
-import json
 import pytest
 
 # Skip all tests if MCP is not installed
@@ -74,10 +73,10 @@ class TestMCPErrorCodes:
 
     def test_error_codes_defined(self):
         from debrief_calc.mcp.server import (
-            ERROR_TOOL_NOT_FOUND,
+            ERROR_EXECUTION_FAILED,
             ERROR_INVALID_CONTEXT,
             ERROR_KIND_MISMATCH,
-            ERROR_EXECUTION_FAILED
+            ERROR_TOOL_NOT_FOUND,
         )
 
         assert ERROR_TOOL_NOT_FOUND == "TOOL_NOT_FOUND"

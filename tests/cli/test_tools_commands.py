@@ -1,10 +1,10 @@
 """Tests for CLI tools commands."""
 
 import json
-import pytest
 from pathlib import Path
-from click.testing import CliRunner
 
+import pytest
+from click.testing import CliRunner
 from debrief_cli.main import cli
 
 

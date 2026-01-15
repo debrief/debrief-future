@@ -5,7 +5,7 @@ Provides functions to validate GeoJSON structures and tool outputs
 against the Debrief schema requirements.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from debrief_calc.exceptions import ValidationError
 
@@ -173,7 +173,7 @@ def validate_tool_output(
         )
 
 
-def validate_feature_kind(feature: dict[str, Any], accepted_kinds: list[str]) -> Optional[str]:
+def validate_feature_kind(feature: dict[str, Any], accepted_kinds: list[str]) -> str | None:
     """
     Check if a feature's kind is in the accepted list.
 

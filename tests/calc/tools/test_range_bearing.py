@@ -1,11 +1,11 @@
 """Unit tests for range-bearing tool."""
 
-import pytest
 import json
 from pathlib import Path
 
+import pytest
 from debrief_calc.models import ContextType, SelectionContext
-from debrief_calc.tools.range_bearing import range_bearing, _calculate_bearing, _calculate_range
+from debrief_calc.tools.range_bearing import _calculate_bearing, _calculate_range, range_bearing
 
 
 @pytest.fixture

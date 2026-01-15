@@ -1,14 +1,13 @@
 """Unit tests for debrief-calc provenance module."""
 
-import pytest
 from datetime import datetime
 
+from debrief_calc.models import Provenance, SourceRef
 from debrief_calc.provenance import (
-    create_provenance,
     attach_provenance,
+    create_provenance,
     set_output_kind,
 )
-from debrief_calc.models import Provenance, SourceRef
 
 
 class TestCreateProvenance:

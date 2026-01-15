@@ -7,6 +7,7 @@ Provides the root CLI group and global options.
 from __future__ import annotations
 
 import sys
+
 import click
 
 from debrief_cli.output import OutputFormatter
@@ -47,14 +48,19 @@ def cli(ctx: Context, json_mode: bool):
     ctx.json_mode = json_mode
 
 
-# Import and register subcommand groups
-from debrief_cli.tools import tools
-from debrief_cli.validate import validate
-from debrief_cli.catalog import catalog
+def _register_commands():
+    """Register subcommand groups (deferred to avoid E402)."""
+    from debrief_cli.catalog import catalog
+    from debrief_cli.tools import tools
+    from debrief_cli.validate import validate
 
-cli.add_command(tools)
-cli.add_command(validate)
-cli.add_command(catalog)
+    cli.add_command(tools)
+    cli.add_command(validate)
+    cli.add_command(catalog)
+
+
+# Register commands at module load
+_register_commands()
 
 
 def main():

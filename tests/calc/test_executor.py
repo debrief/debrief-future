@@ -1,17 +1,14 @@
 """Unit tests for debrief-calc executor."""
 
 import pytest
-
-from debrief_calc.models import ContextType, SelectionContext, Tool
-from debrief_calc.registry import registry
 from debrief_calc.executor import run
+from debrief_calc.models import ContextType, SelectionContext
 
 
 @pytest.fixture(autouse=True)
 def setup_registry():
     """Ensure registry has test tools."""
     # Import built-in tools to register them
-    from debrief_calc.tools import track_stats, range_bearing, area_summary
     yield
 
 

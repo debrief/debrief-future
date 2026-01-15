@@ -25,11 +25,12 @@ Usage:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from debrief_calc.models import ContextType, Tool, ToolParameter, SelectionContext
 from debrief_calc.exceptions import ToolNotFoundError
+from debrief_calc.models import ContextType, SelectionContext, Tool, ToolParameter
 
 if TYPE_CHECKING:
     pass
@@ -80,8 +81,8 @@ class ToolRegistry:
 
     def find_tools(
         self,
-        context_type: Optional[ContextType] = None,
-        kinds: Optional[set[str]] = None
+        context_type: ContextType | None = None,
+        kinds: set[str] | None = None
     ) -> list[Tool]:
         """
         Find tools matching the given criteria.
@@ -103,11 +104,9 @@ class ToolRegistry:
             if context_type is not None and tool.context_type != context_type:
                 continue
 
-            # Filter by kinds if specified
-            if kinds is not None:
-                # Tool must accept at least one of the provided kinds
-                if not any(tool.accepts_kind(k) for k in kinds):
-                    continue
+            # Filter by kinds if specified - tool must accept at least one of the provided kinds
+            if kinds is not None and not any(tool.accepts_kind(k) for k in kinds):
+                continue
 
             results.append(tool)
 
@@ -183,7 +182,7 @@ def tool(
     output_kind: str,
     context_type: ContextType,
     version: str = "1.0.0",
-    parameters: Optional[list[ToolParameter]] = None
+    parameters: list[ToolParameter] | None = None
 ) -> Callable:
     """
     Decorator to register a function as a tool.

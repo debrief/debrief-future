@@ -58,7 +58,7 @@ class OutputFormatter:
         """Output a table."""
         if self.json_mode:
             self._data["rows"] = [
-                dict(zip(headers, row)) for row in rows
+                dict(zip(headers, row, strict=True)) for row in rows
             ]
         else:
             # Calculate column widths

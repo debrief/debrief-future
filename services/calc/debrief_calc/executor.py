@@ -13,22 +13,22 @@ from __future__ import annotations
 import time
 from typing import Any
 
+from debrief_calc.exceptions import (
+    ExecutionError,
+    InvalidContextError,
+    KindMismatchError,
+    ToolNotFoundError,
+    ValidationError,
+)
 from debrief_calc.models import (
     ContextType,
     SelectionContext,
     Tool,
-    ToolResult,
     ToolError,
+    ToolResult,
 )
+from debrief_calc.provenance import attach_provenance, create_provenance, set_output_kind
 from debrief_calc.registry import registry
-from debrief_calc.exceptions import (
-    ToolNotFoundError,
-    InvalidContextError,
-    KindMismatchError,
-    ValidationError,
-    ExecutionError,
-)
-from debrief_calc.provenance import create_provenance, attach_provenance, set_output_kind
 from debrief_calc.validation import validate_tool_output
 
 
@@ -222,4 +222,4 @@ def _execute_handler(
     except Exception as e:
         if isinstance(e, ExecutionError):
             raise
-        raise ExecutionError(tool.name, e)
+        raise ExecutionError(tool.name, e) from e

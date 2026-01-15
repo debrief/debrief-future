@@ -10,13 +10,12 @@ Per Constitution IV.3: Services have zero MCP dependency for domain logic.
 from __future__ import annotations
 
 import json
-from typing import Any
 
 # MCP SDK import is optional
 try:
     from mcp.server import Server
     from mcp.server.stdio import stdio_server
-    from mcp.types import Tool, TextContent
+    from mcp.types import TextContent, Tool
     HAS_MCP = True
 except ImportError:
     HAS_MCP = False
@@ -32,7 +31,7 @@ ERROR_KIND_MISMATCH = "KIND_MISMATCH"
 ERROR_EXECUTION_FAILED = "EXECUTION_FAILED"
 
 
-def create_server() -> "Server":
+def create_server() -> Server:
     """
     Create and configure the MCP server with debrief-calc tools.
 
@@ -51,7 +50,6 @@ def create_server() -> "Server":
     async def list_tools() -> list[Tool]:
         """List all available debrief-calc tools."""
         from debrief_calc import registry
-        from debrief_calc.tools import track_stats, range_bearing, area_summary  # Register tools
 
         tools = []
         for tool in registry.list_all():
@@ -89,7 +87,6 @@ def create_server() -> "Server":
         """Execute a debrief-calc tool via MCP."""
         from debrief_calc import registry, run
         from debrief_calc.models import ContextType, SelectionContext
-        from debrief_calc.tools import track_stats, range_bearing, area_summary  # Register tools
 
         # Convert MCP tool name back to calc tool name
         tool_name = name.replace("calc_", "").replace("_", "-")

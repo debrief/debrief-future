@@ -8,13 +8,12 @@ from __future__ import annotations
 
 import json
 import sys
-from pathlib import Path
 from typing import Any
 
 import click
 
-from debrief_cli.main import pass_context, Context
-from debrief_cli.output import OutputFormatter, format_tool_metadata
+from debrief_cli.main import Context, pass_context
+from debrief_cli.output import format_tool_metadata
 
 
 @click.group()
@@ -37,7 +36,6 @@ def list_tools(ctx: Context, input_file: str | None):
     try:
         # Import here to avoid circular imports and lazy loading
         from debrief_calc import registry
-        from debrief_calc.tools import track_stats, range_bearing, area_summary  # Register tools
 
         # Get filter kind from input file if provided
         filter_kinds = None
@@ -47,10 +45,7 @@ def list_tools(ctx: Context, input_file: str | None):
             filter_kinds = _extract_kinds(data)
 
         # Find matching tools
-        if filter_kinds:
-            tool_list = registry.find_tools(kinds=filter_kinds)
-        else:
-            tool_list = registry.list_all()
+        tool_list = registry.find_tools(kinds=filter_kinds) if filter_kinds else registry.list_all()
 
         if ctx.json_mode:
             formatter.json_output({
@@ -95,7 +90,6 @@ def describe_tool(ctx: Context, tool_name: str):
 
     try:
         from debrief_calc import registry
-        from debrief_calc.tools import track_stats, range_bearing, area_summary  # Register tools
 
         metadata = registry.describe(tool_name)
 
@@ -132,7 +126,6 @@ def run_tool(ctx: Context, tool_name: str, input_file: str, params: tuple):
     try:
         from debrief_calc import registry, run
         from debrief_calc.models import ContextType, SelectionContext
-        from debrief_calc.tools import track_stats, range_bearing, area_summary  # Register tools
 
         # Load input file
         with open(input_file) as f:

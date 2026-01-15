@@ -1,9 +1,7 @@
 """Tests for tool metadata completeness."""
 
 import pytest
-
 from debrief_calc import registry
-from debrief_calc.tools import track_stats, range_bearing, area_summary
 
 
 class TestToolMetadataCompleteness:

@@ -13,12 +13,13 @@ Defines the entities used throughout the tool registry and execution system:
 
 from __future__ import annotations
 
+import re
+from collections.abc import Callable
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator, model_validator
-import re
 
 
 class ContextType(str, Enum):
@@ -68,8 +69,8 @@ class ToolParameter(BaseModel):
     type: str = Field(..., description="Data type: string, number, boolean, enum")
     description: str = Field(..., description="Human-readable description")
     required: bool = Field(default=False, description="Whether parameter is required")
-    default: Optional[Any] = Field(default=None, description="Default value if not provided")
-    choices: Optional[list[Any]] = Field(default=None, description="Valid values for enum type")
+    default: Any | None = Field(default=None, description="Default value if not provided")
+    choices: list[Any] | None = Field(default=None, description="Valid values for enum type")
 
     @field_validator("type")
     @classmethod
@@ -80,7 +81,7 @@ class ToolParameter(BaseModel):
         return v
 
     @model_validator(mode="after")
-    def validate_enum_choices(self) -> "ToolParameter":
+    def validate_enum_choices(self) -> ToolParameter:
         if self.type == "enum" and not self.choices:
             raise ValueError("choices must be provided when type is 'enum'")
         return self
@@ -99,7 +100,7 @@ class ToolError(BaseModel):
     """
     code: str = Field(..., description="Error code")
     message: str = Field(..., description="Human-readable error message")
-    details: Optional[dict[str, Any]] = Field(default=None, description="Additional context-specific details")
+    details: dict[str, Any] | None = Field(default=None, description="Additional context-specific details")
 
 
 class ToolResult(BaseModel):
@@ -111,12 +112,12 @@ class ToolResult(BaseModel):
     """
     tool: str = Field(..., description="Name of tool that produced this result")
     success: bool = Field(..., description="Whether execution succeeded")
-    features: Optional[list[dict[str, Any]]] = Field(default=None, description="Output GeoJSON features")
-    error: Optional[ToolError] = Field(default=None, description="Error details if not success")
+    features: list[dict[str, Any]] | None = Field(default=None, description="Output GeoJSON features")
+    error: ToolError | None = Field(default=None, description="Error details if not success")
     duration_ms: float = Field(..., description="Execution time in milliseconds")
 
     @model_validator(mode="after")
-    def validate_result_consistency(self) -> "ToolResult":
+    def validate_result_consistency(self) -> ToolResult:
         if self.success and self.features is None:
             raise ValueError("features must be provided when success is True")
         if not self.success and self.error is None:
@@ -135,17 +136,17 @@ class SelectionContext(BaseModel):
     """
     type: ContextType = Field(..., description="The context classification")
     features: list[dict[str, Any]] = Field(default_factory=list, description="Selected GeoJSON features")
-    bounds: Optional[list[float]] = Field(default=None, description="Geographic bounds [minx, miny, maxx, maxy]")
+    bounds: list[float] | None = Field(default=None, description="Geographic bounds [minx, miny, maxx, maxy]")
 
     @field_validator("bounds")
     @classmethod
-    def validate_bounds_format(cls, v: Optional[list]) -> Optional[list]:
+    def validate_bounds_format(cls, v: list | None) -> list | None:
         if v is not None and len(v) != 4:
             raise ValueError("bounds must be [minx, miny, maxx, maxy]")
         return v
 
     @model_validator(mode="after")
-    def validate_context_requirements(self) -> "SelectionContext":
+    def validate_context_requirements(self) -> SelectionContext:
         if self.type == ContextType.SINGLE and len(self.features) != 1:
             raise ValueError("features must have exactly 1 item when type is 'single'")
         if self.type == ContextType.MULTI and len(self.features) < 2:
@@ -180,7 +181,7 @@ class Tool(BaseModel):
     output_kind: str = Field(..., description="Kind of features produced")
     context_type: ContextType = Field(..., description="Selection context requirement")
     parameters: list[ToolParameter] = Field(default_factory=list, description="Configurable parameters")
-    handler: Optional[Callable] = Field(default=None, exclude=True, description="Python function implementing the tool")
+    handler: Callable | None = Field(default=None, exclude=True, description="Python function implementing the tool")
 
     model_config = {"arbitrary_types_allowed": True}
 

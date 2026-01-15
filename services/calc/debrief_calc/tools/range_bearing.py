@@ -7,8 +7,8 @@ Calculates range and bearing between two tracks at corresponding time points.
 from __future__ import annotations
 
 import math
-from typing import Any
 import uuid
+from typing import Any
 
 from debrief_calc.models import ContextType, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
