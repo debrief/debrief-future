@@ -8,6 +8,8 @@ This package provides:
 - MCP wrapper for remote tool access (optional)
 """
 
+# Import tools to register them with the registry
+from debrief_calc import tools as _tools  # noqa: F401
 from debrief_calc.exceptions import (
     DebriefCalcError,
     ExecutionError,
@@ -28,9 +30,6 @@ from debrief_calc.models import (
     ToolResult,
 )
 from debrief_calc.registry import registry, tool
-
-# Import tools to register them with the registry
-from debrief_calc import tools as _tools  # noqa: F401
 
 __version__ = "0.1.0"
 
