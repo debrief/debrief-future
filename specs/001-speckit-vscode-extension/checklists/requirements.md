@@ -2,6 +2,7 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-01-15
+**Updated**: 2026-01-15
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -36,11 +37,36 @@
 - [x] UI States defined for empty, loading, error, and success conditions
 - [x] User decision inputs are identified (what information helps users decide)
 
+## UI Design Review *(requires stakeholder sign-off)*
+
+- [ ] Extension layout wireframe reviewed and approved
+- [ ] Catalog browser tree view design reviewed
+- [ ] Map panel layout and toolbar reviewed
+- [ ] Selection interaction model approved (click, shift+click, ctrl+click)
+- [ ] Tools panel location and layout reviewed
+- [ ] Empty and error state designs reviewed
+- [ ] Design review questions addressed (6 questions in spec)
+
+## Design Review Questions Status
+
+| # | Question | Status | Decision |
+|---|----------|--------|----------|
+| 1 | Sidebar vs. Panel for catalog browser | Pending | - |
+| 2 | Selection feedback (color vs. additional indicators) | Pending | - |
+| 3 | Time range control visibility | Pending | - |
+| 4 | Tool panel location | Pending | - |
+| 5 | Multi-plot support | Pending | - |
+| 6 | Result layer management | Pending | - |
+
 ## Notes
 
-- All checklist items pass validation
-- Spec is ready for `/speckit.clarify` or `/speckit.plan`
-- This is a UI feature (VS Code extension with map display, panels, and tools)
-- 4 prioritized user stories cover the complete workflow from browse to analyze
-- 17 functional requirements cover all user story acceptance scenarios
-- 8 measurable success criteria align with tracer bullet exit criteria
+- All specification quality items pass validation
+- **UI Design Review section requires stakeholder discussion before `/speckit.plan`**
+- Enhanced with detailed ASCII wireframes for:
+  - Overall extension layout
+  - Catalog browser sidebar
+  - Map panel with tracks and toolbar
+  - Tools panel with execution states
+  - Empty and error states
+- 6 design review questions identified for discussion
+- Spec ready for design review meeting, then `/speckit.clarify` or `/speckit.plan`
