@@ -85,6 +85,8 @@ Three approaches required:
 - N/A (no persistent data - modifies workflow templates) (004-speckit-ui-workflow)
 - TypeScript 5.x (Electron main + React renderer) + Electron 28+, React 18+, debrief-config (TypeScript), debrief-io (Python via IPC), debrief-stac (Python via IPC) (004-loader-mini-app)
 - N/A (all persistence via debrief-stac service) (004-loader-mini-app)
+- Python 3.11+ + Pydantic >=2.0.0, debrief-schemas (workspace), mcp >=1.0.0 (optional), click (CLI) (005-debrief-calc)
+- N/A (pure transformation service — no persistence) (005-debrief-calc)
 
 ## Recent Changes
 - 000-schemas: Added Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS)
