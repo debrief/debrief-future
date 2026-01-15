@@ -75,6 +75,25 @@ As an analyst, I need to understand what parameters a tool accepts and what outp
 
 ---
 
+### User Story 5 - Verify and Use Tools via Command Line (Priority: P2)
+
+As a developer or power user, I need to discover and execute analysis tools via a command-line interface so that I can verify implementations, automate workflows, and work without a graphical interface.
+
+**Why this priority**: The CLI enables verification of debrief-calc before the VS Code extension (Stage 6) exists. It also serves power users and automation pipelines as an enduring capability.
+
+**Independent Test**: Can be fully tested by running CLI commands against fixture files or STAC catalog items. Delivers tool access without UI dependency.
+
+**Acceptance Scenarios**:
+
+1. **Given** a user has GeoJSON fixture files, **When** they run `debrief-cli tools list --input track.geojson`, **Then** they see tools applicable to that input's kind
+2. **Given** a user wants to run a tool, **When** they execute `debrief-cli tools run track-stats --input track.geojson`, **Then** valid GeoJSON is output to stdout
+3. **Given** a user has items in a STAC catalog, **When** they run `debrief-cli tools run range-bearing --store my-catalog --item track-001 --item track-002`, **Then** the tool executes using catalog data
+4. **Given** a user wants machine-readable output, **When** they add `--json` to any command, **Then** output is valid JSON parseable by standard tools
+5. **Given** a user wants to validate GeoJSON, **When** they run `debrief-cli validate track.geojson`, **Then** they receive pass/fail with details
+6. **Given** a tool execution fails, **When** the CLI exits, **Then** the exit code reflects the failure type (2=invalid args, 3=validation failed, 4=execution failed, 5=store not found)
+
+---
+
 ### Edge Cases
 
 - What happens when a tool execution takes longer than expected? (Tool execution should complete within reasonable time; no cancellation mechanism required for initial release)
@@ -101,6 +120,18 @@ As an analyst, I need to understand what parameters a tool accepts and what outp
 - **FR-013**: System MUST filter available tools based on the `kind` attribute of selected features
 - **FR-014**: All tool outputs MUST include the appropriate `kind` attribute in feature.properties as specified by the tool definition
 
+#### CLI Requirements (debrief-cli package)
+
+- **FR-015**: CLI MUST provide `tools list` command to discover available tools, optionally filtered by input file or STAC item
+- **FR-016**: CLI MUST provide `tools run <tool-name>` command to execute tools with input from files (`--input`) or STAC items (`--store`/`--item`)
+- **FR-017**: CLI MUST provide `tools describe <tool-name>` command to show tool metadata including accepted kinds and parameters
+- **FR-018**: CLI MUST provide `validate` command to check GeoJSON against project schemas
+- **FR-019**: CLI MUST provide `catalog` commands (`stores`, `list`, `get`) to browse STAC catalogs
+- **FR-020**: CLI MUST output to stdout by default; users redirect to files as needed
+- **FR-021**: CLI MUST support `--json` flag on all commands for machine-readable output
+- **FR-022**: CLI MUST use exit codes to indicate outcome (0=success, 2=invalid args, 3=validation failed, 4=execution failed, 5=store not found)
+- **FR-023**: CLI MUST discover STAC stores via XDG config file location (consistent with debrief-config)
+
 ### Key Entities
 
 - **Tool**: An analysis operation that accepts selection context and returns GeoJSON results. Has metadata (name, description, version), selection context requirements, accepted input kinds, output kind, configurable parameters, and output specification.
@@ -124,6 +155,13 @@ As an analyst, I need to understand what parameters a tool accepts and what outp
 - **SC-008**: 100% of tool outputs include a valid `kind` attribute that matches the tool's declared output kind
 - **SC-009**: Tool discovery correctly filters results based on selected feature kinds (no tools shown for incompatible kinds)
 
+#### CLI Success Criteria
+
+- **SC-010**: All debrief-calc acceptance scenarios (SC-001 through SC-009) can be verified via CLI commands
+- **SC-011**: CLI JSON output is valid and parseable by standard tools (jq, Python json module)
+- **SC-012**: CLI exit codes accurately reflect operation outcomes for scripting use
+- **SC-013**: CLI help text (`--help`) is available for all commands and subcommands
+
 ## Assumptions
 
 - Tool metadata schema has been defined in Stage 0 (schemas) and is available for use
@@ -142,6 +180,15 @@ As an analyst, I need to understand what parameters a tool accepts and what outp
 - **mcp-common**: Shared MCP utilities for service exposure
 - Selection context definitions must align with frontend implementations
 
+### CLI Package Dependencies
+
+The `debrief-cli` package integrates multiple services:
+- **debrief-calc**: Tool registry and execution (this spec)
+- **debrief-io**: File format parsing for input files
+- **debrief-stac**: Catalog access for `--store`/`--item` input
+- **debrief-schemas**: Validation for `validate` command
+- **debrief-config**: XDG config location for store discovery
+
 ## Out of Scope
 
 - Asynchronous or background tool execution
@@ -150,3 +197,19 @@ As an analyst, I need to understand what parameters a tool accepts and what outp
 - Tool versioning and migration
 - Performance optimization for very large datasets
 - Tool execution quotas or rate limiting
+
+### CLI Out of Scope (Initial Release)
+
+- Stdin input (files and STAC refs only)
+- Interactive mode / REPL
+- Configuration file for CLI preferences
+- Shell completions (bash, zsh, fish)
+- Progress bars for long operations
+- Remote MCP server connection (CLI uses local libraries directly)
+
+## Clarifications
+
+### Session 2026-01-15
+
+- Q: CLI output file handling → A: Output to stdout by default; users redirect to files
+- Q: STAC store discovery → A: Config file at XDG location (consistent with debrief-config)
