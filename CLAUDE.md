@@ -87,6 +87,7 @@ Three approaches required:
 - N/A (all persistence via debrief-stac service) (004-loader-mini-app)
 - Python 3.11+ + Pydantic >=2.0.0, debrief-schemas (workspace), mcp >=1.0.0 (optional), click (CLI) (005-debrief-calc)
 - N/A (pure transformation service — no persistence) (005-debrief-calc)
+- TypeScript 5.x (VS Code Extension API) + @vscode/api (extension host), Leaflet (map rendering), debrief-config (TypeScript), debrief-stac (via IPC), debrief-calc (via MCP) (006-speckit-vscode-extension)
 
 ## Recent Changes
 - 000-schemas: Added Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS)

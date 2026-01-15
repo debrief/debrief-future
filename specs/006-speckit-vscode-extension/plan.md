@@ -1,104 +1,147 @@
-# Implementation Plan: [FEATURE]
+# Implementation Plan: Debrief VS Code Extension
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Branch**: `006-speckit-vscode-extension` | **Date**: 2026-01-15 | **Spec**: [spec.md](./spec.md)
+**Input**: Feature specification from `/specs/006-speckit-vscode-extension/spec.md`
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Build a VS Code extension for Debrief maritime tactical analysis that enables analysts to browse STAC catalogs from Explorer, display plots on interactive Leaflet maps with vessel tracks and reference locations, select data elements for analysis, discover context-sensitive tools via debrief-calc MCP, execute analysis tools, and view computed results as overlay layers.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: TypeScript 5.x (VS Code Extension API)
+**Primary Dependencies**: @vscode/api (extension host), Leaflet (map rendering), debrief-config (TypeScript), debrief-stac (via IPC), debrief-calc (via MCP)
+**Storage**: N/A (all persistence via debrief-stac service)
+**Testing**: @vscode/test-electron, vitest (unit tests), Playwright (webview tests)
+**Target Platform**: VS Code (Windows, macOS, Linux)
+**Project Type**: VS Code Extension
+**Performance Goals**: Render 10,000 track points without noticeable lag (<100ms frame time)
+**Constraints**: Offline-capable, no external network dependencies for core functionality
+**Scale/Scope**: Single extension, 1 webview panel type, 3 sidebar sections, ~15 commands
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+| Article | Requirement | Status | Notes |
+|---------|-------------|--------|-------|
+| I.1 | Offline by default | ✅ PASS | All operations use local STAC catalogs; no network required |
+| I.2 | No cloud dependencies | ✅ PASS | Local file system only; cloud catalogs explicitly out of scope |
+| I.3 | No silent failures | ✅ PASS | Error states defined for all failure modes (FR-014, error wireframes) |
+| I.4 | Reproducibility | ✅ PASS | Tool execution delegates to debrief-calc which guarantees reproducibility |
+| II.1 | Single source of truth (schema) | ✅ PASS | Uses shared schemas from Stage 0 |
+| II.2 | Schema tests mandatory | ✅ PASS | Contract tests will validate GeoJSON/STAC structures |
+| III.1 | Provenance always | ✅ PASS | Tool results include lineage via debrief-calc |
+| III.2 | Source preservation | ✅ PASS | Extension is read-only; editing data is out of scope |
+| III.4 | Data stays local | ✅ PASS | No telemetry; all data local |
+| IV.1 | Services never touch UI | ✅ PASS | Extension is a frontend; services (debrief-calc, debrief-stac) are separate |
+| IV.2 | Frontends never persist | ✅ PASS | Extension delegates all writes to debrief-stac |
+| V.1 | Fail-safe loading | ✅ PASS | Extension loads in VS Code's isolation model |
+| V.2 | Schema compliance | ✅ PASS | Consumes/produces schema-compliant data |
+| VI.1 | Schema tests gate merges | ✅ PASS | Contract tests in CI |
+| VI.2 | Services require unit tests | ✅ PASS | Extension code will have unit tests |
+| VII.1 | Tests before implementation | ✅ PASS | Test-first approach in task breakdown |
+| VIII.1 | Specs before code | ✅ PASS | This spec exists |
+| IX.1 | Minimal dependencies | ✅ PASS | Only required: VS Code API, Leaflet, existing debrief packages |
+| X.1 | No secrets in code | ✅ PASS | No credentials required |
+| XI.1 | I18N from the start | ⚠️ DEFER | User-facing strings externalized; translations deferred to pre-release |
+| XII.2 | Beta previews | ✅ PASS | SC-007 requires marketplace pre-release publication |
+
+**Gate Status**: ✅ PASS — All critical constitution requirements satisfied. I18N deferred with justification (pre-release phase).
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/[###-feature]/
-├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
-├── data-model.md        # Phase 1 output (/speckit.plan command)
-├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+specs/006-speckit-vscode-extension/
+├── plan.md              # This file
+├── research.md          # Phase 0 output
+├── data-model.md        # Phase 1 output
+├── quickstart.md        # Phase 1 output
+├── contracts/           # Phase 1 output (API contracts)
+├── checklists/          # Quality validation checklists
+│   └── requirements.md  # Spec quality checklist
+└── tasks.md             # Phase 2 output (/speckit.tasks)
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
+apps/vscode/
 ├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
+│   ├── extension.ts         # Extension entry point, activation
+│   ├── commands/            # Command implementations
+│   │   ├── openPlot.ts
+│   │   ├── addStore.ts
+│   │   └── exportPng.ts
+│   ├── providers/           # VS Code API providers
+│   │   ├── stacTreeProvider.ts      # Explorer tree for STAC stores
+│   │   ├── outlineProvider.ts       # Selection outline provider
+│   │   └── virtualFolderProvider.ts # STAC virtual folder provider
+│   ├── views/               # Sidebar views
+│   │   ├── timeRangeView.ts
+│   │   ├── toolsView.ts
+│   │   └── layersView.ts
+│   ├── webview/             # Map webview panel
+│   │   ├── mapPanel.ts      # Webview panel controller
+│   │   ├── messages.ts      # Extension ↔ webview protocol
+│   │   └── web/             # Webview content (bundled separately)
+│   │       ├── index.html
+│   │       ├── map.ts       # Leaflet map logic
+│   │       ├── selection.ts # Selection state/rendering
+│   │       └── styles.css
+│   ├── services/            # Service integrations
+│   │   ├── stacService.ts   # debrief-stac wrapper
+│   │   ├── configService.ts # debrief-config wrapper
+│   │   └── calcService.ts   # debrief-calc MCP client
+│   └── types/               # TypeScript interfaces
+│       ├── plot.ts
+│       ├── track.ts
+│       └── tool.ts
+├── package.json             # Extension manifest
+├── tsconfig.json
+├── esbuild.config.js        # Bundler config
 └── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+    ├── unit/                # Unit tests (vitest)
+    ├── integration/         # Integration tests
+    └── e2e/                 # End-to-end tests (@vscode/test-electron)
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: VS Code Extension structure under `apps/vscode/` following the planned repository layout from ARCHITECTURE.md. Webview content bundled separately from extension host code.
+
+## Constitution Re-Check (Post-Design)
+
+*Verification after Phase 1 design completion.*
+
+| Article | Re-Check | Status | Design Evidence |
+|---------|----------|--------|-----------------|
+| I.1 | Offline by default | ✅ PASS | FileSystemProvider uses local paths; Leaflet bundled locally |
+| I.3 | No silent failures | ✅ PASS | Error states in data-model.md (ToolExecution.status, StacStore.status) |
+| II.2 | Schema tests | ✅ PASS | Contract tests defined in contracts/ directory |
+| III.1 | Provenance | ✅ PASS | ResultLayer tracks executionId, toolName for lineage |
+| IV.2 | Frontends never persist | ✅ PASS | MapViewState uses webview state; no direct file writes |
+| VI.2 | Unit tests | ✅ PASS | Test structure in project layout (tests/unit/) |
+| VII.1 | Tests before implementation | ✅ PASS | Test contracts in data-model.md validation rules |
+| IX.1 | Minimal dependencies | ✅ PASS | research.md confirms only essential deps |
+
+**Post-Design Gate Status**: ✅ PASS — Design artifacts align with constitution requirements.
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
+> No constitution violations requiring justification.
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+*No entries required — all complexity within acceptable bounds.*
+
+---
+
+## Generated Artifacts
+
+| Artifact | Path | Purpose |
+|----------|------|---------|
+| Research | [research.md](./research.md) | Technical decisions and rationale |
+| Data Model | [data-model.md](./data-model.md) | Entity definitions and relationships |
+| Webview Messages | [contracts/webview-messages.md](./contracts/webview-messages.md) | Extension ↔ webview protocol |
+| Commands | [contracts/commands.md](./contracts/commands.md) | VS Code command definitions |
+| Configuration | [contracts/configuration.md](./contracts/configuration.md) | Settings schema |
+| Quickstart | [quickstart.md](./quickstart.md) | Developer onboarding guide |
