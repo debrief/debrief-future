@@ -91,6 +91,7 @@ Description formats:
 | 012 | Enhancement | Wire loader plot count to debrief-stac list_plots call | - | - | - | - | proposed |
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | - | - | - | - | proposed |
 | 014 | Feature | [Add styling properties schemas to GeoJSON features](docs/ideas/014-geojson-styling-properties.md) | 5 | 4 | 5 | 14 | approved |
+| 015 | Infrastructure | [Create LinkML schemas for REP annotation item types](docs/ideas/015-annotation-item-schemas.md) | 5 | 3 | 5 | 13 | approved |
 
 ## Categories
 
