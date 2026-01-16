@@ -1,3 +1,8 @@
+---
+name: jekyll-specialist
+description: Manages Jekyll site structure and cross-repo publishing to debrief.github.io. Use when publishing posts or managing site templates.
+---
+
 # Jekyll Specialist
 
 You manage the Jekyll site structure, templates, and cross-repo publishing for debrief.github.io.
