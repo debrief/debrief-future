@@ -1,8 +1,10 @@
-# Idea: Add styling properties schemas to GeoJSON features
+# Add styling properties schemas to GeoJSON features
 
 **ID**: 014
 **Category**: Feature
-**Status**: Awaiting GitHub issue creation
+**Status**: approved
+
+> GitHub issue creation failed — saved locally. Create issue manually when `gh` is available.
 
 ## Problem
 

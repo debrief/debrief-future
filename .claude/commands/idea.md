@@ -272,9 +272,21 @@ Note: Fast-track is for well-understood ideas. For complex features, the intervi
 | Scenario | Action |
 |----------|--------|
 | No description | Ask for one |
-| BACKLOG.md not found | ERROR |
-| STRATEGY.md not found | ERROR |
+| BACKLOG.md not found | ERROR — stop workflow |
+| STRATEGY.md not found | ERROR — stop workflow |
+| `gh` CLI not available | Fall back to local file (see below) |
+| `gh issue create` fails | Fall back to local file (see below) |
 | Duplicate description | Warn but proceed (different IDs allowed) |
+
+### GitHub Issue Fallback
+
+GitHub issue is preferred, but if `gh` CLI is unavailable or fails:
+
+1. **Create local file** at `docs/ideas/{ID}-{slug}.md` with the same structured content
+2. **Link backlog to local file**: `[Title](docs/ideas/{ID}-{slug}.md)`
+3. **Warn user**: "GitHub issue creation failed — saved locally. Create issue manually when `gh` is available."
+
+The backlog must always link to *something* — either GitHub issue URL or local file path.
 
 ## Example Usage
 
