@@ -40,10 +40,7 @@ def get_websocket_url(base_url: str) -> str:
     parsed = urlparse(base_url)
 
     # Determine WebSocket scheme
-    if parsed.scheme == "https":
-        ws_scheme = "wss"
-    else:
-        ws_scheme = "ws"
+    ws_scheme = "wss" if parsed.scheme == "https" else "ws"
 
     # noVNC websockify endpoint
     ws_path = "/websockify"
@@ -87,10 +84,7 @@ def test_vnc_connection(url: str, timeout: int = 30) -> bool:
         data = ws.recv()
 
         # Convert bytes to string if needed
-        if isinstance(data, bytes):
-            data_str = data.decode("utf-8", errors="replace")
-        else:
-            data_str = data
+        data_str = data.decode("utf-8", errors="replace") if isinstance(data, bytes) else data
 
         print(f"Received: {repr(data_str[:50])}")
 
@@ -101,7 +95,7 @@ def test_vnc_connection(url: str, timeout: int = 30) -> bool:
             ws.close()
             return True
         else:
-            print(f"ERROR: Unexpected response (not RFB protocol)")
+            print("ERROR: Unexpected response (not RFB protocol)")
             ws.close()
             return False
 
