@@ -1,0 +1,65 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-4.2012, 50.3456],
+          [-4.1989, 50.3478],
+          [-4.1967, 50.3501],
+          [-4.1945, 50.3523],
+          [-4.1923, 50.3545],
+          [-4.1901, 50.3567],
+          [-4.1878, 50.3589],
+          [-4.1856, 50.3612],
+          [-4.1834, 50.3634],
+          [-4.1812, 50.3656]
+        ]
+      },
+      "properties": {
+        "id": "track-hms-sutherland",
+        "name": "HMS Sutherland",
+        "platformType": "Frigate",
+        "color": "#FF5722",
+        "times": [
+          "2024-01-14T08:00:00Z",
+          "2024-01-14T08:30:00Z",
+          "2024-01-14T09:00:00Z",
+          "2024-01-14T09:30:00Z",
+          "2024-01-14T10:00:00Z",
+          "2024-01-14T10:30:00Z",
+          "2024-01-14T11:00:00Z",
+          "2024-01-14T11:30:00Z",
+          "2024-01-14T12:00:00Z",
+          "2024-01-14T12:30:00Z"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-4.1901, 50.3512]
+      },
+      "properties": {
+        "id": "loc-start-point",
+        "name": "Start Point",
+        "locationType": "Waypoint"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-4.1856, 50.3589]
+      },
+      "properties": {
+        "id": "loc-turn-point",
+        "name": "Turn Point",
+        "locationType": "Waypoint"
+      }
+    }
+  ]
+}
