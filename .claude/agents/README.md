@@ -57,19 +57,21 @@ The defector investigates bugs, creates GitHub issues with root cause analysis, 
 
 ### Quick Start: `/idea` Command
 
-**For humans**: Use `/idea` to suggest an idea and capture it in the backlog:
+**For humans**: Use `/idea` to suggest an idea and capture it with full detail:
 
 ```bash
 /idea Add progress indicators during long file imports
 ```
 
-This command captures the requirement:
+This command captures the requirement through an adaptive interview:
 1. **Scout evaluates** — checks against CONSTITUTION, STRATEGY, parking lot
-2. **Adds to BACKLOG.md** — if passes hard filters
-3. **Scores (V/M/A)** — prioritizer logic
-4. **Strategic review** — ideas-guy logic (approve/park/reject)
+2. **Interview** — scout asks clarifying questions to gather detail
+3. **GitHub issue** — creates summarized issue (not raw Q&A)
+4. **Adds to BACKLOG.md** — with link to issue
+5. **Scores (V/M/A)** — prioritizer logic
+6. **Strategic review** — ideas-guy logic (approve/park/reject)
 
-You suggest once. The scout evaluates, the system scores, and decides.
+You suggest once. The scout interviews, creates an issue, and the system decides.
 
 **To start implementation later**: Run `/speckit.start {ID}` on an approved item.
 
@@ -84,14 +86,16 @@ You suggest once. The scout evaluates, the system scores, and decides.
 │       │                                                             │
 │       ├── 1. Scout evaluates (hard filters: offline, CONSTITUTION)  │
 │       │       └── If fails → STOP with explanation                  │
-│       ├── 2. Add to BACKLOG.md (proposed)                           │
-│       ├── 3. Score V/M/A (prioritizer logic)                        │
-│       └── 4. Strategic review (ideas-guy logic)                     │
+│       ├── 2. INTERVIEW (adaptive questions until detail sufficient) │
+│       ├── 3. Create GitHub issue (summarized, not raw Q&A)          │
+│       ├── 4. Add to BACKLOG.md (proposed, links to issue)           │
+│       ├── 5. Score V/M/A (prioritizer logic)                        │
+│       └── 6. Strategic review (ideas-guy logic)                     │
 │               ├── Approve → status: approved                        │
 │               ├── Park → STRATEGY.md Parking Lot                    │
 │               └── Reject → Rejected Log                             │
 │                                                                     │
-│       STOPS HERE — requirement captured                             │
+│       STOPS HERE — requirement captured in issue + backlog          │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 

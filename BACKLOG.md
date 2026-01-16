@@ -69,8 +69,10 @@ This bridges backlog approval to the speckit workflow by:
 Format:
 | ID | Category | Description | V | M | A | Total | Status |
 
-When specified, description becomes: [Title](docs/specs/feature-name/spec.md)
-When complete, entire row gets ~~strikethrough~~
+Description formats:
+- New items from /idea: [Short title](github_issue_url) — links to detailed requirement
+- When specified: [Title](docs/specs/feature-name/spec.md) — links to spec
+- When complete: entire row gets ~~strikethrough~~
 -->
 
 | ID | Category | Description | V | M | A | Total | Status |

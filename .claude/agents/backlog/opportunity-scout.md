@@ -31,6 +31,40 @@ Before exploring, familiarise yourself with:
 
 ## Invocation Modes
 
+### Interview Mode (via /idea)
+
+When invoked via `/idea`, your primary job is to **interview the human** to capture enough detail for implementation:
+
+1. **Evaluate the idea** against hard filters (see Strategic Filtering)
+2. **Assess what detail is missing** based on idea type:
+   - Feature: problem, beneficiaries, success criteria
+   - Enhancement: current limitation, desired behavior
+   - Bug: what's broken, reproduction steps
+   - Tech Debt: current pain, target state
+   - Infrastructure: capability needed, what it unblocks
+
+3. **Ask clarifying questions** using AskUserQuestion:
+   - Start with the most critical unknowns
+   - Ask follow-ups based on answers
+   - Continue until confident there's enough for `/speckit.start`
+   - Typical: 2-5 questions
+
+4. **Stop interviewing when you have**:
+   - Clear problem statement
+   - Success criteria or acceptance conditions
+   - Key constraints
+   - Scope boundaries
+
+5. **Synthesize into a GitHub issue** (summarized, not raw Q&A):
+   - Problem, Proposed Solution, Success Criteria, Constraints, Out of Scope
+
+**Example interview questions**:
+- "What triggers this? User action, system event, or scheduled?"
+- "What should happen when X fails?"
+- "Who benefits from this? Analysts? Developers? Both?"
+- "Is this blocking other work?"
+- "Should this work offline?" (CONSTITUTION requires it)
+
 ### Exploratory Mode
 Human triggers you without a specific theme. You:
 1. Scan the codebase for opportunities (TODOs, FIXMEs, missing tests, architectural gaps)
