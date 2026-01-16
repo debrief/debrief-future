@@ -57,49 +57,61 @@ The defector investigates bugs, creates GitHub issues with root cause analysis, 
 
 ### Quick Start: `/idea` Command
 
-**For humans**: Use `/idea` to suggest an idea and let the system handle the rest:
+**For humans**: Use `/idea` to suggest an idea and capture it with full detail:
 
 ```bash
 /idea Add progress indicators during long file imports
 ```
 
-This single command orchestrates the full pipeline:
+This command captures the requirement through an adaptive interview:
 1. **Scout evaluates** — checks against CONSTITUTION, STRATEGY, parking lot
-2. **Adds to BACKLOG.md** — if passes hard filters
-3. **Scores (V/M/A)** — prioritizer logic
-4. **Strategic review** — ideas-guy logic (approve/park/reject)
-5. **If approved** → triggers `/speckit.start`
+2. **Interview** — scout asks clarifying questions to gather detail
+3. **GitHub issue** — creates summarized issue (not raw Q&A)
+4. **Adds to BACKLOG.md** — with link to issue
+5. **Scores (V/M/A)** — prioritizer logic
+6. **Strategic review** — ideas-guy logic (approve/park/reject)
 
-You suggest once. The scout evaluates, the system scores, reviews, and creates the spec.
+You suggest once. The scout interviews, creates an issue, and the system decides.
+
+**To start implementation later**: Run `/speckit.start {ID}` on an approved item.
 
 ### Detailed Workflow (What Happens Under the Hood)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                    BACKLOG → SPECKIT WORKFLOW                       │
+│                 REQUIREMENT CAPTURE (/idea)                         │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
-│  /idea {description}  ─────────────────────────────────────────┐    │
-│       │                                                        │    │
+│  /idea {description}                                                │
+│       │                                                             │
 │       ├── 1. Scout evaluates (hard filters: offline, CONSTITUTION)  │
-│       │       └── If fails → STOP with explanation             │    │
-│       ├── 2. Add to BACKLOG.md (proposed)                      │    │
-│       ├── 3. Score V/M/A (prioritizer logic)                   │    │
-│       ├── 4. Strategic review (ideas-guy logic)                │    │
-│       │       ├── Approve → status: approved                   │    │
-│       │       ├── Park → STRATEGY.md Parking Lot (STOP)        │    │
-│       │       └── Reject → Rejected Log (STOP)                 │    │
-│       └── 5. If approved → /speckit.start {ID}                 │    │
-│                                                                │    │
-│  ──────────────────────────────────────────────────────────────┘    │
+│       │       └── If fails → STOP with explanation                  │
+│       ├── 2. INTERVIEW (adaptive questions until detail sufficient) │
+│       ├── 3. Create GitHub issue (summarized, not raw Q&A)          │
+│       ├── 4. Add to BACKLOG.md (proposed, links to issue)           │
+│       ├── 5. Score V/M/A (prioritizer logic)                        │
+│       └── 6. Strategic review (ideas-guy logic)                     │
+│               ├── Approve → status: approved                        │
+│               ├── Park → STRATEGY.md Parking Lot                    │
+│               └── Reject → Rejected Log                             │
+│                                                                     │
+│       STOPS HERE — requirement captured in issue + backlog          │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│              IMPLEMENTATION (triggered separately)                  │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  /speckit.start {ID}  ← user triggers when ready to implement       │
 │                              │                                      │
 │                              ▼                                      │
-│  6. DESIGN (Commands)                                               │
+│  DESIGN (Commands)                                                  │
 │     /speckit.clarify ─────────> resolves ambiguities                │
 │     /speckit.plan ────────────> creates implementation plan         │
 │     /speckit.tasks ───────────> breaks down into tasks              │
 │                                                                     │
-│  7. BUILD (Commands)                                                │
+│  BUILD (Commands)                                                   │
 │     /speckit.implement ───────> executes tasks, captures evidence   │
 │     /speckit.pr ──────────────> creates PR + publishes blog         │
 │                                                                     │
@@ -107,7 +119,8 @@ You suggest once. The scout evaluates, the system scores, reviews, and creates t
 ```
 
 **Manual workflow** (if you prefer step-by-step control):
-- "Scout, evaluate this idea: {description}" → "Score the backlog" → "Review for approval" → `/speckit.start {ID}`
+- "Scout, evaluate this idea: {description}" → "Score the backlog" → "Review for approval"
+- Later: `/speckit.start {ID}` → design → build
 
 **Status progression**: `proposed` → (scored) → `approved` → `specified` → ... → `complete`
 
