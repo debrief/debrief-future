@@ -51,6 +51,7 @@ When complete, entire row gets ~~strikethrough~~
 
 - **Feature** — New user-facing capability
 - **Enhancement** — Improvement to existing capability
+- **Bug** — Defect in existing functionality (links to GitHub issue)
 - **Tech Debt** — Internal improvement, cleanup, refactoring
 - **Infrastructure** — Build, CI/CD, tooling improvements
 - **Documentation** — Docs, examples, tutorials

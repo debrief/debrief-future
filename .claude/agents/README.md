@@ -10,7 +10,8 @@ agents/
 ├── backlog/            # Backlog management agents
 │   ├── the-ideas-guy.md        # Product Strategist (owns STRATEGY.md, oversees backlog)
 │   ├── opportunity-scout.md    # Identifies features, capabilities, tech debt
-│   └── backlog-prioritizer.md  # Scores and ranks backlog items
+│   ├── backlog-prioritizer.md  # Scores and ranks backlog items
+│   └── defector.md             # Handles bug reports, creates GitHub issues
 └── media/              # Media & communications agents
     ├── content.md      # Content Specialist (blog posts, LinkedIn)
     ├── jekyll.md       # Jekyll Specialist (site structure, templates)
@@ -43,6 +44,13 @@ The scout filters opportunities against `STRATEGY.md` before proposing them to t
 - "Score and reorder the backlog"
 
 The prioritizer uses scoring guidance from `STRATEGY.md` to interpret dimensions in context.
+
+**Defector** — Invoke when something is broken:
+- "Use defector to handle this bug report"
+- "The Tools panel is empty [screenshot]"
+- "Defector, investigate why X isn't working"
+
+The defector investigates bugs, creates GitHub issues with root cause analysis, and adds entries to `BACKLOG.md` linking to the issue. It documents defects but doesn't fix them.
 
 ### Media Agents
 
