@@ -23,7 +23,7 @@ This specification defines a browser-accessible demo environment for Debrief. Th
 │  ┌───────────────────────────────────────────────────────────────────────┐  │
 │  │  1. Build Debrief Python packages                                     │  │
 │  │  2. Create virtual environment, install packages                      │  │
-│  │  3. Bundle frontend applications (Electron loader, etc.)              │  │
+│  │  3. Package VS Code extension (.vsix) from PR/release                 │  │
 │  │  4. Prepare desktop integration files (.desktop, MIME types)          │  │
 │  │  5. Include sample data files                                         │  │
 │  │  6. Package as debrief-demo.tar.gz                                    │  │
@@ -87,17 +87,17 @@ A developer or stakeholder opens a browser on any device (ChromeOS, iPad, laptop
 
 ### User Story 2 - Open Data File via File Manager (Priority: P1)
 
-A user opens the file manager, navigates to sample data files, right-clicks a `.rep` file, and selects "Open in Debrief" from the context menu. The Debrief application launches with the file loaded.
+A user opens the file manager, navigates to sample data files, right-clicks a `.rep` file, and selects "Open in Debrief" from the context menu. VS Code launches with the Debrief extension activated and the file loaded.
 
 **Why this priority**: Demonstrates the full file manager integration workflow that will be used in production.
 
-**Independent Test**: Right-click sample .rep file, select "Open in Debrief", verify application launches with file.
+**Independent Test**: Right-click sample .rep file, select "Open in Debrief", verify VS Code launches with Debrief extension showing the file.
 
 **Acceptance Scenarios**:
 
 1. **Given** desktop is running, **When** user opens file manager (Thunar), **Then** Documents folder with sample files is visible.
 2. **Given** sample .rep files in Documents, **When** user right-clicks a .rep file, **Then** context menu includes "Open in Debrief" option.
-3. **Given** right-click menu displayed, **When** user selects "Open in Debrief", **Then** Debrief application launches and loads the selected file.
+3. **Given** right-click menu displayed, **When** user selects "Open in Debrief", **Then** VS Code opens with the Debrief extension displaying the maritime analysis view for the selected file.
 
 ---
 
@@ -210,7 +210,7 @@ When code is pushed to the main branch, CI automatically builds and publishes a 
 
 | Component | Technology | Rationale |
 |-----------|------------|-----------|
-| Base image | `linuxserver/webtop:ubuntu-xfce` | Well-maintained, lightweight, includes VNC+noVNC |
+| Base image | `linuxserver/webtop:ubuntu-xfce` | Well-maintained, includes VNC+noVNC, VS Code pre-installed |
 | Desktop environment | XFCE | Lightweight, stable, good Thunar file manager |
 | VNC server | TigerVNC (included in base) | Standard, reliable |
 | Web access | noVNC (included in base) | No client install required |
@@ -218,7 +218,8 @@ When code is pushed to the main branch, CI automatically builds and publishes a 
 | Artifact storage | GitHub Releases | Integrated with repo, public URLs, versioning |
 | CI | GitHub Actions | Integrated with repo, free for public repos |
 | Python runtime | 3.11+ | Match project requirements |
-| Node.js runtime | 18+ LTS | For Electron/frontend apps |
+| VS Code | Latest stable | Primary Debrief interface via extension |
+| Node.js runtime | 18+ LTS | For VS Code extension and tooling |
 
 ### Artifact Structure
 
@@ -234,8 +235,8 @@ debrief-demo.tar.gz
 │       ├── debrief_config/
 │       ├── debrief_calc/
 │       └── ...
-├── apps/                           # Frontend applications
-│   └── loader/                     # Electron app (AppImage or unpacked)
+├── extensions/                     # VS Code extensions
+│   └── debrief.vsix                # Debrief VS Code extension package
 ├── dot-local/                      # Ready to copy to /config/.local/
 │   └── share/
 │       ├── applications/
@@ -255,7 +256,8 @@ debrief-demo.tar.gz
 ```
 /opt/debrief/                       # Extracted artifact
 ├── venv/
-├── apps/
+├── extensions/
+│   └── debrief.vsix
 ├── bin/
 └── samples/
 
@@ -276,10 +278,12 @@ Type=Application
 Name=Open in Debrief
 Comment=Open file in Debrief maritime analysis tool
 Exec=/opt/debrief/bin/debrief-open %f
-Icon=debrief
+Icon=code
 MimeType=application/x-debrief-rep;
 Categories=Science;Geography;
 ```
+
+Note: The `debrief-open` script launches VS Code with the file, ensuring the Debrief extension handles it.
 
 **debrief.xml** (MIME type):
 ```xml
@@ -343,6 +347,9 @@ cp -r /opt/debrief/dot-local/* /config/.local/
 update-mime-database /config/.local/share/mime
 update-desktop-database /config/.local/share/applications
 
+echo "Installing VS Code extension..."
+code --install-extension /opt/debrief/extensions/debrief.vsix --force
+
 echo "Copying sample files..."
 mkdir -p "/config/Documents/Debrief Samples"
 cp -r /opt/debrief/samples/* "/config/Documents/Debrief Samples/"
@@ -385,7 +392,7 @@ jobs:
 
       - name: Build artifact
         run: |
-          mkdir -p artifact/{venv,apps,dot-local,bin,samples}
+          mkdir -p artifact/{venv,extensions,dot-local,bin,samples}
 
           # Create and populate venv
           python -m venv --copies artifact/venv
@@ -395,9 +402,10 @@ jobs:
           # Make venv relocatable
           sed -i 's|'$PWD'/artifact|/opt/debrief|g' artifact/venv/bin/*
 
-          # Build frontend apps (when they exist)
-          # cd apps/loader && npm ci && npm run build
-          # cp -r dist artifact/apps/loader
+          # Build VS Code extension
+          cd apps/vscode && npm ci && npm run package
+          cp debrief-*.vsix ../../artifact/extensions/debrief.vsix
+          cd ../..
 
           # Copy desktop integration
           cp -r demo/desktop/* artifact/dot-local/
@@ -436,26 +444,19 @@ This section describes how Debrief components integrate with the demo environmen
 | debrief-io | Planned | Python package in venv |
 | debrief-config | Planned | Python package in venv |
 | debrief-calc | Planned | Python package in venv |
-| Loader app | Planned | Electron app in /opt/debrief/apps/ |
-| VS Code extension | Planned | May require separate integration |
+| VS Code extension | Planned | Primary UI - installed from .vsix at startup |
 
 ### Entry Point Script
 
-The `debrief-open` script serves as the bridge between file manager and Debrief applications. Its implementation will depend on which components are available:
+The `debrief-open` script serves as the bridge between file manager and VS Code with the Debrief extension:
 
-**Minimal (services only)**:
 ```bash
 #!/bin/bash
-# Invoke Python service to process file
-/opt/debrief/venv/bin/python -m debrief_io.cli open "$1"
+# Launch VS Code with the file - Debrief extension handles .rep files
+code --reuse-window "$1"
 ```
 
-**With Loader app**:
-```bash
-#!/bin/bash
-# Launch Electron app with file
-/opt/debrief/apps/loader/debrief-loader "$1"
-```
+The VS Code extension registers file type handlers for Debrief formats. When VS Code opens a `.rep` file, the extension automatically activates and provides the maritime analysis interface.
 
 ### File Type Associations
 

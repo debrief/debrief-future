@@ -1,0 +1,190 @@
+# GitHub Actions workflow for building Debrief demo artifact
+# Builds Python services, VS Code extension, and packages everything for container startup
+
+name: Build Demo Artifact
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/**'
+      - 'apps/vscode/**'
+      - 'demo/**'
+      - 'shared/schemas/**'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v0.1.0)'
+        required: false
+        default: 'dev'
+
+jobs:
+  build:
+    name: Build Demo Artifact
+    runs-on: ubuntu-22.04  # MUST match container base for venv compatibility
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "version=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=dev-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build artifact
+        run: |
+          set -e
+          mkdir -p artifact/{venv,extensions,dot-local,bin,samples}
+
+          # Record version
+          echo "${{ steps.version.outputs.version }}" > artifact/VERSION
+
+          # Create and populate venv with copies (not symlinks)
+          python -m venv --copies artifact/venv
+          artifact/venv/bin/pip install --upgrade pip wheel
+
+          # Install Debrief Python services (if they exist)
+          if ls services/*/pyproject.toml 1> /dev/null 2>&1; then
+            for service in services/*/; do
+              if [ -f "${service}pyproject.toml" ]; then
+                artifact/venv/bin/pip install "${service}"
+              fi
+            done
+          fi
+
+          # Make venv relocatable by rewriting paths
+          # From: /home/runner/work/debrief-future/debrief-future/artifact
+          # To:   /opt/debrief
+          find artifact/venv/bin -type f -exec grep -l "$PWD/artifact" {} \; | \
+            xargs -r sed -i "s|$PWD/artifact|/opt/debrief|g"
+          sed -i "s|$PWD/artifact|/opt/debrief|g" artifact/venv/pyvenv.cfg || true
+
+          # Build VS Code extension (if it exists)
+          if [ -d "apps/vscode" ] && [ -f "apps/vscode/package.json" ]; then
+            cd apps/vscode
+            npm ci
+            npm run package || npm run vsce:package || npx vsce package
+            cp *.vsix ../../artifact/extensions/debrief.vsix
+            cd ../..
+          else
+            echo "VS Code extension not found, creating placeholder"
+            touch artifact/extensions/.placeholder
+          fi
+
+          # Copy desktop integration files
+          if [ -d "demo/desktop" ]; then
+            cp -r demo/desktop/* artifact/dot-local/
+          else
+            # Create minimal desktop integration
+            mkdir -p artifact/dot-local/share/applications
+            mkdir -p artifact/dot-local/share/mime/packages
+            cat > artifact/dot-local/share/applications/debrief-open.desktop << 'DESKTOP'
+          [Desktop Entry]
+          Version=1.0
+          Type=Application
+          Name=Open in Debrief
+          Comment=Open file in Debrief maritime analysis tool
+          Exec=/opt/debrief/bin/debrief-open %f
+          Icon=code
+          MimeType=application/x-debrief-rep;
+          Categories=Science;Geography;
+          DESKTOP
+            cat > artifact/dot-local/share/mime/packages/debrief.xml << 'MIME'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+            <mime-type type="application/x-debrief-rep">
+              <comment>Debrief REP file</comment>
+              <glob pattern="*.rep"/>
+              <glob pattern="*.REP"/>
+            </mime-type>
+          </mime-info>
+          MIME
+          fi
+
+          # Copy entry scripts
+          if [ -d "demo/bin" ]; then
+            cp demo/bin/* artifact/bin/
+          else
+            # Create minimal entry script
+            cat > artifact/bin/debrief-open << 'SCRIPT'
+          #!/bin/bash
+          # Launch VS Code with the file - Debrief extension handles .rep files
+          code --reuse-window "$1"
+          SCRIPT
+          fi
+          chmod +x artifact/bin/*
+
+          # Copy sample files
+          if [ -d "demo/samples" ]; then
+            cp -r demo/samples/* artifact/samples/
+          else
+            echo "No sample files found in demo/samples/"
+            touch artifact/samples/.placeholder
+          fi
+
+          # Package everything
+          tar czf debrief-demo.tar.gz -C artifact .
+
+          # Verify package
+          echo "=== Artifact Contents ==="
+          tar tzf debrief-demo.tar.gz | head -50
+          echo "=== Package Size ==="
+          ls -lh debrief-demo.tar.gz
+
+      - name: Verify venv portability
+        run: |
+          # Extract and check for any remaining absolute paths
+          mkdir -p verify
+          tar xzf debrief-demo.tar.gz -C verify
+
+          echo "=== Checking for hardcoded paths ==="
+          if grep -r "$PWD" verify/venv/bin/ 2>/dev/null; then
+            echo "ERROR: Found hardcoded build paths in venv"
+            exit 1
+          fi
+
+          echo "=== Verifying pyvenv.cfg ==="
+          cat verify/venv/pyvenv.cfg
+
+          rm -rf verify
+
+      - name: Upload artifact to workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: debrief-demo
+          path: debrief-demo.tar.gz
+          retention-days: 30
+
+      - name: Upload to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: debrief-demo.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload latest artifact (non-release)
+        if: github.event_name != 'release' && github.ref == 'refs/heads/main'
+        run: |
+          # This creates/updates a "latest" pre-release for CI builds
+          echo "Latest artifact available at:"
+          echo "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
