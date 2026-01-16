@@ -259,7 +259,7 @@ export class CalcService {
     executionId: string,
     result: ToolExecutionResult
   ): ResultLayer | null {
-    if (!result.success || !result.features) {
+    if (result.success !== true || !result.features) {
       return null;
     }
 
@@ -272,7 +272,7 @@ export class CalcService {
       name: displayName,
       toolName,
       executionId,
-      features: result.features,
+      features: result.features as GeoJSON.Feature[],
       style: createDefaultResultStyle(toolName),
       visible: true,
       createdAt: new Date().toISOString(),
@@ -325,9 +325,9 @@ export class CalcService {
     // For now, we'll simulate a successful connection
   }
 
-  private async fetchToolsFromMcp(): Promise<AnalysisTool[]> {
+  private fetchToolsFromMcp(): Promise<AnalysisTool[]> {
     // Simulated tools - in production, these come from debrief-calc MCP
-    return [
+    return Promise.resolve([
       {
         name: 'range-bearing',
         displayName: 'Range & Bearing Calculator',
@@ -369,11 +369,11 @@ export class CalcService {
         inputKinds: ['track', 'location'],
         inputSchema: {},
       },
-    ];
+    ]);
   }
 
   private async executeToolOnMcp(
-    toolName: string,
+    _toolName: string,
     _tracks: Track[],
     _locations: ReferenceLocation[],
     _params?: Record<string, unknown>

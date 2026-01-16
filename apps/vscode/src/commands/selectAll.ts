@@ -17,7 +17,7 @@ export function createSelectAllCommand(
     }
 
     const tracks = panel.getTracks();
-    const locations = panel.getLocations();
+    const _locations = panel.getLocations();
 
     // Select all tracks
     const trackIds = tracks.map((t) => t.id);
