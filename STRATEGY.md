@@ -89,6 +89,14 @@ Items that don't fit current strategy but may return later:
 | Cloud STAC synchronisation | Offline-first phase | NATO pilot planning begins |
 | Legacy feature parity | Rebuild, not clone | Specific stakeholder requests |
 
+## Rejected Items Log
+
+Items rejected from backlog with reasons. Helps scout learn what doesn't fit.
+
+| Date | Item | Reason | Proposed By |
+|------|------|--------|-------------|
+| — | *(none yet)* | — | — |
+
 ## Strategic Decisions Log
 
 Record significant prioritisation decisions here for future reference.
@@ -100,5 +108,5 @@ Record significant prioritisation decisions here for future reference.
 
 ---
 
-*Document version: 1.0 — January 2026*
+*Document version: 1.1 — January 2026*
 *Next review: At phase boundary (post tracer bullet)*

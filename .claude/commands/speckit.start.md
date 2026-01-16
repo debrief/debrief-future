@@ -53,11 +53,14 @@ Check the item is ready for specification:
 | Check | Pass Condition | Error Message |
 |-------|---------------|---------------|
 | Item exists | Row found in table | "Backlog item {ID} not found in BACKLOG.md" |
-| Status is appropriate | Status is `proposed` | "Item {ID} has status '{status}'. Only 'proposed' items can be started. If already specified, use `/speckit.clarify` or `/speckit.plan` instead." |
+| Status is approved | Status is `approved` | "Item {ID} has status '{status}'. Only 'approved' items can be started. Ask the-ideas-guy to review and approve the item first." |
 | Has description | Description is not empty or `-` | "Item {ID} has no description. Add a description to BACKLOG.md first." |
 
-**Warning (non-blocking)**:
-- If scores are all `-`: "Note: Item {ID} has not been scored. Consider running the backlog-prioritizer first."
+**Status guidance**:
+- `proposed` without scores → needs prioritizer to score
+- `proposed` with scores → needs ideas-guy to approve
+- `approved` → ready for `/speckit.start`
+- `specified` or later → already in progress, use `/speckit.clarify` or `/speckit.plan`
 
 ### Step 4: Confirm with User
 
@@ -95,14 +98,14 @@ After `/speckit.specify` completes successfully, you MUST update BACKLOG.md:
 1. **Find the spec file path** from the speckit.specify output (e.g., `specs/007-rep-special-comments/spec.md`)
 
 2. **Update the backlog row**:
-   - Change status from `proposed` to `specified`
+   - Change status from `approved` to `specified`
    - Convert description to a markdown link: `[Original Description](specs/NNN-feature-name/spec.md)`
 
 3. **Example transformation**:
 
    Before:
    ```
-   | 007 | Enhancement | Implement REP file special comments | 4 | 4 | 4 | 12 | proposed |
+   | 007 | Enhancement | Implement REP file special comments | 4 | 4 | 4 | 12 | approved |
    ```
 
    After:
@@ -138,7 +141,7 @@ After both the spec creation and backlog update:
 ### Workflow Progress
 
 ```
-[x] proposed → [x] specified → [ ] clarified → [ ] planned → [ ] tasked → [ ] implementing → [ ] complete
+[x] proposed → [x] approved → [x] specified → [ ] clarified → [ ] planned → [ ] tasked → [ ] implementing → [ ] complete
 ```
 ```
 
@@ -147,7 +150,9 @@ After both the spec creation and backlog update:
 | Scenario | Action |
 |----------|--------|
 | Item not found | ERROR with suggestion to check BACKLOG.md |
-| Item already specified | Suggest `/speckit.clarify` or `/speckit.plan` instead |
+| Item is `proposed` (no scores) | ERROR: "Item needs scoring first. Run backlog-prioritizer." |
+| Item is `proposed` (has scores) | ERROR: "Item needs approval. Ask ideas-guy to review." |
+| Item already `specified` | Suggest `/speckit.clarify` or `/speckit.plan` instead |
 | Item is complete | ERROR: "Item {ID} is already complete" |
 | BACKLOG.md not found | ERROR: "BACKLOG.md not found at repository root" |
 | Parse failure | ERROR with details, suggest manual inspection |
@@ -156,37 +161,42 @@ After both the spec creation and backlog update:
 
 ### With the-ideas-guy
 
-This command assumes the human (guided by `the-ideas-guy` agent) has already approved the item for specification. The act of running `/speckit.start {ID}` is the approval signal.
+This command requires the ideas-guy to have reviewed and approved the item (status: `approved`). The ideas-guy changes status from `proposed` to `approved` during their review.
 
 ### With opportunity-scout and backlog-prioritizer
 
-Items should ideally be:
-1. Added by scout (or human)
-2. Scored by prioritizer
-3. Reviewed by ideas-guy
-4. Then started with this command
+The workflow requires these steps in order:
+1. Scout or ideas-guy adds item (status: `proposed`)
+2. Prioritizer scores it (still `proposed`, but with V/M/A)
+3. Ideas-guy reviews and approves (status: `approved`)
+4. `/speckit.start {ID}` creates spec (status: `specified`)
 
-However, scoring is not mandatory—unscored items will proceed with a warning.
+This command validates status is `approved` — it won't proceed with `proposed` items.
 
 ### Status Flow
 
-This command initiates the documented BACKLOG.md status progression:
+This command requires `approved` status and advances to `specified`:
 
 ```
-proposed ──[/speckit.start]──> specified ──[/speckit.clarify]──> clarified
-    │                              │                                  │
-    │                              └──────[/speckit.plan]─────────────┘
-    │                                           │
-    │                                           v
-    │                                        planned
-    │                                           │
-    │                              [/speckit.tasks]
-    │                                           │
-    │                                           v
-    │                                        tasked
-    │                                           │
-    │                            [/speckit.implement]
-    │                                           │
-    │                                           v
-    └──────────────────────────────────> implementing ──> complete
+proposed ──[prioritizer scores]──> proposed (with scores)
+                                        │
+                          [ideas-guy reviews]
+                                        │
+                                        v
+                                    approved
+                                        │
+                          [/speckit.start] ◄── YOU ARE HERE
+                                        │
+                                        v
+specified ──[/speckit.clarify]──> clarified ──[/speckit.plan]──> planned
+                                                                    │
+                                                       [/speckit.tasks]
+                                                                    │
+                                                                    v
+                                                                 tasked
+                                                                    │
+                                                     [/speckit.implement]
+                                                                    │
+                                                                    v
+                                                             implementing ──> complete
 ```

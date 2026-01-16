@@ -64,26 +64,29 @@ The complete flow from idea to implementation:
 │                    BACKLOG → SPECKIT WORKFLOW                       │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
-│  1. IDEATION (the-ideas-guy initiates)                              │
-│     the-ideas-guy ──generates──> strategic ideas → BACKLOG.md       │
-│     opportunity-scout ──explores──> technical opportunities         │
+│  1. IDEATION (parallel)                                             │
+│     the-ideas-guy ──generates──> strategic ideas ───┐               │
+│     opportunity-scout ──explores──> technical items ┼──> BACKLOG.md │
+│     human ──────────────────────────────────────────┘   (proposed)  │
 │                                                                     │
-│  2. REVIEW (the-ideas-guy gates)                                    │
-│     the-ideas-guy ──reviews all──> fits STRATEGY.md?                │
-│        ├── Yes → backlog-prioritizer scores (V/M/A)                 │
+│  2. SCORING (backlog-prioritizer)                                   │
+│     scores V/M/A for proposed items                                 │
+│                                                                     │
+│  3. APPROVAL (the-ideas-guy reviews scored items)                   │
+│        ├── Approve → status: approved                               │
 │        ├── Park → STRATEGY.md Parking Lot                           │
-│        └── Reject → explain why                                     │
+│        └── Reject → STRATEGY.md Rejected Log                        │
 │                                                                     │
-│  3. BRIDGE (Command)                                                │
-│     /speckit.start {ID} ──────> creates spec, updates backlog       │
-│                                 status: proposed → specified        │
+│  4. SPECIFICATION                                                   │
+│     /speckit.start {ID} ──────> requires status: approved           │
+│                                 creates spec, status → specified    │
 │                                                                     │
-│  4. SPECIFY (Commands)                                              │
+│  5. DESIGN (Commands)                                               │
 │     /speckit.clarify ─────────> resolves ambiguities                │
 │     /speckit.plan ────────────> creates implementation plan         │
 │     /speckit.tasks ───────────> breaks down into tasks              │
 │                                                                     │
-│  5. BUILD (Commands)                                                │
+│  6. BUILD (Commands)                                                │
 │     /speckit.implement ───────> executes tasks, captures evidence   │
 │     /speckit.pr ──────────────> creates PR + publishes blog         │
 │                                                                     │
@@ -91,11 +94,11 @@ The complete flow from idea to implementation:
 ```
 
 **Key roles:**
-- **the-ideas-guy** is both initiator (generates strategic ideas) and gatekeeper (reviews all candidates)
-- **opportunity-scout** explores code for technical opportunities the ideas-guy can't see
-- **backlog-prioritizer** scores approved items mechanically — after ideas-guy review
+- **the-ideas-guy**: Initiates strategic ideas AND approves items for speckit (changes status to `approved`)
+- **opportunity-scout**: Explores code for technical opportunities (light filtering only)
+- **backlog-prioritizer**: Scores items mechanically (V/M/A)
 
-The bridge is `/speckit.start {ID}` — it connects approved backlog items to the speckit workflow.
+**Status progression**: `proposed` → (scored) → `approved` → `specified` → ... → `complete`
 
 ### Media Agents
 
