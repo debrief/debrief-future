@@ -1,0 +1,115 @@
+name: VS Code Extension
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/vscode/**'
+      - '.github/workflows/vscode-extension.yml'
+    tags:
+      - 'vscode-v*'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/vscode/**'
+      - '.github/workflows/vscode-extension.yml'
+
+defaults:
+  run:
+    working-directory: apps/vscode
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Type check
+        run: pnpm exec tsc --noEmit
+
+      - name: Run unit tests
+        run: pnpm run test:unit
+
+      - name: Build extension
+        run: pnpm run compile
+
+      - name: Package VSIX
+        run: pnpm run package
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debrief-vscode-${{ github.sha }}
+          path: apps/vscode/*.vsix
+          retention-days: 30
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/vscode-v')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build and package
+        run: |
+          pnpm run compile
+          pnpm run package
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/vscode-v}" >> $GITHUB_OUTPUT
+        working-directory: .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Debrief VS Code Extension v${{ steps.version.outputs.version }}
+          body: |
+            ## Installation
+
+            1. Download `debrief-vscode-${{ steps.version.outputs.version }}.vsix` below
+            2. Open VS Code → Extensions → `...` menu → "Install from VSIX..."
+            3. Select the downloaded file
+
+            Or via command line:
+            ```
+            code --install-extension debrief-vscode-${{ steps.version.outputs.version }}.vsix
+            ```
+          files: apps/vscode/*.vsix
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
