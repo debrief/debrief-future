@@ -26,12 +26,13 @@ agents/
 
 The backlog agents manage `BACKLOG.md` and `STRATEGY.md` at the repository root.
 
-**The Ideas Guy** — Product Strategist who oversees the backlog workflow:
-- "Use the-ideas-guy to review backlog strategic alignment"
-- "Ideas guy, should we park this opportunity or add it to backlog?"
+**The Ideas Guy** — Product Strategist who generates ideas and maintains strategy:
+- "Ideas guy, what should we build next?"
+- "Generate ideas for the 'demonstrate value' theme"
 - "Review the backlog and update STRATEGY.md for the new phase"
+- "Ideas guy, should we park this opportunity or add it to backlog?"
 
-The Ideas Guy owns `STRATEGY.md` and makes judgment calls on prioritisation. They oversee the scout and prioritizer, ensuring mechanical scoring aligns with strategic intent.
+The Ideas Guy owns `STRATEGY.md`, generates strategic ideas, and makes judgment calls on prioritisation. Unlike the scout (who explores code), the ideas guy thinks about strategic gaps, demo-ability, and stakeholder needs.
 
 **Opportunity Scout** — Invoke when you want to identify new work:
 - "Use the opportunity-scout to explore the codebase for tech debt"
