@@ -88,6 +88,7 @@ Items that don't fit current strategy but may return later:
 | Real-time streaming | Not post-exercise analysis | Unless stakeholder demand emerges |
 | Cloud STAC synchronisation | Offline-first phase | NATO pilot planning begins |
 | Legacy feature parity | Rebuild, not clone | Specific stakeholder requests |
+| Shared Web Components library (BACKLOG #003) | No VS Code extension exists yet to extract from | VS Code extension development begins (tracer bullet step 6) |
 
 ## Rejected Items Log
 

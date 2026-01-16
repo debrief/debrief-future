@@ -81,7 +81,7 @@ Description formats:
 | 002 | Feature | Add MCP wrapper for debrief-io service | 4 | 3 | 4 | 11 | proposed |
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | proposed |
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | proposed |
-| 003 | Tech Debt | Create shared React component library (shared/components) | 3 | 3 | 4 | 10 | proposed |
+| 003 | Tech Debt | Extract mapping component to shared/web-components for VS Code, Loader, Jupyter reuse | 4 | 3 | 3 | 10 | proposed |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | proposed |
 | 001 | Infrastructure | Extract shared MCP utilities into mcp-common package | 3 | 2 | 4 | 9 | proposed |
 | 006 | Enhancement | Add i18n infrastructure to VS Code extension | 2 | 1 | 4 | 7 | proposed |
