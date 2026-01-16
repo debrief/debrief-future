@@ -14,6 +14,19 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Arguments
+
+Parse the following from user input:
+
+| Argument | Description | Example |
+|----------|-------------|---------|
+| `<path>` | Path to content file or directory | `specs/002-debrief-io/media/shipped-post.md` |
+| `--feature-pr <url>` | URL of related feature PR (for cross-referencing) | `--feature-pr https://github.com/debrief/debrief-future/pull/28` |
+| `--date <YYYY-MM-DD>` | Override post date (defaults to today) | `--date 2026-01-10` |
+| `--dry-run` | Preview changes without creating PR | `--dry-run` |
+
+When invoked from `/speckit.pr`, the `--feature-pr` argument will be provided automatically.
+
 ## Capabilities
 
 This skill handles cross-repository content publishing:
@@ -142,11 +155,25 @@ fi
    ```
 
 8. **Create PR**
+
+   If `--feature-pr` was provided, include it in the PR body:
+
    ```bash
+   # Build Related section based on available context
+   RELATED_SECTION=""
+   if [ -n "$FEATURE_PR_URL" ]; then
+       RELATED_SECTION="## Related
+
+   - Feature PR: $FEATURE_PR_URL
+   - Source: \`$SOURCE_PATH\`
+
+   "
+   fi
+
    gh pr create \
        --repo debrief/debrief.github.io \
        --title "Future Debrief: $CONTENT_TITLE" \
-       --body "$(cat <<'EOF'
+       --body "$(cat <<EOF
    ## Content Update
 
    **Type:** $CONTENT_TYPE
@@ -157,7 +184,7 @@ fi
 
    Once merged, visible at: https://debrief.github.io/future/
 
-   ## Source
+   ${RELATED_SECTION}## Source
 
    Auto-generated from [debrief-future](https://github.com/debrief/debrief-future)
 
