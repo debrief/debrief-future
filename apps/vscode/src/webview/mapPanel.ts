@@ -608,16 +608,6 @@ export class MapPanel {
       <button id="btn-fit-bounds" class="toolbar-btn" title="Fit to All">[]</button>
       <button id="btn-export" class="toolbar-btn" title="Export PNG">E</button>
     </div>
-    <div id="welcome-view" class="welcome-view">
-      <div class="welcome-content">
-        <h1>Debrief</h1>
-        <p>Open a plot to get started</p>
-        <ul>
-          <li>Drag a plot from Explorer onto this area</li>
-          <li>Or use Ctrl+Shift+P and "Debrief: Open Plot"</li>
-        </ul>
-      </div>
-    </div>
   </div>
   <script src="${scriptUri}"></script>
 </body>

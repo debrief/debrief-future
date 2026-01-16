@@ -68,6 +68,9 @@ export interface StacItemSummary {
 
   /** Parent catalog ID */
   catalogId: string;
+
+  /** Parent store ID (needed for URI construction) */
+  storeId: string;
 }
 
 /**

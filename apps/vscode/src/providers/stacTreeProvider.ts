@@ -186,7 +186,7 @@ export class StacTreeProvider
     item.command = {
       command: 'debrief.openPlot',
       title: 'Open Plot',
-      arguments: [{ uri: `stac://${plotItem.catalogId}/${plotItem.itemPath}` }],
+      arguments: [{ uri: `stac://${plotItem.storeId}/${plotItem.itemPath}` }],
     };
 
     return item;

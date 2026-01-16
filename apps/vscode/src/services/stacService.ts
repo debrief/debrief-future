@@ -148,6 +148,7 @@ export class StacService {
             datetime: item.properties.datetime,
             itemPath: relativePath,
             catalogId: catalog.id,
+            storeId: store.id,
           });
         }
       }

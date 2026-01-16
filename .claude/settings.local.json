@@ -7,7 +7,8 @@
       "Bash(pnpm install:*)",
       "Bash(pnpm run compile:*)",
       "Bash(pnpm run test:unit:*)",
-      "Bash(code:*)"
+      "Bash(code:*)",
+      "Bash(find:*)"
     ]
   }
 }

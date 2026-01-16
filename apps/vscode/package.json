@@ -343,7 +343,7 @@
     "vscode:prepublish": "pnpm run compile",
     "compile": "pnpm run compile:extension && pnpm run compile:webview",
     "compile:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
-    "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife",
+    "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife && cp src/webview/web/styles.css dist/webview/styles.css",
     "watch": "pnpm run watch:extension & pnpm run watch:webview",
     "watch:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
     "watch:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife --watch",
