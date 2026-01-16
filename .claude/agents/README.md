@@ -8,6 +8,7 @@ This directory contains agent definitions for specialized subagents that can be 
 agents/
 ├── README.md           # This file
 ├── backlog/            # Backlog management agents
+│   ├── the-ideas-guy.md        # Product Strategist (owns STRATEGY.md, oversees backlog)
 │   ├── opportunity-scout.md    # Identifies features, capabilities, tech debt
 │   └── backlog-prioritizer.md  # Scores and ranks backlog items
 └── media/              # Media & communications agents
@@ -20,17 +21,28 @@ agents/
 
 ### Backlog Agents
 
-The backlog agents manage `BACKLOG.md` at the repository root.
+The backlog agents manage `BACKLOG.md` and `STRATEGY.md` at the repository root.
+
+**The Ideas Guy** — Product Strategist who oversees the backlog workflow:
+- "Use the-ideas-guy to review backlog strategic alignment"
+- "Ideas guy, should we park this opportunity or add it to backlog?"
+- "Review the backlog and update STRATEGY.md for the new phase"
+
+The Ideas Guy owns `STRATEGY.md` and makes judgment calls on prioritisation. They oversee the scout and prioritizer, ensuring mechanical scoring aligns with strategic intent.
 
 **Opportunity Scout** — Invoke when you want to identify new work:
 - "Use the opportunity-scout to explore the codebase for tech debt"
 - "Have the scout flesh out ideas around map visualization"
 - "Scout, what opportunities do you see in the io service?"
 
+The scout filters opportunities against `STRATEGY.md` before proposing them to the backlog.
+
 **Backlog Prioritizer** — Invoke when items need scoring:
 - "Use the backlog-prioritizer to score the new items"
 - "Prioritizer, re-evaluate items in light of the new architecture decision"
 - "Score and reorder the backlog"
+
+The prioritizer uses scoring guidance from `STRATEGY.md` to interpret dimensions in context.
 
 ### Media Agents
 
