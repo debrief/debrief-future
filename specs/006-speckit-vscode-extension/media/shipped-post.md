@@ -28,20 +28,12 @@ Leaflet-powered maps render vessel tracks with smooth performance - even with 10
 
 Select tracks using familiar patterns: click for single selection, Shift+click to add, Ctrl+click to toggle. Selected tracks glow with a subtle animated effect.
 
-**4. Context-Sensitive Tools**
-
-The extension discovers available analysis tools based on your selection. Two tracks selected? Range & Bearing and Closest Approach tools appear. One track? Track Statistics is available.
-
-**5. Result Layers**
-
-Analysis results appear as overlay layers on the map. Toggle visibility, stack multiple analyses, and clear when done.
-
 ## Technical Highlights
 
 - **TypeScript throughout** with strict mode enabled
 - **esbuild** for fast, dual-target bundling
-- **Vitest** for comprehensive test coverage (86%)
-- **MCP protocol** for tool integration with debrief-calc
+- **Vitest** for comprehensive unit test coverage
+- **Canvas rendering** for smooth 10,000+ point performance
 - **Webview state persistence** for seamless session restore
 
 ## Installation
@@ -57,15 +49,15 @@ code --install-extension debrief-vscode-0.1.0.vsix
 1. Click the + button in STAC Stores to register your catalog
 2. Double-click a plot to open the map view
 3. Click tracks to select them
-4. Choose a tool and click Execute
+4. Use the toolbar to zoom, pan, and fit bounds
 
 ## What's Next
 
 This release establishes the foundation for the Debrief analysis platform in VS Code. Future updates will bring:
 
+- Analysis tool integration via MCP protocol
 - Timeline visualization component
-- Additional analysis tools
-- Collaborative features
+- Result layer overlays
 - Cloud STAC catalog support
 
 ## Resources
