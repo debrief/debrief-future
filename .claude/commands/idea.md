@@ -1,5 +1,5 @@
 ---
-description: Submit an idea to the opportunity-scout and orchestrate it through the full backlog-to-spec pipeline. Handles evaluation, scoring, approval, and spec creation in one flow.
+description: Submit an idea to the opportunity-scout for evaluation and capture in the backlog. Handles evaluation, scoring, and approval decision — but stops there. Use /speckit.start to begin implementation later.
 ---
 
 ## User Input
@@ -12,15 +12,17 @@ You **MUST** have an idea description provided.
 
 ## Purpose
 
-This command orchestrates the full pipeline from idea to specification, reducing manual handoffs:
+This command captures requirements and evaluates them for the backlog:
 
 ```
-IDEA → scout evaluates → backlog → score → approve → /speckit.start
-              ↑              ↑        ↑        ↑           ↑
-           (auto)         (auto)   (auto)   (auto)    (auto if approved)
+IDEA → scout evaluates → backlog → score → approve/park/reject
+              ↑              ↑        ↑              ↑
+           (auto)         (auto)   (auto)        (auto)
 ```
 
-The human suggests an idea; the scout evaluates it; the system handles the rest.
+The human suggests an idea; the scout evaluates it; the system scores and decides.
+
+**Implementation happens separately**: When ready to implement an approved item, run `/speckit.start {ID}`.
 
 ## Execution Flow
 
@@ -69,7 +71,7 @@ Report: "Scout evaluation: ✅ Passes hard filters" (with any soft filter flags)
 
 Report: "Added as item {ID}"
 
-### Step 3: Score the Item
+### Step 4: Score the Item
 
 Act as the **backlog-prioritizer**:
 
@@ -82,7 +84,7 @@ Act as the **backlog-prioritizer**:
 4. Update BACKLOG.md with scores
 5. Report scores with brief rationale
 
-### Step 4: Strategic Review
+### Step 5: Strategic Review (Final Step)
 
 Act as the **ideas-guy** in Approval Mode:
 
@@ -94,21 +96,13 @@ Act as the **ideas-guy** in Approval Mode:
    - Is it already in the Parking Lot?
 
 3. Decide:
-   - **Approve**: Change status to `approved`, continue to Step 5
-   - **Park**: Move to Parking Lot, STOP and explain why
-   - **Reject**: Log in Rejected Items, STOP and explain why
+   - **Approve**: Change status to `approved`, report success
+   - **Park**: Move to Parking Lot, explain why
+   - **Reject**: Log in Rejected Items, explain why
 
-### Step 5: Trigger Specification (if approved)
+4. Report the decision and STOP
 
-If the item was approved:
-
-1. Report: "Item {ID} approved. Starting specification workflow..."
-2. Hand off to `/speckit.start {ID}` via the handoff button below
-
-If parked or rejected:
-- Explain the decision
-- Suggest alternatives or timing for revisit
-- STOP (do not trigger speckit)
+**Do NOT trigger `/speckit.start`** — implementation is a separate decision made later.
 
 ## Output Format
 
@@ -129,8 +123,8 @@ Item **{ID}** added as {Category}
 ### 3. Strategic Review
 ✅ **Approved** — {reason}
 
-### 4. Ready for Specification
-Click the handoff below to start `/speckit.start {ID}`
+### Next Step
+When ready to implement, run: `/speckit.start {ID}`
 ```
 
 ### Parked Path
@@ -173,18 +167,12 @@ Logged in STRATEGY.md Rejected Items.
 Item removed from backlog.
 ```
 
-## Handoff
-
-Only if approved:
-- Label: "Start Specification"
-- Command: `/speckit.start {ID}`
-
 ## Fast-Track Option
 
 If the human says `/idea --fast {description}`:
 - Skip detailed reporting
 - Just output: "Item {ID}: {status} — {one-line reason}"
-- Still trigger speckit.start if approved
+- Do NOT trigger speckit.start (user must run it manually when ready)
 
 ## Error Handling
 
