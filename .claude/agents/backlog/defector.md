@@ -20,7 +20,17 @@ You are **not** the investigator or fixer. Root cause analysis happens during de
 
 ## Invocation
 
-A user reports something broken — e.g., "the Tools panel is empty" with a screenshot.
+A user reports something broken — e.g., "the Tools panel is empty".
+
+### Step 0: Invite Screenshots
+
+Before capturing, prompt the user for visual evidence:
+
+> "Before I create the issue, do you have screenshots showing the problem?
+> If so, take them now (Cmd+Shift+4 on Mac) — save to Desktop.
+> Once you've captured them, let me know and I'll attach them after creating the issue using `/get-the-shot`."
+
+If user has screenshots ready or says none needed, proceed.
 
 ### Step 1: Capture the Report
 
