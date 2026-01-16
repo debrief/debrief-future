@@ -18,7 +18,7 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
 
 | Status | Meaning | Trigger |
 |--------|---------|---------|
-| **proposed** | Item added, awaiting review | Scout adds, or human submits |
+| **proposed** | Item added, awaiting review | Scout adds, ideas-guy adds, or human submits |
 | **specified** | Spec created, linked below | `/speckit.start {ID}` |
 | **clarified** | Ambiguities resolved | `/speckit.clarify` |
 | **planned** | Implementation plan ready | `/speckit.plan` |
@@ -26,9 +26,25 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
 | **implementing** | Active development | `/speckit.implement` |
 | **complete** | Done (row struck through) | `/speckit.pr` merged |
 
+### Backlog Flow
+
+```
+1. IDEATION
+   the-ideas-guy ──generates──> strategic ideas
+   opportunity-scout ──explores──> technical opportunities
+                          ↓
+2. REVIEW (the-ideas-guy gates all items)
+   ├── Approve → prioritizer scores (V/M/A)
+   ├── Park → STRATEGY.md Parking Lot
+   └── Reject → explain why
+                          ↓
+3. SPECIFICATION
+   /speckit.start {ID} → creates spec, updates this file
+```
+
 ### Starting Specification Work
 
-When an item is prioritized and approved for work:
+When an item is reviewed, scored, and approved for work:
 
 ```bash
 /speckit.start 007    # Reads item 007, creates spec, updates this file
@@ -76,7 +92,7 @@ When complete, entire row gets ~~strikethrough~~
 
 ## Notes
 
-- Items without scores are awaiting prioritization
-- Scout adds items; Prioritizer scores them
-- Human reviews and approves before speckit workflow begins
+- Items without scores are awaiting review and prioritization
+- Ideas-guy and scout add items; ideas-guy reviews for strategic fit; prioritizer scores approved items
+- Human (or ideas-guy) approves before speckit workflow begins via `/speckit.start {ID}`
 - Completed items remain (struck through) for historical reference

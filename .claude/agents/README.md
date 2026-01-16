@@ -64,31 +64,38 @@ The complete flow from idea to implementation:
 │                    BACKLOG → SPECKIT WORKFLOW                       │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
-│  1. CAPTURE (Agents)                                                │
-│     opportunity-scout ──adds──> BACKLOG.md (proposed, unscored)     │
-│     backlog-prioritizer ──scores──> BACKLOG.md (V/M/A)              │
-│     the-ideas-guy ──reviews──> approves or parks                    │
+│  1. IDEATION (the-ideas-guy initiates)                              │
+│     the-ideas-guy ──generates──> strategic ideas → BACKLOG.md       │
+│     opportunity-scout ──explores──> technical opportunities         │
 │                                                                     │
-│  2. BRIDGE (Command)                                                │
+│  2. REVIEW (the-ideas-guy gates)                                    │
+│     the-ideas-guy ──reviews all──> fits STRATEGY.md?                │
+│        ├── Yes → backlog-prioritizer scores (V/M/A)                 │
+│        ├── Park → STRATEGY.md Parking Lot                           │
+│        └── Reject → explain why                                     │
+│                                                                     │
+│  3. BRIDGE (Command)                                                │
 │     /speckit.start {ID} ──────> creates spec, updates backlog       │
 │                                 status: proposed → specified        │
 │                                                                     │
-│  3. SPECIFY (Commands)                                              │
+│  4. SPECIFY (Commands)                                              │
 │     /speckit.clarify ─────────> resolves ambiguities                │
 │     /speckit.plan ────────────> creates implementation plan         │
 │     /speckit.tasks ───────────> breaks down into tasks              │
 │                                                                     │
-│  4. BUILD (Commands)                                                │
+│  5. BUILD (Commands)                                                │
 │     /speckit.implement ───────> executes tasks, captures evidence   │
 │     /speckit.pr ──────────────> creates PR + publishes blog         │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-The key bridge is `/speckit.start {ID}` — it connects the backlog agents' work to the speckit workflow by:
-- Reading the approved backlog item
-- Creating the feature specification
-- Updating BACKLOG.md with status and spec link
+**Key roles:**
+- **the-ideas-guy** is both initiator (generates strategic ideas) and gatekeeper (reviews all candidates)
+- **opportunity-scout** explores code for technical opportunities the ideas-guy can't see
+- **backlog-prioritizer** scores approved items mechanically — after ideas-guy review
+
+The bridge is `/speckit.start {ID}` — it connects approved backlog items to the speckit workflow.
 
 ### Media Agents
 
