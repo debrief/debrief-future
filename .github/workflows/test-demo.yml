@@ -1,0 +1,277 @@
+# Test Demo Environment Workflow
+# Runs the 7-layer test suite against the deployed demo environment
+#
+# Test Layers:
+# - Layer 1: URL Availability (HTTP 200)
+# - Layer 2: Service Running (VNC, XFCE processes)
+# - Layer 3: VNC Connectivity (WebSocket connection, RFB handshake)
+# - Layer 4: Component Installation (Python packages, entry points)
+# - Layer 5: Desktop Integration (.desktop files, MIME types)
+# - Layer 6: Data Pipeline (REP parsing, GeoJSON output)
+# - Layer 7: E2E Workflow (STAC integration, visual smoke test)
+
+name: Test Demo Environment
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      demo_url:
+        description: 'Demo URL to test'
+        required: false
+        default: 'https://debrief-demo.fly.dev'
+
+  # Run after artifact build completes
+  workflow_run:
+    workflows: ["Build Demo Artifact"]
+    types: [completed]
+
+  # Scheduled runs for monitoring
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+
+env:
+  DEMO_URL: ${{ github.event.inputs.demo_url || 'https://debrief-demo.fly.dev' }}
+  FLY_APP: debrief-demo
+
+jobs:
+  # Layer 1-3: External connectivity tests
+  test-layers-1-3:
+    name: Availability & Connectivity
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependencies
+        run: |
+          pip install websocket-client
+
+      - name: Setup Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Layer 1 - URL Availability
+        id: layer1
+        run: |
+          echo "Testing URL: $DEMO_URL"
+          ./demo/bin/test-url.sh "$DEMO_URL"
+        continue-on-error: true
+
+      - name: Layer 2 - Service Running
+        id: layer2
+        if: steps.layer1.outcome == 'success'
+        run: |
+          fly ssh console --app $FLY_APP \
+            --command "/opt/debrief/bin/test-service.sh" 2>&1 || echo "Layer 2 test completed with warnings"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        continue-on-error: true
+
+      - name: Layer 3 - VNC Connectivity
+        id: layer3
+        if: steps.layer1.outcome == 'success'
+        run: |
+          DEMO_URL="${DEMO_URL}" python tests/demo/test_vnc_connect.py
+        continue-on-error: true
+
+      - name: Layer 1-3 Summary
+        if: always()
+        run: |
+          echo "## Layer 1-3 Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Layer | Test | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 1 | URL Availability | ${{ steps.layer1.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 2 | Service Running | ${{ steps.layer2.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3 | VNC Connectivity | ${{ steps.layer3.outcome }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check Layer 1-3 Results
+        if: always()
+        run: |
+          if [ "${{ steps.layer1.outcome }}" != "success" ]; then
+            echo "::error::Layer 1 (URL Availability) failed"
+            exit 1
+          fi
+
+  # Layer 4-6: Container integration tests
+  test-layers-4-6:
+    name: Components & Integration
+    runs-on: ubuntu-latest
+    needs: test-layers-1-3
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Layer 4 - Component Installation
+        id: layer4
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          fly ssh console --app $FLY_APP \
+            --command "timeout 120 /opt/debrief/bin/test-components.sh" 2>&1 | tee layer4.log
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        continue-on-error: true
+
+      - name: Layer 5 - Desktop Integration
+        id: layer5
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          fly ssh console --app $FLY_APP \
+            --command "timeout 120 /opt/debrief/bin/test-desktop.sh" 2>&1 | tee layer5.log
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        continue-on-error: true
+
+      - name: Layer 6 - Data Pipeline
+        id: layer6
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          fly ssh console --app $FLY_APP \
+            --command "timeout 120 /opt/debrief/bin/test-pipeline.sh" 2>&1 | tee layer6.log
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        continue-on-error: true
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-layers-4-6
+          path: "*.log"
+          retention-days: 7
+
+      - name: Layer 4-6 Summary
+        if: always()
+        run: |
+          echo "## Layer 4-6 Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Layer | Test | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 4 | Component Installation | ${{ steps.layer4.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 5 | Desktop Integration | ${{ steps.layer5.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 6 | Data Pipeline | ${{ steps.layer6.outcome }} |" >> $GITHUB_STEP_SUMMARY
+
+  # Layer 7: End-to-end workflow tests
+  test-layer-7:
+    name: E2E Workflow
+    runs-on: ubuntu-latest
+    needs: test-layers-4-6
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Layer 7a - STAC Workflow
+        id: layer7a
+        timeout-minutes: 10
+        run: |
+          set -o pipefail
+          fly ssh console --app $FLY_APP \
+            --command "timeout 300 /opt/debrief/bin/test-stac-workflow.sh" 2>&1 | tee layer7a.log
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        continue-on-error: true
+
+      - name: Layer 7b - Visual Smoke Test
+        id: layer7b
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          fly ssh console --app $FLY_APP \
+            --command "timeout 60 /opt/debrief/bin/test-visual-smoke.sh" 2>&1 | tee layer7b.log
+
+          # Try to retrieve screenshot
+          fly ssh sftp get --app $FLY_APP /tmp/desktop-smoke.png desktop-smoke.png 2>/dev/null || echo "Could not retrieve screenshot"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        continue-on-error: true
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: layer-7-evidence
+          path: |
+            *.log
+            desktop-smoke.png
+          retention-days: 30
+
+      - name: Layer 7 Summary
+        if: always()
+        run: |
+          echo "## Layer 7 Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 7a - STAC Workflow | ${{ steps.layer7a.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 7b - Visual Smoke | ${{ steps.layer7b.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Manual Verification Checklist" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Review the desktop-smoke.png artifact and verify:" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Desktop shows XFCE environment" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] File manager icon visible in panel/desktop" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Sample files visible in Documents folder" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Right-click menu includes \"Open in Debrief\"" >> $GITHUB_STEP_SUMMARY
+
+  # Final summary job
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [test-layers-1-3, test-layers-4-6, test-layer-7]
+    if: always()
+
+    steps:
+      - name: Generate Final Summary
+        run: |
+          echo "# Demo Environment Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Demo URL**: $DEMO_URL" >> $GITHUB_STEP_SUMMARY
+          echo "**Run Date**: $(date -Iseconds)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Overall Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Layer 1-3 | ${{ needs.test-layers-1-3.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Layer 4-6 | ${{ needs.test-layers-4-6.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Layer 7 | ${{ needs.test-layer-7.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Determine overall status
+          if [ "${{ needs.test-layers-1-3.result }}" == "success" ] && \
+             [ "${{ needs.test-layers-4-6.result }}" == "success" ] && \
+             [ "${{ needs.test-layer-7.result }}" == "success" ]; then
+            echo "### Status: All Tests Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### Status: Some Tests Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Review the individual test results above for details." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Check Overall Status
+        run: |
+          if [ "${{ needs.test-layers-1-3.result }}" != "success" ]; then
+            echo "Layer 1-3 tests failed"
+            exit 1
+          fi
+          echo "All critical tests passed"

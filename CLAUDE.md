@@ -29,7 +29,60 @@ debrief/
 ├── apps/
 │   ├── loader/        # Electron mini-app
 │   └── vscode/        # VS Code extension
+├── demo/              # Browser-accessible demo environment
+│   ├── Dockerfile     # Container definition
+│   ├── fly.toml       # Fly.io configuration
+│   ├── bin/           # Entry scripts and test scripts
+│   ├── desktop/       # Desktop integration files
+│   └── samples/       # Sample data files
 └── docs/
+```
+
+## Demo Environment
+
+A browser-accessible demo environment is available for testing and stakeholder demonstrations.
+
+**URL**: https://debrief-demo.fly.dev
+
+### Key Components
+
+| Component | Description |
+|-----------|-------------|
+| `demo/Dockerfile` | Container with XFCE desktop, VNC, noVNC |
+| `demo/fly.toml` | Fly.io deployment configuration |
+| `demo/99-debrief-setup` | Startup script for artifact download |
+| `.github/workflows/build-demo-artifact.yml` | CI for building demo artifacts |
+| `.github/workflows/test-demo.yml` | 7-layer test suite |
+
+### Test Layers
+
+The demo environment uses a 7-layer test strategy:
+1. URL Availability - HTTP 200 check
+2. Service Running - VNC/XFCE process check
+3. VNC Connectivity - WebSocket/RFB handshake
+4. Component Installation - Python packages, entry points
+5. Desktop Integration - .desktop files, MIME types
+6. Data Pipeline - REP parsing, GeoJSON output
+7. E2E Workflow - STAC integration, visual smoke test
+
+### Local Development
+
+```bash
+# Build locally
+cd demo && docker build -t debrief-demo .
+
+# Run locally
+docker run -p 3000:3000 -e DEBRIEF_VERSION=latest debrief-demo
+
+# Access at http://localhost:3000
+```
+
+### Version Updates
+
+```bash
+# Update to specific version
+fly secrets set DEBRIEF_VERSION=v0.2.0 --app debrief-demo
+fly machines restart --app debrief-demo
 ```
 
 ## Build Sequence (Tracer Bullet)

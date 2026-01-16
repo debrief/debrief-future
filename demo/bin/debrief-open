@@ -1,0 +1,40 @@
+#!/bin/bash
+# debrief-open - Entry point script for opening files in Debrief
+#
+# This script is called by the desktop file association when a user
+# double-clicks or right-clicks "Open in Debrief" on a supported file type.
+#
+# It launches VS Code with the file - the Debrief extension handles
+# file type rendering and analysis.
+
+set -e
+
+FILE="${1:-}"
+
+if [ -z "$FILE" ]; then
+    echo "Usage: debrief-open <file>"
+    echo "Opens a file in VS Code with the Debrief extension."
+    exit 1
+fi
+
+# Check if file exists
+if [ ! -f "$FILE" ]; then
+    echo "Error: File not found: $FILE"
+    exit 1
+fi
+
+# Get absolute path
+ABSOLUTE_PATH="$(realpath "$FILE")"
+
+echo "Opening in Debrief: $ABSOLUTE_PATH"
+
+# Launch VS Code with the file
+# --reuse-window: Opens in existing VS Code window if available
+# The Debrief extension registers handlers for .rep and other Debrief file types
+if command -v code &> /dev/null; then
+    exec code --reuse-window "$ABSOLUTE_PATH"
+else
+    echo "Error: VS Code (code) command not found."
+    echo "Please ensure VS Code is installed."
+    exit 1
+fi
