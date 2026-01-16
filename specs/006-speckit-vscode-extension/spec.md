@@ -117,6 +117,13 @@ A new analyst installs the extension but has no STAC stores configured. They use
 - **FR-030**: Extension MUST display a welcome screen with recent plots when no plot is open
 - **FR-031**: Extension MUST track recently opened plots for quick access
 
+### Developer Experience Requirements
+
+- **DX-001**: Extension MUST include VS Code launch configuration (`.vscode/launch.json`) for F5 debugging in Extension Development Host
+- **DX-002**: Extension MUST include sample STAC test data (`test-data/`) with valid catalog structure and maritime plot for local testing
+- **DX-003**: Sample test data MUST include at least 2 vessel tracks with realistic coordinate sequences
+- **DX-004**: Sample test data MUST include at least 1 reference location point
+
 ### Key Entities
 
 - **STAC Store**: A registered local directory containing a STAC catalog. Has a path and optional display name.

@@ -102,6 +102,12 @@ apps/vscode/
 ├── package.json             # Extension manifest
 ├── tsconfig.json
 ├── esbuild.config.js        # Bundler config
+├── .vscode/                 # Developer experience
+│   └── launch.json          # F5 debugging configuration for Extension Development Host
+├── test-data/               # Sample STAC data for local testing
+│   ├── catalog.json         # STAC catalog root
+│   └── items/               # STAC items (plots)
+│       └── exercise-alpha.json  # Sample plot with tracks
 └── tests/
     ├── unit/                # Unit tests (vitest)
     ├── integration/         # Integration tests
@@ -109,6 +115,8 @@ apps/vscode/
 ```
 
 **Structure Decision**: VS Code Extension structure under `apps/vscode/` following the planned repository layout from ARCHITECTURE.md. Webview content bundled separately from extension host code.
+
+**Developer Experience**: `.vscode/launch.json` enables F5 debugging. `test-data/` provides sample STAC catalog with maritime plot data for testing without requiring external data sources (per DX-001 through DX-004).
 
 ## Constitution Re-Check (Post-Design)
 

@@ -58,6 +58,9 @@
 - [x] T007 Create extension entry point skeleton `apps/vscode/src/extension.ts`
 - [x] T008 [P] Create webview HTML template `apps/vscode/src/webview/web/index.html`
 - [x] T009 [P] Add Leaflet and dependencies to webview `apps/vscode/src/webview/web/map.ts`
+- [x] T009a Create VS Code launch configuration for F5 debugging `apps/vscode/.vscode/launch.json` (DX-001)
+- [x] T009b [P] Create sample STAC catalog for testing `apps/vscode/test-data/catalog.json` (DX-002)
+- [x] T009c [P] Create sample plot with vessel tracks `apps/vscode/test-data/items/exercise-alpha.json` (DX-003, DX-004)
 
 **Checkpoint**: Extension scaffolding complete, can activate in Extension Development Host
 

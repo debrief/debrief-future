@@ -1,6 +1,65 @@
 // Test setup file for vitest
 import { vi } from 'vitest';
 
+// EventEmitter class for proper event handling
+class MockEventEmitter<T> {
+  private listeners: ((e: T) => void)[] = [];
+
+  event = (listener: (e: T) => void) => {
+    this.listeners.push(listener);
+    return { dispose: () => {} };
+  };
+
+  fire = (data: T) => {
+    this.listeners.forEach(l => l(data));
+  };
+
+  dispose = () => {
+    this.listeners = [];
+  };
+}
+
+// TreeItem class that properly stores properties
+class MockTreeItem {
+  label?: string;
+  description?: string;
+  tooltip?: string;
+  contextValue?: string;
+  collapsibleState?: number;
+  iconPath?: unknown;
+  command?: unknown;
+  resourceUri?: unknown;
+
+  constructor(labelOrUri: string | unknown, collapsibleState?: number) {
+    if (typeof labelOrUri === 'string') {
+      this.label = labelOrUri;
+    } else {
+      this.resourceUri = labelOrUri;
+    }
+    this.collapsibleState = collapsibleState;
+  }
+}
+
+// ThemeIcon class
+class MockThemeIcon {
+  id: string;
+  color?: unknown;
+
+  constructor(id: string, color?: unknown) {
+    this.id = id;
+    this.color = color;
+  }
+}
+
+// ThemeColor class
+class MockThemeColor {
+  id: string;
+
+  constructor(id: string) {
+    this.id = id;
+  }
+}
+
 // Mock VS Code API globally
 vi.mock('vscode', () => ({
   window: {
@@ -35,18 +94,15 @@ vi.mock('vscode', () => ({
     file: vi.fn((path: string) => ({ fsPath: path, scheme: 'file', path })),
     parse: vi.fn((uri: string) => ({ fsPath: uri, scheme: 'file', path: uri })),
   },
-  EventEmitter: vi.fn(() => ({
-    event: vi.fn(),
-    fire: vi.fn(),
-    dispose: vi.fn(),
-  })),
-  TreeItem: vi.fn(),
+  EventEmitter: MockEventEmitter,
+  TreeItem: MockTreeItem,
   TreeItemCollapsibleState: {
     None: 0,
     Collapsed: 1,
     Expanded: 2,
   },
-  ThemeIcon: vi.fn(),
+  ThemeIcon: MockThemeIcon,
+  ThemeColor: MockThemeColor,
   ViewColumn: {
     One: 1,
     Two: 2,

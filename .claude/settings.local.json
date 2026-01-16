@@ -3,7 +3,11 @@
     "allow": [
       "Bash(.specify/scripts/bash/setup-plan.sh:*)",
       "Bash(curl:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm run compile:*)",
+      "Bash(pnpm run test:unit:*)",
+      "Bash(code:*)"
     ]
   }
 }

@@ -38,13 +38,42 @@ export const Uri = {
   parse: vi.fn((uri: string) => ({ fsPath: uri, scheme: 'file', path: uri })),
 };
 
-export const EventEmitter = vi.fn(() => ({
-  event: vi.fn(),
-  fire: vi.fn(),
-  dispose: vi.fn(),
-}));
+export class EventEmitter<T> {
+  private listeners: ((e: T) => void)[] = [];
 
-export const TreeItem = vi.fn();
+  event = (listener: (e: T) => void) => {
+    this.listeners.push(listener);
+    return { dispose: () => {} };
+  };
+
+  fire = (data: T) => {
+    this.listeners.forEach(l => l(data));
+  };
+
+  dispose = () => {
+    this.listeners = [];
+  };
+}
+
+export class TreeItem {
+  label?: string;
+  description?: string;
+  tooltip?: string;
+  contextValue?: string;
+  collapsibleState?: number;
+  iconPath?: any;
+  command?: any;
+  resourceUri?: any;
+
+  constructor(labelOrUri: string | any, collapsibleState?: number) {
+    if (typeof labelOrUri === 'string') {
+      this.label = labelOrUri;
+    } else {
+      this.resourceUri = labelOrUri;
+    }
+    this.collapsibleState = collapsibleState;
+  }
+}
 
 export const TreeItemCollapsibleState = {
   None: 0,
@@ -52,7 +81,23 @@ export const TreeItemCollapsibleState = {
   Expanded: 2,
 };
 
-export const ThemeIcon = vi.fn();
+export class ThemeIcon {
+  id: string;
+  color?: any;
+
+  constructor(id: string, color?: any) {
+    this.id = id;
+    this.color = color;
+  }
+}
+
+export class ThemeColor {
+  id: string;
+
+  constructor(id: string) {
+    this.id = id;
+  }
+}
 
 export const ViewColumn = {
   One: 1,
