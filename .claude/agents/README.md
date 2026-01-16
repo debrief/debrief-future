@@ -12,10 +12,12 @@ agents/
 │   ├── opportunity-scout.md    # Identifies features, capabilities, tech debt
 │   ├── backlog-prioritizer.md  # Scores and ranks backlog items
 │   └── defector.md             # Handles bug reports, creates GitHub issues
-└── media/              # Media & communications agents
-    ├── content.md      # Content Specialist (blog posts, LinkedIn)
-    ├── jekyll.md       # Jekyll Specialist (site structure, templates)
-    └── technical.md    # Technical Specialist (specs, docs, diagrams)
+├── media/              # Media & communications agents
+│   ├── content.md      # Content Specialist (blog posts, LinkedIn)
+│   ├── jekyll.md       # Jekyll Specialist (site structure, templates)
+│   └── technical.md    # Technical Specialist (specs, docs, diagrams)
+└── website/            # Cross-repo website publishing agents
+    └── publisher.md    # Executes cross-repo PRs to debrief.github.io
 ```
 
 ## Usage
@@ -55,6 +57,18 @@ The defector investigates bugs, creates GitHub issues with root cause analysis, 
 ### Media Agents
 
 These agents are coordinated via the `/media` command (`.claude/commands/media.md`).
+
+### Website Agents
+
+The website agents handle cross-repository publishing to `debrief/debrief.github.io`.
+
+**Publisher** — Executes the cross-repo PR workflow:
+- Invoked via the `/publish` skill
+- Clones the website repo to a temp directory
+- Transforms content (front matter, image paths)
+- Creates PRs for review
+
+The publisher is typically invoked automatically by `/publish` or `/speckit.pr`, but can be used directly via the Task tool for custom publishing workflows.
 
 ### Direct Invocation
 

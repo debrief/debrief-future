@@ -127,83 +127,35 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 12. **Check for publishable media content**:
     - Look for `FEATURE_DIR/media/shipped-post.md`
-    - If missing, skip to step 16 (final report)
+    - If missing, skip to step 15 (final report)
     - If present, proceed with cross-repo publishing
 
-13. **Execute cross-repo blog publishing**:
-    - Read Jekyll Specialist agent from `.claude/agents/media/jekyll.md`
-    - Follow the Cross-Repo Publishing Workflow documented there
-    - Execute the publishing script:
+13. **Execute cross-repo blog publishing via /publish skill**:
 
-    ```bash
-    # Create temp workspace
-    WORK_DIR=$(mktemp -d)
-    trap "rm -rf $WORK_DIR" EXIT
+    Invoke the publish skill with the shipped post path:
 
-    # Clone website repo
-    gh repo clone debrief/debrief.github.io "$WORK_DIR/website" -- --depth 1 --quiet
-    cd "$WORK_DIR/website"
-
-    # Generate identifiers
-    POST_DATE=$(date +%Y-%m-%d)
-    SLUG=$(echo "$FEATURE_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9-' | cut -c1-50)
-    BRANCH="future-debrief/${POST_DATE}-${SLUG}"
-    FILENAME="${POST_DATE}-${SLUG}.md"
-
-    # Extract title
-    TITLE=$(grep -m1 '^title:' "$FEATURE_DIR/media/shipped-post.md" | sed 's/title: *["]*//;s/["]*$//')
-
-    # Create branch
-    git checkout -b "$BRANCH"
+    ```
+    Skill tool:
+      skill: "publish"
+      args: "$FEATURE_DIR/media/shipped-post.md --feature-pr $FEATURE_PR_URL"
     ```
 
-14. **Transform and publish post**:
-    - Transform front matter from internal format to `future-post` layout
-    - Apply transformations:
-      - `layout: post` → `layout: future-post`
-      - `category: shipped` → `track: "Shipped · {feature-name}"`
-      - `author: ian` → `author: Ian`
-      - Add `reading_time` (calculate: ceil(word_count / 200))
-      - Add `excerpt` (first paragraph, max 150 chars)
-    - Update image paths: `./images/` → `/assets/images/future-debrief/{slug}/`
-    - Copy images if `FEATURE_DIR/media/images/` exists
-    - Commit, push, and create PR:
+    The `/publish` skill handles:
+    - Cloning debrief.github.io to temp directory
+    - Transforming front matter to `future-post` layout
+    - Updating image paths
+    - Creating branch, committing, pushing
+    - Creating PR with cross-reference to feature PR
 
-    ```bash
-    git add _posts/ assets/
-    git commit -m "Add Future Debrief post: $TITLE"
-    git push -u origin "$BRANCH" --quiet
+    See `.claude/commands/publish.md` for full workflow details.
 
-    BLOG_PR_URL=$(gh pr create \
-        --repo debrief/debrief.github.io \
-        --title "Future Debrief: $TITLE" \
-        --body "## New Blog Post
-
-    **Title:** $TITLE
-    **Date:** $POST_DATE
-    **Component:** $FEATURE_NAME
-
-    ## Preview
-
-    Once merged, visible at: https://debrief.github.io/future/blog/
-
-    ## Related
-
-    - Feature PR: $FEATURE_PR_URL
-
-    ---
-    *Auto-generated from [debrief-future](https://github.com/debrief/debrief-future)*" \
-        --base master)
-    ```
-
-15. **Handle blog publishing errors**:
+14. **Handle blog publishing errors**:
     - If `gh` not installed: Skip, warn user
     - If not authenticated: Skip, show `gh auth login` instructions
-    - If branch exists: Append timestamp and retry
     - If any other error: Skip with warning, never fail the main PR
     - **Critical:** Blog publishing failures must never fail the feature PR
 
-16. **Final report with both PRs**:
+15. **Final report with both PRs**:
 
     Display to user:
 
