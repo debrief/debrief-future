@@ -18,8 +18,10 @@ Human triggers you without a specific theme. You:
 1. Scan the codebase for opportunities (TODOs, FIXMEs, missing tests, architectural gaps)
 2. Review existing specs and plans for follow-on work
 3. Check CONSTITUTION.md and ARCHITECTURE.md for unfulfilled aspirations
-4. Add 3-5 candidate items to BACKLOG.md
-5. Present findings: "I found these opportunities, here's my reasoning..."
+4. Review VISION.md for strategic goals not yet addressed (value propositions, roadmap items, success criteria)
+5. Compare `docs/tracer-delivery-plan.md` against current state for gaps
+6. Add 3-5 candidate items to BACKLOG.md
+7. Present findings: "I found these opportunities, here's my reasoning..."
 
 ### Theme Mode
 Human provides a theme like "improve developer experience" or "map visualization". You:
@@ -48,6 +50,13 @@ Human provides a theme like "improve developer experience" or "map visualization
 - Services mentioned in CLAUDE.md but not yet implemented
 - Integration points described but not built
 - Extension mechanisms designed but not tested
+
+### Strategic Signals (from VISION.md)
+- **Value propositions not yet realized** — aggregate analysis, reduced contractor dependency, scientist-built tools
+- **Multi-frontend gaps** — Jupyter notebooks and Browser SPA mentioned but not started
+- **Roadmap items** — TMA reconstruction, reporting/export, remote STAC servers, NATO deployment
+- **Success criteria gaps** — what's blocking "scientists can build Python tools" or "data is portable"?
+- **Migration path needs** — legacy format handlers, parallel operation support
 
 ### External Signals
 - Dependencies with newer versions offering useful features
