@@ -55,48 +55,59 @@ The prioritizer uses scoring guidance from `STRATEGY.md` to interpret dimensions
 
 The defector investigates bugs, creates GitHub issues with root cause analysis, and adds entries to `BACKLOG.md` linking to the issue. It documents defects but doesn't fix them.
 
-### End-to-End Workflow
+### Quick Start: `/idea` Command
 
-The complete flow from idea to implementation:
+**For humans**: Use `/idea` to suggest an idea and let the system handle the rest:
+
+```bash
+/idea Add progress indicators during long file imports
+```
+
+This single command orchestrates the full pipeline:
+1. **Scout evaluates** — checks against CONSTITUTION, STRATEGY, parking lot
+2. **Adds to BACKLOG.md** — if passes hard filters
+3. **Scores (V/M/A)** — prioritizer logic
+4. **Strategic review** — ideas-guy logic (approve/park/reject)
+5. **If approved** → triggers `/speckit.start`
+
+You suggest once. The scout evaluates, the system scores, reviews, and creates the spec.
+
+### Detailed Workflow (What Happens Under the Hood)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                    BACKLOG → SPECKIT WORKFLOW                       │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
-│  1. IDEATION (parallel)                                             │
-│     the-ideas-guy ──generates──> strategic ideas ───┐               │
-│     opportunity-scout ──explores──> technical items ┼──> BACKLOG.md │
-│     human ──────────────────────────────────────────┘   (proposed)  │
-│                                                                     │
-│  2. SCORING (backlog-prioritizer)                                   │
-│     scores V/M/A for proposed items                                 │
-│                                                                     │
-│  3. APPROVAL (the-ideas-guy reviews scored items)                   │
-│        ├── Approve → status: approved                               │
-│        ├── Park → STRATEGY.md Parking Lot                           │
-│        └── Reject → STRATEGY.md Rejected Log                        │
-│                                                                     │
-│  4. SPECIFICATION                                                   │
-│     /speckit.start {ID} ──────> requires status: approved           │
-│                                 creates spec, status → specified    │
-│                                                                     │
-│  5. DESIGN (Commands)                                               │
+│  /idea {description}  ─────────────────────────────────────────┐    │
+│       │                                                        │    │
+│       ├── 1. Scout evaluates (hard filters: offline, CONSTITUTION)  │
+│       │       └── If fails → STOP with explanation             │    │
+│       ├── 2. Add to BACKLOG.md (proposed)                      │    │
+│       ├── 3. Score V/M/A (prioritizer logic)                   │    │
+│       ├── 4. Strategic review (ideas-guy logic)                │    │
+│       │       ├── Approve → status: approved                   │    │
+│       │       ├── Park → STRATEGY.md Parking Lot (STOP)        │    │
+│       │       └── Reject → Rejected Log (STOP)                 │    │
+│       └── 5. If approved → /speckit.start {ID}                 │    │
+│                                                                │    │
+│  ──────────────────────────────────────────────────────────────┘    │
+│                              │                                      │
+│                              ▼                                      │
+│  6. DESIGN (Commands)                                               │
 │     /speckit.clarify ─────────> resolves ambiguities                │
 │     /speckit.plan ────────────> creates implementation plan         │
 │     /speckit.tasks ───────────> breaks down into tasks              │
 │                                                                     │
-│  6. BUILD (Commands)                                                │
+│  7. BUILD (Commands)                                                │
 │     /speckit.implement ───────> executes tasks, captures evidence   │
 │     /speckit.pr ──────────────> creates PR + publishes blog         │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-**Key roles:**
-- **the-ideas-guy**: Initiates strategic ideas AND approves items for speckit (changes status to `approved`)
-- **opportunity-scout**: Explores code for technical opportunities (light filtering only)
-- **backlog-prioritizer**: Scores items mechanically (V/M/A)
+**Manual workflow** (if you prefer step-by-step control):
+- "Scout, evaluate this idea: {description}" → "Score the backlog" → "Review for approval" → `/speckit.start {ID}`
 
 **Status progression**: `proposed` → (scored) → `approved` → `specified` → ... → `complete`
 
