@@ -54,6 +54,41 @@ The prioritizer uses scoring guidance from `STRATEGY.md` to interpret dimensions
 
 The defector investigates bugs, creates GitHub issues with root cause analysis, and adds entries to `BACKLOG.md` linking to the issue. It documents defects but doesn't fix them.
 
+### End-to-End Workflow
+
+The complete flow from idea to implementation:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    BACKLOG → SPECKIT WORKFLOW                       │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  1. CAPTURE (Agents)                                                │
+│     opportunity-scout ──adds──> BACKLOG.md (proposed, unscored)     │
+│     backlog-prioritizer ──scores──> BACKLOG.md (V/M/A)              │
+│     the-ideas-guy ──reviews──> approves or parks                    │
+│                                                                     │
+│  2. BRIDGE (Command)                                                │
+│     /speckit.start {ID} ──────> creates spec, updates backlog       │
+│                                 status: proposed → specified        │
+│                                                                     │
+│  3. SPECIFY (Commands)                                              │
+│     /speckit.clarify ─────────> resolves ambiguities                │
+│     /speckit.plan ────────────> creates implementation plan         │
+│     /speckit.tasks ───────────> breaks down into tasks              │
+│                                                                     │
+│  4. BUILD (Commands)                                                │
+│     /speckit.implement ───────> executes tasks, captures evidence   │
+│     /speckit.pr ──────────────> creates PR + publishes blog         │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+The key bridge is `/speckit.start {ID}` — it connects the backlog agents' work to the speckit workflow by:
+- Reading the approved backlog item
+- Creating the feature specification
+- Updating BACKLOG.md with status and spec link
+
 ### Media Agents
 
 These agents are coordinated via the `/media` command (`.claude/commands/media.md`).

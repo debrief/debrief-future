@@ -16,11 +16,28 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
 
 ## Workflow
 
-1. **Proposed** — Item added with description (by scout or human)
-2. **Specified** — Description becomes link to `docs/specs/*/spec.md`
-3. **Clarified** → **Planned** → **Tasked** — Speckit workflow progresses
-4. **Implementing** — Active development
-5. **Complete** — ~~Strikethrough row~~, item done
+| Status | Meaning | Trigger |
+|--------|---------|---------|
+| **proposed** | Item added, awaiting review | Scout adds, or human submits |
+| **specified** | Spec created, linked below | `/speckit.start {ID}` |
+| **clarified** | Ambiguities resolved | `/speckit.clarify` |
+| **planned** | Implementation plan ready | `/speckit.plan` |
+| **tasked** | Tasks broken down | `/speckit.tasks` |
+| **implementing** | Active development | `/speckit.implement` |
+| **complete** | Done (row struck through) | `/speckit.pr` merged |
+
+### Starting Specification Work
+
+When an item is prioritized and approved for work:
+
+```bash
+/speckit.start 007    # Reads item 007, creates spec, updates this file
+```
+
+This bridges backlog approval to the speckit workflow by:
+1. Validating the item exists and is `proposed`
+2. Creating a feature branch and specification
+3. Updating this file: status → `specified`, description → link to spec
 
 ## Items
 
