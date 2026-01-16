@@ -305,11 +305,14 @@ export class MapPanel {
 
     for (const track of selectedTracks) {
       for (const coord of track.geometry.coordinates) {
-        const [lng, lat] = coord;
-        minLat = Math.min(minLat, lat);
-        maxLat = Math.max(maxLat, lat);
-        minLng = Math.min(minLng, lng);
-        maxLng = Math.max(maxLng, lng);
+        const lng = coord[0];
+        const lat = coord[1];
+        if (typeof lng === 'number' && typeof lat === 'number') {
+          minLat = Math.min(minLat, lat);
+          maxLat = Math.max(maxLat, lat);
+          minLng = Math.min(minLng, lng);
+          maxLng = Math.max(maxLng, lng);
+        }
       }
     }
 
