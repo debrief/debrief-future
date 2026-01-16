@@ -44,6 +44,7 @@ Extract the backlog item ID from `$ARGUMENTS`:
    - **Category**: Feature, Enhancement, Bug, Tech Debt, Infrastructure, Documentation
    - **Description**: The feature description text
    - **Scores**: V, M, A, Total (may be `-` if unscored)
+   - **Complexity**: Low, Medium, or High (determines model for implementation)
    - **Status**: Current status (proposed, specified, etc.)
 
 ### Step 3: Validate Item
@@ -75,12 +76,19 @@ Present the item details and ask for confirmation:
 | Category | {Category} |
 | Description | {Description} |
 | Scores | V:{V} M:{M} A:{A} = {Total} |
+| Complexity | {Complexity} → implementation will use {Model} |
 | Status | {Status} → will become `specified` |
+
+**Complexity → Model mapping:**
+- Low → Haiku (fast, cost-effective for well-defined tasks)
+- Medium → Sonnet (balanced reasoning for moderate complexity)
+- High → Opus (deep reasoning for architectural decisions)
 
 **This will:**
 1. Create a new feature branch
 2. Generate a specification in `specs/NNN-{short-name}/spec.md`
 3. Update BACKLOG.md to link to the spec
+4. Use **{Model}** model for implementation tasks (based on {Complexity} complexity)
 
 Proceed with specification? (The handoff button below will continue)
 ```
