@@ -72,6 +72,23 @@ When item A requires item B to be done first:
 - Consider boosting B's score if it unblocks high-value work
 - Flag to human: "Item 005 depends on 002 — should 002 be prioritized?"
 
+## Parallelism and Coupling
+
+**Favour tasks that can be developed in parallel.** When recommending work, consider coupling:
+
+| Coupling | Location | Parallel Risk | Guidance |
+|----------|----------|---------------|----------|
+| **High** | `shared/schemas/` | Dangerous | Core dependency — changes cascade everywhere. Serialize this work. |
+| **Medium** | `services/*` | Moderate | Services may share patterns. Coordinate if touching same APIs. |
+| **Low** | `apps/*` (separate apps) | Safe | Loader and VS Code can progress independently. Promote these. |
+
+**When scoring batches:**
+- If two high-scoring items touch the same core module, flag: "Items 003 and 007 both modify schemas — recommend serializing"
+- If items are in separate apps, note: "Items 004 (loader) and 009 (vscode) can be developed in parallel"
+- Boost effective priority of loosely-coupled items when multiple agents could work concurrently
+
+**Ask yourself:** "If two agents started these tasks simultaneously, would they conflict?"
+
 ## Score Adjustments
 
 Scores may need adjustment when:

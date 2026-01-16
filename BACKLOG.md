@@ -42,6 +42,10 @@ When complete, entire row gets ~~strikethrough~~
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | proposed |
 | 001 | Infrastructure | Extract shared MCP utilities into mcp-common package | 3 | 2 | 4 | 9 | proposed |
 | 006 | Enhancement | Add i18n infrastructure to VS Code extension | 2 | 1 | 4 | 7 | proposed |
+| 009 | Feature | Implement VS Code map PNG export using leaflet-image integration | - | - | - | - | proposed |
+| 010 | Tech Debt | Add rollback/cleanup API to debrief-stac for interrupted operations | - | - | - | - | proposed |
+| 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | - | - | - | - | proposed |
+| 012 | Enhancement | Wire loader plot count to debrief-stac list_plots call | - | - | - | - | proposed |
 
 ## Categories
 
