@@ -81,7 +81,7 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.refreshStore',
-      (args: { storeId: string }) => {
+      (_args: { storeId: string }) => {
         stacService.clearCache();
         stacTreeProvider.refresh();
       }
