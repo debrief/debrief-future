@@ -118,7 +118,7 @@ Success is:
 - Scientists imagine themselves using Future Debrief
 - Technical leadership sees strategic value
 - Organic conversations happen without prompting
-- When funding discussions come, people already understand the project
+- When collaboration discussions come, people already understand the project
 
 ## What This Strategy Is Not
 

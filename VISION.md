@@ -72,14 +72,14 @@ This proves the components integrate correctly before investing in breadth.
 
 ### Near-term: Existing Stakeholder Engagement (Spring 2026)
 
-Demonstrate the working foundation. Invite stakeholders to fund specific capabilities:
+Demonstrate the working foundation. Invite stakeholders to collaborate on specific capabilities:
 - TMA reconstruction tooling
 - Organisation-specific file handlers
 - Reporting and export features
 
 ### Medium-term: Capability Expansion
 
-Based on user feedback and funding:
+Based on user feedback and collaboration:
 - Additional file format handlers
 - Expanded analysis tool library
 - Remote STAC server support for team collaboration
