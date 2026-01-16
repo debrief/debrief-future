@@ -26,12 +26,13 @@ agents/
 
 The backlog agents manage `BACKLOG.md` and `STRATEGY.md` at the repository root.
 
-**The Ideas Guy** — Product Strategist who oversees the backlog workflow:
-- "Use the-ideas-guy to review backlog strategic alignment"
-- "Ideas guy, should we park this opportunity or add it to backlog?"
+**The Ideas Guy** — Product Strategist who generates ideas and maintains strategy:
+- "Ideas guy, what should we build next?"
+- "Generate ideas for the 'demonstrate value' theme"
 - "Review the backlog and update STRATEGY.md for the new phase"
+- "Ideas guy, should we park this opportunity or add it to backlog?"
 
-The Ideas Guy owns `STRATEGY.md` and makes judgment calls on prioritisation. They oversee the scout and prioritizer, ensuring mechanical scoring aligns with strategic intent.
+The Ideas Guy owns `STRATEGY.md`, generates strategic ideas, and makes judgment calls on prioritisation. Unlike the scout (who explores code), the ideas guy thinks about strategic gaps, demo-ability, and stakeholder needs.
 
 **Opportunity Scout** — Invoke when you want to identify new work:
 - "Use the opportunity-scout to explore the codebase for tech debt"
@@ -53,6 +54,62 @@ The prioritizer uses scoring guidance from `STRATEGY.md` to interpret dimensions
 - "Defector, investigate why X isn't working"
 
 The defector investigates bugs, creates GitHub issues with root cause analysis, and adds entries to `BACKLOG.md` linking to the issue. It documents defects but doesn't fix them.
+
+### Quick Start: `/idea` Command
+
+**For humans**: Use `/idea` to suggest an idea and let the system handle the rest:
+
+```bash
+/idea Add progress indicators during long file imports
+```
+
+This single command orchestrates the full pipeline:
+1. **Scout evaluates** — checks against CONSTITUTION, STRATEGY, parking lot
+2. **Adds to BACKLOG.md** — if passes hard filters
+3. **Scores (V/M/A)** — prioritizer logic
+4. **Strategic review** — ideas-guy logic (approve/park/reject)
+5. **If approved** → triggers `/speckit.start`
+
+You suggest once. The scout evaluates, the system scores, reviews, and creates the spec.
+
+### Detailed Workflow (What Happens Under the Hood)
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    BACKLOG → SPECKIT WORKFLOW                       │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  /idea {description}  ─────────────────────────────────────────┐    │
+│       │                                                        │    │
+│       ├── 1. Scout evaluates (hard filters: offline, CONSTITUTION)  │
+│       │       └── If fails → STOP with explanation             │    │
+│       ├── 2. Add to BACKLOG.md (proposed)                      │    │
+│       ├── 3. Score V/M/A (prioritizer logic)                   │    │
+│       ├── 4. Strategic review (ideas-guy logic)                │    │
+│       │       ├── Approve → status: approved                   │    │
+│       │       ├── Park → STRATEGY.md Parking Lot (STOP)        │    │
+│       │       └── Reject → Rejected Log (STOP)                 │    │
+│       └── 5. If approved → /speckit.start {ID}                 │    │
+│                                                                │    │
+│  ──────────────────────────────────────────────────────────────┘    │
+│                              │                                      │
+│                              ▼                                      │
+│  6. DESIGN (Commands)                                               │
+│     /speckit.clarify ─────────> resolves ambiguities                │
+│     /speckit.plan ────────────> creates implementation plan         │
+│     /speckit.tasks ───────────> breaks down into tasks              │
+│                                                                     │
+│  7. BUILD (Commands)                                                │
+│     /speckit.implement ───────> executes tasks, captures evidence   │
+│     /speckit.pr ──────────────> creates PR + publishes blog         │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Manual workflow** (if you prefer step-by-step control):
+- "Scout, evaluate this idea: {description}" → "Score the backlog" → "Review for approval" → `/speckit.start {ID}`
+
+**Status progression**: `proposed` → (scored) → `approved` → `specified` → ... → `complete`
 
 ### Media Agents
 

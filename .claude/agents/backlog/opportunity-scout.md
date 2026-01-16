@@ -81,31 +81,32 @@ Human provides a theme like "improve developer experience" or "map visualization
 - Patterns from similar projects that could apply
 - User feedback themes (if available)
 
-## Strategic Filtering
+## Strategic Filtering (Light)
 
-**Before proposing any item**, check it against STRATEGY.md:
+You do **light filtering** — reject obvious non-starters, but leave strategic judgment to the ideas-guy.
 
-### Must-Pass Criteria
+### Hard Filters (You Reject)
 
 | Question | If No... |
 |----------|----------|
-| Does it serve an active theme? | Don't propose — mention it as a potential parking lot candidate |
-| Can it work offline? | Don't propose unless redesignable |
-| Is it already in the Parking Lot? | Don't re-propose — it was deliberately deferred |
+| Can it work offline? | Don't propose (violates CONSTITUTION) |
 | Does it conflict with CONSTITUTION.md? | Don't propose |
+| Is it already in the Parking Lot? | Don't re-propose — check STRATEGY.md first |
 
-### Phase Awareness
+### Soft Filters (Flag, Don't Reject)
 
-Read the "Current Phase" section of STRATEGY.md. During tracer bullet phase:
-- Prioritise items that complete the end-to-end workflow
-- Defer breadth items (many formats, many tools) until depth is proven
-- Flag items that are valuable but wrong-phase: "This is good but may be premature"
+| Question | If Uncertain... |
+|----------|-----------------|
+| Does it serve an active theme? | Propose with flag: "Theme fit uncertain" |
+| Does it fit current phase? | Propose with flag: "May be premature for tracer bullet" |
+| Is scope clear? | Propose with flag: "Scope needs clarification" |
 
-### When Uncertain
+### Division of Labor
 
-If you find an opportunity that seems valuable but you're unsure about strategic fit:
-1. Propose it with a flag: "Strategic fit uncertain — may be parking lot candidate"
-2. The `the-ideas-guy` agent will make the final call on park vs. backlog
+- **You**: Find opportunities, apply hard filters, propose with flags
+- **Ideas-guy**: Strategic review of scored items, decides approve/park/reject
+
+Don't over-filter. If something looks valuable, propose it. The ideas-guy reviews all items after scoring and makes the strategic call. Your job is to surface opportunities, not to gatekeep them.
 
 ## Adding Items to BACKLOG.md
 

@@ -16,11 +16,52 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
 
 ## Workflow
 
-1. **Proposed** — Item added with description (by scout or human)
-2. **Specified** — Description becomes link to `docs/specs/*/spec.md`
-3. **Clarified** → **Planned** → **Tasked** — Speckit workflow progresses
-4. **Implementing** — Active development
-5. **Complete** — ~~Strikethrough row~~, item done
+| Status | Meaning | Trigger |
+|--------|---------|---------|
+| **proposed** | Item added, awaiting review | Scout adds, ideas-guy adds, or human submits |
+| **approved** | Strategically reviewed, ready for spec | Ideas-guy approves |
+| **specified** | Spec created, linked below | `/speckit.start {ID}` |
+| **clarified** | Ambiguities resolved | `/speckit.clarify` |
+| **planned** | Implementation plan ready | `/speckit.plan` |
+| **tasked** | Tasks broken down | `/speckit.tasks` |
+| **implementing** | Active development | `/speckit.implement` |
+| **complete** | Done (row struck through) | `/speckit.pr` merged |
+
+### Backlog Flow
+
+```
+1. IDEATION
+   the-ideas-guy ──generates──> strategic ideas ──────────┐
+   opportunity-scout ──explores──> technical opportunities │
+                                                          ▼
+                                                    BACKLOG.md
+                                                     (proposed)
+                                                          │
+2. SCORING (backlog-prioritizer)                          │
+   scores V/M/A for proposed items ◄──────────────────────┘
+                          │
+3. REVIEW (the-ideas-guy)
+   reviews scored items against STRATEGY.md
+      ├── Approve → status: approved
+      ├── Park → STRATEGY.md Parking Lot
+      └── Reject → STRATEGY.md Rejected Log
+                          │
+4. SPECIFICATION          ▼
+   /speckit.start {ID} ← requires status: approved
+```
+
+### Starting Specification Work
+
+When an item has status `approved`:
+
+```bash
+/speckit.start 007    # Validates item is approved, creates spec, updates this file
+```
+
+This bridges backlog approval to the speckit workflow by:
+1. Validating the item exists and has status `approved`
+2. Creating a feature branch and specification
+3. Updating this file: status → `specified`, description → link to spec
 
 ## Items
 
@@ -60,6 +101,8 @@ When complete, entire row gets ~~strikethrough~~
 ## Notes
 
 - Items without scores are awaiting prioritization
-- Scout adds items; Prioritizer scores them
-- Human reviews and approves before speckit workflow begins
+- Ideas-guy and scout add items (status: `proposed`)
+- Prioritizer scores proposed items (V/M/A)
+- Ideas-guy reviews scored items → changes status to `approved`, parks, or rejects
+- `/speckit.start {ID}` requires status `approved`
 - Completed items remain (struck through) for historical reference
