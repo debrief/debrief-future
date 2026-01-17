@@ -4,6 +4,7 @@ import { StacFileSystemProvider } from './providers/stacFileSystemProvider';
 import { ToolsTreeProvider } from './providers/toolsTreeProvider';
 import { LayersTreeProvider } from './providers/layersTreeProvider';
 import { OutlineProvider } from './providers/outlineProvider';
+import { TimeRangeViewProvider } from './views/timeRangeView';
 import { MapPanel } from './webview/mapPanel';
 import { StacService } from './services/stacService';
 import { ConfigService } from './services/configService';
@@ -36,11 +37,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const toolsTreeProvider = new ToolsTreeProvider(calcService);
   const layersTreeProvider = new LayersTreeProvider();
   const outlineProvider = new OutlineProvider();
+  const timeRangeViewProvider = new TimeRangeViewProvider(context.extensionUri);
 
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
     vscode.window.registerTreeDataProvider('debrief.tools', toolsTreeProvider),
-    vscode.window.registerTreeDataProvider('debrief.layers', layersTreeProvider)
+    vscode.window.registerTreeDataProvider('debrief.layers', layersTreeProvider),
+    vscode.window.registerWebviewViewProvider('debrief.timeRange', timeRangeViewProvider)
   );
 
   // Register outline provider for selection
