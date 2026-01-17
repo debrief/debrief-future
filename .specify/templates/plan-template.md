@@ -94,6 +94,28 @@ ios/ or android/
 **Structure Decision**: [Document the selected structure and reference the real
 directories captured above]
 
+## Media Components
+
+*Identify Storybook stories to bundle for blog post demos. This section is optional - skip if the feature has no visual components.*
+
+| Component | Story Source | Bundle Name | Purpose |
+|-----------|--------------|-------------|---------|
+| [Name] | `path/to/Story.stories.tsx` | `component-name.js` | [What it demonstrates] |
+
+**Inclusion Criteria Applied**:
+- [ ] New visual component
+- [ ] Significant visual change
+- [ ] Interactive demo adds narrative value
+
+**Bundleability Verified**:
+- [ ] Stories exist in Storybook
+- [ ] Components render standalone (no app context required)
+- [ ] Reasonable bundle size expected (< 500KB)
+
+**Storybook Link**: `https://debrief.github.io/debrief-future/storybook/?path=/story/[story-id]`
+
+*If no components identified, write "None - backend/infrastructure feature"*
+
 ## Complexity Tracking
 
 > **Fill ONLY if Constitution Check has violations that must be justified**
