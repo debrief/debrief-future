@@ -70,7 +70,7 @@
 
 ### Shared Types & Utilities
 
-- [ ] T011 Define DebriefFeature and DebriefFeatureCollection types `shared/components/src/utils/types.ts`
+- [ ] T011 Re-export types from @debrief/schemas and add convenience unions `shared/components/src/utils/types.ts`
 - [ ] T012 [P] Implement calculateBounds utility `shared/components/src/utils/bounds.ts`
 - [ ] T013 [P] Implement calculateTimeExtent utility `shared/components/src/utils/time.ts`
 - [ ] T014 [P] Implement getFeatureLabel and getFeatureIcon utilities `shared/components/src/utils/labels.ts`
