@@ -1,0 +1,97 @@
+{
+  "name": "@debrief/components",
+  "version": "0.1.0",
+  "description": "Shared React components for Debrief maritime tactical analysis",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./MapView": {
+      "types": "./dist/MapView/index.d.ts",
+      "import": "./dist/MapView/index.js"
+    },
+    "./Timeline": {
+      "types": "./dist/Timeline/index.d.ts",
+      "import": "./dist/Timeline/index.js"
+    },
+    "./FeatureList": {
+      "types": "./dist/FeatureList/index.d.ts",
+      "import": "./dist/FeatureList/index.js"
+    },
+    "./ThemeProvider": {
+      "types": "./dist/ThemeProvider/index.d.ts",
+      "import": "./dist/ThemeProvider/index.js"
+    }
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "dependencies": {
+    "@debrief/schemas": "workspace:*",
+    "@tanstack/react-virtual": "^3.0.0",
+    "leaflet": "^1.9.0",
+    "react-leaflet": "^5.0.0"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "^8.4.0",
+    "@storybook/addon-essentials": "^8.4.0",
+    "@storybook/addon-interactions": "^8.4.0",
+    "@storybook/addon-links": "^8.4.0",
+    "@storybook/blocks": "^8.4.0",
+    "@storybook/react": "^8.4.0",
+    "@storybook/react-vite": "^8.4.0",
+    "@storybook/test": "^8.4.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^14.0.0",
+    "@types/leaflet": "^1.9.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "jsdom": "^24.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^8.4.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.0.0",
+    "vite-plugin-css-injected-by-js": "^3.3.0",
+    "vite-plugin-dts": "^3.7.0",
+    "vitest": "^1.0.0"
+  },
+  "keywords": [
+    "debrief",
+    "react",
+    "components",
+    "maritime",
+    "geojson",
+    "leaflet",
+    "timeline"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

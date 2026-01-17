@@ -1,0 +1,134 @@
+/**
+ * MapView Component Styles
+ */
+
+.debrief-mapview {
+  position: relative;
+  width: 100%;
+  border-radius: var(--debrief-radius-md);
+  overflow: hidden;
+  background-color: var(--debrief-bg-secondary);
+}
+
+.debrief-mapview__container {
+  height: 100%;
+  width: 100%;
+}
+
+/* Leaflet overrides for theming */
+.debrief-mapview .leaflet-container {
+  font-family: var(--debrief-font-family);
+  background-color: var(--debrief-bg-secondary);
+}
+
+/* Control styling */
+.debrief-mapview .leaflet-control-zoom {
+  border: 1px solid var(--debrief-border-color);
+  border-radius: var(--debrief-radius-md);
+  overflow: hidden;
+}
+
+.debrief-mapview .leaflet-control-zoom a {
+  background-color: var(--debrief-map-controls-bg);
+  color: var(--debrief-text-primary);
+  border-bottom: 1px solid var(--debrief-border-color);
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+}
+
+.debrief-mapview .leaflet-control-zoom a:hover {
+  background-color: var(--debrief-bg-tertiary);
+}
+
+.debrief-mapview .leaflet-control-zoom a:last-child {
+  border-bottom: none;
+}
+
+/* Attribution styling */
+.debrief-mapview .leaflet-control-attribution {
+  background-color: var(--debrief-map-controls-bg);
+  font-size: var(--debrief-font-size-xs);
+  color: var(--debrief-text-muted);
+  padding: 2px 6px;
+  border-radius: var(--debrief-radius-sm);
+}
+
+.debrief-mapview .leaflet-control-attribution a {
+  color: var(--debrief-color-primary);
+}
+
+/* Tooltip styling */
+.debrief-mapview .leaflet-tooltip {
+  background-color: var(--debrief-bg-primary);
+  border: 1px solid var(--debrief-border-color);
+  border-radius: var(--debrief-radius-sm);
+  box-shadow: var(--debrief-shadow-md);
+  color: var(--debrief-text-primary);
+  font-family: var(--debrief-font-family);
+  font-size: var(--debrief-font-size-sm);
+  padding: var(--debrief-space-xs) var(--debrief-space-sm);
+}
+
+.debrief-mapview .leaflet-tooltip-top::before {
+  border-top-color: var(--debrief-border-color);
+}
+
+/* Popup styling */
+.debrief-mapview .leaflet-popup-content-wrapper {
+  background-color: var(--debrief-bg-primary);
+  border-radius: var(--debrief-radius-md);
+  box-shadow: var(--debrief-shadow-lg);
+}
+
+.debrief-mapview .leaflet-popup-content {
+  color: var(--debrief-text-primary);
+  font-family: var(--debrief-font-family);
+  font-size: var(--debrief-font-size-md);
+}
+
+.debrief-mapview .leaflet-popup-tip {
+  background-color: var(--debrief-bg-primary);
+}
+
+/* Feature highlight on hover */
+.debrief-mapview .leaflet-interactive:hover {
+  cursor: pointer;
+}
+
+/* Selected feature styling - handled via style prop */
+
+/* Loading state */
+.debrief-mapview--loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Empty state */
+.debrief-mapview--empty .leaflet-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.debrief-mapview__empty-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--debrief-bg-primary);
+  padding: var(--debrief-space-md);
+  border-radius: var(--debrief-radius-md);
+  color: var(--debrief-text-secondary);
+  font-size: var(--debrief-font-size-md);
+  z-index: var(--debrief-z-overlay);
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] .debrief-mapview .leaflet-container {
+  /* Use a dark tile layer or add overlay */
+}
+
+[data-theme='dark'] .debrief-mapview .leaflet-tile {
+  filter: brightness(0.8) saturate(0.8);
+}

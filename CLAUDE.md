@@ -141,9 +141,9 @@ Three approaches required:
 - Python 3.11+ + Pydantic >=2.0.0, debrief-schemas (workspace), mcp >=1.0.0 (optional), click (CLI) (005-debrief-calc)
 - N/A (pure transformation service — no persistence) (005-debrief-calc)
 - TypeScript 5.x (VS Code Extension API) + @vscode/api (extension host), Leaflet (map rendering), debrief-config (TypeScript), debrief-stac (via IPC), debrief-calc (via MCP) (006-speckit-vscode-extension)
-- TypeScript 5.x + React 18+, react-leaflet v4+ (map), @tanstack/react-virtual (lists), HTML5 Canvas (timeline), CSS Custom Properties (theming), Storybook 8.x (component preview) (001-shared-react-components)
+- TypeScript 5.x + React 18+, react-leaflet v5+ (map), @tanstack/react-virtual (lists), HTML5 Canvas (timeline), CSS Custom Properties (theming), Storybook 10.x (component preview) (001-shared-react-components)
 - N/A (pure display components — no persistence) (001-shared-react-components)
 
 ## Recent Changes
-- 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v4+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 8.x
+- 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v5+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 10.x
 - 000-schemas: Added Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS)

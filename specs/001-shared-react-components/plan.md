@@ -10,7 +10,7 @@ Build a reusable React component library providing MapView, Timeline, and Featur
 ## Technical Context
 
 **Language/Version**: TypeScript 5.x with React 18+
-**Primary Dependencies**: react-leaflet v4+, @tanstack/react-virtual, geojson types
+**Primary Dependencies**: react-leaflet v5+, @tanstack/react-virtual, @debrief/schemas (workspace types)
 **Storage**: N/A (pure display components — no persistence)
 **Testing**: Vitest (unit), Storybook (visual preview/review), Playwright (integration)
 **Target Platform**: Electron renderer, VS Code webview, modern browsers
@@ -106,7 +106,7 @@ shared/components/
 │   │   ├── bounds.ts            # calculateBounds
 │   │   ├── time.ts              # calculateTimeExtent
 │   │   ├── labels.ts            # getFeatureLabel, getFeatureIcon
-│   │   └── types.ts             # Shared type definitions
+│   │   └── types.ts             # Re-exports from @debrief/schemas + convenience unions
 │   │
 │   └── styles/
 │       └── tokens.css           # CSS custom property definitions
@@ -207,10 +207,10 @@ Consumers import only what they need; bundlers eliminate unused code.
 |---------|---------|---------|
 | react | ^18.2.0 | Peer dependency |
 | react-dom | ^18.2.0 | Peer dependency |
+| @debrief/schemas | workspace:* | Shared TypeScript types (TrackFeature, ReferenceLocation, etc.) |
 | leaflet | ^1.9.0 | Map rendering |
-| react-leaflet | ^4.2.0 | React wrapper for Leaflet |
+| react-leaflet | ^5.0.0 | React wrapper for Leaflet |
 | @tanstack/react-virtual | ^3.0.0 | List virtualization |
-| geojson | ^0.5.0 | TypeScript types only |
 
 ### Development Dependencies
 
@@ -220,9 +220,9 @@ Consumers import only what they need; bundlers eliminate unused code.
 | vite | ^5.0.0 | Build tool |
 | vitest | ^1.0.0 | Unit testing |
 | @testing-library/react | ^14.0.0 | Component testing |
-| storybook | ^8.0.0 | Component preview |
-| @storybook/react-vite | ^8.0.0 | Storybook + Vite integration |
-| @storybook/addon-a11y | ^8.0.0 | Accessibility testing |
+| storybook | ^10.0.0 | Component preview |
+| @storybook/react-vite | ^10.0.0 | Storybook + Vite integration |
+| @storybook/addon-a11y | ^10.0.0 | Accessibility testing |
 
 ## Integration Points
 
