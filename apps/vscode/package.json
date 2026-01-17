@@ -217,6 +217,15 @@
       {
         "view": "debrief.stacExplorer",
         "contents": "No STAC stores configured.\n[Add Store](command:debrief.addStore)\nA STAC store is a folder containing maritime plot data."
+      },
+      {
+        "view": "debrief.tools",
+        "contents": "Select tracks on the map to see available analysis tools.\n\nTools require debrief-calc Python service.",
+        "when": "!debrief.hasSelection"
+      },
+      {
+        "view": "debrief.layers",
+        "contents": "No layers yet.\n\nOpen a plot to see track layers, or run analysis tools to add result layers."
       }
     ],
     "menus": {
@@ -340,24 +349,24 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "pnpm run compile",
-    "compile": "pnpm run compile:extension && pnpm run compile:webview",
+    "vscode:prepublish": "npm run compile",
+    "compile": "npm run compile:extension && npm run compile:webview",
     "compile:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
     "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife && cp src/webview/web/styles.css dist/webview/styles.css",
-    "watch": "pnpm run watch:extension & pnpm run watch:webview",
+    "watch": "npm run watch:extension & npm run watch:webview",
     "watch:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
     "watch:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife --watch",
-    "dev": "concurrently \"pnpm run watch:extension\" \"pnpm run watch:webview\"",
+    "dev": "concurrently \"npm run watch:extension\" \"npm run watch:webview\"",
     "lint": "eslint src --ext ts",
     "lint:fix": "eslint src --ext ts --fix",
-    "test": "pnpm run test:unit && pnpm run test:integration",
+    "test": "npm run test:unit && npm run test:integration",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:integration": "vscode-test",
     "test:e2e": "playwright test",
     "package": "vsce package --no-dependencies",
-    "pretest": "pnpm run compile"
+    "pretest": "npm run compile"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.8",
