@@ -8,7 +8,18 @@
       "Bash(pnpm run compile:*)",
       "Bash(pnpm run test:unit:*)",
       "Bash(code:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git fetch:*)",
+      "Bash(git rebase:*)",
+      "Bash(git stash:*)",
+      "Bash(git push:*)",
+      "Bash(pnpm test:*)",
+      "Bash(npm test:*)",
+      "Bash(npm install:*)",
+      "Bash(corepack enable:*)",
+      "Bash(corepack prepare:*)",
+      "Bash(gh pr create:*)",
+      "Skill(publish)"
     ]
   }
 }
