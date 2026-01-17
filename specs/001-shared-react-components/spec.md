@@ -149,6 +149,7 @@ A developer wants map selection to highlight the corresponding row in the featur
 ### Session 2026-01-17
 
 - Q: Should components define new TypeScript types for features? → A: No, import existing types from `@debrief/schemas` package (`TrackFeature`, `ReferenceLocation`, etc.)
+- Q: Which Storybook version should be used? → A: Storybook 10.x
 
 ## Assumptions
 
@@ -158,3 +159,4 @@ A developer wants map selection to highlight the corresponding row in the featur
 - VS Code webview and Electron both support modern ES modules and React 18+
 - Initial implementation focuses on display; editing/creation capabilities are out of scope
 - Theme configuration will use CSS custom properties for runtime theming support
+- **Storybook 10.x** will be used for component preview and visual testing

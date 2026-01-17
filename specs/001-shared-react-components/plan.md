@@ -220,9 +220,9 @@ Consumers import only what they need; bundlers eliminate unused code.
 | vite | ^5.0.0 | Build tool |
 | vitest | ^1.0.0 | Unit testing |
 | @testing-library/react | ^14.0.0 | Component testing |
-| storybook | ^8.0.0 | Component preview |
-| @storybook/react-vite | ^8.0.0 | Storybook + Vite integration |
-| @storybook/addon-a11y | ^8.0.0 | Accessibility testing |
+| storybook | ^10.0.0 | Component preview |
+| @storybook/react-vite | ^10.0.0 | Storybook + Vite integration |
+| @storybook/addon-a11y | ^10.0.0 | Accessibility testing |
 
 ## Integration Points
 
