@@ -5,6 +5,15 @@
 **Status**: Draft
 **Input**: User description: "Add dynamic component bundling for blog posts - Package Storybook stories as self-contained JS bundles published alongside blog posts. Bundles stored in debrief.github.io at /assets/components/{post-slug}/. Integration with speckit workflow: plan.md template needs Media Components section, implementation produces component bundle artifacts, /publish handles both blog post and component bundles."
 
+## Clarifications
+
+### Session 2026-01-17
+
+- Q: How do embedded components render in blog posts? → A: Components render inline without Storybook chrome (no sidebar, controls panel, or toolbar). Just the component itself in a contained area.
+- Q: How is component sizing handled? → A: Bundle renders at 100% of container width with responsive behavior. Author controls height via container div CSS. Sensible default aspect ratio for components that don't specify.
+- Q: Should blog posts link to full Storybook? → A: Yes. When a blog post includes embedded component demos, it MUST also include a link to the permanent Storybook URL on GitHub Pages for the full interactive experience with controls and documentation.
+- Q: Who decides which components to include and when? → A: Plan agent suggests components during /speckit.plan, author confirms/modifies. Include when: new visual component, significant visual change, or interactive demo adds narrative value. Exclude when: backend-only, minor UI tweaks, no existing story. Bundleability requires: existing story, standalone rendering, reasonable bundle size.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Author Includes Interactive Component Demo (Priority: P1)
@@ -20,6 +29,8 @@ A blog post author wants to embed an interactive component demo in their "shippe
 1. **Given** a blog post markdown file with component embed markup, **When** the post is published to GitHub Pages, **Then** the interactive component renders in the browser and responds to user input (click, hover, etc.)
 2. **Given** a component bundle stored at `/assets/components/{post-slug}/`, **When** a reader loads the blog post, **Then** the component loads without errors and displays correctly
 3. **Given** a blog post with multiple component embeds, **When** the post is viewed, **Then** all components render independently without conflicts
+4. **Given** an embedded component, **When** it renders in the blog, **Then** it displays without Storybook chrome (no sidebar, controls panel, toolbar) - just the component in a contained area
+5. **Given** a blog post with embedded demos, **When** published, **Then** it includes a link to the permanent Storybook URL on GitHub Pages for full interactive experience
 
 ---
 
@@ -36,6 +47,7 @@ During the planning phase of a feature, the speckit workflow automatically ident
 1. **Given** a feature specification with demo-able components, **When** `/speckit.plan` is executed, **Then** plan.md contains a "Media Components" section identifying stories to bundle
 2. **Given** a feature with no visual components, **When** `/speckit.plan` is executed, **Then** the "Media Components" section indicates "None identified" or is omitted
 3. **Given** multiple Storybook stories for a feature, **When** the plan is created, **Then** each story is listed with its source path and intended bundle name
+4. **Given** a backend-only feature or minor UI tweak, **When** `/speckit.plan` is executed, **Then** no Media Components are suggested (exclusion criteria applied)
 
 ---
 
@@ -77,16 +89,38 @@ When creating a PR for the shipped blog post, the `/publish` skill copies compon
 - What happens when component embed markup references a non-existent bundle? The page should display gracefully (empty div) rather than breaking, with console error for debugging.
 - What happens when the same component is embedded multiple times? Each embed should render independently without state conflicts.
 - What happens when bundle build takes too long? A timeout should occur with guidance on reducing bundle size or splitting components.
+- What happens when a component cannot render standalone (requires app context)? The component fails bundleability check and is excluded from Media Components suggestions.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
+#### Embedded Component Rendering
+
 - **FR-001**: System MUST provide a bundling mechanism that packages Storybook stories into self-contained JS files
 - **FR-002**: Bundles MUST include all runtime dependencies needed to render (React, component code, styles)
 - **FR-003**: Bundles MUST NOT require external Storybook infrastructure to function
+- **FR-013**: Embedded components MUST render without Storybook chrome (no sidebar, controls panel, or toolbar)
+- **FR-014**: Embedded components MUST render at 100% of container width with responsive behavior
+- **FR-015**: Components MUST use a sensible default aspect ratio when height is not specified by author
+- **FR-016**: Authors MUST be able to control component height via container div CSS
+
+#### Storybook Link Requirement
+
+- **FR-017**: Blog posts with embedded component demos MUST include a link to the permanent Storybook URL on GitHub Pages
+- **FR-018**: Storybook links MUST point to the full interactive experience with controls and documentation
+
+#### Component Inclusion Workflow
+
 - **FR-004**: Plan template MUST include a "Media Components" section for identifying stories to bundle
-- **FR-005**: `/speckit.plan` command MUST populate the Media Components section when demo-able components exist
+- **FR-005**: `/speckit.plan` command MUST suggest Media Components when demo-able components exist
+- **FR-019**: Authors MUST be able to confirm, modify, or decline suggested Media Components
+- **FR-020**: System MUST apply inclusion criteria: new visual component, significant visual change, or interactive demo adds narrative value
+- **FR-021**: System MUST apply exclusion criteria: backend-only changes, minor UI tweaks, no existing Storybook story
+- **FR-022**: System MUST verify bundleability: existing story, standalone rendering capability, reasonable bundle size
+
+#### Implementation & Publishing
+
 - **FR-006**: `/speckit.implement` command MUST build component bundles when Media Components are specified
 - **FR-007**: Built bundles MUST be stored at `specs/{feature}/media/components/` during implementation
 - **FR-008**: `/speckit.pr` command MUST pass component bundle paths to the publish workflow
@@ -95,11 +129,21 @@ When creating a PR for the shipped blog post, the `/publish` skill copies compon
 - **FR-011**: System MUST support multiple component embeds in a single blog post
 - **FR-012**: Bundle build failures MUST produce actionable error messages
 
+### Component Inclusion Criteria
+
+| Criterion | Decision |
+|-----------|----------|
+| **Who decides** | Plan agent suggests during `/speckit.plan`, author confirms/modifies |
+| **Include when** | New visual component, significant visual change, interactive demo adds narrative value |
+| **Exclude when** | Backend-only changes, minor UI tweaks, no existing Storybook story |
+| **Bundleability check** | Must have existing story, render standalone without app context, reasonable bundle size |
+
 ### Key Entities
 
-- **Component Bundle**: A self-contained JS file that renders a single interactive component when loaded; identified by bundle name matching the source story
-- **Media Components Section**: A plan.md section that maps Storybook story sources to bundle names with purpose descriptions
+- **Component Bundle**: A self-contained JS file that renders a single interactive component when loaded; identified by bundle name matching the source story. Renders without Storybook chrome at 100% container width.
+- **Media Components Section**: A plan.md section that maps Storybook story sources to bundle names with purpose descriptions. Plan agent suggests, author confirms.
 - **Post Slug**: The URL-safe identifier for a blog post, used to namespace component bundles in the assets directory
+- **Storybook Link**: A permanent URL to the full Storybook experience on GitHub Pages, required in blog posts with embedded demos
 
 ## Success Criteria *(mandatory)*
 
@@ -111,6 +155,8 @@ When creating a PR for the shipped blog post, the `/publish` skill copies compon
 - **SC-004**: End-to-end workflow from plan to publish completes without manual intervention for bundle handling
 - **SC-005**: Authors can embed components using documented HTML snippet pattern without additional tooling knowledge
 - **SC-006**: Components remain interactive in the blog context (respond to user input: click, hover, pan, zoom as applicable)
+- **SC-007**: Embedded components render without any Storybook UI chrome visible
+- **SC-008**: 100% of blog posts with embedded demos include a link to the permanent Storybook URL
 
 ## Assumptions
 
@@ -119,3 +165,4 @@ When creating a PR for the shipped blog post, the `/publish` skill copies compon
 - React 18+ is the component framework
 - Bundle size is acceptable for blog post loading (typical web performance expectations)
 - Authors have access to component source paths when writing blog posts
+- Storybook is deployed to a permanent GitHub Pages URL that remains stable
