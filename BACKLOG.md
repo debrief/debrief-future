@@ -79,7 +79,7 @@ Description formats:
 |----|----------|-------------|---|---|---|-------|--------|
 | 014 | Feature | [Add styling properties schemas to GeoJSON features](docs/ideas/014-geojson-styling-properties.md) | 5 | 4 | 5 | 14 | approved |
 | 015 | Infrastructure | [Create LinkML schemas for REP annotation item types](docs/ideas/015-annotation-item-schemas.md) (prerequisite for #007) | 5 | 3 | 5 | 13 | approved |
-| 007 | Enhancement | Implement REP file special comments (NARRATIVE, CIRCLE, etc.) (requires #015) | 4 | 4 | 4 | 12 | proposed |
+| 007 | Enhancement | [Implement REP file special comments (NARRATIVE, CIRCLE, etc.)](docs/ideas/007-rep-special-comments.md) (requires #015) | 4 | 4 | 4 | 12 | proposed |
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | proposed |
 | 002 | Feature | Add MCP wrapper for debrief-io service | 4 | 3 | 4 | 11 | proposed |
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | proposed |
