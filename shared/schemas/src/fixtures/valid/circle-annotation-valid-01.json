@@ -1,0 +1,15 @@
+{
+  "type": "Feature",
+  "id": "circle-001",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-21.0, 21.8]
+  },
+  "properties": {
+    "kind": "CIRCLE",
+    "radius": 2000,
+    "label": "reference circle",
+    "symbol": "@D",
+    "color": "#FF0000"
+  }
+}

@@ -1,0 +1,309 @@
+id: https://debrief.info/schemas/annotations
+name: annotations
+title: Debrief Annotation Types
+description: >-
+  Annotation types for REP file special comments (NARRATIVE, CIRCLE, etc.).
+  These extend the base GeoJSON Feature pattern with annotation-specific properties.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+  geojson: https://purl.org/geojson/vocab#
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+  - common
+  - geojson
+
+# ============================================================================
+# NarrativeEntry - Timestamped log/narrative entries
+# ============================================================================
+
+classes:
+  NarrativeEntryProperties:
+    description: Properties for a NarrativeEntry annotation
+    attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "NARRATIVE"
+      time:
+        description: Narrative timestamp (ISO8601)
+        range: datetime
+        required: true
+      text:
+        description: Narrative text content
+        required: true
+      track_id:
+        description: Associated track identifier (optional)
+      symbol:
+        description: Display symbol code from REP file
+      color:
+        description: Display color (CSS color string)
+        range: CSSColor
+      source_file:
+        description: Original source file path
+
+  NarrativeEntry:
+    description: >-
+      GeoJSON Feature for timestamped narrative/log entries.
+      Narratives are operator notes associated with a timestamp and optionally a track.
+      Geometry is optional (Point for display position, or null).
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Unique identifier
+        required: true
+      geometry:
+        description: Optional display position (Point) or null
+        range: GeoJSONPoint
+        # Note: geometry is optional for narratives
+      properties:
+        description: Narrative metadata
+        range: NarrativeEntryProperties
+        required: true
+
+# ============================================================================
+# CircleAnnotation - Circular regions
+# ============================================================================
+
+  CircleAnnotationProperties:
+    description: Properties for a CircleAnnotation
+    attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "CIRCLE"
+      radius:
+        description: Circle radius in meters
+        range: float
+        required: true
+        minimum_value: 0
+      label:
+        description: Annotation label text
+      symbol:
+        description: Display symbol code from REP file
+      color:
+        description: Display color (CSS color string)
+        range: CSSColor
+      source_file:
+        description: Original source file path
+
+  CircleAnnotation:
+    description: >-
+      GeoJSON Feature for circle annotations.
+      Geometry is the center point; radius is in properties.
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Unique identifier
+        required: true
+      geometry:
+        description: Circle center point
+        range: GeoJSONPoint
+        required: true
+      properties:
+        description: Circle metadata including radius
+        range: CircleAnnotationProperties
+        required: true
+
+# ============================================================================
+# RectangleAnnotation - Rectangular regions
+# ============================================================================
+
+  RectangleAnnotationProperties:
+    description: Properties for a RectangleAnnotation
+    attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "RECTANGLE"
+      label:
+        description: Annotation label text
+      symbol:
+        description: Display symbol code from REP file
+      color:
+        description: Display color (CSS color string)
+        range: CSSColor
+      source_file:
+        description: Original source file path
+
+  RectangleAnnotation:
+    description: >-
+      GeoJSON Feature for rectangle annotations.
+      Geometry is a Polygon with 4 corners (plus closing point).
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Unique identifier
+        required: true
+      geometry:
+        description: Rectangle as Polygon (4 corners + close)
+        range: GeoJSONPolygon
+        required: true
+      properties:
+        description: Rectangle metadata
+        range: RectangleAnnotationProperties
+        required: true
+
+# ============================================================================
+# LineAnnotation - Line segments
+# ============================================================================
+
+  LineAnnotationProperties:
+    description: Properties for a LineAnnotation
+    attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "LINE"
+      label:
+        description: Annotation label text
+      symbol:
+        description: Display symbol code from REP file
+      color:
+        description: Display color (CSS color string)
+        range: CSSColor
+      source_file:
+        description: Original source file path
+
+  LineAnnotation:
+    description: >-
+      GeoJSON Feature for line segment annotations.
+      Geometry is a LineString with 2 points (start and end).
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Unique identifier
+        required: true
+      geometry:
+        description: Line as LineString (2 points)
+        range: GeoJSONLineString
+        required: true
+      properties:
+        description: Line metadata
+        range: LineAnnotationProperties
+        required: true
+
+# ============================================================================
+# TextAnnotation - Text labels at a position
+# ============================================================================
+
+  TextAnnotationProperties:
+    description: Properties for a TextAnnotation
+    attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "TEXT"
+      text:
+        description: Text content to display
+        required: true
+      symbol:
+        description: Display symbol code from REP file
+      color:
+        description: Display color (CSS color string)
+        range: CSSColor
+      source_file:
+        description: Original source file path
+
+  TextAnnotation:
+    description: >-
+      GeoJSON Feature for text annotations at a position.
+      Geometry is the Point where text should be displayed.
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Unique identifier
+        required: true
+      geometry:
+        description: Text display position
+        range: GeoJSONPoint
+        required: true
+      properties:
+        description: Text metadata
+        range: TextAnnotationProperties
+        required: true
+
+# ============================================================================
+# VectorAnnotation - Vector (range/bearing) from a point
+# ============================================================================
+
+  VectorAnnotationProperties:
+    description: Properties for a VectorAnnotation
+    attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "VECTOR"
+      range:
+        description: Vector length/range in meters
+        range: float
+        required: true
+        minimum_value: 0
+      bearing:
+        description: Vector bearing in degrees (0-360, from north)
+        range: float
+        required: true
+        minimum_value: 0
+        maximum_value: 360
+      label:
+        description: Annotation label text
+      symbol:
+        description: Display symbol code from REP file
+      color:
+        description: Display color (CSS color string)
+        range: CSSColor
+      source_file:
+        description: Original source file path
+
+  VectorAnnotation:
+    description: >-
+      GeoJSON Feature for vector annotations.
+      Geometry is the origin Point; range and bearing define the vector direction.
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Unique identifier
+        required: true
+      geometry:
+        description: Vector origin point
+        range: GeoJSONPoint
+        required: true
+      properties:
+        description: Vector metadata including range and bearing
+        range: VectorAnnotationProperties
+        required: true

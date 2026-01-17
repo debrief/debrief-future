@@ -1,0 +1,11 @@
+{
+  "type": "Feature",
+  "id": "narrative-002",
+  "geometry": null,
+  "properties": {
+    "kind": "NARRATIVE",
+    "time": "1995-12-12T06:22:00Z",
+    "text": "POSSUB TRACK 14",
+    "track_id": "NELSON"
+  }
+}

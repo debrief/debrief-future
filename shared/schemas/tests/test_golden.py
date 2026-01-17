@@ -26,16 +26,31 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "pyt
 from debrief_schemas import (
     ReferenceLocation,
     TrackFeature,
+    # Annotation types
+    NarrativeEntry,
+    CircleAnnotation,
+    RectangleAnnotation,
+    LineAnnotation,
+    TextAnnotation,
+    VectorAnnotation,
 )
 
 FIXTURES_DIR = Path(__file__).parent.parent / "src" / "fixtures"
 VALID_DIR = FIXTURES_DIR / "valid"
 INVALID_DIR = FIXTURES_DIR / "invalid"
 
-# Entity type mapping from fixture prefix to model class (tracer bullet: 2 entities)
+# Entity type mapping from fixture prefix to model class
 ENTITY_MAP = {
+    # Core types
     "track-feature": TrackFeature,
     "reference-location": ReferenceLocation,
+    # Annotation types
+    "narrative-entry": NarrativeEntry,
+    "circle-annotation": CircleAnnotation,
+    "rectangle-annotation": RectangleAnnotation,
+    "line-annotation": LineAnnotation,
+    "text-annotation": TextAnnotation,
+    "vector-annotation": VectorAnnotation,
 }
 
 
@@ -71,7 +86,9 @@ def get_invalid_fixtures() -> list[tuple[str, Path]]:
 
 def is_known_geometry_limitation(entity_type: str, error: ValidationError) -> bool:
     """Check if validation error is due to known LinkML nested array limitation."""
-    if entity_type != "track-feature":
+    # Types with nested coordinate arrays that trigger LinkML limitation
+    nested_coord_types = {"track-feature", "rectangle-annotation", "line-annotation"}
+    if entity_type not in nested_coord_types:
         return False
     for err in error.errors():
         loc = err.get("loc", ())

@@ -27,6 +27,18 @@ enums:
         description: Vessel track (LineString geometry)
       POINT:
         description: Reference point/location (Point geometry)
+      NARRATIVE:
+        description: Timestamped narrative/log entry (no geometry)
+      CIRCLE:
+        description: Circle annotation (Point geometry + radius)
+      RECTANGLE:
+        description: Rectangle annotation (Polygon geometry)
+      LINE:
+        description: Line annotation (LineString geometry)
+      TEXT:
+        description: Text annotation at a position (Point geometry)
+      VECTOR:
+        description: Vector annotation (Point geometry + range/bearing)
 
   TrackTypeEnum:
     description: Type of track feature
