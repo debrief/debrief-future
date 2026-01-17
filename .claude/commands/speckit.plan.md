@@ -94,6 +94,40 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 **Output**: data-model.md, /contracts/*, quickstart.md, agent-specific file
 
+### Phase 1.5: Media Components Assessment
+
+**Prerequisites:** Phase 1 complete (design artifacts exist)
+
+**Purpose**: Identify Storybook stories to bundle for blog post demos. This enables interactive component demos in shipped posts.
+
+1. **Scan for Storybook stories** related to the feature:
+   - Check for `.stories.tsx` files in the feature scope
+   - Look for components mentioned in spec.md
+   - Check if the feature creates or modifies visual components
+
+2. **Apply inclusion criteria**:
+   - New visual component? → Include
+   - Significant visual change? → Include
+   - Interactive demo adds narrative value? → Include
+   - Backend-only / minor UI tweak / no story? → Exclude
+
+3. **Verify bundleability** for each candidate:
+   - Existing Storybook story exists
+   - Component can render standalone (no app context required)
+   - Reasonable bundle size expected (< 500KB)
+
+4. **Populate Media Components section** in plan.md:
+   - Fill table with component name, story source, bundle name, purpose
+   - Check applicable inclusion criteria checkboxes
+   - Add permanent Storybook link for each component
+
+5. **Get author confirmation** if components identified:
+   - Present the Media Components section
+   - Allow author to modify or decline suggestions
+   - If no components identified, write "None - backend/infrastructure feature"
+
+**Output**: plan.md with Media Components section populated (or marked as N/A)
+
 ### Phase 2: Media Content Creation
 
 **Prerequisites:** Phase 1 complete (design artifacts exist)

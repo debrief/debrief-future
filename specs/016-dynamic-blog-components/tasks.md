@@ -46,7 +46,7 @@
 
 **Purpose**: Add Media Components section to plan template - defines the data structure all other changes depend on
 
-- [ ] T001 Add Media Components section to plan template `.specify/templates/plan-template.md`
+- [x] T001 Add Media Components section to plan template `.specify/templates/plan-template.md`
 
 **Section to add after Project Structure:**
 
@@ -86,7 +86,7 @@
 
 ### Implementation for User Story 2
 
-- [ ] T002 Add Phase 1.5 Media Components Assessment to speckit.plan.md `.claude/commands/speckit.plan.md`
+- [x] T002 Add Phase 1.5 Media Components Assessment to speckit.plan.md `.claude/commands/speckit.plan.md`
 
 **Add after Phase 1 Design & Contracts section:**
 
@@ -132,7 +132,7 @@
 
 ### Implementation for User Story 3
 
-- [ ] T003 Add Media Component Bundling step to speckit.implement.md `.claude/commands/speckit.implement.md`
+- [x] T003 Add Media Component Bundling step to speckit.implement.md `.claude/commands/speckit.implement.md`
 
 **Add to Phase 4 (Polish) after evidence collection:**
 
@@ -184,7 +184,7 @@ If plan.md has Media Components entries:
 
 ### Implementation for User Story 4
 
-- [ ] T004 Update speckit.pr.md to pass component bundles to publish `.claude/commands/speckit.pr.md`
+- [x] T004 Update speckit.pr.md to pass component bundles to publish `.claude/commands/speckit.pr.md`
 
 **Add after step 12 (Check for publishable media content):**
 
@@ -208,7 +208,7 @@ If plan.md has Media Components entries:
     ```
 ```
 
-- [ ] T005 [P] Add Arguments table entry for --components `.claude/commands/publish.md`
+- [x] T005 [P] Add Arguments table entry for --components `.claude/commands/publish.md`
 
 **Add to Arguments table:**
 
@@ -216,7 +216,7 @@ If plan.md has Media Components entries:
 | `--components <path>` | Path to component bundles directory | `--components specs/016/media/components/` |
 ```
 
-- [ ] T006 Add Component Bundle Deployment section to publish.md `.claude/commands/publish.md`
+- [x] T006 Add Component Bundle Deployment section to publish.md `.claude/commands/publish.md`
 
 **Add after Image handling section:**
 
@@ -270,17 +270,17 @@ If `--components` argument provided:
 
 ### Workflow Validation
 
-- [ ] T007 Create validation checklist in `specs/016-dynamic-blog-components/evidence/workflow-validation.md`
-- [ ] T008 [P] Document before/after file changes in `specs/016-dynamic-blog-components/evidence/before-after-comparison.md`
+- [x] T007 Create validation checklist in `specs/016-dynamic-blog-components/evidence/workflow-validation.md`
+- [x] T008 [P] Document before/after file changes in `specs/016-dynamic-blog-components/evidence/before-after-comparison.md`
 
 ### Evidence Collection
 
-- [ ] T009 Create example plan.md showing Media Components section `specs/016-dynamic-blog-components/evidence/plan-example.md`
+- [x] T009 Create example plan.md showing Media Components section `specs/016-dynamic-blog-components/evidence/plan-example.md`
 
 ### Media Content
 
-- [ ] T010 Create shipped blog post `specs/016-dynamic-blog-components/media/shipped-post.md`
-- [ ] T011 [P] Create LinkedIn shipped summary `specs/016-dynamic-blog-components/media/linkedin-shipped.md`
+- [x] T010 Create shipped blog post `specs/016-dynamic-blog-components/media/shipped-post.md`
+- [x] T011 [P] Create LinkedIn shipped summary `specs/016-dynamic-blog-components/media/linkedin-shipped.md`
 
 ### PR Creation
 

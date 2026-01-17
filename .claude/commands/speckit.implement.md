@@ -81,6 +81,14 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Capture test-summary.md with test results
      - Create usage-example.md demonstrating the feature
      - Capture any feature-specific artifacts (screenshots, API samples, CLI output, etc.)
+   - **Media component bundling**: If plan.md has Media Components entries:
+     - For each component in the Media Components table:
+       - Locate the Storybook story source file
+       - Create esbuild entry point that imports the story and renders with createRoot
+       - Build self-contained bundle (IIFE format, include React, inline CSS, minify)
+     - Store bundles at `FEATURE_DIR/media/components/`
+     - Verify bundles: self-contained, < 500KB, renders in isolation
+     - Record bundle details in evidence/
    - **Media content**: Create blog posts and LinkedIn summaries using Content Specialist agent
 
 8. Progress tracking and error handling:
