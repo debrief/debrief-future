@@ -150,10 +150,11 @@ A developer wants map selection to highlight the corresponding row in the featur
 
 - Q: Should components define new TypeScript types for features? → A: No, import existing types from `@debrief/schemas` package (`TrackFeature`, `ReferenceLocation`, etc.)
 - Q: Which Storybook version should be used? → A: Storybook 10.x
+- Q: Which react-leaflet version should be used? → A: react-leaflet v5.x
 
 ## Assumptions
 
-- Components will use Leaflet for map rendering (consistent with VS Code extension spec)
+- Components will use Leaflet for map rendering via **react-leaflet v5.x** (consistent with VS Code extension spec)
 - GeoJSON features follow the Debrief schema conventions defined in `/shared/schemas/`
 - **TypeScript types MUST be imported from `@debrief/schemas`** - components should NOT define duplicate type definitions; convenience union types (e.g., `DebriefFeature = TrackFeature | ReferenceLocation`) may be derived from imported types
 - VS Code webview and Electron both support modern ES modules and React 18+

@@ -10,7 +10,7 @@ Build a reusable React component library providing MapView, Timeline, and Featur
 ## Technical Context
 
 **Language/Version**: TypeScript 5.x with React 18+
-**Primary Dependencies**: react-leaflet v4+, @tanstack/react-virtual, @debrief/schemas (workspace types)
+**Primary Dependencies**: react-leaflet v5+, @tanstack/react-virtual, @debrief/schemas (workspace types)
 **Storage**: N/A (pure display components — no persistence)
 **Testing**: Vitest (unit), Storybook (visual preview/review), Playwright (integration)
 **Target Platform**: Electron renderer, VS Code webview, modern browsers
@@ -209,7 +209,7 @@ Consumers import only what they need; bundlers eliminate unused code.
 | react-dom | ^18.2.0 | Peer dependency |
 | @debrief/schemas | workspace:* | Shared TypeScript types (TrackFeature, ReferenceLocation, etc.) |
 | leaflet | ^1.9.0 | Map rendering |
-| react-leaflet | ^4.2.0 | React wrapper for Leaflet |
+| react-leaflet | ^5.0.0 | React wrapper for Leaflet |
 | @tanstack/react-virtual | ^3.0.0 | List virtualization |
 
 ### Development Dependencies
