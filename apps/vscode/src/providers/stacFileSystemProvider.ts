@@ -32,33 +32,33 @@ export class StacFileSystemProvider implements vscode.FileSystemProvider {
   /**
    * Get file/directory stats
    */
-  async stat(uri: vscode.Uri): Promise<vscode.FileStat> {
+  stat(uri: vscode.Uri): Promise<vscode.FileStat> {
     const parsed = this.parseUri(uri);
     if (!parsed) {
       throw vscode.FileSystemError.FileNotFound(uri);
     }
 
     // All STAC items are treated as files
-    return {
+    return Promise.resolve({
       type: vscode.FileType.File,
       ctime: 0,
       mtime: 0,
       size: 0,
-    };
+    });
   }
 
   /**
    * Read directory contents
    */
-  async readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
+  readDirectory(_uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
     // Not implemented for this provider
-    return [];
+    return Promise.resolve([]);
   }
 
   /**
    * Read file contents
    */
-  async readFile(uri: vscode.Uri): Promise<Uint8Array> {
+  readFile(uri: vscode.Uri): Promise<Uint8Array> {
     const parsed = this.parseUri(uri);
     if (!parsed) {
       throw vscode.FileSystemError.FileNotFound(uri);
@@ -75,7 +75,7 @@ export class StacFileSystemProvider implements vscode.FileSystemProvider {
       2
     );
 
-    return new TextEncoder().encode(content);
+    return Promise.resolve(new TextEncoder().encode(content));
   }
 
   /**

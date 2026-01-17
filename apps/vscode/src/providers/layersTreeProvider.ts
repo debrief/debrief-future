@@ -104,7 +104,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
   /**
    * Get children for an element
    */
-  async getChildren(element?: LayerItem): Promise<LayerItem[]> {
+  getChildren(element?: LayerItem): Promise<LayerItem[]> {
     if (!element) {
       // Root level: return headers
       const items: LayerItem[] = [];
@@ -117,29 +117,29 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
         items.push({ type: 'header', label: 'Results', id: 'results' });
       }
 
-      return items;
+      return Promise.resolve(items);
     }
 
     if (element.type === 'header') {
       if (element.id === 'source') {
-        return [
+        return Promise.resolve([
           ...this.tracks.map(
             (track): LayerItem => ({ type: 'track', track })
           ),
           ...this.locations.map(
             (location): LayerItem => ({ type: 'location', location })
           ),
-        ];
+        ]);
       }
 
       if (element.id === 'results') {
-        return this.resultLayers.map(
+        return Promise.resolve(this.resultLayers.map(
           (layer): LayerItem => ({ type: 'result', layer })
-        );
+        ));
       }
     }
 
-    return [];
+    return Promise.resolve([]);
   }
 
   /**

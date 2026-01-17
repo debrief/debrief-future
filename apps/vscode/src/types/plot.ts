@@ -2,7 +2,7 @@
  * Plot-related type definitions for the Debrief VS Code Extension
  */
 
-import type { Feature, LineString, Point, FeatureCollection } from 'geojson';
+import type { Feature, LineString, Point, FeatureCollection, GeoJsonProperties } from 'geojson';
 
 /**
  * A plot from a STAC catalog containing tracks and reference locations
@@ -213,7 +213,7 @@ export type LocationFeature = Feature<Point, {
 /**
  * GeoJSON FeatureCollection for a plot
  */
-export interface PlotFeatureCollection extends FeatureCollection {
+export interface PlotFeatureCollection extends FeatureCollection<LineString | Point, GeoJsonProperties> {
   features: Array<TrackFeature | LocationFeature>;
 }
 

@@ -14,7 +14,13 @@ import type {
   StacItem,
 } from '../types/stac';
 import type { Plot, Track, ReferenceLocation } from '../types/plot';
-import type { LineString, Point, FeatureCollection, Feature } from 'geojson';
+import type { LineString, Point, FeatureCollection, Feature, Geometry, GeoJsonProperties } from 'geojson';
+
+// Typed feature for safe property access
+interface TypedFeature extends Feature<Geometry, GeoJsonProperties> {
+  geometry: { type: string; coordinates: number[] | number[][] };
+  properties: Record<string, unknown> | null;
+}
 
 export class StacService {
   private catalogCache: Map<string, StacCatalog> = new Map();
@@ -23,7 +29,7 @@ export class StacService {
   /**
    * Validate that a path contains a valid STAC catalog
    */
-  async validateStorePath(storePath: string): Promise<{
+  validateStorePath(storePath: string): Promise<{
     valid: boolean;
     error?: string;
   }> {
@@ -42,23 +48,23 @@ export class StacService {
 
       // Basic STAC catalog validation
       if (
-        !catalog ||
+        catalog === null ||
         typeof catalog !== 'object' ||
         !('type' in catalog) ||
         catalog.type !== 'Catalog'
       ) {
-        return {
+        return Promise.resolve({
           valid: false,
           error: 'Invalid STAC catalog format',
-        };
+        });
       }
 
-      return { valid: true };
+      return Promise.resolve({ valid: true });
     } catch (err) {
-      return {
+      return Promise.resolve({
         valid: false,
         error: `Failed to read catalog: ${err instanceof Error ? err.message : String(err)}`,
-      };
+      });
     }
   }
 
@@ -186,7 +192,7 @@ export class StacService {
 
       let trackCount = 0;
       let locationCount = 0;
-      let timeExtent: [string, string] = [
+      const timeExtent: [string, string] = [
         item.properties.datetime,
         item.properties.datetime,
       ];
@@ -198,14 +204,16 @@ export class StacService {
         );
         const features = await this.loadGeoJson(geoJsonPath);
 
-        if (features) {
+        if (features !== null) {
           // Count tracks and locations
-          for (const feature of features.features) {
+          for (const f of features.features) {
+            const feature = f as TypedFeature;
             if (feature.geometry.type === 'LineString') {
               trackCount++;
 
               // Update time extent from track times
-              const times = (feature.properties as { times?: string[] })?.times;
+              const props = feature.properties ?? {};
+              const times = props.times as string[] | undefined;
               if (times && times.length > 0) {
                 const firstTime = times[0];
                 const lastTime = times[times.length - 1];
@@ -273,23 +281,24 @@ export class StacService {
       );
       const featureCollection = await this.loadGeoJson(geoJsonPath);
 
-      if (!featureCollection) {
+      if (featureCollection === null) {
         return { tracks: [], locations: [] };
       }
 
       const tracks: Track[] = [];
       const locations: ReferenceLocation[] = [];
 
-      for (const feature of featureCollection.features) {
+      for (const f of featureCollection.features) {
+        const feature = f as TypedFeature;
+        const props = feature.properties ?? {};
         if (feature.geometry.type === 'LineString') {
-          const props = feature.properties as Record<string, unknown>;
           const times = (props.times as string[]) ?? [];
 
           tracks.push({
             id: (props.id as string) ?? `track-${tracks.length}`,
             name: (props.name as string) ?? `Track ${tracks.length + 1}`,
             platformType: props.platformType as string | undefined,
-            geometry: feature.geometry as LineString,
+            geometry: feature.geometry as unknown as LineString,
             times,
             startTime: times[0] ?? '',
             endTime: times[times.length - 1] ?? '',
@@ -298,13 +307,11 @@ export class StacService {
             selected: false,
           });
         } else if (feature.geometry.type === 'Point') {
-          const props = feature.properties as Record<string, unknown>;
-
           locations.push({
             id: (props.id as string) ?? `location-${locations.length}`,
             name: (props.name as string) ?? `Location ${locations.length + 1}`,
             locationType: props.locationType as string | undefined,
-            geometry: feature.geometry as Point,
+            geometry: feature.geometry as unknown as Point,
             visible: true,
             selected: false,
           });
@@ -359,18 +366,18 @@ export class StacService {
     return this.loadCatalogFromPath(catalogPath);
   }
 
-  private async loadCatalogFromPath(
+  private loadCatalogFromPath(
     catalogPath: string
   ): Promise<StacCatalog | null> {
     // Check cache
     const cached = this.catalogCache.get(catalogPath);
     if (cached) {
-      return cached;
+      return Promise.resolve(cached);
     }
 
     try {
       if (!fs.existsSync(catalogPath)) {
-        return null;
+        return Promise.resolve(null);
       }
 
       const content = fs.readFileSync(catalogPath, 'utf-8');
@@ -379,22 +386,22 @@ export class StacService {
       // Cache for future use
       this.catalogCache.set(catalogPath, catalog);
 
-      return catalog;
+      return Promise.resolve(catalog);
     } catch {
-      return null;
+      return Promise.resolve(null);
     }
   }
 
-  private async loadItem(itemPath: string): Promise<StacItem | null> {
+  private loadItem(itemPath: string): Promise<StacItem | null> {
     // Check cache
     const cached = this.itemCache.get(itemPath);
     if (cached) {
-      return cached;
+      return Promise.resolve(cached);
     }
 
     try {
       if (!fs.existsSync(itemPath)) {
-        return null;
+        return Promise.resolve(null);
       }
 
       const content = fs.readFileSync(itemPath, 'utf-8');
@@ -403,24 +410,24 @@ export class StacService {
       // Cache for future use
       this.itemCache.set(itemPath, item);
 
-      return item;
+      return Promise.resolve(item);
     } catch {
-      return null;
+      return Promise.resolve(null);
     }
   }
 
-  private async loadGeoJson(
+  private loadGeoJson(
     geoJsonPath: string
-  ): Promise<FeatureCollection | null> {
+  ): Promise<FeatureCollection<Geometry, GeoJsonProperties> | null> {
     try {
       if (!fs.existsSync(geoJsonPath)) {
-        return null;
+        return Promise.resolve(null);
       }
 
       const content = fs.readFileSync(geoJsonPath, 'utf-8');
-      return JSON.parse(content) as FeatureCollection;
+      return Promise.resolve(JSON.parse(content) as FeatureCollection<Geometry, GeoJsonProperties>);
     } catch {
-      return null;
+      return Promise.resolve(null);
     }
   }
 
