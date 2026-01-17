@@ -284,7 +284,7 @@ If `--components` argument provided:
 
 ### PR Creation
 
-- [ ] T012 Create PR and publish blog: run /speckit.pr
+- [x] T012 Create PR and publish blog: run /speckit.pr
 
 **Task T012 must run last. It depends on all evidence and media tasks being complete.**
 
