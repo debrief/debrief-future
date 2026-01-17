@@ -14,6 +14,21 @@ Package Storybook stories as self-contained JS bundles published alongside blog 
 4. **Build**: On-demand during `/publish` skill execution — bundles only what's needed for that post
 5. **Naming**: Directory convention `{post-slug}` ties components to their posts
 
+### Speckit Workflow Integration
+
+This feature touches multiple points in the speckit workflow:
+
+| Stage | Skill | Integration |
+|-------|-------|-------------|
+| Planning | `/speckit.plan` | Assess if spec has demo-able components; capture in media section of plan |
+| Implementation | `/speckit.implement` | Build self-contained component bundle as part of implementation artifacts |
+| PR & Publish | `/speckit.pr` | Include packaged component bundle in website PR alongside "shipped" blog post |
+
+**Key workflow changes**:
+- `plan.md` template needs a "Media Components" section to identify bundleable stories
+- Implementation should produce a component bundle artifact when stories are identified
+- `/publish` skill must handle both the blog post markdown AND the component bundle directory
+
 ## Success Criteria
 
 - [ ] Component bundles are self-contained (no external Storybook dependencies)
