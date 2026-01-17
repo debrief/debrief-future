@@ -56,7 +56,7 @@ function calculateTickInterval(durationMs: number, maxTicks: number): number {
     }
   }
 
-  return intervals[intervals.length - 1];
+  return intervals[intervals.length - 1] ?? 604800000; // Default to 1 week
 }
 
 /**

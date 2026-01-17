@@ -23,9 +23,13 @@ export function calculateBounds(
   let maxLat = -Infinity;
 
   for (const feature of featureArray) {
-    // Check if feature already has a bbox
-    if (feature.bbox && feature.bbox.length >= 4) {
-      const [fMinLon, fMinLat, fMaxLon, fMaxLat] = feature.bbox;
+    // Check if feature already has a bbox (GeoJSON allows this)
+    const featureWithBbox = feature as typeof feature & { bbox?: number[] };
+    if (featureWithBbox.bbox && featureWithBbox.bbox.length >= 4) {
+      const fMinLon = featureWithBbox.bbox[0] ?? 0;
+      const fMinLat = featureWithBbox.bbox[1] ?? 0;
+      const fMaxLon = featureWithBbox.bbox[2] ?? 0;
+      const fMaxLat = featureWithBbox.bbox[3] ?? 0;
       minLon = Math.min(minLon, fMinLon);
       minLat = Math.min(minLat, fMinLat);
       maxLon = Math.max(maxLon, fMaxLon);
@@ -39,7 +43,8 @@ export function calculateBounds(
       const coords = feature.geometry.coordinates as unknown as number[][];
       for (const coord of coords) {
         if (coord.length >= 2) {
-          const [lon, lat] = coord;
+          const lon = coord[0] ?? 0;
+          const lat = coord[1] ?? 0;
           minLon = Math.min(minLon, lon);
           minLat = Math.min(minLat, lat);
           maxLon = Math.max(maxLon, lon);
@@ -50,7 +55,8 @@ export function calculateBounds(
       // Point geometry - coordinates is [lon, lat]
       const coords = feature.geometry.coordinates as unknown as number[];
       if (coords.length >= 2) {
-        const [lon, lat] = coords;
+        const lon = coords[0] ?? 0;
+        const lat = coords[1] ?? 0;
         minLon = Math.min(minLon, lon);
         minLat = Math.min(minLat, lat);
         maxLon = Math.max(maxLon, lon);

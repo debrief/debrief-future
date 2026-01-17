@@ -174,15 +174,15 @@
 
 ### Tests for User Story 4
 
-- [ ] T048 [test] Write theme inheritance tests `shared/components/src/ThemeProvider/__tests__/theme-inheritance.test.tsx`
+- [x] T048 [test] Write theme inheritance tests `shared/components/src/ThemeProvider/__tests__/theme-inheritance.test.tsx`
 
 ### Implementation for User Story 4
 
-- [ ] T049 Create VS Code theme adapter `shared/components/src/ThemeProvider/vsCodeAdapter.ts`
-- [ ] T050 Create Electron theme adapter `shared/components/src/ThemeProvider/electronAdapter.ts`
-- [ ] T051 Add theme context to all components (verify usage) `shared/components/src/`
-- [ ] T052 Create cross-context Storybook stories `shared/components/.storybook/decorators/ContextDecorator.tsx`
-- [ ] T053 Add theme switcher to Storybook `shared/components/.storybook/preview.ts`
+- [x] T049 Create VS Code theme adapter `shared/components/src/ThemeProvider/vsCodeAdapter.ts`
+- [x] T050 Create Electron theme adapter `shared/components/src/ThemeProvider/electronAdapter.ts`
+- [x] T051 Add theme context to all components (verify usage) `shared/components/src/`
+- [x] T052 Create cross-context Storybook stories `shared/components/.storybook/decorators/ContextDecorator.tsx`
+- [x] T053 Add theme switcher to Storybook `shared/components/.storybook/preview.ts`
 
 **Checkpoint**: Theme tokens propagate correctly - components look consistent across contexts
 
@@ -196,15 +196,15 @@
 
 ### Tests for User Story 5
 
-- [ ] T054 [P][test] Write MapView click selection tests `shared/components/src/MapView/__tests__/selection.test.tsx`
-- [ ] T055 [P][test] Write MapView multi-select tests `shared/components/src/MapView/__tests__/selection.test.tsx`
+- [x] T054 [P][test] Write MapView click selection tests `shared/components/src/MapView/__tests__/selection.test.tsx`
+- [x] T055 [P][test] Write MapView multi-select tests `shared/components/src/MapView/__tests__/selection.test.tsx`
 
 ### Implementation for User Story 5
 
-- [ ] T056 Add selection handlers to MapView `shared/components/src/MapView/MapView.tsx`
-- [ ] T057 Implement feature highlight styling on selection `shared/components/src/MapView/MapView.css`
-- [ ] T058 Add selection clear on empty space click `shared/components/src/MapView/MapView.tsx`
-- [ ] T059 Create MapView selection Storybook stories `shared/components/src/MapView/MapView.stories.tsx`
+- [x] T056 Add selection handlers to MapView `shared/components/src/MapView/MapView.tsx`
+- [x] T057 Implement feature highlight styling on selection `shared/components/src/MapView/MapView.css`
+- [x] T058 Add selection clear on empty space click `shared/components/src/MapView/MapView.tsx`
+- [x] T059 Create MapView selection Storybook stories `shared/components/src/MapView/MapView.stories.tsx`
 
 **Checkpoint**: Map selection works - click highlights feature and fires callback
 
@@ -218,15 +218,15 @@
 
 ### Tests for User Story 6
 
-- [ ] T060 [test] Write cross-component selection sync tests `shared/components/src/__tests__/selection-sync.test.tsx`
+- [x] T060 [test] Write cross-component selection sync tests `shared/components/src/__tests__/selection-sync.test.tsx`
 
 ### Implementation for User Story 6
 
-- [ ] T061 Add selectedIds prop to FeatureList `shared/components/src/FeatureList/FeatureList.tsx`
-- [ ] T062 Add selectedIds prop to Timeline `shared/components/src/Timeline/Timeline.tsx`
-- [ ] T063 Implement scroll-to-selected in FeatureList `shared/components/src/FeatureList/FeatureList.tsx`
-- [ ] T064 Implement center-on-selected in MapView `shared/components/src/MapView/MapView.tsx`
-- [ ] T065 Create synchronized selection Storybook story `shared/components/.storybook/stories/SynchronizedSelection.stories.tsx`
+- [x] T061 Add selectedIds prop to FeatureList `shared/components/src/FeatureList/FeatureList.tsx`
+- [x] T062 Add selectedIds prop to Timeline `shared/components/src/Timeline/Timeline.tsx`
+- [x] T063 Implement scroll-to-selected in FeatureList `shared/components/src/FeatureList/FeatureList.tsx`
+- [x] T064 Implement center-on-selected in MapView `shared/components/src/MapView/MapView.tsx`
+- [x] T065 Create synchronized selection Storybook story `shared/components/.storybook/stories/SynchronizedSelection.stories.tsx`
 
 **Checkpoint**: Selection syncs across all components - full integration verified
 
@@ -238,29 +238,29 @@
 
 ### Build & Bundle Verification
 
-- [ ] T066 Configure tree-shakeable exports in package.json `shared/components/package.json`
-- [ ] T067 Run production build and verify bundle size <200KB `shared/components/`
-- [ ] T068 Verify 60fps performance in performance stories `shared/components/`
+- [x] T066 Configure tree-shakeable exports in package.json `shared/components/package.json`
+- [x] T067 Run production build and verify bundle size <200KB `shared/components/`
+- [x] T068 Verify 60fps performance in performance stories `shared/components/`
 
 ### Storybook Deployment
 
-- [ ] T069 Configure GitHub Pages deployment for Storybook `shared/components/.storybook/`
-- [ ] T070 Add accessibility addon verification `shared/components/.storybook/`
+- [x] T069 Configure GitHub Pages deployment for Storybook `shared/components/.storybook/`
+- [x] T070 Add accessibility addon verification `shared/components/.storybook/`
 
 ### Evidence Collection
 
-- [ ] T071 Create evidence directory `specs/001-shared-react-components/evidence/`
-- [ ] T072 Capture test summary with Vitest results `specs/001-shared-react-components/evidence/test-summary.md`
-- [ ] T073 Create usage example demonstrating 5-line map display `specs/001-shared-react-components/evidence/usage-example.md`
+- [x] T071 Create evidence directory `specs/001-shared-react-components/evidence/`
+- [x] T072 Capture test summary with Vitest results `specs/001-shared-react-components/evidence/test-summary.md`
+- [x] T073 Create usage example demonstrating 5-line map display `specs/001-shared-react-components/evidence/usage-example.md`
 - [ ] T074 [P] Capture MapView Storybook screenshot `specs/001-shared-react-components/evidence/storybook-screenshots/mapview.png`
 - [ ] T075 [P] Capture Timeline Storybook screenshot `specs/001-shared-react-components/evidence/storybook-screenshots/timeline.png`
 - [ ] T076 [P] Capture FeatureList Storybook screenshot `specs/001-shared-react-components/evidence/storybook-screenshots/featurelist.png`
-- [ ] T077 Document bundle size analysis `specs/001-shared-react-components/evidence/bundle-size.md`
+- [x] T077 Document bundle size analysis `specs/001-shared-react-components/evidence/bundle-size.md`
 
 ### Media Content
 
-- [ ] T078 Create shipped blog post `specs/001-shared-react-components/media/shipped-post.md`
-- [ ] T079 [P] Create LinkedIn shipped summary `specs/001-shared-react-components/media/linkedin-shipped.md`
+- [x] T078 Create shipped blog post `specs/001-shared-react-components/media/shipped-post.md`
+- [x] T079 [P] Create LinkedIn shipped summary `specs/001-shared-react-components/media/linkedin-shipped.md`
 
 ### PR Creation
 

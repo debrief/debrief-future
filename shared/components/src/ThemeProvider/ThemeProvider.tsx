@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, useMemo, useCallback, type ReactNode } from 'react';
 import { ThemeContext, type Theme, type ThemeVariant, type ThemeContextValue } from './ThemeContext';
 import { getThemeTokens, mergeThemeTokens, defaultTheme } from './defaultTheme';
 import '../styles/tokens.css';

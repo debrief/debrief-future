@@ -299,6 +299,64 @@ export const DarkTheme: Story = {
   },
 };
 
+// Multi-select example with Ctrl/Cmd support
+function MultiSelectMapExample() {
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const handleSelect = (id: string, event: React.MouseEvent) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+
+      // Multi-select with Ctrl/Cmd key
+      if (event.ctrlKey || event.metaKey) {
+        if (next.has(id)) {
+          next.delete(id);
+        } else {
+          next.add(id);
+        }
+      } else {
+        // Single select - clear others
+        next.clear();
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleBackgroundClick = () => {
+    setSelectedIds(new Set());
+  };
+
+  return (
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <strong>Selected ({selectedIds.size}):</strong>{' '}
+        {selectedIds.size > 0 ? Array.from(selectedIds).join(', ') : 'None'}
+        <br />
+        <small>Hold Ctrl/Cmd to multi-select. Click background to clear.</small>
+      </div>
+      <MapView
+        features={sampleData}
+        selectedIds={selectedIds}
+        onSelect={handleSelect}
+        onBackgroundClick={handleBackgroundClick}
+        height={500}
+      />
+    </div>
+  );
+}
+
+export const MultiSelect: Story = {
+  render: () => <MultiSelectMapExample />,
+  parameters: {
+    docs: {
+      description: {
+        story: 'Multi-select features using Ctrl/Cmd+Click. Single click selects only that feature.',
+      },
+    },
+  },
+};
+
 export const FiveLineExample: Story = {
   render: () => {
     // SC-001: Display a map with 5 or fewer lines of code

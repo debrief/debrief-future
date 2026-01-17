@@ -180,13 +180,13 @@ describe('Theme Inheritance', () => {
       expect(root.style.getPropertyValue('--debrief-color-secondary')).toBe('#00ff00');
     });
 
-    it('applies custom spacing tokens', () => {
+    it('applies custom background tokens', () => {
       render(
         <ThemeProvider
           theme={{
             variant: 'light',
             tokens: {
-              spacingUnit: '8px',
+              bgPrimary: '#fafafa',
             },
           }}
         >
@@ -195,7 +195,7 @@ describe('Theme Inheritance', () => {
       );
 
       const root = document.documentElement;
-      expect(root.style.getPropertyValue('--debrief-spacing-unit')).toBe('8px');
+      expect(root.style.getPropertyValue('--debrief-bg-primary')).toBe('#fafafa');
     });
   });
 
@@ -207,7 +207,7 @@ describe('Theme Inheritance', () => {
         </ThemeProvider>
       );
 
-      expect(container.querySelector('.debrief-map')).toBeInTheDocument();
+      expect(container.querySelector('.debrief-mapview')).toBeInTheDocument();
       expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
     });
 
@@ -244,7 +244,7 @@ describe('Theme Inheritance', () => {
         </ThemeProvider>
       );
 
-      expect(container.querySelector('.debrief-map')).toBeInTheDocument();
+      expect(container.querySelector('.debrief-mapview')).toBeInTheDocument();
       expect(container.querySelector('.debrief-timeline')).toBeInTheDocument();
       expect(container.querySelector('.debrief-feature-list')).toBeInTheDocument();
       expect(document.documentElement.getAttribute('data-theme')).toBe('dark');

@@ -1,11 +1,10 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
 import type { PathOptions, LatLngBoundsExpression } from 'leaflet';
 import type { DebriefFeature, DebriefFeatureCollection, Bounds } from '../utils/types';
 import { calculateBounds, expandBounds } from '../utils/bounds';
 import { getFeatureColor, getFeatureLabel } from '../utils/labels';
 import { isTrackFeature } from '../utils/types';
-import { useMapInteraction } from './hooks/useMapInteraction';
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 

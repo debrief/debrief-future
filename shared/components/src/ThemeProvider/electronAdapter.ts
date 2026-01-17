@@ -1,4 +1,4 @@
-import type { Theme, ThemeTokens, ThemeVariant } from './ThemeContext';
+import type { Theme, ThemeVariant } from './ThemeContext';
 
 /**
  * Electron IPC channel names for theme communication.
@@ -137,7 +137,7 @@ export async function resolveThemeVariant(
 /**
  * Default Electron theme tokens for light mode.
  */
-const LIGHT_TOKENS: ThemeTokens = {
+const LIGHT_TOKENS: Record<string, string> = {
   bgPrimary: '#ffffff',
   bgSecondary: '#f5f5f5',
   textPrimary: '#1a1a1a',
@@ -160,7 +160,7 @@ const LIGHT_TOKENS: ThemeTokens = {
 /**
  * Default Electron theme tokens for dark mode.
  */
-const DARK_TOKENS: ThemeTokens = {
+const DARK_TOKENS: Record<string, string> = {
   bgPrimary: '#1e1e1e',
   bgSecondary: '#252526',
   textPrimary: '#e0e0e0',
@@ -183,7 +183,7 @@ const DARK_TOKENS: ThemeTokens = {
 /**
  * Get default tokens for a theme variant.
  */
-export function getDefaultTokens(variant: 'light' | 'dark' | 'vscode'): ThemeTokens {
+export function getDefaultTokens(variant: 'light' | 'dark' | 'vscode'): Record<string, string> {
   if (variant === 'dark' || variant === 'vscode') {
     return DARK_TOKENS;
   }

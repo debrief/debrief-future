@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useMemo, useCallback, useState } from 'react';
+import { useRef, useEffect, useMemo, useCallback, useState } from 'react';
 import type { DebriefFeature, DebriefFeatureCollection, TimeExtent } from '../utils/types';
 import { calculateTimeExtent } from '../utils/time';
-import { renderTimeAxis, timeToX, xToTime } from './canvas/TimeAxis';
+import { renderTimeAxis } from './canvas/TimeAxis';
 import { calculateFeatureBars, renderFeatureBars, findBarAtPoint, type FeatureBarInfo } from './canvas/FeatureBars';
 import './Timeline.css';
 
@@ -57,13 +57,15 @@ export function Timeline({
   selectedIds = new Set(),
   onSelect,
   onBackgroundClick,
-  onTimeRangeChange,
+  onTimeRangeChange: _onTimeRangeChange,
   timeExtent: propTimeExtent,
   height = 200,
   barHeight = 24,
   className,
   style,
 }: TimelineProps) {
+  // onTimeRangeChange will be used for synchronized views in future
+  void _onTimeRangeChange;
   const containerRef = useRef<HTMLDivElement>(null);
   const axisCanvasRef = useRef<HTMLCanvasElement>(null);
   const barsCanvasRef = useRef<HTMLCanvasElement>(null);

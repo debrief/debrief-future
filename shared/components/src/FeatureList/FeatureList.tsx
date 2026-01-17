@@ -127,6 +127,7 @@ export function FeatureList({
         >
           {virtualItems.map((virtualItem) => {
             const feature = featureArray[virtualItem.index];
+            if (!feature) return null;
             const isSelected = selectedIds.has(feature.id);
 
             return (

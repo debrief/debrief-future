@@ -1,4 +1,4 @@
-import type { Theme, ThemeTokens } from './ThemeContext';
+import type { Theme } from './ThemeContext';
 
 /**
  * VS Code CSS variable mappings to Debrief tokens.
@@ -50,11 +50,11 @@ export function isVSCodeEnvironment(): boolean {
 /**
  * Extract VS Code theme tokens from CSS variables.
  */
-export function extractVSCodeTokens(): ThemeTokens {
+export function extractVSCodeTokens(): Record<string, string> {
   if (typeof window === 'undefined') return {};
 
   const computedStyle = getComputedStyle(document.documentElement);
-  const tokens: ThemeTokens = {};
+  const tokens: Record<string, string> = {};
 
   // Map VS Code variables to our token names
   for (const [vsCodeVar, debriefVar] of Object.entries(VS_CODE_VARIABLE_MAP)) {
@@ -63,8 +63,8 @@ export function extractVSCodeTokens(): ThemeTokens {
       // Convert --debrief-token-name to tokenName
       const tokenName = debriefVar
         .replace('--debrief-', '')
-        .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase()) as keyof ThemeTokens;
-      (tokens as Record<string, string>)[tokenName] = value;
+        .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+      tokens[tokenName] = value;
     }
   }
 
@@ -103,7 +103,7 @@ export function isVSCodeDarkMode(): boolean {
   // Parse color to determine if dark
   // Simple heuristic: check if luminance is low
   const hexMatch = bgColor.match(/^#([0-9a-f]{6})$/i);
-  if (hexMatch) {
+  if (hexMatch && hexMatch[1]) {
     const hex = hexMatch[1];
     const r = parseInt(hex.slice(0, 2), 16);
     const g = parseInt(hex.slice(2, 4), 16);
@@ -114,7 +114,7 @@ export function isVSCodeDarkMode(): boolean {
 
   // Check for rgb/rgba format
   const rgbMatch = bgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-  if (rgbMatch) {
+  if (rgbMatch && rgbMatch[1] && rgbMatch[2] && rgbMatch[3]) {
     const r = parseInt(rgbMatch[1], 10);
     const g = parseInt(rgbMatch[2], 10);
     const b = parseInt(rgbMatch[3], 10);
@@ -131,7 +131,6 @@ export function isVSCodeDarkMode(): boolean {
  */
 export function createVSCodeTheme(): Theme {
   const tokens = extractVSCodeTokens();
-  const isDark = isVSCodeDarkMode();
 
   return {
     variant: 'vscode',

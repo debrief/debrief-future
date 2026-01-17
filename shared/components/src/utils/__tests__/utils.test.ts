@@ -3,7 +3,7 @@ import { calculateBounds, expandBounds, isPointInBounds } from '../bounds';
 import { calculateTimeExtent, parseTime, formatTime, formatDuration } from '../time';
 import { getFeatureLabel, getFeatureIcon, getFeatureColor, getFeatureDescription } from '../labels';
 import { isTrackFeature, isReferenceLocation } from '../types';
-import type { DebriefFeature, DebriefFeatureCollection } from '../types';
+import type { DebriefFeatureCollection } from '../types';
 import type { TrackFeature, ReferenceLocation } from '@debrief/schemas';
 
 // Test fixtures
