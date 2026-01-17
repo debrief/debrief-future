@@ -47,16 +47,16 @@
 
 **Purpose**: Project initialization and pnpm workspace configuration
 
-- [ ] T001 Create package directory structure `shared/components/`
-- [ ] T002 Initialize package.json with pnpm workspace config `shared/components/package.json`
-- [ ] T003 [P] Configure TypeScript with strict mode `shared/components/tsconfig.json`
-- [ ] T004 [P] Configure Vite for library build `shared/components/vite.config.ts`
-- [ ] T005 [P] Configure Vitest for testing `shared/components/vitest.config.ts`
-- [ ] T006 [P] Create test setup file with jsdom `shared/components/tests/setup.ts`
-- [ ] T007 Setup Storybook configuration `shared/components/.storybook/main.ts`
-- [ ] T008 [P] Configure Storybook preview with decorators `shared/components/.storybook/preview.ts`
-- [ ] T009 [P] Configure Storybook manager UI `shared/components/.storybook/manager.ts`
-- [ ] T010 Create main library entry point `shared/components/src/index.ts`
+- [x] T001 Create package directory structure `shared/components/`
+- [x] T002 Initialize package.json with pnpm workspace config `shared/components/package.json`
+- [x] T003 [P] Configure TypeScript with strict mode `shared/components/tsconfig.json`
+- [x] T004 [P] Configure Vite for library build `shared/components/vite.config.ts`
+- [x] T005 [P] Configure Vitest for testing `shared/components/vitest.config.ts`
+- [x] T006 [P] Create test setup file with jsdom `shared/components/tests/setup.ts`
+- [x] T007 Setup Storybook configuration `shared/components/.storybook/main.ts`
+- [x] T008 [P] Configure Storybook preview with decorators `shared/components/.storybook/preview.ts`
+- [x] T009 [P] Configure Storybook manager UI `shared/components/.storybook/manager.ts`
+- [x] T010 Create main library entry point `shared/components/src/index.ts`
 
 **Checkpoint**: Project scaffolding complete - foundation can begin
 
@@ -70,27 +70,27 @@
 
 ### Shared Types & Utilities
 
-- [ ] T011 Re-export types from @debrief/schemas and add convenience unions `shared/components/src/utils/types.ts`
-- [ ] T012 [P] Implement calculateBounds utility `shared/components/src/utils/bounds.ts`
-- [ ] T013 [P] Implement calculateTimeExtent utility `shared/components/src/utils/time.ts`
-- [ ] T014 [P] Implement getFeatureLabel and getFeatureIcon utilities `shared/components/src/utils/labels.ts`
-- [ ] T015 [test] Write utility unit tests `shared/components/src/utils/__tests__/utils.test.ts`
+- [x] T011 Re-export types from @debrief/schemas and add convenience unions `shared/components/src/utils/types.ts`
+- [x] T012 [P] Implement calculateBounds utility `shared/components/src/utils/bounds.ts`
+- [x] T013 [P] Implement calculateTimeExtent utility `shared/components/src/utils/time.ts`
+- [x] T014 [P] Implement getFeatureLabel and getFeatureIcon utilities `shared/components/src/utils/labels.ts`
+- [x] T015 [test] Write utility unit tests `shared/components/src/utils/__tests__/utils.test.ts`
 
 ### Theme Infrastructure
 
-- [ ] T016 Define CSS custom property tokens `shared/components/src/styles/tokens.css`
-- [ ] T017 Create ThemeContext with TypeScript definitions `shared/components/src/ThemeProvider/ThemeContext.ts`
-- [ ] T018 Define default theme values `shared/components/src/ThemeProvider/defaultTheme.ts`
-- [ ] T019 Implement ThemeProvider component `shared/components/src/ThemeProvider/ThemeProvider.tsx`
-- [ ] T020 Create useTheme hook `shared/components/src/hooks/useTheme.ts`
-- [ ] T021 [P] Create ThemeProvider index export `shared/components/src/ThemeProvider/index.ts`
-- [ ] T022 [test] Write ThemeProvider tests `shared/components/src/ThemeProvider/ThemeProvider.test.tsx`
-- [ ] T023 Create ThemeProvider Storybook stories `shared/components/src/ThemeProvider/ThemeProvider.stories.tsx`
+- [x] T016 Define CSS custom property tokens `shared/components/src/styles/tokens.css`
+- [x] T017 Create ThemeContext with TypeScript definitions `shared/components/src/ThemeProvider/ThemeContext.ts`
+- [x] T018 Define default theme values `shared/components/src/ThemeProvider/defaultTheme.ts`
+- [x] T019 Implement ThemeProvider component `shared/components/src/ThemeProvider/ThemeProvider.tsx`
+- [x] T020 Create useTheme hook `shared/components/src/hooks/useTheme.ts`
+- [x] T021 [P] Create ThemeProvider index export `shared/components/src/ThemeProvider/index.ts`
+- [x] T022 [test] Write ThemeProvider tests `shared/components/src/ThemeProvider/ThemeProvider.test.tsx`
+- [x] T023 Create ThemeProvider Storybook stories `shared/components/src/ThemeProvider/ThemeProvider.stories.tsx`
 
 ### Selection Infrastructure
 
-- [ ] T024 Implement useSelection hook for shared state `shared/components/src/hooks/useSelection.ts`
-- [ ] T025 [test] Write useSelection hook tests `shared/components/src/hooks/__tests__/useSelection.test.ts`
+- [x] T024 Implement useSelection hook for shared state `shared/components/src/hooks/useSelection.ts`
+- [x] T025 [test] Write useSelection hook tests `shared/components/src/hooks/__tests__/useSelection.test.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -104,16 +104,16 @@
 
 ### Tests for User Story 1
 
-- [ ] T026 [P][test] Write MapView render tests `shared/components/src/MapView/MapView.test.tsx`
-- [ ] T027 [P][test] Write MapView zoom/pan interaction tests `shared/components/src/MapView/MapView.test.tsx`
+- [x] T026 [P][test] Write MapView render tests `shared/components/src/MapView/MapView.test.tsx`
+- [x] T027 [P][test] Write MapView zoom/pan interaction tests `shared/components/src/MapView/MapView.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T028 Create MapView component structure `shared/components/src/MapView/index.ts`
-- [ ] T029 Implement useMapInteraction hook `shared/components/src/MapView/hooks/useMapInteraction.ts`
-- [ ] T030 Implement MapView core component with Leaflet `shared/components/src/MapView/MapView.tsx`
-- [ ] T031 Style MapView with CSS custom properties `shared/components/src/MapView/MapView.css`
-- [ ] T032 Create MapView Storybook stories (Default, LargeDataset, Empty) `shared/components/src/MapView/MapView.stories.tsx`
+- [x] T028 Create MapView component structure `shared/components/src/MapView/index.ts`
+- [x] T029 Implement useMapInteraction hook `shared/components/src/MapView/hooks/useMapInteraction.ts`
+- [x] T030 Implement MapView core component with Leaflet `shared/components/src/MapView/MapView.tsx`
+- [x] T031 Style MapView with CSS custom properties `shared/components/src/MapView/MapView.css`
+- [x] T032 Create MapView Storybook stories (Default, LargeDataset, Empty) `shared/components/src/MapView/MapView.stories.tsx`
 
 **Checkpoint**: MapView displays features - SC-001 (5 lines of code) can be verified
 
@@ -127,17 +127,17 @@
 
 ### Tests for User Story 2
 
-- [ ] T033 [P][test] Write Timeline render tests `shared/components/src/Timeline/Timeline.test.tsx`
-- [ ] T034 [P][test] Write Timeline time range adjustment tests `shared/components/src/Timeline/Timeline.test.tsx`
+- [x] T033 [P][test] Write Timeline render tests `shared/components/src/Timeline/Timeline.test.tsx`
+- [x] T034 [P][test] Write Timeline time range adjustment tests `shared/components/src/Timeline/Timeline.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T035 Create Timeline component structure `shared/components/src/Timeline/index.ts`
-- [ ] T036 Implement TimeAxis Canvas renderer `shared/components/src/Timeline/canvas/TimeAxis.ts`
-- [ ] T037 Implement FeatureBars Canvas renderer `shared/components/src/Timeline/canvas/FeatureBars.ts`
-- [ ] T038 Implement Timeline core component with Canvas `shared/components/src/Timeline/Timeline.tsx`
-- [ ] T039 Style Timeline with CSS custom properties `shared/components/src/Timeline/Timeline.css`
-- [ ] T040 Create Timeline Storybook stories (Default, Overlapping, TimeRange) `shared/components/src/Timeline/Timeline.stories.tsx`
+- [x] T035 Create Timeline component structure `shared/components/src/Timeline/index.ts`
+- [x] T036 Implement TimeAxis Canvas renderer `shared/components/src/Timeline/canvas/TimeAxis.ts`
+- [x] T037 Implement FeatureBars Canvas renderer `shared/components/src/Timeline/canvas/FeatureBars.ts`
+- [x] T038 Implement Timeline core component with Canvas `shared/components/src/Timeline/Timeline.tsx`
+- [x] T039 Style Timeline with CSS custom properties `shared/components/src/Timeline/Timeline.css`
+- [x] T040 Create Timeline Storybook stories (Default, Overlapping, TimeRange) `shared/components/src/Timeline/Timeline.stories.tsx`
 
 **Checkpoint**: Timeline displays temporal features - acceptance scenarios verified
 
@@ -151,16 +151,16 @@
 
 ### Tests for User Story 3
 
-- [ ] T041 [P][test] Write FeatureList render tests `shared/components/src/FeatureList/FeatureList.test.tsx`
-- [ ] T042 [P][test] Write FeatureList virtualization performance tests `shared/components/src/FeatureList/FeatureList.test.tsx`
+- [x] T041 [P][test] Write FeatureList render tests `shared/components/src/FeatureList/FeatureList.test.tsx`
+- [x] T042 [P][test] Write FeatureList virtualization performance tests `shared/components/src/FeatureList/FeatureList.test.tsx`
 
 ### Implementation for User Story 3
 
-- [ ] T043 Create FeatureList component structure `shared/components/src/FeatureList/index.ts`
-- [ ] T044 Implement FeatureRow component `shared/components/src/FeatureList/FeatureRow.tsx`
-- [ ] T045 Implement FeatureList with @tanstack/react-virtual `shared/components/src/FeatureList/FeatureList.tsx`
-- [ ] T046 Style FeatureList with CSS custom properties `shared/components/src/FeatureList/FeatureList.css`
-- [ ] T047 Create FeatureList Storybook stories (Default, ManyFeatures, Empty) `shared/components/src/FeatureList/FeatureList.stories.tsx`
+- [x] T043 Create FeatureList component structure `shared/components/src/FeatureList/index.ts`
+- [x] T044 Implement FeatureRow component `shared/components/src/FeatureList/FeatureRow.tsx`
+- [x] T045 Implement FeatureList with @tanstack/react-virtual `shared/components/src/FeatureList/FeatureList.tsx`
+- [x] T046 Style FeatureList with CSS custom properties `shared/components/src/FeatureList/FeatureList.css`
+- [x] T047 Create FeatureList Storybook stories (Default, ManyFeatures, Empty) `shared/components/src/FeatureList/FeatureList.stories.tsx`
 
 **Checkpoint**: FeatureList displays features with virtualization - performance maintained with 1000+ items
 
