@@ -88,6 +88,17 @@ Items that don't fit current strategy but may return later:
 | Real-time streaming | Not post-exercise analysis | Unless stakeholder demand emerges |
 | Cloud STAC synchronisation | Offline-first phase | NATO pilot planning begins |
 | Legacy feature parity | Rebuild, not clone | Specific stakeholder requests |
+| Shared Web Components library (BACKLOG #003) | No VS Code extension exists yet to extract from | VS Code extension development begins (tracer bullet step 6) |
+| VS Code map PNG export (BACKLOG #009) | Nice demo but not tracer bullet critical | After core workflow validated |
+| i18n infrastructure (BACKLOG #006) | Premature for NATO pilot | NATO pilot planning begins |
+
+## Rejected Items Log
+
+Items rejected from backlog with reasons. Helps scout learn what doesn't fit.
+
+| Date | Item | Reason | Proposed By |
+|------|------|--------|-------------|
+| — | *(none yet)* | — | — |
 
 ## Strategic Decisions Log
 
@@ -97,8 +108,9 @@ Record significant prioritisation decisions here for future reference.
 |------|----------|-----------|
 | 2026-01 | Tracer bullet before breadth | Validate architecture with thin slice before investing in many formats/tools |
 | 2026-01 | VS Code as primary frontend | Lower barrier than Electron standalone; developer audience familiar with it |
+| 2026-01-16 | Batch approval: 6 items for tracer bullet | Approved #002, #005, #007, #008, #011, #013 - all serve Themes 1-3; parked #006, #009 |
 
 ---
 
-*Document version: 1.0 — January 2026*
+*Document version: 1.1 — January 2026*
 *Next review: At phase boundary (post tracer bullet)*

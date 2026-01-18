@@ -1,0 +1,16 @@
+{
+  "type": "Feature",
+  "id": "narrative-001",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-5.0, 50.0]
+  },
+  "properties": {
+    "kind": "NARRATIVE",
+    "time": "1995-12-12T05:00:00Z",
+    "text": "COMEX SERIAL 16D",
+    "track_id": "NELSON",
+    "symbol": "@N",
+    "color": "#FFCC00"
+  }
+}

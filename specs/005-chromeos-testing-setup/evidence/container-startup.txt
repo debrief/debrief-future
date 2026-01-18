@@ -1,0 +1,36 @@
+# Container Startup Log
+# Captured: Pending deployment
+# Command: fly logs --app debrief-demo
+#
+# This file will contain the container startup log showing:
+# 1. Container initialization
+# 2. Artifact download from GitHub Releases
+# 3. Desktop integration configuration
+# 4. VS Code extension installation
+# 5. Sample files copy to Documents
+#
+# Expected output format:
+# ========================================
+# Debrief Demo Environment Setup
+# ========================================
+# Version: latest
+# Artifact URL: https://github.com/debrief/debrief-future/releases/latest/download/debrief-demo.tar.gz
+# ========================================
+# Downloading Debrief artifact...
+# Artifact downloaded and extracted successfully.
+# Version recorded: latest
+# Configuring desktop integration...
+# Desktop files copied.
+# MIME database updated.
+# Desktop database updated.
+# Installing VS Code extension...
+# Note: VS Code extension will be installed on first VS Code launch.
+# Copying sample files...
+# Sample files copied to: /config/Documents/Debrief Samples
+# ========================================
+# Debrief setup complete!
+# Version: latest
+# ========================================
+#
+# To capture after deployment:
+# fly logs --app debrief-demo | tee evidence/container-startup.txt

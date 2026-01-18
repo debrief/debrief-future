@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Open in Debrief
+GenericName=Maritime Analysis Tool
+Comment=Open file in Debrief maritime analysis tool
+Exec=/opt/debrief/bin/debrief-open %f
+Icon=code
+Terminal=false
+Categories=Science;Geography;DataVisualization;
+MimeType=application/x-debrief-rep;
+Keywords=debrief;maritime;analysis;track;rep;
+StartupNotify=true

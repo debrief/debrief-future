@@ -54,14 +54,30 @@ You are an **objective evaluator**. You:
 
 **Ask yourself:** "Can AI verify its own work? Are acceptance criteria unambiguous?"
 
+### Complexity (C): Implementation Effort
+
+| Level | Meaning | Model | Examples |
+|-------|---------|-------|----------|
+| **Low** | Straightforward, limited scope | Haiku | Config changes, simple validations, documentation updates |
+| **Medium** | Moderate scope, some design decisions | Sonnet | New service endpoint, schema additions, integration work |
+| **High** | Significant scope, complex design | Opus | Architecture changes, multi-service features, novel algorithms |
+
+**Ask yourself:** "How much reasoning and context does the implementing agent need?"
+
+**Model selection rationale:**
+- **Haiku** — Fast, cost-effective for well-defined tasks with clear patterns
+- **Sonnet** — Balanced reasoning for moderate complexity, good for most features
+- **Opus** — Deep reasoning for architectural decisions, complex integrations, ambiguous requirements
+
 ## Scoring Process
 
 1. **Read the item description** — understand what's being proposed
 2. **Check context** — look at related code, docs, or specs if needed
-3. **Score each dimension** — apply rubrics consistently
-4. **Calculate total** — V + M + A
-5. **Update BACKLOG.md** — replace `-` with scores
-6. **Explain briefly** — "Scored X as 4/3/5 (12) because..."
+3. **Score each dimension** — apply V/M/A rubrics consistently
+4. **Assess complexity** — determine Low/Medium/High for model selection
+5. **Calculate total** — V + M + A
+6. **Update BACKLOG.md** — replace `-` with scores, add complexity
+7. **Explain briefly** — "Scored X as 4/3/5 (12, Medium) because..."
 
 ## Reordering
 
@@ -110,11 +126,11 @@ After scoring, summarize:
 
 > "I've scored 5 items:
 >
-> | ID | Description | V | M | A | Total | Rationale |
-> |----|-------------|---|---|---|-------|-----------|
-> | 007 | Track interpolation | 5 | 5 | 4 | 14 | Core feature, great demo, clear algorithm |
-> | 003 | REP variant support | 4 | 3 | 4 | 11 | NATO interop goal, moderate interest |
-> | 005 | Large file tests | 3 | 2 | 5 | 10 | Important but not exciting, very automatable |
+> | ID | Description | V | M | A | Total | Complexity | Rationale |
+> |----|-------------|---|---|---|-------|------------|-----------|
+> | 007 | Track interpolation | 5 | 5 | 4 | 14 | High | Core feature, great demo, novel algorithm needs Opus |
+> | 003 | REP variant support | 4 | 3 | 4 | 11 | Medium | NATO interop, standard parsing patterns suit Sonnet |
+> | 005 | Large file tests | 3 | 2 | 5 | 10 | Low | Well-defined test patterns, Haiku can handle |
 >
 > Recommended next: #007 has highest score and no dependencies.
 > Note: #003 might score higher on Media if we tie it to NATO partnership angle."

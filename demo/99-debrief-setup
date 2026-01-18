@@ -1,0 +1,114 @@
+#!/bin/bash
+# Debrief Demo Environment Setup Script
+# /etc/cont-init.d/99-debrief-setup
+#
+# This script runs at container startup to:
+# 1. Download the Debrief demo artifact from GitHub Releases
+# 2. Configure desktop integration (file associations, MIME types)
+# 3. Install the VS Code extension
+# 4. Copy sample files to Documents folder
+
+set -e
+
+VERSION="${DEBRIEF_VERSION:-latest}"
+BASE_URL="https://github.com/debrief/debrief-future/releases"
+
+# Determine artifact URL based on version
+if [ "$VERSION" = "latest" ]; then
+  URL="${DEBRIEF_ARTIFACT_URL:-$BASE_URL/latest/download/debrief-demo.tar.gz}"
+else
+  URL="${DEBRIEF_ARTIFACT_URL:-$BASE_URL/download/$VERSION/debrief-demo.tar.gz}"
+fi
+
+echo "========================================"
+echo "Debrief Demo Environment Setup"
+echo "========================================"
+echo "Version: $VERSION"
+echo "Artifact URL: $URL"
+echo "========================================"
+
+# Download and extract artifact with retry logic
+echo "Downloading Debrief artifact..."
+mkdir -p /opt/debrief
+MAX_RETRIES=3
+RETRY_COUNT=0
+
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+  if curl -fsSL "$URL" | tar xz -C /opt/debrief; then
+    echo "Artifact downloaded and extracted successfully."
+    break
+  else
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+    if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+      echo "Download failed, retrying in $((RETRY_COUNT * 2)) seconds... (attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)"
+      sleep $((RETRY_COUNT * 2))
+    else
+      echo "ERROR: Failed to download artifact after $MAX_RETRIES attempts."
+      echo "Please check DEBRIEF_VERSION or DEBRIEF_ARTIFACT_URL environment variables."
+      exit 1
+    fi
+  fi
+done
+
+# Record the version for later verification
+echo "$VERSION" > /opt/debrief/VERSION
+echo "Version recorded: $(cat /opt/debrief/VERSION)"
+
+# Configure desktop integration
+echo "Configuring desktop integration..."
+mkdir -p /config/.local/share/applications
+mkdir -p /config/.local/share/mime/packages
+
+if [ -d /opt/debrief/dot-local ]; then
+  cp -r /opt/debrief/dot-local/* /config/.local/
+  echo "Desktop files copied."
+else
+  echo "Warning: dot-local directory not found in artifact."
+fi
+
+# Update MIME database
+if command -v update-mime-database &> /dev/null; then
+  update-mime-database /config/.local/share/mime 2>/dev/null || true
+  echo "MIME database updated."
+fi
+
+# Update desktop database
+if command -v update-desktop-database &> /dev/null; then
+  update-desktop-database /config/.local/share/applications 2>/dev/null || true
+  echo "Desktop database updated."
+fi
+
+# Install VS Code extension if available
+echo "Installing VS Code extension..."
+if [ -f /opt/debrief/extensions/debrief.vsix ]; then
+  # VS Code may not be available during init, so we schedule this for later
+  if command -v code &> /dev/null; then
+    code --install-extension /opt/debrief/extensions/debrief.vsix --force 2>/dev/null || \
+      echo "Note: VS Code extension will be installed on first VS Code launch."
+  else
+    echo "Note: VS Code command not available. Extension will be installed when user opens VS Code."
+  fi
+else
+  echo "Note: No VS Code extension found in artifact."
+fi
+
+# Copy sample files to Documents folder
+echo "Copying sample files..."
+SAMPLES_DIR="/config/Documents/Debrief Samples"
+mkdir -p "$SAMPLES_DIR"
+
+if [ -d /opt/debrief/samples ]; then
+  cp -r /opt/debrief/samples/* "$SAMPLES_DIR/" 2>/dev/null || true
+  echo "Sample files copied to: $SAMPLES_DIR"
+  ls -la "$SAMPLES_DIR/"
+else
+  echo "Note: No sample files found in artifact."
+fi
+
+# Add debrief bin to PATH for the user
+echo 'export PATH="/opt/debrief/bin:$PATH"' >> /config/.bashrc 2>/dev/null || true
+
+echo "========================================"
+echo "Debrief setup complete!"
+echo "Version: $(cat /opt/debrief/VERSION)"
+echo "========================================"

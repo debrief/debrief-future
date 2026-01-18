@@ -1,0 +1,115 @@
+/**
+ * Timeline Component Styles
+ */
+
+.debrief-timeline {
+  position: relative;
+  width: 100%;
+  min-height: var(--debrief-timeline-height);
+  border: 1px solid var(--debrief-border-color);
+  border-radius: var(--debrief-radius-md);
+  overflow: hidden;
+  background-color: var(--debrief-bg-primary);
+}
+
+.debrief-timeline__axis {
+  display: block;
+  width: 100%;
+  background-color: var(--debrief-bg-secondary);
+  border-bottom: 1px solid var(--debrief-border-color);
+}
+
+.debrief-timeline__bars-container {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.debrief-timeline__bars {
+  display: block;
+  width: 100%;
+}
+
+/* Empty state */
+.debrief-timeline--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.debrief-timeline__empty-message {
+  color: var(--debrief-text-muted);
+  font-size: var(--debrief-font-size-md);
+  font-family: var(--debrief-font-family);
+}
+
+/* Tooltip */
+.debrief-timeline__tooltip {
+  position: fixed;
+  padding: var(--debrief-space-xs) var(--debrief-space-sm);
+  background-color: var(--debrief-bg-primary);
+  border: 1px solid var(--debrief-border-color);
+  border-radius: var(--debrief-radius-sm);
+  box-shadow: var(--debrief-shadow-md);
+  color: var(--debrief-text-primary);
+  font-size: var(--debrief-font-size-sm);
+  font-family: var(--debrief-font-family);
+  pointer-events: none;
+  z-index: var(--debrief-z-tooltip);
+  white-space: nowrap;
+}
+
+/* Scrollbar styling */
+.debrief-timeline__bars-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.debrief-timeline__bars-container::-webkit-scrollbar-track {
+  background: var(--debrief-bg-secondary);
+}
+
+.debrief-timeline__bars-container::-webkit-scrollbar-thumb {
+  background: var(--debrief-border-color);
+  border-radius: 4px;
+}
+
+.debrief-timeline__bars-container::-webkit-scrollbar-thumb:hover {
+  background: var(--debrief-text-muted);
+}
+
+/* Selection range indicator (future feature) */
+.debrief-timeline__range-indicator {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background-color: var(--debrief-selection-bg);
+  border-left: 2px solid var(--debrief-selection-border);
+  border-right: 2px solid var(--debrief-selection-border);
+  pointer-events: none;
+}
+
+/* Loading state */
+.debrief-timeline--loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.debrief-timeline--loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border: 2px solid var(--debrief-color-primary);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: debrief-timeline-spin 0.8s linear infinite;
+}
+
+@keyframes debrief-timeline-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,58 @@
+# Fly.io Configuration for Debrief Demo Environment
+# https://fly.io/docs/reference/configuration/
+
+app = "debrief-demo"
+primary_region = "lhr"  # London - adjust based on target users
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  DEBRIEF_VERSION = "latest"
+  # DEBRIEF_ARTIFACT_URL can be set to override for custom/testing builds
+  PUID = "1000"
+  PGID = "1000"
+  TZ = "Europe/London"
+
+[http_service]
+  internal_port = 3000  # noVNC port in linuxserver/webtop image
+  force_https = true
+  auto_stop_machines = "suspend"  # Suspend when idle for cost savings
+  auto_start_machines = true      # Auto-start on incoming request
+  min_machines_running = 0        # Allow scaling to zero
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 25
+    hard_limit = 30
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 1024
+
+# Health checks - verify VNC is running
+[[services]]
+  protocol = "tcp"
+  internal_port = 3000
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+    force_https = true
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.http_checks]]
+    interval = 30000     # 30 seconds
+    timeout = 10000      # 10 seconds
+    grace_period = "60s" # Allow time for startup
+    method = "GET"
+    path = "/"
+
+# Metrics and monitoring
+[metrics]
+  port = 9091
+  path = "/metrics"

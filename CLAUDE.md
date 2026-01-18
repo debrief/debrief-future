@@ -29,7 +29,60 @@ debrief/
 ├── apps/
 │   ├── loader/        # Electron mini-app
 │   └── vscode/        # VS Code extension
+├── demo/              # Browser-accessible demo environment
+│   ├── Dockerfile     # Container definition
+│   ├── fly.toml       # Fly.io configuration
+│   ├── bin/           # Entry scripts and test scripts
+│   ├── desktop/       # Desktop integration files
+│   └── samples/       # Sample data files
 └── docs/
+```
+
+## Demo Environment
+
+A browser-accessible demo environment is available for testing and stakeholder demonstrations.
+
+**URL**: https://debrief-demo.fly.dev
+
+### Key Components
+
+| Component | Description |
+|-----------|-------------|
+| `demo/Dockerfile` | Container with XFCE desktop, VNC, noVNC |
+| `demo/fly.toml` | Fly.io deployment configuration |
+| `demo/99-debrief-setup` | Startup script for artifact download |
+| `.github/workflows/build-demo-artifact.yml` | CI for building demo artifacts |
+| `.github/workflows/test-demo.yml` | 7-layer test suite |
+
+### Test Layers
+
+The demo environment uses a 7-layer test strategy:
+1. URL Availability - HTTP 200 check
+2. Service Running - VNC/XFCE process check
+3. VNC Connectivity - WebSocket/RFB handshake
+4. Component Installation - Python packages, entry points
+5. Desktop Integration - .desktop files, MIME types
+6. Data Pipeline - REP parsing, GeoJSON output
+7. E2E Workflow - STAC integration, visual smoke test
+
+### Local Development
+
+```bash
+# Build locally
+cd demo && docker build -t debrief-demo .
+
+# Run locally
+docker run -p 3000:3000 -e DEBRIEF_VERSION=latest debrief-demo
+
+# Access at http://localhost:3000
+```
+
+### Version Updates
+
+```bash
+# Update to specific version
+fly secrets set DEBRIEF_VERSION=v0.2.0 --app debrief-demo
+fly machines restart --app debrief-demo
 ```
 
 ## Build Sequence (Tracer Bullet)
@@ -88,6 +141,9 @@ Three approaches required:
 - Python 3.11+ + Pydantic >=2.0.0, debrief-schemas (workspace), mcp >=1.0.0 (optional), click (CLI) (005-debrief-calc)
 - N/A (pure transformation service — no persistence) (005-debrief-calc)
 - TypeScript 5.x (VS Code Extension API) + @vscode/api (extension host), Leaflet (map rendering), debrief-config (TypeScript), debrief-stac (via IPC), debrief-calc (via MCP) (006-speckit-vscode-extension)
+- TypeScript 5.x + React 18+, react-leaflet v5+ (map), @tanstack/react-virtual (lists), HTML5 Canvas (timeline), CSS Custom Properties (theming), Storybook 10.x (component preview) (001-shared-react-components)
+- N/A (pure display components — no persistence) (001-shared-react-components)
 
 ## Recent Changes
+- 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v5+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 10.x
 - 000-schemas: Added Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS)

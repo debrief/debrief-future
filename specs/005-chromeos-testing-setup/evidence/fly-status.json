@@ -1,0 +1,50 @@
+{
+  "_comment": "Fly.io machine status - to be captured after deployment",
+  "_command": "fly status --app debrief-demo --json",
+  "_date": "pending",
+  "expected_output": {
+    "Name": "debrief-demo",
+    "Organization": {
+      "Slug": "debrief"
+    },
+    "Hostname": "debrief-demo.fly.dev",
+    "Machines": [
+      {
+        "id": "placeholder",
+        "name": "debrief-demo-machine",
+        "state": "started",
+        "region": "lhr",
+        "created_at": "2026-01-16T00:00:00Z",
+        "config": {
+          "env": {
+            "DEBRIEF_VERSION": "latest",
+            "TZ": "Europe/London"
+          },
+          "services": [
+            {
+              "protocol": "tcp",
+              "internal_port": 3000,
+              "ports": [
+                {"port": 80, "handlers": ["http"]},
+                {"port": 443, "handlers": ["tls", "http"]}
+              ]
+            }
+          ],
+          "auto_stop_machines": "suspend",
+          "auto_start_machines": true,
+          "min_machines_running": 0
+        },
+        "checks": [
+          {
+            "name": "http",
+            "status": "passing"
+          }
+        ]
+      }
+    ]
+  },
+  "notes": [
+    "To capture after deployment:",
+    "fly status --app debrief-demo --json > evidence/fly-status.json"
+  ]
+}

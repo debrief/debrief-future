@@ -1,0 +1,208 @@
+/**
+ * FeatureList component styles
+ * Uses CSS custom properties for theming
+ */
+
+/* Container */
+.debrief-feature-list {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--debrief-border-color, #e0e0e0);
+  border-radius: var(--debrief-border-radius, 4px);
+  background-color: var(--debrief-bg-primary, #ffffff);
+  font-family: var(--debrief-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-size: var(--debrief-font-size-sm, 13px);
+}
+
+/* Scroll container */
+.debrief-feature-list__scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--debrief-scrollbar-thumb, #c1c1c1) var(--debrief-scrollbar-track, #f1f1f1);
+}
+
+.debrief-feature-list__scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.debrief-feature-list__scroll::-webkit-scrollbar-track {
+  background: var(--debrief-scrollbar-track, #f1f1f1);
+}
+
+.debrief-feature-list__scroll::-webkit-scrollbar-thumb {
+  background: var(--debrief-scrollbar-thumb, #c1c1c1);
+  border-radius: 4px;
+}
+
+.debrief-feature-list__scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--debrief-scrollbar-thumb-hover, #a8a8a8);
+}
+
+/* Content container for virtualization */
+.debrief-feature-list__content {
+  will-change: transform;
+}
+
+/* Empty state */
+.debrief-feature-list--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.debrief-feature-list__empty {
+  color: var(--debrief-text-secondary, #666666);
+  text-align: center;
+  padding: 24px;
+  font-style: italic;
+}
+
+/* Feature row */
+.debrief-feature-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid var(--debrief-border-color-light, #f0f0f0);
+  box-sizing: border-box;
+}
+
+.debrief-feature-row:hover {
+  background-color: var(--debrief-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.debrief-feature-row:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--debrief-focus-ring, rgba(0, 102, 204, 0.4));
+}
+
+.debrief-feature-row:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--debrief-focus-ring, rgba(0, 102, 204, 0.4));
+}
+
+/* Selected state */
+.debrief-feature-row--selected {
+  background-color: var(--debrief-selection-bg, rgba(0, 102, 204, 0.1));
+}
+
+.debrief-feature-row--selected:hover {
+  background-color: var(--debrief-selection-bg-hover, rgba(0, 102, 204, 0.15));
+}
+
+/* Color indicator */
+.debrief-feature-row__indicator {
+  flex-shrink: 0;
+  width: 4px;
+  height: 20px;
+  border-radius: 2px;
+}
+
+/* Content area */
+.debrief-feature-row__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Feature name */
+.debrief-feature-row__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--debrief-text-primary, #1a1a1a);
+  font-weight: 500;
+}
+
+/* Feature type badge */
+.debrief-feature-row__type {
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background-color: var(--debrief-badge-bg, #e8e8e8);
+  color: var(--debrief-badge-text, #555555);
+  font-size: var(--debrief-font-size-xs, 11px);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Additional info (time range, etc.) */
+.debrief-feature-row__info {
+  flex-shrink: 0;
+  color: var(--debrief-text-secondary, #666666);
+  font-size: var(--debrief-font-size-xs, 11px);
+}
+
+/* Track type badges with specific colors */
+.debrief-feature-row[data-track-type="OWNSHIP"] .debrief-feature-row__type {
+  background-color: var(--debrief-ownship-badge-bg, #e3f2fd);
+  color: var(--debrief-ownship-badge-text, #1565c0);
+}
+
+.debrief-feature-row[data-track-type="CONTACT"] .debrief-feature-row__type {
+  background-color: var(--debrief-contact-badge-bg, #fce4ec);
+  color: var(--debrief-contact-badge-text, #c62828);
+}
+
+.debrief-feature-row[data-track-type="REFERENCE"] .debrief-feature-row__type {
+  background-color: var(--debrief-reference-badge-bg, #f3e5f5);
+  color: var(--debrief-reference-badge-text, #7b1fa2);
+}
+
+.debrief-feature-row[data-track-type="SOLUTION"] .debrief-feature-row__type {
+  background-color: var(--debrief-solution-badge-bg, #e8f5e9);
+  color: var(--debrief-solution-badge-text, #2e7d32);
+}
+
+/* Location type badges */
+.debrief-feature-row[data-location-type="WAYPOINT"] .debrief-feature-row__type {
+  background-color: var(--debrief-waypoint-badge-bg, #fff3e0);
+  color: var(--debrief-waypoint-badge-text, #e65100);
+}
+
+.debrief-feature-row[data-location-type="REFERENCE"] .debrief-feature-row__type {
+  background-color: var(--debrief-location-reference-badge-bg, #f3e5f5);
+  color: var(--debrief-location-reference-badge-text, #7b1fa2);
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .debrief-feature-list {
+    border-color: var(--debrief-border-color, #3a3a3a);
+    background-color: var(--debrief-bg-primary, #1e1e1e);
+  }
+
+  .debrief-feature-list__scroll {
+    scrollbar-color: var(--debrief-scrollbar-thumb, #555555) var(--debrief-scrollbar-track, #2d2d2d);
+  }
+
+  .debrief-feature-row {
+    border-bottom-color: var(--debrief-border-color-light, #2d2d2d);
+  }
+
+  .debrief-feature-row:hover {
+    background-color: var(--debrief-hover-bg, rgba(255, 255, 255, 0.06));
+  }
+
+  .debrief-feature-row__name {
+    color: var(--debrief-text-primary, #e0e0e0);
+  }
+
+  .debrief-feature-row__type {
+    background-color: var(--debrief-badge-bg, #3a3a3a);
+    color: var(--debrief-badge-text, #b0b0b0);
+  }
+
+  .debrief-feature-row__info {
+    color: var(--debrief-text-secondary, #888888);
+  }
+
+  .debrief-feature-list__empty {
+    color: var(--debrief-text-secondary, #888888);
+  }
+}

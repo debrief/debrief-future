@@ -1,0 +1,10 @@
+{
+  "type": "Feature",
+  "id": "narrative-invalid-001",
+  "geometry": null,
+  "properties": {
+    "kind": "NARRATIVE",
+    "time": "1995-12-12T05:00:00Z",
+    "track_id": "NELSON"
+  }
+}

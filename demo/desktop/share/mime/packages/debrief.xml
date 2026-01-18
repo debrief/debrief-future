@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <!-- Debrief REP file format -->
+  <mime-type type="application/x-debrief-rep">
+    <comment>Debrief REP file</comment>
+    <comment xml:lang="en">Debrief Replay File</comment>
+    <glob pattern="*.rep"/>
+    <glob pattern="*.REP"/>
+    <magic priority="50">
+      <match type="string" offset="0" value=";;"/>
+    </magic>
+    <icon name="application-x-debrief"/>
+    <generic-icon name="text-x-generic"/>
+  </mime-type>
+
+  <!-- Future: Debrief Session File -->
+  <!--
+  <mime-type type="application/x-debrief-session">
+    <comment>Debrief Session File</comment>
+    <glob pattern="*.dsf"/>
+    <glob pattern="*.DSF"/>
+  </mime-type>
+  -->
+
+  <!-- Future: Debrief Plot File -->
+  <!--
+  <mime-type type="application/x-debrief-plot">
+    <comment>Debrief Plot File</comment>
+    <glob pattern="*.dpf"/>
+    <glob pattern="*.DPF"/>
+  </mime-type>
+  -->
+</mime-info>

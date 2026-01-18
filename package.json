@@ -1,0 +1,25 @@
+{
+  "name": "debrief-future",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Future Debrief - Maritime tactical analysis platform",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "storybook": "pnpm --filter @debrief/components storybook",
+    "build-storybook": "pnpm --filter @debrief/components build-storybook"
+  },
+  "keywords": [
+    "debrief",
+    "maritime",
+    "tactical",
+    "analysis"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
