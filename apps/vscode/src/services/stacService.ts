@@ -14,7 +14,15 @@ import type {
   StacItem,
 } from '../types/stac';
 import type { Plot, Track, ReferenceLocation } from '../types/plot';
-import type { LineString, Point, FeatureCollection, Feature } from 'geojson';
+import type { LineString, Point, Feature, Geometry } from 'geojson';
+
+/**
+ * Internal typed FeatureCollection to avoid GeoJsonProperties 'any' issues
+ */
+interface TypedFeatureCollection {
+  type: 'FeatureCollection';
+  features: Array<Feature<Geometry, Record<string, unknown>>>;
+}
 
 export class StacService {
   private catalogCache: Map<string, StacCatalog> = new Map();
@@ -411,14 +419,14 @@ export class StacService {
 
   private async loadGeoJson(
     geoJsonPath: string
-  ): Promise<FeatureCollection | null> {
+  ): Promise<TypedFeatureCollection | null> {
     try {
       if (!fs.existsSync(geoJsonPath)) {
         return null;
       }
 
       const content = fs.readFileSync(geoJsonPath, 'utf-8');
-      return JSON.parse(content) as FeatureCollection;
+      return JSON.parse(content) as TypedFeatureCollection;
     } catch {
       return null;
     }

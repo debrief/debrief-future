@@ -13,9 +13,12 @@ import { RecentPlotsService } from './services/recentPlotsService';
 import { registerCommands } from './commands';
 
 let mapPanel: MapPanel | undefined;
+let outputChannel: vscode.OutputChannel;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  console.log('Debrief extension activating...');
+  outputChannel = vscode.window.createOutputChannel('Debrief');
+  context.subscriptions.push(outputChannel);
+  outputChannel.appendLine('Debrief extension activating...');
 
   // Initialize services
   const configService = new ConfigService();
@@ -85,9 +88,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // Graceful degradation - tools won't be available but extension works
   });
 
-  console.log('Debrief extension activated');
+  outputChannel.appendLine('Debrief extension activated');
 }
 
 export function deactivate(): void {
-  console.log('Debrief extension deactivated');
+  outputChannel?.appendLine('Debrief extension deactivated');
 }

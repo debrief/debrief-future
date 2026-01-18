@@ -13,6 +13,7 @@ import type {
   ToolExecutionRequest,
   ToolExecutionResult,
   ResultLayer,
+  TypedFeatureCollection,
 } from '../types/tool';
 import {
   createToolExecution,
@@ -373,11 +374,11 @@ export class CalcService {
   }
 
   private async executeToolOnMcp(
-    toolName: string,
+    _toolName: string,
     _tracks: Track[],
     _locations: ReferenceLocation[],
     _params?: Record<string, unknown>
-  ): Promise<GeoJSON.FeatureCollection> {
+  ): Promise<TypedFeatureCollection> {
     // Simulate tool execution delay
     await new Promise((resolve) =>
       setTimeout(resolve, 500 + Math.random() * 500)

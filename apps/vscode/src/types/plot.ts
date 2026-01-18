@@ -213,8 +213,10 @@ export type LocationFeature = Feature<Point, {
 /**
  * GeoJSON FeatureCollection for a plot
  */
-export interface PlotFeatureCollection extends FeatureCollection {
+export interface PlotFeatureCollection {
+  type: 'FeatureCollection';
   features: Array<TrackFeature | LocationFeature>;
+  bbox?: [number, number, number, number] | [number, number, number, number, number, number];
 }
 
 /**

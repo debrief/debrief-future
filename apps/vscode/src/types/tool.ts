@@ -2,8 +2,16 @@
  * Tool-related type definitions for the Debrief VS Code Extension
  */
 
-import type { FeatureCollection } from 'geojson';
+import type { Feature, Geometry } from 'geojson';
 import type { SelectionContextType, FeatureKind } from './plot';
+
+/**
+ * Typed FeatureCollection to avoid GeoJsonProperties 'any' issues
+ */
+export interface TypedFeatureCollection {
+  type: 'FeatureCollection';
+  features: Array<Feature<Geometry, Record<string, unknown>>>;
+}
 
 /**
  * An analysis tool from debrief-calc
@@ -107,7 +115,7 @@ export interface ResultLayer {
   executionId: string;
 
   /** GeoJSON FeatureCollection of results */
-  features: FeatureCollection;
+  features: TypedFeatureCollection;
 
   /** Layer styling configuration */
   style: LayerStyle;
@@ -147,7 +155,7 @@ export interface ToolExecutionResult {
   success: boolean;
 
   /** Result features (if success) */
-  features?: FeatureCollection;
+  features?: TypedFeatureCollection;
 
   /** Error message (if failed) */
   error?: string;

@@ -6,6 +6,7 @@
  */
 
 import * as vscode from 'vscode';
+import type { LineString } from 'geojson';
 import type { Track, ReferenceLocation } from '../types/plot';
 import type { ResultLayer } from '../types/tool';
 
@@ -183,7 +184,9 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
 
     item.contextValue = 'track';
     item.description = track.platformType ?? '';
-    item.tooltip = `${track.name}\nPlatform: ${track.platformType ?? 'Unknown'}\nPoints: ${track.geometry.coordinates.length}`;
+    const geometry = track.geometry as LineString;
+    const pointCount = geometry.coordinates.length;
+    item.tooltip = `${track.name}\nPlatform: ${track.platformType ?? 'Unknown'}\nPoints: ${pointCount}`;
 
     // Checkbox icon based on visibility
     item.iconPath = new vscode.ThemeIcon(
