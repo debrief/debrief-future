@@ -25,6 +25,7 @@
       "Bash(npm run build:*)",
       "Bash(npm run:*)",
       "Bash(npx esbuild:*)"
+      "Skill(publish)"
     ]
   }
 }
