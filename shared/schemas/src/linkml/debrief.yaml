@@ -18,8 +18,11 @@ imports:
   - linkml:types
   - common
   - geojson
+  - annotations
 
 # Root schema imports all modules - no additional classes needed here.
 # All entity definitions are in their respective module files:
 #   - common.yaml: Enums, base types (TimestampedPosition)
 #   - geojson.yaml: TrackFeature, ReferenceLocation
+#   - annotations.yaml: NarrativeEntry, CircleAnnotation, RectangleAnnotation,
+#                       LineAnnotation, TextAnnotation, VectorAnnotation

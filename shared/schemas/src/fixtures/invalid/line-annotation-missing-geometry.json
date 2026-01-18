@@ -1,0 +1,8 @@
+{
+  "type": "Feature",
+  "id": "line-invalid-001",
+  "properties": {
+    "kind": "LINE",
+    "label": "No geometry"
+  }
+}
