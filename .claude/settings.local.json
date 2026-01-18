@@ -19,6 +19,12 @@
       "Bash(corepack enable:*)",
       "Bash(corepack prepare:*)",
       "Bash(gh pr create:*)",
+      "Skill(publish)",
+      "Bash(command -v:*)",
+      "Bash(gh auth status:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run:*)",
+      "Bash(npx esbuild:*)"
       "Skill(publish)"
     ]
   }
