@@ -191,6 +191,186 @@ Extend the REP handler to parse all special comment types, producing GeoJSON fea
 - [ ] TMA_POS and TMA_RB parsed for target motion analysis
 - [ ] TRACKSPLIT markers captured for track segmentation
 
+## Test Strategy
+
+Testing follows the project's schema test strategy (golden fixtures, round-trip, schema comparison) adapted for REP parsing.
+
+### 1. Fixture Sources
+
+| Fixture | Purpose | Location |
+|---------|---------|----------|
+| `shapes.rep` | Reference file from upstream Debrief | `services/io/tests/fixtures/valid/` |
+| `annotations-minimal.rep` | Minimal valid example of each type | `services/io/tests/fixtures/valid/` |
+| `annotations-edge-cases.rep` | Edge cases (empty labels, boundary coords) | `services/io/tests/fixtures/valid/` |
+| `annotations-malformed.rep` | Invalid syntax for error handling | `services/io/tests/fixtures/invalid/` |
+
+The upstream `shapes.rep` file should be copied from:
+`https://github.com/debrief/debrief/blob/develop/org.mwc.cmap.combined.feature/root_installs/sample_data/shapes.rep`
+
+### 2. Golden Output Tests
+
+For each annotation type, create expected JSON output files that parsed REP lines should produce:
+
+```
+services/io/tests/fixtures/golden/
+├── narrative-output.json      # Expected output for NARRATIVE lines
+├── circle-output.json         # Expected output for CIRCLE lines
+├── rect-output.json           # Expected output for RECT lines
+├── line-output.json           # etc.
+├── text-output.json
+├── vector-output.json
+├── poly-output.json
+├── ellipse-output.json
+└── dynamic-shapes-output.json
+```
+
+Test pattern:
+```python
+def test_circle_golden_output():
+    """Parsed CIRCLE matches golden fixture."""
+    result = handler.parse(CIRCLE_INPUT)
+    with open("fixtures/golden/circle-output.json") as f:
+        expected = json.load(f)
+    assert result.annotations[0].model_dump() == expected
+```
+
+### 3. Unit Tests (per parser function)
+
+| Function | Test Cases |
+|----------|------------|
+| `_parse_symbol()` | Simple (`@A`), with layer (`@C[LAYER=X]`), with symbol (`@C[SYMBOL=Y]`), combined, malformed |
+| `_parse_dms_coord()` | All hemispheres (N/S/E/W), zero values, boundary values (±90 lat, ±180 lon), decimal seconds |
+| `_parse_narrative()` | NARRATIVE and NARRATIVE2, with/without milliseconds, multi-word track names (quoted) |
+| `_parse_circle()` | Basic, with layer attribute, various symbol codes |
+| `_parse_rect()` | Two-corner format, label with spaces |
+| `_parse_line()` | Two-point format |
+| `_parse_text()` | Basic, with LAYER, with SYMBOL, both attributes |
+| `_parse_vector()` | Range/bearing values, label extraction |
+| `_parse_poly()` | 3 vertices, 4+ vertices, POLY vs POLYLINE distinction |
+| `_parse_ellipse()` | ELLIPSE with timestamp, ELLIPSE2 with period |
+| `_parse_timetext()` | TIMETEXT single timestamp, PERIODTEXT with range |
+| `_parse_dynamic()` | Quoted names, timestamp with milliseconds |
+
+### 4. Integration Tests
+
+Test full file parsing with mixed content:
+
+```python
+def test_parse_mixed_content():
+    """Parse file with tracks AND annotations."""
+    result = handler.parse(Path("fixtures/valid/shapes.rep"))
+
+    # Tracks still parsed correctly
+    assert len(result.tracks) > 0
+
+    # Annotations extracted
+    assert len(result.annotations) > 0
+
+    # Each annotation type present
+    types = {a.properties.kind for a in result.annotations}
+    assert "circle" in types
+    assert "narrative" in types
+    # etc.
+```
+
+### 5. Regression Tests
+
+Existing track parsing must produce identical output:
+
+```python
+@pytest.mark.parametrize("fixture", ["boat1.rep", "boat2.rep"])
+def test_track_parsing_unchanged(fixture):
+    """Track parsing regression test."""
+    result_new = handler.parse(Path(f"fixtures/valid/{fixture}"))
+    result_baseline = load_baseline(f"baselines/{fixture}.json")
+
+    # Track features must match exactly
+    assert result_new.tracks == result_baseline.tracks
+```
+
+Create baseline files from current parser output before implementing annotation parsing.
+
+### 6. Edge Cases
+
+| Category | Test Cases |
+|----------|------------|
+| **Timestamps** | `HHMMSS` (no ms), `HHMMSS.SSS` (with ms), `HHMMSS.S` (1 digit) |
+| **Labels** | Empty label, label with spaces, label with `\n` escape, label with special chars |
+| **Coordinates** | Equator (0°), Prime meridian (0°), Poles (±90°), Date line (±180°) |
+| **Symbols** | All documented symbol codes, unknown codes (should preserve raw) |
+| **Whitespace** | Multiple spaces between fields, tabs, trailing whitespace |
+| **Case** | `;CIRCLE:` vs `;circle:` vs `;Circle:` (case sensitivity) |
+
+### 7. Error Handling Tests
+
+Malformed annotations should produce warnings, not failures:
+
+```python
+def test_malformed_circle_warns():
+    """Malformed CIRCLE produces warning, continues parsing."""
+    content = ";CIRCLE: @A not enough fields"
+    result = handler.parse_string(content)
+
+    assert len(result.annotations) == 0  # Not parsed
+    assert len(result.warnings) == 1     # Warning recorded
+    assert "CIRCLE" in result.warnings[0].message
+    assert result.warnings[0].line_number == 1
+```
+
+Test cases:
+- Missing required fields
+- Invalid coordinate values (out of range)
+- Malformed symbol syntax
+- Truncated lines
+- Unknown annotation prefix (should skip silently or warn)
+
+### 8. Schema Validation Tests
+
+All parsed annotations must validate against Item 015 Pydantic models:
+
+```python
+from debrief_schemas import CircleAnnotation, NarrativeEntry, ...
+
+def test_circle_validates_against_schema():
+    """Parsed CIRCLE validates against Pydantic model."""
+    result = handler.parse(CIRCLE_INPUT)
+    annotation = result.annotations[0]
+
+    # Should not raise ValidationError
+    validated = CircleAnnotation.model_validate(annotation.model_dump())
+    assert validated.properties.radius > 0
+```
+
+### 9. Round-Trip Tests
+
+Per CLAUDE.md requirement (Python → JSON → TypeScript → JSON → Python):
+
+```python
+def test_annotation_round_trip():
+    """Annotation survives JSON round-trip."""
+    original = handler.parse(CIRCLE_INPUT).annotations[0]
+
+    # Python → JSON
+    json_str = original.model_dump_json()
+
+    # JSON → Python (simulating TypeScript → JSON → Python)
+    restored = CircleAnnotation.model_validate_json(json_str)
+
+    assert original == restored
+```
+
+Full TypeScript round-trip tests require the generated TypeScript interfaces from Item 015.
+
+### 10. Test Coverage Requirements
+
+| Component | Minimum Coverage |
+|-----------|------------------|
+| Symbol parser | 100% (small, critical) |
+| Coordinate parser | 100% (reused, critical) |
+| Each annotation parser | 90%+ |
+| Error handling paths | 80%+ |
+| Integration (full file) | Representative samples |
+
 ## Constraints
 
 - **Schema-first**: Must wait for item 015 (annotation schemas) before implementation
