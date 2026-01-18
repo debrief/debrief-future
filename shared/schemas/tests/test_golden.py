@@ -24,14 +24,13 @@ from pydantic import ValidationError
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
 from debrief_schemas import (
-    ReferenceLocation,
-    TrackFeature,
-    # Annotation types
-    NarrativeEntry,
     CircleAnnotation,
-    RectangleAnnotation,
     LineAnnotation,
+    NarrativeEntry,
+    RectangleAnnotation,
+    ReferenceLocation,
     TextAnnotation,
+    TrackFeature,
     VectorAnnotation,
 )
 
