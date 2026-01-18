@@ -5,6 +5,12 @@
 **Status**: Draft
 **Input**: Extend the REP handler to parse all special comment types, producing GeoJSON features that conform to annotation schemas.
 
+## Clarifications
+
+### Session 2026-01-18
+
+- Q: Where are the annotation Pydantic models located? → A: In `shared/schemas/` package (`shared/schemas/src/linkml/annotations.yaml` with fixtures in `shared/schemas/src/fixtures/`). Schemas were completed in PR #49.
+
 ## User Scenarios & Testing
 
 ### User Story 1 - Parse Narrative Annotations (Priority: P1)
@@ -153,7 +159,7 @@ An analyst loads a REP file with both track positions and annotations. The exist
 - **FR-001**: System MUST recognize all documented special comment prefixes: NARRATIVE, NARRATIVE2, CIRCLE, RECT, LINE, TEXT, VECTOR, POLY, POLYLINE, ELLIPSE, ELLIPSE2, TIMETEXT, PERIODTEXT, WHEEL, DYNAMIC_RECT, DYNAMIC_CIRCLE, DYNAMIC_POLY, SENSOR, SENSOR2, TMA_POS, TMA_RB, TRACKSPLIT
 - **FR-002**: System MUST parse DMS coordinates in the format `DD MM SS.S H DDD MM SS.S H` where H is hemisphere indicator (N/S for latitude, E/W for longitude)
 - **FR-003**: System MUST parse symbol notation including simple codes (`@A`), codes with layer (`@C[LAYER=X]`), codes with symbol type (`@C[SYMBOL=Y]`), and combined attributes
-- **FR-004**: System MUST produce GeoJSON features that conform to the annotation schemas defined in item 015
+- **FR-004**: System MUST produce GeoJSON features that conform to the annotation schemas in `shared/schemas/src/linkml/annotations.yaml`
 - **FR-005**: System MUST preserve existing track parsing behavior with no changes to track output
 - **FR-006**: System MUST include provenance data (source file path and line number) for each parsed annotation
 - **FR-007**: System MUST record warnings for malformed annotations without failing the overall parse
@@ -176,7 +182,7 @@ An analyst loads a REP file with both track positions and annotations. The exist
 
 - **SC-001**: Parser correctly extracts 100% of annotations from the upstream `shapes.rep` reference file
 - **SC-002**: Track parsing regression tests pass with identical output to baseline
-- **SC-003**: All parsed annotations validate against item 015 Pydantic schemas without errors
+- **SC-003**: All parsed annotations validate against `debrief-schemas` Pydantic models without errors
 - **SC-004**: Malformed annotations produce clear warnings including line numbers
 - **SC-005**: Parser processes REP files within 10% of current performance (minimal overhead)
 - **SC-006**: Coordinate parsing handles all hemisphere combinations (N/S/E/W) and boundary values (poles, dateline)
@@ -184,7 +190,7 @@ An analyst loads a REP file with both track positions and annotations. The exist
 
 ## Assumptions
 
-- **A-001**: Item 015 (LinkML annotation schemas) will be completed before this implementation begins
+- **A-001**: Annotation schemas in `shared/schemas/src/linkml/annotations.yaml` are complete (confirmed: PR #49 merged)
 - **A-002**: The upstream `shapes.rep` file from Debrief repository represents the canonical set of annotation formats
 - **A-003**: Symbol color/style decoding is deferred to the UI layer; this parser preserves raw symbol codes
 - **A-004**: Annotation editing and creation are out of scope; this is parse-only functionality
@@ -193,7 +199,7 @@ An analyst loads a REP file with both track positions and annotations. The exist
 
 ## Dependencies
 
-- **Requires**: Item 015 - LinkML schemas for annotation types (CRITICAL prerequisite)
+- **Uses**: `debrief-schemas` package - annotation Pydantic models generated from LinkML (PR #49 complete)
 - **Extends**: Item 002 - debrief-io service (REP handler already exists)
 - **Enables**: Full REP file support in tracer bullet demonstration
 
