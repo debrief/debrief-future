@@ -34,11 +34,11 @@ export class WelcomeViewProvider implements vscode.WebviewViewProvider {
 
     this.updateContent();
 
-    webviewView.webview.onDidReceiveMessage((message) => {
+    webviewView.webview.onDidReceiveMessage((message: { type: string; uri?: string }) => {
       switch (message.type) {
         case 'openPlot':
           void vscode.commands.executeCommand('debrief.openPlot', {
-            uri: message.uri as string,
+            uri: message.uri,
           });
           break;
         case 'openPlotPicker':

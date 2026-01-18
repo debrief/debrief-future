@@ -7,7 +7,28 @@
 
 import type { Track, ReferenceLocation, SelectionContextType } from '../types/plot';
 import type { LayerStyle } from '../types/tool';
-import type { FeatureCollection } from 'geojson';
+
+// Type-safe properties to avoid any from geojson
+type SafeProperties = Record<string, unknown> | null;
+
+// Self-contained geometry type to avoid any
+interface SafeGeometry {
+  type: string;
+  coordinates: unknown;
+}
+
+// Self-contained feature type to avoid any from geojson Feature
+interface SafeFeature {
+  type: 'Feature';
+  geometry: SafeGeometry;
+  properties: SafeProperties;
+}
+
+// Self-contained FeatureCollection type to avoid any from geojson
+interface SafeFeatureCollection {
+  type: 'FeatureCollection';
+  features: SafeFeature[];
+}
 
 // ============================================================================
 // Base Types
@@ -73,7 +94,7 @@ export interface AddResultLayerMessage {
   layer: {
     id: string;
     name: string;
-    features: FeatureCollection;
+    features: SafeFeatureCollection;
     style: LayerStyle;
   };
 }

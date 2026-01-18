@@ -20,6 +20,16 @@ import {
 } from '../types/tool';
 import type { Track, ReferenceLocation } from '../types/plot';
 
+// Self-contained SafeFeatureCollection to avoid any from geojson
+interface SafeFeatureCollection {
+  type: 'FeatureCollection';
+  features: Array<{
+    type: 'Feature';
+    geometry: { type: string; coordinates: unknown };
+    properties: Record<string, unknown> | null;
+  }>;
+}
+
 // MCP connection states
 type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
 
@@ -46,6 +56,11 @@ export class CalcService {
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
+  }
+
+  // Reserved for future use (e.g., storing execution history)
+  getContext(): vscode.ExtensionContext {
+    return this.context;
   }
 
   /**
@@ -259,7 +274,7 @@ export class CalcService {
     executionId: string,
     result: ToolExecutionResult
   ): ResultLayer | null {
-    if (!result.success || !result.features) {
+    if (result.success !== true || result.features === undefined) {
       return null;
     }
 
@@ -272,7 +287,7 @@ export class CalcService {
       name: displayName,
       toolName,
       executionId,
-      features: result.features,
+      features: result.features as SafeFeatureCollection,
       style: createDefaultResultStyle(toolName),
       visible: true,
       createdAt: new Date().toISOString(),
@@ -325,9 +340,9 @@ export class CalcService {
     // For now, we'll simulate a successful connection
   }
 
-  private async fetchToolsFromMcp(): Promise<AnalysisTool[]> {
+  private fetchToolsFromMcp(): Promise<AnalysisTool[]> {
     // Simulated tools - in production, these come from debrief-calc MCP
-    return [
+    return Promise.resolve([
       {
         name: 'range-bearing',
         displayName: 'Range & Bearing Calculator',
@@ -369,15 +384,15 @@ export class CalcService {
         inputKinds: ['track', 'location'],
         inputSchema: {},
       },
-    ];
+    ]);
   }
 
   private async executeToolOnMcp(
-    toolName: string,
+    _toolName: string,
     _tracks: Track[],
     _locations: ReferenceLocation[],
     _params?: Record<string, unknown>
-  ): Promise<GeoJSON.FeatureCollection> {
+  ): Promise<SafeFeatureCollection> {
     // Simulate tool execution delay
     await new Promise((resolve) =>
       setTimeout(resolve, 500 + Math.random() * 500)

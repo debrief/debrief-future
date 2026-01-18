@@ -13,6 +13,7 @@
       "Bash(git rebase:*)",
       "Bash(git stash:*)",
       "Bash(git push:*)",
+      "Bash(git merge:*)",
       "Bash(pnpm test:*)",
       "Bash(npm test:*)",
       "Bash(npm install:*)",
@@ -24,8 +25,12 @@
       "Bash(gh auth status:*)",
       "Bash(npm run build:*)",
       "Bash(npm run:*)",
-      "Bash(npx esbuild:*)"
-      "Skill(publish)"
+      "Bash(npx esbuild:*)",
+      "Bash(git restore:*)",
+      "Bash(pnpm --filter @debrief/vscode lint:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(git pull:*)",
+      "Bash(pnpm exec tsc:*)"
     ]
   }
 }

@@ -15,7 +15,7 @@ import { registerCommands } from './commands';
 let mapPanel: MapPanel | undefined;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  console.log('Debrief extension activating...');
+  // Extension activation begins
 
   // Initialize services
   const configService = new ConfigService();
@@ -37,13 +37,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const toolsTreeProvider = new ToolsTreeProvider(calcService);
   const layersTreeProvider = new LayersTreeProvider();
   const outlineProvider = new OutlineProvider();
-  const timeRangeViewProvider = new TimeRangeViewProvider(context.extensionUri);
+  const timeRangeProvider = new TimeRangeViewProvider(context.extensionUri);
 
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
     vscode.window.registerTreeDataProvider('debrief.tools', toolsTreeProvider),
     vscode.window.registerTreeDataProvider('debrief.layers', layersTreeProvider),
-    vscode.window.registerWebviewViewProvider('debrief.timeRange', timeRangeViewProvider)
+    vscode.window.registerWebviewViewProvider('debrief.timeRange', timeRangeProvider)
   );
 
   // Register outline provider for selection
@@ -64,6 +64,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     stacTreeProvider,
     toolsTreeProvider,
     layersTreeProvider,
+    timeRangeProvider,
     () => mapPanel,
     (panel) => {
       mapPanel = panel;
@@ -85,9 +86,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // Graceful degradation - tools won't be available but extension works
   });
 
-  console.log('Debrief extension activated');
+  // Extension activation complete
 }
 
 export function deactivate(): void {
-  console.log('Debrief extension deactivated');
+  // Extension deactivation
 }

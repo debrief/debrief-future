@@ -10,6 +10,7 @@ import type { RecentPlotsService } from '../services/recentPlotsService';
 import type { StacTreeProvider } from '../providers/stacTreeProvider';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
+import type { TimeRangeViewProvider } from '../views/timeRangeView';
 import type { MapPanel } from '../webview/mapPanel';
 
 import { createOpenPlotCommand } from './openPlot';
@@ -28,6 +29,7 @@ export function registerCommands(
   stacTreeProvider: StacTreeProvider,
   toolsTreeProvider: ToolsTreeProvider,
   layersTreeProvider: LayersTreeProvider,
+  timeRangeProvider: TimeRangeViewProvider,
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void
 ): vscode.Disposable[] {
@@ -44,6 +46,7 @@ export function registerCommands(
         recentPlotsService,
         toolsTreeProvider,
         layersTreeProvider,
+        timeRangeProvider,
         getMapPanel,
         setMapPanel
       )
@@ -78,7 +81,7 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.refreshStore',
-      (args: { storeId: string }) => {
+      (_args: { storeId: string }) => {
         stacService.clearCache();
         stacTreeProvider.refresh();
       }

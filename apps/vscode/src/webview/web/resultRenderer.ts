@@ -3,8 +3,19 @@
  */
 
 import * as L from 'leaflet';
-import type { FeatureCollection } from 'geojson';
 import type { LayerStyle } from '../messages';
+
+// Self-contained GeoJSON types to avoid external dependency
+interface GeoJsonFeature {
+  type: 'Feature';
+  geometry: { type: string; coordinates: unknown };
+  properties: Record<string, unknown> | null;
+}
+
+interface FeatureCollection {
+  type: 'FeatureCollection';
+  features: GeoJsonFeature[];
+}
 
 interface ResultLayerData {
   layer: L.GeoJSON;
