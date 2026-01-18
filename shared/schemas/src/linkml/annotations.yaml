@@ -83,8 +83,15 @@ classes:
         range: FeatureKindEnum
         required: true
         equals_string: "CIRCLE"
+      center:
+        description: Circle center as [longitude, latitude] for precise reconstruction
+        range: float
+        multivalued: true
+        required: true
+        minimum_cardinality: 2
+        maximum_cardinality: 2
       radius:
-        description: Circle radius in meters
+        description: Circle radius in meters for precise reconstruction
         range: float
         required: true
         minimum_value: 0
@@ -101,7 +108,8 @@ classes:
   CircleAnnotation:
     description: >-
       GeoJSON Feature for circle annotations.
-      Geometry is the center point; radius is in properties.
+      Geometry is a Polygon approximating the circle (vertices at regular intervals).
+      Properties contain center and radius for precise reconstruction and smooth rendering.
     attributes:
       type:
         description: GeoJSON type discriminator
@@ -112,11 +120,11 @@ classes:
         description: Unique identifier
         required: true
       geometry:
-        description: Circle center point
-        range: GeoJSONPoint
+        description: Circle as Polygon (approximated with vertices, e.g., every 45 degrees)
+        range: GeoJSONPolygon
         required: true
       properties:
-        description: Circle metadata including radius
+        description: Circle metadata including center and radius for reconstruction
         range: CircleAnnotationProperties
         required: true
 
@@ -265,13 +273,20 @@ classes:
         range: FeatureKindEnum
         required: true
         equals_string: "VECTOR"
+      origin:
+        description: Vector origin as [longitude, latitude] for precise reconstruction
+        range: float
+        multivalued: true
+        required: true
+        minimum_cardinality: 2
+        maximum_cardinality: 2
       range:
-        description: Vector length/range in meters
+        description: Vector length/range in meters for precise reconstruction
         range: float
         required: true
         minimum_value: 0
       bearing:
-        description: Vector bearing in degrees (0-360, from north)
+        description: Vector bearing in degrees (0-360, from north) for precise reconstruction
         range: float
         required: true
         minimum_value: 0
@@ -289,7 +304,8 @@ classes:
   VectorAnnotation:
     description: >-
       GeoJSON Feature for vector annotations.
-      Geometry is the origin Point; range and bearing define the vector direction.
+      Geometry is a LineString from origin to endpoint (computed from range/bearing).
+      Properties contain origin, range, and bearing for precise reconstruction.
     attributes:
       type:
         description: GeoJSON type discriminator
@@ -300,10 +316,10 @@ classes:
         description: Unique identifier
         required: true
       geometry:
-        description: Vector origin point
-        range: GeoJSONPoint
+        description: Vector as LineString (origin to computed endpoint)
+        range: GeoJSONLineString
         required: true
       properties:
-        description: Vector metadata including range and bearing
+        description: Vector metadata including origin, range, and bearing for reconstruction
         range: VectorAnnotationProperties
         required: true

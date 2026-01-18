@@ -87,7 +87,13 @@ def get_invalid_fixtures() -> list[tuple[str, Path]]:
 def is_known_geometry_limitation(entity_type: str, error: ValidationError) -> bool:
     """Check if validation error is due to known LinkML nested array limitation."""
     # Types with nested coordinate arrays that trigger LinkML limitation
-    nested_coord_types = {"track-feature", "rectangle-annotation", "line-annotation"}
+    nested_coord_types = {
+        "track-feature",
+        "rectangle-annotation",
+        "line-annotation",
+        "circle-annotation",
+        "vector-annotation",
+    }
     if entity_type not in nested_coord_types:
         return False
     for err in error.errors():

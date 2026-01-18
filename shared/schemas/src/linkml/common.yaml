@@ -30,7 +30,7 @@ enums:
       NARRATIVE:
         description: Timestamped narrative/log entry (no geometry)
       CIRCLE:
-        description: Circle annotation (Point geometry + radius)
+        description: Circle annotation (Polygon geometry, center+radius in properties)
       RECTANGLE:
         description: Rectangle annotation (Polygon geometry)
       LINE:
@@ -38,7 +38,7 @@ enums:
       TEXT:
         description: Text annotation at a position (Point geometry)
       VECTOR:
-        description: Vector annotation (Point geometry + range/bearing)
+        description: Vector annotation (LineString geometry, origin+range+bearing in properties)
 
   TrackTypeEnum:
     description: Type of track feature

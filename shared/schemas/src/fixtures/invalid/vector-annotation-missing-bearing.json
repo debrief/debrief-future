@@ -2,11 +2,15 @@
   "type": "Feature",
   "id": "vector-invalid-001",
   "geometry": {
-    "type": "Point",
-    "coordinates": [-5.0, 50.0]
+    "type": "LineString",
+    "coordinates": [
+      [-5.0, 50.0],
+      [-4.968, 50.032]
+    ]
   },
   "properties": {
     "kind": "VECTOR",
+    "origin": [-5.0, 50.0],
     "range": 5000,
     "label": "Missing bearing"
   }
