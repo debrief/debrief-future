@@ -14,12 +14,27 @@ import type {
   StacItem,
 } from '../types/stac';
 import type { Plot, Track, ReferenceLocation } from '../types/plot';
-import type { LineString, Point, FeatureCollection, Feature, Geometry, GeoJsonProperties } from 'geojson';
 
-// Typed feature for safe property access
-interface TypedFeature extends Feature<Geometry, GeoJsonProperties> {
-  geometry: { type: string; coordinates: number[] | number[][] };
-  properties: Record<string, unknown> | null;
+// Type-safe properties to avoid any from geojson
+type SafeProperties = Record<string, unknown>;
+
+// Self-contained geometry type to avoid any
+interface SafeGeometry {
+  type: string;
+  coordinates: number[] | number[][];
+}
+
+// Self-contained feature type to avoid any from geojson Feature
+interface SafeFeature {
+  type: 'Feature';
+  geometry: SafeGeometry;
+  properties: SafeProperties | null;
+}
+
+// Self-contained FeatureCollection type to avoid any from geojson
+interface SafeFeatureCollection {
+  type: 'FeatureCollection';
+  features: SafeFeature[];
 }
 
 export class StacService {
@@ -206,8 +221,7 @@ export class StacService {
 
         if (features !== null) {
           // Count tracks and locations
-          for (const f of features.features) {
-            const feature = f as TypedFeature;
+          for (const feature of features.features) {
             if (feature.geometry.type === 'LineString') {
               trackCount++;
 
@@ -288,17 +302,17 @@ export class StacService {
       const tracks: Track[] = [];
       const locations: ReferenceLocation[] = [];
 
-      for (const f of featureCollection.features) {
-        const feature = f as TypedFeature;
+      for (const feature of featureCollection.features) {
         const props = feature.properties ?? {};
         if (feature.geometry.type === 'LineString') {
           const times = (props.times as string[]) ?? [];
+          const lineCoords = feature.geometry.coordinates as number[][];
 
           tracks.push({
             id: (props.id as string) ?? `track-${tracks.length}`,
             name: (props.name as string) ?? `Track ${tracks.length + 1}`,
             platformType: props.platformType as string | undefined,
-            geometry: feature.geometry as unknown as LineString,
+            geometry: { type: 'LineString' as const, coordinates: lineCoords },
             times,
             startTime: times[0] ?? '',
             endTime: times[times.length - 1] ?? '',
@@ -307,11 +321,13 @@ export class StacService {
             selected: false,
           });
         } else if (feature.geometry.type === 'Point') {
+          const pointCoords = feature.geometry.coordinates as number[];
+
           locations.push({
             id: (props.id as string) ?? `location-${locations.length}`,
             name: (props.name as string) ?? `Location ${locations.length + 1}`,
             locationType: props.locationType as string | undefined,
-            geometry: feature.geometry as unknown as Point,
+            geometry: { type: 'Point' as const, coordinates: pointCoords },
             visible: true,
             selected: false,
           });
@@ -418,14 +434,14 @@ export class StacService {
 
   private loadGeoJson(
     geoJsonPath: string
-  ): Promise<FeatureCollection<Geometry, GeoJsonProperties> | null> {
+  ): Promise<SafeFeatureCollection | null> {
     try {
       if (!fs.existsSync(geoJsonPath)) {
         return Promise.resolve(null);
       }
 
       const content = fs.readFileSync(geoJsonPath, 'utf-8');
-      return Promise.resolve(JSON.parse(content) as FeatureCollection<Geometry, GeoJsonProperties>);
+      return Promise.resolve(JSON.parse(content) as SafeFeatureCollection);
     } catch {
       return Promise.resolve(null);
     }

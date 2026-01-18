@@ -15,7 +15,7 @@ import { registerCommands } from './commands';
 let mapPanel: MapPanel | undefined;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  console.log('Debrief extension activating...');
+  // Extension activation begins
 
   // Initialize services
   const configService = new ConfigService();
@@ -86,9 +86,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // Graceful degradation - tools won't be available but extension works
   });
 
-  console.log('Debrief extension activated');
+  // Extension activation complete
 }
 
 export function deactivate(): void {
-  console.log('Debrief extension deactivated');
+  // Extension deactivation
 }

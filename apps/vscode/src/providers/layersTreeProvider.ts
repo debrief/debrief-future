@@ -183,7 +183,8 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
 
     item.contextValue = 'track';
     item.description = track.platformType ?? '';
-    item.tooltip = `${track.name}\nPlatform: ${track.platformType ?? 'Unknown'}\nPoints: ${track.geometry.coordinates.length}`;
+    const geom = track.geometry as { coordinates: number[][] };
+    item.tooltip = `${track.name}\nPlatform: ${track.platformType ?? 'Unknown'}\nPoints: ${geom.coordinates.length}`;
 
     // Checkbox icon based on visibility
     item.iconPath = new vscode.ThemeIcon(

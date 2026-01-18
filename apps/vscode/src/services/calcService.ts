@@ -20,6 +20,16 @@ import {
 } from '../types/tool';
 import type { Track, ReferenceLocation } from '../types/plot';
 
+// Self-contained SafeFeatureCollection to avoid any from geojson
+interface SafeFeatureCollection {
+  type: 'FeatureCollection';
+  features: Array<{
+    type: 'Feature';
+    geometry: { type: string; coordinates: unknown };
+    properties: Record<string, unknown> | null;
+  }>;
+}
+
 // MCP connection states
 type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
 
@@ -259,7 +269,7 @@ export class CalcService {
     executionId: string,
     result: ToolExecutionResult
   ): ResultLayer | null {
-    if (result.success !== true || !result.features) {
+    if (result.success !== true || result.features === undefined) {
       return null;
     }
 
@@ -272,7 +282,7 @@ export class CalcService {
       name: displayName,
       toolName,
       executionId,
-      features: result.features as GeoJSON.Feature[],
+      features: result.features as SafeFeatureCollection,
       style: createDefaultResultStyle(toolName),
       visible: true,
       createdAt: new Date().toISOString(),

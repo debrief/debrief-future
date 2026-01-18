@@ -304,7 +304,8 @@ export class MapPanel {
     let maxLng = -Infinity;
 
     for (const track of selectedTracks) {
-      for (const coord of track.geometry.coordinates) {
+      const geom = track.geometry as { coordinates: number[][] };
+      for (const coord of geom.coordinates) {
         const lng = coord[0];
         const lat = coord[1];
         if (typeof lng === 'number' && typeof lat === 'number') {
@@ -561,7 +562,7 @@ export class MapPanel {
       details: {
         name: track.name,
         platformType: track.platformType ?? 'Unknown',
-        pointCount: track.geometry.coordinates.length,
+        pointCount: (track.geometry as { coordinates: number[][] }).coordinates.length,
         startTime: track.startTime,
         endTime: track.endTime,
         duration,
