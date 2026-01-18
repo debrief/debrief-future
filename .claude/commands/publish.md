@@ -23,6 +23,7 @@ Parse the following from user input:
 | `<path>` | Path to content file or directory | `specs/002-debrief-io/media/shipped-post.md` |
 | `--feature-pr <url>` | URL of related feature PR (for cross-referencing) | `--feature-pr https://github.com/debrief/debrief-future/pull/28` |
 | `--date <YYYY-MM-DD>` | Override post date (defaults to today) | `--date 2026-01-10` |
+| `--components <path>` | Path to component bundles directory | `--components specs/016/media/components/` |
 | `--dry-run` | Preview changes without creating PR | `--dry-run` |
 
 When invoked from `/speckit.pr`, the `--feature-pr` argument will be provided automatically.
@@ -242,6 +243,44 @@ excerpt: "First paragraph, max 150 chars..."
 **Image handling:**
 - Copy from `media/images/` to `assets/images/future-debrief/{slug}/`
 - Update paths: `./images/foo.png` → `/assets/images/future-debrief/{slug}/foo.png`
+
+**Component bundle deployment:**
+
+If `--components` argument provided:
+
+1. **Parse component path:**
+   ```bash
+   COMPONENTS_DIR="$COMPONENTS_ARG"
+   if [ -d "$COMPONENTS_DIR" ]; then
+       echo "Found component bundles at $COMPONENTS_DIR"
+   else
+       echo "Warning: --components specified but directory not found"
+   fi
+   ```
+
+2. **Create component directory** in website repo:
+   ```bash
+   mkdir -p assets/components/{post-slug}/
+   ```
+
+3. **Copy bundles:**
+   ```bash
+   cp -r "$COMPONENTS_DIR"/* assets/components/{post-slug}/
+   ```
+
+4. **Update paths in blog post:**
+   - Component paths: `./components/foo.js` → `/assets/components/{post-slug}/foo.js`
+
+5. **Add to commit:**
+   ```bash
+   git add assets/components/{post-slug}/
+   ```
+
+6. **Update PR checklist** to include component verification:
+   ```markdown
+   - [ ] Component bundles load correctly
+   - [ ] Interactive elements respond to user input
+   ```
 
 ### Standalone Page
 

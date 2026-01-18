@@ -130,14 +130,25 @@ You **MUST** consider the user input before proceeding (if not empty).
     - If missing, skip to step 15 (final report)
     - If present, proceed with cross-repo publishing
 
+12a. **Check for component bundles**:
+    - Look for `FEATURE_DIR/media/components/` directory
+    - If present, prepare to pass to /publish skill:
+      ```bash
+      if [ -d "$FEATURE_DIR/media/components/" ]; then
+          COMPONENTS_ARG="--components $FEATURE_DIR/media/components/"
+      else
+          COMPONENTS_ARG=""
+      fi
+      ```
+
 13. **Execute cross-repo blog publishing via /publish skill**:
 
-    Invoke the publish skill with the shipped post path:
+    Invoke the publish skill with the shipped post path (and components if present):
 
     ```
     Skill tool:
       skill: "publish"
-      args: "$FEATURE_DIR/media/shipped-post.md --feature-pr $FEATURE_PR_URL"
+      args: "$FEATURE_DIR/media/shipped-post.md --feature-pr $FEATURE_PR_URL $COMPONENTS_ARG"
     ```
 
     The `/publish` skill handles:

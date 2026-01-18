@@ -28,6 +28,25 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Read spec.md for feature goals and acceptance criteria
    - Read plan.md for technical approach and architecture
    - Read tasks.md for the task breakdown
+   - Read BACKLOG.md to determine feature complexity and model selection
+
+3a. **Determine model for implementation**:
+
+   Read BACKLOG.md and find the row matching the current feature (by ID or description link).
+   Extract the **Complexity** column value and map to model:
+
+   | Complexity | Model | When to Use |
+   |------------|-------|-------------|
+   | **Low** | `haiku` | Config changes, simple validations, documentation, well-defined patterns |
+   | **Medium** | `sonnet` | New endpoints, schema additions, integration work, standard features |
+   | **High** | `opus` | Architecture changes, multi-service features, novel algorithms, complex design |
+
+   **Usage**: When spawning Task agents for implementation work, pass the `model` parameter:
+   ```
+   Task tool with model: "{model}" based on complexity
+   ```
+
+   If complexity is not specified in BACKLOG.md, default to `sonnet`.
 
 4. **Parse task structure** from tasks.md:
    - **Phase identification**: Setup, Foundation, User Stories, Polish
@@ -62,6 +81,14 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Capture test-summary.md with test results
      - Create usage-example.md demonstrating the feature
      - Capture any feature-specific artifacts (screenshots, API samples, CLI output, etc.)
+   - **Media component bundling**: If plan.md has Media Components entries:
+     - For each component in the Media Components table:
+       - Locate the Storybook story source file
+       - Create esbuild entry point that imports the story and renders with createRoot
+       - Build self-contained bundle (IIFE format, include React, inline CSS, minify)
+     - Store bundles at `FEATURE_DIR/media/components/`
+     - Verify bundles: self-contained, < 500KB, renders in isolation
+     - Record bundle details in evidence/
    - **Media content**: Create blog posts and LinkedIn summaries using Content Specialist agent
 
 8. Progress tracking and error handling:
@@ -173,6 +200,8 @@ Execution steps:
 - Partial success is acceptable — if blog publishing fails but feature PR succeeds, report both and continue
 
 ## Task Execution Guidelines
+
+**Model Selection**: When spawning Task agents (e.g., for Content Specialist, technical implementation), always pass the `model` parameter based on the complexity determined in step 3a. This ensures appropriate reasoning depth for each task.
 
 ### File Creation Tasks
 

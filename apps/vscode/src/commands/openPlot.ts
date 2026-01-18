@@ -93,6 +93,19 @@ export function createOpenPlotCommand(
 
     // Create or get map panel
     let panel = getMapPanel();
+
+    // Check if existing panel is disposed
+    if (panel) {
+      try {
+        // Test if panel is still valid by checking its visibility property
+        const _ = panel.getPanel().visible;
+      } catch {
+        // Panel is disposed, clear the reference
+        panel = undefined;
+        setMapPanel(undefined);
+      }
+    }
+
     if (!panel) {
       panel = MapPanel.createOrShow(context.extensionUri, plot.title);
       setMapPanel(panel);
@@ -100,6 +113,11 @@ export function createOpenPlotCommand(
       // Set up selection change handler
       panel.onSelectionChanged((selection) => {
         toolsTreeProvider.updateSelection(selection);
+      });
+
+      // Clear reference when panel is disposed
+      panel.getPanel().onDidDispose(() => {
+        setMapPanel(undefined);
       });
     }
 

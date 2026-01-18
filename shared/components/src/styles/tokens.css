@@ -1,0 +1,149 @@
+/**
+ * Debrief Design System Tokens
+ * CSS Custom Properties for consistent styling across components.
+ */
+
+:root {
+  /* Colors - Primary */
+  --debrief-color-primary: #0066cc;
+  --debrief-color-primary-hover: #0052a3;
+  --debrief-color-primary-active: #003d7a;
+
+  /* Colors - Secondary */
+  --debrief-color-secondary: #6c757d;
+  --debrief-color-secondary-hover: #5a6268;
+  --debrief-color-secondary-active: #494e52;
+
+  /* Colors - Status */
+  --debrief-color-success: #28a745;
+  --debrief-color-warning: #ffc107;
+  --debrief-color-danger: #dc3545;
+  --debrief-color-info: #17a2b8;
+
+  /* Colors - Track Types */
+  --debrief-color-ownship: #0066cc;
+  --debrief-color-contact: #cc0000;
+  --debrief-color-reference: #666666;
+  --debrief-color-solution: #00cc66;
+
+  /* Colors - Background */
+  --debrief-bg-primary: #ffffff;
+  --debrief-bg-secondary: #f8f9fa;
+  --debrief-bg-tertiary: #e9ecef;
+  --debrief-bg-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Colors - Text */
+  --debrief-text-primary: #212529;
+  --debrief-text-secondary: #6c757d;
+  --debrief-text-muted: #adb5bd;
+  --debrief-text-inverse: #ffffff;
+
+  /* Colors - Border */
+  --debrief-border-color: #dee2e6;
+  --debrief-border-color-focus: #0066cc;
+  --debrief-border-color-error: #dc3545;
+
+  /* Colors - Selection */
+  --debrief-selection-bg: rgba(0, 102, 204, 0.1);
+  --debrief-selection-border: #0066cc;
+
+  /* Spacing */
+  --debrief-space-xs: 4px;
+  --debrief-space-sm: 8px;
+  --debrief-space-md: 16px;
+  --debrief-space-lg: 24px;
+  --debrief-space-xl: 32px;
+  --debrief-space-2xl: 48px;
+
+  /* Typography */
+  --debrief-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  --debrief-font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace;
+
+  --debrief-font-size-xs: 10px;
+  --debrief-font-size-sm: 12px;
+  --debrief-font-size-md: 14px;
+  --debrief-font-size-lg: 16px;
+  --debrief-font-size-xl: 20px;
+  --debrief-font-size-2xl: 24px;
+
+  --debrief-font-weight-normal: 400;
+  --debrief-font-weight-medium: 500;
+  --debrief-font-weight-bold: 600;
+
+  --debrief-line-height-tight: 1.25;
+  --debrief-line-height-normal: 1.5;
+  --debrief-line-height-relaxed: 1.75;
+
+  /* Border Radius */
+  --debrief-radius-sm: 2px;
+  --debrief-radius-md: 4px;
+  --debrief-radius-lg: 8px;
+  --debrief-radius-full: 9999px;
+
+  /* Shadows */
+  --debrief-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --debrief-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --debrief-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* Transitions */
+  --debrief-transition-fast: 150ms ease-in-out;
+  --debrief-transition-normal: 250ms ease-in-out;
+  --debrief-transition-slow: 350ms ease-in-out;
+
+  /* Z-Index */
+  --debrief-z-dropdown: 1000;
+  --debrief-z-sticky: 1020;
+  --debrief-z-fixed: 1030;
+  --debrief-z-overlay: 1040;
+  --debrief-z-modal: 1050;
+  --debrief-z-popover: 1060;
+  --debrief-z-tooltip: 1070;
+
+  /* Component-specific tokens */
+
+  /* Map */
+  --debrief-map-min-height: 300px;
+  --debrief-map-controls-bg: rgba(255, 255, 255, 0.9);
+  --debrief-map-controls-radius: var(--debrief-radius-md);
+
+  /* Timeline */
+  --debrief-timeline-height: 150px;
+  --debrief-timeline-bar-height: 24px;
+  --debrief-timeline-axis-height: 32px;
+  --debrief-timeline-grid-color: rgba(0, 0, 0, 0.1);
+
+  /* Feature List */
+  --debrief-list-row-height: 40px;
+  --debrief-list-hover-bg: var(--debrief-bg-secondary);
+  --debrief-list-selected-bg: var(--debrief-selection-bg);
+}
+
+/* Dark theme overrides */
+[data-theme='dark'],
+.debrief-dark {
+  --debrief-bg-primary: #1e1e1e;
+  --debrief-bg-secondary: #252526;
+  --debrief-bg-tertiary: #2d2d30;
+  --debrief-bg-overlay: rgba(0, 0, 0, 0.7);
+
+  --debrief-text-primary: #cccccc;
+  --debrief-text-secondary: #9d9d9d;
+  --debrief-text-muted: #6d6d6d;
+  --debrief-text-inverse: #1e1e1e;
+
+  --debrief-border-color: #3c3c3c;
+
+  --debrief-map-controls-bg: rgba(30, 30, 30, 0.9);
+
+  --debrief-timeline-grid-color: rgba(255, 255, 255, 0.1);
+}
+
+/* VS Code theme integration */
+[data-theme='vscode'] {
+  --debrief-bg-primary: var(--vscode-editor-background, #1e1e1e);
+  --debrief-bg-secondary: var(--vscode-sideBar-background, #252526);
+  --debrief-text-primary: var(--vscode-editor-foreground, #cccccc);
+  --debrief-text-secondary: var(--vscode-descriptionForeground, #9d9d9d);
+  --debrief-border-color: var(--vscode-panel-border, #3c3c3c);
+  --debrief-color-primary: var(--vscode-focusBorder, #0066cc);
+}
