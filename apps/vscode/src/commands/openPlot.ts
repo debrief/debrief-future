@@ -100,7 +100,7 @@ export function createOpenPlotCommand(
     if (panel) {
       try {
         // Test if panel is still valid by checking its visibility property
-        const _ = panel.getPanel().visible;
+        void panel.getPanel().visible;
       } catch {
         // Panel is disposed, clear the reference
         panel = undefined;

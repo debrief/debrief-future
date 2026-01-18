@@ -168,7 +168,7 @@ export interface ToolExecutionResult {
   success: boolean;
 
   /** Result features (if success) */
-  features?: FeatureCollection;
+  features?: SafeFeatureCollection;
 
   /** Error message (if failed) */
   error?: string;

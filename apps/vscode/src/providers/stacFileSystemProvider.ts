@@ -18,6 +18,11 @@ export class StacFileSystemProvider implements vscode.FileSystemProvider {
     this.stacService = stacService;
   }
 
+  // Reserved for future file content reading
+  getStacService(): StacService {
+    return this.stacService;
+  }
+
   /**
    * Watch for changes (not implemented for read-only provider)
    */

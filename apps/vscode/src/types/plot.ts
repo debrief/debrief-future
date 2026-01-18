@@ -2,7 +2,16 @@
  * Plot-related type definitions for the Debrief VS Code Extension
  */
 
-import type { LineString, Point } from 'geojson';
+// GeoJSON geometry types (self-contained to avoid external dependency)
+export interface LineString {
+  type: 'LineString';
+  coordinates: number[][];
+}
+
+export interface Point {
+  type: 'Point';
+  coordinates: number[];
+}
 
 /**
  * A plot from a STAC catalog containing tracks and reference locations

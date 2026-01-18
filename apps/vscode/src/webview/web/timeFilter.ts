@@ -5,14 +5,15 @@
 import type { TrackRenderer } from './trackRenderer';
 
 export class TimeFilter {
-  private trackRenderer: TrackRenderer;
+  // Reserved for time-based track filtering
+  private _trackRenderer: TrackRenderer;
   private dataStart: string = '';
   private dataEnd: string = '';
   private currentStart: string = '';
   private currentEnd: string = '';
 
   constructor(trackRenderer: TrackRenderer) {
-    this.trackRenderer = trackRenderer;
+    this._trackRenderer = trackRenderer;
   }
 
   /**

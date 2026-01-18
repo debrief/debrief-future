@@ -58,6 +58,11 @@ export class CalcService {
     this.context = context;
   }
 
+  // Reserved for future use (e.g., storing execution history)
+  getContext(): vscode.ExtensionContext {
+    return this.context;
+  }
+
   /**
    * Check if debrief-calc is available
    */
@@ -387,7 +392,7 @@ export class CalcService {
     _tracks: Track[],
     _locations: ReferenceLocation[],
     _params?: Record<string, unknown>
-  ): Promise<GeoJSON.FeatureCollection> {
+  ): Promise<SafeFeatureCollection> {
     // Simulate tool execution delay
     await new Promise((resolve) =>
       setTimeout(resolve, 500 + Math.random() * 500)

@@ -52,10 +52,10 @@ export class StacService {
       const catalogPath = path.join(storePath, 'catalog.json');
 
       if (!fs.existsSync(catalogPath)) {
-        return {
+        return Promise.resolve({
           valid: false,
           error: 'No catalog.json found in directory',
-        };
+        });
       }
 
       const content = fs.readFileSync(catalogPath, 'utf-8');
