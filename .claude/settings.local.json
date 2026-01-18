@@ -8,7 +8,10 @@
       "Bash(pnpm run compile:*)",
       "Bash(pnpm run test:unit:*)",
       "Bash(code:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git fetch:*)",
+      "Bash(git rebase:*)",
+      "Bash(git stash:*)"
     ]
   }
 }
