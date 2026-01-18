@@ -102,6 +102,7 @@ Description formats:
 | 010 | Tech Debt | Add rollback/cleanup API to debrief-stac for interrupted operations | 3 | 1 | 4 | 8 | Medium | proposed |
 | 012 | Enhancement | Wire loader plot count to debrief-stac list_plots call | 2 | 1 | 5 | 8 | Low | proposed |
 | 018 | Infrastructure | [Add VS Code multi-root workspace configuration](docs/ideas/018-vscode-workspace-config.md) | 3 | 1 | 5 | 9 | Low | approved |
+| 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](docs/ideas/019-backlog-interview-capture.md) | 3 | 3 | 5 | 11 | Medium | proposed |
 
 ## Categories
 
