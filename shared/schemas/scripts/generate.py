@@ -37,19 +37,19 @@ def run_command(cmd: list[str], description: str) -> bool:
             print(result.stdout)
         return True
     except subprocess.CalledProcessError as e:
-        print(f"  ✗ Failed: {e}")
+        print(f"  [FAIL] {e}")
         if e.stderr:
             print(e.stderr)
         return False
     except FileNotFoundError:
-        print(f"  ✗ Command not found: {cmd[0]}")
+        print(f"  [FAIL] Command not found: {cmd[0]}")
         return False
 
 
 def generate_pydantic() -> bool:
     """Generate Pydantic models from LinkML schema."""
     if not MASTER_SCHEMA.exists():
-        print(f"  ✗ Master schema not found: {MASTER_SCHEMA}")
+        print(f"  [FAIL] Master schema not found: {MASTER_SCHEMA}")
         return False
 
     PYTHON_OUT.mkdir(parents=True, exist_ok=True)
@@ -65,13 +65,13 @@ def generate_pydantic() -> bool:
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
         output_file.write_text(result.stdout)
-        print(f"  ✓ Generated: {output_file}")
+        print(f"  [OK] Generated: {output_file}")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"  ✗ gen-pydantic failed: {e.stderr}")
+        print(f"  [FAIL] gen-pydantic failed: {e.stderr}")
         return False
     except FileNotFoundError:
-        print("  ✗ gen-pydantic not found. Install with: pip install linkml")
+        print("  [FAIL] gen-pydantic not found. Install with: pip install linkml")
         return False
 
 
@@ -80,7 +80,7 @@ def generate_jsonschema() -> bool:
     import json
 
     if not MASTER_SCHEMA.exists():
-        print(f"  ✗ Master schema not found: {MASTER_SCHEMA}")
+        print(f"  [FAIL] Master schema not found: {MASTER_SCHEMA}")
         return False
 
     JSONSCHEMA_OUT.mkdir(parents=True, exist_ok=True)
@@ -94,7 +94,7 @@ def generate_jsonschema() -> bool:
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
         output_file.write_text(result.stdout)
-        print(f"  ✓ Generated: {output_file}")
+        print(f"  [OK] Generated: {output_file}")
 
         # Generate per-entity schemas
         full_schema = json.loads(result.stdout)
@@ -120,21 +120,21 @@ def generate_jsonschema() -> bool:
                 }
                 entity_file = JSONSCHEMA_OUT / f"{entity}.schema.json"
                 entity_file.write_text(json.dumps(entity_schema, indent=2))
-                print(f"  ✓ Generated: {entity_file}")
+                print(f"  [OK] Generated: {entity_file}")
 
         return True
     except subprocess.CalledProcessError as e:
-        print(f"  ✗ gen-json-schema failed: {e.stderr}")
+        print(f"  [FAIL] gen-json-schema failed: {e.stderr}")
         return False
     except FileNotFoundError:
-        print("  ✗ gen-json-schema not found. Install with: pip install linkml")
+        print("  [FAIL] gen-json-schema not found. Install with: pip install linkml")
         return False
 
 
 def generate_typescript() -> bool:
     """Generate TypeScript interfaces from LinkML schema."""
     if not MASTER_SCHEMA.exists():
-        print(f"  ✗ Master schema not found: {MASTER_SCHEMA}")
+        print(f"  [FAIL] Master schema not found: {MASTER_SCHEMA}")
         return False
 
     TYPESCRIPT_OUT.mkdir(parents=True, exist_ok=True)
@@ -148,18 +148,18 @@ def generate_typescript() -> bool:
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
         output_file.write_text(result.stdout)
-        print(f"  ✓ Generated: {output_file}")
+        print(f"  [OK] Generated: {output_file}")
 
         # Create index.ts that re-exports everything
         index_file = TYPESCRIPT_OUT / "index.ts"
         index_file.write_text('export * from "./types";\n')
-        print(f"  ✓ Generated: {index_file}")
+        print(f"  [OK] Generated: {index_file}")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"  ✗ gen-typescript failed: {e.stderr}")
+        print(f"  [FAIL] gen-typescript failed: {e.stderr}")
         return False
     except FileNotFoundError:
-        print("  ✗ gen-typescript not found. Install with: pip install linkml")
+        print("  [FAIL] gen-typescript not found. Install with: pip install linkml")
         return False
 
 
@@ -172,12 +172,12 @@ def validate_fixtures() -> bool:
     print("Validating fixtures...")
 
     if not valid_dir.exists() or not invalid_dir.exists():
-        print("  ⚠ Fixtures directories not found, skipping validation")
+        print("  [WARN] Fixtures directories not found, skipping validation")
         return True
 
     # This is a placeholder - actual validation would use linkml-validate
     # or the generated Pydantic models
-    print("  ⚠ Fixture validation not yet implemented")
+    print("  [WARN] Fixture validation not yet implemented")
     return True
 
 
@@ -224,9 +224,9 @@ def main():
 
     print()
     if success:
-        print("✓ Generation complete")
+        print("[OK] Generation complete")
     else:
-        print("✗ Generation completed with errors")
+        print("[FAIL] Generation completed with errors")
         sys.exit(1)
 
 

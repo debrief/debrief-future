@@ -1,20 +1,20 @@
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://debrief.info/schemas/ReferenceLocation",
+  "$id": "https://debrief.info/schemas/CircleAnnotation",
   "additionalProperties": false,
-  "description": "GeoJSON Feature for fixed reference points",
+  "description": "GeoJSON Feature for circle annotations. Geometry is a Polygon approximating the circle (vertices at regular intervals). Properties contain center and radius for precise reconstruction and smooth rendering.",
   "properties": {
     "geometry": {
-      "$ref": "#/$defs/GeoJSONPoint",
-      "description": "Location (Point) or area (Polygon)"
+      "$ref": "#/$defs/GeoJSONPolygon",
+      "description": "Circle as Polygon (approximated with vertices, e.g., every 45 degrees)"
     },
     "id": {
       "description": "Unique identifier",
       "type": "string"
     },
     "properties": {
-      "$ref": "#/$defs/ReferenceLocationProperties",
-      "description": "Reference metadata"
+      "$ref": "#/$defs/CircleAnnotationProperties",
+      "description": "Circle metadata including center and radius for reconstruction"
     },
     "type": {
       "const": "Feature",
@@ -28,7 +28,7 @@
     "geometry",
     "properties"
   ],
-  "title": "ReferenceLocation",
+  "title": "CircleAnnotation",
   "type": "object",
   "$defs": {
     "CircleAnnotation": {
