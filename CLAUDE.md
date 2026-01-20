@@ -143,6 +143,8 @@ Three approaches required:
 - TypeScript 5.x (VS Code Extension API) + @vscode/api (extension host), Leaflet (map rendering), debrief-config (TypeScript), debrief-stac (via IPC), debrief-calc (via MCP) (006-speckit-vscode-extension)
 - TypeScript 5.x + React 18+, react-leaflet v5+ (map), @tanstack/react-virtual (lists), HTML5 Canvas (timeline), CSS Custom Properties (theming), Storybook 10.x (component preview) (001-shared-react-components)
 - N/A (pure display components — no persistence) (001-shared-react-components)
+- Python 3.11+ (LinkML, Pydantic), TypeScript 5.x (generated types) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS) (014-geojson-styling-schemas)
+- N/A (schema definitions only - no persistence) (014-geojson-styling-schemas)
 
 ## Recent Changes
 - 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v5+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 10.x
