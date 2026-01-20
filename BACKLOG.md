@@ -87,6 +87,7 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
+| 017 | Enhancement | [Configure VS Code extension to hide default activities on load](docs/ideas/017-vscode-hide-activities.md) | 3 | 3 | 4 | 10 | Medium | approved |
 | 014 | Feature | [Add styling properties schemas to GeoJSON features](docs/ideas/014-geojson-styling-properties.md) | 5 | 4 | 5 | 14 | Medium | approved |
 | 015 | Infrastructure | [Create LinkML schemas for REP annotation item types](docs/ideas/015-annotation-item-schemas.md) (prerequisite for #007) | 5 | 3 | 5 | 13 | Medium | approved |
 | 007 | Enhancement | [Implement REP file special comments (NARRATIVE, CIRCLE, etc.)](docs/ideas/007-rep-special-comments.md) (requires #015) | 4 | 4 | 4 | 12 | Medium | approved |
