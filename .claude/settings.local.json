@@ -30,7 +30,8 @@
       "Bash(pnpm --filter @debrief/vscode lint:*)",
       "Bash(pnpm lint:*)",
       "Bash(git pull:*)",
-      "Bash(pnpm exec tsc:*)"
+      "Bash(pnpm exec tsc:*)",
+      "Bash(ls:*)"
     ]
   }
 }
