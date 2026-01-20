@@ -1,20 +1,20 @@
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://debrief.info/schemas/ReferenceLocation",
+  "$id": "https://debrief.info/schemas/VectorAnnotation",
   "additionalProperties": false,
-  "description": "GeoJSON Feature for fixed reference points",
+  "description": "GeoJSON Feature for vector annotations. Geometry is a LineString from origin to endpoint (computed from range/bearing). Properties contain origin, range, and bearing for precise reconstruction.",
   "properties": {
     "geometry": {
-      "$ref": "#/$defs/GeoJSONPoint",
-      "description": "Location (Point) or area (Polygon)"
+      "$ref": "#/$defs/GeoJSONLineString",
+      "description": "Vector as LineString (origin to computed endpoint)"
     },
     "id": {
       "description": "Unique identifier",
       "type": "string"
     },
     "properties": {
-      "$ref": "#/$defs/ReferenceLocationProperties",
-      "description": "Reference metadata"
+      "$ref": "#/$defs/VectorAnnotationProperties",
+      "description": "Vector metadata including origin, range, and bearing for reconstruction"
     },
     "type": {
       "const": "Feature",
@@ -28,7 +28,7 @@
     "geometry",
     "properties"
   ],
-  "title": "ReferenceLocation",
+  "title": "VectorAnnotation",
   "type": "object",
   "$defs": {
     "CircleAnnotation": {

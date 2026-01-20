@@ -1,20 +1,20 @@
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://debrief.info/schemas/ReferenceLocation",
+  "$id": "https://debrief.info/schemas/TextAnnotation",
   "additionalProperties": false,
-  "description": "GeoJSON Feature for fixed reference points",
+  "description": "GeoJSON Feature for text annotations at a position. Geometry is the Point where text should be displayed.",
   "properties": {
     "geometry": {
       "$ref": "#/$defs/GeoJSONPoint",
-      "description": "Location (Point) or area (Polygon)"
+      "description": "Text display position"
     },
     "id": {
       "description": "Unique identifier",
       "type": "string"
     },
     "properties": {
-      "$ref": "#/$defs/ReferenceLocationProperties",
-      "description": "Reference metadata"
+      "$ref": "#/$defs/TextAnnotationProperties",
+      "description": "Text metadata"
     },
     "type": {
       "const": "Feature",
@@ -28,7 +28,7 @@
     "geometry",
     "properties"
   ],
-  "title": "ReferenceLocation",
+  "title": "TextAnnotation",
   "type": "object",
   "$defs": {
     "CircleAnnotation": {

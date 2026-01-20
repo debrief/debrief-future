@@ -1,20 +1,27 @@
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://debrief.info/schemas/ReferenceLocation",
+  "$id": "https://debrief.info/schemas/NarrativeEntry",
   "additionalProperties": false,
-  "description": "GeoJSON Feature for fixed reference points",
+  "description": "GeoJSON Feature for timestamped narrative/log entries. Narratives are operator notes associated with a timestamp and optionally a track. Geometry is optional (Point for display position, or null).",
   "properties": {
     "geometry": {
-      "$ref": "#/$defs/GeoJSONPoint",
-      "description": "Location (Point) or area (Polygon)"
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GeoJSONPoint"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Optional display position (Point) or null"
     },
     "id": {
       "description": "Unique identifier",
       "type": "string"
     },
     "properties": {
-      "$ref": "#/$defs/ReferenceLocationProperties",
-      "description": "Reference metadata"
+      "$ref": "#/$defs/NarrativeEntryProperties",
+      "description": "Narrative metadata"
     },
     "type": {
       "const": "Feature",
@@ -25,10 +32,9 @@
   "required": [
     "type",
     "id",
-    "geometry",
     "properties"
   ],
-  "title": "ReferenceLocation",
+  "title": "NarrativeEntry",
   "type": "object",
   "$defs": {
     "CircleAnnotation": {

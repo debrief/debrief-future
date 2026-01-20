@@ -6,50 +6,50 @@ all: generate test
 # === Generation Targets ===
 
 generate: generate-pydantic generate-jsonschema generate-typescript
-	@echo "✓ All schemas generated"
+	@echo "[OK] All schemas generated"
 
 generate-pydantic:
 	@echo "Generating Pydantic models..."
 	python scripts/generate.py --target pydantic
-	@echo "✓ Pydantic models generated"
+	@echo "[OK] Pydantic models generated"
 
 generate-jsonschema:
 	@echo "Generating JSON Schema..."
 	python scripts/generate.py --target jsonschema
-	@echo "✓ JSON Schema generated"
+	@echo "[OK] JSON Schema generated"
 
 generate-typescript:
 	@echo "Generating TypeScript interfaces..."
 	python scripts/generate.py --target typescript
-	@echo "✓ TypeScript interfaces generated"
+	@echo "[OK] TypeScript interfaces generated"
 
 # === Test Targets ===
 
 test: test-python test-typescript
-	@echo "✓ All tests passed"
+	@echo "[OK] All tests passed"
 
 test-python:
 	@echo "Running Python tests..."
 	uv run pytest tests/ -v
-	@echo "✓ Python tests passed"
+	@echo "[OK] Python tests passed"
 
 test-typescript:
 	@echo "Running TypeScript tests..."
 	pnpm exec node tests/validate-jsonschema.js
 	pnpm exec tsc --noEmit --project src/generated/typescript/tsconfig.json
-	@echo "✓ TypeScript tests passed"
+	@echo "[OK] TypeScript tests passed"
 
 # === Validation Targets ===
 
 validate-linkml:
 	@echo "Validating LinkML schemas..."
 	linkml-validate -s src/linkml/debrief.yaml
-	@echo "✓ LinkML schemas valid"
+	@echo "[OK] LinkML schemas valid"
 
 validate-fixtures:
 	@echo "Validating fixtures against schemas..."
 	python scripts/generate.py --validate-fixtures
-	@echo "✓ All fixtures validated"
+	@echo "[OK] All fixtures validated"
 
 # === Clean Target ===
 
@@ -60,7 +60,7 @@ clean:
 	rm -rf src/generated/typescript/*.ts
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
-	@echo "✓ Clean complete"
+	@echo "[OK] Clean complete"
 
 # === Help ===
 

@@ -1,20 +1,20 @@
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://debrief.info/schemas/ReferenceLocation",
+  "$id": "https://debrief.info/schemas/RectangleAnnotation",
   "additionalProperties": false,
-  "description": "GeoJSON Feature for fixed reference points",
+  "description": "GeoJSON Feature for rectangle annotations. Geometry is a Polygon with 4 corners (plus closing point).",
   "properties": {
     "geometry": {
-      "$ref": "#/$defs/GeoJSONPoint",
-      "description": "Location (Point) or area (Polygon)"
+      "$ref": "#/$defs/GeoJSONPolygon",
+      "description": "Rectangle as Polygon (4 corners + close)"
     },
     "id": {
       "description": "Unique identifier",
       "type": "string"
     },
     "properties": {
-      "$ref": "#/$defs/ReferenceLocationProperties",
-      "description": "Reference metadata"
+      "$ref": "#/$defs/RectangleAnnotationProperties",
+      "description": "Rectangle metadata"
     },
     "type": {
       "const": "Feature",
@@ -28,7 +28,7 @@
     "geometry",
     "properties"
   ],
-  "title": "ReferenceLocation",
+  "title": "RectangleAnnotation",
   "type": "object",
   "$defs": {
     "CircleAnnotation": {
