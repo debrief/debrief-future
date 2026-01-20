@@ -91,6 +91,7 @@ Items that don't fit current strategy but may return later:
 | Shared Web Components library (BACKLOG #003) | No VS Code extension exists yet to extract from | VS Code extension development begins (tracer bullet step 6) |
 | VS Code map PNG export (BACKLOG #009) | Nice demo but not tracer bullet critical | After core workflow validated |
 | i18n infrastructure (BACKLOG #006) | Premature for NATO pilot | NATO pilot planning begins |
+| Backlog interview capture workflow (BACKLOG #019) | Workflow tooling, doesn't serve tracer bullet themes | After tracer bullet complete, during process refinement |
 
 ## Rejected Items Log
 
