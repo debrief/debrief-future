@@ -2,7 +2,16 @@
  * Plot-related type definitions for the Debrief VS Code Extension
  */
 
-import type { Feature, LineString, Point, FeatureCollection } from 'geojson';
+// GeoJSON geometry types (self-contained to avoid external dependency)
+export interface LineString {
+  type: 'LineString';
+  coordinates: number[][];
+}
+
+export interface Point {
+  type: 'Point';
+  coordinates: number[];
+}
 
 /**
  * A plot from a STAC catalog containing tracks and reference locations
@@ -190,30 +199,39 @@ export interface RecentPlot {
 }
 
 /**
- * GeoJSON Feature for a track
+ * GeoJSON Feature for a track (self-contained to avoid any from geojson)
  */
-export type TrackFeature = Feature<LineString, {
-  id: string;
-  name: string;
-  platformType?: string;
-  times: string[];
-  startTime: string;
-  endTime: string;
-}>;
+export interface TrackFeature {
+  type: 'Feature';
+  geometry: LineString;
+  properties: {
+    id: string;
+    name: string;
+    platformType?: string;
+    times: string[];
+    startTime: string;
+    endTime: string;
+  };
+}
 
 /**
- * GeoJSON Feature for a location
+ * GeoJSON Feature for a location (self-contained to avoid any from geojson)
  */
-export type LocationFeature = Feature<Point, {
-  id: string;
-  name: string;
-  locationType?: string;
-}>;
+export interface LocationFeature {
+  type: 'Feature';
+  geometry: Point;
+  properties: {
+    id: string;
+    name: string;
+    locationType?: string;
+  };
+}
 
 /**
  * GeoJSON FeatureCollection for a plot
  */
-export interface PlotFeatureCollection extends FeatureCollection {
+export interface PlotFeatureCollection {
+  type: 'FeatureCollection';
   features: Array<TrackFeature | LocationFeature>;
 }
 

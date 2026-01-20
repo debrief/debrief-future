@@ -9,7 +9,6 @@ import type {
   WebviewToExtensionMessage,
   Track,
   ReferenceLocation,
-  ResultLayer,
 } from '../messages';
 
 declare function acquireVsCodeApi(): {
@@ -38,9 +37,9 @@ let resultRenderer: ResultRenderer | null = null;
 let selectionManager: SelectionManager | null = null;
 let timeFilter: TimeFilter | null = null;
 
-// State
-let currentTracks: Track[] = [];
-let currentLocations: ReferenceLocation[] = [];
+// State (reserved for future filtering/queries)
+let _currentTracks: Track[] = [];
+let _currentLocations: ReferenceLocation[] = [];
 let currentBbox: [number, number, number, number] | null = null;
 
 /**
@@ -305,8 +304,8 @@ function handleLoadPlot(message: Extract<ExtensionToWebviewMessage, { type: 'loa
   const { plot } = message;
 
   // Store current data
-  currentTracks = plot.tracks;
-  currentLocations = plot.locations;
+  _currentTracks =plot.tracks;
+  _currentLocations =plot.locations;
   currentBbox = plot.bbox;
 
   // Clear existing layers
@@ -335,7 +334,7 @@ function handleLoadPlot(message: Extract<ExtensionToWebviewMessage, { type: 'loa
 function handleUpdateTracks(
   message: Extract<ExtensionToWebviewMessage, { type: 'updateTracks' }>
 ): void {
-  currentTracks = message.tracks;
+  _currentTracks =message.tracks;
   trackRenderer?.renderTracks(message.tracks);
 }
 

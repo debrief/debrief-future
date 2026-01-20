@@ -25,11 +25,12 @@ export function createAddStoreCommand(
       title: 'Select a folder containing a STAC catalog',
     });
 
-    if (!result || result.length === 0) {
+    const selectedUri = result?.[0];
+    if (!selectedUri) {
       return;
     }
 
-    const folderPath = result[0].fsPath;
+    const folderPath = selectedUri.fsPath;
 
     // Validate the folder contains a STAC catalog
     const validation = await vscode.window.withProgress(
@@ -137,11 +138,12 @@ export function createUpdateStorePathCommand(
       defaultUri: vscode.Uri.file(store.path),
     });
 
-    if (!result || result.length === 0) {
+    const selectedUri = result?.[0];
+    if (!selectedUri) {
       return;
     }
 
-    const newPath = result[0].fsPath;
+    const newPath = selectedUri.fsPath;
 
     // Validate the new path
     const validation = await vscode.window.withProgress(

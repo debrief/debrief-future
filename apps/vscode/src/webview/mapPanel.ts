@@ -6,7 +6,6 @@
  */
 
 import * as vscode from 'vscode';
-import * as path from 'path';
 import type { Plot, Track, ReferenceLocation, Selection } from '../types/plot';
 import type { ResultLayer } from '../types/tool';
 import type {
@@ -305,12 +304,16 @@ export class MapPanel {
     let maxLng = -Infinity;
 
     for (const track of selectedTracks) {
-      for (const coord of track.geometry.coordinates) {
-        const [lng, lat] = coord;
-        minLat = Math.min(minLat, lat);
-        maxLat = Math.max(maxLat, lat);
-        minLng = Math.min(minLng, lng);
-        maxLng = Math.max(maxLng, lng);
+      const geom = track.geometry as { coordinates: number[][] };
+      for (const coord of geom.coordinates) {
+        const lng = coord[0];
+        const lat = coord[1];
+        if (typeof lng === 'number' && typeof lat === 'number') {
+          minLat = Math.min(minLat, lat);
+          maxLat = Math.max(maxLat, lat);
+          minLng = Math.min(minLng, lng);
+          maxLng = Math.max(maxLng, lng);
+        }
       }
     }
 
@@ -559,7 +562,7 @@ export class MapPanel {
       details: {
         name: track.name,
         platformType: track.platformType ?? 'Unknown',
-        pointCount: track.geometry.coordinates.length,
+        pointCount: (track.geometry as { coordinates: number[][] }).coordinates.length,
         startTime: track.startTime,
         endTime: track.endTime,
         duration,
@@ -596,8 +599,8 @@ export class MapPanel {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; img-src ${cspSource} data: https:;">
   <title>Debrief Map</title>
-  <link rel="stylesheet" href="${leafletCssUri}">
-  <link rel="stylesheet" href="${stylesUri}">
+  <link rel="stylesheet" href="${leafletCssUri.toString()}">
+  <link rel="stylesheet" href="${stylesUri.toString()}">
 </head>
 <body>
   <div id="map-container">
@@ -609,7 +612,7 @@ export class MapPanel {
       <button id="btn-export" class="toolbar-btn" title="Export PNG">E</button>
     </div>
   </div>
-  <script src="${scriptUri}"></script>
+  <script src="${scriptUri.toString()}"></script>
 </body>
 </html>`;
   }
@@ -621,10 +624,11 @@ export class MapPanel {
 export class MapPanelSerializer implements vscode.WebviewPanelSerializer {
   constructor(private extensionUri: vscode.Uri) {}
 
-  async deserializeWebviewPanel(
+  deserializeWebviewPanel(
     webviewPanel: vscode.WebviewPanel,
     _state: unknown
   ): Promise<void> {
     MapPanel.revive(webviewPanel, this.extensionUri);
+    return Promise.resolve();
   }
 }

@@ -9,7 +9,8 @@ export class LocationRenderer {
   private map: L.Map;
   private locationLayers: Map<string, L.CircleMarker> = new Map();
   private locations: ReferenceLocation[] = [];
-  private selectedIds: Set<string> = new Set();
+  // Reserved for selection highlighting
+  private _selectedIds: Set<string> = new Set();
 
   constructor(map: L.Map) {
     this.map = map;
@@ -43,7 +44,7 @@ export class LocationRenderer {
    * Set selected locations
    */
   setSelectedLocations(selectedIds: Set<string>): void {
-    this.selectedIds = selectedIds;
+    this._selectedIds = selectedIds;
 
     for (const [locationId, marker] of this.locationLayers) {
       const isSelected = selectedIds.has(locationId);

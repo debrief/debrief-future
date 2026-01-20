@@ -8,6 +8,7 @@ import type { StacService } from '../services/stacService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
+import type { TimeRangeViewProvider } from '../views/timeRangeView';
 import { MapPanel } from '../webview/mapPanel';
 import { parseStacUri, buildStacUri } from '../types/stac';
 
@@ -28,6 +29,7 @@ export function createOpenPlotCommand(
   recentPlotsService: RecentPlotsService,
   toolsTreeProvider: ToolsTreeProvider,
   layersTreeProvider: LayersTreeProvider,
+  timeRangeProvider: TimeRangeViewProvider,
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void
 ): (args?: OpenPlotArgs) => Promise<void> {
@@ -98,7 +100,7 @@ export function createOpenPlotCommand(
     if (panel) {
       try {
         // Test if panel is still valid by checking its visibility property
-        const _ = panel.getPanel().visible;
+        void panel.getPanel().visible;
       } catch {
         // Panel is disposed, clear the reference
         panel = undefined;
@@ -128,6 +130,10 @@ export function createOpenPlotCommand(
     layersTreeProvider.setTracks(plotData.tracks);
     layersTreeProvider.setLocations(plotData.locations);
     layersTreeProvider.setResultLayers([]);
+
+    // Update time range panel with plot's time extent
+    const [timeStart, timeEnd] = plot.timeExtent;
+    timeRangeProvider.updateTimeRange(timeStart, timeEnd, timeStart, timeEnd);
 
     // Add to recent plots
     await recentPlotsService.addRecentPlot(

@@ -87,15 +87,19 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
+| 016 | Infrastructure | [Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md) | 3 | 5 | 4 | 12 | Medium | specified |
 | 014 | Feature | [Add styling properties schemas to GeoJSON features](docs/ideas/014-geojson-styling-properties.md) | 5 | 4 | 5 | 14 | Medium | approved |
 | 015 | Infrastructure | [Create LinkML schemas for REP annotation item types](docs/ideas/015-annotation-item-schemas.md) (prerequisite for #007) | 5 | 3 | 5 | 13 | Medium | approved |
 | 007 | Enhancement | [Implement REP file special comments (NARRATIVE, CIRCLE, etc.)](specs/007-rep-special-comments/spec.md) (requires #015) | 4 | 4 | 4 | 12 | Medium | specified |
-| 016 | Infrastructure | [Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md) | 3 | 5 | 4 | 12 | Medium | specified |
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
 | 002 | Feature | Add MCP wrapper for debrief-io service | 4 | 3 | 4 | 11 | Medium | approved |
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | Low | approved |
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | 4 | 2 | 4 | 10 | Low | approved |
+| 017 | Enhancement | [Configure VS Code extension to hide default activities on load](docs/ideas/017-vscode-hide-activities.md) | 3 | 3 | 4 | 10 | Medium | approved |
+| 018 | Infrastructure | [Add VS Code multi-root workspace configuration](docs/ideas/018-vscode-workspace-config.md) | 3 | 1 | 5 | 9 | Low | approved |
+| 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](docs/ideas/019-backlog-interview-capture.md) | 3 | 3 | 5 | 11 | Medium | proposed |
+| 020 | Infrastructure | [Add ELLIPSE and POLYGON annotation schemas](https://github.com/debrief/debrief-future/issues/56) | 3 | 2 | 5 | 10 | Low | proposed |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
 | 001 | Infrastructure | Extract shared MCP utilities into mcp-common package | 3 | 2 | 4 | 9 | Medium | proposed |
 | 010 | Tech Debt | Add rollback/cleanup API to debrief-stac for interrupted operations | 3 | 1 | 4 | 8 | Medium | proposed |
