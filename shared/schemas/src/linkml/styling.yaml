@@ -1,0 +1,153 @@
+id: https://debrief.info/schemas/styling
+name: styling
+title: Debrief Styling Properties
+description: >-
+  Styling schemas for GeoJSON features following Leaflet Path options
+  naming conventions with Debrief-specific extensions.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+  - common
+
+# ============================================================================
+# Styling Classes
+# ============================================================================
+
+classes:
+  PointProperties:
+    description: >-
+      Styling schema for Point and MultiPoint geometries.
+      Follows Leaflet CircleMarker options naming conventions.
+    attributes:
+      shape:
+        description: Marker shape
+        range: PointShapeEnum
+        required: true
+      radius:
+        description: Marker radius in pixels
+        range: float
+        required: true
+        minimum_value: 0
+      fill:
+        description: Whether to fill the shape
+        range: boolean
+      fill_color:
+        description: Fill color (CSS color string)
+        range: CSSColor
+        required: true
+      fill_opacity:
+        description: Fill transparency (0-1)
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+      stroke:
+        description: Whether to draw outline
+        range: boolean
+      color:
+        description: Stroke color (CSS color string)
+        range: CSSColor
+        required: true
+      weight:
+        description: Stroke width in pixels
+        range: float
+        minimum_value: 0
+      opacity:
+        description: Stroke transparency (0-1)
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+
+  LineProperties:
+    description: >-
+      Styling schema for LineString and MultiLineString geometries.
+      Follows Leaflet Polyline options naming conventions.
+    attributes:
+      stroke:
+        description: Whether to draw the line
+        range: boolean
+      color:
+        description: Line color (CSS color string)
+        range: CSSColor
+        required: true
+      weight:
+        description: Line width in pixels
+        range: float
+        minimum_value: 0
+      opacity:
+        description: Line transparency (0-1)
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+      line_cap:
+        description: Line endpoint style
+        range: LineCapEnum
+      line_join:
+        description: Line join style
+        range: LineJoinEnum
+      dash_array:
+        description: Dash pattern (SVG format, e.g., "5, 10")
+        range: string
+
+  PolygonProperties:
+    description: >-
+      Styling schema for Polygon and MultiPolygon geometries.
+      Follows Leaflet Polygon options naming conventions.
+    attributes:
+      fill:
+        description: Whether to fill the polygon
+        range: boolean
+      fill_color:
+        description: Fill color (CSS color string)
+        range: CSSColor
+        required: true
+      fill_opacity:
+        description: Fill transparency (0-1)
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+      stroke:
+        description: Whether to draw border
+        range: boolean
+      color:
+        description: Border color (CSS color string)
+        range: CSSColor
+        required: true
+      weight:
+        description: Border width in pixels
+        range: float
+        minimum_value: 0
+      opacity:
+        description: Border transparency (0-1)
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+      line_cap:
+        description: Border endpoint style
+        range: LineCapEnum
+      line_join:
+        description: Border join style
+        range: LineJoinEnum
+      dash_array:
+        description: Border dash pattern (SVG format, e.g., "5, 10")
+        range: string
+
+  TrackStyle:
+    description: >-
+      Composite styling for TrackFeature, supporting both line path
+      and position markers.
+    attributes:
+      line:
+        description: Styling for the track line path
+        range: LineProperties
+        required: true
+      point:
+        description: Styling for position markers
+        range: PointProperties
+        required: true

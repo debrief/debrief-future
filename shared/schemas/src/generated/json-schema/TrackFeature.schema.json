@@ -87,14 +87,6 @@
           "minItems": 2,
           "type": "array"
         },
-        "color": {
-          "description": "Display color (CSS color string)",
-          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "kind": {
           "$ref": "#/$defs/FeatureKindEnum",
           "const": "CIRCLE",
@@ -119,6 +111,10 @@
             "null"
           ]
         },
+        "style": {
+          "$ref": "#/$defs/PolygonProperties",
+          "description": "Polygon styling properties for the circle area"
+        },
         "symbol": {
           "description": "Display symbol code from REP file",
           "type": [
@@ -130,7 +126,8 @@
       "required": [
         "kind",
         "center",
-        "radius"
+        "radius",
+        "style"
       ],
       "title": "CircleAnnotationProperties",
       "type": "object"
@@ -259,14 +256,6 @@
       "additionalProperties": false,
       "description": "Properties for a LineAnnotation",
       "properties": {
-        "color": {
-          "description": "Display color (CSS color string)",
-          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "kind": {
           "$ref": "#/$defs/FeatureKindEnum",
           "const": "LINE",
@@ -286,6 +275,10 @@
             "null"
           ]
         },
+        "style": {
+          "$ref": "#/$defs/LineProperties",
+          "description": "Line styling properties for the line segment"
+        },
         "symbol": {
           "description": "Display symbol code from REP file",
           "type": [
@@ -295,9 +288,85 @@
         }
       },
       "required": [
-        "kind"
+        "kind",
+        "style"
       ],
       "title": "LineAnnotationProperties",
+      "type": "object"
+    },
+    "LineCapEnum": {
+      "description": "How line endpoints are rendered (SVG/CSS standard)",
+      "enum": [
+        "butt",
+        "round",
+        "square"
+      ],
+      "title": "LineCapEnum",
+      "type": "string"
+    },
+    "LineJoinEnum": {
+      "description": "How line segment joints are rendered (SVG/CSS standard)",
+      "enum": [
+        "miter",
+        "round",
+        "bevel"
+      ],
+      "title": "LineJoinEnum",
+      "type": "string"
+    },
+    "LineProperties": {
+      "additionalProperties": false,
+      "description": "Styling schema for LineString and MultiLineString geometries. Follows Leaflet Polyline options naming conventions.",
+      "properties": {
+        "color": {
+          "description": "Line color (CSS color string)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": "string"
+        },
+        "dash_array": {
+          "description": "Dash pattern (SVG format, e.g., \"5, 10\")",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "line_cap": {
+          "$ref": "#/$defs/LineCapEnum",
+          "description": "Line endpoint style"
+        },
+        "line_join": {
+          "$ref": "#/$defs/LineJoinEnum",
+          "description": "Line join style"
+        },
+        "opacity": {
+          "description": "Line transparency (0-1)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "stroke": {
+          "description": "Whether to draw the line",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "weight": {
+          "description": "Line width in pixels",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "color"
+      ],
+      "title": "LineProperties",
       "type": "object"
     },
     "LocationTypeEnum": {
@@ -354,14 +423,6 @@
       "additionalProperties": false,
       "description": "Properties for a NarrativeEntry annotation",
       "properties": {
-        "color": {
-          "description": "Display color (CSS color string)",
-          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "kind": {
           "$ref": "#/$defs/FeatureKindEnum",
           "const": "NARRATIVE",
@@ -373,6 +434,10 @@
             "string",
             "null"
           ]
+        },
+        "style": {
+          "$ref": "#/$defs/PointProperties",
+          "description": "Point styling properties for display position"
         },
         "symbol": {
           "description": "Display symbol code from REP file",
@@ -401,9 +466,170 @@
       "required": [
         "kind",
         "time",
-        "text"
+        "text",
+        "style"
       ],
       "title": "NarrativeEntryProperties",
+      "type": "object"
+    },
+    "PointProperties": {
+      "additionalProperties": false,
+      "description": "Styling schema for Point and MultiPoint geometries. Follows Leaflet CircleMarker options naming conventions.",
+      "properties": {
+        "color": {
+          "description": "Stroke color (CSS color string)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": "string"
+        },
+        "fill": {
+          "description": "Whether to fill the shape",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "fill_color": {
+          "description": "Fill color (CSS color string)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": "string"
+        },
+        "fill_opacity": {
+          "description": "Fill transparency (0-1)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "opacity": {
+          "description": "Stroke transparency (0-1)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "radius": {
+          "description": "Marker radius in pixels",
+          "minimum": 0,
+          "type": "number"
+        },
+        "shape": {
+          "$ref": "#/$defs/PointShapeEnum",
+          "description": "Marker shape"
+        },
+        "stroke": {
+          "description": "Whether to draw outline",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "weight": {
+          "description": "Stroke width in pixels",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "shape",
+        "radius",
+        "fill_color",
+        "color"
+      ],
+      "title": "PointProperties",
+      "type": "object"
+    },
+    "PointShapeEnum": {
+      "description": "Valid shapes for point markers",
+      "enum": [
+        "circle",
+        "square",
+        "triangle"
+      ],
+      "title": "PointShapeEnum",
+      "type": "string"
+    },
+    "PolygonProperties": {
+      "additionalProperties": false,
+      "description": "Styling schema for Polygon and MultiPolygon geometries. Follows Leaflet Polygon options naming conventions.",
+      "properties": {
+        "color": {
+          "description": "Border color (CSS color string)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": "string"
+        },
+        "dash_array": {
+          "description": "Border dash pattern (SVG format, e.g., \"5, 10\")",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fill": {
+          "description": "Whether to fill the polygon",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "fill_color": {
+          "description": "Fill color (CSS color string)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": "string"
+        },
+        "fill_opacity": {
+          "description": "Fill transparency (0-1)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "line_cap": {
+          "$ref": "#/$defs/LineCapEnum",
+          "description": "Border endpoint style"
+        },
+        "line_join": {
+          "$ref": "#/$defs/LineJoinEnum",
+          "description": "Border join style"
+        },
+        "opacity": {
+          "description": "Border transparency (0-1)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "stroke": {
+          "description": "Whether to draw border",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "weight": {
+          "description": "Border width in pixels",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "fill_color",
+        "color"
+      ],
+      "title": "PolygonProperties",
       "type": "object"
     },
     "RectangleAnnotation": {
@@ -441,14 +667,6 @@
       "additionalProperties": false,
       "description": "Properties for a RectangleAnnotation",
       "properties": {
-        "color": {
-          "description": "Display color (CSS color string)",
-          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "kind": {
           "$ref": "#/$defs/FeatureKindEnum",
           "const": "RECTANGLE",
@@ -468,6 +686,10 @@
             "null"
           ]
         },
+        "style": {
+          "$ref": "#/$defs/PolygonProperties",
+          "description": "Polygon styling properties for the rectangle area"
+        },
         "symbol": {
           "description": "Display symbol code from REP file",
           "type": [
@@ -477,7 +699,8 @@
         }
       },
       "required": [
-        "kind"
+        "kind",
+        "style"
       ],
       "title": "RectangleAnnotationProperties",
       "type": "object"
@@ -517,14 +740,6 @@
       "additionalProperties": false,
       "description": "Properties for a ReferenceLocation",
       "properties": {
-        "color": {
-          "description": "Display color (CSS color string)",
-          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "description": {
           "description": "Additional description",
           "type": [
@@ -544,6 +759,10 @@
         "name": {
           "description": "Reference location name",
           "type": "string"
+        },
+        "style": {
+          "$ref": "#/$defs/PointProperties",
+          "description": "Point styling properties for display"
         },
         "symbol": {
           "description": "Map symbol identifier",
@@ -572,7 +791,8 @@
       "required": [
         "kind",
         "name",
-        "location_type"
+        "location_type",
+        "style"
       ],
       "title": "ReferenceLocationProperties",
       "type": "object"
@@ -612,14 +832,6 @@
       "additionalProperties": false,
       "description": "Properties for a TextAnnotation",
       "properties": {
-        "color": {
-          "description": "Display color (CSS color string)",
-          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "kind": {
           "$ref": "#/$defs/FeatureKindEnum",
           "const": "TEXT",
@@ -631,6 +843,10 @@
             "string",
             "null"
           ]
+        },
+        "style": {
+          "$ref": "#/$defs/PointProperties",
+          "description": "Point styling properties for the text position marker"
         },
         "symbol": {
           "description": "Display symbol code from REP file",
@@ -646,7 +862,8 @@
       },
       "required": [
         "kind",
-        "text"
+        "text",
+        "style"
       ],
       "title": "TextAnnotationProperties",
       "type": "object"
@@ -748,14 +965,6 @@
       "additionalProperties": false,
       "description": "Properties for a TrackFeature",
       "properties": {
-        "color": {
-          "description": "Display color (CSS color string)",
-          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "end_time": {
           "description": "Track end time (ISO8601)",
           "format": "date-time",
@@ -797,6 +1006,10 @@
           "format": "date-time",
           "type": "string"
         },
+        "style": {
+          "$ref": "#/$defs/TrackStyle",
+          "description": "Composite styling for track line and position markers"
+        },
         "track_type": {
           "$ref": "#/$defs/TrackTypeEnum",
           "description": "Type of track"
@@ -808,9 +1021,30 @@
         "track_type",
         "start_time",
         "end_time",
-        "positions"
+        "positions",
+        "style"
       ],
       "title": "TrackProperties",
+      "type": "object"
+    },
+    "TrackStyle": {
+      "additionalProperties": false,
+      "description": "Composite styling for TrackFeature, supporting both line path and position markers.",
+      "properties": {
+        "line": {
+          "$ref": "#/$defs/LineProperties",
+          "description": "Styling for the track line path"
+        },
+        "point": {
+          "$ref": "#/$defs/PointProperties",
+          "description": "Styling for position markers"
+        }
+      },
+      "required": [
+        "line",
+        "point"
+      ],
+      "title": "TrackStyle",
       "type": "object"
     },
     "TrackTypeEnum": {
@@ -865,14 +1099,6 @@
           "minimum": 0,
           "type": "number"
         },
-        "color": {
-          "description": "Display color (CSS color string)",
-          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "kind": {
           "$ref": "#/$defs/FeatureKindEnum",
           "const": "VECTOR",
@@ -906,6 +1132,10 @@
             "null"
           ]
         },
+        "style": {
+          "$ref": "#/$defs/LineProperties",
+          "description": "Line styling properties for the vector"
+        },
         "symbol": {
           "description": "Display symbol code from REP file",
           "type": [
@@ -918,7 +1148,8 @@
         "kind",
         "origin",
         "range",
-        "bearing"
+        "bearing",
+        "style"
       ],
       "title": "VectorAnnotationProperties",
       "type": "object"

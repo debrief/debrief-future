@@ -1,0 +1,13 @@
+{
+  "point": {
+    "shape": "circle",
+    "radius": 4,
+    "fill": true,
+    "fill_color": "#0066CC",
+    "fill_opacity": 1.0,
+    "stroke": true,
+    "color": "#FFFFFF",
+    "weight": 1,
+    "opacity": 1.0
+  }
+}

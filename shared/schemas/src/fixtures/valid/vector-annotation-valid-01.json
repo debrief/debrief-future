@@ -15,6 +15,14 @@
     "bearing": 45.0,
     "label": "Torpedo track",
     "symbol": "@V",
-    "color": "#FF00FF"
+    "style": {
+      "stroke": true,
+      "color": "#FF00FF",
+      "weight": 2,
+      "opacity": 1.0,
+      "line_cap": "round",
+      "line_join": "round",
+      "dash_array": null
+    }
   }
 }

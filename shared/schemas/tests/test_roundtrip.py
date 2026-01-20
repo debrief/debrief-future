@@ -15,7 +15,13 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
-from debrief_schemas import ReferenceLocation
+from debrief_schemas import (
+    LineProperties,
+    PointProperties,
+    PolygonProperties,
+    ReferenceLocation,
+    TrackStyle,
+)
 
 FIXTURES_DIR = Path(__file__).parent.parent / "src" / "fixtures"
 VALID_DIR = FIXTURES_DIR / "valid"
@@ -24,6 +30,11 @@ VALID_DIR = FIXTURES_DIR / "valid"
 # TrackFeature excluded due to LinkML nested array limitation with GeoJSON coordinates
 ROUNDTRIP_ENTITY_MAP = {
     "reference-location": ReferenceLocation,
+    # Styling types (no geometry - safe for round-trip)
+    "point-properties": PointProperties,
+    "line-properties": LineProperties,
+    "polygon-properties": PolygonProperties,
+    "track-style": TrackStyle,
 }
 
 

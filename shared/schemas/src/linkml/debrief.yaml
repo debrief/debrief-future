@@ -17,12 +17,14 @@ default_range: string
 imports:
   - linkml:types
   - common
+  - styling
   - geojson
   - annotations
 
 # Root schema imports all modules - no additional classes needed here.
 # All entity definitions are in their respective module files:
 #   - common.yaml: Enums, base types (TimestampedPosition)
+#   - styling.yaml: PointProperties, LineProperties, PolygonProperties, TrackStyle
 #   - geojson.yaml: TrackFeature, ReferenceLocation
 #   - annotations.yaml: NarrativeEntry, CircleAnnotation, RectangleAnnotation,
 #                       LineAnnotation, TextAnnotation, VectorAnnotation

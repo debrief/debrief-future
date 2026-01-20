@@ -52,6 +52,42 @@ export enum LocationTypeEnum {
     /** Generic reference point */
     REFERENCE = "REFERENCE",
 };
+/**
+* Valid shapes for point markers
+*/
+export enum PointShapeEnum {
+    
+    /** Filled/stroked circle (default marker) */
+    circle = "circle",
+    /** Filled/stroked square (reference points) */
+    square = "square",
+    /** Filled/stroked triangle (directional indicators) */
+    triangle = "triangle",
+};
+/**
+* How line endpoints are rendered (SVG/CSS standard)
+*/
+export enum LineCapEnum {
+    
+    /** Flat edge at endpoint */
+    butt = "butt",
+    /** Semicircle at endpoint */
+    round = "round",
+    /** Square projection beyond endpoint */
+    square = "square",
+};
+/**
+* How line segment joints are rendered (SVG/CSS standard)
+*/
+export enum LineJoinEnum {
+    
+    /** Sharp corner (default) */
+    miter = "miter",
+    /** Rounded corner */
+    round = "round",
+    /** Flat corner */
+    bevel = "bevel",
+};
 
 
 /**
@@ -68,6 +104,90 @@ export interface TimestampedPosition {
     course?: number,
     /** Speed in knots */
     speed?: number,
+}
+
+
+/**
+ * Styling schema for Point and MultiPoint geometries. Follows Leaflet CircleMarker options naming conventions.
+ */
+export interface PointProperties {
+    /** Marker shape */
+    shape: string,
+    /** Marker radius in pixels */
+    radius: number,
+    /** Whether to fill the shape */
+    fill?: boolean,
+    /** Fill color (CSS color string) */
+    fill_color: string,
+    /** Fill transparency (0-1) */
+    fill_opacity?: number,
+    /** Whether to draw outline */
+    stroke?: boolean,
+    /** Stroke color (CSS color string) */
+    color: string,
+    /** Stroke width in pixels */
+    weight?: number,
+    /** Stroke transparency (0-1) */
+    opacity?: number,
+}
+
+
+/**
+ * Styling schema for LineString and MultiLineString geometries. Follows Leaflet Polyline options naming conventions.
+ */
+export interface LineProperties {
+    /** Whether to draw the line */
+    stroke?: boolean,
+    /** Line color (CSS color string) */
+    color: string,
+    /** Line width in pixels */
+    weight?: number,
+    /** Line transparency (0-1) */
+    opacity?: number,
+    /** Line endpoint style */
+    line_cap?: string,
+    /** Line join style */
+    line_join?: string,
+    /** Dash pattern (SVG format, e.g., "5, 10") */
+    dash_array?: string,
+}
+
+
+/**
+ * Styling schema for Polygon and MultiPolygon geometries. Follows Leaflet Polygon options naming conventions.
+ */
+export interface PolygonProperties {
+    /** Whether to fill the polygon */
+    fill?: boolean,
+    /** Fill color (CSS color string) */
+    fill_color: string,
+    /** Fill transparency (0-1) */
+    fill_opacity?: number,
+    /** Whether to draw border */
+    stroke?: boolean,
+    /** Border color (CSS color string) */
+    color: string,
+    /** Border width in pixels */
+    weight?: number,
+    /** Border transparency (0-1) */
+    opacity?: number,
+    /** Border endpoint style */
+    line_cap?: string,
+    /** Border join style */
+    line_join?: string,
+    /** Border dash pattern (SVG format, e.g., "5, 10") */
+    dash_array?: string,
+}
+
+
+/**
+ * Composite styling for TrackFeature, supporting both line path and position markers.
+ */
+export interface TrackStyle {
+    /** Styling for the track line path */
+    line: LineProperties,
+    /** Styling for position markers */
+    point: PointProperties,
 }
 
 
@@ -124,8 +244,8 @@ export interface TrackProperties {
     positions: TimestampedPosition[],
     /** Original source file path */
     source_file?: string,
-    /** Display color (CSS color string) */
-    color?: string,
+    /** Composite styling for track line and position markers */
+    style: TrackStyle,
 }
 
 
@@ -160,8 +280,8 @@ export interface ReferenceLocationProperties {
     description?: string,
     /** Map symbol identifier */
     symbol?: string,
-    /** Display color (CSS color string) */
-    color?: string,
+    /** Point styling properties for display */
+    style: PointProperties,
     /** Start of validity period */
     valid_from?: string,
     /** End of validity period */
@@ -198,8 +318,8 @@ export interface NarrativeEntryProperties {
     track_id?: string,
     /** Display symbol code from REP file */
     symbol?: string,
-    /** Display color (CSS color string) */
-    color?: string,
+    /** Point styling properties for display position */
+    style: PointProperties,
     /** Original source file path */
     source_file?: string,
 }
@@ -234,8 +354,8 @@ export interface CircleAnnotationProperties {
     label?: string,
     /** Display symbol code from REP file */
     symbol?: string,
-    /** Display color (CSS color string) */
-    color?: string,
+    /** Polygon styling properties for the circle area */
+    style: PolygonProperties,
     /** Original source file path */
     source_file?: string,
 }
@@ -266,8 +386,8 @@ export interface RectangleAnnotationProperties {
     label?: string,
     /** Display symbol code from REP file */
     symbol?: string,
-    /** Display color (CSS color string) */
-    color?: string,
+    /** Polygon styling properties for the rectangle area */
+    style: PolygonProperties,
     /** Original source file path */
     source_file?: string,
 }
@@ -298,8 +418,8 @@ export interface LineAnnotationProperties {
     label?: string,
     /** Display symbol code from REP file */
     symbol?: string,
-    /** Display color (CSS color string) */
-    color?: string,
+    /** Line styling properties for the line segment */
+    style: LineProperties,
     /** Original source file path */
     source_file?: string,
 }
@@ -330,8 +450,8 @@ export interface TextAnnotationProperties {
     text: string,
     /** Display symbol code from REP file */
     symbol?: string,
-    /** Display color (CSS color string) */
-    color?: string,
+    /** Point styling properties for the text position marker */
+    style: PointProperties,
     /** Original source file path */
     source_file?: string,
 }
@@ -368,8 +488,8 @@ export interface VectorAnnotationProperties {
     label?: string,
     /** Display symbol code from REP file */
     symbol?: string,
-    /** Display color (CSS color string) */
-    color?: string,
+    /** Line styling properties for the vector */
+    style: LineProperties,
     /** Original source file path */
     source_file?: string,
 }

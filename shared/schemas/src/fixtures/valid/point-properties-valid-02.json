@@ -1,0 +1,11 @@
+{
+  "shape": "square",
+  "radius": 8,
+  "fill": true,
+  "fill_color": "blue",
+  "fill_opacity": 1.0,
+  "stroke": true,
+  "color": "white",
+  "weight": 1,
+  "opacity": 0.9
+}
