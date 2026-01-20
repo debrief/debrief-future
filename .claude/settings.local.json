@@ -31,7 +31,9 @@
       "Bash(pnpm lint:*)",
       "Bash(git pull:*)",
       "Bash(pnpm exec tsc:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr edit:*)"
     ]
   }
 }
