@@ -35,7 +35,9 @@
       "Bash(gh pr view:*)",
       "Bash(gh pr edit:*)",
       "Skill(speckit.specify)",
-      "Bash(.specify/scripts/bash/create-new-feature.sh:*)"
+      "Bash(.specify/scripts/bash/create-new-feature.sh:*)",
+      "Bash(.specify/scripts/bash/update-agent-context.sh:*)",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)"
     ]
   }
 }
