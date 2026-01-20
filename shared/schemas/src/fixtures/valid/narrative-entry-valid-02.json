@@ -6,6 +6,17 @@
     "kind": "NARRATIVE",
     "time": "1995-12-12T06:22:00Z",
     "text": "POSSUB TRACK 14",
-    "track_id": "NELSON"
+    "track_id": "NELSON",
+    "style": {
+      "shape": "circle",
+      "radius": 4,
+      "fill": true,
+      "fill_color": "#999999",
+      "fill_opacity": 0.5,
+      "stroke": false,
+      "color": "#000000",
+      "weight": 0,
+      "opacity": 0
+    }
   }
 }

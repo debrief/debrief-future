@@ -11,6 +11,16 @@
     "text": "COMEX SERIAL 16D",
     "track_id": "NELSON",
     "symbol": "@N",
-    "color": "#FFCC00"
+    "style": {
+      "shape": "circle",
+      "radius": 4,
+      "fill": true,
+      "fill_color": "#FFCC00",
+      "fill_opacity": 1.0,
+      "stroke": true,
+      "color": "#000000",
+      "weight": 1,
+      "opacity": 1.0
+    }
   }
 }

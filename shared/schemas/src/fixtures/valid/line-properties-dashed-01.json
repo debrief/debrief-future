@@ -1,0 +1,9 @@
+{
+  "stroke": true,
+  "color": "#FF0000",
+  "weight": 3,
+  "opacity": 0.9,
+  "line_cap": "butt",
+  "line_join": "miter",
+  "dash_array": "10, 5"
+}

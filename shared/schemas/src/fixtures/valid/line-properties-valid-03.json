@@ -1,0 +1,9 @@
+{
+  "stroke": false,
+  "color": "hsl(120, 100%, 50%)",
+  "weight": 0,
+  "opacity": 0,
+  "line_cap": "square",
+  "line_join": "bevel",
+  "dash_array": "5, 5, 10, 5"
+}

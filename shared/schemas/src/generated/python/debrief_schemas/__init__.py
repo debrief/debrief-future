@@ -85,7 +85,7 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
                     'reference locations. This is a tracer bullet implementation '
                     'covering core entity types.',
      'id': 'https://debrief.info/schemas/debrief',
-     'imports': ['linkml:types', 'common', 'geojson', 'annotations'],
+     'imports': ['linkml:types', 'common', 'styling', 'geojson', 'annotations'],
      'name': 'debrief',
      'prefixes': {'debrief': {'prefix_prefix': 'debrief',
                               'prefix_reference': 'https://debrief.info/schemas/'},
@@ -186,6 +186,60 @@ class LocationTypeEnum(str, Enum):
     """
 
 
+class PointShapeEnum(str, Enum):
+    """
+    Valid shapes for point markers
+    """
+    circle = "circle"
+    """
+    Filled/stroked circle (default marker)
+    """
+    square = "square"
+    """
+    Filled/stroked square (reference points)
+    """
+    triangle = "triangle"
+    """
+    Filled/stroked triangle (directional indicators)
+    """
+
+
+class LineCapEnum(str, Enum):
+    """
+    How line endpoints are rendered (SVG/CSS standard)
+    """
+    butt = "butt"
+    """
+    Flat edge at endpoint
+    """
+    round = "round"
+    """
+    Semicircle at endpoint
+    """
+    square = "square"
+    """
+    Square projection beyond endpoint
+    """
+
+
+class LineJoinEnum(str, Enum):
+    """
+    How line segment joints are rendered (SVG/CSS standard)
+    """
+    miter = "miter"
+    """
+    Sharp corner (default)
+    """
+    round = "round"
+    """
+    Rounded corner
+    """
+    bevel = "bevel"
+    """
+    Flat corner
+    """
+
+
 
 class TimestampedPosition(ConfiguredBaseModel):
     """
@@ -201,6 +255,66 @@ class TimestampedPosition(ConfiguredBaseModel):
     depth: Optional[float] = Field(default=None, description="""Depth in meters (negative = below surface)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition']} })
     course: Optional[float] = Field(default=None, description="""Course in degrees (0-360)""", ge=0, le=360, json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition']} })
     speed: Optional[float] = Field(default=None, description="""Speed in knots""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition']} })
+
+
+class PointProperties(ConfiguredBaseModel):
+    """
+    Styling schema for Point and MultiPoint geometries. Follows Leaflet CircleMarker options naming conventions.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/styling'})
+
+    shape: PointShapeEnum = Field(default=..., description="""Marker shape""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties']} })
+    radius: float = Field(default=..., description="""Marker radius in pixels""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'CircleAnnotationProperties']} })
+    fill: Optional[bool] = Field(default=None, description="""Whether to fill the shape""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'PolygonProperties']} })
+    fill_color: str = Field(default=..., description="""Fill color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'PolygonProperties']} })
+    fill_opacity: Optional[float] = Field(default=None, description="""Fill transparency (0-1)""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'PolygonProperties']} })
+    stroke: Optional[bool] = Field(default=None, description="""Whether to draw outline""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    color: str = Field(default=..., description="""Stroke color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    weight: Optional[float] = Field(default=None, description="""Stroke width in pixels""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    opacity: Optional[float] = Field(default=None, description="""Stroke transparency (0-1)""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+
+
+class LineProperties(ConfiguredBaseModel):
+    """
+    Styling schema for LineString and MultiLineString geometries. Follows Leaflet Polyline options naming conventions.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/styling'})
+
+    stroke: Optional[bool] = Field(default=None, description="""Whether to draw the line""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    color: str = Field(default=..., description="""Line color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    weight: Optional[float] = Field(default=None, description="""Line width in pixels""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    opacity: Optional[float] = Field(default=None, description="""Line transparency (0-1)""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    line_cap: Optional[LineCapEnum] = Field(default=None, description="""Line endpoint style""", json_schema_extra = { "linkml_meta": {'domain_of': ['LineProperties', 'PolygonProperties']} })
+    line_join: Optional[LineJoinEnum] = Field(default=None, description="""Line join style""", json_schema_extra = { "linkml_meta": {'domain_of': ['LineProperties', 'PolygonProperties']} })
+    dash_array: Optional[str] = Field(default=None, description="""Dash pattern (SVG format, e.g., \"5, 10\")""", json_schema_extra = { "linkml_meta": {'domain_of': ['LineProperties', 'PolygonProperties']} })
+
+
+class PolygonProperties(ConfiguredBaseModel):
+    """
+    Styling schema for Polygon and MultiPolygon geometries. Follows Leaflet Polygon options naming conventions.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/styling'})
+
+    fill: Optional[bool] = Field(default=None, description="""Whether to fill the polygon""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'PolygonProperties']} })
+    fill_color: str = Field(default=..., description="""Fill color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'PolygonProperties']} })
+    fill_opacity: Optional[float] = Field(default=None, description="""Fill transparency (0-1)""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'PolygonProperties']} })
+    stroke: Optional[bool] = Field(default=None, description="""Whether to draw border""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    color: str = Field(default=..., description="""Border color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    weight: Optional[float] = Field(default=None, description="""Border width in pixels""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    opacity: Optional[float] = Field(default=None, description="""Border transparency (0-1)""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    line_cap: Optional[LineCapEnum] = Field(default=None, description="""Border endpoint style""", json_schema_extra = { "linkml_meta": {'domain_of': ['LineProperties', 'PolygonProperties']} })
+    line_join: Optional[LineJoinEnum] = Field(default=None, description="""Border join style""", json_schema_extra = { "linkml_meta": {'domain_of': ['LineProperties', 'PolygonProperties']} })
+    dash_array: Optional[str] = Field(default=None, description="""Border dash pattern (SVG format, e.g., \"5, 10\")""", json_schema_extra = { "linkml_meta": {'domain_of': ['LineProperties', 'PolygonProperties']} })
+
+
+class TrackStyle(ConfiguredBaseModel):
+    """
+    Composite styling for TrackFeature, supporting both line path and position markers.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/styling'})
+
+    line: LineProperties = Field(default=..., description="""Styling for the track line path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackStyle']} })
+    point: PointProperties = Field(default=..., description="""Styling for position markers""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackStyle']} })
 
 
 class GeoJSONPoint(ConfiguredBaseModel):
@@ -303,7 +417,7 @@ class TrackProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties']} })
-    color: Optional[str] = Field(default=None, description="""Display color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    style: TrackStyle = Field(default=..., description="""Composite styling for track line and position markers""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
@@ -383,7 +497,7 @@ class ReferenceLocationProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties']} })
-    color: Optional[str] = Field(default=None, description="""Display color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    style: PointProperties = Field(default=..., description="""Point styling properties for display""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
@@ -464,7 +578,7 @@ class NarrativeEntryProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties']} })
-    color: Optional[str] = Field(default=None, description="""Display color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    style: PointProperties = Field(default=..., description="""Point styling properties for display position""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
@@ -541,7 +655,7 @@ class CircleAnnotationProperties(ConfiguredBaseModel):
                        'VectorAnnotationProperties'],
          'equals_string': 'CIRCLE'} })
     center: list[float] = Field(default=..., description="""Circle center as [longitude, latitude] for precise reconstruction""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['CircleAnnotationProperties']} })
-    radius: float = Field(default=..., description="""Circle radius in meters for precise reconstruction""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['CircleAnnotationProperties']} })
+    radius: float = Field(default=..., description="""Circle radius in meters for precise reconstruction""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'CircleAnnotationProperties']} })
     label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
@@ -553,7 +667,7 @@ class CircleAnnotationProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties']} })
-    color: Optional[str] = Field(default=None, description="""Display color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    style: PolygonProperties = Field(default=..., description="""Polygon styling properties for the circle area""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
@@ -640,7 +754,7 @@ class RectangleAnnotationProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties']} })
-    color: Optional[str] = Field(default=None, description="""Display color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    style: PolygonProperties = Field(default=..., description="""Polygon styling properties for the rectangle area""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
@@ -727,7 +841,7 @@ class LineAnnotationProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties']} })
-    color: Optional[str] = Field(default=None, description="""Display color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    style: LineProperties = Field(default=..., description="""Line styling properties for the line segment""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
@@ -811,7 +925,7 @@ class TextAnnotationProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties']} })
-    color: Optional[str] = Field(default=None, description="""Display color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    style: PointProperties = Field(default=..., description="""Point styling properties for the text position marker""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
@@ -901,7 +1015,7 @@ class VectorAnnotationProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties']} })
-    color: Optional[str] = Field(default=None, description="""Display color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    style: LineProperties = Field(default=..., description="""Line styling properties for the vector""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
@@ -965,6 +1079,10 @@ class VectorAnnotation(ConfiguredBaseModel):
 # Model rebuild
 # see https://pydantic-docs.helpmanual.io/usage/models/#rebuilding-a-model
 TimestampedPosition.model_rebuild()
+PointProperties.model_rebuild()
+LineProperties.model_rebuild()
+PolygonProperties.model_rebuild()
+TrackStyle.model_rebuild()
 GeoJSONPoint.model_rebuild()
 GeoJSONLineString.model_rebuild()
 GeoJSONPolygon.model_rebuild()

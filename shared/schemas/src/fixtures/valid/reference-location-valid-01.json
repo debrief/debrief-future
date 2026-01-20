@@ -10,6 +10,17 @@
     "name": "Alpha Waypoint",
     "location_type": "WAYPOINT",
     "description": "Start of exercise track",
-    "symbol": "waypoint-circle"
+    "symbol": "waypoint-circle",
+    "style": {
+      "shape": "circle",
+      "radius": 6,
+      "fill": true,
+      "fill_color": "#FF5733",
+      "fill_opacity": 0.8,
+      "stroke": true,
+      "color": "#000000",
+      "weight": 2,
+      "opacity": 1.0
+    }
   }
 }

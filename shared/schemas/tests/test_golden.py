@@ -26,11 +26,15 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "pyt
 from debrief_schemas import (
     CircleAnnotation,
     LineAnnotation,
+    LineProperties,
     NarrativeEntry,
+    PointProperties,
+    PolygonProperties,
     RectangleAnnotation,
     ReferenceLocation,
     TextAnnotation,
     TrackFeature,
+    TrackStyle,
     VectorAnnotation,
 )
 
@@ -50,6 +54,11 @@ ENTITY_MAP = {
     "line-annotation": LineAnnotation,
     "text-annotation": TextAnnotation,
     "vector-annotation": VectorAnnotation,
+    # Styling types
+    "point-properties": PointProperties,
+    "line-properties": LineProperties,
+    "polygon-properties": PolygonProperties,
+    "track-style": TrackStyle,
 }
 
 
