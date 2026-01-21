@@ -41,7 +41,11 @@
       "Bash(python scripts/generate.py:*)",
       "Bash(pip install:*)",
       "Bash(python -m pytest:*)",
-      "Bash(pytest:*)"
+      "Bash(pytest:*)",
+      "Bash(bash:*)",
+      "Bash(SPECIFY_FEATURE=\"007-rep-special-comments\" bash:*)",
+      "WebFetch(domain:debrief.github.io)",
+      "Skill(speckit.pr)"
     ]
   }
 }
