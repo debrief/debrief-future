@@ -272,6 +272,7 @@ class PointProperties(ConfiguredBaseModel):
     color: str = Field(default=..., description="""Stroke color (CSS color string)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
     weight: Optional[float] = Field(default=None, description="""Stroke width in pixels""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
     opacity: Optional[float] = Field(default=None, description="""Stroke transparency (0-1)""", ge=0, le=1, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'LineProperties', 'PolygonProperties']} })
+    legacy_style: Optional[str] = Field(default=None, description="""Legacy symbol name from Debrief symbology (e.g., 'Aircraft', 'torpedo'). Preserved for future icon rendering support.""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties']} })
 
 
 class LineProperties(ConfiguredBaseModel):
