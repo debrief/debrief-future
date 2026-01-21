@@ -63,6 +63,11 @@ classes:
         range: float
         minimum_value: 0
         maximum_value: 1
+      legacy_style:
+        description: >-
+          Legacy symbol name from Debrief symbology (e.g., 'Aircraft', 'torpedo').
+          Preserved for future icon rendering support.
+        range: string
 
   LineProperties:
     description: >-

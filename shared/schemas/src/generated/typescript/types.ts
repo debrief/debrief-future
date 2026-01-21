@@ -129,6 +129,8 @@ export interface PointProperties {
     weight?: number,
     /** Stroke transparency (0-1) */
     opacity?: number,
+    /** Legacy symbol name from Debrief symbology (e.g., 'Aircraft', 'torpedo'). Preserved for future icon rendering support. */
+    legacy_style?: string,
 }
 
 

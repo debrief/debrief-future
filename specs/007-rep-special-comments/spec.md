@@ -11,6 +11,13 @@
 
 - Q: Where are the annotation Pydantic models located? → A: In `shared/schemas/` package (`shared/schemas/src/linkml/annotations.yaml` with fixtures in `shared/schemas/src/fixtures/`). Schemas were completed in PR #49.
 
+### Session 2026-01-21
+
+- Q: How should the parser populate the required `style` property on annotations given that symbol decoding is deferred to the UI layer? → A: Map symbol codes to concrete styles during parsing (e.g., color code A → blue). Add an optional `legacyStyle` attribute to PointProperties to preserve symbol names (e.g., 'Aircraft', 'Fishing') for future implementation. Reference: https://debrief.github.io/tutorial/reference.html#replay_symbology
+- Q: What should happen when the parser encounters an unrecognized symbol code (e.g., `@Z`) not in the A-Q symbology table? → A: Fail-fast with error. Report filename, line number, and description of the issue so the analyst can fix the source data.
+- Q: Where should the `shapes.rep` reference file (mentioned in SC-001) be sourced from for testing? → A: Copy to local fixtures as a snapshot. The REP format is legacy and stable; local copy in test fixtures is sufficient.
+- Q: What default style should be applied when an annotation has no symbol code? → A: Fail-fast. Missing symbol code is an error; all annotations must have explicit styling in the source data.
+
 ## User Scenarios & Testing
 
 ### User Story 1 - Parse Narrative Annotations (Priority: P1)
@@ -140,13 +147,17 @@ An analyst loads a REP file with both track positions and annotations. The exist
 ### Edge Cases
 
 - What happens when a special comment has invalid or malformed syntax?
-  - Invalid annotations produce warnings but do not fail the parse; processing continues
+  - Parser fails with error including filename, line number, and description; analyst must fix source data
 - What happens when coordinates are out of valid range (latitude > 90 or longitude > 180)?
-  - A warning is recorded with the line number; the annotation is skipped
+  - Parser fails with error including filename, line number, and invalid coordinate values
 - What happens when a DYNAMIC shape name is missing quotes?
-  - Treated as malformed; warning recorded and annotation skipped
+  - Parser fails with error indicating missing quotes and the line location
+- What happens when an unknown symbol code is encountered (e.g., `@Z`)?
+  - Parser fails with error listing the unknown code and valid options (A-Q)
+- What happens when a symbol code is missing from an annotation?
+  - Parser fails with error; all annotations must have explicit symbol codes for styling
 - What happens when an unknown special comment prefix is encountered (e.g., `;CUSTOM:`)?
-  - Unknown prefixes are silently ignored (treated as regular comments)
+  - Unknown prefixes are silently ignored (treated as regular comments) — this is not an error
 - What happens when a label contains newline escape sequences (e.g., `test\npoly`)?
   - The escape sequence is preserved in the label for downstream handling
 - What happens when timestamps have varying precision (HHMMSS vs HHMMSS.SSS)?
@@ -162,15 +173,18 @@ An analyst loads a REP file with both track positions and annotations. The exist
 - **FR-004**: System MUST produce GeoJSON features that conform to the annotation schemas in `shared/schemas/src/linkml/annotations.yaml`
 - **FR-005**: System MUST preserve existing track parsing behavior with no changes to track output
 - **FR-006**: System MUST include provenance data (source file path and line number) for each parsed annotation
-- **FR-007**: System MUST record warnings for malformed annotations without failing the overall parse
+- **FR-007**: System MUST fail-fast on invalid data (unknown symbol codes, malformed syntax) with clear error messages including filename, line number, and issue description
 - **FR-008**: System MUST handle timestamps in both HHMMSS and HHMMSS.SSS formats
 - **FR-009**: System MUST parse quoted names in DYNAMIC annotations (e.g., `"Zone Alpha"`)
 - **FR-010**: System MUST validate parsed annotations against Pydantic models before including in output
+- **FR-011**: System MUST map REP color codes (A-Q) to concrete CSS color values using the Debrief symbology table
+- **FR-012**: System MUST preserve legacy symbol names (e.g., 'Aircraft', 'Submarine', 'Fishing') in the `legacyStyle` property when SYMBOL attribute is present, enabling future icon rendering
+- **FR-013**: System MUST require explicit symbol codes on all annotations; missing symbol codes cause parse failure
 
 ### Key Entities
 
 - **Annotation**: A geographic or temporal marker extracted from a special comment, containing geometry (if applicable), properties (symbol, label, layer), and provenance
-- **Symbol**: Styling information encoded in `@X[...]` notation, including color code, layer assignment, and symbol type
+- **Symbol**: Styling information encoded in `@X[...]` notation, including color code (mapped to CSS color), layer assignment, and symbol type (preserved as `legacyStyle`)
 - **Narrative Entry**: A timestamped text record associated with a track, capturing operator observations
 - **Dynamic Shape**: A named shape with multiple time-indexed positions, representing movement over time
 - **Sensor Contact**: A detection record with bearing, range, type, and optional position
@@ -183,7 +197,7 @@ An analyst loads a REP file with both track positions and annotations. The exist
 - **SC-001**: Parser correctly extracts 100% of annotations from the upstream `shapes.rep` reference file
 - **SC-002**: Track parsing regression tests pass with identical output to baseline
 - **SC-003**: All parsed annotations validate against `debrief-schemas` Pydantic models without errors
-- **SC-004**: Malformed annotations produce clear warnings including line numbers
+- **SC-004**: Malformed annotations cause parse failure with clear error messages including filename, line number, and issue description
 - **SC-005**: Parser processes REP files within 10% of current performance (minimal overhead)
 - **SC-006**: Coordinate parsing handles all hemisphere combinations (N/S/E/W) and boundary values (poles, dateline)
 - **SC-007**: Symbol parsing correctly extracts layer and symbol type from all documented attribute formats
@@ -191,8 +205,8 @@ An analyst loads a REP file with both track positions and annotations. The exist
 ## Assumptions
 
 - **A-001**: Annotation schemas in `shared/schemas/src/linkml/annotations.yaml` are complete (confirmed: PR #49 merged)
-- **A-002**: The upstream `shapes.rep` file from Debrief repository represents the canonical set of annotation formats
-- **A-003**: Symbol color/style decoding is deferred to the UI layer; this parser preserves raw symbol codes
+- **A-002**: The `shapes.rep` reference file (snapshot from upstream Debrief repository) represents the canonical set of annotation formats; stored locally in test fixtures since the REP format is legacy and stable
+- **A-003**: Parser maps REP symbol codes to concrete styling properties using the Debrief symbology table (https://debrief.github.io/tutorial/reference.html#replay_symbology); legacy symbol names are preserved in `legacyStyle` for future UI support
 - **A-004**: Annotation editing and creation are out of scope; this is parse-only functionality
 - **A-005**: Custom or organization-specific annotation types are out of scope
 - **A-006**: STAC storage strategy for annotations will be determined separately
@@ -200,6 +214,7 @@ An analyst loads a REP file with both track positions and annotations. The exist
 ## Dependencies
 
 - **Uses**: `debrief-schemas` package - annotation Pydantic models generated from LinkML (PR #49 complete)
+- **Uses**: `debrief-schemas` styling schemas (PR #58 complete) - requires adding optional `legacyStyle` attribute to PointProperties
 - **Extends**: Item 002 - debrief-io service (REP handler already exists)
 - **Enables**: Full REP file support in tracer bullet demonstration
 
@@ -209,4 +224,4 @@ An analyst loads a REP file with both track positions and annotations. The exist
 - STAC storage strategy for annotations
 - Annotation editing/creation (parse only)
 - Custom/organization-specific annotation types
-- Symbol color/style decoding (preserve raw codes, decode in UI layer)
+- Full legacy symbol rendering (e.g., 'Aircraft', 'Fishing' icons) — symbol names preserved in `legacyStyle` for future implementation

@@ -8,10 +8,44 @@ All exceptions include context for better error messages:
 
 from __future__ import annotations
 
+from enum import Enum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pydantic import ValidationError as PydanticValidationError
+
+
+class ErrorCode(str, Enum):
+    """Error codes for programmatic error handling.
+
+    Used to categorize parse errors for automated processing.
+    """
+
+    # General parse errors
+    PARSE_ERROR = "PARSE_ERROR"
+    UNKNOWN_RECORD = "UNKNOWN_RECORD"
+
+    # Coordinate errors
+    INVALID_COORD = "INVALID_COORD"
+    INVALID_LATITUDE = "INVALID_LATITUDE"
+    INVALID_LONGITUDE = "INVALID_LONGITUDE"
+
+    # Symbol errors
+    INVALID_SYMBOL = "INVALID_SYMBOL"
+    MISSING_SYMBOL = "MISSING_SYMBOL"
+    UNKNOWN_COLOR_CODE = "UNKNOWN_COLOR_CODE"
+
+    # Timestamp errors
+    INVALID_TIMESTAMP = "INVALID_TIMESTAMP"
+    INVALID_DATE = "INVALID_DATE"
+    INVALID_TIME = "INVALID_TIME"
+
+    # Annotation-specific errors
+    MISSING_QUOTED_NAME = "MISSING_QUOTED_NAME"
+    INVALID_RADIUS = "INVALID_RADIUS"
+    INVALID_BEARING = "INVALID_BEARING"
+    INVALID_RANGE = "INVALID_RANGE"
+    INSUFFICIENT_VERTICES = "INSUFFICIENT_VERTICES"
 
 
 class ParseError(Exception):
@@ -24,6 +58,8 @@ class ParseError(Exception):
         message: Error description
         line_number: Line where error occurred (optional)
         field: Field that caused error (optional)
+        code: Error code for programmatic handling (optional)
+        filename: Source filename (optional)
     """
 
     def __init__(
@@ -31,18 +67,57 @@ class ParseError(Exception):
         message: str,
         line_number: int | None = None,
         field: str | None = None,
+        code: ErrorCode | None = None,
+        filename: str | None = None,
     ) -> None:
         super().__init__(message)
         self.message = message
         self.line_number = line_number
         self.field = field
+        self.code = code
+        self.filename = filename
 
     def __str__(self) -> str:
         parts = [self.message]
         if self.line_number is not None:
             parts.append(f"(line {self.line_number})")
+        if self.filename is not None:
+            parts.append(f"in {self.filename}")
         if self.field is not None:
             parts.append(f"[field: {self.field}]")
+        return " ".join(parts)
+
+
+class AnnotationParseError(ParseError):
+    """Error parsing annotation from REP file special comment.
+
+    Fail-fast error raised when annotation data is invalid.
+    Includes context for analyst to fix source data.
+
+    Attributes:
+        annotation_type: Type of annotation being parsed (e.g., "CIRCLE", "NARRATIVE")
+    """
+
+    def __init__(
+        self,
+        message: str,
+        line_number: int | None = None,
+        code: ErrorCode | None = None,
+        filename: str | None = None,
+        annotation_type: str | None = None,
+    ) -> None:
+        super().__init__(message, line_number, None, code, filename)
+        self.annotation_type = annotation_type
+
+    def __str__(self) -> str:
+        parts = []
+        if self.annotation_type:
+            parts.append(f"[{self.annotation_type}]")
+        parts.append(self.message)
+        if self.line_number is not None:
+            parts.append(f"at line {self.line_number}")
+        if self.filename is not None:
+            parts.append(f"in {self.filename}")
         return " ".join(parts)
 
 

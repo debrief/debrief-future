@@ -490,6 +490,13 @@
             "null"
           ]
         },
+        "legacy_style": {
+          "description": "Legacy symbol name from Debrief symbology (e.g., 'Aircraft', 'torpedo'). Preserved for future icon rendering support.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "opacity": {
           "description": "Stroke transparency (0-1)",
           "maximum": 1,
