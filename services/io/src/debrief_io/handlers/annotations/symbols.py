@@ -32,9 +32,13 @@ FILL_STYLES = {
 
 # Full symbol pattern supporting all formats
 # Note: Color code is [A-Z] to catch invalid codes - validation happens separately
+# Formats:
+# - @A, @A@00, @A[LAYER=x] (standard)
+# - aA, aA@00, aA[LAYER=x] (SVG-style, lowercase prefix)
+# - 0A, 1A[LAYER=x] (digit prefix for buoy/icon types)
 SYMBOL_PATTERN = re.compile(
     r"^"
-    r"([a-zA-Z@])"  # Symbol prefix (@ or letter for SVG)
+    r"([a-zA-Z@\d])"  # Symbol prefix (@ or letter or digit)
     r"([A-Z])"  # Color code (accepts any uppercase, validated later)
     r"(?:([A-E@])(\d)(\d))?"  # Optional: line style + thickness + fill
     r"(?:\[([^\]]+)\])?"  # Optional: [LAYER=x,SYMBOL=y]
@@ -196,8 +200,9 @@ def extract_symbol_from_line(line: str) -> str | None:
                 return part[:end_idx]
 
         # Check for SVG-style symbol (lowercase letter followed by color code)
-        elif len(part) >= 2 and part[0].islower() and part[1] in VALID_COLOR_CODES:
-            # Similar logic for SVG style
+        # or digit-prefix symbol (digit followed by color code)
+        elif len(part) >= 2 and (part[0].islower() or part[0].isdigit()) and part[1] in VALID_COLOR_CODES:
+            # Similar logic for SVG style and digit-prefix style
             if "[" in part:
                 close = part.find("]")
                 if close != -1:
