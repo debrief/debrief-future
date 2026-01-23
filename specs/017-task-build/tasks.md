@@ -154,7 +154,7 @@
 
 - [x] T027 Update CI workflow to install Task `arduino/setup-task@v2` `.github/workflows/ci.yml`
 - [x] T028 Replace direct uv/pnpm calls with task commands `.github/workflows/ci.yml`
-- [ ] T029 Verify CI passes with task commands (verify after PR push)
+- [x] T029 Verify CI passes with task commands (verify after PR push)
 
 **Checkpoint**: CI uses identical commands to local development
 
