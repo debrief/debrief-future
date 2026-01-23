@@ -1,0 +1,43 @@
+{
+  "folders": [
+    {
+      "name": "Apps (Electron, VS Code)",
+      "path": "apps"
+    },
+    {
+      "name": "Demo Environment",
+      "path": "demo"
+    },
+    {
+      "name": "Documentation",
+      "path": "docs"
+    },
+    {
+      "name": "Services (Python)",
+      "path": "services"
+    },
+    {
+      "name": "Shared (Schemas, Components)",
+      "path": "shared"
+    },
+    {
+      "name": "Specifications",
+      "path": "specs"
+    },
+    {
+      "name": "Tests",
+      "path": "tests"
+    }
+  ],
+  "settings": {},
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "charliermarsh.ruff",
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "linkml.linkml"
+    ]
+  }
+}
