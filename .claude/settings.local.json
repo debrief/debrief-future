@@ -57,9 +57,25 @@
       "Bash(task lint:*)",
       "Bash(task clean:*)",
       "Bash(task:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(uv run ruff:*)",
+      "Bash(pnpm --filter @debrief/components add:*)",
+      "Bash(pnpm --filter @debrief/components lint:*)",
+      "Bash(grep:*)",
+      "Bash(uv pip list:*)",
+      "Bash(uv pip install:*)",
+      "Bash(uvx ruff:*)"
       "Bash(gh pr list:*)",
       "Bash(gh pr close:*)",
-      "Bash(pnpm build:*)"
+      "Bash(pnpm build:*)",
+      "Bash(pnpm electron:dev:*)",
+      "Bash(git worktree:*)",
+      "Bash(pnpm approve-builds:*)",
+      "Bash(jq:*)",
+      "Bash(pnpm rebuild:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:code.visualstudio.com)"
     ]
   }
 }
