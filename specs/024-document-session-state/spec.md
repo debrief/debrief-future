@@ -105,6 +105,7 @@ An analyst makes changes to the session state. The editor indicates when there a
 - **FR-002**: System MUST organize state into four logical slices: temporal, spatial, features, and document
 - **FR-003**: UI components MUST be able to subscribe to specific state slices or subsets for reactive updates
 - **FR-004**: System MUST support selective subscriptions to minimize unnecessary component updates
+- **FR-004a**: System MUST automatically create a session with default state when a GeoJSON FeatureCollection is opened in the map editor
 
 **Temporal State**
 
@@ -185,6 +186,7 @@ An analyst makes changes to the session state. The editor indicates when there a
 ### Session 2026-01-23
 
 - Q: How can state management be verified without full UI/Python infrastructure? → A: Unit-testable core - State management logic verifiable through programmatic tests without UI; integration tests added later
+- Q: How should opening a GeoJSON FeatureCollection relate to session state? → A: Auto-initialize - Opening a GeoJSON FeatureCollection in the map editor automatically creates a session with default state
 
 ## Success Criteria *(mandatory)*
 
