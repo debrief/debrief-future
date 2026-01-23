@@ -85,3 +85,28 @@ Each decision should include:
 - ✅ Works offline
 - ❌ Less familiar to some developers
 - ❌ File-based, not queryable like SQL
+
+### ADR-004: Feature Kind Discriminator (2026-01-15)
+
+**Context:**
+- GeoJSON `type` field only indicates geometry type, not semantic type
+- A `LineString` could be track, annotation, measurement, or sensor arc
+- Inferring type by checking for specific fields is fragile
+
+**Decision:**
+- Add required `kind` field to `properties` of all GeoJSON Features
+- Use `FeatureKindEnum` with values mapping 1:1 to property schemas
+- Initial values: `TRACK`, `POINT`
+
+**Alternatives Considered:**
+- Geometry-based inference → Rejected: ambiguous, multiple semantic types share geometry
+- Check for type-specific fields → Rejected: fragile, no single dispatch point
+- Hierarchical category + subtype → Rejected: over-engineered
+- Wrapper object → Rejected: breaks GeoJSON conventions
+
+**Consequences:**
+- ✅ Single-field dispatch for type handling
+- ✅ Schema validation per kind
+- ✅ Clear extension point for new feature types
+- ❌ Required on all features, no gradual adoption
+- ❌ Migration burden for existing data
