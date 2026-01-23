@@ -1,0 +1,11 @@
+{
+  "shape": "triangle",
+  "radius": 0,
+  "fill": false,
+  "fill_color": "rgb(255, 0, 0)",
+  "fill_opacity": 0,
+  "stroke": false,
+  "color": "rgba(0, 0, 0, 0.5)",
+  "weight": 0,
+  "opacity": 0
+}

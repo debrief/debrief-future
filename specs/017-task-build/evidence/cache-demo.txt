@@ -1,0 +1,30 @@
+=== Fresh Install (after clean) ===
+task: [clean] rm -rf dist/ .task/ .pytest_cache/ .ruff_cache/
+task: [clean] rm -rf **/dist/ **/.pytest_cache/ **/__pycache__/
+task: [clean] rm -rf node_modules/.cache/
+
+First run:
+task: [install] uv sync
+Resolved 123 packages in 22ms
+Audited 17 packages in 5ms
+task: [install] pnpm install
+Scope: all 6 workspace projects
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+╭ Warning ─────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Ignored build scripts: @vscode/vsce-sign, electron, esbuild, keytar.       │
+│   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+Done in 588ms using pnpm v10.14.0
+task install 2>&1  2.64s user 6.72s system 105% cpu 8.862 total
+
+=== Cached Run (no changes) ===
+
+Second run:
+task: Task "install" is up to date
+task install 2>&1  1.87s user 6.27s system 107% cpu 7.558 total

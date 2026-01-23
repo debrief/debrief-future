@@ -16,6 +16,7 @@ default_range: string
 imports:
   - linkml:types
   - common
+  - styling
   - geojson
 
 # ============================================================================
@@ -42,9 +43,10 @@ classes:
         description: Associated track identifier (optional)
       symbol:
         description: Display symbol code from REP file
-      color:
-        description: Display color (CSS color string)
-        range: CSSColor
+      style:
+        description: Point styling properties for display position
+        range: PointProperties
+        required: true
       source_file:
         description: Original source file path
 
@@ -99,9 +101,10 @@ classes:
         description: Annotation label text
       symbol:
         description: Display symbol code from REP file
-      color:
-        description: Display color (CSS color string)
-        range: CSSColor
+      style:
+        description: Polygon styling properties for the circle area
+        range: PolygonProperties
+        required: true
       source_file:
         description: Original source file path
 
@@ -144,9 +147,10 @@ classes:
         description: Annotation label text
       symbol:
         description: Display symbol code from REP file
-      color:
-        description: Display color (CSS color string)
-        range: CSSColor
+      style:
+        description: Polygon styling properties for the rectangle area
+        range: PolygonProperties
+        required: true
       source_file:
         description: Original source file path
 
@@ -188,9 +192,10 @@ classes:
         description: Annotation label text
       symbol:
         description: Display symbol code from REP file
-      color:
-        description: Display color (CSS color string)
-        range: CSSColor
+      style:
+        description: Line styling properties for the line segment
+        range: LineProperties
+        required: true
       source_file:
         description: Original source file path
 
@@ -233,9 +238,10 @@ classes:
         required: true
       symbol:
         description: Display symbol code from REP file
-      color:
-        description: Display color (CSS color string)
-        range: CSSColor
+      style:
+        description: Point styling properties for the text position marker
+        range: PointProperties
+        required: true
       source_file:
         description: Original source file path
 
@@ -295,9 +301,10 @@ classes:
         description: Annotation label text
       symbol:
         description: Display symbol code from REP file
-      color:
-        description: Display color (CSS color string)
-        range: CSSColor
+      style:
+        description: Line styling properties for the vector
+        range: LineProperties
+        required: true
       source_file:
         description: Original source file path
 

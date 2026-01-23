@@ -21,6 +21,27 @@
       {"time": "2026-01-09T11:00:00Z", "coordinates": [-4.9, 50.1], "course": 45, "speed": 12},
       {"time": "2026-01-09T12:00:00Z", "coordinates": [-4.8, 50.2], "course": 45, "speed": 12}
     ],
-    "color": "#0066CC"
+    "style": {
+      "line": {
+        "stroke": true,
+        "color": "#0066CC",
+        "weight": 2,
+        "opacity": 1.0,
+        "line_cap": "round",
+        "line_join": "round",
+        "dash_array": null
+      },
+      "point": {
+        "shape": "circle",
+        "radius": 4,
+        "fill": true,
+        "fill_color": "#0066CC",
+        "fill_opacity": 1.0,
+        "stroke": true,
+        "color": "#FFFFFF",
+        "weight": 1,
+        "opacity": 1.0
+      }
+    }
   }
 }
