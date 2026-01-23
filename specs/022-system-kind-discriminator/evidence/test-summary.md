@@ -7,7 +7,7 @@
 ## Test Results
 
 ```
-======================== 53 passed, 6 warnings in 0.14s ========================
+======================== 124 passed, 6 warnings in 0.73s ========================
 ```
 
 ### SYSTEM State Fixtures Tested
