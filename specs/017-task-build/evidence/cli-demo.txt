@@ -1,0 +1,9 @@
+task: Available tasks for this project:
+* build:          Build all artifacts (Python wheels + TypeScript bundles)
+* clean:          Remove build artifacts and caches
+* default:        Show available tasks
+* dev:            Start development watch mode
+* install:        Install all dependencies (Python + Node.js)
+* lint:           Check code style (Python + TypeScript)
+* test:           Run all tests (Python + TypeScript)
+* lint:fix:       Auto-fix code style issues
