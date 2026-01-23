@@ -52,7 +52,7 @@ export function createExecuteToolCommand(
         title: `Running ${args.toolName}...`,
         cancellable: true,
       },
-      async (progress, token) => {
+      async (_progress, token) => {
         token.onCancellationRequested(() => {
           calcService.cancelExecution();
         });

@@ -9,6 +9,16 @@
     "kind": "TEXT",
     "text": "waypoint alpha",
     "symbol": "@E",
-    "color": "#FFFFFF"
+    "style": {
+      "shape": "circle",
+      "radius": 0,
+      "fill": false,
+      "fill_color": "#FFFFFF",
+      "fill_opacity": 0,
+      "stroke": false,
+      "color": "#FFFFFF",
+      "weight": 0,
+      "opacity": 0
+    }
   }
 }

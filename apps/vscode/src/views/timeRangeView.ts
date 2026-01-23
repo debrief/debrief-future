@@ -29,12 +29,12 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlContent();
 
-    webviewView.webview.onDidReceiveMessage((message) => {
+    webviewView.webview.onDidReceiveMessage((message: { type: string; start?: string; end?: string }) => {
       switch (message.type) {
         case 'setTimeRange':
           void vscode.commands.executeCommand('debrief.setTimeRange', {
-            start: message.start as string,
-            end: message.end as string,
+            start: message.start,
+            end: message.end,
           });
           break;
         case 'resetTimeRange':

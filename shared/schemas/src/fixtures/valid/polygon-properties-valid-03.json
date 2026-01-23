@@ -1,0 +1,12 @@
+{
+  "fill": true,
+  "fill_color": "rgba(255, 0, 0, 0.5)",
+  "fill_opacity": 0.5,
+  "stroke": true,
+  "color": "#990000",
+  "weight": 1,
+  "opacity": 1.0,
+  "line_cap": "square",
+  "line_join": "bevel",
+  "dash_array": "10, 5"
+}

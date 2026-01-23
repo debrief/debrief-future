@@ -2,8 +2,29 @@
  * Tool-related type definitions for the Debrief VS Code Extension
  */
 
-import type { FeatureCollection } from 'geojson';
 import type { SelectionContextType, FeatureKind } from './plot';
+
+// Type-safe properties to avoid any from geojson
+type SafeProperties = Record<string, unknown> | null;
+
+// Self-contained geometry type to avoid any
+interface SafeGeometry {
+  type: string;
+  coordinates: unknown;
+}
+
+// Self-contained feature type to avoid any from geojson Feature
+interface SafeFeature {
+  type: 'Feature';
+  geometry: SafeGeometry;
+  properties: SafeProperties;
+}
+
+// Self-contained FeatureCollection type to avoid any from geojson
+interface SafeFeatureCollection {
+  type: 'FeatureCollection';
+  features: SafeFeature[];
+}
 
 /**
  * An analysis tool from debrief-calc
@@ -107,7 +128,7 @@ export interface ResultLayer {
   executionId: string;
 
   /** GeoJSON FeatureCollection of results */
-  features: FeatureCollection;
+  features: SafeFeatureCollection;
 
   /** Layer styling configuration */
   style: LayerStyle;
@@ -147,7 +168,7 @@ export interface ToolExecutionResult {
   success: boolean;
 
   /** Result features (if success) */
-  features?: FeatureCollection;
+  features?: SafeFeatureCollection;
 
   /** Error message (if failed) */
   error?: string;

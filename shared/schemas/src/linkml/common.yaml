@@ -68,6 +68,36 @@ enums:
       REFERENCE:
         description: Generic reference point
 
+  PointShapeEnum:
+    description: Valid shapes for point markers
+    permissible_values:
+      circle:
+        description: Filled/stroked circle (default marker)
+      square:
+        description: Filled/stroked square (reference points)
+      triangle:
+        description: Filled/stroked triangle (directional indicators)
+
+  LineCapEnum:
+    description: How line endpoints are rendered (SVG/CSS standard)
+    permissible_values:
+      butt:
+        description: Flat edge at endpoint
+      round:
+        description: Semicircle at endpoint
+      square:
+        description: Square projection beyond endpoint
+
+  LineJoinEnum:
+    description: How line segment joints are rendered (SVG/CSS standard)
+    permissible_values:
+      miter:
+        description: Sharp corner (default)
+      round:
+        description: Rounded corner
+      bevel:
+        description: Flat corner
+
 # ============================================================================
 # Types
 # ============================================================================

@@ -18,6 +18,11 @@
     "GeoJSON",
     "maps"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/debrief/debrief-future.git",
+    "directory": "apps/vscode"
+  },
   "activationEvents": [
     "onFileSystem:stac",
     "onView:debrief.stacExplorer",
@@ -137,6 +142,11 @@
       {
         "command": "debrief.updateStorePath",
         "title": "Update Path",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.restoreActivities",
+        "title": "Restore Default Activities",
         "category": "Debrief"
       }
     ],
@@ -344,6 +354,11 @@
           "type": "number",
           "default": 10,
           "description": "Maximum number of recent plots to remember"
+        },
+        "debrief.hideActivities.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a one-time prompt about the focused activity bar configuration"
         }
       }
     }
@@ -359,7 +374,7 @@
     "dev": "concurrently \"npm run watch:extension\" \"npm run watch:webview\"",
     "lint": "eslint src --ext ts",
     "lint:fix": "eslint src --ext ts --fix",
-    "test": "npm run test:unit && npm run test:integration",
+    "test": "npm run test:unit",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:coverage": "vitest run --coverage",

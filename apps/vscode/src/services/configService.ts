@@ -234,13 +234,14 @@ export class ConfigService {
     }
   }
 
-  private async saveConfig(): Promise<void> {
+  private saveConfig(): Promise<void> {
     try {
       this.ensureConfigDir();
       fs.writeFileSync(CONFIG_FILE, JSON.stringify(this.config, null, 2));
+      return Promise.resolve();
     } catch (err) {
       console.error('Failed to save config:', err);
-      throw err;
+      return Promise.reject(err);
     }
   }
 

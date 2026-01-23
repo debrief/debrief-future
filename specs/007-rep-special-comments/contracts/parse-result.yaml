@@ -1,0 +1,484 @@
+# Parse Result Contract
+# Defines the structure returned by the parse() function
+
+openapi: 3.0.3
+info:
+  title: debrief-io Parse Result
+  version: 0.2.0
+  description: |
+    Contract for the ParseResult returned by debrief-io parse operations.
+    Extended to include annotation features from REP special comments.
+
+components:
+  schemas:
+    ParseResult:
+      type: object
+      required:
+        - features
+        - handler
+        - parse_time_ms
+        - encoding
+        - warnings
+      properties:
+        features:
+          type: array
+          description: GeoJSON Features (tracks and annotations)
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/TrackFeature'
+              - $ref: '#/components/schemas/AnnotationFeature'
+        handler:
+          type: string
+          description: Handler name that processed the file
+          example: "REPHandler"
+        parse_time_ms:
+          type: number
+          description: Time to parse in milliseconds
+          example: 45.2
+        encoding:
+          type: string
+          description: Character encoding detected/used
+          example: "utf-8"
+        warnings:
+          type: array
+          description: Parse warnings (empty on success due to fail-fast)
+          items:
+            $ref: '#/components/schemas/ParseWarning'
+
+    ParseWarning:
+      type: object
+      required:
+        - message
+        - code
+      properties:
+        message:
+          type: string
+          description: Human-readable warning message
+        line_number:
+          type: integer
+          nullable: true
+          description: Source file line number
+        field:
+          type: string
+          nullable: true
+          description: Field that caused the warning
+        code:
+          type: string
+          description: Warning code for programmatic handling
+          enum:
+            - PARSE_ERROR
+            - UNKNOWN_RECORD
+            - INVALID_COORD
+            - INVALID_SYMBOL
+            - MISSING_SYMBOL
+            - INVALID_TIMESTAMP
+
+    TrackFeature:
+      type: object
+      description: Existing track feature (unchanged)
+      required:
+        - type
+        - id
+        - geometry
+        - properties
+      properties:
+        type:
+          type: string
+          enum: ["Feature"]
+        id:
+          type: string
+          format: uuid
+        geometry:
+          $ref: '#/components/schemas/LineStringGeometry'
+        properties:
+          $ref: '#/components/schemas/TrackProperties'
+
+    TrackProperties:
+      type: object
+      required:
+        - kind
+        - platform_id
+        - source_file
+      properties:
+        kind:
+          type: string
+          enum: ["TRACK"]
+        platform_id:
+          type: string
+        platform_name:
+          type: string
+        track_type:
+          type: string
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        source_file:
+          type: string
+
+    AnnotationFeature:
+      type: object
+      description: Annotation feature from special comment
+      required:
+        - type
+        - id
+        - properties
+      properties:
+        type:
+          type: string
+          enum: ["Feature"]
+        id:
+          type: string
+          format: uuid
+        geometry:
+          oneOf:
+            - $ref: '#/components/schemas/PointGeometry'
+            - $ref: '#/components/schemas/LineStringGeometry'
+            - $ref: '#/components/schemas/PolygonGeometry'
+            - type: "null"
+        properties:
+          oneOf:
+            - $ref: '#/components/schemas/NarrativeProperties'
+            - $ref: '#/components/schemas/CircleProperties'
+            - $ref: '#/components/schemas/RectangleProperties'
+            - $ref: '#/components/schemas/LineProperties'
+            - $ref: '#/components/schemas/VectorProperties'
+            - $ref: '#/components/schemas/TextProperties'
+
+    # Geometry Types
+    PointGeometry:
+      type: object
+      required:
+        - type
+        - coordinates
+      properties:
+        type:
+          type: string
+          enum: ["Point"]
+        coordinates:
+          type: array
+          items:
+            type: number
+          minItems: 2
+          maxItems: 2
+          description: "[longitude, latitude]"
+
+    LineStringGeometry:
+      type: object
+      required:
+        - type
+        - coordinates
+      properties:
+        type:
+          type: string
+          enum: ["LineString"]
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+            minItems: 2
+            maxItems: 2
+          minItems: 2
+
+    PolygonGeometry:
+      type: object
+      required:
+        - type
+        - coordinates
+      properties:
+        type:
+          type: string
+          enum: ["Polygon"]
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              type: array
+              items:
+                type: number
+              minItems: 2
+              maxItems: 2
+
+    # Annotation Property Types
+    NarrativeProperties:
+      type: object
+      required:
+        - kind
+        - time
+        - text
+        - style
+        - source_file
+      properties:
+        kind:
+          type: string
+          enum: ["NARRATIVE"]
+        time:
+          type: string
+          format: date-time
+        text:
+          type: string
+        track_id:
+          type: string
+          nullable: true
+        symbol:
+          type: string
+        style:
+          $ref: '#/components/schemas/PointStyle'
+        source_file:
+          type: string
+        line_number:
+          type: integer
+
+    CircleProperties:
+      type: object
+      required:
+        - kind
+        - center
+        - radius
+        - style
+        - source_file
+      properties:
+        kind:
+          type: string
+          enum: ["CIRCLE"]
+        center:
+          type: array
+          items:
+            type: number
+          minItems: 2
+          maxItems: 2
+          description: "[longitude, latitude]"
+        radius:
+          type: number
+          description: Radius in meters
+          minimum: 0
+        label:
+          type: string
+          nullable: true
+        symbol:
+          type: string
+        style:
+          $ref: '#/components/schemas/PolygonStyle'
+        source_file:
+          type: string
+        line_number:
+          type: integer
+
+    RectangleProperties:
+      type: object
+      required:
+        - kind
+        - style
+        - source_file
+      properties:
+        kind:
+          type: string
+          enum: ["RECTANGLE"]
+        label:
+          type: string
+          nullable: true
+        symbol:
+          type: string
+        style:
+          $ref: '#/components/schemas/PolygonStyle'
+        source_file:
+          type: string
+        line_number:
+          type: integer
+
+    LineProperties:
+      type: object
+      required:
+        - kind
+        - style
+        - source_file
+      properties:
+        kind:
+          type: string
+          enum: ["LINE"]
+        label:
+          type: string
+          nullable: true
+        symbol:
+          type: string
+        style:
+          $ref: '#/components/schemas/LineStyle'
+        source_file:
+          type: string
+        line_number:
+          type: integer
+
+    VectorProperties:
+      type: object
+      required:
+        - kind
+        - origin
+        - range
+        - bearing
+        - style
+        - source_file
+      properties:
+        kind:
+          type: string
+          enum: ["VECTOR"]
+        origin:
+          type: array
+          items:
+            type: number
+          minItems: 2
+          maxItems: 2
+          description: "[longitude, latitude]"
+        range:
+          type: number
+          description: Range in meters
+          minimum: 0
+        bearing:
+          type: number
+          description: Bearing in degrees (0-360)
+          minimum: 0
+          maximum: 360
+        label:
+          type: string
+          nullable: true
+        symbol:
+          type: string
+        style:
+          $ref: '#/components/schemas/LineStyle'
+        source_file:
+          type: string
+        line_number:
+          type: integer
+
+    TextProperties:
+      type: object
+      required:
+        - kind
+        - text
+        - style
+        - source_file
+      properties:
+        kind:
+          type: string
+          enum: ["TEXT"]
+        text:
+          type: string
+        symbol:
+          type: string
+        style:
+          $ref: '#/components/schemas/PointStyle'
+        source_file:
+          type: string
+        line_number:
+          type: integer
+
+    # Styling Schemas (from debrief-schemas)
+    PointStyle:
+      type: object
+      required:
+        - shape
+        - radius
+        - fill_color
+        - color
+      properties:
+        shape:
+          type: string
+          enum: ["circle", "square", "triangle", "diamond"]
+        radius:
+          type: number
+          minimum: 0
+        fill:
+          type: boolean
+        fill_color:
+          type: string
+          description: CSS color string
+        fill_opacity:
+          type: number
+          minimum: 0
+          maximum: 1
+        stroke:
+          type: boolean
+        color:
+          type: string
+          description: CSS color string
+        weight:
+          type: number
+          minimum: 0
+        opacity:
+          type: number
+          minimum: 0
+          maximum: 1
+        legacy_style:
+          type: string
+          nullable: true
+          description: Legacy symbol name (e.g., 'Aircraft', 'torpedo')
+
+    LineStyle:
+      type: object
+      required:
+        - color
+      properties:
+        stroke:
+          type: boolean
+        color:
+          type: string
+          description: CSS color string
+        weight:
+          type: number
+          minimum: 0
+        opacity:
+          type: number
+          minimum: 0
+          maximum: 1
+        line_cap:
+          type: string
+          enum: ["butt", "round", "square"]
+        line_join:
+          type: string
+          enum: ["miter", "round", "bevel"]
+        dash_array:
+          type: string
+          nullable: true
+          description: SVG dash pattern
+
+    PolygonStyle:
+      type: object
+      required:
+        - fill_color
+        - color
+      properties:
+        fill:
+          type: boolean
+        fill_color:
+          type: string
+          description: CSS color string
+        fill_opacity:
+          type: number
+          minimum: 0
+          maximum: 1
+        stroke:
+          type: boolean
+        color:
+          type: string
+          description: CSS color string
+        weight:
+          type: number
+          minimum: 0
+        opacity:
+          type: number
+          minimum: 0
+          maximum: 1
+        line_cap:
+          type: string
+          enum: ["butt", "round", "square"]
+        line_join:
+          type: string
+          enum: ["miter", "round", "bevel"]
+        dash_array:
+          type: string
+          nullable: true
+          description: SVG dash pattern

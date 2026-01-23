@@ -10,12 +10,19 @@ import { StacService } from './services/stacService';
 import { ConfigService } from './services/configService';
 import { CalcService } from './services/calcService';
 import { RecentPlotsService } from './services/recentPlotsService';
+import { ActivityBarService } from './services/activityBarService';
 import { registerCommands } from './commands';
+import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 
 let mapPanel: MapPanel | undefined;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  console.log('Debrief extension activating...');
+  // Extension activation begins
+
+  // Initialize activity bar service early (before tree providers)
+  // This hides non-essential activities on first activation
+  const activityBarService = new ActivityBarService(context);
+  await activityBarService.applyDefaults();
 
   // Initialize services
   const configService = new ConfigService();
@@ -37,13 +44,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const toolsTreeProvider = new ToolsTreeProvider(calcService);
   const layersTreeProvider = new LayersTreeProvider();
   const outlineProvider = new OutlineProvider();
-  const timeRangeViewProvider = new TimeRangeViewProvider(context.extensionUri);
+  const timeRangeProvider = new TimeRangeViewProvider(context.extensionUri);
 
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
     vscode.window.registerTreeDataProvider('debrief.tools', toolsTreeProvider),
     vscode.window.registerTreeDataProvider('debrief.layers', layersTreeProvider),
-    vscode.window.registerWebviewViewProvider('debrief.timeRange', timeRangeViewProvider)
+    vscode.window.registerWebviewViewProvider('debrief.timeRange', timeRangeProvider)
   );
 
   // Register outline provider for selection
@@ -64,12 +71,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     stacTreeProvider,
     toolsTreeProvider,
     layersTreeProvider,
+    timeRangeProvider,
     () => mapPanel,
     (panel) => {
       mapPanel = panel;
     }
   );
   context.subscriptions.push(...commands);
+
+  // Register activity bar restore command
+  context.subscriptions.push(createRestoreActivitiesCommand(activityBarService));
 
   // Set initial context
   await vscode.commands.executeCommand('setContext', 'debrief.plotOpen', false);
@@ -85,9 +96,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // Graceful degradation - tools won't be available but extension works
   });
 
-  console.log('Debrief extension activated');
+  // Extension activation complete
 }
 
 export function deactivate(): void {
-  console.log('Debrief extension deactivated');
+  // Extension deactivation
 }

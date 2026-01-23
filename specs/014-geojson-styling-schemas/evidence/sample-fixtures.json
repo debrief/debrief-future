@@ -1,0 +1,78 @@
+{
+  "point_properties_example": {
+    "shape": "circle",
+    "radius": 6,
+    "fill": true,
+    "fill_color": "#FF5733",
+    "fill_opacity": 0.8,
+    "stroke": true,
+    "color": "#000000",
+    "weight": 2,
+    "opacity": 1.0
+  },
+  "line_properties_example": {
+    "stroke": true,
+    "color": "#0066CC",
+    "weight": 3,
+    "opacity": 1.0,
+    "line_cap": "round",
+    "line_join": "round",
+    "dash_array": null
+  },
+  "polygon_properties_example": {
+    "fill": true,
+    "fill_color": "#FFCC00",
+    "fill_opacity": 0.3,
+    "stroke": true,
+    "color": "#FF9900",
+    "weight": 2,
+    "opacity": 1.0,
+    "line_cap": "round",
+    "line_join": "round",
+    "dash_array": "10, 5"
+  },
+  "track_style_example": {
+    "line": {
+      "stroke": true,
+      "color": "#0066CC",
+      "weight": 2,
+      "opacity": 1.0,
+      "line_cap": "round",
+      "line_join": "round",
+      "dash_array": null
+    },
+    "point": {
+      "shape": "circle",
+      "radius": 4,
+      "fill": true,
+      "fill_color": "#0066CC",
+      "fill_opacity": 1.0,
+      "stroke": true,
+      "color": "#FFFFFF",
+      "weight": 1,
+      "opacity": 1.0
+    }
+  },
+  "track_style_tactical_hostile": {
+    "line": {
+      "stroke": true,
+      "color": "#FF0000",
+      "weight": 3,
+      "opacity": 0.9,
+      "line_cap": "butt",
+      "line_join": "miter",
+      "dash_array": "10, 5"
+    },
+    "point": {
+      "shape": "triangle",
+      "radius": 6,
+      "fill": true,
+      "fill_color": "#FF0000",
+      "fill_opacity": 1.0,
+      "stroke": true,
+      "color": "#FFFFFF",
+      "weight": 1,
+      "opacity": 1.0
+    }
+  }
+}

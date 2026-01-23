@@ -19,6 +19,28 @@
       {"time": "2026-01-09T10:30:00Z", "coordinates": [-6.0, 51.0]},
       {"time": "2026-01-09T11:30:00Z", "coordinates": [-5.8, 51.2], "depth": -50}
     ],
-    "source_file": "contact_alpha.rep"
+    "source_file": "contact_alpha.rep",
+    "style": {
+      "line": {
+        "stroke": true,
+        "color": "#FF0000",
+        "weight": 2,
+        "opacity": 0.8,
+        "line_cap": "butt",
+        "line_join": "miter",
+        "dash_array": "10, 5"
+      },
+      "point": {
+        "shape": "triangle",
+        "radius": 5,
+        "fill": true,
+        "fill_color": "#FF0000",
+        "fill_opacity": 0.8,
+        "stroke": true,
+        "color": "#FFFFFF",
+        "weight": 1,
+        "opacity": 1.0
+      }
+    }
   }
 }

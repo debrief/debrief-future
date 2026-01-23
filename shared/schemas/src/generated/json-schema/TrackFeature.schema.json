@@ -43,11 +43,106 @@
   "title": "TrackFeature",
   "type": "object",
   "$defs": {
+    "CircleAnnotation": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature for circle annotations. Geometry is a Polygon approximating the circle (vertices at regular intervals). Properties contain center and radius for precise reconstruction and smooth rendering.",
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONPolygon",
+          "description": "Circle as Polygon (approximated with vertices, e.g., every 45 degrees)"
+        },
+        "id": {
+          "description": "Unique identifier",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/CircleAnnotationProperties",
+          "description": "Circle metadata including center and radius for reconstruction"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "CircleAnnotation",
+      "type": "object"
+    },
+    "CircleAnnotationProperties": {
+      "additionalProperties": false,
+      "description": "Properties for a CircleAnnotation",
+      "properties": {
+        "center": {
+          "description": "Circle center as [longitude, latitude] for precise reconstruction",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "CIRCLE",
+          "description": "Feature type discriminator"
+        },
+        "label": {
+          "description": "Annotation label text",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "radius": {
+          "description": "Circle radius in meters for precise reconstruction",
+          "minimum": 0,
+          "type": "number"
+        },
+        "source_file": {
+          "description": "Original source file path",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "style": {
+          "$ref": "#/$defs/PolygonProperties",
+          "description": "Polygon styling properties for the circle area"
+        },
+        "symbol": {
+          "description": "Display symbol code from REP file",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "center",
+        "radius",
+        "style"
+      ],
+      "title": "CircleAnnotationProperties",
+      "type": "object"
+    },
     "FeatureKindEnum": {
       "description": "Discriminator for GeoJSON feature types",
       "enum": [
         "TRACK",
-        "POINT"
+        "POINT",
+        "NARRATIVE",
+        "CIRCLE",
+        "RECTANGLE",
+        "LINE",
+        "TEXT",
+        "VECTOR"
       ],
       "title": "FeatureKindEnum",
       "type": "string"
@@ -126,6 +221,154 @@
       "title": "GeoJSONPolygon",
       "type": "object"
     },
+    "LineAnnotation": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature for line segment annotations. Geometry is a LineString with 2 points (start and end).",
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONLineString",
+          "description": "Line as LineString (2 points)"
+        },
+        "id": {
+          "description": "Unique identifier",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/LineAnnotationProperties",
+          "description": "Line metadata"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "LineAnnotation",
+      "type": "object"
+    },
+    "LineAnnotationProperties": {
+      "additionalProperties": false,
+      "description": "Properties for a LineAnnotation",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "LINE",
+          "description": "Feature type discriminator"
+        },
+        "label": {
+          "description": "Annotation label text",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_file": {
+          "description": "Original source file path",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "style": {
+          "$ref": "#/$defs/LineProperties",
+          "description": "Line styling properties for the line segment"
+        },
+        "symbol": {
+          "description": "Display symbol code from REP file",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "style"
+      ],
+      "title": "LineAnnotationProperties",
+      "type": "object"
+    },
+    "LineCapEnum": {
+      "description": "How line endpoints are rendered (SVG/CSS standard)",
+      "enum": [
+        "butt",
+        "round",
+        "square"
+      ],
+      "title": "LineCapEnum",
+      "type": "string"
+    },
+    "LineJoinEnum": {
+      "description": "How line segment joints are rendered (SVG/CSS standard)",
+      "enum": [
+        "miter",
+        "round",
+        "bevel"
+      ],
+      "title": "LineJoinEnum",
+      "type": "string"
+    },
+    "LineProperties": {
+      "additionalProperties": false,
+      "description": "Styling schema for LineString and MultiLineString geometries. Follows Leaflet Polyline options naming conventions.",
+      "properties": {
+        "color": {
+          "description": "Line color (CSS color string)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": "string"
+        },
+        "dash_array": {
+          "description": "Dash pattern (SVG format, e.g., \"5, 10\")",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "line_cap": {
+          "$ref": "#/$defs/LineCapEnum",
+          "description": "Line endpoint style"
+        },
+        "line_join": {
+          "$ref": "#/$defs/LineJoinEnum",
+          "description": "Line join style"
+        },
+        "opacity": {
+          "description": "Line transparency (0-1)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "stroke": {
+          "description": "Whether to draw the line",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "weight": {
+          "description": "Line width in pixels",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "color"
+      ],
+      "title": "LineProperties",
+      "type": "object"
+    },
     "LocationTypeEnum": {
       "description": "Type of reference location",
       "enum": [
@@ -138,6 +381,336 @@
       ],
       "title": "LocationTypeEnum",
       "type": "string"
+    },
+    "NarrativeEntry": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature for timestamped narrative/log entries. Narratives are operator notes associated with a timestamp and optionally a track. Geometry is optional (Point for display position, or null).",
+      "properties": {
+        "geometry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GeoJSONPoint"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Optional display position (Point) or null"
+        },
+        "id": {
+          "description": "Unique identifier",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/NarrativeEntryProperties",
+          "description": "Narrative metadata"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "properties"
+      ],
+      "title": "NarrativeEntry",
+      "type": "object"
+    },
+    "NarrativeEntryProperties": {
+      "additionalProperties": false,
+      "description": "Properties for a NarrativeEntry annotation",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "NARRATIVE",
+          "description": "Feature type discriminator"
+        },
+        "source_file": {
+          "description": "Original source file path",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "style": {
+          "$ref": "#/$defs/PointProperties",
+          "description": "Point styling properties for display position"
+        },
+        "symbol": {
+          "description": "Display symbol code from REP file",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "text": {
+          "description": "Narrative text content",
+          "type": "string"
+        },
+        "time": {
+          "description": "Narrative timestamp (ISO8601)",
+          "format": "date-time",
+          "type": "string"
+        },
+        "track_id": {
+          "description": "Associated track identifier (optional)",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "time",
+        "text",
+        "style"
+      ],
+      "title": "NarrativeEntryProperties",
+      "type": "object"
+    },
+    "PointProperties": {
+      "additionalProperties": false,
+      "description": "Styling schema for Point and MultiPoint geometries. Follows Leaflet CircleMarker options naming conventions.",
+      "properties": {
+        "color": {
+          "description": "Stroke color (CSS color string)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": "string"
+        },
+        "fill": {
+          "description": "Whether to fill the shape",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "fill_color": {
+          "description": "Fill color (CSS color string)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": "string"
+        },
+        "fill_opacity": {
+          "description": "Fill transparency (0-1)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "legacy_style": {
+          "description": "Legacy symbol name from Debrief symbology (e.g., 'Aircraft', 'torpedo'). Preserved for future icon rendering support.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "opacity": {
+          "description": "Stroke transparency (0-1)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "radius": {
+          "description": "Marker radius in pixels",
+          "minimum": 0,
+          "type": "number"
+        },
+        "shape": {
+          "$ref": "#/$defs/PointShapeEnum",
+          "description": "Marker shape"
+        },
+        "stroke": {
+          "description": "Whether to draw outline",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "weight": {
+          "description": "Stroke width in pixels",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "shape",
+        "radius",
+        "fill_color",
+        "color"
+      ],
+      "title": "PointProperties",
+      "type": "object"
+    },
+    "PointShapeEnum": {
+      "description": "Valid shapes for point markers",
+      "enum": [
+        "circle",
+        "square",
+        "triangle"
+      ],
+      "title": "PointShapeEnum",
+      "type": "string"
+    },
+    "PolygonProperties": {
+      "additionalProperties": false,
+      "description": "Styling schema for Polygon and MultiPolygon geometries. Follows Leaflet Polygon options naming conventions.",
+      "properties": {
+        "color": {
+          "description": "Border color (CSS color string)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": "string"
+        },
+        "dash_array": {
+          "description": "Border dash pattern (SVG format, e.g., \"5, 10\")",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fill": {
+          "description": "Whether to fill the polygon",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "fill_color": {
+          "description": "Fill color (CSS color string)",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
+          "type": "string"
+        },
+        "fill_opacity": {
+          "description": "Fill transparency (0-1)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "line_cap": {
+          "$ref": "#/$defs/LineCapEnum",
+          "description": "Border endpoint style"
+        },
+        "line_join": {
+          "$ref": "#/$defs/LineJoinEnum",
+          "description": "Border join style"
+        },
+        "opacity": {
+          "description": "Border transparency (0-1)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "stroke": {
+          "description": "Whether to draw border",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "weight": {
+          "description": "Border width in pixels",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "fill_color",
+        "color"
+      ],
+      "title": "PolygonProperties",
+      "type": "object"
+    },
+    "RectangleAnnotation": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature for rectangle annotations. Geometry is a Polygon with 4 corners (plus closing point).",
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONPolygon",
+          "description": "Rectangle as Polygon (4 corners + close)"
+        },
+        "id": {
+          "description": "Unique identifier",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/RectangleAnnotationProperties",
+          "description": "Rectangle metadata"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "RectangleAnnotation",
+      "type": "object"
+    },
+    "RectangleAnnotationProperties": {
+      "additionalProperties": false,
+      "description": "Properties for a RectangleAnnotation",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "RECTANGLE",
+          "description": "Feature type discriminator"
+        },
+        "label": {
+          "description": "Annotation label text",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_file": {
+          "description": "Original source file path",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "style": {
+          "$ref": "#/$defs/PolygonProperties",
+          "description": "Polygon styling properties for the rectangle area"
+        },
+        "symbol": {
+          "description": "Display symbol code from REP file",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "style"
+      ],
+      "title": "RectangleAnnotationProperties",
+      "type": "object"
     },
     "ReferenceLocation": {
       "additionalProperties": false,
@@ -174,14 +747,6 @@
       "additionalProperties": false,
       "description": "Properties for a ReferenceLocation",
       "properties": {
-        "color": {
-          "description": "Display color (CSS color string)",
-          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "description": {
           "description": "Additional description",
           "type": [
@@ -201,6 +766,10 @@
         "name": {
           "description": "Reference location name",
           "type": "string"
+        },
+        "style": {
+          "$ref": "#/$defs/PointProperties",
+          "description": "Point styling properties for display"
         },
         "symbol": {
           "description": "Map symbol identifier",
@@ -229,9 +798,81 @@
       "required": [
         "kind",
         "name",
-        "location_type"
+        "location_type",
+        "style"
       ],
       "title": "ReferenceLocationProperties",
+      "type": "object"
+    },
+    "TextAnnotation": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature for text annotations at a position. Geometry is the Point where text should be displayed.",
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONPoint",
+          "description": "Text display position"
+        },
+        "id": {
+          "description": "Unique identifier",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/TextAnnotationProperties",
+          "description": "Text metadata"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "TextAnnotation",
+      "type": "object"
+    },
+    "TextAnnotationProperties": {
+      "additionalProperties": false,
+      "description": "Properties for a TextAnnotation",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "TEXT",
+          "description": "Feature type discriminator"
+        },
+        "source_file": {
+          "description": "Original source file path",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "style": {
+          "$ref": "#/$defs/PointProperties",
+          "description": "Point styling properties for the text position marker"
+        },
+        "symbol": {
+          "description": "Display symbol code from REP file",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "text": {
+          "description": "Text content to display",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "text",
+        "style"
+      ],
+      "title": "TextAnnotationProperties",
       "type": "object"
     },
     "TimestampedPosition": {
@@ -331,14 +972,6 @@
       "additionalProperties": false,
       "description": "Properties for a TrackFeature",
       "properties": {
-        "color": {
-          "description": "Display color (CSS color string)",
-          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "end_time": {
           "description": "Track end time (ISO8601)",
           "format": "date-time",
@@ -380,6 +1013,10 @@
           "format": "date-time",
           "type": "string"
         },
+        "style": {
+          "$ref": "#/$defs/TrackStyle",
+          "description": "Composite styling for track line and position markers"
+        },
         "track_type": {
           "$ref": "#/$defs/TrackTypeEnum",
           "description": "Type of track"
@@ -391,9 +1028,30 @@
         "track_type",
         "start_time",
         "end_time",
-        "positions"
+        "positions",
+        "style"
       ],
       "title": "TrackProperties",
+      "type": "object"
+    },
+    "TrackStyle": {
+      "additionalProperties": false,
+      "description": "Composite styling for TrackFeature, supporting both line path and position markers.",
+      "properties": {
+        "line": {
+          "$ref": "#/$defs/LineProperties",
+          "description": "Styling for the track line path"
+        },
+        "point": {
+          "$ref": "#/$defs/PointProperties",
+          "description": "Styling for position markers"
+        }
+      },
+      "required": [
+        "line",
+        "point"
+      ],
+      "title": "TrackStyle",
       "type": "object"
     },
     "TrackTypeEnum": {
@@ -406,6 +1064,102 @@
       ],
       "title": "TrackTypeEnum",
       "type": "string"
+    },
+    "VectorAnnotation": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature for vector annotations. Geometry is a LineString from origin to endpoint (computed from range/bearing). Properties contain origin, range, and bearing for precise reconstruction.",
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONLineString",
+          "description": "Vector as LineString (origin to computed endpoint)"
+        },
+        "id": {
+          "description": "Unique identifier",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/VectorAnnotationProperties",
+          "description": "Vector metadata including origin, range, and bearing for reconstruction"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "VectorAnnotation",
+      "type": "object"
+    },
+    "VectorAnnotationProperties": {
+      "additionalProperties": false,
+      "description": "Properties for a VectorAnnotation",
+      "properties": {
+        "bearing": {
+          "description": "Vector bearing in degrees (0-360, from north) for precise reconstruction",
+          "maximum": 360,
+          "minimum": 0,
+          "type": "number"
+        },
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "VECTOR",
+          "description": "Feature type discriminator"
+        },
+        "label": {
+          "description": "Annotation label text",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "origin": {
+          "description": "Vector origin as [longitude, latitude] for precise reconstruction",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        "range": {
+          "description": "Vector length/range in meters for precise reconstruction",
+          "minimum": 0,
+          "type": "number"
+        },
+        "source_file": {
+          "description": "Original source file path",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "style": {
+          "$ref": "#/$defs/LineProperties",
+          "description": "Line styling properties for the vector"
+        },
+        "symbol": {
+          "description": "Display symbol code from REP file",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "origin",
+        "range",
+        "bearing",
+        "style"
+      ],
+      "title": "VectorAnnotationProperties",
+      "type": "object"
     }
   }
 }

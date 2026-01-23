@@ -69,9 +69,9 @@ export function getFeatureIcon(feature: DebriefFeature): string {
  * @returns A CSS color string
  */
 export function getFeatureColor(feature: DebriefFeature): string {
-  // Check for explicit color in properties
-  if (feature.properties.color) {
-    return feature.properties.color;
+  // Check for explicit color in style (tracks have style.line.color)
+  if (isTrackFeature(feature) && feature.properties.style?.line?.color) {
+    return feature.properties.style.line.color;
   }
 
   // Fall back to type-based defaults
