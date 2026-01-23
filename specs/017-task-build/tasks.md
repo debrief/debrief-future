@@ -41,9 +41,9 @@
 
 **Purpose**: Create the Taskfile.yml skeleton and remove old Makefile
 
-- [ ] T001 Create Taskfile.yml with version and vars section `Taskfile.yml`
-- [ ] T002 [P] Add preconditions for uv and pnpm checks `Taskfile.yml`
-- [ ] T003 Remove old Makefile (replaced by Taskfile.yml) `Makefile`
+- [x] T001 Create Taskfile.yml with version and vars section `Taskfile.yml`
+- [x] T002 [P] Add preconditions for uv and pnpm checks `Taskfile.yml`
+- [x] T003 Remove old Makefile (replaced by Taskfile.yml) `Makefile`
 
 ---
 
@@ -55,9 +55,9 @@
 
 **Independent Test**: Run `task install` on fresh checkout, verify both uv and pnpm succeed
 
-- [ ] T004 Implement `install` task with uv sync and pnpm install `Taskfile.yml`
-- [ ] T005 Add source-based caching for lockfiles (uv.lock, pnpm-lock.yaml) `Taskfile.yml`
-- [ ] T006 Verify install skips when lockfiles unchanged
+- [x] T004 Implement `install` task with uv sync and pnpm install `Taskfile.yml`
+- [x] T005 Add source-based caching for lockfiles (uv.lock, pnpm-lock.yaml) `Taskfile.yml`
+- [x] T006 Verify install skips when lockfiles unchanged
 
 **Checkpoint**: `task install` works with caching - foundation ready for dependent tasks
 
@@ -71,11 +71,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 Implement `test` task with deps on install `Taskfile.yml`
-- [ ] T008 Add pytest execution for Python tests `Taskfile.yml`
-- [ ] T009 Add pnpm test execution for TypeScript tests `Taskfile.yml`
-- [ ] T010 Verify non-zero exit on test failure
-- [ ] T011 Verify install runs automatically on fresh checkout
+- [x] T007 Implement `test` task with deps on install `Taskfile.yml`
+- [x] T008 Add pytest execution for Python tests `Taskfile.yml`
+- [x] T009 Add pnpm test execution for TypeScript tests `Taskfile.yml`
+- [x] T010 Verify non-zero exit on test failure
+- [x] T011 Verify install runs automatically on fresh checkout
 
 **Checkpoint**: `task test` runs all tests with auto-install - MVP complete
 
@@ -89,10 +89,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T012 Implement `build` task with deps on install `Taskfile.yml`
-- [ ] T013 Add pnpm build for TypeScript compilation `Taskfile.yml`
-- [ ] T014 Add source-based caching for build artifacts `Taskfile.yml`
-- [ ] T015 Verify cached build completes in < 5 seconds
+- [x] T012 Implement `build` task with deps on install `Taskfile.yml`
+- [x] T013 Add pnpm build for TypeScript compilation `Taskfile.yml`
+- [x] T014 Add source-based caching for build artifacts `Taskfile.yml`
+- [x] T015 Verify cached build completes in < 5 seconds
 
 **Checkpoint**: `task build` works with caching
 
@@ -106,9 +106,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T016 Implement `dev` task with deps on install `Taskfile.yml`
-- [ ] T017 Add interactive: true for proper Ctrl+C handling `Taskfile.yml`
-- [ ] T018 Verify watch mode starts and responds to file changes
+- [x] T016 Implement `dev` task with deps on install `Taskfile.yml`
+- [x] T017 Add interactive: true for proper Ctrl+C handling `Taskfile.yml`
+- [x] T018 Verify watch mode starts and responds to file changes
 
 **Checkpoint**: `task dev` starts watch mode with auto-install
 
@@ -122,11 +122,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T019 Implement `lint` task with deps on install `Taskfile.yml`
-- [ ] T020 Add ruff check and format for Python `Taskfile.yml`
-- [ ] T021 Add pnpm lint for TypeScript `Taskfile.yml`
-- [ ] T022 Implement `lint:fix` task with auto-fix commands `Taskfile.yml`
-- [ ] T023 Verify lint reports violations with file locations
+- [x] T019 Implement `lint` task with deps on install `Taskfile.yml`
+- [x] T020 Add ruff check and format for Python `Taskfile.yml`
+- [x] T021 Add pnpm lint for TypeScript `Taskfile.yml`
+- [x] T022 Implement `lint:fix` task with auto-fix commands `Taskfile.yml`
+- [x] T023 Verify lint reports violations with file locations
 
 **Checkpoint**: `task lint` and `task lint:fix` work
 
@@ -140,9 +140,9 @@
 
 ### Implementation for User Story 6
 
-- [ ] T024 Implement `clean` task to remove build artifacts `Taskfile.yml`
-- [ ] T025 Add desc field to all tasks for help output `Taskfile.yml`
-- [ ] T026 Verify `task --list` shows all tasks with descriptions
+- [x] T024 Implement `clean` task to remove build artifacts `Taskfile.yml`
+- [x] T025 Add desc field to all tasks for help output `Taskfile.yml`
+- [x] T026 Verify `task --list` shows all tasks with descriptions
 
 **Checkpoint**: All utility tasks complete
 
@@ -152,9 +152,9 @@
 
 **Purpose**: Update GitHub Actions to use Task commands
 
-- [ ] T027 Update CI workflow to install Task `arduino/setup-task@v2` `.github/workflows/ci.yml`
-- [ ] T028 Replace direct uv/pnpm calls with task commands `.github/workflows/ci.yml`
-- [ ] T029 Verify CI passes with task commands
+- [ ] T027 Update CI workflow to install Task `arduino/setup-task@v2` `.github/workflows/ci.yml` (deferred - separate PR)
+- [ ] T028 Replace direct uv/pnpm calls with task commands `.github/workflows/ci.yml` (deferred - separate PR)
+- [ ] T029 Verify CI passes with task commands (deferred - separate PR)
 
 **Checkpoint**: CI uses identical commands to local development
 
@@ -166,21 +166,21 @@
 
 ### Documentation
 
-- [ ] T030 Update README.md with new task commands `README.md`
-- [ ] T031 [P] Copy quickstart.md content to appropriate location `docs/`
+- [ ] T030 Update README.md with new task commands `README.md` (deferred - separate PR)
+- [ ] T031 [P] Copy quickstart.md content to appropriate location `docs/` (deferred - separate PR)
 
 ### Evidence Collection
 
-- [ ] T032 Create evidence directory `specs/017-task-build/evidence/`
-- [ ] T033 Capture task list output in `specs/017-task-build/evidence/cli-demo.txt`
-- [ ] T034 [P] Capture cache timing demonstration in `specs/017-task-build/evidence/cache-demo.txt`
-- [ ] T035 Create usage example in `specs/017-task-build/evidence/usage-example.md`
-- [ ] T036 Create test summary in `specs/017-task-build/evidence/test-summary.md`
+- [x] T032 Create evidence directory `specs/017-task-build/evidence/`
+- [x] T033 Capture task list output in `specs/017-task-build/evidence/cli-demo.txt`
+- [x] T034 [P] Capture cache timing demonstration in `specs/017-task-build/evidence/cache-demo.txt`
+- [x] T035 Create usage example in `specs/017-task-build/evidence/usage-example.md`
+- [x] T036 Create test summary in `specs/017-task-build/evidence/test-summary.md`
 
 ### Media Content
 
-- [ ] T037 Create shipped blog post in `specs/017-task-build/media/shipped-post.md`
-- [ ] T038 [P] Create LinkedIn shipped summary in `specs/017-task-build/media/linkedin-shipped.md`
+- [x] T037 Create shipped blog post in `specs/017-task-build/media/shipped-post.md`
+- [x] T038 [P] Create LinkedIn shipped summary in `specs/017-task-build/media/linkedin-shipped.md`
 
 ### PR Creation
 

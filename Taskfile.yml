@@ -1,0 +1,93 @@
+# Debrief v4.x Build System
+#
+# Prerequisites:
+#   - Task (https://taskfile.dev/installation/)
+#   - uv (curl -LsSf https://astral.sh/uv/install.sh | sh)
+#   - pnpm (npm install -g pnpm)
+#
+# Usage:
+#   task --list       Show all available tasks
+#   task install      Install all dependencies
+#   task test         Run all tests
+#   task build        Build all artifacts
+#   task dev          Start development watch mode
+#   task lint         Check code style
+#   task lint:fix     Auto-fix code style issues
+#   task clean        Remove build artifacts
+
+version: '3'
+
+vars:
+  PYTHON_SOURCES: "services/**/*.py shared/**/*.py"
+  TS_SOURCES: "apps/**/*.ts apps/**/*.tsx shared/**/*.ts shared/**/*.tsx"
+
+tasks:
+  default:
+    desc: "Show available tasks"
+    cmds:
+      - task --list
+
+  # Precondition checks - used by install task
+  _check-prereqs:
+    internal: true
+    preconditions:
+      - sh: command -v uv
+        msg: "uv not found. Install: curl -LsSf https://astral.sh/uv/install.sh | sh"
+      - sh: command -v pnpm
+        msg: "pnpm not found. Install: npm install -g pnpm"
+
+  install:
+    desc: "Install all dependencies (Python + Node.js)"
+    deps: [_check-prereqs]
+    sources:
+      - uv.lock
+      - pnpm-lock.yaml
+      - pyproject.toml
+      - package.json
+      - "**/pyproject.toml"
+      - "**/package.json"
+    cmds:
+      - uv sync
+      - pnpm install
+
+  test:
+    desc: "Run all tests (Python + TypeScript)"
+    deps: [install]
+    cmds:
+      - uv run pytest
+      - pnpm test
+
+  build:
+    desc: "Build all artifacts (Python wheels + TypeScript bundles)"
+    deps: [install]
+    cmds:
+      - uv build --all
+      - pnpm build
+
+  dev:
+    desc: "Start development watch mode"
+    deps: [install]
+    cmds:
+      - pnpm storybook
+
+  lint:
+    desc: "Check code style (Python + TypeScript)"
+    deps: [install]
+    cmds:
+      - uv run ruff check .
+      - pnpm lint
+
+  lint:fix:
+    desc: "Auto-fix code style issues"
+    deps: [install]
+    cmds:
+      - uv run ruff check --fix .
+      - uv run ruff format .
+      - pnpm lint -- --fix
+
+  clean:
+    desc: "Remove build artifacts and caches"
+    cmds:
+      - rm -rf dist/ .task/ .pytest_cache/ .ruff_cache/
+      - rm -rf **/dist/ **/.pytest_cache/ **/__pycache__/
+      - rm -rf node_modules/.cache/

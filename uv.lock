@@ -501,6 +501,8 @@ dev = [
 dev = [
     { name = "pydantic" },
     { name = "pyinstaller" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
 ]
 
 [package.metadata]
@@ -511,6 +513,8 @@ provides-extras = ["dev"]
 dev = [
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "pyinstaller", specifier = ">=6.18.0" },
+    { name = "pytest", specifier = ">=7.0.0" },
+    { name = "pytest-cov", specifier = ">=4.0.0" },
 ]
 
 [[package]]
