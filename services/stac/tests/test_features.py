@@ -8,17 +8,17 @@ import json
 from pathlib import Path
 
 import pytest
+from tests.fixtures import (
+    make_sample_feature_collection,
+    make_sample_reference_location,
+    make_sample_track_feature,
+)
 
 from debrief_stac.catalog import create_catalog
 from debrief_stac.features import add_features
 from debrief_stac.models import PlotMetadata
 from debrief_stac.plot import create_plot, read_plot
 from debrief_stac.types import ASSET_ROLE_DATA, MEDIA_TYPE_GEOJSON
-from tests.fixtures import (
-    make_sample_feature_collection,
-    make_sample_reference_location,
-    make_sample_track_feature,
-)
 
 
 class TestAddFeatures:
