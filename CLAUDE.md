@@ -113,6 +113,61 @@ fly machines restart --app debrief-demo
 | TypeScript packaging | pnpm workspaces |
 | User config | XDG Base Directory |
 
+## Parallel Sessions (Worktrees)
+
+Run multiple Claude Code sessions concurrently using git worktrees.
+
+### How It Works
+
+| Environment | Behavior | Detection |
+|-------------|----------|-----------|
+| **Local device** | Creates worktree in `../worktrees/` | `../worktrees/` directory exists |
+| **Cloud (Claude Code)** | Creates branch (single session) | `CLAUDE_CODE_SESSION_ID` env var |
+
+### Setup for Local Parallel Development
+
+```bash
+# One-time setup: create worktrees directory
+mkdir ../worktrees
+
+# Now /speckit.start will automatically create worktrees
+```
+
+### Environment Variables
+
+| Variable | Values | Effect |
+|----------|--------|--------|
+| `SPECKIT_WORKTREES` | `true` | Force worktree mode |
+| `SPECKIT_WORKTREES` | `false` | Force branch mode |
+| (unset) | — | Auto-detect based on environment |
+
+### Workflow
+
+1. Run `/speckit.start 007` in main repo
+2. Script creates `../worktrees/007-feature-name/`
+3. Output shows: `cd ../worktrees/007-feature-name`
+4. Open new terminal/Claude session in that directory
+5. Continue with `/speckit.specify`, `/speckit.plan`, etc.
+
+### Managing Worktrees
+
+```bash
+# List all worktrees
+git worktree list
+
+# Remove a worktree (after PR merged)
+git worktree remove ../worktrees/007-feature-name
+
+# Prune stale worktree entries
+git worktree prune
+```
+
+### Script Flags
+
+The `create-new-feature.sh` script accepts:
+- `--worktree` — Force worktree creation
+- `--no-worktree` — Force branch checkout (current behavior)
+
 ## Key Documents
 
 - `CONSTITUTION.md` — immutable development principles (supersedes all other docs)

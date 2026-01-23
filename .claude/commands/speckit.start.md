@@ -85,10 +85,15 @@ Present the item details and ask for confirmation:
 - High → Opus (deep reasoning for architectural decisions)
 
 **This will:**
-1. Create a new feature branch
+1. Create a new feature branch (or worktree for parallel sessions)
 2. Generate a specification in `specs/NNN-{short-name}/spec.md`
 3. Update BACKLOG.md to link to the spec
 4. Use **{Model}** model for implementation tasks (based on {Complexity} complexity)
+
+**Parallel Session Mode:**
+- Local device: Creates a worktree in `../worktrees/NNN-{short-name}` for parallel work
+- Cloud (Claude Code): Creates a branch (single session)
+- Override with `SPECKIT_WORKTREES=true|false` environment variable
 
 Proceed with specification? (The handoff button below will continue)
 ```

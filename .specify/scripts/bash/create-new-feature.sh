@@ -2,16 +2,27 @@
 
 set -e
 
+# Source common utilities for worktree support
+SCRIPT_DIR_COMMON="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR_COMMON/common.sh"
+
 JSON_MODE=false
 SHORT_NAME=""
 BRANCH_NUMBER=""
+USE_WORKTREE=""  # Empty = auto-detect, "true" = force worktree, "false" = force branch
 ARGS=()
 i=1
 while [ $i -le $# ]; do
     arg="${!i}"
     case "$arg" in
-        --json) 
-            JSON_MODE=true 
+        --json)
+            JSON_MODE=true
+            ;;
+        --worktree)
+            USE_WORKTREE="true"
+            ;;
+        --no-worktree)
+            USE_WORKTREE="false"
             ;;
         --short-name)
             if [ $((i + 1)) -gt $# ]; then
@@ -40,22 +51,35 @@ while [ $i -le $# ]; do
             fi
             BRANCH_NUMBER="$next_arg"
             ;;
-        --help|-h) 
-            echo "Usage: $0 [--json] [--short-name <name>] [--number N] <feature_description>"
+        --help|-h)
+            echo "Usage: $0 [--json] [--short-name <name>] [--number N] [--worktree|--no-worktree] <feature_description>"
             echo ""
             echo "Options:"
             echo "  --json              Output in JSON format"
             echo "  --short-name <name> Provide a custom short name (2-4 words) for the branch"
             echo "  --number N          Specify branch number manually (overrides auto-detection)"
+            echo "  --worktree          Force worktree mode (creates in ../worktrees/)"
+            echo "  --no-worktree       Force branch mode (git checkout -b)"
             echo "  --help, -h          Show this help message"
+            echo ""
+            echo "Environment Variables:"
+            echo "  SPECKIT_WORKTREES=true   Enable worktree mode globally"
+            echo "  SPECKIT_WORKTREES=false  Disable worktree mode globally"
+            echo ""
+            echo "Worktree Detection (when no flag provided):"
+            echo "  1. SPECKIT_WORKTREES env var"
+            echo "  2. CLAUDE_CODE_SESSION_ID set → branch mode (cloud)"
+            echo "  3. ../worktrees/ exists → worktree mode (local parallel)"
+            echo "  4. Default → branch mode"
             echo ""
             echo "Examples:"
             echo "  $0 'Add user authentication system' --short-name 'user-auth'"
             echo "  $0 'Implement OAuth2 integration for API' --number 5"
+            echo "  $0 --worktree 'Parallel feature work'"
             exit 0
             ;;
-        *) 
-            ARGS+=("$arg") 
+        *)
+            ARGS+=("$arg")
             ;;
     esac
     i=$((i + 1))
@@ -271,13 +295,46 @@ if [ ${#BRANCH_NAME} -gt $MAX_BRANCH_LENGTH ]; then
     >&2 echo "[specify] Truncated to: $BRANCH_NAME (${#BRANCH_NAME} bytes)"
 fi
 
+# Determine worktree mode (flag overrides env detection)
+WORKTREE_MODE=false
+WORKTREE_PATH=""
+
 if [ "$HAS_GIT" = true ]; then
-    git checkout -b "$BRANCH_NAME"
+    # Determine if we should use worktree mode
+    if [ "$USE_WORKTREE" = "true" ]; then
+        WORKTREE_MODE=true
+    elif [ "$USE_WORKTREE" = "false" ]; then
+        WORKTREE_MODE=false
+    elif is_worktree_mode; then
+        WORKTREE_MODE=true
+    fi
+
+    if [ "$WORKTREE_MODE" = true ]; then
+        # Create worktree for parallel development
+        WORKTREE_BASE=$(get_worktree_base)
+        WORKTREE_PATH="$WORKTREE_BASE/$BRANCH_NAME"
+        mkdir -p "$WORKTREE_BASE"
+
+        if git worktree add "$WORKTREE_PATH" -b "$BRANCH_NAME" 2>&1; then
+            >&2 echo "[specify] Created worktree at: $WORKTREE_PATH"
+            >&2 echo "[specify] To work in this session: cd $WORKTREE_PATH"
+        else
+            >&2 echo "[specify] ERROR: Failed to create worktree at $WORKTREE_PATH"
+            exit 1
+        fi
+
+        # Feature directory is inside the worktree
+        FEATURE_DIR="$WORKTREE_PATH/specs/$BRANCH_NAME"
+    else
+        # Traditional branch checkout
+        git checkout -b "$BRANCH_NAME"
+        FEATURE_DIR="$SPECS_DIR/$BRANCH_NAME"
+    fi
 else
     >&2 echo "[specify] Warning: Git repository not detected; skipped branch creation for $BRANCH_NAME"
+    FEATURE_DIR="$SPECS_DIR/$BRANCH_NAME"
 fi
 
-FEATURE_DIR="$SPECS_DIR/$BRANCH_NAME"
 mkdir -p "$FEATURE_DIR"
 
 TEMPLATE="$REPO_ROOT/.specify/templates/spec-template.md"
@@ -288,10 +345,25 @@ if [ -f "$TEMPLATE" ]; then cp "$TEMPLATE" "$SPEC_FILE"; else touch "$SPEC_FILE"
 export SPECIFY_FEATURE="$BRANCH_NAME"
 
 if $JSON_MODE; then
-    printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s"}\n' "$BRANCH_NAME" "$SPEC_FILE" "$FEATURE_NUM"
+    if [ -n "$WORKTREE_PATH" ]; then
+        printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s","WORKTREE_PATH":"%s","MODE":"worktree"}\n' \
+            "$BRANCH_NAME" "$SPEC_FILE" "$FEATURE_NUM" "$WORKTREE_PATH"
+    else
+        printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s","MODE":"branch"}\n' \
+            "$BRANCH_NAME" "$SPEC_FILE" "$FEATURE_NUM"
+    fi
 else
     echo "BRANCH_NAME: $BRANCH_NAME"
     echo "SPEC_FILE: $SPEC_FILE"
     echo "FEATURE_NUM: $FEATURE_NUM"
+    if [ -n "$WORKTREE_PATH" ]; then
+        echo "WORKTREE_PATH: $WORKTREE_PATH"
+        echo "MODE: worktree"
+        echo ""
+        echo "To continue in this worktree, run:"
+        echo "  cd $WORKTREE_PATH"
+    else
+        echo "MODE: branch"
+    fi
     echo "SPECIFY_FEATURE environment variable set to: $BRANCH_NAME"
 fi

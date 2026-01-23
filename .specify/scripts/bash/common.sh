@@ -154,3 +154,108 @@ EOF
 check_file() { [[ -f "$1" ]] && echo "  ✓ $2" || echo "  ✗ $2"; }
 check_dir() { [[ -d "$1" && -n $(ls -A "$1" 2>/dev/null) ]] && echo "  ✓ $2" || echo "  ✗ $2"; }
 
+# =============================================================================
+# WORKTREE SUPPORT
+# =============================================================================
+# Enables parallel Claude Code sessions via git worktrees.
+#
+# Detection priority:
+#   1. SPECKIT_WORKTREES=true     → Force worktree mode
+#   2. SPECKIT_WORKTREES=false    → Force branch mode (cloud default)
+#   3. CLAUDE_CODE_SESSION_ID set → Cloud environment, use branch mode
+#   4. ../worktrees/ exists       → Local setup detected, use worktree mode
+#   5. Default                    → Branch mode (current behavior)
+# =============================================================================
+
+# Get the worktree base path (relative to repo root)
+get_worktree_base() {
+    local repo_root=$(get_repo_root)
+    local parent_dir=$(dirname "$repo_root")
+    echo "$parent_dir/worktrees"
+}
+
+# Check if worktree mode is enabled
+# Returns 0 (true) if worktrees should be used, 1 (false) otherwise
+is_worktree_mode() {
+    # Explicit override via environment variable
+    if [[ "${SPECKIT_WORKTREES:-}" == "true" ]]; then
+        return 0
+    fi
+    if [[ "${SPECKIT_WORKTREES:-}" == "false" ]]; then
+        return 1
+    fi
+
+    # Cloud environment detection (Claude Code sessions)
+    if [[ -n "${CLAUDE_CODE_SESSION_ID:-}" ]]; then
+        return 1  # Cloud: use branch checkout
+    fi
+
+    # Local detection: check if worktrees directory exists
+    local worktree_base=$(get_worktree_base)
+    if [[ -d "$worktree_base" ]]; then
+        return 0  # Local parallel setup detected
+    fi
+
+    # Default: use traditional branch mode
+    return 1
+}
+
+# Check if current directory is inside a git worktree (not the main repo)
+is_in_worktree() {
+    if ! has_git; then
+        return 1
+    fi
+    local git_dir=$(git rev-parse --git-dir 2>/dev/null)
+    # Worktrees have .git as a file pointing to the main repo, not a directory
+    if [[ -f "$(get_repo_root)/.git" ]]; then
+        return 0
+    fi
+    return 1
+}
+
+# Get the main repository root (even if we're in a worktree)
+get_main_repo_root() {
+    if ! has_git; then
+        get_repo_root
+        return
+    fi
+
+    # git worktree list shows all worktrees; the first is always the main one
+    local main_worktree=$(git worktree list --porcelain 2>/dev/null | head -1 | sed 's/^worktree //')
+    if [[ -n "$main_worktree" ]]; then
+        echo "$main_worktree"
+    else
+        get_repo_root
+    fi
+}
+
+# Create a new worktree for a branch
+# Usage: create_worktree BRANCH_NAME
+# Returns the worktree path on success, exits on failure
+create_worktree() {
+    local branch_name="$1"
+    local worktree_base=$(get_worktree_base)
+    local worktree_path="$worktree_base/$branch_name"
+
+    # Ensure worktree base exists
+    mkdir -p "$worktree_base"
+
+    # Create the worktree
+    if git worktree add "$worktree_path" -b "$branch_name" 2>/dev/null; then
+        echo "$worktree_path"
+        return 0
+    else
+        echo "ERROR: Failed to create worktree at $worktree_path" >&2
+        return 1
+    fi
+}
+
+# List active worktrees
+list_worktrees() {
+    if ! has_git; then
+        echo "No git repository found" >&2
+        return 1
+    fi
+    git worktree list
+}
+

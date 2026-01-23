@@ -234,6 +234,21 @@ Given that feature description, do this:
 
 **NOTE:** The script creates and checks out the new branch and initializes the spec file before writing.
 
+### Worktree Mode (Parallel Sessions)
+
+When worktree mode is enabled, the script creates a worktree instead of switching branches:
+
+- **Worktree location**: `../worktrees/NNN-{short-name}/`
+- **Detection**: Auto-detected when `../worktrees/` exists, or forced via `SPECKIT_WORKTREES=true`
+- **Cloud sessions**: Always use branch mode (detected via `CLAUDE_CODE_SESSION_ID`)
+
+**Output includes**:
+```json
+{"BRANCH_NAME":"007-feature","SPEC_FILE":"...","FEATURE_NUM":"007","WORKTREE_PATH":"../worktrees/007-feature","MODE":"worktree"}
+```
+
+**After worktree creation**: The user must `cd` to the worktree path to continue working in that session.
+
 ## General Guidelines
 
 ## Quick Guidelines
