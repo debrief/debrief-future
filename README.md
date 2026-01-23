@@ -69,6 +69,186 @@ debrief/
 
 The tracer bullet implementation validates the architecture with a thin end-to-end thread. See [docs/plans/tracer-bullet.md](docs/plans/tracer-bullet.md) for details.
 
+## Development Workflows
+
+This project uses Claude Code with custom commands and agents. The workflows below show how to navigate from idea to shipped feature.
+
+### 1. Idea to Approval
+
+```mermaid
+flowchart LR
+    subgraph entry["Entry"]
+        idea["/idea"]
+        bug["Bug Report"]
+    end
+
+    subgraph capture["Capture"]
+        scout["Scout<br>(evaluates)"]
+        interview["Interview<br>(gathers detail)"]
+        defector["Defector<br>(triages)"]
+    end
+
+    subgraph backlog["Backlog"]
+        issue["GitHub Issue"]
+        add["BACKLOG.md<br>proposed"]
+        score["Prioritizer<br>scores V/M/A"]
+        review["Ideas-Guy<br>reviews"]
+    end
+
+    subgraph outcome["Outcome"]
+        approve["✅ approved"]
+        park["🅿️ parked"]
+        reject["❌ rejected"]
+    end
+
+    idea --> scout --> interview --> issue
+    bug --> defector --> issue
+    issue --> add --> score --> review
+    review --> approve
+    review --> park
+    review --> reject
+
+    approve -->|"ready for"| start["/speckit.start"]
+```
+
+### 2. SpecKit Pipeline
+
+```mermaid
+flowchart LR
+    start["/speckit.start<br>{ID}"]
+    specify["/speckit.specify<br>→ spec.md"]
+    clarify["/speckit.clarify<br>→ clarifications"]
+    plan["/speckit.plan<br>→ plan.md"]
+    tasks["/speckit.tasks<br>→ tasks.md"]
+    implement["/speckit.implement<br>→ code + evidence"]
+    pr["/speckit.pr<br>→ PR + blog"]
+
+    start --> specify --> clarify --> plan --> tasks --> implement --> pr
+
+    specify -.->|"skip if clear"| plan
+```
+
+### 3. SpecKit Helpers
+
+```mermaid
+flowchart TB
+    subgraph anytime["Use Anytime"]
+        checklist["/speckit.checklist<br>quality gates"]
+        analyze["/speckit.analyze<br>consistency audit"]
+        constitution["/speckit.constitution<br>update principles"]
+        tasks2issues["/speckit.taskstoissues<br>GitHub issues"]
+    end
+
+    subgraph context["Best Used With"]
+        spec["spec.md"]
+        plan["plan.md"]
+        tasks["tasks.md"]
+    end
+
+    spec -.-> checklist
+    plan -.-> analyze
+    tasks -.-> analyze
+    tasks -.-> tasks2issues
+```
+
+### 4. Media & Publishing
+
+```mermaid
+flowchart LR
+    subgraph triggers["Triggers"]
+        plan_done["Plan complete"]
+        ship_done["Implementation complete"]
+        manual["/media"]
+    end
+
+    subgraph create["Content Creation"]
+        content["Content Specialist<br>blog + LinkedIn"]
+        tech["Technical Specialist<br>docs + diagrams"]
+    end
+
+    subgraph publish["Publishing"]
+        pub["/publish"]
+        jekyll["Jekyll Specialist<br>site structure"]
+        site["debrief.github.io"]
+    end
+
+    plan_done -->|"planning post"| content
+    ship_done -->|"shipped post"| content
+    manual --> content
+    manual --> tech
+
+    content --> pub --> jekyll --> site
+```
+
+### 5. Agent Roles
+
+```mermaid
+flowchart TB
+    subgraph strategic["Strategic"]
+        ideas["the-ideas-guy<br>• generates ideas<br>• maintains STRATEGY.md<br>• approves/parks/rejects"]
+    end
+
+    subgraph discovery["Discovery"]
+        scout["opportunity-scout<br>• explores codebase<br>• interviews for /idea<br>• proposes items"]
+        defector["defector<br>• triages bugs<br>• creates issues"]
+    end
+
+    subgraph scoring["Scoring"]
+        prioritizer["backlog-prioritizer<br>• scores V/M/A<br>• ranks backlog"]
+    end
+
+    subgraph media["Media"]
+        content["content-specialist<br>• blog posts<br>• LinkedIn"]
+        jekyll["jekyll-specialist<br>• site structure<br>• cross-repo publishing"]
+        tech["technical-specialist<br>• specs, READMEs<br>• Mermaid diagrams"]
+    end
+
+    scout -->|"proposes to"| prioritizer
+    prioritizer -->|"scored items to"| ideas
+    defector -->|"bugs to"| prioritizer
+```
+
+### Quick Reference
+
+**Ideation & Strategy**
+
+| Goal | Command/Agent |
+|------|---------------|
+| Capture new idea | `/idea` |
+| Report a bug | `defector` agent |
+| Explore for opportunities | `opportunity-scout` agent |
+| Strategic review / approve items | `the-ideas-guy` agent |
+| Score backlog items (V/M/A) | `backlog-prioritizer` agent |
+
+**SpecKit Pipeline**
+
+| Goal | Command/Agent |
+|------|---------------|
+| Start approved work | `/speckit.start {ID}` |
+| Write specification | `/speckit.specify` |
+| Resolve ambiguities | `/speckit.clarify` |
+| Create implementation plan | `/speckit.plan` |
+| Generate task list | `/speckit.tasks` |
+| Execute tasks | `/speckit.implement` |
+| Create PR + publish | `/speckit.pr` |
+
+**SpecKit Helpers**
+
+| Goal | Command/Agent |
+|------|---------------|
+| Generate quality checklist | `/speckit.checklist` |
+| Audit cross-artifact consistency | `/speckit.analyze` |
+| Update project principles | `/speckit.constitution` |
+| Convert tasks to GitHub issues | `/speckit.taskstoissues` |
+
+**Media & Utilities**
+
+| Goal | Command/Agent |
+|------|---------------|
+| Write blog content | `/media` or `content-specialist` |
+| Publish to website | `/publish` |
+| Attach screenshot to issue | `/get-the-shot {issue}` |
+
 ## Getting Started
 
 ### Prerequisites
