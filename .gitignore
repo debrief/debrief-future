@@ -212,6 +212,9 @@ node_modules/
 .npm
 .pnpm-store/
 
+# Task runner (go-task)
+.task/
+
 # OS files
 .DS_Store
 Thumbs.db
