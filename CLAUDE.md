@@ -145,6 +145,8 @@ Three approaches required:
 - N/A (pure display components — no persistence) (001-shared-react-components)
 - Python 3.11+ (LinkML, Pydantic), TypeScript 5.x (generated types) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS) (014-geojson-styling-schemas)
 - N/A (schema definitions only - no persistence) (014-geojson-styling-schemas)
+- YAML (Taskfile.yml v3 syntax) + Task v3.x (go-task/task), uv (Python), pnpm (Node.js) (017-task-build)
+- N/A (configuration only) (017-task-build)
 
 ## Recent Changes
 - 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v5+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 10.x

@@ -71,7 +71,39 @@ The tracer bullet implementation validates the architecture with a thin end-to-e
 
 ## Getting Started
 
-*Coming soon* — setup instructions will be added as implementation progresses.
+### Prerequisites
+
+| Tool | Installation |
+|------|--------------|
+| Task | https://taskfile.dev/installation/ (or `brew install go-task`) |
+| uv | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+| pnpm | `npm install -g pnpm` |
+| Node.js | 18+ |
+| Python | 3.11+ |
+
+### Quick Start
+
+```bash
+git clone https://github.com/debrief/debrief-future.git
+cd debrief-future
+task install   # Install all dependencies
+task test      # Run all tests
+```
+
+### Common Commands
+
+| Command | Description |
+|---------|-------------|
+| `task install` | Install all dependencies (Python + Node.js) |
+| `task test` | Run all tests |
+| `task build` | Build all artifacts |
+| `task dev` | Start development watch mode |
+| `task lint` | Check code style |
+| `task lint:fix` | Auto-fix style issues |
+| `task clean` | Remove build artifacts |
+| `task --list` | Show all available tasks |
+
+All commands auto-install dependencies if needed. See [docs/quickstart.md](docs/quickstart.md) for details.
 
 ## Contributing
 
