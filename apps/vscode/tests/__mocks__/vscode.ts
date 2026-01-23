@@ -118,3 +118,9 @@ export const FileType = {
 };
 
 export const Disposable = vi.fn();
+
+export const ConfigurationTarget = {
+  Global: 1,
+  Workspace: 2,
+  WorkspaceFolder: 3,
+};

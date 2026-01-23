@@ -94,6 +94,10 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
+| 017 | Feature | [Add storyboarding capability for mission/exercise briefings](docs/ideas/017-storyboarding-briefings.md) | 4 | 5 | 4 | 13 | High | proposed |
+| 014 | Feature | [Add styling properties schemas to GeoJSON features](docs/ideas/014-geojson-styling-properties.md) | 5 | 4 | 5 | 14 | Medium | approved |
+| 015 | Infrastructure | [Create LinkML schemas for REP annotation item types](docs/ideas/015-annotation-item-schemas.md) (prerequisite for #007) | 5 | 3 | 5 | 13 | Medium | approved |
+| 007 | Enhancement | [Implement REP file special comments (NARRATIVE, CIRCLE, etc.)](docs/ideas/007-rep-special-comments.md) (requires #015) | 4 | 4 | 4 | 12 | Medium | approved |
 | 021 | Feature | [Add REP file loading to VS Code extension](docs/ideas/021-load-rep-files-stac.md) | 5 | 5 | 4 | 14 | Medium | approved |
 | 016 | Infrastructure | [Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md) | 3 | 5 | 4 | 12 | Medium | specified |
 | ~~014~~ | ~~Feature~~ | ~~[Add styling properties schemas to GeoJSON features](specs/014-geojson-styling-schemas/spec.md)~~ | ~~5~~ | ~~4~~ | ~~5~~ | ~~14~~ | ~~Medium~~ | ~~complete~~ |
@@ -112,8 +116,8 @@ Description formats:
 | 001 | Infrastructure | Extract shared MCP utilities into mcp-common package | 3 | 2 | 4 | 9 | Medium | proposed |
 | 010 | Tech Debt | Add rollback/cleanup API to debrief-stac for interrupted operations | 3 | 1 | 4 | 8 | Medium | proposed |
 | 012 | Enhancement | Wire loader plot count to debrief-stac list_plots call | 2 | 1 | 5 | 8 | Low | proposed |
-| 022 | Feature | [Add SYSTEM kind discriminator for non-spatial state](https://github.com/debrief/debrief-future/issues/76) | 5 | 2 | 5 | 12 | Low | approved |
-| 023 | Infrastructure | [Add epic support to speckit workflow](https://github.com/debrief/debrief-future/issues/79) | 4 | 3 | 4 | 11 | Medium | approved |
+| 022 | Feature | [Add SYSTEM kind discriminator for non-spatial state](specs/022-system-kind-discriminator/spec.md) | 5 | 2 | 5 | 12 | Low | specified |
+| 023 | Infrastructure | [Add epic support to speckit workflow](specs/023-epic-workflow-support/spec.md) | 4 | 3 | 4 | 11 | Medium | specified |
 
 ## Categories
 
