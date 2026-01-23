@@ -56,7 +56,10 @@
       "Bash(task build:*)",
       "Bash(task lint:*)",
       "Bash(task clean:*)",
-      "Bash(task:*)"
+      "Bash(task:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr close:*)",
+      "Bash(pnpm build:*)"
     ]
   }
 }

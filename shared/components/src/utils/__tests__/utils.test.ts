@@ -26,6 +26,10 @@ const mockTrackFeature: TrackFeature = {
     start_time: '2024-01-15T08:00:00Z',
     end_time: '2024-01-15T12:00:00Z',
     positions: [],
+    style: {
+      line: { color: '#0066cc', weight: 2 },
+      point: { shape: 'circle', radius: 4, fill_color: '#0066cc', color: '#0066cc' },
+    },
   },
 };
 
@@ -43,6 +47,7 @@ const mockReferenceLocation: ReferenceLocation = {
     description: 'Navigation waypoint',
     valid_from: '2024-01-15T00:00:00Z',
     valid_until: '2024-01-15T23:59:59Z',
+    style: { shape: 'circle', radius: 6, fill_color: '#0066cc', color: '#0066cc' },
   },
 };
 
@@ -266,7 +271,13 @@ describe('labels', () => {
     it('returns explicit color if set', () => {
       const coloredFeature: TrackFeature = {
         ...mockTrackFeature,
-        properties: { ...mockTrackFeature.properties, color: '#ff0000' },
+        properties: {
+          ...mockTrackFeature.properties,
+          style: {
+            line: { color: '#ff0000', weight: 2 },
+            point: { shape: 'circle', radius: 4, fill_color: '#ff0000', color: '#ff0000' },
+          },
+        },
       };
       expect(getFeatureColor(coloredFeature)).toBe('#ff0000');
     });
