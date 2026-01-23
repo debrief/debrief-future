@@ -152,9 +152,9 @@
 
 **Purpose**: Update GitHub Actions to use Task commands
 
-- [ ] T027 Update CI workflow to install Task `arduino/setup-task@v2` `.github/workflows/ci.yml` (deferred - separate PR)
-- [ ] T028 Replace direct uv/pnpm calls with task commands `.github/workflows/ci.yml` (deferred - separate PR)
-- [ ] T029 Verify CI passes with task commands (deferred - separate PR)
+- [x] T027 Update CI workflow to install Task `arduino/setup-task@v2` `.github/workflows/ci.yml`
+- [x] T028 Replace direct uv/pnpm calls with task commands `.github/workflows/ci.yml`
+- [ ] T029 Verify CI passes with task commands (verify after PR push)
 
 **Checkpoint**: CI uses identical commands to local development
 
@@ -184,7 +184,7 @@
 
 ### PR Creation
 
-- [ ] T039 Create PR and publish blog: run /speckit.pr
+- [x] T039 Create PR and publish blog: run /speckit.pr
 
 **Task T039 must run last. It depends on all evidence and media tasks being complete.**
 
