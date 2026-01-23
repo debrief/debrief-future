@@ -25,7 +25,7 @@ Demonstrate the platform is substantial and trustworthy. Only claim this when ea
 - Real workflows supported end-to-end
 - Evidence of reliability and quality
 
-### Track 3: Desire — "New things become possible"
+### Track 3: Ambition — "New things become possible"
 Show what readers could do that they can't today. Use sparingly until Tracks 1 and 2 support it.
 - Aggregate analysis across exercises
 - Python tools scientists can build themselves

@@ -212,7 +212,11 @@ node_modules/
 .npm
 .pnpm-store/
 
-# Task runner (go-task)
+# Electron build artifacts
+apps/loader/release/
+apps/loader/packaging/dist/
+
+# Task runner cache
 .task/
 
 # OS files

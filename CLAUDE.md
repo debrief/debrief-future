@@ -113,6 +113,90 @@ fly machines restart --app debrief-demo
 | TypeScript packaging | pnpm workspaces |
 | User config | XDG Base Directory |
 
+## Parallel Sessions (Worktrees)
+
+Run multiple Claude Code sessions concurrently using git worktrees.
+
+### How It Works
+
+| Environment | Behavior | Detection |
+|-------------|----------|-----------|
+| **Local device** | Creates worktree in `../worktrees/` | `../worktrees/` directory exists |
+| **Cloud (Claude Code)** | Creates branch (single session) | `CLAUDE_CODE_SESSION_ID` env var |
+
+### Setup for Local Parallel Development
+
+```bash
+# One-time setup: create worktrees directory
+mkdir ../worktrees
+
+# Now /speckit.start will automatically create worktrees
+```
+
+### Environment Variables
+
+| Variable | Values | Effect |
+|----------|--------|--------|
+| `SPECKIT_WORKTREES` | `true` | Force worktree mode |
+| `SPECKIT_WORKTREES` | `false` | Force branch mode |
+| (unset) | — | Auto-detect based on environment |
+
+### Workflow
+
+1. Run `/speckit.start 007` in main repo
+2. Script creates `../worktrees/007-feature-name/`
+3. Output shows: `cd ../worktrees/007-feature-name`
+4. Open new terminal/Claude session in that directory
+5. Continue with `/speckit.specify`, `/speckit.plan`, etc.
+
+### Managing Worktrees
+
+```bash
+# List all worktrees
+git worktree list
+
+# Remove a worktree (after PR merged)
+git worktree remove ../worktrees/007-feature-name
+
+# Prune stale worktree entries
+git worktree prune
+```
+
+### Cleanup Utilities
+
+The `common.sh` script provides cleanup functions:
+
+```bash
+# Source the utilities
+source .specify/scripts/bash/common.sh
+
+# List worktrees with status (active/merged/stale)
+list_worktrees_with_status
+
+# Get count of cleanable worktrees
+get_stale_worktree_count
+
+# Preview cleanup (dry run)
+cleanup_stale_worktrees --dry-run
+
+# Execute cleanup (removes merged/stale worktrees)
+cleanup_stale_worktrees
+
+# Force cleanup (removes even with uncommitted changes)
+cleanup_stale_worktrees --force
+```
+
+**When cleanup happens:**
+- `/speckit.start` checks for stale worktrees (where backlog item is complete)
+- Manual cleanup anytime via `cleanup_stale_worktrees`
+- Worktrees persist through PR review cycle for feedback iterations
+
+### Script Flags
+
+The `create-new-feature.sh` script accepts:
+- `--worktree` — Force worktree creation
+- `--no-worktree` — Force branch checkout (current behavior)
+
 ## Key Documents
 
 - `CONSTITUTION.md` — immutable development principles (supersedes all other docs)
@@ -147,6 +231,8 @@ Three approaches required:
 - N/A (schema definitions only - no persistence) (014-geojson-styling-schemas)
 - YAML (Taskfile.yml v3 syntax) + Task v3.x (go-task/task), uv (Python), pnpm (Node.js) (017-task-build)
 - N/A (configuration only) (017-task-build)
+- TypeScript 5.x (VS Code Extension) + @vscode/api ^1.85.0 (017-vscode-hide-activities)
+- VS Code `context.globalState` for initialization tracking, user settings for visibility config (017-vscode-hide-activities)
 
 ## Recent Changes
 - 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v5+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 10.x
