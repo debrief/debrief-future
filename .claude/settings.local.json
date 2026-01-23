@@ -79,7 +79,17 @@
       "Bash(pnpm compile:*)",
       "Bash(tee:*)",
       "Bash(gh issue view:*)",
-      "WebFetch(domain:gist.github.com)"
+      "WebFetch(domain:gist.github.com)",
+      "Bash(git branch:*)",
+      "Bash(gh issue create:*)",
+      "Skill(speckit.plan)",
+      "Bash(make generate:*)",
+      "Bash(uv run:*)",
+      "Bash(make test:*)",
+      "Bash(git commit:*)",
+      "Skill(speckit.tasks)",
+      "Skill(speckit.implement)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
