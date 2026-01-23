@@ -75,7 +75,12 @@
       "Bash(pnpm rebuild:*)",
       "WebSearch",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:code.visualstudio.com)"
+      "WebFetch(domain:code.visualstudio.com)",
+      "Bash(pnpm test:unit:*)",
+      "Bash(pnpm compile:*)",
+      "Bash(tee:*)",
+      "Bash(gh issue view:*)",
+      "WebFetch(domain:gist.github.com)"
     ]
   }
 }
