@@ -99,7 +99,8 @@
                 "RECTANGLE",
                 "LINE",
                 "TEXT",
-                "VECTOR"
+                "VECTOR",
+                "SYSTEM"
             ],
             "title": "FeatureKindEnum",
             "type": "string"
@@ -760,6 +761,124 @@
             ],
             "title": "ReferenceLocationProperties",
             "type": "object"
+        },
+        "SystemState": {
+            "additionalProperties": false,
+            "description": "GeoJSON Feature for storing non-spatial system state",
+            "properties": {
+                "geometry": {
+                    "description": "Always null for SYSTEM features",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "State identifier (must start with 'state.')",
+                    "pattern": "^state\\.[a-z]+$",
+                    "type": "string"
+                },
+                "properties": {
+                    "$ref": "#/$defs/SystemStateProperties",
+                    "description": "State-specific properties"
+                },
+                "type": {
+                    "const": "Feature",
+                    "description": "GeoJSON type discriminator",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "type",
+                "id",
+                "properties"
+            ],
+            "title": "SystemState",
+            "type": "object"
+        },
+        "SystemStateProperties": {
+            "additionalProperties": false,
+            "description": "Properties for SYSTEM features storing application state",
+            "properties": {
+                "bbox": {
+                    "description": "Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state",
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "center": {
+                    "description": "Map center [longitude, latitude] - for spatial state",
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "end_time": {
+                    "description": "Viewport end time (ISO8601) - for temporal state",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "kind": {
+                    "$ref": "#/$defs/FeatureKindEnum",
+                    "const": "SYSTEM",
+                    "description": "Feature type discriminator"
+                },
+                "selected_ids": {
+                    "description": "Array of selected feature IDs - for selection state",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "start_time": {
+                    "description": "Viewport start time (ISO8601) - for temporal state",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "state_type": {
+                    "$ref": "#/$defs/SystemStateTypeEnum",
+                    "description": "Discriminator for state variant (temporal, spatial, selection)"
+                },
+                "zoom": {
+                    "description": "Map zoom level - for spatial state",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "kind",
+                "state_type"
+            ],
+            "title": "SystemStateProperties",
+            "type": "object"
+        },
+        "SystemStateTypeEnum": {
+            "description": "Discriminator for system state variants",
+            "enum": [
+                "temporal",
+                "spatial",
+                "selection"
+            ],
+            "title": "SystemStateTypeEnum",
+            "type": "string"
         },
         "TextAnnotation": {
             "additionalProperties": false,

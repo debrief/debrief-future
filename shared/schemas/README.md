@@ -4,12 +4,36 @@ LinkML master schemas and generated artifacts for Debrief v4.x maritime tactical
 
 ## Overview
 
-This is a **tracer bullet** implementation providing schema definitions for two core entity types:
+This is a **tracer bullet** implementation providing schema definitions for core entity types:
 
 - **TrackFeature** - GeoJSON Feature representing vessel tracks
 - **ReferenceLocation** - GeoJSON Feature for fixed reference points
+- **SystemState** - GeoJSON Feature for non-spatial system state (viewports, selections)
 
 Additional entity types (SensorContact, PlotMetadata, ToolMetadata) will be added in future iterations.
+
+### System State Features
+
+SystemState features store application state alongside spatial data using GeoJSON's `geometry: null` pattern:
+
+```json
+{
+  "type": "Feature",
+  "id": "state.temporal",
+  "geometry": null,
+  "properties": {
+    "kind": "SYSTEM",
+    "state_type": "temporal",
+    "start_time": "2024-01-15T09:00:00Z",
+    "end_time": "2024-01-15T17:30:00Z"
+  }
+}
+```
+
+Three state variants are supported:
+- `state.temporal` - Time viewport (start/end times)
+- `state.spatial` - Map viewport (bbox, zoom, center)
+- `state.selection` - Selected feature IDs
 
 ## Generated Artifacts
 
@@ -24,7 +48,7 @@ From the LinkML master schemas, we generate:
 ### Python (Pydantic)
 
 ```python
-from debrief_schemas import TrackFeature, ReferenceLocation
+from debrief_schemas import TrackFeature, ReferenceLocation, SystemState
 
 # Validate track data
 track = TrackFeature(**track_dict)
