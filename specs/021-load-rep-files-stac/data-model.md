@@ -44,47 +44,9 @@ interface ImportCompleteMessage {
 
 ## Service Interfaces
 
-### ImportService
+**Architecture Note**: IoService is storage-agnostic (parse only). The VS Code extension (mapPanel, command handlers) acts as orchestrator, calling IoService then StacService. No dedicated ImportService.
 
-Orchestrates the REP import workflow.
-
-```typescript
-interface ImportService {
-  /**
-   * Import REP file into target STAC item.
-   * @param repFilePath Absolute path to .rep file
-   * @param catalogPath Path to STAC catalog
-   * @param plotId Target plot/item ID
-   * @returns Import result with feature count
-   * @throws DuplicateImportError if file already imported
-   * @throws ParseError if REP file invalid
-   * @throws StacError if storage fails
-   */
-  importRep(
-    repFilePath: string,
-    catalogPath: string,
-    plotId: string
-  ): Promise<ImportResult>;
-
-  /**
-   * Check if REP file was already imported to plot.
-   * @returns true if duplicate detected
-   */
-  checkDuplicate(
-    repFilePath: string,
-    catalogPath: string,
-    plotId: string
-  ): Promise<boolean>;
-}
-
-interface ImportResult {
-  featureCount: number;
-  bounds: [number, number, number, number] | null;
-  assetKey: string;
-}
-```
-
-### IoService
+### IoService (Storage-Agnostic)
 
 Communicates with debrief-io for REP parsing.
 
