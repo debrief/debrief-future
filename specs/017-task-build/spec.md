@@ -49,9 +49,10 @@ A developer wants to work on code with automatic rebuilding when files change, e
 
 **Acceptance Scenarios**:
 
-1. **Given** developer runs `task dev`, **When** they modify a TypeScript file, **Then** the affected package recompiles automatically
-2. **Given** developer runs `task dev`, **When** they want to stop, **Then** Ctrl+C cleanly terminates all watch processes
-3. **Given** a compilation error occurs during watch, **When** developer fixes the error, **Then** recompilation succeeds without restarting watch
+1. **Given** a fresh checkout, **When** developer runs `task dev`, **Then** dependencies are installed first and watch mode starts
+2. **Given** developer runs `task dev`, **When** they modify a TypeScript file, **Then** the affected package recompiles automatically
+3. **Given** developer runs `task dev`, **When** they want to stop, **Then** Ctrl+C cleanly terminates all watch processes
+4. **Given** a compilation error occurs during watch, **When** developer fixes the error, **Then** recompilation succeeds without restarting watch
 
 ---
 
@@ -65,9 +66,10 @@ A developer wants to check code style and automatically fix issues before commit
 
 **Acceptance Scenarios**:
 
-1. **Given** code with style violations, **When** developer runs `task lint`, **Then** violations are reported with file locations
-2. **Given** code with auto-fixable violations, **When** developer runs `task lint:fix`, **Then** violations are automatically corrected
-3. **Given** clean code, **When** developer runs `task lint`, **Then** command exits with zero status
+1. **Given** a fresh checkout, **When** developer runs `task lint`, **Then** dependencies are installed first and linting runs
+2. **Given** code with style violations, **When** developer runs `task lint`, **Then** violations are reported with file locations
+3. **Given** code with auto-fixable violations, **When** developer runs `task lint:fix`, **Then** violations are automatically corrected
+4. **Given** clean code, **When** developer runs `task lint`, **Then** command exits with zero status
 
 ---
 
@@ -107,7 +109,7 @@ A developer cloning the repo for the first time wants to install all dependencie
 - **FR-008**: System MUST work identically in CI and local development environments
 - **FR-009**: System MUST replace the existing Makefile as the single source of build commands
 - **FR-010**: System MUST provide clear error messages when prerequisites (Python, Node, uv, pnpm) are missing
-- **FR-011**: System MUST automatically run `install` before `test` and `build` if dependencies are missing (task dependencies)
+- **FR-011**: System MUST automatically run `install` before `test`, `build`, `dev`, and `lint` if dependencies are missing (task dependencies)
 
 ### Key Entities
 
