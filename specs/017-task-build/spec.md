@@ -33,7 +33,7 @@ A developer or CI system needs to build all artifacts (compiled TypeScript, Pyth
 
 **Acceptance Scenarios**:
 
-1. **Given** a clean checkout with dependencies installed, **When** developer runs `task build`, **Then** all TypeScript packages compile and Python packages are prepared
+1. **Given** a clean checkout, **When** developer runs `task build`, **Then** dependencies are installed first (via task dependency) and all artifacts are created
 2. **Given** a TypeScript compilation error exists, **When** developer runs `task build`, **Then** the command fails fast with clear error location
 3. **Given** builds have already run and source files unchanged, **When** developer runs `task build` again, **Then** cached outputs are used and build completes quickly
 
@@ -107,7 +107,7 @@ A developer cloning the repo for the first time wants to install all dependencie
 - **FR-008**: System MUST work identically in CI and local development environments
 - **FR-009**: System MUST replace the existing Makefile as the single source of build commands
 - **FR-010**: System MUST provide clear error messages when prerequisites (Python, Node, uv, pnpm) are missing
-- **FR-011**: System MUST support task dependencies (e.g., `test` depends on `install`)
+- **FR-011**: System MUST automatically run `install` before `test` and `build` if dependencies are missing (task dependencies)
 
 ### Key Entities
 
