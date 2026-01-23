@@ -497,6 +497,7 @@ source = { virtual = "." }
 [package.dev-dependencies]
 dev = [
     { name = "click" },
+    { name = "mcp" },
     { name = "pydantic" },
     { name = "pyinstaller" },
     { name = "pytest" },
@@ -509,6 +510,7 @@ dev = [
 [package.metadata.requires-dev]
 dev = [
     { name = "click", specifier = ">=8.0.0" },
+    { name = "mcp", specifier = ">=1.0.0" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "pyinstaller", specifier = ">=6.18.0" },
     { name = "pytest", specifier = ">=7.0.0" },

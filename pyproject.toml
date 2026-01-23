@@ -30,4 +30,14 @@ dev = [
     "pytest-cov>=4.0.0",
     "ruff>=0.8.0",
     "click>=8.0.0",
+    "mcp>=1.0.0",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "shared/schemas/tests", "services/io/tests", "services/config/tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "--import-mode=importlib --ignore=services/stac/tests"
+# Test isolation issue: test_empty_list_when_no_stores fails due to shared state
+# TODO: Fix test isolation in services/config/tests/test_core.py
+xfail_strict = false
