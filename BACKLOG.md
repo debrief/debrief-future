@@ -95,6 +95,10 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
+| 021 | Feature | [Add REP file loading to VS Code extension](specs/021-load-rep-files-stac/spec.md) | 5 | 5 | 4 | 14 | Medium | specified |
+| 014 | Feature | [Add styling properties schemas to GeoJSON features](docs/ideas/014-geojson-styling-properties.md) | 5 | 4 | 5 | 14 | Medium | approved |
+| 015 | Infrastructure | [Create LinkML schemas for REP annotation item types](docs/ideas/015-annotation-item-schemas.md) (prerequisite for #007) | 5 | 3 | 5 | 13 | Medium | approved |
+| 007 | Enhancement | [Implement REP file special comments (NARRATIVE, CIRCLE, etc.)](docs/ideas/007-rep-special-comments.md) (requires #015) | 4 | 4 | 4 | 12 | Medium | approved |
 | 022 | Feature | [Add SYSTEM kind discriminator for non-spatial state](specs/022-system-kind-discriminator/spec.md) | 5 | 2 | 5 | 12 | Low | tasked |
 | 017 | Enhancement | [Configure VS Code extension to hide default activities on load](specs/017-vscode-hide-activities/spec.md) | 3 | 3 | 4 | 10 | Medium | tasked |
 | 021 | Feature | [Add REP file loading to VS Code extension](specs/021-load-rep-files-stac/spec.md) | 5 | 5 | 4 | 14 | Medium | specified |
