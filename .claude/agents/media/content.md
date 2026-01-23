@@ -30,7 +30,7 @@ Demonstrate the platform is substantial and trustworthy. Only claim this when ea
 - Real workflows supported end-to-end
 - Evidence of reliability and quality
 
-### Track 3: Desire — "New things become possible"
+### Track 3: Ambition — "New things become possible"
 Show what readers could do that they can't today. Use sparingly until Tracks 1 and 2 support it.
 - Aggregate analysis across exercises
 - Python tools scientists can build themselves
@@ -145,7 +145,7 @@ All Future Debrief posts use `future-post` layout with these fields:
 | `layout` | Yes | Always `future-post` |
 | `title` | Yes | Post title, include type prefix (Planning:/Shipped:) |
 | `date` | Yes | YYYY-MM-DD format |
-| `track` | Yes | Array of track values: `momentum`, `credibility`, `desire` |
+| `track` | Yes | Array of track values: `momentum`, `credibility`, `ambition` |
 | `author` | Yes | Always `Ian` (capitalized) |
 | `reading_time` | Yes | Minutes to read (calculate: word_count / 200, rounded up) |
 | `tags` | Yes | Array of lowercase, hyphenated tags |
@@ -159,12 +159,12 @@ Posts must include one or more track values from:
 |-------|----------|
 | `momentum` | Announcing plans, sharing progress, work in motion |
 | `credibility` | Delivering features, hitting milestones, proving capability |
-| `desire` | Painting the future, roadmap items, vision pieces |
+| `ambition` | Painting the future, roadmap items, vision pieces |
 
 **Examples:**
 - Planning post: `track: [momentum]`
 - Shipped post: `track: [credibility]`
-- Major milestone with roadmap implications: `track: [credibility, desire]`
+- Major milestone with roadmap implications: `track: [credibility, ambition]`
 - Progress update showing ongoing work: `track: [momentum]`
 
 ## LinkedIn Summaries
@@ -224,7 +224,7 @@ Posts are authored in `debrief-future` and published to `debrief.github.io` by t
 - `author: Ian` (capitalized)
 - Include `reading_time` (calculate: word_count / 200, rounded up)
 - Include `excerpt` (max 150 characters)
-- Include `track` as array with valid values: `momentum`, `credibility`, `desire`
+- Include `track` as array with valid values: `momentum`, `credibility`, `ambition`
 
 **You focus on:**
 - Compelling content
@@ -244,7 +244,7 @@ Before marking a post complete:
 
 - [ ] Front matter has all required fields
 - [ ] `layout: future-post` (not `post` or `future-default`)
-- [ ] `track` is array with valid values (momentum, credibility, desire)
+- [ ] `track` is array with valid values (momentum, credibility, ambition)
 - [ ] `author: Ian` (capitalized)
 - [ ] `reading_time` calculated and included
 - [ ] `excerpt` under 150 characters
