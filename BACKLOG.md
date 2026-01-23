@@ -71,6 +71,13 @@ This bridges backlog approval to the speckit workflow by:
 2. Creating a feature branch and specification
 3. Updating this file: status → `specified`, description → link to spec
 
+## Epics
+
+Large features broken down into multiple backlog items.
+
+| ID | Title | Description | Status | Items |
+|----|-------|-------------|--------|-------|
+
 ## Items
 
 <!--
