@@ -101,7 +101,7 @@ Description formats:
 | 007 | Enhancement | [Implement REP file special comments (NARRATIVE, CIRCLE, etc.)](docs/ideas/007-rep-special-comments.md) (requires #015) | 4 | 4 | 4 | 12 | Medium | approved |
 | 022 | Feature | [Add SYSTEM kind discriminator for non-spatial state](specs/022-system-kind-discriminator/spec.md) | 5 | 2 | 5 | 12 | Low | tasked |
 | 017 | Enhancement | [Configure VS Code extension to hide default activities on load](specs/017-vscode-hide-activities/spec.md) | 3 | 3 | 4 | 10 | Medium | tasked |
-| 021 | Feature | [Add REP file loading to VS Code extension](specs/021-load-rep-files-stac/spec.md) | 5 | 5 | 4 | 14 | Medium | specified |
+| 021 | Feature | [Add REP file loading to VS Code extension](specs/021-load-rep-files-stac/spec.md) | 5 | 5 | 4 | 14 | Medium | tasked |
 | 016 | Infrastructure | [Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md) | 3 | 5 | 4 | 12 | Medium | specified |
 | 023 | Infrastructure | [Add epic support to speckit workflow](specs/023-epic-workflow-support/spec.md) | 4 | 3 | 4 | 11 | Medium | specified |
 | 018 | Infrastructure | [Add VS Code multi-root workspace configuration](specs/018-vscode-workspace-config/spec.md) | 3 | 1 | 5 | 9 | Low | shipped |
@@ -111,6 +111,7 @@ Description formats:
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | Low | approved |
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | 4 | 2 | 4 | 10 | Low | approved |
+| 026 | Feature | [Add annotation shape renderers to VS Code extension](https://github.com/debrief/debrief-future/issues/86) (requires #021) | 5 | 5 | 4 | 14 | Medium | approved |
 | 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](docs/ideas/019-backlog-interview-capture.md) | 3 | 3 | 5 | 11 | Medium | proposed |
 | 020 | Infrastructure | [Add ELLIPSE and POLYGON annotation schemas](https://github.com/debrief/debrief-future/issues/56) | 3 | 2 | 5 | 10 | Low | proposed |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
