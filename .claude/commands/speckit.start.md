@@ -34,6 +34,46 @@ Extract the backlog item ID from `$ARGUMENTS`:
 - Normalize to numeric (e.g., `007` → `7`)
 - ERROR if no ID provided: "Please provide a backlog item ID, e.g., `/speckit.start 007`"
 
+### Step 1a: Check for Stale Worktrees (Cleanup)
+
+Before proceeding, check if there are worktrees that can be cleaned up:
+
+1. **List worktrees**: Run `git worktree list` to find worktrees in `../worktrees/`
+
+2. **For each worktree**, extract the feature ID from the branch name (e.g., `007` from `007-feature-name`)
+
+3. **Check BACKLOG.md** for each worktree's feature ID:
+   - If status is `complete` → worktree is stale, should be removed
+   - If status is anything else → worktree is still active, keep it
+
+4. **If stale worktrees found**, delete them automatically:
+
+   ```bash
+   # For each stale worktree
+   git worktree remove ../worktrees/NNN-feature-name
+   ```
+
+   Report the cleanup:
+
+   ```
+   ## Worktree Cleanup
+
+   Removed stale worktrees for completed features:
+   - ../worktrees/005-old-feature (005 - complete)
+   - ../worktrees/003-another (003 - complete)
+
+   Continuing with feature {ID}...
+   ```
+
+5. **If removal fails** (uncommitted changes), warn but continue:
+
+   ```
+   ⚠️ Could not remove ../worktrees/005-old-feature - has uncommitted changes
+      Run manually: git worktree remove --force ../worktrees/005-old-feature
+   ```
+
+6. **Continue** with the workflow (cleanup failures don't block)
+
 ### Step 2: Read and Parse BACKLOG.md
 
 1. Read `BACKLOG.md` from the repository root
@@ -85,10 +125,15 @@ Present the item details and ask for confirmation:
 - High → Opus (deep reasoning for architectural decisions)
 
 **This will:**
-1. Create a new feature branch
+1. Create a new feature branch (or worktree for parallel sessions)
 2. Generate a specification in `specs/NNN-{short-name}/spec.md`
 3. Update BACKLOG.md to link to the spec
 4. Use **{Model}** model for implementation tasks (based on {Complexity} complexity)
+
+**Parallel Session Mode:**
+- Local device: Creates a worktree in `../worktrees/NNN-{short-name}` for parallel work
+- Cloud (Claude Code): Creates a branch (single session)
+- Override with `SPECKIT_WORKTREES=true|false` environment variable
 
 Proceed with specification? (The handoff button below will continue)
 ```
