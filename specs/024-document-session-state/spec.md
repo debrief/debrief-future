@@ -178,6 +178,13 @@ An analyst makes changes to the session state. The editor indicates when there a
 - Viewport change debouncing during rapid pan/zoom interactions is an implementation detail
 - There is no enforced limit on the number of features that can be selected (reasonable performance expected)
 - Time step auto-calculation from data density is handled at the application layer, not the state management layer
+- State management core is unit-testable through programmatic tests without requiring UI or Python infrastructure; integration tests for UI reactivity and Python access will be added when those systems are available
+
+## Clarifications
+
+### Session 2026-01-23
+
+- Q: How can state management be verified without full UI/Python infrastructure? → A: Unit-testable core - State management logic verifiable through programmatic tests without UI; integration tests added later
 
 ## Success Criteria *(mandatory)*
 
