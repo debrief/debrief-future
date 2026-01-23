@@ -272,6 +272,7 @@ class TimestampedPosition(ConfiguredBaseModel):
     time: datetime  = Field(default=..., description="""Position timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition', 'NarrativeEntryProperties']} })
     coordinates: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
                        'GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon']} })
     depth: Optional[float] = Field(default=None, description="""Depth in meters (negative = below surface)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition']} })
@@ -347,6 +348,7 @@ class GeoJSONPoint(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
     type: Literal["Point"] = Field(default=..., description="""Geometry type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'TrackFeature',
@@ -361,6 +363,34 @@ class GeoJSONPoint(ConfiguredBaseModel):
          'equals_string': 'Point'} })
     coordinates: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
                        'GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon']} })
+
+
+class GeoJSONEmptyPoint(ConfiguredBaseModel):
+    """
+    GeoJSON Point geometry with empty coordinates (for non-spatial features)
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
+
+    type: Literal["Point"] = Field(default=..., description="""Geometry type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation'],
+         'equals_string': 'Point'} })
+    coordinates: list[float] = Field(default=..., description="""Empty array for non-spatial features""", max_length=0, json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
+                       'GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon']} })
 
@@ -372,6 +402,7 @@ class GeoJSONLineString(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
     type: Literal["LineString"] = Field(default=..., description="""Geometry type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'TrackFeature',
@@ -386,6 +417,7 @@ class GeoJSONLineString(ConfiguredBaseModel):
          'equals_string': 'LineString'} })
     coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
                        'GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon']} })
 
@@ -397,6 +429,7 @@ class GeoJSONPolygon(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
     type: Literal["Polygon"] = Field(default=..., description="""Geometry type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'TrackFeature',
@@ -411,6 +444,7 @@ class GeoJSONPolygon(ConfiguredBaseModel):
          'equals_string': 'Polygon'} })
     coordinates: list[float] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
                        'GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon']} })
 
@@ -461,6 +495,7 @@ class TrackFeature(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
     type: Literal["Feature"] = Field(default=..., description="""GeoJSON type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'TrackFeature',
@@ -548,6 +583,7 @@ class ReferenceLocation(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
     type: Literal["Feature"] = Field(default=..., description="""GeoJSON type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'TrackFeature',
@@ -621,6 +657,7 @@ class SystemState(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
     type: Literal["Feature"] = Field(default=..., description="""GeoJSON type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'TrackFeature',
@@ -642,7 +679,7 @@ class SystemState(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation']} })
-    geometry: Optional[str] = Field(default=None, description="""Always null for SYSTEM features""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+    geometry: GeoJSONEmptyPoint = Field(default=..., description="""Point geometry with empty coordinates for SYSTEM features""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
                        'NarrativeEntry',
@@ -725,6 +762,7 @@ class NarrativeEntry(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
     type: Literal["Feature"] = Field(default=..., description="""GeoJSON type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'TrackFeature',
@@ -819,6 +857,7 @@ class CircleAnnotation(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
     type: Literal["Feature"] = Field(default=..., description="""GeoJSON type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'TrackFeature',
@@ -911,6 +950,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
     type: Literal["Feature"] = Field(default=..., description="""GeoJSON type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'TrackFeature',
@@ -1003,6 +1043,7 @@ class LineAnnotation(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
     type: Literal["Feature"] = Field(default=..., description="""GeoJSON type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'TrackFeature',
@@ -1092,6 +1133,7 @@ class TextAnnotation(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
     type: Literal["Feature"] = Field(default=..., description="""GeoJSON type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'TrackFeature',
@@ -1187,6 +1229,7 @@ class VectorAnnotation(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
     type: Literal["Feature"] = Field(default=..., description="""GeoJSON type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
                        'TrackFeature',
@@ -1236,6 +1279,7 @@ LineProperties.model_rebuild()
 PolygonProperties.model_rebuild()
 TrackStyle.model_rebuild()
 GeoJSONPoint.model_rebuild()
+GeoJSONEmptyPoint.model_rebuild()
 GeoJSONLineString.model_rebuild()
 GeoJSONPolygon.model_rebuild()
 TrackProperties.model_rebuild()

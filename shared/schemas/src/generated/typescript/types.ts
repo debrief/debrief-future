@@ -219,6 +219,17 @@ export interface GeoJSONPoint {
 
 
 /**
+ * GeoJSON Point geometry with empty coordinates (for non-spatial features)
+ */
+export interface GeoJSONEmptyPoint {
+    /** Geometry type discriminator */
+    type: string,
+    /** Empty array for non-spatial features */
+    coordinates: number[],
+}
+
+
+/**
  * GeoJSON LineString geometry
  */
 export interface GeoJSONLineString {
@@ -351,8 +362,8 @@ export interface SystemState {
     type: string,
     /** State identifier (must start with 'state.') */
     id: string,
-    /** Always null for SYSTEM features */
-    geometry?: string,
+    /** Point geometry with empty coordinates for SYSTEM features */
+    geometry: GeoJSONEmptyPoint,
     /** State-specific properties */
     properties: SystemStateProperties,
 }

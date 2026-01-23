@@ -2,8 +2,8 @@
   "type": "Feature",
   "id": "state.temporal",
   "geometry": {
-    "type": "Point",
-    "coordinates": [-2.0, 52.25]
+    "type": "LineString",
+    "coordinates": [[-2.0, 52.25], [-1.5, 52.5]]
   },
   "properties": {
     "kind": "SYSTEM",

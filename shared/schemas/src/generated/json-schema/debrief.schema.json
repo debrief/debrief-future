@@ -105,6 +105,31 @@
             "title": "FeatureKindEnum",
             "type": "string"
         },
+        "GeoJSONEmptyPoint": {
+            "additionalProperties": false,
+            "description": "GeoJSON Point geometry with empty coordinates (for non-spatial features)",
+            "properties": {
+                "coordinates": {
+                    "description": "Empty array for non-spatial features",
+                    "items": {
+                        "type": "number"
+                    },
+                    "maxItems": 0,
+                    "type": "array"
+                },
+                "type": {
+                    "const": "Point",
+                    "description": "Geometry type discriminator",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "type",
+                "coordinates"
+            ],
+            "title": "GeoJSONEmptyPoint",
+            "type": "object"
+        },
         "GeoJSONLineString": {
             "additionalProperties": false,
             "description": "GeoJSON LineString geometry",
@@ -767,11 +792,8 @@
             "description": "GeoJSON Feature for storing non-spatial system state",
             "properties": {
                 "geometry": {
-                    "description": "Always null for SYSTEM features",
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "$ref": "#/$defs/GeoJSONEmptyPoint",
+                    "description": "Point geometry with empty coordinates for SYSTEM features"
                 },
                 "id": {
                     "description": "State identifier (must start with 'state.')",
@@ -791,6 +813,7 @@
             "required": [
                 "type",
                 "id",
+                "geometry",
                 "properties"
             ],
             "title": "SystemState",

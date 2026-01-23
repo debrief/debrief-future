@@ -14,13 +14,16 @@ Additional entity types (SensorContact, PlotMetadata, ToolMetadata) will be adde
 
 ### System State Features
 
-SystemState features store application state alongside spatial data using GeoJSON's `geometry: null` pattern:
+SystemState features store application state alongside spatial data using Point geometry with empty coordinates:
 
 ```json
 {
   "type": "Feature",
   "id": "state.temporal",
-  "geometry": null,
+  "geometry": {
+    "type": "Point",
+    "coordinates": []
+  },
   "properties": {
     "kind": "SYSTEM",
     "state_type": "temporal",

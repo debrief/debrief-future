@@ -21,13 +21,16 @@ The implementation adds:
 
 ## How It Works
 
-SYSTEM features use GeoJSON's `geometry: null` pattern:
+SYSTEM features use Point geometry with empty coordinates:
 
 ```json
 {
   "type": "Feature",
   "id": "state.temporal",
-  "geometry": null,
+  "geometry": {
+    "type": "Point",
+    "coordinates": []
+  },
   "properties": {
     "kind": "SYSTEM",
     "state_type": "temporal",
@@ -37,7 +40,7 @@ SYSTEM features use GeoJSON's `geometry: null` pattern:
 }
 ```
 
-The schema validates that SYSTEM features have null geometry and correctly-formatted IDs. Invalid structures are rejected at parse time, not runtime.
+The schema validates that SYSTEM features have Point geometry with empty coordinates and correctly-formatted IDs. Invalid structures are rejected at parse time, not runtime.
 
 ## Evidence
 

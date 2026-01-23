@@ -39,6 +39,21 @@ classes:
         minimum_cardinality: 2
         maximum_cardinality: 2
 
+  GeoJSONEmptyPoint:
+    description: GeoJSON Point geometry with empty coordinates (for non-spatial features)
+    attributes:
+      type:
+        description: Geometry type discriminator
+        range: string
+        required: true
+        equals_string: "Point"
+      coordinates:
+        description: Empty array for non-spatial features
+        range: float
+        multivalued: true
+        required: true
+        maximum_cardinality: 0
+
   GeoJSONLineString:
     description: GeoJSON LineString geometry
     attributes:
@@ -246,10 +261,9 @@ classes:
         required: true
         pattern: "^state\\.[a-z]+$"
       geometry:
-        description: Always null for SYSTEM features
-        # Note: GeoJSON RFC 7946 allows geometry: null
-        # LinkML doesn't have explicit null type, so we make it optional
-        # and validators should check for null
+        description: Point geometry with empty coordinates for SYSTEM features
+        range: GeoJSONEmptyPoint
+        required: true
       properties:
         description: State-specific properties
         range: SystemStateProperties

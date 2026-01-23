@@ -3,13 +3,13 @@
 ## Python (Pydantic)
 
 ```python
-from debrief_schemas import SystemState, SystemStateProperties
+from debrief_schemas import SystemState, SystemStateProperties, GeoJSONEmptyPoint
 
 # Create temporal viewport state
 temporal_state = SystemState(
     type="Feature",
     id="state.temporal",
-    geometry=None,
+    geometry=GeoJSONEmptyPoint(type="Point", coordinates=[]),
     properties=SystemStateProperties(
         kind="SYSTEM",
         state_type="temporal",
@@ -22,7 +22,7 @@ temporal_state = SystemState(
 spatial_state = SystemState(
     type="Feature",
     id="state.spatial",
-    geometry=None,
+    geometry=GeoJSONEmptyPoint(type="Point", coordinates=[]),
     properties=SystemStateProperties(
         kind="SYSTEM",
         state_type="spatial",
@@ -36,7 +36,7 @@ spatial_state = SystemState(
 selection_state = SystemState(
     type="Feature",
     id="state.selection",
-    geometry=None,
+    geometry=GeoJSONEmptyPoint(type="Point", coordinates=[]),
     properties=SystemStateProperties(
         kind="SYSTEM",
         state_type="selection",
@@ -51,12 +51,12 @@ json_str = temporal_state.model_dump_json(indent=2)
 ## TypeScript
 
 ```typescript
-import { SystemState, SystemStateProperties } from '@debrief/schemas';
+import { SystemState } from '@debrief/schemas';
 
 const temporalState: SystemState = {
   type: 'Feature',
   id: 'state.temporal',
-  geometry: null,
+  geometry: { type: 'Point', coordinates: [] },
   properties: {
     kind: 'SYSTEM',
     state_type: 'temporal',
@@ -83,7 +83,7 @@ SYSTEM features integrate seamlessly with spatial features:
     {
       "type": "Feature",
       "id": "state.temporal",
-      "geometry": null,
+      "geometry": { "type": "Point", "coordinates": [] },
       "properties": {
         "kind": "SYSTEM",
         "state_type": "temporal",
