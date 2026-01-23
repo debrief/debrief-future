@@ -59,6 +59,46 @@ Search for "Debrief Maritime Analysis" in the VS Code Extensions marketplace.
 | `debrief.calc.pythonPath` | Python path for debrief-calc | `python` |
 | `debrief.recentPlots.maxCount` | Maximum recent plots to remember | `10` |
 
+## Debrief Profile (Focused Environment)
+
+Debrief includes a VS Code profile that provides a focused analysis environment by hiding non-essential activity bar items (Source Control, Debug, Extensions, Testing).
+
+### For Users
+
+**Import the profile:**
+
+1. Command Palette (`Ctrl+Shift+P`) → "Profiles: Import Profile"
+2. Select `profiles/Debrief.code-profile` from the extension folder
+3. VS Code will switch to the Debrief profile
+
+**Or via command line:**
+
+```bash
+code --profile-import /path/to/debrief/profiles/Debrief.code-profile
+```
+
+**Restore hidden activities:**
+
+Right-click the activity bar and check any items you want to show.
+
+### For Developers
+
+The Extension Development Host automatically uses the Debrief profile via `launch.json`:
+
+```json
+"args": [
+  "--extensionDevelopmentPath=${workspaceFolder}",
+  "--profile-import=${workspaceFolder}/profiles/Debrief.code-profile",
+  "${workspaceFolder}/test-data"
+]
+```
+
+**To update the profile:**
+
+1. In the Extension Dev Host, right-click activity bar to show/hide items
+2. Command Palette → "Profiles: Export Profile"
+3. Replace `profiles/Debrief.code-profile` with the exported file
+
 ## Extension Settings
 
 This extension contributes the following settings:
@@ -68,6 +108,7 @@ This extension contributes the following settings:
 * `debrief.map.renderer`: Choose between Canvas (faster) or SVG rendering
 * `debrief.calc.pythonPath`: Path to Python executable for debrief-calc integration
 * `debrief.calc.connectionTimeout`: MCP connection timeout in milliseconds
+* `debrief.hideActivities.enabled`: Show a one-time prompt about the focused activity bar configuration
 
 ## Known Issues
 
