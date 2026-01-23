@@ -10,12 +10,19 @@ import { StacService } from './services/stacService';
 import { ConfigService } from './services/configService';
 import { CalcService } from './services/calcService';
 import { RecentPlotsService } from './services/recentPlotsService';
+import { ActivityBarService } from './services/activityBarService';
 import { registerCommands } from './commands';
+import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 
 let mapPanel: MapPanel | undefined;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   // Extension activation begins
+
+  // Initialize activity bar service early (before tree providers)
+  // This hides non-essential activities on first activation
+  const activityBarService = new ActivityBarService(context);
+  await activityBarService.applyDefaults();
 
   // Initialize services
   const configService = new ConfigService();
@@ -71,6 +78,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }
   );
   context.subscriptions.push(...commands);
+
+  // Register activity bar restore command
+  context.subscriptions.push(createRestoreActivitiesCommand(activityBarService));
 
   // Set initial context
   await vscode.commands.executeCommand('setContext', 'debrief.plotOpen', false);

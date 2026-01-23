@@ -119,4 +119,9 @@ vi.mock('vscode', () => ({
     SymbolicLink: 64,
   },
   Disposable: vi.fn(),
+  ConfigurationTarget: {
+    Global: 1,
+    Workspace: 2,
+    WorkspaceFolder: 3,
+  },
 }));

@@ -1,0 +1,22 @@
+
+> debrief-vscode@0.1.0 test:unit /Users/ian/git/worktrees/017-vscode-hide-activities/apps/vscode
+> vitest run
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/ian/git/worktrees/017-vscode-hide-activities/apps/vscode
+
+ ✓ tests/unit/toolFilter.test.ts  (6 tests) 4ms
+ ✓ tests/unit/selectionManager.test.ts  (13 tests) 13ms
+ ✓ tests/unit/timeFilter.test.ts  (7 tests) 4ms
+ ✓ tests/unit/calcService.test.ts  (9 tests) 7ms
+ ✓ tests/unit/trackRenderer.test.ts  (5 tests) 27ms
+ ✓ tests/unit/stacTreeProvider.test.ts  (8 tests) 8ms
+ ✓ tests/unit/activityBarService.test.ts  (18 tests) 14ms
+ ✓ tests/unit/storeValidation.test.ts  (10 tests) 3ms
+
+ Test Files  8 passed (8)
+      Tests  76 passed (76)
+   Start at  14:02:31
+   Duration  749ms (transform 224ms, setup 134ms, collect 371ms, tests 80ms, environment 2ms, prepare 1.51s)
+

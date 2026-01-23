@@ -46,8 +46,8 @@
 
 **Purpose**: Configuration schema and project structure
 
-- [ ] T001 Add hideActivities settings schema to contributes.configuration `apps/vscode/package.json`
-- [ ] T002 [P] Create evidence directory `specs/017-vscode-hide-activities/evidence/`
+- [x] T001 Add hideActivities settings schema to contributes.configuration `apps/vscode/package.json`
+- [x] T002 [P] Create evidence directory `specs/017-vscode-hide-activities/evidence/`
 
 ---
 
@@ -55,9 +55,9 @@
 
 **Purpose**: Core ActivityBarService class that all user stories depend on
 
-- [ ] T003 Create ActivityBarService class skeleton `apps/vscode/src/services/activityBarService.ts`
-- [ ] T004 [test] Write unit tests for ActivityBarService `apps/vscode/src/services/activityBarService.test.ts`
-- [ ] T005 Add service types and interfaces `apps/vscode/src/services/activityBarService.ts`
+- [x] T003 Create ActivityBarService class skeleton `apps/vscode/src/services/activityBarService.ts`
+- [x] T004 [test] Write unit tests for ActivityBarService `apps/vscode/tests/unit/activityBarService.test.ts`
+- [x] T005 Add service types and interfaces `apps/vscode/src/services/activityBarService.ts`
 
 **Checkpoint**: Foundation ready - service class exists with test structure
 
@@ -71,17 +71,17 @@
 
 ### Tests for User Story 1
 
-- [ ] T006 [test][US1] Test applyDefaults() hides target activities `apps/vscode/src/services/activityBarService.test.ts`
-- [ ] T007 [P][test][US1] Test isEnabled() reads setting correctly `apps/vscode/src/services/activityBarService.test.ts`
-- [ ] T008 [P][test][US1] Test getTargetViewIds() returns default list `apps/vscode/src/services/activityBarService.test.ts`
+- [x] T006 [test][US1] Test applyDefaults() hides target activities `apps/vscode/tests/unit/activityBarService.test.ts`
+- [x] T007 [P][test][US1] Test isEnabled() reads setting correctly `apps/vscode/tests/unit/activityBarService.test.ts`
+- [x] T008 [P][test][US1] Test getTargetViewIds() returns default list `apps/vscode/tests/unit/activityBarService.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Implement getTargetViewIds() with default view IDs `apps/vscode/src/services/activityBarService.ts`
-- [ ] T010 [US1] Implement isEnabled() to check debrief.hideActivities.enabled `apps/vscode/src/services/activityBarService.ts`
-- [ ] T011 [US1] Implement applyDefaults() to modify workbench.activity.pinnedViewlets2 `apps/vscode/src/services/activityBarService.ts`
-- [ ] T012 [US1] Initialize ActivityBarService in extension.ts activate() `apps/vscode/src/extension.ts`
-- [ ] T013 [US1] Call applyDefaults() after service initialization `apps/vscode/src/extension.ts`
+- [x] T009 [US1] Implement getTargetViewIds() with default view IDs `apps/vscode/src/services/activityBarService.ts`
+- [x] T010 [US1] Implement isEnabled() to check debrief.hideActivities.enabled `apps/vscode/src/services/activityBarService.ts`
+- [x] T011 [US1] Implement applyDefaults() to modify workbench.activity.pinnedViewlets2 `apps/vscode/src/services/activityBarService.ts`
+- [x] T012 [US1] Initialize ActivityBarService in extension.ts activate() `apps/vscode/src/extension.ts`
+- [x] T013 [US1] Call applyDefaults() after service initialization `apps/vscode/src/extension.ts`
 
 **Checkpoint**: Extension hides activities on first activation
 
@@ -97,13 +97,13 @@
 
 ### Tests for User Story 2
 
-- [ ] T014 [test][US2] Test that Debrief activity is NOT in hidden list `apps/vscode/src/services/activityBarService.test.ts`
-- [ ] T015 [P][test][US2] Test that Explorer activity is NOT in hidden list `apps/vscode/src/services/activityBarService.test.ts`
+- [x] T014 [test][US2] Test that Debrief activity is NOT in hidden list `apps/vscode/tests/unit/activityBarService.test.ts`
+- [x] T015 [P][test][US2] Test that Explorer activity is NOT in hidden list `apps/vscode/tests/unit/activityBarService.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T016 [US2] Add validation: never hide 'workbench.view.explorer' or 'debrief' `apps/vscode/src/services/activityBarService.ts`
-- [ ] T017 [US2] Log warning if user adds Explorer to custom viewIds list `apps/vscode/src/services/activityBarService.ts`
+- [x] T016 [US2] Add validation: never hide 'workbench.view.explorer' or 'debrief' `apps/vscode/src/services/activityBarService.ts`
+- [x] T017 [US2] Log warning if user adds Explorer to custom viewIds list `apps/vscode/src/services/activityBarService.ts`
 
 **Checkpoint**: Explorer and Debrief guaranteed visible after hiding
 
@@ -117,19 +117,19 @@
 
 ### Tests for User Story 3
 
-- [ ] T018 [test][US3] Test detectUserOverrides() identifies re-enabled activities `apps/vscode/src/services/activityBarService.test.ts`
-- [ ] T019 [P][test][US3] Test that user-enabled activities are not re-hidden `apps/vscode/src/services/activityBarService.test.ts`
-- [ ] T020 [P][test][US3] Test setting enabled=false restores all activities `apps/vscode/src/services/activityBarService.test.ts`
+- [x] T018 [test][US3] Test detectUserOverrides() identifies re-enabled activities `apps/vscode/tests/unit/activityBarService.test.ts`
+- [x] T019 [P][test][US3] Test that user-enabled activities are not re-hidden `apps/vscode/tests/unit/activityBarService.test.ts`
+- [x] T020 [P][test][US3] Test setting enabled=false restores all activities `apps/vscode/tests/unit/activityBarService.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Track initialization state in context.globalState `apps/vscode/src/services/activityBarService.ts`
-- [ ] T022 [US3] Store last-applied visibility snapshot on first run `apps/vscode/src/services/activityBarService.ts`
-- [ ] T023 [US3] Implement detectUserOverrides() comparing current vs last-applied `apps/vscode/src/services/activityBarService.ts`
-- [ ] T024 [US3] Skip re-hiding for activities user has manually re-enabled `apps/vscode/src/services/activityBarService.ts`
-- [ ] T025 [US3] Add restore command to package.json (Debrief: Restore Default Activities) `apps/vscode/package.json`
-- [ ] T026 [US3] Implement restore command handler `apps/vscode/src/commands/restoreActivities.ts`
-- [ ] T027 [US3] Register restore command in extension.ts `apps/vscode/src/extension.ts`
+- [x] T021 [US3] Track initialization state in context.globalState `apps/vscode/src/services/activityBarService.ts`
+- [x] T022 [US3] Store last-applied visibility snapshot on first run `apps/vscode/src/services/activityBarService.ts`
+- [x] T023 [US3] Implement detectUserOverrides() comparing current vs last-applied `apps/vscode/src/services/activityBarService.ts`
+- [x] T024 [US3] Skip re-hiding for activities user has manually re-enabled `apps/vscode/src/services/activityBarService.ts`
+- [x] T025 [US3] Add restore command to package.json (Debrief: Restore Default Activities) `apps/vscode/package.json`
+- [x] T026 [US3] Implement restore command handler `apps/vscode/src/commands/restoreActivities.ts`
+- [x] T027 [US3] Register restore command in extension.ts `apps/vscode/src/extension.ts`
 
 **Checkpoint**: User overrides persist; restore command works
 
@@ -141,22 +141,22 @@
 
 ### Quality
 
-- [ ] T028 Run full test suite and verify all pass `apps/vscode/`
-- [ ] T029 [P] Run ESLint and fix any issues `apps/vscode/src/services/activityBarService.ts`
-- [ ] T030 [P] Validate quickstart.md instructions work `specs/017-vscode-hide-activities/quickstart.md`
+- [x] T028 Run full test suite and verify all pass `apps/vscode/`
+- [x] T029 [P] Run ESLint and fix any issues `apps/vscode/src/services/activityBarService.ts`
+- [x] T030 [P] Validate quickstart.md instructions work `specs/017-vscode-hide-activities/quickstart.md`
 
 ### Evidence Collection
 
-- [ ] T031 Capture test summary in `specs/017-vscode-hide-activities/evidence/test-summary.md`
-- [ ] T032 Create usage example in `specs/017-vscode-hide-activities/evidence/usage-example.md`
-- [ ] T033 [P] Capture activity bar screenshot (before hiding) in `specs/017-vscode-hide-activities/evidence/activity-bar-before.png`
-- [ ] T034 [P] Capture activity bar screenshot (after hiding) in `specs/017-vscode-hide-activities/evidence/activity-bar-after.png`
-- [ ] T035 [P] Capture settings UI screenshot in `specs/017-vscode-hide-activities/evidence/settings-screenshot.png`
+- [x] T031 Capture test summary in `specs/017-vscode-hide-activities/evidence/test-summary.md`
+- [x] T032 Create usage example in `specs/017-vscode-hide-activities/evidence/usage-example.md`
+- [ ] T033 [P] Capture activity bar screenshot (before hiding) in `specs/017-vscode-hide-activities/evidence/activity-bar-before.png` (SKIPPED - requires running VS Code)
+- [ ] T034 [P] Capture activity bar screenshot (after hiding) in `specs/017-vscode-hide-activities/evidence/activity-bar-after.png` (SKIPPED - requires running VS Code)
+- [ ] T035 [P] Capture settings UI screenshot in `specs/017-vscode-hide-activities/evidence/settings-screenshot.png` (SKIPPED - requires running VS Code)
 
 ### Media Content
 
-- [ ] T036 Create shipped blog post in `specs/017-vscode-hide-activities/media/shipped-post.md`
-- [ ] T037 [P] Create LinkedIn shipped summary in `specs/017-vscode-hide-activities/media/linkedin-shipped.md`
+- [x] T036 Create shipped blog post in `specs/017-vscode-hide-activities/media/shipped-post.md`
+- [x] T037 [P] Create LinkedIn shipped summary in `specs/017-vscode-hide-activities/media/linkedin-shipped.md`
 
 ### PR Creation
 
