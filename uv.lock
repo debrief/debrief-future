@@ -492,22 +492,16 @@ name = "debrief"
 version = "4.0.0"
 source = { virtual = "." }
 
-[package.optional-dependencies]
-dev = [
-    { name = "ruff" },
-]
-
 [package.dev-dependencies]
 dev = [
     { name = "pydantic" },
     { name = "pyinstaller" },
     { name = "pytest" },
     { name = "pytest-cov" },
+    { name = "ruff" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "ruff", marker = "extra == 'dev'", specifier = ">=0.8.0" }]
-provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -515,6 +509,7 @@ dev = [
     { name = "pyinstaller", specifier = ">=6.18.0" },
     { name = "pytest", specifier = ">=7.0.0" },
     { name = "pytest-cov", specifier = ">=4.0.0" },
+    { name = "ruff", specifier = ">=0.8.0" },
 ]
 
 [[package]]
