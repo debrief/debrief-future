@@ -59,7 +59,15 @@
       "Bash(task:*)",
       "Bash(gh pr list:*)",
       "Bash(gh pr close:*)",
-      "Bash(pnpm build:*)"
+      "Bash(pnpm build:*)",
+      "Bash(pnpm electron:dev:*)",
+      "Bash(git worktree:*)",
+      "Bash(pnpm approve-builds:*)",
+      "Bash(jq:*)",
+      "Bash(pnpm rebuild:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:code.visualstudio.com)"
     ]
   }
 }
