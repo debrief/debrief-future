@@ -83,16 +83,16 @@ flowchart LR
     end
 
     subgraph capture["Capture"]
-        scout["Scout\n(evaluates)"]
-        interview["Interview\n(gathers detail)"]
-        defector["Defector\n(triages)"]
+        scout["Scout<br>(evaluates)"]
+        interview["Interview<br>(gathers detail)"]
+        defector["Defector<br>(triages)"]
     end
 
     subgraph backlog["Backlog"]
         issue["GitHub Issue"]
-        add["BACKLOG.md\nproposed"]
-        score["Prioritizer\nscores V/M/A"]
-        review["Ideas-Guy\nreviews"]
+        add["BACKLOG.md<br>proposed"]
+        score["Prioritizer<br>scores V/M/A"]
+        review["Ideas-Guy<br>reviews"]
     end
 
     subgraph outcome["Outcome"]
@@ -115,13 +115,13 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    start["/speckit.start\n{ID}"]
-    specify["/speckit.specify\n→ spec.md"]
-    clarify["/speckit.clarify\n→ clarifications"]
-    plan["/speckit.plan\n→ plan.md"]
-    tasks["/speckit.tasks\n→ tasks.md"]
-    implement["/speckit.implement\n→ code + evidence"]
-    pr["/speckit.pr\n→ PR + blog"]
+    start["/speckit.start<br>{ID}"]
+    specify["/speckit.specify<br>→ spec.md"]
+    clarify["/speckit.clarify<br>→ clarifications"]
+    plan["/speckit.plan<br>→ plan.md"]
+    tasks["/speckit.tasks<br>→ tasks.md"]
+    implement["/speckit.implement<br>→ code + evidence"]
+    pr["/speckit.pr<br>→ PR + blog"]
 
     start --> specify --> clarify --> plan --> tasks --> implement --> pr
 
@@ -133,10 +133,10 @@ flowchart LR
 ```mermaid
 flowchart TB
     subgraph anytime["Use Anytime"]
-        checklist["/speckit.checklist\nquality gates"]
-        analyze["/speckit.analyze\nconsistency audit"]
-        constitution["/speckit.constitution\nupdate principles"]
-        tasks2issues["/speckit.taskstoissues\nGitHub issues"]
+        checklist["/speckit.checklist<br>quality gates"]
+        analyze["/speckit.analyze<br>consistency audit"]
+        constitution["/speckit.constitution<br>update principles"]
+        tasks2issues["/speckit.taskstoissues<br>GitHub issues"]
     end
 
     subgraph context["Best Used With"]
@@ -162,13 +162,13 @@ flowchart LR
     end
 
     subgraph create["Content Creation"]
-        content["Content Specialist\nblog + LinkedIn"]
-        tech["Technical Specialist\ndocs + diagrams"]
+        content["Content Specialist<br>blog + LinkedIn"]
+        tech["Technical Specialist<br>docs + diagrams"]
     end
 
     subgraph publish["Publishing"]
         pub["/publish"]
-        jekyll["Jekyll Specialist\nsite structure"]
+        jekyll["Jekyll Specialist<br>site structure"]
         site["debrief.github.io"]
     end
 
@@ -185,22 +185,22 @@ flowchart LR
 ```mermaid
 flowchart TB
     subgraph strategic["Strategic"]
-        ideas["the-ideas-guy\n• generates ideas\n• maintains STRATEGY.md\n• approves/parks/rejects"]
+        ideas["the-ideas-guy<br>• generates ideas<br>• maintains STRATEGY.md<br>• approves/parks/rejects"]
     end
 
     subgraph discovery["Discovery"]
-        scout["opportunity-scout\n• explores codebase\n• interviews for /idea\n• proposes items"]
-        defector["defector\n• triages bugs\n• creates issues"]
+        scout["opportunity-scout<br>• explores codebase<br>• interviews for /idea<br>• proposes items"]
+        defector["defector<br>• triages bugs<br>• creates issues"]
     end
 
     subgraph scoring["Scoring"]
-        prioritizer["backlog-prioritizer\n• scores V/M/A\n• ranks backlog"]
+        prioritizer["backlog-prioritizer<br>• scores V/M/A<br>• ranks backlog"]
     end
 
     subgraph media["Media"]
-        content["content-specialist\n• blog posts\n• LinkedIn"]
-        jekyll["jekyll-specialist\n• site structure\n• cross-repo publishing"]
-        tech["technical-specialist\n• specs, READMEs\n• Mermaid diagrams"]
+        content["content-specialist<br>• blog posts<br>• LinkedIn"]
+        jekyll["jekyll-specialist<br>• site structure<br>• cross-repo publishing"]
+        tech["technical-specialist<br>• specs, READMEs<br>• Mermaid diagrams"]
     end
 
     scout -->|"proposes to"| prioritizer
