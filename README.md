@@ -210,18 +210,44 @@ flowchart TB
 
 ### Quick Reference
 
+**Ideation & Strategy**
+
 | Goal | Command/Agent |
 |------|---------------|
 | Capture new idea | `/idea` |
-| Report a bug | Invoke `defector` |
+| Report a bug | `defector` agent |
+| Explore for opportunities | `opportunity-scout` agent |
+| Strategic review / approve items | `the-ideas-guy` agent |
+| Score backlog items (V/M/A) | `backlog-prioritizer` agent |
+
+**SpecKit Pipeline**
+
+| Goal | Command/Agent |
+|------|---------------|
 | Start approved work | `/speckit.start {ID}` |
 | Write specification | `/speckit.specify` |
+| Resolve ambiguities | `/speckit.clarify` |
 | Create implementation plan | `/speckit.plan` |
 | Generate task list | `/speckit.tasks` |
 | Execute tasks | `/speckit.implement` |
 | Create PR + publish | `/speckit.pr` |
+
+**SpecKit Helpers**
+
+| Goal | Command/Agent |
+|------|---------------|
+| Generate quality checklist | `/speckit.checklist` |
+| Audit cross-artifact consistency | `/speckit.analyze` |
+| Update project principles | `/speckit.constitution` |
+| Convert tasks to GitHub issues | `/speckit.taskstoissues` |
+
+**Media & Utilities**
+
+| Goal | Command/Agent |
+|------|---------------|
 | Write blog content | `/media` or `content-specialist` |
-| Attach screenshot | `/get-the-shot {issue}` |
+| Publish to website | `/publish` |
+| Attach screenshot to issue | `/get-the-shot {issue}` |
 
 ## Getting Started
 
