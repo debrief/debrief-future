@@ -186,10 +186,10 @@ cleanup_stale_worktrees
 cleanup_stale_worktrees --force
 ```
 
-**When to clean up:**
-- After PR is merged and branch deleted
-- `/speckit.pr` provides cleanup instructions in its output
-- Periodically to remove orphaned worktrees
+**When cleanup happens:**
+- `/speckit.start` checks for stale worktrees (where backlog item is complete)
+- Manual cleanup anytime via `cleanup_stale_worktrees`
+- Worktrees persist through PR review cycle for feedback iterations
 
 ### Script Flags
 

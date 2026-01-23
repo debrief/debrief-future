@@ -34,6 +34,42 @@ Extract the backlog item ID from `$ARGUMENTS`:
 - Normalize to numeric (e.g., `007` → `7`)
 - ERROR if no ID provided: "Please provide a backlog item ID, e.g., `/speckit.start 007`"
 
+### Step 1a: Check for Stale Worktrees (Cleanup)
+
+Before proceeding, check if there are worktrees that can be cleaned up:
+
+1. **List worktrees**: Run `git worktree list` to find worktrees in `../worktrees/`
+
+2. **For each worktree**, extract the feature ID from the branch name (e.g., `007` from `007-feature-name`)
+
+3. **Check BACKLOG.md** for each worktree's feature ID:
+   - If status is `complete` → worktree is stale, can be removed
+   - If status is anything else → worktree is still active
+
+4. **If stale worktrees found**, inform the user:
+
+   ```
+   ## Stale Worktrees Detected
+
+   The following worktrees have completed features and can be cleaned up:
+
+   | Worktree | Feature | Status |
+   |----------|---------|--------|
+   | ../worktrees/005-old-feature | 005 | complete |
+   | ../worktrees/003-another | 003 | complete |
+
+   To clean up, run from the main repo:
+   ```bash
+   source .specify/scripts/bash/common.sh
+   cleanup_stale_worktrees --dry-run  # Preview
+   cleanup_stale_worktrees            # Execute
+   ```
+
+   Continuing with feature {ID}...
+   ```
+
+5. **Continue** with the workflow (don't block on cleanup)
+
 ### Step 2: Read and Parse BACKLOG.md
 
 1. Read `BACKLOG.md` from the repository root

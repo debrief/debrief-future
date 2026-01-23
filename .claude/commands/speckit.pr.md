@@ -203,39 +203,6 @@ You **MUST** consider the user input before proceeding (if not empty).
     3. Create PR in debrief/debrief.github.io
     ```
 
-16. **Worktree cleanup guidance** (if in a worktree):
-
-    Check if current directory is a worktree by looking for `.git` file (not directory):
-
-    ```bash
-    if [[ -f "$(git rev-parse --show-toplevel)/.git" ]]; then
-        # We're in a worktree
-        WORKTREE_PATH=$(git rev-parse --show-toplevel)
-        BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
-    fi
-    ```
-
-    If in a worktree, add to the final report:
-
-    ```
-    ## Worktree Cleanup
-
-    This feature was developed in a worktree at:
-       {WORKTREE_PATH}
-
-    **After the PR is merged**, clean up by running from the main repo:
-
-    ```bash
-    # Remove this worktree
-    git worktree remove {WORKTREE_PATH}
-
-    # Or clean up all merged/stale worktrees
-    source .specify/scripts/bash/common.sh
-    cleanup_stale_worktrees --dry-run  # Preview
-    cleanup_stale_worktrees            # Execute
-    ```
-    ```
-
 ## Evidence Integration Guidelines
 
 When incorporating evidence into the PR:
