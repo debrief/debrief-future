@@ -43,32 +43,36 @@ Before proceeding, check if there are worktrees that can be cleaned up:
 2. **For each worktree**, extract the feature ID from the branch name (e.g., `007` from `007-feature-name`)
 
 3. **Check BACKLOG.md** for each worktree's feature ID:
-   - If status is `complete` → worktree is stale, can be removed
-   - If status is anything else → worktree is still active
+   - If status is `complete` → worktree is stale, should be removed
+   - If status is anything else → worktree is still active, keep it
 
-4. **If stale worktrees found**, inform the user:
+4. **If stale worktrees found**, delete them automatically:
 
-   ```
-   ## Stale Worktrees Detected
-
-   The following worktrees have completed features and can be cleaned up:
-
-   | Worktree | Feature | Status |
-   |----------|---------|--------|
-   | ../worktrees/005-old-feature | 005 | complete |
-   | ../worktrees/003-another | 003 | complete |
-
-   To clean up, run from the main repo:
    ```bash
-   source .specify/scripts/bash/common.sh
-   cleanup_stale_worktrees --dry-run  # Preview
-   cleanup_stale_worktrees            # Execute
+   # For each stale worktree
+   git worktree remove ../worktrees/NNN-feature-name
    ```
+
+   Report the cleanup:
+
+   ```
+   ## Worktree Cleanup
+
+   Removed stale worktrees for completed features:
+   - ../worktrees/005-old-feature (005 - complete)
+   - ../worktrees/003-another (003 - complete)
 
    Continuing with feature {ID}...
    ```
 
-5. **Continue** with the workflow (don't block on cleanup)
+5. **If removal fails** (uncommitted changes), warn but continue:
+
+   ```
+   ⚠️ Could not remove ../worktrees/005-old-feature - has uncommitted changes
+      Run manually: git worktree remove --force ../worktrees/005-old-feature
+   ```
+
+6. **Continue** with the workflow (cleanup failures don't block)
 
 ### Step 2: Read and Parse BACKLOG.md
 
