@@ -43,7 +43,6 @@
       "Bash(python -m pytest:*)",
       "Bash(pytest:*)",
       "Bash(bash:*)",
-      "Bash(SPECIFY_FEATURE=\"007-rep-special-comments\" bash:*)",
       "WebFetch(domain:debrief.github.io)",
       "Skill(speckit.pr)",
       "Bash(uv run pytest:*)",
@@ -64,7 +63,7 @@
       "Bash(grep:*)",
       "Bash(uv pip list:*)",
       "Bash(uv pip install:*)",
-      "Bash(uvx ruff:*)"
+      "Bash(uvx ruff:*)",
       "Bash(gh pr list:*)",
       "Bash(gh pr close:*)",
       "Bash(pnpm build:*)",
