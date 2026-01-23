@@ -56,7 +56,15 @@
       "Bash(task build:*)",
       "Bash(task lint:*)",
       "Bash(task clean:*)",
-      "Bash(task:*)"
+      "Bash(task:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(uv run ruff:*)",
+      "Bash(pnpm --filter @debrief/components add:*)",
+      "Bash(pnpm --filter @debrief/components lint:*)",
+      "Bash(grep:*)",
+      "Bash(uv pip list:*)",
+      "Bash(uv pip install:*)",
+      "Bash(uvx ruff:*)"
     ]
   }
 }
