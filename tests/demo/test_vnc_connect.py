@@ -27,12 +27,8 @@ import sys
 from urllib.parse import urlparse
 
 # Try to import websocket-client
-try:
-    import websocket
-except ImportError:
-    print("ERROR: websocket-client not installed")
-    print("Install with: pip install websocket-client")
-    sys.exit(1)
+import pytest
+websocket = pytest.importorskip("websocket", reason="websocket-client not installed")
 
 
 def get_websocket_url(base_url: str) -> str:
