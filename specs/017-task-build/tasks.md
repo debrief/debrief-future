@@ -166,8 +166,8 @@
 
 ### Documentation
 
-- [ ] T030 Update README.md with new task commands `README.md` (deferred - separate PR)
-- [ ] T031 [P] Copy quickstart.md content to appropriate location `docs/` (deferred - separate PR)
+- [x] T030 Update README.md with new task commands `README.md`
+- [x] T031 [P] Copy quickstart.md content to appropriate location `docs/quickstart.md`
 
 ### Evidence Collection
 
