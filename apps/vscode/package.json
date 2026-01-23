@@ -143,6 +143,11 @@
         "command": "debrief.updateStorePath",
         "title": "Update Path",
         "category": "Debrief"
+      },
+      {
+        "command": "debrief.restoreActivities",
+        "title": "Restore Default Activities",
+        "category": "Debrief"
       }
     ],
     "keybindings": [
@@ -349,6 +354,11 @@
           "type": "number",
           "default": 10,
           "description": "Maximum number of recent plots to remember"
+        },
+        "debrief.hideActivities.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a one-time prompt about the focused activity bar configuration"
         }
       }
     }
