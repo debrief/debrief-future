@@ -233,6 +233,7 @@ Three approaches required:
 - N/A (configuration only) (017-task-build)
 - TypeScript 5.x (VS Code Extension) + @vscode/api ^1.85.0 (017-vscode-hide-activities)
 - VS Code `context.globalState` for initialization tracking, user settings for visibility config (017-vscode-hide-activities)
+- Python 3.11+ (LinkML generators, Pydantic models), TypeScript 5.x (generated types) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS) (022-system-kind-discriminator)
 
 ## Recent Changes
 - 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v5+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 10.x
