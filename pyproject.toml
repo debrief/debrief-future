@@ -10,6 +10,8 @@ members = [
     "services/stac",
     "services/io",
     "services/config",
+    "services/calc",
+    "services/cli",
 ]
 
 [tool.uv.sources]
@@ -17,6 +19,8 @@ debrief-schemas = { workspace = true }
 debrief-stac = { workspace = true }
 debrief-io = { workspace = true }
 debrief-config = { workspace = true }
+debrief-calc = { workspace = true }
+debrief-cli = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -25,4 +29,5 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "ruff>=0.8.0",
+    "click>=8.0.0",
 ]

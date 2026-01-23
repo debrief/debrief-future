@@ -9,6 +9,8 @@ resolution-markers = [
 [manifest]
 members = [
     "debrief",
+    "debrief-calc",
+    "debrief-cli",
     "debrief-config",
     "debrief-io",
     "debrief-schemas",
@@ -494,6 +496,7 @@ source = { virtual = "." }
 
 [package.dev-dependencies]
 dev = [
+    { name = "click" },
     { name = "pydantic" },
     { name = "pyinstaller" },
     { name = "pytest" },
@@ -505,12 +508,63 @@ dev = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "click", specifier = ">=8.0.0" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "pyinstaller", specifier = ">=6.18.0" },
     { name = "pytest", specifier = ">=7.0.0" },
     { name = "pytest-cov", specifier = ">=4.0.0" },
     { name = "ruff", specifier = ">=0.8.0" },
 ]
+
+[[package]]
+name = "debrief-calc"
+version = "0.1.0"
+source = { editable = "services/calc" }
+dependencies = [
+    { name = "pydantic" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
+mcp = [
+    { name = "mcp" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.0.0" },
+    { name = "pydantic", specifier = ">=2.0.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
+]
+provides-extras = ["mcp", "dev"]
+
+[[package]]
+name = "debrief-cli"
+version = "0.1.0"
+source = { editable = "services/cli" }
+dependencies = [
+    { name = "click" },
+    { name = "debrief-calc" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "click", specifier = ">=8.0.0" },
+    { name = "debrief-calc", editable = "services/calc" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
+]
+provides-extras = ["dev"]
 
 [[package]]
 name = "debrief-config"

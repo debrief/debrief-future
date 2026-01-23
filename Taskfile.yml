@@ -48,6 +48,7 @@ tasks:
       - "**/package.json"
     cmds:
       - uv sync
+      - uv pip install -e shared/schemas -e services/config -e services/io -e services/stac -e services/calc -e services/cli
       - pnpm install
 
   test:
