@@ -57,13 +57,14 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
+**Architecture Note**: IoService is storage-agnostic (parse only, returns GeoJSON). Extension orchestrates IoService → StacService. No dedicated ImportService.
+
 - [ ] T004 Create IoService for debrief-io MCP communication `apps/vscode/src/services/ioService.ts`
-- [ ] T005 [P] Add parse_rep method to IoService (mirrors CalcService pattern) `apps/vscode/src/services/ioService.ts`
+- [ ] T005 [P] Add parseRep method to IoService (returns GeoJSON features, storage-agnostic) `apps/vscode/src/services/ioService.ts`
 - [ ] T006 Extend StacService with addAsset method `apps/vscode/src/services/stacService.ts`
 - [ ] T007 [P] Extend StacService with addFeatures method `apps/vscode/src/services/stacService.ts`
 - [ ] T008 [P] Add hasAsset method for duplicate detection `apps/vscode/src/services/stacService.ts`
-- [ ] T009 Create ImportService orchestrating parse → store → refresh `apps/vscode/src/services/importService.ts`
-- [ ] T010 Add bounds calculation utility for auto-zoom `apps/vscode/src/utils/bounds.ts`
+- [ ] T009 Add bounds calculation utility for auto-zoom `apps/vscode/src/utils/bounds.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -77,19 +78,18 @@
 
 ### Tests for User Story 1
 
-- [ ] T011 [test] Unit tests for ImportService `apps/vscode/tests/unit/importService.test.ts`
-- [ ] T012 [P][test] Unit tests for IoService parse method `apps/vscode/tests/unit/ioService.test.ts`
-- [ ] T013 [P][test] Unit tests for bounds calculation `apps/vscode/tests/unit/bounds.test.ts`
+- [ ] T010 [test] Unit tests for IoService parseRep method `apps/vscode/tests/unit/ioService.test.ts`
+- [ ] T011 [P][test] Unit tests for bounds calculation `apps/vscode/tests/unit/bounds.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T014 Add drop zone event listeners in webview `apps/vscode/src/webview/web/map.ts`
-- [ ] T015 Handle repFileDrop message in MapPanel `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T016 Wire MapPanel to ImportService for import orchestration `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T017 Add progress notification during import `apps/vscode/src/services/importService.ts`
-- [ ] T018 Implement fitBounds call after successful import `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T019 Add duplicate detection with warning dialog `apps/vscode/src/services/importService.ts`
-- [ ] T020 Handle parse errors with user-friendly messages `apps/vscode/src/services/importService.ts`
+- [ ] T012 Add drop zone event listeners in webview `apps/vscode/src/webview/web/map.ts`
+- [ ] T013 Handle repFileDrop message in MapPanel `apps/vscode/src/webview/mapPanel.ts`
+- [ ] T014 Add orchestration in MapPanel: IoService.parseRep() → StacService.addAsset/addFeatures() `apps/vscode/src/webview/mapPanel.ts`
+- [ ] T015 Add progress notification during import `apps/vscode/src/webview/mapPanel.ts`
+- [ ] T016 Implement fitBounds call after successful import `apps/vscode/src/webview/mapPanel.ts`
+- [ ] T017 Add duplicate detection with warning dialog `apps/vscode/src/webview/mapPanel.ts`
+- [ ] T018 Handle parse errors with user-friendly messages `apps/vscode/src/webview/mapPanel.ts`
 
 **Checkpoint**: Drag-and-drop import fully functional and testable independently
 
@@ -103,18 +103,17 @@
 
 ### Tests for User Story 2
 
-- [ ] T021 [test] Unit tests for CatalogItemPicker `apps/vscode/tests/unit/catalogItemPicker.test.ts`
-- [ ] T022 [P][test] Integration test for context menu flow `apps/vscode/tests/integration/import.test.ts`
+- [ ] T019 [test] Unit tests for CatalogItemPicker `apps/vscode/tests/unit/catalogItemPicker.test.ts`
+- [ ] T020 [P][test] Integration test for context menu flow `apps/vscode/tests/integration/import.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T023 Add explorer/context menu contribution for .rep files `apps/vscode/package.json`
-- [ ] T024 Create CatalogItemPicker using QuickPick API `apps/vscode/src/views/catalogItemPicker.ts`
-- [ ] T025 Implement two-step selection: catalog → item `apps/vscode/src/views/catalogItemPicker.ts`
-- [ ] T026 Create importRep command handler `apps/vscode/src/commands/importRep.ts`
-- [ ] T027 Register importRep command in extension activation `apps/vscode/src/commands/index.ts`
-- [ ] T028 Wire picker selection to ImportService `apps/vscode/src/commands/importRep.ts`
-- [ ] T029 Add refresh trigger to StacTreeProvider after import `apps/vscode/src/providers/stacTreeProvider.ts`
+- [ ] T021 Add explorer/context menu contribution for .rep files `apps/vscode/package.json`
+- [ ] T022 Create CatalogItemPicker using QuickPick API `apps/vscode/src/views/catalogItemPicker.ts`
+- [ ] T023 Implement two-step selection: catalog → item `apps/vscode/src/views/catalogItemPicker.ts`
+- [ ] T024 Create importRep command handler with orchestration (IoService → StacService) `apps/vscode/src/commands/importRep.ts`
+- [ ] T025 Register importRep command in extension activation `apps/vscode/src/commands/index.ts`
+- [ ] T026 Add refresh trigger to StacTreeProvider after import `apps/vscode/src/providers/stacTreeProvider.ts`
 
 **Checkpoint**: Context menu import fully functional, both flows work independently
 
@@ -128,16 +127,16 @@
 
 ### Tests for User Story 3
 
-- [ ] T030 [test] Unit tests for error message formatting `apps/vscode/tests/unit/errorMessages.test.ts`
+- [ ] T027 [test] Unit tests for error message formatting `apps/vscode/tests/unit/errorMessages.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T031 Create error message templates for all failure codes `apps/vscode/src/utils/errorMessages.ts`
-- [ ] T032 Add INVALID_FORMAT error handling with line number context `apps/vscode/src/services/importService.ts`
-- [ ] T033 Add STORAGE_ERROR handling with recovery suggestion `apps/vscode/src/services/importService.ts`
-- [ ] T034 Add FILE_NOT_FOUND error with path context `apps/vscode/src/services/importService.ts`
-- [ ] T035 Add non-REP file rejection with clear feedback `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T036 Add multi-file drop handling (reject with message) `apps/vscode/src/webview/web/map.ts`
+- [ ] T028 Create error message templates for all failure codes `apps/vscode/src/utils/errorMessages.ts`
+- [ ] T029 Add INVALID_FORMAT error handling with line number context `apps/vscode/src/webview/mapPanel.ts`
+- [ ] T030 Add STORAGE_ERROR handling with recovery suggestion `apps/vscode/src/webview/mapPanel.ts`
+- [ ] T031 Add FILE_NOT_FOUND error with path context `apps/vscode/src/commands/importRep.ts`
+- [ ] T032 Add non-REP file rejection with clear feedback `apps/vscode/src/webview/mapPanel.ts`
+- [ ] T033 Add multi-file drop handling (reject with message) `apps/vscode/src/webview/web/map.ts`
 
 **Checkpoint**: All error scenarios handled with user-friendly messages
 
@@ -149,32 +148,32 @@
 
 ### Documentation
 
-- [ ] T037 Update extension README with import feature `apps/vscode/README.md`
-- [ ] T038 [P] Add keyboard shortcuts section if applicable `apps/vscode/README.md`
+- [ ] T034 Update extension README with import feature `apps/vscode/README.md`
+- [ ] T035 [P] Add keyboard shortcuts section if applicable `apps/vscode/README.md`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T039 Create evidence directory `specs/021-load-rep-files-stac/evidence/`
-- [ ] T040 Capture test summary with pass/fail counts `specs/021-load-rep-files-stac/evidence/test-summary.md`
-- [ ] T041 Record usage example demonstrating drag-drop flow `specs/021-load-rep-files-stac/evidence/usage-example.md`
-- [ ] T042 [P] Capture screen recording of import flow `specs/021-load-rep-files-stac/evidence/import-flow.gif`
-- [ ] T043 [P] Capture context menu screenshot `specs/021-load-rep-files-stac/evidence/context-menu-demo.png`
+- [ ] T036 Create evidence directory `specs/021-load-rep-files-stac/evidence/`
+- [ ] T037 Capture test summary with pass/fail counts `specs/021-load-rep-files-stac/evidence/test-summary.md`
+- [ ] T038 Record usage example demonstrating drag-drop flow `specs/021-load-rep-files-stac/evidence/usage-example.md`
+- [ ] T039 [P] Capture screen recording of import flow `specs/021-load-rep-files-stac/evidence/import-flow.gif`
+- [ ] T040 [P] Capture context menu screenshot `specs/021-load-rep-files-stac/evidence/context-menu-demo.png`
 
 ### Runtime Verification
 
-- [ ] T044 Run VS Code extension in dev mode and verify import works
-- [ ] T045 [P] Test import with sample REP file from demo/samples/
+- [ ] T041 Run VS Code extension in dev mode and verify import works
+- [ ] T042 [P] Test import with sample REP file from demo/samples/
 
 ### Media Content
 
-- [ ] T046 Create shipped blog post `specs/021-load-rep-files-stac/media/shipped-post.md`
-- [ ] T047 [P] Create LinkedIn shipped summary `specs/021-load-rep-files-stac/media/linkedin-shipped.md`
+- [ ] T043 Create shipped blog post `specs/021-load-rep-files-stac/media/shipped-post.md`
+- [ ] T044 [P] Create LinkedIn shipped summary `specs/021-load-rep-files-stac/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T048 Create PR and publish blog: run /speckit.pr
+- [ ] T045 Create PR and publish blog: run /speckit.pr
 
-**Task T048 must run last. It depends on all evidence and media tasks being complete.**
+**Task T045 must run last. It depends on all evidence and media tasks being complete.**
 
 ---
 
@@ -192,8 +191,8 @@
 ### User Story Dependencies
 
 - **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
-- **User Story 2 (P2)**: Can start after Foundational (Phase 2) - Uses same ImportService as US1
-- **User Story 3 (P3)**: Can start after Foundational (Phase 2) - Enhances error handling in ImportService
+- **User Story 2 (P2)**: Can start after Foundational (Phase 2) - Shares IoService/StacService with US1
+- **User Story 3 (P3)**: Can start after Foundational (Phase 2) - Enhances error handling in orchestration code
 
 ### Within Each User Story
 
@@ -212,28 +211,28 @@ T003 [P] Add command contribution
 
 **Phase 2 (Foundational)**:
 ```
-T005 [P] Add parse_rep method
+T005 [P] Add parseRep method
 T007 [P] Add addFeatures method
 T008 [P] Add hasAsset method
 ```
 
 **Phase 3 (US1 Tests)**:
 ```
-T012 [P] IoService tests
-T013 [P] Bounds tests
+T010 [test] IoService tests
+T011 [P][test] Bounds tests
 ```
 
 **Phase 4 (US2 Tests)**:
 ```
-T022 [P] Integration test
+T020 [P] Integration test
 ```
 
 **Phase 6 (Evidence)**:
 ```
-T042 [P] Screen recording
-T043 [P] Context menu screenshot
-T045 [P] Sample file test
-T047 [P] LinkedIn summary
+T039 [P] Screen recording
+T040 [P] Context menu screenshot
+T042 [P] Sample file test
+T044 [P] LinkedIn summary
 ```
 
 ---
@@ -243,8 +242,8 @@ T047 [P] LinkedIn summary
 ### MVP First (User Story 1 Only)
 
 1. Complete Phase 1: Setup (T001-T003)
-2. Complete Phase 2: Foundational (T004-T010)
-3. Complete Phase 3: User Story 1 (T011-T020)
+2. Complete Phase 2: Foundational (T004-T009)
+3. Complete Phase 3: User Story 1 (T010-T018)
 4. **STOP and VALIDATE**: Test drag-drop independently
 5. Deploy/demo if ready
 
@@ -261,12 +260,12 @@ T047 [P] LinkedIn summary
 | Phase | Task Count |
 |-------|------------|
 | Phase 1: Setup | 3 |
-| Phase 2: Foundational | 7 |
-| Phase 3: US1 (P1) | 10 |
-| Phase 4: US2 (P2) | 9 |
+| Phase 2: Foundational | 6 |
+| Phase 3: US1 (P1) | 9 |
+| Phase 4: US2 (P2) | 8 |
 | Phase 5: US3 (P3) | 7 |
 | Phase 6: Polish | 12 |
-| **Total** | **48** |
+| **Total** | **45** |
 
 ---
 
@@ -275,4 +274,5 @@ T047 [P] LinkedIn summary
 - [P] tasks = different files, no dependencies
 - Tests use vitest for unit, VS Code Extension Test framework for integration
 - Evidence is required before PR creation
-- Run `/speckit.pr` after T047 complete to create PR with evidence
+- Run `/speckit.pr` after T044 complete to create PR with evidence
+- **Architecture**: IoService is storage-agnostic (parse only). Extension orchestrates IoService → StacService. No ImportService.

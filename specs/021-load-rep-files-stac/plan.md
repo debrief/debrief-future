@@ -59,15 +59,15 @@ apps/vscode/
 ├── src/
 │   ├── extension.ts                    # Entry point (register commands)
 │   ├── commands/
-│   │   ├── importRep.ts                # NEW: Import command handler
+│   │   ├── importRep.ts                # NEW: Import command handler (orchestrates IoService → StacService)
 │   │   └── index.ts                    # Command registration (update)
 │   ├── services/
-│   │   ├── importService.ts            # NEW: Import orchestration
+│   │   ├── ioService.ts                # NEW: Wrapper for debrief-io parse_rep (storage-agnostic)
 │   │   └── stacService.ts              # Existing: add_asset, add_features calls
 │   ├── providers/
 │   │   └── stacTreeProvider.ts         # Update: refresh after import
 │   ├── webview/
-│   │   ├── mapPanel.ts                 # Update: handle drop events
+│   │   ├── mapPanel.ts                 # Update: handle drop events, orchestrate import
 │   │   ├── messages.ts                 # Update: add import messages
 │   │   └── web/
 │   │       └── map.ts                  # Update: drop zone handling
@@ -75,7 +75,7 @@ apps/vscode/
 │       └── catalogItemPicker.ts        # NEW: QuickPick-based picker
 ├── tests/
 │   ├── unit/
-│   │   └── importService.test.ts       # NEW: Import logic tests
+│   │   └── ioService.test.ts           # NEW: Parser wrapper tests
 │   └── integration/
 │       └── import.test.ts              # NEW: E2E import tests
 └── package.json                        # Update: context menu contribution
@@ -85,7 +85,7 @@ services/stac/
     └── assets.py                       # Update: add duplicate check function
 ```
 
-**Structure Decision**: Extension of existing VS Code extension structure. New files for import functionality; updates to existing mapPanel and stacService.
+**Structure Decision**: VS Code extension acts as orchestrator. IoService handles parsing (storage-agnostic), StacService handles storage. No dedicated ImportService - command handlers coordinate the workflow directly.
 
 ## Media Components
 
@@ -119,28 +119,36 @@ No violations to justify.
 │  └──────┬───────┘    └──────┬───────┘    └────────┬─────────┘  │
 │         │                   │                      │            │
 │         │  importRep cmd    │  drop event          │ selection  │
-│         ▼                   ▼                      ▼            │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │                    ImportService                          │  │
-│  │  - orchestrates parse → store → refresh                   │  │
-│  │  - handles errors → user notifications                    │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│         │                                          │            │
-│         ▼                                          ▼            │
-│  ┌──────────────┐                          ┌──────────────┐    │
-│  │  CalcService │                          │  StacService │    │
-│  │  (MCP→io)    │                          │ (file ops)   │    │
-│  └──────┬───────┘                          └──────┬───────┘    │
-└─────────┼────────────────────────────────────────┼─────────────┘
-          │                                        │
-          ▼                                        ▼
-   ┌──────────────┐                        ┌──────────────┐
-   │  debrief-io  │                        │ debrief-stac │
-   │  (Python)    │                        │  (Python)    │
-   │  parse_rep() │                        │ add_asset()  │
-   └──────────────┘                        │ add_features │
-                                           └──────────────┘
+│         │                   │                      │            │
+│         └───────────────────┴──────────────────────┘            │
+│                             │                                    │
+│                             ▼                                    │
+│         ┌───────────────────────────────────────────┐           │
+│         │        Extension Orchestration            │           │
+│         │  (command handlers / mapPanel methods)    │           │
+│         │  1. Call IoService.parseRep()             │           │
+│         │  2. Call StacService.addAsset()           │           │
+│         │  3. Call StacService.addFeatures()        │           │
+│         │  4. Refresh UI, handle errors             │           │
+│         └───────────────────────────────────────────┘           │
+│                    │                       │                     │
+│                    ▼                       ▼                     │
+│           ┌──────────────┐         ┌──────────────┐             │
+│           │  IoService   │         │  StacService │             │
+│           │  (parse only)│         │  (storage)   │             │
+│           └──────┬───────┘         └──────┬───────┘             │
+└──────────────────┼─────────────────────────┼────────────────────┘
+                   │                         │
+                   ▼                         ▼
+            ┌──────────────┐          ┌──────────────┐
+            │  debrief-io  │          │ debrief-stac │
+            │  (Python)    │          │  (Python)    │
+            │  parse_rep() │          │ add_asset()  │
+            └──────────────┘          │ add_features │
+                                      └──────────────┘
 ```
+
+**Key architectural decision**: IoService is storage-agnostic. It only parses REP files and returns GeoJSON features. The VS Code extension acts as orchestrator, coordinating IoService (parsing) and StacService (storage) separately. This enables future storage backends (e.g., local files) without changing IoService.
 
 ## Key Design Decisions
 
@@ -149,10 +157,10 @@ No violations to justify.
 - **Rationale**: MapPanel is already a webview; HTML5 drop is well-supported
 - **Alternative rejected**: VS Code Tree Drag-Drop API (only works tree-to-tree)
 
-### 2. Python Service Communication
-- **Decision**: Extend CalcService MCP pattern for debrief-io calls
-- **Rationale**: Consistent with existing architecture; circuit breaker already implemented
-- **Alternative rejected**: Direct subprocess spawn (inconsistent, no error handling)
+### 2. Service Separation (Storage-Agnostic IoService)
+- **Decision**: IoService handles parsing only, returns GeoJSON features. Extension orchestrates IoService → StacService separately.
+- **Rationale**: Enables future storage backends (local files, other catalogs) without modifying IoService. Clean separation of concerns.
+- **Alternative rejected**: Combined ImportService that knows about both parsing and STAC (tighter coupling, less flexible)
 
 ### 3. Duplicate Detection
 - **Decision**: Check asset keys by source filename stem before import
@@ -172,20 +180,20 @@ No violations to justify.
 ## Implementation Phases
 
 ### Phase 1: Core Infrastructure (P1 Drag-Drop)
-1. Add ImportService with parse → store → refresh orchestration
-2. Extend CalcService to call debrief-io parse_rep via MCP
-3. Extend StacService with add_asset and duplicate check
-4. Wire drop event from webview to ImportService
+1. Create IoService wrapper for debrief-io parse_rep (storage-agnostic, returns GeoJSON)
+2. Extend StacService with add_asset and duplicate check
+3. Add orchestration logic in mapPanel (IoService → StacService)
+4. Wire drop event from webview to mapPanel orchestration
 5. Add progress notification during import
 
 ### Phase 2: Context Menu Flow (P2)
 1. Add package.json contribution for .rep file context menu
 2. Implement CatalogItemPicker using QuickPick API
-3. Wire importRep command to picker → ImportService
+3. Create importRep command handler with orchestration (IoService → StacService)
 4. Add refresh trigger to StacTreeProvider after import
 
 ### Phase 3: Polish & Error Handling (P3)
 1. Implement comprehensive error messages for all failure modes
-2. Add unit tests for ImportService
+2. Add unit tests for IoService (parsing wrapper)
 3. Add integration tests for full import flow
 4. Documentation updates

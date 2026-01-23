@@ -142,9 +142,9 @@ When import operations encounter problems, the analyst receives clear feedback a
 ## Assumptions
 
 - The VS Code extension already has a map panel component that displays GeoJSON from STAC items
-- The debrief-io service provides a parsing function that accepts REP file content and returns structured data
+- The debrief-io service provides a parsing function that accepts REP file content and returns GeoJSON features (storage-agnostic)
 - The debrief-stac service provides functions to add assets and update GeoJSON on STAC items
-- The loader mini-app has reusable picker components for catalog/item selection
+- The VS Code extension orchestrates the workflow: IoService (parse) → StacService (store) - no dedicated import service
 - REP files are local files accessible via VS Code's file system APIs
 - A STAC item must already exist before data can be imported into it (no item creation in this feature)
 
@@ -156,3 +156,9 @@ When import operations encounter problems, the analyst receives clear feedback a
 - Undo/rollback of import operations
 - Creation of new STAC items (user must have an existing item as target)
 - Export or round-trip of imported data back to REP format
+
+## Clarifications
+
+### Session 2026-01-23
+
+- Q: Should IoService know about STAC storage? → A: No. IoService is storage-agnostic - it parses REP files and returns GeoJSON features only. VS Code extension acts as orchestrator, calling IoService for parsing then StacService for storage. This separation enables future storage backends (e.g., local files) without changing IoService.
