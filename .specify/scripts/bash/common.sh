@@ -259,3 +259,135 @@ list_worktrees() {
     git worktree list
 }
 
+# =============================================================================
+# WORKTREE CLEANUP UTILITIES
+# =============================================================================
+
+# List worktrees with stale branches (branch deleted on remote or merged)
+# Output format: PATH BRANCH STATUS
+# Status: "stale" (branch deleted), "merged" (branch merged to main), "active"
+list_worktrees_with_status() {
+    if ! has_git; then
+        echo "No git repository found" >&2
+        return 1
+    fi
+
+    local worktree_base=$(get_worktree_base)
+    if [[ ! -d "$worktree_base" ]]; then
+        return 0  # No worktrees directory
+    fi
+
+    # Fetch latest remote state (silently)
+    git fetch --prune origin 2>/dev/null || true
+
+    # Get list of remote branches
+    local remote_branches=$(git ls-remote --heads origin 2>/dev/null | awk '{print $2}' | sed 's|refs/heads/||')
+
+    # Get merged branches (into main/master)
+    local main_branch="main"
+    git show-ref --verify --quiet refs/heads/master 2>/dev/null && main_branch="master"
+    local merged_branches=$(git branch --merged "$main_branch" 2>/dev/null | sed 's/^[* ]*//')
+
+    # Iterate through worktrees (skip main repo)
+    git worktree list --porcelain 2>/dev/null | while read -r line; do
+        if [[ "$line" =~ ^worktree\ (.+) ]]; then
+            local wt_path="${BASH_REMATCH[1]}"
+            # Skip main repo
+            if [[ "$wt_path" != "$(get_main_repo_root)" ]]; then
+                local wt_branch=""
+            fi
+        elif [[ "$line" =~ ^branch\ refs/heads/(.+) ]]; then
+            wt_branch="${BASH_REMATCH[1]}"
+        elif [[ -z "$line" && -n "$wt_path" && -n "$wt_branch" ]]; then
+            # End of worktree entry - determine status
+            local status="active"
+
+            # Check if branch is merged
+            if echo "$merged_branches" | grep -qx "$wt_branch"; then
+                status="merged"
+            # Check if branch exists on remote
+            elif ! echo "$remote_branches" | grep -qx "$wt_branch"; then
+                # Branch not on remote - could be stale or just local
+                # Check if it was ever pushed (has upstream)
+                if git rev-parse --verify "origin/$wt_branch" >/dev/null 2>&1; then
+                    status="stale"  # Had upstream, now deleted
+                fi
+            fi
+
+            echo "$wt_path $wt_branch $status"
+            wt_path=""
+            wt_branch=""
+        fi
+    done
+}
+
+# Get count of stale/merged worktrees that can be cleaned up
+get_stale_worktree_count() {
+    local count=0
+    while read -r path branch status; do
+        if [[ "$status" == "stale" || "$status" == "merged" ]]; then
+            ((count++))
+        fi
+    done < <(list_worktrees_with_status 2>/dev/null)
+    echo "$count"
+}
+
+# Remove a worktree safely
+# Usage: remove_worktree PATH [--force]
+remove_worktree() {
+    local wt_path="$1"
+    local force="${2:-}"
+
+    if [[ ! -d "$wt_path" ]]; then
+        echo "Worktree not found: $wt_path" >&2
+        return 1
+    fi
+
+    if [[ "$force" == "--force" ]]; then
+        git worktree remove --force "$wt_path" 2>&1
+    else
+        git worktree remove "$wt_path" 2>&1
+    fi
+}
+
+# Clean up all stale and merged worktrees (interactive)
+# Usage: cleanup_stale_worktrees [--dry-run] [--force]
+cleanup_stale_worktrees() {
+    local dry_run=false
+    local force=""
+
+    for arg in "$@"; do
+        case "$arg" in
+            --dry-run) dry_run=true ;;
+            --force) force="--force" ;;
+        esac
+    done
+
+    local cleaned=0
+    local failed=0
+
+    while read -r path branch status; do
+        if [[ "$status" == "stale" || "$status" == "merged" ]]; then
+            if $dry_run; then
+                echo "[dry-run] Would remove: $path ($branch - $status)"
+            else
+                echo "Removing worktree: $path ($branch - $status)"
+                if remove_worktree "$path" "$force"; then
+                    ((cleaned++))
+                else
+                    ((failed++))
+                    echo "  Failed to remove (try --force if uncommitted changes)" >&2
+                fi
+            fi
+        fi
+    done < <(list_worktrees_with_status 2>/dev/null)
+
+    if ! $dry_run; then
+        # Prune any stale worktree entries
+        git worktree prune 2>/dev/null
+
+        echo ""
+        echo "Cleanup complete: $cleaned removed, $failed failed"
+    fi
+}
+

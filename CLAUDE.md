@@ -162,6 +162,35 @@ git worktree remove ../worktrees/007-feature-name
 git worktree prune
 ```
 
+### Cleanup Utilities
+
+The `common.sh` script provides cleanup functions:
+
+```bash
+# Source the utilities
+source .specify/scripts/bash/common.sh
+
+# List worktrees with status (active/merged/stale)
+list_worktrees_with_status
+
+# Get count of cleanable worktrees
+get_stale_worktree_count
+
+# Preview cleanup (dry run)
+cleanup_stale_worktrees --dry-run
+
+# Execute cleanup (removes merged/stale worktrees)
+cleanup_stale_worktrees
+
+# Force cleanup (removes even with uncommitted changes)
+cleanup_stale_worktrees --force
+```
+
+**When to clean up:**
+- After PR is merged and branch deleted
+- `/speckit.pr` provides cleanup instructions in its output
+- Periodically to remove orphaned worktrees
+
 ### Script Flags
 
 The `create-new-feature.sh` script accepts:
