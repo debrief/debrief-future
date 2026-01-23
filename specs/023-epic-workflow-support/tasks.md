@@ -211,7 +211,7 @@ Review and finalize the planning post content.
 ## Phase 5: Integration
 
 ### Task 5.1: Create PR with all artifacts
-**Status**: [ ] pending → run /speckit.pr
+**Status**: [x] complete
 
 Create pull request with skill, BACKLOG.md changes, and documentation.
 
