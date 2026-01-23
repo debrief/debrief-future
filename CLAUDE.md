@@ -149,3 +149,30 @@ Three approaches required:
 ## Recent Changes
 - 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v5+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 10.x
 - 000-schemas: Added Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS)
+
+## Project Memory System
+
+Institutional knowledge lives in `docs/project_notes/` for consistency across sessions.
+
+### Memory Files
+
+- **bugs.md** - Bug log with dates, solutions, prevention notes
+- **decisions.md** - Architectural Decision Records (ADRs) with context and trade-offs
+- **key_facts.md** - Project configuration, URLs, important constants
+- **issues.md** - Work log with ticket IDs and URLs
+
+### Memory-Aware Protocols
+
+**Before proposing architectural changes:**
+- Check `docs/project_notes/decisions.md` for existing decisions
+- If conflicts exist, acknowledge and explain why change is warranted
+
+**When encountering errors:**
+- Search `docs/project_notes/bugs.md` for similar issues
+- Document new bugs and solutions when resolved
+
+**When looking up project config:**
+- Check `docs/project_notes/key_facts.md` first
+
+**When completing work:**
+- Log in `docs/project_notes/issues.md` with ticket ID and URL
