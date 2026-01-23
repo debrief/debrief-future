@@ -88,7 +88,7 @@ Description formats:
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
 | 016 | Infrastructure | [Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md) | 3 | 5 | 4 | 12 | Medium | specified |
-| 014 | Feature | [Add styling properties schemas to GeoJSON features](specs/014-geojson-styling-schemas/spec.md) | 5 | 4 | 5 | 14 | Medium | specified |
+| ~~014~~ | ~~Feature~~ | ~~[Add styling properties schemas to GeoJSON features](specs/014-geojson-styling-schemas/spec.md)~~ | ~~5~~ | ~~4~~ | ~~5~~ | ~~14~~ | ~~Medium~~ | ~~complete~~ |
 | 015 | Infrastructure | [Create LinkML schemas for REP annotation item types](docs/ideas/015-annotation-item-schemas.md) (prerequisite for #007) | 5 | 3 | 5 | 13 | Medium | approved |
 | 007 | Enhancement | [Implement REP file special comments (NARRATIVE, CIRCLE, etc.)](specs/007-rep-special-comments/spec.md) (requires #015) | 4 | 4 | 4 | 12 | Medium | specified |
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
