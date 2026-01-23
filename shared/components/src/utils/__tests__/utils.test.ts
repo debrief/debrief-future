@@ -286,10 +286,15 @@ describe('labels', () => {
       expect(getFeatureColor(mockTrackFeature)).toBe('#0066cc');
     });
 
-    it('returns red for contact tracks', () => {
+    it('returns red for contact tracks without explicit style', () => {
+      // Create contact track without style to test type-based default color
+      const { style: _unused, ...propsWithoutStyle } = mockTrackFeature.properties;
       const contactTrack: TrackFeature = {
         ...mockTrackFeature,
-        properties: { ...mockTrackFeature.properties, track_type: 'CONTACT' },
+        properties: {
+          ...propsWithoutStyle,
+          track_type: 'CONTACT',
+        } as TrackFeature['properties'],
       };
       expect(getFeatureColor(contactTrack)).toBe('#cc0000');
     });
