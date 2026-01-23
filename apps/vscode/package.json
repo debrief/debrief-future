@@ -358,18 +358,7 @@
         "debrief.hideActivities.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Hide non-essential activity bar items (Search, Source Control, Debug, Extensions, Testing) on activation"
-        },
-        "debrief.hideActivities.viewIds": {
-          "type": "array",
-          "default": [
-            "workbench.view.search",
-            "workbench.view.scm",
-            "workbench.view.debug",
-            "workbench.view.extensions",
-            "workbench.view.testing"
-          ],
-          "description": "Activity bar view IDs to hide (advanced users only)"
+          "description": "Show a one-time prompt about the focused activity bar configuration"
         }
       }
     }

@@ -92,7 +92,10 @@ vi.mock('vscode', () => ({
   },
   Uri: {
     file: vi.fn((path: string) => ({ fsPath: path, scheme: 'file', path })),
-    parse: vi.fn((uri: string) => ({ fsPath: uri, scheme: 'file', path: uri })),
+    parse: vi.fn((uri: string) => {
+      const scheme = uri.startsWith('https://') ? 'https' : uri.startsWith('http://') ? 'http' : 'file';
+      return { fsPath: uri, scheme, path: uri };
+    }),
   },
   EventEmitter: MockEventEmitter,
   TreeItem: MockTreeItem,
@@ -123,5 +126,8 @@ vi.mock('vscode', () => ({
     Global: 1,
     Workspace: 2,
     WorkspaceFolder: 3,
+  },
+  env: {
+    openExternal: vi.fn(),
   },
 }));
