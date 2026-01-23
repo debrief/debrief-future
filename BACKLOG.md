@@ -97,7 +97,7 @@ Description formats:
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | 4 | 2 | 4 | 10 | Low | approved |
 | 017 | Enhancement | [Configure VS Code extension to hide default activities on load](docs/ideas/017-vscode-hide-activities.md) | 3 | 3 | 4 | 10 | Medium | approved |
-| 018 | Infrastructure | [Add VS Code multi-root workspace configuration](specs/018-vscode-workspace-config/spec.md) | 3 | 1 | 5 | 9 | Low | specified |
+| 018 | Infrastructure | [Add VS Code multi-root workspace configuration](specs/018-vscode-workspace-config/spec.md) | 3 | 1 | 5 | 9 | Low | shipped |
 | 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](docs/ideas/019-backlog-interview-capture.md) | 3 | 3 | 5 | 11 | Medium | proposed |
 | 020 | Infrastructure | [Add ELLIPSE and POLYGON annotation schemas](https://github.com/debrief/debrief-future/issues/56) | 3 | 2 | 5 | 10 | Low | proposed |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
