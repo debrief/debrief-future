@@ -105,6 +105,8 @@ Description formats:
 | 001 | Infrastructure | Extract shared MCP utilities into mcp-common package | 3 | 2 | 4 | 9 | Medium | proposed |
 | 010 | Tech Debt | Add rollback/cleanup API to debrief-stac for interrupted operations | 3 | 1 | 4 | 8 | Medium | proposed |
 | 012 | Enhancement | Wire loader plot count to debrief-stac list_plots call | 2 | 1 | 5 | 8 | Low | proposed |
+| 022 | Feature | [Add SYSTEM kind discriminator for non-spatial state](https://github.com/debrief/debrief-future/issues/76) | 5 | 2 | 5 | 12 | Low | approved |
+| 023 | Infrastructure | [Add epic support to speckit workflow](https://github.com/debrief/debrief-future/issues/79) | 4 | 3 | 4 | 11 | Medium | approved |
 
 ## Categories
 
