@@ -32,6 +32,7 @@ from debrief_schemas import (
     PolygonProperties,
     RectangleAnnotation,
     ReferenceLocation,
+    SystemState,
     TextAnnotation,
     TrackFeature,
     TrackStyle,
@@ -47,6 +48,8 @@ ENTITY_MAP = {
     # Core types
     "track-feature": TrackFeature,
     "reference-location": ReferenceLocation,
+    # System state types
+    "system-state": SystemState,
     # Annotation types
     "narrative-entry": NarrativeEntry,
     "circle-annotation": CircleAnnotation,
