@@ -28,6 +28,7 @@ from urllib.parse import urlparse
 
 # Try to import websocket-client
 import pytest
+
 websocket = pytest.importorskip("websocket", reason="websocket-client not installed")
 
 
