@@ -9,7 +9,7 @@ Implement epic support for the speckit workflow: a new `/epic` skill that breaks
 ## Phase 1: Infrastructure
 
 ### Task 1.1: Add Epics section to BACKLOG.md
-**Status**: [ ] pending
+**Status**: [x] complete
 
 Add the Epics table structure to BACKLOG.md between Workflow and Items sections.
 
@@ -26,7 +26,7 @@ Add the Epics table structure to BACKLOG.md between Workflow and Items sections.
 ## Phase 2: Core Skill Implementation
 
 ### Task 2.1: Create /epic skill file
-**Status**: [ ] pending
+**Status**: [x] complete
 
 Create the skill definition at `.claude/commands/epic.md` following the pattern from `/idea`.
 
@@ -41,7 +41,7 @@ Create the skill definition at `.claude/commands/epic.md` following the pattern 
 ---
 
 ### Task 2.2: Implement input parsing section
-**Status**: [ ] pending
+**Status**: [x] complete
 
 Add parsing logic in the skill to handle text descriptions, local file paths, and GitHub URLs.
 
@@ -56,7 +56,7 @@ Add parsing logic in the skill to handle text descriptions, local file paths, an
 ---
 
 ### Task 2.3: Implement Opus analysis section
-**Status**: [ ] pending
+**Status**: [x] complete
 
 Add the BA + Technical Architect analysis prompting that generates item breakdown.
 
@@ -71,7 +71,7 @@ Add the BA + Technical Architect analysis prompting that generates item breakdow
 ---
 
 ### Task 2.4: Implement Epic ID assignment
-**Status**: [ ] pending
+**Status**: [x] complete
 
 Add logic to scan BACKLOG.md Epics table and assign next sequential ID (E01, E02, etc.).
 
@@ -86,7 +86,7 @@ Add logic to scan BACKLOG.md Epics table and assign next sequential ID (E01, E02
 ---
 
 ### Task 2.5: Implement BACKLOG.md update section
-**Status**: [ ] pending
+**Status**: [x] complete
 
 Add logic to update BACKLOG.md with epic row and item rows.
 
@@ -101,7 +101,7 @@ Add logic to update BACKLOG.md with epic row and item rows.
 ---
 
 ### Task 2.6: Implement GitHub issue creation section
-**Status**: [ ] pending
+**Status**: [x] complete
 
 Add logic to create GitHub issues for each item using `gh issue create`.
 
@@ -117,7 +117,7 @@ Add logic to create GitHub issues for each item using `gh issue create`.
 ---
 
 ### Task 2.7: Implement offline fallback
-**Status**: [ ] pending
+**Status**: [x] complete
 
 Add fallback when GitHub CLI is unavailable.
 
@@ -132,7 +132,7 @@ Add fallback when GitHub CLI is unavailable.
 ---
 
 ### Task 2.8: Implement summary output
-**Status**: [ ] pending
+**Status**: [x] complete
 
 Add the final report showing created epic, items, and next steps.
 
