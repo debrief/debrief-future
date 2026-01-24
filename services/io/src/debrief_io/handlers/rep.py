@@ -28,8 +28,8 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
-from debrief_io.handlers.base import BaseHandler
 from debrief_io.handlers.annotations.parser import is_annotation_line, parse_annotations
+from debrief_io.handlers.base import BaseHandler
 from debrief_io.models import ParseResult, ParseWarning
 
 

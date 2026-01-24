@@ -5,8 +5,9 @@ Ensures that track parsing is UNCHANGED when annotation support is added.
 These tests establish a baseline and verify no regression occurs.
 """
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from debrief_io.handlers.rep import REPHandler
 
