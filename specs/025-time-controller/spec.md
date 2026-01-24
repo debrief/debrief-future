@@ -111,6 +111,7 @@ A power user performing intensive analysis wants to control playback without mov
 - Q: How should controls be arranged in the panel? → A: Scrubber on top, play/pause and speed below in a row
 - Q: What UI pattern for the speed selector? → A: Dropdown menu (click to reveal options)
 - Q: Visual feedback during scrubbing? → A: Permanent time display updates in real-time (no tooltip needed)
+- Q: Where should the time display appear? → A: Above the scrubber as a header row
 
 ## User Interface Flow
 
@@ -123,11 +124,12 @@ The time controller lives as a **separate panel in the VS Code sidebar**, alongs
 
 ### Visual Layout
 
-The panel arranges controls in a **two-row vertical layout**:
-- **Top row**: Time scrubber spanning full panel width, with permanent time display showing current position
-- **Bottom row**: Play/Pause button on the left, speed selector dropdown on the right
+The panel arranges controls in a **three-row vertical layout**:
+- **Row 1 (Header)**: Permanent time display showing current position (e.g., "12:34:56")
+- **Row 2**: Time scrubber spanning full panel width
+- **Row 3**: Play/Pause button on the left, speed selector dropdown on the right
 
-**Time Display**: Permanently visible, updates in real-time during scrubbing and playback. No tooltip needed — the display itself provides feedback.
+**Time Display**: Positioned above the scrubber as a header. Permanently visible, updates in real-time during scrubbing and playback. No tooltip needed — the display itself provides feedback.
 
 **Speed Selector**: Dropdown menu displaying current speed (e.g., "1x"), clicking reveals options (1x, 2x, 4x, 8x) for selection.
 
