@@ -46,13 +46,13 @@
 
 **Purpose**: Project initialization, dependencies, and schema definition
 
-- [ ] T001 Create TypeScript service package `services/session-state/package.json`
-- [ ] T002 [P] Create TypeScript config `services/session-state/tsconfig.json`
-- [ ] T003 [P] Create Vitest config `services/session-state/vitest.config.ts`
-- [ ] T004 Create LinkML schema `shared/schemas/src/session-state.yaml`
-- [ ] T005 [P] Create Python client package `services/session-state-py/pyproject.toml`
-- [ ] T006 [P] Create debug dashboard directory `tools/debug-dashboard/`
-- [ ] T007 [P] Create Playwright config `tools/debug-dashboard/playwright.config.ts`
+- [x] T001 Create TypeScript service package `services/session-state/package.json`
+- [x] T002 [P] Create TypeScript config `services/session-state/tsconfig.json`
+- [x] T003 [P] Create Vitest config `services/session-state/vitest.config.ts`
+- [x] T004 Create LinkML schema `shared/schemas/src/linkml/session-state.yaml`
+- [x] T005 [P] Create Python client package `services/session-state-py/pyproject.toml`
+- [x] T006 [P] Create debug dashboard directory `tools/debug-dashboard/`
+- [x] T007 [P] Create Playwright config `tools/debug-dashboard/playwright.config.ts`
 
 **Checkpoint**: Project scaffolding complete - ready for foundation
 
@@ -66,25 +66,25 @@
 
 ### Type Definitions
 
-- [ ] T008 Generate TypeScript types from LinkML `services/session-state/src/types/index.ts`
-- [ ] T009 [P] Define TimeInstant and TimeRange types `services/session-state/src/types/temporal.ts`
-- [ ] T010 [P] Define ViewportPolygon type `services/session-state/src/types/spatial.ts`
-- [ ] T011 [P] Define FeatureSelection type `services/session-state/src/types/features.ts`
+- [x] T008 Generate TypeScript types from LinkML `services/session-state/src/types/index.ts`
+- [x] T009 [P] Define TimeInstant and TimeRange types `services/session-state/src/types/temporal.ts`
+- [x] T010 [P] Define ViewportPolygon type `services/session-state/src/types/spatial.ts`
+- [x] T011 [P] Define FeatureSelection type `services/session-state/src/types/features.ts`
 
 ### Store Infrastructure
 
-- [ ] T012 Create store factory with Zustand `services/session-state/src/store/index.ts`
-- [ ] T013 [P] Create temporal slice `services/session-state/src/store/slices/temporal.ts`
-- [ ] T014 [P] Create spatial slice `services/session-state/src/store/slices/spatial.ts`
-- [ ] T015 [P] Create features slice `services/session-state/src/store/slices/features.ts`
-- [ ] T016 [P] Create document slice `services/session-state/src/store/slices/document.ts`
+- [x] T012 Create store factory with Zustand `services/session-state/src/store/index.ts`
+- [x] T013 [P] Create temporal slice `services/session-state/src/store/slices/temporal.ts`
+- [x] T014 [P] Create spatial slice `services/session-state/src/store/slices/spatial.ts`
+- [x] T015 [P] Create features slice `services/session-state/src/store/slices/features.ts`
+- [x] T016 [P] Create document slice `services/session-state/src/store/slices/document.ts`
 
 ### Foundation Tests
 
-- [ ] T017 [test] Unit tests for temporal slice `services/session-state/tests/unit/slices/temporal.test.ts`
-- [ ] T018 [P][test] Unit tests for spatial slice `services/session-state/tests/unit/slices/spatial.test.ts`
-- [ ] T019 [P][test] Unit tests for features slice `services/session-state/tests/unit/slices/features.test.ts`
-- [ ] T020 [P][test] Unit tests for document slice `services/session-state/tests/unit/slices/document.test.ts`
+- [x] T017 [test] Unit tests for temporal slice `services/session-state/tests/unit/slices/temporal.test.ts`
+- [x] T018 [P][test] Unit tests for spatial slice `services/session-state/tests/unit/slices/spatial.test.ts`
+- [x] T019 [P][test] Unit tests for features slice `services/session-state/tests/unit/slices/features.test.ts`
+- [x] T020 [P][test] Unit tests for document slice `services/session-state/tests/unit/slices/document.test.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -98,15 +98,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T021 [test] Test reactive subscriptions `services/session-state/tests/unit/subscriptions.test.ts`
-- [ ] T022 [P][test] Test selective subscriptions (SC-006) `services/session-state/tests/unit/selective.test.ts`
+- [x] T021 [test] Test reactive subscriptions `services/session-state/tests/unit/subscriptions.test.ts`
+- [x] T022 [P][test] Test selective subscriptions (SC-006) `services/session-state/tests/unit/selective.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T023 Implement subscribeWithSelector middleware `services/session-state/src/store/middleware/selector.ts`
-- [ ] T024 [P] Add subscription helpers to store `services/session-state/src/store/subscriptions.ts`
-- [ ] T025 Export public API for subscriptions `services/session-state/src/index.ts`
-- [ ] T026 [test] Verify SC-001: updates within 100ms `services/session-state/tests/unit/performance.test.ts`
+- [x] T023 Implement subscribeWithSelector middleware `services/session-state/src/store/middleware/selector.ts`
+- [x] T024 [P] Add subscription helpers to store `services/session-state/src/store/subscriptions.ts`
+- [x] T025 Export public API for subscriptions `services/session-state/src/index.ts`
+- [x] T026 [test] Verify SC-001: updates within 100ms `services/session-state/tests/unit/performance.test.ts`
 
 **Checkpoint**: US1 complete - reactive subscriptions work
 
@@ -120,28 +120,28 @@
 
 ### Server Infrastructure
 
-- [ ] T027 Create Express server setup `services/session-state/src/server/index.ts`
-- [ ] T028 [P] Implement CORS middleware (FR-038) `services/session-state/src/server/cors.ts`
-- [ ] T029 Implement MCP tool handlers `services/session-state/src/server/mcp.ts`
+- [x] T027 Create Express server setup `services/session-state/src/server/index.ts`
+- [x] T028 [P] Implement CORS middleware (FR-038) `services/session-state/src/server/cors.ts`
+- [x] T029 Implement MCP tool handlers `services/session-state/src/server/mcp.ts`
 
 ### MCP Tools Implementation
 
-- [ ] T030 Implement session.getState tool `services/session-state/src/server/tools/getState.ts`
-- [ ] T031 [P] Implement session.setCurrentTime tool `services/session-state/src/server/tools/setCurrentTime.ts`
-- [ ] T032 [P] Implement session.setViewport tool `services/session-state/src/server/tools/setViewport.ts`
-- [ ] T033 [P] Implement session.setSelection tool `services/session-state/src/server/tools/setSelection.ts`
-- [ ] T034 [P] Implement session.setHiddenFeatures tool `services/session-state/src/server/tools/setHiddenFeatures.ts`
+- [x] T030 Implement session.getState tool `services/session-state/src/server/tools/getState.ts`
+- [x] T031 [P] Implement session.setCurrentTime tool `services/session-state/src/server/tools/setCurrentTime.ts`
+- [x] T032 [P] Implement session.setViewport tool `services/session-state/src/server/tools/setViewport.ts`
+- [x] T033 [P] Implement session.setSelection tool `services/session-state/src/server/tools/setSelection.ts`
+- [x] T034 [P] Implement session.setHiddenFeatures tool `services/session-state/src/server/tools/setHiddenFeatures.ts`
 
 ### Python Client
 
-- [ ] T035 Create Python MCP client wrapper `services/session-state-py/src/debrief_session/client.py`
-- [ ] T036 [P] Generate Python types from LinkML `services/session-state-py/src/debrief_session/types.py`
-- [ ] T037 [P] Create Python package init `services/session-state-py/src/debrief_session/__init__.py`
+- [x] T035 Create Python MCP client wrapper `services/session-state-py/src/debrief_session/client.py`
+- [x] T036 [P] Generate Python types from LinkML `services/session-state-py/src/debrief_session/types.py`
+- [x] T037 [P] Create Python package init `services/session-state-py/src/debrief_session/__init__.py`
 
 ### Tests for User Story 2
 
-- [ ] T038 [test] MCP tool integration tests `services/session-state/tests/integration/mcp.test.ts`
-- [ ] T039 [P][test] Python client tests `services/session-state-py/tests/test_client.py`
+- [x] T038 [test] MCP tool integration tests `services/session-state/tests/integration/mcp.test.ts`
+- [x] T039 [P][test] Python client tests `services/session-state-py/tests/test_client.py`
 
 **Checkpoint**: US2 complete - Python can read/write state via MCP
 
