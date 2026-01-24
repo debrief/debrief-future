@@ -87,6 +87,22 @@ An analyst makes changes to the session state. The editor indicates when there a
 
 ---
 
+### User Story 6 - Developer Debugs State via Web Dashboard (Priority: P6)
+
+A developer runs the session state server standalone (outside VS Code) and opens a web-based debug dashboard to monitor and manipulate state. The dashboard displays all state slices in real-time, allowing the developer to verify behavior and force state changes for testing.
+
+**Why this priority**: Debug tooling accelerates development and enables testing without requiring the full VS Code environment. This is foundational for the "unit-testable core" approach.
+
+**Independent Test**: Can be fully tested by starting the standalone server, opening the dashboard in a browser, and verifying state displays update in real-time when modified via the MCP interface.
+
+**Acceptance Scenarios**:
+
+1. **Given** the server is running standalone, **When** a developer opens the dashboard URL, **Then** they see the current state of all four slices
+2. **Given** the dashboard is open, **When** state changes via MCP tool call, **Then** the dashboard updates in real-time to reflect the change
+3. **Given** the dashboard is open, **When** the developer edits a state value and submits, **Then** the server state is updated and other clients are notified
+
+---
+
 ### Edge Cases
 
 - When loading a session file with an incompatible (future) schema version, the system MUST reject the load with a clear error message; older versions can be migrated forward per SC-007
@@ -157,6 +173,22 @@ An analyst makes changes to the session state. The editor indicates when there a
 - **FR-032**: Time values MUST be stored internally as epoch milliseconds for efficient comparison
 - **FR-033**: Time values MUST be serialized in ISO 8601 UTC format for interoperability
 
+**Server Deployment**
+
+- **FR-034**: Session state server MUST be runnable as a standalone process outside VS Code
+- **FR-035**: Server MUST expose MCP interface via HTTP transport when running standalone
+- **FR-036**: When embedded in VS Code, TypeScript UI components MUST access state directly (in-process) while Python accesses via HTTP
+- **FR-037**: The same state management code MUST be used in both standalone and embedded modes
+
+**Developer Tools**
+
+- **FR-038**: Server MUST serve a web-based debug dashboard when running standalone
+- **FR-039**: Dashboard MUST display all four state slices with real-time updates
+- **FR-040**: Dashboard MUST display features slice as a collapsible tree view
+- **FR-041**: Dashboard MUST display temporal, spatial, and document slices as editable text/form fields
+- **FR-042**: Dashboard MUST allow developers to modify state values directly
+- **FR-043**: State changes made via dashboard MUST trigger the same update path as MCP tool calls (including undo history)
+
 ### Key Entities
 
 - **SessionState**: Composite entity containing all session state slices; the root of the persistence model
@@ -191,6 +223,7 @@ An analyst makes changes to the session state. The editor indicates when there a
 - Q: How should the system handle loading a session referencing a missing feature collection? → A: Fail load - Reject session load entirely with error message
 - Q: How should concurrent modifications from Python and UI be handled? → A: Last-write-wins - Whichever modification arrives last takes effect
 - Q: How should incompatible (future) schema versions be handled? → A: Reject with error - Refuse to load with clear error message
+- Q: How can developers test state management without VS Code? → A: Standalone server with HTTP/MCP interface plus web-based debug dashboard for monitoring and manipulating state
 
 ## Success Criteria *(mandatory)*
 
@@ -203,3 +236,5 @@ An analyst makes changes to the session state. The editor indicates when there a
 - **SC-005**: System supports at least 50 undo steps before oldest entries are discarded
 - **SC-006**: State changes trigger updates only to subscribed components (no unnecessary re-renders)
 - **SC-007**: Session files from older schema versions can be migrated to the current version
+- **SC-008**: Debug dashboard displays state changes within 200ms of modification
+- **SC-009**: Standalone server can be started and accept MCP tool calls without any VS Code dependencies
