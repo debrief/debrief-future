@@ -11,6 +11,7 @@
 
 - Q: What is the verification strategy? → A: Phased approach - Phase 1: headless unit tests, Phase 2: HTML harness with Playwright, Phase 3: VS Code integration (deferred)
 - Q: What does the HTML harness show? → A: Features list (left), tools list (right), "show inactive tools" toggle
+- Q: Does Phase 2 include tool execution testing? → A: No, selection matching only; execution deferred to Phase 3
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -148,6 +149,7 @@ Implementation and verification proceeds in three phases to minimize VS Code int
 - Standalone HTML page for visual verification
 - Layout: Feature list (left) | Tool list (right)
 - Includes "Show inactive tools" toggle
+- Scope: Selection matching only (no tool execution)
 - Automated testing via Playwright (no human required)
 - Manual verification also available
 - Exit criteria: Playwright tests pass, manual smoke test successful
