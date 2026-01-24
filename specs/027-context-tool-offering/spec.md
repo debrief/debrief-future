@@ -14,6 +14,7 @@
 - Q: Does Phase 2 include tool execution testing? → A: No, selection matching only; execution deferred to Phase 3
 - Q: HTML harness technology? → A: Storybook (since using fixture data); standalone HTML only if connecting to live service
 - Q: How does Playwright test Storybook? → A: Playwright starts Storybook via webServer config, runs tests, captures screenshots for blog media
+- Q: When should LinkML schemas be defined? → A: Phase 0 (first), so all development is against typed objects from the start
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -139,11 +140,19 @@ An analyst wonders why a specific tool isn't available and can view inactive too
 
 ### Phased Approach
 
-Implementation and verification proceeds in three phases to minimize VS Code integration overhead:
+Implementation and verification proceeds in four phases to minimize VS Code integration overhead:
+
+**Phase 0 - Schema Definition (LinkML)**
+- Define Tool, SelectionRequirement schemas in LinkML
+- Generate TypeScript types from LinkML
+- Generate JSON Schema for validation
+- All subsequent development uses generated types
+- Exit criteria: Schema adherence tests pass, TypeScript types available
 
 **Phase 1 - Unit Tests (Headless)**
 - Verify ToolMatchService matching logic with fixture data
 - Test all selection requirement combinations
+- Uses generated TypeScript types from Phase 0
 - No UI or browser dependencies
 - Exit criteria: All matching algorithm edge cases pass
 

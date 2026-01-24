@@ -25,18 +25,18 @@ Implement a context-sensitive tool offering system that matches analysis tools t
 
 | Article | Requirement | Status | Notes |
 |---------|-------------|--------|-------|
-| I.1 Offline by default | Core functionality works without network | ✅ PASS | Fixture data, no MCP in Phases 1-2 |
+| I.1 Offline by default | Core functionality works without network | ✅ PASS | Fixture data, no MCP in Phases 0-2 |
 | I.4 Reproducibility | Same inputs produce identical results | ✅ PASS | Pure function matching algorithm |
-| II.1 Single source of truth | LinkML master schemas | ⚠️ DEFERRED | SelectionRequirement schema needed for Phase 3 |
-| III.1 Provenance always | Every transformation records lineage | N/A | Phases 1-2: no transformations, matching only |
-| IV.1 Services never touch UI | Python services return data only | ✅ PASS | TypeScript library, no Python in Phases 1-2 |
+| II.1 Single source of truth | LinkML master schemas | ✅ PASS | Tool/SelectionRequirement schemas in Phase 0 |
+| III.1 Provenance always | Every transformation records lineage | N/A | Phases 0-2: no transformations, matching only |
+| IV.1 Services never touch UI | Python services return data only | ✅ PASS | TypeScript library, no Python in Phases 0-2 |
 | IV.3 Services have zero MCP dependency | Domain logic in pure libraries | ✅ PASS | ToolMatchService is pure TypeScript |
-| VI.1 Schema tests gate all merges | Derived schema adherence tests | ⚠️ DEFERRED | For Phase 3 MCP integration |
+| VI.1 Schema tests gate all merges | Derived schema adherence tests | ✅ PASS | Schema adherence tests in Phase 0 |
 | VI.2 Services require unit tests | No service code without tests | ✅ PASS | Phase 1 is all unit tests |
 | VII.1 Tests before implementation | Define expected behaviour first | ✅ PASS | Unit test fixtures defined before implementation |
 | VIII.1 Specs before code | Written specification exists | ✅ PASS | spec.md complete with clarifications |
 
-**Gate Status**: ✅ PASS - No blocking violations. Deferred items are Phase 3 scope.
+**Gate Status**: ✅ PASS - All constitution requirements satisfied.
 
 ## Project Structure
 
@@ -62,14 +62,23 @@ specs/027-context-tool-offering/
 ### Source Code (repository root)
 
 ```text
+shared/schemas/
+├── src/
+│   └── tool/                         # NEW: Tool metadata schemas (Phase 0)
+│       ├── tool.yaml                 # LinkML schema definition
+│       ├── types.ts                  # Generated TypeScript types
+│       └── tool-metadata.schema.json # Generated JSON Schema
+└── tests/
+    └── tool/                         # Schema adherence tests
+        └── fixtures/                 # Golden fixture files
+
 shared/components/
 ├── src/
-│   ├── ToolMatch/                    # NEW: Tool matching library
+│   ├── ToolMatch/                    # NEW: Tool matching library (Phase 1)
 │   │   ├── index.ts                  # Public exports
 │   │   ├── ToolMatchService.ts       # Core matching algorithm
-│   │   ├── types.ts                  # Tool, SelectionRequirement, Selection types
 │   │   ├── explanations.ts           # Inactive tool explanation generator
-│   │   └── ToolMatchHarness/         # Storybook verification harness
+│   │   └── ToolMatchHarness/         # Storybook verification harness (Phase 2)
 │   │       ├── ToolMatchHarness.tsx  # React component
 │   │       ├── ToolMatchHarness.stories.tsx  # Storybook story
 │   │       └── fixtures/             # Test fixture data
@@ -77,16 +86,19 @@ shared/components/
 │   │           └── tools.json        # Sample tool definitions
 │   └── ... (existing components)
 ├── tests/
-│   └── ToolMatch/                    # NEW: Unit tests
+│   └── ToolMatch/                    # Unit tests
 │       ├── ToolMatchService.test.ts  # Matching algorithm tests
 │       └── explanations.test.ts      # Explanation generator tests
-├── e2e/                              # NEW: Playwright E2E tests
+├── e2e/                              # Playwright E2E tests
 │   └── ToolMatchHarness.spec.ts      # Storybook interaction + screenshots
-├── playwright.config.ts              # NEW: Playwright config with webServer
+├── playwright.config.ts              # Playwright config with webServer
 └── ... (existing config)
 ```
 
-**Structure Decision**: ToolMatchService lives in shared/components as a standalone module with its own Storybook story. This allows reuse across Storybook harness and future VS Code extension.
+**Structure Decision**:
+- LinkML schemas live in shared/schemas (single source of truth per Constitution Article II)
+- ToolMatchService imports types from @debrief/schemas
+- Storybook harness lives in shared/components for visual verification
 
 ## Media Components
 
@@ -108,15 +120,30 @@ shared/components/
 
 ## Implementation Phases
 
+### Phase 0: Schema Definition (LinkML)
+
+**Goal**: Define canonical schemas so all development uses typed objects from the start
+
+**Deliverables**:
+1. `tool.yaml` - LinkML schema for Tool and SelectionRequirement
+2. Generated TypeScript types (`types.ts`)
+3. Generated JSON Schema (`tool-metadata.schema.json`)
+4. Schema adherence tests (golden fixtures)
+
+**Location**: `shared/schemas/src/tool/`
+
+**Exit Criteria**: Schema adherence tests pass, TypeScript types importable
+
 ### Phase 1: Unit Tests (Headless)
 
 **Goal**: Verify ToolMatchService matching logic with fixture data
 
 **Deliverables**:
 1. `ToolMatchService.ts` - Core matching algorithm
-2. `types.ts` - TypeScript interfaces (Tool, SelectionRequirement, Selection)
-3. `explanations.ts` - Inactive tool explanation generator
-4. Unit tests covering all matching edge cases
+2. `explanations.ts` - Inactive tool explanation generator
+3. Unit tests covering all matching edge cases
+
+**Note**: TypeScript types come from Phase 0 (not hand-written)
 
 **Exit Criteria**: All unit tests pass
 
@@ -151,4 +178,6 @@ shared/components/
 
 ## Complexity Tracking
 
-No constitution violations requiring justification. All deferred items are explicitly Phase 3 scope.
+No constitution violations requiring justification. All articles satisfied:
+- Article II (Schema Integrity): LinkML schemas defined in Phase 0
+- Article VI (Testing): Schema adherence tests + unit tests + Playwright E2E
