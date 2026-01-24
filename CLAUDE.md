@@ -236,6 +236,8 @@ Three approaches required:
 - Python 3.11+ (LinkML generators, Pydantic models), TypeScript 5.x (generated types) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS) (022-system-kind-discriminator)
 - Markdown (skill definition), Bash (gh CLI integration) + Claude Code Skill system, GitHub CLI (`gh`), Opus model (023-epic-workflow-support)
 - BACKLOG.md (epics and items tables), GitHub issues (023-epic-workflow-support)
+- TypeScript 5.x (shared library, Storybook harness, VS Code extension) + React 18+, Storybook 8.x, Vitest, Playwright (027-context-tool-offering)
+- N/A (pure matching logic, no persistence in Phases 1-2) (027-context-tool-offering)
 
 ## Recent Changes
 - 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v5+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 10.x
