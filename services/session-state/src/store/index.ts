@@ -166,7 +166,11 @@ export function createSessionStore() {
         }
 
         // Apply the change
-        set(partial, replace);
+        if (replace === true) {
+          set(partial as SessionStoreWithUndo, true);
+        } else {
+          set(partial);
+        }
 
         // Check if dirty should be set (for non-undo/redo changes)
         if (!isUndoRedo) {

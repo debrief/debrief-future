@@ -58,10 +58,13 @@ export async function loadSession(
     }
 
     // Migrate if needed
-    const migratedData = migrateSession(data, data.version);
+    const migratedData = migrateSession(
+      data as unknown as Record<string, unknown>,
+      data.version
+    ) as unknown as SessionFile;
 
     // Apply state to store
-    const result = applySessionState(store, migratedData as SessionFile, path);
+    const result = applySessionState(store, migratedData, path);
 
     return {
       success: true,

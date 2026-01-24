@@ -22,6 +22,22 @@ export const SCHEMA_VERSION = '1.0.0';
 
 /**
  * Complete session state combining all slices (FR-001, FR-002).
+ * This is the flat store structure used by Zustand.
+ */
+export type SessionStore = TemporalSlice &
+  SpatialSlice &
+  FeaturesSlice &
+  DocumentSlice &
+  TemporalActions &
+  SpatialActions &
+  FeaturesActions &
+  DocumentActions & {
+    /** Reset all state to defaults */
+    reset: () => void;
+  };
+
+/**
+ * Grouped session state for API responses and persistence.
  */
 export interface SessionState {
   temporal: TemporalSlice;
@@ -41,11 +57,6 @@ export interface SessionActions
   /** Reset all state to defaults */
   reset: () => void;
 }
-
-/**
- * Complete store type including state and actions.
- */
-export type SessionStore = SessionState & SessionActions;
 
 /**
  * Persistent state - what gets saved to file (FR-024).
