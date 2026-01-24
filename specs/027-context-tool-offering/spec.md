@@ -5,6 +5,13 @@
 **Status**: Draft
 **Input**: User description: "Context-Sensitive Tool Offering in VS Code - dynamically offer analysis tools based on analyst selections"
 
+## Clarifications
+
+### Session 2026-01-24
+
+- Q: What is the verification strategy? → A: Phased approach - Phase 1: headless unit tests, Phase 2: HTML harness with Playwright, Phase 3: VS Code integration (deferred)
+- Q: What does the HTML harness show? → A: Features list (left), tools list (right), "show inactive tools" toggle
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Discover Applicable Tools (Priority: P1)
@@ -125,6 +132,42 @@ An analyst wonders why a specific tool isn't available and can view inactive too
 - **SC-005**: System handles 50+ registered tools without degradation in matching or display performance
 - **SC-006**: Analysts can access tools from any of the three surfaces (context menu, sidebar, command palette) with consistent results
 
+## Verification Strategy
+
+### Phased Approach
+
+Implementation and verification proceeds in three phases to minimize VS Code integration overhead:
+
+**Phase 1 - Unit Tests (Headless)**
+- Verify ToolMatchService matching logic with fixture data
+- Test all selection requirement combinations
+- No UI or browser dependencies
+- Exit criteria: All matching algorithm edge cases pass
+
+**Phase 2 - HTML Verification Harness**
+- Standalone HTML page for visual verification
+- Layout: Feature list (left) | Tool list (right)
+- Includes "Show inactive tools" toggle
+- Automated testing via Playwright (no human required)
+- Manual verification also available
+- Exit criteria: Playwright tests pass, manual smoke test successful
+
+**Phase 3 - VS Code Integration**
+- Wire ToolMatchService into VS Code extension
+- Connect to real MCP for tool discovery and execution
+- Deferred until Phases 1-2 verified
+- Exit criteria: All acceptance scenarios pass in VS Code
+
+### HTML Harness Requirements
+
+- **HH-001**: Harness MUST display a list of selectable GeoJSON features grouped by kind (tracks, points, etc.)
+- **HH-002**: Harness MUST allow multi-selection of features via checkboxes or click
+- **HH-003**: Harness MUST display matching tools list that updates on selection change
+- **HH-004**: Harness MUST provide "Show inactive tools" toggle (default: hidden)
+- **HH-005**: Harness MUST show explanatory text for inactive tools when toggle enabled
+- **HH-006**: Harness MUST work with fixture data (no MCP dependency)
+- **HH-007**: Harness MUST support Playwright automation for CI testing
+
 ## Assumptions
 
 - debrief-calc service exposes tools via MCP with the expected `list_tools` and `execute_tool` operations
@@ -132,6 +175,7 @@ An analyst wonders why a specific tool isn't available and can view inactive too
 - The VS Code extension already has a selection model that tracks which features are selected
 - debrief-stac write_plot operation supports provenance metadata attachment
 - Tools in this iteration are parameterless (no user-provided inputs beyond selection)
+- ToolMatchService is implemented as a standalone TypeScript library usable in both HTML harness and VS Code extension
 
 ## Out of Scope
 
