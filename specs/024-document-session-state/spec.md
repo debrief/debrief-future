@@ -90,7 +90,7 @@ An analyst makes changes to the session state. The editor indicates when there a
 ### Edge Cases
 
 - What happens when loading a session file with an incompatible schema version?
-- How does the system handle loading a session that references a feature collection that no longer exists?
+- When loading a session that references a feature collection that no longer exists, the system MUST reject the load with an error message indicating the missing collection
 - What happens when undo is invoked with an empty history stack?
 - How does the system behave when the time range is set to a zero-duration interval?
 - What happens when the viewport polygon contains invalid coordinates (outside valid geographic bounds)?
@@ -187,6 +187,7 @@ An analyst makes changes to the session state. The editor indicates when there a
 
 - Q: How can state management be verified without full UI/Python infrastructure? → A: Unit-testable core - State management logic verifiable through programmatic tests without UI; integration tests added later
 - Q: How should opening a GeoJSON FeatureCollection relate to session state? → A: Auto-initialize - Opening a GeoJSON FeatureCollection in the map editor automatically creates a session with default state
+- Q: How should the system handle loading a session referencing a missing feature collection? → A: Fail load - Reject session load entirely with error message
 
 ## Success Criteria *(mandatory)*
 
