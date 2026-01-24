@@ -153,8 +153,17 @@
   - Empty selection state
   - Two tracks selected (Range Calculation active)
   - Show inactive tools toggle enabled
-- [ ] Run e2e tests to capture screenshots
+- [ ] Run e2e tests to capture screenshots (requires local execution)
 - [ ] Copy screenshots to `specs/027-context-tool-offering/media/screenshots/`
+
+> **Manual steps required** (browser environment needed):
+> ```bash
+> cd shared/components
+> npx playwright install chromium
+> pnpm test:e2e
+> mkdir -p ../../specs/027-context-tool-offering/media/screenshots
+> cp screenshots/*.png ../../specs/027-context-tool-offering/media/screenshots/
+> ```
 
 **Acceptance**: Screenshots captured and suitable for blog post
 
