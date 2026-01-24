@@ -179,17 +179,22 @@ A developer runs the session state server standalone (outside VS Code) and opens
 - **FR-035**: Server MUST expose MCP interface via HTTP transport when running standalone
 - **FR-036**: When embedded in VS Code, TypeScript UI components MUST access state directly (in-process) while Python accesses via HTTP
 - **FR-037**: The same state management code MUST be used in both standalone and embedded modes
+- **FR-037a**: Server MUST provide a Server-Sent Events (SSE) endpoint for real-time state change notifications
 
 **Developer Tools**
 
 - **FR-038**: Server MUST support CORS headers to allow access from standalone HTML applications
 - **FR-039**: A separate debug dashboard application MUST be provided as a standalone HTML/JS app (not hosted by the server)
 - **FR-040**: Dashboard MUST connect to the server via HTTP/MCP interface
-- **FR-041**: Dashboard MUST display all four state slices with real-time updates
-- **FR-042**: Dashboard MUST display features slice as a collapsible tree view
-- **FR-043**: Dashboard MUST display temporal, spatial, and document slices as editable text/form fields
-- **FR-044**: Dashboard MUST allow developers to modify state values directly
+- **FR-041**: Dashboard MUST display all four state slices with real-time updates via Server-Sent Events (SSE)
+- **FR-042**: Dashboard MUST display features slice as a collapsible tree view showing feature IDs with name/type properties when available
+- **FR-043**: Dashboard MUST display temporal, spatial, and document slices as editable fields
+- **FR-044**: Dashboard MUST support inline editing - click to edit, submit on Enter or blur
 - **FR-045**: State changes made via dashboard MUST use the same MCP tool interface as Python clients
+- **FR-046**: Dashboard MUST accept server URL via URL parameter (`?server=`) with localStorage fallback
+- **FR-047**: Dashboard MUST display editable server URL in header, persisted to localStorage
+- **FR-048**: Dashboard MUST show connection status indicator (connected/disconnected)
+- **FR-049**: Tool action buttons (undo, redo, save, load, playback) are deferred to a future phase
 
 ### Key Entities
 
@@ -227,6 +232,11 @@ A developer runs the session state server standalone (outside VS Code) and opens
 - Q: How should incompatible (future) schema versions be handled? → A: Reject with error - Refuse to load with clear error message
 - Q: How can developers test state management without VS Code? → A: Standalone server with HTTP/MCP interface plus web-based debug dashboard for monitoring and manipulating state
 - Q: Should the debug dashboard be hosted by the server or separate? → A: Separate HTML app - keeps server minimal (pure API), allows independent evolution, aligns with "thick services, thin frontends"
+- Q: How should dashboard configure server URL? → A: URL parameter (?server=) with editable header field, persisted to localStorage
+- Q: How should dashboard receive real-time updates? → A: Server-Sent Events (SSE) from server
+- Q: How should dashboard handle editing? → A: Inline editing - click to edit, submit on Enter/blur
+- Q: What should features tree show? → A: Feature IDs with name/type properties when available
+- Q: Which tool action buttons should dashboard have? → A: Deferred to future phase - focus on state display and editing first
 
 ## Success Criteria *(mandatory)*
 
