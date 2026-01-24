@@ -80,6 +80,9 @@ shared/components/
 │   └── ToolMatch/                    # NEW: Unit tests
 │       ├── ToolMatchService.test.ts  # Matching algorithm tests
 │       └── explanations.test.ts      # Explanation generator tests
+├── e2e/                              # NEW: Playwright E2E tests
+│   └── ToolMatchHarness.spec.ts      # Storybook interaction + screenshots
+├── playwright.config.ts              # NEW: Playwright config with webServer
 └── ... (existing config)
 ```
 
@@ -124,9 +127,16 @@ shared/components/
 **Deliverables**:
 1. `ToolMatchHarness.tsx` - React component with feature list (left) and tool list (right)
 2. `ToolMatchHarness.stories.tsx` - Storybook story with fixture data
-3. Playwright tests for automated CI verification
+3. `playwright.config.ts` - Configured to start Storybook via `webServer`
+4. `ToolMatchHarness.spec.ts` - Playwright tests with interaction and screenshot capture
 
-**Exit Criteria**: Playwright tests pass, manual smoke test successful
+**Playwright Approach**:
+- Playwright starts Storybook instance automatically (`webServer` config)
+- Tests navigate to story URL, interact with harness, verify tool matching
+- Screenshots captured at key states (empty, selection, tools shown, inactive toggle)
+- Screenshots saved to `media/screenshots/` for shipped blog post
+
+**Exit Criteria**: Playwright tests pass, screenshots captured for blog media
 
 ### Phase 3: VS Code Integration (Deferred)
 

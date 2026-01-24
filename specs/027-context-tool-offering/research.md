@@ -116,16 +116,50 @@ function getInactiveReason(tool: Tool, selection: Selection): string {
 
 **Question**: How should the Storybook harness be tested with Playwright?
 
-**Decision**: Use Storybook test runner with Playwright for component interaction tests
+**Decision**: Use Playwright directly with `webServer` config to start Storybook and capture screenshots
 
-**Rationale**: The existing shared/components workspace uses Storybook 8.x which has built-in Playwright support via `@storybook/test-runner`.
+**Rationale**: Playwright can start Storybook automatically, run interaction tests, and capture screenshots for blog media. This provides both automated verification and visual assets in one pass.
 
 **Pattern**:
-1. Define fixture data in `.stories.tsx` file
-2. Use `play` function for interaction tests
-3. Run via `test-storybook` command which uses Playwright under the hood
+1. Configure `playwright.config.ts` with `webServer` to start Storybook
+2. Write Playwright test spec (`.spec.ts`) that navigates to story URL
+3. Interact with harness (select features, toggle inactive tools)
+4. Assert expected tools appear/disappear
+5. Capture screenshots at key states for blog media
 
-**Example**:
+**Example playwright.config.ts**:
+```typescript
+export default defineConfig({
+  webServer: {
+    command: 'pnpm storybook --ci',
+    url: 'http://localhost:6006',
+    reuseExistingServer: !process.env.CI,
+  },
+  use: {
+    baseURL: 'http://localhost:6006',
+  },
+})
+```
+
+**Example test spec**:
+```typescript
+// ToolMatchHarness.spec.ts
+test('shows range calculation when two tracks selected', async ({ page }) => {
+  await page.goto('/iframe.html?id=toolmatch-harness--default')
+
+  // Select two tracks
+  await page.click('[data-testid="feature-track-1"]')
+  await page.click('[data-testid="feature-track-2"]')
+
+  // Verify tool appears
+  await expect(page.getByText('Range Calculation')).toBeVisible()
+
+  // Capture screenshot for blog
+  await page.screenshot({ path: 'media/screenshots/two-tracks-selected.png' })
+})
+```
+
+**Example Storybook story (for fixture data)**:
 ```typescript
 // ToolMatchHarness.stories.tsx
 export const Default: Story = {

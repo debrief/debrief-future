@@ -13,6 +13,7 @@
 - Q: What does the HTML harness show? → A: Features list (left), tools list (right), "show inactive tools" toggle
 - Q: Does Phase 2 include tool execution testing? → A: No, selection matching only; execution deferred to Phase 3
 - Q: HTML harness technology? → A: Storybook (since using fixture data); standalone HTML only if connecting to live service
+- Q: How does Playwright test Storybook? → A: Playwright starts Storybook via webServer config, runs tests, captures screenshots for blog media
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -151,9 +152,10 @@ Implementation and verification proceeds in three phases to minimize VS Code int
 - Layout: Feature list (left) | Tool list (right)
 - Includes "Show inactive tools" toggle
 - Scope: Selection matching only (no tool execution)
-- Automated testing via Playwright (no human required)
-- Manual verification also available
-- Exit criteria: Playwright tests pass, manual smoke test successful
+- Playwright starts Storybook instance, runs interaction tests, captures screenshots
+- Screenshots reused for shipped blog post (no manual capture needed)
+- Manual verification also available via `pnpm storybook`
+- Exit criteria: Playwright tests pass, screenshots captured
 
 **Phase 3 - VS Code Integration**
 - Wire ToolMatchService into VS Code extension
@@ -171,6 +173,7 @@ Implementation and verification proceeds in three phases to minimize VS Code int
 - **HH-006**: Harness MUST work with JSON fixture data (no MCP/live service dependency)
 - **HH-007**: Harness MUST be implemented as a Storybook story for fixture-driven testing
 - **HH-008**: Harness MUST support Playwright automation for CI testing
+- **HH-009**: Playwright tests MUST capture screenshots suitable for blog post media
 
 ## Assumptions
 
