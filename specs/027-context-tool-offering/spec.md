@@ -12,6 +12,7 @@
 - Q: What is the verification strategy? → A: Phased approach - Phase 1: headless unit tests, Phase 2: HTML harness with Playwright, Phase 3: VS Code integration (deferred)
 - Q: What does the HTML harness show? → A: Features list (left), tools list (right), "show inactive tools" toggle
 - Q: Does Phase 2 include tool execution testing? → A: No, selection matching only; execution deferred to Phase 3
+- Q: HTML harness technology? → A: Storybook (since using fixture data); standalone HTML only if connecting to live service
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -145,8 +146,8 @@ Implementation and verification proceeds in three phases to minimize VS Code int
 - No UI or browser dependencies
 - Exit criteria: All matching algorithm edge cases pass
 
-**Phase 2 - HTML Verification Harness**
-- Standalone HTML page for visual verification
+**Phase 2 - HTML Verification Harness (Storybook)**
+- Storybook story with fixture data (no live service dependency)
 - Layout: Feature list (left) | Tool list (right)
 - Includes "Show inactive tools" toggle
 - Scope: Selection matching only (no tool execution)
@@ -160,15 +161,16 @@ Implementation and verification proceeds in three phases to minimize VS Code int
 - Deferred until Phases 1-2 verified
 - Exit criteria: All acceptance scenarios pass in VS Code
 
-### HTML Harness Requirements
+### HTML Harness Requirements (Storybook)
 
 - **HH-001**: Harness MUST display a list of selectable GeoJSON features grouped by kind (tracks, points, etc.)
 - **HH-002**: Harness MUST allow multi-selection of features via checkboxes or click
 - **HH-003**: Harness MUST display matching tools list that updates on selection change
 - **HH-004**: Harness MUST provide "Show inactive tools" toggle (default: hidden)
 - **HH-005**: Harness MUST show explanatory text for inactive tools when toggle enabled
-- **HH-006**: Harness MUST work with fixture data (no MCP dependency)
-- **HH-007**: Harness MUST support Playwright automation for CI testing
+- **HH-006**: Harness MUST work with JSON fixture data (no MCP/live service dependency)
+- **HH-007**: Harness MUST be implemented as a Storybook story for fixture-driven testing
+- **HH-008**: Harness MUST support Playwright automation for CI testing
 
 ## Assumptions
 
