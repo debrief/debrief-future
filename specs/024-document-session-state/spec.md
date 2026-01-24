@@ -180,6 +180,7 @@ An analyst makes changes to the session state. The editor indicates when there a
 - There is no enforced limit on the number of features that can be selected (reasonable performance expected)
 - Time step auto-calculation from data density is handled at the application layer, not the state management layer
 - State management core is unit-testable through programmatic tests without requiring UI or Python infrastructure; integration tests for UI reactivity and Python access will be added when those systems are available
+- Concurrent state modifications from UI and Python follow last-write-wins semantics; no priority is given to either source
 
 ## Clarifications
 
@@ -188,6 +189,7 @@ An analyst makes changes to the session state. The editor indicates when there a
 - Q: How can state management be verified without full UI/Python infrastructure? → A: Unit-testable core - State management logic verifiable through programmatic tests without UI; integration tests added later
 - Q: How should opening a GeoJSON FeatureCollection relate to session state? → A: Auto-initialize - Opening a GeoJSON FeatureCollection in the map editor automatically creates a session with default state
 - Q: How should the system handle loading a session referencing a missing feature collection? → A: Fail load - Reject session load entirely with error message
+- Q: How should concurrent modifications from Python and UI be handled? → A: Last-write-wins - Whichever modification arrives last takes effect
 
 ## Success Criteria *(mandatory)*
 
