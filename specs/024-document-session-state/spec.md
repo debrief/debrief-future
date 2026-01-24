@@ -196,6 +196,12 @@ A developer runs the session state server standalone (outside VS Code) and opens
 - **FR-048**: Dashboard MUST show connection status indicator (connected/disconnected)
 - **FR-049**: Tool action buttons (undo, redo, save, load, playback) are deferred to a future phase
 
+**Dashboard Testing & Screenshots**
+
+- **FR-050**: Debug dashboard MUST be tested via Playwright e2e tests that drive the UI programmatically
+- **FR-051**: Playwright tests MUST capture screenshots demonstrating dashboard behavior across different state configurations
+- **FR-052**: Screenshots MUST demonstrate selection-sensitive tool behavior (showing how available tools change based on current selection)
+
 ### Key Entities
 
 - **SessionState**: Composite entity containing all session state slices; the root of the persistence model
@@ -238,6 +244,10 @@ A developer runs the session state server standalone (outside VS Code) and opens
 - Q: What should features tree show? → A: Feature IDs with name/type properties when available
 - Q: Which tool action buttons should dashboard have? → A: Deferred to future phase - focus on state display and editing first
 
+### Session 2026-01-24
+
+- Q: How should the debug dashboard be tested and documented visually? → A: Playwright e2e tests drive the dashboard UI, capture screenshots demonstrating selection-sensitive tool behavior
+
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
@@ -251,3 +261,4 @@ A developer runs the session state server standalone (outside VS Code) and opens
 - **SC-007**: Session files from older schema versions can be migrated to the current version
 - **SC-008**: Debug dashboard displays state changes within 200ms of modification
 - **SC-009**: Standalone server can be started and accept MCP tool calls without any VS Code dependencies
+- **SC-010**: Playwright e2e tests produce a visual artifact set (screenshots) demonstrating dashboard functionality and selection-sensitive tool availability
