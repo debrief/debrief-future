@@ -55,6 +55,23 @@ An analyst reviewing long operational periods wants to speed up playback to quic
 
 ---
 
+### User Story 4 - Keyboard-Driven Control (Priority: P4)
+
+A power user performing intensive analysis wants to control playback without moving their hands from the keyboard, enabling faster workflow during detailed investigations.
+
+**Why this priority**: Keyboard shortcuts enhance efficiency for power users but are not essential for basic functionality. All features remain accessible via mouse/touch controls.
+
+**Independent Test**: Can be fully tested by focusing the time controller panel and using keyboard shortcuts to play, pause, and scrub through time.
+
+**Acceptance Scenarios**:
+
+1. **Given** the time controller panel has focus and playback is paused, **When** the user presses Space, **Then** playback starts.
+2. **Given** the time controller panel has focus and playback is active, **When** the user presses Space, **Then** playback pauses.
+3. **Given** the time controller panel has focus, **When** the user presses the Right arrow key, **Then** time advances by a small increment.
+4. **Given** the time controller panel has focus, **When** the user presses the Left arrow key, **Then** time moves backward by a small increment.
+
+---
+
 ### Edge Cases
 
 - What happens when no track data is loaded? The time controller displays a disabled state with no usable range.
@@ -77,6 +94,8 @@ An analyst reviewing long operational periods wants to speed up playback to quic
 - **FR-008**: System MUST display the time range boundaries (start and end times) of loaded data.
 - **FR-009**: System MUST pause playback automatically when the end of the time range is reached.
 - **FR-010**: System MUST function fully offline without network connectivity.
+- **FR-011**: System MUST support keyboard shortcut Space to toggle play/pause when the panel has focus.
+- **FR-012**: System MUST support keyboard shortcuts Left/Right arrows to scrub backward/forward in small increments when the panel has focus.
 
 ### Key Entities
 
@@ -86,6 +105,13 @@ An analyst reviewing long operational periods wants to speed up playback to quic
 - **Playback Speed**: The rate at which time advances relative to real-time (1x, 2x, 4x, 8x).
 
 ## User Interface Flow
+
+### UI Location
+
+The time controller lives as a **separate panel in the VS Code sidebar**, alongside other Debrief panels. This provides:
+- Standard VS Code interaction patterns
+- Ability to collapse when not needed
+- Consistent positioning across sessions
 
 ### Decision Analysis
 
@@ -132,6 +158,7 @@ An analyst reviewing long operational periods wants to speed up playback to quic
 - The VS Code extension webview environment supports the required animation capabilities.
 - Time ranges can span multiple days but typically represent hours to days of operational data.
 - Default playback speed is 1x (real-time) when playback begins.
+- Step forward/backward buttons are not needed; the scrubber combined with keyboard arrow keys provides sufficient precision for frame-by-frame navigation.
 
 ## Dependencies
 
