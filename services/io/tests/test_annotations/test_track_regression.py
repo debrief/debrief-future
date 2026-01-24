@@ -8,7 +8,6 @@ These tests establish a baseline and verify no regression occurs.
 from pathlib import Path
 
 import pytest
-
 from debrief_io.handlers.rep import REPHandler
 
 
