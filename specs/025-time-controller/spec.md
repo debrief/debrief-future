@@ -96,6 +96,7 @@ A power user performing intensive analysis wants to control playback without mov
 - **FR-010**: System MUST function fully offline without network connectivity.
 - **FR-011**: System MUST support keyboard shortcut Space to toggle play/pause when the panel has focus.
 - **FR-012**: System MUST support keyboard shortcuts Left/Right arrows to scrub backward/forward in small increments when the panel has focus.
+- **FR-013**: System MUST support user-selectable light/dark theme independent of host environment (for Storybook compatibility).
 
 ### Key Entities
 
@@ -112,6 +113,7 @@ A power user performing intensive analysis wants to control playback without mov
 - Q: What UI pattern for the speed selector? → A: Dropdown menu (click to reveal options)
 - Q: Visual feedback during scrubbing? → A: Permanent time display updates in real-time (no tooltip needed)
 - Q: Where should the time display appear? → A: Above the scrubber as a header row
+- Q: Theme adaptation for VS Code? → A: User-selectable theme (independent, for Storybook compatibility)
 
 ## User Interface Flow
 
@@ -132,6 +134,8 @@ The panel arranges controls in a **three-row vertical layout**:
 **Time Display**: Positioned above the scrubber as a header. Permanently visible, updates in real-time during scrubbing and playback. No tooltip needed — the display itself provides feedback.
 
 **Speed Selector**: Dropdown menu displaying current speed (e.g., "1x"), clicking reveals options (1x, 2x, 4x, 8x) for selection.
+
+**Theming**: Component supports user-selectable light/dark theme independent of VS Code settings. This enables proper rendering in Storybook and other non-VS Code contexts.
 
 ### Decision Analysis
 
