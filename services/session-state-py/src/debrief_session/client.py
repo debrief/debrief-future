@@ -3,17 +3,16 @@ Session state MCP client for Python.
 Feature: 024-document-session-state
 """
 
-from typing import Optional, Union
 import httpx
 
 from .types import (
-    SessionState,
-    TemporalSlice,
-    SpatialSlice,
-    FeaturesSlice,
     DocumentSlice,
-    TimeInstant,
     FeatureSelection,
+    FeaturesSlice,
+    SessionState,
+    SpatialSlice,
+    TemporalSlice,
+    TimeInstant,
 )
 
 
@@ -49,7 +48,7 @@ class SessionClient:
     def __exit__(self, *args) -> None:
         self.close()
 
-    def _call_tool(self, tool: str, input_data: Optional[dict] = None) -> dict:
+    def _call_tool(self, tool: str, input_data: dict | None = None) -> dict:
         """Call an MCP tool and return the result."""
         response = self._client.post(
             self.base_url,
@@ -95,8 +94,8 @@ class SessionClient:
     def set_current_time(
         self,
         *,
-        epoch: Optional[int] = None,
-        iso: Optional[str] = None,
+        epoch: int | None = None,
+        iso: str | None = None,
     ) -> TimeInstant:
         """
         Set the current playback/display time.
@@ -123,7 +122,7 @@ class SessionClient:
     def set_viewport(
         self,
         coordinates: list[list[float]],
-        rotation: Optional[float] = None,
+        rotation: float | None = None,
     ) -> dict:
         """
         Set the map viewport.
@@ -144,7 +143,7 @@ class SessionClient:
     def set_selection(
         self,
         feature_ids: list[str],
-        primary: Optional[str] = None,
+        primary: str | None = None,
     ) -> FeatureSelection:
         """
         Set the feature selection.

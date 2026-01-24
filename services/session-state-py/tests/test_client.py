@@ -9,7 +9,6 @@ Run: pnpm --filter @debrief/session-state dev
 import pytest
 from debrief_session import SessionClient, TimeInstant
 
-
 # Mark all tests as requiring the server
 pytestmark = pytest.mark.skipif(
     True,  # Skip by default - server needs to be running

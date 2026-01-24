@@ -4,7 +4,7 @@ Feature: 024-document-session-state
 """
 
 from datetime import datetime
-from typing import Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -43,8 +43,8 @@ class TimeRange(BaseModel):
 class TimeFilter(BaseModel):
     """Constraints on the visible time window."""
 
-    start: Optional[TimeInstant] = None
-    end: Optional[TimeInstant] = None
+    start: TimeInstant | None = None
+    end: TimeInstant | None = None
 
 
 class TimeStep(BaseModel):
@@ -83,7 +83,7 @@ class FeatureSelection(BaseModel):
     """Set of selected feature identifiers."""
 
     featureIds: list[str] = Field(default_factory=list, alias="featureIds")
-    primary: Optional[str] = None
+    primary: str | None = None
     timestamp: TimeInstant
 
     class Config:
@@ -93,9 +93,9 @@ class FeatureSelection(BaseModel):
 class TemporalSlice(BaseModel):
     """Temporal state slice."""
 
-    currentTime: Optional[TimeInstant] = Field(None, alias="currentTime")
-    timeRange: Optional[TimeRange] = Field(None, alias="timeRange")
-    timeFilter: Optional[TimeFilter] = Field(None, alias="timeFilter")
+    currentTime: TimeInstant | None = Field(None, alias="currentTime")
+    timeRange: TimeRange | None = Field(None, alias="timeRange")
+    timeFilter: TimeFilter | None = Field(None, alias="timeFilter")
     stepSize: TimeStep = Field(alias="stepSize")
     playbackRate: float = Field(alias="playbackRate")
     playbackState: str = Field(alias="playbackState")
@@ -108,14 +108,14 @@ class TemporalSlice(BaseModel):
 class SpatialSlice(BaseModel):
     """Spatial state slice."""
 
-    viewport: Optional[ViewportPolygon] = None
+    viewport: ViewportPolygon | None = None
     rotation: float = 0
 
 
 class FeaturesSlice(BaseModel):
     """Features state slice."""
 
-    featureCollectionUri: Optional[str] = Field(None, alias="featureCollectionUri")
+    featureCollectionUri: str | None = Field(None, alias="featureCollectionUri")
     selection: FeatureSelection
     hiddenFeatureIds: list[str] = Field(default_factory=list, alias="hiddenFeatureIds")
 
@@ -127,7 +127,7 @@ class DocumentSlice(BaseModel):
     """Document state slice."""
 
     dirty: bool = False
-    savePath: Optional[str] = Field(None, alias="savePath")
+    savePath: str | None = Field(None, alias="savePath")
 
     class Config:
         populate_by_name = True
