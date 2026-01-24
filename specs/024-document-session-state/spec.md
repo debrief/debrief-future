@@ -89,17 +89,17 @@ An analyst makes changes to the session state. The editor indicates when there a
 
 ### User Story 6 - Developer Debugs State via Web Dashboard (Priority: P6)
 
-A developer runs the session state server standalone (outside VS Code) and opens a web-based debug dashboard to monitor and manipulate state. The dashboard displays all state slices in real-time, allowing the developer to verify behavior and force state changes for testing.
+A developer runs the session state server standalone (outside VS Code) and opens a separate debug dashboard HTML app in their browser. The dashboard connects to the server via HTTP and displays all state slices in real-time, allowing the developer to verify behavior and force state changes for testing.
 
-**Why this priority**: Debug tooling accelerates development and enables testing without requiring the full VS Code environment. This is foundational for the "unit-testable core" approach.
+**Why this priority**: Debug tooling accelerates development and enables testing without requiring the full VS Code environment. This is foundational for the "unit-testable core" approach. Keeping the dashboard separate from the server maintains the "thick services, thin frontends" architecture.
 
-**Independent Test**: Can be fully tested by starting the standalone server, opening the dashboard in a browser, and verifying state displays update in real-time when modified via the MCP interface.
+**Independent Test**: Can be fully tested by starting the standalone server, opening the dashboard HTML file in a browser, configuring the server URL, and verifying state displays update in real-time when modified via the MCP interface.
 
 **Acceptance Scenarios**:
 
-1. **Given** the server is running standalone, **When** a developer opens the dashboard URL, **Then** they see the current state of all four slices
-2. **Given** the dashboard is open, **When** state changes via MCP tool call, **Then** the dashboard updates in real-time to reflect the change
-3. **Given** the dashboard is open, **When** the developer edits a state value and submits, **Then** the server state is updated and other clients are notified
+1. **Given** the server is running standalone, **When** a developer opens the dashboard HTML app and configures the server URL, **Then** they see the current state of all four slices
+2. **Given** the dashboard is connected, **When** state changes via MCP tool call, **Then** the dashboard updates in real-time to reflect the change
+3. **Given** the dashboard is connected, **When** the developer edits a state value and submits, **Then** the server state is updated via MCP and other clients are notified
 
 ---
 
@@ -182,12 +182,14 @@ A developer runs the session state server standalone (outside VS Code) and opens
 
 **Developer Tools**
 
-- **FR-038**: Server MUST serve a web-based debug dashboard when running standalone
-- **FR-039**: Dashboard MUST display all four state slices with real-time updates
-- **FR-040**: Dashboard MUST display features slice as a collapsible tree view
-- **FR-041**: Dashboard MUST display temporal, spatial, and document slices as editable text/form fields
-- **FR-042**: Dashboard MUST allow developers to modify state values directly
-- **FR-043**: State changes made via dashboard MUST trigger the same update path as MCP tool calls (including undo history)
+- **FR-038**: Server MUST support CORS headers to allow access from standalone HTML applications
+- **FR-039**: A separate debug dashboard application MUST be provided as a standalone HTML/JS app (not hosted by the server)
+- **FR-040**: Dashboard MUST connect to the server via HTTP/MCP interface
+- **FR-041**: Dashboard MUST display all four state slices with real-time updates
+- **FR-042**: Dashboard MUST display features slice as a collapsible tree view
+- **FR-043**: Dashboard MUST display temporal, spatial, and document slices as editable text/form fields
+- **FR-044**: Dashboard MUST allow developers to modify state values directly
+- **FR-045**: State changes made via dashboard MUST use the same MCP tool interface as Python clients
 
 ### Key Entities
 
@@ -224,6 +226,7 @@ A developer runs the session state server standalone (outside VS Code) and opens
 - Q: How should concurrent modifications from Python and UI be handled? → A: Last-write-wins - Whichever modification arrives last takes effect
 - Q: How should incompatible (future) schema versions be handled? → A: Reject with error - Refuse to load with clear error message
 - Q: How can developers test state management without VS Code? → A: Standalone server with HTTP/MCP interface plus web-based debug dashboard for monitoring and manipulating state
+- Q: Should the debug dashboard be hosted by the server or separate? → A: Separate HTML app - keeps server minimal (pure API), allows independent evolution, aligns with "thick services, thin frontends"
 
 ## Success Criteria *(mandatory)*
 
