@@ -104,6 +104,12 @@ A power user performing intensive analysis wants to control playback without mov
 - **Playback State**: Whether time is progressing automatically (playing) or stationary (paused).
 - **Playback Speed**: The rate at which time advances relative to real-time (1x, 2x, 4x, 8x).
 
+## Clarifications
+
+### Session 2026-01-24
+
+- Q: How should controls be arranged in the panel? → A: Scrubber on top, play/pause and speed below in a row
+
 ## User Interface Flow
 
 ### UI Location
@@ -112,6 +118,12 @@ The time controller lives as a **separate panel in the VS Code sidebar**, alongs
 - Standard VS Code interaction patterns
 - Ability to collapse when not needed
 - Consistent positioning across sessions
+
+### Visual Layout
+
+The panel arranges controls in a **two-row vertical layout**:
+- **Top row**: Time scrubber spanning full panel width, with time display showing current position
+- **Bottom row**: Play/Pause button on the left, speed selector on the right
 
 ### Decision Analysis
 
