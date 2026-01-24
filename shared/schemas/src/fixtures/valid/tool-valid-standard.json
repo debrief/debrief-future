@@ -1,0 +1,13 @@
+{
+  "id": "range-calculation",
+  "name": "Range Calculation",
+  "description": "Calculate range and bearing between two tracks",
+  "version": "1.0.0",
+  "requirements": [
+    {
+      "kind": "TRACK",
+      "min": 2,
+      "max": 2
+    }
+  ]
+}
