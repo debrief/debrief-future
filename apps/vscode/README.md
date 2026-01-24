@@ -6,6 +6,7 @@ Maritime tactical analysis extension for Visual Studio Code. Browse STAC catalog
 
 - **Browse STAC Catalogs**: View registered STAC stores in the Explorer panel with virtual folders
 - **Interactive Map Display**: Display vessel tracks and reference locations on Leaflet maps
+- **Import REP Files**: Drag-and-drop or right-click to import REP format track data
 - **Track Selection**: Click, Shift+click, and Ctrl+click to select tracks for analysis
 - **Analysis Tools**: Discover and execute context-sensitive analysis tools via debrief-calc
 - **Result Layers**: View computed analysis results as overlay layers on the map
@@ -35,8 +36,9 @@ Search for "Debrief Maritime Analysis" in the VS Code Extensions marketplace.
 
 1. **Add a STAC Store**: Click the + button in the STAC Stores panel or run `Debrief: Add STAC Store`
 2. **Open a Plot**: Double-click a plot in the Explorer or use `Debrief: Open Plot`
-3. **Select Tracks**: Click tracks on the map to select them
-4. **Run Analysis**: Choose a tool from the Tools panel and click Execute
+3. **Import Data**: Drag a `.rep` file onto the map, or right-click a REP file → "Load into Debrief..."
+4. **Select Tracks**: Click tracks on the map to select them
+5. **Run Analysis**: Choose a tool from the Tools panel and click Execute
 
 ## Commands
 
@@ -44,10 +46,36 @@ Search for "Debrief Maritime Analysis" in the VS Code Extensions marketplace.
 |---------|-------------|----------|
 | `Debrief: Open Plot` | Open a plot from STAC stores | `Ctrl+Shift+O` |
 | `Debrief: Add STAC Store` | Register a new STAC catalog | - |
+| `Debrief: Load into Debrief...` | Import REP file with target picker | - |
 | `Debrief: Select All Tracks` | Select all tracks in current plot | `Ctrl+A` |
 | `Debrief: Clear Selection` | Clear current selection | `Escape` |
 | `Debrief: Fit to All Tracks` | Zoom map to fit all tracks | `Ctrl+0` |
 | `Debrief: Export as PNG` | Export current map view | - |
+
+## Importing REP Files
+
+Two methods to import REP format track data:
+
+### Drag and Drop
+
+1. Open a plot in the map panel
+2. Drag a `.rep` file from the VS Code Explorer (or system file manager) onto the map
+3. The REP file is parsed, stored as a STAC asset, and tracks appear on the map
+4. Map automatically zooms to show imported data
+
+### Context Menu
+
+1. Right-click any `.rep` file in the VS Code Explorer
+2. Select "Load into Debrief..."
+3. Choose the target plot from the picker
+4. Import completes with progress notification
+
+### Import Behavior
+
+- **Duplicate detection**: Re-importing the same file shows a warning
+- **Error handling**: Malformed files show specific error messages with line numbers
+- **Offline support**: Works without network connection (uses local STAC catalogs)
+- **Single file**: Multi-file drop is not supported; import one file at a time
 
 ## Configuration
 

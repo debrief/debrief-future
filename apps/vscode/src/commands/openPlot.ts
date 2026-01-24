@@ -5,6 +5,7 @@
 import * as vscode from 'vscode';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
+import type { IoService } from '../services/ioService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
@@ -26,6 +27,7 @@ export function createOpenPlotCommand(
   context: vscode.ExtensionContext,
   configService: ConfigService,
   stacService: StacService,
+  ioService: IoService,
   recentPlotsService: RecentPlotsService,
   toolsTreeProvider: ToolsTreeProvider,
   layersTreeProvider: LayersTreeProvider,
@@ -122,6 +124,9 @@ export function createOpenPlotCommand(
         setMapPanel(undefined);
       });
     }
+
+    // Set up import services for drag-drop functionality
+    panel.setImportServices(ioService, stacService, store);
 
     // Load plot into panel
     panel.loadPlot(plot, plotData.tracks, plotData.locations);

@@ -7,6 +7,7 @@ import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { CalcService } from '../services/calcService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
+import type { IoService } from '../services/ioService';
 import type { StacTreeProvider } from '../providers/stacTreeProvider';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
@@ -19,6 +20,7 @@ import { createSelectAllCommand, createClearSelectionCommand } from './selectAll
 import { createExecuteToolCommand, createCancelToolExecutionCommand } from './executeTool';
 import { createExportPngCommand } from './exportPng';
 import { createChangeTrackColorCommand } from './changeTrackColor';
+import { createImportRepCommand } from './importRep';
 
 export function registerCommands(
   context: vscode.ExtensionContext,
@@ -26,6 +28,7 @@ export function registerCommands(
   stacService: StacService,
   calcService: CalcService,
   recentPlotsService: RecentPlotsService,
+  ioService: IoService,
   stacTreeProvider: StacTreeProvider,
   toolsTreeProvider: ToolsTreeProvider,
   layersTreeProvider: LayersTreeProvider,
@@ -43,6 +46,7 @@ export function registerCommands(
         context,
         configService,
         stacService,
+        ioService,
         recentPlotsService,
         toolsTreeProvider,
         layersTreeProvider,
@@ -262,6 +266,19 @@ export function registerCommands(
     vscode.commands.registerCommand(
       'debrief.exportPng',
       createExportPngCommand(getMapPanel)
+    )
+  );
+
+  // Import commands
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.importRep',
+      createImportRepCommand(
+        configService,
+        stacService,
+        ioService,
+        stacTreeProvider
+      )
     )
   );
 

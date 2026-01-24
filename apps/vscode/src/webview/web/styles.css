@@ -288,3 +288,131 @@ html, body {
 .leaflet-popup-tip {
   background: var(--vscode-editorHoverWidget-background, #252526);
 }
+
+/* Drop Zone Styles */
+#map-container.drop-active {
+  outline: 3px dashed var(--vscode-focusBorder, #0078d4);
+  outline-offset: -3px;
+}
+
+#map-container.drop-active::after {
+  content: 'Drop REP file here';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px 40px;
+  background: var(--vscode-editor-background, #1e1e1e);
+  border: 2px dashed var(--vscode-focusBorder, #0078d4);
+  border-radius: 8px;
+  font-size: 16px;
+  color: var(--vscode-focusBorder, #0078d4);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Drop Error Overlay */
+.drop-error-overlay {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.drop-error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--vscode-inputValidation-errorBackground, #5a1d1d);
+  border: 1px solid var(--vscode-inputValidation-errorBorder, #be1100);
+  border-radius: 4px;
+  color: var(--vscode-inputValidation-errorForeground, #ffffff);
+  font-size: 13px;
+}
+
+.drop-error-icon {
+  font-size: 16px;
+}
+
+/* Import Progress Overlay */
+.import-progress-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.import-progress-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  background: var(--vscode-editor-background, #1e1e1e);
+  border: 1px solid var(--vscode-panel-border, #454545);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.import-progress-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--vscode-panel-border, #454545);
+  border-top-color: var(--vscode-focusBorder, #0078d4);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.import-progress-text {
+  color: var(--vscode-foreground, #cccccc);
+  font-size: 14px;
+}
+
+/* Import Success Overlay */
+.import-success-overlay {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.import-success-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--vscode-inputValidation-infoBackground, #063b49);
+  border: 1px solid var(--vscode-inputValidation-infoBorder, #007acc);
+  border-radius: 4px;
+  color: var(--vscode-inputValidation-infoForeground, #ffffff);
+  font-size: 13px;
+}
+
+.import-success-icon {
+  font-size: 16px;
+  color: var(--vscode-terminal-ansiGreen, #23d18b);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

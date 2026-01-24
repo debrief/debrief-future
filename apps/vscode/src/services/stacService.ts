@@ -478,4 +478,221 @@ export class StacService {
     this.catalogCache.clear();
     this.itemCache.clear();
   }
+
+  // ============================================================================
+  // Import Support Methods (REP File Loading)
+  // ============================================================================
+
+  /**
+   * Add source file as asset on a STAC item.
+   * Copies the file to the item's assets directory and updates the item JSON.
+   *
+   * @param storePath Path to the STAC store root
+   * @param itemPath Relative path to the item JSON file
+   * @param sourcePath Absolute path to source file to add
+   * @param assetKey Optional asset key (defaults to filename stem)
+   * @returns Asset key used
+   */
+  async addAsset(
+    storePath: string,
+    itemPath: string,
+    sourcePath: string,
+    assetKey?: string
+  ): Promise<string> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+
+    if (!item) {
+      throw new Error(`Item not found: ${itemPath}`);
+    }
+
+    // Determine asset key from filename if not provided
+    const filename = path.basename(sourcePath);
+    const key = assetKey ?? path.parse(filename).name;
+
+    // Create assets directory if needed
+    const itemDir = path.dirname(fullItemPath);
+    const assetsDir = path.join(itemDir, 'assets');
+    if (!fs.existsSync(assetsDir)) {
+      fs.mkdirSync(assetsDir, { recursive: true });
+    }
+
+    // Copy source file to assets directory
+    const destPath = path.join(assetsDir, filename);
+    fs.copyFileSync(sourcePath, destPath);
+
+    // Add asset reference to item
+    const relativeHref = `./assets/${filename}`;
+    item.assets[key] = {
+      href: relativeHref,
+      type: 'application/x-rep',
+      title: filename,
+      roles: ['source'],
+    };
+
+    // Write updated item
+    fs.writeFileSync(fullItemPath, JSON.stringify(item, null, 2));
+
+    // Clear cache for this item
+    this.itemCache.delete(fullItemPath);
+
+    return key;
+  }
+
+  /**
+   * Append features to a STAC item's GeoJSON data file.
+   *
+   * @param storePath Path to the STAC store root
+   * @param itemPath Relative path to the item JSON file
+   * @param features GeoJSON features to append
+   * @returns Updated total feature count
+   */
+  async addFeatures(
+    storePath: string,
+    itemPath: string,
+    features: SafeFeature[]
+  ): Promise<number> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+
+    if (!item) {
+      throw new Error(`Item not found: ${itemPath}`);
+    }
+
+    // Find or create GeoJSON asset
+    let geoJsonAsset = Object.values(item.assets).find(
+      (asset) =>
+        asset.type === 'application/geo+json' ||
+        asset.href.endsWith('.geojson')
+    );
+
+    const itemDir = path.dirname(fullItemPath);
+    let geoJsonPath: string;
+    let featureCollection: SafeFeatureCollection;
+
+    if (geoJsonAsset) {
+      geoJsonPath = path.resolve(itemDir, geoJsonAsset.href);
+      const existing = await this.loadGeoJson(geoJsonPath);
+      featureCollection = existing ?? { type: 'FeatureCollection', features: [] };
+    } else {
+      // Create new GeoJSON file
+      const geoJsonFilename = `${item.id}.geojson`;
+      geoJsonPath = path.join(itemDir, geoJsonFilename);
+      featureCollection = { type: 'FeatureCollection', features: [] };
+
+      // Add asset reference
+      item.assets['data'] = {
+        href: `./${geoJsonFilename}`,
+        type: 'application/geo+json',
+        title: 'Plot Data',
+        roles: ['data'],
+      };
+    }
+
+    // Append new features
+    featureCollection.features.push(...features);
+
+    // Update bbox if features have coordinates
+    const newBbox = this.calculateBboxFromFeatures(featureCollection.features);
+    if (newBbox) {
+      item.bbox = newBbox;
+    }
+
+    // Write updated GeoJSON
+    fs.writeFileSync(geoJsonPath, JSON.stringify(featureCollection, null, 2));
+
+    // Write updated item (with new bbox)
+    fs.writeFileSync(fullItemPath, JSON.stringify(item, null, 2));
+
+    // Clear caches
+    this.itemCache.delete(fullItemPath);
+
+    return featureCollection.features.length;
+  }
+
+  /**
+   * Check if an asset key already exists on a STAC item.
+   * Used for duplicate import detection.
+   *
+   * @param storePath Path to the STAC store root
+   * @param itemPath Relative path to the item JSON file
+   * @param assetKey Asset key to check
+   * @returns True if asset exists
+   */
+  async hasAsset(
+    storePath: string,
+    itemPath: string,
+    assetKey: string
+  ): Promise<boolean> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+
+    if (!item) {
+      return false;
+    }
+
+    return assetKey in item.assets;
+  }
+
+  /**
+   * Calculate bounding box from features
+   */
+  private calculateBboxFromFeatures(
+    features: SafeFeature[]
+  ): [number, number, number, number] | null {
+    let minLon = Infinity;
+    let minLat = Infinity;
+    let maxLon = -Infinity;
+    let maxLat = -Infinity;
+
+    for (const feature of features) {
+      const coords = this.extractCoordinates(feature.geometry);
+      for (const [lon, lat] of coords) {
+        if (typeof lon === 'number' && typeof lat === 'number') {
+          minLon = Math.min(minLon, lon);
+          minLat = Math.min(minLat, lat);
+          maxLon = Math.max(maxLon, lon);
+          maxLat = Math.max(maxLat, lat);
+        }
+      }
+    }
+
+    if (minLon === Infinity) {
+      return null;
+    }
+
+    return [minLon, minLat, maxLon, maxLat];
+  }
+
+  /**
+   * Extract all coordinates from a geometry
+   */
+  private extractCoordinates(geometry: SafeGeometry): number[][] {
+    const coords: number[][] = [];
+
+    if (geometry.type === 'Point') {
+      const point = geometry.coordinates as number[];
+      if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {
+        coords.push([point[0], point[1]]);
+      }
+    } else if (geometry.type === 'LineString') {
+      const line = geometry.coordinates as number[][];
+      for (const point of line) {
+        if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {
+          coords.push([point[0], point[1]]);
+        }
+      }
+    } else if (geometry.type === 'Polygon') {
+      const rings = geometry.coordinates as unknown as number[][][];
+      for (const ring of rings) {
+        for (const point of ring) {
+          if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {
+            coords.push([point[0], point[1]]);
+          }
+        }
+      }
+    }
+
+    return coords;
+  }
 }

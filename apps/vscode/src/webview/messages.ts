@@ -203,6 +203,34 @@ export interface WebviewReadyMessage {
 // Union Types
 // ============================================================================
 
+// ============================================================================
+// Import Messages (REP File Loading)
+// ============================================================================
+
+/** REP file drop from webview to extension (Webview → Host) */
+export interface RepFileDropMessage {
+  type: 'repFileDrop';
+  uris: string[];  // file:// URIs from dataTransfer
+}
+
+/** Import progress update (Host → Webview) */
+export interface ImportProgressMessage {
+  type: 'importProgress';
+  stage: 'parsing' | 'storing' | 'complete' | 'error';
+  message?: string;
+}
+
+/** Import complete notification (Host → Webview) */
+export interface ImportCompleteMessage {
+  type: 'importComplete';
+  featureCount: number;
+  bounds: [number, number, number, number];  // [minLon, minLat, maxLon, maxLat]
+}
+
+// ============================================================================
+// Union Types
+// ============================================================================
+
 /** All messages from extension to webview */
 export type ExtensionToWebviewMessage =
   | LoadPlotMessage
@@ -216,7 +244,9 @@ export type ExtensionToWebviewMessage =
   | SetTimeRangeMessage
   | SetTrackColorMessage
   | RequestExportPngResponse
-  | RequestTrackDetailsResponse;
+  | RequestTrackDetailsResponse
+  | ImportProgressMessage
+  | ImportCompleteMessage;
 
 /** All messages from webview to extension */
 export type WebviewToExtensionMessage =
@@ -225,7 +255,8 @@ export type WebviewToExtensionMessage =
   | RequestExportPngRequest
   | RequestTrackColorChangeMessage
   | RequestTrackDetailsRequest
-  | WebviewReadyMessage;
+  | WebviewReadyMessage
+  | RepFileDropMessage;
 
 // ============================================================================
 // Re-exports for webview

@@ -148,6 +148,12 @@
         "command": "debrief.restoreActivities",
         "title": "Restore Default Activities",
         "category": "Debrief"
+      },
+      {
+        "command": "debrief.importRep",
+        "title": "Load into Debrief...",
+        "category": "Debrief",
+        "icon": "$(file-add)"
       }
     ],
     "keybindings": [
@@ -239,6 +245,13 @@
       }
     ],
     "menus": {
+      "explorer/context": [
+        {
+          "command": "debrief.importRep",
+          "when": "resourceExtname == .rep",
+          "group": "navigation"
+        }
+      ],
       "view/title": [
         {
           "command": "debrief.addStore",

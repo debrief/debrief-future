@@ -87,6 +87,7 @@ function initializeMap(): void {
   // Set up event listeners
   setupMapEvents();
   setupToolbarEvents();
+  setupDropZone();
 
   // Restore state if available
   const savedState = vscode.getState();
@@ -136,6 +137,105 @@ function setupMapEvents(): void {
       selectionManager?.clearSelection();
     }
   });
+}
+
+/**
+ * Set up drag-and-drop event listeners for REP file import
+ */
+function setupDropZone(): void {
+  const mapContainer = document.getElementById('map-container');
+  if (!mapContainer) {
+    return;
+  }
+
+  // Prevent default drag behavior
+  mapContainer.addEventListener('dragover', (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    mapContainer.classList.add('drop-active');
+  });
+
+  mapContainer.addEventListener('dragleave', (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    mapContainer.classList.remove('drop-active');
+  });
+
+  mapContainer.addEventListener('dragenter', (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  // Handle file drop
+  mapContainer.addEventListener('drop', (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    mapContainer.classList.remove('drop-active');
+
+    const files = e.dataTransfer?.files;
+    if (!files || files.length === 0) {
+      return;
+    }
+
+    // Check for multiple files
+    if (files.length > 1) {
+      showDropError('Only single file import is supported. Please drop one file at a time.');
+      return;
+    }
+
+    const file = files[0];
+
+    // Check file extension
+    if (!file.name.toLowerCase().endsWith('.rep')) {
+      showDropError(`Cannot import "${file.name}": only .rep files are supported.`);
+      return;
+    }
+
+    // Get file URI - in VS Code webview, we need to use the path
+    // The dataTransfer contains file:// URIs
+    const items = e.dataTransfer?.items;
+    if (items && items.length > 0) {
+      const item = items[0];
+      if (item.kind === 'file') {
+        const fileEntry = item.getAsFile();
+        if (fileEntry) {
+          // In webview context, we have access to the file path via webkitRelativePath
+          // or we need to send the file data to extension host
+          // For VS Code webviews, the extension host handles file system access
+
+          // Send drop message to extension with file name
+          // Extension will use VS Code APIs to locate the file
+          vscode.postMessage({
+            type: 'repFileDrop',
+            uris: [(fileEntry as File & { path?: string }).path ?? file.name],
+          });
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Show drop error message
+ */
+function showDropError(message: string): void {
+  // Create temporary error overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'drop-error-overlay';
+  overlay.innerHTML = `
+    <div class="drop-error-message">
+      <span class="drop-error-icon">⚠️</span>
+      <span>${message}</span>
+    </div>
+  `;
+
+  const container = document.getElementById('map-container');
+  container?.appendChild(overlay);
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    overlay.remove();
+  }, 3000);
 }
 
 /**
@@ -295,9 +395,83 @@ function handleMessage(message: ExtensionToWebviewMessage): void {
       handleSetTrackColor(message);
       break;
 
+    case 'importProgress':
+      handleImportProgress(message);
+      break;
+
+    case 'importComplete':
+      handleImportComplete(message);
+      break;
+
     default:
       console.warn('Unknown message type:', (message as { type: string }).type);
   }
+}
+
+/**
+ * Handle import progress message
+ */
+function handleImportProgress(
+  message: Extract<ExtensionToWebviewMessage, { type: 'importProgress' }>
+): void {
+  const existingOverlay = document.querySelector('.import-progress-overlay');
+
+  if (message.stage === 'complete' || message.stage === 'error') {
+    existingOverlay?.remove();
+    return;
+  }
+
+  if (!existingOverlay) {
+    const overlay = document.createElement('div');
+    overlay.className = 'import-progress-overlay';
+    overlay.innerHTML = `
+      <div class="import-progress-message">
+        <span class="import-progress-spinner"></span>
+        <span class="import-progress-text">${message.message ?? 'Importing...'}</span>
+      </div>
+    `;
+    document.getElementById('map-container')?.appendChild(overlay);
+  } else {
+    const textEl = existingOverlay.querySelector('.import-progress-text');
+    if (textEl) {
+      textEl.textContent = message.message ?? 'Importing...';
+    }
+  }
+}
+
+/**
+ * Handle import complete message
+ */
+function handleImportComplete(
+  message: Extract<ExtensionToWebviewMessage, { type: 'importComplete' }>
+): void {
+  // Remove progress overlay
+  document.querySelector('.import-progress-overlay')?.remove();
+
+  // Fit to new bounds
+  if (map && message.bounds) {
+    const [minLon, minLat, maxLon, maxLat] = message.bounds;
+    const bounds = L.latLngBounds(
+      L.latLng(minLat, minLon),
+      L.latLng(maxLat, maxLon)
+    );
+    map.fitBounds(bounds, { padding: [50, 50] });
+  }
+
+  // Show brief success message
+  const overlay = document.createElement('div');
+  overlay.className = 'import-success-overlay';
+  overlay.innerHTML = `
+    <div class="import-success-message">
+      <span class="import-success-icon">✓</span>
+      <span>Imported ${message.featureCount} feature${message.featureCount !== 1 ? 's' : ''}</span>
+    </div>
+  `;
+  document.getElementById('map-container')?.appendChild(overlay);
+
+  setTimeout(() => {
+    overlay.remove();
+  }, 2000);
 }
 
 function handleLoadPlot(message: Extract<ExtensionToWebviewMessage, { type: 'loadPlot' }>): void {
