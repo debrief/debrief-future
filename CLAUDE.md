@@ -236,6 +236,8 @@ Three approaches required:
 - Python 3.11+ (LinkML generators, Pydantic models), TypeScript 5.x (generated types) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS) (022-system-kind-discriminator)
 - Markdown (skill definition), Bash (gh CLI integration) + Claude Code Skill system, GitHub CLI (`gh`), Opus model (023-epic-workflow-support)
 - BACKLOG.md (epics and items tables), GitHub issues (023-epic-workflow-support)
+- TypeScript 5.x + React 18+, VS Code Webview API (025-time-controller)
+- N/A (component state only, time position managed via props/context) (025-time-controller)
 
 ## Recent Changes
 - 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v5+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 10.x
