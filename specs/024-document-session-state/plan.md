@@ -12,7 +12,7 @@ Implement a centralized session state management system for the Debrief VS Code 
 **Language/Version**: TypeScript 5.x (state server + VS Code extension), Python 3.11+ (MCP client library)
 **Primary Dependencies**: Zustand (state management), Express.js (HTTP server), @modelcontextprotocol/sdk (MCP), better-sse (SSE)
 **Storage**: JSON file at user-defined path (session persistence)
-**Testing**: Vitest (TypeScript), pytest (Python client)
+**Testing**: Vitest (TypeScript unit tests), pytest (Python client), Playwright (dashboard e2e + screenshots)
 **Target Platform**: VS Code Extension (primary), standalone HTTP server (debug mode)
 **Project Type**: Monorepo service - TypeScript library with Python client bindings
 **Performance Goals**: State updates propagate to UI within 100ms (SC-001), dashboard updates within 200ms (SC-008)
@@ -102,7 +102,15 @@ shared/schemas/src/
 tools/debug-dashboard/
 ├── index.html             # Standalone HTML app
 ├── styles.css
-└── app.js                 # Vanilla JS (no build required)
+├── app.js                 # Vanilla JS (no build required)
+├── playwright.config.ts   # Playwright configuration
+├── tests/
+│   └── dashboard.spec.ts  # E2E tests with screenshot capture
+└── screenshots/           # Generated visual artifacts
+    ├── state-overview.png
+    ├── selection-empty.png
+    ├── selection-single.png
+    └── selection-multi.png
 
 services/session-state-py/
 ├── pyproject.toml
@@ -118,9 +126,16 @@ services/session-state-py/
 
 *Identify Storybook stories to bundle for blog post demos.*
 
-None - backend/infrastructure feature
+None - backend/infrastructure feature (no Storybook components)
 
-The session state service is a backend infrastructure component. The debug dashboard is a standalone HTML app for development purposes, not a user-facing visual component suitable for blog demos.
+The session state service is a backend infrastructure component. However, **Playwright e2e tests will generate screenshots** demonstrating dashboard functionality and selection-sensitive tool behavior. These screenshots serve as visual documentation and can be included in shipped blog posts.
+
+| Artifact | Source | Purpose |
+|----------|--------|---------|
+| `screenshots/state-overview.png` | Playwright test | Dashboard showing all four state slices |
+| `screenshots/selection-empty.png` | Playwright test | Tool availability with no selection |
+| `screenshots/selection-single.png` | Playwright test | Tool availability with single feature selected |
+| `screenshots/selection-multi.png` | Playwright test | Tool availability with multiple features selected |
 
 ## Complexity Tracking
 

@@ -264,6 +264,56 @@ const createTimeInstant = (date: Date): TimeInstant => ({
 
 ---
 
+## Decision 8: Dashboard E2E Testing & Screenshots
+
+**Decision**: Playwright for e2e tests with automated screenshot capture
+
+**Rationale**:
+- Playwright supports headless browser testing without complex setup
+- Built-in screenshot API produces high-quality visual artifacts
+- Tests can programmatically drive the dashboard UI via state changes
+- Screenshots document selection-sensitive tool behavior across scenarios
+- Visual artifacts serve as documentation and can be included in blog posts
+
+**Alternatives Considered**:
+- **Cypress**: Heavier dependency, less suited for standalone HTML apps
+- **Puppeteer**: Lower-level API, more boilerplate for screenshots
+- **Manual screenshots**: Not reproducible, labor-intensive
+
+**Screenshot Strategy**:
+- Each test scenario captures a screenshot after state stabilizes
+- Screenshots stored in `tools/debug-dashboard/screenshots/`
+- Naming convention: `{scenario}.png` (e.g., `selection-multi.png`)
+- CI can regenerate screenshots on dashboard changes
+
+**Example Test**:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('shows selection-sensitive tools', async ({ page }) => {
+  await page.goto('file:///path/to/debug-dashboard/index.html?server=http://localhost:3001');
+
+  // Wait for SSE connection
+  await expect(page.locator('.connection-status')).toHaveText('Connected');
+
+  // Screenshot with no selection
+  await page.screenshot({ path: 'screenshots/selection-empty.png' });
+
+  // Simulate selection via MCP tool call
+  await fetch('http://localhost:3001/mcp', {
+    method: 'POST',
+    body: JSON.stringify({ method: 'session.setSelection', params: { featureIds: ['track-001'] } })
+  });
+
+  // Wait for dashboard update
+  await page.waitForSelector('[data-selected="track-001"]');
+  await page.screenshot({ path: 'screenshots/selection-single.png' });
+});
+```
+
+---
+
 ## Technology Stack Summary
 
 | Concern | Choice | Version | Notes |
@@ -274,7 +324,8 @@ const createTimeInstant = (date: Date): TimeInstant => ({
 | MCP SDK | @modelcontextprotocol/sdk | ^1.0.0 | Streamable HTTP transport |
 | SSE | better-sse | ^1.0.0 | Channel broadcasting |
 | Schema validation | Zod | ^3.22.0 | MCP tool schemas |
-| Testing | Vitest | ^1.0.0 | Fast, TypeScript-native |
+| Unit testing | Vitest | ^1.0.0 | Fast, TypeScript-native |
+| E2E testing | Playwright | ^1.40.0 | Dashboard tests + screenshots |
 
 ---
 
