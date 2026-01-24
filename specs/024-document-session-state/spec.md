@@ -91,9 +91,9 @@ An analyst makes changes to the session state. The editor indicates when there a
 
 - When loading a session file with an incompatible (future) schema version, the system MUST reject the load with a clear error message; older versions can be migrated forward per SC-007
 - When loading a session that references a feature collection that no longer exists, the system MUST reject the load with an error message indicating the missing collection
-- What happens when undo is invoked with an empty history stack?
-- How does the system behave when the time range is set to a zero-duration interval?
-- What happens when the viewport polygon contains invalid coordinates (outside valid geographic bounds)?
+- When undo is invoked with an empty history stack, the system MUST perform no action and return an indication that no undo was available
+- When the time range is set to a zero-duration interval (start equals end), the system MUST accept this as a valid degenerate case representing a single point in time
+- When the viewport polygon contains invalid coordinates (outside valid geographic bounds -180 to 180 longitude, -90 to 90 latitude), the system MUST reject the operation with a validation error
 
 ## Requirements *(mandatory)*
 
