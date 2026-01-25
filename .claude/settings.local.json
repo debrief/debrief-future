@@ -107,7 +107,8 @@
       "Bash(npx tsc:*)",
       "Bash(npx playwright install:*)",
       "Bash(node capture-dashboard.mjs:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(pgrep:*)"
     ]
   }
 }
