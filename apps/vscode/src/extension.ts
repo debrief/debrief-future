@@ -30,7 +30,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const stacService = new StacService();
   const calcService = new CalcService(context);
   const recentPlotsService = new RecentPlotsService(context);
-  const ioService = new IoService();
+  const ioService = new IoService(context.extensionPath);
 
   // Register file system provider for stac:// URIs
   const stacFileSystemProvider = new StacFileSystemProvider(stacService);

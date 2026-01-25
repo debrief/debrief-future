@@ -11,15 +11,45 @@
 
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
+import * as path from 'path';
+import * as fs from 'fs';
 import type { ParseResult, ParseWarning, GeoJSONFeature } from '../types/import';
 import { RepParseError } from '../types/import';
 
 export class IoService {
   private pythonPath: string;
 
-  constructor() {
+  constructor(extensionPath?: string) {
     const config = vscode.workspace.getConfiguration('debrief');
-    this.pythonPath = config.get<string>('calc.pythonPath', 'python');
+    const configuredPath = config.get<string>('calc.pythonPath', '');
+
+    // Use configured path if explicitly set, otherwise auto-detect
+    this.pythonPath = configuredPath || this.findPythonPath(extensionPath);
+  }
+
+  /**
+   * Find Python executable, preferring project venv
+   */
+  private findPythonPath(extensionPath?: string): string {
+    // Look for .venv in extension's parent directories (monorepo structure)
+    // apps/vscode -> apps -> repo-root/.venv
+    if (extensionPath) {
+      const candidates = [
+        path.join(extensionPath, '..', '..', '.venv', 'bin', 'python'),
+        path.join(extensionPath, '..', '.venv', 'bin', 'python'),
+        path.join(extensionPath, '.venv', 'bin', 'python'),
+      ];
+
+      for (const candidate of candidates) {
+        const resolved = path.resolve(candidate);
+        if (fs.existsSync(resolved)) {
+          return resolved;
+        }
+      }
+    }
+
+    // Fall back to system python
+    return 'python';
   }
 
   /**
