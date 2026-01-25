@@ -74,17 +74,20 @@ export function createAddStoreCommand(
 
 /**
  * Create the remove store command
+ * Accepts either { storeId } or the StacStore element directly (from context menu)
  */
 export function createRemoveStoreCommand(
   configService: ConfigService,
   stacTreeProvider: StacTreeProvider
-): (args: { storeId: string }) => Promise<void> {
-  return async (args: { storeId: string }) => {
-    if (!args?.storeId) {
+): (arg: { storeId: string } | { id: string }) => Promise<void> {
+  return async (arg: { storeId: string } | { id: string }) => {
+    // Handle both { storeId } and direct StacStore element with { id }
+    const storeId = 'storeId' in arg ? arg.storeId : arg?.id;
+    if (!storeId) {
       return;
     }
 
-    const store = configService.getStore(args.storeId);
+    const store = configService.getStore(storeId);
     if (!store) {
       return;
     }
@@ -101,7 +104,7 @@ export function createRemoveStoreCommand(
     }
 
     // Remove the store
-    const removed = await configService.removeStore(args.storeId);
+    const removed = await configService.removeStore(storeId);
 
     if (removed) {
       stacTreeProvider.refresh();
@@ -112,18 +115,21 @@ export function createRemoveStoreCommand(
 
 /**
  * Create the update store path command
+ * Accepts either { storeId } or the StacStore element directly (from context menu)
  */
 export function createUpdateStorePathCommand(
   configService: ConfigService,
   stacService: StacService,
   stacTreeProvider: StacTreeProvider
-): (args: { storeId: string }) => Promise<void> {
-  return async (args: { storeId: string }) => {
-    if (!args?.storeId) {
+): (arg: { storeId: string } | { id: string }) => Promise<void> {
+  return async (arg: { storeId: string } | { id: string }) => {
+    // Handle both { storeId } and direct StacStore element with { id }
+    const storeId = 'storeId' in arg ? arg.storeId : arg?.id;
+    if (!storeId) {
       return;
     }
 
-    const store = configService.getStore(args.storeId);
+    const store = configService.getStore(storeId);
     if (!store) {
       return;
     }
@@ -166,7 +172,7 @@ export function createUpdateStorePathCommand(
 
     // Update the path
     try {
-      await configService.updateStorePath(args.storeId, newPath);
+      await configService.updateStorePath(storeId, newPath);
       stacService.clearCache();
       stacTreeProvider.refresh();
       void vscode.window.showInformationMessage('Store path updated');

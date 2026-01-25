@@ -266,7 +266,7 @@
       "view/item/context": [
         {
           "command": "debrief.removeStore",
-          "when": "view == debrief.stacExplorer && viewItem == store",
+          "when": "view == debrief.stacExplorer && viewItem =~ /^store/",
           "group": "3_modify"
         },
         {
