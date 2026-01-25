@@ -4,6 +4,9 @@ import { DebriefFeature, DebriefFeatureCollection, Bounds } from './types';
  * Calculate the bounding box for a collection of features.
  * Returns [minLon, minLat, maxLon, maxLat] or null if no valid coordinates.
  *
+ * Handles all GeoJSON geometry types: Point, LineString, Polygon,
+ * MultiPoint, MultiLineString, MultiPolygon.
+ *
  * @param features - FeatureCollection or array of features
  * @returns Bounds tuple or null if no valid coordinates found
  */
