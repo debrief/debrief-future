@@ -116,6 +116,7 @@ A power user performing intensive analysis wants to control playback without mov
 - Q: Where should the time display appear? → A: Above the scrubber as a header row
 - Q: Theme adaptation for VS Code? → A: User-selectable theme (independent, for Storybook compatibility)
 - Q: Toggle UI for track display mode (full vs snail trail)? → A: Toggle switch with labels (Full / Trail)
+- Q: Where to place the track display toggle? → A: Row 3, between Play/Pause and Speed selector
 
 ## User Interface Flow
 
@@ -131,7 +132,7 @@ The time controller lives as a **separate panel in the VS Code sidebar**, alongs
 The panel arranges controls in a **three-row vertical layout**:
 - **Row 1 (Header)**: Permanent time display showing current position (e.g., "12:34:56")
 - **Row 2**: Time scrubber spanning full panel width
-- **Row 3**: Play/Pause button on the left, speed selector dropdown on the right
+- **Row 3**: Play/Pause button on the left, Full/Trail toggle switch in the center, speed selector dropdown on the right
 
 **Time Display**: Positioned above the scrubber as a header. Permanently visible, updates in real-time during scrubbing and playback. No tooltip needed — the display itself provides feedback.
 
