@@ -130,8 +130,11 @@ class TrackBuilder:
         # Sort positions by timestamp
         self.positions.sort(key=lambda p: p.timestamp)
 
-        # Build coordinates array [lon, lat, elevation?, time?]
+        # Build coordinates array [lon, lat]
         coordinates = [[p.lon, p.lat] for p in self.positions]
+
+        # Build times array (ISO strings, parallel to coordinates)
+        times = [p.timestamp.isoformat() for p in self.positions]
 
         # Build positions array with full metadata
         positions_data = [
@@ -158,6 +161,7 @@ class TrackBuilder:
                 "platform_id": self.platform_id,
                 "platform_name": self.platform_id,
                 "track_type": "CONTACT",  # Default, can be overridden
+                "times": times,  # Required for track identification
                 "start_time": self.positions[0].timestamp.isoformat(),
                 "end_time": self.positions[-1].timestamp.isoformat(),
                 "positions": positions_data,
@@ -175,12 +179,14 @@ class REPHandler(BaseHandler):
 
     # Pattern for track position records
     # Format: YYMMDD HHMMSS.SSS TRACKNAME SYMBOL LAT(DMS) LON(DMS) COURSE SPEED DEPTH [LABEL]
+    # Track name: unquoted (no spaces) or "quoted with spaces"
+    # Symbol formats: @A, @A@00, @BA10, BBA10, @C[SYMBOL=missile], @B[LAYER=LIGHT_TRACKS]
     POSITION_PATTERN = re.compile(
         r"^\s*"
         r"(\d{6})\s+"  # Date YYMMDD
         r"(\d{6}(?:\.\d+)?)\s+"  # Time HHMMSS.SSS
-        r"(\S+)\s+"  # Track name
-        r"(@\w+)\s+"  # Symbol
+        r'(?:"([^"]+)"|(\S+))\s+'  # Track name (quoted or unquoted)
+        r"(@?\w+(?:@@?\w+)?(?:\[[\w=,]+\])?)\s+"  # Symbol (various formats inc. @@)
         r"(\d+)\s+(\d+)\s+([\d.]+)\s+([NS])\s+"  # Lat DMS
         r"(\d+)\s+(\d+)\s+([\d.]+)\s+([EW])\s+"  # Lon DMS
         r"([\d.]+)\s+"  # Course
@@ -301,25 +307,26 @@ class REPHandler(BaseHandler):
 
         date_str = groups[0]
         time_str = groups[1]
-        track_name = groups[2]
-        symbol = groups[3]
+        # Track name: quoted (group 2) or unquoted (group 3)
+        track_name = groups[2] or groups[3]
+        symbol = groups[4]
 
         # Parse latitude DMS
-        lat_deg = float(groups[4])
-        lat_min = float(groups[5])
-        lat_sec = float(groups[6])
-        lat_hem = groups[7]
+        lat_deg = float(groups[5])
+        lat_min = float(groups[6])
+        lat_sec = float(groups[7])
+        lat_hem = groups[8]
 
         # Parse longitude DMS
-        lon_deg = float(groups[8])
-        lon_min = float(groups[9])
-        lon_sec = float(groups[10])
-        lon_hem = groups[11]
+        lon_deg = float(groups[9])
+        lon_min = float(groups[10])
+        lon_sec = float(groups[11])
+        lon_hem = groups[12]
 
-        course = float(groups[12])
-        speed = float(groups[13])
-        depth = float(groups[14])
-        label = groups[15].strip() if groups[15] else None
+        course = float(groups[13])
+        speed = float(groups[14])
+        depth = float(groups[15])
+        label = groups[16].strip() if groups[16] else None
 
         # Convert DMS to decimal
         lat = parse_dms_coordinate(lat_deg, lat_min, lat_sec, lat_hem)

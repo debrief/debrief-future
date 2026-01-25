@@ -1,0 +1,52 @@
+/**
+ * Spatial state slice implementation.
+ * Feature: 024-document-session-state
+ */
+
+import type { StateCreator } from 'zustand';
+import type {
+  SpatialSlice,
+  SpatialActions,
+  ViewportPolygon,
+  Coordinate,
+  SessionStore,
+} from '../../types/index.js';
+import {
+  DEFAULT_SPATIAL_SLICE,
+  validateViewportPolygon,
+  calculateViewportCenter,
+  normalizeRotation,
+} from '../../types/index.js';
+
+export type SpatialSliceWithActions = SpatialSlice & SpatialActions;
+
+/**
+ * Create the spatial slice for the session store.
+ */
+export const createSpatialSlice: StateCreator<
+  SessionStore,
+  [],
+  [],
+  SpatialSliceWithActions
+> = (set, get) => ({
+  ...DEFAULT_SPATIAL_SLICE,
+
+  setViewport: (viewport: ViewportPolygon | null) => {
+    if (viewport !== null && !validateViewportPolygon(viewport)) {
+      throw new Error(
+        'Invalid viewport coordinates: must be within [-180, 180] longitude and [-90, 90] latitude'
+      );
+    }
+    set({ viewport });
+  },
+
+  setRotation: (rotation: number) => {
+    set({ rotation: normalizeRotation(rotation) });
+  },
+
+  getCenter: (): Coordinate | null => {
+    const { viewport } = get();
+    if (!viewport) return null;
+    return calculateViewportCenter(viewport);
+  },
+});

@@ -168,7 +168,7 @@ def build_narrative(line: str, line_number: int, filename: str) -> dict[str, Any
     return {
         "type": "Feature",
         "id": generate_feature_id(),
-        "geometry": None,  # NARRATIVE has no geometry
+        "geometry": {"type": "Point", "coordinates": []},  # Empty point - no spatial location
         "properties": {
             "kind": "NARRATIVE",
             "time": ts.iso_string,
