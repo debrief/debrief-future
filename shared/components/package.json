@@ -57,7 +57,7 @@
     "@debrief/schemas": "workspace:*",
     "@tanstack/react-virtual": "^3.0.0",
     "leaflet": "^1.9.0",
-    "react-leaflet": "^5.0.0"
+    "react-leaflet": "^4.2.1"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^8.4.0",
