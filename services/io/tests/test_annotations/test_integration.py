@@ -186,9 +186,7 @@ class TestTrackRegressionWithAnnotations:
         result_with_annotations = rep_handler.parse(track_with_annotations, "test.rep")
 
         # Extract just the track features
-        track1 = [
-            f for f in result_track_only.features if f["properties"]["kind"] == "TRACK"
-        ][0]
+        track1 = [f for f in result_track_only.features if f["properties"]["kind"] == "TRACK"][0]
         track2 = [
             f for f in result_with_annotations.features if f["properties"]["kind"] == "TRACK"
         ][0]
@@ -215,9 +213,7 @@ class TestTrackRegressionWithAnnotations:
         result_track_only = rep_handler.parse(track_only, "test.rep")
         result_with_annotations = rep_handler.parse(track_with_annotations, "test.rep")
 
-        track1 = [
-            f for f in result_track_only.features if f["properties"]["kind"] == "TRACK"
-        ][0]
+        track1 = [f for f in result_track_only.features if f["properties"]["kind"] == "TRACK"][0]
         track2 = [
             f for f in result_with_annotations.features if f["properties"]["kind"] == "TRACK"
         ][0]
