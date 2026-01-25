@@ -16,9 +16,11 @@ const meta: Meta<typeof MapView> = {
 Demonstrates all 15+ annotation shape types parsed from REP files.
 
 **Shape Types Shown:**
-- **Basic**: CIRCLE, RECTANGLE, LINE, VECTOR, TEXT, NARRATIVE
+- **Basic**: CIRCLE, RECTANGLE, LINE, VECTOR, TEXT
 - **Phase 2**: POLY, POLYLINE, ELLIPSE, ELLIPSE2, TIMETEXT, PERIODTEXT, WHEEL
-- **Phase 3**: DYNAMIC_RECT, DYNAMIC_CIRCLE, DYNAMIC_POLY, SENSOR, SENSOR2, TMA_POS, TRACKSPLIT
+- **Phase 3**: DYNAMIC_RECT, DYNAMIC_CIRCLE, DYNAMIC_POLY, SENSOR, SENSOR2, TMA_POS
+
+Note: NARRATIVE (non-spatial) and TRACKSPLIT (metadata-only) features are filtered out.
 
 This story uses a generated GeoJSON fixture from \`services/io/tests/fixtures/valid/shapes.rep\`.
 Regenerate with: \`uv run python services/io/scripts/generate-storybook-fixtures.py\`
@@ -40,11 +42,19 @@ export default meta;
 type Story = StoryObj<typeof MapView>;
 
 // Type assertion for the imported JSON
-// Filter out features with null geometry (TRACKSPLIT, etc.) which can't be rendered on the map
+// Filter out features that can't be rendered on the map:
+// - null geometry (TRACKSPLIT, etc.)
+// - empty coordinates (NARRATIVE - non-spatial features)
 const rawData = allShapesData as unknown as DebriefFeatureCollection;
 const shapesFeatureCollection: DebriefFeatureCollection = {
   type: 'FeatureCollection',
-  features: rawData.features.filter((f) => f.geometry !== null),
+  features: rawData.features.filter((f) => {
+    if (f.geometry === null) return false;
+    const coords = f.geometry.coordinates;
+    // Filter out empty coordinate arrays
+    if (Array.isArray(coords) && coords.length === 0) return false;
+    return true;
+  }),
 };
 
 // Count shapes by kind for display
@@ -164,13 +174,13 @@ export const EllipseVariants: Story = {
 
 export const TextShapes: Story = {
   args: {
-    features: filterByKinds(['TEXT', 'TIMETEXT', 'PERIODTEXT', 'NARRATIVE']),
+    features: filterByKinds(['TEXT', 'TIMETEXT', 'PERIODTEXT']),
     height: '100%',
   },
   parameters: {
     docs: {
       description: {
-        story: 'Text-based annotation shapes: TEXT, TIMETEXT, PERIODTEXT, NARRATIVE',
+        story: 'Text-based annotation shapes: TEXT, TIMETEXT, PERIODTEXT (NARRATIVE is non-spatial)',
       },
     },
   },
