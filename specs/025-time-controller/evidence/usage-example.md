@@ -127,6 +127,53 @@ When the TimeController has focus:
 | `Right Arrow` | Scrub forward |
 | `Left Arrow` | Scrub backward |
 
+## VS Code Extension Integration
+
+The TimeController is integrated into the VS Code extension's activity bar:
+
+```
+Debrief Activity Bar
+├── Time Range (webview - TimeController)
+├── Tools
+└── Layers
+```
+
+### Architecture
+
+The integration uses a React webview:
+
+1. **timeController.tsx** - React entry point that:
+   - Renders TimeController from @debrief/components
+   - Handles message passing with extension
+   - Persists state (currentTime, speed, displayMode)
+
+2. **TimeRangeViewProvider** - VS Code webview provider that:
+   - Loads the React webview bundle
+   - Converts plot timeExtent (ISO strings) to timestamps
+   - Applies VS Code theme CSS overrides
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `debrief.setTimeRange` | Set current time position |
+| `debrief.resetTimeRange` | Reset to full data range |
+| `debrief.setDisplayMode` | Toggle full/trail display |
+
+### Theme Integration
+
+The webview uses CSS variable overrides to match VS Code themes:
+
+```css
+.debrief-time-scrubber__progress {
+  background: var(--vscode-progressBar-background);
+}
+.debrief-playback-button {
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+}
+```
+
 ## Storybook Preview
 
 View interactive demos at:
