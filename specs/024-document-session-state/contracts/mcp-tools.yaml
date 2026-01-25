@@ -1,0 +1,565 @@
+# MCP Tools Contract: Session State Management
+# Feature: 024-document-session-state
+# Date: 2026-01-24
+#
+# These tools expose session state operations via MCP (Model Context Protocol).
+# Python clients access state through these tools (FR-028, FR-029, FR-030).
+
+---
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Session State MCP Tools
+version: "1.0.0"
+
+tools:
+
+  # ==========================================================================
+  # State Read Operations (FR-029)
+  # ==========================================================================
+
+  session.getState:
+    title: Get Session State
+    description: |
+      Retrieve the current session state. Can return full state or a specific slice.
+    inputSchema:
+      type: object
+      properties:
+        slice:
+          type: string
+          enum: [temporal, spatial, features, document]
+          description: Optional slice to retrieve. If omitted, returns full state.
+      required: []
+    outputSchema:
+      type: object
+      description: Full SessionState or requested slice
+    examples:
+      - input: {}
+        output: { temporal: {...}, spatial: {...}, features: {...}, document: {...} }
+      - input: { slice: "temporal" }
+        output: { currentTime: {...}, timeRange: {...}, ... }
+
+  session.getTemporalState:
+    title: Get Temporal State
+    description: Retrieve the current temporal state slice.
+    inputSchema:
+      type: object
+      properties: {}
+      required: []
+    outputSchema:
+      type: object
+      properties:
+        currentTime:
+          $ref: "#/definitions/TimeInstant"
+          nullable: true
+        timeRange:
+          $ref: "#/definitions/TimeRange"
+          nullable: true
+        timeFilter:
+          $ref: "#/definitions/TimeFilter"
+          nullable: true
+        stepSize:
+          $ref: "#/definitions/TimeStep"
+        playbackRate:
+          type: number
+          minimum: 0.1
+          maximum: 100.0
+        playbackState:
+          type: string
+          enum: [stopped, playing, paused]
+        displayMode:
+          type: string
+          enum: [normal, snailTrail]
+
+  session.getSpatialState:
+    title: Get Spatial State
+    description: Retrieve the current spatial state slice.
+    inputSchema:
+      type: object
+      properties: {}
+      required: []
+    outputSchema:
+      type: object
+      properties:
+        viewport:
+          $ref: "#/definitions/ViewportPolygon"
+          nullable: true
+        rotation:
+          type: number
+        center:
+          $ref: "#/definitions/Coordinate"
+          nullable: true
+          description: Derived from viewport (read-only)
+
+  session.getFeaturesState:
+    title: Get Features State
+    description: Retrieve the current features state slice.
+    inputSchema:
+      type: object
+      properties: {}
+      required: []
+    outputSchema:
+      type: object
+      properties:
+        featureCollectionUri:
+          type: string
+          nullable: true
+        selection:
+          $ref: "#/definitions/FeatureSelection"
+        hiddenFeatureIds:
+          type: array
+          items:
+            type: string
+
+  session.getDocumentState:
+    title: Get Document State
+    description: Retrieve the current document state slice.
+    inputSchema:
+      type: object
+      properties: {}
+      required: []
+    outputSchema:
+      type: object
+      properties:
+        dirty:
+          type: boolean
+        savePath:
+          type: string
+          nullable: true
+        undoAvailable:
+          type: boolean
+        redoAvailable:
+          type: boolean
+        undoStackSize:
+          type: integer
+        redoStackSize:
+          type: integer
+
+  # ==========================================================================
+  # State Write Operations (FR-030)
+  # ==========================================================================
+
+  session.setCurrentTime:
+    title: Set Current Time
+    description: |
+      Set the current playback/display time. Triggers UI update (FR-030).
+      Recorded in undo history (FR-031).
+    inputSchema:
+      type: object
+      properties:
+        epoch:
+          type: integer
+          description: Time as milliseconds since Unix epoch
+        iso:
+          type: string
+          format: date-time
+          description: Time as ISO 8601 UTC string (alternative to epoch)
+      oneOf:
+        - required: [epoch]
+        - required: [iso]
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        currentTime:
+          $ref: "#/definitions/TimeInstant"
+
+  session.setTimeRange:
+    title: Set Time Range
+    description: Set the full temporal extent of loaded data.
+    inputSchema:
+      type: object
+      properties:
+        start:
+          $ref: "#/definitions/TimeInstantInput"
+        end:
+          $ref: "#/definitions/TimeInstantInput"
+      required: [start, end]
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        timeRange:
+          $ref: "#/definitions/TimeRange"
+
+  session.setTimeFilter:
+    title: Set Time Filter
+    description: Set or clear the visible time window constraint.
+    inputSchema:
+      type: object
+      properties:
+        start:
+          $ref: "#/definitions/TimeInstantInput"
+          nullable: true
+        end:
+          $ref: "#/definitions/TimeInstantInput"
+          nullable: true
+        clear:
+          type: boolean
+          description: If true, clears the filter entirely
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        timeFilter:
+          $ref: "#/definitions/TimeFilter"
+          nullable: true
+
+  session.setPlaybackRate:
+    title: Set Playback Rate
+    description: Set the playback speed multiplier.
+    inputSchema:
+      type: object
+      properties:
+        rate:
+          type: number
+          minimum: 0.1
+          maximum: 100.0
+      required: [rate]
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        playbackRate:
+          type: number
+
+  session.setDisplayMode:
+    title: Set Display Mode
+    description: Set the track visualization mode.
+    inputSchema:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum: [normal, snailTrail]
+      required: [mode]
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        displayMode:
+          type: string
+
+  session.setViewport:
+    title: Set Viewport
+    description: Set the visible map viewport as a 4-corner polygon.
+    inputSchema:
+      type: object
+      properties:
+        coordinates:
+          type: array
+          items:
+            $ref: "#/definitions/Coordinate"
+          minItems: 4
+          maxItems: 4
+          description: Four corners in clockwise order [NW, NE, SE, SW]
+        rotation:
+          type: number
+          description: Optional rotation in degrees
+      required: [coordinates]
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        viewport:
+          $ref: "#/definitions/ViewportPolygon"
+        center:
+          $ref: "#/definitions/Coordinate"
+
+  session.setSelection:
+    title: Set Selection
+    description: Set the currently selected features.
+    inputSchema:
+      type: object
+      properties:
+        featureIds:
+          type: array
+          items:
+            type: string
+        primary:
+          type: string
+          nullable: true
+          description: Primary selection for properties display
+        clear:
+          type: boolean
+          description: If true, clears selection
+      oneOf:
+        - required: [featureIds]
+        - required: [clear]
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        selection:
+          $ref: "#/definitions/FeatureSelection"
+
+  session.setHiddenFeatures:
+    title: Set Hidden Features
+    description: Set which features are hidden from display.
+    inputSchema:
+      type: object
+      properties:
+        featureIds:
+          type: array
+          items:
+            type: string
+        add:
+          type: array
+          items:
+            type: string
+          description: Feature IDs to add to hidden set
+        remove:
+          type: array
+          items:
+            type: string
+          description: Feature IDs to remove from hidden set
+        clear:
+          type: boolean
+          description: If true, clears all hidden features
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        hiddenFeatureIds:
+          type: array
+          items:
+            type: string
+
+  # ==========================================================================
+  # Viewport Operations (FR-014, FR-015)
+  # ==========================================================================
+
+  session.zoomToSelection:
+    title: Zoom to Selection
+    description: Zoom the viewport to fit the currently selected features (FR-014).
+    inputSchema:
+      type: object
+      properties:
+        padding:
+          type: number
+          description: Padding around selection in degrees
+          default: 0.1
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        viewport:
+          $ref: "#/definitions/ViewportPolygon"
+
+  session.zoomToAll:
+    title: Zoom to All
+    description: Fit the viewport to all loaded data (FR-015).
+    inputSchema:
+      type: object
+      properties:
+        padding:
+          type: number
+          description: Padding around data in degrees
+          default: 0.1
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        viewport:
+          $ref: "#/definitions/ViewportPolygon"
+
+  # ==========================================================================
+  # Undo/Redo Operations (FR-021)
+  # ==========================================================================
+
+  session.undo:
+    title: Undo
+    description: |
+      Revert to previous state. Returns indication if no undo available (Edge Case).
+    inputSchema:
+      type: object
+      properties:
+        steps:
+          type: integer
+          minimum: 1
+          default: 1
+          description: Number of steps to undo
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        undone:
+          type: integer
+          description: Number of steps actually undone
+        undoAvailable:
+          type: boolean
+        redoAvailable:
+          type: boolean
+
+  session.redo:
+    title: Redo
+    description: Reapply previously undone change.
+    inputSchema:
+      type: object
+      properties:
+        steps:
+          type: integer
+          minimum: 1
+          default: 1
+          description: Number of steps to redo
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        redone:
+          type: integer
+        undoAvailable:
+          type: boolean
+        redoAvailable:
+          type: boolean
+
+  # ==========================================================================
+  # Persistence Operations (FR-024, FR-025)
+  # ==========================================================================
+
+  session.save:
+    title: Save Session
+    description: Save the current session state to a file (FR-024).
+    inputSchema:
+      type: object
+      properties:
+        path:
+          type: string
+          description: File path to save to. Uses existing savePath if omitted.
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        path:
+          type: string
+        savedAt:
+          type: string
+          format: date-time
+
+  session.load:
+    title: Load Session
+    description: |
+      Load session state from a file (FR-025).
+      Resets ephemeral state (playback, dirty, history) per FR-027.
+      Fails if feature collection no longer exists (Edge Case).
+    inputSchema:
+      type: object
+      properties:
+        path:
+          type: string
+      required: [path]
+    outputSchema:
+      type: object
+      properties:
+        success:
+          type: boolean
+        version:
+          type: string
+        state:
+          description: Loaded SessionState
+
+# ==========================================================================
+# Shared Definitions
+# ==========================================================================
+
+definitions:
+
+  TimeInstant:
+    type: object
+    properties:
+      epoch:
+        type: integer
+        description: Milliseconds since Unix epoch
+      iso:
+        type: string
+        format: date-time
+        description: ISO 8601 UTC string
+    required: [epoch, iso]
+
+  TimeInstantInput:
+    description: Input format for time - either epoch or iso
+    oneOf:
+      - type: object
+        properties:
+          epoch:
+            type: integer
+        required: [epoch]
+      - type: object
+        properties:
+          iso:
+            type: string
+            format: date-time
+        required: [iso]
+
+  TimeRange:
+    type: object
+    properties:
+      start:
+        $ref: "#/definitions/TimeInstant"
+      end:
+        $ref: "#/definitions/TimeInstant"
+    required: [start, end]
+
+  TimeFilter:
+    type: object
+    properties:
+      start:
+        $ref: "#/definitions/TimeInstant"
+        nullable: true
+      end:
+        $ref: "#/definitions/TimeInstant"
+        nullable: true
+
+  TimeStep:
+    type: object
+    properties:
+      value:
+        type: number
+      unit:
+        type: string
+        enum: [millisecond, second, minute, hour, day]
+    required: [value, unit]
+
+  Coordinate:
+    type: array
+    items:
+      type: number
+    minItems: 2
+    maxItems: 2
+    description: "[longitude, latitude]"
+
+  ViewportPolygon:
+    type: object
+    properties:
+      coordinates:
+        type: array
+        items:
+          $ref: "#/definitions/Coordinate"
+        minItems: 4
+        maxItems: 4
+    required: [coordinates]
+
+  FeatureSelection:
+    type: object
+    properties:
+      featureIds:
+        type: array
+        items:
+          type: string
+      primary:
+        type: string
+        nullable: true
+      timestamp:
+        $ref: "#/definitions/TimeInstant"
+    required: [featureIds, timestamp]

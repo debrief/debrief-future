@@ -22,3 +22,13 @@ export type { DebriefFeature, DebriefFeatureCollection } from './utils/types';
 export { calculateBounds } from './utils/bounds';
 export { calculateTimeExtent } from './utils/time';
 export { getFeatureLabel, getFeatureIcon } from './utils/labels';
+
+// ToolMatch
+export {
+  ToolMatchService,
+  getInactiveReason,
+  getAllInactiveReasons,
+  createSelection,
+  createSelectionFromCounts,
+} from './ToolMatch';
+export type { Selection, MatchResult, Tool, SelectionRequirement } from './ToolMatch';

@@ -20,6 +20,7 @@ imports:
   - styling
   - geojson
   - annotations
+  - tool
 
 # Root schema imports all modules - no additional classes needed here.
 # All entity definitions are in their respective module files:

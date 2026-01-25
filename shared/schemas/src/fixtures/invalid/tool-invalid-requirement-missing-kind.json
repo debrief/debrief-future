@@ -1,0 +1,11 @@
+{
+  "id": "missing-kind",
+  "name": "Missing Kind Tool",
+  "version": "1.0.0",
+  "requirements": [
+    {
+      "min": 1,
+      "max": 2
+    }
+  ]
+}
