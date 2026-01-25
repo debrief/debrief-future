@@ -61,7 +61,7 @@
       "Bash(sh -)",
       "Bash(export PNPM_HOME=\"/home/ian/.local/share/pnpm\")",
       "Bash(export PATH=\"$PNPM_HOME:$PATH\")",
-      "Bash(pnpm --version:*)"
+      "Bash(pnpm --version:*)",
       "Bash(task install:*)",
       "Bash(brew install:*)",
       "Bash(task --version:*)",
