@@ -1,0 +1,91 @@
+id: https://debrief.info/schemas/tool
+name: tool
+title: Debrief Tool Metadata Schemas
+description: >-
+  LinkML schemas for analysis tool metadata in Debrief v4.x.
+  Defines Tool and SelectionRequirement classes for context-sensitive
+  tool offering based on analyst selections.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+
+# ============================================================================
+# Classes
+# ============================================================================
+
+classes:
+  SelectionRequirement:
+    description: >-
+      A constraint specifying which feature kinds a tool accepts,
+      with minimum and maximum counts. Used to determine if a tool
+      is applicable to the current selection.
+    attributes:
+      kind:
+        description: >-
+          The feature kind this requirement applies to (e.g., "track",
+          "point", "reference_location"). Must match the 'kind' property
+          of GeoJSON features.
+        range: string
+        required: true
+      min:
+        description: >-
+          Minimum number of features of this kind required.
+          Must be >= 0. Defaults to 0 if not specified.
+        range: integer
+        required: false
+        minimum_value: 0
+      max:
+        description: >-
+          Maximum number of features of this kind allowed.
+          Must be >= min if both specified. Null means no upper limit.
+        range: integer
+        required: false
+        minimum_value: 0
+
+  Tool:
+    description: >-
+      An analysis operation with a name, description, version, and
+      selection requirements. Tools are discovered from debrief-calc
+      via MCP and matched to analyst selections.
+    attributes:
+      id:
+        description: >-
+          Unique identifier for the tool. Used for execution and
+          deduplication. Should be stable across versions.
+        range: string
+        required: true
+        identifier: true
+      name:
+        description: >-
+          Human-readable name displayed in menus and panels.
+          Should be concise (2-4 words).
+        range: string
+        required: true
+      description:
+        description: >-
+          Brief description of what the tool does. Displayed in
+          tooltips and help text. Should be one sentence.
+        range: string
+        required: false
+      version:
+        description: >-
+          Tool version string for provenance tracking.
+          Follows semantic versioning (e.g., "1.0.0").
+        range: string
+        required: false
+      requirements:
+        description: >-
+          List of selection requirements. Tool is active when ALL
+          requirements are satisfied by the current selection.
+          Empty list means tool accepts any selection.
+        range: SelectionRequirement
+        required: false
+        multivalued: true
+        inlined_as_list: true

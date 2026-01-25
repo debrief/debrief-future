@@ -109,6 +109,9 @@ def generate_jsonschema() -> bool:
             "LineAnnotation",
             "TextAnnotation",
             "VectorAnnotation",
+            # Tool metadata types
+            "Tool",
+            "SelectionRequirement",
         ]
         for entity in entity_types:
             if entity in full_schema.get("$defs", {}):

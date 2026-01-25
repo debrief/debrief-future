@@ -1,0 +1,12 @@
+{
+  "id": "track-summary",
+  "name": "Track Summary",
+  "description": "Summarize one or more tracks",
+  "version": "1.0.0",
+  "requirements": [
+    {
+      "kind": "TRACK",
+      "min": 1
+    }
+  ]
+}

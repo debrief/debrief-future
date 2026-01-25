@@ -28,6 +28,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
+from debrief_io.handlers.annotations.parser import is_annotation_line, parse_annotations
 from debrief_io.handlers.base import BaseHandler
 from debrief_io.models import ParseResult, ParseWarning
 
@@ -213,11 +214,12 @@ class REPHandler(BaseHandler):
             source_file: Path to source file (for provenance)
 
         Returns:
-            ParseResult with TrackFeature objects and any warnings
+            ParseResult with TrackFeature objects, annotations, and any warnings
         """
         start_time = time.perf_counter()
         warnings: list[ParseWarning] = []
         tracks: dict[str, TrackBuilder] = {}
+        annotation_lines: list[tuple[int, str]] = []
 
         lines = content.splitlines()
 
@@ -226,9 +228,11 @@ class REPHandler(BaseHandler):
             if not line.strip():
                 continue
 
-            # Skip comment lines
+            # Check for annotation lines (special comments like ;NARRATIVE:, ;CIRCLE:, etc.)
             if line.strip().startswith(";"):
-                # TODO: Handle special comments like ;NARRATIVE:, ;CIRCLE:, etc.
+                if is_annotation_line(line):
+                    annotation_lines.append((line_num, line))
+                # Skip all comment lines for track parsing
                 continue
 
             # Try to parse as position record
@@ -266,6 +270,11 @@ class REPHandler(BaseHandler):
 
         # Build features from tracks
         features = [track.build_feature(source_file) for track in tracks.values()]
+
+        # Parse annotations and add to features
+        if annotation_lines:
+            annotation_features = parse_annotations(annotation_lines, source_file)
+            features.extend(annotation_features)
 
         elapsed_ms = (time.perf_counter() - start_time) * 1000
 

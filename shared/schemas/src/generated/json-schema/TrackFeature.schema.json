@@ -830,6 +830,37 @@
       "title": "ReferenceLocationProperties",
       "type": "object"
     },
+    "SelectionRequirement": {
+      "additionalProperties": false,
+      "description": "A constraint specifying which feature kinds a tool accepts, with minimum and maximum counts. Used to determine if a tool is applicable to the current selection.",
+      "properties": {
+        "kind": {
+          "description": "The feature kind this requirement applies to (e.g., \"track\", \"point\", \"reference_location\"). Must match the 'kind' property of GeoJSON features.",
+          "type": "string"
+        },
+        "max": {
+          "description": "Maximum number of features of this kind allowed. Must be >= min if both specified. Null means no upper limit.",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "min": {
+          "description": "Minimum number of features of this kind required. Must be >= 0. Defaults to 0 if not specified.",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "SelectionRequirement",
+      "type": "object"
+    },
     "SystemState": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for storing non-spatial system state",
@@ -1065,6 +1096,50 @@
         "coordinates"
       ],
       "title": "TimestampedPosition",
+      "type": "object"
+    },
+    "Tool": {
+      "additionalProperties": false,
+      "description": "An analysis operation with a name, description, version, and selection requirements. Tools are discovered from debrief-calc via MCP and matched to analyst selections.",
+      "properties": {
+        "description": {
+          "description": "Brief description of what the tool does. Displayed in tooltips and help text. Should be one sentence.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "description": "Unique identifier for the tool. Used for execution and deduplication. Should be stable across versions.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name displayed in menus and panels. Should be concise (2-4 words).",
+          "type": "string"
+        },
+        "requirements": {
+          "description": "List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection.",
+          "items": {
+            "$ref": "#/$defs/SelectionRequirement"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "version": {
+          "description": "Tool version string for provenance tracking. Follows semantic versioning (e.g., \"1.0.0\").",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "Tool",
       "type": "object"
     },
     "TrackFeature": {

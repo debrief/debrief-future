@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/schemas/tool-metadata.schema.json",
+  "title": "Tool Metadata",
+  "description": "Schema for analysis tool metadata used in context-sensitive tool offering",
+  "type": "object",
+  "required": ["name", "description", "version", "requirements"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Display name for the tool"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of what the tool does"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+",
+      "description": "Semantic version (e.g., '1.0.0')"
+    },
+    "requirements": {
+      "type": "array",
+      "description": "Array of selection constraints",
+      "items": {
+        "$ref": "#/$defs/SelectionRequirement"
+      }
+    }
+  },
+  "$defs": {
+    "SelectionRequirement": {
+      "type": "object",
+      "description": "A constraint specifying which feature kinds a tool accepts",
+      "required": ["kind", "min", "max"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Feature kind (e.g., 'track', 'point', 'reference_location')"
+        },
+        "min": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum count required (0 = optional)"
+        },
+        "max": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Maximum count allowed (null for unlimited)"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "name": "Range Calculation",
+      "description": "Calculate range and bearing between two tracks",
+      "version": "1.0.0",
+      "requirements": [
+        { "kind": "track", "min": 2, "max": 2 }
+      ]
+    },
+    {
+      "name": "Bearing to Point",
+      "description": "Calculate bearing from track to reference point",
+      "version": "1.0.0",
+      "requirements": [
+        { "kind": "track", "min": 1, "max": 1 },
+        { "kind": "point", "min": 1, "max": 1 }
+      ]
+    },
+    {
+      "name": "Global Statistics",
+      "description": "Compute statistics across all features",
+      "version": "1.0.0",
+      "requirements": []
+    }
+  ]
+}
