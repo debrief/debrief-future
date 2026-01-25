@@ -11,6 +11,7 @@ import { ConfigService } from './services/configService';
 import { CalcService } from './services/calcService';
 import { RecentPlotsService } from './services/recentPlotsService';
 import { ActivityBarService } from './services/activityBarService';
+import { IoService } from './services/ioService';
 import { registerCommands } from './commands';
 import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 
@@ -29,6 +30,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const stacService = new StacService();
   const calcService = new CalcService(context);
   const recentPlotsService = new RecentPlotsService(context);
+  const ioService = new IoService(context.extensionPath);
 
   // Register file system provider for stac:// URIs
   const stacFileSystemProvider = new StacFileSystemProvider(stacService);
@@ -68,6 +70,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     stacService,
     calcService,
     recentPlotsService,
+    ioService,
     stacTreeProvider,
     toolsTreeProvider,
     layersTreeProvider,

@@ -6,12 +6,20 @@
  */
 
 import * as vscode from 'vscode';
+import * as path from 'path';
 import type { Plot, Track, ReferenceLocation, Selection } from '../types/plot';
 import type { ResultLayer } from '../types/tool';
 import type {
   ExtensionToWebviewMessage,
   WebviewToExtensionMessage,
+  GeoJSONFeature,
 } from './messages';
+import type { IoService } from '../services/ioService';
+import type { StacService } from '../services/stacService';
+import type { StacStore } from '../types/stac';
+import type { LayersTreeProvider } from '../providers/layersTreeProvider';
+import { DuplicateImportError } from '../types/import';
+import { calculateBounds, mergeBounds } from '../utils/bounds';
 
 export class MapPanel {
   public static currentPanel: MapPanel | undefined;
@@ -28,6 +36,12 @@ export class MapPanel {
   private resultLayers: ResultLayer[] = [];
   private isWebviewReady = false;
   private pendingMessages: ExtensionToWebviewMessage[] = [];
+
+  // Services for REP import
+  private ioService: IoService | null = null;
+  private stacService: StacService | null = null;
+  private currentStore: StacStore | null = null;
+  private layersTreeProvider: LayersTreeProvider | null = null;
 
   // Event handlers
   private onSelectionChangedCallback:
@@ -135,7 +149,8 @@ export class MapPanel {
   public loadPlot(
     plot: Plot,
     tracks: Track[],
-    locations: ReferenceLocation[]
+    locations: ReferenceLocation[],
+    otherFeatures: GeoJSONFeature[] = []
   ): void {
     this.currentPlot = plot;
     this.currentTracks = tracks;
@@ -153,6 +168,7 @@ export class MapPanel {
         title: plot.title,
         tracks,
         locations,
+        otherFeatures,
         bbox: plot.bbox,
         timeExtent: plot.timeExtent,
       },
@@ -386,6 +402,35 @@ export class MapPanel {
   }
 
   /**
+   * Set services for REP import functionality
+   */
+  public setImportServices(
+    ioService: IoService,
+    stacService: StacService,
+    store: StacStore,
+    layersTreeProvider: LayersTreeProvider
+  ): void {
+    this.ioService = ioService;
+    this.stacService = stacService;
+    this.currentStore = store;
+    this.layersTreeProvider = layersTreeProvider;
+  }
+
+  /**
+   * Get current plot info
+   */
+  public getCurrentPlot(): Plot | null {
+    return this.currentPlot;
+  }
+
+  /**
+   * Get current store
+   */
+  public getCurrentStore(): StacStore | null {
+    return this.currentStore;
+  }
+
+  /**
    * Dispose the panel
    */
   public dispose(): void {
@@ -457,6 +502,10 @@ export class MapPanel {
       case 'requestTrackDetails':
         this.handleTrackDetailsRequest(message.requestId, message.trackId);
         break;
+
+      case 'repFileDrop':
+        void this.handleRepFileDrop(message.uris);
+        break;
     }
   }
 
@@ -527,6 +576,205 @@ export class MapPanel {
 
     if (result) {
       this.setTrackColor(trackId, result);
+    }
+  }
+
+  /**
+   * Handle REP file drop - orchestrates IoService → StacService
+   */
+  private async handleRepFileDrop(uris: string[]): Promise<void> {
+    const currentPlot = this.currentPlot;
+    const currentStore = this.currentStore;
+    const ioService = this.ioService;
+    const stacService = this.stacService;
+
+    if (!currentPlot || !currentStore) {
+      void vscode.window.showErrorMessage(
+        'No plot is currently open. Please open a plot first.'
+      );
+      return;
+    }
+
+    if (!ioService || !stacService) {
+      void vscode.window.showErrorMessage(
+        'Import services not available. REP import requires debrief-io service.'
+      );
+      return;
+    }
+
+    if (uris.length === 0) {
+      return;
+    }
+
+    // Get the first URI (single file only)
+    const uri = uris[0];
+    if (!uri) {
+      return;
+    }
+    const filePath = uri.startsWith('file://') ? uri.slice(7) : uri;
+    const filename = path.basename(filePath);
+    const assetKey = path.parse(filename).name;
+
+    try {
+      // Check for duplicate import
+      this.postMessage({
+        type: 'importProgress',
+        stage: 'parsing',
+        message: 'Checking for duplicates...',
+      });
+
+      const isDuplicate = await stacService.hasAsset(
+        currentStore.path,
+        currentPlot.itemPath,
+        assetKey
+      );
+
+      if (isDuplicate) {
+        const result = await vscode.window.showWarningMessage(
+          `File "${filename}" has already been imported to this plot.`,
+          'Cancel'
+        );
+
+        this.postMessage({ type: 'importProgress', stage: 'complete' });
+
+        if (result === 'Cancel' || !result) {
+          return;
+        }
+      }
+
+      // Parse REP file
+      this.postMessage({
+        type: 'importProgress',
+        stage: 'parsing',
+        message: `Parsing ${filename}...`,
+      });
+
+      const parseResult = await ioService.parseRep(filePath);
+
+      if (parseResult.warnings.length > 0) {
+        // Show warnings but continue
+        const warningMessages = parseResult.warnings
+          .slice(0, 3)
+          .map((w) => w.message)
+          .join('; ');
+        void vscode.window.showWarningMessage(
+          `Parsed with warnings: ${warningMessages}`
+        );
+      }
+
+      if (parseResult.features.length === 0) {
+        void vscode.window.showWarningMessage(
+          `No features found in ${filename}`
+        );
+        this.postMessage({ type: 'importProgress', stage: 'complete' });
+        return;
+      }
+
+      // Store asset
+      this.postMessage({
+        type: 'importProgress',
+        stage: 'storing',
+        message: 'Storing asset...',
+      });
+
+      await stacService.addAsset(
+        currentStore.path,
+        currentPlot.itemPath,
+        filePath,
+        assetKey
+      );
+
+      // Store features
+      this.postMessage({
+        type: 'importProgress',
+        stage: 'storing',
+        message: 'Storing features...',
+      });
+
+      // Convert to the format StacService expects
+      const safeFeatures = parseResult.features.map((f) => ({
+        type: 'Feature' as const,
+        geometry: {
+          type: f.geometry.type,
+          coordinates: f.geometry.coordinates as number[] | number[][],
+        },
+        properties: f.properties,
+      }));
+
+      await stacService.addFeatures(
+        currentStore.path,
+        currentPlot.itemPath,
+        safeFeatures
+      );
+
+      // Calculate bounds for zoom
+      const newBounds = calculateBounds(parseResult.features);
+      const mergedBounds = mergeBounds(
+        currentPlot.bbox,
+        newBounds
+      );
+
+      // Reload plot data to get new tracks
+      stacService.clearCache();
+      const updatedData = await stacService.loadPlotData(
+        currentStore,
+        currentPlot.itemPath
+      );
+
+      if (updatedData) {
+        // Update internal state
+        this.currentTracks = updatedData.tracks;
+        this.currentLocations = updatedData.locations;
+
+        // Update webview with new tracks
+        this.postMessage({
+          type: 'loadPlot',
+          plot: {
+            id: currentPlot.id,
+            title: currentPlot.title,
+            tracks: updatedData.tracks,
+            locations: updatedData.locations,
+            otherFeatures: updatedData.otherFeatures,
+            bbox: mergedBounds ?? currentPlot.bbox,
+            timeExtent: currentPlot.timeExtent,
+          },
+        });
+
+        // Update layers panel
+        this.layersTreeProvider?.setTracks(updatedData.tracks);
+        this.layersTreeProvider?.setLocations(updatedData.locations);
+      }
+
+      // Send completion message
+      this.postMessage({
+        type: 'importComplete',
+        featureCount: parseResult.features.length,
+        bounds: mergedBounds ?? [0, 0, 0, 0],
+      });
+
+      // Show success notification
+      void vscode.window.showInformationMessage(
+        `Imported ${parseResult.features.length} feature(s) from ${filename}`
+      );
+
+      // Trigger tree refresh
+      void vscode.commands.executeCommand('debrief.refreshStore', {
+        storeId: currentStore.id,
+      });
+
+    } catch (error) {
+      this.postMessage({
+        type: 'importProgress',
+        stage: 'error',
+        message: error instanceof Error ? error.message : 'Import failed',
+      });
+
+      if (error instanceof DuplicateImportError) {
+        void vscode.window.showWarningMessage(error.message);
+      } else {
+        const message = error instanceof Error ? error.message : String(error);
+        void vscode.window.showErrorMessage(`Import failed: ${message}`);
+      }
     }
   }
 

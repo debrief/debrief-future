@@ -148,6 +148,12 @@
         "command": "debrief.restoreActivities",
         "title": "Restore Default Activities",
         "category": "Debrief"
+      },
+      {
+        "command": "debrief.importRep",
+        "title": "Load into Debrief...",
+        "category": "Debrief",
+        "icon": "$(file-add)"
       }
     ],
     "keybindings": [
@@ -239,6 +245,13 @@
       }
     ],
     "menus": {
+      "explorer/context": [
+        {
+          "command": "debrief.importRep",
+          "when": "resourceExtname == .rep",
+          "group": "navigation"
+        }
+      ],
       "view/title": [
         {
           "command": "debrief.addStore",
@@ -253,7 +266,7 @@
       "view/item/context": [
         {
           "command": "debrief.removeStore",
-          "when": "view == debrief.stacExplorer && viewItem == store",
+          "when": "view == debrief.stacExplorer && viewItem =~ /^store/",
           "group": "3_modify"
         },
         {
@@ -342,8 +355,8 @@
         },
         "debrief.calc.pythonPath": {
           "type": "string",
-          "default": "python",
-          "description": "Path to Python executable for debrief-calc"
+          "default": "",
+          "description": "Path to Python executable for debrief-calc. Leave empty to auto-detect from project .venv"
         },
         "debrief.calc.connectionTimeout": {
           "type": "number",

@@ -42,6 +42,9 @@ let _currentTracks: Track[] = [];
 let _currentLocations: ReferenceLocation[] = [];
 let currentBbox: [number, number, number, number] | null = null;
 
+// Layer for other GeoJSON features (polygons, etc.)
+let otherFeaturesLayer: L.GeoJSON | null = null;
+
 /**
  * Initialize the Leaflet map
  */
@@ -87,6 +90,7 @@ function initializeMap(): void {
   // Set up event listeners
   setupMapEvents();
   setupToolbarEvents();
+  setupDropZone();
 
   // Restore state if available
   const savedState = vscode.getState();
@@ -136,6 +140,113 @@ function setupMapEvents(): void {
       selectionManager?.clearSelection();
     }
   });
+}
+
+/**
+ * Set up drag-and-drop event listeners for REP file import
+ */
+function setupDropZone(): void {
+  const mapContainer = document.getElementById('map-container');
+  if (!mapContainer) {
+    return;
+  }
+
+  // Prevent default drag behavior
+  mapContainer.addEventListener('dragover', (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    mapContainer.classList.add('drop-active');
+  });
+
+  mapContainer.addEventListener('dragleave', (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    mapContainer.classList.remove('drop-active');
+  });
+
+  mapContainer.addEventListener('dragenter', (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  // Handle file drop
+  mapContainer.addEventListener('drop', (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    mapContainer.classList.remove('drop-active');
+
+    // Get URI list (VS Code explorer uses text/uri-list)
+    const uriList = e.dataTransfer?.getData('text/uri-list');
+
+    // Try multiple approaches to get dropped file path
+    let droppedFilePath: string | null = null;
+
+    // Approach 1: VS Code URI list (from VS Code explorer)
+    if (uriList) {
+      const uris = uriList.split('\n').filter((u: string) => u.trim() && !u.startsWith('#'));
+      if (uris.length > 0) {
+        droppedFilePath = uris[0] ?? null;
+      }
+    }
+
+    // Approach 2: Native file drop (if not from VS Code)
+    const files = e.dataTransfer?.files;
+    if (!droppedFilePath && files && files.length > 0) {
+      const items = e.dataTransfer?.items;
+      if (items && items.length > 0) {
+        const item = items[0];
+        if (item.kind === 'file') {
+          const fileEntry = item.getAsFile();
+          droppedFilePath = (fileEntry as File & { path?: string })?.path ?? null;
+        }
+      }
+    }
+
+    if (!droppedFilePath) {
+      showDropError('Could not read dropped file. Try using right-click menu instead.');
+      return;
+    }
+
+    // Convert file:// URI to path if needed
+    if (droppedFilePath.startsWith('file://')) {
+      droppedFilePath = decodeURIComponent(droppedFilePath.slice(7));
+    }
+
+    // Check file extension
+    if (!droppedFilePath.toLowerCase().endsWith('.rep')) {
+      const filename = droppedFilePath.split('/').pop() ?? droppedFilePath;
+      showDropError(`Cannot import "${filename}": only .rep files are supported.`);
+      return;
+    }
+
+    vscode.postMessage({
+      type: 'repFileDrop',
+      uris: [droppedFilePath],
+    });
+  });
+}
+
+/**
+ * Show drop error message
+ */
+function showDropError(message: string): void {
+  // Create temporary error overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'drop-error-overlay';
+  overlay.innerHTML = `
+    <div class="drop-error-message">
+      <span class="drop-error-icon">⚠️</span>
+      <span>${message}</span>
+    </div>
+  `;
+
+  const container = document.getElementById('map-container');
+  container?.appendChild(overlay);
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    overlay.remove();
+  }, 3000);
 }
 
 /**
@@ -295,17 +406,91 @@ function handleMessage(message: ExtensionToWebviewMessage): void {
       handleSetTrackColor(message);
       break;
 
+    case 'importProgress':
+      handleImportProgress(message);
+      break;
+
+    case 'importComplete':
+      handleImportComplete(message);
+      break;
+
     default:
       console.warn('Unknown message type:', (message as { type: string }).type);
   }
+}
+
+/**
+ * Handle import progress message
+ */
+function handleImportProgress(
+  message: Extract<ExtensionToWebviewMessage, { type: 'importProgress' }>
+): void {
+  const existingOverlay = document.querySelector('.import-progress-overlay');
+
+  if (message.stage === 'complete' || message.stage === 'error') {
+    existingOverlay?.remove();
+    return;
+  }
+
+  if (!existingOverlay) {
+    const overlay = document.createElement('div');
+    overlay.className = 'import-progress-overlay';
+    overlay.innerHTML = `
+      <div class="import-progress-message">
+        <span class="import-progress-spinner"></span>
+        <span class="import-progress-text">${message.message ?? 'Importing...'}</span>
+      </div>
+    `;
+    document.getElementById('map-container')?.appendChild(overlay);
+  } else {
+    const textEl = existingOverlay.querySelector('.import-progress-text');
+    if (textEl) {
+      textEl.textContent = message.message ?? 'Importing...';
+    }
+  }
+}
+
+/**
+ * Handle import complete message
+ */
+function handleImportComplete(
+  message: Extract<ExtensionToWebviewMessage, { type: 'importComplete' }>
+): void {
+  // Remove progress overlay
+  document.querySelector('.import-progress-overlay')?.remove();
+
+  // Fit to new bounds
+  if (map && message.bounds) {
+    const [minLon, minLat, maxLon, maxLat] = message.bounds;
+    const bounds = L.latLngBounds(
+      L.latLng(minLat, minLon),
+      L.latLng(maxLat, maxLon)
+    );
+    map.fitBounds(bounds, { padding: [50, 50] });
+  }
+
+  // Show brief success message
+  const overlay = document.createElement('div');
+  overlay.className = 'import-success-overlay';
+  overlay.innerHTML = `
+    <div class="import-success-message">
+      <span class="import-success-icon">✓</span>
+      <span>Imported ${message.featureCount} feature${message.featureCount !== 1 ? 's' : ''}</span>
+    </div>
+  `;
+  document.getElementById('map-container')?.appendChild(overlay);
+
+  setTimeout(() => {
+    overlay.remove();
+  }, 2000);
 }
 
 function handleLoadPlot(message: Extract<ExtensionToWebviewMessage, { type: 'loadPlot' }>): void {
   const { plot } = message;
 
   // Store current data
-  _currentTracks =plot.tracks;
-  _currentLocations =plot.locations;
+  _currentTracks = plot.tracks;
+  _currentLocations = plot.locations;
   currentBbox = plot.bbox;
 
   // Clear existing layers
@@ -314,9 +499,55 @@ function handleLoadPlot(message: Extract<ExtensionToWebviewMessage, { type: 'loa
   resultRenderer?.clear();
   selectionManager?.clearSelection();
 
+  // Clear other features layer
+  if (otherFeaturesLayer && map) {
+    map.removeLayer(otherFeaturesLayer);
+    otherFeaturesLayer = null;
+  }
+
   // Render tracks and locations
   trackRenderer?.renderTracks(plot.tracks);
   locationRenderer?.renderLocations(plot.locations);
+
+  // Render other features (polygons, etc.) with standard GeoJSON layer
+  if (plot.otherFeatures && plot.otherFeatures.length > 0 && map) {
+    const featureCollection = {
+      type: 'FeatureCollection' as const,
+      features: plot.otherFeatures,
+    };
+
+    otherFeaturesLayer = L.geoJSON(featureCollection as GeoJSON.GeoJsonObject, {
+      style: (feature) => {
+        // Use properties for styling if available, otherwise defaults
+        const props = feature?.properties ?? {};
+        return {
+          color: (props.stroke as string) ?? '#3388ff',
+          weight: (props['stroke-width'] as number) ?? 2,
+          opacity: (props['stroke-opacity'] as number) ?? 1,
+          fillColor: (props.fill as string) ?? '#3388ff',
+          fillOpacity: (props['fill-opacity'] as number) ?? 0.2,
+        };
+      },
+      pointToLayer: (feature, latlng) => {
+        // Render points as circle markers
+        const props = feature?.properties ?? {};
+        return L.circleMarker(latlng, {
+          radius: 6,
+          color: (props.stroke as string) ?? '#3388ff',
+          fillColor: (props.fill as string) ?? '#3388ff',
+          fillOpacity: 0.6,
+        });
+      },
+      onEachFeature: (feature, layer) => {
+        // Add popup with feature info
+        const props = feature?.properties ?? {};
+        const name = (props.name as string) ?? (props.kind as string) ?? 'Feature';
+        layer.bindTooltip(name);
+      },
+    });
+
+    otherFeaturesLayer.addTo(map);
+  }
 
   // Initialize time filter
   timeFilter?.initialize(plot.timeExtent[0], plot.timeExtent[1]);

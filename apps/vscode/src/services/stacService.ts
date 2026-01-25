@@ -14,6 +14,7 @@ import type {
   StacItem,
 } from '../types/stac';
 import type { Plot, Track, ReferenceLocation } from '../types/plot';
+import type { GeoJSONFeature } from '../types/import';
 
 // Type-safe properties to avoid any from geojson
 type SafeProperties = Record<string, unknown>;
@@ -21,13 +22,13 @@ type SafeProperties = Record<string, unknown>;
 // Self-contained geometry type to avoid any
 interface SafeGeometry {
   type: string;
-  coordinates: number[] | number[][];
+  coordinates: number[] | number[][] | number[][][];
 }
 
 // Self-contained feature type to avoid any from geojson Feature
 interface SafeFeature {
   type: 'Feature';
-  geometry: SafeGeometry;
+  geometry: SafeGeometry | null;
   properties: SafeProperties | null;
 }
 
@@ -222,7 +223,10 @@ export class StacService {
         if (features !== null) {
           // Count tracks and locations
           for (const feature of features.features) {
-            if (feature.geometry.type === 'LineString') {
+            const geom = feature.geometry;
+            if (!geom) {continue;} // Skip features with null geometry
+
+            if (geom.type === 'LineString') {
               trackCount++;
 
               // Update time extent from track times
@@ -238,7 +242,7 @@ export class StacService {
                   timeExtent[1] = lastTime;
                 }
               }
-            } else if (feature.geometry.type === 'Point') {
+            } else if (geom.type === 'Point') {
               locationCount++;
             }
           }
@@ -269,7 +273,7 @@ export class StacService {
   async loadPlotData(
     store: StacStore,
     itemPath: string
-  ): Promise<{ tracks: Track[]; locations: ReferenceLocation[] } | null> {
+  ): Promise<{ tracks: Track[]; locations: ReferenceLocation[]; otherFeatures: GeoJSONFeature[] } | null> {
     try {
       const fullPath = path.join(store.path, itemPath);
       const item = await this.loadItem(fullPath);
@@ -286,7 +290,7 @@ export class StacService {
       );
 
       if (!geoJsonAsset) {
-        return { tracks: [], locations: [] };
+        return { tracks: [], locations: [], otherFeatures: [] };
       }
 
       const geoJsonPath = path.resolve(
@@ -296,22 +300,31 @@ export class StacService {
       const featureCollection = await this.loadGeoJson(geoJsonPath);
 
       if (featureCollection === null) {
-        return { tracks: [], locations: [] };
+        return { tracks: [], locations: [], otherFeatures: [] };
       }
 
       const tracks: Track[] = [];
       const locations: ReferenceLocation[] = [];
+      const otherFeatures: GeoJSONFeature[] = [];
 
       for (const feature of featureCollection.features) {
         const props = feature.properties ?? {};
-        if (feature.geometry.type === 'LineString') {
+        const geom = feature.geometry;
+
+        // Skip features with no geometry
+        if (!geom) {
+          continue;
+        }
+
+        if (geom.type === 'LineString' && props.times) {
+          // Track: LineString with times array
           const times = (props.times as string[]) ?? [];
-          const lineCoords = feature.geometry.coordinates as number[][];
+          const lineCoords = geom.coordinates as number[][];
 
           tracks.push({
             id: (props.id as string) ?? `track-${tracks.length}`,
-            name: (props.name as string) ?? `Track ${tracks.length + 1}`,
-            platformType: props.platformType as string | undefined,
+            name: (props.platform_name as string) ?? (props.name as string) ?? `Track ${tracks.length + 1}`,
+            platformType: (props.track_type as string) ?? (props.platformType as string) ?? undefined,
             geometry: { type: 'LineString' as const, coordinates: lineCoords },
             times,
             startTime: times[0] ?? '',
@@ -320,8 +333,9 @@ export class StacService {
             visible: true,
             selected: false,
           });
-        } else if (feature.geometry.type === 'Point') {
-          const pointCoords = feature.geometry.coordinates as number[];
+        } else if (geom.type === 'Point' && props.kind === 'LOCATION') {
+          // Reference location: Point with kind=LOCATION
+          const pointCoords = geom.coordinates as number[];
 
           locations.push({
             id: (props.id as string) ?? `location-${locations.length}`,
@@ -331,10 +345,17 @@ export class StacService {
             visible: true,
             selected: false,
           });
+        } else {
+          // Other features: render with standard GeoJSON layer
+          otherFeatures.push({
+            type: 'Feature',
+            geometry: geom as GeoJSONFeature['geometry'],
+            properties: props,
+          });
         }
       }
 
-      return { tracks, locations };
+      return { tracks, locations, otherFeatures };
     } catch (err) {
       console.error('Failed to load plot data:', err);
       return null;
@@ -477,5 +498,223 @@ export class StacService {
   clearCache(): void {
     this.catalogCache.clear();
     this.itemCache.clear();
+  }
+
+  // ============================================================================
+  // Import Support Methods (REP File Loading)
+  // ============================================================================
+
+  /**
+   * Add source file as asset on a STAC item.
+   * Copies the file to the item's assets directory and updates the item JSON.
+   *
+   * @param storePath Path to the STAC store root
+   * @param itemPath Relative path to the item JSON file
+   * @param sourcePath Absolute path to source file to add
+   * @param assetKey Optional asset key (defaults to filename stem)
+   * @returns Asset key used
+   */
+  async addAsset(
+    storePath: string,
+    itemPath: string,
+    sourcePath: string,
+    assetKey?: string
+  ): Promise<string> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+
+    if (!item) {
+      throw new Error(`Item not found: ${itemPath}`);
+    }
+
+    // Determine asset key from filename if not provided
+    const filename = path.basename(sourcePath);
+    const key = assetKey ?? path.parse(filename).name;
+
+    // Create assets directory if needed
+    const itemDir = path.dirname(fullItemPath);
+    const assetsDir = path.join(itemDir, 'assets');
+    if (!fs.existsSync(assetsDir)) {
+      fs.mkdirSync(assetsDir, { recursive: true });
+    }
+
+    // Copy source file to assets directory
+    const destPath = path.join(assetsDir, filename);
+    fs.copyFileSync(sourcePath, destPath);
+
+    // Add asset reference to item
+    const relativeHref = `./assets/${filename}`;
+    item.assets[key] = {
+      href: relativeHref,
+      type: 'application/x-rep',
+      title: filename,
+      roles: ['source'],
+    };
+
+    // Write updated item
+    fs.writeFileSync(fullItemPath, JSON.stringify(item, null, 2));
+
+    // Clear cache for this item
+    this.itemCache.delete(fullItemPath);
+
+    return key;
+  }
+
+  /**
+   * Append features to a STAC item's GeoJSON data file.
+   *
+   * @param storePath Path to the STAC store root
+   * @param itemPath Relative path to the item JSON file
+   * @param features GeoJSON features to append
+   * @returns Updated total feature count
+   */
+  async addFeatures(
+    storePath: string,
+    itemPath: string,
+    features: SafeFeature[]
+  ): Promise<number> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+
+    if (!item) {
+      throw new Error(`Item not found: ${itemPath}`);
+    }
+
+    // Find or create GeoJSON asset
+    const geoJsonAsset = Object.values(item.assets).find(
+      (asset) =>
+        asset.type === 'application/geo+json' ||
+        asset.href.endsWith('.geojson')
+    );
+
+    const itemDir = path.dirname(fullItemPath);
+    let geoJsonPath: string;
+    let featureCollection: SafeFeatureCollection;
+
+    if (geoJsonAsset) {
+      geoJsonPath = path.resolve(itemDir, geoJsonAsset.href);
+      const existing = await this.loadGeoJson(geoJsonPath);
+      featureCollection = existing ?? { type: 'FeatureCollection', features: [] };
+    } else {
+      // Create new GeoJSON file
+      const geoJsonFilename = `${item.id}.geojson`;
+      geoJsonPath = path.join(itemDir, geoJsonFilename);
+      featureCollection = { type: 'FeatureCollection', features: [] };
+
+      // Add asset reference
+      item.assets['data'] = {
+        href: `./${geoJsonFilename}`,
+        type: 'application/geo+json',
+        title: 'Plot Data',
+        roles: ['data'],
+      };
+    }
+
+    // Append new features
+    featureCollection.features.push(...features);
+
+    // Update bbox if features have coordinates
+    const newBbox = this.calculateBboxFromFeatures(featureCollection.features);
+    if (newBbox) {
+      item.bbox = newBbox;
+    }
+
+    // Write updated GeoJSON
+    fs.writeFileSync(geoJsonPath, JSON.stringify(featureCollection, null, 2));
+
+    // Write updated item (with new bbox)
+    fs.writeFileSync(fullItemPath, JSON.stringify(item, null, 2));
+
+    // Clear caches
+    this.itemCache.delete(fullItemPath);
+
+    return featureCollection.features.length;
+  }
+
+  /**
+   * Check if an asset key already exists on a STAC item.
+   * Used for duplicate import detection.
+   *
+   * @param storePath Path to the STAC store root
+   * @param itemPath Relative path to the item JSON file
+   * @param assetKey Asset key to check
+   * @returns True if asset exists
+   */
+  async hasAsset(
+    storePath: string,
+    itemPath: string,
+    assetKey: string
+  ): Promise<boolean> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+
+    if (!item) {
+      return false;
+    }
+
+    return assetKey in item.assets;
+  }
+
+  /**
+   * Calculate bounding box from features
+   */
+  private calculateBboxFromFeatures(
+    features: SafeFeature[]
+  ): [number, number, number, number] | null {
+    let minLon = Infinity;
+    let minLat = Infinity;
+    let maxLon = -Infinity;
+    let maxLat = -Infinity;
+
+    for (const feature of features) {
+      if (!feature.geometry) {continue;} // Skip features with null geometry
+      const coords = this.extractCoordinates(feature.geometry);
+      for (const [lon, lat] of coords) {
+        if (typeof lon === 'number' && typeof lat === 'number') {
+          minLon = Math.min(minLon, lon);
+          minLat = Math.min(minLat, lat);
+          maxLon = Math.max(maxLon, lon);
+          maxLat = Math.max(maxLat, lat);
+        }
+      }
+    }
+
+    if (minLon === Infinity) {
+      return null;
+    }
+
+    return [minLon, minLat, maxLon, maxLat];
+  }
+
+  /**
+   * Extract all coordinates from a geometry
+   */
+  private extractCoordinates(geometry: SafeGeometry): number[][] {
+    const coords: number[][] = [];
+
+    if (geometry.type === 'Point') {
+      const point = geometry.coordinates as number[];
+      if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {
+        coords.push([point[0], point[1]]);
+      }
+    } else if (geometry.type === 'LineString') {
+      const line = geometry.coordinates as number[][];
+      for (const point of line) {
+        if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {
+          coords.push([point[0], point[1]]);
+        }
+      }
+    } else if (geometry.type === 'Polygon') {
+      const rings = geometry.coordinates as unknown as number[][][];
+      for (const ring of rings) {
+        for (const point of ring) {
+          if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {
+            coords.push([point[0], point[1]]);
+          }
+        }
+      }
+    }
+
+    return coords;
   }
 }
