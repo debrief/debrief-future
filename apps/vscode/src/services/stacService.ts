@@ -22,13 +22,13 @@ type SafeProperties = Record<string, unknown>;
 // Self-contained geometry type to avoid any
 interface SafeGeometry {
   type: string;
-  coordinates: number[] | number[][];
+  coordinates: number[] | number[][] | number[][][];
 }
 
 // Self-contained feature type to avoid any from geojson Feature
 interface SafeFeature {
   type: 'Feature';
-  geometry: SafeGeometry;
+  geometry: SafeGeometry | null;
   properties: SafeProperties | null;
 }
 
@@ -223,7 +223,10 @@ export class StacService {
         if (features !== null) {
           // Count tracks and locations
           for (const feature of features.features) {
-            if (feature.geometry.type === 'LineString') {
+            const geom = feature.geometry;
+            if (!geom) continue; // Skip features with null geometry
+
+            if (geom.type === 'LineString') {
               trackCount++;
 
               // Update time extent from track times
@@ -239,7 +242,7 @@ export class StacService {
                   timeExtent[1] = lastTime;
                 }
               }
-            } else if (feature.geometry.type === 'Point') {
+            } else if (geom.type === 'Point') {
               locationCount++;
             }
           }
@@ -287,7 +290,7 @@ export class StacService {
       );
 
       if (!geoJsonAsset) {
-        return { tracks: [], locations: [] };
+        return { tracks: [], locations: [], otherFeatures: [] };
       }
 
       const geoJsonPath = path.resolve(
@@ -664,6 +667,7 @@ export class StacService {
     let maxLat = -Infinity;
 
     for (const feature of features) {
+      if (!feature.geometry) continue; // Skip features with null geometry
       const coords = this.extractCoordinates(feature.geometry);
       for (const [lon, lat] of coords) {
         if (typeof lon === 'number' && typeof lat === 'number') {
