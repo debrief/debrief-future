@@ -131,9 +131,16 @@ export function MapView({
   style,
   height = 400,
 }: MapViewProps) {
-  // Normalize features to array
+  // Normalize features to array and filter out features that can't be rendered
   const featureArray = useMemo(() => {
-    return Array.isArray(features) ? features : features.features;
+    const arr = Array.isArray(features) ? features : features.features;
+    // Filter out features with null geometry or empty coordinates
+    return arr.filter((f) => {
+      if (!f.geometry) return false;
+      const coords = f.geometry.coordinates;
+      if (Array.isArray(coords) && coords.length === 0) return false;
+      return true;
+    });
   }, [features]);
 
   // Calculate bounds for auto-fit
