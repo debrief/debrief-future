@@ -39,6 +39,21 @@ classes:
         minimum_cardinality: 2
         maximum_cardinality: 2
 
+  GeoJSONEmptyPoint:
+    description: GeoJSON Point geometry with empty coordinates (for non-spatial features)
+    attributes:
+      type:
+        description: Geometry type discriminator
+        range: string
+        required: true
+        equals_string: "Point"
+      coordinates:
+        description: Empty array for non-spatial features
+        range: float
+        multivalued: true
+        required: true
+        maximum_cardinality: 0
+
   GeoJSONLineString:
     description: GeoJSON LineString geometry
     attributes:
@@ -190,4 +205,66 @@ classes:
       properties:
         description: Reference metadata
         range: ReferenceLocationProperties
+        required: true
+
+# ============================================================================
+# SystemState (Non-spatial system state features)
+# ============================================================================
+
+  SystemStateProperties:
+    description: Properties for SYSTEM features storing application state
+    attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "SYSTEM"
+      state_type:
+        description: Discriminator for state variant (temporal, spatial, selection)
+        range: SystemStateTypeEnum
+        required: true
+      # Temporal viewport fields (when state_type = temporal)
+      start_time:
+        description: Viewport start time (ISO8601) - for temporal state
+        range: datetime
+      end_time:
+        description: Viewport end time (ISO8601) - for temporal state
+        range: datetime
+      # Spatial viewport fields (when state_type = spatial)
+      bbox:
+        description: Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state
+        range: float
+        multivalued: true
+      zoom:
+        description: Map zoom level - for spatial state
+        range: float
+      center:
+        description: Map center [longitude, latitude] - for spatial state
+        range: float
+        multivalued: true
+      # Selection state fields (when state_type = selection)
+      selected_ids:
+        description: Array of selected feature IDs - for selection state
+        range: string
+        multivalued: true
+
+  SystemState:
+    description: GeoJSON Feature for storing non-spatial system state
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: State identifier (must start with 'state.')
+        required: true
+        pattern: "^state\\.[a-z]+$"
+      geometry:
+        description: Point geometry with empty coordinates for SYSTEM features
+        range: GeoJSONEmptyPoint
+        required: true
+      properties:
+        description: State-specific properties
+        range: SystemStateProperties
         required: true

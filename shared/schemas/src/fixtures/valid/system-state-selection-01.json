@@ -1,0 +1,13 @@
+{
+  "type": "Feature",
+  "id": "state.selection",
+  "geometry": {
+    "type": "Point",
+    "coordinates": []
+  },
+  "properties": {
+    "kind": "SYSTEM",
+    "state_type": "selection",
+    "selected_ids": ["track-001", "track-002", "ref-waypoint-alpha"]
+  }
+}

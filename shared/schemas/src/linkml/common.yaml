@@ -39,6 +39,8 @@ enums:
         description: Text annotation at a position (Point geometry)
       VECTOR:
         description: Vector annotation (LineString geometry, origin+range+bearing in properties)
+      SYSTEM:
+        description: Non-spatial system state (null geometry, reserved state.* IDs)
 
   TrackTypeEnum:
     description: Type of track feature
@@ -97,6 +99,16 @@ enums:
         description: Rounded corner
       bevel:
         description: Flat corner
+
+  SystemStateTypeEnum:
+    description: Discriminator for system state variants
+    permissible_values:
+      temporal:
+        description: Time viewport state (start/end times)
+      spatial:
+        description: Map viewport state (bbox, zoom)
+      selection:
+        description: Feature selection state (selected IDs)
 
 # ============================================================================
 # Types

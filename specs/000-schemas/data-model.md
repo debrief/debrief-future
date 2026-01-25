@@ -29,7 +29,7 @@ Future iterations will add: SensorContact, PlotMetadata, ToolMetadata.
 
 All features include a `kind` field in their properties to enable schema-based type identification. This allows consumers to dispatch to the correct schema based on a single field check, rather than inferring type from geometry or checking for type-specific fields.
 
-See [ADR-001: Feature Kind Discriminator](/docs/adr/001-feature-kind-discriminator.md) for design rationale.
+See [ADR-004: Feature Kind Discriminator](/docs/project_notes/decisions.md#adr-004-feature-kind-discriminator-2026-01-15) for design rationale.
 
 ### FeatureKindEnum
 

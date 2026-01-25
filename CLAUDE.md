@@ -113,6 +113,90 @@ fly machines restart --app debrief-demo
 | TypeScript packaging | pnpm workspaces |
 | User config | XDG Base Directory |
 
+## Parallel Sessions (Worktrees)
+
+Run multiple Claude Code sessions concurrently using git worktrees.
+
+### How It Works
+
+| Environment | Behavior | Detection |
+|-------------|----------|-----------|
+| **Local device** | Creates worktree in `../worktrees/` | `../worktrees/` directory exists |
+| **Cloud (Claude Code)** | Creates branch (single session) | `CLAUDE_CODE_SESSION_ID` env var |
+
+### Setup for Local Parallel Development
+
+```bash
+# One-time setup: create worktrees directory
+mkdir ../worktrees
+
+# Now /speckit.start will automatically create worktrees
+```
+
+### Environment Variables
+
+| Variable | Values | Effect |
+|----------|--------|--------|
+| `SPECKIT_WORKTREES` | `true` | Force worktree mode |
+| `SPECKIT_WORKTREES` | `false` | Force branch mode |
+| (unset) | — | Auto-detect based on environment |
+
+### Workflow
+
+1. Run `/speckit.start 007` in main repo
+2. Script creates `../worktrees/007-feature-name/`
+3. Output shows: `cd ../worktrees/007-feature-name`
+4. Open new terminal/Claude session in that directory
+5. Continue with `/speckit.specify`, `/speckit.plan`, etc.
+
+### Managing Worktrees
+
+```bash
+# List all worktrees
+git worktree list
+
+# Remove a worktree (after PR merged)
+git worktree remove ../worktrees/007-feature-name
+
+# Prune stale worktree entries
+git worktree prune
+```
+
+### Cleanup Utilities
+
+The `common.sh` script provides cleanup functions:
+
+```bash
+# Source the utilities
+source .specify/scripts/bash/common.sh
+
+# List worktrees with status (active/merged/stale)
+list_worktrees_with_status
+
+# Get count of cleanable worktrees
+get_stale_worktree_count
+
+# Preview cleanup (dry run)
+cleanup_stale_worktrees --dry-run
+
+# Execute cleanup (removes merged/stale worktrees)
+cleanup_stale_worktrees
+
+# Force cleanup (removes even with uncommitted changes)
+cleanup_stale_worktrees --force
+```
+
+**When cleanup happens:**
+- `/speckit.start` checks for stale worktrees (where backlog item is complete)
+- Manual cleanup anytime via `cleanup_stale_worktrees`
+- Worktrees persist through PR review cycle for feedback iterations
+
+### Script Flags
+
+The `create-new-feature.sh` script accepts:
+- `--worktree` — Force worktree creation
+- `--no-worktree` — Force branch checkout (current behavior)
+
 ## Key Documents
 
 - `CONSTITUTION.md` — immutable development principles (supersedes all other docs)
@@ -145,7 +229,46 @@ Three approaches required:
 - N/A (pure display components — no persistence) (001-shared-react-components)
 - Python 3.11+ (LinkML, Pydantic), TypeScript 5.x (generated types) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS) (014-geojson-styling-schemas)
 - N/A (schema definitions only - no persistence) (014-geojson-styling-schemas)
+- YAML (Taskfile.yml v3 syntax) + Task v3.x (go-task/task), uv (Python), pnpm (Node.js) (017-task-build)
+- N/A (configuration only) (017-task-build)
+- TypeScript 5.x (VS Code Extension) + @vscode/api ^1.85.0 (017-vscode-hide-activities)
+- VS Code `context.globalState` for initialization tracking, user settings for visibility config (017-vscode-hide-activities)
+- Python 3.11+ (LinkML generators, Pydantic models), TypeScript 5.x (generated types) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS) (022-system-kind-discriminator)
+- Markdown (skill definition), Bash (gh CLI integration) + Claude Code Skill system, GitHub CLI (`gh`), Opus model (023-epic-workflow-support)
+- BACKLOG.md (epics and items tables), GitHub issues (023-epic-workflow-support)
+- TypeScript 5.x (shared library, Storybook harness, VS Code extension) + React 18+, Storybook 8.x, Vitest, Playwright (027-context-tool-offering)
+- N/A (pure matching logic, no persistence in Phases 1-2) (027-context-tool-offering)
+- TypeScript 5.x (state server + VS Code extension), Python 3.11+ (MCP client library) + Zustand ^5.0.0, Zundo ^2.0.0, Express ^4.18.0, @modelcontextprotocol/sdk ^1.0.0, better-sse ^1.0.0, Zod ^3.22.0, Vitest ^1.0.0, Playwright ^1.40.0 (024-document-session-state)
+- JSON file at user-defined path (session persistence) (024-document-session-state)
 
 ## Recent Changes
+- 024-document-session-state: Added TypeScript 5.x + Zustand, Zundo, Express, MCP SDK, better-sse for session state management with Python client library
 - 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v5+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 10.x
 - 000-schemas: Added Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS)
+
+## Project Memory System
+
+Institutional knowledge lives in `docs/project_notes/` for consistency across sessions.
+
+### Memory Files
+
+- **bugs.md** - Bug log with dates, solutions, prevention notes
+- **decisions.md** - Architectural Decision Records (ADRs) with context and trade-offs
+- **key_facts.md** - Project configuration, URLs, important constants
+- **issues.md** - Work log with ticket IDs and URLs
+
+### Memory-Aware Protocols
+
+**Before proposing architectural changes:**
+- Check `docs/project_notes/decisions.md` for existing decisions
+- If conflicts exist, acknowledge and explain why change is warranted
+
+**When encountering errors:**
+- Search `docs/project_notes/bugs.md` for similar issues
+- Document new bugs and solutions when resolved
+
+**When looking up project config:**
+- Check `docs/project_notes/key_facts.md` first
+
+**When completing work:**
+- Log in `docs/project_notes/issues.md` with ticket ID and URL

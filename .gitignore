@@ -212,6 +212,13 @@ node_modules/
 .npm
 .pnpm-store/
 
+# Electron build artifacts
+apps/loader/release/
+apps/loader/packaging/dist/
+
+# Task runner cache
+.task/
+
 # OS files
 .DS_Store
 Thumbs.db
