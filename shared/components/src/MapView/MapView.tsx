@@ -9,14 +9,19 @@ import { isTrackFeature } from '../utils/types';
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 
+// Import marker icons as modules so Vite bundles them with correct paths
+// Icons bundled for offline support (CONSTITUTION.md)
+import markerIcon from '../assets/marker-icon.png';
+import markerIcon2x from '../assets/marker-icon-2x.png';
+import markerShadow from '../assets/marker-shadow.png';
+
 // Fix Leaflet marker icons not loading in bundled environments
-// Icons are bundled in public/images/ for offline support (CONSTITUTION.md)
 // @ts-expect-error - Leaflet types don't include _getIconUrl
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconUrl: '/images/marker-icon.png',
-  iconRetinaUrl: '/images/marker-icon-2x.png',
-  shadowUrl: '/images/marker-shadow.png',
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
 });
 
 export interface MapViewProps {
