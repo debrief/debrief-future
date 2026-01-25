@@ -43,7 +43,12 @@ export default meta;
 type Story = StoryObj<typeof MapView>;
 
 // Type assertion for the imported JSON
-const shapesFeatureCollection = allShapesData as unknown as DebriefFeatureCollection;
+// Filter out features with null geometry (TRACKSPLIT, etc.) which can't be rendered on the map
+const rawData = allShapesData as unknown as DebriefFeatureCollection;
+const shapesFeatureCollection: DebriefFeatureCollection = {
+  type: 'FeatureCollection',
+  features: rawData.features.filter((f) => f.geometry !== null),
+};
 
 // Count shapes by kind for display
 const shapeCounts = shapesFeatureCollection.features.reduce(
@@ -80,7 +85,7 @@ All annotation shapes parsed from the test REP file.
   },
 };
 
-// Filter by shape category
+// Filter by shape category (already excludes null geometries via shapesFeatureCollection)
 function filterByKinds(kinds: string[]): DebriefFeatureCollection {
   return {
     type: 'FeatureCollection',
