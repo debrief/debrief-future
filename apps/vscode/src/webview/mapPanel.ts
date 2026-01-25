@@ -12,6 +12,7 @@ import type { ResultLayer } from '../types/tool';
 import type {
   ExtensionToWebviewMessage,
   WebviewToExtensionMessage,
+  GeoJSONFeature,
 } from './messages';
 import type { IoService } from '../services/ioService';
 import type { StacService } from '../services/stacService';
@@ -149,7 +150,7 @@ export class MapPanel {
     plot: Plot,
     tracks: Track[],
     locations: ReferenceLocation[],
-    otherFeatures: Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> = []
+    otherFeatures: GeoJSONFeature[] = []
   ): void {
     this.currentPlot = plot;
     this.currentTracks = tracks;

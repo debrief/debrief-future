@@ -58,11 +58,12 @@ interface ResponseMessage extends Message {
 /** GeoJSON feature for fallback rendering */
 export interface GeoJSONFeature {
   type: 'Feature';
+  id?: string;
   geometry: {
     type: string;
     coordinates: unknown;
   };
-  properties: Record<string, unknown>;
+  properties: Record<string, unknown> | null;
 }
 
 /** Load a plot into the webview */
