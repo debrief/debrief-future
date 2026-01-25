@@ -25,6 +25,7 @@ export class IoService {
 
     // Use configured path if explicitly set, otherwise auto-detect
     this.pythonPath = configuredPath || this.findPythonPath(extensionPath);
+    console.log('[IoService] Using Python path:', this.pythonPath);
   }
 
   /**
@@ -91,11 +92,17 @@ export class IoService {
 
       const message = error instanceof Error ? error.message : String(error);
 
+      // Log full error for debugging
+      console.error('[IoService] Parse error:', message);
+
       // Try to extract line number from error message
       const lineMatch = message.match(/line\s+(\d+)/i);
       const lineNumber = lineMatch && lineMatch[1] ? parseInt(lineMatch[1], 10) : undefined;
 
-      throw new RepParseError(filePath, lineNumber, undefined, 'PARSE_FAILED');
+      // Include actual error message in the thrown error
+      const parseError = new RepParseError(filePath, lineNumber, undefined, 'PARSE_FAILED');
+      parseError.message = `Failed to parse REP file: ${message}`;
+      throw parseError;
     }
   }
 
