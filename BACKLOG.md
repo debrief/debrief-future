@@ -113,6 +113,7 @@ Description formats:
 | 001 | Infrastructure | Extract shared MCP utilities into mcp-common package | 3 | 2 | 4 | 9 | Medium | proposed |
 | 010 | Tech Debt | Add rollback/cleanup API to debrief-stac for interrupted operations | 3 | 1 | 4 | 8 | Medium | proposed |
 | 027 | Infrastructure | [Add automated screenshot capture for Storybook stories](docs/ideas/027-automated-screenshots.md) | 3 | 4 | 4 | 11 | Medium | approved |
+| 028 | Infrastructure | [Reinstate Playwright E2E testing in CI](docs/ideas/028-reinstate-playwright-ci.md) | 4 | 2 | 5 | 11 | Medium | approved |
 | 012 | Enhancement | Wire loader plot count to debrief-stac list_plots call | 2 | 1 | 5 | 8 | Low | proposed |
 | 027 | Documentation | [Document vscrui as standard component library for VS Code webviews](docs/ideas/027-vscrui-component-library.md) | 3 | 1 | 5 | 9 | Low | approved |
 | 027 | Documentation | [Document Storybook VS Code theming setup](docs/ideas/027-storybook-vscode-theming.md) | 2 | 2 | 5 | 9 | Low | approved |
