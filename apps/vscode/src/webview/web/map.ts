@@ -172,46 +172,54 @@ function setupDropZone(): void {
     e.stopPropagation();
     mapContainer.classList.remove('drop-active');
 
+    // Get URI list (VS Code explorer uses text/uri-list)
+    const uriList = e.dataTransfer?.getData('text/uri-list');
+
+    // Try multiple approaches to get dropped file path
+    let droppedFilePath: string | null = null;
+
+    // Approach 1: VS Code URI list (from VS Code explorer)
+    if (uriList) {
+      const uris = uriList.split('\n').filter((u: string) => u.trim() && !u.startsWith('#'));
+      if (uris.length > 0) {
+        droppedFilePath = uris[0] ?? null;
+      }
+    }
+
+    // Approach 2: Native file drop (if not from VS Code)
     const files = e.dataTransfer?.files;
-    if (!files || files.length === 0) {
-      return;
-    }
-
-    // Check for multiple files
-    if (files.length > 1) {
-      showDropError('Only single file import is supported. Please drop one file at a time.');
-      return;
-    }
-
-    const file = files[0];
-
-    // Check file extension
-    if (!file.name.toLowerCase().endsWith('.rep')) {
-      showDropError(`Cannot import "${file.name}": only .rep files are supported.`);
-      return;
-    }
-
-    // Get file URI - in VS Code webview, we need to use the path
-    // The dataTransfer contains file:// URIs
-    const items = e.dataTransfer?.items;
-    if (items && items.length > 0) {
-      const item = items[0];
-      if (item.kind === 'file') {
-        const fileEntry = item.getAsFile();
-        if (fileEntry) {
-          // In webview context, we have access to the file path via webkitRelativePath
-          // or we need to send the file data to extension host
-          // For VS Code webviews, the extension host handles file system access
-
-          // Send drop message to extension with file name
-          // Extension will use VS Code APIs to locate the file
-          vscode.postMessage({
-            type: 'repFileDrop',
-            uris: [(fileEntry as File & { path?: string }).path ?? file.name],
-          });
+    if (!droppedFilePath && files && files.length > 0) {
+      const items = e.dataTransfer?.items;
+      if (items && items.length > 0) {
+        const item = items[0];
+        if (item.kind === 'file') {
+          const fileEntry = item.getAsFile();
+          droppedFilePath = (fileEntry as File & { path?: string })?.path ?? null;
         }
       }
     }
+
+    if (!droppedFilePath) {
+      showDropError('Could not read dropped file. Try using right-click menu instead.');
+      return;
+    }
+
+    // Convert file:// URI to path if needed
+    if (droppedFilePath.startsWith('file://')) {
+      droppedFilePath = decodeURIComponent(droppedFilePath.slice(7));
+    }
+
+    // Check file extension
+    if (!droppedFilePath.toLowerCase().endsWith('.rep')) {
+      const filename = droppedFilePath.split('/').pop() ?? droppedFilePath;
+      showDropError(`Cannot import "${filename}": only .rep files are supported.`);
+      return;
+    }
+
+    vscode.postMessage({
+      type: 'repFileDrop',
+      uris: [droppedFilePath],
+    });
   });
 }
 

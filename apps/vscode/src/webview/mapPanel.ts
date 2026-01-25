@@ -714,7 +714,7 @@ export class MapPanel {
       // Reload plot data to get new tracks
       stacService.clearCache();
       const updatedData = await stacService.loadPlotData(
-        currentStore.path,
+        currentStore,
         currentPlot.itemPath
       );
 

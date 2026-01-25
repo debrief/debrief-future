@@ -119,9 +119,12 @@ export function createOpenPlotCommand(
         toolsTreeProvider.updateSelection(selection);
       });
 
-      // Clear reference when panel is disposed
+      // Clear reference and layers when panel is disposed
       panel.getPanel().onDidDispose(() => {
         setMapPanel(undefined);
+        layersTreeProvider.setTracks([]);
+        layersTreeProvider.setLocations([]);
+        layersTreeProvider.setResultLayers([]);
       });
     }
 
