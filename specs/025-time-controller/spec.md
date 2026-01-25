@@ -97,6 +97,7 @@ A power user performing intensive analysis wants to control playback without mov
 - **FR-011**: System MUST support keyboard shortcut Space to toggle play/pause when the panel has focus.
 - **FR-012**: System MUST support keyboard shortcuts Left/Right arrows to scrub backward/forward in small increments when the panel has focus.
 - **FR-013**: System MUST support user-selectable light/dark theme independent of host environment (for Storybook compatibility).
+- **FR-014**: System MUST provide a toggle switch to switch between "Full" track display (entire track visible) and "Trail" mode (snail trail showing track up to current time only).
 
 ### Key Entities
 
@@ -114,6 +115,7 @@ A power user performing intensive analysis wants to control playback without mov
 - Q: Visual feedback during scrubbing? → A: Permanent time display updates in real-time (no tooltip needed)
 - Q: Where should the time display appear? → A: Above the scrubber as a header row
 - Q: Theme adaptation for VS Code? → A: User-selectable theme (independent, for Storybook compatibility)
+- Q: Toggle UI for track display mode (full vs snail trail)? → A: Toggle switch with labels (Full / Trail)
 
 ## User Interface Flow
 
