@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.io/schemas/annotation-shapes",
+  "title": "Annotation Shape Types",
+  "description": "JSON Schema for Phase 2 and Phase 3 REP annotation shapes",
+  "definitions": {
+    "Position": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "[longitude, latitude]"
+    },
+    "PolygonProperties": {
+      "type": "object",
+      "properties": {
+        "fill": { "type": "boolean" },
+        "fill_color": { "type": "string" },
+        "fill_opacity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "stroke": { "type": "boolean" },
+        "color": { "type": "string" },
+        "weight": { "type": "number", "minimum": 0 },
+        "opacity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "dash_array": { "type": "string" }
+      },
+      "required": ["fill", "fill_color", "fill_opacity", "stroke", "color", "weight", "opacity"]
+    },
+    "LineProperties": {
+      "type": "object",
+      "properties": {
+        "stroke": { "type": "boolean" },
+        "color": { "type": "string" },
+        "weight": { "type": "number", "minimum": 0 },
+        "opacity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "dash_array": { "type": "string" }
+      },
+      "required": ["stroke", "color", "weight", "opacity"]
+    },
+    "PointProperties": {
+      "type": "object",
+      "properties": {
+        "shape": { "type": "string", "enum": ["circle", "square", "triangle"] },
+        "radius": { "type": "number", "minimum": 0 },
+        "fill": { "type": "boolean" },
+        "fill_color": { "type": "string" },
+        "fill_opacity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "stroke": { "type": "boolean" },
+        "color": { "type": "string" },
+        "weight": { "type": "number", "minimum": 0 },
+        "opacity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "legacy_style": { "type": "string" }
+      },
+      "required": ["shape", "radius", "fill", "fill_color", "fill_opacity", "stroke", "color", "weight", "opacity"]
+    },
+    "BaseAnnotationProperties": {
+      "type": "object",
+      "properties": {
+        "kind": { "type": "string" },
+        "label": { "type": "string" },
+        "symbol": { "type": "string" },
+        "source_file": { "type": "string" },
+        "line_number": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["kind", "source_file", "line_number"]
+    },
+    "EllipseAnnotation": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "Feature" },
+        "id": { "type": "string", "format": "uuid" },
+        "geometry": {
+          "type": "object",
+          "properties": {
+            "type": { "const": "Polygon" },
+            "coordinates": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/Position" }
+              }
+            }
+          },
+          "required": ["type", "coordinates"]
+        },
+        "properties": {
+          "allOf": [
+            { "$ref": "#/definitions/BaseAnnotationProperties" },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "const": "ELLIPSE" },
+                "center": { "$ref": "#/definitions/Position" },
+                "semi_major": { "type": "number", "exclusiveMinimum": 0 },
+                "semi_minor": { "type": "number", "exclusiveMinimum": 0 },
+                "orientation": { "type": "number", "minimum": 0, "maximum": 360 },
+                "timestamp": { "type": "string", "format": "date-time" },
+                "style": { "$ref": "#/definitions/PolygonProperties" }
+              },
+              "required": ["kind", "center", "semi_major", "semi_minor", "orientation", "timestamp", "style"]
+            }
+          ]
+        }
+      },
+      "required": ["type", "id", "geometry", "properties"]
+    },
+    "WheelAnnotation": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "Feature" },
+        "id": { "type": "string", "format": "uuid" },
+        "geometry": {
+          "type": "object",
+          "properties": {
+            "type": { "const": "Polygon" },
+            "coordinates": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/Position" }
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "required": ["type", "coordinates"]
+        },
+        "properties": {
+          "allOf": [
+            { "$ref": "#/definitions/BaseAnnotationProperties" },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "const": "WHEEL" },
+                "center": { "$ref": "#/definitions/Position" },
+                "inner_radius": { "type": "number", "exclusiveMinimum": 0 },
+                "outer_radius": { "type": "number", "exclusiveMinimum": 0 },
+                "style": { "$ref": "#/definitions/PolygonProperties" }
+              },
+              "required": ["kind", "center", "inner_radius", "outer_radius", "style"]
+            }
+          ]
+        }
+      },
+      "required": ["type", "id", "geometry", "properties"]
+    },
+    "SensorAnnotation": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "Feature" },
+        "id": { "type": "string", "format": "uuid" },
+        "geometry": {
+          "type": "object",
+          "properties": {
+            "type": { "const": "LineString" },
+            "coordinates": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/Position" },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "required": ["type", "coordinates"]
+        },
+        "properties": {
+          "allOf": [
+            { "$ref": "#/definitions/BaseAnnotationProperties" },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "const": "SENSOR" },
+                "track_id": { "type": "string" },
+                "bearing": { "type": "number", "minimum": 0, "maximum": 360 },
+                "range": { "type": "number", "exclusiveMinimum": 0 },
+                "sensor_type": { "type": "string" },
+                "style": { "$ref": "#/definitions/LineProperties" }
+              },
+              "required": ["kind", "track_id", "bearing", "range", "sensor_type", "style"]
+            }
+          ]
+        }
+      },
+      "required": ["type", "id", "geometry", "properties"]
+    },
+    "TracksplitAnnotation": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "Feature" },
+        "id": { "type": "string", "format": "uuid" },
+        "geometry": { "type": "null" },
+        "properties": {
+          "allOf": [
+            { "$ref": "#/definitions/BaseAnnotationProperties" },
+            {
+              "type": "object",
+              "properties": {
+                "kind": { "const": "TRACKSPLIT" },
+                "track_id": { "type": "string" },
+                "timestamp": { "type": "string", "format": "date-time" }
+              },
+              "required": ["kind", "track_id", "timestamp"]
+            }
+          ]
+        }
+      },
+      "required": ["type", "id", "geometry", "properties"]
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/definitions/EllipseAnnotation" },
+    { "$ref": "#/definitions/WheelAnnotation" },
+    { "$ref": "#/definitions/SensorAnnotation" },
+    { "$ref": "#/definitions/TracksplitAnnotation" }
+  ]
+}

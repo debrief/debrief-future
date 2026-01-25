@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
 import type { PathOptions, LatLngBoundsExpression } from 'leaflet';
 import type { DebriefFeature, DebriefFeatureCollection, Bounds } from '../utils/types';
 import { calculateBounds, expandBounds } from '../utils/bounds';
@@ -7,6 +8,21 @@ import { getFeatureColor, getFeatureLabel } from '../utils/labels';
 import { isTrackFeature } from '../utils/types';
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
+
+// Import marker icons as modules so Vite bundles them with correct paths
+// Icons bundled for offline support (CONSTITUTION.md)
+import markerIcon from '../assets/marker-icon.png';
+import markerIcon2x from '../assets/marker-icon-2x.png';
+import markerShadow from '../assets/marker-shadow.png';
+
+// Fix Leaflet marker icons not loading in bundled environments
+// @ts-expect-error - Leaflet types don't include _getIconUrl
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
+});
 
 export interface MapViewProps {
   /** GeoJSON features to display */
@@ -131,9 +147,16 @@ export function MapView({
   style,
   height = 400,
 }: MapViewProps) {
-  // Normalize features to array
+  // Normalize features to array and filter out features that can't be rendered
   const featureArray = useMemo(() => {
-    return Array.isArray(features) ? features : features.features;
+    const arr = Array.isArray(features) ? features : features.features;
+    // Filter out features with null geometry or empty coordinates
+    return arr.filter((f) => {
+      if (!f.geometry) return false;
+      const coords = f.geometry.coordinates;
+      if (Array.isArray(coords) && coords.length === 0) return false;
+      return true;
+    });
   }, [features]);
 
   // Calculate bounds for auto-fit

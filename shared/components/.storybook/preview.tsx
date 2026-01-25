@@ -9,10 +9,11 @@ import type { ThemeVariant } from '../src/ThemeProvider/ThemeContext';
 const withThemeProvider: Decorator = (Story, context) => {
   const theme = context.globals.theme as ThemeVariant;
 
-  return React.createElement(
-    ThemeProvider,
-    { theme: { variant: theme } },
-    React.createElement(Story)
+  // Use JSX syntax for proper Story component rendering
+  return (
+    <ThemeProvider theme={{ variant: theme }}>
+      <Story />
+    </ThemeProvider>
   );
 };
 
