@@ -5,13 +5,9 @@ Ensures that track parsing is UNCHANGED when annotation support is added.
 These tests establish a baseline and verify no regression occurs.
 """
 
-from pathlib import Path
-
 import pytest
+
 from debrief_io.handlers.rep import REPHandler
-
-
-FIXTURES_DIR = Path(__file__).parent.parent / "fixtures" / "valid"
 
 
 @pytest.fixture
@@ -20,13 +16,14 @@ def rep_handler():
     return REPHandler()
 
 
+@pytest.fixture
+def shapes_content(valid_fixtures_dir):
+    """Load shapes.rep fixture."""
+    return (valid_fixtures_dir / "shapes.rep").read_text()
+
+
 class TestTrackRegressionBoat1:
     """Regression tests using boat1.rep fixture."""
-
-    @pytest.fixture
-    def boat1_content(self):
-        """Load boat1.rep fixture."""
-        return (FIXTURES_DIR / "boat1.rep").read_text()
 
     def test_track_count_unchanged(self, rep_handler, boat1_content):
         """Verify exactly one track is parsed from boat1.rep."""
@@ -88,11 +85,6 @@ class TestTrackRegressionBoat1:
 class TestTrackRegressionShapesRep:
     """Regression tests for tracks in shapes.rep (mixed tracks and annotations)."""
 
-    @pytest.fixture
-    def shapes_content(self):
-        """Load shapes.rep fixture."""
-        return (FIXTURES_DIR / "shapes.rep").read_text()
-
     def test_track_parsing_with_annotations(self, rep_handler, shapes_content):
         """Verify tracks are parsed correctly alongside annotations."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
@@ -131,11 +123,6 @@ class TestTrackRegressionShapesRep:
 
 class TestAnnotationCountInShapesRep:
     """Test annotation parsing counts for shapes.rep."""
-
-    @pytest.fixture
-    def shapes_content(self):
-        """Load shapes.rep fixture."""
-        return (FIXTURES_DIR / "shapes.rep").read_text()
 
     def test_circle_annotations_parsed(self, rep_handler, shapes_content):
         """Verify CIRCLE annotations are parsed."""
