@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Session State Debug Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Session State Debug Dashboard</h1>
+    <div class="server-config">
+      <label for="server-url">Server URL:</label>
+      <input type="text" id="server-url" value="http://localhost:3001">
+      <button id="connect-btn">Connect</button>
+      <span id="connection-status" class="status disconnected">Disconnected</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <!-- Temporal Slice -->
+      <section class="slice" id="temporal-slice">
+        <h2>Temporal</h2>
+        <div class="fields">
+          <div class="field">
+            <label>Current Time</label>
+            <div class="value" data-field="temporal.currentTime">
+              <span class="display">--</span>
+              <input type="text" class="edit" style="display:none">
+            </div>
+          </div>
+          <div class="field">
+            <label>Time Range</label>
+            <div class="value" data-field="temporal.timeRange">
+              <span class="display">--</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Playback Rate</label>
+            <div class="value editable" data-field="temporal.playbackRate">
+              <span class="display">1.0</span>
+              <input type="number" class="edit" min="0.1" max="100" step="0.1" style="display:none">
+            </div>
+          </div>
+          <div class="field">
+            <label>Playback State</label>
+            <div class="value" data-field="temporal.playbackState">
+              <span class="display">stopped</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Display Mode</label>
+            <div class="value editable" data-field="temporal.displayMode">
+              <span class="display">normal</span>
+              <select class="edit" style="display:none">
+                <option value="normal">normal</option>
+                <option value="snailTrail">snailTrail</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Spatial Slice -->
+      <section class="slice" id="spatial-slice">
+        <h2>Spatial</h2>
+        <div class="fields">
+          <div class="field">
+            <label>Viewport</label>
+            <div class="value" data-field="spatial.viewport">
+              <span class="display">--</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Rotation</label>
+            <div class="value editable" data-field="spatial.rotation">
+              <span class="display">0</span>
+              <input type="number" class="edit" min="0" max="360" step="1" style="display:none">
+            </div>
+          </div>
+          <div class="field">
+            <label>Center (derived)</label>
+            <div class="value" data-field="spatial.center">
+              <span class="display">--</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Slice -->
+      <section class="slice" id="features-slice">
+        <h2>Features</h2>
+        <div class="fields">
+          <div class="field">
+            <label>Feature Collection URI</label>
+            <div class="value" data-field="features.featureCollectionUri">
+              <span class="display">--</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Selection</label>
+            <div class="value tree" data-field="features.selection">
+              <div class="tree-content">
+                <span class="display">No selection</span>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Hidden Features</label>
+            <div class="value tree" data-field="features.hiddenFeatureIds">
+              <div class="tree-content">
+                <span class="display">None</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Document Slice -->
+      <section class="slice" id="document-slice">
+        <h2>Document</h2>
+        <div class="fields">
+          <div class="field">
+            <label>Dirty</label>
+            <div class="value" data-field="document.dirty">
+              <span class="display dirty-indicator">false</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Save Path</label>
+            <div class="value" data-field="document.savePath">
+              <span class="display">--</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="status-bar">
+      <span id="last-update">Last update: --</span>
+      <span id="event-count">Events: 0</span>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
