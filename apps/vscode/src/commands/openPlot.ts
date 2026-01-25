@@ -126,7 +126,7 @@ export function createOpenPlotCommand(
     }
 
     // Set up import services for drag-drop functionality
-    panel.setImportServices(ioService, stacService, store);
+    panel.setImportServices(ioService, stacService, store, layersTreeProvider);
 
     // Load plot into panel
     panel.loadPlot(plot, plotData.tracks, plotData.locations);

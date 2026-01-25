@@ -16,6 +16,7 @@ import type {
 import type { IoService } from '../services/ioService';
 import type { StacService } from '../services/stacService';
 import type { StacStore } from '../types/stac';
+import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import { DuplicateImportError } from '../types/import';
 import { calculateBounds, mergeBounds } from '../utils/bounds';
 
@@ -39,6 +40,7 @@ export class MapPanel {
   private ioService: IoService | null = null;
   private stacService: StacService | null = null;
   private currentStore: StacStore | null = null;
+  private layersTreeProvider: LayersTreeProvider | null = null;
 
   // Event handlers
   private onSelectionChangedCallback:
@@ -402,11 +404,13 @@ export class MapPanel {
   public setImportServices(
     ioService: IoService,
     stacService: StacService,
-    store: StacStore
+    store: StacStore,
+    layersTreeProvider: LayersTreeProvider
   ): void {
     this.ioService = ioService;
     this.stacService = stacService;
     this.currentStore = store;
+    this.layersTreeProvider = layersTreeProvider;
   }
 
   /**
@@ -706,6 +710,36 @@ export class MapPanel {
         currentPlot.bbox,
         newBounds
       );
+
+      // Reload plot data to get new tracks
+      stacService.clearCache();
+      const updatedData = await stacService.loadPlotData(
+        currentStore.path,
+        currentPlot.itemPath
+      );
+
+      if (updatedData) {
+        // Update internal state
+        this.currentTracks = updatedData.tracks;
+        this.currentLocations = updatedData.locations;
+
+        // Update webview with new tracks
+        this.postMessage({
+          type: 'loadPlot',
+          plot: {
+            id: currentPlot.id,
+            title: currentPlot.title,
+            tracks: updatedData.tracks,
+            locations: updatedData.locations,
+            bbox: mergedBounds ?? currentPlot.bbox,
+            timeExtent: currentPlot.timeExtent,
+          },
+        });
+
+        // Update layers panel
+        this.layersTreeProvider?.setTracks(updatedData.tracks);
+        this.layersTreeProvider?.setLocations(updatedData.locations);
+      }
 
       // Send completion message
       this.postMessage({
