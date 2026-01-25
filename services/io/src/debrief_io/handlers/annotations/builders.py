@@ -1543,7 +1543,9 @@ def build_sensor(line: str, line_number: int, filename: str) -> dict[str, Any]:
     dx = range_m * math.cos(bearing_rad)
     dy = range_m * math.sin(bearing_rad)
 
-    contact_lon = observer_lon + dx / meters_per_degree_lon if meters_per_degree_lon > 0 else observer_lon
+    contact_lon = (
+        observer_lon + dx / meters_per_degree_lon if meters_per_degree_lon > 0 else observer_lon
+    )
     contact_lat = observer_lat + dy / meters_per_degree_lat
 
     # Sensor type and label after bearing/range
@@ -1788,7 +1790,7 @@ def build_tma(line: str, line_number: int, filename: str) -> dict[str, Any] | No
                 numeric_parts = []
             else:
                 target_name = remaining_after_coords[1:quote_end]
-                numeric_str = remaining_after_coords[quote_end + 1:].strip()
+                numeric_str = remaining_after_coords[quote_end + 1 :].strip()
                 numeric_parts = numeric_str.split()
         else:
             # Unquoted target name - first word

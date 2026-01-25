@@ -72,10 +72,9 @@ def main() -> int:
     feature_collection["metadata"] = {
         "source": str(input_path.name),
         "feature_count": len(annotations),
-        "shape_types": list(set(
-            f.get("properties", {}).get("kind", "unknown")
-            for f in annotations
-        )),
+        "shape_types": list(
+            set(f.get("properties", {}).get("kind", "unknown") for f in annotations)
+        ),
     }
 
     # Ensure output directory exists
