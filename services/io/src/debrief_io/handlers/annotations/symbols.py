@@ -201,7 +201,11 @@ def extract_symbol_from_line(line: str) -> str | None:
 
         # Check for SVG-style symbol (lowercase letter followed by color code)
         # or digit-prefix symbol (digit followed by color code)
-        elif len(part) >= 2 and (part[0].islower() or part[0].isdigit()) and part[1] in VALID_COLOR_CODES:
+        elif (
+            len(part) >= 2
+            and (part[0].islower() or part[0].isdigit())
+            and part[1] in VALID_COLOR_CODES
+        ):
             # Similar logic for SVG style and digit-prefix style
             if "[" in part:
                 close = part.find("]")
