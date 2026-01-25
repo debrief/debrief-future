@@ -1,0 +1,18 @@
+{
+  "id": "bearing-to-point",
+  "name": "Bearing to Point",
+  "description": "Calculate bearing from track to reference point",
+  "version": "1.0.0",
+  "requirements": [
+    {
+      "kind": "TRACK",
+      "min": 1,
+      "max": 1
+    },
+    {
+      "kind": "POINT",
+      "min": 1,
+      "max": 1
+    }
+  ]
+}

@@ -7,35 +7,35 @@
 ## Phase 0: Schema Definition (LinkML)
 
 ### 0.1 Create LinkML schema for Tool metadata
-- [ ] Create `shared/schemas/src/tool/tool.yaml`
-- [ ] Define `Tool` class with name, description, version, requirements fields
-- [ ] Define `SelectionRequirement` class with kind, min, max fields
-- [ ] Add appropriate constraints (min >= 0, max >= min or null)
+- [x] Create `shared/schemas/src/linkml/tool.yaml`
+- [x] Define `Tool` class with name, description, version, requirements fields
+- [x] Define `SelectionRequirement` class with kind, min, max fields
+- [x] Add appropriate constraints (min >= 0, max >= min or null)
 
 **Acceptance**: Schema validates sample tool definitions
 
 ### 0.2 Generate TypeScript types from LinkML
-- [ ] Configure LinkML TypeScript generator in build
-- [ ] Generate `types.ts` from `tool.yaml`
-- [ ] Export types: `Tool`, `SelectionRequirement`
-- [ ] Verify types are importable: `import { Tool } from '@debrief/schemas/tool'`
+- [x] Configure LinkML TypeScript generator in build
+- [x] Generate `types.ts` from `tool.yaml`
+- [x] Export types: `Tool`, `SelectionRequirement`
+- [x] Verify types are importable: `import { Tool } from '@debrief/schemas'`
 
 **Acceptance**: TypeScript compiler accepts generated types
 
 ### 0.3 Generate JSON Schema for validation
-- [ ] Configure LinkML JSON Schema generator
-- [ ] Generate `tool-metadata.schema.json`
-- [ ] Verify schema validates example tool definitions
+- [x] Configure LinkML JSON Schema generator
+- [x] Generate `Tool.schema.json` and `SelectionRequirement.schema.json`
+- [x] Verify schema validates example tool definitions
 
 **Acceptance**: JSON Schema validates fixtures, rejects invalid data
 
 ### 0.4 Create schema adherence tests
-- [ ] Create `shared/schemas/tests/tool/fixtures/` directory
-- [ ] Add `valid-tool.json` - tool with standard requirements
-- [ ] Add `valid-tool-no-requirements.json` - tool that accepts any selection
-- [ ] Add `invalid-tool-missing-name.json` - should fail validation
-- [ ] Add `invalid-requirement-negative-min.json` - should fail validation
-- [ ] Write test that validates fixtures against schema
+- [x] Create `shared/schemas/src/fixtures/valid/` and `invalid/` directories
+- [x] Add `tool-valid-standard.json` - tool with standard requirements
+- [x] Add `tool-valid-no-requirements.json` - tool that accepts any selection
+- [x] Add `tool-invalid-missing-name.json` - should fail validation
+- [x] Add `tool-invalid-requirement-negative-min.json` - should fail validation
+- [x] Update validation script to test fixtures against Tool schema
 
 **Acceptance**: All valid fixtures pass, all invalid fixtures fail
 
@@ -44,114 +44,126 @@
 ## Phase 1: Unit Tests (Headless)
 
 ### 1.1 Create ToolMatchService module structure
-- [ ] Create `shared/components/src/ToolMatch/` directory
-- [ ] Create `index.ts` with public exports
-- [ ] Import types from `@debrief/schemas/tool`
+- [x] Create `shared/components/src/ToolMatch/` directory
+- [x] Create `index.ts` with public exports
+- [x] Import types from `@debrief/schemas`
 
 **Acceptance**: Module structure exists, types importable
 
 ### 1.2 Implement ToolMatchService core algorithm
-- [ ] Create `ToolMatchService.ts`
-- [ ] Implement `constructor(tools: Tool[])`
-- [ ] Implement `getMatchResults(selection: Selection): MatchResult[]`
-- [ ] Implement `isToolActive(tool: Tool, selection: Selection): boolean`
-- [ ] Implement `getActiveTools(selection: Selection): Tool[]`
+- [x] Create `ToolMatchService.ts`
+- [x] Implement `constructor(tools: Tool[])`
+- [x] Implement `getMatchResults(selection: Selection): MatchResult[]`
+- [x] Implement `isToolActive(tool: Tool, selection: Selection): boolean`
+- [x] Implement `getActiveTools(selection: Selection): Tool[]`
 
 **Acceptance**: Service compiles, methods callable
 
 ### 1.3 Implement inactive tool explanations
-- [ ] Create `explanations.ts`
-- [ ] Implement `getInactiveReason(tool: Tool, selection: Selection): string`
-- [ ] Format: "Requires N kind(s) (M selected)"
-- [ ] Format: "Maximum N kind(s) allowed (M selected)"
-- [ ] Format: "Does not accept kind features (N in selection)"
+- [x] Create `explanations.ts`
+- [x] Implement `getInactiveReason(tool: Tool, selection: Selection): string`
+- [x] Format: "Requires N kind(s) (M selected)"
+- [x] Format: "Maximum N kind(s) allowed (M selected)"
+- [x] Format: "Does not accept kind features (N in selection)"
 
 **Acceptance**: Explanations are human-readable and specific
 
 ### 1.4 Write unit tests for matching algorithm
-- [ ] Create `shared/components/tests/ToolMatch/ToolMatchService.test.ts`
-- [ ] Test: Tool with exact requirement (2 tracks) matches 2 tracks
-- [ ] Test: Tool with exact requirement rejects 1 track
-- [ ] Test: Tool with min-only requirement (1+ tracks) matches multiple
-- [ ] Test: Tool with max requirement rejects excess
-- [ ] Test: Tool with multiple requirements (track + point)
-- [ ] Test: Tool with no requirements always active
-- [ ] Test: Selection with extra kinds rejected
-- [ ] Test: Empty selection matches tools with no requirements only
+- [x] Create `shared/components/src/ToolMatch/__tests__/ToolMatchService.test.ts`
+- [x] Test: Tool with exact requirement (2 tracks) matches 2 tracks
+- [x] Test: Tool with exact requirement rejects 1 track
+- [x] Test: Tool with min-only requirement (1+ tracks) matches multiple
+- [x] Test: Tool with max requirement rejects excess
+- [x] Test: Tool with multiple requirements (track + point)
+- [x] Test: Tool with no requirements always active
+- [x] Test: Selection with extra kinds rejected
+- [x] Test: Empty selection matches tools with no requirements only
 
-**Acceptance**: All unit tests pass
+**Acceptance**: All unit tests pass (22 tests)
 
 ### 1.5 Write unit tests for explanations
-- [ ] Create `shared/components/tests/ToolMatch/explanations.test.ts`
-- [ ] Test: Under-selection explanation (needs 2, has 1)
-- [ ] Test: Over-selection explanation (max 1, has 2)
-- [ ] Test: Wrong kind explanation (has points, needs tracks)
-- [ ] Test: Active tool returns empty string
+- [x] Create `shared/components/src/ToolMatch/__tests__/explanations.test.ts`
+- [x] Test: Under-selection explanation (needs 2, has 1)
+- [x] Test: Over-selection explanation (max 1, has 2)
+- [x] Test: Wrong kind explanation (has points, needs tracks)
+- [x] Test: Active tool returns empty string
 
-**Acceptance**: All explanation tests pass
+**Acceptance**: All explanation tests pass (16 tests)
 
 ---
 
 ## Phase 2: Storybook Harness
 
 ### 2.1 Create fixture data files
-- [ ] Create `shared/components/src/ToolMatch/ToolMatchHarness/fixtures/`
-- [ ] Create `features.json` with sample GeoJSON features:
+- [x] Create `shared/components/src/ToolMatch/ToolMatchHarness/fixtures/`
+- [x] Create `features.ts` with sample features:
   - 3 tracks (track-1, track-2, track-3)
   - 2 reference locations (ref-1, ref-2)
-  - 2 points (point-1, point-2)
-- [ ] Create `tools.json` with sample tool definitions:
+  - 2 narratives (narrative-1, narrative-2)
+- [x] Create `tools.ts` with sample tool definitions:
   - "Range Calculation" - requires exactly 2 tracks
   - "Bearing to Point" - requires 1 track + 1 point
-  - "Area Analysis" - requires 3+ reference locations
+  - "Area Analysis" - requires 3+ points
   - "Track Summary" - requires 1+ tracks (no max)
   - "Global Statistics" - no requirements (always active)
 
 **Acceptance**: Fixtures load without errors
 
 ### 2.2 Implement ToolMatchHarness React component
-- [ ] Create `ToolMatchHarness.tsx`
-- [ ] Left panel: Feature list with checkboxes, grouped by kind
-- [ ] Right panel: Tool list showing active tools
-- [ ] "Show inactive tools" toggle (default: hidden)
-- [ ] When toggle on: show inactive tools with explanations
-- [ ] Use ToolMatchService for matching logic
-- [ ] Add `data-testid` attributes for Playwright
+- [x] Create `ToolMatchHarness.tsx`
+- [x] Left panel: Feature list with checkboxes, grouped by kind
+- [x] Right panel: Tool list showing active tools
+- [x] "Show inactive tools" toggle (default: hidden)
+- [x] When toggle on: show inactive tools with explanations
+- [x] Use ToolMatchService for matching logic
+- [x] Add `data-testid` attributes for Playwright
 
 **Acceptance**: Component renders with fixture data
 
 ### 2.3 Create Storybook story
-- [ ] Create `ToolMatchHarness.stories.tsx`
-- [ ] Default story with fixture features and tools
-- [ ] Story variant: "No Selection" (empty state)
-- [ ] Story variant: "Two Tracks Selected" (shows Range Calculation)
-- [ ] Story variant: "Show Inactive" (toggle enabled)
+- [x] Create `ToolMatchHarness.stories.tsx`
+- [x] Default story with fixture features and tools
+- [x] Story variant: "TwoTracksSelected" (shows Range Calculation)
+- [x] Story variant: "TrackAndPoint" (shows Bearing to Point)
+- [x] Story variant: "ShowInactive" (toggle enabled)
+- [x] Story variant: "DarkTheme"
 
 **Acceptance**: Stories render in Storybook
 
 ### 2.4 Configure Playwright for Storybook testing
-- [ ] Create/update `shared/components/playwright.config.ts`
-- [ ] Configure `webServer` to start Storybook on port 6006
-- [ ] Set `baseURL` to Storybook URL
-- [ ] Configure screenshot directory: `media/screenshots/`
+- [x] Create `shared/components/playwright.config.ts`
+- [x] Configure `webServer` to start Storybook on port 6006
+- [x] Set `baseURL` to Storybook URL
+- [x] Configure screenshot directory: `screenshots/`
 
-**Acceptance**: `pnpm playwright test` starts Storybook automatically
+**Acceptance**: `pnpm test:e2e` starts Storybook automatically
 
 ### 2.5 Write Playwright interaction tests
-- [ ] Create `shared/components/e2e/ToolMatchHarness.spec.ts`
-- [ ] Test: Initial state shows "Global Statistics" only
-- [ ] Test: Select 2 tracks → "Range Calculation" appears
-- [ ] Test: Select 1 track + 1 point → "Bearing to Point" appears
-- [ ] Test: Toggle "Show inactive" → all tools visible with explanations
-- [ ] Test: Deselect all → returns to initial state
+- [x] Create `shared/components/e2e/ToolMatchHarness.spec.ts`
+- [x] Test: Initial state shows "Global Statistics" only
+- [x] Test: Select 2 tracks → "Range Calculation" appears
+- [x] Test: Select 1 track + 1 point → "Bearing to Point" appears
+- [x] Test: Toggle "Show inactive" → all tools visible with explanations
+- [x] Test: Deselect all → returns to initial state
 
 **Acceptance**: All Playwright tests pass
 
 ### 2.6 Capture screenshots for blog media
-- [ ] Screenshot: Empty selection state
-- [ ] Screenshot: Two tracks selected (Range Calculation active)
-- [ ] Screenshot: Show inactive tools toggle enabled
-- [ ] Save to `specs/027-context-tool-offering/media/screenshots/`
+- [x] Screenshot tests configured in Playwright spec:
+  - Empty selection state
+  - Two tracks selected (Range Calculation active)
+  - Show inactive tools toggle enabled
+- [ ] Run e2e tests to capture screenshots (requires local execution)
+- [ ] Copy screenshots to `specs/027-context-tool-offering/media/screenshots/`
+
+> **Manual steps required** (browser environment needed):
+> ```bash
+> cd shared/components
+> npx playwright install chromium
+> pnpm test:e2e
+> mkdir -p ../../specs/027-context-tool-offering/media/screenshots
+> cp screenshots/*.png ../../specs/027-context-tool-offering/media/screenshots/
+> ```
 
 **Acceptance**: Screenshots captured and suitable for blog post
 

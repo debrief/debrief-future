@@ -1,34 +1,47 @@
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://debrief.info/schemas/CircleAnnotation",
+  "$id": "https://debrief.info/schemas/Tool",
   "additionalProperties": false,
-  "description": "GeoJSON Feature for circle annotations. Geometry is a Polygon approximating the circle (vertices at regular intervals). Properties contain center and radius for precise reconstruction and smooth rendering.",
+  "description": "An analysis operation with a name, description, version, and selection requirements. Tools are discovered from debrief-calc via MCP and matched to analyst selections.",
   "properties": {
-    "geometry": {
-      "$ref": "#/$defs/GeoJSONPolygon",
-      "description": "Circle as Polygon (approximated with vertices, e.g., every 45 degrees)"
+    "description": {
+      "description": "Brief description of what the tool does. Displayed in tooltips and help text. Should be one sentence.",
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "id": {
-      "description": "Unique identifier",
+      "description": "Unique identifier for the tool. Used for execution and deduplication. Should be stable across versions.",
       "type": "string"
     },
-    "properties": {
-      "$ref": "#/$defs/CircleAnnotationProperties",
-      "description": "Circle metadata including center and radius for reconstruction"
-    },
-    "type": {
-      "const": "Feature",
-      "description": "GeoJSON type discriminator",
+    "name": {
+      "description": "Human-readable name displayed in menus and panels. Should be concise (2-4 words).",
       "type": "string"
+    },
+    "requirements": {
+      "description": "List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection.",
+      "items": {
+        "$ref": "#/$defs/SelectionRequirement"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "version": {
+      "description": "Tool version string for provenance tracking. Follows semantic versioning (e.g., \"1.0.0\").",
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [
-    "type",
     "id",
-    "geometry",
-    "properties"
+    "name"
   ],
-  "title": "CircleAnnotation",
+  "title": "Tool",
   "type": "object",
   "$defs": {
     "CircleAnnotation": {
