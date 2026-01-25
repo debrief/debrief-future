@@ -1,0 +1,11 @@
+{
+  "id": "bad-requirements",
+  "name": "Bad Requirements Tool",
+  "version": "1.0.0",
+  "requirements": [
+    {
+      "kind": "TRACK",
+      "min": -1
+    }
+  ]
+}

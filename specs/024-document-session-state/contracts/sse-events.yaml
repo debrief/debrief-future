@@ -1,0 +1,637 @@
+# SSE Events Contract: Session State Management
+# Feature: 024-document-session-state
+# Date: 2026-01-24
+#
+# These events are sent via Server-Sent Events (SSE) for real-time updates.
+# Used by the debug dashboard (FR-041) and reactive UI components (FR-003).
+
+---
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Session State SSE Events
+version: "1.0.0"
+
+# ==========================================================================
+# SSE Endpoint
+# ==========================================================================
+
+endpoint:
+  path: /sse
+  method: GET
+  description: |
+    Server-Sent Events endpoint for real-time state updates.
+    Supports reconnection via Last-Event-ID header (FR-037a).
+  headers:
+    request:
+      Last-Event-ID:
+        type: string
+        description: Last received event ID for reconnection
+    response:
+      Content-Type: text/event-stream
+      Cache-Control: no-cache
+      Connection: keep-alive
+      Access-Control-Allow-Origin: "*"
+
+# ==========================================================================
+# Event Types
+# ==========================================================================
+
+events:
+
+  # --------------------------------------------------------------------------
+  # Full State Sync
+  # --------------------------------------------------------------------------
+
+  state-sync:
+    description: |
+      Sent on initial connection or reconnection with full state.
+      Also sent when a full state reload occurs.
+    data:
+      type: object
+      properties:
+        type:
+          const: full-state
+        state:
+          $ref: "#/definitions/SessionState"
+        timestamp:
+          type: integer
+          description: Unix epoch milliseconds
+      required: [type, state, timestamp]
+    example:
+      event: state-sync
+      id: "1"
+      data: |
+        {
+          "type": "full-state",
+          "state": {
+            "temporal": {...},
+            "spatial": {...},
+            "features": {...},
+            "document": {...}
+          },
+          "timestamp": 1706097600000
+        }
+
+  # --------------------------------------------------------------------------
+  # Temporal Slice Events
+  # --------------------------------------------------------------------------
+
+  temporal.currentTime:
+    description: Current time changed (SC-001 requires <100ms propagation)
+    data:
+      type: object
+      properties:
+        type:
+          const: field-update
+        slice:
+          const: temporal
+        field:
+          const: currentTime
+        value:
+          $ref: "#/definitions/TimeInstant"
+          nullable: true
+        previousValue:
+          $ref: "#/definitions/TimeInstant"
+          nullable: true
+        timestamp:
+          type: integer
+      required: [type, slice, field, value, timestamp]
+
+  temporal.timeRange:
+    description: Time range changed
+    data:
+      type: object
+      properties:
+        type:
+          const: field-update
+        slice:
+          const: temporal
+        field:
+          const: timeRange
+        value:
+          $ref: "#/definitions/TimeRange"
+          nullable: true
+        timestamp:
+          type: integer
+      required: [type, slice, field, value, timestamp]
+
+  temporal.timeFilter:
+    description: Time filter changed
+    data:
+      type: object
+      properties:
+        type:
+          const: field-update
+        slice:
+          const: temporal
+        field:
+          const: timeFilter
+        value:
+          $ref: "#/definitions/TimeFilter"
+          nullable: true
+        timestamp:
+          type: integer
+      required: [type, slice, field, value, timestamp]
+
+  temporal.playbackState:
+    description: Playback state changed (ephemeral - not tracked in undo)
+    data:
+      type: object
+      properties:
+        type:
+          const: field-update
+        slice:
+          const: temporal
+        field:
+          const: playbackState
+        value:
+          type: string
+          enum: [stopped, playing, paused]
+        timestamp:
+          type: integer
+      required: [type, slice, field, value, timestamp]
+
+  temporal.playbackRate:
+    description: Playback rate changed
+    data:
+      type: object
+      properties:
+        type:
+          const: field-update
+        slice:
+          const: temporal
+        field:
+          const: playbackRate
+        value:
+          type: number
+        timestamp:
+          type: integer
+      required: [type, slice, field, value, timestamp]
+
+  temporal.displayMode:
+    description: Display mode changed
+    data:
+      type: object
+      properties:
+        type:
+          const: field-update
+        slice:
+          const: temporal
+        field:
+          const: displayMode
+        value:
+          type: string
+          enum: [normal, snailTrail]
+        timestamp:
+          type: integer
+      required: [type, slice, field, value, timestamp]
+
+  # --------------------------------------------------------------------------
+  # Spatial Slice Events
+  # --------------------------------------------------------------------------
+
+  spatial.viewport:
+    description: Viewport changed
+    data:
+      type: object
+      properties:
+        type:
+          const: field-update
+        slice:
+          const: spatial
+        field:
+          const: viewport
+        value:
+          $ref: "#/definitions/ViewportPolygon"
+          nullable: true
+        center:
+          $ref: "#/definitions/Coordinate"
+          nullable: true
+          description: Derived center point
+        timestamp:
+          type: integer
+      required: [type, slice, field, value, timestamp]
+
+  spatial.rotation:
+    description: Map rotation changed
+    data:
+      type: object
+      properties:
+        type:
+          const: field-update
+        slice:
+          const: spatial
+        field:
+          const: rotation
+        value:
+          type: number
+        timestamp:
+          type: integer
+      required: [type, slice, field, value, timestamp]
+
+  # --------------------------------------------------------------------------
+  # Features Slice Events
+  # --------------------------------------------------------------------------
+
+  features.selection:
+    description: Feature selection changed
+    data:
+      type: object
+      properties:
+        type:
+          const: field-update
+        slice:
+          const: features
+        field:
+          const: selection
+        value:
+          $ref: "#/definitions/FeatureSelection"
+        timestamp:
+          type: integer
+      required: [type, slice, field, value, timestamp]
+
+  features.hiddenFeatureIds:
+    description: Hidden features changed
+    data:
+      type: object
+      properties:
+        type:
+          const: field-update
+        slice:
+          const: features
+        field:
+          const: hiddenFeatureIds
+        value:
+          type: array
+          items:
+            type: string
+        added:
+          type: array
+          items:
+            type: string
+          description: Features newly hidden
+        removed:
+          type: array
+          items:
+            type: string
+          description: Features newly visible
+        timestamp:
+          type: integer
+      required: [type, slice, field, value, timestamp]
+
+  features.featureCollectionUri:
+    description: Feature collection reference changed
+    data:
+      type: object
+      properties:
+        type:
+          const: field-update
+        slice:
+          const: features
+        field:
+          const: featureCollectionUri
+        value:
+          type: string
+          nullable: true
+        timestamp:
+          type: integer
+      required: [type, slice, field, value, timestamp]
+
+  # --------------------------------------------------------------------------
+  # Document Slice Events
+  # --------------------------------------------------------------------------
+
+  document.dirty:
+    description: Dirty flag changed
+    data:
+      type: object
+      properties:
+        type:
+          const: field-update
+        slice:
+          const: document
+        field:
+          const: dirty
+        value:
+          type: boolean
+        timestamp:
+          type: integer
+      required: [type, slice, field, value, timestamp]
+
+  document.saved:
+    description: Session was saved
+    data:
+      type: object
+      properties:
+        type:
+          const: action
+        action:
+          const: saved
+        path:
+          type: string
+        savedAt:
+          type: string
+          format: date-time
+        timestamp:
+          type: integer
+      required: [type, action, path, savedAt, timestamp]
+
+  document.loaded:
+    description: Session was loaded
+    data:
+      type: object
+      properties:
+        type:
+          const: action
+        action:
+          const: loaded
+        path:
+          type: string
+        version:
+          type: string
+        timestamp:
+          type: integer
+      required: [type, action, path, version, timestamp]
+
+  # --------------------------------------------------------------------------
+  # Undo/Redo Events
+  # --------------------------------------------------------------------------
+
+  document.undo:
+    description: Undo was performed
+    data:
+      type: object
+      properties:
+        type:
+          const: action
+        action:
+          const: undo
+        steps:
+          type: integer
+        undoStackSize:
+          type: integer
+        redoStackSize:
+          type: integer
+        timestamp:
+          type: integer
+      required: [type, action, steps, undoStackSize, redoStackSize, timestamp]
+
+  document.redo:
+    description: Redo was performed
+    data:
+      type: object
+      properties:
+        type:
+          const: action
+        action:
+          const: redo
+        steps:
+          type: integer
+        undoStackSize:
+          type: integer
+        redoStackSize:
+          type: integer
+        timestamp:
+          type: integer
+      required: [type, action, steps, undoStackSize, redoStackSize, timestamp]
+
+  # --------------------------------------------------------------------------
+  # Batch Update Event
+  # --------------------------------------------------------------------------
+
+  batch-update:
+    description: Multiple fields changed in a single operation
+    data:
+      type: object
+      properties:
+        type:
+          const: batch-update
+        updates:
+          type: array
+          items:
+            type: object
+            properties:
+              slice:
+                type: string
+                enum: [temporal, spatial, features, document]
+              field:
+                type: string
+              value:
+                description: New value (type varies by field)
+            required: [slice, field, value]
+        timestamp:
+          type: integer
+      required: [type, updates, timestamp]
+
+  # --------------------------------------------------------------------------
+  # Error Event
+  # --------------------------------------------------------------------------
+
+  error:
+    description: An error occurred during state operation
+    data:
+      type: object
+      properties:
+        type:
+          const: error
+        code:
+          type: string
+          enum:
+            - VALIDATION_ERROR
+            - INVALID_VIEWPORT
+            - COLLECTION_NOT_FOUND
+            - SCHEMA_VERSION_INCOMPATIBLE
+            - FILE_NOT_FOUND
+            - PERMISSION_DENIED
+        message:
+          type: string
+        details:
+          type: object
+          description: Additional error context
+        timestamp:
+          type: integer
+      required: [type, code, message, timestamp]
+
+# ==========================================================================
+# Shared Definitions
+# ==========================================================================
+
+definitions:
+
+  SessionState:
+    type: object
+    properties:
+      temporal:
+        $ref: "#/definitions/TemporalSlice"
+      spatial:
+        $ref: "#/definitions/SpatialSlice"
+      features:
+        $ref: "#/definitions/FeaturesSlice"
+      document:
+        $ref: "#/definitions/DocumentSlice"
+    required: [temporal, spatial, features, document]
+
+  TemporalSlice:
+    type: object
+    properties:
+      currentTime:
+        $ref: "#/definitions/TimeInstant"
+        nullable: true
+      timeRange:
+        $ref: "#/definitions/TimeRange"
+        nullable: true
+      timeFilter:
+        $ref: "#/definitions/TimeFilter"
+        nullable: true
+      stepSize:
+        $ref: "#/definitions/TimeStep"
+      playbackRate:
+        type: number
+      playbackState:
+        type: string
+        enum: [stopped, playing, paused]
+      displayMode:
+        type: string
+        enum: [normal, snailTrail]
+
+  SpatialSlice:
+    type: object
+    properties:
+      viewport:
+        $ref: "#/definitions/ViewportPolygon"
+        nullable: true
+      rotation:
+        type: number
+      center:
+        $ref: "#/definitions/Coordinate"
+        nullable: true
+
+  FeaturesSlice:
+    type: object
+    properties:
+      featureCollectionUri:
+        type: string
+        nullable: true
+      selection:
+        $ref: "#/definitions/FeatureSelection"
+      hiddenFeatureIds:
+        type: array
+        items:
+          type: string
+
+  DocumentSlice:
+    type: object
+    properties:
+      dirty:
+        type: boolean
+      savePath:
+        type: string
+        nullable: true
+      undoAvailable:
+        type: boolean
+      redoAvailable:
+        type: boolean
+
+  TimeInstant:
+    type: object
+    properties:
+      epoch:
+        type: integer
+      iso:
+        type: string
+        format: date-time
+    required: [epoch, iso]
+
+  TimeRange:
+    type: object
+    properties:
+      start:
+        $ref: "#/definitions/TimeInstant"
+      end:
+        $ref: "#/definitions/TimeInstant"
+    required: [start, end]
+
+  TimeFilter:
+    type: object
+    properties:
+      start:
+        $ref: "#/definitions/TimeInstant"
+        nullable: true
+      end:
+        $ref: "#/definitions/TimeInstant"
+        nullable: true
+
+  TimeStep:
+    type: object
+    properties:
+      value:
+        type: number
+      unit:
+        type: string
+        enum: [millisecond, second, minute, hour, day]
+    required: [value, unit]
+
+  Coordinate:
+    type: array
+    items:
+      type: number
+    minItems: 2
+    maxItems: 2
+
+  ViewportPolygon:
+    type: object
+    properties:
+      coordinates:
+        type: array
+        items:
+          $ref: "#/definitions/Coordinate"
+        minItems: 4
+        maxItems: 4
+    required: [coordinates]
+
+  FeatureSelection:
+    type: object
+    properties:
+      featureIds:
+        type: array
+        items:
+          type: string
+      primary:
+        type: string
+        nullable: true
+      timestamp:
+        $ref: "#/definitions/TimeInstant"
+    required: [featureIds, timestamp]
+
+# ==========================================================================
+# Wire Format Examples
+# ==========================================================================
+
+wireFormatExamples:
+
+  singleFieldUpdate: |
+    id: 42
+    event: temporal.currentTime
+    data: {"type":"field-update","slice":"temporal","field":"currentTime","value":{"epoch":1706097600000,"iso":"2024-01-24T12:00:00.000Z"},"timestamp":1706097600100}
+
+  batchUpdate: |
+    id: 43
+    event: batch-update
+    data: {"type":"batch-update","updates":[{"slice":"temporal","field":"currentTime","value":{"epoch":1706097600000,"iso":"2024-01-24T12:00:00.000Z"}},{"slice":"spatial","field":"viewport","value":{"coordinates":[[-5,55],[5,55],[5,50],[-5,50]]}}],"timestamp":1706097600100}
+
+  errorEvent: |
+    id: 44
+    event: error
+    data: {"type":"error","code":"INVALID_VIEWPORT","message":"Viewport coordinates out of valid geographic bounds","details":{"coordinate":[-200,55],"constraint":"longitude must be in [-180, 180]"},"timestamp":1706097600100}
+
+# ==========================================================================
+# Dashboard Update Timing (SC-008)
+# ==========================================================================
+
+performanceRequirements:
+  maxLatency: 200ms
+  description: |
+    Debug dashboard displays state changes within 200ms of modification (SC-008).
+    This includes:
+    - Server processing time
+    - SSE transmission time
+    - Dashboard rendering time

@@ -46,7 +46,22 @@
       "WebFetch(domain:debrief.github.io)",
       "Skill(speckit.pr)",
       "Bash(uv run pytest:*)",
-      "Bash(git add:*)",
+      "Bash(gh:*)",
+      "Bash(uv run ruff check:*)",
+      "Bash(python3 -m pip install:*)",
+      "Bash(awk:*)",
+      "Bash(xxd:*)",
+      "Bash(sh)",
+      "Bash(export PATH=\"$HOME/.local/bin:$PATH\")",
+      "Bash(ruff format:*)",
+      "Bash(~/.local/bin/ruff format:*)",
+      "Bash(~/.local/bin/ruff check:*)",
+      "Bash(~/.local/bin/task:*)",
+      "Bash(npm:*)",
+      "Bash(sh -)",
+      "Bash(export PNPM_HOME=\"/home/ian/.local/share/pnpm\")",
+      "Bash(export PATH=\"$PNPM_HOME:$PATH\")",
+      "Bash(pnpm --version:*)"
       "Bash(task install:*)",
       "Bash(brew install:*)",
       "Bash(task --version:*)",
@@ -79,7 +94,17 @@
       "Bash(pnpm compile:*)",
       "Bash(tee:*)",
       "Bash(gh issue view:*)",
-      "WebFetch(domain:gist.github.com)"
+      "WebFetch(domain:gist.github.com)",
+      "Bash(git branch:*)",
+      "Bash(gh issue create:*)",
+      "Skill(speckit.plan)",
+      "Bash(make generate:*)",
+      "Bash(uv run:*)",
+      "Bash(make test:*)",
+      "Bash(git commit:*)",
+      "Skill(speckit.tasks)",
+      "Skill(speckit.implement)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

@@ -233,10 +233,16 @@ Three approaches required:
 - N/A (configuration only) (017-task-build)
 - TypeScript 5.x (VS Code Extension) + @vscode/api ^1.85.0 (017-vscode-hide-activities)
 - VS Code `context.globalState` for initialization tracking, user settings for visibility config (017-vscode-hide-activities)
-- TypeScript 5.x (VS Code Extension API) + @vscode/api ^1.85.0, existing debrief-io (Python), debrief-stac (Python) (021-load-rep-files-stac)
-- STAC catalog via debrief-stac service (file-based, offline) (021-load-rep-files-stac)
+- Python 3.11+ (LinkML generators, Pydantic models), TypeScript 5.x (generated types) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS) (022-system-kind-discriminator)
+- Markdown (skill definition), Bash (gh CLI integration) + Claude Code Skill system, GitHub CLI (`gh`), Opus model (023-epic-workflow-support)
+- BACKLOG.md (epics and items tables), GitHub issues (023-epic-workflow-support)
+- TypeScript 5.x (shared library, Storybook harness, VS Code extension) + React 18+, Storybook 8.x, Vitest, Playwright (027-context-tool-offering)
+- N/A (pure matching logic, no persistence in Phases 1-2) (027-context-tool-offering)
+- TypeScript 5.x (state server + VS Code extension), Python 3.11+ (MCP client library) + Zustand ^5.0.0, Zundo ^2.0.0, Express ^4.18.0, @modelcontextprotocol/sdk ^1.0.0, better-sse ^1.0.0, Zod ^3.22.0, Vitest ^1.0.0, Playwright ^1.40.0 (024-document-session-state)
+- JSON file at user-defined path (session persistence) (024-document-session-state)
 
 ## Recent Changes
+- 024-document-session-state: Added TypeScript 5.x + Zustand, Zundo, Express, MCP SDK, better-sse for session state management with Python client library
 - 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v5+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 10.x
 - 000-schemas: Added Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS)
 

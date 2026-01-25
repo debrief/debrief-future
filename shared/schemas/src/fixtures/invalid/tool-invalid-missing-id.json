@@ -1,0 +1,5 @@
+{
+  "name": "Broken Tool",
+  "description": "A tool missing the required id field",
+  "version": "1.0.0"
+}

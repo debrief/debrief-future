@@ -1,3 +1,4 @@
+export type ToolId = string;
 /**
 * Discriminator for GeoJSON feature types
 */
@@ -19,6 +20,8 @@ export enum FeatureKindEnum {
     TEXT = "TEXT",
     /** Vector annotation (LineString geometry, origin+range+bearing in properties) */
     VECTOR = "VECTOR",
+    /** Non-spatial system state (null geometry, reserved state.* IDs) */
+    SYSTEM = "SYSTEM",
 };
 /**
 * Type of track feature
@@ -87,6 +90,18 @@ export enum LineJoinEnum {
     round = "round",
     /** Flat corner */
     bevel = "bevel",
+};
+/**
+* Discriminator for system state variants
+*/
+export enum SystemStateTypeEnum {
+    
+    /** Time viewport state (start/end times) */
+    temporal = "temporal",
+    /** Map viewport state (bbox, zoom) */
+    spatial = "spatial",
+    /** Feature selection state (selected IDs) */
+    selection = "selection",
 };
 
 
@@ -205,6 +220,17 @@ export interface GeoJSONPoint {
 
 
 /**
+ * GeoJSON Point geometry with empty coordinates (for non-spatial features)
+ */
+export interface GeoJSONEmptyPoint {
+    /** Geometry type discriminator */
+    type: string,
+    /** Empty array for non-spatial features */
+    coordinates: number[],
+}
+
+
+/**
  * GeoJSON LineString geometry
  */
 export interface GeoJSONLineString {
@@ -303,6 +329,44 @@ export interface ReferenceLocation {
     geometry: GeoJSONPoint,
     /** Reference metadata */
     properties: ReferenceLocationProperties,
+}
+
+
+/**
+ * Properties for SYSTEM features storing application state
+ */
+export interface SystemStateProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Discriminator for state variant (temporal, spatial, selection) */
+    state_type: string,
+    /** Viewport start time (ISO8601) - for temporal state */
+    start_time?: string,
+    /** Viewport end time (ISO8601) - for temporal state */
+    end_time?: string,
+    /** Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state */
+    bbox?: number[],
+    /** Map zoom level - for spatial state */
+    zoom?: number,
+    /** Map center [longitude, latitude] - for spatial state */
+    center?: number[],
+    /** Array of selected feature IDs - for selection state */
+    selected_ids?: string[],
+}
+
+
+/**
+ * GeoJSON Feature for storing non-spatial system state
+ */
+export interface SystemState {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** State identifier (must start with 'state.') */
+    id: string,
+    /** Point geometry with empty coordinates for SYSTEM features */
+    geometry: GeoJSONEmptyPoint,
+    /** State-specific properties */
+    properties: SystemStateProperties,
 }
 
 
@@ -509,6 +573,36 @@ export interface VectorAnnotation {
     geometry: GeoJSONLineString,
     /** Vector metadata including origin, range, and bearing for reconstruction */
     properties: VectorAnnotationProperties,
+}
+
+
+/**
+ * A constraint specifying which feature kinds a tool accepts, with minimum and maximum counts. Used to determine if a tool is applicable to the current selection.
+ */
+export interface SelectionRequirement {
+    /** The feature kind this requirement applies to (e.g., "track", "point", "reference_location"). Must match the 'kind' property of GeoJSON features. */
+    kind: string,
+    /** Minimum number of features of this kind required. Must be >= 0. Defaults to 0 if not specified. */
+    min?: number,
+    /** Maximum number of features of this kind allowed. Must be >= min if both specified. Null means no upper limit. */
+    max?: number,
+}
+
+
+/**
+ * An analysis operation with a name, description, version, and selection requirements. Tools are discovered from debrief-calc via MCP and matched to analyst selections.
+ */
+export interface Tool {
+    /** Unique identifier for the tool. Used for execution and deduplication. Should be stable across versions. */
+    id: string,
+    /** Human-readable name displayed in menus and panels. Should be concise (2-4 words). */
+    name: string,
+    /** Brief description of what the tool does. Displayed in tooltips and help text. Should be one sentence. */
+    description?: string,
+    /** Tool version string for provenance tracking. Follows semantic versioning (e.g., "1.0.0"). */
+    version?: string,
+    /** List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection. */
+    requirements?: SelectionRequirement[],
 }
 
 

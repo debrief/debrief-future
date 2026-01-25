@@ -99,10 +99,36 @@
                 "RECTANGLE",
                 "LINE",
                 "TEXT",
-                "VECTOR"
+                "VECTOR",
+                "SYSTEM"
             ],
             "title": "FeatureKindEnum",
             "type": "string"
+        },
+        "GeoJSONEmptyPoint": {
+            "additionalProperties": false,
+            "description": "GeoJSON Point geometry with empty coordinates (for non-spatial features)",
+            "properties": {
+                "coordinates": {
+                    "description": "Empty array for non-spatial features",
+                    "items": {
+                        "type": "number"
+                    },
+                    "maxItems": 0,
+                    "type": "array"
+                },
+                "type": {
+                    "const": "Point",
+                    "description": "Geometry type discriminator",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "type",
+                "coordinates"
+            ],
+            "title": "GeoJSONEmptyPoint",
+            "type": "object"
         },
         "GeoJSONLineString": {
             "additionalProperties": false,
@@ -761,6 +787,153 @@
             "title": "ReferenceLocationProperties",
             "type": "object"
         },
+        "SelectionRequirement": {
+            "additionalProperties": false,
+            "description": "A constraint specifying which feature kinds a tool accepts, with minimum and maximum counts. Used to determine if a tool is applicable to the current selection.",
+            "properties": {
+                "kind": {
+                    "description": "The feature kind this requirement applies to (e.g., \"track\", \"point\", \"reference_location\"). Must match the 'kind' property of GeoJSON features.",
+                    "type": "string"
+                },
+                "max": {
+                    "description": "Maximum number of features of this kind allowed. Must be >= min if both specified. Null means no upper limit.",
+                    "minimum": 0,
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "min": {
+                    "description": "Minimum number of features of this kind required. Must be >= 0. Defaults to 0 if not specified.",
+                    "minimum": 0,
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "kind"
+            ],
+            "title": "SelectionRequirement",
+            "type": "object"
+        },
+        "SystemState": {
+            "additionalProperties": false,
+            "description": "GeoJSON Feature for storing non-spatial system state",
+            "properties": {
+                "geometry": {
+                    "$ref": "#/$defs/GeoJSONEmptyPoint",
+                    "description": "Point geometry with empty coordinates for SYSTEM features"
+                },
+                "id": {
+                    "description": "State identifier (must start with 'state.')",
+                    "pattern": "^state\\.[a-z]+$",
+                    "type": "string"
+                },
+                "properties": {
+                    "$ref": "#/$defs/SystemStateProperties",
+                    "description": "State-specific properties"
+                },
+                "type": {
+                    "const": "Feature",
+                    "description": "GeoJSON type discriminator",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "type",
+                "id",
+                "geometry",
+                "properties"
+            ],
+            "title": "SystemState",
+            "type": "object"
+        },
+        "SystemStateProperties": {
+            "additionalProperties": false,
+            "description": "Properties for SYSTEM features storing application state",
+            "properties": {
+                "bbox": {
+                    "description": "Bounding box [minLon, minLat, maxLon, maxLat] - for spatial state",
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "center": {
+                    "description": "Map center [longitude, latitude] - for spatial state",
+                    "items": {
+                        "type": "number"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "end_time": {
+                    "description": "Viewport end time (ISO8601) - for temporal state",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "kind": {
+                    "$ref": "#/$defs/FeatureKindEnum",
+                    "const": "SYSTEM",
+                    "description": "Feature type discriminator"
+                },
+                "selected_ids": {
+                    "description": "Array of selected feature IDs - for selection state",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "start_time": {
+                    "description": "Viewport start time (ISO8601) - for temporal state",
+                    "format": "date-time",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "state_type": {
+                    "$ref": "#/$defs/SystemStateTypeEnum",
+                    "description": "Discriminator for state variant (temporal, spatial, selection)"
+                },
+                "zoom": {
+                    "description": "Map zoom level - for spatial state",
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "kind",
+                "state_type"
+            ],
+            "title": "SystemStateProperties",
+            "type": "object"
+        },
+        "SystemStateTypeEnum": {
+            "description": "Discriminator for system state variants",
+            "enum": [
+                "temporal",
+                "spatial",
+                "selection"
+            ],
+            "title": "SystemStateTypeEnum",
+            "type": "string"
+        },
         "TextAnnotation": {
             "additionalProperties": false,
             "description": "GeoJSON Feature for text annotations at a position. Geometry is the Point where text should be displayed.",
@@ -880,6 +1053,50 @@
                 "coordinates"
             ],
             "title": "TimestampedPosition",
+            "type": "object"
+        },
+        "Tool": {
+            "additionalProperties": false,
+            "description": "An analysis operation with a name, description, version, and selection requirements. Tools are discovered from debrief-calc via MCP and matched to analyst selections.",
+            "properties": {
+                "description": {
+                    "description": "Brief description of what the tool does. Displayed in tooltips and help text. Should be one sentence.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "id": {
+                    "description": "Unique identifier for the tool. Used for execution and deduplication. Should be stable across versions.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Human-readable name displayed in menus and panels. Should be concise (2-4 words).",
+                    "type": "string"
+                },
+                "requirements": {
+                    "description": "List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection.",
+                    "items": {
+                        "$ref": "#/$defs/SelectionRequirement"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "version": {
+                    "description": "Tool version string for provenance tracking. Follows semantic versioning (e.g., \"1.0.0\").",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "name"
+            ],
+            "title": "Tool",
             "type": "object"
         },
         "TrackFeature": {

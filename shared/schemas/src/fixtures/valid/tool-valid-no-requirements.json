@@ -1,0 +1,7 @@
+{
+  "id": "global-statistics",
+  "name": "Global Statistics",
+  "description": "Show statistics for all features in the plot",
+  "version": "1.0.0",
+  "requirements": []
+}
