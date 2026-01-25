@@ -131,12 +131,8 @@ try:
 
     result = parse_rep(file_path)
 
-    # Convert to JSON-serializable format
-    output = {
-        'features': result.get('features', []),
-        'warnings': result.get('warnings', []),
-        'encoding': result.get('encoding', 'utf-8')
-    }
+    # Convert Pydantic model to JSON-serializable dict
+    output = result.model_dump()
 
     print(json.dumps(output))
 except Exception as e:
