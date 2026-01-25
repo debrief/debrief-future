@@ -48,8 +48,8 @@ export function calculateBounds(features: GeoJSONFeature[]): Bounds | null {
  * @returns Merged bounds
  */
 export function mergeBounds(a: Bounds | null, b: Bounds | null): Bounds | null {
-  if (!a) return b;
-  if (!b) return a;
+  if (!a) {return b;}
+  if (!b) {return a;}
 
   return [
     Math.min(a[0], b[0]),

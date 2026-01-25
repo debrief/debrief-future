@@ -224,7 +224,7 @@ export class StacService {
           // Count tracks and locations
           for (const feature of features.features) {
             const geom = feature.geometry;
-            if (!geom) continue; // Skip features with null geometry
+            if (!geom) {continue;} // Skip features with null geometry
 
             if (geom.type === 'LineString') {
               trackCount++;
@@ -581,7 +581,7 @@ export class StacService {
     }
 
     // Find or create GeoJSON asset
-    let geoJsonAsset = Object.values(item.assets).find(
+    const geoJsonAsset = Object.values(item.assets).find(
       (asset) =>
         asset.type === 'application/geo+json' ||
         asset.href.endsWith('.geojson')
@@ -667,7 +667,7 @@ export class StacService {
     let maxLat = -Infinity;
 
     for (const feature of features) {
-      if (!feature.geometry) continue; // Skip features with null geometry
+      if (!feature.geometry) {continue;} // Skip features with null geometry
       const coords = this.extractCoordinates(feature.geometry);
       for (const [lon, lat] of coords) {
         if (typeof lon === 'number' && typeof lat === 'number') {
