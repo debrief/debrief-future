@@ -23,17 +23,15 @@ export class IoService {
     const config = vscode.workspace.getConfiguration('debrief');
     const configuredPath = config.get<string>('calc.pythonPath', '');
 
-    // Use configured path if explicitly set, otherwise auto-detect
+    // Use configured path if explicitly set, otherwise auto-detect from project .venv
     this.pythonPath = configuredPath || this.findPythonPath(extensionPath);
-    console.log('[IoService] Using Python path:', this.pythonPath);
+    console.log('[IoService] Using Python:', this.pythonPath);
   }
 
   /**
    * Find Python executable, preferring project venv
    */
   private findPythonPath(extensionPath?: string): string {
-    console.log('[IoService] extensionPath:', extensionPath);
-
     // Look for .venv in extension's parent directories (monorepo structure)
     // apps/vscode -> apps -> repo-root/.venv
     if (extensionPath) {
@@ -45,7 +43,6 @@ export class IoService {
 
       for (const candidate of candidates) {
         const resolved = path.resolve(candidate);
-        console.log('[IoService] Checking:', resolved, 'exists:', fs.existsSync(resolved));
         if (fs.existsSync(resolved)) {
           return resolved;
         }
@@ -53,7 +50,6 @@ export class IoService {
     }
 
     // Fall back to system python
-    console.log('[IoService] Falling back to system python');
     return 'python';
   }
 

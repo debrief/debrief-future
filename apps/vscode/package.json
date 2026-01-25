@@ -355,8 +355,8 @@
         },
         "debrief.calc.pythonPath": {
           "type": "string",
-          "default": "python",
-          "description": "Path to Python executable for debrief-calc"
+          "default": "",
+          "description": "Path to Python executable for debrief-calc. Leave empty to auto-detect from project .venv"
         },
         "debrief.calc.connectionTimeout": {
           "type": "number",
