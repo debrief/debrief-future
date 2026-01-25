@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { MapView } from './MapView';
-import { ThemeProvider } from '../ThemeProvider';
 import type { DebriefFeatureCollection } from '../utils/types';
 
 // Import generated fixture
@@ -30,11 +29,9 @@ Regenerate with: \`uv run python services/io/scripts/generate-storybook-fixtures
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <ThemeProvider>
-        <div style={{ height: '100vh' }}>
-          <Story />
-        </div>
-      </ThemeProvider>
+      <div style={{ height: '100vh' }}>
+        <Story />
+      </div>
     ),
   ],
 };
