@@ -104,7 +104,10 @@
       "Bash(git commit:*)",
       "Skill(speckit.tasks)",
       "Skill(speckit.implement)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npx playwright install:*)",
+      "Bash(node capture-dashboard.mjs:*)",
+      "Bash(kill:*)"
     ]
   }
 }
