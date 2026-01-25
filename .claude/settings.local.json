@@ -47,8 +47,22 @@
       "WebFetch(domain:debrief.github.io)",
       "Skill(speckit.pr)",
       "Bash(uv run pytest:*)",
-      "Bash(git add:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat\\(007\\): add annotation parsing infrastructure\n\nPhase 1 - Setup:\n- Add legacy_style attribute to PointProperties schema\n- Regenerate all derived schemas \\(Pydantic, JSON Schema, TypeScript\\)\n- Create annotations submodule structure in debrief_io\n\nPhase 2 - Foundational:\n- Add symbology module with A-Q color code mapping to CSS\n- Add coordinate parsing module for DMS format\n- Add timestamp parsing module for YYMMDD HHMMSS format\n- Add symbol parsing module for @X, @X@YY, @X[LAYER=y] formats\n- Add base annotation parser structure with fail-fast error handling\n- Add annotation-specific error codes to exceptions\n- Add builders module with P1 implementations \\(NARRATIVE, CIRCLE, RECT, LINE\\)\n\nTest coverage:\n- 88 new tests for annotation parsing infrastructure\n- All 135 io service tests pass\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(gh:*)",
+      "Bash(uv run ruff check:*)",
+      "Bash(python3 -m pip install:*)",
+      "Bash(awk:*)",
+      "Bash(xxd:*)",
+      "Bash(sh)",
+      "Bash(export PATH=\"$HOME/.local/bin:$PATH\")",
+      "Bash(ruff format:*)",
+      "Bash(~/.local/bin/ruff format:*)",
+      "Bash(~/.local/bin/ruff check:*)",
+      "Bash(~/.local/bin/task:*)",
+      "Bash(npm:*)",
+      "Bash(sh -)",
+      "Bash(export PNPM_HOME=\"/home/ian/.local/share/pnpm\")",
+      "Bash(export PATH=\"$PNPM_HOME:$PATH\")",
+      "Bash(pnpm --version:*)"
     ]
   }
 }
