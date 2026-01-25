@@ -21,7 +21,7 @@ from pathlib import Path
 src_path = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
-from debrief_io.parser import parse_rep
+from debrief_io.parser import parse_rep  # noqa: E402
 
 
 def main() -> int:

@@ -1776,10 +1776,7 @@ def build_tma(line: str, line_number: int, filename: str) -> dict[str, Any] | No
         validate_longitude(center_lon, line_number)
 
         # After coords (1 + 8 = 9): target_name (possibly quoted), orientation, semi_major, semi_minor, course, speed, depth
-        # Check if target name is quoted in the remaining after_quote content
-        remaining = after_quote
         # Skip past the parts we've already processed (symbol + 8 coord parts)
-        # But since after_quote was already split, we need to handle quotes differently
         remaining_after_coords = " ".join(parts[9:])
 
         # Check for quoted target name
