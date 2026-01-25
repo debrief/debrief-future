@@ -14,6 +14,8 @@ export type SSEEventType =
   | 'temporal.currentTime'
   | 'temporal.timeRange'
   | 'temporal.playbackState'
+  | 'temporal.playbackRate'
+  | 'temporal.displayMode'
   | 'spatial.viewport'
   | 'spatial.rotation'
   | 'features.selection'
@@ -84,6 +86,26 @@ export function createSSEHandler(store: SessionStoreApi) {
         slice: 'temporal',
         field: 'playbackState',
         value: state.playbackState,
+        timestamp: Date.now(),
+      });
+    }
+
+    if (state.playbackRate !== prevState.playbackRate) {
+      broadcast('temporal.playbackRate', {
+        type: 'field-update',
+        slice: 'temporal',
+        field: 'playbackRate',
+        value: state.playbackRate,
+        timestamp: Date.now(),
+      });
+    }
+
+    if (state.displayMode !== prevState.displayMode) {
+      broadcast('temporal.displayMode', {
+        type: 'field-update',
+        slice: 'temporal',
+        field: 'displayMode',
+        value: state.displayMode,
         timestamp: Date.now(),
       });
     }

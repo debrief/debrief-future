@@ -210,6 +210,76 @@ describe('MCP Integration', () => {
     });
   });
 
+  describe('POST /mcp - session.setPlaybackRate', () => {
+    it('should set playback rate', async () => {
+      const response = await request(app)
+        .post('/mcp')
+        .send({ tool: 'session.setPlaybackRate', input: { rate: 2.5 } });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.playbackRate).toBe(2.5);
+
+      // Verify store was updated
+      expect(store.getState().playbackRate).toBe(2.5);
+    });
+
+    it('should reject rate below minimum', async () => {
+      const response = await request(app)
+        .post('/mcp')
+        .send({ tool: 'session.setPlaybackRate', input: { rate: 0.05 } });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(false);
+      expect(response.body.error).toContain('0.1');
+    });
+
+    it('should reject rate above maximum', async () => {
+      const response = await request(app)
+        .post('/mcp')
+        .send({ tool: 'session.setPlaybackRate', input: { rate: 150 } });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(false);
+      expect(response.body.error).toContain('100');
+    });
+  });
+
+  describe('POST /mcp - session.setRotation', () => {
+    it('should set rotation', async () => {
+      const response = await request(app)
+        .post('/mcp')
+        .send({ tool: 'session.setRotation', input: { rotation: 45 } });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.rotation).toBe(45);
+
+      // Verify store was updated
+      expect(store.getState().rotation).toBe(45);
+    });
+
+    it('should normalize rotation to 0-360 range', async () => {
+      const response = await request(app)
+        .post('/mcp')
+        .send({ tool: 'session.setRotation', input: { rotation: 450 } });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.rotation).toBe(90); // 450 % 360 = 90
+    });
+
+    it('should handle negative rotation', async () => {
+      const response = await request(app)
+        .post('/mcp')
+        .send({ tool: 'session.setRotation', input: { rotation: -90 } });
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.rotation).toBe(270); // -90 normalized to 270
+    });
+  });
+
   describe('error handling', () => {
     it('should handle missing tool name', async () => {
       const response = await request(app)

@@ -13,6 +13,8 @@ import {
   setViewport,
   setSelection,
   setHiddenFeatures,
+  setPlaybackRate,
+  setRotation,
 } from './tools/index.js';
 
 /**
@@ -40,6 +42,8 @@ const TOOLS = {
   'session.setViewport': setViewport,
   'session.setSelection': setSelection,
   'session.setHiddenFeatures': setHiddenFeatures,
+  'session.setPlaybackRate': setPlaybackRate,
+  'session.setRotation': setRotation,
 } as const;
 
 type ToolName = keyof typeof TOOLS;

@@ -298,16 +298,17 @@ async function sendUpdate(fieldPath, value) {
 
   switch (fieldPath) {
     case 'temporal.playbackRate':
-      tool = 'session.setCurrentTime';
-      // For playback rate, we'd need a different tool
-      // This is a simplified example
-      return;
+      tool = 'session.setPlaybackRate';
+      input = { rate: parseFloat(value) };
+      break;
     case 'temporal.displayMode':
       // Would need session.setDisplayMode tool
+      console.log('No handler for field:', fieldPath);
       return;
     case 'spatial.rotation':
-      // Would need to update via setViewport
-      return;
+      tool = 'session.setRotation';
+      input = { rotation: parseFloat(value) };
+      break;
     default:
       console.log('No handler for field:', fieldPath);
       return;
