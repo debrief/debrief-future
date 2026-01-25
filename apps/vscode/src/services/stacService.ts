@@ -310,8 +310,8 @@ export class StacService {
 
           tracks.push({
             id: (props.id as string) ?? `track-${tracks.length}`,
-            name: (props.name as string) ?? `Track ${tracks.length + 1}`,
-            platformType: props.platformType as string | undefined,
+            name: (props.platform_name as string) ?? (props.name as string) ?? `Track ${tracks.length + 1}`,
+            platformType: (props.track_type as string) ?? (props.platformType as string) ?? undefined,
             geometry: { type: 'LineString' as const, coordinates: lineCoords },
             times,
             startTime: times[0] ?? '',
