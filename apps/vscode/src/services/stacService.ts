@@ -14,6 +14,7 @@ import type {
   StacItem,
 } from '../types/stac';
 import type { Plot, Track, ReferenceLocation } from '../types/plot';
+import type { GeoJSONFeature } from '../types/import';
 
 // Type-safe properties to avoid any from geojson
 type SafeProperties = Record<string, unknown>;
@@ -269,7 +270,7 @@ export class StacService {
   async loadPlotData(
     store: StacStore,
     itemPath: string
-  ): Promise<{ tracks: Track[]; locations: ReferenceLocation[] } | null> {
+  ): Promise<{ tracks: Track[]; locations: ReferenceLocation[]; otherFeatures: GeoJSONFeature[] } | null> {
     try {
       const fullPath = path.join(store.path, itemPath);
       const item = await this.loadItem(fullPath);
@@ -296,17 +297,26 @@ export class StacService {
       const featureCollection = await this.loadGeoJson(geoJsonPath);
 
       if (featureCollection === null) {
-        return { tracks: [], locations: [] };
+        return { tracks: [], locations: [], otherFeatures: [] };
       }
 
       const tracks: Track[] = [];
       const locations: ReferenceLocation[] = [];
+      const otherFeatures: GeoJSONFeature[] = [];
 
       for (const feature of featureCollection.features) {
         const props = feature.properties ?? {};
-        if (feature.geometry.type === 'LineString') {
+        const geom = feature.geometry;
+
+        // Skip features with no geometry
+        if (!geom) {
+          continue;
+        }
+
+        if (geom.type === 'LineString' && props.times) {
+          // Track: LineString with times array
           const times = (props.times as string[]) ?? [];
-          const lineCoords = feature.geometry.coordinates as number[][];
+          const lineCoords = geom.coordinates as number[][];
 
           tracks.push({
             id: (props.id as string) ?? `track-${tracks.length}`,
@@ -320,8 +330,9 @@ export class StacService {
             visible: true,
             selected: false,
           });
-        } else if (feature.geometry.type === 'Point') {
-          const pointCoords = feature.geometry.coordinates as number[];
+        } else if (geom.type === 'Point' && props.kind === 'LOCATION') {
+          // Reference location: Point with kind=LOCATION
+          const pointCoords = geom.coordinates as number[];
 
           locations.push({
             id: (props.id as string) ?? `location-${locations.length}`,
@@ -331,10 +342,17 @@ export class StacService {
             visible: true,
             selected: false,
           });
+        } else {
+          // Other features: render with standard GeoJSON layer
+          otherFeatures.push({
+            type: 'Feature',
+            geometry: geom as GeoJSONFeature['geometry'],
+            properties: props,
+          });
         }
       }
 
-      return { tracks, locations };
+      return { tracks, locations, otherFeatures };
     } catch (err) {
       console.error('Failed to load plot data:', err);
       return null;

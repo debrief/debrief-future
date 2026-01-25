@@ -55,6 +55,16 @@ interface ResponseMessage extends Message {
 // Extension → Webview Messages
 // ============================================================================
 
+/** GeoJSON feature for fallback rendering */
+export interface GeoJSONFeature {
+  type: 'Feature';
+  geometry: {
+    type: string;
+    coordinates: unknown;
+  };
+  properties: Record<string, unknown>;
+}
+
 /** Load a plot into the webview */
 export interface LoadPlotMessage {
   type: 'loadPlot';
@@ -63,6 +73,7 @@ export interface LoadPlotMessage {
     title: string;
     tracks: Track[];
     locations: ReferenceLocation[];
+    otherFeatures?: GeoJSONFeature[];
     bbox: [number, number, number, number];
     timeExtent: [string, string];
   };

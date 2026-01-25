@@ -148,7 +148,8 @@ export class MapPanel {
   public loadPlot(
     plot: Plot,
     tracks: Track[],
-    locations: ReferenceLocation[]
+    locations: ReferenceLocation[],
+    otherFeatures: Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> = []
   ): void {
     this.currentPlot = plot;
     this.currentTracks = tracks;
@@ -166,6 +167,7 @@ export class MapPanel {
         title: plot.title,
         tracks,
         locations,
+        otherFeatures,
         bbox: plot.bbox,
         timeExtent: plot.timeExtent,
       },
@@ -731,6 +733,7 @@ export class MapPanel {
             title: currentPlot.title,
             tracks: updatedData.tracks,
             locations: updatedData.locations,
+            otherFeatures: updatedData.otherFeatures,
             bbox: mergedBounds ?? currentPlot.bbox,
             timeExtent: currentPlot.timeExtent,
           },

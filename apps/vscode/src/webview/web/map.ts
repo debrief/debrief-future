@@ -42,6 +42,9 @@ let _currentTracks: Track[] = [];
 let _currentLocations: ReferenceLocation[] = [];
 let currentBbox: [number, number, number, number] | null = null;
 
+// Layer for other GeoJSON features (polygons, etc.)
+let otherFeaturesLayer: L.GeoJSON | null = null;
+
 /**
  * Initialize the Leaflet map
  */
@@ -486,8 +489,8 @@ function handleLoadPlot(message: Extract<ExtensionToWebviewMessage, { type: 'loa
   const { plot } = message;
 
   // Store current data
-  _currentTracks =plot.tracks;
-  _currentLocations =plot.locations;
+  _currentTracks = plot.tracks;
+  _currentLocations = plot.locations;
   currentBbox = plot.bbox;
 
   // Clear existing layers
@@ -496,9 +499,55 @@ function handleLoadPlot(message: Extract<ExtensionToWebviewMessage, { type: 'loa
   resultRenderer?.clear();
   selectionManager?.clearSelection();
 
+  // Clear other features layer
+  if (otherFeaturesLayer && map) {
+    map.removeLayer(otherFeaturesLayer);
+    otherFeaturesLayer = null;
+  }
+
   // Render tracks and locations
   trackRenderer?.renderTracks(plot.tracks);
   locationRenderer?.renderLocations(plot.locations);
+
+  // Render other features (polygons, etc.) with standard GeoJSON layer
+  if (plot.otherFeatures && plot.otherFeatures.length > 0 && map) {
+    const featureCollection = {
+      type: 'FeatureCollection' as const,
+      features: plot.otherFeatures,
+    };
+
+    otherFeaturesLayer = L.geoJSON(featureCollection as GeoJSON.GeoJsonObject, {
+      style: (feature) => {
+        // Use properties for styling if available, otherwise defaults
+        const props = feature?.properties ?? {};
+        return {
+          color: (props.stroke as string) ?? '#3388ff',
+          weight: (props['stroke-width'] as number) ?? 2,
+          opacity: (props['stroke-opacity'] as number) ?? 1,
+          fillColor: (props.fill as string) ?? '#3388ff',
+          fillOpacity: (props['fill-opacity'] as number) ?? 0.2,
+        };
+      },
+      pointToLayer: (feature, latlng) => {
+        // Render points as circle markers
+        const props = feature?.properties ?? {};
+        return L.circleMarker(latlng, {
+          radius: 6,
+          color: (props.stroke as string) ?? '#3388ff',
+          fillColor: (props.fill as string) ?? '#3388ff',
+          fillOpacity: 0.6,
+        });
+      },
+      onEachFeature: (feature, layer) => {
+        // Add popup with feature info
+        const props = feature?.properties ?? {};
+        const name = (props.name as string) ?? (props.kind as string) ?? 'Feature';
+        layer.bindTooltip(name);
+      },
+    });
+
+    otherFeaturesLayer.addTo(map);
+  }
 
   // Initialize time filter
   timeFilter?.initialize(plot.timeExtent[0], plot.timeExtent[1]);

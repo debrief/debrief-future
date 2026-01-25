@@ -132,7 +132,7 @@ export function createOpenPlotCommand(
     panel.setImportServices(ioService, stacService, store, layersTreeProvider);
 
     // Load plot into panel
-    panel.loadPlot(plot, plotData.tracks, plotData.locations);
+    panel.loadPlot(plot, plotData.tracks, plotData.locations, plotData.otherFeatures);
 
     // Update layers panel
     layersTreeProvider.setTracks(plotData.tracks);
