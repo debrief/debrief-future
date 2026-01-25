@@ -261,6 +261,11 @@ flowchart TB
 | Node.js | 18+ |
 | Python | 3.11+ |
 
+**Linux only** (for building Electron app with bundled Python services):
+```bash
+sudo apt install binutils libpython3-dev
+```
+
 ### Quick Start
 
 ```bash
