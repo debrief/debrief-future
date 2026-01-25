@@ -117,6 +117,7 @@ A power user performing intensive analysis wants to control playback without mov
 - Q: Theme adaptation for VS Code? → A: User-selectable theme (independent, for Storybook compatibility)
 - Q: Toggle UI for track display mode (full vs snail trail)? → A: Toggle switch with labels (Full / Trail)
 - Q: Where to place the track display toggle? → A: Row 3, between Play/Pause and Speed selector
+- Q: Default track display mode on load? → A: Full (entire track visible)
 
 ## User Interface Flow
 
@@ -185,6 +186,7 @@ The panel arranges controls in a **three-row vertical layout**:
 - The VS Code extension webview environment supports the required animation capabilities.
 - Time ranges can span multiple days but typically represent hours to days of operational data.
 - Default playback speed is 1x (real-time) when playback begins.
+- Default track display mode is "Full" (entire track visible) when data is loaded; users can switch to "Trail" mode manually.
 - Step forward/backward buttons are not needed; the scrubber combined with keyboard arrow keys provides sufficient precision for frame-by-frame navigation.
 
 ## Dependencies
