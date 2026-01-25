@@ -100,7 +100,7 @@ Description formats:
 | 017 | Enhancement | [Configure VS Code extension to hide default activities on load](specs/017-vscode-hide-activities/spec.md) | 3 | 3 | 4 | 10 | Medium | tasked |
 | 016 | Infrastructure | [Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md) | 3 | 5 | 4 | 12 | Medium | specified |
 | 023 | Infrastructure | [Add epic support to speckit workflow](specs/023-epic-workflow-support/spec.md) | 4 | 3 | 4 | 11 | Medium | specified |
-| 025 | Feature | [Design time controller UI/UX for VS Code extension](docs/ideas/022-time-controller.md) | 5 | 5 | 4 | 14 | Medium | approved |
+| 025 | Feature | [Design time controller UI/UX for VS Code extension](specs/025-time-controller/spec.md) | 5 | 5 | 4 | 14 | Medium | planned |
 | 026 | Feature | [Add annotation shape renderers to VS Code extension](https://github.com/debrief/debrief-future/issues/86) (requires #021) | 5 | 5 | 4 | 14 | Medium | approved |
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
 | 002 | Feature | Add MCP wrapper for debrief-io service | 4 | 3 | 4 | 11 | Medium | approved |
