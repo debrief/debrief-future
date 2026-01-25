@@ -46,7 +46,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "generate:fixtures": "cd ../../services/io && uv run python scripts/generate-storybook-fixtures.py"
   },
   "peerDependencies": {
     "react": "^18.2.0",
