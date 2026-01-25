@@ -97,7 +97,7 @@ A power user performing intensive analysis wants to control playback without mov
 - **FR-011**: System MUST support keyboard shortcut Space to toggle play/pause when the panel has focus.
 - **FR-012**: System MUST support keyboard shortcuts Left/Right arrows to scrub backward/forward in small increments when the panel has focus.
 - **FR-013**: System MUST support user-selectable light/dark theme independent of host environment (for Storybook compatibility).
-- **FR-014**: System MUST provide a toggle switch to switch between "Full" track display (entire track visible) and "Trail" mode (snail trail showing track up to current time only).
+- **FR-014**: System MUST provide a toggle switch to switch between "Full" track display (entire track visible) and "Trail" mode (showing track history from start up to current time position only).
 
 ### Key Entities
 
@@ -105,6 +105,7 @@ A power user performing intensive analysis wants to control playback without mov
 - **Time Range**: The span from earliest to latest timestamps across all loaded track data.
 - **Playback State**: Whether time is progressing automatically (playing) or stationary (paused).
 - **Playback Speed**: The rate at which time advances relative to real-time (1x, 2x, 4x, 8x).
+- **Track Display Mode**: Controls track visualization — "Full" shows entire track regardless of time position; "Trail" shows track history from start up to current time position only.
 
 ## Clarifications
 
@@ -117,6 +118,8 @@ A power user performing intensive analysis wants to control playback without mov
 - Q: Theme adaptation for VS Code? → A: User-selectable theme (independent, for Storybook compatibility)
 - Q: Toggle UI for track display mode (full vs snail trail)? → A: Toggle switch with labels (Full / Trail)
 - Q: Where to place the track display toggle? → A: Row 3, between Play/Pause and Speed selector
+- Q: Default track display mode on load? → A: Full (entire track visible)
+- Q: What does Trail mode show? → A: Track history from start up to current time position
 
 ## User Interface Flow
 
@@ -185,6 +188,7 @@ The panel arranges controls in a **three-row vertical layout**:
 - The VS Code extension webview environment supports the required animation capabilities.
 - Time ranges can span multiple days but typically represent hours to days of operational data.
 - Default playback speed is 1x (real-time) when playback begins.
+- Default track display mode is "Full" (entire track visible) when data is loaded; users can switch to "Trail" mode manually.
 - Step forward/backward buttons are not needed; the scrubber combined with keyboard arrow keys provides sufficient precision for frame-by-frame navigation.
 
 ## Dependencies
