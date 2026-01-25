@@ -3,7 +3,7 @@
  * Feature: 024-document-session-state
  */
 
-import { create } from 'zustand';
+import { createStore } from 'zustand/vanilla';
 import { subscribeWithSelector } from 'zustand/middleware';
 import type { SessionStore } from '../types/index.js';
 import {
@@ -129,7 +129,7 @@ export function createSessionStore() {
   // Flag to prevent recording during undo/redo
   let isUndoRedo = false;
 
-  const store = create<SessionStoreWithUndo>()(
+  const store = createStore<SessionStoreWithUndo>()(
     subscribeWithSelector((set, get, api) => {
       // Wrap set to track history and dirty state
       const trackedSet: typeof set = (partial, replace) => {
