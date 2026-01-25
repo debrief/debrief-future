@@ -1,15 +1,51 @@
 /**
  * Time Range View - Sidebar webview for time range control
+ *
+ * Uses the TimeController React component from @debrief/components
+ * to provide playback controls for maritime track visualization.
  */
 
 import * as vscode from 'vscode';
+
+// Message types from webview to extension
+interface TimeChangeMessage {
+  type: 'timeChange';
+  time: number;
+}
+
+interface PlaybackStateChangeMessage {
+  type: 'playbackStateChange';
+  state: 'playing' | 'paused';
+}
+
+interface DisplayModeChangeMessage {
+  type: 'displayModeChange';
+  mode: 'full' | 'trail';
+}
+
+interface WebviewReadyMessage {
+  type: 'webviewReady';
+}
+
+type WebviewMessage =
+  | TimeChangeMessage
+  | PlaybackStateChangeMessage
+  | DisplayModeChangeMessage
+  | WebviewReadyMessage;
 
 export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'debrief.timeRange';
 
   private _view?: vscode.WebviewView;
   private _extensionUri: vscode.Uri;
-  private _timeRange: { start: string; end: string; dataStart: string; dataEnd: string } | null = null;
+  private _timeExtent: { start: number; end: number } | null = null;
+  private _isWebviewReady = false;
+  private _pendingMessages: Array<Record<string, unknown>> = [];
+
+  // Event callbacks
+  private _onTimeChangeCallback?: (time: number) => void;
+  private _onPlaybackStateChangeCallback?: (state: 'playing' | 'paused') => void;
+  private _onDisplayModeChangeCallback?: (mode: 'full' | 'trail') => void;
 
   constructor(extensionUri: vscode.Uri) {
     this._extensionUri = extensionUri;
@@ -21,149 +57,241 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
     _token: vscode.CancellationToken
   ): void {
     this._view = webviewView;
+    this._isWebviewReady = false;
 
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [this._extensionUri],
+      localResourceRoots: [
+        vscode.Uri.joinPath(this._extensionUri, 'dist'),
+        vscode.Uri.joinPath(this._extensionUri, 'node_modules'),
+      ],
     };
 
-    webviewView.webview.html = this._getHtmlContent();
+    webviewView.webview.html = this._getHtmlContent(webviewView.webview);
 
-    webviewView.webview.onDidReceiveMessage((message: { type: string; start?: string; end?: string }) => {
+    // Handle messages from webview
+    webviewView.webview.onDidReceiveMessage((message: WebviewMessage) => {
       switch (message.type) {
-        case 'setTimeRange':
+        case 'webviewReady':
+          this._isWebviewReady = true;
+          // Send any pending messages
+          for (const pending of this._pendingMessages) {
+            void webviewView.webview.postMessage(pending);
+          }
+          this._pendingMessages = [];
+          // Send current time extent if available
+          if (this._timeExtent) {
+            this._postMessage({
+              type: 'updateTimeExtent',
+              start: this._timeExtent.start,
+              end: this._timeExtent.end,
+              dataStart: this._timeExtent.start,
+              dataEnd: this._timeExtent.end,
+            });
+          }
+          break;
+
+        case 'timeChange':
+          if (this._onTimeChangeCallback) {
+            this._onTimeChangeCallback(message.time);
+          }
+          // Also execute command for other parts of extension
           void vscode.commands.executeCommand('debrief.setTimeRange', {
-            start: message.start,
-            end: message.end,
+            time: message.time,
           });
           break;
-        case 'resetTimeRange':
-          void vscode.commands.executeCommand('debrief.resetTimeRange');
+
+        case 'playbackStateChange':
+          if (this._onPlaybackStateChangeCallback) {
+            this._onPlaybackStateChangeCallback(message.state);
+          }
           break;
-        case 'fitToSelection':
-          void vscode.commands.executeCommand('debrief.fitToSelection');
+
+        case 'displayModeChange':
+          if (this._onDisplayModeChangeCallback) {
+            this._onDisplayModeChangeCallback(message.mode);
+          }
+          void vscode.commands.executeCommand('debrief.setDisplayMode', {
+            mode: message.mode,
+          });
           break;
       }
     });
   }
 
   /**
-   * Update the time range display
+   * Update the time extent from plot data
    */
-  public updateTimeRange(
-    start: string,
-    end: string,
-    dataStart: string,
-    dataEnd: string
-  ): void {
-    this._timeRange = { start, end, dataStart, dataEnd };
-    if (this._view) {
-      void this._view.webview.postMessage({
-        type: 'updateTimeRange',
-        ...this._timeRange,
-      });
+  public updateTimeExtent(start: number, end: number): void {
+    this._timeExtent = { start, end };
+    this._postMessage({
+      type: 'updateTimeExtent',
+      start,
+      end,
+      dataStart: start,
+      dataEnd: end,
+    });
+  }
+
+  /**
+   * Set the current time position
+   */
+  public setCurrentTime(time: number): void {
+    this._postMessage({
+      type: 'setCurrentTime',
+      time,
+    });
+  }
+
+  /**
+   * Set UI state (empty, loading, ready)
+   */
+  public setUIState(state: 'empty' | 'loading' | 'ready'): void {
+    this._postMessage({
+      type: 'setUIState',
+      uiState: state,
+    });
+  }
+
+  /**
+   * Clear the time extent (reset to empty state)
+   */
+  public clearTimeExtent(): void {
+    this._timeExtent = null;
+    this._postMessage({
+      type: 'setUIState',
+      uiState: 'empty',
+    });
+  }
+
+  /**
+   * Register callback for time changes
+   */
+  public onTimeChange(callback: (time: number) => void): void {
+    this._onTimeChangeCallback = callback;
+  }
+
+  /**
+   * Register callback for playback state changes
+   */
+  public onPlaybackStateChange(callback: (state: 'playing' | 'paused') => void): void {
+    this._onPlaybackStateChangeCallback = callback;
+  }
+
+  /**
+   * Register callback for display mode changes
+   */
+  public onDisplayModeChange(callback: (mode: 'full' | 'trail') => void): void {
+    this._onDisplayModeChangeCallback = callback;
+  }
+
+  /**
+   * Post message to webview, queueing if not ready
+   */
+  private _postMessage(message: Record<string, unknown>): void {
+    if (this._isWebviewReady && this._view) {
+      void this._view.webview.postMessage(message);
+    } else {
+      this._pendingMessages.push(message);
     }
   }
 
-  private _getHtmlContent(): string {
+  private _getHtmlContent(webview: vscode.Webview): string {
+    // Get URI for the bundled TimeController webview
+    const scriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview', 'timeController.js')
+    );
+
+    const cspSource = webview.cspSource;
+
+    // Note: The TimeController CSS is bundled with the JS via vite-plugin-css-injected-by-js
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; font-src ${cspSource};">
+  <title>Time Controller</title>
   <style>
+    :root {
+      /* Map VS Code theme colors to TimeController CSS variables */
+      --debrief-bg-primary: var(--vscode-sideBar-background);
+      --debrief-bg-secondary: var(--vscode-input-background);
+      --debrief-text-primary: var(--vscode-foreground);
+      --debrief-text-secondary: var(--vscode-descriptionForeground);
+      --debrief-border: var(--vscode-panel-border);
+      --debrief-accent: var(--vscode-focusBorder);
+      --debrief-accent-hover: var(--vscode-focusBorder);
+    }
     body {
-      padding: 10px;
+      margin: 0;
+      padding: 8px;
+      background: var(--vscode-sideBar-background);
       font-family: var(--vscode-font-family);
       font-size: var(--vscode-font-size);
       color: var(--vscode-foreground);
     }
-    .slider-container {
-      margin: 10px 0;
-    }
-    .time-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--vscode-descriptionForeground);
-      margin-top: 4px;
-    }
-    .slider {
+    #root {
       width: 100%;
-      height: 20px;
-      cursor: pointer;
     }
-    .buttons {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
+    .time-controller-webview {
+      width: 100%;
     }
-    button {
-      flex: 1;
-      padding: 6px 12px;
-      background: var(--vscode-button-secondaryBackground);
-      color: var(--vscode-button-secondaryForeground);
-      border: none;
-      cursor: pointer;
-      font-size: 12px;
+    /* Override TimeController styles for VS Code sidebar */
+    .debrief-time-controller {
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
     }
-    button:hover {
-      background: var(--vscode-button-secondaryHoverBackground);
+    .debrief-time-controller__row {
+      padding: 4px 0 !important;
     }
-    .empty-state {
-      text-align: center;
-      color: var(--vscode-descriptionForeground);
-      padding: 20px;
+    .debrief-time-display {
+      color: var(--vscode-foreground) !important;
+    }
+    .debrief-time-scrubber__track {
+      background: var(--vscode-input-background) !important;
+    }
+    .debrief-time-scrubber__progress {
+      background: var(--vscode-progressBar-background) !important;
+    }
+    .debrief-time-scrubber__thumb {
+      background: var(--vscode-button-background) !important;
+      border-color: var(--vscode-button-background) !important;
+    }
+    .debrief-playback-button {
+      background: var(--vscode-button-secondaryBackground) !important;
+      color: var(--vscode-button-secondaryForeground) !important;
+    }
+    .debrief-playback-button:hover {
+      background: var(--vscode-button-secondaryHoverBackground) !important;
+    }
+    .debrief-speed-selector__button {
+      background: var(--vscode-dropdown-background) !important;
+      color: var(--vscode-dropdown-foreground) !important;
+      border-color: var(--vscode-dropdown-border) !important;
+    }
+    .debrief-speed-selector__dropdown {
+      background: var(--vscode-dropdown-background) !important;
+      border-color: var(--vscode-dropdown-border) !important;
+    }
+    .debrief-speed-selector__option {
+      color: var(--vscode-dropdown-foreground) !important;
+    }
+    .debrief-speed-selector__option:hover {
+      background: var(--vscode-list-hoverBackground) !important;
+    }
+    .debrief-display-mode-toggle {
+      background: var(--vscode-input-background) !important;
+    }
+    .debrief-display-mode-toggle__slider {
+      background: var(--vscode-button-background) !important;
     }
   </style>
 </head>
 <body>
-  <div id="content">
-    <div class="empty-state">
-      Open a plot to see time controls
-    </div>
-  </div>
-  <script>
-    const vscode = acquireVsCodeApi();
-
-    window.addEventListener('message', (event) => {
-      const message = event.data;
-      if (message.type === 'updateTimeRange') {
-        updateUI(message);
-      }
-    });
-
-    function updateUI(data) {
-      const content = document.getElementById('content');
-      content.innerHTML = \`
-        <div class="slider-container">
-          <input type="range" class="slider" id="slider" min="0" max="100" value="0">
-          <div class="time-labels">
-            <span>\${formatTime(data.dataStart)}</span>
-            <span>\${formatTime(data.dataEnd)}</span>
-          </div>
-        </div>
-        <div class="buttons">
-          <button onclick="resetRange()">Full Range</button>
-          <button onclick="fitSelection()">Fit to Selection</button>
-        </div>
-      \`;
-    }
-
-    function formatTime(iso) {
-      if (!iso) return '--:--';
-      const date = new Date(iso);
-      return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-    }
-
-    function resetRange() {
-      vscode.postMessage({ type: 'resetTimeRange' });
-    }
-
-    function fitSelection() {
-      vscode.postMessage({ type: 'fitToSelection' });
-    }
-  </script>
+  <div id="root"></div>
+  <script src="${scriptUri.toString()}"></script>
 </body>
 </html>`;
   }

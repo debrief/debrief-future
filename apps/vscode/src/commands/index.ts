@@ -242,9 +242,17 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.setTimeRange',
-      (args: { start: string; end: string }) => {
+      (args: { time?: number; start?: string; end?: string }) => {
         const panel = getMapPanel();
-        if (panel && args?.start && args?.end) {
+        if (!panel) {
+          return;
+        }
+        // Support both timestamp-based (from TimeController) and ISO string-based calls
+        if (args?.time !== undefined) {
+          // Convert timestamp to ISO string for map panel
+          const isoTime = new Date(args.time).toISOString();
+          panel.setTimeRange(isoTime, isoTime);
+        } else if (args?.start && args?.end) {
           panel.setTimeRange(args.start, args.end);
         }
       }
@@ -256,9 +264,32 @@ export function registerCommands(
       const panel = getMapPanel();
       if (panel) {
         // Reset to full range - need plot data
-        // TODO: Implement full range reset
+        const plot = panel.getCurrentPlot();
+        if (plot) {
+          const [timeStart, timeEnd] = plot.timeExtent;
+          panel.setTimeRange(timeStart, timeEnd);
+          timeRangeProvider.updateTimeExtent(
+            new Date(timeStart).getTime(),
+            new Date(timeEnd).getTime()
+          );
+        }
       }
     })
+  );
+
+  // Display mode command
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.setDisplayMode',
+      (args: { mode: 'full' | 'trail' }) => {
+        const panel = getMapPanel();
+        if (panel && args?.mode) {
+          // Send display mode to map panel
+          // The map panel will handle rendering full track or trail mode
+          // For now this is a placeholder - full implementation requires map updates
+        }
+      }
+    )
   );
 
   // Export commands

@@ -140,8 +140,11 @@ export function createOpenPlotCommand(
     layersTreeProvider.setResultLayers([]);
 
     // Update time range panel with plot's time extent
-    const [timeStart, timeEnd] = plot.timeExtent;
-    timeRangeProvider.updateTimeRange(timeStart, timeEnd, timeStart, timeEnd);
+    // Convert ISO strings to timestamps for the TimeController
+    const [timeStartStr, timeEndStr] = plot.timeExtent;
+    const timeStart = new Date(timeStartStr).getTime();
+    const timeEnd = new Date(timeEndStr).getTime();
+    timeRangeProvider.updateTimeExtent(timeStart, timeEnd);
 
     // Add to recent plots
     await recentPlotsService.addRecentPlot(
