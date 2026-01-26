@@ -180,7 +180,10 @@ export class StacTreeProvider
     item.contextValue = 'plot';
     item.iconPath = new vscode.ThemeIcon('graph');
     item.description = this.formatDate(plotItem.datetime);
-    item.tooltip = `${plotItem.title}\n${new Date(plotItem.datetime).toLocaleString()}`;
+    const dateStr = plotItem.datetime
+      ? new Date(plotItem.datetime).toLocaleString()
+      : '';
+    item.tooltip = dateStr ? `${plotItem.title}\n${dateStr}` : plotItem.title;
 
     // Make double-click open the plot
     item.command = {
@@ -243,8 +246,14 @@ export class StacTreeProvider
     return items;
   }
 
-  private formatDate(isoDate: string): string {
+  private formatDate(isoDate: string | undefined): string {
+    if (!isoDate) {
+      return '';
+    }
     const date = new Date(isoDate);
+    if (isNaN(date.getTime())) {
+      return '';
+    }
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / 86400000);
