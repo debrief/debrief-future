@@ -110,6 +110,7 @@ Record significant prioritisation decisions here for future reference.
 | 2026-01 | Tracer bullet before breadth | Validate architecture with thin slice before investing in many formats/tools |
 | 2026-01 | VS Code as primary frontend | Lower barrier than Electron standalone; developer audience familiar with it |
 | 2026-01-16 | Batch approval: 6 items for tracer bullet | Approved #002, #005, #007, #008, #011, #013 - all serve Themes 1-3; parked #006, #009 |
+| 2026-01-26 | Approved #029 session-state VS Code integration | Completes 024 architectural investment; enables Python tool state access via MCP; foundational for multi-document workflow |
 
 ---
 
