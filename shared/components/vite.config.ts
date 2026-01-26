@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 import { resolve } from 'path';
 
 export default defineConfig({
@@ -10,6 +11,10 @@ export default defineConfig({
       insertTypesEntry: true,
       include: ['src'],
       exclude: ['**/*.stories.tsx', '**/*.test.tsx'],
+    }),
+    cssInjectedByJsPlugin({
+      // Inject CSS into the main index.js entry point
+      jsAssetsFilterFunction: (outputChunk) => outputChunk.name === 'index',
     }),
   ],
   build: {
