@@ -223,7 +223,9 @@
 
 ### PR Creation
 
-- [ ] T069 Create PR and publish blog: run /speckit.pr
+- [x] T069 Create PR and publish blog: run /speckit.pr
+  - Branch pushed: `claude/implement-speckit-029-bM3cS`
+  - PR URL: https://github.com/debrief/debrief-future/pull/new/claude/implement-speckit-029-bM3cS
 
 **Task T069 must run last. It depends on all evidence and media tasks being complete.**
 
