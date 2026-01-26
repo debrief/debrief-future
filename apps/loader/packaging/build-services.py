@@ -180,9 +180,15 @@ def ensure_tools_installed(repo_root: Path) -> tuple[bool, str]:
     try:
         result = subprocess.run(["uv", "--version"], capture_output=True)
         if result.returncode != 0:
-            return False, "uv is not installed. Install with: curl -LsSf https://astral.sh/uv/install.sh | sh"
+            return (
+                False,
+                "uv is not installed. Install with: curl -LsSf https://astral.sh/uv/install.sh | sh",
+            )
     except FileNotFoundError:
-        return False, "uv is not installed. Install with: curl -LsSf https://astral.sh/uv/install.sh | sh"
+        return (
+            False,
+            "uv is not installed. Install with: curl -LsSf https://astral.sh/uv/install.sh | sh",
+        )
 
     # Check for objdump on Linux (required by PyInstaller)
     if sys.platform == "linux":
@@ -195,8 +201,9 @@ def ensure_tools_installed(repo_root: Path) -> tuple[bool, str]:
 
         # Check for Python shared library (required by PyInstaller on Linux)
         import sysconfig
-        libdir = sysconfig.get_config_var('LIBDIR')
-        ldlibrary = sysconfig.get_config_var('LDLIBRARY')
+
+        libdir = sysconfig.get_config_var("LIBDIR")
+        ldlibrary = sysconfig.get_config_var("LDLIBRARY")
         if libdir and ldlibrary:
             libpath = Path(libdir) / ldlibrary
             if not libpath.exists():
@@ -206,7 +213,10 @@ def ensure_tools_installed(repo_root: Path) -> tuple[bool, str]:
                     Path(f"/usr/lib/{ldlibrary}"),
                 ]
                 if not any(p.exists() for p in alt_paths):
-                    return False, "Python shared library not found. Install with: sudo apt install libpython3-dev"
+                    return (
+                        False,
+                        "Python shared library not found. Install with: sudo apt install libpython3-dev",
+                    )
 
     # Add pyinstaller to the workspace
     print("Ensuring PyInstaller is available...")
