@@ -105,7 +105,7 @@ Description formats:
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
 | 002 | Feature | Add MCP wrapper for debrief-io service | 4 | 3 | 4 | 11 | Medium | approved |
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | Low | approved |
-| 028 | Tech Debt | [Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md) | 4 | 2 | 5 | 11 | Low | specified |
+| 028 | Tech Debt | [Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md) | 4 | 2 | 5 | 11 | Low | tasked |
 | 029 | Tech Debt | [Integrate session-state service into VS Code extension](specs/029-session-state-vscode/spec.md) (multi-document support) | 5 | 3 | 4 | 12 | High | tasked |
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | 5 | 2 | 4 | 11 | Low | approved |
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
