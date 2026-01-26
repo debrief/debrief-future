@@ -206,7 +206,7 @@ def ensure_tools_installed(repo_root: Path) -> tuple[bool, str]:
                     Path(f"/usr/lib/{ldlibrary}"),
                 ]
                 if not any(p.exists() for p in alt_paths):
-                    return False, f"Python shared library not found. Install with: sudo apt install libpython3-dev"
+                    return False, "Python shared library not found. Install with: sudo apt install libpython3-dev"
 
     # Add pyinstaller to the workspace
     print("Ensuring PyInstaller is available...")
