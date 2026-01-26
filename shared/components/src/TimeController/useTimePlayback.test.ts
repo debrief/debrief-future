@@ -1,0 +1,342 @@
+/**
+ * Tests for useTimePlayback hook.
+ */
+
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useTimePlayback } from './useTimePlayback';
+import type { TimeExtent } from '../utils/types';
+
+// Mock requestAnimationFrame
+const mockRAF = vi.fn();
+const mockCancelRAF = vi.fn();
+
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.stubGlobal('requestAnimationFrame', mockRAF);
+  vi.stubGlobal('cancelAnimationFrame', mockCancelRAF);
+  mockRAF.mockImplementation((callback: FrameRequestCallback) => {
+    return setTimeout(() => callback(performance.now()), 16) as unknown as number;
+  });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+  mockRAF.mockClear();
+  mockCancelRAF.mockClear();
+});
+
+const HOUR = 60 * 60 * 1000;
+const NOW = 1704067200000; // 2024-01-01 00:00:00 UTC
+
+describe('useTimePlayback', () => {
+  describe('initialization', () => {
+    it('initializes with time at start of range', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      expect(result.current.currentTime).toBe(NOW);
+      expect(result.current.playbackState).toBe('paused');
+      expect(result.current.speed).toBe(1);
+    });
+
+    it('initializes with provided initial time', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const initialTime = NOW + 30 * 60 * 1000; // 30 minutes in
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent, initialTime })
+      );
+
+      expect(result.current.currentTime).toBe(initialTime);
+    });
+
+    it('initializes with provided initial speed', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent, initialSpeed: 4 })
+      );
+
+      expect(result.current.speed).toBe(4);
+    });
+
+    it('handles null time extent', () => {
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent: null })
+      );
+
+      expect(result.current.currentTime).toBe(0);
+      expect(result.current.atStart).toBe(true);
+      expect(result.current.atEnd).toBe(true);
+    });
+  });
+
+  describe('setCurrentTime', () => {
+    it('updates current time', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      act(() => {
+        result.current.setCurrentTime(NOW + 15 * 60 * 1000);
+      });
+
+      expect(result.current.currentTime).toBe(NOW + 15 * 60 * 1000);
+    });
+
+    it('clamps time to range', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      act(() => {
+        result.current.setCurrentTime(NOW - 1000);
+      });
+      expect(result.current.currentTime).toBe(NOW);
+
+      act(() => {
+        result.current.setCurrentTime(NOW + HOUR + 1000);
+      });
+      expect(result.current.currentTime).toBe(NOW + HOUR);
+    });
+
+    it('calls onTimeChange callback', () => {
+      const onTimeChange = vi.fn();
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent, onTimeChange })
+      );
+
+      act(() => {
+        result.current.setCurrentTime(NOW + 15 * 60 * 1000);
+      });
+
+      expect(onTimeChange).toHaveBeenCalledWith(NOW + 15 * 60 * 1000);
+    });
+  });
+
+  describe('play/pause', () => {
+    it('play sets state to playing', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      act(() => {
+        result.current.play();
+      });
+
+      expect(result.current.playbackState).toBe('playing');
+    });
+
+    it('pause sets state to paused', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      act(() => {
+        result.current.play();
+      });
+      act(() => {
+        result.current.pause();
+      });
+
+      expect(result.current.playbackState).toBe('paused');
+    });
+
+    it('togglePlayback toggles state', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      expect(result.current.playbackState).toBe('paused');
+
+      act(() => {
+        result.current.togglePlayback();
+      });
+      expect(result.current.playbackState).toBe('playing');
+
+      act(() => {
+        result.current.togglePlayback();
+      });
+      expect(result.current.playbackState).toBe('paused');
+    });
+
+    it('calls onPlaybackStateChange callback', () => {
+      const onPlaybackStateChange = vi.fn();
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent, onPlaybackStateChange })
+      );
+
+      act(() => {
+        result.current.play();
+      });
+
+      expect(onPlaybackStateChange).toHaveBeenCalledWith('playing');
+    });
+
+    it('restarts from beginning if at end', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      act(() => {
+        result.current.setCurrentTime(NOW + HOUR);
+      });
+      expect(result.current.atEnd).toBe(true);
+
+      act(() => {
+        result.current.play();
+      });
+
+      expect(result.current.currentTime).toBe(NOW);
+      expect(result.current.playbackState).toBe('playing');
+    });
+  });
+
+  describe('speed', () => {
+    it('setSpeed updates playback speed', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      act(() => {
+        result.current.setSpeed(4);
+      });
+
+      expect(result.current.speed).toBe(4);
+    });
+
+    it('accepts valid speed values', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      const validSpeeds = [1, 2, 4, 8] as const;
+      for (const speed of validSpeeds) {
+        act(() => {
+          result.current.setSpeed(speed);
+        });
+        expect(result.current.speed).toBe(speed);
+      }
+    });
+  });
+
+  describe('scrubbing', () => {
+    it('scrubForward advances time by increment', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      const initialTime = result.current.currentTime;
+
+      act(() => {
+        result.current.scrubForward();
+      });
+
+      expect(result.current.currentTime).toBeGreaterThan(initialTime);
+    });
+
+    it('scrubBackward moves time back by increment', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      // Move to middle first
+      act(() => {
+        result.current.setCurrentTime(NOW + 30 * 60 * 1000);
+      });
+
+      const midTime = result.current.currentTime;
+
+      act(() => {
+        result.current.scrubBackward();
+      });
+
+      expect(result.current.currentTime).toBeLessThan(midTime);
+    });
+
+    it('scrubForward clamps to end', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      // Move near end
+      act(() => {
+        result.current.setCurrentTime(NOW + HOUR - 1000);
+      });
+
+      act(() => {
+        result.current.scrubForward();
+      });
+
+      expect(result.current.currentTime).toBe(NOW + HOUR);
+    });
+
+    it('scrubBackward clamps to start', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      act(() => {
+        result.current.scrubBackward();
+      });
+
+      expect(result.current.currentTime).toBe(NOW);
+    });
+  });
+
+  describe('atStart/atEnd', () => {
+    it('atStart is true at beginning of range', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      expect(result.current.atStart).toBe(true);
+      expect(result.current.atEnd).toBe(false);
+    });
+
+    it('atEnd is true at end of range', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      act(() => {
+        result.current.setCurrentTime(NOW + HOUR);
+      });
+
+      expect(result.current.atStart).toBe(false);
+      expect(result.current.atEnd).toBe(true);
+    });
+
+    it('both false in middle of range', () => {
+      const timeExtent: TimeExtent = [NOW, NOW + HOUR];
+      const { result } = renderHook(() =>
+        useTimePlayback({ timeExtent })
+      );
+
+      act(() => {
+        result.current.setCurrentTime(NOW + 30 * 60 * 1000);
+      });
+
+      expect(result.current.atStart).toBe(false);
+      expect(result.current.atEnd).toBe(false);
+    });
+  });
+});

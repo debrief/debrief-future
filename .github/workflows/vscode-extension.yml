@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'apps/vscode/**'
+      - 'shared/components/**'
       - '.github/workflows/vscode-extension.yml'
     tags:
       - 'vscode-v*'
@@ -12,6 +13,7 @@ on:
     branches: [main]
     paths:
       - 'apps/vscode/**'
+      - 'shared/components/**'
       - '.github/workflows/vscode-extension.yml'
 
 defaults:
@@ -49,7 +51,7 @@ jobs:
         run: pnpm run test:unit
 
       - name: Build extension
-        run: pnpm run compile
+        run: pnpm run build
 
       - name: Package VSIX
         run: pnpm run package
@@ -85,7 +87,7 @@ jobs:
 
       - name: Build and package
         run: |
-          pnpm run compile
+          pnpm run build
           pnpm run package
 
       - name: Extract version from tag

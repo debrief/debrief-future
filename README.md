@@ -263,6 +263,11 @@ flowchart TB
 
 > **Windows note:** After installing tools, restart your terminal for PATH changes to take effect.
 
+**Linux only** (for building Electron app with bundled Python services):
+```bash
+sudo apt install binutils libpython3-dev
+```
+
 ### Quick Start
 
 ```bash

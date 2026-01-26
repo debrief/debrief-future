@@ -2,6 +2,28 @@
 
 This document describes how to bundle the Python services (debrief-stac, debrief-io) with the Electron app so they're self-contained and don't require separate Python installation.
 
+## Prerequisites
+
+### All Platforms
+- **uv** - Python package manager: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- **Python 3.11+** - For running PyInstaller
+
+### Linux (Debian/Ubuntu)
+```bash
+sudo apt install binutils libpython3-dev
+```
+- `binutils` - provides `objdump` required by PyInstaller
+- `libpython3-dev` - provides Python shared library required by PyInstaller
+
+### macOS
+```bash
+# Xcode command line tools (includes required libraries)
+xcode-select --install
+```
+
+### Windows
+- Visual C++ Build Tools (for some native extensions)
+
 ## Architecture Overview
 
 The Loader app communicates with Python services via JSON-RPC over stdin/stdout:
