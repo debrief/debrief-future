@@ -117,6 +117,11 @@ Description formats:
 | 027 | Infrastructure | [Add automated screenshot capture for Storybook stories](docs/ideas/027-automated-screenshots.md) | 3 | 4 | 4 | 11 | Medium | approved |
 | 028 | Infrastructure | [Reinstate Playwright E2E testing in CI](docs/ideas/028-reinstate-playwright-ci.md) | 4 | 2 | 5 | 11 | Medium | approved |
 | 012 | Enhancement | Wire loader plot count to debrief-stac list_plots call | 2 | 1 | 5 | 8 | Low | proposed |
+| 030 | Tech Debt | Fix test isolation in debrief-config tests (shared state causes test_empty_list_when_no_stores to fail) | - | - | - | - | Low | proposed |
+| 031 | Tech Debt | Add session-state-py package to uv workspace (exists in services/ but not in pyproject.toml members) | - | - | - | - | Low | proposed |
+| 032 | Tech Debt | Consolidate config handling - loader and vscode both re-implement config instead of using shared/config-ts | - | - | - | - | Medium | proposed |
+| 033 | Tech Debt | Re-enable debrief-stac tests in pytest (currently excluded with --ignore flag in pyproject.toml) | - | - | - | - | Low | proposed |
+| 034 | Tech Debt | Remove synchronous fs calls from VS Code stacService (uses fs.existsSync, readFileSync instead of async) | - | - | - | - | Low | proposed |
 | 027 | Documentation | [Document vscrui as standard component library for VS Code webviews](docs/ideas/027-vscrui-component-library.md) | 3 | 1 | 5 | 9 | Low | approved |
 | 027 | Documentation | [Document Storybook VS Code theming setup](docs/ideas/027-storybook-vscode-theming.md) | 2 | 2 | 5 | 9 | Low | approved |
 | 018 | Infrastructure | [Add VS Code multi-root workspace configuration](specs/018-vscode-workspace-config/spec.md) | 3 | 1 | 5 | 9 | Low | shipped |
