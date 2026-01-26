@@ -154,6 +154,11 @@
         "title": "Load into Debrief...",
         "category": "Debrief",
         "icon": "$(file-add)"
+      },
+      {
+        "command": "debrief.setDisplayMode",
+        "title": "Set Display Mode",
+        "category": "Debrief"
       }
     ],
     "keybindings": [
@@ -378,12 +383,13 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
+    "build": "pnpm --filter @debrief/components build && npm run compile",
     "compile": "npm run compile:extension && npm run compile:webview",
     "compile:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
-    "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife && node -e \"require('fs').copyFileSync('src/webview/web/styles.css', 'dist/webview/styles.css')\"",
+    "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife && esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text && node -e \"require('fs').copyFileSync('src/webview/web/styles.css', 'dist/webview/styles.css')\"",
     "watch": "npm run watch:extension & npm run watch:webview",
     "watch:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
-    "watch:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife --watch",
+    "watch:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife --watch & esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch",
     "dev": "concurrently \"npm run watch:extension\" \"npm run watch:webview\"",
     "lint": "eslint src --ext ts",
     "lint:fix": "eslint src --ext ts --fix",
@@ -394,11 +400,13 @@
     "test:integration": "vscode-test",
     "test:e2e": "playwright test",
     "package": "vsce package --no-dependencies",
-    "pretest": "npm run compile"
+    "pretest": "npm run build"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.8",
     "@types/node": "^20.10.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0",
@@ -414,7 +422,10 @@
     "vitest": "^1.0.0"
   },
   "dependencies": {
+    "@debrief/components": "workspace:*",
     "leaflet": "^1.9.4",
-    "leaflet-image": "^0.4.0"
+    "leaflet-image": "^0.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }

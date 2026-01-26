@@ -2,6 +2,8 @@
   "name": "debrief-loader",
   "version": "0.1.0",
   "description": "Debrief file loading orchestration application",
+  "author": "Debrief Project <debrief@debrief.info>",
+  "homepage": "https://github.com/debrief/debrief-future",
   "main": "dist/main/index.cjs",
   "type": "module",
   "scripts": {
@@ -10,7 +12,7 @@
     "build:mac": "npm run build:services -- --platform darwin && tsc && vite build && electron-builder --mac",
     "build:win": "npm run build:services -- --platform win32 && tsc && vite build && electron-builder --win",
     "build:linux": "npm run build:services -- --platform linux && tsc && vite build && electron-builder --linux",
-    "build:services": "python packaging/build-services.py",
+    "build:services": "python3 packaging/build-services.py",
     "build:renderer": "vite build",
     "build:main": "tsc -p tsconfig.main.json",
     "preview": "vite preview",

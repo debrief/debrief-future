@@ -174,13 +174,49 @@ if __name__ == "__main__":
     return output_path
 
 
-def ensure_tools_installed(repo_root: Path) -> None:
-    """Ensure required tools are installed."""
+def ensure_tools_installed(repo_root: Path) -> tuple[bool, str]:
+    """Ensure required tools are installed. Returns (success, error_message)."""
     # Check for uv
-    result = subprocess.run(["uv", "--version"], capture_output=True)
-    if result.returncode != 0:
-        print("ERROR: uv is not installed. Install with: pip install uv")
-        sys.exit(1)
+    try:
+        result = subprocess.run(["uv", "--version"], capture_output=True)
+        if result.returncode != 0:
+            return (
+                False,
+                "uv is not installed. Install with: curl -LsSf https://astral.sh/uv/install.sh | sh",
+            )
+    except FileNotFoundError:
+        return (
+            False,
+            "uv is not installed. Install with: curl -LsSf https://astral.sh/uv/install.sh | sh",
+        )
+
+    # Check for objdump on Linux (required by PyInstaller)
+    if sys.platform == "linux":
+        try:
+            result = subprocess.run(["objdump", "--version"], capture_output=True)
+            if result.returncode != 0:
+                return False, "objdump is not installed. Install with: sudo apt install binutils"
+        except FileNotFoundError:
+            return False, "objdump is not installed. Install with: sudo apt install binutils"
+
+        # Check for Python shared library (required by PyInstaller on Linux)
+        import sysconfig
+
+        libdir = sysconfig.get_config_var("LIBDIR")
+        ldlibrary = sysconfig.get_config_var("LDLIBRARY")
+        if libdir and ldlibrary:
+            libpath = Path(libdir) / ldlibrary
+            if not libpath.exists():
+                # Also check in standard locations
+                alt_paths = [
+                    Path(f"/usr/lib/x86_64-linux-gnu/{ldlibrary}"),
+                    Path(f"/usr/lib/{ldlibrary}"),
+                ]
+                if not any(p.exists() for p in alt_paths):
+                    return (
+                        False,
+                        "Python shared library not found. Install with: sudo apt install libpython3-dev",
+                    )
 
     # Add pyinstaller to the workspace
     print("Ensuring PyInstaller is available...")
@@ -191,6 +227,7 @@ def ensure_tools_installed(repo_root: Path) -> None:
         text=True,
     )
     # Ignore errors if already installed
+    return True, ""
 
 
 def main():
@@ -212,7 +249,16 @@ def main():
     print()
 
     # Ensure tools are available
-    ensure_tools_installed(repo_root)
+    tools_ok, error_msg = ensure_tools_installed(repo_root)
+    if not tools_ok:
+        print(f"WARNING: {error_msg}")
+        print("         Skipping Python services build.")
+        print("         The Electron app will run but Python services won't be bundled.")
+        # Create empty services directory so electron-builder doesn't fail
+        services_dir = dist_dir / "services"
+        services_dir.mkdir(parents=True, exist_ok=True)
+        (services_dir / ".gitkeep").touch()
+        return
 
     # Clean previous build
     if dist_dir.exists():

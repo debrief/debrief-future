@@ -100,12 +100,13 @@ Description formats:
 | 017 | Enhancement | [Configure VS Code extension to hide default activities on load](specs/017-vscode-hide-activities/spec.md) | 3 | 3 | 4 | 10 | Medium | tasked |
 | 016 | Infrastructure | [Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md) | 3 | 5 | 4 | 12 | Medium | specified |
 | 023 | Infrastructure | [Add epic support to speckit workflow](specs/023-epic-workflow-support/spec.md) | 4 | 3 | 4 | 11 | Medium | specified |
-| 025 | Feature | [Design time controller UI/UX for VS Code extension](docs/ideas/022-time-controller.md) | 5 | 5 | 4 | 14 | Medium | approved |
+| 025 | Feature | [Design time controller UI/UX for VS Code extension](specs/025-time-controller/spec.md) | 5 | 5 | 4 | 14 | Medium | implementing |
 | 026 | Feature | [Add annotation shape renderers to VS Code extension](https://github.com/debrief/debrief-future/issues/86) (requires #021) | 5 | 5 | 4 | 14 | Medium | approved |
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
 | 002 | Feature | Add MCP wrapper for debrief-io service | 4 | 3 | 4 | 11 | Medium | approved |
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | Low | approved |
 | 028 | Tech Debt | [Add comprehensive unit tests for stacService](https://github.com/debrief/debrief-future/issues/98) | 4 | 2 | 5 | 11 | Low | proposed |
+| 029 | Tech Debt | [Integrate session-state service into VS Code extension](docs/ideas/029-session-state-vscode-integration.md) (multi-document support) | 5 | 3 | 4 | 12 | High | proposed |
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | 5 | 2 | 4 | 11 | Low | approved |
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
 | 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](docs/ideas/019-backlog-interview-capture.md) | 3 | 3 | 5 | 11 | Medium | proposed |

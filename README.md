@@ -253,13 +253,20 @@ flowchart TB
 
 ### Prerequisites
 
-| Tool | Installation |
-|------|--------------|
-| Task | https://taskfile.dev/installation/ (or `brew install go-task`) |
-| uv | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| pnpm | `npm install -g pnpm` |
-| Node.js | 18+ |
-| Python | 3.11+ |
+| Tool | macOS / Linux | Windows |
+|------|---------------|---------|
+| Task | `brew install go-task` | `winget install Task.Task` or `choco install go-task` |
+| uv | `curl -LsSf https://astral.sh/uv/install.sh \| sh` | `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 \| iex"` |
+| pnpm | `npm install -g pnpm` | `npm install -g pnpm` |
+| Node.js | 18+ | 18+ |
+| Python | 3.11+ | 3.11+ |
+
+> **Windows note:** After installing tools, restart your terminal for PATH changes to take effect.
+
+**Linux only** (for building Electron app with bundled Python services):
+```bash
+sudo apt install binutils libpython3-dev
+```
 
 ### Quick Start
 
