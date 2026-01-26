@@ -114,6 +114,9 @@ importers:
       '@debrief/components':
         specifier: workspace:*
         version: link:../../shared/components
+      '@debrief/session-state':
+        specifier: workspace:*
+        version: link:../../services/session-state
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4

@@ -8,6 +8,7 @@ import type { StacService } from '../services/stacService';
 import type { CalcService } from '../services/calcService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
 import type { IoService } from '../services/ioService';
+import type { SessionManager } from '../services/sessionManager';
 import type { StacTreeProvider } from '../providers/stacTreeProvider';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
@@ -29,6 +30,7 @@ export function registerCommands(
   calcService: CalcService,
   recentPlotsService: RecentPlotsService,
   ioService: IoService,
+  sessionManager: SessionManager,
   stacTreeProvider: StacTreeProvider,
   toolsTreeProvider: ToolsTreeProvider,
   layersTreeProvider: LayersTreeProvider,
@@ -48,6 +50,7 @@ export function registerCommands(
         stacService,
         ioService,
         recentPlotsService,
+        sessionManager,
         toolsTreeProvider,
         layersTreeProvider,
         timeRangeProvider,

@@ -3,9 +3,21 @@
  *
  * Uses the TimeController React component from @debrief/components
  * to provide playback controls for maritime track visualization.
+ *
+ * Feature: 029-session-state-vscode
+ * - Subscribes to session manager for active session changes
+ * - Updates webview when temporal state changes
+ * - Updates session state when user changes time
  */
 
 import * as vscode from 'vscode';
+import {
+  subscribeToTemporal,
+  createTimeInstant,
+  type SessionStoreApi,
+  type TemporalSlice,
+} from '@debrief/session-state';
+import type { SessionManager } from '../services/sessionManager';
 
 // Message types from webview to extension
 interface TimeChangeMessage {
@@ -42,13 +54,131 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
   private _isWebviewReady = false;
   private _pendingMessages: Array<Record<string, unknown>> = [];
 
-  // Event callbacks
+  // Session manager integration
+  private _sessionManager?: SessionManager;
+  private _activeSession?: SessionStoreApi;
+  private _temporalUnsubscribe?: () => void;
+  private _sessionChangeDisposable?: vscode.Disposable;
+
+  // Event callbacks (legacy - kept for backward compatibility)
   private _onTimeChangeCallback?: (time: number) => void;
   private _onPlaybackStateChangeCallback?: (state: 'playing' | 'paused') => void;
   private _onDisplayModeChangeCallback?: (mode: 'full' | 'trail') => void;
 
-  constructor(extensionUri: vscode.Uri) {
+  constructor(extensionUri: vscode.Uri, sessionManager?: SessionManager) {
     this._extensionUri = extensionUri;
+    this._sessionManager = sessionManager;
+
+    // Subscribe to session manager if provided
+    if (sessionManager) {
+      this._sessionChangeDisposable = sessionManager.onActiveSessionChange(
+        (session) => this._handleActiveSessionChange(session)
+      );
+    }
+  }
+
+  /**
+   * Set session manager (for late binding after construction)
+   */
+  public setSessionManager(sessionManager: SessionManager): void {
+    // Clean up existing subscription
+    if (this._sessionChangeDisposable) {
+      this._sessionChangeDisposable.dispose();
+    }
+
+    this._sessionManager = sessionManager;
+    this._sessionChangeDisposable = sessionManager.onActiveSessionChange(
+      (session) => this._handleActiveSessionChange(session)
+    );
+
+    // Subscribe to current active session if any
+    const activeSession = sessionManager.getActiveSession();
+    if (activeSession) {
+      this._handleActiveSessionChange(activeSession);
+    }
+  }
+
+  /**
+   * Handle active session change from SessionManager
+   */
+  private _handleActiveSessionChange(session: SessionStoreApi | null): void {
+    // Unsubscribe from previous session
+    if (this._temporalUnsubscribe) {
+      this._temporalUnsubscribe();
+      this._temporalUnsubscribe = undefined;
+    }
+
+    this._activeSession = session ?? undefined;
+
+    if (session) {
+      // Subscribe to temporal state changes
+      this._temporalUnsubscribe = subscribeToTemporal(
+        session,
+        (temporal) => this._handleTemporalChange(temporal)
+      );
+
+      // Set initial state from session
+      const state = session.getState();
+      if (state.timeRange) {
+        this._timeExtent = {
+          start: state.timeRange.start.epoch,
+          end: state.timeRange.end.epoch,
+        };
+        this._postMessage({
+          type: 'updateTimeExtent',
+          start: state.timeRange.start.epoch,
+          end: state.timeRange.end.epoch,
+          dataStart: state.timeRange.start.epoch,
+          dataEnd: state.timeRange.end.epoch,
+        });
+      }
+      if (state.currentTime) {
+        this._postMessage({
+          type: 'setCurrentTime',
+          time: state.currentTime.epoch,
+        });
+      }
+      this.setUIState('ready');
+    } else {
+      // No active session - show empty state
+      this._timeExtent = null;
+      this.setUIState('empty');
+    }
+  }
+
+  /**
+   * Handle temporal state changes from session
+   */
+  private _handleTemporalChange(temporal: TemporalSlice): void {
+    // Update time extent if changed
+    if (temporal.timeRange) {
+      const newExtent = {
+        start: temporal.timeRange.start.epoch,
+        end: temporal.timeRange.end.epoch,
+      };
+      if (
+        !this._timeExtent ||
+        this._timeExtent.start !== newExtent.start ||
+        this._timeExtent.end !== newExtent.end
+      ) {
+        this._timeExtent = newExtent;
+        this._postMessage({
+          type: 'updateTimeExtent',
+          start: newExtent.start,
+          end: newExtent.end,
+          dataStart: newExtent.start,
+          dataEnd: newExtent.end,
+        });
+      }
+    }
+
+    // Update current time if changed
+    if (temporal.currentTime) {
+      this._postMessage({
+        type: 'setCurrentTime',
+        time: temporal.currentTime.epoch,
+      });
+    }
   }
 
   public resolveWebviewView(
@@ -92,22 +222,43 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
           break;
 
         case 'timeChange':
+          // Update session state if available
+          if (this._activeSession) {
+            this._activeSession.getState().setCurrentTime(
+              createTimeInstant(message.time)
+            );
+          }
+          // Legacy callback
           if (this._onTimeChangeCallback) {
             this._onTimeChangeCallback(message.time);
           }
-          // Also execute command for other parts of extension
+          // Execute command for other parts of extension
           void vscode.commands.executeCommand('debrief.setTimeRange', {
             time: message.time,
           });
           break;
 
         case 'playbackStateChange':
+          // Update session state if available
+          if (this._activeSession) {
+            this._activeSession.getState().setPlaybackState(
+              message.state === 'playing' ? 'playing' : 'paused'
+            );
+          }
+          // Legacy callback
           if (this._onPlaybackStateChangeCallback) {
             this._onPlaybackStateChangeCallback(message.state);
           }
           break;
 
         case 'displayModeChange':
+          // Update session state if available
+          if (this._activeSession) {
+            this._activeSession.getState().setDisplayMode(
+              message.mode === 'trail' ? 'snailTrail' : 'normal'
+            );
+          }
+          // Legacy callback
           if (this._onDisplayModeChangeCallback) {
             this._onDisplayModeChangeCallback(message.mode);
           }
@@ -183,6 +334,18 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
    */
   public onDisplayModeChange(callback: (mode: 'full' | 'trail') => void): void {
     this._onDisplayModeChangeCallback = callback;
+  }
+
+  /**
+   * Dispose resources
+   */
+  public dispose(): void {
+    if (this._temporalUnsubscribe) {
+      this._temporalUnsubscribe();
+    }
+    if (this._sessionChangeDisposable) {
+      this._sessionChangeDisposable.dispose();
+    }
   }
 
   /**

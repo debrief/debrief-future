@@ -7,6 +7,7 @@ import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { IoService } from '../services/ioService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
+import type { SessionManager } from '../services/sessionManager';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
@@ -29,6 +30,7 @@ export function createOpenPlotCommand(
   stacService: StacService,
   ioService: IoService,
   recentPlotsService: RecentPlotsService,
+  sessionManager: SessionManager,
   toolsTreeProvider: ToolsTreeProvider,
   layersTreeProvider: LayersTreeProvider,
   timeRangeProvider: TimeRangeViewProvider,
@@ -94,6 +96,18 @@ export function createOpenPlotCommand(
       void vscode.window.showErrorMessage('Failed to load plot data');
       return;
     }
+
+    // Create session for this document
+    const plotUri = buildStacUri(storeId, itemPath);
+    sessionManager.createSession(plotUri, {
+      plot,
+      tracks: plotData.tracks,
+      locations: plotData.locations,
+      featureCollectionUri: plotUri,
+    });
+
+    // Set as active document
+    sessionManager.setActiveDocument(plotUri);
 
     // Create or get map panel
     let panel = getMapPanel();

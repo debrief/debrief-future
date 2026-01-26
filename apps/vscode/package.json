@@ -424,6 +424,7 @@
   },
   "dependencies": {
     "@debrief/components": "workspace:*",
+    "@debrief/session-state": "workspace:*",
     "leaflet": "^1.9.4",
     "leaflet-image": "^0.4.0",
     "react": "^18.2.0",

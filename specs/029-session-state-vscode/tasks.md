@@ -44,9 +44,9 @@
 
 **Purpose**: Add dependency and verify build
 
-- [ ] T001 Add session-state workspace dependency `apps/vscode/package.json`
-- [ ] T002 Verify esbuild bundles session-state library `apps/vscode/esbuild.config.js`
-- [ ] T003 Run build to confirm no errors
+- [x] T001 Add session-state workspace dependency `apps/vscode/package.json`
+- [x] T002 Verify esbuild bundles session-state library `apps/vscode/esbuild.config.js`
+- [x] T003 Run build to confirm no errors
 
 **Checkpoint**: Extension builds successfully with session-state dependency
 
@@ -58,12 +58,12 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Create SessionManager class skeleton `apps/vscode/src/services/sessionManager.ts`
-- [ ] T005 Implement createSession() with store initialization `apps/vscode/src/services/sessionManager.ts`
-- [ ] T006 Implement getActiveSession() and setActiveDocument() `apps/vscode/src/services/sessionManager.ts`
-- [ ] T007 Add onActiveSessionChange event emitter `apps/vscode/src/services/sessionManager.ts`
-- [ ] T008 Implement dispose() and session cleanup `apps/vscode/src/services/sessionManager.ts`
-- [ ] T009 [test] Write SessionManager unit tests `apps/vscode/src/test/unit/sessionManager.test.ts`
+- [x] T004 Create SessionManager class skeleton `apps/vscode/src/services/sessionManager.ts`
+- [x] T005 Implement createSession() with store initialization `apps/vscode/src/services/sessionManager.ts`
+- [x] T006 Implement getActiveSession() and setActiveDocument() `apps/vscode/src/services/sessionManager.ts`
+- [x] T007 Add onActiveSessionChange event emitter `apps/vscode/src/services/sessionManager.ts`
+- [x] T008 Implement dispose() and session cleanup `apps/vscode/src/services/sessionManager.ts`
+- [x] T009 [test] Write SessionManager unit tests `apps/vscode/tests/unit/sessionManager.test.ts`
 
 **Checkpoint**: SessionManager can create, cache, and switch sessions
 
@@ -82,10 +82,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T012 Integrate SessionManager into extension activation `apps/vscode/src/extension.ts`
-- [ ] T013 Wire TimeRangeViewProvider to accept SessionManager `apps/vscode/src/views/timeRangeView.ts`
-- [ ] T014 Add temporal slice subscription to TimeRangeViewProvider `apps/vscode/src/views/timeRangeView.ts`
-- [ ] T015 Handle timeChange messages to update session state `apps/vscode/src/views/timeRangeView.ts`
+- [x] T012 Integrate SessionManager into extension activation `apps/vscode/src/extension.ts`
+- [x] T013 Wire TimeRangeViewProvider to accept SessionManager `apps/vscode/src/views/timeRangeView.ts`
+- [x] T014 Add temporal slice subscription to TimeRangeViewProvider `apps/vscode/src/views/timeRangeView.ts`
+- [x] T015 Handle timeChange messages to update session state `apps/vscode/src/views/timeRangeView.ts`
 - [ ] T016 Wire LayersTreeProvider to accept SessionManager `apps/vscode/src/providers/layersTreeProvider.ts`
 - [ ] T017 Add features slice subscription to LayersTreeProvider `apps/vscode/src/providers/layersTreeProvider.ts`
 - [ ] T018 Replace local visibility state with session state `apps/vscode/src/providers/layersTreeProvider.ts`
@@ -93,8 +93,8 @@
 - [ ] T020 Add viewport/selection/time messages to message types `apps/vscode/src/webview/messages.ts`
 - [ ] T021 Subscribe MapPanel to spatial, features, temporal slices `apps/vscode/src/webview/mapPanel.ts`
 - [ ] T022 Add debounced viewport update handler (100ms) `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T023 Update openPlot command to create session `apps/vscode/src/commands/openPlot.ts`
-- [ ] T024 Pass SessionManager to all component constructors `apps/vscode/src/extension.ts`
+- [x] T023 Update openPlot command to create session `apps/vscode/src/commands/openPlot.ts`
+- [x] T024 Pass SessionManager to all component constructors `apps/vscode/src/extension.ts`
 
 **Checkpoint**: Single document state sync works - time/selection changes reflect across all components
 
@@ -209,17 +209,17 @@
 
 ### Evidence Collection
 
-- [ ] T061 Create evidence directory `specs/029-session-state-vscode/evidence/`
-- [ ] T062 Capture test summary with pass/fail counts `specs/029-session-state-vscode/evidence/test-summary.md`
-- [ ] T063 Create usage demonstration showing state sync `specs/029-session-state-vscode/evidence/usage-example.md`
+- [x] T061 Create evidence directory `specs/029-session-state-vscode/evidence/`
+- [x] T062 Capture test summary with pass/fail counts `specs/029-session-state-vscode/evidence/test-summary.md`
+- [x] T063 Create usage demonstration showing state sync `specs/029-session-state-vscode/evidence/usage-example.md`
 - [ ] T064 [P] Document state flow between components `specs/029-session-state-vscode/evidence/state-flow.md`
 - [ ] T065 [P] Capture multi-document switching demo `specs/029-session-state-vscode/evidence/multi-doc-demo.md`
 - [ ] T066 [P] Document MCP integration example `specs/029-session-state-vscode/evidence/mcp-integration.md`
 
 ### Media Content
 
-- [ ] T067 Create shipped blog post `specs/029-session-state-vscode/media/shipped-post.md`
-- [ ] T068 [P] Create LinkedIn shipped summary `specs/029-session-state-vscode/media/linkedin-shipped.md`
+- [x] T067 Create shipped blog post `specs/029-session-state-vscode/media/shipped-post.md`
+- [x] T068 [P] Create LinkedIn shipped summary `specs/029-session-state-vscode/media/linkedin-shipped.md`
 
 ### PR Creation
 

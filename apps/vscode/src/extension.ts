@@ -12,6 +12,7 @@ import { CalcService } from './services/calcService';
 import { RecentPlotsService } from './services/recentPlotsService';
 import { ActivityBarService } from './services/activityBarService';
 import { IoService } from './services/ioService';
+import { SessionManager } from './services/sessionManager';
 import { registerCommands } from './commands';
 import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 
@@ -31,6 +32,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const calcService = new CalcService(context);
   const recentPlotsService = new RecentPlotsService(context);
   const ioService = new IoService(context.extensionPath);
+  const sessionManager = new SessionManager();
+  context.subscriptions.push(sessionManager);
 
   // Register file system provider for stac:// URIs
   const stacFileSystemProvider = new StacFileSystemProvider(stacService);
@@ -46,7 +49,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const toolsTreeProvider = new ToolsTreeProvider(calcService);
   const layersTreeProvider = new LayersTreeProvider();
   const outlineProvider = new OutlineProvider();
-  const timeRangeProvider = new TimeRangeViewProvider(context.extensionUri);
+  const timeRangeProvider = new TimeRangeViewProvider(context.extensionUri, sessionManager);
 
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
@@ -71,6 +74,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     calcService,
     recentPlotsService,
     ioService,
+    sessionManager,
     stacTreeProvider,
     toolsTreeProvider,
     layersTreeProvider,
