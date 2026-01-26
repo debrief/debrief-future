@@ -400,7 +400,7 @@
     "test:integration": "vscode-test",
     "test:e2e": "playwright test",
     "package": "vsce package --no-dependencies",
-    "pretest": "npm run compile"
+    "pretest": "npm run build"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.8",
