@@ -380,7 +380,7 @@
     "vscode:prepublish": "npm run compile",
     "compile": "npm run compile:extension && npm run compile:webview",
     "compile:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
-    "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife && cp src/webview/web/styles.css dist/webview/styles.css",
+    "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife && node -e \"require('fs').copyFileSync('src/webview/web/styles.css', 'dist/webview/styles.css')\"",
     "watch": "npm run watch:extension & npm run watch:webview",
     "watch:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
     "watch:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife --watch",
