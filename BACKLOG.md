@@ -107,6 +107,7 @@ Description formats:
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | Low | approved |
 | 028 | Tech Debt | [Add comprehensive unit tests for stacService](https://github.com/debrief/debrief-future/issues/98) | 4 | 2 | 5 | 11 | Low | proposed |
 | 029 | Tech Debt | [Integrate session-state service into VS Code extension](specs/029-session-state-vscode/spec.md) (multi-document support) | 5 | 3 | 4 | 12 | High | tasked |
+| 030 | Tech Debt | [Add replay mode and time acceleration to temporal state schema](docs/ideas/030-temporal-ui-state.md) (requires #029) | 4 | 2 | 4 | 10 | Medium | approved |
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | 5 | 2 | 4 | 11 | Low | approved |
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
 | 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](docs/ideas/019-backlog-interview-capture.md) | 3 | 3 | 5 | 11 | Medium | proposed |
@@ -124,6 +125,7 @@ Description formats:
 | 034 | Tech Debt | [Remove synchronous fs calls from VS Code stacService](docs/ideas/034-async-stac-service-fs.md) | - | - | - | - | Low | proposed |
 | 027 | Documentation | [Document vscrui as standard component library for VS Code webviews](docs/ideas/027-vscrui-component-library.md) | 3 | 1 | 5 | 9 | Low | approved |
 | 027 | Documentation | [Document Storybook VS Code theming setup](docs/ideas/027-storybook-vscode-theming.md) | 2 | 2 | 5 | 9 | Low | approved |
+| 030 | Feature | [Invoke debrief-calc distance tool from VS Code extension](https://github.com/debrief/debrief-future/issues/115) (requires #025, #029) | 5 | 5 | 4 | 14 | Medium | approved |
 | 018 | Infrastructure | [Add VS Code multi-root workspace configuration](specs/018-vscode-workspace-config/spec.md) | 3 | 1 | 5 | 9 | Low | shipped |
 | ~~014~~ | ~~Feature~~ | ~~[Add styling properties schemas to GeoJSON features](specs/014-geojson-styling-schemas/spec.md)~~ | ~~5~~ | ~~4~~ | ~~5~~ | ~~14~~ | ~~Medium~~ | ~~complete~~ |
 | ~~015~~ | ~~Infrastructure~~ | ~~[Create LinkML schemas for REP annotation item types](specs/015-annotation-item-schemas/spec.md)~~ | ~~5~~ | ~~3~~ | ~~5~~ | ~~13~~ | ~~Medium~~ | ~~complete~~ |
