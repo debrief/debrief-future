@@ -128,17 +128,22 @@ export function createOpenPlotCommand(
       panel = MapPanel.createOrShow(context.extensionUri, plot.title);
       setMapPanel(panel);
 
+      // Wire session manager for state synchronization (Feature: 029)
+      panel.setSessionManager(sessionManager);
+
       // Set up selection change handler
       panel.onSelectionChanged((selection) => {
         toolsTreeProvider.updateSelection(selection);
       });
 
-      // Clear reference and layers when panel is disposed
+      // Clear reference, layers, and sessions when panel is disposed
       panel.getPanel().onDidDispose(() => {
         setMapPanel(undefined);
         layersTreeProvider.setTracks([]);
         layersTreeProvider.setLocations([]);
         layersTreeProvider.setResultLayers([]);
+        // Dispose all sessions since they're no longer visible (T028)
+        sessionManager.disposeAllSessions();
       });
     }
 

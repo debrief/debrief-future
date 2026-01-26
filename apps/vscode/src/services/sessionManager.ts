@@ -31,10 +31,13 @@
 import * as vscode from 'vscode';
 import {
   createSessionStore,
+  startServer,
   type SessionStoreApi,
+  type ServerOptions,
   createTimeInstantFromISO,
   type TimeRange,
 } from '@debrief/session-state';
+import type { Express } from 'express';
 import type { Plot, Track, ReferenceLocation } from '../types/plot';
 
 /**
@@ -77,6 +80,12 @@ export class SessionManager implements vscode.Disposable {
 
   /** Event fired when the active session changes */
   readonly onActiveSessionChange = this._onActiveSessionChange.event;
+
+  /** MCP server instance (Feature: 029 - Phase 5) */
+  private mcpServer: { app: Express; close: () => void } | null = null;
+
+  /** MCP server port (defaults to 3001, configurable via settings) */
+  private mcpPort: number = 3001;
 
   /**
    * Create a new session for a document.
@@ -181,6 +190,13 @@ export class SessionManager implements vscode.Disposable {
     // Emit event with new active session
     const session = uri ? this.sessions.get(uri) ?? null : null;
     this._onActiveSessionChange.fire(session);
+
+    // Update MCP server to use new session (Feature: 029 - Phase 5)
+    if (session && this.mcpServer) {
+      this.restartMcpServer(session);
+    } else if (!session) {
+      this.stopMcpServer();
+    }
   }
 
   /**
@@ -237,9 +253,118 @@ export class SessionManager implements vscode.Disposable {
   }
 
   /**
+   * Dispose all sessions.
+   *
+   * Called when the map panel is closed, since sessions are meaningless
+   * without a panel to display them.
+   */
+  disposeAllSessions(): void {
+    this.sessions.clear();
+    if (this.activeDocumentUri !== null) {
+      this.activeDocumentUri = null;
+      this._onActiveSessionChange.fire(null);
+    }
+  }
+
+  // ============================================================================
+  // MCP Server Management (Feature: 029 - Phase 5)
+  // ============================================================================
+
+  /**
+   * Set the MCP server port.
+   *
+   * @param port - The port number for the MCP server
+   */
+  setMcpPort(port: number): void {
+    this.mcpPort = port;
+    // If server is running, restart with new port
+    if (this.mcpServer) {
+      const activeSession = this.getActiveSession();
+      if (activeSession) {
+        this.restartMcpServer(activeSession);
+      }
+    }
+  }
+
+  /**
+   * Get the MCP server port.
+   *
+   * @returns The configured MCP port
+   */
+  getMcpPort(): number {
+    return this.mcpPort;
+  }
+
+  /**
+   * Start the MCP server for the given session.
+   *
+   * The server provides HTTP endpoints for Python tools to read/write
+   * session state via the MCP protocol.
+   *
+   * @param session - The session store to expose via MCP
+   */
+  startMcpServer(session: SessionStoreApi): void {
+    // Stop existing server if running
+    this.stopMcpServer();
+
+    try {
+      const options: ServerOptions = {
+        port: this.mcpPort,
+        host: '127.0.0.1', // Localhost only for security
+      };
+
+      this.mcpServer = startServer(session, options);
+      console.log(`[SessionManager] MCP server started on port ${this.mcpPort}`);
+    } catch (error) {
+      console.error('[SessionManager] Failed to start MCP server:', error);
+      // Don't throw - MCP is optional functionality
+    }
+  }
+
+  /**
+   * Stop the MCP server.
+   */
+  stopMcpServer(): void {
+    if (this.mcpServer) {
+      try {
+        this.mcpServer.close();
+        console.log('[SessionManager] MCP server stopped');
+      } catch (error) {
+        console.error('[SessionManager] Error stopping MCP server:', error);
+      }
+      this.mcpServer = null;
+    }
+  }
+
+  /**
+   * Restart the MCP server with a new session store.
+   *
+   * Called when the active session changes to ensure Python tools
+   * access the correct session state.
+   *
+   * @param session - The new session store
+   */
+  restartMcpServer(session: SessionStoreApi): void {
+    this.stopMcpServer();
+    this.startMcpServer(session);
+  }
+
+  /**
+   * Check if the MCP server is running.
+   *
+   * @returns True if the server is running
+   */
+  isMcpServerRunning(): boolean {
+    return this.mcpServer !== null;
+  }
+
+  /**
    * Dispose all resources.
    */
   dispose(): void {
+    // Stop MCP server
+    this.stopMcpServer();
+
     // Clear all sessions
     this.sessions.clear();
     this.activeDocumentUri = null;

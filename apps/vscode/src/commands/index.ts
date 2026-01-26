@@ -22,6 +22,8 @@ import { createExecuteToolCommand, createCancelToolExecutionCommand } from './ex
 import { createExportPngCommand } from './exportPng';
 import { createChangeTrackColorCommand } from './changeTrackColor';
 import { createImportRepCommand } from './importRep';
+import { createUndoCommand, createRedoCommand } from './undoRedo';
+import { createSaveSessionCommand } from './saveSession';
 
 export function registerCommands(
   context: vscode.ExtensionContext,
@@ -173,10 +175,26 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.toggleLayerVisibility',
-      (args: { layerId: string }) => {
+      (args: { layerId: string; featureId?: string }) => {
         const panel = getMapPanel();
-        if (panel && args?.layerId) {
-          // Toggle visibility - need to track current state
+        if (!panel || !args?.layerId) {
+          return;
+        }
+
+        // Use session state if featureId is provided
+        const featureId = args.featureId;
+        const activeSession = sessionManager.getActiveSession();
+
+        if (featureId && activeSession) {
+          // Toggle via session state - this will trigger subscriptions
+          activeSession.getState().toggleFeatureVisibility(featureId);
+
+          // Also update map panel for immediate visual feedback
+          const hiddenIds = activeSession.getState().hiddenFeatureIds;
+          const isVisible = !hiddenIds.includes(featureId);
+          panel.setLayerVisibility(args.layerId, isVisible);
+        } else {
+          // Fallback to legacy behavior for backward compatibility
           const tracks = panel.getTracks();
           const locations = panel.getLocations();
           const results = panel.getResultLayers();
@@ -313,6 +331,32 @@ export function registerCommands(
         ioService,
         stacTreeProvider
       )
+    )
+  );
+
+  // Undo/Redo commands (Feature: 029 - Phase 6)
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.undo',
+      createUndoCommand(sessionManager)
+    )
+  );
+
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.redo',
+      createRedoCommand(sessionManager)
+    )
+  );
+
+  // Session persistence command (Feature: 029 - Phase 7)
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.saveSession',
+      createSaveSessionCommand(sessionManager, (storeId) => {
+        const store = configService.getStore(storeId);
+        return store?.path;
+      })
     )
   );
 

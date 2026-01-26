@@ -351,4 +351,69 @@ describe('SessionManager', () => {
       expect(state2.selection.featureIds).toContain('track-2');
     });
   });
+
+  describe('disposeAllSessions', () => {
+    it('should remove all sessions', () => {
+      sessionManager.createSession('uri1', createMockPlotData());
+      sessionManager.createSession('uri2', createMockPlotData());
+
+      sessionManager.disposeAllSessions();
+
+      expect(sessionManager.getSessionCount()).toBe(0);
+      expect(sessionManager.hasSession('uri1')).toBe(false);
+      expect(sessionManager.hasSession('uri2')).toBe(false);
+    });
+
+    it('should clear active document', () => {
+      sessionManager.createSession('uri1', createMockPlotData());
+
+      sessionManager.disposeAllSessions();
+
+      expect(sessionManager.getActiveDocumentUri()).toBeNull();
+      expect(sessionManager.getActiveSession()).toBeNull();
+    });
+
+    it('should emit null session change event', () => {
+      sessionManager.createSession('uri1', createMockPlotData());
+
+      const listener = vi.fn();
+      sessionManager.onActiveSessionChange(listener);
+
+      sessionManager.disposeAllSessions();
+
+      expect(listener).toHaveBeenCalledWith(null);
+    });
+
+    it('should not emit event if no active document', () => {
+      // Create then dispose the session first
+      sessionManager.createSession('uri1', createMockPlotData());
+      sessionManager.setActiveDocument(null);
+
+      const listener = vi.fn();
+      sessionManager.onActiveSessionChange(listener);
+
+      sessionManager.disposeAllSessions();
+
+      expect(listener).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('MCP server management', () => {
+    it('should have default MCP port of 3001', () => {
+      expect(sessionManager.getMcpPort()).toBe(3001);
+    });
+
+    it('should update MCP port via setMcpPort', () => {
+      sessionManager.setMcpPort(4000);
+      expect(sessionManager.getMcpPort()).toBe(4000);
+    });
+
+    it('should report server not running initially', () => {
+      expect(sessionManager.isMcpServerRunning()).toBe(false);
+    });
+
+    // Note: Full MCP server tests require actual HTTP server
+    // which would need integration tests. Unit tests here
+    // verify the interface exists and basic state management works.
+  });
 });

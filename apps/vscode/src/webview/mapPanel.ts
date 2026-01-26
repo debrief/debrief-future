@@ -3,6 +3,11 @@
  *
  * This controller manages the webview lifecycle, message passing,
  * and state persistence for the map panel.
+ *
+ * Feature: 029-session-state-vscode
+ * - Subscribes to session manager for active session changes
+ * - Updates webview when viewport/selection/time changes in session
+ * - Sends viewport changes to session state (debounced)
  */
 
 import * as vscode from 'vscode';
@@ -18,6 +23,13 @@ import type { IoService } from '../services/ioService';
 import type { StacService } from '../services/stacService';
 import type { StacStore } from '../types/stac';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
+import type { SessionManager } from '../services/sessionManager';
+import {
+  subscribeToSpatial,
+  subscribeToSelection,
+  subscribeToTemporal,
+  type SessionStoreApi,
+} from '@debrief/session-state';
 import { DuplicateImportError } from '../types/import';
 import { calculateBounds, mergeBounds } from '../utils/bounds';
 
@@ -50,6 +62,16 @@ export class MapPanel {
   private onExportPngCallback:
     | ((requestId: string) => Promise<void>)
     | undefined;
+
+  // Session manager integration (Feature: 029)
+  private sessionManager?: SessionManager;
+  private activeSession?: SessionStoreApi;
+  private spatialUnsubscribe?: () => void;
+  private selectionUnsubscribe?: () => void;
+  private temporalUnsubscribe?: () => void;
+  private sessionChangeDisposable?: vscode.Disposable;
+  private viewportUpdateTimeout?: NodeJS.Timeout;
+  private static readonly VIEWPORT_DEBOUNCE_MS = 100;
 
   private constructor(
     panel: vscode.WebviewPanel,
@@ -431,10 +453,116 @@ export class MapPanel {
   }
 
   /**
+   * Set session manager for state synchronization (Feature: 029)
+   */
+  public setSessionManager(sessionManager: SessionManager): void {
+    this.sessionManager = sessionManager;
+
+    // Subscribe to active session changes
+    this.sessionChangeDisposable = sessionManager.onActiveSessionChange(
+      (session) => this.handleActiveSessionChange(session)
+    );
+
+    // Initialize with current session if any
+    const currentSession = sessionManager.getActiveSession();
+    if (currentSession) {
+      this.handleActiveSessionChange(currentSession);
+    }
+  }
+
+  /**
+   * Handle active session change (Feature: 029)
+   */
+  private handleActiveSessionChange(session: SessionStoreApi | null): void {
+    // Unsubscribe from previous session
+    this.spatialUnsubscribe?.();
+    this.selectionUnsubscribe?.();
+    this.temporalUnsubscribe?.();
+    this.spatialUnsubscribe = undefined;
+    this.selectionUnsubscribe = undefined;
+    this.temporalUnsubscribe = undefined;
+
+    this.activeSession = session ?? undefined;
+
+    if (session) {
+      // Subscribe to spatial (viewport) changes
+      this.spatialUnsubscribe = subscribeToSpatial(session, (spatial) => {
+        if (spatial.viewport) {
+          this.postMessage({
+            type: 'setViewport',
+            viewport: {
+              center: [spatial.viewport.center.lat, spatial.viewport.center.lng],
+              zoom: spatial.viewport.zoom,
+            },
+          });
+        }
+      });
+
+      // Subscribe to selection changes
+      this.selectionUnsubscribe = subscribeToSelection(session, (selection) => {
+        // Split feature IDs into tracks and locations
+        const trackIds: string[] = [];
+        const locationIds: string[] = [];
+        for (const id of selection.featureIds) {
+          // Determine if track or location based on current data
+          if (this.currentTracks.some(t => t.id === id)) {
+            trackIds.push(id);
+          } else if (this.currentLocations.some(l => l.id === id)) {
+            locationIds.push(id);
+          }
+        }
+        this.postMessage({
+          type: 'setSelection',
+          selection: { trackIds, locationIds },
+        });
+      });
+
+      // Subscribe to temporal (time) changes
+      this.temporalUnsubscribe = subscribeToTemporal(session, (temporal) => {
+        if (temporal.currentTime) {
+          this.postMessage({
+            type: 'setCurrentTime',
+            time: temporal.currentTime.epoch,
+          });
+        }
+      });
+    }
+  }
+
+  /**
+   * Handle viewport change from webview with debouncing (Feature: 029)
+   */
+  private handleViewportChanged(viewport: { center: [number, number]; zoom: number }): void {
+    // Clear existing timeout
+    if (this.viewportUpdateTimeout) {
+      clearTimeout(this.viewportUpdateTimeout);
+    }
+
+    // Debounce viewport updates to session state
+    this.viewportUpdateTimeout = setTimeout(() => {
+      if (this.activeSession) {
+        this.activeSession.getState().setViewport({
+          center: { lat: viewport.center[0], lng: viewport.center[1] },
+          zoom: viewport.zoom,
+        });
+      }
+    }, MapPanel.VIEWPORT_DEBOUNCE_MS);
+  }
+
+  /**
    * Dispose the panel
    */
   public dispose(): void {
     MapPanel.currentPanel = undefined;
+
+    // Clean up session subscriptions (Feature: 029)
+    this.spatialUnsubscribe?.();
+    this.selectionUnsubscribe?.();
+    this.temporalUnsubscribe?.();
+    this.sessionChangeDisposable?.dispose();
+    if (this.viewportUpdateTimeout) {
+      clearTimeout(this.viewportUpdateTimeout);
+    }
 
     // Clean up resources
     this.panel.dispose();
@@ -486,6 +614,11 @@ export class MapPanel {
 
       case 'viewStateChanged':
         // View state changes are handled automatically by webview persistence
+        break;
+
+      case 'viewportChanged':
+        // Debounced viewport update to session state (Feature: 029)
+        this.handleViewportChanged(message.viewport);
         break;
 
       case 'requestExportPng':

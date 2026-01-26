@@ -139,6 +139,21 @@ export interface SetTimeRangeMessage {
   };
 }
 
+/** Set viewport from session state (Feature: 029) */
+export interface SetViewportMessage {
+  type: 'setViewport';
+  viewport: {
+    center: [number, number]; // [lat, lng]
+    zoom: number;
+  };
+}
+
+/** Set current time position from session state (Feature: 029) */
+export interface SetCurrentTimeMessage {
+  type: 'setCurrentTime';
+  time: number; // epoch ms
+}
+
 /** Set custom color for a track */
 export interface SetTrackColorMessage {
   type: 'setTrackColor';
@@ -211,6 +226,15 @@ export interface WebviewReadyMessage {
   type: 'webviewReady';
 }
 
+/** Notify extension of viewport change for session state (Feature: 029) */
+export interface ViewportChangedMessage {
+  type: 'viewportChanged';
+  viewport: {
+    center: [number, number]; // [lat, lng]
+    zoom: number;
+  };
+}
+
 // ============================================================================
 // Union Types
 // ============================================================================
@@ -255,6 +279,8 @@ export type ExtensionToWebviewMessage =
   | FitBoundsMessage
   | SetTimeRangeMessage
   | SetTrackColorMessage
+  | SetViewportMessage
+  | SetCurrentTimeMessage
   | RequestExportPngResponse
   | RequestTrackDetailsResponse
   | ImportProgressMessage
@@ -264,6 +290,7 @@ export type ExtensionToWebviewMessage =
 export type WebviewToExtensionMessage =
   | SelectionChangedMessage
   | ViewStateChangedMessage
+  | ViewportChangedMessage
   | RequestExportPngRequest
   | RequestTrackColorChangeMessage
   | RequestTrackDetailsRequest

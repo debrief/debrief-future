@@ -159,6 +159,24 @@
         "command": "debrief.setDisplayMode",
         "title": "Set Display Mode",
         "category": "Debrief"
+      },
+      {
+        "command": "debrief.undo",
+        "title": "Undo",
+        "category": "Debrief",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "debrief.redo",
+        "title": "Redo",
+        "category": "Debrief",
+        "icon": "$(redo)"
+      },
+      {
+        "command": "debrief.saveSession",
+        "title": "Save Session",
+        "category": "Debrief",
+        "icon": "$(save)"
       }
     ],
     "keybindings": [
@@ -200,6 +218,24 @@
         "command": "debrief.openPlot",
         "key": "ctrl+shift+o",
         "mac": "cmd+shift+o"
+      },
+      {
+        "command": "debrief.undo",
+        "key": "ctrl+z",
+        "mac": "cmd+z",
+        "when": "debrief.mapFocused"
+      },
+      {
+        "command": "debrief.redo",
+        "key": "ctrl+y",
+        "mac": "cmd+shift+z",
+        "when": "debrief.mapFocused"
+      },
+      {
+        "command": "debrief.saveSession",
+        "key": "ctrl+s",
+        "mac": "cmd+s",
+        "when": "debrief.mapFocused"
       }
     ],
     "viewsContainers": {
@@ -372,6 +408,13 @@
           "type": "number",
           "default": 10,
           "description": "Maximum number of recent plots to remember"
+        },
+        "debrief.mcp.port": {
+          "type": "number",
+          "default": 3001,
+          "minimum": 1024,
+          "maximum": 65535,
+          "description": "Port for the MCP session state server (used by Python tools)"
         },
         "debrief.hideActivities.enabled": {
           "type": "boolean",

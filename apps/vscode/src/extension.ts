@@ -35,6 +35,19 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const sessionManager = new SessionManager();
   context.subscriptions.push(sessionManager);
 
+  // Configure MCP server port from settings (Feature: 029 - Phase 5)
+  const mcpConfig = vscode.workspace.getConfiguration('debrief');
+  const mcpPort = mcpConfig.get<number>('mcp.port', 3001);
+  sessionManager.setMcpPort(mcpPort);
+
+  // Start MCP server when first session becomes active
+  const mcpServerStarter = sessionManager.onActiveSessionChange((session) => {
+    if (session && !sessionManager.isMcpServerRunning()) {
+      sessionManager.startMcpServer(session);
+    }
+  });
+  context.subscriptions.push(mcpServerStarter);
+
   // Register file system provider for stac:// URIs
   const stacFileSystemProvider = new StacFileSystemProvider(stacService);
   context.subscriptions.push(
@@ -47,7 +60,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // Register tree providers
   const stacTreeProvider = new StacTreeProvider(configService, stacService);
   const toolsTreeProvider = new ToolsTreeProvider(calcService);
-  const layersTreeProvider = new LayersTreeProvider();
+  const layersTreeProvider = new LayersTreeProvider(sessionManager);
   const outlineProvider = new OutlineProvider();
   const timeRangeProvider = new TimeRangeViewProvider(context.extensionUri, sessionManager);
 
