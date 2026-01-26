@@ -118,6 +118,11 @@ Description formats:
 | 027 | Infrastructure | [Add automated screenshot capture for Storybook stories](docs/ideas/027-automated-screenshots.md) | 3 | 4 | 4 | 11 | Medium | approved |
 | 028 | Infrastructure | [Reinstate Playwright E2E testing in CI](docs/ideas/028-reinstate-playwright-ci.md) | 4 | 2 | 5 | 11 | Medium | approved |
 | 012 | Enhancement | Wire loader plot count to debrief-stac list_plots call | 2 | 1 | 5 | 8 | Low | proposed |
+| 030 | Tech Debt | [Fix test isolation in debrief-config tests](docs/ideas/030-fix-config-test-isolation.md) | - | - | - | - | Low | proposed |
+| 031 | Tech Debt | [Add session-state-py package to uv workspace](docs/ideas/031-add-session-state-py-workspace.md) | - | - | - | - | Low | proposed |
+| 032 | Tech Debt | [Consolidate config handling across apps](docs/ideas/032-consolidate-config-handling.md) | - | - | - | - | Medium | proposed |
+| 033 | Tech Debt | [Re-enable debrief-stac tests in pytest](docs/ideas/033-reenable-stac-tests.md) | - | - | - | - | Low | proposed |
+| 034 | Tech Debt | [Remove synchronous fs calls from VS Code stacService](docs/ideas/034-async-stac-service-fs.md) | - | - | - | - | Low | proposed |
 | 027 | Documentation | [Document vscrui as standard component library for VS Code webviews](docs/ideas/027-vscrui-component-library.md) | 3 | 1 | 5 | 9 | Low | approved |
 | 027 | Documentation | [Document Storybook VS Code theming setup](docs/ideas/027-storybook-vscode-theming.md) | 2 | 2 | 5 | 9 | Low | approved |
 | 030 | Feature | [Invoke debrief-calc distance tool from VS Code extension](https://github.com/debrief/debrief-future/issues/115) (requires #025, #029) | 5 | 5 | 4 | 14 | Medium | approved |
