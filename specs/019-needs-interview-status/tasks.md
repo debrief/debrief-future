@@ -164,12 +164,12 @@
 
 ### Media Content
 
-- [ ] T040 Create shipped blog post `specs/019-needs-interview-status/media/shipped-post.md`
-- [ ] T041 [P] Create LinkedIn shipped summary `specs/019-needs-interview-status/media/linkedin-shipped.md`
+- [x] T040 Create shipped blog post `specs/019-needs-interview-status/media/shipped-post.md`
+- [x] T041 [P] Create LinkedIn shipped summary `specs/019-needs-interview-status/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T042 Create PR and publish blog: run /speckit.pr
+- [x] T042 Create PR and publish blog: run /speckit.pr
 
 **Task T042 must run last. It depends on all evidence and media tasks being complete.**
 
