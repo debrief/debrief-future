@@ -56,7 +56,6 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
   private _pendingMessages: Array<Record<string, unknown>> = [];
 
   // Session manager integration
-  private _sessionManager?: SessionManager;
   private _activeSession?: SessionStoreApi;
   private _temporalUnsubscribe?: () => void;
   private _sessionChangeDisposable?: vscode.Disposable;
@@ -68,7 +67,6 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
 
   constructor(extensionUri: vscode.Uri, sessionManager?: SessionManager) {
     this._extensionUri = extensionUri;
-    this._sessionManager = sessionManager;
 
     // Subscribe to session manager if provided
     if (sessionManager) {
@@ -87,7 +85,6 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
       this._sessionChangeDisposable.dispose();
     }
 
-    this._sessionManager = sessionManager;
     this._sessionChangeDisposable = sessionManager.onActiveSessionChange(
       (session) => this._handleActiveSessionChange(session)
     );

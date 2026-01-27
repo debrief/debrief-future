@@ -66,12 +66,12 @@ export function createRedoCommand(
 /**
  * Register undo/redo commands with VS Code.
  *
- * @param context - Extension context for registering disposables
+ * @param _context - Extension context (unused, kept for API consistency)
  * @param sessionManager - The session manager service
  * @returns Array of disposables for cleanup
  */
 export function registerUndoRedoCommands(
-  context: vscode.ExtensionContext,
+  _context: vscode.ExtensionContext,
   sessionManager: SessionManager
 ): vscode.Disposable[] {
   const disposables: vscode.Disposable[] = [];

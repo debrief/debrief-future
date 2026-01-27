@@ -65,7 +65,6 @@ export class MapPanel {
     | undefined;
 
   // Session manager integration (Feature: 029)
-  private sessionManager?: SessionManager;
   private activeSession?: SessionStoreApi;
   private spatialUnsubscribe?: () => void;
   private selectionUnsubscribe?: () => void;
@@ -457,8 +456,6 @@ export class MapPanel {
    * Set session manager for state synchronization (Feature: 029)
    */
   public setSessionManager(sessionManager: SessionManager): void {
-    this.sessionManager = sessionManager;
-
     // Subscribe to active session changes
     this.sessionChangeDisposable = sessionManager.onActiveSessionChange(
       (session) => this.handleActiveSessionChange(session)

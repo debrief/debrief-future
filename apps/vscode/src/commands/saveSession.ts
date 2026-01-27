@@ -71,7 +71,7 @@ export function createSaveSessionCommand(
       if (parsed) {
         const storePath = getStorePath(parsed.storeId);
         if (storePath) {
-          savePath = deriveSessionPath(plotUri, storePath) ?? undefined;
+          savePath = deriveSessionPath(plotUri, storePath);
         }
       }
 

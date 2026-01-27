@@ -37,17 +37,13 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
   private resultLayers: ResultLayer[] = [];
 
   // Session manager integration
-  private _sessionManager?: SessionManager;
   private _activeSession?: SessionStoreApi;
   private _selectionUnsubscribe?: () => void;
   private _hiddenUnsubscribe?: () => void;
   private _sessionChangeDisposable?: vscode.Disposable;
   private _hiddenFeatureIds: Set<string> = new Set();
-  private _selectedFeatureIds: Set<string> = new Set();
 
   constructor(sessionManager?: SessionManager) {
-    this._sessionManager = sessionManager;
-
     if (sessionManager) {
       this._sessionChangeDisposable = sessionManager.onActiveSessionChange(
         (session) => this._handleActiveSessionChange(session)
@@ -63,7 +59,6 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       this._sessionChangeDisposable.dispose();
     }
 
-    this._sessionManager = sessionManager;
     this._sessionChangeDisposable = sessionManager.onActiveSessionChange(
       (session) => this._handleActiveSessionChange(session)
     );
@@ -94,8 +89,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       // Subscribe to selection changes
       this._selectionUnsubscribe = subscribeToSelection(
         session,
-        (selection) => {
-          this._selectedFeatureIds = new Set(selection.featureIds);
+        () => {
           this.refresh();
         }
       );
@@ -112,12 +106,10 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       // Initialize from current state
       const state: SessionStoreWithUndo = session.getState();
       this._hiddenFeatureIds = new Set(state.hiddenFeatureIds);
-      this._selectedFeatureIds = new Set(state.selection.featureIds);
       this.refresh();
     } else {
       // No active session - clear state
       this._hiddenFeatureIds = new Set();
-      this._selectedFeatureIds = new Set();
       this.refresh();
     }
   }
@@ -127,13 +119,6 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
    */
   private _isFeatureVisible(featureId: string): boolean {
     return !this._hiddenFeatureIds.has(featureId);
-  }
-
-  /**
-   * Check if a feature is selected in session
-   */
-  private _isFeatureSelected(featureId: string): boolean {
-    return this._selectedFeatureIds.has(featureId);
   }
 
   /**
