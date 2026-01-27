@@ -241,6 +241,8 @@ Three approaches required:
 - N/A (pure matching logic, no persistence in Phases 1-2) (027-context-tool-offering)
 - TypeScript 5.x (state server + VS Code extension), Python 3.11+ (MCP client library) + Zustand ^5.0.0, Zundo ^2.0.0, Express ^4.18.0, @modelcontextprotocol/sdk ^1.0.0, better-sse ^1.0.0, Zod ^3.22.0, Vitest ^1.0.0, Playwright ^1.40.0 (024-document-session-state)
 - JSON file at user-defined path (session persistence) (024-document-session-state)
+- Markdown (Claude Code command files) + Claude Code skill system, GitHub CLI (`gh`) for issue updates (019-needs-interview-status)
+- BACKLOG.md (existing file), no new storage (019-needs-interview-status)
 
 ## Recent Changes
 - 024-document-session-state: Added TypeScript 5.x + Zustand, Zundo, Express, MCP SDK, better-sse for session state management with Python client library
