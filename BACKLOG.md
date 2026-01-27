@@ -26,6 +26,7 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
 
 | Status | Meaning | Trigger |
 |--------|---------|---------|
+| **needs-interview** | Quick capture, awaiting detailed requirements | `/idea --defer` |
 | **proposed** | Item added, awaiting review | Scout adds, ideas-guy adds, or human submits |
 | **approved** | Strategically reviewed, ready for spec | Ideas-guy approves |
 | **specified** | Spec created, linked below | `/speckit.start {ID}` |
@@ -43,20 +44,49 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
    opportunity-scout ──explores──> technical opportunities │
                                                           ▼
                                                     BACKLOG.md
-                                                     (proposed)
                                                           │
-2. SCORING (backlog-prioritizer)                          │
-   scores V/M/A for proposed items ◄──────────────────────┘
-                          │
-3. REVIEW (the-ideas-guy)
+                  ┌───────────────────┬───────────────────┘
+                  │                   │
+                  ▼                   ▼
+           (needs-interview)     (proposed)
+           Quick capture         Full detail
+                  │                   │
+                  │                   │
+2. INTERVIEW      │                   │
+   /interview ────┘                   │
+   completes requirements gathering   │
+          │                           │
+          └─────────────> proposed <──┘
+                              │
+3. SCORING (backlog-prioritizer)
+   scores V/M/A for proposed items
+                              │
+4. REVIEW (the-ideas-guy)
    reviews scored items against STRATEGY.md
       ├── Approve → status: approved
       ├── Park → STRATEGY.md Parking Lot
       └── Reject → STRATEGY.md Rejected Log
-                          │
-4. SPECIFICATION          ▼
+                              │
+5. SPECIFICATION              ▼
    /speckit.start {ID} ← requires status: approved
 ```
+
+### Status Validation Rules
+
+| Command | Required Status | Error if Wrong Status |
+|---------|-----------------|----------------------|
+| `/interview` | `needs-interview` | "Item {ID} doesn't need an interview (status: {status})" |
+| `/speckit.start` | `approved` | "Item {ID} needs interview first. Run `/interview` to complete requirements gathering." (if `needs-interview`) |
+| `/speckit.start` | `approved` | "Item {ID} has status '{status}'. Only 'approved' items can be started." (other statuses) |
+
+**Quick Capture Path** (via `/idea --defer`):
+1. User captures idea quickly → status: `needs-interview`
+2. Later, user runs `/interview` → conducts full interview → status: `proposed`
+3. Normal flow continues: scoring → approval → specification
+
+**Full Detail Path** (via `/idea`):
+1. User provides full detail with interview → status: `proposed`
+2. Normal flow continues: scoring → approval → specification
 
 ### Starting Specification Work
 

@@ -47,8 +47,8 @@
 
 **Purpose**: Project initialization and documentation structure
 
-- [ ] T001 Create evidence directory `specs/019-needs-interview-status/evidence/`
-- [ ] T002 Verify all prerequisite files exist (spec.md, plan.md, research.md, data-model.md)
+- [x] T001 Create evidence directory `specs/019-needs-interview-status/evidence/`
+- [x] T002 Verify all prerequisite files exist (spec.md, plan.md, research.md, data-model.md)
 
 ---
 
@@ -58,8 +58,8 @@
 
 **CRITICAL**: No command changes can proceed until the status is documented.
 
-- [ ] T003 Add `needs-interview` status to BACKLOG.md workflow section with status flow diagram `BACKLOG.md`
-- [ ] T004 Document status validation rules (which commands accept which statuses) `BACKLOG.md`
+- [x] T003 Add `needs-interview` status to BACKLOG.md workflow section with status flow diagram `BACKLOG.md`
+- [x] T004 Document status validation rules (which commands accept which statuses) `BACKLOG.md`
 
 **Checkpoint**: `needs-interview` status is documented - command modifications can now begin.
 
