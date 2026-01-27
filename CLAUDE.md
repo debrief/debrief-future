@@ -243,6 +243,8 @@ Three approaches required:
 - JSON file at user-defined path (session persistence) (024-document-session-state)
 - Markdown (Claude Code command files) + Claude Code skill system, GitHub CLI (`gh`) for issue updates (019-needs-interview-status)
 - BACKLOG.md (existing file), no new storage (019-needs-interview-status)
+- TypeScript 5.x + React 18+, react-leaflet v5+, Leaflet, @debrief/components (existing MapView, TimeController) (030-temporal-track-rendering)
+- N/A (pure display component - no persistence) (030-temporal-track-rendering)
 
 ## Recent Changes
 - 024-document-session-state: Added TypeScript 5.x + Zustand, Zundo, Express, MCP SDK, better-sse for session state management with Python client library
