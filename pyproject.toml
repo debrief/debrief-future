@@ -34,7 +34,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "shared/schemas/tests", "services/io/tests", "services/config/tests"]
+testpaths = ["tests", "shared/schemas/tests", "services/io/tests", "services/config/tests", "services/calc/tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "--import-mode=importlib --ignore=services/stac/tests"
