@@ -29,6 +29,7 @@ import {
   subscribeToSelection,
   subscribeToTemporal,
   type SessionStoreApi,
+  type SessionStoreWithUndo,
 } from '@debrief/session-state';
 import { DuplicateImportError } from '../types/import';
 import { calculateBounds, mergeBounds } from '../utils/bounds';
@@ -564,11 +565,12 @@ export class MapPanel {
           zoom: viewport.zoom,
         };
         // Only update if viewport actually changed (avoid feedback loop)
-        const currentViewport = this.activeSession.getState().viewport;
+        const state: SessionStoreWithUndo = this.activeSession.getState();
+        const currentViewport = state.viewport;
         if (!currentViewport ||
             JSON.stringify(currentViewport.coordinates) !== JSON.stringify(newViewport.coordinates) ||
             currentViewport.zoom !== newViewport.zoom) {
-          this.activeSession.getState().setViewport(newViewport);
+          state.setViewport(newViewport);
         }
       }
     }, MapPanel.VIEWPORT_DEBOUNCE_MS);
@@ -675,7 +677,7 @@ export class MapPanel {
       case 'requestUndo':
         // Handle undo request from webview keyboard shortcut (Feature: 029)
         if (this.activeSession) {
-          const state = this.activeSession.getState();
+          const state: SessionStoreWithUndo = this.activeSession.getState();
           if (state.canUndo()) {
             state.undo();
           }
@@ -685,7 +687,7 @@ export class MapPanel {
       case 'requestRedo':
         // Handle redo request from webview keyboard shortcut (Feature: 029)
         if (this.activeSession) {
-          const state = this.activeSession.getState();
+          const state: SessionStoreWithUndo = this.activeSession.getState();
           if (state.canRedo()) {
             state.redo();
           }
