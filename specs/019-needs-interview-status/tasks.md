@@ -131,9 +131,9 @@
 
 ### Implementation for Validation Gate
 
-- [ ] T024 Add `needs-interview` validation check to Step 3 (Validate Item) `.claude/commands/speckit.start.md`
-- [ ] T025 Add error message: "Item {ID} needs interview first. Run `/interview` to complete requirements gathering." `.claude/commands/speckit.start.md`
-- [ ] T026 Update status guidance to include `needs-interview` status `.claude/commands/speckit.start.md`
+- [x] T024 Add `needs-interview` validation check to Step 3 (Validate Item) `.claude/commands/speckit.start.md`
+- [x] T025 Add error message: "Item {ID} needs interview first. Run `/interview` to complete requirements gathering." `.claude/commands/speckit.start.md`
+- [x] T026 Update status guidance to include `needs-interview` status `.claude/commands/speckit.start.md`
 
 **Checkpoint**: `/speckit.start` correctly rejects `needs-interview` items with clear guidance.
 
