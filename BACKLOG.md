@@ -105,7 +105,7 @@ Description formats:
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
 | 002 | Feature | Add MCP wrapper for debrief-io service | 4 | 3 | 4 | 11 | Medium | approved |
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | Low | approved |
-| 028 | Tech Debt | [Add comprehensive unit tests for stacService](https://github.com/debrief/debrief-future/issues/98) | 4 | 2 | 5 | 11 | Low | proposed |
+| 028 | Tech Debt | [Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md) | 4 | 2 | 5 | 11 | Low | implementing |
 | 029 | Tech Debt | [Integrate session-state service into VS Code extension](specs/029-session-state-vscode/spec.md) (multi-document support) | 5 | 3 | 4 | 12 | High | tasked |
 | 030 | Tech Debt | [Add replay mode and time acceleration to temporal state schema](docs/ideas/030-temporal-ui-state.md) (requires #029) | 4 | 2 | 4 | 10 | Medium | approved |
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | 5 | 2 | 4 | 11 | Low | approved |
@@ -116,11 +116,11 @@ Description formats:
 | 001 | Infrastructure | Extract shared MCP utilities into mcp-common package | 3 | 2 | 4 | 9 | Medium | proposed |
 | 010 | Tech Debt | Add rollback/cleanup API to debrief-stac for interrupted operations | 3 | 1 | 4 | 8 | Medium | proposed |
 | 027 | Infrastructure | [Add automated screenshot capture for Storybook stories](docs/ideas/027-automated-screenshots.md) | 3 | 4 | 4 | 11 | Medium | approved |
-| 028 | Infrastructure | [Reinstate Playwright E2E testing in CI](docs/ideas/028-reinstate-playwright-ci.md) | 4 | 2 | 5 | 11 | Medium | approved |
+| 030 | Infrastructure | [Reinstate Playwright E2E testing in CI](docs/ideas/030-reinstate-playwright-ci.md) | 4 | 2 | 5 | 11 | Medium | approved |
 | 012 | Enhancement | Wire loader plot count to debrief-stac list_plots call | 2 | 1 | 5 | 8 | Low | proposed |
+| 031 | Documentation | [Document vscrui as standard component library for VS Code webviews](docs/ideas/031-vscrui-component-library.md) | 3 | 1 | 5 | 9 | Low | approved |
+| 032 | Documentation | [Document Storybook VS Code theming setup](docs/ideas/032-storybook-vscode-theming.md) | 2 | 2 | 5 | 9 | Low | approved |
 | 030 | Tech Debt | [Fix test isolation in debrief-config tests](docs/ideas/030-fix-config-test-isolation.md) | - | - | - | - | Low | proposed |
-| 031 | Tech Debt | [Add session-state-py package to uv workspace](docs/ideas/031-add-session-state-py-workspace.md) | - | - | - | - | Low | proposed |
-| 032 | Tech Debt | [Consolidate config handling across apps](docs/ideas/032-consolidate-config-handling.md) | - | - | - | - | Medium | proposed |
 | 033 | Tech Debt | [Re-enable debrief-stac tests in pytest](docs/ideas/033-reenable-stac-tests.md) | - | - | - | - | Low | proposed |
 | 034 | Tech Debt | [Remove synchronous fs calls from VS Code stacService](docs/ideas/034-async-stac-service-fs.md) | - | - | - | - | Low | proposed |
 | 027 | Documentation | [Document vscrui as standard component library for VS Code webviews](docs/ideas/027-vscrui-component-library.md) | 3 | 1 | 5 | 9 | Low | approved |
