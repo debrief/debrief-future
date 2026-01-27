@@ -254,6 +254,77 @@ export class SessionManager implements vscode.Disposable {
   }
 
   /**
+   * Check if any session has unsaved changes.
+   *
+   * @returns True if at least one session is dirty
+   */
+  hasDirtySessions(): boolean {
+    for (const session of this.sessions.values()) {
+      const state: SessionStoreWithUndo = session.getState();
+      if (state.dirty) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Get count of dirty sessions.
+   *
+   * @returns Number of sessions with unsaved changes
+   */
+  getDirtySessionCount(): number {
+    let count = 0;
+    for (const session of this.sessions.values()) {
+      const state: SessionStoreWithUndo = session.getState();
+      if (state.dirty) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Dispose all sessions with optional save prompt (Feature: 029 - T058).
+   *
+   * Shows a prompt if any session has unsaved changes.
+   *
+   * @param promptOnDirty - Whether to show save prompt for dirty sessions
+   * @returns True if disposed, false if user cancelled
+   */
+  async disposeAllSessionsWithPrompt(promptOnDirty: boolean = true): Promise<boolean> {
+    // Check for dirty sessions
+    if (promptOnDirty && this.hasDirtySessions()) {
+      const dirtyCount = this.getDirtySessionCount();
+      const message = dirtyCount === 1
+        ? 'You have unsaved session changes. Do you want to save before closing?'
+        : `You have ${dirtyCount} sessions with unsaved changes. Do you want to save before closing?`;
+
+      const result = await vscode.window.showWarningMessage(
+        message,
+        { modal: true },
+        'Save All',
+        'Discard',
+        'Cancel'
+      );
+
+      if (result === 'Cancel' || result === undefined) {
+        return false; // User cancelled
+      }
+
+      if (result === 'Save All') {
+        // Save all dirty sessions
+        await vscode.commands.executeCommand('debrief.saveSession');
+      }
+      // 'Discard' falls through to dispose
+    }
+
+    // Dispose all sessions
+    this.disposeAllSessions();
+    return true;
+  }
+
+  /**
    * Dispose all sessions.
    *
    * Called when the map panel is closed, since sessions are meaningless

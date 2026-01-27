@@ -7,7 +7,6 @@
  * They only apply when a Debrief plot is open and focused.
  */
 
-import * as vscode from 'vscode';
 import type { SessionStoreWithUndo } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
 
@@ -63,32 +62,3 @@ export function createRedoCommand(
   };
 }
 
-/**
- * Register undo/redo commands with VS Code.
- *
- * @param _context - Extension context (unused, kept for API consistency)
- * @param sessionManager - The session manager service
- * @returns Array of disposables for cleanup
- */
-export function registerUndoRedoCommands(
-  _context: vscode.ExtensionContext,
-  sessionManager: SessionManager
-): vscode.Disposable[] {
-  const disposables: vscode.Disposable[] = [];
-
-  disposables.push(
-    vscode.commands.registerCommand(
-      'debrief.undo',
-      createUndoCommand(sessionManager)
-    )
-  );
-
-  disposables.push(
-    vscode.commands.registerCommand(
-      'debrief.redo',
-      createRedoCommand(sessionManager)
-    )
-  );
-
-  return disposables;
-}

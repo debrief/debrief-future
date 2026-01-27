@@ -22,7 +22,7 @@ import { parseStacUri } from '../types/stac';
  * @param storePath - The filesystem path of the STAC store
  * @returns The session file path, or null if unable to derive
  */
-export function deriveSessionPath(plotUri: string, storePath: string): string | null {
+function deriveSessionPath(plotUri: string, storePath: string): string | null {
   const parsed = parseStacUri(plotUri);
   if (!parsed) {
     return null;

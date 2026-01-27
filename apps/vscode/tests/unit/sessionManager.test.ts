@@ -416,4 +416,60 @@ describe('SessionManager', () => {
     // which would need integration tests. Unit tests here
     // verify the interface exists and basic state management works.
   });
+
+  describe('dirty session tracking (Feature: 029 - T057/T058)', () => {
+    it('should return false for hasDirtySessions when no sessions', () => {
+      expect(sessionManager.hasDirtySessions()).toBe(false);
+    });
+
+    it('should return false for hasDirtySessions when all sessions are clean', () => {
+      const session = sessionManager.createSession('uri1', createMockPlotData());
+      // Sessions start clean after creation
+      session.getState().markClean();
+
+      expect(sessionManager.hasDirtySessions()).toBe(false);
+    });
+
+    it('should return true for hasDirtySessions when session is modified', () => {
+      const session = sessionManager.createSession('uri1', createMockPlotData());
+      // Modify the session to make it dirty
+      session.getState().setSelection(['track-1'], 'track-1');
+
+      expect(sessionManager.hasDirtySessions()).toBe(true);
+    });
+
+    it('should return 0 for getDirtySessionCount when no sessions', () => {
+      expect(sessionManager.getDirtySessionCount()).toBe(0);
+    });
+
+    it('should count dirty sessions correctly', () => {
+      const session1 = sessionManager.createSession('uri1', createMockPlotData());
+      const session2 = sessionManager.createSession('uri2', createMockPlotData());
+
+      // Make both clean first
+      session1.getState().markClean();
+      session2.getState().markClean();
+
+      // Make only session1 dirty
+      session1.getState().setSelection(['track-1'], 'track-1');
+
+      expect(sessionManager.getDirtySessionCount()).toBe(1);
+
+      // Make session2 dirty too
+      session2.getState().setSelection(['track-2'], 'track-2');
+
+      expect(sessionManager.getDirtySessionCount()).toBe(2);
+    });
+
+    it('should update dirty count when session is marked clean', () => {
+      const session = sessionManager.createSession('uri1', createMockPlotData());
+      session.getState().setSelection(['track-1'], 'track-1');
+
+      expect(sessionManager.getDirtySessionCount()).toBe(1);
+
+      session.getState().markClean();
+
+      expect(sessionManager.getDirtySessionCount()).toBe(0);
+    });
+  });
 });

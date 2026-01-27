@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { subscribeToDirty, type SessionStoreApi } from '@debrief/session-state';
 import { StacTreeProvider } from './providers/stacTreeProvider';
 import { StacFileSystemProvider } from './providers/stacFileSystemProvider';
 import { ToolsTreeProvider } from './providers/toolsTreeProvider';
@@ -47,6 +48,47 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }
   });
   context.subscriptions.push(mcpServerStarter);
+
+  // Create dirty indicator in status bar (Feature: 029 - T057)
+  const dirtyIndicator = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Left,
+    100
+  );
+  dirtyIndicator.text = '$(circle-filled) Unsaved Session';
+  dirtyIndicator.tooltip = 'Session has unsaved changes. Press Ctrl+S to save.';
+  dirtyIndicator.command = 'debrief.saveSession';
+  context.subscriptions.push(dirtyIndicator);
+
+  // Track dirty subscription for cleanup when session changes
+  let dirtyUnsubscribe: (() => void) | undefined;
+
+  // Subscribe to dirty changes on active session
+  const dirtyWatcher = sessionManager.onActiveSessionChange((session: SessionStoreApi | null) => {
+    // Cleanup previous subscription
+    if (dirtyUnsubscribe) {
+      dirtyUnsubscribe();
+      dirtyUnsubscribe = undefined;
+    }
+    dirtyIndicator.hide();
+
+    if (session) {
+      // Show indicator if already dirty
+      const state = session.getState();
+      if (state.dirty) {
+        dirtyIndicator.show();
+      }
+
+      // Subscribe to dirty changes
+      dirtyUnsubscribe = subscribeToDirty(session, (dirty: boolean) => {
+        if (dirty) {
+          dirtyIndicator.show();
+        } else {
+          dirtyIndicator.hide();
+        }
+      });
+    }
+  });
+  context.subscriptions.push(dirtyWatcher);
 
   // Register file system provider for stac:// URIs
   const stacFileSystemProvider = new StacFileSystemProvider(stacService);
