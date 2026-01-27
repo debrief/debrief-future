@@ -486,15 +486,27 @@ export class MapPanel {
 
     if (session) {
       // Subscribe to spatial (viewport) changes
+      // Track last viewport sent to map to avoid redundant messages
+      let lastSentViewportKey = '';
       this.spatialUnsubscribe = subscribeToSpatial(session, (spatial) => {
-        if (spatial.viewport) {
-          this.postMessage({
-            type: 'setViewport',
-            viewport: {
-              center: [spatial.viewport.center.lat, spatial.viewport.center.lng],
-              zoom: spatial.viewport.zoom,
-            },
-          });
+        if (spatial.viewport && spatial.viewport.zoom !== undefined) {
+          // Calculate center from coordinates: [NW, NE, SE, SW] in [lng, lat] order
+          const coords = spatial.viewport.coordinates;
+          const centerLng = (coords[0][0] + coords[1][0] + coords[2][0] + coords[3][0]) / 4;
+          const centerLat = (coords[0][1] + coords[1][1] + coords[2][1] + coords[3][1]) / 4;
+          const viewportKey = `${centerLat.toFixed(6)},${centerLng.toFixed(6)},${spatial.viewport.zoom}`;
+
+          // Only send if actually different from last sent
+          if (viewportKey !== lastSentViewportKey) {
+            lastSentViewportKey = viewportKey;
+            this.postMessage({
+              type: 'setViewport',
+              viewport: {
+                center: [centerLat, centerLng],
+                zoom: spatial.viewport.zoom,
+              },
+            });
+          }
         }
       });
 
@@ -532,7 +544,11 @@ export class MapPanel {
   /**
    * Handle viewport change from webview with debouncing (Feature: 029)
    */
-  private handleViewportChanged(viewport: { center: [number, number]; zoom: number }): void {
+  private handleViewportChanged(viewport: {
+    center: [number, number];
+    zoom: number;
+    bounds?: [[number, number], [number, number], [number, number], [number, number]];
+  }): void {
     // Clear existing timeout
     if (this.viewportUpdateTimeout) {
       clearTimeout(this.viewportUpdateTimeout);
@@ -540,11 +556,19 @@ export class MapPanel {
 
     // Debounce viewport updates to session state
     this.viewportUpdateTimeout = setTimeout(() => {
-      if (this.activeSession) {
-        this.activeSession.getState().setViewport({
-          center: { lat: viewport.center[0], lng: viewport.center[1] },
+      if (this.activeSession && viewport.bounds) {
+        // bounds is [NW, NE, SE, SW] in [lng, lat] order - matches ViewportPolygon format
+        const newViewport = {
+          coordinates: viewport.bounds,
           zoom: viewport.zoom,
-        });
+        };
+        // Only update if viewport actually changed (avoid feedback loop)
+        const currentViewport = this.activeSession.getState().viewport;
+        if (!currentViewport ||
+            JSON.stringify(currentViewport.coordinates) !== JSON.stringify(newViewport.coordinates) ||
+            currentViewport.zoom !== newViewport.zoom) {
+          this.activeSession.getState().setViewport(newViewport);
+        }
       }
     }, MapPanel.VIEWPORT_DEBOUNCE_MS);
   }
@@ -613,7 +637,14 @@ export class MapPanel {
         break;
 
       case 'viewStateChanged':
-        // View state changes are handled automatically by webview persistence
+        // Forward viewport changes to session state (Feature: 029)
+        if (message.state?.bounds) {
+          this.handleViewportChanged({
+            center: message.state.center,
+            zoom: message.state.zoom,
+            bounds: message.state.bounds,
+          });
+        }
         break;
 
       case 'viewportChanged':
@@ -638,6 +669,26 @@ export class MapPanel {
 
       case 'repFileDrop':
         void this.handleRepFileDrop(message.uris);
+        break;
+
+      case 'requestUndo':
+        // Handle undo request from webview keyboard shortcut (Feature: 029)
+        if (this.activeSession) {
+          const state = this.activeSession.getState();
+          if (state.canUndo()) {
+            state.undo();
+          }
+        }
+        break;
+
+      case 'requestRedo':
+        // Handle redo request from webview keyboard shortcut (Feature: 029)
+        if (this.activeSession) {
+          const state = this.activeSession.getState();
+          if (state.canRedo()) {
+            state.redo();
+          }
+        }
         break;
     }
   }

@@ -200,6 +200,8 @@ export interface ViewStateChangedMessage {
     center: [number, number];
     zoom: number;
     timeRange: { start: string; end: string };
+    /** Viewport bounds as [NW, NE, SE, SW] corners in [lng, lat] order */
+    bounds?: [[number, number], [number, number], [number, number], [number, number]];
   };
 }
 
@@ -224,6 +226,16 @@ export interface RequestTrackDetailsRequest extends RequestMessage {
 /** Signal that webview has initialized and is ready to receive data */
 export interface WebviewReadyMessage {
   type: 'webviewReady';
+}
+
+/** Request undo from webview (keyboard shortcut) */
+export interface RequestUndoMessage {
+  type: 'requestUndo';
+}
+
+/** Request redo from webview (keyboard shortcut) */
+export interface RequestRedoMessage {
+  type: 'requestRedo';
 }
 
 /** Notify extension of viewport change for session state (Feature: 029) */
@@ -295,7 +307,9 @@ export type WebviewToExtensionMessage =
   | RequestTrackColorChangeMessage
   | RequestTrackDetailsRequest
   | WebviewReadyMessage
-  | RepFileDropMessage;
+  | RepFileDropMessage
+  | RequestUndoMessage
+  | RequestRedoMessage;
 
 // ============================================================================
 // Re-exports for webview

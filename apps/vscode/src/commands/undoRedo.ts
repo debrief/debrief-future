@@ -31,8 +31,6 @@ export function createUndoCommand(
     const state = session.getState();
     if (state.canUndo()) {
       state.undo();
-      // Optionally show status bar message
-      // vscode.window.setStatusBarMessage('Undo', 2000);
     }
   };
 }
