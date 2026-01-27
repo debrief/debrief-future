@@ -76,7 +76,11 @@
       "Bash(pushd:*)",
       "Bash(popd)",
       "Bash(dir /b /o-d \"%USERPROFILE%\\\\Pictures\\\\Screenshots\")",
-      "Bash(npx vitest run:*)"
+      "Bash(npx vitest run:*)",
+      "Bash(if [ -d \"../worktrees\" ])",
+      "Bash(then echo \"WORKTREES_DIR_EXISTS\")",
+      "Bash(else echo \"NO_WORKTREES_DIR\")",
+      "Bash(fi)"
     ]
   }
 }
