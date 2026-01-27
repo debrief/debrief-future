@@ -17,7 +17,14 @@ def runner():
 @pytest.fixture
 def valid_geojson_path():
     """Path to valid GeoJSON fixture."""
-    return Path(__file__).parent.parent / "calc" / "fixtures" / "track-single.geojson"
+    return (
+        Path(__file__).parent.parent.parent
+        / "services"
+        / "calc"
+        / "tests"
+        / "fixtures"
+        / "track-single.geojson"
+    )
 
 
 @pytest.fixture

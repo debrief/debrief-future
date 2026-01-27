@@ -45,6 +45,9 @@ let currentBbox: [number, number, number, number] | null = null;
 // Layer for other GeoJSON features (polygons, etc.)
 let otherFeaturesLayer: L.GeoJSON | null = null;
 
+// Flag to suppress view notifications during undo/redo (Feature: 029)
+let suppressViewNotify = false;
+
 /**
  * Initialize the Leaflet map
  */
@@ -299,17 +302,27 @@ function saveViewState(): void {
  * Notify extension of view state change
  */
 function notifyViewStateChanged(): void {
-  if (!map) {
+  if (!map || suppressViewNotify) {
     return;
   }
 
   const center = map.getCenter();
+  const leafletBounds = map.getBounds();
+  // Convert to [NW, NE, SE, SW] in [lng, lat] order for GeoJSON compatibility
+  const bounds: [[number, number], [number, number], [number, number], [number, number]] = [
+    [leafletBounds.getNorthWest().lng, leafletBounds.getNorthWest().lat], // NW
+    [leafletBounds.getNorthEast().lng, leafletBounds.getNorthEast().lat], // NE
+    [leafletBounds.getSouthEast().lng, leafletBounds.getSouthEast().lat], // SE
+    [leafletBounds.getSouthWest().lng, leafletBounds.getSouthWest().lat], // SW
+  ];
+
   const message: WebviewToExtensionMessage = {
     type: 'viewStateChanged',
     state: {
       center: [center.lat, center.lng],
       zoom: map.getZoom(),
       timeRange: timeFilter?.getCurrentRange() ?? { start: '', end: '' },
+      bounds,
     },
   };
 
@@ -404,6 +417,14 @@ function handleMessage(message: ExtensionToWebviewMessage): void {
 
     case 'setTrackColor':
       handleSetTrackColor(message);
+      break;
+
+    case 'setViewport':
+      handleSetViewport(message);
+      break;
+
+    case 'setCurrentTime':
+      handleSetCurrentTime(message);
       break;
 
     case 'importProgress':
@@ -634,10 +655,48 @@ function handleSetTrackColor(
   saveViewState();
 }
 
+/**
+ * Handle setViewport message from extension (for undo/redo).
+ * Sets the map view without notifying extension back (to avoid loop).
+ */
+function handleSetViewport(
+  message: Extract<ExtensionToWebviewMessage, { type: 'setViewport' }>
+): void {
+  if (!map) return;
+  suppressViewNotify = true;
+  map.setView(message.viewport.center, message.viewport.zoom, { animate: false });
+  saveViewState();
+  // Reset flag after current event cycle
+  setTimeout(() => { suppressViewNotify = false; }, 0);
+}
+
+/**
+ * Handle setCurrentTime message from extension (for undo/redo).
+ * TODO: Implement current time visualization when playhead feature is added.
+ */
+function handleSetCurrentTime(
+  _message: Extract<ExtensionToWebviewMessage, { type: 'setCurrentTime' }>
+): void {
+  // Current time (playhead) is not yet visualized in the map
+  // This will be implemented when the time controller is integrated
+}
+
 // Listen for messages from extension
 window.addEventListener('message', (event) => {
   const message = event.data as ExtensionToWebviewMessage;
   handleMessage(message);
+});
+
+// Handle keyboard shortcuts (Ctrl+Z for undo, Ctrl+Y for redo)
+// These need to be captured in the webview since it's an iframe
+window.addEventListener('keydown', (event) => {
+  if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+    event.preventDefault();
+    vscode.postMessage({ type: 'requestUndo' } as WebviewToExtensionMessage);
+  } else if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || (event.key === 'z' && event.shiftKey))) {
+    event.preventDefault();
+    vscode.postMessage({ type: 'requestRedo' } as WebviewToExtensionMessage);
+  }
 });
 
 // Initialize when DOM is ready

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { subscribeToDirty, type SessionStoreApi } from '@debrief/session-state';
 import { StacTreeProvider } from './providers/stacTreeProvider';
 import { StacFileSystemProvider } from './providers/stacFileSystemProvider';
 import { ToolsTreeProvider } from './providers/toolsTreeProvider';
@@ -12,6 +13,7 @@ import { CalcService } from './services/calcService';
 import { RecentPlotsService } from './services/recentPlotsService';
 import { ActivityBarService } from './services/activityBarService';
 import { IoService } from './services/ioService';
+import { SessionManager } from './services/sessionManager';
 import { registerCommands } from './commands';
 import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 
@@ -31,6 +33,62 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const calcService = new CalcService(context);
   const recentPlotsService = new RecentPlotsService(context);
   const ioService = new IoService(context.extensionPath);
+  const sessionManager = new SessionManager();
+  context.subscriptions.push(sessionManager);
+
+  // Configure MCP server port from settings (Feature: 029 - Phase 5)
+  const mcpConfig = vscode.workspace.getConfiguration('debrief');
+  const mcpPort = mcpConfig.get<number>('mcp.port', 3001);
+  sessionManager.setMcpPort(mcpPort);
+
+  // Start MCP server when first session becomes active
+  const mcpServerStarter = sessionManager.onActiveSessionChange((session) => {
+    if (session && !sessionManager.isMcpServerRunning()) {
+      sessionManager.startMcpServer(session);
+    }
+  });
+  context.subscriptions.push(mcpServerStarter);
+
+  // Create dirty indicator in status bar (Feature: 029 - T057)
+  const dirtyIndicator = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Left,
+    100
+  );
+  dirtyIndicator.text = '$(circle-filled) Unsaved Session';
+  dirtyIndicator.tooltip = 'Session has unsaved changes. Press Ctrl+S to save.';
+  dirtyIndicator.command = 'debrief.saveSession';
+  context.subscriptions.push(dirtyIndicator);
+
+  // Track dirty subscription for cleanup when session changes
+  let dirtyUnsubscribe: (() => void) | undefined;
+
+  // Subscribe to dirty changes on active session
+  const dirtyWatcher = sessionManager.onActiveSessionChange((session: SessionStoreApi | null) => {
+    // Cleanup previous subscription
+    if (dirtyUnsubscribe) {
+      dirtyUnsubscribe();
+      dirtyUnsubscribe = undefined;
+    }
+    dirtyIndicator.hide();
+
+    if (session) {
+      // Show indicator if already dirty
+      const state = session.getState();
+      if (state.dirty) {
+        dirtyIndicator.show();
+      }
+
+      // Subscribe to dirty changes
+      dirtyUnsubscribe = subscribeToDirty(session, (dirty: boolean) => {
+        if (dirty) {
+          dirtyIndicator.show();
+        } else {
+          dirtyIndicator.hide();
+        }
+      });
+    }
+  });
+  context.subscriptions.push(dirtyWatcher);
 
   // Register file system provider for stac:// URIs
   const stacFileSystemProvider = new StacFileSystemProvider(stacService);
@@ -44,9 +102,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // Register tree providers
   const stacTreeProvider = new StacTreeProvider(configService, stacService);
   const toolsTreeProvider = new ToolsTreeProvider(calcService);
-  const layersTreeProvider = new LayersTreeProvider();
+  const layersTreeProvider = new LayersTreeProvider(sessionManager);
   const outlineProvider = new OutlineProvider();
-  const timeRangeProvider = new TimeRangeViewProvider(context.extensionUri);
+  const timeRangeProvider = new TimeRangeViewProvider(context.extensionUri, sessionManager);
 
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
@@ -71,6 +129,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     calcService,
     recentPlotsService,
     ioService,
+    sessionManager,
     stacTreeProvider,
     toolsTreeProvider,
     layersTreeProvider,

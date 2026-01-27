@@ -8,6 +8,8 @@ import type { StacService } from '../services/stacService';
 import type { CalcService } from '../services/calcService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
 import type { IoService } from '../services/ioService';
+import type { SessionManager } from '../services/sessionManager';
+import type { SessionStoreApi, SessionStoreWithUndo } from '@debrief/session-state';
 import type { StacTreeProvider } from '../providers/stacTreeProvider';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
@@ -21,6 +23,8 @@ import { createExecuteToolCommand, createCancelToolExecutionCommand } from './ex
 import { createExportPngCommand } from './exportPng';
 import { createChangeTrackColorCommand } from './changeTrackColor';
 import { createImportRepCommand } from './importRep';
+import { createUndoCommand, createRedoCommand } from './undoRedo';
+import { createSaveSessionCommand } from './saveSession';
 
 export function registerCommands(
   context: vscode.ExtensionContext,
@@ -29,6 +33,7 @@ export function registerCommands(
   calcService: CalcService,
   recentPlotsService: RecentPlotsService,
   ioService: IoService,
+  sessionManager: SessionManager,
   stacTreeProvider: StacTreeProvider,
   toolsTreeProvider: ToolsTreeProvider,
   layersTreeProvider: LayersTreeProvider,
@@ -48,6 +53,7 @@ export function registerCommands(
         stacService,
         ioService,
         recentPlotsService,
+        sessionManager,
         toolsTreeProvider,
         layersTreeProvider,
         timeRangeProvider,
@@ -170,10 +176,27 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.toggleLayerVisibility',
-      (args: { layerId: string }) => {
+      (args: { layerId: string; featureId?: string }) => {
         const panel = getMapPanel();
-        if (panel && args?.layerId) {
-          // Toggle visibility - need to track current state
+        if (!panel || !args?.layerId) {
+          return;
+        }
+
+        // Use session state if featureId is provided
+        const featureId = args.featureId;
+        const activeSession: SessionStoreApi | null = sessionManager.getActiveSession();
+
+        if (featureId !== undefined && activeSession !== null) {
+          // Toggle via session state - this will trigger subscriptions
+          const state: SessionStoreWithUndo = activeSession.getState();
+          state.toggleFeatureVisibility(featureId);
+
+          // Also update map panel for immediate visual feedback
+          const hiddenIds = state.hiddenFeatureIds;
+          const isVisible = !hiddenIds.includes(featureId);
+          panel.setLayerVisibility(args.layerId, isVisible);
+        } else {
+          // Fallback to legacy behavior for backward compatibility
           const tracks = panel.getTracks();
           const locations = panel.getLocations();
           const results = panel.getResultLayers();
@@ -310,6 +333,32 @@ export function registerCommands(
         ioService,
         stacTreeProvider
       )
+    )
+  );
+
+  // Undo/Redo commands (Feature: 029 - Phase 6)
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.undo',
+      createUndoCommand(sessionManager)
+    )
+  );
+
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.redo',
+      createRedoCommand(sessionManager)
+    )
+  );
+
+  // Session persistence command (Feature: 029 - Phase 7)
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.saveSession',
+      createSaveSessionCommand(sessionManager, (storeId) => {
+        const store = configService.getStore(storeId);
+        return store?.path;
+      })
     )
   );
 

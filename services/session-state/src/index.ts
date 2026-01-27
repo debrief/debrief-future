@@ -33,6 +33,7 @@ export {
   getSessionStore,
   resetSessionStore,
   type SessionStoreApi,
+  type SessionStoreWithUndo,
 } from './store/index.js';
 
 // Subscriptions

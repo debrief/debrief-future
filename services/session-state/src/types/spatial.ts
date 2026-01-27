@@ -14,6 +14,8 @@ export type Coordinate = [number, number];
  */
 export interface ViewportPolygon {
   coordinates: [Coordinate, Coordinate, Coordinate, Coordinate];
+  /** Map zoom level for restoring the view */
+  zoom?: number;
 }
 
 /**

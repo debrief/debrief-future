@@ -17,13 +17,27 @@ def runner():
 @pytest.fixture
 def single_track_path():
     """Path to single track fixture."""
-    return Path(__file__).parent.parent / "calc" / "fixtures" / "track-single.geojson"
+    return (
+        Path(__file__).parent.parent.parent
+        / "services"
+        / "calc"
+        / "tests"
+        / "fixtures"
+        / "track-single.geojson"
+    )
 
 
 @pytest.fixture
 def tracks_pair_path():
     """Path to tracks pair fixture."""
-    return Path(__file__).parent.parent / "calc" / "fixtures" / "tracks-pair.geojson"
+    return (
+        Path(__file__).parent.parent.parent
+        / "services"
+        / "calc"
+        / "tests"
+        / "fixtures"
+        / "tracks-pair.geojson"
+    )
 
 
 class TestToolsList:

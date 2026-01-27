@@ -96,8 +96,8 @@ class TestRangeBearingTool:
             props = result["properties"]
             assert "range_nm" in props
             assert "bearing_deg" in props
-            assert isinstance(props["range_nm"], (int, float))
-            assert isinstance(props["bearing_deg"], (int, float))
+            assert isinstance(props["range_nm"], int | float)
+            assert isinstance(props["bearing_deg"], int | float)
 
     def test_result_references_tracks(self, multi_track_context):
         results = range_bearing(multi_track_context, {})

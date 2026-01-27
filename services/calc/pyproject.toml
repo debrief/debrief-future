@@ -38,6 +38,6 @@ dev = [
 packages = ["debrief_calc"]
 
 [tool.pytest.ini_options]
-testpaths = ["../../tests/calc"]
+testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]

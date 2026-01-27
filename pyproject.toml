@@ -24,6 +24,12 @@ debrief-cli = { workspace = true }
 
 [dependency-groups]
 dev = [
+    "debrief-schemas",
+    "debrief-stac",
+    "debrief-io",
+    "debrief-config",
+    "debrief-calc",
+    "debrief-cli",
     "pydantic>=2.12.5",
     "pyinstaller>=6.18.0",
     "pytest>=7.0.0",
@@ -34,7 +40,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "shared/schemas/tests", "services/io/tests", "services/config/tests"]
+testpaths = ["tests", "shared/schemas/tests", "services/io/tests", "services/config/tests", "services/calc/tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "--import-mode=importlib --ignore=services/stac/tests"

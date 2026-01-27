@@ -139,6 +139,21 @@ export interface SetTimeRangeMessage {
   };
 }
 
+/** Set viewport from session state (Feature: 029) */
+export interface SetViewportMessage {
+  type: 'setViewport';
+  viewport: {
+    center: [number, number]; // [lat, lng]
+    zoom: number;
+  };
+}
+
+/** Set current time position from session state (Feature: 029) */
+export interface SetCurrentTimeMessage {
+  type: 'setCurrentTime';
+  time: number; // epoch ms
+}
+
 /** Set custom color for a track */
 export interface SetTrackColorMessage {
   type: 'setTrackColor';
@@ -185,6 +200,8 @@ export interface ViewStateChangedMessage {
     center: [number, number];
     zoom: number;
     timeRange: { start: string; end: string };
+    /** Viewport bounds as [NW, NE, SE, SW] corners in [lng, lat] order */
+    bounds?: [[number, number], [number, number], [number, number], [number, number]];
   };
 }
 
@@ -209,6 +226,25 @@ export interface RequestTrackDetailsRequest extends RequestMessage {
 /** Signal that webview has initialized and is ready to receive data */
 export interface WebviewReadyMessage {
   type: 'webviewReady';
+}
+
+/** Request undo from webview (keyboard shortcut) */
+export interface RequestUndoMessage {
+  type: 'requestUndo';
+}
+
+/** Request redo from webview (keyboard shortcut) */
+export interface RequestRedoMessage {
+  type: 'requestRedo';
+}
+
+/** Notify extension of viewport change for session state (Feature: 029) */
+export interface ViewportChangedMessage {
+  type: 'viewportChanged';
+  viewport: {
+    center: [number, number]; // [lat, lng]
+    zoom: number;
+  };
 }
 
 // ============================================================================
@@ -255,6 +291,8 @@ export type ExtensionToWebviewMessage =
   | FitBoundsMessage
   | SetTimeRangeMessage
   | SetTrackColorMessage
+  | SetViewportMessage
+  | SetCurrentTimeMessage
   | RequestExportPngResponse
   | RequestTrackDetailsResponse
   | ImportProgressMessage
@@ -264,11 +302,14 @@ export type ExtensionToWebviewMessage =
 export type WebviewToExtensionMessage =
   | SelectionChangedMessage
   | ViewStateChangedMessage
+  | ViewportChangedMessage
   | RequestExportPngRequest
   | RequestTrackColorChangeMessage
   | RequestTrackDetailsRequest
   | WebviewReadyMessage
-  | RepFileDropMessage;
+  | RepFileDropMessage
+  | RequestUndoMessage
+  | RequestRedoMessage;
 
 // ============================================================================
 // Re-exports for webview
