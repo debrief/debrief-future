@@ -107,9 +107,10 @@ Description formats:
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | Low | approved |
 | 028 | Tech Debt | [Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md) | 4 | 2 | 5 | 11 | Low | implementing |
 | 029 | Tech Debt | [Integrate session-state service into VS Code extension](specs/029-session-state-vscode/spec.md) (multi-document support) | 5 | 3 | 4 | 12 | High | tasked |
+| 030 | Tech Debt | [Add replay mode and time acceleration to temporal state schema](docs/ideas/030-temporal-ui-state.md) (requires #029) | 4 | 2 | 4 | 10 | Medium | approved |
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | 5 | 2 | 4 | 11 | Low | approved |
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
-| 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](docs/ideas/019-backlog-interview-capture.md) | 3 | 3 | 5 | 11 | Medium | proposed |
+| 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](specs/019-needs-interview-status/spec.md) | 3 | 3 | 5 | 11 | Medium | specified |
 | ~~020~~ | ~~Infrastructure~~ | ~~[Add remaining shape type importers with Storybook verification](specs/020-shape-types-importer/spec.md)~~ | ~~4~~ | ~~4~~ | ~~5~~ | ~~13~~ | ~~Low~~ | ~~complete~~ |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
 | 001 | Infrastructure | Extract shared MCP utilities into mcp-common package | 3 | 2 | 4 | 9 | Medium | proposed |
@@ -119,6 +120,12 @@ Description formats:
 | 012 | Enhancement | Wire loader plot count to debrief-stac list_plots call | 2 | 1 | 5 | 8 | Low | proposed |
 | 031 | Documentation | [Document vscrui as standard component library for VS Code webviews](docs/ideas/031-vscrui-component-library.md) | 3 | 1 | 5 | 9 | Low | approved |
 | 032 | Documentation | [Document Storybook VS Code theming setup](docs/ideas/032-storybook-vscode-theming.md) | 2 | 2 | 5 | 9 | Low | approved |
+| 030 | Tech Debt | [Fix test isolation in debrief-config tests](docs/ideas/030-fix-config-test-isolation.md) | - | - | - | - | Low | proposed |
+| 033 | Tech Debt | [Re-enable debrief-stac tests in pytest](docs/ideas/033-reenable-stac-tests.md) | - | - | - | - | Low | proposed |
+| 034 | Tech Debt | [Remove synchronous fs calls from VS Code stacService](docs/ideas/034-async-stac-service-fs.md) | - | - | - | - | Low | proposed |
+| 027 | Documentation | [Document vscrui as standard component library for VS Code webviews](docs/ideas/027-vscrui-component-library.md) | 3 | 1 | 5 | 9 | Low | approved |
+| 027 | Documentation | [Document Storybook VS Code theming setup](docs/ideas/027-storybook-vscode-theming.md) | 2 | 2 | 5 | 9 | Low | approved |
+| 030 | Feature | [Invoke debrief-calc distance tool from VS Code extension](https://github.com/debrief/debrief-future/issues/115) (requires #025, #029) | 5 | 5 | 4 | 14 | Medium | approved |
 | 018 | Infrastructure | [Add VS Code multi-root workspace configuration](specs/018-vscode-workspace-config/spec.md) | 3 | 1 | 5 | 9 | Low | shipped |
 | ~~014~~ | ~~Feature~~ | ~~[Add styling properties schemas to GeoJSON features](specs/014-geojson-styling-schemas/spec.md)~~ | ~~5~~ | ~~4~~ | ~~5~~ | ~~14~~ | ~~Medium~~ | ~~complete~~ |
 | ~~015~~ | ~~Infrastructure~~ | ~~[Create LinkML schemas for REP annotation item types](specs/015-annotation-item-schemas/spec.md)~~ | ~~5~~ | ~~3~~ | ~~5~~ | ~~13~~ | ~~Medium~~ | ~~complete~~ |

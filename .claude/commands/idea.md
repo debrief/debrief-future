@@ -10,6 +10,16 @@ $ARGUMENTS
 
 You **MUST** have an idea description provided.
 
+## Agent References
+
+| Role | Agent File |
+|------|------------|
+| Scout (evaluation + interview) | `.claude/agents/backlog/opportunity-scout.md` |
+| Prioritizer (scoring) | `.claude/agents/backlog/backlog-prioritizer.md` |
+| Ideas Guy (approval) | `.claude/agents/backlog/the-ideas-guy.md` |
+
+**Read these agent files** when acting in each role to understand the detailed protocols.
+
 ## Purpose
 
 This command captures requirements through an adaptive interview:
@@ -38,7 +48,9 @@ If no description provided:
 
 ### Step 2: Scout Evaluation
 
-Act as the **opportunity-scout**:
+**First**, read the opportunity-scout agent definition at `.claude/agents/backlog/opportunity-scout.md` to understand your role and interview approach.
+
+Then act as the **opportunity-scout**:
 
 1. Read `STRATEGY.md` — check current phase, themes, parking lot
 2. Read `CONSTITUTION.md` — check for conflicts
@@ -60,6 +72,8 @@ Act as the **opportunity-scout**:
 Report: "Scout evaluation: ✅ Passes hard filters" (with any soft filter flags)
 
 ### Step 3: Interview (Interactive)
+
+Follow the **Interview Mode** protocol defined in `.claude/agents/backlog/opportunity-scout.md`.
 
 Conduct an **adaptive conversation** to gather enough detail for implementation:
 

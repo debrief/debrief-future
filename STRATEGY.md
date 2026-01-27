@@ -111,6 +111,8 @@ Record significant prioritisation decisions here for future reference.
 | 2026-01 | VS Code as primary frontend | Lower barrier than Electron standalone; developer audience familiar with it |
 | 2026-01-16 | Batch approval: 6 items for tracer bullet | Approved #002, #005, #007, #008, #011, #013 - all serve Themes 1-3; parked #006, #009 |
 | 2026-01-26 | Approved #029 session-state VS Code integration | Completes 024 architectural investment; enables Python tool state access via MCP; foundational for multi-document workflow |
+| 2026-01-26 | Approved #019 needs-interview backlog workflow | Workflow infrastructure has precedent (023, 027, 028); high autonomy score; addresses idea capture friction |
+| 2026-01-26 | Approved #030 calc tool invocation from VS Code | Completes tracer bullet ("run analysis tool → see results"); high demo value for stakeholder engagement |
 
 ---
 
