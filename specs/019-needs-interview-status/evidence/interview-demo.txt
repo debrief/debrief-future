@@ -1,0 +1,118 @@
+# Demo: /interview Command
+
+This demonstrates the batch interview processing workflow.
+
+## Command (List Mode)
+
+```
+Human: /interview
+```
+
+## Expected Output (List of Pending Items)
+
+```
+## Items Awaiting Interview
+
+| # | ID | Category | Description | Prelim Scores |
+|---|----|-----------|--------------|----|
+| 1 | 042 | Feature | Add batch export feature for reports | V:4 M:3 A:4 |
+| 2 | 045 | Enhancement | Improve search performance | V:4 M:2 A:3 |
+
+**Select an item by ID** (e.g., `042`) or **number** (e.g., `1`)
+
+Or run `/interview {ID}` directly to skip this step.
+```
+
+## Command (Direct Selection)
+
+```
+Human: /interview 042
+```
+
+## Expected Interview Flow
+
+The interview uses multiple-choice questions asked one at a time:
+
+```
+What is the primary use case for batch export?
+
+A) Exporting multiple analyses for external reporting
+B) Archiving completed projects
+C) Sharing with team members who don't have Debrief
+D) Other (please describe)
+```
+
+User answers, then next question:
+
+```
+What file formats should be supported?
+
+A) PDF only (for formal reports)
+B) PDF and CSV (reports + data)
+C) PDF, CSV, and GeoJSON (full data portability)
+D) User-configurable format selection
+```
+
+## Expected Final Output
+
+```
+## Interview Complete: Add batch export feature for reports
+
+### 1. Item Selected
+ID: 042 | Category: Feature
+Original capture: quick capture via --defer
+
+### 2. Interview Conducted
+Questions asked: 4
+Key findings:
+- Primary use case: External stakeholder reporting
+- Required formats: PDF and CSV
+- Scope: Selected analyses, not entire workspace
+
+### 3. Issue Created
+#156: [Add batch export feature](https://github.com/debrief/debrief-future/issues/156)
+
+### 4. Backlog Updated
+Status: `needs-interview` → `proposed`
+
+### 5. Scores Refined
+| Dimension | Preliminary | Final | Change |
+|-----------|-------------|-------|--------|
+| Value | 4 | 5 | +1 |
+| Media | 3 | 4 | +1 |
+| Autonomy | 4 | 4 | - |
+| **Total** | 11 | 13 | +2 |
+
+### 6. Strategic Review
+✅ **Approved** — Aligns with current themes
+
+### Next Step
+When ready to implement, run: `/speckit.start 042`
+```
+
+## Edge Case: No Items
+
+```
+Human: /interview
+```
+
+```
+## Interview Queue Empty
+
+No items have status `needs-interview`.
+
+**To add items for later interview:**
+- Use `/idea --defer {description}` for quick capture
+- Items will appear here for detailed requirements gathering
+```
+
+## Key Points Verified
+
+1. Step 1 parses BACKLOG.md for needs-interview items
+2. Step 2 displays numbered list with selection options
+3. Step 3 accepts ID or list number selection
+4. Step 4 uses multiple-choice questions (FR-009, FR-010)
+5. Step 5 creates GitHub issue
+6. Step 6 updates status to proposed
+7. Step 7 refines scores
+8. Step 8 performs strategic review

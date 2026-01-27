@@ -1,0 +1,51 @@
+# Demo: /idea --defer Command
+
+This demonstrates the quick capture workflow using the --defer flag.
+
+## Command
+
+```
+Human: /idea --defer Add batch export feature for reports
+```
+
+## Expected Output
+
+```
+## Quick Capture: Add batch export feature for reports
+
+### 1. Scout Evaluation
+✅ Passes hard filters
+
+### 2. Interview Deferred
+⏭️ Skipping detailed interview for quick capture
+
+### 3. Added to Backlog
+Item **042** added as Feature
+Status: `needs-interview`
+
+### 4. Preliminary Scores
+| V | M | A | Total |
+|---|---|---|-------|
+| 4 | 3 | 4 | 11 |
+
+**Note**: Scores are preliminary based on limited information.
+
+### Next Steps
+- Run `/interview` later to complete requirements gathering
+- Interview will create GitHub issue and refine scores
+- After interview, item proceeds to normal approval flow
+```
+
+## BACKLOG.md Entry
+
+```
+| 042 | Feature | Add batch export feature for reports | 4 | 3 | 4 | 11 | - | needs-interview |
+```
+
+## Key Points Verified
+
+1. --defer flag is recognized in Step 1 (Parse the Idea)
+2. Interview is skipped (Step 2a: Defer Path)
+3. Status is set to needs-interview (Step 5)
+4. Scores marked as preliminary (Step 6)
+5. Output uses Deferred Path format

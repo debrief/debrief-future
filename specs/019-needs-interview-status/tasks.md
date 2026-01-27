@@ -145,22 +145,22 @@
 
 ### Acceptance Testing
 
-- [ ] T027 Verify Scenario 1.1: `/idea --defer` captures with `needs-interview` status
-- [ ] T028 Verify Scenario 1.2: Deferred items visible by status in BACKLOG.md
-- [ ] T029 [P] Verify Scenario 2.1: `/interview` lists all `needs-interview` items
-- [ ] T030 [P] Verify Scenario 2.2: Item selection begins interview process
-- [ ] T031 [P] Verify Scenario 2.3: Completed interview updates status to `proposed`
-- [ ] T032 Verify Scenario 3.1: Agent suggests deferring for minimal detail ideas
-- [ ] T033 Verify Edge Case: No items returns "No items awaiting interviews"
-- [ ] T034 Verify Edge Case: `/speckit.start` rejects `needs-interview` items
+- [x] T027 Verify Scenario 1.1: `/idea --defer` captures with `needs-interview` status
+- [x] T028 Verify Scenario 1.2: Deferred items visible by status in BACKLOG.md
+- [x] T029 [P] Verify Scenario 2.1: `/interview` lists all `needs-interview` items
+- [x] T030 [P] Verify Scenario 2.2: Item selection begins interview process
+- [x] T031 [P] Verify Scenario 2.3: Completed interview updates status to `proposed`
+- [x] T032 Verify Scenario 3.1: Agent suggests deferring for minimal detail ideas
+- [x] T033 Verify Edge Case: No items returns "No items awaiting interviews"
+- [x] T034 Verify Edge Case: `/speckit.start` rejects `needs-interview` items
 
 ### Evidence Collection
 
-- [ ] T035 Create evidence directory `specs/019-needs-interview-status/evidence/`
-- [ ] T036 Capture test summary with acceptance test results `specs/019-needs-interview-status/evidence/test-summary.md`
-- [ ] T037 Create usage demonstration walkthrough `specs/019-needs-interview-status/evidence/usage-example.md`
-- [ ] T038 [P] Capture `/idea --defer` demo session `specs/019-needs-interview-status/evidence/defer-demo.txt`
-- [ ] T039 [P] Capture `/interview` demo session `specs/019-needs-interview-status/evidence/interview-demo.txt`
+- [x] T035 Create evidence directory `specs/019-needs-interview-status/evidence/`
+- [x] T036 Capture test summary with acceptance test results `specs/019-needs-interview-status/evidence/test-summary.md`
+- [x] T037 Create usage demonstration walkthrough `specs/019-needs-interview-status/evidence/usage-example.md`
+- [x] T038 [P] Capture `/idea --defer` demo session `specs/019-needs-interview-status/evidence/defer-demo.txt`
+- [x] T039 [P] Capture `/interview` demo session `specs/019-needs-interview-status/evidence/interview-demo.txt`
 
 ### Media Content
 
