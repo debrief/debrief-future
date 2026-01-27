@@ -92,16 +92,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T011 Create `/interview` command with purpose and user input sections `.claude/commands/interview.md`
-- [ ] T012 Implement Step 1: Parse BACKLOG.md for `needs-interview` items `.claude/commands/interview.md`
-- [ ] T013 Implement Step 2: Display numbered list of pending items `.claude/commands/interview.md`
-- [ ] T014 Implement Step 3: Selection by item ID `.claude/commands/interview.md`
-- [ ] T015 Implement Step 4: Interview process (reuse pattern from idea.md Step 3) `.claude/commands/interview.md`
-- [ ] T016 Implement Step 5: Update status from `needs-interview` to `proposed` `.claude/commands/interview.md`
-- [ ] T017 Implement Step 6: Update GitHub issue if exists (FR-011) `.claude/commands/interview.md`
-- [ ] T018 Add multiple-choice question format (FR-009, FR-010) `.claude/commands/interview.md`
-- [ ] T019 Add output format for success and edge cases `.claude/commands/interview.md`
-- [ ] T020 Add error handling for no items, invalid selection `.claude/commands/interview.md`
+- [x] T011 Create `/interview` command with purpose and user input sections `.claude/commands/interview.md`
+- [x] T012 Implement Step 1: Parse BACKLOG.md for `needs-interview` items `.claude/commands/interview.md`
+- [x] T013 Implement Step 2: Display numbered list of pending items `.claude/commands/interview.md`
+- [x] T014 Implement Step 3: Selection by item ID `.claude/commands/interview.md`
+- [x] T015 Implement Step 4: Interview process (reuse pattern from idea.md Step 3) `.claude/commands/interview.md`
+- [x] T016 Implement Step 5: Update status from `needs-interview` to `proposed` `.claude/commands/interview.md`
+- [x] T017 Implement Step 6: Update GitHub issue if exists (FR-011) `.claude/commands/interview.md`
+- [x] T018 Add multiple-choice question format (FR-009, FR-010) `.claude/commands/interview.md`
+- [x] T019 Add output format for success and edge cases `.claude/commands/interview.md`
+- [x] T020 Add error handling for no items, invalid selection `.claude/commands/interview.md`
 
 **Checkpoint**: Users can list and process deferred items via `/interview`. Status transitions correctly.
 
