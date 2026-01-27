@@ -70,7 +70,13 @@
       "WebFetch(domain:debrief.github.io)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:gist.github.com)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(claude:*)",
+      "Bash(scoop install:*)",
+      "Bash(pushd:*)",
+      "Bash(popd)",
+      "Bash(dir /b /o-d \"%USERPROFILE%\\\\Pictures\\\\Screenshots\")",
+      "Bash(npx vitest run:*)"
     ]
   }
 }
