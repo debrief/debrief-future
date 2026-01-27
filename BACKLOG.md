@@ -26,6 +26,7 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
 
 | Status | Meaning | Trigger |
 |--------|---------|---------|
+| **needs-interview** | Quick capture, awaiting detailed requirements | `/idea --defer` |
 | **proposed** | Item added, awaiting review | Scout adds, ideas-guy adds, or human submits |
 | **approved** | Strategically reviewed, ready for spec | Ideas-guy approves |
 | **specified** | Spec created, linked below | `/speckit.start {ID}` |
@@ -43,20 +44,49 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
    opportunity-scout ──explores──> technical opportunities │
                                                           ▼
                                                     BACKLOG.md
-                                                     (proposed)
                                                           │
-2. SCORING (backlog-prioritizer)                          │
-   scores V/M/A for proposed items ◄──────────────────────┘
-                          │
-3. REVIEW (the-ideas-guy)
+                  ┌───────────────────┬───────────────────┘
+                  │                   │
+                  ▼                   ▼
+           (needs-interview)     (proposed)
+           Quick capture         Full detail
+                  │                   │
+                  │                   │
+2. INTERVIEW      │                   │
+   /interview ────┘                   │
+   completes requirements gathering   │
+          │                           │
+          └─────────────> proposed <──┘
+                              │
+3. SCORING (backlog-prioritizer)
+   scores V/M/A for proposed items
+                              │
+4. REVIEW (the-ideas-guy)
    reviews scored items against STRATEGY.md
       ├── Approve → status: approved
       ├── Park → STRATEGY.md Parking Lot
       └── Reject → STRATEGY.md Rejected Log
-                          │
-4. SPECIFICATION          ▼
+                              │
+5. SPECIFICATION              ▼
    /speckit.start {ID} ← requires status: approved
 ```
+
+### Status Validation Rules
+
+| Command | Required Status | Error if Wrong Status |
+|---------|-----------------|----------------------|
+| `/interview` | `needs-interview` | "Item {ID} doesn't need an interview (status: {status})" |
+| `/speckit.start` | `approved` | "Item {ID} needs interview first. Run `/interview` to complete requirements gathering." (if `needs-interview`) |
+| `/speckit.start` | `approved` | "Item {ID} has status '{status}'. Only 'approved' items can be started." (other statuses) |
+
+**Quick Capture Path** (via `/idea --defer`):
+1. User captures idea quickly → status: `needs-interview`
+2. Later, user runs `/interview` → conducts full interview → status: `proposed`
+3. Normal flow continues: scoring → approval → specification
+
+**Full Detail Path** (via `/idea`):
+1. User provides full detail with interview → status: `proposed`
+2. Normal flow continues: scoring → approval → specification
 
 ### Starting Specification Work
 
@@ -110,7 +140,7 @@ Description formats:
 | 030 | Tech Debt | [Add replay mode and time acceleration to temporal state schema](docs/ideas/030-temporal-ui-state.md) (requires #029) | 4 | 2 | 4 | 10 | Medium | approved |
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | 5 | 2 | 4 | 11 | Low | approved |
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
-| 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](specs/019-needs-interview-status/spec.md) | 3 | 3 | 5 | 11 | Medium | specified |
+| 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](specs/019-needs-interview-status/spec.md) | 3 | 3 | 5 | 11 | Medium | implementing |
 | ~~020~~ | ~~Infrastructure~~ | ~~[Add remaining shape type importers with Storybook verification](specs/020-shape-types-importer/spec.md)~~ | ~~4~~ | ~~4~~ | ~~5~~ | ~~13~~ | ~~Low~~ | ~~complete~~ |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
 | 001 | Infrastructure | Extract shared MCP utilities into mcp-common package | 3 | 2 | 4 | 9 | Medium | proposed |

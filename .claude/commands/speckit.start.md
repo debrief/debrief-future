@@ -94,10 +94,12 @@ Check the item is ready for specification:
 | Check | Pass Condition | Error Message |
 |-------|---------------|---------------|
 | Item exists | Row found in table | "Backlog item {ID} not found in BACKLOG.md" |
+| Not needs-interview | Status is NOT `needs-interview` | "Item {ID} needs interview first. Run `/interview` to complete requirements gathering." |
 | Status is approved | Status is `approved` | "Item {ID} has status '{status}'. Only 'approved' items can be started. Ask the-ideas-guy to review and approve the item first." |
 | Has description | Description is not empty or `-` | "Item {ID} has no description. Add a description to BACKLOG.md first." |
 
 **Status guidance**:
+- `needs-interview` → captured quickly, needs `/interview` to complete requirements
 - `proposed` without scores → needs prioritizer to score
 - `proposed` with scores → needs ideas-guy to approve
 - `approved` → ready for `/speckit.start`
@@ -203,6 +205,7 @@ After both the spec creation and backlog update:
 | Scenario | Action |
 |----------|--------|
 | Item not found | ERROR with suggestion to check BACKLOG.md |
+| Item is `needs-interview` | ERROR: "Item {ID} needs interview first. Run `/interview` to complete requirements gathering." |
 | Item is `proposed` (no scores) | ERROR: "Item needs scoring first. Run backlog-prioritizer." |
 | Item is `proposed` (has scores) | ERROR: "Item needs approval. Ask ideas-guy to review." |
 | Item already `specified` | Suggest `/speckit.clarify` or `/speckit.plan` instead |
@@ -231,16 +234,22 @@ This command validates status is `approved` — it won't proceed with `proposed`
 This command requires `approved` status and advances to `specified`:
 
 ```
-proposed ──[prioritizer scores]──> proposed (with scores)
-                                        │
-                          [ideas-guy reviews]
-                                        │
-                                        v
-                                    approved
-                                        │
-                          [/speckit.start] ◄── YOU ARE HERE
-                                        │
-                                        v
+needs-interview ──[/interview]──> proposed
+        │                             │
+        │                             │
+        │           [prioritizer scores]
+        │                             │
+        │                             v
+        │                   proposed (with scores)
+        │                             │
+        │               [ideas-guy reviews]
+        │                             │
+        │                             v
+        └─────── BLOCKED ───────> approved
+                                      │
+                        [/speckit.start] ◄── YOU ARE HERE
+                                      │
+                                      v
 specified ──[/speckit.clarify]──> clarified ──[/speckit.plan]──> planned
                                                                     │
                                                        [/speckit.tasks]
@@ -253,3 +262,5 @@ specified ──[/speckit.clarify]──> clarified ──[/speckit.plan]──>
                                                                     v
                                                              implementing ──> complete
 ```
+
+**Note**: Items with `needs-interview` status cannot be started. Run `/interview` first to complete requirements gathering.

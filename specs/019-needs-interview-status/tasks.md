@@ -47,8 +47,8 @@
 
 **Purpose**: Project initialization and documentation structure
 
-- [ ] T001 Create evidence directory `specs/019-needs-interview-status/evidence/`
-- [ ] T002 Verify all prerequisite files exist (spec.md, plan.md, research.md, data-model.md)
+- [x] T001 Create evidence directory `specs/019-needs-interview-status/evidence/`
+- [x] T002 Verify all prerequisite files exist (spec.md, plan.md, research.md, data-model.md)
 
 ---
 
@@ -58,8 +58,8 @@
 
 **CRITICAL**: No command changes can proceed until the status is documented.
 
-- [ ] T003 Add `needs-interview` status to BACKLOG.md workflow section with status flow diagram `BACKLOG.md`
-- [ ] T004 Document status validation rules (which commands accept which statuses) `BACKLOG.md`
+- [x] T003 Add `needs-interview` status to BACKLOG.md workflow section with status flow diagram `BACKLOG.md`
+- [x] T004 Document status validation rules (which commands accept which statuses) `BACKLOG.md`
 
 **Checkpoint**: `needs-interview` status is documented - command modifications can now begin.
 
@@ -73,12 +73,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T005 Add `--defer` flag parsing to Step 1 (Parse the Idea) `.claude/commands/idea.md`
-- [ ] T006 Add defer flow that skips interview and uses minimal detail `.claude/commands/idea.md`
-- [ ] T007 Update Step 5 (Add to Backlog) to set status `needs-interview` when deferred `.claude/commands/idea.md`
-- [ ] T008 Update Step 6 (Score the Item) to mark scores as `[preliminary]` when deferred `.claude/commands/idea.md`
-- [ ] T009 Add defer path to Output Format section with appropriate messaging `.claude/commands/idea.md`
-- [ ] T010 Update Example Usage section to show `--defer` flag `.claude/commands/idea.md`
+- [x] T005 Add `--defer` flag parsing to Step 1 (Parse the Idea) `.claude/commands/idea.md`
+- [x] T006 Add defer flow that skips interview and uses minimal detail `.claude/commands/idea.md`
+- [x] T007 Update Step 5 (Add to Backlog) to set status `needs-interview` when deferred `.claude/commands/idea.md`
+- [x] T008 Update Step 6 (Score the Item) to mark scores as `[preliminary]` when deferred `.claude/commands/idea.md`
+- [x] T009 Add defer path to Output Format section with appropriate messaging `.claude/commands/idea.md`
+- [x] T010 Update Example Usage section to show `--defer` flag `.claude/commands/idea.md`
 
 **Checkpoint**: Users can capture ideas quickly with `--defer` flag. Status shows `needs-interview`, scores show `[preliminary]`.
 
@@ -92,16 +92,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T011 Create `/interview` command with purpose and user input sections `.claude/commands/interview.md`
-- [ ] T012 Implement Step 1: Parse BACKLOG.md for `needs-interview` items `.claude/commands/interview.md`
-- [ ] T013 Implement Step 2: Display numbered list of pending items `.claude/commands/interview.md`
-- [ ] T014 Implement Step 3: Selection by item ID `.claude/commands/interview.md`
-- [ ] T015 Implement Step 4: Interview process (reuse pattern from idea.md Step 3) `.claude/commands/interview.md`
-- [ ] T016 Implement Step 5: Update status from `needs-interview` to `proposed` `.claude/commands/interview.md`
-- [ ] T017 Implement Step 6: Update GitHub issue if exists (FR-011) `.claude/commands/interview.md`
-- [ ] T018 Add multiple-choice question format (FR-009, FR-010) `.claude/commands/interview.md`
-- [ ] T019 Add output format for success and edge cases `.claude/commands/interview.md`
-- [ ] T020 Add error handling for no items, invalid selection `.claude/commands/interview.md`
+- [x] T011 Create `/interview` command with purpose and user input sections `.claude/commands/interview.md`
+- [x] T012 Implement Step 1: Parse BACKLOG.md for `needs-interview` items `.claude/commands/interview.md`
+- [x] T013 Implement Step 2: Display numbered list of pending items `.claude/commands/interview.md`
+- [x] T014 Implement Step 3: Selection by item ID `.claude/commands/interview.md`
+- [x] T015 Implement Step 4: Interview process (reuse pattern from idea.md Step 3) `.claude/commands/interview.md`
+- [x] T016 Implement Step 5: Update status from `needs-interview` to `proposed` `.claude/commands/interview.md`
+- [x] T017 Implement Step 6: Update GitHub issue if exists (FR-011) `.claude/commands/interview.md`
+- [x] T018 Add multiple-choice question format (FR-009, FR-010) `.claude/commands/interview.md`
+- [x] T019 Add output format for success and edge cases `.claude/commands/interview.md`
+- [x] T020 Add error handling for no items, invalid selection `.claude/commands/interview.md`
 
 **Checkpoint**: Users can list and process deferred items via `/interview`. Status transitions correctly.
 
@@ -115,9 +115,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T021 Update Step 2 (Scout Evaluation) to detect minimal detail `.claude/commands/idea.md`
-- [ ] T022 Add suggestion to defer when detail is insufficient `.claude/commands/idea.md`
-- [ ] T023 Add note about preliminary scores in scoring section `.claude/commands/idea.md`
+- [x] T021 Update Step 2 (Scout Evaluation) to detect minimal detail `.claude/commands/idea.md`
+- [x] T022 Add suggestion to defer when detail is insufficient `.claude/commands/idea.md`
+- [x] T023 Add note about preliminary scores in scoring section `.claude/commands/idea.md`
 
 **Checkpoint**: Agents proactively suggest deferring when ideas lack sufficient detail.
 
@@ -131,9 +131,9 @@
 
 ### Implementation for Validation Gate
 
-- [ ] T024 Add `needs-interview` validation check to Step 3 (Validate Item) `.claude/commands/speckit.start.md`
-- [ ] T025 Add error message: "Item {ID} needs interview first. Run `/interview` to complete requirements gathering." `.claude/commands/speckit.start.md`
-- [ ] T026 Update status guidance to include `needs-interview` status `.claude/commands/speckit.start.md`
+- [x] T024 Add `needs-interview` validation check to Step 3 (Validate Item) `.claude/commands/speckit.start.md`
+- [x] T025 Add error message: "Item {ID} needs interview first. Run `/interview` to complete requirements gathering." `.claude/commands/speckit.start.md`
+- [x] T026 Update status guidance to include `needs-interview` status `.claude/commands/speckit.start.md`
 
 **Checkpoint**: `/speckit.start` correctly rejects `needs-interview` items with clear guidance.
 
@@ -145,31 +145,31 @@
 
 ### Acceptance Testing
 
-- [ ] T027 Verify Scenario 1.1: `/idea --defer` captures with `needs-interview` status
-- [ ] T028 Verify Scenario 1.2: Deferred items visible by status in BACKLOG.md
-- [ ] T029 [P] Verify Scenario 2.1: `/interview` lists all `needs-interview` items
-- [ ] T030 [P] Verify Scenario 2.2: Item selection begins interview process
-- [ ] T031 [P] Verify Scenario 2.3: Completed interview updates status to `proposed`
-- [ ] T032 Verify Scenario 3.1: Agent suggests deferring for minimal detail ideas
-- [ ] T033 Verify Edge Case: No items returns "No items awaiting interviews"
-- [ ] T034 Verify Edge Case: `/speckit.start` rejects `needs-interview` items
+- [x] T027 Verify Scenario 1.1: `/idea --defer` captures with `needs-interview` status
+- [x] T028 Verify Scenario 1.2: Deferred items visible by status in BACKLOG.md
+- [x] T029 [P] Verify Scenario 2.1: `/interview` lists all `needs-interview` items
+- [x] T030 [P] Verify Scenario 2.2: Item selection begins interview process
+- [x] T031 [P] Verify Scenario 2.3: Completed interview updates status to `proposed`
+- [x] T032 Verify Scenario 3.1: Agent suggests deferring for minimal detail ideas
+- [x] T033 Verify Edge Case: No items returns "No items awaiting interviews"
+- [x] T034 Verify Edge Case: `/speckit.start` rejects `needs-interview` items
 
 ### Evidence Collection
 
-- [ ] T035 Create evidence directory `specs/019-needs-interview-status/evidence/`
-- [ ] T036 Capture test summary with acceptance test results `specs/019-needs-interview-status/evidence/test-summary.md`
-- [ ] T037 Create usage demonstration walkthrough `specs/019-needs-interview-status/evidence/usage-example.md`
-- [ ] T038 [P] Capture `/idea --defer` demo session `specs/019-needs-interview-status/evidence/defer-demo.txt`
-- [ ] T039 [P] Capture `/interview` demo session `specs/019-needs-interview-status/evidence/interview-demo.txt`
+- [x] T035 Create evidence directory `specs/019-needs-interview-status/evidence/`
+- [x] T036 Capture test summary with acceptance test results `specs/019-needs-interview-status/evidence/test-summary.md`
+- [x] T037 Create usage demonstration walkthrough `specs/019-needs-interview-status/evidence/usage-example.md`
+- [x] T038 [P] Capture `/idea --defer` demo session `specs/019-needs-interview-status/evidence/defer-demo.txt`
+- [x] T039 [P] Capture `/interview` demo session `specs/019-needs-interview-status/evidence/interview-demo.txt`
 
 ### Media Content
 
-- [ ] T040 Create shipped blog post `specs/019-needs-interview-status/media/shipped-post.md`
-- [ ] T041 [P] Create LinkedIn shipped summary `specs/019-needs-interview-status/media/linkedin-shipped.md`
+- [x] T040 Create shipped blog post `specs/019-needs-interview-status/media/shipped-post.md`
+- [x] T041 [P] Create LinkedIn shipped summary `specs/019-needs-interview-status/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T042 Create PR and publish blog: run /speckit.pr
+- [x] T042 Create PR and publish blog: run /speckit.pr
 
 **Task T042 must run last. It depends on all evidence and media tasks being complete.**
 
