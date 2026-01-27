@@ -1,64 +1,14 @@
+/**
+ * CalcService Tests - Tests for tool-related functionality
+ *
+ * Feature: 038-context-tool-vscode
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { AnalysisTool } from '../../src/types/tool';
-import { isToolApplicable, createDefaultResultStyle } from '../../src/types/tool';
+import type { Tool } from '../../src/types/tool';
+import { createDefaultResultStyle, createToolExecution } from '../../src/types/tool';
 
 describe('CalcService logic', () => {
-  describe('isToolApplicable', () => {
-    const multiTrackTool: AnalysisTool = {
-      name: 'range-bearing',
-      displayName: 'Range & Bearing',
-      description: 'Calculate range and bearing',
-      contextType: 'multi-track',
-      inputKinds: ['track'],
-      inputSchema: {},
-    };
-
-    const anyContextTool: AnalysisTool = {
-      name: 'stats',
-      displayName: 'Statistics',
-      description: 'Calculate statistics',
-      contextType: 'any',
-      inputKinds: ['track', 'location'],
-      inputSchema: {},
-    };
-
-    it('returns true when context type matches', () => {
-      expect(isToolApplicable(multiTrackTool, 'multi-track', ['track'])).toBe(
-        true
-      );
-    });
-
-    it('returns false when context type does not match', () => {
-      expect(isToolApplicable(multiTrackTool, 'single-track', ['track'])).toBe(
-        false
-      );
-    });
-
-    it('returns true for any context type tool', () => {
-      expect(isToolApplicable(anyContextTool, 'single-track', ['track'])).toBe(
-        true
-      );
-      expect(isToolApplicable(anyContextTool, 'multi-track', ['track'])).toBe(
-        true
-      );
-      expect(isToolApplicable(anyContextTool, 'location', ['location'])).toBe(
-        true
-      );
-    });
-
-    it('checks input kinds when specified', () => {
-      const locationOnlyTool: AnalysisTool = {
-        ...anyContextTool,
-        inputKinds: ['location'],
-      };
-
-      expect(isToolApplicable(locationOnlyTool, 'any', ['track'])).toBe(false);
-      expect(isToolApplicable(locationOnlyTool, 'any', ['location'])).toBe(
-        true
-      );
-    });
-  });
-
   describe('createDefaultResultStyle', () => {
     it('creates consistent style for same tool name', () => {
       const style1 = createDefaultResultStyle('range-bearing');
@@ -86,49 +36,65 @@ describe('CalcService logic', () => {
     });
   });
 
-  describe('tool filtering', () => {
-    const tools: AnalysisTool[] = [
-      {
-        name: 'range-bearing',
-        displayName: 'Range & Bearing',
-        description: 'Calculate range and bearing',
-        contextType: 'multi-track',
-        inputKinds: ['track'],
-        inputSchema: {},
-      },
-      {
-        name: 'track-stats',
-        displayName: 'Track Statistics',
-        description: 'Calculate track stats',
-        contextType: 'single-track',
-        inputKinds: ['track'],
-        inputSchema: {},
-      },
-      {
-        name: 'distance-to-point',
-        displayName: 'Distance to Point',
-        description: 'Calculate distance',
-        contextType: 'mixed',
-        inputKinds: ['track', 'location'],
-        inputSchema: {},
-      },
-    ];
+  describe('createToolExecution', () => {
+    it('creates execution record with pending status', () => {
+      const execution = createToolExecution('range-bearing', 'Range & Bearing');
 
-    it('filters tools by context type', () => {
-      const multiTrackTools = tools.filter(
-        (t) => t.contextType === 'multi-track' || t.contextType === 'any'
-      );
-
-      expect(multiTrackTools).toHaveLength(1);
-      expect(multiTrackTools[0].name).toBe('range-bearing');
+      expect(execution.toolId).toBe('range-bearing');
+      expect(execution.toolName).toBe('Range & Bearing');
+      expect(execution.status).toBe('pending');
+      expect(execution.startedAt).toBeDefined();
+      expect(execution.id).toMatch(/^exec-/);
     });
 
-    it('returns multiple applicable tools', () => {
-      const singleTrackTools = tools.filter(
-        (t) => t.contextType === 'single-track' || t.contextType === 'any'
-      );
+    it('creates unique IDs for each execution', () => {
+      const exec1 = createToolExecution('tool-1', 'Tool 1');
+      const exec2 = createToolExecution('tool-2', 'Tool 2');
 
-      expect(singleTrackTools).toHaveLength(1);
+      expect(exec1.id).not.toBe(exec2.id);
+    });
+  });
+
+  describe('Tool type', () => {
+    it('supports SelectionRequirement format', () => {
+      const tool: Tool = {
+        id: 'range-bearing',
+        name: 'Range & Bearing',
+        description: 'Calculate range and bearing between tracks',
+        version: '1.0.0',
+        requirements: [{ kind: 'TRACK', min: 2, max: 2 }],
+      };
+
+      expect(tool.requirements).toBeDefined();
+      expect(tool.requirements).toHaveLength(1);
+      expect(tool.requirements![0].kind).toBe('TRACK');
+      expect(tool.requirements![0].min).toBe(2);
+      expect(tool.requirements![0].max).toBe(2);
+    });
+
+    it('supports tools with no requirements', () => {
+      const tool: Tool = {
+        id: 'universal-info',
+        name: 'Feature Information',
+        description: 'Display info about any feature',
+        requirements: [],
+      };
+
+      expect(tool.requirements).toEqual([]);
+    });
+
+    it('supports tools with multiple requirements', () => {
+      const tool: Tool = {
+        id: 'distance-to-point',
+        name: 'Distance to Point',
+        description: 'Calculate distance from track to point',
+        requirements: [
+          { kind: 'TRACK', min: 1, max: 1 },
+          { kind: 'POINT', min: 1, max: 1 },
+        ],
+      };
+
+      expect(tool.requirements).toHaveLength(2);
     });
   });
 });

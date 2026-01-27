@@ -9,6 +9,7 @@ import type { CalcService } from '../services/calcService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
 import type { IoService } from '../services/ioService';
 import type { SessionManager } from '../services/sessionManager';
+import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { SessionStoreApi, SessionStoreWithUndo } from '@debrief/session-state';
 import type { StacTreeProvider } from '../providers/stacTreeProvider';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
@@ -19,7 +20,12 @@ import type { MapPanel } from '../webview/mapPanel';
 import { createOpenPlotCommand } from './openPlot';
 import { createAddStoreCommand, createRemoveStoreCommand, createUpdateStorePathCommand } from './addStore';
 import { createSelectAllCommand, createClearSelectionCommand } from './selectAll';
-import { createExecuteToolCommand, createCancelToolExecutionCommand } from './executeTool';
+import {
+  createExecuteToolCommand,
+  createCancelToolExecutionCommand,
+  createShowToolRequirementsCommand,
+  createToggleInactiveToolsCommand,
+} from './executeTool';
 import { createExportPngCommand } from './exportPng';
 import { createChangeTrackColorCommand } from './changeTrackColor';
 import { createImportRepCommand } from './importRep';
@@ -38,6 +44,7 @@ export function registerCommands(
   toolsTreeProvider: ToolsTreeProvider,
   layersTreeProvider: LayersTreeProvider,
   timeRangeProvider: TimeRangeViewProvider,
+  toolMatchAdapter: ToolMatchAdapter,
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void
 ): vscode.Disposable[] {
@@ -157,11 +164,11 @@ export function registerCommands(
     })
   );
 
-  // Tool commands
+  // Tool commands (Feature: 038 - uses toolMatchAdapter for selection)
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.executeTool',
-      createExecuteToolCommand(calcService, getMapPanel, layersTreeProvider)
+      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider)
     )
   );
 
@@ -171,6 +178,39 @@ export function registerCommands(
       createCancelToolExecutionCommand(calcService)
     )
   );
+
+  // Tool helper commands (Feature: 038)
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.showToolRequirements',
+      createShowToolRequirementsCommand()
+    )
+  );
+
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.toggleInactiveTools',
+      createToggleInactiveToolsCommand(toolsTreeProvider)
+    )
+  );
+
+  // Tool-specific commands for command palette (FR-019, FR-020)
+  // These provide direct tool execution with proper enablement
+  const toolCommandMap: Record<string, string> = {
+    'debrief.tool.rangeBearing': 'range-bearing',
+    'debrief.tool.closestApproach': 'closest-approach',
+    'debrief.tool.relativeMotion': 'relative-motion',
+    'debrief.tool.trackStats': 'track-stats',
+    'debrief.tool.distanceToPoint': 'distance-to-point',
+  };
+
+  for (const [command, toolId] of Object.entries(toolCommandMap)) {
+    disposables.push(
+      vscode.commands.registerCommand(command, async () => {
+        await vscode.commands.executeCommand('debrief.executeTool', toolId);
+      })
+    );
+  }
 
   // Layer commands
   disposables.push(

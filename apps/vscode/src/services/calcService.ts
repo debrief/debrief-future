@@ -4,21 +4,23 @@
  * This service provides access to analysis tools via the Model Context Protocol.
  * It handles lazy connection, caching, and graceful degradation when the service
  * is unavailable.
+ *
+ * Feature: 038-context-tool-vscode - Updated to return Tool[] from @debrief/schemas
  */
 
 import * as vscode from 'vscode';
 import type {
-  AnalysisTool,
+  Tool,
   ToolExecution,
   ToolExecutionRequest,
   ToolExecutionResult,
   ResultLayer,
+  ToolProvenance,
 } from '../types/tool';
 import {
   createToolExecution,
   createDefaultResultStyle,
 } from '../types/tool';
-import type { Track, ReferenceLocation } from '../types/plot';
 
 // Self-contained SafeFeatureCollection to avoid any from geojson
 interface SafeFeatureCollection {
@@ -35,7 +37,7 @@ type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
 
 // Tool cache entry
 interface ToolCacheEntry {
-  tools: AnalysisTool[];
+  tools: Tool[];
   timestamp: number;
 }
 
@@ -125,9 +127,12 @@ export class CalcService {
   }
 
   /**
-   * List available analysis tools
+   * List available analysis tools.
+   *
+   * Returns Tool[] compatible with ToolMatchService.
+   * Tools use the SelectionRequirement format from @debrief/schemas.
    */
-  async listTools(): Promise<AnalysisTool[]> {
+  async listTools(): Promise<Tool[]> {
     // Check cache
     if (this.toolCache && Date.now() - this.toolCache.timestamp < TOOL_CACHE_TTL) {
       return this.toolCache.tools;
@@ -154,70 +159,35 @@ export class CalcService {
   }
 
   /**
-   * Get tools applicable to the current selection
-   */
-  async getApplicableTools(
-    tracks: Track[],
-    locations: ReferenceLocation[]
-  ): Promise<AnalysisTool[]> {
-    const allTools = await this.listTools();
-
-    // Determine selection context
-    const trackCount = tracks.filter((t) => t.selected).length;
-    const locationCount = locations.filter((l) => l.selected).length;
-
-    let contextType: string;
-    if (trackCount === 0 && locationCount === 0) {
-      return [];
-    } else if (trackCount === 1 && locationCount === 0) {
-      contextType = 'single-track';
-    } else if (trackCount > 1 && locationCount === 0) {
-      contextType = 'multi-track';
-    } else if (trackCount === 0 && locationCount > 0) {
-      contextType = 'location';
-    } else {
-      contextType = 'mixed';
-    }
-
-    // Filter tools by context
-    return allTools.filter(
-      (tool) => tool.contextType === 'any' || tool.contextType === contextType
-    );
-  }
-
-  /**
-   * Execute a tool on the selection
+   * Execute a tool on the selection.
+   *
+   * @param request - Execution request with tool ID and feature IDs
+   * @returns Execution result with features and provenance
    */
   async executeTool(
-    request: ToolExecutionRequest,
-    tracks: Track[],
-    locations: ReferenceLocation[]
+    request: ToolExecutionRequest
   ): Promise<ToolExecutionResult> {
     // Ensure connected
     await this.connect();
 
+    // Find the tool
+    const allTools = this.toolCache?.tools ?? [];
+    const tool = allTools.find((t) => t.id === request.toolId);
+    const toolName = tool?.name ?? request.toolId;
+
     // Create execution record
-    const execution = createToolExecution(request.toolName);
+    const execution = createToolExecution(request.toolId, toolName);
     this.currentExecution = execution;
 
     try {
       execution.status = 'running';
 
-      // Get selected features
-      const selectedTracks = tracks.filter((t) =>
-        request.trackIds.includes(t.id)
-      );
-      const selectedLocations = locations.filter((l) =>
-        request.locationIds.includes(l.id)
-      );
-
       const startTime = Date.now();
 
       // Note: In a real implementation, this would call the MCP server
       const result = await this.executeToolOnMcp(
-        request.toolName,
-        selectedTracks,
-        selectedLocations,
+        request.toolId,
+        request.featureIds,
         request.params
       );
 
@@ -267,24 +237,42 @@ export class CalcService {
   }
 
   /**
-   * Create a result layer from tool execution
+   * Create a result layer from tool execution with provenance (FR-024).
+   *
+   * @param toolId - Tool ID that produced the result
+   * @param executionId - Execution ID
+   * @param result - Tool execution result
+   * @param sourceFeatureIds - IDs of features used as inputs
+   * @returns ResultLayer with provenance metadata
    */
   createResultLayer(
-    toolName: string,
+    toolId: string,
     executionId: string,
-    result: ToolExecutionResult
+    result: ToolExecutionResult,
+    sourceFeatureIds: string[]
   ): ResultLayer | null {
     if (result.success !== true || result.features === undefined) {
       return null;
     }
 
     const allTools = this.toolCache?.tools ?? [];
-    const tool = allTools.find((t) => t.name === toolName);
-    const displayName = tool?.displayName ?? toolName;
+    const tool = allTools.find((t) => t.id === toolId);
+    const toolName = tool?.name ?? toolId;
+    const toolVersion = tool?.version ?? '0.0.0';
+
+    const provenance: ToolProvenance = {
+      toolId,
+      toolName,
+      toolVersion,
+      executionTime: new Date().toISOString(),
+      sourceFeatureIds,
+      durationMs: result.durationMs,
+    };
 
     return {
       id: `layer-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-      name: displayName,
+      name: toolName,
+      toolId,
       toolName,
       executionId,
       features: result.features as SafeFeatureCollection,
@@ -292,6 +280,7 @@ export class CalcService {
       visible: true,
       createdAt: new Date().toISOString(),
       zIndex: 100, // Result layers on top
+      provenance,
     };
   }
 
@@ -340,57 +329,58 @@ export class CalcService {
     // For now, we'll simulate a successful connection
   }
 
-  private fetchToolsFromMcp(): Promise<AnalysisTool[]> {
+  /**
+   * Fetch tools from MCP server.
+   *
+   * Returns Tool[] with SelectionRequirement format for ToolMatchService.
+   */
+  private fetchToolsFromMcp(): Promise<Tool[]> {
     // Simulated tools - in production, these come from debrief-calc MCP
     return Promise.resolve([
       {
-        name: 'range-bearing',
-        displayName: 'Range & Bearing Calculator',
-        description:
-          'Calculate distance and bearing between two tracks at matching times',
-        contextType: 'multi-track',
-        inputKinds: ['track'],
-        inputSchema: {},
+        id: 'range-bearing',
+        name: 'Range & Bearing',
+        description: 'Calculate distance and bearing between two tracks at matching times',
+        version: '1.0.0',
+        requirements: [{ kind: 'TRACK', min: 2, max: 2 }],
       },
       {
-        name: 'closest-approach',
-        displayName: 'Closest Point of Approach',
+        id: 'closest-approach',
+        name: 'Closest Point of Approach',
         description: 'Find when and where the tracks came closest to each other',
-        contextType: 'multi-track',
-        inputKinds: ['track'],
-        inputSchema: {},
+        version: '1.0.0',
+        requirements: [{ kind: 'TRACK', min: 2, max: 2 }],
       },
       {
-        name: 'relative-motion',
-        displayName: 'Relative Motion Analysis',
-        description: 'Compute motion of one track relative to the other',
-        contextType: 'multi-track',
-        inputKinds: ['track'],
-        inputSchema: {},
+        id: 'relative-motion',
+        name: 'Relative Motion Analysis',
+        description: 'Compute motion of one track relative to another',
+        version: '1.0.0',
+        requirements: [{ kind: 'TRACK', min: 2, max: 2 }],
       },
       {
-        name: 'track-stats',
-        displayName: 'Track Statistics',
+        id: 'track-stats',
+        name: 'Track Statistics',
         description: 'Calculate speed, course, and distance statistics for a track',
-        contextType: 'single-track',
-        inputKinds: ['track'],
-        inputSchema: {},
+        version: '1.0.0',
+        requirements: [{ kind: 'TRACK', min: 1, max: 1 }],
       },
       {
-        name: 'distance-to-point',
-        displayName: 'Distance to Point',
+        id: 'distance-to-point',
+        name: 'Distance to Point',
         description: 'Calculate distance from track to a reference point over time',
-        contextType: 'mixed',
-        inputKinds: ['track', 'location'],
-        inputSchema: {},
+        version: '1.0.0',
+        requirements: [
+          { kind: 'TRACK', min: 1, max: 1 },
+          { kind: 'POINT', min: 1, max: 1 },
+        ],
       },
     ]);
   }
 
   private async executeToolOnMcp(
-    _toolName: string,
-    _tracks: Track[],
-    _locations: ReferenceLocation[],
+    _toolId: string,
+    _featureIds: string[],
     _params?: Record<string, unknown>
   ): Promise<SafeFeatureCollection> {
     // Simulate tool execution delay

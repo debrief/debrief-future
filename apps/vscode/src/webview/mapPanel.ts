@@ -446,6 +446,34 @@ export class MapPanel {
   }
 
   /**
+   * Get the feature kind for a feature ID (Feature: 038).
+   *
+   * Looks up the 'kind' property of features from the current plot data.
+   * Returns the kind string (e.g., 'TRACK', 'POINT', 'CIRCLE') or undefined if unknown.
+   *
+   * @param featureId - The feature ID to look up
+   * @returns The feature kind string or undefined
+   */
+  public getFeatureKind(featureId: string): string | undefined {
+    // Check tracks first (most common)
+    const track = this.currentTracks.find((t) => t.id === featureId);
+    if (track) {
+      return 'TRACK';
+    }
+
+    // Check locations
+    const location = this.currentLocations.find((l) => l.id === featureId);
+    if (location) {
+      return 'POINT';
+    }
+
+    // Future: check other feature types (CIRCLE, RECTANGLE, LINE, VECTOR)
+    // These would be stored in a separate collection
+
+    return undefined;
+  }
+
+  /**
    * Get current store
    */
   public getCurrentStore(): StacStore | null {
