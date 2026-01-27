@@ -1,0 +1,20 @@
+ RUN  v1.6.1 /home/user/debrief-future/apps/vscode
+      Coverage enabled with v8
+
+ ✓ tests/unit/stacService.test.ts  (64 tests) 56ms
+
+ Test Files  1 passed (1)
+      Tests  64 passed (64)
+   Start at  05:22:12
+   Duration  2.32s (transform 210ms, setup 77ms, collect 179ms, tests 56ms, environment 0ms, prepare 542ms)
+
+ % Coverage report from v8
+----------------|---------|----------|---------|---------|----------------------
+File            | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+----------------|---------|----------|---------|---------|----------------------
+All files       |   97.08 |    81.48 |     100 |   97.08 |
+ stacService.ts |   97.08 |    81.48 |     100 |   97.08 | ...2-453,467-468,587
+----------------|---------|----------|---------|---------|----------------------
+
+Target: >80% line coverage
+Result: 97.08% line coverage - EXCEEDED
