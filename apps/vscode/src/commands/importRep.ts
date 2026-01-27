@@ -182,14 +182,12 @@ async function importRepFile(
         );
 
         if (isDuplicate) {
-          const result = await vscode.window.showWarningMessage(
+          // Show warning - only option is Cancel, so any result means abort
+          await vscode.window.showWarningMessage(
             `File "${filename}" has already been imported to this plot.`,
             'Cancel'
           );
-
-          if (result === 'Cancel' || !result) {
-            return;
-          }
+          return;
         }
 
         // Parse

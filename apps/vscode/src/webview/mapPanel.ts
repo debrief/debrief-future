@@ -489,12 +489,13 @@ export class MapPanel {
       // Track last viewport sent to map to avoid redundant messages
       let lastSentViewportKey = '';
       this.spatialUnsubscribe = subscribeToSpatial(session, (spatial) => {
-        if (spatial.viewport && spatial.viewport.zoom !== undefined) {
+        const zoom = spatial.viewport?.zoom;
+        if (spatial.viewport !== null && zoom !== undefined) {
           // Calculate center from coordinates: [NW, NE, SE, SW] in [lng, lat] order
           const coords = spatial.viewport.coordinates;
           const centerLng = (coords[0][0] + coords[1][0] + coords[2][0] + coords[3][0]) / 4;
           const centerLat = (coords[0][1] + coords[1][1] + coords[2][1] + coords[3][1]) / 4;
-          const viewportKey = `${centerLat.toFixed(6)},${centerLng.toFixed(6)},${spatial.viewport.zoom}`;
+          const viewportKey = `${centerLat.toFixed(6)},${centerLng.toFixed(6)},${zoom}`;
 
           // Only send if actually different from last sent
           if (viewportKey !== lastSentViewportKey) {
@@ -503,7 +504,7 @@ export class MapPanel {
               type: 'setViewport',
               viewport: {
                 center: [centerLat, centerLng],
-                zoom: spatial.viewport.zoom,
+                zoom,
               },
             });
           }
@@ -814,16 +815,13 @@ export class MapPanel {
       );
 
       if (isDuplicate) {
-        const result = await vscode.window.showWarningMessage(
+        // Show warning - only option is Cancel, so any result means abort
+        await vscode.window.showWarningMessage(
           `File "${filename}" has already been imported to this plot.`,
           'Cancel'
         );
-
         this.postMessage({ type: 'importProgress', stage: 'complete' });
-
-        if (result === 'Cancel' || !result) {
-          return;
-        }
+        return;
       }
 
       // Parse REP file

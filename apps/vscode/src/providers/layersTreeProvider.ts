@@ -14,7 +14,6 @@ import * as vscode from 'vscode';
 import {
   subscribeToSelection,
   type SessionStoreApi,
-  type FeaturesSlice,
 } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
 import type { Track, ReferenceLocation } from '../types/plot';

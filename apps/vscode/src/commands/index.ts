@@ -9,6 +9,7 @@ import type { CalcService } from '../services/calcService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
 import type { IoService } from '../services/ioService';
 import type { SessionManager } from '../services/sessionManager';
+import type { SessionStoreApi } from '@debrief/session-state';
 import type { StacTreeProvider } from '../providers/stacTreeProvider';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
@@ -183,14 +184,15 @@ export function registerCommands(
 
         // Use session state if featureId is provided
         const featureId = args.featureId;
-        const activeSession = sessionManager.getActiveSession();
+        const activeSession: SessionStoreApi | null = sessionManager.getActiveSession();
 
-        if (featureId && activeSession) {
+        if (featureId !== undefined && activeSession !== null) {
           // Toggle via session state - this will trigger subscriptions
           activeSession.getState().toggleFeatureVisibility(featureId);
 
           // Also update map panel for immediate visual feedback
-          const hiddenIds = activeSession.getState().hiddenFeatureIds;
+          const state = activeSession.getState();
+          const hiddenIds = state.hiddenFeatureIds;
           const isVisible = !hiddenIds.includes(featureId);
           panel.setLayerVisibility(args.layerId, isVisible);
         } else {

@@ -73,7 +73,7 @@ tasks:
 
   lint:
     desc: "Check code style (Python + TypeScript)"
-    deps: [install]
+    deps: [install, build]
     cmds:
       - uv run ruff check .
       - pnpm lint
