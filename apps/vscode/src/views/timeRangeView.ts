@@ -15,6 +15,7 @@ import {
   subscribeToTemporal,
   createTimeInstant,
   type SessionStoreApi,
+  type SessionStoreWithUndo,
   type TemporalSlice,
 } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
@@ -118,7 +119,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
       );
 
       // Set initial state from session
-      const state = session.getState();
+      const state: SessionStoreWithUndo = session.getState();
       if (state.timeRange) {
         this._timeExtent = {
           start: state.timeRange.start.epoch,
@@ -224,9 +225,8 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
         case 'timeChange':
           // Update session state if available
           if (this._activeSession) {
-            this._activeSession.getState().setCurrentTime(
-              createTimeInstant(message.time)
-            );
+            const state: SessionStoreWithUndo = this._activeSession.getState();
+            state.setCurrentTime(createTimeInstant(message.time));
           }
           // Legacy callback
           if (this._onTimeChangeCallback) {
@@ -241,9 +241,8 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
         case 'playbackStateChange':
           // Update session state if available
           if (this._activeSession) {
-            this._activeSession.getState().setPlaybackState(
-              message.state === 'playing' ? 'playing' : 'paused'
-            );
+            const state: SessionStoreWithUndo = this._activeSession.getState();
+            state.setPlaybackState(message.state === 'playing' ? 'playing' : 'paused');
           }
           // Legacy callback
           if (this._onPlaybackStateChangeCallback) {
@@ -254,9 +253,8 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
         case 'displayModeChange':
           // Update session state if available
           if (this._activeSession) {
-            this._activeSession.getState().setDisplayMode(
-              message.mode === 'trail' ? 'snailTrail' : 'normal'
-            );
+            const state: SessionStoreWithUndo = this._activeSession.getState();
+            state.setDisplayMode(message.mode === 'trail' ? 'snailTrail' : 'normal');
           }
           // Legacy callback
           if (this._onDisplayModeChangeCallback) {

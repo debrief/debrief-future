@@ -8,6 +8,7 @@
  */
 
 import * as vscode from 'vscode';
+import type { SessionStoreWithUndo } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
 
 /**
@@ -28,7 +29,7 @@ export function createUndoCommand(
       return;
     }
 
-    const state = session.getState();
+    const state: SessionStoreWithUndo = session.getState();
     if (state.canUndo()) {
       state.undo();
     }
@@ -53,7 +54,7 @@ export function createRedoCommand(
       return;
     }
 
-    const state = session.getState();
+    const state: SessionStoreWithUndo = session.getState();
     if (state.canRedo()) {
       state.redo();
       // Optionally show status bar message

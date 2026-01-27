@@ -14,6 +14,7 @@ import * as vscode from 'vscode';
 import {
   subscribeToSelection,
   type SessionStoreApi,
+  type SessionStoreWithUndo,
 } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
 import type { Track, ReferenceLocation } from '../types/plot';
@@ -109,7 +110,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       );
 
       // Initialize from current state
-      const state = session.getState();
+      const state: SessionStoreWithUndo = session.getState();
       this._hiddenFeatureIds = new Set(state.hiddenFeatureIds);
       this._selectedFeatureIds = new Set(state.selection.featureIds);
       this.refresh();
@@ -140,7 +141,8 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
    */
   public toggleVisibility(featureId: string): void {
     if (this._activeSession) {
-      this._activeSession.getState().toggleFeatureVisibility(featureId);
+      const state: SessionStoreWithUndo = this._activeSession.getState();
+      state.toggleFeatureVisibility(featureId);
     }
   }
 

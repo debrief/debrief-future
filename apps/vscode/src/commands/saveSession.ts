@@ -8,7 +8,7 @@
  */
 
 import * as vscode from 'vscode';
-import { saveSession } from '@debrief/session-state';
+import { saveSession, type SessionStoreWithUndo } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
 import { parseStacUri } from '../types/stac';
 
@@ -56,7 +56,7 @@ export function createSaveSessionCommand(
     }
 
     // Check if session is dirty
-    const state = session.getState();
+    const state: SessionStoreWithUndo = session.getState();
     if (!state.dirty) {
       void vscode.window.showInformationMessage('Session has no unsaved changes');
       return;

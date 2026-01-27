@@ -33,6 +33,7 @@ import {
   createSessionStore,
   startServer,
   type SessionStoreApi,
+  type SessionStoreWithUndo,
   type ServerOptions,
   createTimeInstantFromISO,
   type TimeRange,
@@ -110,7 +111,7 @@ export class SessionManager implements vscode.Disposable {
     const store = createSessionStore();
 
     // Initialize state from plot data
-    const state = store.getState();
+    const state: SessionStoreWithUndo = store.getState();
 
     // Set feature collection URI
     state.setFeatureCollectionUri(data.featureCollectionUri);
