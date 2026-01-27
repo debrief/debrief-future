@@ -73,12 +73,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T005 Add `--defer` flag parsing to Step 1 (Parse the Idea) `.claude/commands/idea.md`
-- [ ] T006 Add defer flow that skips interview and uses minimal detail `.claude/commands/idea.md`
-- [ ] T007 Update Step 5 (Add to Backlog) to set status `needs-interview` when deferred `.claude/commands/idea.md`
-- [ ] T008 Update Step 6 (Score the Item) to mark scores as `[preliminary]` when deferred `.claude/commands/idea.md`
-- [ ] T009 Add defer path to Output Format section with appropriate messaging `.claude/commands/idea.md`
-- [ ] T010 Update Example Usage section to show `--defer` flag `.claude/commands/idea.md`
+- [x] T005 Add `--defer` flag parsing to Step 1 (Parse the Idea) `.claude/commands/idea.md`
+- [x] T006 Add defer flow that skips interview and uses minimal detail `.claude/commands/idea.md`
+- [x] T007 Update Step 5 (Add to Backlog) to set status `needs-interview` when deferred `.claude/commands/idea.md`
+- [x] T008 Update Step 6 (Score the Item) to mark scores as `[preliminary]` when deferred `.claude/commands/idea.md`
+- [x] T009 Add defer path to Output Format section with appropriate messaging `.claude/commands/idea.md`
+- [x] T010 Update Example Usage section to show `--defer` flag `.claude/commands/idea.md`
 
 **Checkpoint**: Users can capture ideas quickly with `--defer` flag. Status shows `needs-interview`, scores show `[preliminary]`.
 

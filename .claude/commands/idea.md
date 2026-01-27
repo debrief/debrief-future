@@ -42,9 +42,14 @@ Extract from `$ARGUMENTS`:
 - **Description**: The feature/enhancement idea
 - **Category** (optional): Feature, Enhancement, Bug, Tech Debt, Infrastructure, Documentation
   - If not specified, infer from description
+- **Flags**:
+  - `--defer`: Skip interview, capture quickly with preliminary scores (status: `needs-interview`)
+  - `--fast`: Skip interview and detailed reporting (existing option)
 
 If no description provided:
 > "Please provide an idea description, e.g., `/idea Add track interpolation for gaps > 5 minutes`"
+
+**Defer Mode**: If `--defer` is present, skip Step 3 (Interview) and Step 4 (GitHub Issue). The idea will be captured with minimal detail and marked as `needs-interview` for later processing via `/interview`.
 
 ### Step 2: Scout Evaluation
 
@@ -70,6 +75,18 @@ Then act as the **opportunity-scout**:
 6. If passes hard filters → proceed to Step 3
 
 Report: "Scout evaluation: ✅ Passes hard filters" (with any soft filter flags)
+
+### Step 2a: Defer Path (if `--defer` flag)
+
+If `--defer` is present, skip the full interview:
+
+1. **Capture minimal detail**: Use only the provided description
+2. **Skip GitHub issue creation**: No issue created yet (will be created during `/interview`)
+3. **Proceed directly to Step 5**: Add to backlog with status `needs-interview`
+
+Report: "⏭️ Deferring interview — capturing for later processing"
+
+Continue to Step 5, skipping Steps 3 and 4.
 
 ### Step 3: Interview (Interactive)
 
@@ -135,21 +152,32 @@ Report: "Created issue #{number}: {title}"
 
 1. Read `BACKLOG.md`
 2. Find the next available ID (scan existing IDs, use max + 1)
-3. Add row linking to the GitHub issue:
+3. Add row to the backlog:
+
+   **Normal path** (with GitHub issue):
    ```
-   | {ID} | {Category} | [{Short title}](issue_url) | - | - | - | - | proposed |
+   | {ID} | {Category} | [{Short title}](issue_url) | - | - | - | - | - | proposed |
    ```
    - Description is a markdown link to the issue
    - Short title: imperative mood, ~5-10 words (e.g., "Add progress indicators during file imports")
+
+   **Defer path** (no issue yet):
+   ```
+   | {ID} | {Category} | {Short title} | - | - | - | - | - | needs-interview |
+   ```
+   - Description is plain text (no link — issue created later during `/interview`)
+   - Status is `needs-interview` instead of `proposed`
+
 4. Save BACKLOG.md
 
-Report: "Added as item {ID}, linked to #{issue_number}"
+Report (normal): "Added as item {ID}, linked to #{issue_number}"
+Report (defer): "Added as item {ID} (needs-interview) — run `/interview` later to complete"
 
 ### Step 6: Score the Item
 
 Act as the **backlog-prioritizer**:
 
-1. Read the item description (follow link to issue for full context)
+1. Read the item description (follow link to issue for full context, if available)
 2. Read `STRATEGY.md` for scoring guidance
 3. Score each dimension:
    - **Value (V)**: How much does this improve Debrief's capability? (1-5)
@@ -157,6 +185,11 @@ Act as the **backlog-prioritizer**:
    - **Autonomy (A)**: How suitable for AI implementation? (1-5)
 4. Update BACKLOG.md with scores
 5. Report scores with brief rationale
+
+**Defer path**: When `--defer` is used, scores are **preliminary** based on limited information:
+- Mark scores with `[preliminary]` in the rationale
+- Scores will be refined during `/interview` when full detail is available
+- Report: "Preliminary scores (will be refined during interview)"
 
 ### Step 7: Strategic Review (Final Step)
 
@@ -270,6 +303,44 @@ Item removed from backlog.
 Issue closed with rejection reason.
 ```
 
+### Deferred Path (--defer flag)
+```
+## Quick Capture: {Description}
+
+### 1. Scout Evaluation
+✅ Passes hard filters
+
+### 2. Interview Deferred
+⏭️ Skipping detailed interview for quick capture
+
+### 3. Added to Backlog
+Item **{ID}** added as {Category}
+Status: `needs-interview`
+
+### 4. Preliminary Scores
+| V | M | A | Total |
+|---|---|---|-------|
+| {V} | {M} | {A} | {Total} |
+
+**Note**: Scores are preliminary based on limited information.
+
+### Next Steps
+- Run `/interview` later to complete requirements gathering
+- Interview will create GitHub issue and refine scores
+- After interview, item proceeds to normal approval flow
+```
+
+## Defer Option
+
+If the human says `/idea --defer {description}`:
+- **Skip the interview** — capture the idea with minimal detail
+- **Skip GitHub issue creation** — issue will be created during `/interview`
+- Set status to `needs-interview` instead of `proposed`
+- Assign preliminary scores with note they may change
+- Output the deferred path format above
+
+Use `--defer` when you want to capture an idea quickly without committing to a full interview session. Later, run `/interview` to process all deferred items.
+
 ## Fast-Track Option
 
 If the human says `/idea --fast {description}`:
@@ -304,5 +375,19 @@ The backlog must always link to *something* — either GitHub issue URL or local
 
 ## Example Usage
 
+### Standard Idea (with interview)
 ```
 Human: /idea Add progress indicators during long file imports
+```
+→ Scout evaluates → Interview → GitHub issue → Backlog → Score → Approve
+
+### Deferred Idea (quick capture)
+```
+Human: /idea --defer Add batch export feature for reports
+```
+→ Scout evaluates → Skip interview → Backlog (needs-interview) → Preliminary scores
+→ Later: `/interview` → Complete requirements → GitHub issue → Approve
+
+### Fast-Track Idea (minimal output)
+```
+Human: /idea --fast Add track interpolation for gaps > 5 minutes
