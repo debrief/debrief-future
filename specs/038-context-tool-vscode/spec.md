@@ -7,7 +7,9 @@
 
 ## Clarifications
 
-*None yet - initial draft*
+### Session 2026-01-27
+
+- Q: Which feature kinds must tool matching support? → A: Core shapes: TRACK, CIRCLE, RECTANGLE, LINE, VECTOR, plus point types (Waypoint, etc.)
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -114,7 +116,7 @@ An analyst has selected a single track and wonders why the Range & Bearing tool 
 
 - **FR-005**: Extension MUST read selection state from the session-state service (029).
 - **FR-006**: Extension MUST re-evaluate tool matching whenever selection changes.
-- **FR-007**: Extension MUST group selected features by kind (track, reference_location, etc.) for matching.
+- **FR-007**: Extension MUST group selected features by kind for matching. Supported kinds: TRACK, CIRCLE, RECTANGLE, LINE, VECTOR, and point types (Waypoint, reference locations).
 
 **Sidebar Tools Panel**
 
@@ -207,6 +209,7 @@ An analyst has selected a single track and wonders why the Range & Bearing tool 
 - Session-state service (029) provides reactive selection state updates.
 - Analysis service exposes tool listing and execution operations.
 - Tools in this iteration are parameterless (no user-provided inputs beyond selection).
+- Test data in `apps/vscode/test-data/local-store/` will be enriched to include all supported feature kinds (TRACK, CIRCLE, RECTANGLE, LINE, VECTOR, point types) for verification.
 
 ## Out of Scope
 

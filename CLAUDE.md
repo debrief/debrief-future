@@ -243,6 +243,8 @@ Three approaches required:
 - JSON file at user-defined path (session persistence) (024-document-session-state)
 - Markdown (Claude Code command files) + Claude Code skill system, GitHub CLI (`gh`) for issue updates (019-needs-interview-status)
 - BACKLOG.md (existing file), no new storage (019-needs-interview-status)
+- TypeScript 5.x (VS Code extension) + @debrief/components (ToolMatchService), @debrief/session-state (SessionManager, selection subscriptions), VS Code Extension API (038-context-tool-offering)
+- N/A (pure integration - no new storage) (038-context-tool-offering)
 
 ## Recent Changes
 - 024-document-session-state: Added TypeScript 5.x + Zustand, Zundo, Express, MCP SDK, better-sse for session state management with Python client library
