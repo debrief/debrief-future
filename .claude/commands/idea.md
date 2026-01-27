@@ -72,7 +72,26 @@ Then act as the **opportunity-scout**:
    - Phase fit uncertain?
    - Scope unclear?
 
-6. If passes hard filters → proceed to Step 3
+6. **Detect minimal detail** — assess if the description provides enough context:
+
+   **Indicators of insufficient detail**:
+   - Very short description (< 10 words)
+   - Vague terms without specifics ("improve performance", "make it better")
+   - Missing problem statement (what pain does this solve?)
+   - No clear scope or boundaries
+   - Ambiguous target (who/what is affected?)
+
+   **If minimal detail detected** and `--defer` was NOT used:
+   > "This idea seems to have limited detail. Would you like to:
+   >
+   > A) **Proceed with interview** — I'll ask questions to gather more detail
+   > B) **Defer for later** — Capture quickly now, complete interview via `/interview`
+   >
+   > (Tip: Use `/idea --defer` next time to skip this prompt)"
+
+   Wait for user choice before proceeding.
+
+7. If passes hard filters → proceed to Step 3 (or Step 2a if deferring)
 
 Report: "Scout evaluation: ✅ Passes hard filters" (with any soft filter flags)
 

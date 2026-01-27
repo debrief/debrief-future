@@ -115,9 +115,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T021 Update Step 2 (Scout Evaluation) to detect minimal detail `.claude/commands/idea.md`
-- [ ] T022 Add suggestion to defer when detail is insufficient `.claude/commands/idea.md`
-- [ ] T023 Add note about preliminary scores in scoring section `.claude/commands/idea.md`
+- [x] T021 Update Step 2 (Scout Evaluation) to detect minimal detail `.claude/commands/idea.md`
+- [x] T022 Add suggestion to defer when detail is insufficient `.claude/commands/idea.md`
+- [x] T023 Add note about preliminary scores in scoring section `.claude/commands/idea.md`
 
 **Checkpoint**: Agents proactively suggest deferring when ideas lack sufficient detail.
 
