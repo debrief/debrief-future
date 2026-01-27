@@ -131,7 +131,8 @@ Description formats:
 | 016 | Infrastructure | [Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md) | 3 | 5 | 4 | 12 | Medium | specified |
 | 023 | Infrastructure | [Add epic support to speckit workflow](specs/023-epic-workflow-support/spec.md) | 4 | 3 | 4 | 11 | Medium | specified |
 | 026 | Feature | [Add annotation shape renderers to VS Code extension](https://github.com/debrief/debrief-future/issues/86) (requires ~~#021~~) | 5 | 5 | 4 | 14 | Medium | approved |
-| 035 | Feature | [Invoke debrief-calc distance tool from VS Code extension](https://github.com/debrief/debrief-future/issues/115) (requires ~~#025~~, #029) | 5 | 5 | 4 | 14 | Medium | approved |
+| ~~035~~ | ~~Feature~~ | ~~[Invoke debrief-calc distance tool from VS Code extension](https://github.com/debrief/debrief-future/issues/115)~~ | ~~5~~ | ~~5~~ | ~~4~~ | ~~14~~ | ~~Medium~~ | ~~absorbed by #038~~ |
+| 038 | Feature | [Integrate context-sensitive tool offering into VS Code extension](https://github.com/debrief/debrief-future/issues/122) (absorbs #035, requires #029) | 5 | 5 | 4 | 14 | Medium | approved |
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
 | 002 | Feature | Add MCP wrapper for debrief-io service | 4 | 3 | 4 | 11 | Medium | approved |
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | Low | approved |

@@ -113,6 +113,7 @@ Record significant prioritisation decisions here for future reference.
 | 2026-01-26 | Approved #029 session-state VS Code integration | Completes 024 architectural investment; enables Python tool state access via MCP; foundational for multi-document workflow |
 | 2026-01-26 | Approved #019 needs-interview backlog workflow | Workflow infrastructure has precedent (023, 027, 028); high autonomy score; addresses idea capture friction |
 | 2026-01-26 | Approved #035 calc tool invocation from VS Code | Completes tracer bullet ("run analysis tool → see results"); high demo value for stakeholder engagement |
+| 2026-01-27 | Approved #038 context-sensitive tool offering (absorbs #035) | Completes Phase 3 of 027-context-tool-offering; full dynamic tool discovery + execution; absorbs #035 as broader scope |
 
 ---
 
