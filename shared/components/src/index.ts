@@ -19,9 +19,16 @@ export type { FeatureListProps } from './FeatureList';
 export { ThemeProvider } from './ThemeProvider';
 export type { ThemeProviderProps, Theme } from './ThemeProvider';
 
+// Temporal Track Rendering
+export { TemporalTrackLayer } from './MapView/TemporalTrackLayer';
+export type { TemporalTrackLayerProps } from './MapView/TemporalTrackLayer';
+export { TrackHighlightMarker } from './MapView/TrackHighlightMarker';
+export type { TrackHighlightMarkerProps, HighlightMarkerStyle } from './MapView/TrackHighlightMarker';
+
 // Hooks
 export { useSelection } from './hooks/useSelection';
 export { useTheme } from './hooks/useTheme';
+export { useTemporalTrack } from './MapView/useTemporalTrack';
 
 // Types
 export type { DebriefFeature, DebriefFeatureCollection } from './utils/types';

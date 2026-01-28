@@ -2,10 +2,12 @@ import { useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import type { PathOptions, LatLngBoundsExpression } from 'leaflet';
-import type { DebriefFeature, DebriefFeatureCollection, Bounds } from '../utils/types';
+import type { DebriefFeature, DebriefFeatureCollection, Bounds, DisplayMode } from '../utils/types';
 import { calculateBounds, expandBounds } from '../utils/bounds';
 import { getFeatureColor, getFeatureLabel } from '../utils/labels';
 import { isTrackFeature } from '../utils/types';
+import { extractTemporalData } from './temporal-utils';
+import { TemporalTrackLayer } from './TemporalTrackLayer';
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 
@@ -66,6 +68,12 @@ export interface MapViewProps {
 
   /** Height of the map (default: 400px) */
   height?: number | string;
+
+  /** Current time position for temporal rendering (epoch ms). Enables temporal track rendering when provided. */
+  currentTime?: number;
+
+  /** Track display mode: 'full' (entire track + marker) or 'trail' (snail-trail up to current time). */
+  displayMode?: DisplayMode;
 }
 
 // Component to handle map events and auto-fit
@@ -146,6 +154,8 @@ export function MapView({
   className,
   style,
   height = 400,
+  currentTime,
+  displayMode = 'full',
 }: MapViewProps) {
   // Normalize features to array and filter out features that can't be rendered
   const featureArray = useMemo(() => {
@@ -159,13 +169,30 @@ export function MapView({
     });
   }, [features]);
 
-  // Calculate bounds for auto-fit
+  // Separate temporal tracks from static features when temporal rendering is active
+  const { temporalFeatures, staticFeatures } = useMemo(() => {
+    if (currentTime === undefined) {
+      return { temporalFeatures: [] as DebriefFeature[], staticFeatures: featureArray };
+    }
+    const temporal: DebriefFeature[] = [];
+    const nonTemporal: DebriefFeature[] = [];
+    for (const f of featureArray) {
+      if (extractTemporalData(f)) {
+        temporal.push(f);
+      } else {
+        nonTemporal.push(f);
+      }
+    }
+    return { temporalFeatures: temporal, staticFeatures: nonTemporal };
+  }, [featureArray, currentTime]);
+
+  // Calculate bounds for auto-fit (use all features regardless)
   const bounds = useMemo(() => calculateBounds(featureArray), [featureArray]);
 
-  // Create GeoJSON data structure
+  // Create GeoJSON data structure for static (non-temporal) features
   const geojsonData = useMemo(() => ({
     type: 'FeatureCollection' as const,
-    features: featureArray.map((f) => ({
+    features: staticFeatures.map((f) => ({
       ...f,
       geometry: {
         ...f.geometry,
@@ -173,7 +200,7 @@ export function MapView({
         coordinates: f.geometry.coordinates,
       },
     })),
-  }), [featureArray]);
+  }), [staticFeatures]);
 
   // Style function for features
   const featureStyle = useMemo(() => {
@@ -238,14 +265,25 @@ export function MapView({
           onBackgroundClick={onBackgroundClick}
         />
 
-        {featureArray.length > 0 && (
+        {staticFeatures.length > 0 && (
           <GeoJSON
-            key={JSON.stringify(selectedIds.size) + featureArray.length}
+            key={JSON.stringify(selectedIds.size) + staticFeatures.length}
             data={geojsonData}
             style={featureStyle}
             onEachFeature={onEachFeature}
           />
         )}
+
+        {currentTime !== undefined && temporalFeatures.map((f) => (
+          <TemporalTrackLayer
+            key={String(f.id)}
+            feature={f}
+            currentTime={currentTime}
+            displayMode={displayMode}
+            isSelected={selectedIds.has(f.id)}
+            onClick={onSelect}
+          />
+        ))}
       </MapContainer>
     </div>
   );

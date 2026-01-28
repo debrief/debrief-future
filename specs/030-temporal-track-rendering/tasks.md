@@ -43,8 +43,8 @@
 
 **Purpose**: Project structure verification and type exports
 
-- [ ] T001 Export DisplayMode type from utils `shared/components/src/utils/types.ts`
-- [ ] T002 [P] Create temporal-utils module `shared/components/src/MapView/temporal-utils.ts`
+- [x] T001 Export DisplayMode type from utils `shared/components/src/utils/types.ts`
+- [x] T002 [P] Create temporal-utils module `shared/components/src/MapView/temporal-utils.ts`
 
 ---
 
@@ -54,10 +54,10 @@
 
 **⚠️ CRITICAL**: All rendering logic depends on these utility functions
 
-- [ ] T003 Implement findNearestPointIndex binary search `shared/components/src/MapView/temporal-utils.ts`
-- [ ] T004 Implement sliceTrackToTime function `shared/components/src/MapView/temporal-utils.ts`
-- [ ] T005 Implement extractTemporalData function `shared/components/src/MapView/temporal-utils.ts`
-- [ ] T006 [test] Write unit tests for temporal-utils `shared/components/src/MapView/__tests__/temporal-utils.test.ts`
+- [x] T003 Implement findNearestPointIndex binary search `shared/components/src/MapView/temporal-utils.ts`
+- [x] T004 Implement sliceTrackToTime function `shared/components/src/MapView/temporal-utils.ts`
+- [x] T005 Implement extractTemporalData function `shared/components/src/MapView/temporal-utils.ts`
+- [x] T006 [test] Write unit tests for temporal-utils `shared/components/src/MapView/__tests__/temporal-utils.test.ts`
 
 **Checkpoint**: Utility functions ready - component implementation can begin
 
@@ -71,12 +71,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] Create TrackHighlightMarker component `shared/components/src/MapView/TrackHighlightMarker.tsx`
-- [ ] T008 [US1] Create useTemporalTrack hook `shared/components/src/MapView/useTemporalTrack.ts`
-- [ ] T009 [US1] Create TemporalTrackLayer component (full-track mode) `shared/components/src/MapView/TemporalTrackLayer.tsx`
-- [ ] T010 [US1] Add currentTime and displayMode props to MapView `shared/components/src/MapView/MapView.tsx`
-- [ ] T011 [US1] Integrate TemporalTrackLayer into MapView for temporal tracks `shared/components/src/MapView/MapView.tsx`
-- [ ] T012 [US1] [test] Write component test for full-track rendering `shared/components/src/MapView/__tests__/TemporalTrackLayer.test.tsx`
+- [x] T007 [US1] Create TrackHighlightMarker component `shared/components/src/MapView/TrackHighlightMarker.tsx`
+- [x] T008 [US1] Create useTemporalTrack hook `shared/components/src/MapView/useTemporalTrack.ts`
+- [x] T009 [US1] Create TemporalTrackLayer component (full-track mode) `shared/components/src/MapView/TemporalTrackLayer.tsx`
+- [x] T010 [US1] Add currentTime and displayMode props to MapView `shared/components/src/MapView/MapView.tsx`
+- [x] T011 [US1] Integrate TemporalTrackLayer into MapView for temporal tracks `shared/components/src/MapView/MapView.tsx`
+- [x] T012 [US1] [test] Write component test for full-track rendering `shared/components/src/MapView/__tests__/TemporalTrackLayer.test.tsx`
 
 **Checkpoint**: Full-track mode complete - tracks show entire path with moving highlight marker
 
@@ -90,9 +90,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Add snail-trail mode rendering to TemporalTrackLayer `shared/components/src/MapView/TemporalTrackLayer.tsx`
-- [ ] T014 [US2] Update useTemporalTrack hook for trail mode geometry `shared/components/src/MapView/useTemporalTrack.ts`
-- [ ] T015 [US2] [test] Write component test for snail-trail rendering `shared/components/src/MapView/__tests__/TemporalTrackLayer.test.tsx`
+- [x] T013 [US2] Add snail-trail mode rendering to TemporalTrackLayer `shared/components/src/MapView/TemporalTrackLayer.tsx`
+- [x] T014 [US2] Update useTemporalTrack hook for trail mode geometry `shared/components/src/MapView/useTemporalTrack.ts`
+- [x] T015 [US2] [test] Write component test for snail-trail rendering `shared/components/src/MapView/__tests__/TemporalTrackLayer.test.tsx`
 
 **Checkpoint**: Both display modes work - can switch between full-track and snail-trail
 
@@ -106,9 +106,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T016 [US3] Optimize useTemporalTrack with memoization `shared/components/src/MapView/useTemporalTrack.ts`
-- [ ] T017 [US3] Add render key optimization for efficient GeoJSON updates `shared/components/src/MapView/TemporalTrackLayer.tsx`
-- [ ] T018 [US3] Handle rapid time changes (debouncing/throttling) `shared/components/src/MapView/useTemporalTrack.ts`
+- [x] T016 [US3] Optimize useTemporalTrack with memoization `shared/components/src/MapView/useTemporalTrack.ts`
+- [x] T017 [US3] Add render key optimization for efficient GeoJSON updates `shared/components/src/MapView/TemporalTrackLayer.tsx`
+- [x] T018 [US3] Handle rapid time changes (debouncing/throttling) `shared/components/src/MapView/useTemporalTrack.ts`
 
 **Checkpoint**: Playback is smooth - no stuttering or dropped frames at 10fps
 
@@ -122,8 +122,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T019 [US4] Ensure mode prop change triggers immediate re-render `shared/components/src/MapView/TemporalTrackLayer.tsx`
-- [ ] T020 [US4] Handle mode switch during playback `shared/components/src/MapView/useTemporalTrack.ts`
+- [x] T019 [US4] Ensure mode prop change triggers immediate re-render `shared/components/src/MapView/TemporalTrackLayer.tsx`
+- [x] T020 [US4] Handle mode switch during playback `shared/components/src/MapView/useTemporalTrack.ts`
 
 **Checkpoint**: Mode switching works - can toggle between modes seamlessly
 
@@ -135,8 +135,8 @@
 
 ### Integrated Demo Story (REQUIRED - primary verification method)
 
-- [ ] T021 Create sample track data fixtures (2-3 tracks with timestamps) `shared/components/src/MapView/__fixtures__/sampleTracks.ts`
-- [ ] T022 Create integrated Storybook demo combining MapView + tracks + TimeController `shared/components/src/MapView/TemporalTrack.stories.tsx`
+- [x] T021 Create sample track data fixtures (2-3 tracks with timestamps) `shared/components/src/MapView/__fixtures__/sampleTracks.ts`
+- [x] T022 Create integrated Storybook demo combining MapView + tracks + TimeController `shared/components/src/MapView/TemporalTrack.stories.tsx`
 
 > **T022** is the primary verification story. It MUST include:
 > - A MapView rendering 2-3 sample tracks with temporal data
@@ -148,25 +148,25 @@
 
 ### Documentation
 
-- [ ] T024 Export new components from package index `shared/components/src/index.ts`
-- [ ] T025 [P] Update MapView JSDoc with temporal props `shared/components/src/MapView/MapView.tsx`
+- [x] T024 Export new components from package index `shared/components/src/index.ts`
+- [x] T025 [P] Update MapView JSDoc with temporal props `shared/components/src/MapView/MapView.tsx`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T026 Create evidence directory `specs/030-temporal-track-rendering/evidence/`
-- [ ] T027 Run tests and capture results in `specs/030-temporal-track-rendering/evidence/test-summary.md`
-- [ ] T028 Create usage example in `specs/030-temporal-track-rendering/evidence/usage-example.md`
-- [ ] T029 [P] Capture Storybook screenshot (full-track) `specs/030-temporal-track-rendering/evidence/storybook-full-track.png`
-- [ ] T030 [P] Capture Storybook screenshot (snail-trail) `specs/030-temporal-track-rendering/evidence/storybook-snail-trail.png`
+- [x] T026 Create evidence directory `specs/030-temporal-track-rendering/evidence/`
+- [x] T027 Run tests and capture results in `specs/030-temporal-track-rendering/evidence/test-summary.md`
+- [x] T028 Create usage example in `specs/030-temporal-track-rendering/evidence/usage-example.md`
+- [x] T029 [P] Capture Storybook screenshot (full-track) `specs/030-temporal-track-rendering/evidence/storybook-full-track.png`
+- [x] T030 [P] Capture Storybook screenshot (snail-trail) `specs/030-temporal-track-rendering/evidence/storybook-snail-trail.png`
 
 ### Media Content (REQUIRED)
 
-- [ ] T031 Create shipped blog post `specs/030-temporal-track-rendering/media/shipped-post.md`
-- [ ] T032 [P] Create LinkedIn shipped summary `specs/030-temporal-track-rendering/media/linkedin-shipped.md`
+- [x] T031 Create shipped blog post `specs/030-temporal-track-rendering/media/shipped-post.md`
+- [x] T032 [P] Create LinkedIn shipped summary `specs/030-temporal-track-rendering/media/linkedin-shipped.md`
 
 ### PR Creation (REQUIRED - must be final task)
 
-- [ ] T033 Create PR and publish blog: run /speckit.pr
+- [x] T033 Create PR and publish blog: run /speckit.pr
 
 **Task T033 must run last. It depends on all evidence and media tasks being complete.**
 
