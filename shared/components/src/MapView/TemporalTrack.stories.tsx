@@ -1,6 +1,9 @@
 /**
  * Integrated Storybook demo for temporal track rendering.
  *
+ * Run: pnpm storybook
+ * View: http://localhost:6006/?path=/story/mapview-temporal-track-rendering--integrated-demo
+ *
  * Combines MapView with sample tracks and TimeController to verify:
  * - Full-track mode (complete path + highlight marker)
  * - Snail-trail mode (path grows to current time)
