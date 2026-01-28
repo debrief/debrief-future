@@ -11,7 +11,7 @@
  * - Mode switching while maintaining time position
  */
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { MapView } from './MapView';
 import { TimeController } from '../TimeController/TimeController';

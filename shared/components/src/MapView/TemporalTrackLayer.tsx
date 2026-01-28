@@ -63,8 +63,9 @@ export function TemporalTrackLayer({
     if (!onClick) return undefined;
     return (_feat: GeoJSON.Feature, layer: L.Layer) => {
       layer.on('click', (e) => {
-        (e as any).originalEvent?.stopPropagation();
-        onClick(String(feature.id), (e as any).originalEvent as React.MouseEvent);
+        const leafletEvent = e as L.LeafletMouseEvent;
+        leafletEvent.originalEvent?.stopPropagation();
+        onClick(String(feature.id), leafletEvent.originalEvent as unknown as React.MouseEvent);
       });
     };
   }, [onClick, feature.id]);
@@ -80,7 +81,7 @@ export function TemporalTrackLayer({
     <>
       <GeoJSON
         key={renderKey}
-        data={geojsonData as any}
+        data={geojsonData as unknown as GeoJSON.GeoJsonObject}
         style={() => style}
         onEachFeature={onEachFeature}
       />
@@ -88,7 +89,7 @@ export function TemporalTrackLayer({
         <TrackHighlightMarker
           position={markerLatLng}
           style={markerStyle}
-          tooltip={(feature.properties as any)?.name}
+          tooltip={(feature.properties as unknown as Record<string, string>)?.name}
         />
       )}
     </>
