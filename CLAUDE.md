@@ -245,6 +245,8 @@ Three approaches required:
 - BACKLOG.md (existing file), no new storage (019-needs-interview-status)
 - TypeScript 5.x + React 18+, react-leaflet v5+, Leaflet, @debrief/components (existing MapView, TimeController) (030-temporal-track-rendering)
 - N/A (pure display component - no persistence) (030-temporal-track-rendering)
+- TypeScript 5.x (VS Code extension) + @debrief/components (ToolMatchService), @debrief/session-state (SessionManager, selection subscriptions), VS Code Extension API (038-context-tool-offering)
+- N/A (pure integration - no new storage) (038-context-tool-offering)
 
 ## Recent Changes
 - 024-document-session-state: Added TypeScript 5.x + Zustand, Zundo, Express, MCP SDK, better-sse for session state management with Python client library

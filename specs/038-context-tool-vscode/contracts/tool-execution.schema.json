@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/schemas/tool-execution",
+  "title": "Tool Execution Contracts",
+  "description": "JSON Schema contracts for tool execution request/response in VS Code extension",
+
+  "$defs": {
+    "ToolExecutionRequest": {
+      "type": "object",
+      "description": "Request to execute a tool via MCP",
+      "properties": {
+        "toolId": {
+          "type": "string",
+          "description": "Unique identifier of the tool to execute"
+        },
+        "featureIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "IDs of selected features to pass to the tool"
+        }
+      },
+      "required": ["toolId", "featureIds"]
+    },
+
+    "Provenance": {
+      "type": "object",
+      "description": "Provenance metadata attached to result features",
+      "properties": {
+        "tool": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "name": { "type": "string" },
+            "version": { "type": "string" }
+          },
+          "required": ["id", "name"]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO8601 execution timestamp"
+        },
+        "sourceFeatureIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Input feature IDs used for this computation"
+        }
+      },
+      "required": ["tool", "timestamp", "sourceFeatureIds"]
+    },
+
+    "ResultEnvelope": {
+      "type": "object",
+      "description": "Response from tool execution containing operations to apply",
+      "properties": {
+        "add": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GeoJSONFeature" },
+          "description": "Features to add to the plot"
+        },
+        "update": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GeoJSONFeature" },
+          "description": "Features to replace in the plot (matched by ID)"
+        },
+        "remove": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Feature IDs to remove from the plot"
+        }
+      }
+    },
+
+    "GeoJSONFeature": {
+      "type": "object",
+      "description": "GeoJSON Feature with provenance in properties",
+      "properties": {
+        "type": {
+          "const": "Feature"
+        },
+        "id": {
+          "type": "string"
+        },
+        "geometry": {
+          "type": "object"
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "description": "Feature kind for tool matching"
+            },
+            "provenance": {
+              "$ref": "#/$defs/Provenance"
+            }
+          }
+        }
+      },
+      "required": ["type", "geometry", "properties"]
+    },
+
+    "ToolExecutionError": {
+      "type": "object",
+      "description": "Error response from failed tool execution",
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": ["TOOL_NOT_FOUND", "INVALID_SELECTION", "EXECUTION_FAILED", "SERVICE_UNAVAILABLE"],
+          "description": "Error code for programmatic handling"
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable error message"
+        },
+        "details": {
+          "type": "object",
+          "description": "Additional error context"
+        }
+      },
+      "required": ["code", "message"]
+    }
+  }
+}
