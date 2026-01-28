@@ -8,10 +8,8 @@
  */
 
 import { useMemo } from 'react';
-import type { DisplayMode } from '../utils/types';
-import type { TemporalTrackData } from './temporal-utils';
+import type { DisplayMode, DebriefFeature } from '../utils/types';
 import { findNearestPointIndex, sliceTrackToTime, extractTemporalData } from './temporal-utils';
-import type { DebriefFeature } from '../utils/types';
 
 export interface TemporalRenderState {
   nearestIndex: number;
@@ -50,7 +48,7 @@ export function useTemporalTrack(
 
     const { coordinates, timestamps, timeExtent } = temporalData;
     const nearestIndex = findNearestPointIndex(timestamps, currentTime);
-    const nearestTime = nearestIndex >= 0 ? timestamps[nearestIndex] : 0;
+    const nearestTime = nearestIndex >= 0 ? timestamps[nearestIndex]! : 0;
 
     if (displayMode === 'trail') {
       const visibleCoordinates = sliceTrackToTime(coordinates, timestamps, currentTime);
@@ -65,7 +63,7 @@ export function useTemporalTrack(
 
     // Full-track mode
     const showMarker = nearestIndex >= 0 && currentTime >= timeExtent[0];
-    const markerPosition = showMarker ? coordinates[nearestIndex] : null;
+    const markerPosition: [number, number] | null = showMarker ? coordinates[nearestIndex]! : null;
     return {
       nearestIndex,
       nearestTime,

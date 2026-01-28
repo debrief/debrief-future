@@ -35,9 +35,9 @@ export function findNearestPointIndex(
   if (timestamps.length === 1) return 0;
 
   // Before first timestamp
-  if (targetTime <= timestamps[0]) return 0;
+  if (targetTime <= timestamps[0]!) return 0;
   // After last timestamp
-  if (targetTime >= timestamps[timestamps.length - 1]) return timestamps.length - 1;
+  if (targetTime >= timestamps[timestamps.length - 1]!) return timestamps.length - 1;
 
   // Binary search
   let low = 0;
@@ -45,8 +45,9 @@ export function findNearestPointIndex(
 
   while (low <= high) {
     const mid = (low + high) >>> 1;
-    if (timestamps[mid] === targetTime) return mid;
-    if (timestamps[mid] < targetTime) {
+    const midVal = timestamps[mid]!;
+    if (midVal === targetTime) return mid;
+    if (midVal < targetTime) {
       low = mid + 1;
     } else {
       high = mid - 1;
@@ -57,8 +58,8 @@ export function findNearestPointIndex(
   if (low >= timestamps.length) return timestamps.length - 1;
   if (low === 0) return 0;
 
-  const diffLow = Math.abs(timestamps[low] - targetTime);
-  const diffHigh = Math.abs(timestamps[low - 1] - targetTime);
+  const diffLow = Math.abs(timestamps[low]! - targetTime);
+  const diffHigh = Math.abs(timestamps[low - 1]! - targetTime);
   return diffLow <= diffHigh ? low : low - 1;
 }
 
@@ -82,7 +83,7 @@ export function sliceTrackToTime(
   if (nearestIndex < 0) return [];
 
   // If target time is before the track start, return empty (nothing to show yet)
-  if (targetTime < timestamps[0]) return [];
+  if (targetTime < timestamps[0]!) return [];
 
   return coordinates.slice(0, nearestIndex + 1);
 }
@@ -101,18 +102,21 @@ export function extractTemporalData(
   // Must be a LineString
   if (feature.geometry.type !== 'LineString') return null;
 
-  const coordinates = feature.geometry.coordinates as [number, number][];
-  const times = (feature.properties as Record<string, unknown>).times as number[] | undefined;
+  const coordinates = feature.geometry.coordinates as unknown as [number, number][];
+  const times = (feature.properties as unknown as Record<string, unknown>).times as number[] | undefined;
 
   if (!times || !Array.isArray(times) || times.length === 0) return null;
   if (coordinates.length === 0) return null;
   // times and coordinates must match in length
   if (times.length !== coordinates.length) return null;
 
+  const first = times[0]!;
+  const last = times[times.length - 1]!;
+
   return {
     trackId: String(feature.id ?? ''),
     coordinates,
     timestamps: times,
-    timeExtent: [times[0], times[times.length - 1]],
+    timeExtent: [first, last],
   };
 }
