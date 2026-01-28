@@ -133,11 +133,18 @@
 
 **Purpose**: Documentation, Storybook stories, evidence collection
 
-### Storybook Stories
+### Integrated Demo Story (REQUIRED - primary verification method)
 
-- [ ] T021 Create TemporalTrack story with full-track mode `shared/components/src/MapView/TemporalTrack.stories.tsx`
-- [ ] T022 [P] Add snail-trail mode story variant `shared/components/src/MapView/TemporalTrack.stories.tsx`
-- [ ] T023 [P] Add playback demo story with time controls `shared/components/src/MapView/TemporalTrack.stories.tsx`
+- [ ] T021 Create sample track data fixtures (2-3 tracks with timestamps) `shared/components/src/MapView/__fixtures__/sampleTracks.ts`
+- [ ] T022 Create integrated Storybook demo combining MapView + tracks + TimeController `shared/components/src/MapView/TemporalTrack.stories.tsx`
+
+> **T022** is the primary verification story. It MUST include:
+> - A MapView rendering 2-3 sample tracks with temporal data
+> - A TimeController below the map with scrubber, play/pause, and mode toggle
+> - Working full-track mode (complete path + highlight marker)
+> - Working snail-trail mode (path grows to current time)
+> - Playback at multiple speeds
+> - Mode switching while maintaining time position
 
 ### Documentation
 
@@ -187,7 +194,7 @@
 ### Parallel Opportunities
 
 - T001, T002: Setup tasks can run in parallel
-- T021, T022, T023: Storybook stories can run in parallel
+- T021, T022: Sample data + integrated story
 - T029, T030: Screenshot capture can run in parallel
 - T031, T032: Media content can run in parallel
 

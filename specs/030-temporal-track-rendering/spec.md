@@ -95,6 +95,7 @@ An analyst reviewing a scenario wants to switch between full-track and snail-tra
 - **FR-008**: System MUST find the nearest track point to the current time using timestamp comparison.
 - **FR-009**: System MUST visually distinguish the highlight marker from the track path (different color, size, or symbol).
 - **FR-010**: System MUST function fully offline without network connectivity.
+- **FR-011**: System MUST include an integrated Storybook story combining a MapView with sample tracks and a TimeController, enabling visual verification of full-track mode, snail-trail mode, and playback without requiring VS Code.
 
 ### Key Entities
 
@@ -157,6 +158,12 @@ An analyst reviewing a scenario wants to switch between full-track and snail-tra
 - **001-shared-react-components**: MapView component that renders track features.
 - **024-document-session-state**: Shared state for temporal position synchronization.
 - **@debrief/schemas**: TypeScript types for track features and temporal data.
+
+## Clarifications
+
+### Session 2026-01-28
+
+- Q: How can temporal rendering be verified without VS Code? → A: Include an integrated Storybook story combining MapView with sample tracks and a TimeController, enabling visual verification of both display modes and playback directly in the browser.
 
 ## Out of Scope
 
