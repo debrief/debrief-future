@@ -230,6 +230,18 @@ export function registerCommands(
     )
   );
 
+  // Feature selection command (layers tree click)
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.toggleFeatureSelection',
+      (args: { featureId: string }) => {
+        if (args?.featureId) {
+          layersTreeProvider.toggleSelection(args.featureId);
+        }
+      }
+    )
+  );
+
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.removeResultLayer',

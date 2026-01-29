@@ -39,9 +39,8 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
   // Session manager integration
   private _activeSession?: SessionStoreApi;
   private _selectionUnsubscribe?: () => void;
-  private _hiddenUnsubscribe?: () => void;
   private _sessionChangeDisposable?: vscode.Disposable;
-  private _hiddenFeatureIds: Set<string> = new Set();
+  private _selectedFeatureIds: Set<string> = new Set();
 
   constructor(sessionManager?: SessionManager) {
     if (sessionManager) {
@@ -78,47 +77,27 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       this._selectionUnsubscribe();
       this._selectionUnsubscribe = undefined;
     }
-    if (this._hiddenUnsubscribe) {
-      this._hiddenUnsubscribe();
-      this._hiddenUnsubscribe = undefined;
-    }
-
     this._activeSession = session ?? undefined;
 
     if (session) {
       // Subscribe to selection changes
       this._selectionUnsubscribe = subscribeToSelection(
         session,
-        () => {
-          this.refresh();
-        }
-      );
-
-      // Subscribe to hidden features changes
-      this._hiddenUnsubscribe = session.subscribe(
-        (state) => state.hiddenFeatureIds,
-        (hiddenIds) => {
-          this._hiddenFeatureIds = new Set(hiddenIds);
+        (selection) => {
+          this._selectedFeatureIds = new Set(selection.featureIds);
           this.refresh();
         }
       );
 
       // Initialize from current state
       const state: SessionStoreWithUndo = session.getState();
-      this._hiddenFeatureIds = new Set(state.hiddenFeatureIds);
+      this._selectedFeatureIds = new Set(state.selection.featureIds);
       this.refresh();
     } else {
       // No active session - clear state
-      this._hiddenFeatureIds = new Set();
+      this._selectedFeatureIds = new Set();
       this.refresh();
     }
-  }
-
-  /**
-   * Check if a feature is visible (not hidden in session)
-   */
-  private _isFeatureVisible(featureId: string): boolean {
-    return !this._hiddenFeatureIds.has(featureId);
   }
 
   /**
@@ -128,6 +107,27 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
     if (this._activeSession) {
       const state: SessionStoreWithUndo = this._activeSession.getState();
       state.toggleFeatureVisibility(featureId);
+    }
+  }
+
+  /**
+   * Check if a feature is selected
+   */
+  private _isFeatureSelected(featureId: string): boolean {
+    return this._selectedFeatureIds.has(featureId);
+  }
+
+  /**
+   * Toggle selection for a feature via session state
+   */
+  public toggleSelection(featureId: string): void {
+    if (this._activeSession) {
+      const state: SessionStoreWithUndo = this._activeSession.getState();
+      if (this._selectedFeatureIds.has(featureId)) {
+        state.removeFromSelection([featureId]);
+      } else {
+        state.addToSelection([featureId]);
+      }
     }
   }
 
@@ -197,9 +197,6 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
   dispose(): void {
     if (this._selectionUnsubscribe) {
       this._selectionUnsubscribe();
-    }
-    if (this._hiddenUnsubscribe) {
-      this._hiddenUnsubscribe();
     }
     if (this._sessionChangeDisposable) {
       this._sessionChangeDisposable.dispose();
@@ -307,14 +304,11 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
     const geom = track.geometry as { coordinates: number[][] };
     item.tooltip = `${track.name}\nPlatform: ${track.platformType ?? 'Unknown'}\nPoints: ${geom.coordinates.length}`;
 
-    // Use session state for visibility if available, fallback to track.visible
-    const isVisible = this._activeSession
-      ? this._isFeatureVisible(track.id)
-      : track.visible;
+    // Selection state
+    const isSelected = this._isFeatureSelected(track.id);
 
-    // Checkbox icon based on visibility
     item.iconPath = new vscode.ThemeIcon(
-      isVisible ? 'eye' : 'eye-closed'
+      isSelected ? 'check' : 'circle-outline'
     );
 
     // Color indicator
@@ -322,11 +316,11 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       item.resourceUri = vscode.Uri.parse(`color:${track.color}`);
     }
 
-    // Command to toggle visibility
+    // Command to toggle selection
     item.command = {
-      command: 'debrief.toggleLayerVisibility',
-      title: 'Toggle Visibility',
-      arguments: [{ layerId: `track-${track.id}`, featureId: track.id }],
+      command: 'debrief.toggleFeatureSelection',
+      title: 'Toggle Selection',
+      arguments: [{ featureId: track.id }],
     };
 
     return item;
@@ -342,19 +336,17 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
     item.description = location.locationType ?? '';
     item.tooltip = `${location.name}\nType: ${location.locationType ?? 'Unknown'}`;
 
-    // Use session state for visibility if available, fallback to location.visible
-    const isVisible = this._activeSession
-      ? this._isFeatureVisible(location.id)
-      : location.visible;
+    // Selection state
+    const isSelected = this._isFeatureSelected(location.id);
 
     item.iconPath = new vscode.ThemeIcon(
-      isVisible ? 'location' : 'circle-outline'
+      isSelected ? 'check' : 'circle-outline'
     );
 
     item.command = {
-      command: 'debrief.toggleLayerVisibility',
-      title: 'Toggle Visibility',
-      arguments: [{ layerId: `location-${location.id}`, featureId: location.id }],
+      command: 'debrief.toggleFeatureSelection',
+      title: 'Toggle Selection',
+      arguments: [{ featureId: location.id }],
     };
 
     return item;
@@ -370,19 +362,17 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
     item.description = new Date(layer.createdAt).toLocaleTimeString();
     item.tooltip = `${layer.name}\nTool: ${layer.toolName}\nCreated: ${new Date(layer.createdAt).toLocaleString()}`;
 
-    // Use session state for visibility if available, fallback to layer.visible
-    const isVisible = this._activeSession
-      ? this._isFeatureVisible(layer.id)
-      : layer.visible;
+    // Selection state
+    const isSelected = this._isFeatureSelected(layer.id);
 
     item.iconPath = new vscode.ThemeIcon(
-      isVisible ? 'symbol-misc' : 'circle-outline'
+      isSelected ? 'check' : 'circle-outline'
     );
 
     item.command = {
-      command: 'debrief.toggleLayerVisibility',
-      title: 'Toggle Visibility',
-      arguments: [{ layerId: layer.id, featureId: layer.id }],
+      command: 'debrief.toggleFeatureSelection',
+      title: 'Toggle Selection',
+      arguments: [{ featureId: layer.id }],
     };
 
     return item;

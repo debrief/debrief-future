@@ -118,3 +118,10 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 
 **When completing work:**
 - Log in `docs/project_notes/issues.md` with ticket ID and URL
+
+## Active Technologies
+- TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store) (039-wire-timecontroller-temporal-track)
+- N/A (in-memory temporal state only) (039-wire-timecontroller-temporal-track)
+
+## Recent Changes
+- 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)

@@ -154,6 +154,13 @@ export interface SetCurrentTimeMessage {
   time: number; // epoch ms
 }
 
+/** Set display mode for temporal track rendering (Feature: 039) */
+export interface SetDisplayModeMessage {
+  type: 'setDisplayMode';
+  /** 'full' = entire track + highlight marker; 'trail' = snail-trail to current time */
+  displayMode: 'full' | 'trail';
+}
+
 /** Set custom color for a track */
 export interface SetTrackColorMessage {
   type: 'setTrackColor';
@@ -293,6 +300,7 @@ export type ExtensionToWebviewMessage =
   | SetTrackColorMessage
   | SetViewportMessage
   | SetCurrentTimeMessage
+  | SetDisplayModeMessage
   | RequestExportPngResponse
   | RequestTrackDetailsResponse
   | ImportProgressMessage
