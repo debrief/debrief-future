@@ -11,6 +11,8 @@ import type { IoService } from '../services/ioService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
 import type { SessionManager } from '../services/sessionManager';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
+import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
+import { createTimeInstant } from '@debrief/session-state';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
 import { MapPanel } from '../webview/mapPanel';
@@ -57,6 +59,7 @@ export function createOpenPlotCommand(
   recentPlotsService: RecentPlotsService,
   sessionManager: SessionManager,
   toolsTreeProvider: ToolsTreeProvider,
+  toolMatchAdapter: ToolMatchAdapter,
   layersTreeProvider: LayersTreeProvider,
   timeRangeProvider: TimeRangeViewProvider,
   getMapPanel: () => MapPanel | undefined,
@@ -180,7 +183,12 @@ export function createOpenPlotCommand(
 
       // Set up selection change handler
       panel.onSelectionChanged((selection) => {
-        toolsTreeProvider.updateSelection(selection);
+        toolMatchAdapter.updateSelection({
+          featureIds: [...selection.trackIds, ...selection.locationIds],
+          primary: selection.trackIds[0] ?? selection.locationIds[0] ?? null,
+          timestamp: createTimeInstant(Date.now()),
+        });
+        toolsTreeProvider.refresh();
       });
 
       // Clear reference, layers, and sessions when panel is disposed

@@ -62,6 +62,7 @@ export function registerCommands(
         recentPlotsService,
         sessionManager,
         toolsTreeProvider,
+        toolMatchAdapter,
         layersTreeProvider,
         timeRangeProvider,
         getMapPanel,
