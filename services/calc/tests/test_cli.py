@@ -4,9 +4,6 @@ import json
 import subprocess
 import sys
 
-import pytest
-
-
 def run_cli(input_data: dict) -> dict:
     """Run cli.py with JSON input and return parsed output."""
     result = subprocess.run(
