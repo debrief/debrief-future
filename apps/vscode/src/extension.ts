@@ -182,7 +182,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         );
 
         // Update context values for tool commands (FR-019, FR-020)
-        updateToolContextValues(toolMatchAdapter, calcService);
+        void updateToolContextValues(toolMatchAdapter, calcService);
       }
     );
   });
