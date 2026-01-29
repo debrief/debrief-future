@@ -129,34 +129,23 @@ describe('TimeController', () => {
       expect(screen.getByText('4x')).toBeInTheDocument();
     });
 
-    it('opens dropdown on click', () => {
+    it('has up and down arrow buttons', () => {
       const timeExtent: TimeExtent = [NOW, NOW + HOUR];
       render(<TimeController timeExtent={timeExtent} />);
 
-      const speedButton = screen.getByRole('button', { name: /playback speed/i });
-      fireEvent.click(speedButton);
-
-      // Should show all speed options
-      expect(screen.getByRole('option', { name: '1x' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: '2x' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: '4x' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: '8x' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /increase speed/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /decrease speed/i })).toBeInTheDocument();
     });
 
-    it('changes speed when option is selected', () => {
+    it('changes speed when up arrow is clicked', () => {
       const timeExtent: TimeExtent = [NOW, NOW + HOUR];
       render(<TimeController timeExtent={timeExtent} />);
 
-      // Open dropdown
-      const speedButton = screen.getByRole('button', { name: /playback speed/i });
-      fireEvent.click(speedButton);
+      // Default speed is 1x, click up to go to 2x
+      const upButton = screen.getByRole('button', { name: /increase speed/i });
+      fireEvent.click(upButton);
 
-      // Select 4x
-      const option4x = screen.getByRole('option', { name: '4x' });
-      fireEvent.click(option4x);
-
-      // Should show new speed
-      expect(screen.getByText('4x')).toBeInTheDocument();
+      expect(screen.getByText('2x')).toBeInTheDocument();
     });
   });
 
