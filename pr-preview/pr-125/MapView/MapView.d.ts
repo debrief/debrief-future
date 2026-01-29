@@ -1,4 +1,4 @@
-import { DebriefFeature, DebriefFeatureCollection, Bounds } from '../utils/types';
+import { DebriefFeature, DebriefFeatureCollection, Bounds, DisplayMode } from '../utils/types';
 
 export interface MapViewProps {
     /** GeoJSON features to display */
@@ -29,6 +29,10 @@ export interface MapViewProps {
     style?: React.CSSProperties;
     /** Height of the map (default: 400px) */
     height?: number | string;
+    /** Current time position for temporal rendering (epoch ms). Enables temporal track rendering when provided. */
+    currentTime?: number;
+    /** Track display mode: 'full' (entire track + marker) or 'trail' (snail-trail up to current time). */
+    displayMode?: DisplayMode;
 }
 /**
  * MapView component for displaying GeoJSON features on an interactive map.
@@ -44,5 +48,5 @@ export interface MapViewProps {
  * />
  * ```
  */
-export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, autoFitBounds, tileLayerUrl, tileLayerAttribution, className, style, height, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
+export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, autoFitBounds, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=MapView.d.ts.map

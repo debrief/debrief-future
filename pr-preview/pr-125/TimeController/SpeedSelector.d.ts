@@ -1,7 +1,8 @@
 import { SpeedSelectorProps } from './types';
 
 /**
- * Dropdown selector for playback speed (1x, 2x, 4x, 8x).
+ * Spinner selector for playback speed (1x, 2x, 4x, 8x).
+ * Up/down arrows cycle through preset values.
  *
  * @example
  * ```tsx

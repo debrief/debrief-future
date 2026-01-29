@@ -1,6 +1,7 @@
 import { TrackFeature, ReferenceLocation, TrackProperties, ReferenceLocationProperties, FeatureKindEnum, TrackTypeEnum, LocationTypeEnum, TimestampedPosition } from '@debrief/schemas';
 
 export type { TrackFeature, ReferenceLocation, TrackProperties, ReferenceLocationProperties, FeatureKindEnum, TrackTypeEnum, LocationTypeEnum, TimestampedPosition, };
+export type { DisplayMode } from '../TimeController/types';
 /**
  * Union type for all Debrief feature types.
  * Components should accept either type interchangeably.

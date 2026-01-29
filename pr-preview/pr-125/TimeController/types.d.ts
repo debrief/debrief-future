@@ -3,7 +3,7 @@ import { TimeExtent } from '../utils/types';
 /**
  * Playback speed multiplier options.
  */
-export type PlaybackSpeed = 1 | 2 | 4 | 8;
+export type PlaybackSpeed = 1 | 2 | 4 | 8 | 16 | 32 | 64;
 /**
  * Track display mode.
  * - 'full': Show entire track regardless of time position
