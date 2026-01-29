@@ -25,6 +25,7 @@
       },
       "properties": {
         "id": "track-hms-defender",
+        "kind": "TRACK",
         "name": "HMS Defender",
         "platformType": "OWNSHIP",
         "color": "#2196F3",
@@ -71,6 +72,7 @@
       },
       "properties": {
         "id": "track-uss-freedom",
+        "kind": "TRACK",
         "name": "USS Freedom",
         "platformType": "CONTACT",
         "color": "#4CAF50",
@@ -101,9 +103,9 @@
       },
       "properties": {
         "id": "loc-alpha-point",
+        "kind": "POINT",
         "name": "Alpha Point",
-        "kind": "LOCATION",
-        "locationType": "Waypoint"
+        "locationType": "WAYPOINT"
       }
     },
     {
@@ -114,9 +116,9 @@
       },
       "properties": {
         "id": "loc-bravo-datum",
+        "kind": "POINT",
         "name": "Bravo Datum",
-        "kind": "LOCATION",
-        "locationType": "Reference"
+        "locationType": "REFERENCE"
       }
     },
     {
@@ -134,13 +136,16 @@
         ]]
       },
       "properties": {
+        "id": "circle-exclusion-zone",
         "kind": "CIRCLE",
         "center": [-4.1100, 50.4000],
         "radius": 500,
         "label": "Exclusion Zone",
         "style": {
+          "fill": true,
           "fill_color": "#F44336",
           "fill_opacity": 0.2,
+          "stroke": true,
           "color": "#F44336",
           "weight": 2,
           "opacity": 0.8
@@ -160,11 +165,14 @@
         ]]
       },
       "properties": {
+        "id": "rect-exercise-area",
         "kind": "RECTANGLE",
         "label": "Exercise Area Alpha",
         "style": {
+          "fill": true,
           "fill_color": "#2196F3",
           "fill_opacity": 0.1,
+          "stroke": true,
           "color": "#2196F3",
           "weight": 2,
           "opacity": 0.6,
@@ -182,9 +190,11 @@
         ]
       },
       "properties": {
+        "id": "line-sector-boundary",
         "kind": "LINE",
         "label": "Sector Boundary",
         "style": {
+          "stroke": true,
           "color": "#795548",
           "weight": 3,
           "opacity": 0.7,
@@ -202,16 +212,451 @@
         ]
       },
       "properties": {
+        "id": "vector-wind",
         "kind": "VECTOR",
         "origin": [-4.1200, 50.4150],
         "range": 1200,
         "bearing": 135,
         "label": "Wind Direction",
         "style": {
+          "stroke": true,
           "color": "#607D8B",
           "weight": 2,
           "opacity": 0.9
         }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-4.1000, 50.4080]
+      },
+      "properties": {
+        "id": "text-nav-warning",
+        "kind": "TEXT",
+        "text": "NAV WARNING: Restricted area",
+        "label": "Nav Warning",
+        "style": {
+          "color": "#FF5722",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-4.1450, 50.3950]
+      },
+      "properties": {
+        "id": "timetext-contact-report",
+        "kind": "TIMETEXT",
+        "text": "Contact bearing 045",
+        "label": "Contact Report",
+        "time": "2024-01-15T11:00:00Z",
+        "style": {
+          "color": "#9C27B0",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-4.0950, 50.3850]
+      },
+      "properties": {
+        "id": "periodtext-exercise-phase",
+        "kind": "PERIODTEXT",
+        "text": "Phase 2: ASW Ops",
+        "label": "Exercise Phase",
+        "start_time": "2024-01-15T11:00:00Z",
+        "end_time": "2024-01-15T13:00:00Z",
+        "style": {
+          "color": "#3F51B5",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.1320, 50.4100],
+          [-4.1280, 50.4120],
+          [-4.1240, 50.4110],
+          [-4.1230, 50.4080],
+          [-4.1260, 50.4060],
+          [-4.1310, 50.4070],
+          [-4.1320, 50.4100]
+        ]]
+      },
+      "properties": {
+        "id": "poly-minefield",
+        "kind": "POLY",
+        "label": "Suspected Minefield",
+        "style": {
+          "fill": true,
+          "fill_color": "#FF9800",
+          "fill_opacity": 0.25,
+          "stroke": true,
+          "color": "#FF9800",
+          "weight": 2,
+          "opacity": 0.8,
+          "dash_array": "5, 5"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-4.1400, 50.4150],
+          [-4.1350, 50.4170],
+          [-4.1280, 50.4160],
+          [-4.1220, 50.4180],
+          [-4.1180, 50.4170]
+        ]
+      },
+      "properties": {
+        "id": "polyline-shipping-lane",
+        "kind": "POLYLINE",
+        "label": "Shipping Lane Boundary",
+        "style": {
+          "stroke": true,
+          "color": "#009688",
+          "weight": 2,
+          "opacity": 0.7,
+          "dash_array": "8, 4"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.1050, 50.3830],
+          [-4.1025, 50.3845],
+          [-4.0990, 50.3850],
+          [-4.0960, 50.3840],
+          [-4.0945, 50.3820],
+          [-4.0950, 50.3800],
+          [-4.0975, 50.3785],
+          [-4.1010, 50.3780],
+          [-4.1040, 50.3790],
+          [-4.1055, 50.3810],
+          [-4.1050, 50.3830]
+        ]]
+      },
+      "properties": {
+        "id": "ellipse-uncertainty",
+        "kind": "ELLIPSE",
+        "center": [-4.1000, 50.3815],
+        "semi_major": 400,
+        "semi_minor": 200,
+        "orientation": 30,
+        "label": "Position Uncertainty",
+        "time": "2024-01-15T11:30:00Z",
+        "style": {
+          "fill": true,
+          "fill_color": "#E91E63",
+          "fill_opacity": 0.15,
+          "stroke": true,
+          "color": "#E91E63",
+          "weight": 1,
+          "opacity": 0.7
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.1420, 50.3870],
+          [-4.1400, 50.3890],
+          [-4.1370, 50.3895],
+          [-4.1340, 50.3885],
+          [-4.1330, 50.3865],
+          [-4.1340, 50.3845],
+          [-4.1370, 50.3840],
+          [-4.1400, 50.3850],
+          [-4.1420, 50.3870]
+        ]]
+      },
+      "properties": {
+        "id": "ellipse2-search-area",
+        "kind": "ELLIPSE2",
+        "center": [-4.1375, 50.3868],
+        "semi_major": 350,
+        "semi_minor": 180,
+        "orientation": 60,
+        "label": "Search Area Estimate",
+        "start_time": "2024-01-15T10:00:00Z",
+        "end_time": "2024-01-15T12:00:00Z",
+        "style": {
+          "fill": true,
+          "fill_color": "#673AB7",
+          "fill_opacity": 0.15,
+          "stroke": true,
+          "color": "#673AB7",
+          "weight": 1,
+          "opacity": 0.7,
+          "dash_array": "4, 4"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-4.1300, 50.3920]
+      },
+      "properties": {
+        "id": "wheel-sonar",
+        "kind": "WHEEL",
+        "label": "Sonar Coverage",
+        "radius": 600,
+        "inner_radius": 200,
+        "spoke_count": 8,
+        "style": {
+          "stroke": true,
+          "color": "#00BCD4",
+          "weight": 1,
+          "opacity": 0.6
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.0880, 50.3930],
+          [-4.0830, 50.3930],
+          [-4.0830, 50.3900],
+          [-4.0880, 50.3900],
+          [-4.0880, 50.3930]
+        ]]
+      },
+      "properties": {
+        "id": "dynrect-patrol-box",
+        "kind": "DYNAMIC_RECT",
+        "label": "Patrol Box",
+        "group": "patrol-alpha",
+        "time": "2024-01-15T10:30:00Z",
+        "style": {
+          "fill": true,
+          "fill_color": "#CDDC39",
+          "fill_opacity": 0.2,
+          "stroke": true,
+          "color": "#CDDC39",
+          "weight": 2,
+          "opacity": 0.8
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.1560, 50.4100],
+          [-4.1530, 50.4120],
+          [-4.1500, 50.4110],
+          [-4.1490, 50.4080],
+          [-4.1520, 50.4060],
+          [-4.1550, 50.4070],
+          [-4.1560, 50.4100]
+        ]]
+      },
+      "properties": {
+        "id": "dyncircle-guard-zone",
+        "kind": "DYNAMIC_CIRCLE",
+        "center": [-4.1525, 50.4090],
+        "radius": 300,
+        "label": "Guard Zone",
+        "group": "guard-bravo",
+        "time": "2024-01-15T11:00:00Z",
+        "style": {
+          "fill": true,
+          "fill_color": "#FF5722",
+          "fill_opacity": 0.15,
+          "stroke": true,
+          "color": "#FF5722",
+          "weight": 2,
+          "opacity": 0.7
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.0920, 50.4050],
+          [-4.0890, 50.4070],
+          [-4.0850, 50.4060],
+          [-4.0840, 50.4030],
+          [-4.0870, 50.4010],
+          [-4.0910, 50.4020],
+          [-4.0920, 50.4050]
+        ]]
+      },
+      "properties": {
+        "id": "dynpoly-moving-zone",
+        "kind": "DYNAMIC_POLY",
+        "label": "Moving Exclusion Zone",
+        "group": "exclusion-charlie",
+        "time": "2024-01-15T12:00:00Z",
+        "style": {
+          "fill": true,
+          "fill_color": "#795548",
+          "fill_opacity": 0.2,
+          "stroke": true,
+          "color": "#795548",
+          "weight": 2,
+          "opacity": 0.8,
+          "dash_array": "6, 3"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-4.1150, 50.3950],
+          [-4.1050, 50.3880]
+        ]
+      },
+      "properties": {
+        "id": "sensor-bearing-1",
+        "kind": "SENSOR",
+        "label": "Sonar Contact B1",
+        "sensor_type": "SONAR",
+        "bearing": 210,
+        "range": 800,
+        "origin": [-4.1150, 50.3950],
+        "time": "2024-01-15T11:15:00Z",
+        "style": {
+          "stroke": true,
+          "color": "#E91E63",
+          "weight": 1,
+          "opacity": 0.6,
+          "dash_array": "3, 3"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-4.1150, 50.3950],
+          [-4.1250, 50.3870]
+        ]
+      },
+      "properties": {
+        "id": "sensor2-bearing-only",
+        "kind": "SENSOR2",
+        "label": "Passive Bearing B2",
+        "sensor_type": "PASSIVE",
+        "bearing": 225,
+        "origin": [-4.1150, 50.3950],
+        "time": "2024-01-15T11:20:00Z",
+        "style": {
+          "stroke": true,
+          "color": "#9C27B0",
+          "weight": 1,
+          "opacity": 0.5,
+          "dash_array": "2, 4"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.1080, 50.3880],
+          [-4.1060, 50.3895],
+          [-4.1030, 50.3898],
+          [-4.1005, 50.3888],
+          [-4.0995, 50.3870],
+          [-4.1005, 50.3855],
+          [-4.1030, 50.3850],
+          [-4.1060, 50.3858],
+          [-4.1080, 50.3880]
+        ]]
+      },
+      "properties": {
+        "id": "tma-pos-estimate",
+        "kind": "TMA_POS",
+        "label": "TMA Solution",
+        "center": [-4.1040, 50.3875],
+        "semi_major": 250,
+        "semi_minor": 150,
+        "orientation": 45,
+        "course": 180,
+        "speed": 12,
+        "time": "2024-01-15T11:45:00Z",
+        "style": {
+          "fill": true,
+          "fill_color": "#FF9800",
+          "fill_opacity": 0.2,
+          "stroke": true,
+          "color": "#FF9800",
+          "weight": 2,
+          "opacity": 0.8
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "id": "narrative-entry-1",
+        "kind": "NARRATIVE",
+        "text": "Exercise Alpha commenced. HMS Defender departing Plymouth.",
+        "time": "2024-01-15T09:30:00Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "id": "narrative-entry-2",
+        "kind": "NARRATIVE",
+        "text": "Sonar contact bearing 210, classified probable submarine.",
+        "time": "2024-01-15T11:15:00Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "id": "narrative-entry-3",
+        "kind": "NARRATIVE",
+        "text": "Exercise Alpha complete. All units returning to port.",
+        "time": "2024-01-15T14:00:00Z"
       }
     }
   ]

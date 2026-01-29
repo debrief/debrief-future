@@ -86,13 +86,11 @@ export class ToolsTreeProvider implements vscode.TreeDataProvider<vscode.TreeIte
   private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-  private calcService: CalcService;
   private toolMatchAdapter: ToolMatchAdapter;
   private calcAvailable = false;
   private showInactiveTools = false;
 
-  constructor(calcService: CalcService, toolMatchAdapter: ToolMatchAdapter) {
-    this.calcService = calcService;
+  constructor(_calcService: CalcService, toolMatchAdapter: ToolMatchAdapter) {
     this.toolMatchAdapter = toolMatchAdapter;
   }
 
