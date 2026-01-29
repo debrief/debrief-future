@@ -7,7 +7,12 @@ particularly edge cases not covered by lower-level unit tests.
 
 from pathlib import Path
 
-from debrief_stac.cli import handle_copy_asset, handle_create_plot, handle_init_catalog
+from debrief_stac.cli import (
+    handle_copy_asset,
+    handle_create_plot,
+    handle_init_catalog,
+    handle_migrate_store,
+)
 from debrief_stac.plot import read_plot
 
 
@@ -107,3 +112,49 @@ class TestHandleCopyAsset:
         assert "asset_href" in result
         assert result["asset_href"] == "./assets/data.rep"
         assert Path(result["asset_path"]).exists()
+
+
+class TestHandleMigrateStore:
+    """Tests for handle_migrate_store CLI handler."""
+
+    def test_migrate_store_returns_migrated_items(self, temp_dir: Path) -> None:
+        """migrate_store should return migrated item IDs and count."""
+        import json
+
+        store = temp_dir / "store"
+        store.mkdir()
+        items_dir = store / "items"
+        items_dir.mkdir()
+
+        catalog = {
+            "type": "Catalog",
+            "stac_version": "1.0.0",
+            "id": "test",
+            "description": "Test",
+            "links": [
+                {"rel": "root", "href": "./catalog.json", "type": "application/json"},
+                {"rel": "item", "href": "./items/alpha.json", "type": "application/json"},
+            ],
+        }
+        (store / "catalog.json").write_text(json.dumps(catalog))
+
+        item = {
+            "type": "Feature",
+            "stac_version": "1.0.0",
+            "id": "alpha",
+            "geometry": None,
+            "bbox": None,
+            "properties": {"title": "Alpha", "datetime": "2024-01-01T00:00:00Z"},
+            "links": [
+                {"rel": "root", "href": "../catalog.json", "type": "application/json"},
+                {"rel": "parent", "href": "../catalog.json", "type": "application/json"},
+                {"rel": "self", "href": "./alpha.json", "type": "application/json"},
+            ],
+            "assets": {},
+        }
+        (items_dir / "alpha.json").write_text(json.dumps(item))
+
+        result = handle_migrate_store({"path": str(store)})
+
+        assert result["count"] == 1
+        assert result["migrated_items"] == ["alpha"]

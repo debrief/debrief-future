@@ -4,15 +4,37 @@
   "id": "exercise-alpha",
   "geometry": {
     "type": "Polygon",
-    "coordinates": [[
-      [-4.1534, 50.3789],
-      [-4.0923, 50.3789],
-      [-4.0923, 50.4123],
-      [-4.1534, 50.4123],
-      [-4.1534, 50.3789]
-    ]]
+    "coordinates": [
+      [
+        [
+          -4.1534,
+          50.3789
+        ],
+        [
+          -4.0923,
+          50.3789
+        ],
+        [
+          -4.0923,
+          50.4123
+        ],
+        [
+          -4.1534,
+          50.4123
+        ],
+        [
+          -4.1534,
+          50.3789
+        ]
+      ]
+    ]
   },
-  "bbox": [-4.1534, 50.3789, -4.0923, 50.4123],
+  "bbox": [
+    -4.1534,
+    50.3789,
+    -4.0923,
+    50.4123
+  ],
   "properties": {
     "title": "Exercise Alpha",
     "description": "Naval exercise in Plymouth Sound, January 2024",
@@ -33,7 +55,7 @@
     },
     {
       "rel": "self",
-      "href": "./exercise-alpha.json",
+      "href": "./item.json",
       "type": "application/json"
     }
   ],
@@ -42,7 +64,9 @@
       "href": "./exercise-alpha.geojson",
       "type": "application/geo+json",
       "title": "Track and Location Data",
-      "roles": ["data"]
+      "roles": [
+        "data"
+      ]
     }
   }
 }

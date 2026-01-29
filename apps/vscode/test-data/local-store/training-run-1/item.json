@@ -4,15 +4,37 @@
   "id": "training-run-1",
   "geometry": {
     "type": "Polygon",
-    "coordinates": [[
-      [-4.2012, 50.3456],
-      [-4.1812, 50.3456],
-      [-4.1812, 50.3656],
-      [-4.2012, 50.3656],
-      [-4.2012, 50.3456]
-    ]]
+    "coordinates": [
+      [
+        [
+          -4.2012,
+          50.3456
+        ],
+        [
+          -4.1812,
+          50.3456
+        ],
+        [
+          -4.1812,
+          50.3656
+        ],
+        [
+          -4.2012,
+          50.3656
+        ],
+        [
+          -4.2012,
+          50.3456
+        ]
+      ]
+    ]
   },
-  "bbox": [-4.2012, 50.3456, -4.1812, 50.3656],
+  "bbox": [
+    -4.2012,
+    50.3456,
+    -4.1812,
+    50.3656
+  ],
   "properties": {
     "title": "Training Run 1",
     "description": "Single vessel training exercise",
@@ -33,7 +55,7 @@
     },
     {
       "rel": "self",
-      "href": "./training-run-1.json",
+      "href": "./item.json",
       "type": "application/json"
     }
   ],
@@ -42,7 +64,9 @@
       "href": "./training-run-1.geojson",
       "type": "application/geo+json",
       "title": "Track and Location Data",
-      "roles": ["data"]
+      "roles": [
+        "data"
+      ]
     }
   }
 }

@@ -40,8 +40,8 @@
 
 **Purpose**: Create the new module file and test file
 
-- [ ] T001 Create migration module `services/stac/src/debrief_stac/migrate.py`
-- [ ] T002 [P] Create migration test file `services/stac/tests/test_migrate.py`
+- [x] T001 Create migration module `services/stac/src/debrief_stac/migrate.py`
+- [x] T002 [P] Create migration test file `services/stac/tests/test_migrate.py`
 
 ---
 
@@ -53,18 +53,18 @@
 
 ### Tests
 
-- [ ] T003 [test] Write test: migrate store with items in `items/` subdirectory `services/stac/tests/test_migrate.py`
-- [ ] T004 [P][test] Write test: migration is idempotent (running twice is no-op) `services/stac/tests/test_migrate.py`
-- [ ] T005 [P][test] Write test: catalog.json item links updated correctly `services/stac/tests/test_migrate.py`
-- [ ] T006 [P][test] Write test: item.json self/parent/root links updated `services/stac/tests/test_migrate.py`
-- [ ] T007 [P][test] Write test: asset hrefs remain correct `services/stac/tests/test_migrate.py`
-- [ ] T008 [P][test] Write test: empty items/ directory removed after migration `services/stac/tests/test_migrate.py`
-- [ ] T009 [P][test] Write test: assets/ subdirectory created in each item folder `services/stac/tests/test_migrate.py`
+- [x] T003 [test] Write test: migrate store with items in `items/` subdirectory `services/stac/tests/test_migrate.py`
+- [x] T004 [P][test] Write test: migration is idempotent (running twice is no-op) `services/stac/tests/test_migrate.py`
+- [x] T005 [P][test] Write test: catalog.json item links updated correctly `services/stac/tests/test_migrate.py`
+- [x] T006 [P][test] Write test: item.json self/parent/root links updated `services/stac/tests/test_migrate.py`
+- [x] T007 [P][test] Write test: asset hrefs remain correct `services/stac/tests/test_migrate.py`
+- [x] T008 [P][test] Write test: empty items/ directory removed after migration `services/stac/tests/test_migrate.py`
+- [x] T009 [P][test] Write test: assets/ subdirectory created in each item folder `services/stac/tests/test_migrate.py`
 
 ### Implementation
 
-- [ ] T010 Implement `migrate_flat_store()` function `services/stac/src/debrief_stac/migrate.py`
-- [ ] T011 Run tests and fix until all pass `services/stac/tests/test_migrate.py`
+- [x] T010 Implement `migrate_flat_store()` function `services/stac/src/debrief_stac/migrate.py`
+- [x] T011 Run tests and fix until all pass `services/stac/tests/test_migrate.py`
 
 **Checkpoint**: Migration function works on synthetic test fixtures
 
@@ -76,10 +76,10 @@
 
 **Independent Test**: Send JSON-RPC `migrate_store` request via stdin and verify response
 
-- [ ] T012 [test] Write test for `handle_migrate_store` JSON-RPC handler `services/stac/tests/test_cli.py`
-- [ ] T013 Add `handle_migrate_store` to CLI handlers `services/stac/src/debrief_stac/cli.py`
-- [ ] T014 Add `migrate_store` to method dispatch map `services/stac/src/debrief_stac/cli.py`
-- [ ] T015 Run CLI tests and fix until passing `services/stac/tests/test_cli.py`
+- [x] T012 [test] Write test for `handle_migrate_store` JSON-RPC handler `services/stac/tests/test_cli.py`
+- [x] T013 Add `handle_migrate_store` to CLI handlers `services/stac/src/debrief_stac/cli.py`
+- [x] T014 Add `migrate_store` to method dispatch map `services/stac/src/debrief_stac/cli.py`
+- [x] T015 Run CLI tests and fix until passing `services/stac/tests/test_cli.py`
 
 **Checkpoint**: Migration callable via JSON-RPC
 
@@ -91,13 +91,13 @@
 
 **Independent Test**: VS Code extension tests pass with migrated test data
 
-- [ ] T016 Capture before-state directory listing of `apps/vscode/test-data/local-store/`
-- [ ] T017 Run migration against `apps/vscode/test-data/local-store/`
-- [ ] T018 Verify migrated structure: `exercise-alpha/item.json`, `training-run-1/item.json`
-- [ ] T019 Verify `assets/` subdirectories created
-- [ ] T020 Verify `items/` directory removed
-- [ ] T021 Run existing VS Code extension tests to confirm no breakage
-- [ ] T022 Update any VS Code test fixtures that reference old paths `apps/vscode/tests/`
+- [x] T016 Capture before-state directory listing of `apps/vscode/test-data/local-store/`
+- [x] T017 Run migration against `apps/vscode/test-data/local-store/`
+- [x] T018 Verify migrated structure: `exercise-alpha/item.json`, `training-run-1/item.json`
+- [x] T019 Verify `assets/` subdirectories created
+- [x] T020 Verify `items/` directory removed
+- [x] T021 Run existing VS Code extension tests to confirm no breakage
+- [x] T022 Update any VS Code test fixtures that reference old paths `apps/vscode/tests/`
 
 **Checkpoint**: Test data migrated, all existing tests pass
 
@@ -109,19 +109,19 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T023 Create evidence directory `specs/040-stac-store-organization/evidence/`
-- [ ] T024 Capture test summary with pass/fail counts `specs/040-stac-store-organization/evidence/test-summary.md`
-- [ ] T025 Record usage example demonstrating migration `specs/040-stac-store-organization/evidence/usage-example.md`
-- [ ] T026 [P] Capture before/after directory listing `specs/040-stac-store-organization/evidence/before-after.md`
+- [x] T023 Create evidence directory `specs/040-stac-store-organization/evidence/`
+- [x] T024 Capture test summary with pass/fail counts `specs/040-stac-store-organization/evidence/test-summary.md`
+- [x] T025 Record usage example demonstrating migration `specs/040-stac-store-organization/evidence/usage-example.md`
+- [x] T026 [P] Capture before/after directory listing `specs/040-stac-store-organization/evidence/before-after.md`
 
 ### Media Content
 
-- [ ] T027 Create shipped blog post `specs/040-stac-store-organization/media/shipped-post.md`
-- [ ] T028 [P] Create LinkedIn shipped summary `specs/040-stac-store-organization/media/linkedin-shipped.md`
+- [x] T027 Create shipped blog post `specs/040-stac-store-organization/media/shipped-post.md`
+- [x] T028 [P] Create LinkedIn shipped summary `specs/040-stac-store-organization/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T029 Create PR and publish blog: run /speckit.pr
+- [x] T029 Create PR and publish blog: run /speckit.pr
 
 **Task T029 must run last. It depends on all evidence and media tasks being complete.**
 
