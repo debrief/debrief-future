@@ -21,21 +21,27 @@ local-data/
 ```
 local-data/
   track_NELSON/
-    track_NELSON.json
+    item.json
     track_NELSON.geojson
     assets/
       original_source_file.rep
   track_COLLINGWOOD/
-    track_COLLINGWOOD.json
+    item.json
     track_COLLINGWOOD.geojson
     assets/
       original_source_file.rep
 ```
 
+Key decisions:
+- **Folder naming**: Use the plot/item name (e.g., `track_NELSON/`)
+- **Item JSON**: Always named `item.json` within its folder
+- **GeoJSON plots**: Remain at item folder root level (sibling to `assets/`)
+- **Migration tool**: Python CLI command that updates href references
+
 Changes required:
 1. Update `debrief-stac` service to read/write using per-item folder structure
 2. Update STAC item JSON `href` references to reflect new relative paths
-3. Add a migration method to convert existing flat stores to the new structure
+3. Add a Python CLI migration command to convert existing flat stores to the new structure
 4. Run the migration against `apps/vs-code/test-data/local-data`
 
 ## Success Criteria
