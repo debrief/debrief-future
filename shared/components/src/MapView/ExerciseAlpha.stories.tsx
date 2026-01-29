@@ -1,14 +1,11 @@
 /**
- * Exercise Alpha — integrated demo loading the extended test-data GeoJSON.
+ * Exercise Alpha — integrated demo with all supported shape/annotation types.
  *
- * Demonstrates all supported shape/annotation feature types rendered on the map
- * alongside temporal tracks controlled by the TimeController.
- *
- * Feature kinds included:
+ * Combines MapView with TimeController to verify rendering of every feature kind:
  *   TRACK (2), POINT (2), CIRCLE, RECTANGLE, LINE, VECTOR,
  *   TEXT, TIMETEXT, PERIODTEXT, POLY, POLYLINE,
  *   ELLIPSE, ELLIPSE2, WHEEL, DYNAMIC_RECT, DYNAMIC_CIRCLE, DYNAMIC_POLY,
- *   SENSOR, SENSOR2, TMA_POS, NARRATIVE (3 — non-spatial, filtered)
+ *   SENSOR, SENSOR2, TMA_POS, NARRATIVE (3 — non-spatial, shown in sidebar)
  */
 
 import { useState } from 'react';
@@ -16,33 +13,18 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { MapView } from './MapView';
 import { TimeController } from '../TimeController/TimeController';
 import type { DisplayMode } from '../TimeController/types';
-import type { DebriefFeatureCollection } from '../utils/types';
-import type { TimeExtent } from '../utils/types';
+import {
+  exerciseAlphaFeatures,
+  exerciseAlphaTimeExtent,
+  exerciseAlphaNarratives,
+} from './__fixtures__/exerciseAlpha';
 
-// Import the exercise-alpha test data directly
-import exerciseAlphaRaw from '../../../../apps/vscode/test-data/local-store/items/exercise-alpha.geojson';
-
-// Cast and filter non-renderable features (NARRATIVE has empty coordinates)
-const rawData = exerciseAlphaRaw as unknown as DebriefFeatureCollection;
-const exerciseAlpha: DebriefFeatureCollection = {
-  type: 'FeatureCollection',
-  features: rawData.features.filter((f) => {
-    if (!f.geometry) return false;
-    const coords = f.geometry.coordinates;
-    if (Array.isArray(coords) && coords.length === 0) return false;
-    return true;
-  }),
-};
-
-// Exercise time range: 2024-01-15 09:30 – 14:00 UTC
-const TIME_START = new Date('2024-01-15T09:30:00Z').getTime();
-const TIME_END = new Date('2024-01-15T14:00:00Z').getTime();
-const timeExtent: TimeExtent = [TIME_START, TIME_END];
+const [TIME_START] = exerciseAlphaTimeExtent;
 
 // Summarise feature kinds for docs
-const kindCounts = exerciseAlpha.features.reduce(
-  (acc, f) => {
-    const kind = (f.properties as { kind?: string })?.kind ?? 'unknown';
+const kindCounts = exerciseAlphaFeatures.reduce(
+  (acc: Record<string, number>, f: { properties?: { kind?: string } }) => {
+    const kind = f.properties?.kind ?? 'unknown';
     acc[kind] = (acc[kind] ?? 0) + 1;
     return acc;
   },
@@ -52,11 +34,6 @@ const kindSummary = Object.entries(kindCounts)
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([k, n]) => `${k}: ${n}`)
   .join(', ');
-
-// Narrative entries (non-spatial) for the sidebar panel
-const narratives = (exerciseAlphaRaw as unknown as DebriefFeatureCollection).features
-  .filter((f) => (f.properties as { kind?: string })?.kind === 'NARRATIVE')
-  .map((f) => f.properties as { time?: string; text?: string });
 
 // ---------- Demo components ----------
 
@@ -68,7 +45,7 @@ function IntegratedDemo() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', gap: 0 }}>
       <div style={{ flex: 1, minHeight: 0 }}>
         <MapView
-          features={exerciseAlpha}
+          features={exerciseAlphaFeatures}
           currentTime={currentTime}
           displayMode={displayMode}
           height="100%"
@@ -77,7 +54,7 @@ function IntegratedDemo() {
       </div>
       <div style={{ padding: '8px', borderTop: '1px solid #ccc', background: '#1e1e1e' }}>
         <TimeController
-          timeExtent={timeExtent}
+          timeExtent={exerciseAlphaTimeExtent}
           initialTime={TIME_START}
           initialDisplayMode={displayMode}
           onTimeChange={setCurrentTime}
@@ -92,9 +69,8 @@ function WithNarrativePanel() {
   const [currentTime, setCurrentTime] = useState<number>(TIME_START);
   const [displayMode, setDisplayMode] = useState<DisplayMode>('full');
 
-  // Show narratives whose time <= currentTime
-  const visibleNarratives = narratives.filter(
-    (n) => n.time && new Date(n.time).getTime() <= currentTime,
+  const visibleNarratives = exerciseAlphaNarratives.filter(
+    (n) => new Date(n.time).getTime() <= currentTime,
   );
 
   return (
@@ -102,7 +78,7 @@ function WithNarrativePanel() {
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <MapView
-            features={exerciseAlpha}
+            features={exerciseAlphaFeatures}
             currentTime={currentTime}
             displayMode={displayMode}
             height="100%"
@@ -135,7 +111,7 @@ function WithNarrativePanel() {
       </div>
       <div style={{ padding: '8px', borderTop: '1px solid #ccc', background: '#1e1e1e' }}>
         <TimeController
-          timeExtent={timeExtent}
+          timeExtent={exerciseAlphaTimeExtent}
           initialTime={TIME_START}
           initialDisplayMode={displayMode}
           onTimeChange={setCurrentTime}
@@ -155,12 +131,11 @@ const meta: Meta = {
     docs: {
       description: {
         component: `
-Loads \`exercise-alpha.geojson\` from the VS Code test-data local store and renders
-**all supported shape/annotation types** on a single map with an integrated TimeController.
+Renders **all supported shape/annotation types** on a single map with an integrated TimeController.
 
-**Renderable features (${exerciseAlpha.features.length}):** ${kindSummary}
+**Renderable features (${exerciseAlphaFeatures.length}):** ${kindSummary}
 
-**Non-spatial features:** ${narratives.length} NARRATIVE entries (shown in the narrative panel variant)
+**Non-spatial features:** ${exerciseAlphaNarratives.length} NARRATIVE entries (shown in the narrative panel variant)
 
 ### Shape types demonstrated
 
@@ -211,14 +186,9 @@ export const WithNarrativeLog: StoryObj = {
 };
 
 export const StaticOverview: StoryObj = {
-  args: {
-    features: exerciseAlpha,
-    height: '100%',
-    autoFitBounds: true,
-  },
-  render: (args) => (
+  render: () => (
     <div style={{ height: '100vh' }}>
-      <MapView {...args} />
+      <MapView features={exerciseAlphaFeatures} height="100%" autoFitBounds />
     </div>
   ),
   parameters: {
