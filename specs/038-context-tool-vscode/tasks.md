@@ -45,9 +45,9 @@
 
 **Purpose**: Test data enrichment and type alignment
 
-- [ ] T001 Enrich test data with all supported feature kinds `apps/vscode/test-data/local-store/items/exercise-alpha.geojson`
-- [ ] T002 [P] Add sample tools fixture for testing `apps/vscode/test-data/fixtures/sample-tools.json`
-- [ ] T003 [P] Align tool types with @debrief/components exports `apps/vscode/src/types/tool.ts`
+- [x] T001 Enrich test data with all supported feature kinds `apps/vscode/test-data/local-store/items/exercise-alpha.geojson`
+- [x] T002 [P] Add sample tools fixture for testing `apps/vscode/test-data/fixtures/sample-tools.json`
+- [x] T003 [P] Align tool types with @debrief/components exports `apps/vscode/src/types/tool.ts`
 
 **Checkpoint**: Test data and type foundations ready
 
@@ -59,11 +59,11 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 [test] Write unit tests for ToolMatchAdapter `apps/vscode/tests/unit/toolMatchAdapter.test.ts`
-- [ ] T005 Create ToolMatchAdapter service `apps/vscode/src/services/toolMatchAdapter.ts`
-- [ ] T006 Update CalcService to return Tool[] compatible with ToolMatchService `apps/vscode/src/services/calcService.ts`
-- [ ] T007 Update extension.ts to initialize ToolMatchAdapter with SessionManager `apps/vscode/src/extension.ts`
-- [ ] T008 [P] Add tool context value setters for menu visibility `apps/vscode/src/commands/index.ts`
+- [x] T004 [test] Write unit tests for ToolMatchAdapter `apps/vscode/tests/unit/toolMatchAdapter.test.ts`
+- [x] T005 Create ToolMatchAdapter service `apps/vscode/src/services/toolMatchAdapter.ts`
+- [x] T006 Update CalcService to return Tool[] compatible with ToolMatchService `apps/vscode/src/services/calcService.ts`
+- [x] T007 Update extension.ts to initialize ToolMatchAdapter with SessionManager `apps/vscode/src/extension.ts`
+- [x] T008 [P] Add tool context value setters for menu visibility `apps/vscode/src/commands/index.ts`
 
 **Checkpoint**: Foundation ready - ToolMatchAdapter bridges selection to ToolMatchService
 
@@ -77,15 +77,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T009 [test] Write tests for ToolsTreeProvider with ToolMatchService integration `apps/vscode/tests/unit/toolsTreeProvider.test.ts`
+- [x] T009 [test] Write tests for ToolsTreeProvider with ToolMatchService integration `apps/vscode/tests/unit/toolsTreeProvider.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T010 Update ToolsTreeProvider to use ToolMatchAdapter `apps/vscode/src/providers/toolsTreeProvider.ts`
-- [ ] T011 [P] Add empty state rendering for no selection `apps/vscode/src/providers/toolsTreeProvider.ts`
-- [ ] T012 [P] Add loading state for tool discovery `apps/vscode/src/providers/toolsTreeProvider.ts`
-- [ ] T013 Subscribe to session selection changes and refresh tree `apps/vscode/src/providers/toolsTreeProvider.ts`
-- [ ] T014 Add error state for calc service unavailable `apps/vscode/src/providers/toolsTreeProvider.ts`
+- [x] T010 Update ToolsTreeProvider to use ToolMatchAdapter `apps/vscode/src/providers/toolsTreeProvider.ts`
+- [x] T011 [P] Add empty state rendering for no selection `apps/vscode/src/providers/toolsTreeProvider.ts`
+- [x] T012 [P] Add loading state for tool discovery `apps/vscode/src/providers/toolsTreeProvider.ts`
+- [x] T013 Subscribe to session selection changes and refresh tree `apps/vscode/src/providers/toolsTreeProvider.ts`
+- [x] T014 Add error state for calc service unavailable `apps/vscode/src/providers/toolsTreeProvider.ts`
 
 **Checkpoint**: User Story 1 complete - Tools panel shows applicable tools on selection
 
@@ -99,16 +99,16 @@
 
 ### Tests for User Story 2
 
-- [ ] T015 [test] Write tests for tool execution command `apps/vscode/tests/unit/executeTool.test.ts`
+- [x] T015 [test] Write tests for tool execution command `apps/vscode/tests/unit/executeTool.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T016 Update executeTool command to call CalcService with feature IDs `apps/vscode/src/commands/executeTool.ts`
-- [ ] T017 Add provenance metadata to result features `apps/vscode/src/commands/executeTool.ts`
-- [ ] T018 Persist results via StacService with provenance `apps/vscode/src/commands/executeTool.ts`
-- [ ] T019 [P] Add error notification on tool execution failure `apps/vscode/src/commands/executeTool.ts`
-- [ ] T020 [P] Add success notification with result count `apps/vscode/src/commands/executeTool.ts`
-- [ ] T021 Wire tool click in tree provider to execute command `apps/vscode/src/providers/toolsTreeProvider.ts`
+- [x] T016 Update executeTool command to call CalcService with feature IDs `apps/vscode/src/commands/executeTool.ts`
+- [x] T017 Add provenance metadata to result features `apps/vscode/src/commands/executeTool.ts`
+- [x] T018 Persist results via StacService with provenance `apps/vscode/src/commands/executeTool.ts`
+- [x] T019 [P] Add error notification on tool execution failure `apps/vscode/src/commands/executeTool.ts`
+- [x] T020 [P] Add success notification with result count `apps/vscode/src/commands/executeTool.ts`
+- [x] T021 Wire tool click in tree provider to execute command `apps/vscode/src/providers/toolsTreeProvider.ts`
 
 **Checkpoint**: User Story 2 complete - Tool execution works with provenance
 
@@ -122,10 +122,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T022 Add Tools submenu definition to package.json `apps/vscode/package.json`
-- [ ] T023 Register dynamic tool menu items in package.json `apps/vscode/package.json`
-- [ ] T024 Update context value setters to control menu visibility `apps/vscode/src/commands/index.ts`
-- [ ] T025 Add "when" clauses for each tool menu item `apps/vscode/package.json`
+- [x] T022 Add Tools submenu definition to package.json `apps/vscode/package.json`
+- [x] T023 Register dynamic tool menu items in package.json `apps/vscode/package.json`
+- [x] T024 Update context value setters to control menu visibility `apps/vscode/src/commands/index.ts`
+- [x] T025 Add "when" clauses for each tool menu item `apps/vscode/package.json`
 
 **Checkpoint**: User Story 3 complete - Context menu shows applicable tools
 
@@ -139,9 +139,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T026 Register tool commands in package.json with "Debrief: " prefix `apps/vscode/package.json`
-- [ ] T027 Add enablement clauses for tool commands `apps/vscode/package.json`
-- [ ] T028 Wire command handlers to executeTool `apps/vscode/src/extension.ts`
+- [x] T026 Register tool commands in package.json with "Debrief: " prefix `apps/vscode/package.json`
+- [x] T027 Add enablement clauses for tool commands `apps/vscode/package.json`
+- [x] T028 Wire command handlers to executeTool `apps/vscode/src/extension.ts`
 
 **Checkpoint**: User Story 4 complete - Command Palette integration works
 
@@ -155,11 +155,11 @@
 
 ### Implementation for User Story 5
 
-- [ ] T029 Add "Show inactive tools" toggle command `apps/vscode/package.json`
-- [ ] T030 Implement toggle state in ToolsTreeProvider `apps/vscode/src/providers/toolsTreeProvider.ts`
-- [ ] T031 Render inactive tools with explanation text from MatchResult `apps/vscode/src/providers/toolsTreeProvider.ts`
-- [ ] T032 Style inactive tools differently (grayed out) `apps/vscode/src/providers/toolsTreeProvider.ts`
-- [ ] T033 Persist toggle state in workspace settings `apps/vscode/src/providers/toolsTreeProvider.ts`
+- [x] T029 Add "Show inactive tools" toggle command `apps/vscode/package.json`
+- [x] T030 Implement toggle state in ToolsTreeProvider `apps/vscode/src/providers/toolsTreeProvider.ts`
+- [x] T031 Render inactive tools with explanation text from MatchResult `apps/vscode/src/providers/toolsTreeProvider.ts`
+- [x] T032 Style inactive tools differently (grayed out) `apps/vscode/src/providers/toolsTreeProvider.ts`
+- [x] T033 Persist toggle state in workspace settings `apps/vscode/src/providers/toolsTreeProvider.ts`
 
 **Checkpoint**: User Story 5 complete - Inactive tool explanations visible
 
@@ -171,20 +171,20 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T034 Create evidence directory `specs/038-context-tool-vscode/evidence/`
-- [ ] T035 Capture test results in `specs/038-context-tool-vscode/evidence/test-summary.md`
-- [ ] T036 Create usage example showing full workflow `specs/038-context-tool-vscode/evidence/usage-example.md`
-- [ ] T037 [P] Document selection → matching flow `specs/038-context-tool-vscode/evidence/selection-flow.md`
+- [x] T034 Create evidence directory `specs/038-context-tool-vscode/evidence/`
+- [x] T035 Capture test results in `specs/038-context-tool-vscode/evidence/test-summary.md`
+- [x] T036 Create usage example showing full workflow `specs/038-context-tool-vscode/evidence/usage-example.md`
+- [x] T037 [P] Document selection → matching flow `specs/038-context-tool-vscode/evidence/selection-flow.md`
 - [ ] T038 [P] Capture screenshots of Tools panel states `specs/038-context-tool-vscode/evidence/tool-panel-states.png`
 
 ### Media Content (REQUIRED)
 
-- [ ] T039 Create shipped blog post `specs/038-context-tool-vscode/media/shipped-post.md`
-- [ ] T040 [P] Create LinkedIn shipped summary `specs/038-context-tool-vscode/media/linkedin-shipped.md`
+- [x] T039 Create shipped blog post `specs/038-context-tool-vscode/media/shipped-post.md`
+- [x] T040 [P] Create LinkedIn shipped summary `specs/038-context-tool-vscode/media/linkedin-shipped.md`
 
 ### PR Creation (REQUIRED - FINAL TASK)
 
-- [ ] T041 Create PR and publish blog: run /speckit.pr
+- [x] T041 Create PR and publish blog: run /speckit.pr
 
 **Task T041 must run last. It depends on all evidence and media tasks being complete.**
 

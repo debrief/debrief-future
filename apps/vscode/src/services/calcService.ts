@@ -4,21 +4,56 @@
  * This service provides access to analysis tools via the Model Context Protocol.
  * It handles lazy connection, caching, and graceful degradation when the service
  * is unavailable.
+ *
+ * Feature: 038-context-tool-vscode - Updated to return Tool[] from @debrief/schemas
  */
 
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
+import { execFile, spawn } from 'child_process';
+import { promisify } from 'util';
 import type {
-  AnalysisTool,
+  Tool,
   ToolExecution,
   ToolExecutionRequest,
   ToolExecutionResult,
   ResultLayer,
+  ToolProvenance,
 } from '../types/tool';
 import {
   createToolExecution,
   createDefaultResultStyle,
 } from '../types/tool';
-import type { Track, ReferenceLocation } from '../types/plot';
+import type { MapPanel } from '../webview/mapPanel';
+
+const execFileAsync = promisify(execFile);
+
+/** Spawn a process with JSON on stdin, return stdout. */
+function spawnWithStdin(
+  cmd: string,
+  args: string[],
+  input: string,
+  timeout: number
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(cmd, args, { timeout });
+    let stdout = '';
+    let stderr = '';
+    proc.stdout.on('data', (d: Buffer) => { stdout += d.toString(); });
+    proc.stderr.on('data', (d: Buffer) => { stderr += d.toString(); });
+    proc.on('close', (code) => {
+      if (code !== 0) {
+        reject(new Error(stderr || `Process exited with code ${code}`));
+      } else {
+        resolve(stdout);
+      }
+    });
+    proc.on('error', reject);
+    proc.stdin.write(input);
+    proc.stdin.end();
+  });
+}
 
 // Self-contained SafeFeatureCollection to avoid any from geojson
 interface SafeFeatureCollection {
@@ -35,7 +70,7 @@ type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
 
 // Tool cache entry
 interface ToolCacheEntry {
-  tools: AnalysisTool[];
+  tools: Tool[];
   timestamp: number;
 }
 
@@ -53,9 +88,11 @@ export class CalcService {
   private failureCount = 0;
   private lastFailureTime = 0;
   private currentExecution: ToolExecution | null = null;
+  private getMapPanel: () => MapPanel | undefined;
 
-  constructor(context: vscode.ExtensionContext) {
+  constructor(context: vscode.ExtensionContext, getMapPanel: () => MapPanel | undefined) {
     this.context = context;
+    this.getMapPanel = getMapPanel;
   }
 
   // Reserved for future use (e.g., storing execution history)
@@ -98,14 +135,11 @@ export class CalcService {
     this.connectionState = 'connecting';
 
     try {
-      // Get Python path from configuration
+      const pythonPath = this.getPythonPath();
       const config = vscode.workspace.getConfiguration('debrief');
-      const pythonPath = config.get<string>('calc.pythonPath') ?? 'python';
       const timeout = config.get<number>('calc.connectionTimeout') ?? 5000;
 
-      // Note: In a real implementation, this would spawn the MCP server
-      // and establish a connection. For now, we'll simulate the connection.
-      await this.simulateConnection(pythonPath, timeout);
+      await this.validatePython(pythonPath, timeout);
 
       this.connectionState = 'connected';
       this.failureCount = 0;
@@ -125,9 +159,12 @@ export class CalcService {
   }
 
   /**
-   * List available analysis tools
+   * List available analysis tools.
+   *
+   * Returns Tool[] compatible with ToolMatchService.
+   * Tools use the SelectionRequirement format from @debrief/schemas.
    */
-  async listTools(): Promise<AnalysisTool[]> {
+  async listTools(): Promise<Tool[]> {
     // Check cache
     if (this.toolCache && Date.now() - this.toolCache.timestamp < TOOL_CACHE_TTL) {
       return this.toolCache.tools;
@@ -154,70 +191,35 @@ export class CalcService {
   }
 
   /**
-   * Get tools applicable to the current selection
-   */
-  async getApplicableTools(
-    tracks: Track[],
-    locations: ReferenceLocation[]
-  ): Promise<AnalysisTool[]> {
-    const allTools = await this.listTools();
-
-    // Determine selection context
-    const trackCount = tracks.filter((t) => t.selected).length;
-    const locationCount = locations.filter((l) => l.selected).length;
-
-    let contextType: string;
-    if (trackCount === 0 && locationCount === 0) {
-      return [];
-    } else if (trackCount === 1 && locationCount === 0) {
-      contextType = 'single-track';
-    } else if (trackCount > 1 && locationCount === 0) {
-      contextType = 'multi-track';
-    } else if (trackCount === 0 && locationCount > 0) {
-      contextType = 'location';
-    } else {
-      contextType = 'mixed';
-    }
-
-    // Filter tools by context
-    return allTools.filter(
-      (tool) => tool.contextType === 'any' || tool.contextType === contextType
-    );
-  }
-
-  /**
-   * Execute a tool on the selection
+   * Execute a tool on the selection.
+   *
+   * @param request - Execution request with tool ID and feature IDs
+   * @returns Execution result with features and provenance
    */
   async executeTool(
-    request: ToolExecutionRequest,
-    tracks: Track[],
-    locations: ReferenceLocation[]
+    request: ToolExecutionRequest
   ): Promise<ToolExecutionResult> {
     // Ensure connected
     await this.connect();
 
+    // Find the tool
+    const allTools = this.toolCache?.tools ?? [];
+    const tool = allTools.find((t) => t.id === request.toolId);
+    const toolName = tool?.name ?? request.toolId;
+
     // Create execution record
-    const execution = createToolExecution(request.toolName);
+    const execution = createToolExecution(request.toolId, toolName);
     this.currentExecution = execution;
 
     try {
       execution.status = 'running';
 
-      // Get selected features
-      const selectedTracks = tracks.filter((t) =>
-        request.trackIds.includes(t.id)
-      );
-      const selectedLocations = locations.filter((l) =>
-        request.locationIds.includes(l.id)
-      );
-
       const startTime = Date.now();
 
       // Note: In a real implementation, this would call the MCP server
       const result = await this.executeToolOnMcp(
-        request.toolName,
-        selectedTracks,
-        selectedLocations,
+        request.toolId,
+        request.featureIds,
         request.params
       );
 
@@ -267,24 +269,42 @@ export class CalcService {
   }
 
   /**
-   * Create a result layer from tool execution
+   * Create a result layer from tool execution with provenance (FR-024).
+   *
+   * @param toolId - Tool ID that produced the result
+   * @param executionId - Execution ID
+   * @param result - Tool execution result
+   * @param sourceFeatureIds - IDs of features used as inputs
+   * @returns ResultLayer with provenance metadata
    */
   createResultLayer(
-    toolName: string,
+    toolId: string,
     executionId: string,
-    result: ToolExecutionResult
+    result: ToolExecutionResult,
+    sourceFeatureIds: string[]
   ): ResultLayer | null {
     if (result.success !== true || result.features === undefined) {
       return null;
     }
 
     const allTools = this.toolCache?.tools ?? [];
-    const tool = allTools.find((t) => t.name === toolName);
-    const displayName = tool?.displayName ?? toolName;
+    const tool = allTools.find((t) => t.id === toolId);
+    const toolName = tool?.name ?? toolId;
+    const toolVersion = tool?.version ?? '0.0.0';
+
+    const provenance: ToolProvenance = {
+      toolId,
+      toolName,
+      toolVersion,
+      executionTime: new Date().toISOString(),
+      sourceFeatureIds,
+      durationMs: result.durationMs,
+    };
 
     return {
       id: `layer-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-      name: displayName,
+      name: toolName,
+      toolId,
       toolName,
       executionId,
       features: result.features as SafeFeatureCollection,
@@ -292,6 +312,7 @@ export class CalcService {
       visible: true,
       createdAt: new Date().toISOString(),
       zIndex: 100, // Result layers on top
+      provenance,
     };
   }
 
@@ -329,79 +350,165 @@ export class CalcService {
     }
   }
 
-  private async simulateConnection(
-    _pythonPath: string,
+  private async validatePython(
+    pythonPath: string,
     timeout: number
   ): Promise<void> {
-    // Simulate connection delay
-    await new Promise((resolve) => setTimeout(resolve, Math.min(timeout, 100)));
-
-    // Note: In production, this would actually spawn and connect to the MCP server
-    // For now, we'll simulate a successful connection
+    try {
+      await execFileAsync(pythonPath, ['-c', 'import debrief_calc'], {
+        timeout,
+      });
+    } catch {
+      throw new Error(
+        `debrief-calc not available via '${pythonPath}'. ` +
+        'Ensure debrief_calc is installed in the configured Python environment.'
+      );
+    }
   }
 
-  private fetchToolsFromMcp(): Promise<AnalysisTool[]> {
-    // Simulated tools - in production, these come from debrief-calc MCP
-    return Promise.resolve([
-      {
-        name: 'range-bearing',
-        displayName: 'Range & Bearing Calculator',
-        description:
-          'Calculate distance and bearing between two tracks at matching times',
-        contextType: 'multi-track',
-        inputKinds: ['track'],
-        inputSchema: {},
-      },
-      {
-        name: 'closest-approach',
-        displayName: 'Closest Point of Approach',
-        description: 'Find when and where the tracks came closest to each other',
-        contextType: 'multi-track',
-        inputKinds: ['track'],
-        inputSchema: {},
-      },
-      {
-        name: 'relative-motion',
-        displayName: 'Relative Motion Analysis',
-        description: 'Compute motion of one track relative to the other',
-        contextType: 'multi-track',
-        inputKinds: ['track'],
-        inputSchema: {},
-      },
-      {
-        name: 'track-stats',
-        displayName: 'Track Statistics',
-        description: 'Calculate speed, course, and distance statistics for a track',
-        contextType: 'single-track',
-        inputKinds: ['track'],
-        inputSchema: {},
-      },
-      {
-        name: 'distance-to-point',
-        displayName: 'Distance to Point',
-        description: 'Calculate distance from track to a reference point over time',
-        contextType: 'mixed',
-        inputKinds: ['track', 'location'],
-        inputSchema: {},
-      },
-    ]);
+  private getPythonPath(): string {
+    const config = vscode.workspace.getConfiguration('debrief');
+    const configured = config.get<string>('calc.pythonPath');
+    if (configured) {
+      return configured;
+    }
+
+    // Try workspace folders and their ancestors for .venv (common with uv/poetry monorepos)
+    const folders = vscode.workspace.workspaceFolders;
+    if (folders) {
+      for (const folder of folders) {
+        let dir = folder.uri.fsPath;
+        // Walk up to 5 levels looking for .venv
+        for (let i = 0; i < 5; i++) {
+          const venvPython = path.join(dir, '.venv', 'bin', 'python');
+          if (fs.existsSync(venvPython)) {
+            return venvPython;
+          }
+          const parent = path.dirname(dir);
+          if (parent === dir) { break; }
+          dir = parent;
+        }
+      }
+    }
+
+    return 'python';
+  }
+
+  /**
+   * Fetch tools from debrief-calc Python registry.
+   *
+   * Returns Tool[] with SelectionRequirement format for ToolMatchService.
+   */
+  private async fetchToolsFromMcp(): Promise<Tool[]> {
+    const pythonPath = this.getPythonPath();
+    const script = `
+import json
+from debrief_calc.registry import registry
+from debrief_calc.models import ContextType
+tools = []
+for t in registry.list_all():
+    ctx = t.context_type
+    min_count = 1 if ctx == ContextType.SINGLE else (2 if ctx == ContextType.MULTI else 0)
+    max_count = 1 if ctx == ContextType.SINGLE else (99 if ctx == ContextType.MULTI else 0)
+    reqs = [{"kind": k.upper(), "min": min_count, "max": max_count} for k in t.input_kinds]
+    tools.append({"id": t.name, "name": t.name, "description": t.description, "version": t.version, "requirements": reqs})
+print(json.dumps(tools))
+`;
+    const { stdout } = await execFileAsync(pythonPath, ['-c', script], {
+      timeout: 10000,
+    });
+    return JSON.parse(stdout.trim()) as Tool[];
+  }
+
+  /**
+   * Resolve feature IDs to GeoJSON features using MapPanel data.
+   */
+  private resolveFeatures(
+    featureIds: string[]
+  ): Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> {
+    const panel = this.getMapPanel();
+    if (!panel) {
+      throw new Error('No map panel available');
+    }
+
+    const tracks = panel.getTracks();
+    const locations = panel.getLocations();
+    const features: Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> = [];
+
+    for (const id of featureIds) {
+      const track = tracks.find((t) => t.id === id);
+      if (track) {
+        features.push({
+          type: 'Feature',
+          geometry: track.geometry,
+          properties: {
+            id: track.id,
+            name: track.name,
+            kind: 'track',
+            platformType: track.platformType,
+            times: track.times,
+            startTime: track.startTime,
+            endTime: track.endTime,
+          },
+        });
+        continue;
+      }
+
+      const location = locations.find((l) => l.id === id);
+      if (location) {
+        features.push({
+          type: 'Feature',
+          geometry: location.geometry,
+          properties: {
+            id: location.id,
+            name: location.name,
+            kind: 'location',
+            locationType: location.locationType,
+          },
+        });
+        continue;
+      }
+
+      throw new Error(`Feature not found: ${id}`);
+    }
+
+    return features;
   }
 
   private async executeToolOnMcp(
-    _toolName: string,
-    _tracks: Track[],
-    _locations: ReferenceLocation[],
-    _params?: Record<string, unknown>
+    toolId: string,
+    featureIds: string[],
+    params?: Record<string, unknown>
   ): Promise<SafeFeatureCollection> {
-    // Simulate tool execution delay
-    await new Promise((resolve) =>
-      setTimeout(resolve, 500 + Math.random() * 500)
+    const features = this.resolveFeatures(featureIds);
+
+    const input = JSON.stringify({
+      tool: toolId,
+      features,
+      params: params ?? {},
+    });
+
+    const pythonPath = this.getPythonPath();
+    const stdout = await spawnWithStdin(
+      pythonPath,
+      ['-m', 'debrief_calc.cli'],
+      input,
+      30000
     );
 
-    // Return empty result - in production, this would be actual computed data
+    const result = JSON.parse(stdout.trim()) as {
+      success: boolean;
+      features: SafeFeatureCollection['features'];
+      error?: { code: string; message: string };
+    };
+
+    if (!result.success) {
+      throw new Error(result.error?.message ?? 'Tool execution failed');
+    }
+
     return {
       type: 'FeatureCollection',
-      features: [],
+      features: result.features,
     };
   }
 }

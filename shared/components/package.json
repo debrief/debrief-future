@@ -27,6 +27,10 @@
     "./ThemeProvider": {
       "types": "./dist/ThemeProvider/index.d.ts",
       "import": "./dist/ThemeProvider/index.js"
+    },
+    "./ToolMatch": {
+      "types": "./dist/ToolMatch/index.d.ts",
+      "import": "./dist/ToolMatch/index.js"
     }
   },
   "sideEffects": [

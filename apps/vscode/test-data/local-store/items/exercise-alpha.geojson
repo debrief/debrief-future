@@ -26,23 +26,23 @@
       "properties": {
         "id": "track-hms-defender",
         "name": "HMS Defender",
-        "platformType": "Destroyer",
+        "platformType": "OWNSHIP",
         "color": "#2196F3",
         "times": [
           "2024-01-15T09:30:00Z",
-          "2024-01-15T09:45:00Z",
-          "2024-01-15T10:00:00Z",
-          "2024-01-15T10:15:00Z",
+          "2024-01-15T09:50:00Z",
+          "2024-01-15T10:10:00Z",
           "2024-01-15T10:30:00Z",
-          "2024-01-15T10:45:00Z",
-          "2024-01-15T11:00:00Z",
-          "2024-01-15T11:15:00Z",
+          "2024-01-15T10:50:00Z",
+          "2024-01-15T11:10:00Z",
           "2024-01-15T11:30:00Z",
-          "2024-01-15T11:45:00Z",
-          "2024-01-15T12:00:00Z",
+          "2024-01-15T11:50:00Z",
+          "2024-01-15T12:10:00Z",
           "2024-01-15T12:30:00Z",
-          "2024-01-15T13:00:00Z",
+          "2024-01-15T12:50:00Z",
+          "2024-01-15T13:10:00Z",
           "2024-01-15T13:30:00Z",
+          "2024-01-15T13:50:00Z",
           "2024-01-15T14:00:00Z"
         ]
       }
@@ -72,23 +72,23 @@
       "properties": {
         "id": "track-uss-freedom",
         "name": "USS Freedom",
-        "platformType": "Frigate",
+        "platformType": "CONTACT",
         "color": "#4CAF50",
         "times": [
           "2024-01-15T09:30:00Z",
-          "2024-01-15T09:45:00Z",
-          "2024-01-15T10:00:00Z",
-          "2024-01-15T10:15:00Z",
+          "2024-01-15T09:50:00Z",
+          "2024-01-15T10:10:00Z",
           "2024-01-15T10:30:00Z",
-          "2024-01-15T10:45:00Z",
-          "2024-01-15T11:00:00Z",
-          "2024-01-15T11:15:00Z",
+          "2024-01-15T10:50:00Z",
+          "2024-01-15T11:10:00Z",
           "2024-01-15T11:30:00Z",
-          "2024-01-15T11:45:00Z",
-          "2024-01-15T12:00:00Z",
+          "2024-01-15T11:50:00Z",
+          "2024-01-15T12:10:00Z",
           "2024-01-15T12:30:00Z",
-          "2024-01-15T13:00:00Z",
+          "2024-01-15T12:50:00Z",
+          "2024-01-15T13:10:00Z",
           "2024-01-15T13:30:00Z",
+          "2024-01-15T13:50:00Z",
           "2024-01-15T14:00:00Z"
         ]
       }
@@ -102,7 +102,116 @@
       "properties": {
         "id": "loc-alpha-point",
         "name": "Alpha Point",
+        "kind": "LOCATION",
         "locationType": "Waypoint"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-4.1350, 50.4000]
+      },
+      "properties": {
+        "id": "loc-bravo-datum",
+        "name": "Bravo Datum",
+        "kind": "LOCATION",
+        "locationType": "Reference"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.1100, 50.4050],
+          [-4.1050, 50.4035],
+          [-4.1050, 50.3965],
+          [-4.1100, 50.3950],
+          [-4.1150, 50.3965],
+          [-4.1150, 50.4035],
+          [-4.1100, 50.4050]
+        ]]
+      },
+      "properties": {
+        "kind": "CIRCLE",
+        "center": [-4.1100, 50.4000],
+        "radius": 500,
+        "label": "Exclusion Zone",
+        "style": {
+          "fill_color": "#F44336",
+          "fill_opacity": 0.2,
+          "color": "#F44336",
+          "weight": 2,
+          "opacity": 0.8
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.1600, 50.4200],
+          [-4.0800, 50.4200],
+          [-4.0800, 50.3700],
+          [-4.1600, 50.3700],
+          [-4.1600, 50.4200]
+        ]]
+      },
+      "properties": {
+        "kind": "RECTANGLE",
+        "label": "Exercise Area Alpha",
+        "style": {
+          "fill_color": "#2196F3",
+          "fill_opacity": 0.1,
+          "color": "#2196F3",
+          "weight": 2,
+          "opacity": 0.6,
+          "dash_array": "10, 5"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-4.1500, 50.3800],
+          [-4.0900, 50.4100]
+        ]
+      },
+      "properties": {
+        "kind": "LINE",
+        "label": "Sector Boundary",
+        "style": {
+          "color": "#795548",
+          "weight": 3,
+          "opacity": 0.7,
+          "dash_array": "15, 10"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-4.1200, 50.4150],
+          [-4.1050, 50.4100]
+        ]
+      },
+      "properties": {
+        "kind": "VECTOR",
+        "origin": [-4.1200, 50.4150],
+        "range": 1200,
+        "bearing": 135,
+        "label": "Wind Direction",
+        "style": {
+          "color": "#607D8B",
+          "weight": 2,
+          "opacity": 0.9
+        }
       }
     }
   ]

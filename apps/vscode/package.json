@@ -177,6 +177,42 @@
         "title": "Save Session",
         "category": "Debrief",
         "icon": "$(save)"
+      },
+      {
+        "command": "debrief.showToolRequirements",
+        "title": "Show Tool Requirements",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.toggleInactiveTools",
+        "title": "Toggle Inactive Tools",
+        "category": "Debrief",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "debrief.tool.rangeBearing",
+        "title": "Debrief: Range & Bearing",
+        "enablement": "debrief.tool.range-bearing.active"
+      },
+      {
+        "command": "debrief.tool.closestApproach",
+        "title": "Debrief: Closest Point of Approach",
+        "enablement": "debrief.tool.closest-approach.active"
+      },
+      {
+        "command": "debrief.tool.relativeMotion",
+        "title": "Debrief: Relative Motion Analysis",
+        "enablement": "debrief.tool.relative-motion.active"
+      },
+      {
+        "command": "debrief.tool.trackStats",
+        "title": "Debrief: Track Statistics",
+        "enablement": "debrief.tool.track-stats.active"
+      },
+      {
+        "command": "debrief.tool.distanceToPoint",
+        "title": "Debrief: Distance to Point",
+        "enablement": "debrief.tool.distance-to-point.active"
       }
     ],
     "keybindings": [
@@ -302,6 +338,11 @@
         {
           "command": "debrief.clearAllResults",
           "when": "view == debrief.layers && debrief.hasResultLayers"
+        },
+        {
+          "command": "debrief.toggleInactiveTools",
+          "when": "view == debrief.tools && debrief.calcAvailable",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -334,6 +375,11 @@
           "command": "debrief.changeTrackColor",
           "when": "view == debrief.layers && viewItem == track",
           "group": "2_style"
+        },
+        {
+          "command": "debrief.executeTool",
+          "when": "view == debrief.tools && viewItem == tool.active",
+          "group": "1_execute"
         }
       ],
       "commandPalette": [

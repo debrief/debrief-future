@@ -1,27 +1,39 @@
 /**
  * Tool Execution Commands - Execute and cancel analysis tools
+ *
+ * Feature: 038-context-tool-vscode
+ * - Uses ToolMatchAdapter to get selected feature IDs
+ * - Adds provenance metadata to result layers (FR-024)
+ * - Shows notifications for success/failure (FR-015)
  */
 
 import * as vscode from 'vscode';
 import type { CalcService } from '../services/calcService';
+import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { MapPanel } from '../webview/mapPanel';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 
-interface ExecuteToolArgs {
-  toolName: string;
-  params?: Record<string, unknown>;
-}
-
 /**
  * Create the execute tool command
+ *
+ * @param calcService - CalcService for executing tools
+ * @param toolMatchAdapter - ToolMatchAdapter for getting selection
+ * @param getMapPanel - Function to get current MapPanel
+ * @param layersTreeProvider - LayersTreeProvider for displaying results
  */
 export function createExecuteToolCommand(
   calcService: CalcService,
+  toolMatchAdapter: ToolMatchAdapter,
   getMapPanel: () => MapPanel | undefined,
   layersTreeProvider: LayersTreeProvider
-): (args: ExecuteToolArgs) => Promise<void> {
-  return async (args: ExecuteToolArgs) => {
-    if (!args?.toolName) {
+): (toolId: string) => Promise<void> {
+  return async (toolId: string) => {
+    // Handle both new format (toolId string) and legacy format (object with toolName)
+    const resolvedToolId = typeof toolId === 'object' && toolId !== null
+      ? ((toolId as Record<string, unknown>).toolName as string) || ((toolId as Record<string, unknown>).toolId as string)
+      : toolId;
+
+    if (!resolvedToolId) {
       return;
     }
 
@@ -31,25 +43,24 @@ export function createExecuteToolCommand(
       return;
     }
 
-    const tracks = panel.getTracks();
-    const locations = panel.getLocations();
+    // Get selected feature IDs from ToolMatchAdapter (Feature: 038)
+    const selectedFeatureIds = toolMatchAdapter.getSelectedFeatureIds();
 
-    // Get selected features
-    const selectedTrackIds = tracks.filter((t) => t.selected).map((t) => t.id);
-    const selectedLocationIds = locations
-      .filter((l) => l.selected)
-      .map((l) => l.id);
-
-    if (selectedTrackIds.length === 0 && selectedLocationIds.length === 0) {
-      void vscode.window.showWarningMessage('No tracks or locations selected');
+    if (selectedFeatureIds.length === 0) {
+      void vscode.window.showWarningMessage('No features selected');
       return;
     }
 
-    // Execute tool with progress
+    // Find tool name for display
+    const tools = toolMatchAdapter.getAllTools();
+    const tool = tools.find((t) => t.id === resolvedToolId);
+    const toolName = tool?.name ?? resolvedToolId;
+
+    // Execute tool with progress (FR-015)
     const result = await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
-        title: `Running ${args.toolName}...`,
+        title: `Running ${toolName}...`,
         cancellable: true,
       },
       async (_progress, token) => {
@@ -57,16 +68,10 @@ export function createExecuteToolCommand(
           calcService.cancelExecution();
         });
 
-        return calcService.executeTool(
-          {
-            toolName: args.toolName,
-            trackIds: selectedTrackIds,
-            locationIds: selectedLocationIds,
-            params: args.params,
-          },
-          tracks,
-          locations
-        );
+        return calcService.executeTool({
+          toolId: resolvedToolId,
+          featureIds: selectedFeatureIds,
+        });
       }
     );
 
@@ -77,12 +82,13 @@ export function createExecuteToolCommand(
       return;
     }
 
-    // Create result layer
+    // Create result layer with provenance (FR-024)
     const execution = calcService.getCurrentExecution();
     const layer = calcService.createResultLayer(
-      args.toolName,
+      resolvedToolId,
       execution?.id ?? `exec-${Date.now()}`,
-      result
+      result,
+      selectedFeatureIds
     );
 
     if (layer) {
@@ -92,6 +98,7 @@ export function createExecuteToolCommand(
       // Update layers panel
       layersTreeProvider.addResultLayer(layer);
 
+      // Success notification (FR-015)
       void vscode.window.showInformationMessage(
         `Analysis complete: ${layer.name}`
       );
@@ -107,5 +114,33 @@ export function createCancelToolExecutionCommand(
 ): (args: { executionId: string }) => void {
   return (_args: { executionId: string }) => {
     calcService.cancelExecution();
+  };
+}
+
+/**
+ * Create the show tool requirements command (FR-011)
+ *
+ * Shows why a tool is inactive in a notification.
+ */
+export function createShowToolRequirementsCommand(): (toolId: string, explanation: string) => void {
+  return (toolId: string, explanation: string) => {
+    void vscode.window.showInformationMessage(
+      `Tool "${toolId}" is inactive: ${explanation ?? 'Selection does not match requirements'}`
+    );
+  };
+}
+
+/**
+ * Create the toggle inactive tools command (FR-010)
+ */
+export function createToggleInactiveToolsCommand(
+  toolsTreeProvider: { toggleShowInactiveTools: () => void; getShowInactiveTools: () => boolean }
+): () => void {
+  return () => {
+    toolsTreeProvider.toggleShowInactiveTools();
+    const showInactive = toolsTreeProvider.getShowInactiveTools();
+    void vscode.window.showInformationMessage(
+      showInactive ? 'Showing inactive tools' : 'Hiding inactive tools'
+    );
   };
 }
