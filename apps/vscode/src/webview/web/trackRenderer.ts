@@ -4,6 +4,7 @@
 
 import * as L from 'leaflet';
 import type { Track } from '../messages';
+import { findNearestPointIndex, sliceTrackToTime } from './temporalUtils';
 
 // Default color palette
 const DEFAULT_COLORS = [
@@ -17,14 +18,29 @@ const DEFAULT_COLORS = [
   '#f781bf',
 ];
 
+// Highlight marker style
+const HIGHLIGHT_MARKER_OPTS: L.CircleMarkerOptions = {
+  radius: 6,
+  weight: 2,
+  opacity: 1,
+  fillOpacity: 0.9,
+};
+
 export class TrackRenderer {
   private map: L.Map;
   private trackLayers: Map<string, L.Polyline> = new Map();
   private labelLayers: Map<string, L.Marker> = new Map();
+  private highlightMarkers: Map<string, L.CircleMarker> = new Map();
   private tracks: Track[] = [];
   private selectedIds: Set<string> = new Set();
   private customColors: Record<string, string> = {};
   private colorIndex = 0;
+
+  // Temporal state (Feature: 039)
+  private cachedTimestamps: Map<string, number[]> = new Map();
+  private cachedFullLatLngs: Map<string, L.LatLng[]> = new Map();
+  private currentTime: number | null = null;
+  private displayMode: 'full' | 'trail' = 'full';
 
   constructor(map: L.Map) {
     this.map = map;
@@ -42,6 +58,11 @@ export class TrackRenderer {
     for (const track of tracks) {
       this.renderTrack(track);
     }
+
+    // If temporal state is active, apply it to the newly rendered tracks
+    if (this.currentTime !== null) {
+      this.applyTemporalState();
+    }
   }
 
   /**
@@ -54,9 +75,56 @@ export class TrackRenderer {
     for (const layer of this.labelLayers.values()) {
       this.map.removeLayer(layer);
     }
+    for (const marker of this.highlightMarkers.values()) {
+      this.map.removeLayer(marker);
+    }
     this.trackLayers.clear();
     this.labelLayers.clear();
+    this.highlightMarkers.clear();
+    this.cachedTimestamps.clear();
+    this.cachedFullLatLngs.clear();
     this.tracks = [];
+  }
+
+  /**
+   * Set current time for temporal track rendering (Feature: 039).
+   * Updates all tracks to show their state at the given time.
+   */
+  setCurrentTime(time: number): void {
+    this.currentTime = time;
+    this.applyTemporalState();
+  }
+
+  /**
+   * Set display mode for temporal track rendering (Feature: 039).
+   * 'full' = entire track + highlight marker; 'trail' = snail-trail to current time.
+   */
+  setDisplayMode(mode: 'full' | 'trail'): void {
+    this.displayMode = mode;
+    if (this.currentTime !== null) {
+      this.applyTemporalState();
+    }
+  }
+
+  /**
+   * Clear temporal state — restore static full-track rendering (Feature: 039).
+   */
+  clearTemporalState(): void {
+    this.currentTime = null;
+
+    // Remove all highlight markers
+    for (const marker of this.highlightMarkers.values()) {
+      this.map.removeLayer(marker);
+    }
+    this.highlightMarkers.clear();
+
+    // Restore full polylines
+    for (const [trackId, layer] of this.trackLayers) {
+      const fullLatLngs = this.cachedFullLatLngs.get(trackId);
+      if (fullLatLngs) {
+        layer.setLatLngs(fullLatLngs);
+      }
+    }
   }
 
   /**
@@ -77,6 +145,7 @@ export class TrackRenderer {
   setTrackVisibility(trackId: string, visible: boolean): void {
     const layer = this.trackLayers.get(trackId);
     const label = this.labelLayers.get(trackId);
+    const highlight = this.highlightMarkers.get(trackId);
 
     if (visible) {
       if (layer && !this.map.hasLayer(layer)) {
@@ -85,12 +154,18 @@ export class TrackRenderer {
       if (label && !this.map.hasLayer(label)) {
         this.map.addLayer(label);
       }
+      if (highlight && !this.map.hasLayer(highlight)) {
+        this.map.addLayer(highlight);
+      }
     } else {
       if (layer) {
         this.map.removeLayer(layer);
       }
       if (label) {
         this.map.removeLayer(label);
+      }
+      if (highlight) {
+        this.map.removeLayer(highlight);
       }
     }
 
@@ -110,6 +185,12 @@ export class TrackRenderer {
 
     if (layer) {
       layer.setStyle({ color });
+    }
+
+    // Update highlight marker color too
+    const highlight = this.highlightMarkers.get(trackId);
+    if (highlight) {
+      highlight.setStyle({ color, fillColor: color });
     }
 
     // Update track state
@@ -150,6 +231,17 @@ export class TrackRenderer {
     const latLngs = track.geometry.coordinates.map(
       (coord) => L.latLng(coord[1], coord[0])
     );
+
+    // Cache full coordinates for temporal restore
+    this.cachedFullLatLngs.set(track.id, latLngs);
+
+    // Cache parsed timestamps (ISO → epoch ms) for temporal algorithms
+    if (track.times && track.times.length > 0) {
+      this.cachedTimestamps.set(
+        track.id,
+        track.times.map((t) => new Date(t).getTime())
+      );
+    }
 
     // Get color
     const color = this.getTrackColor(track);
@@ -198,6 +290,76 @@ export class TrackRenderer {
 
     // Add label at start point
     this.addTrackLabel(track, latLngs);
+  }
+
+  /**
+   * Apply temporal state to all tracks (Feature: 039).
+   * Called when currentTime or displayMode changes.
+   */
+  private applyTemporalState(): void {
+    if (this.currentTime === null) return;
+
+    for (const track of this.tracks) {
+      if (!track.visible) continue;
+
+      const timestamps = this.cachedTimestamps.get(track.id);
+      const fullLatLngs = this.cachedFullLatLngs.get(track.id);
+      if (!timestamps || !fullLatLngs || timestamps.length === 0) continue;
+
+      const polyline = this.trackLayers.get(track.id);
+      if (!polyline) continue;
+
+      const color = this.getTrackColor(track);
+      const nearestIdx = findNearestPointIndex(timestamps, this.currentTime);
+      if (nearestIdx < 0) continue;
+
+      if (this.displayMode === 'trail') {
+        // Snail-trail: show start → currentTime
+        const coords = track.geometry.coordinates as [number, number][];
+        const sliced = sliceTrackToTime(coords, timestamps, this.currentTime);
+        if (sliced.length > 0) {
+          const trailLatLngs = sliced.map((c) => L.latLng(c[1], c[0]));
+          polyline.setLatLngs(trailLatLngs);
+        }
+        // Remove highlight marker in trail mode
+        this.removeHighlightMarker(track.id);
+      } else {
+        // Full mode: show entire track + highlight marker at current position
+        polyline.setLatLngs(fullLatLngs);
+        const pos = fullLatLngs[nearestIdx];
+        if (pos) {
+          this.updateHighlightMarker(track.id, pos, color);
+        }
+      }
+    }
+  }
+
+  private updateHighlightMarker(
+    trackId: string,
+    position: L.LatLng,
+    color: string
+  ): void {
+    let marker = this.highlightMarkers.get(trackId);
+    if (marker) {
+      marker.setLatLng(position);
+      marker.setStyle({ color, fillColor: color });
+    } else {
+      marker = L.circleMarker(position, {
+        ...HIGHLIGHT_MARKER_OPTS,
+        color,
+        fillColor: color,
+      });
+      marker.addTo(this.map);
+      this.highlightMarkers.set(trackId, marker);
+    }
+  }
+
+  private removeHighlightMarker(trackId: string): void {
+    const marker = this.highlightMarkers.get(trackId);
+    if (marker) {
+      this.map.removeLayer(marker);
+      this.highlightMarkers.delete(trackId);
+    }
   }
 
   private addTrackLabel(track: Track, latLngs: L.LatLng[]): void {

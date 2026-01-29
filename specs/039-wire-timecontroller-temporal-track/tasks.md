@@ -41,8 +41,8 @@
 
 **Purpose**: New file creation and scaffolding
 
-- [ ] T001 Create temporal utilities module `apps/vscode/src/webview/web/temporalUtils.ts`
-- [ ] T002 [P] Create temporal utilities test file `apps/vscode/tests/unit/temporalUtils.test.ts`
+- [x] T001 Create temporal utilities module `apps/vscode/src/webview/web/temporalUtils.ts`
+- [x] T002 [P] Create temporal utilities test file `apps/vscode/tests/unit/temporalUtils.test.ts`
 
 ---
 
@@ -52,15 +52,15 @@
 
 ### Tests (write first, must fail)
 
-- [ ] T003 [test] Write unit tests for `findNearestPointIndex` — empty array, single element, exact match, between elements, before/after range `apps/vscode/tests/unit/temporalUtils.test.ts`
-- [ ] T004 [P][test] Write unit tests for `sliceTrackToTime` — empty input, before start, at start, mid-track, at end, after end `apps/vscode/tests/unit/temporalUtils.test.ts`
+- [x] T003 [test] Write unit tests for `findNearestPointIndex` — empty array, single element, exact match, between elements, before/after range `apps/vscode/tests/unit/temporalUtils.test.ts`
+- [x] T004 [P][test] Write unit tests for `sliceTrackToTime` — empty input, before start, at start, mid-track, at end, after end `apps/vscode/tests/unit/temporalUtils.test.ts`
 
 ### Implementation
 
-- [ ] T005 Implement `findNearestPointIndex` binary search in `apps/vscode/src/webview/web/temporalUtils.ts`
-- [ ] T006 Implement `sliceTrackToTime` in `apps/vscode/src/webview/web/temporalUtils.ts`
-- [ ] T007 [P] Add `SetDisplayModeMessage` to `ExtensionToWebviewMessage` union `apps/vscode/src/webview/messages.ts`
-- [ ] T008 Verify tests pass for T003 and T004
+- [x] T005 Implement `findNearestPointIndex` binary search in `apps/vscode/src/webview/web/temporalUtils.ts`
+- [x] T006 Implement `sliceTrackToTime` in `apps/vscode/src/webview/web/temporalUtils.ts`
+- [x] T007 [P] Add `SetDisplayModeMessage` to `ExtensionToWebviewMessage` union `apps/vscode/src/webview/messages.ts`
+- [x] T008 Verify tests pass for T003 and T004
 
 **Checkpoint**: Temporal algorithms tested and message types defined
 
@@ -74,13 +74,13 @@
 
 ### Implementation
 
-- [ ] T009 Add cached timestamp state (`Map<string, number[]>`) to TrackRenderer — parse `Track.times` ISO strings to epoch ms on `renderTracks()` `apps/vscode/src/webview/web/trackRenderer.ts`
-- [ ] T010 Add `currentTime: number | null` and `displayMode: 'full' | 'trail'` state fields to TrackRenderer `apps/vscode/src/webview/web/trackRenderer.ts`
-- [ ] T011 Add highlight marker layer storage (`Map<string, L.CircleMarker>`) to TrackRenderer `apps/vscode/src/webview/web/trackRenderer.ts`
-- [ ] T012 Implement `setCurrentTime(time: number)` — for each track: compute nearest index, update polyline via `setLatLngs()`, update/create/remove highlight marker `apps/vscode/src/webview/web/trackRenderer.ts`
-- [ ] T013 Implement `setDisplayMode(mode: 'full' | 'trail')` — store mode, re-apply temporal rendering if currentTime is set `apps/vscode/src/webview/web/trackRenderer.ts`
-- [ ] T014 Implement `clearTemporalState()` — reset to static full-track polylines, remove all highlight markers `apps/vscode/src/webview/web/trackRenderer.ts`
-- [ ] T015 Update `clear()` to also clean up highlight markers and cached timestamps `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T009 Add cached timestamp state (`Map<string, number[]>`) to TrackRenderer — parse `Track.times` ISO strings to epoch ms on `renderTracks()` `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T010 Add `currentTime: number | null` and `displayMode: 'full' | 'trail'` state fields to TrackRenderer `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T011 Add highlight marker layer storage (`Map<string, L.CircleMarker>`) to TrackRenderer `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T012 Implement `setCurrentTime(time: number)` — for each track: compute nearest index, update polyline via `setLatLngs()`, update/create/remove highlight marker `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T013 Implement `setDisplayMode(mode: 'full' | 'trail')` — store mode, re-apply temporal rendering if currentTime is set `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T014 Implement `clearTemporalState()` — reset to static full-track polylines, remove all highlight markers `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T015 Update `clear()` to also clean up highlight markers and cached timestamps `apps/vscode/src/webview/web/trackRenderer.ts`
 
 **Checkpoint**: TrackRenderer can render temporal tracks — unit algorithms tested, rendering logic complete
 
@@ -94,11 +94,11 @@
 
 ### Implementation
 
-- [ ] T016 Implement `handleSetCurrentTime` in map.ts — call `trackRenderer.setCurrentTime(message.time)` `apps/vscode/src/webview/web/map.ts`
-- [ ] T017 Implement `handleSetDisplayMode` in map.ts — call `trackRenderer.setDisplayMode(message.displayMode)` `apps/vscode/src/webview/web/map.ts`
-- [ ] T018 Add `'setDisplayMode'` case to message handler switch in map.ts `apps/vscode/src/webview/web/map.ts`
-- [ ] T019 Extend `subscribeToTemporal` callback in MapPanel to forward `displayMode` changes (map `'normal'→'full'`, `'snailTrail'→'trail'`) `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T020 Verify `timeRangeView.ts` already persists displayMode to SessionStore (read-only check — should need no changes) `apps/vscode/src/views/timeRangeView.ts`
+- [x] T016 Implement `handleSetCurrentTime` in map.ts — call `trackRenderer.setCurrentTime(message.time)` `apps/vscode/src/webview/web/map.ts`
+- [x] T017 Implement `handleSetDisplayMode` in map.ts — call `trackRenderer.setDisplayMode(message.displayMode)` `apps/vscode/src/webview/web/map.ts`
+- [x] T018 Add `'setDisplayMode'` case to message handler switch in map.ts `apps/vscode/src/webview/web/map.ts`
+- [x] T019 Extend `subscribeToTemporal` callback in MapPanel to forward `displayMode` changes (map `'normal'→'full'`, `'snailTrail'→'trail'`) `apps/vscode/src/webview/mapPanel.ts`
+- [x] T020 Verify `timeRangeView.ts` already persists displayMode to SessionStore (read-only check — should need no changes) `apps/vscode/src/views/timeRangeView.ts`
 
 **Checkpoint**: Full pipeline wired — TimeController → SessionStore → MapPanel → webview → TrackRenderer
 
@@ -110,19 +110,19 @@
 
 ### Verification
 
-- [ ] T021 Run existing VS Code extension tests to confirm no regressions
-- [ ] T022 Run temporalUtils unit tests to confirm all pass
-- [ ] T023 Verify tracks render correctly when no temporal state is active (currentTime is null — static mode)
+- [x] T021 Run existing VS Code extension tests to confirm no regressions
+- [x] T022 Run temporalUtils unit tests to confirm all pass
+- [x] T023 Verify tracks render correctly when no temporal state is active (currentTime is null — static mode)
 
 ### Evidence Collection
 
-- [ ] T024 Capture test summary in `specs/039-wire-timecontroller-temporal-track/evidence/test-summary.md`
-- [ ] T025 Create usage demonstration in `specs/039-wire-timecontroller-temporal-track/evidence/usage-example.md`
+- [x] T024 Capture test summary in `specs/039-wire-timecontroller-temporal-track/evidence/test-summary.md`
+- [x] T025 Create usage demonstration in `specs/039-wire-timecontroller-temporal-track/evidence/usage-example.md`
 
 ### Media Content
 
-- [ ] T026 Create shipped blog post in `specs/039-wire-timecontroller-temporal-track/media/shipped-post.md`
-- [ ] T027 [P] Create LinkedIn shipped summary in `specs/039-wire-timecontroller-temporal-track/media/linkedin-shipped.md`
+- [x] T026 Create shipped blog post in `specs/039-wire-timecontroller-temporal-track/media/shipped-post.md`
+- [x] T027 [P] Create LinkedIn shipped summary in `specs/039-wire-timecontroller-temporal-track/media/linkedin-shipped.md`
 
 ### PR Creation
 

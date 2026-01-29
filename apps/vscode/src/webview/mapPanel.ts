@@ -528,7 +528,7 @@ export class MapPanel {
         });
       });
 
-      // Subscribe to temporal (time) changes
+      // Subscribe to temporal (time + displayMode) changes (Feature: 039)
       this.temporalUnsubscribe = subscribeToTemporal(session, (temporal) => {
         if (temporal.currentTime) {
           this.postMessage({
@@ -536,6 +536,12 @@ export class MapPanel {
             time: temporal.currentTime.epoch,
           });
         }
+        // Forward display mode to map webview
+        const webviewMode = temporal.displayMode === 'snailTrail' ? 'trail' : 'full';
+        this.postMessage({
+          type: 'setDisplayMode',
+          displayMode: webviewMode,
+        });
       });
     }
   }
