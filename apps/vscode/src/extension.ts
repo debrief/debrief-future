@@ -36,7 +36,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // Initialize services
   const configService = new ConfigService();
   const stacService = new StacService();
-  const calcService = new CalcService(context);
+  const calcService = new CalcService(context, () => mapPanel);
   const recentPlotsService = new RecentPlotsService(context);
   const ioService = new IoService(context.extensionPath);
   const sessionManager = new SessionManager();

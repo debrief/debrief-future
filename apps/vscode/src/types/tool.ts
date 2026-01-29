@@ -357,8 +357,8 @@ export function createDefaultResultStyle(toolName: string): LayerStyle {
   const hue = Math.abs(hash) % 360;
 
   return {
-    strokeColor: `hsl(${hue}, 70%, 50%)`,
-    strokeWidth: 2,
+    strokeColor: '#ff0000',
+    strokeWidth: 4,
     dashArray: [8, 4],
     fillColor: `hsl(${hue}, 70%, 50%)`,
     fillOpacity: 0.3,
