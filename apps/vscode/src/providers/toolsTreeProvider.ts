@@ -14,7 +14,7 @@
 import * as vscode from 'vscode';
 import type { CalcService } from '../services/calcService';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
-import type { Tool, MatchResult } from '../types/tool';
+import type { Tool } from '../types/tool';
 import { getInactiveReason } from '../types/tool';
 
 /**
@@ -130,6 +130,7 @@ export class ToolsTreeProvider implements vscode.TreeDataProvider<vscode.TreeIte
     return element;
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async getChildren(element?: vscode.TreeItem): Promise<vscode.TreeItem[]> {
     // No nested children
     if (element) {
