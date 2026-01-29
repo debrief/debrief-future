@@ -122,6 +122,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 ## Active Technologies
 - TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store) (039-wire-timecontroller-temporal-track)
 - N/A (in-memory temporal state only) (039-wire-timecontroller-temporal-track)
+- Python 3.11 + None (stdlib only — json, pathlib, shutil) (040-stac-store-organization)
+- Local filesystem (STAC 1.0.0 catalogs) (040-stac-store-organization)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
