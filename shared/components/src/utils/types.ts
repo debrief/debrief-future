@@ -26,6 +26,9 @@ export type {
   TimestampedPosition,
 };
 
+// Re-export DisplayMode from TimeController for use by MapView temporal rendering
+export type { DisplayMode } from '../TimeController/types';
+
 /**
  * Union type for all Debrief feature types.
  * Components should accept either type interchangeably.

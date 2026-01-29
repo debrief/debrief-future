@@ -427,6 +427,10 @@ function handleMessage(message: ExtensionToWebviewMessage): void {
       handleSetCurrentTime(message);
       break;
 
+    case 'setDisplayMode':
+      handleSetDisplayMode(message);
+      break;
+
     case 'importProgress':
       handleImportProgress(message);
       break;
@@ -671,14 +675,23 @@ function handleSetViewport(
 }
 
 /**
- * Handle setCurrentTime message from extension (for undo/redo).
- * TODO: Implement current time visualization when playhead feature is added.
+ * Handle setCurrentTime message from extension (Feature: 039).
+ * Updates track rendering to reflect the current temporal position.
  */
 function handleSetCurrentTime(
-  _message: Extract<ExtensionToWebviewMessage, { type: 'setCurrentTime' }>
+  message: Extract<ExtensionToWebviewMessage, { type: 'setCurrentTime' }>
 ): void {
-  // Current time (playhead) is not yet visualized in the map
-  // This will be implemented when the time controller is integrated
+  trackRenderer?.setCurrentTime(message.time);
+}
+
+/**
+ * Handle setDisplayMode message from extension (Feature: 039).
+ * Switches between full-track and snail-trail rendering.
+ */
+function handleSetDisplayMode(
+  message: Extract<ExtensionToWebviewMessage, { type: 'setDisplayMode' }>
+): void {
+  trackRenderer?.setDisplayMode(message.displayMode);
 }
 
 // Listen for messages from extension

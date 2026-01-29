@@ -1,14 +1,15 @@
 /**
- * SpeedSelector component - dropdown for playback speed selection.
+ * SpeedSelector component - up/down spinner for playback speed selection.
  */
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import type { SpeedSelectorProps, PlaybackSpeed } from './types';
 
-const SPEED_OPTIONS: PlaybackSpeed[] = [1, 2, 4, 8];
+const SPEED_OPTIONS: PlaybackSpeed[] = [1, 2, 4, 8, 16, 32, 64];
 
 /**
- * Dropdown selector for playback speed (1x, 2x, 4x, 8x).
+ * Spinner selector for playback speed (1x, 2x, 4x, 8x).
+ * Up/down arrows cycle through preset values.
  *
  * @example
  * ```tsx
@@ -24,114 +25,70 @@ export function SpeedSelector({
   disabled = false,
   className,
 }: SpeedSelectorProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const currentIndex = SPEED_OPTIONS.indexOf(speed);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
+  const handleUp = useCallback(() => {
+    const nextIndex = Math.min(currentIndex + 1, SPEED_OPTIONS.length - 1);
+    const nextSpeed = SPEED_OPTIONS[nextIndex];
+    if (nextSpeed !== undefined) onSpeedChange(nextSpeed);
+  }, [currentIndex, onSpeedChange]);
 
-    if (isOpen) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [isOpen]);
-
-  // Close on escape
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
-
-  const handleToggle = useCallback(() => {
-    if (!disabled) {
-      setIsOpen((prev) => !prev);
-    }
-  }, [disabled]);
-
-  const handleSelect = useCallback(
-    (selectedSpeed: PlaybackSpeed) => {
-      onSpeedChange(selectedSpeed);
-      setIsOpen(false);
-    },
-    [onSpeedChange]
-  );
+  const handleDown = useCallback(() => {
+    const prevIndex = Math.max(currentIndex - 1, 0);
+    const prevSpeed = SPEED_OPTIONS[prevIndex];
+    if (prevSpeed !== undefined) onSpeedChange(prevSpeed);
+  }, [currentIndex, onSpeedChange]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (disabled) return;
-
-      if (e.key === 'Enter' || e.key === ' ') {
+      if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setIsOpen((prev) => !prev);
-      } else if (e.key === 'ArrowDown' && isOpen) {
+        handleUp();
+      } else if (e.key === 'ArrowDown') {
         e.preventDefault();
-        const currentIndex = SPEED_OPTIONS.indexOf(speed);
-        const nextIndex = Math.min(currentIndex + 1, SPEED_OPTIONS.length - 1);
-        const nextSpeed = SPEED_OPTIONS[nextIndex];
-        if (nextSpeed !== undefined) onSpeedChange(nextSpeed);
-      } else if (e.key === 'ArrowUp' && isOpen) {
-        e.preventDefault();
-        const currentIndex = SPEED_OPTIONS.indexOf(speed);
-        const prevIndex = Math.max(currentIndex - 1, 0);
-        const prevSpeed = SPEED_OPTIONS[prevIndex];
-        if (prevSpeed !== undefined) onSpeedChange(prevSpeed);
+        handleDown();
       }
     },
-    [disabled, isOpen, speed, onSpeedChange]
+    [disabled, handleUp, handleDown]
   );
 
   return (
     <div
-      ref={containerRef}
-      className={`debrief-speed-selector ${isOpen ? 'debrief-speed-selector--open' : ''} ${disabled ? 'debrief-speed-selector--disabled' : ''} ${className ?? ''}`}
+      className={`debrief-speed-selector ${disabled ? 'debrief-speed-selector--disabled' : ''} ${className ?? ''}`}
+      role="spinbutton"
+      aria-valuenow={speed}
+      aria-valuemin={SPEED_OPTIONS[0]}
+      aria-valuemax={SPEED_OPTIONS[SPEED_OPTIONS.length - 1]}
+      aria-label={`Playback speed: ${speed}x`}
+      tabIndex={disabled ? -1 : 0}
+      onKeyDown={handleKeyDown}
     >
       <button
         type="button"
-        className="debrief-speed-selector__button"
-        onClick={handleToggle}
-        onKeyDown={handleKeyDown}
-        disabled={disabled}
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        aria-label={`Playback speed: ${speed}x`}
+        className="debrief-speed-selector__step-btn debrief-speed-selector__step-btn--down"
+        onClick={handleDown}
+        disabled={disabled || currentIndex === 0}
+        aria-label="Decrease speed"
+        tabIndex={-1}
       >
-        <span className="debrief-speed-selector__value">{speed}x</span>
-        <svg
-          className="debrief-speed-selector__arrow"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          aria-hidden="true"
-        >
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M7 14l5-5 5 5z" />
+        </svg>
+      </button>
+      <span className="debrief-speed-selector__value">{speed}x</span>
+      <button
+        type="button"
+        className="debrief-speed-selector__step-btn debrief-speed-selector__step-btn--up"
+        onClick={handleUp}
+        disabled={disabled || currentIndex === SPEED_OPTIONS.length - 1}
+        aria-label="Increase speed"
+        tabIndex={-1}
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="M7 10l5 5 5-5z" />
         </svg>
       </button>
-
-      {isOpen && (
-        <ul className="debrief-speed-selector__dropdown" role="listbox">
-          {SPEED_OPTIONS.map((option) => (
-            <li
-              key={option}
-              className={`debrief-speed-selector__option ${option === speed ? 'debrief-speed-selector__option--selected' : ''}`}
-              role="option"
-              aria-selected={option === speed}
-              onClick={() => handleSelect(option)}
-            >
-              {option}x
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }
