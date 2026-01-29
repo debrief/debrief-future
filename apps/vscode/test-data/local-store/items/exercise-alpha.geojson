@@ -3,7 +3,6 @@
   "features": [
     {
       "type": "Feature",
-      "id": "track-hms-defender",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -25,22 +24,31 @@
         ]
       },
       "properties": {
-        "kind": "TRACK",
-        "platform_id": "hms-defender",
-        "platform_name": "HMS Defender",
-        "track_type": "OWNSHIP",
-        "start_time": "2024-01-15T09:30:00Z",
-        "end_time": "2024-01-15T14:00:00Z",
-        "positions": [],
-        "style": {
-          "line": { "color": "#2196F3", "weight": 2, "opacity": 1 },
-          "point": { "shape": "circle", "radius": 4, "fill_color": "#2196F3", "color": "#2196F3" }
-        }
+        "id": "track-hms-defender",
+        "name": "HMS Defender",
+        "platformType": "OWNSHIP",
+        "color": "#2196F3",
+        "times": [
+          "2024-01-15T09:30:00Z",
+          "2024-01-15T09:50:00Z",
+          "2024-01-15T10:10:00Z",
+          "2024-01-15T10:30:00Z",
+          "2024-01-15T10:50:00Z",
+          "2024-01-15T11:10:00Z",
+          "2024-01-15T11:30:00Z",
+          "2024-01-15T11:50:00Z",
+          "2024-01-15T12:10:00Z",
+          "2024-01-15T12:30:00Z",
+          "2024-01-15T12:50:00Z",
+          "2024-01-15T13:10:00Z",
+          "2024-01-15T13:30:00Z",
+          "2024-01-15T13:50:00Z",
+          "2024-01-15T14:00:00Z"
+        ]
       }
     },
     {
       "type": "Feature",
-      "id": "track-uss-freedom",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -62,60 +70,57 @@
         ]
       },
       "properties": {
-        "kind": "TRACK",
-        "platform_id": "uss-freedom",
-        "platform_name": "USS Freedom",
-        "track_type": "CONTACT",
-        "start_time": "2024-01-15T09:30:00Z",
-        "end_time": "2024-01-15T14:00:00Z",
-        "positions": [],
-        "style": {
-          "line": { "color": "#4CAF50", "weight": 2, "opacity": 1 },
-          "point": { "shape": "circle", "radius": 4, "fill_color": "#4CAF50", "color": "#4CAF50" }
-        }
+        "id": "track-uss-freedom",
+        "name": "USS Freedom",
+        "platformType": "CONTACT",
+        "color": "#4CAF50",
+        "times": [
+          "2024-01-15T09:30:00Z",
+          "2024-01-15T09:50:00Z",
+          "2024-01-15T10:10:00Z",
+          "2024-01-15T10:30:00Z",
+          "2024-01-15T10:50:00Z",
+          "2024-01-15T11:10:00Z",
+          "2024-01-15T11:30:00Z",
+          "2024-01-15T11:50:00Z",
+          "2024-01-15T12:10:00Z",
+          "2024-01-15T12:30:00Z",
+          "2024-01-15T12:50:00Z",
+          "2024-01-15T13:10:00Z",
+          "2024-01-15T13:30:00Z",
+          "2024-01-15T13:50:00Z",
+          "2024-01-15T14:00:00Z"
+        ]
       }
     },
     {
       "type": "Feature",
-      "id": "loc-alpha-point",
       "geometry": {
         "type": "Point",
         "coordinates": [-4.1189, 50.3912]
       },
       "properties": {
-        "kind": "POINT",
+        "id": "loc-alpha-point",
         "name": "Alpha Point",
-        "location_type": "WAYPOINT",
-        "style": {
-          "shape": "circle",
-          "radius": 6,
-          "fill_color": "#FF9800",
-          "color": "#FF9800"
-        }
+        "kind": "LOCATION",
+        "locationType": "Waypoint"
       }
     },
     {
       "type": "Feature",
-      "id": "loc-bravo-datum",
       "geometry": {
         "type": "Point",
         "coordinates": [-4.1350, 50.4000]
       },
       "properties": {
-        "kind": "POINT",
+        "id": "loc-bravo-datum",
         "name": "Bravo Datum",
-        "location_type": "REFERENCE",
-        "style": {
-          "shape": "square",
-          "radius": 6,
-          "fill_color": "#9C27B0",
-          "color": "#9C27B0"
-        }
+        "kind": "LOCATION",
+        "locationType": "Reference"
       }
     },
     {
       "type": "Feature",
-      "id": "circle-exclusion-zone",
       "geometry": {
         "type": "Polygon",
         "coordinates": [[
@@ -144,7 +149,6 @@
     },
     {
       "type": "Feature",
-      "id": "rect-exercise-area",
       "geometry": {
         "type": "Polygon",
         "coordinates": [[
@@ -170,7 +174,6 @@
     },
     {
       "type": "Feature",
-      "id": "line-boundary",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -191,7 +194,6 @@
     },
     {
       "type": "Feature",
-      "id": "vector-wind",
       "geometry": {
         "type": "LineString",
         "coordinates": [
