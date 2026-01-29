@@ -3,8 +3,6 @@
 import json
 from pathlib import Path
 
-import pytest
-
 from debrief_stac.migrate import migrate_flat_store
 
 
@@ -124,8 +122,8 @@ class TestMigrateFlatStore:
         migrate_flat_store(store)
 
         catalog = json.loads((store / "catalog.json").read_text())
-        item_links = [l for l in catalog["links"] if l["rel"] == "item"]
-        hrefs = sorted(l["href"] for l in item_links)
+        item_links = [link for link in catalog["links"] if link["rel"] == "item"]
+        hrefs = sorted(link["href"] for link in item_links)
         assert hrefs == ["./exercise-alpha/item.json", "./training-run-1/item.json"]
 
     def test_item_self_link_updated(self, tmp_path: Path) -> None:
@@ -136,7 +134,7 @@ class TestMigrateFlatStore:
         migrate_flat_store(store)
 
         item = json.loads((store / "exercise-alpha" / "item.json").read_text())
-        self_link = next(l for l in item["links"] if l["rel"] == "self")
+        self_link = next(link for link in item["links"] if link["rel"] == "self")
         assert self_link["href"] == "./item.json"
 
     def test_item_parent_root_links_correct(self, tmp_path: Path) -> None:
@@ -147,8 +145,8 @@ class TestMigrateFlatStore:
         migrate_flat_store(store)
 
         item = json.loads((store / "exercise-alpha" / "item.json").read_text())
-        root_link = next(l for l in item["links"] if l["rel"] == "root")
-        parent_link = next(l for l in item["links"] if l["rel"] == "parent")
+        root_link = next(link for link in item["links"] if link["rel"] == "root")
+        parent_link = next(link for link in item["links"] if link["rel"] == "parent")
         assert root_link["href"] == "../catalog.json"
         assert parent_link["href"] == "../catalog.json"
 
