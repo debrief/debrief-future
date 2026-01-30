@@ -125,6 +125,7 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
+| 041 | Feature | [Add STAC catalog overview panel with map and timeline](docs/ideas/041-stac-catalog-overview-panel.md) | 5 | 5 | 3 | 13 | High | approved |
 | 040 | Enhancement | [Reorganize STAC store to per-item folder structure](specs/040-stac-store-organization/spec.md) | 4 | 3 | 4 | 11 | Medium | specified |
 | 039 | Bug | [Wire TimeController to TemporalTrackLayer in VS Code extension](specs/039-wire-timecontroller-temporal-track/spec.md) | 5 | 5 | 4 | 14 | Medium | specified |
 | 028 | Tech Debt | [Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md) | 4 | 2 | 5 | 11 | Low | implementing |
