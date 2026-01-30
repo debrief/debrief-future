@@ -130,6 +130,7 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Local filesystem STAC catalogs (read-only) (042-stac-catalog-overview-panel)
 - TypeScript 5.x (VS Code extension) + VS Code extension API, debrief-io (REP parser), stacService (043-load-rep-new-plot)
 - Local filesystem STAC catalogs (read-write) (043-load-rep-new-plot)
+- TypeScript 5.x (VS Code extension) + VS Code extension API, existing `stacService`, existing `ioService`, Node.js `fs/promises`, `crypto.randomUUID()` (043-load-rep-new-plot)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
