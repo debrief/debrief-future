@@ -39,7 +39,7 @@
 
 **Purpose**: Prepare output locations
 
-- [ ] T001 Create docs directory if needed and evidence directory `specs/032-storybook-vscode-theming/evidence/`
+- [x] T001 Create docs directory if needed and evidence directory `specs/032-storybook-vscode-theming/evidence/`
 
 ---
 
@@ -47,13 +47,13 @@
 
 **Purpose**: Extract accurate data from all theming source files before writing documentation
 
-- [ ] T002 Read and extract all tokens from `shared/components/src/styles/tokens.css`
-- [ ] T003 [P] Read and extract VS Code variable map from `shared/components/src/ThemeProvider/vsCodeAdapter.ts`
-- [ ] T004 [P] Read ThemeProvider implementation from `shared/components/src/ThemeProvider/ThemeProvider.tsx`
-- [ ] T005 [P] Read ThemeContext types from `shared/components/src/ThemeProvider/ThemeContext.ts`
-- [ ] T006 [P] Read Storybook preview config from `shared/components/.storybook/preview.tsx`
-- [ ] T007 [P] Read context decorators from `shared/components/.storybook/decorators/ContextDecorator.tsx`
-- [ ] T008 [P] Read Storybook manager config from `shared/components/.storybook/manager.ts`
+- [x] T002 Read and extract all tokens from `shared/components/src/styles/tokens.css`
+- [x] T003 [P] Read and extract VS Code variable map from `shared/components/src/ThemeProvider/vsCodeAdapter.ts`
+- [x] T004 [P] Read ThemeProvider implementation from `shared/components/src/ThemeProvider/ThemeProvider.tsx`
+- [x] T005 [P] Read ThemeContext types from `shared/components/src/ThemeProvider/ThemeContext.ts`
+- [x] T006 [P] Read Storybook preview config from `shared/components/.storybook/preview.tsx`
+- [x] T007 [P] Read context decorators from `shared/components/.storybook/decorators/ContextDecorator.tsx`
+- [x] T008 [P] Read Storybook manager config from `shared/components/.storybook/manager.ts`
 
 **Checkpoint**: All source data extracted — documentation writing can begin
 
@@ -67,13 +67,13 @@
 
 ### Implementation
 
-- [ ] T009 Write Section 1: Overview (three-layer architecture) `docs/storybook-vscode-theming.md`
-- [ ] T010 Write Section 2: Token Reference table (all color tokens with light/dark values) `docs/storybook-vscode-theming.md`
-- [ ] T011 Write Section 3: VS Code Variable Mapping table (all 20 entries) `docs/storybook-vscode-theming.md`
-- [ ] T012 Write Section 4: Storybook Theme Toolbar `docs/storybook-vscode-theming.md`
-- [ ] T013 Write Section 5: Context Decorators `docs/storybook-vscode-theming.md`
-- [ ] T014 Write Section 6: How-To Add a New Themed Component `docs/storybook-vscode-theming.md`
-- [ ] T015 Write Section 7: File Reference table `docs/storybook-vscode-theming.md`
+- [x] T009 Write Section 1: Overview (three-layer architecture) `docs/storybook-vscode-theming.md`
+- [x] T010 Write Section 2: Token Reference table (all color tokens with light/dark values) `docs/storybook-vscode-theming.md`
+- [x] T011 Write Section 3: VS Code Variable Mapping table (all 20 entries) `docs/storybook-vscode-theming.md`
+- [x] T012 Write Section 4: Storybook Theme Toolbar `docs/storybook-vscode-theming.md`
+- [x] T013 Write Section 5: Context Decorators `docs/storybook-vscode-theming.md`
+- [x] T014 Write Section 6: How-To Add a New Themed Component `docs/storybook-vscode-theming.md`
+- [x] T015 Write Section 7: File Reference table `docs/storybook-vscode-theming.md`
 
 **Checkpoint**: Documentation file complete
 
@@ -85,7 +85,7 @@
 
 **Independent Test**: Grep `CLAUDE.md` for `storybook-vscode-theming`
 
-- [ ] T016 Add theming doc reference to Key Documents section `CLAUDE.md`
+- [x] T016 Add theming doc reference to Key Documents section `CLAUDE.md`
 
 **Checkpoint**: Both deliverables complete
 
@@ -95,15 +95,15 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T017 Create evidence directory `specs/032-storybook-vscode-theming/evidence/`
-- [ ] T018 Verify token table completeness against `tokens.css` and capture results `specs/032-storybook-vscode-theming/evidence/test-summary.md`
-- [ ] T019 [P] Verify mapping table completeness against `vsCodeAdapter.ts` `specs/032-storybook-vscode-theming/evidence/test-summary.md`
-- [ ] T020 Create usage example showing a developer following the guide `specs/032-storybook-vscode-theming/evidence/usage-example.md`
+- [x] T017 Create evidence directory `specs/032-storybook-vscode-theming/evidence/`
+- [x] T018 Verify token table completeness against `tokens.css` and capture results `specs/032-storybook-vscode-theming/evidence/test-summary.md`
+- [x] T019 [P] Verify mapping table completeness against `vsCodeAdapter.ts` `specs/032-storybook-vscode-theming/evidence/test-summary.md`
+- [x] T020 Create usage example showing a developer following the guide `specs/032-storybook-vscode-theming/evidence/usage-example.md`
 
 ### Media Content
 
-- [ ] T021 Create shipped blog post `specs/032-storybook-vscode-theming/media/shipped-post.md`
-- [ ] T022 [P] Create LinkedIn shipped summary `specs/032-storybook-vscode-theming/media/linkedin-shipped.md`
+- [x] T021 Create shipped blog post `specs/032-storybook-vscode-theming/media/shipped-post.md`
+- [x] T022 [P] Create LinkedIn shipped summary `specs/032-storybook-vscode-theming/media/linkedin-shipped.md`
 
 ### PR Creation
 

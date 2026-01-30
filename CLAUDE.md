@@ -80,6 +80,7 @@ debrief/
 - `ARCHITECTURE.md` — technical design decisions
 - `VISION.md` — strategic context
 - `docs/tracer-delivery-plan.md` — implementation roadmap
+- `docs/storybook-vscode-theming.md` — Storybook VS Code theming guide
 
 ## Schema Test Strategy
 
