@@ -124,6 +124,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - N/A (in-memory temporal state only) (039-wire-timecontroller-temporal-track)
 - Python 3.11 + None (stdlib only — json, pathlib, shutil) (040-stac-store-organization)
 - Local filesystem (STAC 1.0.0 catalogs) (040-stac-store-organization)
+- Python 3.11 (debrief-stac service), TypeScript 5.x (VS Code extension) + pystac concepts (manual STAC JSON), MCP SDK, VS Code extension API (001-save-calc-results-stac)
+- Local filesystem STAC catalog (JSON + GeoJSON files) (001-save-calc-results-stac)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
