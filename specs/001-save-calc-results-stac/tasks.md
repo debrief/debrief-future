@@ -91,25 +91,26 @@
 - [ ] T021 [US1] Implement saveResult command handler `apps/vscode/src/commands/saveResult.ts`
 - [ ] T022 [US1] Register debrief.saveResult command in extension activation `apps/vscode/src/extension.ts`
 - [ ] T023 [US1] Add command and context menu contribution to package.json `apps/vscode/package.json`
-- [ ] T024 [US1] Update LayersTreeProvider to show saved indicator on result items `apps/vscode/src/providers/layersTreeProvider.ts`
-
 **Checkpoint**: User can save a result to STAC via context menu. Item has correct provenance.
 
 ---
 
-## Phase 4: User Story 2 — Reopen a Saved Result (Priority: P2)
+## Phase 4: User Story 2 — Browse and Open Saved Results (Priority: P2)
 
-**Goal**: Saved results appear in catalog listing and can be opened/rendered on the map
+**Goal**: Saved results appear in STAC Stores panel under parent items, Layers panel shows file icon for persisted results, double-click opens artifact
 
-**Independent Test**: Save a result, close and reopen, verify it appears in list and renders correctly.
+**Independent Test**: Save a result, verify it appears in STAC Stores tree under the correct parent, verify file icon on result layer, double-click opens artifact in editor.
 
 ### Implementation for User Story 2
 
 - [ ] T025 [US2] Ensure list_plots includes result items (verify no filtering by kind) `services/stac/src/debrief_stac/catalog.py`
-- [ ] T026 [US2] Handle debrief:kind=calc-result in loadPlotData to apply result styling `apps/vscode/src/services/stacService.ts`
-- [ ] T027 [US2] Apply result-specific styling (dashed lines, distinct colours) when rendering saved results `apps/vscode/src/webview/web/map.ts`
+- [ ] T026 [US2] Show saved results as child nodes under parent STAC Item in STAC Stores tree `apps/vscode/src/providers/stacStoresProvider.ts`
+- [ ] T027 [US2] Handle debrief:kind=calc-result in loadPlotData to apply result styling `apps/vscode/src/services/stacService.ts`
+- [ ] T028 [US2] Apply result-specific styling (dashed lines, distinct colours) when rendering saved results `apps/vscode/src/webview/web/map.ts`
+- [ ] T029 [US2] Show file icon on persisted result layers in LayersTreeProvider `apps/vscode/src/providers/layersTreeProvider.ts`
+- [ ] T030 [US2] Add double-click handler on result layers to open saved artifact in editor `apps/vscode/src/providers/layersTreeProvider.ts`
 
-**Checkpoint**: Saved results round-trip through the catalog and display correctly.
+**Checkpoint**: Saved results visible in STAC Stores tree, file icon on persisted layers, double-click opens artifact.
 
 ---
 
@@ -121,8 +122,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T028 [US3] Check savedItemId before calling MCP in saveResult command `apps/vscode/src/commands/saveResult.ts`
-- [ ] T029 [US3] Handle already_exists response from MCP tool with user notification `apps/vscode/src/commands/saveResult.ts`
+- [ ] T031 [US3] Check savedItemId before calling MCP in saveResult command `apps/vscode/src/commands/saveResult.ts`
+- [ ] T032 [US3] Handle already_exists response from MCP tool with user notification `apps/vscode/src/commands/saveResult.ts`
 
 **Checkpoint**: Double-saving shows "already saved" notification instead of creating duplicates.
 
@@ -132,22 +133,22 @@
 
 ### Evidence Collection
 
-- [ ] T030 Create evidence directory `specs/001-save-calc-results-stac/evidence/`
-- [ ] T031 Capture test results in `specs/001-save-calc-results-stac/evidence/test-summary.md`
-- [ ] T032 Create usage demonstration in `specs/001-save-calc-results-stac/evidence/usage-example.md`
-- [ ] T033 [P] Capture sample result STAC Item in `specs/001-save-calc-results-stac/evidence/sample-result-item.json`
-- [ ] T034 [P] Capture sample result GeoJSON in `specs/001-save-calc-results-stac/evidence/sample-features.geojson`
+- [ ] T033 Create evidence directory `specs/001-save-calc-results-stac/evidence/`
+- [ ] T034 Capture test results in `specs/001-save-calc-results-stac/evidence/test-summary.md`
+- [ ] T035 Create usage demonstration in `specs/001-save-calc-results-stac/evidence/usage-example.md`
+- [ ] T036 [P] Capture sample result STAC Item in `specs/001-save-calc-results-stac/evidence/sample-result-item.json`
+- [ ] T037 [P] Capture sample result GeoJSON in `specs/001-save-calc-results-stac/evidence/sample-features.geojson`
 
 ### Media Content
 
-- [ ] T035 Create shipped blog post in `specs/001-save-calc-results-stac/media/shipped-post.md`
-- [ ] T036 [P] Create LinkedIn shipped summary in `specs/001-save-calc-results-stac/media/linkedin-shipped.md`
+- [ ] T038 Create shipped blog post in `specs/001-save-calc-results-stac/media/shipped-post.md`
+- [ ] T039 [P] Create LinkedIn shipped summary in `specs/001-save-calc-results-stac/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T037 Create PR and publish blog: run /speckit.pr
+- [ ] T040 Create PR and publish blog: run /speckit.pr
 
-**Task T037 must run last. It depends on all evidence and media tasks being complete.**
+**Task T040 must run last. It depends on all evidence and media tasks being complete.**
 
 ---
 

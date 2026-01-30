@@ -24,18 +24,20 @@ An analyst runs a range/bearing calculation between two tracks. The result appea
 
 ---
 
-### User Story 2 - Reopen a Saved Result (Priority: P2)
+### User Story 2 - Browse and Open Saved Results (Priority: P2)
 
-An analyst returns to the STAC catalog and sees previously saved results alongside loaded plots. They open a saved result and see it displayed on the map, just as it appeared when originally computed.
+An analyst returns to the STAC Stores panel and sees previously saved results nested under their parent STAC Item, alongside the source data folder. They can also spot persisted results in the Layers panel by the file icon appended to the result layer name. Double-clicking the result layer in the Layers panel opens the saved artifact (the STAC Item JSON or GeoJSON asset) in the VS Code editor for inspection.
 
-**Why this priority**: Saving without reopening has limited value. Being able to return to past results completes the persistence story and enables collaborative workflows.
+**Why this priority**: Saving without being able to find and inspect results has limited value. Browsing results in context (under their parent item) and opening artifacts completes the persistence story.
 
-**Independent Test**: Can be tested by saving a result, closing the session, reopening the catalog, and loading the saved result item to verify it renders correctly.
+**Independent Test**: Can be tested by saving a result, verifying it appears in the STAC Stores tree under the correct parent item, verifying the file icon appears on the result layer in Layers, and double-clicking to open the artifact.
 
 **Acceptance Scenarios**:
 
-1. **Given** a saved result exists in the catalog, **When** the user lists items in the catalog, **Then** the saved result appears alongside regular plots.
-2. **Given** a saved result is listed, **When** the user opens it, **Then** the result features are rendered on the map with the same styling as when originally computed.
+1. **Given** a saved result exists in the catalog, **When** the user expands a STAC Item in the STAC Stores panel, **Then** the saved result appears as a child node alongside the source data folder.
+2. **Given** a result layer has been persisted, **When** the user views the Layers panel, **Then** the result layer displays a file icon indicating it has a saved artifact on disk.
+3. **Given** a result layer with a file icon, **When** the user double-clicks it in the Layers panel, **Then** the saved artifact opens in the VS Code editor.
+4. **Given** a saved result is opened from the STAC Stores panel, **When** the user loads it, **Then** the result features are rendered on the map with the same styling as when originally computed.
 
 ---
 
@@ -71,8 +73,10 @@ An analyst accidentally triggers "Save Result" on a result that has already been
 - **FR-005**: The result GeoJSON FeatureCollection MUST be stored as an asset of the STAC Item, preserving all feature-level provenance metadata.
 - **FR-006**: The saved STAC Item MUST validate against the STAC 1.0.0 specification.
 - **FR-007**: Saving the same result multiple times MUST NOT create duplicate items in the catalog.
-- **FR-008**: Saved results MUST appear when listing catalog items (alongside regular plots).
+- **FR-008**: Saved results MUST appear in the STAC Stores panel as child nodes under their parent STAC Item.
 - **FR-009**: Saved results MUST be openable and renderable on the map.
+- **FR-012**: Result layers in the Layers panel that have been persisted MUST display a file icon indicating a saved artifact exists.
+- **FR-013**: Double-clicking a persisted result layer in the Layers panel MUST open the saved artifact in the VS Code editor.
 - **FR-010**: The system MUST map result feature IDs back to their parent STAC Item IDs to construct `derived_from` links.
 - **FR-011**: The system MUST display clear error messages if the save operation fails (e.g., disk full, permissions error).
 
@@ -104,7 +108,7 @@ An analyst accidentally triggers "Save Result" on a result that has already been
 - **Empty State**: Not applicable — the save action is only available when a result layer exists.
 - **Loading State**: Brief progress indication during save (notification or status bar message).
 - **Error State**: Notification with error description (e.g., "Failed to save result: disk full") and option to retry.
-- **Success State**: Notification confirming "Result saved to catalog" with the item name. The result layer in the Layers panel gains a visual indicator (e.g., icon change) showing it has been persisted.
+- **Success State**: Notification confirming "Result saved to catalog" with the item name. The result layer in the Layers panel gains a file icon (`$(file)`) indicating it has been persisted. The result also appears as a child node under the parent STAC Item in the STAC Stores panel.
 
 ## Success Criteria *(mandatory)*
 
