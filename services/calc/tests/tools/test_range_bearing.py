@@ -125,7 +125,7 @@ class TestRangeBearingTool:
 class TestRangeBearingEdgeCases:
     """Edge case tests for range-bearing tool."""
 
-    def test_insufficient_features(self):
+    def test_non_temporal_features(self):
         feature = {
             "type": "Feature",
             "id": "track-1",
@@ -134,9 +134,12 @@ class TestRangeBearingEdgeCases:
         }
         context = SelectionContext(type=ContextType.MULTI, features=[feature, feature])
 
-        # Should still work with duplicate feature
+        # Non-temporal features: returns single closest-point result
         results = range_bearing(context, {})
-        assert len(results) == 3
+        assert len(results) == 1
+        assert results[0]["properties"]["measurement_type"] == "closest"
+        assert "label" in results[0]["properties"]
+        assert results[0]["geometry"]["type"] == "Point"
 
     def test_empty_coordinates(self):
         feature1 = {

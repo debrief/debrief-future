@@ -408,10 +408,24 @@ from debrief_calc.models import ContextType
 tools = []
 for t in registry.list_all():
     ctx = t.context_type
-    min_count = 1 if ctx == ContextType.SINGLE else (2 if ctx == ContextType.MULTI else 0)
-    max_count = 1 if ctx == ContextType.SINGLE else (99 if ctx == ContextType.MULTI else 0)
-    reqs = [{"kind": k.upper(), "min": min_count, "max": max_count} for k in t.input_kinds]
-    tools.append({"id": t.name, "name": t.name, "description": t.description, "version": t.version, "requirements": reqs})
+    multi_kind = False
+    if ctx == ContextType.REGION:
+        reqs = [{"kind": "REGION", "min": 1, "max": 1}]
+    elif ctx == ContextType.NONE:
+        reqs = []
+    else:
+        multi_kind = ctx == ContextType.MULTI and len(t.input_kinds) > 1
+        if ctx == ContextType.SINGLE:
+            min_count, max_count = 1, 1
+        elif multi_kind:
+            min_count, max_count = 0, 99
+        else:
+            min_count, max_count = 2, 99
+        reqs = [{"kind": k.upper(), "min": min_count, "max": max_count} for k in t.input_kinds]
+    entry = {"id": t.name, "name": t.name, "description": t.description, "version": t.version, "requirements": reqs}
+    if multi_kind:
+        entry["minFeatures"] = 2
+    tools.append(entry)
 print(json.dumps(tools))
 `;
     const { stdout } = await execFileAsync(pythonPath, ['-c', script], {
@@ -433,6 +447,8 @@ print(json.dumps(tools))
 
     const tracks = panel.getTracks();
     const locations = panel.getLocations();
+    const otherFeatures = panel.getOtherFeatures();
+    const resultLayers = panel.getResultLayers();
     const features: Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> = [];
 
     for (const id of featureIds) {
@@ -466,6 +482,38 @@ print(json.dumps(tools))
             locationType: location.locationType,
           },
         });
+        continue;
+      }
+
+      const shape = otherFeatures.find((f) => (f.properties as Record<string, unknown>)?.id === id);
+      if (shape) {
+        const props = shape.properties ?? {};
+        features.push({
+          type: 'Feature',
+          geometry: shape.geometry,
+          properties: {
+            ...props,
+            kind: (props.kind as string) ?? 'shape',
+          },
+        });
+        continue;
+      }
+
+      const resultLayer = resultLayers.find((l) => l.id === id);
+      if (resultLayer) {
+        for (const feature of resultLayer.features.features) {
+          features.push({
+            type: 'Feature',
+            geometry: feature.geometry,
+            properties: {
+              ...feature.properties,
+              kind: 'result',
+              sourceToolId: resultLayer.toolId,
+              sourceToolName: resultLayer.toolName,
+              resultLayerId: resultLayer.id,
+            },
+          });
+        }
         continue;
       }
 

@@ -21,11 +21,13 @@ interface ResultLayerData {
   layer: L.GeoJSON;
   name: string;
   visible: boolean;
+  baseWeight: number;
 }
 
 export class ResultRenderer {
   private map: L.Map;
   private resultLayers: Map<string, ResultLayerData> = new Map();
+  private selectedLayerIds: Set<string> = new Set();
 
   constructor(map: L.Map) {
     this.map = map;
@@ -43,11 +45,13 @@ export class ResultRenderer {
     // Remove existing layer with same ID
     this.removeLayer(id);
 
+    const baseWeight = style.strokeWidth;
+
     // Create GeoJSON layer with styling
     const geoJsonLayer = L.geoJSON(features, {
       style: () => ({
         color: style.strokeColor,
-        weight: style.strokeWidth,
+        weight: baseWeight,
         dashArray: style.dashArray?.join(','),
         fillColor: style.fillColor,
         fillOpacity: style.fillOpacity ?? 0.2,
@@ -62,6 +66,14 @@ export class ResultRenderer {
           weight: 1,
         });
       },
+      onEachFeature: (feature, layer) => {
+        const props = feature.properties ?? {};
+        const label = (props.label as string)
+          ?? (props.name as string)
+          ?? (props.measurement_type as string)
+          ?? name;
+        layer.bindTooltip(label);
+      },
     });
 
     // Add to map
@@ -72,6 +84,7 @@ export class ResultRenderer {
       layer: geoJsonLayer,
       name,
       visible: true,
+      baseWeight,
     });
   }
 
@@ -111,6 +124,28 @@ export class ResultRenderer {
     }
 
     data.visible = visible;
+  }
+
+  /**
+   * Update selection styling for result layers
+   */
+  setSelectedLayers(selectedIds: Set<string>): void {
+    this.selectedLayerIds = selectedIds;
+    for (const [id, data] of this.resultLayers) {
+      const isSelected = selectedIds.has(id);
+      data.layer.eachLayer((sub) => {
+        if ('setStyle' in sub && typeof (sub as L.Path).setStyle === 'function') {
+          (sub as L.Path).setStyle({
+            weight: isSelected ? data.baseWeight + 3 : data.baseWeight,
+            opacity: isSelected ? 1 : 0.8,
+          });
+        }
+        // For circle markers, also increase radius
+        if (sub instanceof L.CircleMarker) {
+          sub.setRadius(isSelected ? 8 : 5);
+        }
+      });
+    }
   }
 
   /**

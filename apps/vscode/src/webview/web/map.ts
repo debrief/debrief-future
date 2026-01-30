@@ -543,30 +543,31 @@ function handleLoadPlot(message: Extract<ExtensionToWebviewMessage, { type: 'loa
 
     otherFeaturesLayer = L.geoJSON(featureCollection as GeoJSON.GeoJsonObject, {
       style: (feature) => {
-        // Use properties for styling if available, otherwise defaults
         const props = feature?.properties ?? {};
+        const style = (props.style as Record<string, unknown>) ?? {};
         return {
-          color: (props.stroke as string) ?? '#3388ff',
-          weight: (props['stroke-width'] as number) ?? 2,
-          opacity: (props['stroke-opacity'] as number) ?? 1,
-          fillColor: (props.fill as string) ?? '#3388ff',
-          fillOpacity: (props['fill-opacity'] as number) ?? 0.2,
+          color: (style.color as string) ?? (props.stroke as string) ?? '#3388ff',
+          weight: (style.weight as number) ?? (props['stroke-width'] as number) ?? 2,
+          opacity: (style.opacity as number) ?? (props['stroke-opacity'] as number) ?? 1,
+          fillColor: (style.fill_color as string) ?? (props.fill as string) ?? '#3388ff',
+          fillOpacity: (style.fill_opacity as number) ?? (props['fill-opacity'] as number) ?? 0.2,
+          dashArray: (style.dash_array as string) ?? undefined,
         };
       },
       pointToLayer: (feature, latlng) => {
-        // Render points as circle markers
         const props = feature?.properties ?? {};
+        const style = (props.style as Record<string, unknown>) ?? {};
         return L.circleMarker(latlng, {
           radius: 6,
-          color: (props.stroke as string) ?? '#3388ff',
-          fillColor: (props.fill as string) ?? '#3388ff',
-          fillOpacity: 0.6,
+          color: (style.color as string) ?? (props.stroke as string) ?? '#3388ff',
+          fillColor: (style.fill_color as string) ?? (props.fill as string) ?? '#3388ff',
+          fillOpacity: (style.fill_opacity as number) ?? 0.6,
         });
       },
       onEachFeature: (feature, layer) => {
         // Add popup with feature info
         const props = feature?.properties ?? {};
-        const name = (props.name as string) ?? (props.kind as string) ?? 'Feature';
+        const name = (props.label as string) ?? (props.name as string) ?? (props.kind as string) ?? 'Feature';
         layer.bindTooltip(name);
       },
     });
@@ -597,10 +598,32 @@ function handleUpdateTracks(
 function handleSetSelection(
   message: Extract<ExtensionToWebviewMessage, { type: 'setSelection' }>
 ): void {
-  selectionManager?.setSelection(
-    message.selection.trackIds,
-    message.selection.locationIds
-  );
+  const ids = new Set(message.featureIds);
+  selectionManager?.setSelectionFromIds(ids);
+  updateShapeSelection(ids);
+  resultRenderer?.setSelectedLayers(ids);
+}
+
+function updateShapeSelection(selectedShapeIds: Set<string>): void {
+  if (!otherFeaturesLayer) {
+    return;
+  }
+  otherFeaturesLayer.eachLayer((layer) => {
+    const geoLayer = layer as L.GeoJSON & { feature?: GeoJSON.Feature };
+    const featureId = (geoLayer.feature?.properties?.id as string) ?? '';
+    const isSelected = featureId !== '' && selectedShapeIds.has(featureId);
+    const props = geoLayer.feature?.properties ?? {};
+    const style = (props.style as Record<string, unknown>) ?? {};
+    const baseWeight = (style.weight as number) ?? 2;
+    const baseOpacity = (style.opacity as number) ?? 1;
+
+    if ('setStyle' in layer && typeof (layer as L.Path).setStyle === 'function') {
+      (layer as L.Path).setStyle({
+        weight: isSelected ? baseWeight + 3 : baseWeight,
+        opacity: isSelected ? 1 : baseOpacity,
+      });
+    }
+  });
 }
 
 function handleAddResultLayer(

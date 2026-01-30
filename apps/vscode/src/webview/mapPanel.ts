@@ -46,6 +46,7 @@ export class MapPanel {
   private currentPlot: Plot | null = null;
   private currentTracks: Track[] = [];
   private currentLocations: ReferenceLocation[] = [];
+  private otherFeatures: GeoJSONFeature[] = [];
   private resultLayers: ResultLayer[] = [];
   private isWebviewReady = false;
   private pendingMessages: ExtensionToWebviewMessage[] = [];
@@ -177,6 +178,7 @@ export class MapPanel {
     this.currentPlot = plot;
     this.currentTracks = tracks;
     this.currentLocations = locations;
+    this.otherFeatures = otherFeatures;
     this.resultLayers = [];
 
     // Update panel title
@@ -201,6 +203,56 @@ export class MapPanel {
   }
 
   /**
+   * Remove features by ID from all in-memory arrays, then re-send loadPlot to webview.
+   */
+  public removeFeatures(ids: string[]): void {
+    if (!this.currentPlot) {
+      return;
+    }
+
+    const idSet = new Set(ids);
+
+    this.currentTracks = this.currentTracks.filter((t) => !idSet.has(t.id));
+    this.currentLocations = this.currentLocations.filter((l) => !idSet.has(l.id));
+    this.otherFeatures = this.otherFeatures.filter((f) => {
+      const fId = (f.properties as Record<string, unknown>)?.id as string | undefined;
+      return !fId || !idSet.has(fId);
+    });
+    this.resultLayers = this.resultLayers.filter((l) => !idSet.has(l.id));
+
+    // Re-send full plot data so webview rebuilds from source of truth
+    this.postMessage({
+      type: 'loadPlot',
+      plot: {
+        id: this.currentPlot.id,
+        title: this.currentPlot.title,
+        tracks: this.currentTracks,
+        locations: this.currentLocations,
+        otherFeatures: this.otherFeatures,
+        bbox: this.currentPlot.bbox,
+        timeExtent: this.currentPlot.timeExtent,
+      },
+    });
+
+    // Update result layers context
+    if (this.resultLayers.length === 0) {
+      void vscode.commands.executeCommand(
+        'setContext',
+        'debrief.hasResultLayers',
+        false
+      );
+    }
+
+    // Update layers tree provider if available
+    if (this.layersTreeProvider) {
+      this.layersTreeProvider.setTracks(this.currentTracks);
+      this.layersTreeProvider.setLocations(this.currentLocations);
+      this.layersTreeProvider.setShapes(this.otherFeatures as import('../types/import').GeoJSONFeature[]);
+      this.layersTreeProvider.setResultLayers([...this.resultLayers]);
+    }
+  }
+
+  /**
    * Update tracks (e.g., after time filter change)
    */
   public updateTracks(tracks: Track[]): void {
@@ -214,10 +266,10 @@ export class MapPanel {
   /**
    * Set selection
    */
-  public setSelection(trackIds: string[], locationIds: string[]): void {
+  public setSelection(featureIds: string[]): void {
     this.postMessage({
       type: 'setSelection',
-      selection: { trackIds, locationIds },
+      featureIds,
     });
   }
 
@@ -423,6 +475,10 @@ export class MapPanel {
     return this.resultLayers;
   }
 
+  public getOtherFeatures(): GeoJSONFeature[] {
+    return this.otherFeatures;
+  }
+
   /**
    * Set services for REP import functionality
    */
@@ -467,8 +523,17 @@ export class MapPanel {
       return 'POINT';
     }
 
-    // Future: check other feature types (CIRCLE, RECTANGLE, LINE, VECTOR)
-    // These would be stored in a separate collection
+    // Check shapes (other features)
+    const shape = this.otherFeatures.find((f) => (f.properties as Record<string, unknown>)?.id === featureId);
+    if (shape) {
+      return 'SHAPE';
+    }
+
+    // Check result layers
+    const resultLayer = this.resultLayers.find((l) => l.id === featureId);
+    if (resultLayer) {
+      return 'RESULT';
+    }
 
     return undefined;
   }
@@ -539,20 +604,9 @@ export class MapPanel {
 
       // Subscribe to selection changes
       this.selectionUnsubscribe = subscribeToSelection(session, (selection) => {
-        // Split feature IDs into tracks and locations
-        const trackIds: string[] = [];
-        const locationIds: string[] = [];
-        for (const id of selection.featureIds) {
-          // Determine if track or location based on current data
-          if (this.currentTracks.some(t => t.id === id)) {
-            trackIds.push(id);
-          } else if (this.currentLocations.some(l => l.id === id)) {
-            locationIds.push(id);
-          }
-        }
         this.postMessage({
           type: 'setSelection',
-          selection: { trackIds, locationIds },
+          featureIds: selection.featureIds,
         });
       });
 
@@ -958,6 +1012,7 @@ export class MapPanel {
         // Update layers panel
         this.layersTreeProvider?.setTracks(updatedData.tracks);
         this.layersTreeProvider?.setLocations(updatedData.locations);
+        this.layersTreeProvider?.setShapes(updatedData.otherFeatures);
       }
 
       // Send completion message

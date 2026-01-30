@@ -31,6 +31,7 @@ import { createChangeTrackColorCommand } from './changeTrackColor';
 import { createImportRepCommand } from './importRep';
 import { createUndoCommand, createRedoCommand } from './undoRedo';
 import { createSaveSessionCommand } from './saveSession';
+import { createDeleteSelectionCommand } from './deleteSelection';
 
 export function registerCommands(
   context: vscode.ExtensionContext,
@@ -271,18 +272,6 @@ export function registerCommands(
     )
   );
 
-  // Feature selection command (layers tree click)
-  disposables.push(
-    vscode.commands.registerCommand(
-      'debrief.toggleFeatureSelection',
-      (args: { featureId: string }) => {
-        if (args?.featureId) {
-          layersTreeProvider.toggleSelection(args.featureId);
-        }
-      }
-    )
-  );
-
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.removeResultLayer',
@@ -412,6 +401,14 @@ export function registerCommands(
         const store = configService.getStore(storeId);
         return store?.path;
       })
+    )
+  );
+
+  // Delete selection command
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.deleteSelection',
+      createDeleteSelectionCommand(sessionManager, getMapPanel, layersTreeProvider)
     )
   );
 

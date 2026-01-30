@@ -66,3 +66,20 @@ docker run -p 3000:3000 -e DEBRIEF_VERSION=latest debrief-demo
 
 **External:**
 - Demo: https://debrief-demo.fly.dev
+
+### Dynamic Tool Selection (Calc Service)
+
+**How tool matching works:**
+- Python calc tools declare `context_type` (SINGLE/MULTI/REGION/NONE) and `input_kinds`
+- `fetchToolsFromMcp()` in `calcService.ts` converts these to `SelectionRequirement[]` (kind + min/max)
+- `ToolMatchAdapter` converts session selection (feature IDs) → kind counts via `mapPanel.getFeatureKind()`
+- `checkRequirements()` in `tool.ts` uses **closed-world matching** (ADR-005): tool active only if all selected kinds are in its requirements, and counts are within bounds
+
+**Feature kinds recognized:** `TRACK`, `POINT`, `RESULT`, `REGION`
+
+**Key files:**
+- Tool requirements generation: `calcService.ts` → `fetchToolsFromMcp()`
+- Feature kind resolution: `mapPanel.ts` → `getFeatureKind()`
+- Match logic: `tool.ts` → `checkRequirements()`
+- Adapter bridging session↔matching: `toolMatchAdapter.ts`
+- Feature resolution for execution: `calcService.ts` → `resolveFeatures()`

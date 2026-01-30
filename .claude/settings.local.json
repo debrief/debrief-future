@@ -80,7 +80,8 @@
       "Bash(if [ -d \"../worktrees\" ])",
       "Bash(then echo \"WORKTREES_DIR_EXISTS\")",
       "Bash(else echo \"NO_WORKTREES_DIR\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(python3:*)"
     ]
   }
 }

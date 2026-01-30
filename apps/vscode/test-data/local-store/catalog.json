@@ -17,13 +17,13 @@
     },
     {
       "rel": "item",
-      "href": "./items/exercise-alpha.json",
+      "href": "./exercise-alpha/item.json",
       "type": "application/json",
       "title": "Exercise Alpha"
     },
     {
       "rel": "item",
-      "href": "./items/training-run-1.json",
+      "href": "./training-run-1/item.json",
       "type": "application/json",
       "title": "Training Run 1"
     }

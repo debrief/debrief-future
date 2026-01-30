@@ -89,10 +89,7 @@ export interface UpdateTracksMessage {
 /** Set the current selection (from external source like Outline click) */
 export interface SetSelectionMessage {
   type: 'setSelection';
-  selection: {
-    trackIds: string[];
-    locationIds: string[];
-  };
+  featureIds: string[];
 }
 
 /** Clear all selection */

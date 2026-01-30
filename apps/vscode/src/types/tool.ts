@@ -33,6 +33,8 @@ export interface Tool {
   version?: string;
   /** Selection requirements for the tool to be active */
   requirements?: SelectionRequirement[];
+  /** Minimum total features across all kinds (for multi-kind tools) */
+  minFeatures?: number;
 }
 
 /**
@@ -70,6 +72,15 @@ export function createSelectionFromCounts(counts: Record<string, number>): ToolS
  * Check if a tool's requirements are satisfied by a selection.
  */
 function checkRequirements(requirements: SelectionRequirement[], selection: ToolSelection): boolean {
+  const acceptedKinds = new Set(requirements.map((r) => r.kind));
+
+  // Reject if selection contains kinds the tool doesn't accept
+  for (const kind of selection.keys()) {
+    if (!acceptedKinds.has(kind) && (selection.get(kind) ?? 0) > 0) {
+      return false;
+    }
+  }
+
   for (const req of requirements) {
     const count = selection.get(req.kind) ?? 0;
     const min = req.min ?? 1;
@@ -94,6 +105,14 @@ export function getInactiveReason(tool: Tool, selection: ToolSelection): string 
   }
 
   const reasons: string[] = [];
+  const acceptedKinds = new Set(tool.requirements.map((r) => r.kind));
+
+  for (const [kind, count] of selection) {
+    if (!acceptedKinds.has(kind) && count > 0) {
+      reasons.push(`Unexpected ${kind} in selection`);
+    }
+  }
+
   for (const req of tool.requirements) {
     const count = selection.get(req.kind) ?? 0;
     const min = req.min ?? 1;
@@ -103,6 +122,16 @@ export function getInactiveReason(tool: Tool, selection: ToolSelection): string 
       reasons.push(`Need ${min} ${req.kind}, have ${count}`);
     } else if (max !== undefined && count > max) {
       reasons.push(`Need at most ${max} ${req.kind}, have ${count}`);
+    }
+  }
+
+  if (tool.minFeatures !== undefined) {
+    let total = 0;
+    for (const count of selection.values()) {
+      total += count;
+    }
+    if (total < tool.minFeatures) {
+      reasons.push(`Need ${tool.minFeatures} features total, have ${total}`);
     }
   }
 
@@ -143,7 +172,19 @@ export class ToolMatchService {
     if (!tool.requirements || tool.requirements.length === 0) {
       return true; // No requirements = always active
     }
-    return checkRequirements(tool.requirements, selection);
+    if (!checkRequirements(tool.requirements, selection)) {
+      return false;
+    }
+    if (tool.minFeatures !== undefined) {
+      let total = 0;
+      for (const count of selection.values()) {
+        total += count;
+      }
+      if (total < tool.minFeatures) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

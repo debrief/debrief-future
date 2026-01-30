@@ -17,6 +17,7 @@ from debrief_stac.exceptions import (
     PlotNotFoundError,
 )
 from debrief_stac.features import add_features
+from debrief_stac.migrate import migrate_flat_store
 from debrief_stac.models import PlotMetadata
 from debrief_stac.plot import create_plot
 
@@ -214,6 +215,25 @@ def handle_init_catalog(params: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def handle_migrate_store(params: dict[str, Any]) -> dict[str, Any]:
+    """Handle migrate_store method.
+
+    Args:
+        params: {"path": str}
+
+    Returns:
+        {"migrated_items": list[str], "count": int}
+    """
+    path = params.get("path")
+    if not path:
+        raise ValueError("Missing required parameter: path")
+
+    from pathlib import Path
+
+    migrated = migrate_flat_store(Path(path))
+    return {"migrated_items": migrated, "count": len(migrated)}
+
+
 def handle_request(request: dict[str, Any]) -> dict[str, Any]:
     """Handle a JSON-RPC request and return the response.
 
@@ -234,6 +254,7 @@ def handle_request(request: dict[str, Any]) -> dict[str, Any]:
         "add_features": handle_add_features,
         "copy_asset": handle_copy_asset,
         "init_catalog": handle_init_catalog,
+        "migrate_store": handle_migrate_store,
     }
 
     try:

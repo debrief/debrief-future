@@ -190,6 +190,12 @@
         "icon": "$(filter)"
       },
       {
+        "command": "debrief.deleteSelection",
+        "title": "Delete Selected Features",
+        "category": "Debrief",
+        "icon": "$(trash)"
+      },
+      {
         "command": "debrief.tool.rangeBearing",
         "title": "Debrief: Range & Bearing",
         "enablement": "debrief.tool.range-bearing.active"
@@ -272,6 +278,18 @@
         "key": "ctrl+s",
         "mac": "cmd+s",
         "when": "debrief.mapFocused"
+      },
+      {
+        "command": "debrief.deleteSelection",
+        "key": "delete",
+        "mac": "backspace",
+        "when": "focusedView == 'debrief.layers' && debrief.hasSelection"
+      },
+      {
+        "command": "debrief.deleteSelection",
+        "key": "delete",
+        "mac": "delete",
+        "when": "focusedView == 'debrief.layers' && debrief.hasSelection"
       }
     ],
     "viewsContainers": {
@@ -406,6 +424,10 @@
         {
           "command": "debrief.exportPng",
           "when": "debrief.plotOpen"
+        },
+        {
+          "command": "debrief.deleteSelection",
+          "when": "debrief.plotOpen && debrief.hasSelection"
         }
       ]
     },

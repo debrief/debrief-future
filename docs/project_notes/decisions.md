@@ -110,3 +110,29 @@ Each decision should include:
 - ✅ Clear extension point for new feature types
 - ❌ Required on all features, no gradual adoption
 - ❌ Migration burden for existing data
+
+### ADR-005: Closed-World Tool Matching (2026-01-30)
+
+**Context:**
+- Calc tools declare requirements as `SelectionRequirement[]` (kind + min/max counts)
+- `checkRequirements()` only validated kinds listed in requirements, ignoring extra kinds
+- Result layers, region tools, and mixed selections caused tools to appear active when they couldn't execute
+- Three bugs: result layer IDs unresolvable, REGION tools always active, extra kinds silently ignored
+
+**Decision:**
+- Closed-world matching: a tool is only active if the selection contains *exactly* the kinds it accepts, in valid quantities
+- `checkRequirements()` rejects selections containing kinds not listed in the tool's requirements
+- REGION context tools require `kind: "REGION"` explicitly
+- `resolveFeatures()` resolves tracks, locations, *and* result layers
+
+**Alternatives Considered:**
+- Skip/warn on unknown IDs → Rejected: masks selection errors, tool still runs with partial input
+- Filter IDs at execution time → Rejected: tool appears active but silently drops features
+- Open-world (ignore extra kinds) → Rejected: caused the bugs in the first place
+
+**Consequences:**
+- ✅ Tools only appear when selection exactly matches their input contract
+- ✅ No runtime context-type mismatches
+- ✅ Result layers are first-class selectable features
+- ❌ New feature kinds must be added to tool requirements to be accepted
+- ❌ REGION tools inactive until region selection UX is built

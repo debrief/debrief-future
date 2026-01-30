@@ -19,12 +19,32 @@ import {
 import type { SessionManager } from '../services/sessionManager';
 import type { Track, ReferenceLocation } from '../types/plot';
 import type { ResultLayer } from '../types/tool';
+import type { GeoJSONFeature } from '../types/import';
 
-type LayerItem =
+export type LayerItem =
   | { type: 'header'; label: string; id: string }
   | { type: 'track'; track: Track }
   | { type: 'location'; location: ReferenceLocation }
+  | { type: 'shape'; feature: GeoJSONFeature }
   | { type: 'result'; layer: ResultLayer };
+
+/**
+ * Extract feature ID from any LayerItem variant.
+ */
+export function getFeatureId(item: LayerItem): string | undefined {
+  switch (item.type) {
+    case 'track':
+      return item.track.id;
+    case 'location':
+      return item.location.id;
+    case 'shape':
+      return (item.feature.properties?.id as string) ?? undefined;
+    case 'result':
+      return item.layer.id;
+    default:
+      return undefined;
+  }
+}
 
 export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<
@@ -34,6 +54,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
 
   private tracks: Track[] = [];
   private locations: ReferenceLocation[] = [];
+  private shapes: GeoJSONFeature[] = [];
   private resultLayers: ResultLayer[] = [];
 
   // Session manager integration
@@ -148,6 +169,14 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
   }
 
   /**
+   * Update shapes (other features)
+   */
+  setShapes(shapes: GeoJSONFeature[]): void {
+    this.shapes = shapes;
+    this.refresh();
+  }
+
+  /**
    * Update result layers
    */
   setResultLayers(layers: ResultLayer[]): void {
@@ -180,6 +209,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
   clear(): void {
     this.tracks = [];
     this.locations = [];
+    this.shapes = [];
     this.resultLayers = [];
     this.refresh();
   }
@@ -214,6 +244,8 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
         return this.createTrackItem(element.track);
       case 'location':
         return this.createLocationItem(element.location);
+      case 'shape':
+        return this.createShapeItem(element.feature);
       case 'result':
         return this.createResultItem(element.layer);
     }
@@ -227,7 +259,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       // Root level: return headers
       const items: LayerItem[] = [];
 
-      if (this.tracks.length > 0 || this.locations.length > 0) {
+      if (this.tracks.length > 0 || this.locations.length > 0 || this.shapes.length > 0) {
         items.push({ type: 'header', label: 'Source Data', id: 'source' });
       }
 
@@ -246,6 +278,9 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
           ),
           ...this.locations.map(
             (location): LayerItem => ({ type: 'location', location })
+          ),
+          ...this.shapes.map(
+            (feature): LayerItem => ({ type: 'shape', feature })
           ),
         ]);
       }
@@ -268,7 +303,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       return undefined;
     }
 
-    if (element.type === 'track' || element.type === 'location') {
+    if (element.type === 'track' || element.type === 'location' || element.type === 'shape') {
       return { type: 'header', label: 'Source Data', id: 'source' };
     }
 
@@ -316,13 +351,6 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       item.resourceUri = vscode.Uri.parse(`color:${track.color}`);
     }
 
-    // Command to toggle selection
-    item.command = {
-      command: 'debrief.toggleFeatureSelection',
-      title: 'Toggle Selection',
-      arguments: [{ featureId: track.id }],
-    };
-
     return item;
   }
 
@@ -343,11 +371,28 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       isSelected ? 'check' : 'circle-outline'
     );
 
-    item.command = {
-      command: 'debrief.toggleFeatureSelection',
-      title: 'Toggle Selection',
-      arguments: [{ featureId: location.id }],
-    };
+    return item;
+  }
+
+  private createShapeItem(feature: GeoJSONFeature): vscode.TreeItem {
+    const props = feature.properties ?? {};
+    const kind = (props.kind as string) ?? feature.geometry.type;
+    const label = (props.label as string) ?? (props.name as string) ?? kind;
+
+    const item = new vscode.TreeItem(
+      label,
+      vscode.TreeItemCollapsibleState.None
+    );
+
+    item.contextValue = 'shape';
+    item.description = kind.toLowerCase();
+    item.tooltip = `${label}\nType: ${kind}\nGeometry: ${feature.geometry.type}`;
+
+    const featureId = (props.id as string) ?? '';
+    const isSelected = featureId ? this._isFeatureSelected(featureId) : false;
+    item.iconPath = new vscode.ThemeIcon(
+      isSelected ? 'check' : 'circle-outline'
+    );
 
     return item;
   }
@@ -368,12 +413,6 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
     item.iconPath = new vscode.ThemeIcon(
       isSelected ? 'check' : 'circle-outline'
     );
-
-    item.command = {
-      command: 'debrief.toggleFeatureSelection',
-      title: 'Toggle Selection',
-      arguments: [{ featureId: layer.id }],
-    };
 
     return item;
   }
