@@ -487,7 +487,7 @@ print(json.dumps(tools))
 
       const shape = otherFeatures.find((f) => (f.properties as Record<string, unknown>)?.id === id);
       if (shape) {
-        const props = (shape.properties ?? {}) as Record<string, unknown>;
+        const props = shape.properties ?? {};
         features.push({
           type: 'Feature',
           geometry: shape.geometry,

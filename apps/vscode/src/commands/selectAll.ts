@@ -22,8 +22,6 @@ export function createSelectAllCommand(
 
     // Select all tracks
     const trackIds = tracks.map((t) => t.id);
-    const locationIds: string[] = [];
-
     panel.setSelection(trackIds);
   };
 }
