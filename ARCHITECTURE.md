@@ -134,6 +134,7 @@ Shared MCP utilities in `/services/mcp-common/` ensure consistency.
 | Python packaging | uv workspaces | Fast, modern monorepo support |
 | TypeScript packaging | pnpm workspaces | Strict, efficient |
 | User config location | XDG Base Directory | Cross-platform standard |
+| Webview UI components | [vscrui](shared/components/vscrui.md) | React components matching VS Code native styling; replaces deprecated Webview UI Toolkit |
 | Spatial storage | STAC | Asset management, catalog browsing, ecosystem tooling |
 | Feature format | GeoJSON | Universal, tooling interoperability |
 | Service integration | MCP | Emerging standard, thin wrapper layer |

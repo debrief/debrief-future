@@ -39,7 +39,7 @@
 
 **Purpose**: Create directory structure for the documentation deliverable
 
-- [ ] T001 Create shared components directory `shared/components/`
+- [x] T001 Create shared components directory `shared/components/`
 
 ---
 
@@ -51,7 +51,7 @@
 
 ### Implementation
 
-- [ ] T002 Create vscrui.md with standard declaration, rationale, installation, peer deps, component inventory, usage example, upstream reference `shared/components/vscrui.md`
+- [x] T002 Create vscrui.md with standard declaration, rationale, installation, peer deps, component inventory, usage example, upstream reference `shared/components/vscrui.md`
 
 **Checkpoint**: vscrui.md covers FR-001 through FR-005, FR-009, FR-010 (stories 1 & 2)
 
@@ -65,7 +65,7 @@
 
 ### Implementation
 
-- [ ] T003 Add scope and constraints sections to vscrui.md covering FR-006, FR-007, edge cases `shared/components/vscrui.md`
+- [x] T003 Add scope and constraints sections to vscrui.md covering FR-006, FR-007, edge cases `shared/components/vscrui.md`
 
 **Checkpoint**: vscrui.md now covers all FR-001 through FR-010
 
@@ -75,7 +75,7 @@
 
 **Purpose**: Ensure the document is discoverable from project-level docs (SC-004)
 
-- [ ] T004 Add vscrui reference to ARCHITECTURE.md tooling/tech stack section `ARCHITECTURE.md`
+- [x] T004 Add vscrui reference to ARCHITECTURE.md tooling/tech stack section `ARCHITECTURE.md`
 
 **Checkpoint**: Developer can find vscrui.md from ARCHITECTURE.md
 
@@ -85,14 +85,14 @@
 
 ### Evidence Collection
 
-- [ ] T005 Create evidence directory `specs/031-vscrui-component-library/evidence/`
-- [ ] T006 Capture FR verification checklist in `specs/031-vscrui-component-library/evidence/test-summary.md`
-- [ ] T007 [P] Record usage walkthrough in `specs/031-vscrui-component-library/evidence/usage-example.md`
+- [x] T005 Create evidence directory `specs/031-vscrui-component-library/evidence/`
+- [x] T006 Capture FR verification checklist in `specs/031-vscrui-component-library/evidence/test-summary.md`
+- [x] T007 [P] Record usage walkthrough in `specs/031-vscrui-component-library/evidence/usage-example.md`
 
 ### Media Content
 
-- [ ] T008 Create shipped blog post in `specs/031-vscrui-component-library/media/shipped-post.md`
-- [ ] T009 [P] Create LinkedIn shipped summary in `specs/031-vscrui-component-library/media/linkedin-shipped.md`
+- [x] T008 Create shipped blog post in `specs/031-vscrui-component-library/media/shipped-post.md`
+- [x] T009 [P] Create LinkedIn shipped summary in `specs/031-vscrui-component-library/media/linkedin-shipped.md`
 
 ### PR Creation
 
