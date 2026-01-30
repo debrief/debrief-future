@@ -219,6 +219,12 @@
         "command": "debrief.tool.distanceToPoint",
         "title": "Debrief: Distance to Point",
         "enablement": "debrief.tool.distance-to-point.active"
+      },
+      {
+        "command": "debrief.openCatalogOverview",
+        "title": "Open Catalog Overview",
+        "category": "Debrief",
+        "icon": "$(map)"
       }
     ],
     "keybindings": [
@@ -380,6 +386,11 @@
           "group": "3_modify"
         },
         {
+          "command": "debrief.openCatalogOverview",
+          "when": "view == debrief.stacExplorer && viewItem == catalog",
+          "group": "1_navigation"
+        },
+        {
           "command": "debrief.openPlot",
           "when": "view == debrief.stacExplorer && viewItem == plot",
           "group": "1_navigation"
@@ -497,7 +508,7 @@
     "build": "pnpm --filter @debrief/components build && npm run compile",
     "compile": "npm run compile:extension && npm run compile:webview",
     "compile:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
-    "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife && esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text && cpy src/webview/web/styles.css dist/webview/",
+    "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife && esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/catalogOverview.tsx --bundle --outfile=dist/webview/catalogOverview.js --format=iife --loader:.tsx=tsx --loader:.css=text && cpy src/webview/web/styles.css dist/webview/",
     "watch": "npm run watch:extension & npm run watch:webview",
     "watch:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
     "watch:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife --watch & esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch",

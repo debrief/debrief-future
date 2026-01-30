@@ -1,4 +1,7 @@
 // Components
+export { CatalogOverview } from './CatalogOverview';
+export type { CatalogOverviewProps, CatalogOverviewItem } from './CatalogOverview';
+
 export { MapView } from './MapView';
 export type { MapViewProps } from './MapView';
 
