@@ -1,0 +1,13 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Deleted stuff",
+      "annotations": {
+        "debrief:resultType": "deletion/sensor",
+        "debrief:sourceFeatures": ["track_a"],
+        "debrief:label": "Removed contacts"
+      }
+    }
+  ]
+}

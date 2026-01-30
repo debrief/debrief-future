@@ -1,0 +1,14 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Deleted 3 sensor contacts from Track A",
+      "annotations": {
+        "debrief:resultType": "deletion/sensor",
+        "debrief:sourceFeatures": ["track_a"],
+        "debrief:label": "Removed outlier contacts",
+        "debrief:deletedFeatures": ["contact_001", "contact_002", "contact_003"]
+      }
+    }
+  ]
+}

@@ -49,14 +49,14 @@
 
 **Purpose**: Project scaffolding and schema definition
 
-- [ ] T001 Create LinkML result type schema `shared/schemas/src/linkml/tool-result.yaml`
-- [ ] T002 [P] Create valid golden fixture for mutation result `shared/schemas/fixtures/tool-result/valid/mutation.json`
-- [ ] T003 [P] Create valid golden fixture for addition result `shared/schemas/fixtures/tool-result/valid/addition.json`
-- [ ] T004 [P] Create valid golden fixture for deletion result `shared/schemas/fixtures/tool-result/valid/deletion.json`
-- [ ] T005 [P] Create valid golden fixture for artifact result `shared/schemas/fixtures/tool-result/valid/artifact.json`
-- [ ] T006 [P] Create valid golden fixture for multi-result response (deletion + artifact) `shared/schemas/fixtures/tool-result/valid/multi-result.json`
-- [ ] T007 [P] Create invalid golden fixtures (missing annotations, bad top-level type) `shared/schemas/fixtures/tool-result/invalid/`
-- [ ] T008 Create evidence and media directories `specs/041-document-tool-results/evidence/`
+- [x] T001 Create LinkML result type schema `shared/schemas/src/linkml/tool-result.yaml`
+- [x] T002 [P] Create valid golden fixture for mutation result `shared/schemas/fixtures/tool-result/valid/mutation.json`
+- [x] T003 [P] Create valid golden fixture for addition result `shared/schemas/fixtures/tool-result/valid/addition.json`
+- [x] T004 [P] Create valid golden fixture for deletion result `shared/schemas/fixtures/tool-result/valid/deletion.json`
+- [x] T005 [P] Create valid golden fixture for artifact result `shared/schemas/fixtures/tool-result/valid/artifact.json`
+- [x] T006 [P] Create valid golden fixture for multi-result response (deletion + artifact) `shared/schemas/fixtures/tool-result/valid/multi-result.json`
+- [x] T007 [P] Create invalid golden fixtures (missing annotations, bad top-level type) `shared/schemas/fixtures/tool-result/invalid/`
+- [x] T008 Create evidence and media directories `specs/041-document-tool-results/evidence/`
 
 ---
 
@@ -66,10 +66,10 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T009 [test] Write ResultTopType and ResultTypePath unit tests `services/calc/tests/test_result_types.py`
-- [ ] T010 Implement ResultTopType enum and ResultTypePath class `services/calc/debrief_calc/result_types.py`
-- [ ] T011 [test] Write provenance writing tests `services/stac/tests/test_provenance.py`
-- [ ] T012 Implement write_provenance() function `services/stac/src/debrief_stac/provenance.py`
+- [x] T009 [test] Write ResultTopType and ResultTypePath unit tests `services/calc/tests/test_result_types.py`
+- [x] T010 Implement ResultTopType enum and ResultTypePath class `services/calc/debrief_calc/result_types.py`
+- [x] T011 [test] Write provenance writing tests `services/stac/tests/test_provenance.py`
+- [x] T012 Implement write_provenance() function `services/stac/src/debrief_stac/provenance.py`
 
 **Checkpoint**: Foundation ready — result type classification and provenance writing available for all stories
 
@@ -83,21 +83,21 @@
 
 ### Tests for User Story 1
 
-- [ ] T013 [P][test] Write build_mutation tests `services/calc/tests/test_result_builder.py`
-- [ ] T014 [P][test] Write build_addition tests `services/calc/tests/test_result_builder.py`
-- [ ] T015 [P][test] Write build_deletion tests `services/calc/tests/test_result_builder.py`
-- [ ] T016 [P][test] Write build_artifact tests `services/calc/tests/test_result_builder.py`
-- [ ] T017 [P][test] Write build_error and build_response (multi-content) tests `services/calc/tests/test_result_builder.py`
+- [x] T013 [P][test] Write build_mutation tests `services/calc/tests/test_result_builder.py`
+- [x] T014 [P][test] Write build_addition tests `services/calc/tests/test_result_builder.py`
+- [x] T015 [P][test] Write build_deletion tests `services/calc/tests/test_result_builder.py`
+- [x] T016 [P][test] Write build_artifact tests `services/calc/tests/test_result_builder.py`
+- [x] T017 [P][test] Write build_error and build_response (multi-content) tests `services/calc/tests/test_result_builder.py`
 
 ### Implementation for User Story 1
 
-- [ ] T018 Implement build_mutation() `services/calc/debrief_calc/result_builder.py`
-- [ ] T019 Implement build_addition() `services/calc/debrief_calc/result_builder.py`
-- [ ] T020 Implement build_deletion() `services/calc/debrief_calc/result_builder.py`
-- [ ] T021 Implement build_artifact() `services/calc/debrief_calc/result_builder.py`
-- [ ] T022 Implement build_error() and build_response() (wraps content items into MCP response) `services/calc/debrief_calc/result_builder.py`
-- [ ] T023 Update MCP server to use result_builder for tool responses (single and multi-content) `services/calc/debrief_calc/mcp/server.py`
-- [ ] T024 Verify all US1 tests pass
+- [x] T018 Implement build_mutation() `services/calc/debrief_calc/result_builder.py`
+- [x] T019 Implement build_addition() `services/calc/debrief_calc/result_builder.py`
+- [x] T020 Implement build_deletion() `services/calc/debrief_calc/result_builder.py`
+- [x] T021 Implement build_artifact() `services/calc/debrief_calc/result_builder.py`
+- [x] T022 Implement build_error() and build_response() (wraps content items into MCP response) `services/calc/debrief_calc/result_builder.py`
+- [x] T023 Update MCP server to use result_builder for tool responses (single and multi-content) `services/calc/debrief_calc/mcp/server.py`
+- [x] T024 Verify all US1 tests pass
 
 **Checkpoint**: Tools return typed, annotated MCP responses (single or multi-content) — US1 independently functional
 
@@ -111,19 +111,19 @@
 
 ### Tests for User Story 2
 
-- [ ] T025 [P][test] Write update_features tests `services/stac/tests/test_features.py`
-- [ ] T026 [P][test] Write delete_features tests `services/stac/tests/test_features.py`
-- [ ] T027 [P][test] Write store_artifact tests `services/stac/tests/test_artifacts.py`
-- [ ] T028 [test] Write provenance integration tests (provenance written by each atomic op) `services/stac/tests/test_provenance.py`
+- [x] T025 [P][test] Write update_features tests `services/stac/tests/test_features.py`
+- [x] T026 [P][test] Write delete_features tests `services/stac/tests/test_features.py`
+- [x] T027 [P][test] Write store_artifact tests `services/stac/tests/test_artifacts.py`
+- [x] T028 [test] Write provenance integration tests (provenance written by each atomic op) `services/stac/tests/test_provenance.py`
 
 ### Implementation for User Story 2
 
-- [ ] T029 Implement update_features() in features module `services/stac/src/debrief_stac/features.py`
-- [ ] T030 Implement delete_features() in features module `services/stac/src/debrief_stac/features.py`
-- [ ] T031 Implement store_artifact() — file write + item.json asset update `services/stac/src/debrief_stac/artifacts.py`
-- [ ] T032 Integrate provenance writing into update_features, add_features, and delete_features `services/stac/src/debrief_stac/features.py`
-- [ ] T033 Add atomic STAC operation MCP tools (update_features, add_features, delete_features, store_artifact) `services/stac/src/debrief_stac/mcp/server.py`
-- [ ] T034 Verify all US2 tests pass
+- [x] T029 Implement update_features() in features module `services/stac/src/debrief_stac/features.py`
+- [x] T030 Implement delete_features() in features module `services/stac/src/debrief_stac/features.py`
+- [x] T031 Implement store_artifact() — file write + item.json asset update `services/stac/src/debrief_stac/artifacts.py`
+- [x] T032 Integrate provenance writing into update_features, add_features, and delete_features `services/stac/src/debrief_stac/features.py`
+- [x] T033 Add atomic STAC operation MCP tools (update_features, add_features, delete_features, store_artifact) `services/stac/src/debrief_stac/mcp/server.py`
+- [x] T034 Verify all US2 tests pass
 
 **Checkpoint**: Atomic STAC operations work — US1 + US2 form the MVP
 
@@ -137,14 +137,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T035 [test] Write diffFeatureCollections tests (add, remove, modify, identical, empty, incremental) `shared/components/diff/tests/diffFeatureCollections.test.ts`
+- [x] T035 [test] Write diffFeatureCollections tests (add, remove, modify, identical, empty, incremental) `shared/components/diff/tests/diffFeatureCollections.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T036 Create diff package scaffolding (package.json, tsconfig) `shared/components/diff/`
-- [ ] T037 Implement diffFeatureCollections() `shared/components/diff/src/diffFeatureCollections.ts`
-- [ ] T038 Export public API from package index `shared/components/diff/src/index.ts`
-- [ ] T039 Verify all US3 tests pass
+- [x] T036 Create diff package scaffolding (package.json, tsconfig) `shared/components/diff/`
+- [x] T037 Implement diffFeatureCollections() `shared/components/diff/src/diffFeatureCollections.ts`
+- [x] T038 Export public API from package index `shared/components/diff/src/index.ts`
+- [x] T039 Verify all US3 tests pass
 
 **Checkpoint**: Diff utility available for frontends — US3 independently functional
 
@@ -158,13 +158,13 @@
 
 ### Tests for User Story 4
 
-- [ ] T040 [test] Write TypeScript matchesResultType and getTopLevelType tests `shared/components/diff/tests/resultTypes.test.ts`
+- [x] T040 [test] Write TypeScript matchesResultType and getTopLevelType tests `shared/components/diff/tests/resultTypes.test.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T041 Implement matchesResultType() and getTopLevelType() in TypeScript `shared/components/diff/src/resultTypes.ts`
-- [ ] T042 Export result type utilities from package index `shared/components/diff/src/index.ts`
-- [ ] T043 Verify all US4 tests pass
+- [x] T041 Implement matchesResultType() and getTopLevelType() in TypeScript `shared/components/diff/src/resultTypes.ts`
+- [x] T042 Export result type utilities from package index `shared/components/diff/src/index.ts`
+- [x] T043 Verify all US4 tests pass
 
 **Checkpoint**: Hierarchical type degradation works in both Python and TypeScript — US4 independently functional
 
@@ -180,8 +180,8 @@
 
 ### Implementation for User Story 5
 
-- [ ] T044 Define artifact notification event interface in TypeScript `shared/components/diff/src/artifactEvent.ts`
-- [ ] T045 Export artifact event types from package index `shared/components/diff/src/index.ts`
+- [x] T044 Define artifact notification event interface in TypeScript `shared/components/diff/src/artifactEvent.ts`
+- [x] T045 Export artifact event types from package index `shared/components/diff/src/index.ts`
 
 **Checkpoint**: Artifact notification contract defined — extension integration deferred to a follow-on feature
 
@@ -193,25 +193,25 @@
 
 ### Validation
 
-- [ ] T046 Run quickstart.md validation end-to-end
-- [ ] T047 Run all Python tests across services/calc and services/stac
-- [ ] T048 [P] Run all TypeScript tests in shared/components/diff
+- [x] T046 Run quickstart.md validation end-to-end
+- [x] T047 Run all Python tests across services/calc and services/stac
+- [x] T048 [P] Run all TypeScript tests in shared/components/diff
 
 ### Evidence Collection
 
-- [ ] T049 Capture test summary in `specs/041-document-tool-results/evidence/test-summary.md`
-- [ ] T050 Create usage demonstration in `specs/041-document-tool-results/evidence/usage-example.md`
-- [ ] T051 [P] Capture sample MCP responses (single and multi-content) in `specs/041-document-tool-results/evidence/`
-- [ ] T052 [P] Capture sample diff output in `specs/041-document-tool-results/evidence/diff-output.json`
+- [x] T049 Capture test summary in `specs/041-document-tool-results/evidence/test-summary.md`
+- [x] T050 Create usage demonstration in `specs/041-document-tool-results/evidence/usage-example.md`
+- [x] T051 [P] Capture sample MCP responses (single and multi-content) in `specs/041-document-tool-results/evidence/`
+- [x] T052 [P] Capture sample diff output in `specs/041-document-tool-results/evidence/diff-output.json`
 
 ### Media Content
 
-- [ ] T053 Create shipped blog post in `specs/041-document-tool-results/media/shipped-post.md`
-- [ ] T054 [P] Create LinkedIn shipped summary in `specs/041-document-tool-results/media/linkedin-shipped.md`
+- [x] T053 Create shipped blog post in `specs/041-document-tool-results/media/shipped-post.md`
+- [x] T054 [P] Create LinkedIn shipped summary in `specs/041-document-tool-results/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T055 Create PR and publish blog: run /speckit.pr
+- [x] T055 Create PR and publish blog: run /speckit.pr
 
 **Task T055 must run last. It depends on all evidence and media tasks being complete.**
 

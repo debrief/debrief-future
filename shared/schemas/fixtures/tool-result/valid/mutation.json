@@ -1,0 +1,17 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "feature://track_a",
+        "mimeType": "application/geo+json",
+        "text": "{\"type\":\"Feature\",\"id\":\"track_a\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[0,0],[1,1],[2,2]]},\"properties\":{\"kind\":\"track\",\"name\":\"Track A\"}}"
+      },
+      "annotations": {
+        "debrief:resultType": "mutation/track/smoothed",
+        "debrief:sourceFeatures": ["track_a"],
+        "debrief:label": "Smoothed Track A"
+      }
+    }
+  ]
+}

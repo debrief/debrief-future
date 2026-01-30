@@ -1,0 +1,12 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Some result",
+      "annotations": {
+        "debrief:resultType": "mutation/track/smoothed",
+        "debrief:sourceFeatures": ["track_a"]
+      }
+    }
+  ]
+}

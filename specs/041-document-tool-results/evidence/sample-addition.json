@@ -1,0 +1,17 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "feature://cpa_001",
+        "mimeType": "application/geo+json",
+        "text": "{\"type\":\"Feature\",\"id\":\"cpa_001\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.5,1.5]},\"properties\":{\"kind\":\"analysis\",\"name\":\"CPA Point\"}}"
+      },
+      "annotations": {
+        "debrief:resultType": "addition/analysis/cpa_point",
+        "debrief:sourceFeatures": ["track_a", "track_b"],
+        "debrief:label": "CPA between Track A and Track B"
+      }
+    }
+  ]
+}
