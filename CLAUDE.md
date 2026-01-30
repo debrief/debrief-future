@@ -126,6 +126,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Local filesystem (STAC 1.0.0 catalogs) (040-stac-store-organization)
 - Python 3.11 (debrief-stac service), TypeScript 5.x (VS Code extension) + pystac concepts (manual STAC JSON), MCP SDK, VS Code extension API (001-save-calc-results-stac)
 - Local filesystem STAC catalog (JSON + GeoJSON files) (001-save-calc-results-stac)
+- TypeScript 5.x (VS Code extension webview) + Leaflet ^1.9.4 (already in project), VS Code extension API, esbuild (042-stac-catalog-overview-panel)
+- Local filesystem STAC catalogs (read-only) (042-stac-catalog-overview-panel)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
