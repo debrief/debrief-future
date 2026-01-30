@@ -311,8 +311,8 @@ export class StacService {
         const props = feature.properties ?? {};
         const geom = feature.geometry;
 
-        // Skip features with no geometry
-        if (!geom) {
+        // Skip features with no geometry or empty coordinates
+        if (!geom || !geom.coordinates || (Array.isArray(geom.coordinates) && geom.coordinates.length === 0)) {
           continue;
         }
 
