@@ -442,6 +442,12 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
     .debrief-display-mode-toggle {
       background: var(--vscode-input-background) !important;
     }
+    .debrief-display-mode-toggle__label {
+      color: var(--vscode-disabledForeground) !important;
+    }
+    .debrief-display-mode-toggle__label--active {
+      color: var(--vscode-foreground) !important;
+    }
     .debrief-display-mode-toggle__slider {
       background: var(--vscode-button-background) !important;
     }
