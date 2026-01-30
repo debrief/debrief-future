@@ -206,6 +206,7 @@ export function createOpenPlotCommand(
         setMapPanel(undefined);
         layersTreeProvider.setTracks([]);
         layersTreeProvider.setLocations([]);
+        layersTreeProvider.setShapes([]);
         layersTreeProvider.setResultLayers([]);
         // Dispose all sessions since they're no longer visible (T028)
         sessionManager.disposeAllSessions();
@@ -221,6 +222,7 @@ export function createOpenPlotCommand(
     // Update layers panel
     layersTreeProvider.setTracks(plotData.tracks);
     layersTreeProvider.setLocations(plotData.locations);
+    layersTreeProvider.setShapes(plotData.otherFeatures);
     layersTreeProvider.setResultLayers([]);
 
     // Update time range panel with plot's time extent

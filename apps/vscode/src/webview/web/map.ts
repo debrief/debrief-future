@@ -567,7 +567,7 @@ function handleLoadPlot(message: Extract<ExtensionToWebviewMessage, { type: 'loa
       onEachFeature: (feature, layer) => {
         // Add popup with feature info
         const props = feature?.properties ?? {};
-        const name = (props.name as string) ?? (props.kind as string) ?? 'Feature';
+        const name = (props.label as string) ?? (props.name as string) ?? (props.kind as string) ?? 'Feature';
         layer.bindTooltip(name);
       },
     });
