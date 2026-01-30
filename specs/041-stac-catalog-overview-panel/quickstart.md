@@ -10,23 +10,34 @@ Add `bbox`, `startDatetime`, `endDatetime` fields to `StacItemSummary`. In `stac
 
 **Test**: Unit test that `listItems()` returns correct bbox and temporal fields from a fixture item.json.
 
-### Step 2: Create the webview entry point
+### Step 2: Create the shared React component
 
-**Files**: `apps/vscode/src/webview/web/catalogOverview.ts`, `catalogOverview.css`
+**Files**: `shared/components/src/CatalogOverview/`
 
-Vanilla JS + Leaflet + SVG:
-- Initialize a Leaflet map in the top region
-- Draw an SVG timeline in the bottom region
-- Add drag bar between them (pointer events → flex-basis adjustment)
-- Listen for `loadCatalogOverview` messages
-- On item double-click, post `overviewItemSelected` message
+Build `<CatalogOverview />` as a React component:
+- Props: `items: CatalogOverviewItem[]`, `onItemSelect: (itemPath: string) => void`
+- React-Leaflet map in the top region with `<Rectangle>` for each item bbox
+- SVG timeline in the bottom region with horizontal bars
+- Drag bar between them (pointer events → flex adjustment)
+- CSS custom properties for theming
+
+**Test**: Storybook stories with fixture data — default view, empty catalog, missing metadata, single item, many items.
+
+### Step 3: Create the VS Code webview entry point
+
+**File**: `apps/vscode/src/webview/web/catalogOverview.tsx`
+
+Thin React entry point that:
+- Renders `<CatalogOverview />` into `#root`
+- Listens for `loadCatalogOverview` messages → passes data as props
+- On `onItemSelect` callback → posts `overviewItemSelected` message
 
 **Build**: Add esbuild entry to `compile:webview` in `package.json`:
 ```
-esbuild src/webview/web/catalogOverview.ts --bundle --outfile=dist/webview/catalogOverview.js --format=iife
+esbuild src/webview/web/catalogOverview.tsx --bundle --outfile=dist/webview/catalogOverview.js --format=iife --loader:.tsx=tsx --loader:.css=text
 ```
 
-### Step 3: Create the panel class
+### Step 4: Create the panel class
 
 **File**: `apps/vscode/src/panels/catalogOverviewPanel.ts`
 
@@ -36,7 +47,7 @@ Follow `mapPanel.ts` pattern:
 - Message handling for `overviewItemSelected` → trigger existing plot open logic
 - Post `loadCatalogOverview` when webview reports ready
 
-### Step 4: Register command and wire up tree view
+### Step 5: Register command and wire up tree view
 
 **Files**: `apps/vscode/src/extension.ts`, `apps/vscode/src/providers/stacTreeProvider.ts`, `apps/vscode/package.json`
 
@@ -44,9 +55,10 @@ Follow `mapPanel.ts` pattern:
 - Add command to catalog tree items in `stacTreeProvider.ts`
 - Add command contribution to `package.json`
 
-### Step 5: Manual verification
+### Step 6: Storybook verification + manual VS Code testing
 
-- Open a STAC store with multiple items
+- Run Storybook, verify all stories render correctly
+- Open a STAC store with multiple items in VS Code
 - Double-click a catalog node → overview panel opens
 - Verify map shows bounding boxes, timeline shows time bars
 - Double-click an item → opens in plot view
@@ -55,11 +67,13 @@ Follow `mapPanel.ts` pattern:
 
 ## Key Patterns to Follow
 
-| Pattern | Reference File | Line |
-|---------|---------------|------|
-| WebviewPanel lifecycle | `apps/vscode/src/webview/mapPanel.ts` | Class definition |
-| HTML generation with CSP | `apps/vscode/src/webview/mapPanel.ts` | `getHtmlForWebview()` |
-| Leaflet CSS from node_modules | `apps/vscode/src/webview/mapPanel.ts` | Line ~1101 |
-| esbuild IIFE bundling | `apps/vscode/package.json` | `compile:webview` script |
-| Tree item commands | `apps/vscode/src/providers/stacTreeProvider.ts` | `getTreeItem()` |
-| stacService data loading | `apps/vscode/src/services/stacService.ts` | `listItems()` |
+| Pattern | Reference File |
+|---------|---------------|
+| Shared React component | `shared/components/src/TimeController/TimeController.tsx` |
+| Storybook stories | `shared/components/src/TimeController/TimeController.stories.tsx` |
+| WebviewPanel lifecycle | `apps/vscode/src/webview/mapPanel.ts` |
+| React webview entry point | `apps/vscode/src/webview/web/timeController.tsx` |
+| HTML generation with CSP | `apps/vscode/src/webview/mapPanel.ts` → `getHtmlForWebview()` |
+| esbuild TSX bundling | `apps/vscode/package.json` → `compile:webview` script |
+| Tree item commands | `apps/vscode/src/providers/stacTreeProvider.ts` → `getTreeItem()` |
+| stacService data loading | `apps/vscode/src/services/stacService.ts` → `listItems()` |

@@ -61,10 +61,18 @@ specs/041-stac-catalog-overview-panel/
 ### Source Code (repository root)
 
 ```text
+shared/components/src/
+├── CatalogOverview/
+│   ├── CatalogOverview.tsx            # NEW — React component (map + timeline + drag bar)
+│   ├── CatalogOverview.css            # NEW — styles with CSS custom properties
+│   ├── CatalogOverview.stories.tsx    # NEW — Storybook stories
+│   ├── types.ts                       # NEW — component prop types
+│   └── index.ts                       # NEW — public export
+
 apps/vscode/
 ├── src/
 │   ├── panels/
-│   │   └── catalogOverviewPanel.ts    # NEW — WebviewPanel lifecycle
+│   │   └── catalogOverviewPanel.ts    # NEW — WebviewPanel lifecycle + message bridge
 │   ├── services/
 │   │   └── stacService.ts             # MODIFY — extend StacItemSummary
 │   ├── providers/
@@ -73,19 +81,32 @@ apps/vscode/
 │   │   └── stac.ts                    # MODIFY — add bbox/temporal fields
 │   ├── webview/
 │   │   └── web/
-│   │       ├── catalogOverview.ts     # NEW — webview entry point
-│   │       └── catalogOverview.css    # NEW — webview styles
+│   │       └── catalogOverview.tsx    # NEW — webview entry (renders React component)
 │   └── extension.ts                   # MODIFY — register command + panel
-└── package.json                       # MODIFY — add command contribution
+└── package.json                       # MODIFY — add command + esbuild entry
 ```
 
-**Structure Decision**: New panel files go in `src/panels/` (new directory) to distinguish from the existing `src/webview/mapPanel.ts` which mixes panel lifecycle with webview concerns. The webview entry point stays in `src/webview/web/` following established convention.
+**Structure Decision**: The UI is a shared React component in `shared/components/` (like TimeController), tested via Storybook. The VS Code extension provides a thin webview wrapper. Panel lifecycle goes in `src/panels/` to distinguish from the existing `src/webview/mapPanel.ts`.
 
 ## Media Components
 
 *Identify Storybook stories to bundle for blog post demos.*
 
-None — this feature is a VS Code extension webview panel. It cannot render standalone in Storybook because it depends on the VS Code webview API and local STAC catalog data. A screenshot/screencast in the blog post will be more effective than an interactive demo.
+| Component | Story Source | Bundle Name | Purpose |
+|-----------|--------------|-------------|---------|
+| CatalogOverview | `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx` | `catalog-overview.js` | Map + timeline overview of STAC catalog items |
+
+**Inclusion Criteria Applied**:
+- [x] New visual component
+- [x] Significant visual change
+- [x] Interactive demo adds narrative value
+
+**Bundleability Verified**:
+- [x] Stories exist in Storybook
+- [x] Components render standalone (no app context required)
+- [x] Reasonable bundle size expected (< 500KB)
+
+**Storybook Link**: `https://debrief.github.io/debrief-future/storybook/?path=/story/catalogoverview--default`
 
 ## Complexity Tracking
 

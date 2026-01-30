@@ -10,14 +10,14 @@
 - `CustomReadonlyEditorProvider` — requires file URI as document; catalog.json could be used but feels forced. Would require registering a `customEditors` contribution for `*.json` files with a filename pattern, which risks conflicts.
 - `WebviewViewProvider` (sidebar) — too constrained for a map+timeline overview that needs full editor area space.
 
-## R2: Webview Framework (Vanilla JS vs React)
+## R2: Webview Framework (React shared component)
 
-**Decision**: Vanilla JS + Leaflet + SVG, matching the existing map webview pattern.
+**Decision**: React component in `shared/components/`, with React-Leaflet for the map and SVG for the timeline. Tested in Storybook, then embedded in VS Code webview.
 
-**Rationale**: The map webview (`map.ts`) is vanilla JS with Leaflet. Using the same approach ensures consistency, avoids adding React to another webview bundle, and keeps bundle size small. The timeline is a simple horizontal bar chart — SVG is sufficient without a framework.
+**Rationale**: The catalog overview is a visual UI component that benefits from Storybook-driven development and testing. The TimeController already follows this pattern (shared React component → VS Code webview). React-Leaflet is already a dependency in `shared/components/`. Developing the component standalone first enables visual verification, theme testing, and iteration without rebuilding the full extension.
 
 **Alternatives considered**:
-- React (like TimeController) — adds ~40KB to bundle, unnecessary for this UI
+- Vanilla JS + Leaflet (like existing map.ts) — would work but loses Storybook testability and component reusability
 - D3.js for timeline — overkill for simple horizontal bars; adds dependency
 
 ## R3: Opening the Overview Panel
@@ -65,6 +65,6 @@
 
 ## R8: esbuild Bundle Configuration
 
-**Decision**: Add a new esbuild entry point for `catalogOverview.ts`, producing `dist/webview/catalogOverview.js` in IIFE format.
+**Decision**: Add a new esbuild entry point for `catalogOverview.tsx`, producing `dist/webview/catalogOverview.js` in IIFE format with TSX and CSS-as-text loaders.
 
-**Rationale**: Follows the existing pattern: `map.ts` → `map.js`, `timeController.tsx` → `timeController.js`. Add one more esbuild invocation to the `compile:webview` script.
+**Rationale**: Follows the TimeController pattern: `timeController.tsx` → `timeController.js` with `--loader:.tsx=tsx --loader:.css=text`. Add one more esbuild invocation to the `compile:webview` script.

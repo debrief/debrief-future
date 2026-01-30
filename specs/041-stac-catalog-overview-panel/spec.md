@@ -28,40 +28,33 @@ If items are missing these fields, they are rendered on the timeline/map with a 
 
 ## Design
 
-### Panel Type: Custom Editor
+### Architecture: Shared Web Component + VS Code Integration
 
-Use `vscode.CustomReadonlyEditorProvider` to register a virtual document editor for STAC catalogs. This allows the panel to appear in the editor area (not the sidebar) and supports the "double-click to open" UX.
+The catalog overview is developed as a **React component in `shared/components/`**, tested in Storybook, then embedded in the VS Code extension as a webview panel. This follows the same pattern as the TimeController component.
 
-Register a custom editor for a virtual URI scheme (e.g., `debrief-catalog:`):
+**Layers**:
+1. **`<CatalogOverview />`** — React component in `shared/components/` with Storybook stories. Accepts catalog data as props, emits item selection via callbacks. Framework-agnostic, no VS Code dependency.
+2. **VS Code webview** — thin wrapper that renders the React component, bridges VS Code message protocol to component props/callbacks.
 
-```typescript
-export class CatalogOverviewProvider implements vscode.CustomReadonlyEditorProvider {
-  public static readonly viewType = 'debrief.catalogOverview';
+### Panel Type: WebviewPanel
 
-  resolveCustomEditor(
-    document: vscode.CustomDocument,
-    webviewPanel: vscode.WebviewPanel,
-  ): void {
-    // Set up webview HTML, message handling
-  }
-}
-```
+Use `vscode.window.createWebviewPanel()` (like MapPanel) to open the overview in the editor area. The panel lifecycle class manages message passing between the extension host and the React component.
 
-**Alternative considered**: `WebviewPanel` (like MapPanel). Rejected because CustomEditor integrates better with VS Code's editor lifecycle — tabs, split views, and the "reopen closed editor" flow all work automatically.
+**Alternative considered**: `CustomReadonlyEditorProvider` — requires a file-backed document; STAC catalogs are directories, not files. The virtual URI workaround adds complexity without clear benefit.
 
-**Alternative considered**: `WebviewViewProvider` (like TimeRangeView). Rejected because the overview is document-scoped content, not a global sidebar panel.
+**Alternative considered**: `WebviewViewProvider` (sidebar) — too constrained for a map+timeline overview that needs full editor area space.
 
 ### Opening the Panel
 
 When the user double-clicks a catalog node in the STAC Stores tree view (`stacTreeProvider.ts`), the extension:
 
-1. Constructs a virtual URI: `debrief-catalog://<store-path>/<catalog-id>`
-2. Calls `vscode.commands.executeCommand('vscode.openWith', uri, 'debrief.catalogOverview')`
-3. The custom editor provider resolves the document and populates the webview
+1. Calls `debrief.openCatalogOverview` command with store path and catalog ID
+2. Creates (or shows existing) `WebviewPanel` for that catalog
+3. Loads item metadata via `stacService.listItems()` and posts to webview
 
-### Webview Layout
+### Component Layout
 
-The webview contains two regions in a vertical split:
+The `<CatalogOverview />` component contains two regions in a vertical split:
 
 ```
 ┌──────────────────────────────┐
@@ -77,11 +70,11 @@ The webview contains two regions in a vertical split:
 └──────────────────────────────┘
 ```
 
-**Map region** (top): Leaflet map showing a rectangle or polygon for each item's `bbox`. Items without `bbox` are omitted from the map. The map auto-fits to the combined extent of all items.
+**Map region** (top): React-Leaflet map showing a `<Rectangle>` for each item's `bbox`. Items without `bbox` are omitted from the map. The map auto-fits to the combined extent of all items.
 
 **Timeline region** (bottom): SVG-based horizontal bar chart. Each item is a row with a bar spanning `start_datetime` to `end_datetime`. Items without temporal metadata show a point marker at `datetime` if available, or are listed with a "no time data" label.
 
-**Drag bar**: A `<div>` between the regions that supports pointer drag to resize. Persists the split ratio to `vscode.Memento` (workspace state).
+**Drag bar**: A `<div>` between the regions that supports pointer drag to resize. Split ratio controlled via component state, persisted by the host (VS Code Memento or Storybook knob).
 
 ### Message Protocol
 
@@ -150,11 +143,13 @@ This avoids loading full GeoJSON assets — only the lightweight `item.json` met
 
 ### Styling
 
-- Use VS Code theme variables (`--vscode-editor-background`, `--vscode-foreground`, etc.) for all colors
+- Component uses CSS custom properties for theming (same approach as TimeController)
+- VS Code webview wrapper maps `--vscode-*` variables to component CSS variables
+- Storybook stories provide light/dark theme decorators
 - Map tile layer: use a neutral/dark tile set that works with both light and dark themes, or use a simple vector outline map
-- Timeline bars: use `--vscode-charts-*` color variables for item bars
+- Timeline bars: use theme accent color variables for item bars
 - Hover state on items: highlight border, show tooltip with item title and time range
-- Selected item: distinct border color using `--vscode-focusBorder`
+- Selected item: distinct border color using theme focus color
 
 ## Data Flow
 
@@ -179,20 +174,24 @@ Webview (user double-clicks item)
 
 | File | Purpose |
 |------|---------|
-| `apps/vscode/src/editors/catalogOverviewProvider.ts` | CustomReadonlyEditorProvider implementation |
-| `apps/vscode/src/editors/catalogOverviewMessages.ts` | Message types for the overview panel |
-| `apps/vscode/src/webview/web/catalogOverview.ts` | Webview entry point (Leaflet map + SVG timeline) |
-| `apps/vscode/src/webview/web/catalogOverview.css` | Styles for the overview panel |
+| `shared/components/src/CatalogOverview/CatalogOverview.tsx` | React component: map + timeline + drag bar |
+| `shared/components/src/CatalogOverview/CatalogOverview.css` | Component styles with CSS custom properties |
+| `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx` | Storybook stories with fixture data |
+| `shared/components/src/CatalogOverview/types.ts` | Component prop types (`CatalogOverviewItem`, etc.) |
+| `shared/components/src/CatalogOverview/index.ts` | Public export |
+| `apps/vscode/src/panels/catalogOverviewPanel.ts` | WebviewPanel lifecycle + message bridging |
+| `apps/vscode/src/webview/web/catalogOverview.tsx` | Webview entry point (renders React component) |
 
 ## Files to Modify
 
 | File | Change |
 |------|--------|
-| `apps/vscode/src/extension.ts` | Register `CatalogOverviewProvider`, register open command |
+| `apps/vscode/src/extension.ts` | Register `openCatalogOverview` command |
 | `apps/vscode/src/services/stacService.ts` | Extend `listItems()` / `StacItemSummary` with bbox and temporal fields |
 | `apps/vscode/src/providers/stacTreeProvider.ts` | Add double-click command to catalog nodes |
 | `apps/vscode/src/types/stac.ts` | Add `bbox`, `startDatetime`, `endDatetime` to `StacItemSummary` |
-| `apps/vscode/package.json` | Register `customEditors` contribution point |
+| `apps/vscode/package.json` | Add command contribution + esbuild entry |
+| `shared/components/src/index.ts` | Export `CatalogOverview` component |
 
 ## Acceptance Criteria
 
@@ -209,10 +208,11 @@ Webview (user double-clicks item)
 
 ## Testing Strategy
 
-1. **Unit tests** for `StacItemSummary` metadata extraction — verify bbox, start/end datetime parsing from item.json
-2. **Unit tests** for the overview provider — verify correct URI construction and message posting
-3. **Manual verification** — load a STAC store with multiple items, verify map shows extents, timeline shows ranges, navigation works
-4. **Edge cases** — empty catalog, single item, items without bbox, items without temporal metadata
+1. **Storybook stories** for `<CatalogOverview />` — fixture data with various item configurations (all metadata, missing bbox, missing temporal, empty catalog, single item)
+2. **Unit tests** for `StacItemSummary` metadata extraction — verify bbox, start/end datetime parsing from item.json
+3. **Unit tests** for timeline layout logic — verify bar positioning, time axis scaling, edge cases
+4. **Manual verification** — load a STAC store with multiple items in VS Code, verify map shows extents, timeline shows ranges, item navigation works
+5. **Edge cases** — empty catalog, single item, items without bbox, items without temporal metadata
 
 ## Out of Scope
 
@@ -220,4 +220,3 @@ Webview (user double-clicks item)
 - Remote/cloud STAC catalog support
 - Filtering or search within the overview
 - Synchronizing the overview panel viewport with the plot MapPanel
-- React-based implementation (vanilla JS + Leaflet + SVG, consistent with existing map webview)
