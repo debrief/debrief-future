@@ -88,6 +88,16 @@ A result that produces a non-GeoJSON file.
 | mimeType | string | MIME type of the artifact |
 | annotations | ToolResultAnnotations | Must include resultType starting with `artifact/` and `debrief:href` |
 
+### ToolResponse
+
+An MCP response from a tool, containing one or more content items.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| content | ContentItem[] | Array of one or more result content items |
+
+Each content item is processed independently by the orchestrator based on its `debrief:resultType`. Content items are processed sequentially in array order.
+
 ### ToolErrorResponse
 
 Structured error from a failed tool execution.
@@ -142,11 +152,13 @@ A single modified feature in a diff result.
 ## Relationships
 
 ```
-Tool ──executes──► ToolResult (1:N over time)
-ToolResult ──classified_as──► ResultTypePath (1:1)
-ToolResult ──annotated_with──► ToolResultAnnotations (1:1)
-ToolResult ──persisted_by──► debrief-stac (1:1)
-FeatureCollection ──diffed_to──► FeatureCollectionDiff (1:1 per comparison)
+Tool ──executes──► ToolResponse (1:N over time)
+ToolResponse ──contains──► ContentItem (1:N per response)
+ContentItem ──classified_as──► ResultTypePath (1:1)
+ContentItem ──annotated_with──► ToolResultAnnotations (1:1)
+Orchestrator ──interprets──► ContentItem ──calls──► AtomicSTACOperation
+AtomicSTACOperation ──updates──► FeatureCollection
+FeatureCollection ──diffed_to──► FeatureCollectionDiff (1:1 per operation)
 Feature ──has_provenance──► FeatureProvenance (1:0..1)
 FeatureProvenance ──references──► SourceRef (1:N)
 ```
@@ -199,10 +211,12 @@ artifact/
 
 ## Validation Rules
 
-1. `debrief:resultType` MUST start with one of: `mutation/`, `addition/`, `deletion/`, `artifact/`
-2. `debrief:sourceFeatures` MUST be a non-empty array of strings
-3. `debrief:label` MUST be a non-empty string
-4. `debrief:href` MUST be present when `debrief:resultType` starts with `artifact/`
-5. `debrief:deletedFeatures` MUST be present when `debrief:resultType` starts with `deletion/`
-6. Error responses MUST include `debrief:errorCategory` from the defined set
-7. Persisted features MUST have `properties.prov` populated after any persistence operation
+1. A tool response MUST contain a `content` array with at least one item
+2. Each content item's `debrief:resultType` MUST start with one of: `mutation/`, `addition/`, `deletion/`, `artifact/`
+3. Each content item's `debrief:sourceFeatures` MUST be a non-empty array of strings
+4. Each content item's `debrief:label` MUST be a non-empty string
+5. `debrief:href` MUST be present when `debrief:resultType` starts with `artifact/`
+6. `debrief:deletedFeatures` MUST be present when `debrief:resultType` starts with `deletion/`
+7. Error responses MUST include `debrief:errorCategory` from the defined set
+8. Persisted features MUST have `properties.prov` populated after any atomic persistence operation
+9. Content items in a multi-result response are processed sequentially in array order

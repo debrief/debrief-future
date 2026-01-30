@@ -54,25 +54,32 @@ cd services/calc
 uv run pytest tests/test_result_builder.py -v
 ```
 
-## Persistence: Store Results via debrief-stac
+## Persistence: Atomic STAC Operations
 
-After a tool returns a result, the orchestrator sends it to debrief-stac:
+After a tool returns a result, the orchestrator iterates the content array and calls the appropriate atomic STAC operation for each content item. debrief-stac has no knowledge of result types — the orchestrator interprets them.
 
 ```python
-from debrief_stac.results import persist_result
+from debrief_stac.features import update_features, add_features, delete_features
+from debrief_stac.artifacts import store_artifact
 
-updated_fc = persist_result(
-    catalog_path="/data/catalog",
-    plot_id="plot_001",
-    result=tool_response,  # MCP-compliant result from debrief-calc
-)
+# For mutations — update existing features
+count = update_features("/data/catalog", "plot_001", [modified_feature])
+
+# For additions — append new features
+count = add_features("/data/catalog", "plot_001", [new_feature])
+
+# For deletions — remove features by ID
+count = delete_features("/data/catalog", "plot_001", ["contact_001", "contact_002"])
+
+# For artifacts — write file and update item.json
+item = store_artifact("/data/catalog", "plot_001", data, "./results/report.json", "application/json", "Outlier report")
 ```
 
 Run persistence tests:
 
 ```bash
 cd services/stac
-uv run pytest tests/test_results.py -v
+uv run pytest tests/test_features.py tests/test_artifacts.py tests/test_provenance.py -v
 ```
 
 ## Diff: Compare FeatureCollections
@@ -97,8 +104,9 @@ pnpm test
 
 ## Verify End-to-End
 
-1. Invoke a tool via MCP → verify response has annotations
-2. Send result to debrief-stac → verify FeatureCollection updated
-3. Diff old and new FC → verify correct changes reported
+1. Invoke a tool via MCP → verify response has content array with annotations
+2. For each content item, call appropriate atomic STAC operation → verify FeatureCollection updated
+3. Diff old and new FC after each operation → verify correct changes reported incrementally
 4. Check `properties.prov` on affected features → verify provenance recorded
 5. For artifacts: check `results/` directory and `item.json` assets
+6. For multi-result responses: verify each content item processed sequentially in array order

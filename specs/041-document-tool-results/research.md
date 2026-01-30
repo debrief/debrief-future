@@ -21,7 +21,7 @@
 
 **Key file**: `debrief_stac/features.py` — `add_features()` at line 23. Validates features, appends to FeatureCollection, updates bbox, saves item.
 
-**Gap**: Missing mutation (in-place update), deletion, artifact persistence, provenance recording, and result-type-aware routing.
+**Gap**: Missing mutation (in-place update), deletion, artifact persistence, and provenance recording. Note: debrief-stac does NOT need result-type-aware routing — the orchestrator (frontend/LLM) interprets result types and calls the appropriate atomic STAC operation.
 
 ### LinkML Schemas (shared/schemas/)
 
@@ -50,12 +50,16 @@ All types carry `annotations` object with `debrief:resultType`, `debrief:sourceF
 
 Spec 001 focuses on the VS Code "Save Result" command and STAC Item creation for persisted results. Spec 041 is the underlying architecture that 001 depends on:
 
-- 041 defines result types and persistence routing → 001 uses it to save
-- 041 defines MCP response format → 001 consumes those responses
+- 041 defines result types and MCP response format → 001 consumes those responses
+- 041 defines atomic STAC operations → 001 uses them to persist
 - 041 defines the diff utility → frontends use it after persistence
-- 001's `create_result()` is a specific case of 041's `persist_result()` routing
+- 041's orchestrator logic (iterating content array, calling atomic ops) is the mechanism 001 builds upon
 
-Implementation of 041 should subsume and extend the persistence work planned in 001.
+Key architectural change: debrief-stac has no knowledge of result types. The orchestrator (frontend/LLM) interprets `debrief:resultType` on each content item and calls the appropriate atomic STAC operation (update_features, add_features, delete_features, store_artifact).
+
+## Multi-Result Responses
+
+Tools may return multiple content items in a single MCP response. For example, a "trim outliers" tool returns both a deletion (removing contacts) and an artifact (outlier report). The orchestrator processes each content item sequentially in array order, calling atomic STAC operations and updating the UI incrementally after each one.
 
 ## Provenance Design
 

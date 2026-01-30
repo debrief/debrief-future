@@ -81,13 +81,13 @@ services/calc/debrief_calc/
 
 services/stac/src/debrief_stac/
 ├── features.py               # MODIFY: Add update_features(), delete_features()
-├── results.py                # NEW: persist_result() routing by result type
+├── artifacts.py              # NEW: store_artifact() — file write + item.json update
 ├── provenance.py             # NEW: Write PROV to feature properties
 ├── mcp/
-│   └── server.py             # MODIFY: Add persist_result tool
+│   └── server.py             # MODIFY: Add atomic STAC operation tools
 └── tests/
     ├── test_features.py      # MODIFY: Add tests for update + delete
-    ├── test_results.py       # NEW: Result persistence tests per type
+    ├── test_artifacts.py     # NEW: Artifact storage tests
     └── test_provenance.py    # NEW: Provenance writing tests
 
 shared/components/

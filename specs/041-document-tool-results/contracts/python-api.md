@@ -56,6 +56,23 @@ class ResultTypePath:
 ### `result_builder.py`
 
 ```python
+def build_response(
+    content_items: list[dict],
+) -> dict:
+    """Build an MCP tool response containing one or more content items.
+
+    Args:
+        content_items: List of content dicts (from build_mutation, build_addition, etc.)
+
+    Returns:
+        MCP response dict with content array
+
+    Raises:
+        ValueError: If content_items is empty
+    """
+    ...
+
+
 def build_mutation(
     features: list[dict],
     result_subtype: str,
@@ -159,40 +176,9 @@ def build_error(
     ...
 ```
 
-## debrief-stac: Result Persistence
+## debrief-stac: Atomic Storage Operations
 
-### `results.py`
-
-```python
-def persist_result(
-    catalog_path: str | Path,
-    plot_id: str,
-    result: dict,
-) -> dict:
-    """Persist a tool result to the STAC catalog.
-
-    Routes to the appropriate handler based on debrief:resultType:
-    - mutation/ → update features in-place in FeatureCollection
-    - addition/ → append features to FeatureCollection
-    - deletion/ → remove features from FeatureCollection
-    - artifact/ → write file to results/ directory + update item.json
-
-    All operations also write provenance to affected feature properties.
-
-    Args:
-        catalog_path: Path to the catalog directory
-        plot_id: ID of the plot to update
-        result: MCP-compliant result dict with annotations
-
-    Returns:
-        Updated FeatureCollection dict
-
-    Raises:
-        ValueError: If result type is invalid or annotations are missing
-        PlotNotFoundError: If the plot doesn't exist
-    """
-    ...
-```
+debrief-stac exposes simple, storage-focused operations with no knowledge of result types. The orchestrator (frontend/LLM) is responsible for interpreting result types and calling the appropriate operation.
 
 ### `features.py` (additions to existing module)
 
@@ -242,6 +228,37 @@ def delete_features(
 
     Raises:
         PlotNotFoundError: If the plot doesn't exist
+    """
+    ...
+```
+
+### `artifacts.py`
+
+```python
+def store_artifact(
+    catalog_path: str | Path,
+    plot_id: str,
+    artifact_data: bytes,
+    href: str,
+    mime_type: str,
+    label: str,
+) -> dict:
+    """Write an artifact file to the results/ directory and update item.json.
+
+    Args:
+        catalog_path: Path to the catalog directory
+        plot_id: ID of the plot
+        artifact_data: Raw artifact bytes
+        href: Relative file path (e.g., "./results/bt_plot_001.png")
+        mime_type: MIME type of the artifact
+        label: Human-readable label for the asset entry
+
+    Returns:
+        Updated STAC Item dict with new asset entry
+
+    Raises:
+        PlotNotFoundError: If the plot doesn't exist
+        ValueError: If href doesn't start with "./results/"
     """
     ...
 ```

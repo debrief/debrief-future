@@ -82,6 +82,46 @@ function matchesResultType(typePath: string, prefix: string): boolean;
 function getTopLevelType(typePath: string): ResultTopType;
 ```
 
+## Orchestrator: Content Array Processing
+
+```typescript
+/**
+ * Process a multi-result tool response by iterating the content array
+ * and calling the appropriate atomic STAC operation for each item.
+ *
+ * Each content item is processed sequentially in array order.
+ * After each atomic operation, the diff utility is called and UI is updated.
+ *
+ * @param response - MCP tool response with content array
+ * @param catalogPath - Path to the STAC catalog
+ * @param plotId - Plot ID to update
+ * @returns Array of FeatureCollectionDiff results (one per content item)
+ *
+ * @example
+ * ```typescript
+ * // Tool returns deletion + artifact
+ * const diffs = await processToolResponse(response, catalogPath, plotId);
+ * // diffs[0] = diff from deletion operation
+ * // diffs[1] = diff from artifact storage (FC unchanged, but asset added)
+ * ```
+ */
+async function processToolResponse(
+  response: ToolResponse,
+  catalogPath: string,
+  plotId: string,
+): Promise<FeatureCollectionDiff[]>;
+
+interface ToolResponse {
+  content: ContentItem[];
+}
+
+interface ContentItem {
+  type: "text" | "resource" | "image";
+  annotations: DebriefResultAnnotations;
+  [key: string]: unknown;
+}
+```
+
 ## Debrief Result Annotations
 
 ```typescript

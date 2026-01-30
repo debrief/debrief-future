@@ -26,6 +26,7 @@
 | sample-addition.json | MCP response for an addition result | After result builder works |
 | sample-deletion.json | MCP response for a deletion result | After result builder works |
 | sample-artifact.json | MCP response for an artifact result | After result builder works |
+| sample-multi-result.json | MCP response with multiple content items | After result builder works |
 | diff-output.json | FeatureCollectionDiff output example | After diff utility works |
 
 ### Media Content
@@ -53,8 +54,9 @@
 - [ ] T003 [P] Create valid golden fixture for addition result `shared/schemas/fixtures/tool-result/valid/addition.json`
 - [ ] T004 [P] Create valid golden fixture for deletion result `shared/schemas/fixtures/tool-result/valid/deletion.json`
 - [ ] T005 [P] Create valid golden fixture for artifact result `shared/schemas/fixtures/tool-result/valid/artifact.json`
-- [ ] T006 [P] Create invalid golden fixtures (missing annotations, bad top-level type) `shared/schemas/fixtures/tool-result/invalid/`
-- [ ] T007 Create evidence and media directories `specs/041-document-tool-results/evidence/`
+- [ ] T006 [P] Create valid golden fixture for multi-result response (deletion + artifact) `shared/schemas/fixtures/tool-result/valid/multi-result.json`
+- [ ] T007 [P] Create invalid golden fixtures (missing annotations, bad top-level type) `shared/schemas/fixtures/tool-result/invalid/`
+- [ ] T008 Create evidence and media directories `specs/041-document-tool-results/evidence/`
 
 ---
 
@@ -64,10 +66,10 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 [test] Write ResultTopType and ResultTypePath unit tests `services/calc/tests/test_result_types.py`
-- [ ] T009 Implement ResultTopType enum and ResultTypePath class `services/calc/debrief_calc/result_types.py`
-- [ ] T010 [test] Write provenance writing tests `services/stac/tests/test_provenance.py`
-- [ ] T011 Implement write_provenance() function `services/stac/src/debrief_stac/provenance.py`
+- [ ] T009 [test] Write ResultTopType and ResultTypePath unit tests `services/calc/tests/test_result_types.py`
+- [ ] T010 Implement ResultTopType enum and ResultTypePath class `services/calc/debrief_calc/result_types.py`
+- [ ] T011 [test] Write provenance writing tests `services/stac/tests/test_provenance.py`
+- [ ] T012 Implement write_provenance() function `services/stac/src/debrief_stac/provenance.py`
 
 **Checkpoint**: Foundation ready — result type classification and provenance writing available for all stories
 
@@ -75,56 +77,55 @@
 
 ## Phase 3: User Story 1 — Tool Returns Typed Result (Priority: P1) 🎯 MVP
 
-**Goal**: Tools return MCP-compliant responses with Debrief annotations classifying results into one of four types
+**Goal**: Tools return MCP-compliant responses (single or multi-content) with Debrief annotations classifying each content item into one of four types
 
-**Independent Test**: Invoke any calc tool and verify response contains valid MCP content with `debrief:resultType`, `debrief:sourceFeatures`, and `debrief:label` annotations
+**Independent Test**: Invoke any calc tool and verify response contains a valid MCP content array where each item has `debrief:resultType`, `debrief:sourceFeatures`, and `debrief:label` annotations
 
 ### Tests for User Story 1
 
-- [ ] T012 [P][test] Write build_mutation tests `services/calc/tests/test_result_builder.py`
-- [ ] T013 [P][test] Write build_addition tests `services/calc/tests/test_result_builder.py`
-- [ ] T014 [P][test] Write build_deletion tests `services/calc/tests/test_result_builder.py`
-- [ ] T015 [P][test] Write build_artifact tests `services/calc/tests/test_result_builder.py`
-- [ ] T016 [P][test] Write build_error tests `services/calc/tests/test_result_builder.py`
+- [ ] T013 [P][test] Write build_mutation tests `services/calc/tests/test_result_builder.py`
+- [ ] T014 [P][test] Write build_addition tests `services/calc/tests/test_result_builder.py`
+- [ ] T015 [P][test] Write build_deletion tests `services/calc/tests/test_result_builder.py`
+- [ ] T016 [P][test] Write build_artifact tests `services/calc/tests/test_result_builder.py`
+- [ ] T017 [P][test] Write build_error and build_response (multi-content) tests `services/calc/tests/test_result_builder.py`
 
 ### Implementation for User Story 1
 
-- [ ] T017 Implement build_mutation() `services/calc/debrief_calc/result_builder.py`
-- [ ] T018 Implement build_addition() `services/calc/debrief_calc/result_builder.py`
-- [ ] T019 Implement build_deletion() `services/calc/debrief_calc/result_builder.py`
-- [ ] T020 Implement build_artifact() `services/calc/debrief_calc/result_builder.py`
-- [ ] T021 Implement build_error() `services/calc/debrief_calc/result_builder.py`
-- [ ] T022 Update MCP server to use result_builder for tool responses `services/calc/debrief_calc/mcp/server.py`
-- [ ] T023 Verify all US1 tests pass
+- [ ] T018 Implement build_mutation() `services/calc/debrief_calc/result_builder.py`
+- [ ] T019 Implement build_addition() `services/calc/debrief_calc/result_builder.py`
+- [ ] T020 Implement build_deletion() `services/calc/debrief_calc/result_builder.py`
+- [ ] T021 Implement build_artifact() `services/calc/debrief_calc/result_builder.py`
+- [ ] T022 Implement build_error() and build_response() (wraps content items into MCP response) `services/calc/debrief_calc/result_builder.py`
+- [ ] T023 Update MCP server to use result_builder for tool responses (single and multi-content) `services/calc/debrief_calc/mcp/server.py`
+- [ ] T024 Verify all US1 tests pass
 
-**Checkpoint**: Tools return typed, annotated MCP responses — US1 independently functional
+**Checkpoint**: Tools return typed, annotated MCP responses (single or multi-content) — US1 independently functional
 
 ---
 
 ## Phase 4: User Story 2 — Result Persisted to STAC Catalog (Priority: P1) 🎯 MVP
 
-**Goal**: debrief-stac persists all four result types with provenance recording
+**Goal**: debrief-stac exposes atomic storage operations (no result type knowledge) with provenance recording; orchestrator iterates content array and calls appropriate operations
 
-**Independent Test**: Send each result type to debrief-stac and verify FeatureCollection, item.json, and results/ directory are correctly updated
+**Independent Test**: Call each atomic STAC operation independently and verify FeatureCollection, item.json, and results/ directory are correctly updated
 
 ### Tests for User Story 2
 
-- [ ] T024 [P][test] Write update_features tests `services/stac/tests/test_features.py`
-- [ ] T025 [P][test] Write delete_features tests `services/stac/tests/test_features.py`
-- [ ] T026 [test] Write persist_result routing tests (all four types) `services/stac/tests/test_results.py`
-- [ ] T027 [test] Write artifact file persistence tests `services/stac/tests/test_results.py`
+- [ ] T025 [P][test] Write update_features tests `services/stac/tests/test_features.py`
+- [ ] T026 [P][test] Write delete_features tests `services/stac/tests/test_features.py`
+- [ ] T027 [P][test] Write store_artifact tests `services/stac/tests/test_artifacts.py`
+- [ ] T028 [test] Write provenance integration tests (provenance written by each atomic op) `services/stac/tests/test_provenance.py`
 
 ### Implementation for User Story 2
 
-- [ ] T028 Implement update_features() in features module `services/stac/src/debrief_stac/features.py`
-- [ ] T029 Implement delete_features() in features module `services/stac/src/debrief_stac/features.py`
-- [ ] T030 Implement persist_result() routing by result type `services/stac/src/debrief_stac/results.py`
-- [ ] T031 Implement artifact file write + STAC Item asset update in persist_result `services/stac/src/debrief_stac/results.py`
-- [ ] T032 Integrate provenance writing into persist_result for all types `services/stac/src/debrief_stac/results.py`
-- [ ] T033 Add persist_result MCP tool to stac server `services/stac/src/debrief_stac/mcp/server.py`
+- [ ] T029 Implement update_features() in features module `services/stac/src/debrief_stac/features.py`
+- [ ] T030 Implement delete_features() in features module `services/stac/src/debrief_stac/features.py`
+- [ ] T031 Implement store_artifact() — file write + item.json asset update `services/stac/src/debrief_stac/artifacts.py`
+- [ ] T032 Integrate provenance writing into update_features, add_features, and delete_features `services/stac/src/debrief_stac/features.py`
+- [ ] T033 Add atomic STAC operation MCP tools (update_features, add_features, delete_features, store_artifact) `services/stac/src/debrief_stac/mcp/server.py`
 - [ ] T034 Verify all US2 tests pass
 
-**Checkpoint**: Full compute-persist pipeline works — US1 + US2 form the MVP
+**Checkpoint**: Atomic STAC operations work — US1 + US2 form the MVP
 
 ---
 
@@ -136,7 +137,7 @@
 
 ### Tests for User Story 3
 
-- [ ] T035 [test] Write diffFeatureCollections tests (add, remove, modify, identical, empty) `shared/components/diff/tests/diffFeatureCollections.test.ts`
+- [ ] T035 [test] Write diffFeatureCollections tests (add, remove, modify, identical, empty, incremental) `shared/components/diff/tests/diffFeatureCollections.test.ts`
 
 ### Implementation for User Story 3
 
@@ -200,7 +201,7 @@
 
 - [ ] T049 Capture test summary in `specs/041-document-tool-results/evidence/test-summary.md`
 - [ ] T050 Create usage demonstration in `specs/041-document-tool-results/evidence/usage-example.md`
-- [ ] T051 [P] Capture sample MCP responses (mutation, addition, deletion, artifact) in `specs/041-document-tool-results/evidence/`
+- [ ] T051 [P] Capture sample MCP responses (single and multi-content) in `specs/041-document-tool-results/evidence/`
 - [ ] T052 [P] Capture sample diff output in `specs/041-document-tool-results/evidence/diff-output.json`
 
 ### Media Content
@@ -232,10 +233,10 @@
 ### User Story Dependencies
 
 - **US1 (P1)**: After Foundation — no other story dependencies
-- **US2 (P1)**: After Foundation + US1 (consumes result builder output)
+- **US2 (P1)**: After Foundation — atomic STAC ops are independent of US1 (no result type knowledge); can run in parallel with US1
 - **US3 (P2)**: After Foundation — independent of US1/US2
 - **US4 (P2)**: After Foundation — independent of US1/US2/US3
-- **US5 (P3)**: After US2 (artifact persistence) — contracts only
+- **US5 (P3)**: After US2 (store_artifact operation) — contracts only
 
 ### Within Each User Story
 
@@ -246,10 +247,11 @@
 
 ### Parallel Opportunities
 
-- T002–T006 (golden fixtures) can all run in parallel
-- T008+T010 (foundation tests) can run in parallel
-- T012–T016 (US1 builder tests) can all run in parallel
-- T024+T025 (US2 feature operation tests) can run in parallel
+- T002–T007 (golden fixtures) can all run in parallel
+- T009+T011 (foundation tests) can run in parallel
+- T013–T017 (US1 builder tests) can all run in parallel
+- T025+T026+T027 (US2 atomic operation tests) can all run in parallel
+- US1 (Phase 3) and US2 (Phase 4) can run in parallel (stac has no result type knowledge)
 - US3 (Phase 5) and US4 (Phase 6) can run entirely in parallel with each other
 - T047+T048 (final test runs) can run in parallel
 - T051+T052 (evidence capture) can run in parallel
@@ -261,11 +263,11 @@
 
 ```bash
 # Launch all US1 builder tests in parallel:
-Task: "Write build_mutation tests"     (T012)
-Task: "Write build_addition tests"     (T013)
-Task: "Write build_deletion tests"     (T014)
-Task: "Write build_artifact tests"     (T015)
-Task: "Write build_error tests"        (T016)
+Task: "Write build_mutation tests"                    (T013)
+Task: "Write build_addition tests"                    (T014)
+Task: "Write build_deletion tests"                    (T015)
+Task: "Write build_artifact tests"                    (T016)
+Task: "Write build_error + build_response tests"      (T017)
 ```
 
 ---
@@ -297,9 +299,10 @@ With multiple developers:
 
 1. Team completes Setup + Foundation together
 2. Once Foundation is done:
-   - Developer A: US1 (result builder) → US2 (persistence)
-   - Developer B: US3 (diff utility) + US4 (type degradation)
+   - Developer A: US1 (result builder) + US3 (diff utility)
+   - Developer B: US2 (atomic STAC ops) + US4 (type degradation)
 3. US5 handled after US2 completes
+4. US1 and US2 run in parallel — stac has no result type knowledge
 
 ---
 
