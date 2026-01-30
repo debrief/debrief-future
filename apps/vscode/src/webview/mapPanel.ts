@@ -467,8 +467,11 @@ export class MapPanel {
       return 'POINT';
     }
 
-    // Future: check other feature types (CIRCLE, RECTANGLE, LINE, VECTOR)
-    // These would be stored in a separate collection
+    // Check result layers
+    const resultLayer = this.resultLayers.find((l) => l.id === featureId);
+    if (resultLayer) {
+      return 'RESULT';
+    }
 
     return undefined;
   }
