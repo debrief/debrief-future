@@ -333,7 +333,8 @@
     "viewsWelcome": [
       {
         "view": "debrief.stacExplorer",
-        "contents": "No STAC stores configured.\n[Add Store](command:debrief.addStore)\nA STAC store is a folder containing maritime plot data."
+        "contents": "No STAC stores configured.\n[Add Store](command:debrief.addStore)\nA STAC store is a folder containing maritime plot data.",
+        "when": "!debrief.hasStores"
       },
       {
         "view": "debrief.tools",

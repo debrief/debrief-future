@@ -118,6 +118,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // Create ToolMatchAdapter - tools will be loaded when calcService connects
   const toolMatchAdapter = new ToolMatchAdapter([], getFeatureKind);
 
+  // Set store context early so viewsWelcome doesn't flash incorrectly
+  const updateHasStores = (): void => {
+    void vscode.commands.executeCommand(
+      'setContext',
+      'debrief.hasStores',
+      configService.getStores().length > 0,
+    );
+  };
+  updateHasStores();
+  configService.onConfigChange(() => updateHasStores());
+
   // Register tree providers
   const stacTreeProvider = new StacTreeProvider(configService, stacService);
   const toolsTreeProvider = new ToolsTreeProvider(calcService, toolMatchAdapter);
