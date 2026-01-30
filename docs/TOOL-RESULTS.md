@@ -129,30 +129,46 @@ Lists source and result assets for navigation:
 ### Sequence
 
 1. Frontend/LLM invokes tool via MCP
-2. Tool executes, returns MCP-compliant response with annotations
-3. Frontend/LLM sends result to debrief-stac: "store this result against these source features"
-4. debrief-stac:
-   - Writes artifact file to `results/` (if applicable)
-   - Updates FeatureCollection (mutation/addition/deletion)
-   - Writes PROV to affected feature properties
-   - Updates `item.json` asset list
-   - Returns full updated FeatureCollection
-5. Frontend diffs old FC vs new FC
-6. Frontend applies minimal UI updates
+2. Tool executes, returns MCP response with content array (one or more items)
+3. Frontend/LLM iterates content array:
+   - Interprets `debrief:resultType` for each item
+   - Calls appropriate atomic debrief-stac operation
+   - Receives updated FeatureCollection
+   - Diffs old FC vs new FC
+   - Applies incremental UI update
+4. User sees changes progressively as each operation completes
+
+### Atomic STAC Operations
+
+debrief-stac exposes simple, storage-focused operations with no knowledge of result types:
+
+| Operation | Purpose |
+|-----------|---------|
+| `update_features(feature_ids, features)` | Modify existing features (for mutations) |
+| `add_features(features)` | Add new features to FC (for additions) |
+| `delete_features(feature_ids)` | Remove features from FC (for deletions) |
+| `store_artifact(artifact_data, path)` | Write file to results/, update item.json |
+
+Each operation:
+- Performs its persistence task
+- Writes PROV to affected feature properties
+- Updates `item.json` as needed
+- Returns full updated FeatureCollection
 
 ### Responsibility Boundaries
 
 | Component | Responsibility |
 |-----------|----------------|
-| Tool (debrief-calc) | Pure computation; returns result + metadata; no persistence knowledge |
-| Orchestrator (frontend/LLM) | Invokes tool, routes result to debrief-stac |
-| debrief-stac | All persistence — artifacts, FC updates, PROV, item.json |
-| Frontend | Diffing, rendering, user feedback |
+| Tool (debrief-calc) | Pure computation; returns MCP content array; no persistence knowledge |
+| Orchestrator (frontend/LLM) | Iterates content array, interprets result types, calls atomic STAC operations |
+| debrief-stac | Atomic persistence — no result type knowledge, just storage operations |
+| Frontend | Diffing after each operation, incremental rendering, user feedback |
 
 ### Diffing
 
 - Shared `diffFeatureCollections(old, new)` utility
 - Returns `{ added: Feature[], removed: string[], modified: { id, feature }[] }`
+- Called after each atomic STAC operation for incremental UI updates
 - React-Leaflet path: can rely on React reconciliation with keyed components
 - VS Code imperative path: feeds diff into existing renderer add/remove/update methods
 
@@ -246,6 +262,45 @@ Return via appropriate MCP content type:
 | `debrief:href` | Artifacts only | Relative path for persistence |
 | `debrief:deletedFeatures` | Deletions only | Feature IDs removed |
 
+### Multi-Result Responses
+
+Tools may return multiple content items in a single MCP response. For example, a "trim outliers" tool might:
+- Delete features exceeding a threshold
+- Return a report artifact listing what was removed
+
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Removed 3 outlier contacts",
+      "annotations": {
+        "debrief:resultType": "deletion/sensor",
+        "debrief:deletedFeatures": ["contact_001", "contact_002", "contact_003"],
+        "debrief:sourceFeatures": ["track_a"],
+        "debrief:label": "Outlier contacts removed"
+      }
+    },
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "artifact://outlier_report",
+        "mimeType": "application/json",
+        "text": "{ \"threshold\": 2.5, \"removed\": [...] }"
+      },
+      "annotations": {
+        "debrief:resultType": "artifact/dataset/outlier_report",
+        "debrief:href": "./results/outlier_report_001.json",
+        "debrief:sourceFeatures": ["track_a"],
+        "debrief:label": "Outlier removal report"
+      }
+    }
+  ]
+}
+```
+
+Each content item is processed independently based on its `debrief:resultType`.
+
 ## User Feedback
 
 ### Mutations
@@ -311,18 +366,25 @@ An LLM can verify correct implementation by checking:
 - Four top-level result types exist with correct names
 
 ### Tool Response Contract
-- Tool output validates against MCP content type schemas
-- Required annotations present (`debrief:resultType`, `debrief:sourceFeatures`, `debrief:label`)
-- `resultType` starts with valid top-level (`mutation/`, `addition/`, `deletion/`, `artifact/`)
+- Tool output is valid MCP response (single or multi-content)
+- Each content item has required annotations (`debrief:resultType`, `debrief:sourceFeatures`, `debrief:label`)
+- Each `resultType` starts with valid top-level (`mutation/`, `addition/`, `deletion/`, `artifact/`)
+
+### Atomic STAC Operations
+- `update_features()` modifies specified features, returns updated FC
+- `add_features()` appends features to FC, returns updated FC
+- `delete_features()` removes features from FC, returns updated FC
+- `store_artifact()` writes file to `results/`, updates `item.json`
 
 ### Persistence Outcomes
-- After debrief-stac call: artifact file exists at `results/{filename}`
+- After STAC calls: artifact files exist at `results/{filename}`
 - FC contains new/modified features with PROV in properties
-- `item.json` assets list includes new result with correct role
+- `item.json` assets list includes new results with correct roles
 
 ### Diff Utility
 - Given two FCs, returns correct `added`, `removed`, `modified` sets
 - Empty diff when FCs identical
+- Works correctly when called incrementally (after each atomic operation)
 
 ### Error Contract
 - Failed tool returns MCP error structure
@@ -334,8 +396,6 @@ An LLM can verify correct implementation by checking:
 |------|-------|
 | PROV format | W3C PROV compliance; exact property structure TBD |
 | Common sub-types | Flesh out core sub-types under each top-level |
-| Multi-type responses | Can a tool return mutation + artifact together? |
-| Type combination constraints | Can deletion + addition combine in one response? |
 | Annotation optionality | Which annotations required/optional per type |
 | Error category definitions | Full enumeration of error categories |
 
@@ -349,3 +409,4 @@ An LLM can verify correct implementation by checking:
 | Date | Change |
 |------|--------|
 | January 2026 | Initial architecture decisions |
+| January 2026 | Added multi-result responses, atomic STAC operations, incremental diffing |
