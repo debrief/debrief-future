@@ -92,6 +92,8 @@ export interface SetSelectionMessage {
   selection: {
     trackIds: string[];
     locationIds: string[];
+    shapeIds: string[];
+    resultLayerIds: string[];
   };
 }
 

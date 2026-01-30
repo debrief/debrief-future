@@ -602,6 +602,30 @@ function handleSetSelection(
     message.selection.trackIds,
     message.selection.locationIds
   );
+  updateShapeSelection(new Set(message.selection.shapeIds));
+  resultRenderer?.setSelectedLayers(new Set(message.selection.resultLayerIds));
+}
+
+function updateShapeSelection(selectedShapeIds: Set<string>): void {
+  if (!otherFeaturesLayer) {
+    return;
+  }
+  otherFeaturesLayer.eachLayer((layer) => {
+    const geoLayer = layer as L.GeoJSON & { feature?: GeoJSON.Feature };
+    const featureId = (geoLayer.feature?.properties?.id as string) ?? '';
+    const isSelected = featureId !== '' && selectedShapeIds.has(featureId);
+    const props = geoLayer.feature?.properties ?? {};
+    const style = (props.style as Record<string, unknown>) ?? {};
+    const baseWeight = (style.weight as number) ?? 2;
+    const baseOpacity = (style.opacity as number) ?? 1;
+
+    if ('setStyle' in layer && typeof (layer as L.Path).setStyle === 'function') {
+      (layer as L.Path).setStyle({
+        weight: isSelected ? baseWeight + 3 : baseWeight,
+        opacity: isSelected ? 1 : baseOpacity,
+      });
+    }
+  });
 }
 
 function handleAddResultLayer(

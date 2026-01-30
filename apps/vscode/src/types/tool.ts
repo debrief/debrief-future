@@ -33,6 +33,8 @@ export interface Tool {
   version?: string;
   /** Selection requirements for the tool to be active */
   requirements?: SelectionRequirement[];
+  /** Minimum total features across all kinds (for multi-kind tools) */
+  minFeatures?: number;
 }
 
 /**
@@ -123,6 +125,16 @@ export function getInactiveReason(tool: Tool, selection: ToolSelection): string 
     }
   }
 
+  if (tool.minFeatures !== undefined) {
+    let total = 0;
+    for (const count of selection.values()) {
+      total += count;
+    }
+    if (total < tool.minFeatures) {
+      reasons.push(`Need ${tool.minFeatures} features total, have ${total}`);
+    }
+  }
+
   return reasons.join('; ');
 }
 
@@ -160,7 +172,19 @@ export class ToolMatchService {
     if (!tool.requirements || tool.requirements.length === 0) {
       return true; // No requirements = always active
     }
-    return checkRequirements(tool.requirements, selection);
+    if (!checkRequirements(tool.requirements, selection)) {
+      return false;
+    }
+    if (tool.minFeatures !== undefined) {
+      let total = 0;
+      for (const count of selection.values()) {
+        total += count;
+      }
+      if (total < tool.minFeatures) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

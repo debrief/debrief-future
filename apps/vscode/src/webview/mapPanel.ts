@@ -46,6 +46,7 @@ export class MapPanel {
   private currentPlot: Plot | null = null;
   private currentTracks: Track[] = [];
   private currentLocations: ReferenceLocation[] = [];
+  private otherFeatures: GeoJSONFeature[] = [];
   private resultLayers: ResultLayer[] = [];
   private isWebviewReady = false;
   private pendingMessages: ExtensionToWebviewMessage[] = [];
@@ -177,6 +178,7 @@ export class MapPanel {
     this.currentPlot = plot;
     this.currentTracks = tracks;
     this.currentLocations = locations;
+    this.otherFeatures = otherFeatures;
     this.resultLayers = [];
 
     // Update panel title
@@ -214,10 +216,10 @@ export class MapPanel {
   /**
    * Set selection
    */
-  public setSelection(trackIds: string[], locationIds: string[]): void {
+  public setSelection(trackIds: string[], locationIds: string[], shapeIds: string[] = [], resultLayerIds: string[] = []): void {
     this.postMessage({
       type: 'setSelection',
-      selection: { trackIds, locationIds },
+      selection: { trackIds, locationIds, shapeIds, resultLayerIds },
     });
   }
 
@@ -423,6 +425,10 @@ export class MapPanel {
     return this.resultLayers;
   }
 
+  public getOtherFeatures(): GeoJSONFeature[] {
+    return this.otherFeatures;
+  }
+
   /**
    * Set services for REP import functionality
    */
@@ -465,6 +471,12 @@ export class MapPanel {
     const location = this.currentLocations.find((l) => l.id === featureId);
     if (location) {
       return 'POINT';
+    }
+
+    // Check shapes (other features)
+    const shape = this.otherFeatures.find((f) => (f.properties as Record<string, unknown>)?.id === featureId);
+    if (shape) {
+      return 'SHAPE';
     }
 
     // Check result layers
@@ -542,20 +554,25 @@ export class MapPanel {
 
       // Subscribe to selection changes
       this.selectionUnsubscribe = subscribeToSelection(session, (selection) => {
-        // Split feature IDs into tracks and locations
+        // Split feature IDs into tracks, locations, shapes, and result layers
         const trackIds: string[] = [];
         const locationIds: string[] = [];
+        const shapeIds: string[] = [];
+        const resultLayerIds: string[] = [];
         for (const id of selection.featureIds) {
-          // Determine if track or location based on current data
           if (this.currentTracks.some(t => t.id === id)) {
             trackIds.push(id);
           } else if (this.currentLocations.some(l => l.id === id)) {
             locationIds.push(id);
+          } else if (this.otherFeatures.some(f => (f.properties as Record<string, unknown>)?.id === id)) {
+            shapeIds.push(id);
+          } else if (this.resultLayers.some(l => l.id === id)) {
+            resultLayerIds.push(id);
           }
         }
         this.postMessage({
           type: 'setSelection',
-          selection: { trackIds, locationIds },
+          selection: { trackIds, locationIds, shapeIds, resultLayerIds },
         });
       });
 
