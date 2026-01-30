@@ -70,6 +70,15 @@ export function createSelectionFromCounts(counts: Record<string, number>): ToolS
  * Check if a tool's requirements are satisfied by a selection.
  */
 function checkRequirements(requirements: SelectionRequirement[], selection: ToolSelection): boolean {
+  const acceptedKinds = new Set(requirements.map((r) => r.kind));
+
+  // Reject if selection contains kinds the tool doesn't accept
+  for (const kind of selection.keys()) {
+    if (!acceptedKinds.has(kind) && (selection.get(kind) ?? 0) > 0) {
+      return false;
+    }
+  }
+
   for (const req of requirements) {
     const count = selection.get(req.kind) ?? 0;
     const min = req.min ?? 1;
@@ -94,6 +103,14 @@ export function getInactiveReason(tool: Tool, selection: ToolSelection): string 
   }
 
   const reasons: string[] = [];
+  const acceptedKinds = new Set(tool.requirements.map((r) => r.kind));
+
+  for (const [kind, count] of selection) {
+    if (!acceptedKinds.has(kind) && count > 0) {
+      reasons.push(`Unexpected ${kind} in selection`);
+    }
+  }
+
   for (const req of tool.requirements) {
     const count = selection.get(req.kind) ?? 0;
     const min = req.min ?? 1;
