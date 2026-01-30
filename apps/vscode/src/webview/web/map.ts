@@ -598,12 +598,10 @@ function handleUpdateTracks(
 function handleSetSelection(
   message: Extract<ExtensionToWebviewMessage, { type: 'setSelection' }>
 ): void {
-  selectionManager?.setSelection(
-    message.selection.trackIds,
-    message.selection.locationIds
-  );
-  updateShapeSelection(new Set(message.selection.shapeIds));
-  resultRenderer?.setSelectedLayers(new Set(message.selection.resultLayerIds));
+  const ids = new Set(message.featureIds);
+  selectionManager?.setSelectionFromIds(ids);
+  updateShapeSelection(ids);
+  resultRenderer?.setSelectedLayers(ids);
 }
 
 function updateShapeSelection(selectedShapeIds: Set<string>): void {

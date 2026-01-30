@@ -83,11 +83,12 @@ export class SelectionManager {
   }
 
   /**
-   * Set selection programmatically
+   * Set selection programmatically from a flat set of feature IDs.
+   * Each renderer ignores IDs it doesn't own.
    */
-  setSelection(trackIds: string[], locationIds: string[]): void {
-    this.selectedTrackIds = new Set(trackIds);
-    this.selectedLocationIds = new Set(locationIds);
+  setSelectionFromIds(ids: Set<string>): void {
+    this.selectedTrackIds = ids;
+    this.selectedLocationIds = ids;
     this.updateVisualSelection();
     // Don't notify - this was triggered externally
   }

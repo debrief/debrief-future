@@ -216,10 +216,10 @@ export class MapPanel {
   /**
    * Set selection
    */
-  public setSelection(trackIds: string[], locationIds: string[], shapeIds: string[] = [], resultLayerIds: string[] = []): void {
+  public setSelection(featureIds: string[]): void {
     this.postMessage({
       type: 'setSelection',
-      selection: { trackIds, locationIds, shapeIds, resultLayerIds },
+      featureIds,
     });
   }
 
@@ -554,25 +554,9 @@ export class MapPanel {
 
       // Subscribe to selection changes
       this.selectionUnsubscribe = subscribeToSelection(session, (selection) => {
-        // Split feature IDs into tracks, locations, shapes, and result layers
-        const trackIds: string[] = [];
-        const locationIds: string[] = [];
-        const shapeIds: string[] = [];
-        const resultLayerIds: string[] = [];
-        for (const id of selection.featureIds) {
-          if (this.currentTracks.some(t => t.id === id)) {
-            trackIds.push(id);
-          } else if (this.currentLocations.some(l => l.id === id)) {
-            locationIds.push(id);
-          } else if (this.otherFeatures.some(f => (f.properties as Record<string, unknown>)?.id === id)) {
-            shapeIds.push(id);
-          } else if (this.resultLayers.some(l => l.id === id)) {
-            resultLayerIds.push(id);
-          }
-        }
         this.postMessage({
           type: 'setSelection',
-          selection: { trackIds, locationIds, shapeIds, resultLayerIds },
+          featureIds: selection.featureIds,
         });
       });
 

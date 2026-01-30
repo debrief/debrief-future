@@ -24,7 +24,7 @@ export function createSelectAllCommand(
     const trackIds = tracks.map((t) => t.id);
     const locationIds: string[] = [];
 
-    panel.setSelection(trackIds, locationIds);
+    panel.setSelection(trackIds);
   };
 }
 
