@@ -127,6 +127,7 @@ Description formats:
 |----|----------|-------------|---|---|---|-------|------------|--------|
 | ~~040~~ | ~~Enhancement~~ | ~~[Reorganize STAC store to per-item folder structure](specs/040-stac-store-organization/spec.md)~~ | ~~4~~ | ~~3~~ | ~~4~~ | ~~11~~ | ~~Medium~~ | ~~complete~~ |
 | ~~039~~ | ~~Bug~~ | ~~[Wire TimeController to TemporalTrackLayer in VS Code extension](specs/039-wire-timecontroller-temporal-track/spec.md)~~ | ~~5~~ | ~~5~~ | ~~4~~ | ~~14~~ | ~~Medium~~ | ~~complete~~ |
+| 044 | Enhancement | [Build unified Debrief activity panel as single webview](docs/ideas/044-unified-activity-panel.md) (requires #031) | 5 | 5 | 3 | 13 | High | approved |
 | 043 | Feature | [Load REP files into new plot via "Add to new plot in store"](docs/ideas/043-load-rep-new-plot.md) | 5 | 5 | 4 | 14 | Medium | approved |
 | 042 | Feature | [Add STAC catalog overview panel with map and timeline](specs/042-stac-catalog-overview-panel/spec.md) | 5 | 5 | 3 | 13 | High | specified |
 | 028 | Tech Debt | [Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md) | 4 | 2 | 5 | 11 | Low | implementing |
