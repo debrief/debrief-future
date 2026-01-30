@@ -1,7 +1,7 @@
-# Spec 041: Add STAC Catalog Overview Panel with Map and Timeline
+# Spec 042: Add STAC Catalog Overview Panel with Map and Timeline
 
 **Status**: specified
-**Backlog Item**: 041 (Feature)
+**Backlog Item**: 042 (Feature)
 **Complexity**: High (Opus)
 
 ## Problem

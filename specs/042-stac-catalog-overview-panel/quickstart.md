@@ -1,4 +1,4 @@
-# Quickstart: 041 STAC Catalog Overview Panel
+# Quickstart: 042 STAC Catalog Overview Panel
 
 ## Implementation Order
 

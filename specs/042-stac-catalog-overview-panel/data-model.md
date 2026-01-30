@@ -1,4 +1,4 @@
-# Data Model: 041 STAC Catalog Overview Panel
+# Data Model: 042 STAC Catalog Overview Panel
 
 ## Entities
 

@@ -1,14 +1,14 @@
 # Tasks: STAC Catalog Overview Panel
 
-**Input**: Design documents from `/specs/041-stac-catalog-overview-panel/`
+**Input**: Design documents from `/specs/042-stac-catalog-overview-panel/`
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md
 
 ---
 
 ## Evidence Requirements
 
-**Evidence Directory**: `specs/041-stac-catalog-overview-panel/evidence/`
-**Media Directory**: `specs/041-stac-catalog-overview-panel/media/`
+**Evidence Directory**: `specs/042-stac-catalog-overview-panel/evidence/`
+**Media Directory**: `specs/042-stac-catalog-overview-panel/media/`
 
 ### Planned Artifacts
 
@@ -157,15 +157,15 @@
 
 ### Evidence Collection
 
-- [ ] T041 Create evidence directory `specs/041-stac-catalog-overview-panel/evidence/`
-- [ ] T042 Capture test summary in `specs/041-stac-catalog-overview-panel/evidence/test-summary.md`
-- [ ] T043 Create usage demonstration in `specs/041-stac-catalog-overview-panel/evidence/usage-example.md`
-- [ ] T044 [P] Capture Storybook screenshots of key stories in `specs/041-stac-catalog-overview-panel/evidence/storybook-screenshots/`
+- [ ] T041 Create evidence directory `specs/042-stac-catalog-overview-panel/evidence/`
+- [ ] T042 Capture test summary in `specs/042-stac-catalog-overview-panel/evidence/test-summary.md`
+- [ ] T043 Create usage demonstration in `specs/042-stac-catalog-overview-panel/evidence/usage-example.md`
+- [ ] T044 [P] Capture Storybook screenshots of key stories in `specs/042-stac-catalog-overview-panel/evidence/storybook-screenshots/`
 
 ### Media Content
 
-- [ ] T045 Create shipped blog post in `specs/041-stac-catalog-overview-panel/media/shipped-post.md`
-- [ ] T046 [P] Create LinkedIn shipped summary in `specs/041-stac-catalog-overview-panel/media/linkedin-shipped.md`
+- [ ] T045 Create shipped blog post in `specs/042-stac-catalog-overview-panel/media/shipped-post.md`
+- [ ] T046 [P] Create LinkedIn shipped summary in `specs/042-stac-catalog-overview-panel/media/linkedin-shipped.md`
 
 ### PR Creation
 

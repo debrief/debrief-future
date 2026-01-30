@@ -1,4 +1,4 @@
-# Research: 041 STAC Catalog Overview Panel
+# Research: 042 STAC Catalog Overview Panel
 
 ## R1: CustomReadonlyEditorProvider vs WebviewPanel
 

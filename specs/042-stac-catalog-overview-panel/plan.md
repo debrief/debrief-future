@@ -1,7 +1,7 @@
 # Implementation Plan: STAC Catalog Overview Panel
 
 **Branch**: `claude/speckit-start-041-GPj21` | **Date**: 2026-01-30 | **Spec**: [spec.md](spec.md)
-**Input**: Feature specification from `specs/041-stac-catalog-overview-panel/spec.md`
+**Input**: Feature specification from `specs/042-stac-catalog-overview-panel/spec.md`
 
 ## Summary
 
@@ -45,7 +45,7 @@ Add a read-only overview panel to the VS Code extension that displays all items 
 ### Documentation (this feature)
 
 ```text
-specs/041-stac-catalog-overview-panel/
+specs/042-stac-catalog-overview-panel/
 ├── spec.md              # Feature specification
 ├── plan.md              # This file
 ├── research.md          # Phase 0 research
