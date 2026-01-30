@@ -69,10 +69,55 @@ def _find_closest_point(target_time: float, coordinates: list[list[float]]) -> l
     return closest
 
 
+def _is_temporal(feature: dict[str, Any]) -> bool:
+    """Check if a feature has temporal data (times in properties or timestamps in coordinates)."""
+    props = feature.get("properties", {}) or {}
+    times = props.get("times")
+    if isinstance(times, list) and len(times) > 0:
+        return True
+    # Check for timestamp in coordinates (4th element: [lon, lat, alt, time])
+    coords = feature.get("geometry", {}).get("coordinates", [])
+    if isinstance(coords, list) and len(coords) > 0:
+        first = coords[0]
+        if isinstance(first, list) and len(first) >= 4:
+            return True
+    return False
+
+
+def _extract_coords(feature: dict[str, Any]) -> list[list[float]]:
+    """Extract coordinate list from a feature geometry."""
+    geom = feature.get("geometry", {})
+    gtype = geom.get("type", "")
+    coords = geom.get("coordinates", [])
+    if gtype == "Point":
+        return [coords] if coords else []
+    if gtype in ("LineString",):
+        return coords
+    if gtype == "Polygon":
+        # Use exterior ring
+        return coords[0] if coords else []
+    return coords
+
+
+def _closest_points_between(
+    coords_a: list[list[float]], coords_b: list[list[float]]
+) -> tuple[list[float], list[float]]:
+    """Find the pair of points (one from each set) with minimum distance."""
+    best_a, best_b = coords_a[0], coords_b[0]
+    best_dist = float("inf")
+    for a in coords_a:
+        for b in coords_b:
+            d = _calculate_range(a[0], a[1], b[0], b[1])
+            if d < best_dist:
+                best_dist = d
+                best_a, best_b = a, b
+    return best_a, best_b
+
+
 @tool(
     name="range-bearing",
-    description="Calculate range and bearing between two tracks at their start, midpoint, and end",
-    input_kinds=["track"],
+    description="Calculate range and bearing between two features (tracks, shapes, or mixed)",
+    input_kinds=["track", "shape"],
     output_kind="range-bearing",
     context_type=ContextType.MULTI,
     parameters=[
@@ -87,31 +132,73 @@ def _find_closest_point(target_time: float, coordinates: list[list[float]]) -> l
 )
 def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dict[str, Any]]:
     """
-    Calculate range and bearing between two tracks.
+    Calculate range and bearing between two features.
+
+    Supports track-track (temporal sampling at start/mid/end) and
+    mixed temporal/non-temporal (closest point, returns midpoint).
 
     Args:
-        context: SelectionContext with exactly two track features
+        context: SelectionContext with exactly two features
         params: Optional parameters (sample_points)
 
     Returns:
-        List containing Features with range/bearing data as LineStrings
+        List containing Features with range/bearing data
     """
     if len(context.features) < 2:
         return []
 
-    track1 = context.features[0]
-    track2 = context.features[1]
+    feat1 = context.features[0]
+    feat2 = context.features[1]
 
-    coords1 = track1.get("geometry", {}).get("coordinates", [])
-    coords2 = track2.get("geometry", {}).get("coordinates", [])
+    coords1 = _extract_coords(feat1)
+    coords2 = _extract_coords(feat2)
 
     if not coords1 or not coords2:
         return []
 
+    both_temporal = _is_temporal(feat1) and _is_temporal(feat2)
+
+    # Mixed temporal/non-temporal: return single midpoint between closest points
+    if not both_temporal:
+        pt1, pt2 = _closest_points_between(coords1, coords2)
+        range_nm = _calculate_range(pt1[0], pt1[1], pt2[0], pt2[1])
+        bearing = _calculate_bearing(pt1[0], pt1[1], pt2[0], pt2[1])
+        mid_lon = (pt1[0] + pt2[0]) / 2
+        mid_lat = (pt1[1] + pt2[1]) / 2
+
+        props1 = feat1.get("properties", {}) or {}
+        props2 = feat2.get("properties", {}) or {}
+        name1 = props1.get("name") or props1.get("label") or props1.get("id", "feature-1")
+        name2 = props2.get("name") or props2.get("label") or props2.get("id", "feature-2")
+
+        return [
+            {
+                "type": "Feature",
+                "id": f"rb-closest-{uuid.uuid4().hex[:8]}",
+                "properties": {
+                    "measurement_type": "closest",
+                    "range_nm": round(range_nm, 2),
+                    "bearing_deg": round(bearing, 1),
+                    "label": f"{round(range_nm, 2)} nm",
+                    "from_feature": name1,
+                    "to_feature": name2,
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [round(mid_lon, 6), round(mid_lat, 6)],
+                },
+            }
+        ]
+
+    # Both temporal: sample at start, midpoint, end
     results = []
     sample_points = params.get("sample_points", "all")
 
-    # Calculate at start
+    props1 = feat1.get("properties", {}) or {}
+    props2 = feat2.get("properties", {}) or {}
+    name1 = props1.get("name") or props1.get("id", "track-1")
+    name2 = props2.get("name") or props2.get("id", "track-2")
+
     if sample_points in ("endpoints", "all"):
         start1 = coords1[0]
         start2 = coords2[0]
@@ -126,8 +213,8 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dic
                     "measurement_type": "start",
                     "range_nm": round(range_nm, 2),
                     "bearing_deg": round(bearing, 1),
-                    "from_track": track1.get("id", "track-1"),
-                    "to_track": track2.get("id", "track-2"),
+                    "from_track": name1,
+                    "to_track": name2,
                 },
                 "geometry": {
                     "type": "LineString",
@@ -136,7 +223,6 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dic
             }
         )
 
-    # Calculate at midpoint
     if sample_points in ("midpoint", "all"):
         mid_idx1 = len(coords1) // 2
         mid_idx2 = len(coords2) // 2
@@ -153,8 +239,8 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dic
                     "measurement_type": "midpoint",
                     "range_nm": round(range_nm, 2),
                     "bearing_deg": round(bearing, 1),
-                    "from_track": track1.get("id", "track-1"),
-                    "to_track": track2.get("id", "track-2"),
+                    "from_track": name1,
+                    "to_track": name2,
                 },
                 "geometry": {
                     "type": "LineString",
@@ -163,7 +249,6 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dic
             }
         )
 
-    # Calculate at end
     if sample_points in ("endpoints", "all"):
         end1 = coords1[-1]
         end2 = coords2[-1]
@@ -178,8 +263,8 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dic
                     "measurement_type": "end",
                     "range_nm": round(range_nm, 2),
                     "bearing_deg": round(bearing, 1),
-                    "from_track": track1.get("id", "track-1"),
-                    "to_track": track2.get("id", "track-2"),
+                    "from_track": name1,
+                    "to_track": name2,
                 },
                 "geometry": {
                     "type": "LineString",
