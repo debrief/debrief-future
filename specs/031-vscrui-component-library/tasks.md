@@ -96,7 +96,7 @@
 
 ### PR Creation
 
-- [ ] T010 Create PR and publish blog: run /speckit.pr
+- [ ] T010 ⏳ Create PR and publish blog: run /speckit.pr
 
 **Task T010 must run last. It depends on all evidence and media tasks being complete.**
 
