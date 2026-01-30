@@ -40,8 +40,8 @@
 
 **Purpose**: No new project scaffolding needed — feature extends existing files. Setup is limited to creating test fixtures.
 
-- [ ] T001 Create test fixture for empty STAC store `apps/vscode/src/test/fixtures/empty-store/catalog.json`
-- [ ] T002 [P] Create test fixture REP file for import testing `apps/vscode/src/test/fixtures/sample.rep`
+- [x] T001 Create test fixture for empty STAC store `apps/vscode/src/test/fixtures/empty-store/catalog.json`
+- [x] T002 [P] Create test fixture REP file for import testing `apps/vscode/src/test/fixtures/sample.rep`
 
 ---
 
@@ -49,9 +49,9 @@
 
 **Purpose**: The `stacService.createItem()` method MUST exist before any user story can be implemented.
 
-- [ ] T003 [test] Write unit tests for stacService.createItem() `apps/vscode/src/test/stacService.test.ts`
-- [ ] T004 Implement stacService.createItem() method `apps/vscode/src/services/stacService.ts`
-- [ ] T005 [test] Write unit tests for createItem() atomicity — verify folder cleanup on failure `apps/vscode/src/test/stacService.test.ts`
+- [x] T003 [test] Write unit tests for stacService.createItem() `apps/vscode/src/test/stacService.test.ts`
+- [x] T004 Implement stacService.createItem() method `apps/vscode/src/services/stacService.ts`
+- [x] T005 [test] Write unit tests for createItem() atomicity — verify folder cleanup on failure `apps/vscode/src/test/stacService.test.ts`
 
 **Checkpoint**: createItem() works — can create STAC Items with correct folder structure, item.json, catalog.json link, and cleanup on failure.
 
@@ -65,17 +65,17 @@
 
 ### Tests for User Story 1
 
-- [ ] T006 [test] Write tests for QuickPick "new plot" option generation `apps/vscode/src/test/importRep.test.ts`
-- [ ] T007 [P][test] Write tests for new-plot creation flow (parse → create → store → open) `apps/vscode/src/test/importRep.test.ts`
+- [x] T006 [test] Write tests for QuickPick "new plot" option generation `apps/vscode/src/test/importRep.test.ts`
+- [x] T007 [P][test] Write tests for new-plot creation flow (parse → create → store → open) `apps/vscode/src/test/importRep.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Add "Add to new plot in [store-name]" entries to showItemPicker() `apps/vscode/src/commands/importRep.ts`
-- [ ] T009 [US1] Add title prompt after user selects a "new plot" option `apps/vscode/src/commands/importRep.ts`
-- [ ] T010 [US1] Implement createNewPlotFromRep() — parse, create item, addFeatures, addAsset, open MapPanel `apps/vscode/src/commands/importRep.ts`
-- [ ] T011 [US1] Add atomicity cleanup — delete item folder on failure after creation `apps/vscode/src/commands/importRep.ts`
-- [ ] T012 [US1] Compute and set bbox and temporal metadata on new item from parsed data `apps/vscode/src/commands/importRep.ts`
-- [ ] T013 [US1] Refresh STAC tree view after successful creation `apps/vscode/src/commands/importRep.ts`
+- [x] T008 [US1] Add "Add to new plot in [store-name]" entries to showItemPicker() `apps/vscode/src/commands/importRep.ts`
+- [x] T009 [US1] Add title prompt after user selects a "new plot" option `apps/vscode/src/commands/importRep.ts`
+- [x] T010 [US1] Implement createNewPlotFromRep() — parse, create item, addFeatures, addAsset, open MapPanel `apps/vscode/src/commands/importRep.ts`
+- [x] T011 [US1] Add atomicity cleanup — delete item folder on failure after creation `apps/vscode/src/commands/importRep.ts`
+- [x] T012 [US1] Compute and set bbox and temporal metadata on new item from parsed data `apps/vscode/src/commands/importRep.ts`
+- [x] T013 [US1] Refresh STAC tree view after successful creation `apps/vscode/src/commands/importRep.ts`
 
 **Checkpoint**: Single REP file can be loaded into a new plot via context menu. The plot opens in MapPanel with correct data, assets, and metadata.
 
@@ -89,14 +89,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T014 [test] Write tests for multi-file GeoJSON merge `apps/vscode/src/test/importRep.test.ts`
+- [x] T014 [test] Write tests for multi-file GeoJSON merge `apps/vscode/src/test/importRep.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Extend createNewPlotFromRep() to accept multiple file URIs `apps/vscode/src/commands/importRep.ts`
-- [ ] T016 [US2] Implement fail-fast parsing — parse all files before creating item `apps/vscode/src/commands/importRep.ts`
-- [ ] T017 [US2] Merge features from multiple ParseResults into single FeatureCollection `apps/vscode/src/commands/importRep.ts`
-- [ ] T018 [US2] Register each .rep file as a separate asset on the new item `apps/vscode/src/commands/importRep.ts`
+- [x] T015 [US2] Extend createNewPlotFromRep() to accept multiple file URIs `apps/vscode/src/commands/importRep.ts`
+- [x] T016 [US2] Implement fail-fast parsing — parse all files before creating item `apps/vscode/src/commands/importRep.ts`
+- [x] T017 [US2] Merge features from multiple ParseResults into single FeatureCollection `apps/vscode/src/commands/importRep.ts`
+- [x] T018 [US2] Register each .rep file as a separate asset on the new item `apps/vscode/src/commands/importRep.ts`
 
 **Checkpoint**: Multiple REP files can be loaded into a single new plot. All tracks appear, all files stored as assets.
 
@@ -110,8 +110,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Add drop handler for .rep files when no map panel is open `apps/vscode/src/commands/importRep.ts`
-- [ ] T020 [US3] Reuse showItemPicker() and createNewPlotFromRep() from US1 `apps/vscode/src/commands/importRep.ts`
+- [x] T019 [US3] Add drop handler for .rep files when no map panel is open `apps/vscode/src/commands/importRep.ts`
+- [x] T020 [US3] Reuse showItemPicker() and createNewPlotFromRep() from US1 `apps/vscode/src/commands/importRep.ts`
 
 **Checkpoint**: Drag-and-drop onto empty editor triggers the same new-plot flow as context menu.
 
@@ -123,24 +123,24 @@
 
 ### Edge Cases & Error Handling
 
-- [ ] T021 Handle "no STAC stores configured" — show info message `apps/vscode/src/commands/importRep.ts`
-- [ ] T022 [P] Handle empty/whitespace title validation in InputBox `apps/vscode/src/commands/importRep.ts`
-- [ ] T023 [P] Handle store folder not writable — show error message `apps/vscode/src/commands/importRep.ts`
+- [x] T021 Handle "no STAC stores configured" — show info message `apps/vscode/src/commands/importRep.ts`
+- [x] T022 [P] Handle empty/whitespace title validation in InputBox `apps/vscode/src/commands/importRep.ts`
+- [x] T023 [P] Handle store folder not writable — show error message `apps/vscode/src/commands/importRep.ts`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T024 Capture test results in `specs/043-load-rep-new-plot/evidence/test-summary.md`
-- [ ] T025 Create usage demonstration in `specs/043-load-rep-new-plot/evidence/usage-example.md`
-- [ ] T026 [P] Document QuickPick layout with "new plot" entries in `specs/043-load-rep-new-plot/evidence/picker-options.md`
+- [x] T024 Capture test results in `specs/043-load-rep-new-plot/evidence/test-summary.md`
+- [x] T025 Create usage demonstration in `specs/043-load-rep-new-plot/evidence/usage-example.md`
+- [x] T026 [P] Document QuickPick layout with "new plot" entries in `specs/043-load-rep-new-plot/evidence/picker-options.md`
 
 ### Media Content
 
-- [ ] T027 Create shipped blog post in `specs/043-load-rep-new-plot/media/shipped-post.md`
-- [ ] T028 [P] Create LinkedIn shipped summary in `specs/043-load-rep-new-plot/media/linkedin-shipped.md`
+- [x] T027 Create shipped blog post in `specs/043-load-rep-new-plot/media/shipped-post.md`
+- [x] T028 [P] Create LinkedIn shipped summary in `specs/043-load-rep-new-plot/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T029 Create PR and publish blog: run /speckit.pr
+- [x] T029 Create PR and publish blog: run /speckit.pr
 
 **Task T029 must run last. It depends on all evidence and media tasks being complete.**
 
