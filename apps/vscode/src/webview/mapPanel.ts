@@ -961,6 +961,7 @@ export class MapPanel {
         // Update layers panel
         this.layersTreeProvider?.setTracks(updatedData.tracks);
         this.layersTreeProvider?.setLocations(updatedData.locations);
+        this.layersTreeProvider?.setShapes(updatedData.otherFeatures);
       }
 
       // Send completion message
