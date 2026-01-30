@@ -48,6 +48,6 @@ export function createOpenCatalogOverviewCommand(
       catalog.title,
     );
 
-    panel.loadCatalog(catalog, store.path, items);
+    panel.loadCatalog(catalog, store.path, items, store.id);
   };
 }

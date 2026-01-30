@@ -54,6 +54,7 @@ export class CatalogOverviewPanel {
   private isWebviewReady = false;
   private pendingMessages: ExtensionToOverviewMessage[] = [];
   private catalogId = '';
+  private storeId = '';
 
   private constructor(
     panel: vscode.WebviewPanel,
@@ -126,8 +127,12 @@ export class CatalogOverviewPanel {
     catalog: Catalog,
     storePath: string,
     items: StacItemSummary[],
+    storeId?: string,
   ): void {
     this.catalogId = catalog.id;
+    if (storeId) {
+      this.storeId = storeId;
+    }
 
     const overviewItems = items.map((item) => ({
       id: item.id,
@@ -183,8 +188,9 @@ export class CatalogOverviewPanel {
 
       case 'overviewItemSelected':
         // Open the selected item in the existing plot view
+        // URI format: stac://store-id/relative-item-path
         void vscode.commands.executeCommand('debrief.openPlot', {
-          uri: `stac://${message.storePath}/${message.itemPath}`,
+          uri: `stac://${this.storeId}/${message.itemPath}`,
         });
         break;
     }
