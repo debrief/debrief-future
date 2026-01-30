@@ -5,7 +5,7 @@
 
 import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { MapContainer, Rectangle, TileLayer, Tooltip, useMap } from 'react-leaflet';
-import type { LatLngBoundsExpression } from 'leaflet';
+import type { LatLngBoundsExpression, LeafletMouseEvent } from 'leaflet';
 import type { CatalogOverviewProps, CatalogOverviewItem } from './types';
 import './CatalogOverview.css';
 
@@ -188,6 +188,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
           center={[0, 0]}
           zoom={2}
           scrollWheelZoom={true}
+          doubleClickZoom={false}
           style={{ width: '100%', height: '100%' }}
         >
           <TileLayer
@@ -201,7 +202,12 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
               bounds={bboxToBounds(item.bbox!)}
               pathOptions={{ color: 'var(--co-accent, #007fd4)', weight: 2, fillOpacity: 0.15 }}
               eventHandlers={{
-                dblclick: () => handleItemDblClick(item.itemPath),
+                dblclick: (e: LeafletMouseEvent) => {
+                  // Stop Leaflet from zooming on double-click
+                  e.originalEvent.preventDefault();
+                  e.originalEvent.stopPropagation();
+                  handleItemDblClick(item.itemPath);
+                },
               }}
             >
               <Tooltip>

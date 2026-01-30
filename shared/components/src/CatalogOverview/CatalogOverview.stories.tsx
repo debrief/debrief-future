@@ -144,12 +144,17 @@ const OVERLAPPING_ITEMS: CatalogOverviewItem[] = [
 // Stories
 // ============================================================================
 
+/** Handler that shows an alert on item selection (visible in Storybook) */
+const handleSelect = (path: string): void => {
+  alert(`Open plot: ${path}`);
+};
+
 /** Default view with multiple items */
 export const Default: Story = {
   render: () => (
     <CatalogOverview
       items={FIXTURE_ITEMS}
-      onItemSelect={(path) => console.log('Selected:', path)}
+      onItemSelect={handleSelect}
     />
   ),
 };
@@ -157,7 +162,7 @@ export const Default: Story = {
 /** Empty catalog — no items */
 export const EmptyCatalog: Story = {
   render: () => (
-    <CatalogOverview items={[]} onItemSelect={console.log} />
+    <CatalogOverview items={[]} onItemSelect={handleSelect} />
   ),
 };
 
@@ -166,7 +171,7 @@ export const MissingBbox: Story = {
   render: () => (
     <CatalogOverview
       items={ITEMS_NO_BBOX}
-      onItemSelect={(path) => console.log('Selected:', path)}
+      onItemSelect={handleSelect}
     />
   ),
 };
@@ -176,7 +181,7 @@ export const MissingTime: Story = {
   render: () => (
     <CatalogOverview
       items={ITEMS_NO_TIME}
-      onItemSelect={(path) => console.log('Selected:', path)}
+      onItemSelect={handleSelect}
     />
   ),
 };
@@ -186,7 +191,7 @@ export const SingleItem: Story = {
   render: () => (
     <CatalogOverview
       items={SINGLE_ITEM}
-      onItemSelect={(path) => console.log('Selected:', path)}
+      onItemSelect={handleSelect}
     />
   ),
 };
@@ -196,7 +201,7 @@ export const ManyItems: Story = {
   render: () => (
     <CatalogOverview
       items={MANY_ITEMS}
-      onItemSelect={(path) => console.log('Selected:', path)}
+      onItemSelect={handleSelect}
     />
   ),
 };
@@ -206,7 +211,7 @@ export const OverlappingRanges: Story = {
   render: () => (
     <CatalogOverview
       items={OVERLAPPING_ITEMS}
-      onItemSelect={(path) => console.log('Selected:', path)}
+      onItemSelect={handleSelect}
     />
   ),
 };
@@ -216,7 +221,7 @@ export const MixedMetadata: Story = {
   render: () => (
     <CatalogOverview
       items={[...FIXTURE_ITEMS, ...ITEMS_NO_BBOX.slice(0, 1), ...ITEMS_NO_TIME.slice(0, 1)]}
-      onItemSelect={(path) => console.log('Selected:', path)}
+      onItemSelect={handleSelect}
     />
   ),
 };
@@ -228,7 +233,7 @@ export const ResizableDemo: Story = {
     return (
       <CatalogOverview
         items={FIXTURE_ITEMS}
-        onItemSelect={(path) => console.log('Selected:', path)}
+        onItemSelect={handleSelect}
         initialSplitRatio={ratio}
         onSplitRatioChange={setRatio}
       />
@@ -263,7 +268,7 @@ export const LightTheme: Story = {
   render: () => (
     <CatalogOverview
       items={FIXTURE_ITEMS}
-      onItemSelect={(path) => console.log('Selected:', path)}
+      onItemSelect={handleSelect}
     />
   ),
 };
@@ -273,7 +278,7 @@ export const DarkTheme: Story = {
   render: () => (
     <CatalogOverview
       items={FIXTURE_ITEMS}
-      onItemSelect={(path) => console.log('Selected:', path)}
+      onItemSelect={handleSelect}
     />
   ),
 };
