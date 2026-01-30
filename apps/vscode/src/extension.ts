@@ -8,7 +8,7 @@ import {
 import { StacTreeProvider } from './providers/stacTreeProvider';
 import { StacFileSystemProvider } from './providers/stacFileSystemProvider';
 import { ToolsTreeProvider } from './providers/toolsTreeProvider';
-import { LayersTreeProvider } from './providers/layersTreeProvider';
+import { LayersTreeProvider, getFeatureId } from './providers/layersTreeProvider';
 import { OutlineProvider } from './providers/outlineProvider';
 import { TimeRangeViewProvider } from './views/timeRangeView';
 import { MapPanel } from './webview/mapPanel';
@@ -125,10 +125,30 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const outlineProvider = new OutlineProvider();
   const timeRangeProvider = new TimeRangeViewProvider(context.extensionUri, sessionManager);
 
+  const layersTreeView = vscode.window.createTreeView('debrief.layers', {
+    treeDataProvider: layersTreeProvider,
+    canSelectMany: true,
+  });
+
+  // Sync native tree selection → session state
+  layersTreeView.onDidChangeSelection((e) => {
+    const ids: string[] = [];
+    for (const item of e.selection) {
+      const id = getFeatureId(item);
+      if (id) {
+        ids.push(id);
+      }
+    }
+    const session = sessionManager.getActiveSession();
+    if (session) {
+      session.getState().setSelection(ids);
+    }
+  });
+
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
     vscode.window.registerTreeDataProvider('debrief.tools', toolsTreeProvider),
-    vscode.window.registerTreeDataProvider('debrief.layers', layersTreeProvider),
+    layersTreeView,
     vscode.window.registerWebviewViewProvider('debrief.timeRange', timeRangeProvider)
   );
 

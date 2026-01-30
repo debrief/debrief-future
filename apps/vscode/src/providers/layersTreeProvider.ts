@@ -21,12 +21,30 @@ import type { Track, ReferenceLocation } from '../types/plot';
 import type { ResultLayer } from '../types/tool';
 import type { GeoJSONFeature } from '../types/import';
 
-type LayerItem =
+export type LayerItem =
   | { type: 'header'; label: string; id: string }
   | { type: 'track'; track: Track }
   | { type: 'location'; location: ReferenceLocation }
   | { type: 'shape'; feature: GeoJSONFeature }
   | { type: 'result'; layer: ResultLayer };
+
+/**
+ * Extract feature ID from any LayerItem variant.
+ */
+export function getFeatureId(item: LayerItem): string | undefined {
+  switch (item.type) {
+    case 'track':
+      return item.track.id;
+    case 'location':
+      return item.location.id;
+    case 'shape':
+      return (item.feature.properties?.id as string) ?? undefined;
+    case 'result':
+      return item.layer.id;
+    default:
+      return undefined;
+  }
+}
 
 export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<
@@ -333,13 +351,6 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       item.resourceUri = vscode.Uri.parse(`color:${track.color}`);
     }
 
-    // Command to toggle selection
-    item.command = {
-      command: 'debrief.toggleFeatureSelection',
-      title: 'Toggle Selection',
-      arguments: [{ featureId: track.id }],
-    };
-
     return item;
   }
 
@@ -360,12 +371,6 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       isSelected ? 'check' : 'circle-outline'
     );
 
-    item.command = {
-      command: 'debrief.toggleFeatureSelection',
-      title: 'Toggle Selection',
-      arguments: [{ featureId: location.id }],
-    };
-
     return item;
   }
 
@@ -379,24 +384,15 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       vscode.TreeItemCollapsibleState.None
     );
 
-    const featureId = (props.id as string) ?? '';
-
     item.contextValue = 'shape';
     item.description = kind.toLowerCase();
     item.tooltip = `${label}\nType: ${kind}\nGeometry: ${feature.geometry.type}`;
 
+    const featureId = (props.id as string) ?? '';
     const isSelected = featureId ? this._isFeatureSelected(featureId) : false;
     item.iconPath = new vscode.ThemeIcon(
       isSelected ? 'check' : 'circle-outline'
     );
-
-    if (featureId) {
-      item.command = {
-        command: 'debrief.toggleFeatureSelection',
-        title: 'Toggle Selection',
-        arguments: [{ featureId }],
-      };
-    }
 
     return item;
   }
@@ -417,12 +413,6 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
     item.iconPath = new vscode.ThemeIcon(
       isSelected ? 'check' : 'circle-outline'
     );
-
-    item.command = {
-      command: 'debrief.toggleFeatureSelection',
-      title: 'Toggle Selection',
-      arguments: [{ featureId: layer.id }],
-    };
 
     return item;
   }
