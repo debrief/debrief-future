@@ -127,6 +127,7 @@ Description formats:
 |----|----------|-------------|---|---|---|-------|------------|--------|
 | ~~040~~ | ~~Enhancement~~ | ~~[Reorganize STAC store to per-item folder structure](specs/040-stac-store-organization/spec.md)~~ | ~~4~~ | ~~3~~ | ~~4~~ | ~~11~~ | ~~Medium~~ | ~~complete~~ |
 | ~~039~~ | ~~Bug~~ | ~~[Wire TimeController to TemporalTrackLayer in VS Code extension](specs/039-wire-timecontroller-temporal-track/spec.md)~~ | ~~5~~ | ~~5~~ | ~~4~~ | ~~14~~ | ~~Medium~~ | ~~complete~~ |
+| 041 | Feature | [Add STAC catalog overview panel with map and timeline](docs/ideas/041-stac-catalog-overview-panel.md) | 5 | 5 | 3 | 13 | High | approved |
 | 028 | Tech Debt | [Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md) | 4 | 2 | 5 | 11 | Low | implementing |
 | 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](specs/019-needs-interview-status/spec.md) | 3 | 3 | 5 | 11 | Medium | implementing |
 | ~~029~~ | ~~Tech Debt~~ | ~~[Integrate session-state service into VS Code extension](specs/029-session-state-vscode/spec.md) (multi-document support)~~ | ~~5~~ | ~~3~~ | ~~4~~ | ~~12~~ | ~~High~~ | ~~complete~~ |
