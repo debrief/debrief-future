@@ -148,7 +148,7 @@ Description formats:
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
 | ~~030~~ | ~~Tech Debt~~ | ~~[Add replay mode and time acceleration to temporal state schema](docs/ideas/030-temporal-ui-state.md) (requires #029)~~ | ~~4~~ | ~~2~~ | ~~4~~ | ~~10~~ | ~~Medium~~ | ~~complete~~ |
 | 031 | Documentation | [Document vscrui as standard component library for VS Code webviews](docs/ideas/031-vscrui-component-library.md) | 3 | 1 | 5 | 9 | Low | approved |
-| 032 | Documentation | [Document Storybook VS Code theming setup](docs/ideas/032-storybook-vscode-theming.md) | 2 | 2 | 5 | 9 | Low | approved |
+| 032 | Documentation | [Document Storybook VS Code theming setup](specs/032-storybook-vscode-theming/spec.md) | 2 | 2 | 5 | 9 | Low | specified |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
 | 033 | Tech Debt | [Re-enable debrief-stac tests in pytest](docs/ideas/033-reenable-stac-tests.md) | 4 | 2 | 4 | 10 | Low | proposed |
 | 034 | Tech Debt | [Remove synchronous fs calls from VS Code stacService](docs/ideas/034-async-stac-service-fs.md) | 3 | 2 | 5 | 10 | Low | proposed |
