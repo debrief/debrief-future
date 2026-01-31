@@ -84,10 +84,10 @@ export function FilterDropdown({
 
   return (
     <div className="debrief-filter-dropdown">
-      {/* Selection Action Buttons — icon row at top */}
-      {onApplyToSelection && (
-        <>
-          <div className="debrief-filter-dropdown__action-row">
+      {/* Header row: selection actions (left) + clear filters eraser (right) */}
+      <div className="debrief-filter-dropdown__action-row">
+        {onApplyToSelection && (
+          <>
             <button
               className="debrief-filter-dropdown__action-icon-btn"
               onClick={() => onApplyToSelection('selectAll')}
@@ -95,7 +95,6 @@ export function FilterDropdown({
               title={labels.applySelectAll}
               aria-label={labels.applySelectAll}
             >
-              {/* Select all icon: double-check */}
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="1 9 5 13 15 3" />
                 <polyline points="1 4 5 8" />
@@ -108,7 +107,6 @@ export function FilterDropdown({
               title={labels.applySelectMatched}
               aria-label={labels.applySelectMatched}
             >
-              {/* Select matched icon: check with filter */}
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="2 8 6 12 14 4" />
               </svg>
@@ -120,7 +118,6 @@ export function FilterDropdown({
               title={labels.applyAddMatched}
               aria-label={labels.applyAddMatched}
             >
-              {/* Add matched icon: plus */}
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="8" y1="3" x2="8" y2="13" />
                 <line x1="3" y1="8" x2="13" y2="8" />
@@ -133,15 +130,26 @@ export function FilterDropdown({
               title={labels.applyRemoveMatched}
               aria-label={labels.applyRemoveMatched}
             >
-              {/* Remove matched icon: minus */}
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="3" y1="8" x2="13" y2="8" />
               </svg>
             </button>
-          </div>
-          <div className="debrief-filter-dropdown__divider" />
-        </>
-      )}
+          </>
+        )}
+        <div className="debrief-filter-dropdown__action-spacer" />
+        <button
+          className="debrief-filter-dropdown__action-icon-btn"
+          onClick={clearAll}
+          disabled={!hasActiveFilter}
+          title={labels.clearAllFilters}
+          aria-label={labels.clearAllFilters}
+        >
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 14h8M7.5 14l5.3-5.3a2 2 0 0 0 0-2.8L10.1 3.1a2 2 0 0 0-2.8 0L2.6 7.8a2 2 0 0 0 0 2.8L5 13.1" />
+          </svg>
+        </button>
+      </div>
+      <div className="debrief-filter-dropdown__divider" />
 
       {/* Text Search */}
       <div className="debrief-filter-dropdown__section">
@@ -265,17 +273,6 @@ export function FilterDropdown({
         </label>
       </div>
 
-      <div className="debrief-filter-dropdown__divider" />
-
-      {/* Clear All */}
-      <div className="debrief-filter-dropdown__section">
-        <button
-          className="debrief-filter-dropdown__clear-btn"
-          onClick={clearAll}
-        >
-          {labels.clearAllFilters}
-        </button>
-      </div>
     </div>
   );
 }

@@ -64,6 +64,10 @@
   cursor: default;
 }
 
+.debrief-filter-dropdown__action-spacer {
+  flex: 1;
+}
+
 /* Search input */
 .debrief-filter-dropdown__search-input {
   width: 100%;
