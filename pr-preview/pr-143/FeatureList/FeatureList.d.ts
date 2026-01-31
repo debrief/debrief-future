@@ -18,6 +18,8 @@ export interface FeatureListProps {
      * Simple callback when a feature is clicked (id only).
      */
     onSelect?: (id: string) => void;
+    /** Set of hidden feature IDs (shown with eye-slash icon) */
+    hiddenIds?: Set<string>;
     /** Optional filter function */
     filter?: (feature: DebriefFeature) => boolean;
     /** Height of the list container in pixels */
@@ -44,5 +46,5 @@ export interface FeatureListProps {
  * />
  * ```
  */
-export declare function FeatureList({ features, selectedIds, onSelectionChange, onSelect, filter, height, rowHeight, className, style, }: FeatureListProps): import("react/jsx-runtime").JSX.Element;
+export declare function FeatureList({ features, selectedIds, hiddenIds, onSelectionChange, onSelect, filter, height, rowHeight, className, style, }: FeatureListProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=FeatureList.d.ts.map

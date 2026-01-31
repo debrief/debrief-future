@@ -61,6 +61,8 @@ export interface ToolbarLabels {
     run: string;
     filter: string;
     associatedFiles: string;
+    showHidden: string;
+    hideHidden: string;
     searchPlaceholder: string;
     searchScopeName: string;
     searchScopeType: string;
@@ -176,11 +178,14 @@ export interface LayersToolbarProps {
     resultsChanged?: boolean;
     /** Current filter state */
     filterState?: FilterState;
+    /** Whether hidden features are shown in the list (default true) */
+    showHidden?: boolean;
     onDelete?: (featureIds: string[]) => void;
     onToggleVisibility?: (featureIds: string[]) => void;
     onRunTool?: (toolId: string, featureIds: string[]) => void;
     onRunAction?: (actionId: string, featureIds: string[]) => void;
     onFilterChange?: (filterState: FilterState) => void;
+    onShowHiddenChange?: (show: boolean) => void;
     onApplyToSelection?: (action: SelectionApplyAction) => void;
     onFileAction?: (file: AssociatedFile, action: FileAction) => void;
     /** Called when a dropdown is opened (parent can reset change flags) */
