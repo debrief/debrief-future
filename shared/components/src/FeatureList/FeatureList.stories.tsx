@@ -494,3 +494,40 @@ export const WithToolbarDarkTheme: Story = {
     },
   },
 };
+
+// Multi-theme side-by-side preview (046 visual verification)
+function MultiThemePanel({ variant, label }: { variant: 'light' | 'dark' | 'vscode'; label: string }) {
+  const bg = variant === 'light' ? '#ffffff' : '#1e1e1e';
+  return (
+    <div style={{ flex: 1, minWidth: 380 }}>
+      <div style={{ padding: '4px 8px', fontSize: 11, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        {label}
+      </div>
+      <div style={{ backgroundColor: bg, padding: 8, borderRadius: 4, border: '1px solid #333' }}>
+        <ThemeProvider theme={{ variant }}>
+          <FeatureListWithToolbarExample />
+        </ThemeProvider>
+      </div>
+    </div>
+  );
+}
+
+export const WithToolbarMultiTheme: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+      <MultiThemePanel variant="light" label="Light" />
+      <MultiThemePanel variant="dark" label="Dark" />
+      <MultiThemePanel variant="vscode" label="VS Code" />
+    </div>
+  ),
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        story:
+          'Side-by-side multi-theme preview of the integrated FeatureList + LayersToolbar. ' +
+          'Verifies that all controls render correctly across Light, Dark, and VS Code theme variants (046 visual verification).',
+      },
+    },
+  },
+};
