@@ -18,6 +18,7 @@ type OpenDropdown = 'filter' | 'run' | 'associated' | null;
  */
 export function LayersToolbar({
   selectedFeatureIds,
+  features,
   toolMatches = [],
   sourceFiles = [],
   resultFiles = [],
@@ -181,6 +182,8 @@ export function LayersToolbar({
                 filterState={filterState}
                 onFilterChange={(state) => onFilterChange?.(state)}
                 onApplyToSelection={onApplyToSelection}
+                hasActiveFilter={filterActive}
+                allSelected={selectedFeatureIds.length > 0 && selectedFeatureIds.length >= features.length}
                 labels={labelOverrides}
               />
             </div>
@@ -198,8 +201,8 @@ export function LayersToolbar({
             aria-label={labels.associatedFiles}
             aria-expanded={openDropdown === 'associated'}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M4.5 3a2.5 2.5 0 0 1 5 0v.5H11a1 1 0 0 1 1 1V6h-1V4.5H5V6H4V4.5a1 1 0 0 1 1-1h-.5V3a2.5 2.5 0 0 1 0 0Zm1 0v.5h3V3a1.5 1.5 0 0 0-3 0ZM2 7h12v1H2V7Zm0 2h12v1H2V9Zm0 2h12v1H2v-1Zm0 2h8v1H2v-1Z" />
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10.5 4.5l-5 5a2.12 2.12 0 0 0 3 3l5-5a3.54 3.54 0 0 0-5-5l-5 5a4.95 4.95 0 0 0 7 7l4.5-4.5" />
             </svg>
             <span className="debrief-layers-toolbar__arrow">▾</span>
           </button>
