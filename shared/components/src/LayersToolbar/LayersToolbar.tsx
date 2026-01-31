@@ -18,7 +18,6 @@ type OpenDropdown = 'filter' | 'run' | 'associated' | null;
  */
 export function LayersToolbar({
   selectedFeatureIds,
-  features: _features,
   toolMatches = [],
   sourceFiles = [],
   resultFiles = [],
