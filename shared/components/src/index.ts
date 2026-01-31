@@ -19,6 +19,16 @@ export type {
 export { FeatureList } from './FeatureList';
 export type { FeatureListProps } from './FeatureList';
 
+export { LayersToolbar, FilterDropdown } from './LayersToolbar';
+export type {
+  LayersToolbarProps,
+  FilterDropdownProps,
+  FilterState,
+  AssociatedFile,
+  ToolbarLabels,
+} from './LayersToolbar';
+export { DEFAULT_FILTER_STATE, isFilterActive } from './LayersToolbar';
+
 export { ThemeProvider } from './ThemeProvider';
 export type { ThemeProviderProps, Theme } from './ThemeProvider';
 
