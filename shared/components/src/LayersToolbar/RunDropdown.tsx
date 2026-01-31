@@ -73,7 +73,7 @@ export function RunDropdown({
       // Group by tool category
       const grouped = new Map<string, typeof activeTools>();
       for (const match of activeTools) {
-        const cat = match.tool.category ?? 'Other';
+        const cat = (match.tool as Record<string, unknown>)['category'] as string ?? 'Other';
         const existing = grouped.get(cat) ?? [];
         grouped.set(cat, [...existing, match]);
       }

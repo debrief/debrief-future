@@ -5,10 +5,13 @@
 import type { Tool } from '@debrief/schemas';
 import type { MatchResult } from '../../ToolMatch/types';
 
+/** Extended Tool with category for Run dropdown grouping */
+type ToolWithCategory = Tool & { category?: string };
+
 /**
  * Sample tools with category and subcategory for Run dropdown grouping.
  */
-export const sampleToolsWithCategories: Tool[] = [
+export const sampleToolsWithCategories: ToolWithCategory[] = [
   {
     id: 'tma-bearing-only',
     name: 'Bearing-Only TMA',

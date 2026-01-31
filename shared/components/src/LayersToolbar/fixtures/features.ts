@@ -2,15 +2,24 @@
  * Sample DebriefFeature collections for LayersToolbar stories and tests.
  */
 
-import type { TrackFeature, ReferenceLocation } from '@debrief/schemas';
+import type { TrackFeature, ReferenceLocation, TrackStyle, PointProperties } from '@debrief/schemas';
 import type { DebriefFeature } from '../../utils/types';
 
 const trackTypes = ['OWNSHIP', 'CONTACT', 'REFERENCE', 'SOLUTION'] as const;
+const trackColors = ['#1565c0', '#c62828', '#7b1fa2', '#2e7d32'];
 const platforms = [
   'HMS Victory', 'USS Constitution', 'Contact Alpha', 'Contact Bravo',
   'HMS Dreadnought', 'USS Enterprise', 'Contact Charlie', 'Contact Delta',
   'HMS Illustrious', 'USS Nimitz',
 ];
+
+function defaultPointStyle(color: string): PointProperties {
+  return { shape: 'circle', radius: 4, fill: true, fill_color: color, color };
+}
+
+function defaultTrackStyle(color: string): TrackStyle {
+  return { line: { color }, point: defaultPointStyle(color) };
+}
 
 /**
  * Generate sample track features.
@@ -32,6 +41,7 @@ export function generateTracks(count: number): TrackFeature[] {
       start_time: new Date(baseTime + i * 3600000).toISOString(),
       end_time: new Date(baseTime + (i + 12) * 3600000).toISOString(),
       positions: [],
+      style: defaultTrackStyle(trackColors[i % 4] ?? '#1565c0'),
     },
   }));
 }
@@ -56,6 +66,7 @@ export function generateLocations(count: number): ReferenceLocation[] {
       kind: 'POINT' as const,
       name: `${names[i % names.length]} ${Math.floor(i / names.length) || ''}`.trim(),
       location_type: (i % 2 === 0 ? 'WAYPOINT' : 'REFERENCE') as 'WAYPOINT' | 'REFERENCE',
+      style: defaultPointStyle(i % 2 === 0 ? '#e65100' : '#7b1fa2'),
       valid_from: '2024-06-15T00:00:00Z',
       valid_until: '2024-06-15T23:59:59Z',
     },
