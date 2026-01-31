@@ -75,6 +75,7 @@ export interface ToolbarLabels {
     visibilityVisibleOnly: string;
     temporalAfter: string;
     temporalBefore: string;
+    applySelectAll: string;
     applySelectMatched: string;
     applyAddMatched: string;
     applyRemoveMatched: string;
@@ -109,7 +110,7 @@ export declare const DEFAULT_LABELS: ToolbarLabels;
 /** File action types for Associated Files context menu */
 export type FileAction = 'open' | 'openWith' | 'reveal' | 'delete';
 /** Selection apply action types */
-export type SelectionApplyAction = 'select' | 'add' | 'remove';
+export type SelectionApplyAction = 'selectAll' | 'select' | 'add' | 'remove';
 /**
  * Props for the FilterDropdown component.
  */
@@ -120,6 +121,10 @@ export interface FilterDropdownProps {
     onFilterChange: (state: FilterState) => void;
     /** Called when apply-to-selection action is triggered */
     onApplyToSelection?: (action: SelectionApplyAction) => void;
+    /** Whether any filter is currently active (enables filter-dependent actions) */
+    hasActiveFilter?: boolean;
+    /** Whether all features are already selected (disables Select All) */
+    allSelected?: boolean;
     /** Externalisable labels */
     labels?: Partial<ToolbarLabels>;
 }
