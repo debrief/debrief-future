@@ -12,7 +12,7 @@ export interface FeatureRowProps {
   isSelected: boolean;
 
   /** Click handler */
-  onClick: () => void;
+  onClick: (event: React.MouseEvent) => void;
 
   /** Optional inline style */
   style?: CSSProperties;
@@ -74,7 +74,7 @@ export function FeatureRow({
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          onClick();
+          onClick(e as unknown as React.MouseEvent);
         }
       }}
       style={style}

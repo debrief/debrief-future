@@ -382,18 +382,17 @@ function FeatureListWithToolbarExample() {
     };
   }, [filterState]);
 
-  const handleSelect = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-    // Simulate tool change notification
+  const handleSelectionChange = (ids: Set<string>) => {
+    setSelectedIds(ids);
     setToolsChanged(true);
+  };
+
+  const handleApplyToSelection = (action: string) => {
+    if (action === 'selectAll') {
+      setSelectedIds(new Set(toolbarFeatures.features.map((f) => f.id)));
+    } else {
+      console.log('Apply to selection:', action);
+    }
   };
 
   const handleDelete = (ids: string[]) => {
@@ -430,14 +429,14 @@ function FeatureListWithToolbarExample() {
         onToggleVisibility={handleToggleVisibility}
         onRunTool={handleRunTool}
         onFilterChange={setFilterState}
-        onApplyToSelection={(action) => console.log('Apply to selection:', action)}
+        onApplyToSelection={handleApplyToSelection}
         onFileAction={(file, action) => console.log('File action:', action, file.name)}
         onDropdownOpened={handleDropdownOpened}
       />
       <FeatureList
         features={toolbarFeatures}
         selectedIds={selectedIds}
-        onSelect={handleSelect}
+        onSelectionChange={handleSelectionChange}
         filter={filter}
         height={350}
       />
