@@ -263,6 +263,8 @@ export interface LayersToolbarProps {
   selectedFeatureIds: string[];
   /** All features in the current plot */
   features: DebriefFeature[];
+  /** Set of hidden feature IDs (determines visibility icon state) */
+  hiddenIds?: Set<string>;
   /** Tool match results for current selection */
   toolMatches?: MatchResult[];
   /** Associated source files */

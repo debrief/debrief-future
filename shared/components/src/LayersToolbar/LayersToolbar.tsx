@@ -19,6 +19,7 @@ type OpenDropdown = 'filter' | 'run' | 'associated' | null;
 export function LayersToolbar({
   selectedFeatureIds,
   features,
+  hiddenIds,
   toolMatches = [],
   sourceFiles = [],
   resultFiles = [],
@@ -45,6 +46,18 @@ export function LayersToolbar({
 
   const hasSelection = selectedFeatureIds.length > 0;
   const filterActive = isFilterActive(filterState);
+
+  // Determine visibility state of selected features: 'all-visible' | 'all-hidden' | 'mixed'
+  const selectionVisibility = useMemo(() => {
+    if (!hasSelection || !hiddenIds || hiddenIds.size === 0) return 'all-visible' as const;
+    let hiddenCount = 0;
+    for (const id of selectedFeatureIds) {
+      if (hiddenIds.has(id)) hiddenCount++;
+    }
+    if (hiddenCount === 0) return 'all-visible' as const;
+    if (hiddenCount === selectedFeatureIds.length) return 'all-hidden' as const;
+    return 'mixed' as const;
+  }, [hasSelection, selectedFeatureIds, hiddenIds]);
 
   // Cache sorted unique kind values, regenerated when features change
   const featureKinds = useMemo(() => {
@@ -110,7 +123,7 @@ export function LayersToolbar({
           </svg>
         </button>
 
-        {/* Visibility */}
+        {/* Visibility — icon reflects state of selected features */}
         <button
           className="debrief-layers-toolbar__btn"
           disabled={!hasSelection}
@@ -118,9 +131,28 @@ export function LayersToolbar({
           title={labels.toggleVisibility}
           aria-label={labels.toggleVisibility}
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M8 3.5c-3.4 0-6.2 2.1-7.8 4.5 1.6 2.4 4.4 4.5 7.8 4.5s6.2-2.1 7.8-4.5C14.2 5.6 11.4 3.5 8 3.5Zm0 8a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0-5.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
-          </svg>
+          {selectionVisibility === 'all-visible' ? (
+            /* Eye with slash: will hide visible items */
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 2l12 12" />
+              <path d="M6.5 6.5a2 2 0 0 0 3 3" />
+              <path d="M3.5 5.5C2.2 6.8 1.5 8 1.5 8s2.5 4.5 6.5 4.5c1 0 1.9-.3 2.7-.7" />
+              <path d="M10.7 10.7c2-1.3 3.3-2.7 3.3-2.7S11.5 3.5 8 3.5c-.7 0-1.3.1-1.9.3" />
+            </svg>
+          ) : selectionVisibility === 'all-hidden' ? (
+            /* Open eye: will make hidden items visible */
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8s-2.5 4.5-6.5 4.5S1.5 8 1.5 8Z" />
+              <circle cx="8" cy="8" r="2" />
+            </svg>
+          ) : (
+            /* Mixed: half-eye (eye with dot) */
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8s-2.5 4.5-6.5 4.5S1.5 8 1.5 8Z" />
+              <circle cx="8" cy="8" r="2" />
+              <line x1="8" y1="3" x2="8" y2="5" />
+            </svg>
+          )}
         </button>
 
         {/* Run */}
@@ -175,16 +207,18 @@ export function LayersToolbar({
             aria-pressed={!showHidden}
           >
             {showHidden ? (
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8s-2.5 4.5-6.5 4.5S1.5 8 1.5 8Z" />
-                <circle cx="8" cy="8" r="2" />
-              </svg>
-            ) : (
+              /* Eye-slash: hidden features are shown, click to hide them */
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M2 2l12 12" />
                 <path d="M6.5 6.5a2 2 0 0 0 3 3" />
                 <path d="M3.5 5.5C2.2 6.8 1.5 8 1.5 8s2.5 4.5 6.5 4.5c1 0 1.9-.3 2.7-.7" />
                 <path d="M10.7 10.7c2-1.3 3.3-2.7 3.3-2.7S11.5 3.5 8 3.5c-.7 0-1.3.1-1.9.3" />
+              </svg>
+            ) : (
+              /* Open eye: hidden features are suppressed, click to show them */
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8s-2.5 4.5-6.5 4.5S1.5 8 1.5 8Z" />
+                <circle cx="8" cy="8" r="2" />
               </svg>
             )}
           </button>

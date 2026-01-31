@@ -436,6 +436,7 @@ function FeatureListWithToolbarExample() {
       <LayersToolbar
         selectedFeatureIds={selectedFeatureIds}
         features={toolbarFeatures.features}
+        hiddenIds={hiddenIds}
         toolMatches={toolMatches}
         sourceFiles={sampleSourceFiles}
         resultFiles={sampleResultFiles}
