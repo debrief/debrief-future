@@ -1,0 +1,111 @@
+/**
+ * LayersToolbar component styles.
+ */
+
+.debrief-layers-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  background-color: var(--debrief-bg-primary, #ffffff);
+  border: 1px solid var(--debrief-border-color, #e0e0e0);
+  border-radius: var(--debrief-border-radius, 4px);
+  font-family: var(--debrief-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+}
+
+.debrief-layers-toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.debrief-layers-toolbar__spacer {
+  flex: 1;
+}
+
+/* Button base */
+.debrief-layers-toolbar__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 6px;
+  border: none;
+  border-radius: var(--debrief-border-radius, 4px);
+  background: none;
+  color: var(--debrief-text-primary, #1a1a1a);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--debrief-font-size-sm, 13px);
+  line-height: 1;
+  position: relative;
+}
+
+.debrief-layers-toolbar__btn:hover:not(:disabled) {
+  background-color: var(--debrief-hover-bg, rgba(0, 0, 0, 0.06));
+}
+
+.debrief-layers-toolbar__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+
+.debrief-layers-toolbar__btn--active {
+  background-color: var(--debrief-selection-bg, rgba(0, 102, 204, 0.1));
+}
+
+.debrief-layers-toolbar__btn--with-arrow {
+  padding-right: 4px;
+}
+
+.debrief-layers-toolbar__arrow {
+  font-size: 10px;
+  color: var(--debrief-text-secondary, #666666);
+  margin-left: 1px;
+}
+
+/* SVG icons */
+.debrief-layers-toolbar__btn svg {
+  flex-shrink: 0;
+}
+
+/* Dropdown wrapper */
+.debrief-layers-toolbar__btn-wrapper {
+  position: relative;
+}
+
+.debrief-layers-toolbar__dropdown {
+  position: absolute;
+  top: 100%;
+  margin-top: 4px;
+  z-index: 100;
+}
+
+.debrief-layers-toolbar__dropdown--left {
+  left: 0;
+}
+
+.debrief-layers-toolbar__dropdown--right {
+  right: 0;
+}
+
+/* Dark theme */
+@media (prefers-color-scheme: dark) {
+  .debrief-layers-toolbar {
+    background-color: var(--debrief-bg-primary, #1e1e1e);
+    border-color: var(--debrief-border-color, #3a3a3a);
+  }
+
+  .debrief-layers-toolbar__btn {
+    color: var(--debrief-text-primary, #e0e0e0);
+  }
+
+  .debrief-layers-toolbar__btn:hover:not(:disabled) {
+    background-color: var(--debrief-hover-bg, rgba(255, 255, 255, 0.08));
+  }
+
+  .debrief-layers-toolbar__arrow {
+    color: var(--debrief-text-secondary, #888888);
+  }
+}

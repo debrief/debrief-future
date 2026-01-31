@@ -1,0 +1,165 @@
+/**
+ * AssociatedFilesDropdown styles.
+ */
+
+.debrief-associated-files {
+  width: 260px;
+  background-color: var(--debrief-bg-primary, #ffffff);
+  border: 1px solid var(--debrief-border-color, #e0e0e0);
+  border-radius: var(--debrief-border-radius, 4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  font-family: var(--debrief-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-size: var(--debrief-font-size-sm, 13px);
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.debrief-associated-files__section {
+  padding: 4px 0;
+}
+
+.debrief-associated-files__section-header {
+  padding: 6px 12px 4px;
+  font-weight: 600;
+  font-size: var(--debrief-font-size-xs, 11px);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--debrief-text-secondary, #666666);
+}
+
+.debrief-associated-files__divider {
+  height: 1px;
+  background-color: var(--debrief-border-color-light, #f0f0f0);
+}
+
+.debrief-associated-files__empty {
+  padding: 6px 12px;
+  color: var(--debrief-text-secondary, #666666);
+  font-style: italic;
+}
+
+/* File row */
+.debrief-associated-files__file {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 12px;
+  border: none;
+  background: none;
+  color: var(--debrief-text-primary, #1a1a1a);
+  font-size: var(--debrief-font-size-sm, 13px);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.debrief-associated-files__file:hover {
+  background-color: var(--debrief-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.debrief-associated-files__file--active {
+  background-color: var(--debrief-selection-bg, rgba(0, 102, 204, 0.1));
+}
+
+.debrief-associated-files__viewer-badge {
+  flex-shrink: 0;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background-color: var(--debrief-badge-bg, #e8e8e8);
+  color: var(--debrief-badge-text, #555555);
+  font-size: var(--debrief-font-size-xs, 11px);
+  font-weight: 600;
+}
+
+.debrief-associated-files__file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Context menu (inline below file) */
+.debrief-associated-files__context-menu {
+  padding: 2px 0;
+  margin: 0 8px 4px;
+  border: 1px solid var(--debrief-border-color-light, #f0f0f0);
+  border-radius: var(--debrief-border-radius, 4px);
+  background-color: var(--debrief-bg-primary, #ffffff);
+}
+
+.debrief-associated-files__action {
+  display: block;
+  width: 100%;
+  padding: 4px 10px;
+  border: none;
+  background: none;
+  color: var(--debrief-text-primary, #1a1a1a);
+  font-size: var(--debrief-font-size-sm, 13px);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.debrief-associated-files__action:hover {
+  background-color: var(--debrief-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.debrief-associated-files__action--danger {
+  color: #c62828;
+}
+
+.debrief-associated-files__action--danger:hover {
+  background-color: rgba(198, 40, 40, 0.06);
+}
+
+.debrief-associated-files__separator {
+  height: 1px;
+  background-color: var(--debrief-border-color-light, #f0f0f0);
+  margin: 2px 0;
+}
+
+.debrief-associated-files__provenance-warning {
+  padding: 4px 10px;
+  color: #c62828;
+  font-size: var(--debrief-font-size-xs, 11px);
+  font-style: italic;
+}
+
+/* Dark theme */
+@media (prefers-color-scheme: dark) {
+  .debrief-associated-files {
+    background-color: var(--debrief-bg-primary, #1e1e1e);
+    border-color: var(--debrief-border-color, #3a3a3a);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .debrief-associated-files__divider,
+  .debrief-associated-files__separator {
+    background-color: var(--debrief-border-color-light, #2d2d2d);
+  }
+
+  .debrief-associated-files__file {
+    color: var(--debrief-text-primary, #e0e0e0);
+  }
+
+  .debrief-associated-files__file:hover {
+    background-color: var(--debrief-hover-bg, rgba(255, 255, 255, 0.06));
+  }
+
+  .debrief-associated-files__context-menu {
+    background-color: var(--debrief-bg-primary, #1e1e1e);
+    border-color: var(--debrief-border-color-light, #2d2d2d);
+  }
+
+  .debrief-associated-files__action {
+    color: var(--debrief-text-primary, #e0e0e0);
+  }
+
+  .debrief-associated-files__action:hover {
+    background-color: var(--debrief-hover-bg, rgba(255, 255, 255, 0.06));
+  }
+}
