@@ -7,7 +7,7 @@ export interface FeatureRowProps {
     /** Whether this row is selected */
     isSelected: boolean;
     /** Click handler */
-    onClick: () => void;
+    onClick: (event: React.MouseEvent) => void;
     /** Optional inline style */
     style?: CSSProperties;
 }
