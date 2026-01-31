@@ -11,6 +11,9 @@ export interface FeatureRowProps {
   /** Whether this row is selected */
   isSelected: boolean;
 
+  /** Whether this feature is hidden (shows eye-slash indicator) */
+  isHidden?: boolean;
+
   /** Click handler */
   onClick: (event: React.MouseEvent) => void;
 
@@ -50,6 +53,7 @@ function getFeatureInfo(feature: DebriefFeature): string | null {
 export function FeatureRow({
   feature,
   isSelected,
+  isHidden = false,
   onClick,
   style,
 }: FeatureRowProps) {
@@ -61,6 +65,7 @@ export function FeatureRow({
   const className = [
     'debrief-feature-row',
     isSelected && 'debrief-feature-row--selected',
+    isHidden && 'debrief-feature-row--hidden',
   ]
     .filter(Boolean)
     .join(' ');
@@ -87,7 +92,17 @@ export function FeatureRow({
         <span className="debrief-feature-row__name">{label}</span>
         <span className="debrief-feature-row__type">{type}</span>
       </div>
-      {info && <span className="debrief-feature-row__info">{info}</span>}
+      {isHidden && (
+        <span className="debrief-feature-row__hidden-icon" title="Hidden">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 2l12 12" />
+            <path d="M6.5 6.5a2 2 0 0 0 3 3" />
+            <path d="M3.5 5.5C2.2 6.8 1.5 8 1.5 8s2.5 4.5 6.5 4.5c1 0 1.9-.3 2.7-.7" />
+            <path d="M10.7 10.7c2-1.3 3.3-2.7 3.3-2.7S11.5 3.5 8 3.5c-.7 0-1.3.1-1.9.3" />
+          </svg>
+        </span>
+      )}
+      {!isHidden && info && <span className="debrief-feature-row__info">{info}</span>}
     </div>
   );
 }

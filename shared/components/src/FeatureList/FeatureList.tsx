@@ -25,6 +25,9 @@ export interface FeatureListProps {
    */
   onSelect?: (id: string) => void;
 
+  /** Set of hidden feature IDs (shown with eye-slash icon) */
+  hiddenIds?: Set<string>;
+
   /** Optional filter function */
   filter?: (feature: DebriefFeature) => boolean;
 
@@ -71,6 +74,7 @@ function normalizeFeatures(
 export function FeatureList({
   features,
   selectedIds = new Set(),
+  hiddenIds,
   onSelectionChange,
   onSelect,
   filter,
@@ -187,6 +191,7 @@ export function FeatureList({
             const feature = featureArray[virtualItem.index];
             if (!feature) return null;
             const isSelected = selectedIds.has(feature.id);
+            const isHidden = hiddenIds?.has(feature.id) ?? false;
 
             return (
               <div
@@ -203,6 +208,7 @@ export function FeatureList({
                 <FeatureRow
                   feature={feature}
                   isSelected={isSelected}
+                  isHidden={isHidden}
                   onClick={(e) => handleRowClick(virtualItem.index, e)}
                   style={{ height: '100%' }}
                 />

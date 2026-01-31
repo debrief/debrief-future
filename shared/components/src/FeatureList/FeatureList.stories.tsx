@@ -339,6 +339,12 @@ const toolbarFeatures: DebriefFeatureCollection = {
 
 function FeatureListWithToolbarExample() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(() => {
+    // Start with a couple of features hidden to demonstrate the feature
+    const ids = toolbarFeatures.features.slice(2, 4).map((f) => f.id);
+    return new Set(ids);
+  });
+  const [showHidden, setShowHidden] = useState(true);
   const [filterState, setFilterState] = useState<FilterState>(DEFAULT_FILTER_STATE);
   const [toolsChanged, setToolsChanged] = useState(false);
   const [resultsChanged, setResultsChanged] = useState(false);
@@ -361,10 +367,14 @@ function FeatureListWithToolbarExample() {
     return toolMatchService.getMatchResults(selection);
   }, [selectedIds, toolMatchService]);
 
-  // Simple text filter applied to FeatureList
+  // Filter: text, kind, and show/hide hidden
   const filter = useMemo(() => {
-    if (!isFilterActive(filterState)) return undefined;
+    const hasFilter = isFilterActive(filterState);
+    const needsHiddenFilter = !showHidden && hiddenIds.size > 0;
+    if (!hasFilter && !needsHiddenFilter) return undefined;
     return (feature: DebriefFeature) => {
+      // Hide hidden features when showHidden is off
+      if (!showHidden && hiddenIds.has(feature.id)) return false;
       // Feature type filter (by kind)
       const kind = feature.properties.kind;
       if (kind && filterState.featureTypes[kind] === false) return false;
@@ -380,7 +390,7 @@ function FeatureListWithToolbarExample() {
       }
       return true;
     };
-  }, [filterState]);
+  }, [filterState, showHidden, hiddenIds]);
 
   const handleSelectionChange = (ids: Set<string>) => {
     setSelectedIds(ids);
@@ -400,7 +410,14 @@ function FeatureListWithToolbarExample() {
   };
 
   const handleToggleVisibility = (ids: string[]) => {
-    console.log('Toggle visibility:', ids);
+    setHiddenIds((prev) => {
+      const next = new Set(prev);
+      for (const id of ids) {
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+      }
+      return next;
+    });
   };
 
   const handleRunTool = (toolId: string, ids: string[]) => {
@@ -425,10 +442,12 @@ function FeatureListWithToolbarExample() {
         toolsChanged={toolsChanged}
         resultsChanged={resultsChanged}
         filterState={filterState}
+        showHidden={showHidden}
         onDelete={handleDelete}
         onToggleVisibility={handleToggleVisibility}
         onRunTool={handleRunTool}
         onFilterChange={setFilterState}
+        onShowHiddenChange={setShowHidden}
         onApplyToSelection={handleApplyToSelection}
         onFileAction={(file, action) => console.log('File action:', action, file.name)}
         onDropdownOpened={handleDropdownOpened}
@@ -436,6 +455,7 @@ function FeatureListWithToolbarExample() {
       <FeatureList
         features={toolbarFeatures}
         selectedIds={selectedIds}
+        hiddenIds={hiddenIds}
         onSelectionChange={handleSelectionChange}
         filter={filter}
         height={350}

@@ -102,6 +102,8 @@ export interface ToolbarLabels {
   run: string;
   filter: string;
   associatedFiles: string;
+  showHidden: string;
+  hideHidden: string;
   // Filter dropdown
   searchPlaceholder: string;
   searchScopeName: string;
@@ -193,6 +195,8 @@ export const DEFAULT_LABELS: ToolbarLabels = {
   deleteFile: 'Delete',
   provenanceWarning: 'Warning: Removing source data breaks provenance chain',
   noFiles: 'No files',
+  showHidden: 'Show hidden features',
+  hideHidden: 'Hide hidden features',
 };
 
 /** File action types for Associated Files context menu */
@@ -271,6 +275,8 @@ export interface LayersToolbarProps {
   resultsChanged?: boolean;
   /** Current filter state */
   filterState?: FilterState;
+  /** Whether hidden features are shown in the list (default true) */
+  showHidden?: boolean;
 
   // Callbacks
   onDelete?: (featureIds: string[]) => void;
@@ -278,6 +284,7 @@ export interface LayersToolbarProps {
   onRunTool?: (toolId: string, featureIds: string[]) => void;
   onRunAction?: (actionId: string, featureIds: string[]) => void;
   onFilterChange?: (filterState: FilterState) => void;
+  onShowHiddenChange?: (show: boolean) => void;
   onApplyToSelection?: (action: SelectionApplyAction) => void;
   onFileAction?: (file: AssociatedFile, action: FileAction) => void;
   /** Called when a dropdown is opened (parent can reset change flags) */

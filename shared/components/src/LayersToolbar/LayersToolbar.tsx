@@ -25,11 +25,13 @@ export function LayersToolbar({
   toolsChanged = false,
   resultsChanged = false,
   filterState: externalFilterState,
+  showHidden = true,
   onDelete,
   onToggleVisibility,
   onRunTool,
   onRunAction,
   onFilterChange,
+  onShowHiddenChange,
   onApplyToSelection,
   onFileAction,
   onDropdownOpened,
@@ -163,6 +165,30 @@ export function LayersToolbar({
 
       {/* Plot-scoped group */}
       <div className="debrief-layers-toolbar__group">
+        {/* Show/Hide hidden features toggle */}
+        {onShowHiddenChange && (
+          <button
+            className={`debrief-layers-toolbar__btn${showHidden ? '' : ' debrief-layers-toolbar__btn--active'}`}
+            onClick={() => onShowHiddenChange(!showHidden)}
+            title={showHidden ? labels.hideHidden : labels.showHidden}
+            aria-label={showHidden ? labels.hideHidden : labels.showHidden}
+            aria-pressed={!showHidden}
+          >
+            {showHidden ? (
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8s-2.5 4.5-6.5 4.5S1.5 8 1.5 8Z" />
+                <circle cx="8" cy="8" r="2" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 2l12 12" />
+                <path d="M6.5 6.5a2 2 0 0 0 3 3" />
+                <path d="M3.5 5.5C2.2 6.8 1.5 8 1.5 8s2.5 4.5 6.5 4.5c1 0 1.9-.3 2.7-.7" />
+                <path d="M10.7 10.7c2-1.3 3.3-2.7 3.3-2.7S11.5 3.5 8 3.5c-.7 0-1.3.1-1.9.3" />
+              </svg>
+            )}
+          </button>
+        )}
         {/* Filter */}
         <div className="debrief-layers-toolbar__btn-wrapper">
           <button

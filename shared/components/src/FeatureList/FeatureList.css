@@ -170,6 +170,18 @@
   color: var(--debrief-location-reference-badge-text, #7b1fa2);
 }
 
+/* Hidden state */
+.debrief-feature-row--hidden {
+  opacity: 0.55;
+}
+
+.debrief-feature-row__hidden-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--debrief-text-secondary, #666666);
+}
+
 /* Dark theme support */
 @media (prefers-color-scheme: dark) {
   .debrief-feature-list {
