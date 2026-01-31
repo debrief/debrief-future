@@ -170,8 +170,9 @@ export function LayersToolbar({
                 <path d="M1 2h14l-5 6v5l-4 2V8L1 2Z" />
               </svg>
             ) : (
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M11.5 7a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9Zm0-1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM8 8l5 5-.7.7L7.3 8.7 8 8Z" />
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="7" cy="7" r="4.5" />
+                <line x1="10.2" y1="10.2" x2="14" y2="14" />
               </svg>
             )}
             <span className="debrief-layers-toolbar__arrow">▾</span>
