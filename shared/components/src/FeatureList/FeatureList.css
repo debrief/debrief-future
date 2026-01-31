@@ -14,10 +14,11 @@
   font-size: var(--debrief-font-size-sm, 13px);
 }
 
-/* Scroll container */
+/* Scroll container — always visible to show viewport proportion */
 .debrief-feature-list__scroll {
   scrollbar-width: thin;
   scrollbar-color: var(--debrief-scrollbar-thumb, #c1c1c1) var(--debrief-scrollbar-track, #f1f1f1);
+  overflow-y: scroll !important;
 }
 
 .debrief-feature-list__scroll::-webkit-scrollbar {
