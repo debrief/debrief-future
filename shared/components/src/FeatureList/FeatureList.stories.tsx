@@ -431,6 +431,7 @@ function FeatureListWithToolbarExample() {
         onToggleVisibility={handleToggleVisibility}
         onRunTool={handleRunTool}
         onFilterChange={setFilterState}
+        onApplyToSelection={(action) => console.log('Apply to selection:', action)}
         onFileAction={(file, action) => console.log('File action:', action, file.name)}
         onDropdownOpened={handleDropdownOpened}
       />
