@@ -365,10 +365,9 @@ function FeatureListWithToolbarExample() {
   const filter = useMemo(() => {
     if (!isFilterActive(filterState)) return undefined;
     return (feature: DebriefFeature) => {
-      // Feature type filter
-      const isTrack = 'track_type' in feature.properties;
-      if (isTrack && !filterState.featureTypes.tracks) return false;
-      if (!isTrack && !filterState.featureTypes.zones) return false;
+      // Feature type filter (by kind)
+      const kind = feature.properties.kind;
+      if (kind && filterState.featureTypes[kind] === false) return false;
       // Text search
       if (filterState.textQuery) {
         const query = filterState.textQuery.toLowerCase();

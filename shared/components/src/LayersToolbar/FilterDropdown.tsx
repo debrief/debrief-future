@@ -17,6 +17,7 @@ import './FilterDropdown.css';
  * fires onFilterChange on every interaction.
  */
 export function FilterDropdown({
+  featureKinds,
   filterState,
   onFilterChange,
   onApplyToSelection,
@@ -58,10 +59,10 @@ export function FilterDropdown({
     });
   };
 
-  const updateFeatureType = (key: keyof typeof filterState.featureTypes, value: boolean) => {
+  const updateFeatureType = (kind: string, value: boolean) => {
     onFilterChange({
       ...filterState,
-      featureTypes: { ...filterState.featureTypes, [key]: value },
+      featureTypes: { ...filterState.featureTypes, [kind]: value },
     });
   };
 
@@ -174,31 +175,26 @@ export function FilterDropdown({
 
       <div className="debrief-filter-dropdown__divider" />
 
-      {/* Feature Types */}
-      <div className="debrief-filter-dropdown__section">
-        <div className="debrief-filter-dropdown__section-title">
-          {labels.featureTypeTracks}
+      {/* Feature Types (built from feature kinds) */}
+      {featureKinds.length > 0 && (
+        <div className="debrief-filter-dropdown__section">
+          <div className="debrief-filter-dropdown__section-title">
+            {labels.featureTypesTitle}
+          </div>
+          <div className="debrief-filter-dropdown__checkbox-grid">
+            {featureKinds.map((kind) => (
+              <label key={kind} className="debrief-filter-dropdown__checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={filterState.featureTypes[kind] ?? true}
+                  onChange={(e) => updateFeatureType(kind, e.target.checked)}
+                />
+                {kind}
+              </label>
+            ))}
+          </div>
         </div>
-        <div className="debrief-filter-dropdown__checkbox-grid">
-          {(
-            [
-              ['tracks', labels.featureTypeTracks],
-              ['contacts', labels.featureTypeContacts],
-              ['zones', labels.featureTypeZones],
-              ['annotations', labels.featureTypeAnnotations],
-            ] as const
-          ).map(([key, label]) => (
-            <label key={key} className="debrief-filter-dropdown__checkbox-label">
-              <input
-                type="checkbox"
-                checked={filterState.featureTypes[key]}
-                onChange={(e) => updateFeatureType(key, e.target.checked)}
-              />
-              {label}
-            </label>
-          ))}
-        </div>
-      </div>
+      )}
 
       <div className="debrief-filter-dropdown__divider" />
 

@@ -5,6 +5,8 @@ import { ThemeProvider } from '../ThemeProvider';
 import type { FilterState } from './types';
 import { DEFAULT_FILTER_STATE } from './types';
 
+const SAMPLE_KINDS = ['CONTACT', 'POINT', 'TRACK', 'ZONE'];
+
 const meta: Meta<typeof FilterDropdown> = {
   title: 'Components/LayersToolbar/FilterDropdown',
   component: FilterDropdown,
@@ -13,7 +15,7 @@ const meta: Meta<typeof FilterDropdown> = {
     docs: {
       description: {
         component:
-          'FilterDropdown provides text search, scope selection, feature type checkboxes, visibility filters, temporal range, and apply-to-selection actions.',
+          'FilterDropdown provides text search, scope selection, feature type checkboxes (built from feature kinds), visibility filters, temporal range, and apply-to-selection actions.',
       },
     },
   },
@@ -38,6 +40,7 @@ function InteractiveFilter() {
   return (
     <div>
       <FilterDropdown
+        featureKinds={SAMPLE_KINDS}
         filterState={filterState}
         onFilterChange={setFilterState}
         onApplyToSelection={(action) => console.log('Apply to selection:', action)}
@@ -68,6 +71,7 @@ export const WithActiveTextFilter: Story = {
     });
     return (
       <FilterDropdown
+        featureKinds={SAMPLE_KINDS}
         filterState={filterState}
         onFilterChange={setFilterState}
         onApplyToSelection={(action) => console.log('Apply:', action)}
@@ -81,14 +85,15 @@ export const WithTypeFilters: Story = {
     const [filterState, setFilterState] = useState<FilterState>({
       ...DEFAULT_FILTER_STATE,
       featureTypes: {
-        tracks: true,
-        contacts: false,
-        zones: false,
-        annotations: true,
+        TRACK: true,
+        CONTACT: false,
+        ZONE: false,
+        POINT: true,
       },
     });
     return (
       <FilterDropdown
+        featureKinds={SAMPLE_KINDS}
         filterState={filterState}
         onFilterChange={setFilterState}
       />
@@ -107,6 +112,7 @@ export const WithTemporalFilters: Story = {
     });
     return (
       <FilterDropdown
+        featureKinds={SAMPLE_KINDS}
         filterState={filterState}
         onFilterChange={setFilterState}
       />
@@ -119,12 +125,13 @@ export const WithAllFiltersActive: Story = {
     const [filterState, setFilterState] = useState<FilterState>({
       textQuery: 'Victory',
       searchScope: { name: true, type: false, platform: true, attachments: false },
-      featureTypes: { tracks: true, contacts: false, zones: false, annotations: false },
+      featureTypes: { TRACK: true, CONTACT: false, ZONE: false, POINT: false },
       visibility: 'visible-only',
       temporal: { after: '2024-06-15T08:00', before: '2024-06-15T20:00' },
     });
     return (
       <FilterDropdown
+        featureKinds={SAMPLE_KINDS}
         filterState={filterState}
         onFilterChange={setFilterState}
         onApplyToSelection={(action) => console.log('Apply:', action)}
@@ -139,6 +146,7 @@ export const DarkTheme: Story = {
     return (
       <ThemeProvider theme={{ variant: 'dark' }}>
         <FilterDropdown
+          featureKinds={SAMPLE_KINDS}
           filterState={filterState}
           onFilterChange={setFilterState}
           onApplyToSelection={(action) => console.log('Apply:', action)}

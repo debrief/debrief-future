@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import type { LayersToolbarProps } from './types';
 import { DEFAULT_FILTER_STATE, DEFAULT_LABELS, isFilterActive } from './types';
 import { FilterDropdown } from './FilterDropdown';
@@ -43,6 +43,15 @@ export function LayersToolbar({
 
   const hasSelection = selectedFeatureIds.length > 0;
   const filterActive = isFilterActive(filterState);
+
+  // Cache sorted unique kind values, regenerated when features change
+  const featureKinds = useMemo(() => {
+    const kinds = new Set<string>();
+    for (const f of features) {
+      if (f.properties.kind) kinds.add(f.properties.kind);
+    }
+    return Array.from(kinds).sort();
+  }, [features]);
 
   const toggleDropdown = useCallback(
     (dropdown: OpenDropdown) => {
@@ -180,6 +189,7 @@ export function LayersToolbar({
           {openDropdown === 'filter' && (
             <div className="debrief-layers-toolbar__dropdown debrief-layers-toolbar__dropdown--right">
               <FilterDropdown
+                featureKinds={featureKinds}
                 filterState={filterState}
                 onFilterChange={(state) => onFilterChange?.(state)}
                 onApplyToSelection={onApplyToSelection}

@@ -22,4 +22,4 @@ export type {
   SelectionApplyAction,
 } from './types';
 
-export { DEFAULT_FILTER_STATE, DEFAULT_LABELS, isFilterActive } from './types';
+export { DEFAULT_FILTER_STATE, DEFAULT_LABELS, isFilterActive, buildFeatureTypes } from './types';
