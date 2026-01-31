@@ -1,5 +1,9 @@
 # Add layers toolbar with search, run, and associated files to FeatureList in shared-components
 
+## Reference Specification
+
+**[docs/layers-toolbar-spec.md](../layers-toolbar-spec.md)** is the authoritative source for all toolbar behaviour, dropdown structures, icons, tooltips, filter logic, multi-suffix conventions, and Constitution compliance. This idea document scopes the shared-components implementation; the spec contains the full detail.
+
 ## Problem
 
 The FeatureList component in shared-components displays features but lacks the toolbar specified in docs/layers-toolbar-spec.md. Analysts need efficient access to selection-scoped actions (delete, visibility, run tool) and plot-scoped utilities (filter/search, associated files) without navigating menus. The toolbar should live entirely in shared-components with no VS Code dependencies, ready for later integration into a unified activity panel.
@@ -30,6 +34,30 @@ Extend the existing FeatureList with a toolbar implementing all 5 buttons from t
 - Integrate toolbar above existing FeatureList
 - Story showing full combined view with interactive selection driving tool matching
 - Dark theme variant
+
+### Key Spec Details (see layers-toolbar-spec.md for full detail)
+
+**Run dropdown** — nested context menu:
+- File (Export Selection, Export to GeoJSON, Export to CSV)
+- Edit (Duplicate, Rename, Lock/Unlock)
+- View (Zoom to Selection, Pan to Feature, Center Map)
+- Analysis (TMA, Track Processing, Statistics — context-sensitive via ToolMatch)
+- Yellow halo on button when available tools change; clears after ~3s or on open
+
+**Filter dropdown** — sections per spec:
+- Text search with scope checkboxes (Name, Type, Platform, Attachments — first 3 checked by default)
+- Feature Type checkboxes (Tracks, Contacts, Zones, Annotations) — additive
+- Visibility filters (show hidden only, show visible only)
+- Temporal filters (before/after datetime pickers)
+- Apply to Selection actions (Select matched, Add matched to selection, Remove matched)
+- All filters additive; search icon → filter icon when any filter active
+
+**Associated Files dropdown** — Sources/Results tree:
+- Lists contents of sources/ and results/ subfolders
+- Click → context menu: Open, Open With..., Reveal in Explorer, Delete
+- Delete on Sources warns about provenance chain
+- Multi-suffix convention: `<name>.<viewer-type>.<format>` (e.g. `.2d.json`, `.table.json`)
+- Yellow halo when new Results file added; clears after ~3s or on open
 
 ### Tool Selection
 - Use existing `ToolMatchService` from shared-components for Run dropdown
