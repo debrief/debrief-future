@@ -1,9 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { FeatureList } from './FeatureList';
+import { LayersToolbar } from '../LayersToolbar';
+import { DEFAULT_FILTER_STATE, isFilterActive } from '../LayersToolbar';
+import type { FilterState } from '../LayersToolbar';
+import { ToolMatchService, createSelectionFromCounts } from '../ToolMatch';
 import { ThemeProvider } from '../ThemeProvider';
-import type { DebriefFeatureCollection } from '../utils/types';
+import type { DebriefFeature, DebriefFeatureCollection } from '../utils/types';
 import type { TrackFeature, ReferenceLocation } from '@debrief/schemas';
+import { sampleSourceFiles, sampleResultFiles } from '../LayersToolbar/fixtures/files';
+import { sampleToolsWithCategories as sampleTools } from '../LayersToolbar/fixtures/tools';
 
 const meta: Meta<typeof FeatureList> = {
   title: 'Components/FeatureList',
@@ -317,6 +323,153 @@ export const LocationsOnly: Story = {
     docs: {
       description: {
         story: 'Feature list showing only reference location features.',
+      },
+    },
+  },
+};
+
+// ---- Combined FeatureList + LayersToolbar ----
+
+const toolbarData = generateTracks(12);
+const toolbarLocations = generateLocations(4);
+const toolbarFeatures: DebriefFeatureCollection = {
+  type: 'FeatureCollection',
+  features: [...toolbarData, ...toolbarLocations],
+};
+
+function FeatureListWithToolbarExample() {
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [filterState, setFilterState] = useState<FilterState>(DEFAULT_FILTER_STATE);
+  const [toolsChanged, setToolsChanged] = useState(false);
+  const [resultsChanged, setResultsChanged] = useState(false);
+
+  const toolMatchService = useMemo(() => new ToolMatchService(sampleTools), []);
+
+  const selectedFeatureIds = useMemo(() => Array.from(selectedIds), [selectedIds]);
+
+  // Build selection counts from selected features for ToolMatch
+  const toolMatches = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const id of selectedIds) {
+      const feature = toolbarFeatures.features.find((f) => f.id === id);
+      if (feature) {
+        const kind = feature.properties.kind;
+        counts[kind] = (counts[kind] || 0) + 1;
+      }
+    }
+    const selection = createSelectionFromCounts(counts);
+    return toolMatchService.getMatchResults(selection);
+  }, [selectedIds, toolMatchService]);
+
+  // Simple text filter applied to FeatureList
+  const filter = useMemo(() => {
+    if (!isFilterActive(filterState)) return undefined;
+    return (feature: DebriefFeature) => {
+      // Feature type filter
+      const isTrack = 'track_type' in feature.properties;
+      if (isTrack && !filterState.featureTypes.tracks) return false;
+      if (!isTrack && !filterState.featureTypes.zones) return false;
+      // Text search
+      if (filterState.textQuery) {
+        const query = filterState.textQuery.toLowerCase();
+        const name = ('platform_name' in feature.properties
+          ? feature.properties.platform_name
+          : 'name' in feature.properties
+            ? feature.properties.name
+            : feature.id ?? '') as string;
+        if (!name.toLowerCase().includes(query)) return false;
+      }
+      return true;
+    };
+  }, [filterState]);
+
+  const handleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+    // Simulate tool change notification
+    setToolsChanged(true);
+  };
+
+  const handleDelete = (ids: string[]) => {
+    console.log('Delete features:', ids);
+  };
+
+  const handleToggleVisibility = (ids: string[]) => {
+    console.log('Toggle visibility:', ids);
+  };
+
+  const handleRunTool = (toolId: string, ids: string[]) => {
+    console.log('Run tool:', toolId, 'on features:', ids);
+    // Simulate new result file arriving
+    setResultsChanged(true);
+  };
+
+  const handleDropdownOpened = (dropdown: 'run' | 'associated') => {
+    if (dropdown === 'run') setToolsChanged(false);
+    if (dropdown === 'associated') setResultsChanged(false);
+  };
+
+  return (
+    <div style={{ width: 420 }}>
+      <LayersToolbar
+        selectedFeatureIds={selectedFeatureIds}
+        features={toolbarFeatures.features}
+        toolMatches={toolMatches}
+        sourceFiles={sampleSourceFiles}
+        resultFiles={sampleResultFiles}
+        toolsChanged={toolsChanged}
+        resultsChanged={resultsChanged}
+        filterState={filterState}
+        onDelete={handleDelete}
+        onToggleVisibility={handleToggleVisibility}
+        onRunTool={handleRunTool}
+        onFilterChange={setFilterState}
+        onFileAction={(file, action) => console.log('File action:', action, file.name)}
+        onDropdownOpened={handleDropdownOpened}
+      />
+      <FeatureList
+        features={toolbarFeatures}
+        selectedIds={selectedIds}
+        onSelect={handleSelect}
+        filter={filter}
+        height={350}
+      />
+    </div>
+  );
+}
+
+export const WithToolbar: Story = {
+  render: () => <FeatureListWithToolbarExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'FeatureList with LayersToolbar above. Select features to enable toolbar actions. ' +
+          'Filter narrows the list. Run dropdown shows context-sensitive tools based on selection. ' +
+          'Associated Files shows source/result files. Yellow halo appears on tool/result changes.',
+      },
+    },
+  },
+};
+
+export const WithToolbarDarkTheme: Story = {
+  render: () => (
+    <ThemeProvider theme={{ variant: 'dark' }}>
+      <FeatureListWithToolbarExample />
+    </ThemeProvider>
+  ),
+  parameters: {
+    backgrounds: { default: 'dark' },
+    docs: {
+      description: {
+        story: 'Combined FeatureList + LayersToolbar in dark theme.',
       },
     },
   },
