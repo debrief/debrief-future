@@ -13,5 +13,5 @@ import { FilterDropdownProps } from './types';
  * Controlled component: parent owns FilterState, this component
  * fires onFilterChange on every interaction.
  */
-export declare function FilterDropdown({ filterState, onFilterChange, onApplyToSelection, hasActiveFilter, allSelected, labels: labelOverrides, }: FilterDropdownProps): import("react/jsx-runtime").JSX.Element;
+export declare function FilterDropdown({ featureKinds, filterState, onFilterChange, onApplyToSelection, hasActiveFilter, allSelected, labels: labelOverrides, }: FilterDropdownProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=FilterDropdown.d.ts.map

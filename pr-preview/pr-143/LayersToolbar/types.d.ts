@@ -14,13 +14,8 @@ export interface FilterState {
         platform: boolean;
         attachments: boolean;
     };
-    /** Feature type visibility */
-    featureTypes: {
-        tracks: boolean;
-        contacts: boolean;
-        zones: boolean;
-        annotations: boolean;
-    };
+    /** Feature type (kind) visibility — keys are the `kind` values found in features */
+    featureTypes: Record<string, boolean>;
     /** Visibility filter */
     visibility: 'all' | 'hidden-only' | 'visible-only';
     /** Temporal range filter */
@@ -33,6 +28,11 @@ export interface FilterState {
  * Default filter state with no filters active.
  */
 export declare const DEFAULT_FILTER_STATE: FilterState;
+/**
+ * Build a featureTypes record from a list of kind strings, all enabled by default.
+ * Merges with any existing state to preserve user toggles.
+ */
+export declare function buildFeatureTypes(kinds: string[], existing?: Record<string, boolean>): Record<string, boolean>;
 /**
  * Check if any filter is active (differs from defaults).
  */
@@ -66,10 +66,8 @@ export interface ToolbarLabels {
     searchScopeType: string;
     searchScopePlatform: string;
     searchScopeAttachments: string;
-    featureTypeTracks: string;
-    featureTypeContacts: string;
-    featureTypeZones: string;
-    featureTypeAnnotations: string;
+    /** Section title for kind checkboxes */
+    featureTypesTitle: string;
     visibilityAll: string;
     visibilityHiddenOnly: string;
     visibilityVisibleOnly: string;
@@ -115,6 +113,8 @@ export type SelectionApplyAction = 'selectAll' | 'select' | 'add' | 'remove';
  * Props for the FilterDropdown component.
  */
 export interface FilterDropdownProps {
+    /** Sorted list of unique kind values from the current features */
+    featureKinds: string[];
     /** Current filter state */
     filterState: FilterState;
     /** Called when any filter changes */
