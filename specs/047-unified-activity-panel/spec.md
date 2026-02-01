@@ -1,6 +1,6 @@
 # Feature Specification: Unified Debrief Activity Panel
 
-**Feature Branch**: `001-unified-activity-panel`
+**Feature Branch**: `047-unified-activity-panel`
 **Created**: 2026-02-01
 **Status**: Draft
 **Input**: User description: "Build unified Debrief activity panel as single webview component"
