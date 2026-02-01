@@ -115,7 +115,10 @@ class TestToolsRun:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["type"] == "FeatureCollection"
-        assert len(data["features"]) == 3  # start, mid, end
+        assert len(data["features"]) == 1  # single range-bearing-series
+        series = data["features"][0]
+        assert series["type"] == "range-bearing-series"
+        assert len(series["entries"]) == 5  # one per matching timestamp
 
     def test_run_with_parameters(self, runner, tracks_pair_path):
         result = runner.invoke(
