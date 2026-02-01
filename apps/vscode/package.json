@@ -295,13 +295,13 @@
         "command": "debrief.deleteSelection",
         "key": "delete",
         "mac": "backspace",
-        "when": "focusedView == 'debrief.layers' && debrief.hasSelection"
+        "when": "focusedView == 'debrief.activityPanel' && debrief.hasSelection"
       },
       {
         "command": "debrief.deleteSelection",
         "key": "delete",
         "mac": "delete",
-        "when": "focusedView == 'debrief.layers' && debrief.hasSelection"
+        "when": "focusedView == 'debrief.activityPanel' && debrief.hasSelection"
       }
     ],
     "viewsContainers": {
@@ -316,17 +316,9 @@
     "views": {
       "debrief": [
         {
-          "id": "debrief.timeRange",
-          "name": "Time Range",
+          "id": "debrief.activityPanel",
+          "name": "Activity",
           "type": "webview"
-        },
-        {
-          "id": "debrief.tools",
-          "name": "Tools"
-        },
-        {
-          "id": "debrief.layers",
-          "name": "Layers"
         }
       ],
       "explorer": [
@@ -348,13 +340,8 @@
         "when": "debrief.noStores"
       },
       {
-        "view": "debrief.tools",
-        "contents": "Select tracks on the map to see available analysis tools.\n\nTools require debrief-calc Python service.",
-        "when": "!debrief.hasSelection"
-      },
-      {
-        "view": "debrief.layers",
-        "contents": "No layers yet.\n\nOpen a plot to see track layers, or run analysis tools to add result layers."
+        "view": "debrief.activityPanel",
+        "contents": "No plot loaded.\n\nOpen a plot to see time controls, layers, and available analysis tools."
       }
     ],
     "menus": {
@@ -373,11 +360,11 @@
         },
         {
           "command": "debrief.clearAllResults",
-          "when": "view == debrief.layers && debrief.hasResultLayers"
+          "when": "view == debrief.activityPanel && debrief.hasResultLayers"
         },
         {
           "command": "debrief.toggleInactiveTools",
-          "when": "view == debrief.tools && debrief.calcAvailable",
+          "when": "view == debrief.activityPanel && debrief.calcAvailable",
           "group": "navigation"
         }
       ],
@@ -409,27 +396,27 @@
         },
         {
           "command": "debrief.removeResultLayer",
-          "when": "view == debrief.layers && viewItem == resultLayer",
+          "when": "view == debrief.activityPanel && viewItem == resultLayer",
           "group": "3_modify"
         },
         {
           "command": "debrief.removeResultLayer",
-          "when": "view == debrief.layers && viewItem == artifactResultLayer",
+          "when": "view == debrief.activityPanel && viewItem == artifactResultLayer",
           "group": "3_modify"
         },
         {
           "command": "debrief.openResultArtifact",
-          "when": "view == debrief.layers && viewItem == artifactResultLayer",
+          "when": "view == debrief.activityPanel && viewItem == artifactResultLayer",
           "group": "1_navigation"
         },
         {
           "command": "debrief.changeTrackColor",
-          "when": "view == debrief.layers && viewItem == track",
+          "when": "view == debrief.activityPanel && viewItem == track",
           "group": "2_style"
         },
         {
           "command": "debrief.executeTool",
-          "when": "view == debrief.tools && viewItem == tool.active",
+          "when": "view == debrief.activityPanel && viewItem == tool.active",
           "group": "1_execute"
         }
       ],
@@ -530,10 +517,10 @@
     "build": "pnpm --filter @debrief/components build && npm run compile",
     "compile": "npm run compile:extension && npm run compile:webview",
     "compile:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
-    "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife && esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/catalogOverview.tsx --bundle --outfile=dist/webview/catalogOverview.js --format=iife --loader:.tsx=tsx --loader:.css=text && cpy src/webview/web/styles.css dist/webview/",
+    "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife && esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/catalogOverview.tsx --bundle --outfile=dist/webview/catalogOverview.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && cpy src/webview/web/styles.css dist/webview/",
     "watch": "npm run watch:extension & npm run watch:webview",
     "watch:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
-    "watch:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife --watch & esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch",
+    "watch:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife --watch & esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch",
     "dev": "concurrently \"npm run watch:extension\" \"npm run watch:webview\"",
     "prelint": "pnpm --filter @debrief/session-state build",
     "lint": "eslint src --ext ts",

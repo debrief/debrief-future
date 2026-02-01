@@ -60,3 +60,17 @@ export {
   createSelectionFromCounts,
 } from './ToolMatch';
 export type { Selection, MatchResult, Tool, SelectionRequirement } from './ToolMatch';
+
+// ToolsPanel
+export { ToolsPanel } from './ToolsPanel';
+export type {
+  ToolsPanelProps,
+  ToolsPanelItem,
+  ActivityPanelProps,
+  ActivityPanelCollapseState,
+  ActivityPanelMessage,
+} from './ActivityPanel/types';
+
+// ActivityPanel
+export { ActivityPanel } from './ActivityPanel';
+export { DEFAULT_COLLAPSE_STATE } from './ActivityPanel/types';

@@ -11,6 +11,7 @@ import { ToolsTreeProvider } from './providers/toolsTreeProvider';
 import { LayersTreeProvider, getFeatureId } from './providers/layersTreeProvider';
 import { OutlineProvider } from './providers/outlineProvider';
 import { TimeRangeViewProvider } from './views/timeRangeView';
+import { ActivityPanelViewProvider } from './views/activityPanelView';
 import { MapPanel } from './webview/mapPanel';
 import { StacService } from './services/stacService';
 import { ConfigService } from './services/configService';
@@ -142,6 +143,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const outlineProvider = new OutlineProvider();
   const timeRangeProvider = new TimeRangeViewProvider(context.extensionUri, sessionManager);
 
+  // Register unified activity panel (Feature: 047)
+  const activityPanelProvider = new ActivityPanelViewProvider(
+    context.extensionUri,
+    sessionManager,
+    toolMatchAdapter,
+    calcService
+  );
+
   const layersTreeView = vscode.window.createTreeView('debrief.layers', {
     treeDataProvider: layersTreeProvider,
     canSelectMany: true,
@@ -166,7 +175,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
     vscode.window.registerTreeDataProvider('debrief.tools', toolsTreeProvider),
     layersTreeView,
-    vscode.window.registerWebviewViewProvider('debrief.timeRange', timeRangeProvider)
+    vscode.window.registerWebviewViewProvider('debrief.timeRange', timeRangeProvider),
+    vscode.window.registerWebviewViewProvider('debrief.activityPanel', activityPanelProvider)
   );
 
   // Register outline provider for selection

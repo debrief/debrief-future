@@ -1,0 +1,115 @@
+/**
+ * ActivityPanel styles - unified panel with collapsible sections.
+ *
+ * Layout model:
+ *  - Time Controller: fixed height (content-sized), collapse only
+ *  - Tools & Layers: flexible, share remaining vertical space, internal scroll
+ *  - No top-level scrollbar — panel fills available height exactly
+ */
+
+.debrief-activity-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden; /* no top-level scrollbar */
+  background: var(--debrief-bg-primary, #1e1e1e);
+  color: var(--debrief-text-primary, #cccccc);
+}
+
+/* ── Section (shared) ──────────────────────────────────── */
+
+.debrief-activity-panel__section {
+  flex: 0 0 auto; /* default: fixed, sized to content */
+  border-bottom: 1px solid var(--debrief-border-color, #454545);
+  min-height: 0; /* allow flex children to shrink */
+}
+
+.debrief-activity-panel__section:last-child {
+  border-bottom: none;
+}
+
+/* Flexible section — stretches to fill remaining space */
+.debrief-activity-panel__section--flexible {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.debrief-activity-panel__section--flexible .debrief-activity-panel__section-content {
+  flex: 1 1 0%;
+  overflow-y: auto;
+}
+
+/* Collapsed — header only, no flex growth */
+.debrief-activity-panel__section--collapsed {
+  flex: 0 0 auto !important;
+}
+
+/* ── Section header ────────────────────────────────────── */
+
+.debrief-activity-panel__section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--debrief-bg-secondary, #252526);
+  border: none;
+  color: var(--debrief-text-primary, #cccccc);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.debrief-activity-panel__section-header:hover {
+  background: var(--debrief-bg-tertiary, #2a2d2e);
+}
+
+.debrief-activity-panel__section-header:focus-visible {
+  outline: 1px solid var(--debrief-border-color-focus, #007acc);
+  outline-offset: -1px;
+}
+
+.debrief-activity-panel__section-title {
+  flex: 1;
+  text-align: left;
+}
+
+/* ── Section content ───────────────────────────────────── */
+
+.debrief-activity-panel__section-content {
+  padding: 4px 0;
+}
+
+.debrief-activity-panel__section--collapsed .debrief-activity-panel__section-content {
+  display: none;
+}
+
+/* ── Resize handle between flexible sections ───────────── */
+
+.debrief-activity-panel__resize-handle {
+  flex: 0 0 4px;
+  cursor: row-resize;
+  background: var(--debrief-border-color, #454545);
+  transition: background-color 0.15s ease;
+}
+
+.debrief-activity-panel__resize-handle:hover {
+  background: var(--debrief-border-color-focus, #007acc);
+}
+
+/* ── Error state ───────────────────────────────────────── */
+
+.debrief-activity-panel__section-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  color: var(--debrief-text-muted, #808080);
+  font-size: 12px;
+}
