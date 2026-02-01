@@ -167,10 +167,9 @@ export function FilterDropdown({
           ).map(([key, label]) => (
             <Checkbox
               key={key}
-              label={label}
               checked={filterState.searchScope[key]}
               onChange={(checked: boolean) => updateScope(key, checked)}
-            />
+            >{label}</Checkbox>
           ))}
         </div>
       </div>
@@ -187,10 +186,9 @@ export function FilterDropdown({
             {featureKinds.map((kind) => (
               <Checkbox
                 key={kind}
-                label={kind}
                 checked={filterState.featureTypes[kind] ?? true}
                 onChange={(checked: boolean) => updateFeatureType(kind, checked)}
-              />
+              >{kind}</Checkbox>
             ))}
           </div>
         </div>
@@ -203,7 +201,7 @@ export function FilterDropdown({
         <Dropdown
           options={visibilityOptions}
           value={filterState.visibility}
-          onChange={(value: string) => updateVisibility(value as typeof filterState.visibility)}
+          onChange={(value) => { if (typeof value === 'string') updateVisibility(value as typeof filterState.visibility); }}
         />
       </div>
 
