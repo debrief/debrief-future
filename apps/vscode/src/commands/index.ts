@@ -3,6 +3,7 @@
  */
 
 import * as vscode from 'vscode';
+import * as path from 'path';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { CalcService } from '../services/calcService';
@@ -230,10 +231,10 @@ export function registerCommands(
           void vscode.window.showWarningMessage('No plot open');
           return;
         }
-        const itemDir = require('path').dirname(
-          require('path').join(store.path, plot.itemPath)
+        const itemDir = path.dirname(
+          path.join(store.path, plot.itemPath)
         );
-        const filePath = require('path').join(itemDir, 'assets', layer.artifactHref);
+        const filePath = path.join(itemDir, 'assets', layer.artifactHref);
         try {
           const doc = await vscode.workspace.openTextDocument(filePath);
           await vscode.window.showTextDocument(doc);

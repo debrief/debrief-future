@@ -592,11 +592,11 @@ print(json.dumps(tools))
 
     // Check for error response
     if ('error' in parsed) {
-      const err = parsed as MCPErrorResponse;
-      throw new Error(err.error.message);
+      const errResponse: MCPErrorResponse = parsed;
+      throw new Error(errResponse.error.message);
     }
 
-    const response = parsed as MCPToolResponse;
+    const response = parsed;
 
     // Extract content from MCP response items
     const geoFeatures: SafeFeatureCollection['features'] = [];
@@ -624,7 +624,7 @@ print(json.dumps(tools))
       }
 
       if (item.type === 'resource' && item.resource) {
-        const feature = JSON.parse(item.resource.text);
+        const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
         geoFeatures.push(feature);
       }
     }

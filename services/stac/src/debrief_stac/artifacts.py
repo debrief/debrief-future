@@ -4,7 +4,6 @@ Artifact storage for debrief-stac.
 Writes artifact files to the results/ directory and updates STAC Item asset lists.
 """
 
-import json
 from pathlib import Path
 
 from debrief_stac.plot import _save_plot, read_plot

@@ -5,7 +5,7 @@ Records lineage information in feature properties to enable traceability
 per Constitution III.1 (Provenance always).
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def write_provenance(
@@ -35,7 +35,7 @@ def write_provenance(
     feature["properties"]["prov"] = {
         "tool": tool,
         "version": version,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "sources": [
             {"id": fid, "kind": "feature"} for fid in source_feature_ids
         ],
