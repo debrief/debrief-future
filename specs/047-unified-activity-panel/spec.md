@@ -128,6 +128,7 @@ A developer building an alternative frontend (e.g., Electron or Jupyter) can imp
 - Q: Should section headers use Codicon icons? → A: Yes, Codicon icons for collapse chevrons and section identity icons.
 - Q: What components should the Layers section use? → A: The existing LayersToolbar and FeatureList components composed together (from #045), not a new component built from scratch.
 - Q: Should the Time Controller be converted to use vscrui components? → A: Yes, convert all Time Controller controls to vscrui equivalents where available (Button, Icon, Dropdown); keep custom implementation only for controls with no vscrui equivalent (e.g., time scrubber slider).
+- Q: Should the SpeedSelector use vscrui Dropdown? → A: Yes, convert SpeedSelector to vscrui Dropdown. Previous z-index issues in VS Code panels are resolved by the new webview context.
 
 ## Assumptions
 
