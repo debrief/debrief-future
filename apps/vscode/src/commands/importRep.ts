@@ -22,14 +22,14 @@ interface ImportRepArgs {
 
 /** Discriminated union for picker items */
 interface ExistingPlotPickItem extends vscode.QuickPickItem {
-  kind: 'existingPlot';
+  pickKind: 'existingPlot';
   storeId: string;
   storePath: string;
   itemPath: string;
 }
 
 interface NewPlotPickItem extends vscode.QuickPickItem {
-  kind: 'newPlot';
+  pickKind: 'newPlot';
   storeId: string;
   storePath: string;
 }
@@ -100,7 +100,7 @@ export function createImportRepCommand(
       return;
     }
 
-    if (selectedItem.kind === 'newPlot') {
+    if (selectedItem.pickKind === 'newPlot') {
       // New plot flow
       await createNewPlotFromRep(
         filePaths,
@@ -146,7 +146,7 @@ async function showItemPicker(
       label: `$(add) Add to new plot in "${store.displayName ?? store.path}"`,
       description: '',
       detail: 'Create a new STAC Item in this store',
-      kind: 'newPlot',
+      pickKind: 'newPlot',
       storeId: store.id,
       storePath: store.path,
     });
@@ -164,7 +164,7 @@ async function showItemPicker(
           label: `$(graph) ${item.title}`,
           description: new Date(item.datetime).toLocaleDateString(),
           detail: `${store.displayName ?? store.path} / ${catalog.title}`,
-          kind: 'existingPlot',
+          pickKind: 'existingPlot',
           storeId: store.id,
           storePath: store.path,
           itemPath: item.itemPath,
