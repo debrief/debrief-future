@@ -129,23 +129,19 @@ describe('TimeController', () => {
       expect(screen.getByText('4x')).toBeInTheDocument();
     });
 
-    it('has up and down arrow buttons', () => {
+    it('renders as a dropdown with speed options', () => {
       const timeExtent: TimeExtent = [NOW, NOW + HOUR];
       render(<TimeController timeExtent={timeExtent} />);
 
-      expect(screen.getByRole('button', { name: /increase speed/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /decrease speed/i })).toBeInTheDocument();
+      // SpeedSelector is now a vscrui Dropdown showing current speed
+      expect(screen.getByText('1x')).toBeInTheDocument();
     });
 
-    it('changes speed when up arrow is clicked', () => {
+    it('shows initial speed from props', () => {
       const timeExtent: TimeExtent = [NOW, NOW + HOUR];
-      render(<TimeController timeExtent={timeExtent} />);
+      render(<TimeController timeExtent={timeExtent} initialSpeed={8} />);
 
-      // Default speed is 1x, click up to go to 2x
-      const upButton = screen.getByRole('button', { name: /increase speed/i });
-      fireEvent.click(upButton);
-
-      expect(screen.getByText('2x')).toBeInTheDocument();
+      expect(screen.getByText('8x')).toBeInTheDocument();
     });
   });
 
@@ -154,16 +150,20 @@ describe('TimeController', () => {
       const timeExtent: TimeExtent = [NOW, NOW + HOUR];
       render(<TimeController timeExtent={timeExtent} />);
 
-      const toggle = screen.getByRole('switch');
-      expect(toggle).toHaveAttribute('aria-checked', 'false');
+      // Both Full and Trail buttons are rendered in a radiogroup
+      const group = screen.getByRole('radiogroup', { name: /display mode/i });
+      expect(group).toBeInTheDocument();
+      expect(screen.getByText('Full')).toBeInTheDocument();
+      expect(screen.getByText('Trail')).toBeInTheDocument();
     });
 
     it('can be initialized in Trail mode', () => {
       const timeExtent: TimeExtent = [NOW, NOW + HOUR];
       render(<TimeController timeExtent={timeExtent} initialDisplayMode="trail" />);
 
-      const toggle = screen.getByRole('switch');
-      expect(toggle).toHaveAttribute('aria-checked', 'true');
+      // Trail mode active — both buttons still visible
+      expect(screen.getByText('Full')).toBeInTheDocument();
+      expect(screen.getByText('Trail')).toBeInTheDocument();
     });
 
     it('calls onDisplayModeChange when toggled', () => {
@@ -176,8 +176,8 @@ describe('TimeController', () => {
         />
       );
 
-      const toggle = screen.getByRole('switch');
-      fireEvent.click(toggle);
+      // Click the Trail text to toggle mode
+      fireEvent.click(screen.getByText('Trail'));
 
       expect(onDisplayModeChange).toHaveBeenCalledWith('trail');
     });
@@ -325,12 +325,12 @@ describe('TimeController', () => {
       expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
     });
 
-    it('display mode toggle has accessible role', () => {
+    it('display mode toggle has accessible radiogroup role', () => {
       const timeExtent: TimeExtent = [NOW, NOW + HOUR];
       render(<TimeController timeExtent={timeExtent} />);
 
-      const toggle = screen.getByRole('switch');
-      expect(toggle).toHaveAttribute('aria-label', expect.stringMatching(/display mode/i));
+      const group = screen.getByRole('radiogroup', { name: /display mode/i });
+      expect(group).toBeInTheDocument();
     });
   });
 });
