@@ -221,6 +221,12 @@
         "enablement": "debrief.tool.distance-to-point.active"
       },
       {
+        "command": "debrief.openResultArtifact",
+        "title": "Open Result Artifact",
+        "category": "Debrief",
+        "icon": "$(file)"
+      },
+      {
         "command": "debrief.openCatalogOverview",
         "title": "Open Catalog Overview",
         "category": "Debrief",
@@ -405,6 +411,16 @@
           "command": "debrief.removeResultLayer",
           "when": "view == debrief.layers && viewItem == resultLayer",
           "group": "3_modify"
+        },
+        {
+          "command": "debrief.removeResultLayer",
+          "when": "view == debrief.layers && viewItem == artifactResultLayer",
+          "group": "3_modify"
+        },
+        {
+          "command": "debrief.openResultArtifact",
+          "when": "view == debrief.layers && viewItem == artifactResultLayer",
+          "group": "1_navigation"
         },
         {
           "command": "debrief.changeTrackColor",

@@ -403,16 +403,26 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       vscode.TreeItemCollapsibleState.None
     );
 
-    item.contextValue = 'resultLayer';
     item.description = new Date(layer.createdAt).toLocaleTimeString();
     item.tooltip = `${layer.name}\nTool: ${layer.toolName}\nCreated: ${new Date(layer.createdAt).toLocaleString()}`;
 
-    // Selection state
-    const isSelected = this._isFeatureSelected(layer.id);
-
-    item.iconPath = new vscode.ThemeIcon(
-      isSelected ? 'check' : 'circle-outline'
-    );
+    // Artifact results: click opens in text editor
+    if (layer.artifactHref) {
+      item.contextValue = 'artifactResultLayer';
+      item.command = {
+        command: 'debrief.openResultArtifact',
+        title: 'Open Result',
+        arguments: [layer],
+      };
+      item.iconPath = new vscode.ThemeIcon('file');
+    } else {
+      item.contextValue = 'resultLayer';
+      // Selection state
+      const isSelected = this._isFeatureSelected(layer.id);
+      item.iconPath = new vscode.ThemeIcon(
+        isSelected ? 'check' : 'circle-outline'
+      );
+    }
 
     return item;
   }

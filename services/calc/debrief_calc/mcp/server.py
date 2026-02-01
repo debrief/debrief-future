@@ -88,24 +88,31 @@ def create_server() -> Server:
     @server.call_tool()
     async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         """Execute a debrief-calc tool via MCP."""
-        from debrief_calc import registry, run
+        from debrief_calc import registry as reg
+        from debrief_calc import run
         from debrief_calc.models import ContextType, SelectionContext
+        from debrief_calc.result_builder import (
+            build_addition,
+            build_artifact,
+            build_error,
+            build_response,
+        )
 
         # Convert MCP tool name back to calc tool name
         tool_name = name.replace("calc_", "").replace("_", "-")
 
         try:
-            tool = registry.get_tool(tool_name)
+            tool = reg.get_tool(tool_name)
         except Exception as e:
+            error = build_error(
+                message=str(e),
+                category="resource_not_found",
+                affected_feature_ids=[],
+            )
             return [
                 TextContent(
                     type="text",
-                    text=json.dumps(
-                        {
-                            "success": False,
-                            "error": {"code": ERROR_TOOL_NOT_FOUND, "message": str(e)},
-                        }
-                    ),
+                    text=json.dumps({"error": error}),
                 )
             ]
 
@@ -113,6 +120,14 @@ def create_server() -> Server:
         features = arguments.get("features", [])
         bounds = arguments.get("bounds")
         params = arguments.get("params", {})
+
+        # Extract source IDs
+        source_ids = []
+        for f in features:
+            props = f.get("properties", {}) or {}
+            fid = f.get("id") or props.get("id")
+            if fid:
+                source_ids.append(str(fid))
 
         try:
             if tool.context_type == ContextType.SINGLE:
@@ -134,45 +149,59 @@ def create_server() -> Server:
             result = run(tool_name, context, params)
 
             if result.success:
+                if tool.output_kind == "range-bearing-series":
+                    import json as _json
+
+                    series_data = result.features[0] if result.features else {}
+                    data_bytes = _json.dumps(series_data, indent=2).encode("utf-8")
+                    href = f"range-bearing-{'-'.join(source_ids[:2])}.json"
+                    content_item = build_artifact(
+                        data=data_bytes,
+                        mime_type="application/json",
+                        result_subtype="range-bearing-series",
+                        source_feature_ids=source_ids,
+                        label=f"{tool_name} results",
+                        href=href,
+                    )
+                    response = build_response([content_item])
+                else:
+                    content_items = build_addition(
+                        features=result.features or [],
+                        result_subtype=tool.output_kind,
+                        source_feature_ids=source_ids,
+                        label=f"{tool_name} results",
+                    )
+                    response = build_response(content_items)
+                response["duration_ms"] = result.duration_ms
                 return [
                     TextContent(
                         type="text",
-                        text=json.dumps(
-                            {
-                                "success": True,
-                                "features": result.features,
-                                "duration_ms": result.duration_ms,
-                            }
-                        ),
+                        text=json.dumps(response),
                     )
                 ]
             else:
+                error = build_error(
+                    message=result.error.message if result.error else "Unknown error",
+                    category="invalid_input",
+                    affected_feature_ids=source_ids,
+                )
                 return [
                     TextContent(
                         type="text",
-                        text=json.dumps(
-                            {
-                                "success": False,
-                                "error": {
-                                    "code": result.error.code,
-                                    "message": result.error.message,
-                                    "details": result.error.details,
-                                },
-                            }
-                        ),
+                        text=json.dumps({"error": error, "duration_ms": result.duration_ms}),
                     )
                 ]
 
         except Exception as e:
+            error = build_error(
+                message=str(e),
+                category="algorithm_failure",
+                affected_feature_ids=source_ids,
+            )
             return [
                 TextContent(
                     type="text",
-                    text=json.dumps(
-                        {
-                            "success": False,
-                            "error": {"code": ERROR_EXECUTION_FAILED, "message": str(e)},
-                        }
-                    ),
+                    text=json.dumps({"error": error}),
                 )
             ]
 

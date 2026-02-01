@@ -112,11 +112,10 @@ class TestParameterDocumentation:
         param_names = [p.name for p in tool.parameters]
         assert "distance_unit" in param_names
 
-    def test_range_bearing_has_sample_points_param(self):
+    def test_range_bearing_has_no_params(self):
         tool = registry.get_tool("range-bearing")
 
-        param_names = [p.name for p in tool.parameters]
-        assert "sample_points" in param_names
+        assert len(tool.parameters) == 0
 
     def test_area_summary_has_include_centroid_param(self):
         tool = registry.get_tool("area-summary")

@@ -1,0 +1,28 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Deleted 3 outlier contacts",
+      "annotations": {
+        "debrief:resultType": "deletion/sensor",
+        "debrief:sourceFeatures": ["track_a"],
+        "debrief:label": "Removed outlier contacts",
+        "debrief:deletedFeatures": ["contact_001", "contact_002", "contact_003"]
+      }
+    },
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "artifact://outlier_report_001",
+        "mimeType": "application/json",
+        "text": "{\"outliers\": 3, \"threshold\": 2.5}"
+      },
+      "annotations": {
+        "debrief:resultType": "artifact/report/outlier_summary",
+        "debrief:sourceFeatures": ["track_a"],
+        "debrief:label": "Outlier analysis report",
+        "debrief:href": "./results/outlier_report.json"
+      }
+    }
+  ]
+}

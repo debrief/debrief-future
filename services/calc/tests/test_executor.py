@@ -37,7 +37,11 @@ def multi_track_context():
     feature1 = {
         "type": "Feature",
         "id": "track-alpha",
-        "properties": {"kind": "track", "name": "Alpha"},
+        "properties": {
+            "kind": "track",
+            "name": "Alpha",
+            "times": ["2024-01-15T08:00:00Z", "2024-01-15T09:00:00Z"],
+        },
         "geometry": {
             "type": "LineString",
             "coordinates": [[-5.0, 50.0, 0, 1705305600000], [-4.5, 50.2, 0, 1705309200000]],
@@ -46,7 +50,11 @@ def multi_track_context():
     feature2 = {
         "type": "Feature",
         "id": "track-bravo",
-        "properties": {"kind": "track", "name": "Bravo"},
+        "properties": {
+            "kind": "track",
+            "name": "Bravo",
+            "times": ["2024-01-15T08:00:00Z", "2024-01-15T09:00:00Z"],
+        },
         "geometry": {
             "type": "LineString",
             "coordinates": [[-4.0, 50.5, 0, 1705305600000], [-4.5, 50.3, 0, 1705309200000]],
@@ -83,13 +91,15 @@ class TestRunSuccess:
 
         assert result.success is True
         assert result.tool == "range-bearing"
-        assert len(result.features) == 3  # start, mid, end
+        assert len(result.features) == 1  # single wrapper
 
-        for feature in result.features:
-            assert feature["properties"]["kind"] == "range-bearing"
-            assert "provenance" in feature["properties"]
-            assert "range_nm" in feature["properties"]
-            assert "bearing_deg" in feature["properties"]
+        wrapper = result.features[0]
+        assert wrapper["type"] == "range-bearing-series"
+        assert "entries" in wrapper
+        assert len(wrapper["entries"]) == 2
+        for entry in wrapper["entries"]:
+            assert "range_nm" in entry
+            assert "bearing_deg" in entry
 
     def test_run_area_summary(self, region_context):
         result = run("area-summary", region_context)
@@ -104,10 +114,10 @@ class TestRunSuccess:
         assert "statistics" in feature["properties"]
 
     def test_run_with_parameters(self, multi_track_context):
-        result = run("range-bearing", multi_track_context, params={"sample_points": "midpoint"})
+        result = run("range-bearing", multi_track_context, params={})
 
         assert result.success is True
-        assert len(result.features) == 1  # Only midpoint
+        assert len(result.features) == 1  # single wrapper with time-series
 
     def test_provenance_attached(self, single_track_context):
         result = run("track-stats", single_track_context)

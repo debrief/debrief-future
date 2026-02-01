@@ -3,6 +3,7 @@
  */
 
 import * as vscode from 'vscode';
+import * as path from 'path';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { CalcService } from '../services/calcService';
@@ -171,7 +172,7 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.executeTool',
-      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider)
+      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider, stacService)
     )
   );
 
@@ -214,6 +215,35 @@ export function registerCommands(
       })
     );
   }
+
+  // Open result artifact in editor
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.openResultArtifact',
+      async (layer: { artifactHref?: string }) => {
+        if (!layer?.artifactHref) {
+          return;
+        }
+        const panel = getMapPanel();
+        const store = panel?.getCurrentStore?.();
+        const plot = panel?.getCurrentPlot?.();
+        if (!store?.path || !plot?.itemPath) {
+          void vscode.window.showWarningMessage('No plot open');
+          return;
+        }
+        const itemDir = path.dirname(
+          path.join(store.path, plot.itemPath)
+        );
+        const filePath = path.join(itemDir, 'assets', layer.artifactHref);
+        try {
+          const doc = await vscode.workspace.openTextDocument(filePath);
+          await vscode.window.showTextDocument(doc);
+        } catch {
+          void vscode.window.showErrorMessage(`Could not open artifact: ${layer.artifactHref}`);
+        }
+      }
+    )
+  );
 
   // Layer commands
   disposables.push(

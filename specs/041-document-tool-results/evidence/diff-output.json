@@ -1,0 +1,30 @@
+{
+  "description": "Example diff output: Track A modified, CPA point added",
+  "input": {
+    "oldFC": {
+      "type": "FeatureCollection",
+      "features": [
+        {"type": "Feature", "id": "track_a", "geometry": {"type": "Point", "coordinates": [0, 0]}, "properties": {"name": "Track A"}}
+      ]
+    },
+    "newFC": {
+      "type": "FeatureCollection",
+      "features": [
+        {"type": "Feature", "id": "track_a", "geometry": {"type": "LineString", "coordinates": [[0,0],[1,1]]}, "properties": {"name": "Track A (smoothed)"}},
+        {"type": "Feature", "id": "cpa_001", "geometry": {"type": "Point", "coordinates": [0.5, 0.5]}, "properties": {"name": "CPA Point"}}
+      ]
+    }
+  },
+  "output": {
+    "added": [
+      {"type": "Feature", "id": "cpa_001", "geometry": {"type": "Point", "coordinates": [0.5, 0.5]}, "properties": {"name": "CPA Point"}}
+    ],
+    "removed": [],
+    "modified": [
+      {
+        "id": "track_a",
+        "feature": {"type": "Feature", "id": "track_a", "geometry": {"type": "LineString", "coordinates": [[0,0],[1,1]]}, "properties": {"name": "Track A (smoothed)"}}
+      }
+    ]
+  }
+}

@@ -499,6 +499,63 @@ export class StacService {
   }
 
   /**
+   * Write artifact data as a STAC asset on a plot item.
+   *
+   * @param storePath Path to the STAC store root
+   * @param itemPath Relative path to the item JSON file
+   * @param filename Asset filename (e.g. "range-bearing-t1-t2.json")
+   * @param data String data to write
+   * @param mimeType MIME type of the asset
+   * @param metadata Extra metadata fields for the asset entry
+   * @returns Absolute path to the written file
+   */
+  async addResultAsset(
+    storePath: string,
+    itemPath: string,
+    filename: string,
+    data: string,
+    mimeType: string,
+    metadata?: Record<string, unknown>
+  ): Promise<string> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+
+    if (!item) {
+      throw new Error(`Item not found: ${itemPath}`);
+    }
+
+    // Create assets directory if needed
+    const itemDir = path.dirname(fullItemPath);
+    const assetsDir = path.join(itemDir, 'assets');
+    if (!fs.existsSync(assetsDir)) {
+      fs.mkdirSync(assetsDir, { recursive: true });
+    }
+
+    // Write data file
+    const destPath = path.join(assetsDir, filename);
+    fs.writeFileSync(destPath, data, 'utf-8');
+
+    // Add asset reference to item
+    const key = path.parse(filename).name;
+    const relativeHref = `./assets/${filename}`;
+    item.assets[key] = {
+      href: relativeHref,
+      type: mimeType,
+      title: filename,
+      roles: ['result'],
+      ...metadata,
+    };
+
+    // Write updated item
+    fs.writeFileSync(fullItemPath, JSON.stringify(item, null, 2));
+
+    // Clear cache for this item
+    this.itemCache.delete(fullItemPath);
+
+    return destPath;
+  }
+
+  /**
    * Clear all caches
    */
   clearCache(): void {

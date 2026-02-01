@@ -68,6 +68,73 @@ class TestMCPToolExecution:
         assert context.bounds == bounds
 
 
+class TestMCPResponseFormat:
+    """Tests for MCP response format using result_builder."""
+
+    def test_build_addition_response(self):
+        """Verify result_builder produces correct MCP content structure."""
+        from debrief_calc.result_builder import build_addition, build_response
+
+        features = [
+            {"type": "Feature", "id": "f1", "geometry": None, "properties": {"kind": "stats"}}
+        ]
+        items = build_addition(
+            features=features,
+            result_subtype="track-statistics",
+            source_feature_ids=["track-1"],
+            label="track-stats results",
+        )
+        response = build_response(items)
+
+        assert "content" in response
+        assert len(response["content"]) == 1
+        item = response["content"][0]
+        assert item["type"] == "resource"
+        assert item["annotations"]["debrief:resultType"] == "addition/track-statistics"
+        assert item["annotations"]["debrief:sourceFeatures"] == ["track-1"]
+
+    def test_build_error_response(self):
+        """Verify result_builder produces correct MCP error structure."""
+        from debrief_calc.result_builder import build_error
+
+        error = build_error(
+            message="Tool not found",
+            category="resource_not_found",
+            affected_feature_ids=["track-1"],
+        )
+        assert error["code"] == -32000
+        assert error["message"] == "Tool not found"
+        assert error["data"]["debrief:errorCategory"] == "resource_not_found"
+        assert error["data"]["debrief:affectedFeatures"] == ["track-1"]
+
+
+class TestMCPArtifactResponse:
+    """Tests for artifact result format."""
+
+    def test_build_artifact_response(self):
+        """Verify result_builder produces correct artifact content."""
+        from debrief_calc.result_builder import build_artifact, build_response
+
+        data = b'{"type":"range-bearing-series","entries":[]}'
+        item = build_artifact(
+            data=data,
+            mime_type="application/json",
+            result_subtype="range-bearing-series",
+            source_feature_ids=["track-1", "track-2"],
+            label="range-bearing results",
+            href="range-bearing-track-1-track-2.json",
+        )
+        response = build_response([item])
+
+        assert "content" in response
+        assert len(response["content"]) == 1
+        content = response["content"][0]
+        assert content["type"] == "resource"
+        assert content["annotations"]["debrief:resultType"] == "artifact/range-bearing-series"
+        assert content["annotations"]["debrief:href"] == "range-bearing-track-1-track-2.json"
+        assert content["resource"]["mimeType"] == "application/json"
+
+
 class TestMCPErrorCodes:
     """Tests for MCP error code handling."""
 

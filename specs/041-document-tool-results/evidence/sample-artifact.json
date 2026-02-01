@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "image",
+      "data": "iVBORw0KGgo=",
+      "mimeType": "image/png",
+      "annotations": {
+        "debrief:resultType": "artifact/image/bearing_time_plot",
+        "debrief:sourceFeatures": ["track_a"],
+        "debrief:label": "Bearing-time plot for Track A",
+        "debrief:href": "./results/bt_plot_001.png"
+      }
+    }
+  ]
+}

@@ -1,14 +1,16 @@
 /**
  * Tool Execution Commands - Execute and cancel analysis tools
  *
- * Feature: 038-context-tool-vscode
+ * Feature: 038-context-tool-vscode, 041-tool-results-architecture
  * - Uses ToolMatchAdapter to get selected feature IDs
  * - Adds provenance metadata to result layers (FR-024)
  * - Shows notifications for success/failure (FR-015)
+ * - Auto-persists addition results to STAC (#041)
  */
 
 import * as vscode from 'vscode';
 import type { CalcService } from '../services/calcService';
+import type { StacService } from '../services/stacService';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { MapPanel } from '../webview/mapPanel';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
@@ -20,12 +22,14 @@ import type { LayersTreeProvider } from '../providers/layersTreeProvider';
  * @param toolMatchAdapter - ToolMatchAdapter for getting selection
  * @param getMapPanel - Function to get current MapPanel
  * @param layersTreeProvider - LayersTreeProvider for displaying results
+ * @param stacService - StacService for persisting results to STAC
  */
 export function createExecuteToolCommand(
   calcService: CalcService,
   toolMatchAdapter: ToolMatchAdapter,
   getMapPanel: () => MapPanel | undefined,
-  layersTreeProvider: LayersTreeProvider
+  layersTreeProvider: LayersTreeProvider,
+  stacService?: StacService
 ): (toolId: string) => Promise<void> {
   return async (toolId: string) => {
     // Handle both new format (toolId string) and legacy format (object with toolName)
@@ -92,11 +96,56 @@ export function createExecuteToolCommand(
     );
 
     if (layer) {
-      // Add to map
-      panel.addResultLayer(layer);
+      // Add to map (skip webview message for artifact layers — no map geometry)
+      if (!layer.artifactHref) {
+        panel.addResultLayer(layer);
+      } else {
+        // Still store in panel's result layers for tracking
+        panel.addResultLayer(layer);
+      }
 
       // Update layers panel
       layersTreeProvider.addResultLayer(layer);
+
+      // Auto-persist artifact results to STAC
+      if (stacService && result.artifactData && result.artifactHref) {
+        try {
+          const store = panel.getCurrentStore?.();
+          const plot = panel.getCurrentPlot?.();
+          if (store?.path && plot?.itemPath) {
+            await stacService.addResultAsset(
+              store.path,
+              plot.itemPath,
+              result.artifactHref,
+              result.artifactData,
+              'application/json',
+              {
+                'debrief:toolId': resolvedToolId,
+                'debrief:sourceFeatures': selectedFeatureIds,
+              }
+            );
+          }
+        } catch (persistErr) {
+          console.warn('[debrief] Failed to persist artifact to STAC:', persistErr);
+        }
+      }
+
+      // Auto-persist addition results to STAC (#041)
+      if (stacService && !result.artifactData && result.resultType?.startsWith('addition/')) {
+        try {
+          const store = panel.getCurrentStore?.();
+          const plot = panel.getCurrentPlot?.();
+          if (store?.path && plot?.itemPath) {
+            await stacService.addFeatures(
+              store.path,
+              plot.itemPath,
+              layer.features.features as Parameters<typeof stacService.addFeatures>[2]
+            );
+          }
+        } catch (persistErr) {
+          console.warn('[debrief] Failed to persist result to STAC:', persistErr);
+        }
+      }
 
       // Success notification (FR-015)
       void vscode.window.showInformationMessage(

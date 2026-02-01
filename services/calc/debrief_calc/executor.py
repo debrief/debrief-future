@@ -81,13 +81,16 @@ def run(
             parameters=params,
         )
 
-        for feature in output_features:
-            set_output_kind(feature, tool.output_kind)
-            attach_provenance(feature, provenance)
+        # Attach provenance only to GeoJSON Feature outputs (not artifact data)
+        is_geojson = all(f.get("type") == "Feature" for f in output_features)
+        if is_geojson:
+            for feature in output_features:
+                set_output_kind(feature, tool.output_kind)
+                attach_provenance(feature, provenance)
 
-        # Validate output if requested
-        if validate_output:
-            validate_tool_output(output_features, tool.output_kind, tool.name)
+            # Validate output if requested
+            if validate_output:
+                validate_tool_output(output_features, tool.output_kind, tool.name)
 
         duration_ms = (time.perf_counter() - start_time) * 1000
 

@@ -5,7 +5,13 @@ from pathlib import Path
 
 import pytest
 from debrief_calc.models import ContextType, SelectionContext
-from debrief_calc.tools.range_bearing import _calculate_bearing, _calculate_range, range_bearing
+from debrief_calc.tools.range_bearing import (
+    _calculate_bearing,
+    _calculate_range,
+    _closest_point_on_polygon,
+    _closest_point_on_segment,
+    range_bearing,
+)
 
 
 @pytest.fixture
@@ -22,110 +28,161 @@ def multi_track_context(tracks_pair_fixture):
     return SelectionContext(type=ContextType.MULTI, features=tracks_pair_fixture["features"])
 
 
-class TestCalculateBearing:
-    """Tests for bearing calculation."""
+def _make_track(name, coords, times):
+    return {
+        "type": "Feature",
+        "id": name,
+        "properties": {"name": name, "kind": "track", "times": times},
+        "geometry": {"type": "LineString", "coordinates": coords},
+    }
 
+
+def _make_point(name, lon, lat):
+    return {
+        "type": "Feature",
+        "id": name,
+        "properties": {"name": name, "kind": "point"},
+        "geometry": {"type": "Point", "coordinates": [lon, lat]},
+    }
+
+
+def _make_polygon(name, ring):
+    return {
+        "type": "Feature",
+        "id": name,
+        "properties": {"name": name, "kind": "shape"},
+        "geometry": {"type": "Polygon", "coordinates": [ring]},
+    }
+
+
+class TestCalculateBearing:
     def test_bearing_due_north(self):
-        bearing = _calculate_bearing(0.0, 50.0, 0.0, 51.0)
-        assert abs(bearing - 0.0) < 1.0  # Approximately north
+        assert abs(_calculate_bearing(0.0, 50.0, 0.0, 51.0)) < 1.0
 
     def test_bearing_due_east(self):
-        bearing = _calculate_bearing(0.0, 50.0, 1.0, 50.0)
-        assert abs(bearing - 90.0) < 1.0  # Approximately east
+        assert abs(_calculate_bearing(0.0, 50.0, 1.0, 50.0) - 90.0) < 1.0
 
     def test_bearing_due_south(self):
-        bearing = _calculate_bearing(0.0, 51.0, 0.0, 50.0)
-        assert abs(bearing - 180.0) < 1.0  # Approximately south
+        assert abs(_calculate_bearing(0.0, 51.0, 0.0, 50.0) - 180.0) < 1.0
 
     def test_bearing_due_west(self):
-        bearing = _calculate_bearing(1.0, 50.0, 0.0, 50.0)
-        assert abs(bearing - 270.0) < 1.0  # Approximately west
+        assert abs(_calculate_bearing(1.0, 50.0, 0.0, 50.0) - 270.0) < 1.0
 
     def test_bearing_range(self):
-        # Bearing should always be 0-360
         bearing = _calculate_bearing(-5.0, 50.0, -4.0, 51.0)
         assert 0 <= bearing < 360
 
 
 class TestCalculateRange:
-    """Tests for range calculation."""
-
     def test_same_point_zero_range(self):
-        range_nm = _calculate_range(-4.0, 50.0, -4.0, 50.0)
-        assert range_nm == 0.0
+        assert _calculate_range(-4.0, 50.0, -4.0, 50.0) == 0.0
 
     def test_known_range(self):
-        # 1 degree latitude is approximately 60 nm
         range_nm = _calculate_range(0.0, 50.0, 0.0, 51.0)
         assert 59 < range_nm < 61
 
 
-class TestRangeBearingTool:
-    """Tests for the range-bearing tool handler."""
+class TestClosestPointHelpers:
+    def test_closest_point_on_segment_midpoint(self):
+        cx, cy = _closest_point_on_segment(0.5, 1.0, 0.0, 0.0, 1.0, 0.0)
+        assert abs(cx - 0.5) < 1e-9
+        assert abs(cy - 0.0) < 1e-9
 
-    def test_returns_three_features_by_default(self, multi_track_context):
+    def test_closest_point_on_segment_clamped(self):
+        cx, cy = _closest_point_on_segment(2.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+        assert abs(cx - 1.0) < 1e-9
+
+    def test_closest_point_on_polygon(self):
+        ring = [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [0.0, 0.0]]
+        cx, cy = _closest_point_on_polygon(0.5, -0.5, ring)
+        assert abs(cy - 0.0) < 1e-9
+        assert abs(cx - 0.5) < 1e-9
+
+
+class TestRangeBearingTrackTrack:
+    """Track + Track time-series tests."""
+
+    def test_returns_time_series(self, multi_track_context):
         results = range_bearing(multi_track_context, {})
-
-        assert isinstance(results, list)
-        assert len(results) == 3  # start, mid, end
-
-    def test_returns_one_feature_for_midpoint_only(self, multi_track_context):
-        results = range_bearing(multi_track_context, {"sample_points": "midpoint"})
-
         assert len(results) == 1
-        assert results[0]["properties"]["measurement_type"] == "midpoint"
+        wrapper = results[0]
+        assert wrapper["type"] == "range-bearing-series"
+        assert len(wrapper["entries"]) == 5
 
-    def test_returns_two_features_for_endpoints(self, multi_track_context):
-        results = range_bearing(multi_track_context, {"sample_points": "endpoints"})
+    def test_entries_have_required_fields(self, multi_track_context):
+        wrapper = range_bearing(multi_track_context, {})[0]
+        for entry in wrapper["entries"]:
+            assert "time" in entry
+            assert "range_nm" in entry
+            assert "bearing_deg" in entry
+            assert isinstance(entry["range_nm"], (int, float))
+            assert 0 <= entry["bearing_deg"] < 360
 
-        assert len(results) == 2
-        types = {r["properties"]["measurement_type"] for r in results}
-        assert types == {"start", "end"}
+    def test_references_features(self, multi_track_context):
+        wrapper = range_bearing(multi_track_context, {})[0]
+        assert wrapper["from_feature"] == "Alpha"
+        assert wrapper["to_feature"] == "Bravo"
 
-    def test_result_is_linestring(self, multi_track_context):
-        results = range_bearing(multi_track_context, {})
+    def test_range_positive(self, multi_track_context):
+        wrapper = range_bearing(multi_track_context, {})[0]
+        for entry in wrapper["entries"]:
+            assert entry["range_nm"] >= 0
 
-        for result in results:
-            assert result["geometry"]["type"] == "LineString"
-            assert len(result["geometry"]["coordinates"]) == 2
+    def test_times_are_iso_strings(self, multi_track_context):
+        wrapper = range_bearing(multi_track_context, {})[0]
+        for entry in wrapper["entries"]:
+            assert entry["time"].endswith("Z")
 
-    def test_result_has_range_and_bearing(self, multi_track_context):
-        results = range_bearing(multi_track_context, {})
 
-        for result in results:
-            props = result["properties"]
-            assert "range_nm" in props
-            assert "bearing_deg" in props
-            assert isinstance(props["range_nm"], int | float)
-            assert isinstance(props["bearing_deg"], int | float)
+class TestRangeBearingTrackPoint:
+    """Track + Point tests."""
 
-    def test_result_references_tracks(self, multi_track_context):
-        results = range_bearing(multi_track_context, {})
+    def test_track_point_series(self):
+        track = _make_track(
+            "T1", [[-5.0, 50.0], [-4.0, 50.0]], ["2024-01-01T00:00:00Z", "2024-01-01T01:00:00Z"]
+        )
+        point = _make_point("P1", -4.5, 50.5)
+        ctx = SelectionContext(type=ContextType.MULTI, features=[track, point])
+        results = range_bearing(ctx, {})
+        assert len(results) == 1
+        wrapper = results[0]
+        assert len(wrapper["entries"]) == 2
+        assert wrapper["from_feature"] == "T1"
+        assert wrapper["to_feature"] == "P1"
 
-        for result in results:
-            props = result["properties"]
-            assert "from_track" in props
-            assert "to_track" in props
+    def test_point_track_order(self):
+        """Point first, track second — still produces series."""
+        point = _make_point("P1", -4.5, 50.5)
+        track = _make_track(
+            "T1", [[-5.0, 50.0], [-4.0, 50.0]], ["2024-01-01T00:00:00Z", "2024-01-01T01:00:00Z"]
+        )
+        ctx = SelectionContext(type=ContextType.MULTI, features=[point, track])
+        results = range_bearing(ctx, {})
+        assert len(results) == 1
+        assert len(results[0]["entries"]) == 2
 
-    def test_bearing_is_valid_range(self, multi_track_context):
-        results = range_bearing(multi_track_context, {})
 
-        for result in results:
-            bearing = result["properties"]["bearing_deg"]
-            assert 0 <= bearing < 360
+class TestRangeBearingTrackPolygon:
+    """Track + Polygon tests."""
 
-    def test_range_is_positive(self, multi_track_context):
-        results = range_bearing(multi_track_context, {})
-
-        for result in results:
-            range_nm = result["properties"]["range_nm"]
-            assert range_nm >= 0
+    def test_track_polygon_series(self):
+        track = _make_track(
+            "T1", [[-5.0, 50.0], [-4.0, 50.0]], ["2024-01-01T00:00:00Z", "2024-01-01T01:00:00Z"]
+        )
+        ring = [[-3.0, 49.0], [-2.0, 49.0], [-2.0, 50.0], [-3.0, 50.0], [-3.0, 49.0]]
+        poly = _make_polygon("Zone", ring)
+        ctx = SelectionContext(type=ContextType.MULTI, features=[track, poly])
+        results = range_bearing(ctx, {})
+        assert len(results) == 1
+        wrapper = results[0]
+        assert len(wrapper["entries"]) == 2
+        for entry in wrapper["entries"]:
+            assert entry["range_nm"] >= 0
 
 
 class TestRangeBearingEdgeCases:
-    """Edge case tests for range-bearing tool."""
-
-    def test_non_temporal_features(self):
+    def test_no_times_returns_empty(self):
+        """Features without times produce no series."""
         feature = {
             "type": "Feature",
             "id": "track-1",
@@ -133,28 +190,30 @@ class TestRangeBearingEdgeCases:
             "geometry": {"type": "LineString", "coordinates": [[-4.0, 50.0], [-3.9, 50.1]]},
         }
         context = SelectionContext(type=ContextType.MULTI, features=[feature, feature])
-
-        # Non-temporal features: returns single closest-point result
         results = range_bearing(context, {})
-        assert len(results) == 1
-        assert results[0]["properties"]["measurement_type"] == "closest"
-        assert "label" in results[0]["properties"]
-        assert results[0]["geometry"]["type"] == "Point"
+        assert results == []
 
     def test_empty_coordinates(self):
         feature1 = {
             "type": "Feature",
             "id": "track-1",
-            "properties": {"kind": "track"},
+            "properties": {"kind": "track", "times": ["2024-01-01T00:00:00Z"]},
             "geometry": {"type": "LineString", "coordinates": []},
         }
         feature2 = {
             "type": "Feature",
             "id": "track-2",
-            "properties": {"kind": "track"},
+            "properties": {"kind": "track", "times": ["2024-01-01T00:00:00Z"]},
             "geometry": {"type": "LineString", "coordinates": [[-4.0, 50.0]]},
         }
         context = SelectionContext(type=ContextType.MULTI, features=[feature1, feature2])
+        results = range_bearing(context, {})
+        assert results == []
 
+    def test_two_points_no_track_returns_empty(self):
+        """Two non-track features produce no series."""
+        p1 = _make_point("P1", -4.0, 50.0)
+        p2 = _make_point("P2", -3.0, 50.0)
+        context = SelectionContext(type=ContextType.MULTI, features=[p1, p2])
         results = range_bearing(context, {})
         assert results == []
