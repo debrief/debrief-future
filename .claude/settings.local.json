@@ -81,7 +81,8 @@
       "Bash(then echo \"WORKTREES_DIR_EXISTS\")",
       "Bash(else echo \"NO_WORKTREES_DIR\")",
       "Bash(fi)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(npx eslint:*)"
     ]
   }
 }
