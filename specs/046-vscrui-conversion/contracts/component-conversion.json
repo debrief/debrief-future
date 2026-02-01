@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "vscrui Conversion Verification Contract",
+  "description": "Defines the expected state after converting components from raw HTML to vscrui",
+  "type": "object",
+  "properties": {
+    "cssAudit": {
+      "type": "object",
+      "description": "CSS file compliance checks",
+      "properties": {
+        "rawColourValues": {
+          "type": "integer",
+          "const": 0,
+          "description": "Count of raw hex/rgb/rgba values in component CSS (excluding tokens.css)"
+        },
+        "prefersColorSchemeQueries": {
+          "type": "integer",
+          "const": 0,
+          "description": "Count of @media (prefers-color-scheme) blocks in component CSS"
+        },
+        "newTokensDefined": {
+          "type": "array",
+          "items": { "type": "string" },
+          "contains": { "const": "--debrief-color-attention" },
+          "description": "New design tokens added to tokens.css"
+        }
+      },
+      "required": ["rawColourValues", "prefersColorSchemeQueries", "newTokensDefined"]
+    },
+    "componentConversions": {
+      "type": "object",
+      "description": "Element conversion counts",
+      "properties": {
+        "buttonsConverted": {
+          "type": "integer",
+          "minimum": 20,
+          "description": "Raw <button> elements replaced with vscrui <Button>"
+        },
+        "textFieldsConverted": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Raw <input type=text> replaced with vscrui <TextField>"
+        },
+        "checkboxesConverted": {
+          "type": "integer",
+          "minimum": 4,
+          "description": "Raw <input type=checkbox> replaced with vscrui <Checkbox>"
+        },
+        "radioGroupsConverted": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Radio groups replaced with vscrui <Dropdown>"
+        },
+        "iconsConverted": {
+          "type": "integer",
+          "minimum": 10,
+          "description": "Inline SVGs replaced with vscrui <Icon>"
+        },
+        "nativeInputsRetained": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Elements intentionally kept as native HTML",
+          "contains": { "const": "datetime-local" }
+        }
+      },
+      "required": ["buttonsConverted", "textFieldsConverted", "checkboxesConverted", "radioGroupsConverted", "iconsConverted"]
+    },
+    "storybookStories": {
+      "type": "object",
+      "properties": {
+        "multiContextStories": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "string" },
+          "description": "Components with withMultiContext stories showing Light/Dark/VSCode"
+        },
+        "themeVariantsVerified": {
+          "type": "array",
+          "items": { "enum": ["light", "dark", "vscode"] },
+          "minItems": 3
+        }
+      },
+      "required": ["multiContextStories", "themeVariantsVerified"]
+    },
+    "dependencies": {
+      "type": "object",
+      "properties": {
+        "vscrui": {
+          "type": "string",
+          "description": "vscrui version in package.json dependencies"
+        },
+        "codiconCssImported": {
+          "type": "boolean",
+          "const": true,
+          "description": "vscrui/dist/codicon.css imported in Storybook preview"
+        }
+      },
+      "required": ["vscrui", "codiconCssImported"]
+    }
+  },
+  "required": ["cssAudit", "componentConversions", "storybookStories", "dependencies"]
+}

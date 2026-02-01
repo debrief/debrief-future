@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { Button, Checkbox, Dropdown, Icon, TextField } from 'vscrui';
 import type { FilterDropdownProps } from './types';
 import { DEFAULT_FILTER_STATE, DEFAULT_LABELS } from './types';
 import './FilterDropdown.css';
@@ -82,83 +83,78 @@ export function FilterDropdown({
     onFilterChange(DEFAULT_FILTER_STATE);
   };
 
+  const visibilityOptions = [
+    { label: labels.visibilityAll, value: 'all' },
+    { label: labels.visibilityHiddenOnly, value: 'hidden-only' },
+    { label: labels.visibilityVisibleOnly, value: 'visible-only' },
+  ];
+
   return (
     <div className="debrief-filter-dropdown">
       {/* Header row: selection actions (left) + clear filters eraser (right) */}
       <div className="debrief-filter-dropdown__action-row">
         {onApplyToSelection && (
           <>
-            <button
-              className="debrief-filter-dropdown__action-icon-btn"
+            <Button
+              appearance="icon"
               onClick={() => onApplyToSelection('selectAll')}
               disabled={allSelected}
               title={labels.applySelectAll}
               aria-label={labels.applySelectAll}
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="1 9 5 13 15 3" />
-                <polyline points="1 4 5 8" />
-              </svg>
-            </button>
-            <button
-              className="debrief-filter-dropdown__action-icon-btn"
+              <Icon name="check-all" />
+            </Button>
+            <Button
+              appearance="icon"
               onClick={() => onApplyToSelection('select')}
               disabled={!hasActiveFilter}
               title={labels.applySelectMatched}
               aria-label={labels.applySelectMatched}
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="2 8 6 12 14 4" />
-              </svg>
-            </button>
-            <button
-              className="debrief-filter-dropdown__action-icon-btn"
+              <Icon name="check" />
+            </Button>
+            <Button
+              appearance="icon"
               onClick={() => onApplyToSelection('add')}
               disabled={!hasActiveFilter}
               title={labels.applyAddMatched}
               aria-label={labels.applyAddMatched}
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="8" y1="3" x2="8" y2="13" />
-                <line x1="3" y1="8" x2="13" y2="8" />
-              </svg>
-            </button>
-            <button
-              className="debrief-filter-dropdown__action-icon-btn"
+              <Icon name="add" />
+            </Button>
+            <Button
+              appearance="icon"
               onClick={() => onApplyToSelection('remove')}
               disabled={!hasActiveFilter}
               title={labels.applyRemoveMatched}
               aria-label={labels.applyRemoveMatched}
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="3" y1="8" x2="13" y2="8" />
-              </svg>
-            </button>
+              <Icon name="remove" />
+            </Button>
           </>
         )}
         <div className="debrief-filter-dropdown__action-spacer" />
-        <button
-          className="debrief-filter-dropdown__action-icon-btn"
+        <Button
+          appearance="icon"
           onClick={clearAll}
           disabled={!hasActiveFilter}
           title={labels.clearAllFilters}
           aria-label={labels.clearAllFilters}
         >
+          {/* Eraser — no Codicon equivalent, retain inline SVG */}
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 14h8M7.5 14l5.3-5.3a2 2 0 0 0 0-2.8L10.1 3.1a2 2 0 0 0-2.8 0L2.6 7.8a2 2 0 0 0 0 2.8L5 13.1" />
           </svg>
-        </button>
+        </Button>
       </div>
       <div className="debrief-filter-dropdown__divider" />
 
       {/* Text Search */}
       <div className="debrief-filter-dropdown__section">
-        <input
-          type="text"
-          className="debrief-filter-dropdown__search-input"
+        <TextField
           placeholder={labels.searchPlaceholder}
           value={localQuery}
-          onChange={(e) => handleTextChange(e.target.value)}
+          onChange={handleTextChange}
         />
         <div className="debrief-filter-dropdown__scope-row">
           {(
@@ -169,14 +165,11 @@ export function FilterDropdown({
               ['attachments', labels.searchScopeAttachments],
             ] as const
           ).map(([key, label]) => (
-            <label key={key} className="debrief-filter-dropdown__checkbox-label">
-              <input
-                type="checkbox"
-                checked={filterState.searchScope[key]}
-                onChange={(e) => updateScope(key, e.target.checked)}
-              />
-              {label}
-            </label>
+            <Checkbox
+              key={key}
+              checked={filterState.searchScope[key]}
+              onChange={(checked: boolean) => updateScope(key, checked)}
+            >{label}</Checkbox>
           ))}
         </div>
       </div>
@@ -191,14 +184,11 @@ export function FilterDropdown({
           </div>
           <div className="debrief-filter-dropdown__checkbox-grid">
             {featureKinds.map((kind) => (
-              <label key={kind} className="debrief-filter-dropdown__checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={filterState.featureTypes[kind] ?? true}
-                  onChange={(e) => updateFeatureType(kind, e.target.checked)}
-                />
-                {kind}
-              </label>
+              <Checkbox
+                key={kind}
+                checked={filterState.featureTypes[kind] ?? true}
+                onChange={(checked: boolean) => updateFeatureType(kind, checked)}
+              >{kind}</Checkbox>
             ))}
           </div>
         </div>
@@ -208,28 +198,16 @@ export function FilterDropdown({
 
       {/* Visibility */}
       <div className="debrief-filter-dropdown__section">
-        {(
-          [
-            ['all', labels.visibilityAll],
-            ['hidden-only', labels.visibilityHiddenOnly],
-            ['visible-only', labels.visibilityVisibleOnly],
-          ] as const
-        ).map(([value, label]) => (
-          <label key={value} className="debrief-filter-dropdown__radio-label">
-            <input
-              type="radio"
-              name="debrief-filter-visibility"
-              checked={filterState.visibility === value}
-              onChange={() => updateVisibility(value)}
-            />
-            {label}
-          </label>
-        ))}
+        <Dropdown
+          options={visibilityOptions}
+          value={filterState.visibility}
+          onChange={(value) => { if (typeof value === 'string') updateVisibility(value as typeof filterState.visibility); }}
+        />
       </div>
 
       <div className="debrief-filter-dropdown__divider" />
 
-      {/* Temporal */}
+      {/* Temporal — native datetime-local retained (vscrui TextField doesn't support type pass-through) */}
       <div className="debrief-filter-dropdown__section">
         <label className="debrief-filter-dropdown__temporal-label">
           {labels.temporalAfter}
@@ -241,13 +219,13 @@ export function FilterDropdown({
               onChange={(e) => updateTemporal('after', e.target.value || null)}
             />
             {filterState.temporal.after && (
-              <button
-                className="debrief-filter-dropdown__temporal-clear"
+              <Button
+                appearance="icon"
                 onClick={() => updateTemporal('after', null)}
                 aria-label="Clear after filter"
               >
                 ×
-              </button>
+              </Button>
             )}
           </div>
         </label>
@@ -261,13 +239,13 @@ export function FilterDropdown({
               onChange={(e) => updateTemporal('before', e.target.value || null)}
             />
             {filterState.temporal.before && (
-              <button
-                className="debrief-filter-dropdown__temporal-clear"
+              <Button
+                appearance="icon"
                 onClick={() => updateTemporal('before', null)}
                 aria-label="Clear before filter"
               >
                 ×
-              </button>
+              </Button>
             )}
           </div>
         </label>
