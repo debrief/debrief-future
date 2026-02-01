@@ -156,7 +156,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
       this._sendLayersUpdate();
 
       // Send selection update
-      if (state.selection != null) {
+      if (state.selection !== undefined && state.selection !== null) {
         this._postMessage({
           type: 'selection:update',
           payload: {
