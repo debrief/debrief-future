@@ -43,8 +43,8 @@
 
 **Purpose**: Install vscrui and prepare the build environment
 
-- [ ] T001 Install vscrui dependency in shared/components `shared/components/package.json`
-- [ ] T002 Import Codicon CSS in Storybook preview `shared/components/.storybook/preview.tsx`
+- [x] T001 Install vscrui dependency in shared/components `shared/components/package.json`
+- [x] T002 Import Codicon CSS in Storybook preview `shared/components/.storybook/preview.tsx`
 
 **Checkpoint**: vscrui available, Codicon icons render in Storybook
 
@@ -56,12 +56,12 @@
 
 **⚠️ CRITICAL**: No component conversion can begin until this phase is complete
 
-- [ ] T003 Add --debrief-color-attention token to tokens.css `shared/components/src/styles/tokens.css`
-- [ ] T004 [P] Replace hardcoded #c62828 with var(--debrief-color-danger) in AssociatedFilesDropdown.css `shared/components/src/LayersToolbar/AssociatedFilesDropdown.css`
-- [ ] T005 [P] Replace hardcoded rgba(198,40,40,0.06) with color-mix() in AssociatedFilesDropdown.css `shared/components/src/LayersToolbar/AssociatedFilesDropdown.css`
-- [ ] T006 [P] Replace hardcoded rgba(255,193,7,...) values with --debrief-color-attention in YellowHalo.css `shared/components/src/LayersToolbar/YellowHalo.css`
-- [ ] T007 Replace @media (prefers-color-scheme: dark) with [data-theme='dark'] in FeatureList.css `shared/components/src/FeatureList/FeatureList.css`
-- [ ] T008 [P] Replace @media (prefers-color-scheme: dark) with [data-theme='dark'] in FilterDropdown.css `shared/components/src/LayersToolbar/FilterDropdown.css`
+- [x] T003 Add --debrief-color-attention token to tokens.css `shared/components/src/styles/tokens.css`
+- [x] T004 [P] Replace hardcoded #c62828 with var(--debrief-color-danger) in AssociatedFilesDropdown.css `shared/components/src/LayersToolbar/AssociatedFilesDropdown.css`
+- [x] T005 [P] Replace hardcoded rgba(198,40,40,0.06) with color-mix() in AssociatedFilesDropdown.css `shared/components/src/LayersToolbar/AssociatedFilesDropdown.css`
+- [x] T006 [P] Replace hardcoded rgba(255,193,7,...) values with --debrief-color-attention in YellowHalo.css `shared/components/src/LayersToolbar/YellowHalo.css`
+- [x] T007 Replace @media (prefers-color-scheme: dark) with [data-theme='dark'] in FeatureList.css `shared/components/src/FeatureList/FeatureList.css`
+- [x] T008 [P] Replace @media (prefers-color-scheme: dark) with [data-theme='dark'] in FilterDropdown.css `shared/components/src/LayersToolbar/FilterDropdown.css`
 
 **Checkpoint**: Zero raw colour values outside tokens.css, zero prefers-color-scheme queries. Verify with grep.
 
@@ -75,17 +75,17 @@
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Replace search input with vscrui TextField in FilterDropdown `shared/components/src/LayersToolbar/FilterDropdown.tsx`
-- [ ] T010 [US1] Replace static checkboxes (name, type, platform, attachments) with vscrui Checkbox `shared/components/src/LayersToolbar/FilterDropdown.tsx`
-- [ ] T011 [US1] Replace dynamic feature kind checkboxes with vscrui Checkbox `shared/components/src/LayersToolbar/FilterDropdown.tsx`
-- [ ] T012 [US1] Replace visibility radio group with vscrui Dropdown `shared/components/src/LayersToolbar/FilterDropdown.tsx`
-- [ ] T013 [US1] Replace action row icon buttons with vscrui Button appearance="icon" `shared/components/src/LayersToolbar/FilterDropdown.tsx`
-- [ ] T014 [US1] Style native datetime-local inputs with --debrief-* tokens `shared/components/src/LayersToolbar/FilterDropdown.css`
-- [ ] T015 [US1] Remove obsolete raw-element CSS classes from FilterDropdown.css `shared/components/src/LayersToolbar/FilterDropdown.css`
-- [ ] T016 [US1] Replace toolbar buttons with vscrui Button appearance="icon" in LayersToolbar `shared/components/src/LayersToolbar/LayersToolbar.tsx`
-- [ ] T017 [US1] Remove obsolete raw-button CSS classes from LayersToolbar.css `shared/components/src/LayersToolbar/LayersToolbar.css`
-- [ ] T018 [US1] Replace menu item buttons with vscrui Button in RunDropdown `shared/components/src/LayersToolbar/RunDropdown.tsx`
-- [ ] T019 [US1] Replace file row and context action buttons with vscrui Button in AssociatedFilesDropdown `shared/components/src/LayersToolbar/AssociatedFilesDropdown.tsx`
+- [x] T009 [US1] Replace search input with vscrui TextField in FilterDropdown `shared/components/src/LayersToolbar/FilterDropdown.tsx`
+- [x] T010 [US1] Replace static checkboxes (name, type, platform, attachments) with vscrui Checkbox `shared/components/src/LayersToolbar/FilterDropdown.tsx`
+- [x] T011 [US1] Replace dynamic feature kind checkboxes with vscrui Checkbox `shared/components/src/LayersToolbar/FilterDropdown.tsx`
+- [x] T012 [US1] Replace visibility radio group with vscrui Dropdown `shared/components/src/LayersToolbar/FilterDropdown.tsx`
+- [x] T013 [US1] Replace action row icon buttons with vscrui Button appearance="icon" `shared/components/src/LayersToolbar/FilterDropdown.tsx`
+- [x] T014 [US1] Style native datetime-local inputs with --debrief-* tokens `shared/components/src/LayersToolbar/FilterDropdown.css`
+- [x] T015 [US1] Remove obsolete raw-element CSS classes from FilterDropdown.css `shared/components/src/LayersToolbar/FilterDropdown.css`
+- [x] T016 [US1] Replace toolbar buttons with vscrui Button appearance="icon" in LayersToolbar `shared/components/src/LayersToolbar/LayersToolbar.tsx`
+- [x] T017 [US1] Remove obsolete raw-button CSS classes from LayersToolbar.css `shared/components/src/LayersToolbar/LayersToolbar.css`
+- [x] T018 [US1] Replace menu item buttons with vscrui Button in RunDropdown `shared/components/src/LayersToolbar/RunDropdown.tsx`
+- [x] T019 [US1] Replace file row and context action buttons with vscrui Button in AssociatedFilesDropdown `shared/components/src/LayersToolbar/AssociatedFilesDropdown.tsx`
 
 **Checkpoint**: All interactive elements use vscrui components. Verify in Light, Dark, VS Code themes.
 
@@ -99,8 +99,8 @@
 
 ### Verification for User Story 2
 
-- [ ] T020 [US2] Run colour audit: grep for rgb/rgba/#hex in shared/components/src/**/*.css excluding tokens.css
-- [ ] T021 [US2] Verify --debrief-color-attention renders correctly in Light and Dark themes in Storybook
+- [x] T020 [US2] Run colour audit: grep for rgb/rgba/#hex in shared/components/src/**/*.css excluding tokens.css
+- [x] T021 [US2] Verify --debrief-color-attention renders correctly in Light and Dark themes in Storybook
 
 **Checkpoint**: Automated grep returns zero matches. Attention token visible in both themes.
 
@@ -114,8 +114,8 @@
 
 ### Verification for User Story 3
 
-- [ ] T022 [US3] Run media query audit: grep for prefers-color-scheme in shared/components/src/**/*.css
-- [ ] T023 [US3] Verify Storybook Dark theme toolbar overrides browser light mode preference
+- [x] T022 [US3] Run media query audit: grep for prefers-color-scheme in shared/components/src/**/*.css
+- [x] T023 [US3] Verify Storybook Dark theme toolbar overrides browser light mode preference
 
 **Checkpoint**: Zero media queries. ThemeProvider controls dark mode exclusively.
 
@@ -129,12 +129,12 @@
 
 ### Implementation for User Story 4
 
-- [ ] T024 [P] [US4] Replace trash inline SVG with Icon name="trash" in LayersToolbar `shared/components/src/LayersToolbar/LayersToolbar.tsx`
-- [ ] T025 [P] [US4] Replace eye/eye-closed inline SVGs with Icon name="eye"/"eye-closed" `shared/components/src/LayersToolbar/LayersToolbar.tsx`
-- [ ] T026 [P] [US4] Replace play inline SVG with Icon name="play" `shared/components/src/LayersToolbar/LayersToolbar.tsx`
-- [ ] T027 [P] [US4] Replace search/filter inline SVGs with Icon name="search"/"filter" `shared/components/src/LayersToolbar/LayersToolbar.tsx`
-- [ ] T028 [US4] Replace check-all, check, add, remove inline SVGs with Codicon Icons in FilterDropdown `shared/components/src/LayersToolbar/FilterDropdown.tsx`
-- [ ] T029 [US4] Verify eraser and paperclip SVGs retained (no Codicon equivalent) `shared/components/src/LayersToolbar/LayersToolbar.tsx`
+- [x] T024 [P] [US4] Replace trash inline SVG with Icon name="trash" in LayersToolbar `shared/components/src/LayersToolbar/LayersToolbar.tsx`
+- [x] T025 [P] [US4] Replace eye/eye-closed inline SVGs with Icon name="eye"/"eye-closed" `shared/components/src/LayersToolbar/LayersToolbar.tsx`
+- [x] T026 [P] [US4] Replace play inline SVG with Icon name="play" `shared/components/src/LayersToolbar/LayersToolbar.tsx`
+- [x] T027 [P] [US4] Replace search/filter inline SVGs with Icon name="search"/"filter" `shared/components/src/LayersToolbar/LayersToolbar.tsx`
+- [x] T028 [US4] Replace check-all, check, add, remove inline SVGs with Codicon Icons in FilterDropdown `shared/components/src/LayersToolbar/FilterDropdown.tsx`
+- [x] T029 [US4] Verify eraser and paperclip SVGs retained (no Codicon equivalent) `shared/components/src/LayersToolbar/LayersToolbar.tsx`
 
 **Checkpoint**: Codicon icons render in all three themes. No broken icon slots.
 
@@ -148,8 +148,8 @@
 
 ### Implementation for User Story 5
 
-- [ ] T030 [P] [US5] Add withMultiContext story for LayersToolbar `shared/components/src/LayersToolbar/LayersToolbar.stories.tsx`
-- [ ] T031 [P] [US5] Add withMultiContext story for FilterDropdown `shared/components/src/LayersToolbar/FilterDropdown.stories.tsx`
+- [x] T030 [P] [US5] Add withMultiContext story for LayersToolbar `shared/components/src/LayersToolbar/LayersToolbar.stories.tsx`
+- [x] T031 [P] [US5] Add withMultiContext story for FilterDropdown `shared/components/src/LayersToolbar/FilterDropdown.stories.tsx`
 
 **Checkpoint**: Both multi-context stories render Light, Dark, VS Code side-by-side.
 

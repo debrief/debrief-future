@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { Button } from 'vscrui';
 import type { RunDropdownProps } from './types';
 import { DEFAULT_LABELS } from './types';
 import './RunDropdown.css';
@@ -126,14 +127,15 @@ export function RunDropdown({
                 </div>
               );
               return (
-                <button
+                <Button
                   key={item.id}
+                  appearance="icon"
                   className={`debrief-run-dropdown__item${item.disabled ? ' debrief-run-dropdown__item--disabled' : ''}`}
                   disabled={item.disabled}
                   onClick={() => handleClick(category.id, item.id)}
                 >
                   {item.label}
-                </button>
+                </Button>
               );
             })}
           </div>
