@@ -72,12 +72,13 @@ A developer building an alternative frontend (e.g., Electron or Jupyter) can imp
 - **FR-007**: The panel MUST preserve each section's collapse/expand state across panel reopenings within the same session.
 - **FR-008**: The unified panel MUST use less vertical space than the equivalent separate panels for the same content.
 - **FR-009**: Each sub-component and the composed panel MUST have Storybook stories that can be verified in all three theme variants (light, dark, VS Code).
+- **FR-010**: Section headers MUST use Codicon icons for collapse/expand chevrons and section identification, consistent with the project's icon standards.
 
 ### Key Entities
 
 - **Activity Panel**: The single unified container that hosts all three sub-components. Attributes: collapse states, active section.
 - **Sub-Component**: An independently developed and testable UI section (Time Controller, Tools, or Layers). Each has its own data inputs, interaction model, and rendering logic.
-- **Section Header**: A clickable header for each sub-component that controls collapse/expand behavior and displays the section title.
+- **Section Header**: A clickable header for each sub-component that controls collapse/expand behavior, displays the section title, and includes a Codicon identity icon and a Codicon collapse/expand chevron.
 
 ## User Interface Flow
 
@@ -123,6 +124,7 @@ A developer building an alternative frontend (e.g., Electron or Jupyter) can imp
 
 - Q: Which theme variants must the panel support? → A: All three (light, dark, VS Code) via the project's `--debrief-*` token system.
 - Q: Must sub-components and the composed panel have Storybook stories? → A: Yes, Storybook stories required for each sub-component and the composed panel.
+- Q: Should section headers use Codicon icons? → A: Yes, Codicon icons for collapse chevrons and section identity icons.
 
 ## Assumptions
 
