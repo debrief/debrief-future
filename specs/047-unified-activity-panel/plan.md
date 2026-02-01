@@ -5,7 +5,7 @@
 
 ## Summary
 
-Consolidate the three separate activity sidebar views (Time Controller webview, Tools TreeView, Layers TreeView) into a single React webview panel using vscrui `Pane` components for collapsible sections. Tools and Layers are converted from native VS Code TreeViews to shared React components. All sub-components are independently importable from `@debrief/components` and verified in Storybook across light, dark, and VS Code theme variants.
+Consolidate the three separate activity sidebar views (Time Controller webview, Tools TreeView, Layers TreeView) into a single React webview panel using vscrui `Pane` components for collapsible sections. Tools is converted from a native VS Code TreeView to a shared React component. The Layers section composes the existing `LayersToolbar` and `FeatureList` components (from #045) rather than building a new component. All sub-components are independently importable from `@debrief/components` and verified in Storybook across light, dark, and VS Code theme variants.
 
 ## Technical Context
 
@@ -71,10 +71,8 @@ shared/components/src/
 │   ├── ToolsPanel.tsx             # React replacement for ToolsTreeProvider
 │   ├── ToolsPanel.stories.tsx
 │   └── ToolsPanel.css
-├── LayersPanel/
-│   ├── LayersPanel.tsx            # React replacement for LayersTreeProvider
-│   ├── LayersPanel.stories.tsx
-│   └── LayersPanel.css
+├── LayersToolbar/                  # Already exists (from #045)
+├── FeatureList/                    # Already exists (from #045)
 └── index.ts                       # Updated exports
 
 apps/vscode/src/
@@ -93,7 +91,8 @@ apps/vscode/src/
 |-----------|--------------|-------------|---------|
 | ActivityPanel | `shared/components/src/ActivityPanel/ActivityPanel.stories.tsx` | `activity-panel.js` | Demonstrates unified 3-section panel with collapse |
 | ToolsPanel | `shared/components/src/ToolsPanel/ToolsPanel.stories.tsx` | `tools-panel.js` | Shows context-sensitive tool list |
-| LayersPanel | `shared/components/src/LayersPanel/LayersPanel.stories.tsx` | `layers-panel.js` | Shows layer visibility toggles |
+| LayersToolbar | `shared/components/src/LayersToolbar/LayersToolbar.stories.tsx` | `layers-toolbar.js` | Already exists — layer action toolbar |
+| FeatureList | `shared/components/src/FeatureList/FeatureList.stories.tsx` | `feature-list.js` | Already exists — virtualized feature list |
 
 **Inclusion Criteria Applied**:
 - [x] New visual component
