@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { Button, Icon } from 'vscrui';
 import type { LayersToolbarProps } from './types';
 import { DEFAULT_FILTER_STATE, DEFAULT_LABELS, isFilterActive } from './types';
 import { FilterDropdown } from './FilterDropdown';
@@ -111,67 +112,47 @@ export function LayersToolbar({
       {/* Selection-scoped group */}
       <div className="debrief-layers-toolbar__group">
         {/* Delete */}
-        <button
-          className="debrief-layers-toolbar__btn"
+        <Button
+          appearance="icon"
           disabled={!hasSelection}
           onClick={() => hasSelection && onDelete?.(selectedFeatureIds)}
           title={labels.delete}
           aria-label={labels.delete}
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M5.5 1h5a.5.5 0 0 1 .5.5V3H5V1.5a.5.5 0 0 1 .5-.5ZM4 3V1.5A1.5 1.5 0 0 1 5.5 0h5A1.5 1.5 0 0 1 12 1.5V3h2.5a.5.5 0 0 1 0 1H14l-.7 9.1A1.5 1.5 0 0 1 11.8 14H4.2a1.5 1.5 0 0 1-1.5-1.4L2 4h-.5a.5.5 0 0 1 0-1H4Zm1 1-.7 9h7.4l-.7-9H5Z" />
-          </svg>
-        </button>
+          <Icon name="trash" />
+        </Button>
 
         {/* Visibility — icon reflects state of selected features */}
-        <button
-          className="debrief-layers-toolbar__btn"
+        <Button
+          appearance="icon"
           disabled={!hasSelection}
           onClick={() => hasSelection && onToggleVisibility?.(selectedFeatureIds)}
           title={labels.toggleVisibility}
           aria-label={labels.toggleVisibility}
         >
           {selectionVisibility === 'all-visible' ? (
-            /* Eye with slash: will hide visible items */
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 2l12 12" />
-              <path d="M6.5 6.5a2 2 0 0 0 3 3" />
-              <path d="M3.5 5.5C2.2 6.8 1.5 8 1.5 8s2.5 4.5 6.5 4.5c1 0 1.9-.3 2.7-.7" />
-              <path d="M10.7 10.7c2-1.3 3.3-2.7 3.3-2.7S11.5 3.5 8 3.5c-.7 0-1.3.1-1.9.3" />
-            </svg>
+            <Icon name="eye-closed" />
           ) : selectionVisibility === 'all-hidden' ? (
-            /* Open eye: will make hidden items visible */
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8s-2.5 4.5-6.5 4.5S1.5 8 1.5 8Z" />
-              <circle cx="8" cy="8" r="2" />
-            </svg>
+            <Icon name="eye" />
           ) : (
-            /* Mixed: half-eye (eye with dot) */
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8s-2.5 4.5-6.5 4.5S1.5 8 1.5 8Z" />
-              <circle cx="8" cy="8" r="2" />
-              <line x1="8" y1="3" x2="8" y2="5" />
-            </svg>
+            <Icon name="eye" />
           )}
-        </button>
+        </Button>
 
         {/* Run */}
         <div className="debrief-layers-toolbar__btn-wrapper">
-          <button
-            className={`debrief-layers-toolbar__btn debrief-layers-toolbar__btn--with-arrow${
-              toolsChanged ? ' debrief-toolbar-btn--halo' : ''
-            }`}
+          <Button
+            appearance="icon"
+            className={toolsChanged ? 'debrief-toolbar-btn--halo' : undefined}
             disabled={!hasSelection}
             onClick={() => hasSelection && toggleDropdown('run')}
             title={labels.run}
             aria-label={labels.run}
             aria-expanded={openDropdown === 'run'}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M4 2l10 6-10 6V2Z" />
-            </svg>
+            <Icon name="play" />
             <span className="debrief-layers-toolbar__arrow">▾</span>
-          </button>
+          </Button>
           {openDropdown === 'run' && (
             <div className="debrief-layers-toolbar__dropdown debrief-layers-toolbar__dropdown--left">
               <RunDropdown
@@ -199,53 +180,36 @@ export function LayersToolbar({
       <div className="debrief-layers-toolbar__group">
         {/* Show/Hide hidden features toggle */}
         {onShowHiddenChange && (
-          <button
-            className={`debrief-layers-toolbar__btn${showHidden ? '' : ' debrief-layers-toolbar__btn--active'}`}
+          <Button
+            appearance="icon"
             onClick={() => onShowHiddenChange(!showHidden)}
             title={showHidden ? labels.hideHidden : labels.showHidden}
             aria-label={showHidden ? labels.hideHidden : labels.showHidden}
             aria-pressed={!showHidden}
           >
             {showHidden ? (
-              /* Eye-slash: hidden features are shown, click to hide them */
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 2l12 12" />
-                <path d="M6.5 6.5a2 2 0 0 0 3 3" />
-                <path d="M3.5 5.5C2.2 6.8 1.5 8 1.5 8s2.5 4.5 6.5 4.5c1 0 1.9-.3 2.7-.7" />
-                <path d="M10.7 10.7c2-1.3 3.3-2.7 3.3-2.7S11.5 3.5 8 3.5c-.7 0-1.3.1-1.9.3" />
-              </svg>
+              <Icon name="eye-closed" />
             ) : (
-              /* Open eye: hidden features are suppressed, click to show them */
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8s-2.5 4.5-6.5 4.5S1.5 8 1.5 8Z" />
-                <circle cx="8" cy="8" r="2" />
-              </svg>
+              <Icon name="eye" />
             )}
-          </button>
+          </Button>
         )}
         {/* Filter */}
         <div className="debrief-layers-toolbar__btn-wrapper">
-          <button
-            className={`debrief-layers-toolbar__btn debrief-layers-toolbar__btn--with-arrow${
-              filterActive ? ' debrief-layers-toolbar__btn--active' : ''
-            }`}
+          <Button
+            appearance="icon"
             onClick={() => toggleDropdown('filter')}
             title={labels.filter}
             aria-label={labels.filter}
             aria-expanded={openDropdown === 'filter'}
           >
             {filterActive ? (
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M1 2h14l-5 6v5l-4 2V8L1 2Z" />
-              </svg>
+              <Icon name="filter-filled" />
             ) : (
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="7" cy="7" r="4.5" />
-                <line x1="10.2" y1="10.2" x2="14" y2="14" />
-              </svg>
+              <Icon name="search" />
             )}
             <span className="debrief-layers-toolbar__arrow">▾</span>
-          </button>
+          </Button>
           {openDropdown === 'filter' && (
             <div className="debrief-layers-toolbar__dropdown debrief-layers-toolbar__dropdown--right">
               <FilterDropdown
@@ -263,20 +227,20 @@ export function LayersToolbar({
 
         {/* Associated Files */}
         <div className="debrief-layers-toolbar__btn-wrapper">
-          <button
-            className={`debrief-layers-toolbar__btn debrief-layers-toolbar__btn--with-arrow${
-              resultsChanged ? ' debrief-toolbar-btn--halo' : ''
-            }`}
+          <Button
+            appearance="icon"
+            className={resultsChanged ? 'debrief-toolbar-btn--halo' : undefined}
             onClick={() => toggleDropdown('associated')}
             title={labels.associatedFiles}
             aria-label={labels.associatedFiles}
             aria-expanded={openDropdown === 'associated'}
           >
+            {/* Paperclip — no Codicon equivalent, retain inline SVG */}
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M10.5 4.5l-5 5a2.12 2.12 0 0 0 3 3l5-5a3.54 3.54 0 0 0-5-5l-5 5a4.95 4.95 0 0 0 7 7l4.5-4.5" />
             </svg>
             <span className="debrief-layers-toolbar__arrow">▾</span>
-          </button>
+          </Button>
           {openDropdown === 'associated' && (
             <div className="debrief-layers-toolbar__dropdown debrief-layers-toolbar__dropdown--right">
               <AssociatedFilesDropdown

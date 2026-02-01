@@ -127,6 +127,7 @@ Description formats:
 |----|----------|-------------|---|---|---|-------|------------|--------|
 | ~~040~~ | ~~Enhancement~~ | ~~[Reorganize STAC store to per-item folder structure](specs/040-stac-store-organization/spec.md)~~ | ~~4~~ | ~~3~~ | ~~4~~ | ~~11~~ | ~~Medium~~ | ~~complete~~ |
 | ~~039~~ | ~~Bug~~ | ~~[Wire TimeController to TemporalTrackLayer in VS Code extension](specs/039-wire-timecontroller-temporal-track/spec.md)~~ | ~~5~~ | ~~5~~ | ~~4~~ | ~~14~~ | ~~Medium~~ | ~~complete~~ |
+| 046 | Tech Debt | [Convert raw HTML to vscrui components and theme library](specs/046-vscrui-conversion/spec.md) | 4 | 3 | 5 | 12 | Medium | tasked |
 | 045 | Feature | [Add layers toolbar to FeatureList in shared-components](specs/045-featurelist-layers-toolbar/spec.md) (prerequisite for #044) | 5 | 5 | 4 | 14 | High | specified |
 | 044 | Enhancement | [Build unified Debrief activity panel as single webview](docs/ideas/044-unified-activity-panel.md) (requires #031, #045) | 5 | 5 | 3 | 13 | High | approved |
 | 043 | Feature | [Load REP files into new plot via "Add to new plot in store"](docs/ideas/043-load-rep-new-plot.md) | 5 | 5 | 4 | 14 | Medium | approved |

@@ -208,3 +208,48 @@ export const DarkTheme: Story = {
     backgrounds: { default: 'dark' },
   },
 };
+
+// Multi-context: Light, Dark, VS Code side-by-side
+export const MultiContext: Story = {
+  render: () => {
+    const sharedProps = {
+      selectedFeatureIds: ['track-000', 'track-001'] as string[],
+      features: sampleFeatures,
+      toolMatches: createActiveToolResults(),
+      sourceFiles: sampleSourceFiles,
+      resultFiles: sampleResultFiles,
+      onDelete: (ids: string[]) => console.log('Delete:', ids),
+      onToggleVisibility: (ids: string[]) => console.log('Visibility:', ids),
+      onRunTool: (toolId: string, ids: string[]) => console.log('Run:', toolId, ids),
+    };
+    return (
+      <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>Light</div>
+          <ThemeProvider theme={{ variant: 'light' }}>
+            <LayersToolbar {...sharedProps} />
+          </ThemeProvider>
+        </div>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>Dark</div>
+          <ThemeProvider theme={{ variant: 'dark' }}>
+            <LayersToolbar {...sharedProps} />
+          </ThemeProvider>
+        </div>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>VS Code</div>
+          <ThemeProvider theme={{ variant: 'vscode' }}>
+            <LayersToolbar {...sharedProps} />
+          </ThemeProvider>
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows LayersToolbar in Light, Dark, and VS Code themes side-by-side for visual comparison.',
+      },
+    },
+  },
+};
