@@ -14,10 +14,11 @@
   font-size: var(--debrief-font-size-sm, 13px);
 }
 
-/* Scroll container */
+/* Scroll container — always visible to show viewport proportion */
 .debrief-feature-list__scroll {
   scrollbar-width: thin;
   scrollbar-color: var(--debrief-scrollbar-thumb, #c1c1c1) var(--debrief-scrollbar-track, #f1f1f1);
+  overflow-y: scroll !important;
 }
 
 .debrief-feature-list__scroll::-webkit-scrollbar {
@@ -168,6 +169,18 @@
 .debrief-feature-row[data-location-type="REFERENCE"] .debrief-feature-row__type {
   background-color: var(--debrief-location-reference-badge-bg, #f3e5f5);
   color: var(--debrief-location-reference-badge-text, #7b1fa2);
+}
+
+/* Hidden state */
+.debrief-feature-row--hidden {
+  opacity: 0.55;
+}
+
+.debrief-feature-row__hidden-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--debrief-text-secondary, #666666);
 }
 
 /* Dark theme support */

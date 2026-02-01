@@ -168,6 +168,13 @@ export class StacTreeProvider
     item.description = `${catalog.itemCount} plot${catalog.itemCount === 1 ? '' : 's'}`;
     item.tooltip = catalog.description ?? catalog.title;
 
+    // Double-click opens catalog overview panel (Feature: 042)
+    item.command = {
+      command: 'debrief.openCatalogOverview',
+      title: 'Open Catalog Overview',
+      arguments: [{ catalogId: catalog.id, storeId: catalog.storeId }],
+    };
+
     return item;
   }
 

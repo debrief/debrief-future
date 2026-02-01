@@ -32,6 +32,7 @@ import { createImportRepCommand } from './importRep';
 import { createUndoCommand, createRedoCommand } from './undoRedo';
 import { createSaveSessionCommand } from './saveSession';
 import { createDeleteSelectionCommand } from './deleteSelection';
+import { createOpenCatalogOverviewCommand } from './openCatalogOverview';
 
 export function registerCommands(
   context: vscode.ExtensionContext,
@@ -438,6 +439,14 @@ export function registerCommands(
     vscode.commands.registerCommand(
       'debrief.deleteSelection',
       createDeleteSelectionCommand(sessionManager, getMapPanel, layersTreeProvider)
+    )
+  );
+
+  // Catalog overview command (Feature: 042)
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.openCatalogOverview',
+      createOpenCatalogOverviewCommand(context, configService, stacService)
     )
   );
 

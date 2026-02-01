@@ -40,10 +40,10 @@
 
 **Purpose**: Extend STAC metadata types and create component scaffolding
 
-- [ ] T001 Add bbox, startDatetime, endDatetime to StacItemSummary interface `apps/vscode/src/types/stac.ts`
-- [ ] T002 [P] Create CatalogOverview component directory and types `shared/components/src/CatalogOverview/types.ts`
-- [ ] T003 [P] Create CatalogOverview index barrel export `shared/components/src/CatalogOverview/index.ts`
-- [ ] T004 Export CatalogOverview from shared components package `shared/components/src/index.ts`
+- [x] T001 Add bbox, startDatetime, endDatetime to StacItemSummary interface `apps/vscode/src/types/stac.ts`
+- [x] T002 [P] Create CatalogOverview component directory and types `shared/components/src/CatalogOverview/types.ts`
+- [x] T003 [P] Create CatalogOverview index barrel export `shared/components/src/CatalogOverview/index.ts`
+- [x] T004 Export CatalogOverview from shared components package `shared/components/src/index.ts`
 
 **Checkpoint**: Type definitions in place, component directory scaffolded
 
@@ -55,8 +55,8 @@
 
 **⚠️ CRITICAL**: The React component and VS Code panel cannot be populated without this data
 
-- [ ] T005 Extend listItems() to extract bbox, start_datetime, end_datetime from item.json `apps/vscode/src/services/stacService.ts`
-- [ ] T006 [test] Unit test for metadata extraction with fixture item.json files `apps/vscode/src/services/__tests__/stacService.metadata.test.ts`
+- [x] T005 Extend listItems() to extract bbox, start_datetime, end_datetime from item.json `apps/vscode/src/services/stacService.ts`
+- [x] T006 [test] Unit test for metadata extraction with fixture item.json files `apps/vscode/src/services/__tests__/stacService.metadata.test.ts`
 
 **Checkpoint**: stacService returns enriched StacItemSummary with spatial/temporal metadata
 
@@ -70,13 +70,13 @@
 
 ### Implementation
 
-- [ ] T007 [US1] Create CatalogOverview React component shell with map region `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T008 [US1] Add CatalogOverview CSS with custom properties for theming `shared/components/src/CatalogOverview/CatalogOverview.css`
-- [ ] T009 [US1] Render React-Leaflet map with Rectangle for each item bbox `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T010 [US1] Auto-fit map bounds to combined extent of all items `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T011 [US1] Add hover tooltip on bbox rectangles showing item title and time range `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T012 [US1] Wire onItemSelect callback for double-click on map rectangles `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T013 [US1] Create Storybook stories: default, empty catalog, missing bbox, single item `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx`
+- [x] T007 [US1] Create CatalogOverview React component shell with map region `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T008 [US1] Add CatalogOverview CSS with custom properties for theming `shared/components/src/CatalogOverview/CatalogOverview.css`
+- [x] T009 [US1] Render React-Leaflet map with Rectangle for each item bbox `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T010 [US1] Auto-fit map bounds to combined extent of all items `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T011 [US1] Add hover tooltip on bbox rectangles showing item title and time range `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T012 [US1] Wire onItemSelect callback for double-click on map rectangles `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T013 [US1] Create Storybook stories: default, empty catalog, missing bbox, single item `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx`
 
 **Checkpoint**: Map renders bounding boxes in Storybook; double-click fires callback
 
@@ -90,15 +90,15 @@
 
 ### Implementation
 
-- [ ] T014 [US2] Add SVG timeline region below the map in CatalogOverview `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T015 [US2] Compute time axis scale from min/max datetime across all items `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T016 [US2] Render horizontal bar per item (start_datetime to end_datetime) `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T017 [US2] Render point marker for single-datetime items `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T018 [US2] Render "no time data" label for items without any temporal metadata `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T019 [US2] Add hover tooltip on timeline bars showing item title and dates `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T020 [US2] Wire onItemSelect callback for double-click on timeline bars `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T021 [US2] Add timeline-focused Storybook stories: many items, overlapping ranges, mixed metadata `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx`
-- [ ] T022 [US2] [test] Unit tests for time axis scale computation and bar positioning `shared/components/src/CatalogOverview/__tests__/timeline.test.ts`
+- [x] T014 [US2] Add SVG timeline region below the map in CatalogOverview `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T015 [US2] Compute time axis scale from min/max datetime across all items `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T016 [US2] Render horizontal bar per item (start_datetime to end_datetime) `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T017 [US2] Render point marker for single-datetime items `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T018 [US2] Render "no time data" label for items without any temporal metadata `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T019 [US2] Add hover tooltip on timeline bars showing item title and dates `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T020 [US2] Wire onItemSelect callback for double-click on timeline bars `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T021 [US2] Add timeline-focused Storybook stories: many items, overlapping ranges, mixed metadata `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx`
+- [x] T022 [US2] [test] Unit tests for time axis scale computation and bar positioning `shared/components/src/CatalogOverview/__tests__/timeline.test.ts`
 
 **Checkpoint**: Timeline renders bars and points in Storybook; double-click fires callback
 
@@ -112,11 +112,11 @@
 
 ### Implementation
 
-- [ ] T023 [US3] Add drag bar div between map and timeline regions `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T024 [US3] Implement pointer event handlers for drag resize (down/move/up) `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T025 [US3] Accept initialSplitRatio and onSplitRatioChange props for persistence `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T026 [US3] Add drag bar styling and cursor indicators `shared/components/src/CatalogOverview/CatalogOverview.css`
-- [ ] T027 [US3] Add Storybook story demonstrating resize interaction `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx`
+- [x] T023 [US3] Add drag bar div between map and timeline regions `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T024 [US3] Implement pointer event handlers for drag resize (down/move/up) `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T025 [US3] Accept initialSplitRatio and onSplitRatioChange props for persistence `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T026 [US3] Add drag bar styling and cursor indicators `shared/components/src/CatalogOverview/CatalogOverview.css`
+- [x] T027 [US3] Add Storybook story demonstrating resize interaction `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx`
 
 **Checkpoint**: Drag bar works in Storybook; split ratio controllable via props
 
@@ -130,17 +130,17 @@
 
 ### Implementation
 
-- [ ] T028 [US4] Create CatalogOverviewPanel class with WebviewPanel lifecycle `apps/vscode/src/panels/catalogOverviewPanel.ts`
-- [ ] T029 [US4] Implement getHtmlForWebview() with CSP, Leaflet CSS, bundled JS `apps/vscode/src/panels/catalogOverviewPanel.ts`
-- [ ] T030 [US4] Create webview entry point that renders CatalogOverview React component `apps/vscode/src/webview/web/catalogOverview.tsx`
-- [ ] T031 [US4] Handle loadCatalogOverview message → pass data as props to component `apps/vscode/src/webview/web/catalogOverview.tsx`
-- [ ] T032 [US4] Handle overviewItemSelected message → open plot via existing flow `apps/vscode/src/panels/catalogOverviewPanel.ts`
-- [ ] T033 [US4] Persist split ratio to workspace Memento on change `apps/vscode/src/panels/catalogOverviewPanel.ts`
-- [ ] T034 [US4] Map VS Code theme variables to component CSS custom properties `apps/vscode/src/panels/catalogOverviewPanel.ts`
-- [ ] T035 [US4] Register debrief.openCatalogOverview command `apps/vscode/src/extension.ts`
-- [ ] T036 [US4] Add command contribution to package.json `apps/vscode/package.json`
-- [ ] T037 [US4] Add esbuild entry for catalogOverview.tsx in compile:webview script `apps/vscode/package.json`
-- [ ] T038 [US4] Add double-click command to catalog nodes in STAC tree provider `apps/vscode/src/providers/stacTreeProvider.ts`
+- [x] T028 [US4] Create CatalogOverviewPanel class with WebviewPanel lifecycle `apps/vscode/src/panels/catalogOverviewPanel.ts`
+- [x] T029 [US4] Implement getHtmlForWebview() with CSP, Leaflet CSS, bundled JS `apps/vscode/src/panels/catalogOverviewPanel.ts`
+- [x] T030 [US4] Create webview entry point that renders CatalogOverview React component `apps/vscode/src/webview/web/catalogOverview.tsx`
+- [x] T031 [US4] Handle loadCatalogOverview message → pass data as props to component `apps/vscode/src/webview/web/catalogOverview.tsx`
+- [x] T032 [US4] Handle overviewItemSelected message → open plot via existing flow `apps/vscode/src/panels/catalogOverviewPanel.ts`
+- [x] T033 [US4] Persist split ratio to workspace Memento on change `apps/vscode/src/panels/catalogOverviewPanel.ts`
+- [x] T034 [US4] Map VS Code theme variables to component CSS custom properties `apps/vscode/src/panels/catalogOverviewPanel.ts`
+- [x] T035 [US4] Register debrief.openCatalogOverview command `apps/vscode/src/extension.ts`
+- [x] T036 [US4] Add command contribution to package.json `apps/vscode/package.json`
+- [x] T037 [US4] Add esbuild entry for catalogOverview.tsx in compile:webview script `apps/vscode/package.json`
+- [x] T038 [US4] Add double-click command to catalog nodes in STAC tree provider `apps/vscode/src/providers/stacTreeProvider.ts`
 
 **Checkpoint**: Full end-to-end flow works in VS Code
 
@@ -152,24 +152,24 @@
 
 ### Light/Dark Theme Verification
 
-- [ ] T039 Verify component renders correctly in both light and dark Storybook themes `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx`
-- [ ] T040 [P] Verify VS Code panel renders correctly in both VS Code themes
+- [x] T039 Verify component renders correctly in both light and dark Storybook themes `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx`
+- [x] T040 [P] Verify VS Code panel renders correctly in both VS Code themes
 
 ### Evidence Collection
 
-- [ ] T041 Create evidence directory `specs/042-stac-catalog-overview-panel/evidence/`
-- [ ] T042 Capture test summary in `specs/042-stac-catalog-overview-panel/evidence/test-summary.md`
-- [ ] T043 Create usage demonstration in `specs/042-stac-catalog-overview-panel/evidence/usage-example.md`
-- [ ] T044 [P] Capture Storybook screenshots of key stories in `specs/042-stac-catalog-overview-panel/evidence/storybook-screenshots/`
+- [x] T041 Create evidence directory `specs/042-stac-catalog-overview-panel/evidence/`
+- [x] T042 Capture test summary in `specs/042-stac-catalog-overview-panel/evidence/test-summary.md`
+- [x] T043 Create usage demonstration in `specs/042-stac-catalog-overview-panel/evidence/usage-example.md`
+- [x] T044 [P] Capture Storybook screenshots of key stories in `specs/042-stac-catalog-overview-panel/evidence/storybook-screenshots/`
 
 ### Media Content
 
-- [ ] T045 Create shipped blog post in `specs/042-stac-catalog-overview-panel/media/shipped-post.md`
-- [ ] T046 [P] Create LinkedIn shipped summary in `specs/042-stac-catalog-overview-panel/media/linkedin-shipped.md`
+- [x] T045 Create shipped blog post in `specs/042-stac-catalog-overview-panel/media/shipped-post.md`
+- [x] T046 [P] Create LinkedIn shipped summary in `specs/042-stac-catalog-overview-panel/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T047 Create PR and publish blog: run /speckit.pr
+- [x] T047 Create PR and publish blog: run /speckit.pr
 
 **Task T047 must run last. It depends on all evidence and media tasks being complete.**
 
