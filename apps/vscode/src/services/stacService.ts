@@ -519,13 +519,18 @@ export class StacService {
     options: { title: string; id?: string }
   ): Promise<{ itemPath: string; itemId: string; itemDir: string }> {
     const itemId = options.id ?? crypto.randomUUID();
-    const itemDir = path.join(storePath, itemId);
+    const folderName = options.title
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+    const itemDir = path.join(storePath, folderName || itemId);
     const assetsDir = path.join(itemDir, 'assets');
     const itemJsonPath = path.join(itemDir, 'item.json');
 
     // Check for existing item with same ID
     if (fs.existsSync(itemDir)) {
-      throw new Error(`Item already exists: ${itemId}`);
+      throw new Error(`Item already exists: ${folderName || itemId}`);
     }
 
     // Create directories
@@ -566,7 +571,7 @@ export class StacService {
 
       catalog.links.push({
         rel: 'item',
-        href: `./${itemId}/item.json`,
+        href: `./${folderName || itemId}/item.json`,
         type: 'application/json',
         title: options.title,
       });
@@ -577,7 +582,7 @@ export class StacService {
       this.catalogCache.delete(catalogPath);
     }
 
-    const itemPath = `${itemId}/item.json`;
+    const itemPath = `${folderName || itemId}/item.json`;
     return { itemPath, itemId, itemDir };
   }
 

@@ -1624,7 +1624,7 @@ describe('StacService', () => {
       vi.mocked(fs.existsSync).mockImplementation((p) => {
         const s = String(p);
         // Item dir does not exist yet; catalog.json does
-        if (s.endsWith('test-uuid-1234')) {return false;}
+        if (s.endsWith('my-plot')) {return false;}
         if (s.endsWith('catalog.json')) {return true;}
         return false;
       });
@@ -1635,16 +1635,16 @@ describe('StacService', () => {
       const result = await service.createItem('/store', { title: 'My Plot' });
 
       expect(result.itemId).toBe('test-uuid-1234');
-      expect(result.itemPath).toBe('test-uuid-1234/item.json');
-      expect(result.itemDir).toBe(path.join('/store', 'test-uuid-1234'));
+      expect(result.itemPath).toBe('my-plot/item.json');
+      expect(result.itemDir).toBe(path.join('/store', 'my-plot'));
 
       // Should create item dir and assets dir
       expect(vi.mocked(fs.mkdirSync)).toHaveBeenCalledWith(
-        path.join('/store', 'test-uuid-1234'),
+        path.join('/store', 'my-plot'),
         { recursive: true }
       );
       expect(vi.mocked(fs.mkdirSync)).toHaveBeenCalledWith(
-        path.join('/store', 'test-uuid-1234', 'assets'),
+        path.join('/store', 'my-plot', 'assets'),
         { recursive: true }
       );
 
@@ -1672,7 +1672,7 @@ describe('StacService', () => {
 
       vi.mocked(fs.existsSync).mockImplementation((p) => {
         const s = String(p);
-        if (s.endsWith('test-uuid-1234')) {return false;}
+        if (s.endsWith('new-plot')) {return false;}
         if (s.endsWith('catalog.json')) {return true;}
         return false;
       });
@@ -1690,14 +1690,14 @@ describe('StacService', () => {
         (l: { rel: string }) => l.rel === 'item'
       );
       expect(itemLink).toBeDefined();
-      expect(itemLink.href).toBe('./test-uuid-1234/item.json');
+      expect(itemLink.href).toBe('./new-plot/item.json');
       expect(itemLink.title).toBe('New Plot');
     });
 
     it('should use provided ID instead of generating one', async () => {
       vi.mocked(fs.existsSync).mockImplementation((p) => {
         const s = String(p);
-        if (s.endsWith('my-custom-id')) {return false;}
+        if (s.endsWith('custom-id-plot')) {return false;}
         if (s.endsWith('catalog.json')) {return true;}
         return false;
       });
@@ -1711,7 +1711,7 @@ describe('StacService', () => {
       });
 
       expect(result.itemId).toBe('my-custom-id');
-      expect(result.itemPath).toBe('my-custom-id/item.json');
+      expect(result.itemPath).toBe('custom-id-plot/item.json');
     });
 
     it('should throw if item directory already exists', async () => {
