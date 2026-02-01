@@ -1,0 +1,296 @@
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import type { LayersToolbarProps } from './types';
+import { DEFAULT_FILTER_STATE, DEFAULT_LABELS, isFilterActive } from './types';
+import { FilterDropdown } from './FilterDropdown';
+import { RunDropdown } from './RunDropdown';
+import { AssociatedFilesDropdown } from './AssociatedFilesDropdown';
+import './LayersToolbar.css';
+import './YellowHalo.css';
+
+type OpenDropdown = 'filter' | 'run' | 'associated' | null;
+
+/**
+ * LayersToolbar renders 5 buttons in two groups:
+ * - Selection-scoped (left): Delete, Visibility, Run
+ * - Plot-scoped (right): Filter, Associated Files
+ *
+ * Only one dropdown is open at a time. Click-outside or Escape closes it.
+ */
+export function LayersToolbar({
+  selectedFeatureIds,
+  features,
+  hiddenIds,
+  toolMatches = [],
+  sourceFiles = [],
+  resultFiles = [],
+  toolsChanged = false,
+  resultsChanged = false,
+  filterState: externalFilterState,
+  showHidden = true,
+  onDelete,
+  onToggleVisibility,
+  onRunTool,
+  onRunAction,
+  onFilterChange,
+  onShowHiddenChange,
+  onApplyToSelection,
+  onFileAction,
+  onDropdownOpened,
+  labels: labelOverrides,
+  className,
+}: LayersToolbarProps) {
+  const labels = { ...DEFAULT_LABELS, ...labelOverrides };
+  const filterState = externalFilterState ?? DEFAULT_FILTER_STATE;
+  const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
+
+  const hasSelection = selectedFeatureIds.length > 0;
+  const filterActive = isFilterActive(filterState);
+
+  // Determine visibility state of selected features: 'all-visible' | 'all-hidden' | 'mixed'
+  const selectionVisibility = useMemo(() => {
+    if (!hasSelection || !hiddenIds || hiddenIds.size === 0) return 'all-visible' as const;
+    let hiddenCount = 0;
+    for (const id of selectedFeatureIds) {
+      if (hiddenIds.has(id)) hiddenCount++;
+    }
+    if (hiddenCount === 0) return 'all-visible' as const;
+    if (hiddenCount === selectedFeatureIds.length) return 'all-hidden' as const;
+    return 'mixed' as const;
+  }, [hasSelection, selectedFeatureIds, hiddenIds]);
+
+  // Cache sorted unique kind values, regenerated when features change
+  const featureKinds = useMemo(() => {
+    const kinds = new Set<string>();
+    for (const f of features) {
+      if (f.properties.kind) kinds.add(f.properties.kind);
+    }
+    return Array.from(kinds).sort();
+  }, [features]);
+
+  const toggleDropdown = useCallback(
+    (dropdown: OpenDropdown) => {
+      setOpenDropdown((prev) => {
+        if (prev === dropdown) return null;
+        // Notify parent when run or associated opens
+        if (dropdown === 'run' || dropdown === 'associated') {
+          onDropdownOpened?.(dropdown);
+        }
+        return dropdown;
+      });
+    },
+    [onDropdownOpened],
+  );
+
+  // Close on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenDropdown(null);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Close on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (toolbarRef.current && !toolbarRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const containerClassName = ['debrief-layers-toolbar', className]
+    .filter(Boolean)
+    .join(' ');
+
+  return (
+    <div className={containerClassName} ref={toolbarRef}>
+      {/* Selection-scoped group */}
+      <div className="debrief-layers-toolbar__group">
+        {/* Delete */}
+        <button
+          className="debrief-layers-toolbar__btn"
+          disabled={!hasSelection}
+          onClick={() => hasSelection && onDelete?.(selectedFeatureIds)}
+          title={labels.delete}
+          aria-label={labels.delete}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M5.5 1h5a.5.5 0 0 1 .5.5V3H5V1.5a.5.5 0 0 1 .5-.5ZM4 3V1.5A1.5 1.5 0 0 1 5.5 0h5A1.5 1.5 0 0 1 12 1.5V3h2.5a.5.5 0 0 1 0 1H14l-.7 9.1A1.5 1.5 0 0 1 11.8 14H4.2a1.5 1.5 0 0 1-1.5-1.4L2 4h-.5a.5.5 0 0 1 0-1H4Zm1 1-.7 9h7.4l-.7-9H5Z" />
+          </svg>
+        </button>
+
+        {/* Visibility — icon reflects state of selected features */}
+        <button
+          className="debrief-layers-toolbar__btn"
+          disabled={!hasSelection}
+          onClick={() => hasSelection && onToggleVisibility?.(selectedFeatureIds)}
+          title={labels.toggleVisibility}
+          aria-label={labels.toggleVisibility}
+        >
+          {selectionVisibility === 'all-visible' ? (
+            /* Eye with slash: will hide visible items */
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 2l12 12" />
+              <path d="M6.5 6.5a2 2 0 0 0 3 3" />
+              <path d="M3.5 5.5C2.2 6.8 1.5 8 1.5 8s2.5 4.5 6.5 4.5c1 0 1.9-.3 2.7-.7" />
+              <path d="M10.7 10.7c2-1.3 3.3-2.7 3.3-2.7S11.5 3.5 8 3.5c-.7 0-1.3.1-1.9.3" />
+            </svg>
+          ) : selectionVisibility === 'all-hidden' ? (
+            /* Open eye: will make hidden items visible */
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8s-2.5 4.5-6.5 4.5S1.5 8 1.5 8Z" />
+              <circle cx="8" cy="8" r="2" />
+            </svg>
+          ) : (
+            /* Mixed: half-eye (eye with dot) */
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8s-2.5 4.5-6.5 4.5S1.5 8 1.5 8Z" />
+              <circle cx="8" cy="8" r="2" />
+              <line x1="8" y1="3" x2="8" y2="5" />
+            </svg>
+          )}
+        </button>
+
+        {/* Run */}
+        <div className="debrief-layers-toolbar__btn-wrapper">
+          <button
+            className={`debrief-layers-toolbar__btn debrief-layers-toolbar__btn--with-arrow${
+              toolsChanged ? ' debrief-toolbar-btn--halo' : ''
+            }`}
+            disabled={!hasSelection}
+            onClick={() => hasSelection && toggleDropdown('run')}
+            title={labels.run}
+            aria-label={labels.run}
+            aria-expanded={openDropdown === 'run'}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M4 2l10 6-10 6V2Z" />
+            </svg>
+            <span className="debrief-layers-toolbar__arrow">▾</span>
+          </button>
+          {openDropdown === 'run' && (
+            <div className="debrief-layers-toolbar__dropdown debrief-layers-toolbar__dropdown--left">
+              <RunDropdown
+                toolMatches={toolMatches}
+                selectedFeatureIds={selectedFeatureIds}
+                onRunTool={(toolId, ids) => {
+                  onRunTool?.(toolId, ids);
+                  setOpenDropdown(null);
+                }}
+                onRunAction={(actionId, ids) => {
+                  onRunAction?.(actionId, ids);
+                  setOpenDropdown(null);
+                }}
+                labels={labelOverrides}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Spacer */}
+      <div className="debrief-layers-toolbar__spacer" />
+
+      {/* Plot-scoped group */}
+      <div className="debrief-layers-toolbar__group">
+        {/* Show/Hide hidden features toggle */}
+        {onShowHiddenChange && (
+          <button
+            className={`debrief-layers-toolbar__btn${showHidden ? '' : ' debrief-layers-toolbar__btn--active'}`}
+            onClick={() => onShowHiddenChange(!showHidden)}
+            title={showHidden ? labels.hideHidden : labels.showHidden}
+            aria-label={showHidden ? labels.hideHidden : labels.showHidden}
+            aria-pressed={!showHidden}
+          >
+            {showHidden ? (
+              /* Eye-slash: hidden features are shown, click to hide them */
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 2l12 12" />
+                <path d="M6.5 6.5a2 2 0 0 0 3 3" />
+                <path d="M3.5 5.5C2.2 6.8 1.5 8 1.5 8s2.5 4.5 6.5 4.5c1 0 1.9-.3 2.7-.7" />
+                <path d="M10.7 10.7c2-1.3 3.3-2.7 3.3-2.7S11.5 3.5 8 3.5c-.7 0-1.3.1-1.9.3" />
+              </svg>
+            ) : (
+              /* Open eye: hidden features are suppressed, click to show them */
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8s-2.5 4.5-6.5 4.5S1.5 8 1.5 8Z" />
+                <circle cx="8" cy="8" r="2" />
+              </svg>
+            )}
+          </button>
+        )}
+        {/* Filter */}
+        <div className="debrief-layers-toolbar__btn-wrapper">
+          <button
+            className={`debrief-layers-toolbar__btn debrief-layers-toolbar__btn--with-arrow${
+              filterActive ? ' debrief-layers-toolbar__btn--active' : ''
+            }`}
+            onClick={() => toggleDropdown('filter')}
+            title={labels.filter}
+            aria-label={labels.filter}
+            aria-expanded={openDropdown === 'filter'}
+          >
+            {filterActive ? (
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M1 2h14l-5 6v5l-4 2V8L1 2Z" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="7" cy="7" r="4.5" />
+                <line x1="10.2" y1="10.2" x2="14" y2="14" />
+              </svg>
+            )}
+            <span className="debrief-layers-toolbar__arrow">▾</span>
+          </button>
+          {openDropdown === 'filter' && (
+            <div className="debrief-layers-toolbar__dropdown debrief-layers-toolbar__dropdown--right">
+              <FilterDropdown
+                featureKinds={featureKinds}
+                filterState={filterState}
+                onFilterChange={(state) => onFilterChange?.(state)}
+                onApplyToSelection={onApplyToSelection}
+                hasActiveFilter={filterActive}
+                allSelected={selectedFeatureIds.length > 0 && selectedFeatureIds.length >= features.length}
+                labels={labelOverrides}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Associated Files */}
+        <div className="debrief-layers-toolbar__btn-wrapper">
+          <button
+            className={`debrief-layers-toolbar__btn debrief-layers-toolbar__btn--with-arrow${
+              resultsChanged ? ' debrief-toolbar-btn--halo' : ''
+            }`}
+            onClick={() => toggleDropdown('associated')}
+            title={labels.associatedFiles}
+            aria-label={labels.associatedFiles}
+            aria-expanded={openDropdown === 'associated'}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10.5 4.5l-5 5a2.12 2.12 0 0 0 3 3l5-5a3.54 3.54 0 0 0-5-5l-5 5a4.95 4.95 0 0 0 7 7l4.5-4.5" />
+            </svg>
+            <span className="debrief-layers-toolbar__arrow">▾</span>
+          </button>
+          {openDropdown === 'associated' && (
+            <div className="debrief-layers-toolbar__dropdown debrief-layers-toolbar__dropdown--right">
+              <AssociatedFilesDropdown
+                sourceFiles={sourceFiles}
+                resultFiles={resultFiles}
+                onFileAction={(file, action) => {
+                  onFileAction?.(file, action);
+                }}
+                labels={labelOverrides}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

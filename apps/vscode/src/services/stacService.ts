@@ -165,6 +165,8 @@ export class StacService {
         const item = await this.loadItem(itemPath);
 
         if (item) {
+          const startDatetime = (item.properties.start_datetime as string | undefined) ?? null;
+          const endDatetime = (item.properties.end_datetime as string | undefined) ?? null;
           items.push({
             id: item.id,
             title: item.properties.title ?? item.id,
@@ -172,6 +174,9 @@ export class StacService {
             itemPath: relativePath,
             catalogId: catalog.id,
             storeId: store.id,
+            bbox: item.bbox ?? null,
+            startDatetime,
+            endDatetime,
           });
         }
       }
