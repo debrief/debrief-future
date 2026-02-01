@@ -1714,12 +1714,12 @@ describe('StacService', () => {
       expect(result.itemPath).toBe('custom-id-plot/item.json');
     });
 
-    it('should throw if item directory already exists', async () => {
+    it('should throw if item directory already exists', () => {
       vi.mocked(fs.existsSync).mockReturnValue(true); // dir exists
 
-      await expect(
+      expect(() =>
         service.createItem('/store', { title: 'Duplicate' })
-      ).rejects.toThrow('Item already exists');
+      ).toThrow('Item already exists');
     });
   });
 
