@@ -33,11 +33,11 @@ class ResultTypePath:
             raise ValueError("path must not contain empty segments")
         try:
             self._top_level = ResultTopType(self._segments[0])
-        except ValueError:
+        except ValueError as err:
             valid = ", ".join(t.value for t in ResultTopType)
             raise ValueError(
                 f"first segment must be a valid ResultTopType ({valid}), got: '{self._segments[0]}'"
-            )
+            ) from err
         self._path = path
 
     @property
