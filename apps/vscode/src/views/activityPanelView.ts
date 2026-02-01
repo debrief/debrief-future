@@ -24,8 +24,7 @@ import {
 import type { SessionManager } from '../services/sessionManager';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { CalcService } from '../services/calcService';
-import type { DebriefFeature } from '@debrief/components';
-import type { MatchResult } from '@debrief/components';
+import type { MatchResult } from '../types/tool';
 
 // Message types from webview
 interface TemporalSeekMessage {
@@ -98,14 +97,14 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
 
   constructor(
     extensionUri: vscode.Uri,
-    private readonly sessionManager: SessionManager,
-    private readonly toolMatchAdapter: ToolMatchAdapter,
-    private readonly calcService: CalcService
+    private readonly _sessionManager: SessionManager,
+    private readonly _toolMatchAdapter: ToolMatchAdapter,
+    private readonly _calcService: CalcService
   ) {
     this._extensionUri = extensionUri;
 
     // Subscribe to session manager
-    this._sessionChangeDisposable = sessionManager.onActiveSessionChange((session) =>
+    this._sessionChangeDisposable = this._sessionManager.onActiveSessionChange((session) =>
       this._handleActiveSessionChange(session)
     );
   }
@@ -128,12 +127,12 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
 
     if (session) {
       // Subscribe to temporal state changes
-      this._temporalUnsubscribe = subscribeToTemporal(session, (temporal) =>
+      this._temporalUnsubscribe = subscribeToTemporal(session, (temporal: TemporalSlice) =>
         this._handleTemporalChange(temporal)
       );
 
       // Subscribe to selection changes
-      this._selectionUnsubscribe = subscribeToSelection(session, (selection) =>
+      this._selectionUnsubscribe = subscribeToSelection(session, (selection: FeatureSelection) =>
         this._handleSelectionChange(selection)
       );
 
@@ -207,7 +206,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     });
 
     // Update tool match adapter and send new tools list
-    this.toolMatchAdapter.updateSelection(selection);
+    this._toolMatchAdapter.updateSelection(selection);
     this._sendToolsUpdate();
   }
 
@@ -215,13 +214,13 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
    * Send tools update to webview
    */
   private _sendToolsUpdate(): void {
-    const matches = this.toolMatchAdapter.getAllMatches();
-    const tools = matches.map((match) => ({
+    const matches = this._toolMatchAdapter.getMatchResults();
+    const tools = matches.map((match: MatchResult) => ({
       id: match.tool.id,
       name: match.tool.name,
       description: match.tool.description,
-      applicable: match.active,
-      explanation: match.active ? undefined : match.inactiveReason,
+      applicable: match.isActive,
+      explanation: match.isActive ? undefined : match.explanation,
     }));
 
     this._postMessage({
@@ -239,7 +238,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     }
 
     const state: SessionStoreWithUndo = this._activeSession.getState();
-    const features: DebriefFeature[] = state.layers.map((layer) => ({
+    const features = state.layers.map((layer: { id: string; geometry: unknown; properties: Record<string, unknown> }) => ({
       id: layer.id,
       type: 'Feature' as const,
       geometry: layer.geometry,
@@ -250,7 +249,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     const hiddenIds: string[] = [];
 
     // Get tool matches
-    const toolMatches: MatchResult[] = this.toolMatchAdapter.getAllMatches();
+    const toolMatches = this._toolMatchAdapter.getMatchResults();
 
     this._postMessage({
       type: 'layers:update',
@@ -396,9 +395,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
           cancellable: false,
         },
         async () => {
-          // Execute tool via CalcService
-          // For now, just show a message
-          void vscode.window.showInformationMessage(`Running tool: ${toolId} on ${selectedIds.length} features`);
+          await this._calcService.executeTool({ toolId, featureIds: selectedIds });
         }
       );
     } catch (error) {
