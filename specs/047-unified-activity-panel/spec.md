@@ -125,10 +125,11 @@ A developer building an alternative frontend (e.g., Electron or Jupyter) can imp
 - Q: Which theme variants must the panel support? → A: All three (light, dark, VS Code) via the project's `--debrief-*` token system.
 - Q: Must sub-components and the composed panel have Storybook stories? → A: Yes, Storybook stories required for each sub-component and the composed panel.
 - Q: Should section headers use Codicon icons? → A: Yes, Codicon icons for collapse chevrons and section identity icons.
+- Q: What components should the Layers section use? → A: The existing LayersToolbar and FeatureList components composed together (from #045), not a new component built from scratch.
 
 ## Assumptions
 
-- The existing time controller, tools panel, and layers panel implementations will be refactored into shared components rather than built from scratch.
+- The existing time controller is reused as-is from `shared/components/`. The layers section composes the existing `LayersToolbar` and `FeatureList` components (from #045) rather than building a new component from scratch.
 - The vscrui component library (documented in prerequisite #031) provides sufficient primitives for building all three sub-components with native styling.
 - Section collapse/expand state persistence is session-scoped only (not persisted across editor restarts). Cross-restart persistence is a future enhancement.
 - The ordering of sections (time controller, tools, layers top-to-bottom) follows the current sidebar ordering and is fixed for this iteration.
