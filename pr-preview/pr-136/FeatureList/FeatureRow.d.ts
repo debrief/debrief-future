@@ -6,13 +6,15 @@ export interface FeatureRowProps {
     feature: DebriefFeature;
     /** Whether this row is selected */
     isSelected: boolean;
+    /** Whether this feature is hidden (shows eye-slash indicator) */
+    isHidden?: boolean;
     /** Click handler */
-    onClick: () => void;
+    onClick: (event: React.MouseEvent) => void;
     /** Optional inline style */
     style?: CSSProperties;
 }
 /**
  * FeatureRow displays a single feature in the list.
  */
-export declare function FeatureRow({ feature, isSelected, onClick, style, }: FeatureRowProps): import("react/jsx-runtime").JSX.Element;
+export declare function FeatureRow({ feature, isSelected, isHidden, onClick, style, }: FeatureRowProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=FeatureRow.d.ts.map

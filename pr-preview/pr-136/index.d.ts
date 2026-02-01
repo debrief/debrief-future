@@ -1,3 +1,5 @@
+export { CatalogOverview } from './CatalogOverview';
+export type { CatalogOverviewProps, CatalogOverviewItem } from './CatalogOverview';
 export { MapView } from './MapView';
 export type { MapViewProps } from './MapView';
 export { Timeline } from './Timeline';
@@ -6,6 +8,9 @@ export { TimeController, useTimePlayback } from './TimeController';
 export type { TimeControllerProps, PlaybackSpeed, PlaybackState, DisplayMode, } from './TimeController';
 export { FeatureList } from './FeatureList';
 export type { FeatureListProps } from './FeatureList';
+export { LayersToolbar, FilterDropdown } from './LayersToolbar';
+export type { LayersToolbarProps, FilterDropdownProps, FilterState, AssociatedFile, ToolbarLabels, } from './LayersToolbar';
+export { DEFAULT_FILTER_STATE, isFilterActive } from './LayersToolbar';
 export { ThemeProvider } from './ThemeProvider';
 export type { ThemeProviderProps, Theme } from './ThemeProvider';
 export { TemporalTrackLayer } from './MapView/TemporalTrackLayer';
