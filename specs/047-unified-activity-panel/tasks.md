@@ -42,10 +42,10 @@
 
 **Purpose**: Project scaffolding and shared type definitions
 
-- [ ] T001 Create webview message types from contract `shared/components/src/ActivityPanel/types.ts`
-- [ ] T002 [P] Create ActivityPanel directory structure `shared/components/src/ActivityPanel/`
-- [ ] T003 [P] Create ToolsPanel directory structure `shared/components/src/ToolsPanel/`
-- [ ] T004 [P] Verify LayersToolbar and FeatureList directories exist (from #045) `shared/components/src/LayersToolbar/`, `shared/components/src/FeatureList/`
+- [x] T001 Create webview message types from contract `shared/components/src/ActivityPanel/types.ts`
+- [x] T002 [P] Create ActivityPanel directory structure `shared/components/src/ActivityPanel/`
+- [x] T003 [P] Create ToolsPanel directory structure `shared/components/src/ToolsPanel/`
+- [x] T004 [P] Verify LayersToolbar and FeatureList directories exist (from #045) `shared/components/src/LayersToolbar/`, `shared/components/src/FeatureList/`
 
 ---
 
@@ -55,17 +55,17 @@
 
 **⚠️ CRITICAL**: The composed ActivityPanel (US1) and the VS Code integration cannot begin until ToolsPanel exists, TimeController is converted to vscrui, and LayersToolbar + FeatureList (from #045) are verified.
 
-- [ ] T005 [P] Create ToolsPanel React component rendering a list of ToolMatch items with Codicon icons and vscrui Button `shared/components/src/ToolsPanel/ToolsPanel.tsx`
-- [ ] T006 [P] Create ToolsPanel styles using --debrief-* tokens `shared/components/src/ToolsPanel/ToolsPanel.css`
-- [ ] T007 [P] Create ToolsPanel Storybook stories with light/dark/VS Code theme variants `shared/components/src/ToolsPanel/ToolsPanel.stories.tsx`
-- [ ] T008 [P] Verify LayersToolbar component exists and renders correctly (from #045) `shared/components/src/LayersToolbar/LayersToolbar.tsx`
-- [ ] T009 [P] Verify FeatureList component exists and renders correctly (from #045) `shared/components/src/FeatureList/FeatureList.tsx`
-- [ ] T010 [P] Convert PlaybackControls from custom buttons with inline SVGs to vscrui Button + Icon components, preserving ARIA attributes `shared/components/src/TimeController/PlaybackControls.tsx`
-- [ ] T011 [P] Convert SpeedSelector from custom spinbutton to vscrui Dropdown with speed options [1, 2, 4, 8, 16, 32, 64]x `shared/components/src/TimeController/SpeedSelector.tsx`
-- [ ] T012 [P] Convert DisplayModeToggle from custom switch to vscrui Button toggle, preserving Full/Trail mode semantics `shared/components/src/TimeController/DisplayModeToggle.tsx`
-- [ ] T013 Update TimeController.css to remove styles for replaced custom controls, retain TimeScrubber and TimeDisplay styles `shared/components/src/TimeController/TimeController.css`
-- [ ] T014 Update TimeController Storybook stories to verify vscrui conversion across all three theme variants `shared/components/src/TimeController/TimeController.stories.tsx`
-- [ ] T015 Export ToolsPanel from package barrel (LayersToolbar and FeatureList already exported from #045) `shared/components/src/index.ts`
+- [x] T005 [P] Create ToolsPanel React component rendering a list of ToolMatch items with Codicon icons and vscrui Button `shared/components/src/ToolsPanel/ToolsPanel.tsx`
+- [x] T006 [P] Create ToolsPanel styles using --debrief-* tokens `shared/components/src/ToolsPanel/ToolsPanel.css`
+- [x] T007 [P] Create ToolsPanel Storybook stories with light/dark/VS Code theme variants `shared/components/src/ToolsPanel/ToolsPanel.stories.tsx`
+- [x] T008 [P] Verify LayersToolbar component exists and renders correctly (from #045) `shared/components/src/LayersToolbar/LayersToolbar.tsx`
+- [x] T009 [P] Verify FeatureList component exists and renders correctly (from #045) `shared/components/src/FeatureList/FeatureList.tsx`
+- [x] T010 [P] Convert PlaybackControls from custom buttons with inline SVGs to vscrui Button + Icon components, preserving ARIA attributes `shared/components/src/TimeController/PlaybackControls.tsx`
+- [x] T011 [P] Convert SpeedSelector from custom spinbutton to vscrui Dropdown with speed options [1, 2, 4, 8, 16, 32, 64]x `shared/components/src/TimeController/SpeedSelector.tsx`
+- [x] T012 [P] Convert DisplayModeToggle from custom switch to vscrui Button toggle, preserving Full/Trail mode semantics `shared/components/src/TimeController/DisplayModeToggle.tsx`
+- [x] T013 Update TimeController.css to remove styles for replaced custom controls, retain TimeScrubber and TimeDisplay styles `shared/components/src/TimeController/TimeController.css`
+- [x] T014 Update TimeController Storybook stories to verify vscrui conversion across all three theme variants `shared/components/src/TimeController/TimeController.stories.tsx`
+- [x] T015 Export ToolsPanel from package barrel (LayersToolbar and FeatureList already exported from #045) `shared/components/src/index.ts`
 
 **Checkpoint**: ToolsPanel renders in Storybook; TimeController uses vscrui controls; LayersToolbar and FeatureList verified from #045 — all across three theme variants
 
@@ -100,9 +100,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T024 [US2] Add collapse state management to ActivityPanel using ActivityPanelState with vscode.setState/getState persistence `shared/components/src/ActivityPanel/ActivityPanel.tsx`
-- [ ] T025 [US2] Add Storybook story variants for collapsed states (single collapsed, all collapsed, mixed) `shared/components/src/ActivityPanel/ActivityPanel.stories.tsx`
-- [ ] T026 [US2] Wire collapse state persistence through webview postMessage in ActivityPanelViewProvider `apps/vscode/src/views/activityPanelView.ts`
+- [x] T024 [US2] Add collapse state management to ActivityPanel using ActivityPanelState with vscode.setState/getState persistence `shared/components/src/ActivityPanel/ActivityPanel.tsx`
+- [x] T025 [US2] Add Storybook story variants for collapsed states (single collapsed, all collapsed, mixed) `shared/components/src/ActivityPanel/ActivityPanel.stories.tsx`
+- [x] T026 [US2] Wire collapse state persistence through webview postMessage in ActivityPanelViewProvider `apps/vscode/src/views/activityPanelView.ts`
 
 **Checkpoint**: Collapse/expand works with session-scoped persistence. Storybook stories show all collapse state combinations.
 
@@ -116,12 +116,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T027 [US3] Verify ToolsPanel has no VS Code API imports and accepts data via props only `shared/components/src/ToolsPanel/ToolsPanel.tsx`
-- [ ] T028 [P] [US3] Verify LayersToolbar and FeatureList have no VS Code API imports and accept data via props only `shared/components/src/LayersToolbar/`, `shared/components/src/FeatureList/`
-- [ ] T029 [P] [US3] Verify TimeController has no VS Code API imports after vscrui conversion `shared/components/src/TimeController/TimeController.tsx`
-- [ ] T030 [P] [US3] Verify ActivityPanel accepts sub-component data via props with optional onMessage callback for host communication `shared/components/src/ActivityPanel/ActivityPanel.tsx`
-- [ ] T031 [US3] Add error boundary wrapping each Pane section so a failing sub-component shows inline error without affecting siblings `shared/components/src/ActivityPanel/ActivityPanel.tsx`
-- [ ] T032 [US3] Add Storybook story demonstrating error boundary (one section throwing, others functional) `shared/components/src/ActivityPanel/ActivityPanel.stories.tsx`
+- [x] T027 [US3] Verify ToolsPanel has no VS Code API imports and accepts data via props only `shared/components/src/ToolsPanel/ToolsPanel.tsx`
+- [x] T028 [P] [US3] Verify LayersToolbar and FeatureList have no VS Code API imports and accept data via props only `shared/components/src/LayersToolbar/`, `shared/components/src/FeatureList/`
+- [x] T029 [P] [US3] Verify TimeController has no VS Code API imports after vscrui conversion `shared/components/src/TimeController/TimeController.tsx`
+- [x] T030 [P] [US3] Verify ActivityPanel accepts sub-component data via props with optional onMessage callback for host communication `shared/components/src/ActivityPanel/ActivityPanel.tsx`
+- [x] T031 [US3] Add error boundary wrapping each Pane section so a failing sub-component shows inline error without affecting siblings `shared/components/src/ActivityPanel/ActivityPanel.tsx`
+- [x] T032 [US3] Add Storybook story demonstrating error boundary (one section throwing, others functional) `shared/components/src/ActivityPanel/ActivityPanel.stories.tsx`
 
 **Checkpoint**: All sub-components render in Storybook without VS Code. Error boundary isolates failures per section.
 
