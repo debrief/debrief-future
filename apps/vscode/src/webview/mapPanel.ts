@@ -285,6 +285,17 @@ export class MapPanel {
    */
   public addResultLayer(layer: ResultLayer): void {
     this.resultLayers.push(layer);
+
+    // Skip webview message for artifact layers (no map geometry)
+    if (layer.artifactHref) {
+      void vscode.commands.executeCommand(
+        'setContext',
+        'debrief.hasResultLayers',
+        true
+      );
+      return;
+    }
+
     this.postMessage({
       type: 'addResultLayer',
       layer: {

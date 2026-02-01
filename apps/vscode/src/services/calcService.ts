@@ -20,6 +20,8 @@ import type {
   ToolExecutionResult,
   ResultLayer,
   ToolProvenance,
+  MCPToolResponse,
+  MCPErrorResponse,
 } from '../types/tool';
 import {
   createToolExecution,
@@ -230,8 +232,13 @@ export class CalcService {
 
       return {
         success: true,
-        features: result,
+        features: result.features,
         durationMs,
+        resultType: result.resultType,
+        label: result.label,
+        sourceFeatureIds: result.sourceFeatureIds,
+        artifactData: result.artifactData,
+        artifactHref: result.artifactHref,
       };
     } catch (err) {
       execution.status = 'failed';
@@ -283,7 +290,44 @@ export class CalcService {
     result: ToolExecutionResult,
     sourceFeatureIds: string[]
   ): ResultLayer | null {
-    if (result.success !== true || result.features === undefined) {
+    if (result.success !== true) {
+      return null;
+    }
+
+    // Artifact results: no GeoJSON features, but still create layer for Layers panel
+    if (result.artifactData && result.artifactHref) {
+      const allTools = this.toolCache?.tools ?? [];
+      const tool = allTools.find((t) => t.id === toolId);
+      const toolName = tool?.name ?? toolId;
+      const toolVersion = tool?.version ?? '0.0.0';
+
+      const provenance: ToolProvenance = {
+        toolId,
+        toolName,
+        toolVersion,
+        executionTime: new Date().toISOString(),
+        sourceFeatureIds,
+        durationMs: result.durationMs,
+      };
+
+      return {
+        id: `layer-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+        name: toolName,
+        toolId,
+        toolName,
+        executionId,
+        features: { type: 'FeatureCollection', features: [] },
+        style: createDefaultResultStyle(toolName),
+        visible: true,
+        createdAt: new Date().toISOString(),
+        zIndex: 100,
+        provenance,
+        artifactHref: result.artifactHref,
+        artifactMimeType: 'application/json',
+      };
+    }
+
+    if (result.features === undefined) {
       return null;
     }
 
@@ -527,7 +571,7 @@ print(json.dumps(tools))
     toolId: string,
     featureIds: string[],
     params?: Record<string, unknown>
-  ): Promise<SafeFeatureCollection> {
+  ): Promise<{ features: SafeFeatureCollection; resultType?: string; label?: string; sourceFeatureIds?: string[]; artifactData?: string; artifactHref?: string }> {
     const features = this.resolveFeatures(featureIds);
 
     const input = JSON.stringify({
@@ -544,19 +588,54 @@ print(json.dumps(tools))
       30000
     );
 
-    const result = JSON.parse(stdout.trim()) as {
-      success: boolean;
-      features: SafeFeatureCollection['features'];
-      error?: { code: string; message: string };
-    };
+    const parsed = JSON.parse(stdout.trim()) as MCPToolResponse | MCPErrorResponse;
 
-    if (!result.success) {
-      throw new Error(result.error?.message ?? 'Tool execution failed');
+    // Check for error response
+    if ('error' in parsed) {
+      const err = parsed as MCPErrorResponse;
+      throw new Error(err.error.message);
+    }
+
+    const response = parsed as MCPToolResponse;
+
+    // Extract content from MCP response items
+    const geoFeatures: SafeFeatureCollection['features'] = [];
+    let resultType: string | undefined;
+    let label: string | undefined;
+    let sourceFeatureIds: string[] | undefined;
+    let artifactData: string | undefined;
+    let artifactHref: string | undefined;
+
+    for (const item of response.content) {
+      // Grab annotations from first item
+      if (!resultType && item.annotations) {
+        resultType = item.annotations['debrief:resultType'];
+        label = item.annotations['debrief:label'];
+        sourceFeatureIds = item.annotations['debrief:sourceFeatures'];
+      }
+
+      // Detect artifact items via debrief:href annotation
+      if (item.annotations?.['debrief:href']) {
+        artifactHref = item.annotations['debrief:href'];
+        if (item.type === 'resource' && item.resource) {
+          artifactData = item.resource.text;
+        }
+        continue;
+      }
+
+      if (item.type === 'resource' && item.resource) {
+        const feature = JSON.parse(item.resource.text);
+        geoFeatures.push(feature);
+      }
     }
 
     return {
-      type: 'FeatureCollection',
-      features: result.features,
+      features: { type: 'FeatureCollection', features: geoFeatures },
+      resultType,
+      label,
+      sourceFeatureIds,
+      artifactData,
+      artifactHref,
     };
   }
 }

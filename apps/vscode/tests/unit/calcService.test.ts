@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { Tool } from '../../src/types/tool';
+import type { Tool, MCPToolResponse, MCPErrorResponse, MCPContentItem } from '../../src/types/tool';
 import { createDefaultResultStyle, createToolExecution } from '../../src/types/tool';
 
 describe('CalcService logic', () => {
@@ -95,6 +95,99 @@ describe('CalcService logic', () => {
       };
 
       expect(tool.requirements).toHaveLength(2);
+    });
+  });
+
+  describe('MCP content types (#041)', () => {
+    it('MCPToolResponse contains content array with annotations', () => {
+      const response: MCPToolResponse = {
+        content: [
+          {
+            type: 'resource',
+            resource: {
+              uri: 'feature://stats-1',
+              mimeType: 'application/geo+json',
+              text: '{"type":"Feature","geometry":null,"properties":{}}',
+            },
+            annotations: {
+              'debrief:resultType': 'addition/track-statistics',
+              'debrief:sourceFeatures': ['track-1'],
+              'debrief:label': 'track-stats results',
+            },
+          },
+        ],
+        duration_ms: 42,
+      };
+
+      expect(response.content).toHaveLength(1);
+      expect(response.content[0].type).toBe('resource');
+      expect(response.content[0].annotations['debrief:resultType']).toBe('addition/track-statistics');
+      expect(response.duration_ms).toBe(42);
+    });
+
+    it('MCPErrorResponse contains structured error', () => {
+      const response: MCPErrorResponse = {
+        error: {
+          code: -32000,
+          message: 'Tool not found',
+          data: {
+            'debrief:errorCategory': 'resource_not_found',
+            'debrief:affectedFeatures': ['track-1'],
+          },
+        },
+      };
+
+      expect(response.error.code).toBe(-32000);
+      expect(response.error.data['debrief:errorCategory']).toBe('resource_not_found');
+    });
+
+    it('MCPContentItem supports artifact with debrief:href annotation', () => {
+      const artifactItem: MCPContentItem = {
+        type: 'resource',
+        resource: {
+          uri: 'artifact://range-bearing-t1-t2.json',
+          mimeType: 'application/json',
+          text: '{"type":"range-bearing-series","entries":[]}',
+        },
+        annotations: {
+          'debrief:resultType': 'artifact/range-bearing-series',
+          'debrief:sourceFeatures': ['track-1', 'track-2'],
+          'debrief:label': 'range-bearing results',
+          'debrief:href': 'range-bearing-t1-t2.json',
+        },
+      };
+
+      expect(artifactItem.type).toBe('resource');
+      expect(artifactItem.annotations['debrief:resultType']).toBe('artifact/range-bearing-series');
+      expect(artifactItem.annotations['debrief:href']).toBe('range-bearing-t1-t2.json');
+      expect(artifactItem.resource?.mimeType).toBe('application/json');
+    });
+
+    it('MCPContentItem supports resource, text, and image types', () => {
+      const resourceItem: MCPContentItem = {
+        type: 'resource',
+        resource: { uri: 'feature://f1', mimeType: 'application/geo+json', text: '{}' },
+        annotations: {
+          'debrief:resultType': 'addition/range-bearing',
+          'debrief:sourceFeatures': [],
+          'debrief:label': 'test',
+        },
+      };
+
+      const textItem: MCPContentItem = {
+        type: 'text',
+        text: 'Deleted 2 features',
+        annotations: {
+          'debrief:resultType': 'deletion/merge',
+          'debrief:sourceFeatures': ['a', 'b'],
+          'debrief:label': 'merge results',
+          'debrief:deletedFeatures': ['a', 'b'],
+        },
+      };
+
+      expect(resourceItem.type).toBe('resource');
+      expect(textItem.type).toBe('text');
+      expect(textItem.annotations['debrief:deletedFeatures']).toEqual(['a', 'b']);
     });
   });
 });

@@ -329,6 +329,12 @@ export interface ResultLayer {
 
   /** Provenance metadata */
   provenance: ToolProvenance;
+
+  /** Artifact file href (for non-GeoJSON results) */
+  artifactHref?: string;
+
+  /** Artifact MIME type */
+  artifactMimeType?: string;
 }
 
 /**
@@ -383,6 +389,71 @@ export interface ToolExecutionResult {
 
   /** Execution duration in ms */
   durationMs: number;
+
+  /** MCP result type (e.g. "addition/track-statistics") */
+  resultType?: string;
+
+  /** Display label from annotations */
+  label?: string;
+
+  /** Source feature IDs from annotations */
+  sourceFeatureIds?: string[];
+
+  /** Artifact data string (for non-GeoJSON results like time-series) */
+  artifactData?: string;
+
+  /** Artifact filename hint from debrief:href annotation */
+  artifactHref?: string;
+}
+
+// ---------------------------------------------------------------------------
+// MCP Content Types (#041 Tool Results Architecture)
+// ---------------------------------------------------------------------------
+
+/**
+ * Debrief-specific annotations on MCP content items.
+ */
+export interface DebriefAnnotations {
+  'debrief:resultType': string;
+  'debrief:sourceFeatures': string[];
+  'debrief:label': string;
+  'debrief:href'?: string;
+  'debrief:deletedFeatures'?: string[];
+}
+
+/**
+ * A single MCP content item (resource, text, or image).
+ */
+export interface MCPContentItem {
+  type: 'resource' | 'text' | 'image';
+  resource?: { uri: string; mimeType: string; text: string };
+  text?: string;
+  data?: string;
+  mimeType?: string;
+  annotations: DebriefAnnotations;
+}
+
+/**
+ * Successful MCP tool response with content array.
+ */
+export interface MCPToolResponse {
+  content: MCPContentItem[];
+  duration_ms: number;
+}
+
+/**
+ * MCP error response with structured error data.
+ */
+export interface MCPErrorResponse {
+  error: {
+    code: number;
+    message: string;
+    data: {
+      'debrief:errorCategory': string;
+      'debrief:affectedFeatures': string[];
+    };
+  };
+  duration_ms?: number;
 }
 
 /**
