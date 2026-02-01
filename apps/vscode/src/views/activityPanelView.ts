@@ -156,7 +156,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
       this._sendLayersUpdate();
 
       // Send selection update
-      if (state.selection) {
+      if (state.selection != null) {
         this._postMessage({
           type: 'selection:update',
           payload: {
@@ -238,7 +238,9 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     }
 
     const state: SessionStoreWithUndo = this._activeSession.getState();
-    const features = state.layers.map((layer: { id: string; geometry: unknown; properties: Record<string, unknown> }) => ({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const layers: Array<{ id: string; geometry: unknown; properties: Record<string, unknown> }> = state.layers;
+    const features = layers.map((layer) => ({
       id: layer.id,
       type: 'Feature' as const,
       geometry: layer.geometry,
@@ -249,16 +251,10 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     const hiddenIds: string[] = [];
 
     // Get tool matches
-    const toolMatches = this._toolMatchAdapter.getMatchResults();
+    const toolMatches: MatchResult[] = this._toolMatchAdapter.getMatchResults();
 
-    this._postMessage({
-      type: 'layers:update',
-      payload: {
-        layers: features,
-        hiddenIds,
-        toolMatches,
-      },
-    });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    this._postMessage({ type: 'layers:update', payload: { layers: features, hiddenIds, toolMatches } });
   }
 
   public resolveWebviewView(
