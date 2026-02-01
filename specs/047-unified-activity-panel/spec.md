@@ -66,7 +66,7 @@ A developer building an alternative frontend (e.g., Electron or Jupyter) can imp
 - **FR-001**: System MUST display time controller, tools, and layers sections within a single unified panel.
 - **FR-002**: Each section MUST be independently collapsible and expandable via its section header.
 - **FR-003**: Each sub-component (time controller, tools, layers) MUST function as a standalone shared component that does not depend on VS Code APIs directly.
-- **FR-004**: The unified panel MUST render using native VS Code visual styling (colors, fonts, spacing) to match the host environment.
+- **FR-004**: The unified panel MUST render correctly in all three project theme variants (light, dark, VS Code) using the project's `--debrief-*` design token system. No hardcoded colors are permitted.
 - **FR-005**: The panel MUST work entirely offline without requiring network access.
 - **FR-006**: An error in one sub-component MUST NOT prevent the other sub-components from rendering and functioning.
 - **FR-007**: The panel MUST preserve each section's collapse/expand state across panel reopenings within the same session.
@@ -114,6 +114,12 @@ A developer building an alternative frontend (e.g., Electron or Jupyter) can imp
 - **SC-003**: Each sub-component can be rendered and tested independently outside of the host editor within a standalone test harness.
 - **SC-004**: An error in any one sub-component does not prevent the remaining sub-components from functioning — verified by simulating a failure in each section.
 - **SC-005**: The panel operates fully offline with no network requests required for any core functionality.
+
+## Clarifications
+
+### Session 2026-02-01
+
+- Q: Which theme variants must the panel support? → A: All three (light, dark, VS Code) via the project's `--debrief-*` token system.
 
 ## Assumptions
 
