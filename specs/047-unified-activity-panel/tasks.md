@@ -133,9 +133,9 @@
 
 ### Evidence Collection
 
-- [ ] T033 Create evidence directory `specs/047-unified-activity-panel/evidence/`
-- [ ] T034 Capture test summary with pass/fail counts `specs/047-unified-activity-panel/evidence/test-summary.md`
-- [ ] T035 Create usage demonstration showing how to open and interact with the panel `specs/047-unified-activity-panel/evidence/usage-example.md`
+- [x] T033 Create evidence directory `specs/047-unified-activity-panel/evidence/`
+- [x] T034 Capture test summary with pass/fail counts `specs/047-unified-activity-panel/evidence/test-summary.md`
+- [x] T035 Create usage demonstration showing how to open and interact with the panel `specs/047-unified-activity-panel/evidence/usage-example.md`
 - [ ] T036 [P] Capture Storybook screenshots of ActivityPanel in all three themes `specs/047-unified-activity-panel/evidence/screenshots/`
 
 ### Media Content
