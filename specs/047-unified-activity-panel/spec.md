@@ -65,7 +65,7 @@ A developer building an alternative frontend (e.g., Electron or Jupyter) can imp
 
 - **FR-001**: System MUST display time controller, tools, and layers sections within a single unified panel.
 - **FR-002**: Each section MUST be independently collapsible and expandable via its section header.
-- **FR-003**: Each sub-component (time controller, tools, layers) MUST function as a standalone shared component that does not depend on VS Code APIs directly.
+- **FR-003**: Each sub-component (time controller, tools, layers) MUST function as a standalone shared component that does not depend on VS Code APIs directly. All sub-components MUST use vscrui primitives and `--debrief-*` design tokens for visual consistency.
 - **FR-004**: The unified panel MUST render correctly in all three project theme variants (light, dark, VS Code) using the project's `--debrief-*` design token system. No hardcoded colors are permitted.
 - **FR-005**: The panel MUST work entirely offline without requiring network access.
 - **FR-006**: An error in one sub-component MUST NOT prevent the other sub-components from rendering and functioning.
@@ -73,6 +73,7 @@ A developer building an alternative frontend (e.g., Electron or Jupyter) can imp
 - **FR-008**: The unified panel MUST use less vertical space than the equivalent separate panels for the same content.
 - **FR-009**: Each sub-component and the composed panel MUST have Storybook stories that can be verified in all three theme variants (light, dark, VS Code).
 - **FR-010**: Section headers MUST use Codicon icons for collapse/expand chevrons and section identification, consistent with the project's icon standards.
+- **FR-011**: The Time Controller MUST be converted to use vscrui components (Button, Icon, Dropdown) for all controls where vscrui equivalents exist. Custom implementations are permitted only for controls without vscrui equivalents (e.g., the time scrubber slider).
 
 ### Key Entities
 
@@ -126,10 +127,11 @@ A developer building an alternative frontend (e.g., Electron or Jupyter) can imp
 - Q: Must sub-components and the composed panel have Storybook stories? → A: Yes, Storybook stories required for each sub-component and the composed panel.
 - Q: Should section headers use Codicon icons? → A: Yes, Codicon icons for collapse chevrons and section identity icons.
 - Q: What components should the Layers section use? → A: The existing LayersToolbar and FeatureList components composed together (from #045), not a new component built from scratch.
+- Q: Should the Time Controller be converted to use vscrui components? → A: Yes, convert all Time Controller controls to vscrui equivalents where available (Button, Icon, Dropdown); keep custom implementation only for controls with no vscrui equivalent (e.g., time scrubber slider).
 
 ## Assumptions
 
-- The existing time controller is reused as-is from `shared/components/`. The layers section composes the existing `LayersToolbar` and `FeatureList` components (from #045) rather than building a new component from scratch.
+- The existing Time Controller is converted to use vscrui components (Button, Icon, Dropdown) where equivalents exist; custom implementations are retained only for controls without vscrui equivalents (e.g., the time scrubber slider). The layers section composes the existing `LayersToolbar` and `FeatureList` components (from #045) rather than building a new component from scratch.
 - The vscrui component library (documented in prerequisite #031) provides sufficient primitives for building all three sub-components with native styling.
 - Section collapse/expand state persistence is session-scoped only (not persisted across editor restarts). Cross-restart persistence is a future enhancement.
 - The ordering of sections (time controller, tools, layers top-to-bottom) follows the current sidebar ordering and is fixed for this iteration.
@@ -141,7 +143,7 @@ A developer building an alternative frontend (e.g., Electron or Jupyter) can imp
 
 ## Out of Scope
 
-- Adding new functionality to any sub-component (this is a layout/architecture consolidation).
+- Adding new functionality to any sub-component beyond the vscrui conversion (this is a layout/architecture consolidation).
 - Non-VS Code frontend integration (Electron, Jupyter) — components will be reusable, but integration is future work.
 - Drag-to-reorder sections within the panel.
 - Persisting collapse state across editor restarts.
