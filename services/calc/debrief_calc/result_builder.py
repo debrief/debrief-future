@@ -8,7 +8,7 @@ for each of the four result types: mutation, addition, deletion, artifact.
 import base64
 import json
 
-from debrief_calc.result_types import ResultTopType, ResultTypePath
+from debrief_calc.result_types import ResultTypePath
 
 VALID_ERROR_CATEGORIES = {"invalid_input", "algorithm_failure", "resource_not_found"}
 
