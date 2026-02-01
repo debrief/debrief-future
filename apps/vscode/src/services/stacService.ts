@@ -519,10 +519,10 @@ export class StacService {
    * @param options Title and optional ID for the new item
    * @returns Created item path (relative) and ID
    */
-  async createItem(
+  createItem(
     storePath: string,
     options: { title: string; id?: string }
-  ): Promise<{ itemPath: string; itemId: string; itemDir: string }> {
+  ): { itemPath: string; itemId: string; itemDir: string } {
     const itemId = options.id ?? crypto.randomUUID();
     const folderName = options.title
       .trim()

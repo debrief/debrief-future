@@ -262,7 +262,7 @@ async function createNewPlotFromRep(
       let itemResult: { itemPath: string; itemId: string; itemDir: string };
 
       try {
-        itemResult = await stacService.createItem(storePath, { title: title.trim() });
+        itemResult = stacService.createItem(storePath, { title: title.trim() });
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         void vscode.window.showErrorMessage(
