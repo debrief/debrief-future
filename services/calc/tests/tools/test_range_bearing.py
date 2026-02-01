@@ -8,8 +8,8 @@ from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.range_bearing import (
     _calculate_bearing,
     _calculate_range,
-    _closest_point_on_segment,
     _closest_point_on_polygon,
+    _closest_point_on_segment,
     range_bearing,
 )
 

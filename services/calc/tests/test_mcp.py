@@ -1,6 +1,5 @@
 """Integration tests for MCP server."""
 
-import json
 
 import pytest
 
