@@ -130,7 +130,7 @@ Description formats:
 | 046 | Tech Debt | [Convert raw HTML to vscrui components and theme library](specs/046-vscrui-conversion/spec.md) | 4 | 3 | 5 | 12 | Medium | tasked |
 | 045 | Feature | [Add layers toolbar to FeatureList in shared-components](specs/045-featurelist-layers-toolbar/spec.md) (prerequisite for #044) | 5 | 5 | 4 | 14 | High | specified |
 | 044 | Enhancement | [Build unified Debrief activity panel as single webview](docs/ideas/044-unified-activity-panel.md) (requires #031, #045) | 5 | 5 | 3 | 13 | High | approved |
-| 043 | Feature | [Load REP files into new plot via "Add to new plot in store"](docs/ideas/043-load-rep-new-plot.md) | 5 | 5 | 4 | 14 | Medium | approved |
+| 043 | Feature | [Load REP files into new plot via "Add to new plot in store"](specs/043-load-rep-new-plot/spec.md) | 5 | 5 | 4 | 14 | Medium | specified |
 | 042 | Feature | [Add STAC catalog overview panel with map and timeline](specs/042-stac-catalog-overview-panel/spec.md) | 5 | 5 | 3 | 13 | High | specified |
 | 028 | Tech Debt | [Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md) | 4 | 2 | 5 | 11 | Low | implementing |
 | 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](specs/019-needs-interview-status/spec.md) | 3 | 3 | 5 | 11 | Medium | implementing |

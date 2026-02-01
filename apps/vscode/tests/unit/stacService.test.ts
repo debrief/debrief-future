@@ -23,6 +23,11 @@ vi.mock('fs', () => ({
   writeFileSync: vi.fn(),
   mkdirSync: vi.fn(),
   copyFileSync: vi.fn(),
+  rmSync: vi.fn(),
+}));
+
+vi.mock('crypto', () => ({
+  randomUUID: vi.fn(() => 'test-uuid-1234'),
 }));
 
 // =============================================================================
@@ -1603,6 +1608,206 @@ describe('StacService', () => {
       const readCount3 = vi.mocked(fs.readFileSync).mock.calls.length;
 
       expect(readCount3).toBeGreaterThan(readCount2);
+    });
+  });
+
+  // ===========================================================================
+  // Phase: createItem tests (Feature 043)
+  // ===========================================================================
+
+  describe('createItem', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should create item directory, assets directory, and item.json', async () => {
+      vi.mocked(fs.existsSync).mockImplementation((p) => {
+        const s = String(p);
+        // Item dir does not exist yet; catalog.json does
+        if (s.endsWith('my-plot')) {return false;}
+        if (s.endsWith('catalog.json')) {return true;}
+        return false;
+      });
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify(createMockCatalog({ links: [] }))
+      );
+
+      const result = await service.createItem('/store', { title: 'My Plot' });
+
+      expect(result.itemId).toBe('test-uuid-1234');
+      expect(result.itemPath).toBe('my-plot/item.json');
+      expect(result.itemDir).toBe(path.join('/store', 'my-plot'));
+
+      // Should create item dir and assets dir
+      expect(vi.mocked(fs.mkdirSync)).toHaveBeenCalledWith(
+        path.join('/store', 'my-plot'),
+        { recursive: true }
+      );
+      expect(vi.mocked(fs.mkdirSync)).toHaveBeenCalledWith(
+        path.join('/store', 'my-plot', 'assets'),
+        { recursive: true }
+      );
+
+      // Should write item.json
+      const writeCall = vi.mocked(fs.writeFileSync).mock.calls.find(
+        (c) => String(c[0]).endsWith('item.json')
+      );
+      expect(writeCall).toBeDefined();
+      const itemJson = JSON.parse(writeCall![1] as string);
+      expect(itemJson.type).toBe('Feature');
+      expect(itemJson.stac_version).toBe('1.0.0');
+      expect(itemJson.id).toBe('test-uuid-1234');
+      expect(itemJson.properties.title).toBe('My Plot');
+      expect(itemJson.bbox).toBeNull();
+      expect(itemJson.geometry).toBeNull();
+      expect(itemJson.assets).toEqual({});
+    });
+
+    it('should update catalog.json with item link', async () => {
+      const originalCatalog = createMockCatalog({
+        links: [
+          { rel: 'root', href: './catalog.json', type: 'application/json' },
+        ],
+      });
+
+      vi.mocked(fs.existsSync).mockImplementation((p) => {
+        const s = String(p);
+        if (s.endsWith('new-plot')) {return false;}
+        if (s.endsWith('catalog.json')) {return true;}
+        return false;
+      });
+      vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(originalCatalog));
+
+      await service.createItem('/store', { title: 'New Plot' });
+
+      // Find the catalog.json write
+      const catalogWrite = vi.mocked(fs.writeFileSync).mock.calls.find(
+        (c) => String(c[0]).endsWith('catalog.json')
+      );
+      expect(catalogWrite).toBeDefined();
+      const updatedCatalog = JSON.parse(catalogWrite![1] as string);
+      const itemLink = updatedCatalog.links.find(
+        (l: { rel: string }) => l.rel === 'item'
+      );
+      expect(itemLink).toBeDefined();
+      expect(itemLink.href).toBe('./new-plot/item.json');
+      expect(itemLink.title).toBe('New Plot');
+    });
+
+    it('should use provided ID instead of generating one', async () => {
+      vi.mocked(fs.existsSync).mockImplementation((p) => {
+        const s = String(p);
+        if (s.endsWith('custom-id-plot')) {return false;}
+        if (s.endsWith('catalog.json')) {return true;}
+        return false;
+      });
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        JSON.stringify(createMockCatalog({ links: [] }))
+      );
+
+      const result = await service.createItem('/store', {
+        title: 'Custom ID Plot',
+        id: 'my-custom-id',
+      });
+
+      expect(result.itemId).toBe('my-custom-id');
+      expect(result.itemPath).toBe('custom-id-plot/item.json');
+    });
+
+    it('should throw if item directory already exists', () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true); // dir exists
+
+      expect(() =>
+        service.createItem('/store', { title: 'Duplicate' })
+      ).toThrow('Item already exists');
+    });
+  });
+
+  // ===========================================================================
+  // Phase: updateTemporalMetadata tests (Feature 043)
+  // ===========================================================================
+
+  describe('updateTemporalMetadata', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('should set start_datetime and end_datetime from track times', async () => {
+      const item = createMockItem({
+        assets: {
+          data: { href: './data.geojson', type: 'application/geo+json', title: 'Data' },
+        },
+      });
+
+      const fc = {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
+            properties: {
+              times: ['2024-01-01T00:00:00Z', '2024-01-01T12:00:00Z'],
+            },
+          },
+          {
+            type: 'Feature',
+            geometry: { type: 'LineString', coordinates: [[2, 2], [3, 3]] },
+            properties: {
+              times: ['2024-01-02T00:00:00Z', '2024-01-02T18:00:00Z'],
+            },
+          },
+        ],
+      };
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockImplementation((p) => {
+        const s = String(p);
+        if (s.endsWith('item.json')) {return JSON.stringify(item);}
+        if (s.endsWith('.geojson')) {return JSON.stringify(fc);}
+        throw new Error(`Unexpected: ${s}`);
+      });
+
+      await service.updateTemporalMetadata('/store', 'test-item/item.json');
+
+      const writeCall = vi.mocked(fs.writeFileSync).mock.calls.find(
+        (c) => String(c[0]).endsWith('item.json')
+      );
+      expect(writeCall).toBeDefined();
+      const updatedItem = JSON.parse(writeCall![1] as string);
+      expect(updatedItem.properties.start_datetime).toBe('2024-01-01T00:00:00Z');
+      expect(updatedItem.properties.end_datetime).toBe('2024-01-02T18:00:00Z');
+    });
+
+    it('should not write if no temporal data found', async () => {
+      const item = createMockItem({
+        assets: {
+          data: { href: './data.geojson', type: 'application/geo+json', title: 'Data' },
+        },
+      });
+
+      const fc = {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [0, 0] },
+            properties: { name: 'loc1' },
+          },
+        ],
+      };
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockImplementation((p) => {
+        const s = String(p);
+        if (s.endsWith('item.json')) {return JSON.stringify(item);}
+        if (s.endsWith('.geojson')) {return JSON.stringify(fc);}
+        throw new Error(`Unexpected: ${s}`);
+      });
+
+      await service.updateTemporalMetadata('/store', 'test-item/item.json');
+
+      // Should not write item.json (no temporal data)
+      expect(vi.mocked(fs.writeFileSync)).not.toHaveBeenCalled();
     });
   });
 });

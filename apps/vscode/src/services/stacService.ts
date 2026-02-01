@@ -5,6 +5,7 @@
  */
 
 import * as fs from 'fs';
+import * as crypto from 'crypto';
 import * as path from 'path';
 import type {
   StacStore,
@@ -560,6 +561,137 @@ export class StacService {
   clearCache(): void {
     this.catalogCache.clear();
     this.itemCache.clear();
+  }
+
+  // ============================================================================
+  // Item Creation (New Plot)
+  // ============================================================================
+
+  /**
+   * Create a new STAC Item in a store.
+   * Creates the per-item folder structure with item.json and assets/ directory,
+   * and updates catalog.json to link the new item.
+   *
+   * @param storePath Absolute path to the STAC store root
+   * @param options Title and optional ID for the new item
+   * @returns Created item path (relative) and ID
+   */
+  createItem(
+    storePath: string,
+    options: { title: string; id?: string }
+  ): { itemPath: string; itemId: string; itemDir: string } {
+    const itemId = options.id ?? crypto.randomUUID();
+    const folderName = options.title
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+    const itemDir = path.join(storePath, folderName || itemId);
+    const assetsDir = path.join(itemDir, 'assets');
+    const itemJsonPath = path.join(itemDir, 'item.json');
+
+    // Check for existing item with same ID
+    if (fs.existsSync(itemDir)) {
+      throw new Error(`Item already exists: ${folderName || itemId}`);
+    }
+
+    // Create directories
+    fs.mkdirSync(itemDir, { recursive: true });
+    fs.mkdirSync(assetsDir, { recursive: true });
+
+    // Build STAC Item JSON
+    const now = new Date().toISOString();
+    const item = {
+      type: 'Feature',
+      stac_version: '1.0.0',
+      id: itemId,
+      geometry: null,
+      bbox: null,
+      properties: {
+        title: options.title,
+        datetime: null,
+        start_datetime: null,
+        end_datetime: null,
+        created: now,
+      },
+      links: [
+        { rel: 'root', href: '../catalog.json', type: 'application/json' },
+        { rel: 'parent', href: '../catalog.json', type: 'application/json' },
+        { rel: 'self', href: './item.json', type: 'application/json' },
+      ],
+      assets: {},
+    };
+
+    // Write item.json
+    fs.writeFileSync(itemJsonPath, JSON.stringify(item, null, 2));
+
+    // Update catalog.json to link the new item
+    const catalogPath = path.join(storePath, 'catalog.json');
+    if (fs.existsSync(catalogPath)) {
+      const catalogContent = fs.readFileSync(catalogPath, 'utf-8');
+      const catalog = JSON.parse(catalogContent) as { links: Array<{ rel: string; href: string; type?: string; title?: string }> };
+
+      catalog.links.push({
+        rel: 'item',
+        href: `./${folderName || itemId}/item.json`,
+        type: 'application/json',
+        title: options.title,
+      });
+
+      fs.writeFileSync(catalogPath, JSON.stringify(catalog, null, 2));
+
+      // Clear catalog cache
+      this.catalogCache.delete(catalogPath);
+    }
+
+    const itemPath = `${folderName || itemId}/item.json`;
+    return { itemPath, itemId, itemDir };
+  }
+
+  /**
+   * Update temporal metadata on a STAC item from its GeoJSON features.
+   * Scans track features for time arrays and sets start_datetime/end_datetime.
+   */
+  async updateTemporalMetadata(
+    storePath: string,
+    itemPath: string
+  ): Promise<void> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+    if (!item) {return;}
+
+    // Find GeoJSON asset and load features
+    const geoJsonAsset = Object.values(item.assets).find(
+      (asset) =>
+        asset.type === 'application/geo+json' ||
+        asset.href.endsWith('.geojson')
+    );
+    if (!geoJsonAsset) {return;}
+
+    const geoJsonPath = path.resolve(path.dirname(fullItemPath), geoJsonAsset.href);
+    const fc = await this.loadGeoJson(geoJsonPath);
+    if (!fc) {return;}
+
+    let earliest: string | null = null;
+    let latest: string | null = null;
+
+    for (const feature of fc.features) {
+      const props = feature.properties ?? {};
+      const times = props.times as string[] | undefined;
+      if (times && times.length > 0) {
+        const first = times[0];
+        const last = times[times.length - 1];
+        if (first && (!earliest || first < earliest)) {earliest = first;}
+        if (last && (!latest || last > latest)) {latest = last;}
+      }
+    }
+
+    if (earliest || latest) {
+      item.properties.start_datetime = earliest;
+      item.properties.end_datetime = latest;
+      fs.writeFileSync(fullItemPath, JSON.stringify(item, null, 2));
+      this.itemCache.delete(fullItemPath);
+    }
   }
 
   // ============================================================================

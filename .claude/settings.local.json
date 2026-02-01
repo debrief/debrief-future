@@ -82,7 +82,8 @@
       "Bash(else echo \"NO_WORKTREES_DIR\")",
       "Bash(fi)",
       "Bash(python3:*)",
-      "Bash(python -c:*)"
+      "Bash(python -c:*)",
+      "Bash(npx eslint:*)"
     ]
   }
 }
