@@ -238,23 +238,17 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     }
 
     const state: SessionStoreWithUndo = this._activeSession.getState();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const layers: Array<{ id: string; geometry: unknown; properties: Record<string, unknown> }> = state.layers;
-    const features = layers.map((layer) => ({
-      id: layer.id,
-      type: 'Feature' as const,
-      geometry: layer.geometry,
-      properties: layer.properties,
-    }));
 
-    // Get hidden IDs (for future use)
-    const hiddenIds: string[] = [];
-
-    // Get tool matches
+    // Layers/features come from the STAC catalog, not session state.
+    // The webview receives an empty list here; full layer data will be
+    // pushed once the LayersTreeProvider is wired into this view.
+    const hiddenIds: string[] = state.hiddenFeatureIds ?? [];
     const toolMatches: MatchResult[] = this._toolMatchAdapter.getMatchResults();
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    this._postMessage({ type: 'layers:update', payload: { layers: features, hiddenIds, toolMatches } });
+    this._postMessage({
+      type: 'layers:update',
+      payload: { layers: [] as unknown[], hiddenIds, toolMatches },
+    });
   }
 
   public resolveWebviewView(
@@ -357,7 +351,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
         case 'layer:select':
           if (this._activeSession) {
             const state: SessionStoreWithUndo = this._activeSession.getState();
-            state.setSelection({ featureIds: message.payload.featureIds });
+            state.setSelection(message.payload.featureIds);
           }
           break;
       }
