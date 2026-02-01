@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Button } from 'vscrui';
 import type { AssociatedFilesDropdownProps, AssociatedFile, FileAction } from './types';
 import { DEFAULT_LABELS } from './types';
 import './AssociatedFilesDropdown.css';
@@ -42,7 +43,8 @@ export function AssociatedFilesDropdown({
       ) : (
         files.map((file) => (
           <div key={file.path}>
-            <button
+            <Button
+              appearance="icon"
               className={`debrief-associated-files__file${
                 contextFile?.path === file.path ? ' debrief-associated-files__file--active' : ''
               }`}
@@ -54,7 +56,7 @@ export function AssociatedFilesDropdown({
                 </span>
               )}
               <span className="debrief-associated-files__file-name">{file.name}</span>
-            </button>
+            </Button>
             {contextFile?.path === file.path && (
               <div className="debrief-associated-files__context-menu">
                 {showProvenanceWarning && (
@@ -62,31 +64,35 @@ export function AssociatedFilesDropdown({
                     {labels.provenanceWarning}
                   </div>
                 )}
-                <button
+                <Button
+                  appearance="secondary"
                   className="debrief-associated-files__action"
                   onClick={() => handleAction(file, 'open')}
                 >
                   {labels.open}
-                </button>
-                <button
+                </Button>
+                <Button
+                  appearance="secondary"
                   className="debrief-associated-files__action"
                   onClick={() => handleAction(file, 'openWith')}
                 >
                   {labels.openWith}
-                </button>
-                <button
+                </Button>
+                <Button
+                  appearance="secondary"
                   className="debrief-associated-files__action"
                   onClick={() => handleAction(file, 'reveal')}
                 >
                   {labels.revealInExplorer}
-                </button>
+                </Button>
                 <div className="debrief-associated-files__separator" />
-                <button
+                <Button
+                  appearance="secondary"
                   className="debrief-associated-files__action debrief-associated-files__action--danger"
                   onClick={() => handleAction(file, 'delete')}
                 >
                   {showProvenanceWarning ? `${labels.deleteFile} (confirm)` : labels.deleteFile}
-                </button>
+                </Button>
               </div>
             )}
           </div>

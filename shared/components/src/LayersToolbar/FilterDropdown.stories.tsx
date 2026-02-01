@@ -158,3 +158,59 @@ export const DarkTheme: Story = {
     backgrounds: { default: 'dark' },
   },
 };
+
+// Multi-context: Light, Dark, VS Code side-by-side
+function MultiContextFilter() {
+  const [lightState, setLightState] = useState<FilterState>(DEFAULT_FILTER_STATE);
+  const [darkState, setDarkState] = useState<FilterState>(DEFAULT_FILTER_STATE);
+  const [vscodeState, setVscodeState] = useState<FilterState>(DEFAULT_FILTER_STATE);
+
+  return (
+    <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>Light</div>
+        <ThemeProvider theme={{ variant: 'light' }}>
+          <FilterDropdown
+            featureKinds={SAMPLE_KINDS}
+            filterState={lightState}
+            onFilterChange={setLightState}
+            onApplyToSelection={(action) => console.log('Apply:', action)}
+          />
+        </ThemeProvider>
+      </div>
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>Dark</div>
+        <ThemeProvider theme={{ variant: 'dark' }}>
+          <FilterDropdown
+            featureKinds={SAMPLE_KINDS}
+            filterState={darkState}
+            onFilterChange={setDarkState}
+            onApplyToSelection={(action) => console.log('Apply:', action)}
+          />
+        </ThemeProvider>
+      </div>
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 4 }}>VS Code</div>
+        <ThemeProvider theme={{ variant: 'vscode' }}>
+          <FilterDropdown
+            featureKinds={SAMPLE_KINDS}
+            filterState={vscodeState}
+            onFilterChange={setVscodeState}
+            onApplyToSelection={(action) => console.log('Apply:', action)}
+          />
+        </ThemeProvider>
+      </div>
+    </div>
+  );
+}
+
+export const MultiContext: Story = {
+  render: () => <MultiContextFilter />,
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows FilterDropdown in Light, Dark, and VS Code themes side-by-side for visual comparison.',
+      },
+    },
+  },
+};
