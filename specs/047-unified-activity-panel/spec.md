@@ -71,6 +71,7 @@ A developer building an alternative frontend (e.g., Electron or Jupyter) can imp
 - **FR-006**: An error in one sub-component MUST NOT prevent the other sub-components from rendering and functioning.
 - **FR-007**: The panel MUST preserve each section's collapse/expand state across panel reopenings within the same session.
 - **FR-008**: The unified panel MUST use less vertical space than the equivalent separate panels for the same content.
+- **FR-009**: Each sub-component and the composed panel MUST have Storybook stories that can be verified in all three theme variants (light, dark, VS Code).
 
 ### Key Entities
 
@@ -114,12 +115,14 @@ A developer building an alternative frontend (e.g., Electron or Jupyter) can imp
 - **SC-003**: Each sub-component can be rendered and tested independently outside of the host editor within a standalone test harness.
 - **SC-004**: An error in any one sub-component does not prevent the remaining sub-components from functioning — verified by simulating a failure in each section.
 - **SC-005**: The panel operates fully offline with no network requests required for any core functionality.
+- **SC-006**: Each sub-component and the composed panel render correctly in Storybook across all three theme variants with no visual regressions.
 
 ## Clarifications
 
 ### Session 2026-02-01
 
 - Q: Which theme variants must the panel support? → A: All three (light, dark, VS Code) via the project's `--debrief-*` token system.
+- Q: Must sub-components and the composed panel have Storybook stories? → A: Yes, Storybook stories required for each sub-component and the composed panel.
 
 ## Assumptions
 
