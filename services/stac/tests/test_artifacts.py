@@ -1,6 +1,5 @@
 """Tests for artifact storage."""
 
-
 import pytest
 
 from debrief_stac.artifacts import store_artifact
@@ -23,8 +22,7 @@ class TestStoreArtifact:
         catalog_path, plot_id = catalog_with_plot
         data = b"\x89PNG\r\ntest image data"
         item = store_artifact(
-            str(catalog_path), plot_id, data,
-            "./results/bt_plot.png", "image/png", "BT Plot"
+            str(catalog_path), plot_id, data, "./results/bt_plot.png", "image/png", "BT Plot"
         )
 
         # Check file written
@@ -44,8 +42,7 @@ class TestStoreArtifact:
         catalog_path, plot_id = catalog_with_plot
         data = b'{"report": "summary"}'
         item = store_artifact(
-            str(catalog_path), plot_id, data,
-            "./results/report.json", "application/json", "Report"
+            str(catalog_path), plot_id, data, "./results/report.json", "application/json", "Report"
         )
         assert "result-report" in item["assets"]
 
@@ -53,15 +50,13 @@ class TestStoreArtifact:
         catalog_path, plot_id = catalog_with_plot
         with pytest.raises(ValueError, match="href must start with"):
             store_artifact(
-                str(catalog_path), plot_id, b"data",
-                "./data/file.txt", "text/plain", "Bad path"
+                str(catalog_path), plot_id, b"data", "./data/file.txt", "text/plain", "Bad path"
             )
 
     def test_persisted_to_item_json(self, catalog_with_plot):
         catalog_path, plot_id = catalog_with_plot
         store_artifact(
-            str(catalog_path), plot_id, b"data",
-            "./results/file.txt", "text/plain", "Test"
+            str(catalog_path), plot_id, b"data", "./results/file.txt", "text/plain", "Test"
         )
         item = read_plot(str(catalog_path), plot_id)
         assert "result-file" in item["assets"]

@@ -9,6 +9,7 @@ from enum import Enum
 
 class ResultTopType(str, Enum):
     """Four permitted top-level result types."""
+
     MUTATION = "mutation"
     ADDITION = "addition"
     DELETION = "deletion"
@@ -63,7 +64,7 @@ class ResultTypePath:
         prefix_segments = prefix.split("/")
         if len(prefix_segments) > len(self._segments):
             return False
-        return self._segments[:len(prefix_segments)] == prefix_segments
+        return self._segments[: len(prefix_segments)] == prefix_segments
 
     def __str__(self) -> str:
         return self._path

@@ -96,6 +96,7 @@ class TestCli:
         # Check resource contains valid JSON time-series
         assert item["type"] == "resource"
         import json
+
         series_data = json.loads(item["resource"]["text"])
         assert series_data["type"] == "range-bearing-series"
         assert len(series_data["entries"]) == 2

@@ -36,9 +36,7 @@ def write_provenance(
         "tool": tool,
         "version": version,
         "timestamp": datetime.now(UTC).isoformat(),
-        "sources": [
-            {"id": fid, "kind": "feature"} for fid in source_feature_ids
-        ],
+        "sources": [{"id": fid, "kind": "feature"} for fid in source_feature_ids],
         "parameters": parameters or {},
     }
 

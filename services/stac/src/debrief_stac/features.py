@@ -197,7 +197,8 @@ def delete_features(
     ids_to_remove = set(feature_ids)
     original_count = len(fc["features"])
     fc["features"] = [
-        f for f in fc["features"]
+        f
+        for f in fc["features"]
         if (f.get("id") or f.get("properties", {}).get("id")) not in ids_to_remove
     ]
     removed_count = original_count - len(fc["features"])

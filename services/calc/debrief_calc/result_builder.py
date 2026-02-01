@@ -155,9 +155,7 @@ def build_error(
 ) -> dict:
     """Build MCP error response with Debrief metadata."""
     if category not in VALID_ERROR_CATEGORIES:
-        raise ValueError(
-            f"category must be one of {VALID_ERROR_CATEGORIES}, got: '{category}'"
-        )
+        raise ValueError(f"category must be one of {VALID_ERROR_CATEGORIES}, got: '{category}'")
 
     return {
         "code": code,

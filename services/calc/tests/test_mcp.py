@@ -1,6 +1,5 @@
 """Integration tests for MCP server."""
 
-
 import pytest
 
 # Skip all tests if MCP is not installed

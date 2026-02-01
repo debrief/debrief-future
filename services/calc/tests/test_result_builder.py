@@ -40,7 +40,9 @@ class TestBuildMutation:
     def test_multiple_features(self):
         items = build_mutation(
             [_make_feature("a"), _make_feature("b")],
-            "track/smoothed", ["a", "b"], "Smoothed tracks"
+            "track/smoothed",
+            ["a", "b"],
+            "Smoothed tracks",
         )
         assert len(items) == 2
 
@@ -84,7 +86,9 @@ class TestBuildDeletion:
 class TestBuildArtifact:
     def test_image_artifact(self):
         data = b"\x89PNG\r\n"
-        item = build_artifact(data, "image/png", "image/bt_plot", ["track_a"], "BT Plot", "./results/bt.png")
+        item = build_artifact(
+            data, "image/png", "image/bt_plot", ["track_a"], "BT Plot", "./results/bt.png"
+        )
         assert item["type"] == "image"
         assert item["data"] == base64.b64encode(data).decode("ascii")
         assert item["mimeType"] == "image/png"
@@ -93,7 +97,9 @@ class TestBuildArtifact:
 
     def test_non_image_artifact(self):
         data = b'{"report": true}'
-        item = build_artifact(data, "application/json", "report/summary", ["a"], "Report", "./results/report.json")
+        item = build_artifact(
+            data, "application/json", "report/summary", ["a"], "Report", "./results/report.json"
+        )
         assert item["type"] == "resource"
         assert item["resource"]["mimeType"] == "application/json"
 

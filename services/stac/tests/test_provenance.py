@@ -20,9 +20,11 @@ class TestWriteProvenance:
     def test_provenance_with_parameters(self):
         feature = {"type": "Feature", "geometry": None, "properties": {}}
         result = write_provenance(
-            feature, "cpa-calculator", "2.0.0",
+            feature,
+            "cpa-calculator",
+            "2.0.0",
             ["track_a", "track_b"],
-            parameters={"threshold": 500}
+            parameters={"threshold": 500},
         )
 
         prov = result["properties"]["prov"]

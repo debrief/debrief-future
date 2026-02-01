@@ -151,6 +151,7 @@ def create_server() -> Server:
             if result.success:
                 if tool.output_kind == "range-bearing-series":
                     import json as _json
+
                     series_data = result.features[0] if result.features else {}
                     data_bytes = _json.dumps(series_data, indent=2).encode("utf-8")
                     href = f"range-bearing-{'-'.join(source_ids[:2])}.json"

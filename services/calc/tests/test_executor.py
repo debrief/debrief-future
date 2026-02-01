@@ -37,7 +37,11 @@ def multi_track_context():
     feature1 = {
         "type": "Feature",
         "id": "track-alpha",
-        "properties": {"kind": "track", "name": "Alpha", "times": ["2024-01-15T08:00:00Z", "2024-01-15T09:00:00Z"]},
+        "properties": {
+            "kind": "track",
+            "name": "Alpha",
+            "times": ["2024-01-15T08:00:00Z", "2024-01-15T09:00:00Z"],
+        },
         "geometry": {
             "type": "LineString",
             "coordinates": [[-5.0, 50.0, 0, 1705305600000], [-4.5, 50.2, 0, 1705309200000]],
@@ -46,7 +50,11 @@ def multi_track_context():
     feature2 = {
         "type": "Feature",
         "id": "track-bravo",
-        "properties": {"kind": "track", "name": "Bravo", "times": ["2024-01-15T08:00:00Z", "2024-01-15T09:00:00Z"]},
+        "properties": {
+            "kind": "track",
+            "name": "Bravo",
+            "times": ["2024-01-15T08:00:00Z", "2024-01-15T09:00:00Z"],
+        },
         "geometry": {
             "type": "LineString",
             "coordinates": [[-4.0, 50.5, 0, 1705305600000], [-4.5, 50.3, 0, 1705309200000]],

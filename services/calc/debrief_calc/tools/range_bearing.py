@@ -85,7 +85,9 @@ def _closest_point_on_segment(
     return ax + t * dx, ay + t * dy
 
 
-def _closest_point_on_polygon(lon: float, lat: float, ring_coords: list[list[float]]) -> tuple[float, float]:
+def _closest_point_on_polygon(
+    lon: float, lat: float, ring_coords: list[list[float]]
+) -> tuple[float, float]:
     """Find closest point on polygon exterior ring to (lon, lat)."""
     best_dist = float("inf")
     best_pt = (ring_coords[0][0], ring_coords[0][1])
@@ -148,11 +150,13 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dic
         n = min(len(times1), len(coords1), len(times2), len(coords2))
         for i in range(n):
             c1, c2 = coords1[i], coords2[i]
-            series.append({
-                "time": times1[i],
-                "range_nm": round(_calculate_range(c1[0], c1[1], c2[0], c2[1]), 2),
-                "bearing_deg": round(_calculate_bearing(c1[0], c1[1], c2[0], c2[1]), 1),
-            })
+            series.append(
+                {
+                    "time": times1[i],
+                    "range_nm": round(_calculate_range(c1[0], c1[1], c2[0], c2[1]), 2),
+                    "bearing_deg": round(_calculate_bearing(c1[0], c1[1], c2[0], c2[1]), 1),
+                }
+            )
 
     elif track1 or track2:
         # One track, one fixed feature
@@ -181,19 +185,23 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dic
                 r = _calculate_range(ox, oy, tc[0], tc[1])
                 b = _calculate_bearing(ox, oy, tc[0], tc[1])
 
-            series.append({
-                "time": track_times[i],
-                "range_nm": round(r, 2),
-                "bearing_deg": round(b, 1),
-            })
+            series.append(
+                {
+                    "time": track_times[i],
+                    "range_nm": round(r, 2),
+                    "bearing_deg": round(b, 1),
+                }
+            )
 
     if not series:
         return []
 
     # Return as single wrapper feature containing the series data
-    return [{
-        "type": "range-bearing-series",
-        "from_feature": name1,
-        "to_feature": name2,
-        "entries": series,
-    }]
+    return [
+        {
+            "type": "range-bearing-series",
+            "from_feature": name1,
+            "to_feature": name2,
+            "entries": series,
+        }
+    ]
