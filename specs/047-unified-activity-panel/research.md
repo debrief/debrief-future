@@ -31,19 +31,20 @@
 - Custom collapsible component → rejected because vscrui Pane already exists and is the project standard
 - HTML `<details>/<summary>` → rejected because styling inconsistency with VS Code and no Codicon support
 
-## R3: Tools and Layers Conversion from TreeView to React
+## R3: Tools Conversion from TreeView to React; Layers Composition
 
-**Decision**: Create new React components `ToolsPanel` and `LayersPanel` in `shared/components/` that replicate the functionality of the existing `ToolsTreeProvider` and `LayersTreeProvider`.
+**Decision**: Create a new React component `ToolsPanel` in `shared/components/` that replicates the functionality of the existing `ToolsTreeProvider`. The Layers section composes existing `LayersToolbar` and `FeatureList` components (from #045).
 
 **Rationale**:
 - TreeDataProvider outputs cannot be embedded in a webview — they are VS Code native UI only
 - Existing providers contain the data logic (tool matching, layer filtering) which can be reused via message passing from the extension host
 - The React components consume the same data structures but render with vscrui components
-- `FeatureList` component already exists and can be leveraged for the layers list
+- `LayersToolbar` and `FeatureList` already exist from #045, so Layers needs only composition, not a new component
 
 **Alternatives considered**:
 - Embed TreeViews inside webview via iframe → not supported by VS Code API
 - Keep tools/layers as native TreeViews alongside a webview → defeats the single-panel goal
+- Build new LayersPanel from scratch → rejected since LayersToolbar + FeatureList already provide full functionality
 
 ## R4: State Communication Pattern
 
@@ -70,3 +71,18 @@
 
 **Alternatives considered**:
 - Keep old views and add new one with a setting toggle → adds maintenance burden and violates single-panel goal
+
+## R6: Time Controller Conversion to vscrui Components
+
+**Decision**: Convert Time Controller sub-components from custom HTML elements to vscrui components where equivalents exist. PlaybackControls buttons → vscrui `Button` + `Icon`, SpeedSelector → vscrui `Dropdown`, DisplayModeToggle → vscrui `Button` toggle. TimeScrubber remains custom (no vscrui slider equivalent). TimeDisplay remains as-is (plain text rendering).
+
+**Rationale**:
+- The Time Controller currently uses custom `<button>` elements with inline SVGs, a custom spinbutton, and a custom toggle switch
+- Converting to vscrui ensures visual consistency across all three sub-components in the unified panel
+- vscrui `Dropdown` was previously avoided for SpeedSelector due to z-index issues in the old VS Code panel context; the new webview context resolves this
+- The time scrubber slider has no vscrui equivalent and its custom implementation provides essential fine-grained control
+- Existing ARIA attributes and keyboard support must be preserved through the conversion
+
+**Alternatives considered**:
+- Keep Time Controller as-is → rejected because visual inconsistency between custom buttons and vscrui buttons in adjacent sections
+- Convert everything including the scrubber to a custom vscrui component → rejected as over-engineering; scrubber works well as-is
