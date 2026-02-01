@@ -45,7 +45,7 @@
 - [ ] T001 Create webview message types from contract `shared/components/src/ActivityPanel/types.ts`
 - [ ] T002 [P] Create ActivityPanel directory structure `shared/components/src/ActivityPanel/`
 - [ ] T003 [P] Create ToolsPanel directory structure `shared/components/src/ToolsPanel/`
-- [ ] T004 [P] Create LayersPanel directory structure `shared/components/src/LayersPanel/`
+- [ ] T004 [P] Verify LayersToolbar and FeatureList directories exist (from #045) `shared/components/src/LayersToolbar/`, `shared/components/src/FeatureList/`
 
 ---
 
@@ -53,17 +53,16 @@
 
 **Purpose**: Shared sub-components that all user stories depend on
 
-**⚠️ CRITICAL**: The composed ActivityPanel (US1) and the VS Code integration cannot begin until ToolsPanel and LayersPanel exist as React components.
+**⚠️ CRITICAL**: The composed ActivityPanel (US1) and the VS Code integration cannot begin until ToolsPanel exists and LayersToolbar + FeatureList (from #045) are verified.
 
 - [ ] T005 [P] Create ToolsPanel React component rendering a list of ToolMatch items with Codicon icons and vscrui Button `shared/components/src/ToolsPanel/ToolsPanel.tsx`
 - [ ] T006 [P] Create ToolsPanel styles using --debrief-* tokens `shared/components/src/ToolsPanel/ToolsPanel.css`
 - [ ] T007 [P] Create ToolsPanel Storybook stories with light/dark/VS Code theme variants `shared/components/src/ToolsPanel/ToolsPanel.stories.tsx`
-- [ ] T008 [P] Create LayersPanel React component rendering a tree of LayerItem with visibility toggles using vscrui Checkbox and Codicon icons `shared/components/src/LayersPanel/LayersPanel.tsx`
-- [ ] T009 [P] Create LayersPanel styles using --debrief-* tokens `shared/components/src/LayersPanel/LayersPanel.css`
-- [ ] T010 [P] Create LayersPanel Storybook stories with light/dark/VS Code theme variants `shared/components/src/LayersPanel/LayersPanel.stories.tsx`
-- [ ] T011 Export ToolsPanel and LayersPanel from package barrel `shared/components/src/index.ts`
+- [ ] T008 [P] Verify LayersToolbar component exists and renders correctly (from #045) `shared/components/src/LayersToolbar/LayersToolbar.tsx`
+- [ ] T009 [P] Verify FeatureList component exists and renders correctly (from #045) `shared/components/src/FeatureList/FeatureList.tsx`
+- [ ] T010 Export ToolsPanel from package barrel (LayersToolbar and FeatureList already exported from #045) `shared/components/src/index.ts`
 
-**Checkpoint**: ToolsPanel and LayersPanel render in Storybook across all three theme variants
+**Checkpoint**: ToolsPanel renders in Storybook across all three theme variants; LayersToolbar and FeatureList verified from #045
 
 ---
 
@@ -75,7 +74,7 @@
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Create ActivityPanel component composing TimeController, ToolsPanel, and LayersPanel inside three vscrui Pane sections with Codicon identity icons `shared/components/src/ActivityPanel/ActivityPanel.tsx`
+- [ ] T012 [US1] Create ActivityPanel component composing TimeController, ToolsPanel, and LayersToolbar + FeatureList inside three vscrui Pane sections with Codicon identity icons `shared/components/src/ActivityPanel/ActivityPanel.tsx`
 - [ ] T013 [US1] Create ActivityPanel styles (vertical stack layout, spacing) using --debrief-* tokens `shared/components/src/ActivityPanel/ActivityPanel.css`
 - [ ] T014 [US1] Create ActivityPanel Storybook stories with mock data for all three sections, in light/dark/VS Code themes `shared/components/src/ActivityPanel/ActivityPanel.stories.tsx`
 - [ ] T015 [US1] Create webview entry point bootstrapping ActivityPanel with React createRoot and ThemeProvider `apps/vscode/src/webview/web/activityPanel.tsx`
@@ -106,14 +105,14 @@
 
 ## Phase 5: User Story 3 — Use Each Sub-Component Independently (Priority: P3)
 
-**Goal**: Developer can import any sub-component (TimeController, ToolsPanel, LayersPanel) into a standalone test harness without VS Code dependencies.
+**Goal**: Developer can import any sub-component (TimeController, ToolsPanel, LayersToolbar + FeatureList) into a standalone test harness without VS Code dependencies.
 
 **Independent Test**: Import a single sub-component into a standalone Vitest + React Testing Library test and verify it renders and responds to interactions without VS Code APIs.
 
 ### Implementation for User Story 3
 
 - [ ] T023 [US3] Verify ToolsPanel has no VS Code API imports and accepts data via props only `shared/components/src/ToolsPanel/ToolsPanel.tsx`
-- [ ] T024 [P] [US3] Verify LayersPanel has no VS Code API imports and accepts data via props only `shared/components/src/LayersPanel/LayersPanel.tsx`
+- [ ] T024 [P] [US3] Verify LayersToolbar and FeatureList have no VS Code API imports and accept data via props only `shared/components/src/LayersToolbar/`, `shared/components/src/FeatureList/`
 - [ ] T025 [P] [US3] Verify ActivityPanel accepts sub-component data via props with optional onMessage callback for host communication `shared/components/src/ActivityPanel/ActivityPanel.tsx`
 - [ ] T026 [US3] Add error boundary wrapping each Pane section so a failing sub-component shows inline error without affecting siblings `shared/components/src/ActivityPanel/ActivityPanel.tsx`
 - [ ] T027 [US3] Add Storybook story demonstrating error boundary (one section throwing, others functional) `shared/components/src/ActivityPanel/ActivityPanel.stories.tsx`
@@ -152,21 +151,21 @@
 
 - **Setup (Phase 1)**: No dependencies — can start immediately
 - **Foundational (Phase 2)**: Depends on T001 (types) — BLOCKS all user stories
-- **User Story 1 (Phase 3)**: Depends on Phase 2 completion (ToolsPanel + LayersPanel exist)
+- **User Story 1 (Phase 3)**: Depends on Phase 2 completion (ToolsPanel created + LayersToolbar/FeatureList verified)
 - **User Story 2 (Phase 4)**: Depends on Phase 3 (ActivityPanel exists to add collapse state)
 - **User Story 3 (Phase 5)**: Depends on Phase 3 (components exist to verify independence)
 - **Polish (Phase 6)**: Depends on all user stories complete
 
 ### User Story Dependencies
 
-- **US1 (P1)**: Requires ToolsPanel + LayersPanel from Phase 2. Can start as soon as Phase 2 complete.
+- **US1 (P1)**: Requires ToolsPanel + LayersToolbar/FeatureList from Phase 2. Can start as soon as Phase 2 complete.
 - **US2 (P2)**: Requires ActivityPanel from US1. Sequential after US1.
 - **US3 (P3)**: Requires all components from US1. Can run in parallel with US2 (T023-T025 don't conflict with T020-T022).
 
 ### Parallel Opportunities
 
-- **Phase 1**: T002, T003, T004 can run in parallel (directory creation)
-- **Phase 2**: T005-T010 can all run in parallel (ToolsPanel and LayersPanel are independent)
+- **Phase 1**: T002, T003, T004 can run in parallel (directory creation/verification)
+- **Phase 2**: T005-T009 can all run in parallel (ToolsPanel creation and LayersToolbar/FeatureList verification are independent)
 - **Phase 4 + Phase 5**: US2 (collapse state) and US3 (independence verification) can run in parallel after US1
 - **Phase 6**: T031, T033 can run in parallel with other evidence tasks
 
@@ -177,7 +176,7 @@
 ### MVP First (User Story 1 Only)
 
 1. Complete Phase 1: Setup (types + directories)
-2. Complete Phase 2: Foundational (ToolsPanel + LayersPanel React components)
+2. Complete Phase 2: Foundational (ToolsPanel + verify LayersToolbar/FeatureList)
 3. Complete Phase 3: User Story 1 (ActivityPanel + VS Code integration)
 4. **STOP and VALIDATE**: Open sidebar, verify unified panel with all three sections
 5. Deploy/demo if ready
@@ -197,7 +196,8 @@
 - [P] tasks = different files, no dependencies
 - [US#] label maps task to specific user story
 - Existing TimeController component is reused as-is (already a shared React component)
-- ToolsPanel and LayersPanel are new React components replacing native VS Code TreeViews
+- ToolsPanel is a new React component replacing the native VS Code ToolsTreeView
+- Layers section composes existing LayersToolbar + FeatureList components (from #045)
 - All styles must use `--debrief-*` CSS tokens exclusively — no hardcoded colors
 - All Storybook stories must include light, dark, and VS Code theme variants
 - Section headers use Codicon icons for identity and collapse/expand chevrons
