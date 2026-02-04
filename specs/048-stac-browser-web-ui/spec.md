@@ -10,56 +10,52 @@ Reviewing cross-cutting integration between UI components (STAC browser, map pan
 
 1. Review component integration in a browser
 2. Run Playwright tests against the integrated UI
-3. Verify the message protocol and state synchronization work correctly
+3. Verify state synchronization between components works correctly
 
 ## Goal
 
-Create a standalone web application that hosts the same UI components used in VS Code, backed by mock services. This provides:
+Create a standalone web application that composes existing `@debrief/components` (MapView, ActivityPanel, CatalogOverview, etc.) backed by mock services. This provides:
 
 1. **Browser-based review** — load STAC catalog, select plot, see it in map, interact with activity panel
 2. **Playwright testability** — full E2E tests against integrated components
-3. **Architecture validation** — mock services implement the same APIs, validating contracts
+3. **Architecture validation** — proves components work together outside VS Code
 
 The web shell is **not** a production alternative to VS Code — it's a development/testing tool.
 
 ## Design Principles
 
-1. **Same components** — reuse actual webview code, not reimplementations
-2. **Valid APIs** — mocks implement real service interfaces, just with static/in-memory data
-3. **No IO service** — skip REP import; load GeoJSON directly from mock STAC
-4. **Mock tools** — 2-3 simple JS tools demonstrating the tool execution flow
-5. **Message bridge abstraction** — decouple from `acquireVsCodeApi()` so same code works in both environments
+1. **Compose existing components** — use `@debrief/components` (MapView, ActivityPanel, TimeController, etc.)
+2. **Reuse session-state** — same Zustand store as VS Code
+3. **Valid APIs** — mocks implement real service interfaces, just with static/in-memory data
+4. **No IO service** — skip REP import; load GeoJSON directly from mock STAC
+5. **Mock tools** — 2-3 simple JS tools demonstrating the tool execution flow
 
 ## Architecture
 
-### Message Bridge Abstraction
+### Key Insight: Components Already Exist
 
-Create an interface that abstracts VS Code's webview API:
+`@debrief/components` exports everything needed:
 
-```typescript
-// shared/components/src/MessageBridge/types.ts
-interface MessageBridge {
-  postMessage(msg: WebviewToHostMessage): void;
-  onMessage(handler: (msg: HostToWebviewMessage) => void): () => void;
-  getState<T>(): T | undefined;
-  setState<T>(state: T): void;
-}
+| Component | Purpose | VS Code Status |
+|-----------|---------|----------------|
+| `MapView` | Leaflet map with selection, temporal rendering | **Not used** (has custom `web/map.ts`) |
+| `TimeController` | Time scrubber, playback controls | Used in activity panel webview |
+| `FeatureList` | Layers panel | Used in activity panel webview |
+| `ActivityPanel` | Unified sidebar | Used in activity panel webview |
+| `ToolsPanel` | Tool list with active state | Used in activity panel webview |
+| `CatalogOverview` | STAC catalog browser | **Not used** (has custom TreeDataProvider) |
+| `useSelection` | Selection state hook | Available |
+| `ThemeProvider` | VS Code theme integration | Used |
 
-// VS Code implementation
-class VsCodeMessageBridge implements MessageBridge {
-  private vscode = acquireVsCodeApi();
-  // ... delegates to vscode API
-}
+The web shell simply **composes these components** with mock data. No MessageBridge abstraction needed — the components are already framework-agnostic React.
 
-// Web implementation
-class WebMessageBridge implements MessageBridge {
-  private state: unknown;
-  private handlers: Set<(msg: HostToWebviewMessage) => void>;
-  // ... uses in-memory state, direct function calls
-}
-```
+### VS Code Migration Path
 
-The existing webview code (`map.ts`, activity panel) gets refactored to accept a `MessageBridge` instead of calling `acquireVsCodeApi()` directly.
+This spec also establishes the path for VS Code to adopt `@debrief/components/MapView`:
+
+1. **Current**: VS Code uses vanilla JS `webview/web/map.ts` (744 lines)
+2. **Target**: VS Code webview uses `<MapView />` from `@debrief/components` (291 lines)
+3. **Benefit**: Single map implementation, tested in Storybook, works in web shell and VS Code
 
 ### Web Shell Structure
 
@@ -68,10 +64,7 @@ apps/web-shell/
 ├── index.html              # Entry point
 ├── src/
 │   ├── main.tsx            # React app entry
-│   ├── App.tsx             # Shell layout (sidebar + main area)
-│   ├── components/
-│   │   ├── StacBrowser.tsx # Tree view of mock catalog
-│   │   └── Shell.tsx       # Orchestrates panels
+│   ├── App.tsx             # Shell layout composing @debrief/components
 │   ├── mocks/
 │   │   ├── stacService.ts  # Mock StacService with static data
 │   │   ├── calcService.ts  # Mock CalcService with JS tools
@@ -83,10 +76,8 @@ apps/web-shell/
 │   │       └── another-plot/
 │   │           ├── item.json
 │   │           └── data.geojson
-│   ├── services/
-│   │   ├── webHost.ts      # "Extension host" equivalent for web
-│   │   └── messageBridge.ts
-│   └── store/              # Reuses @debrief/session-state
+│   └── hooks/
+│       └── useSessionStore.ts  # Zustand store integration
 ├── playwright/
 │   ├── playwright.config.ts
 │   └── tests/
@@ -99,6 +90,105 @@ apps/web-shell/
 └── tsconfig.json
 ```
 
+### App.tsx — Composing Existing Components
+
+The web shell is primarily just component composition:
+
+```tsx
+// apps/web-shell/src/App.tsx
+import {
+  MapView,
+  ActivityPanel,
+  CatalogOverview,
+  TimeController,
+  FeatureList,
+  ToolsPanel,
+  ThemeProvider,
+  useSelection,
+} from '@debrief/components';
+import { createSessionStore, subscribeToTemporal } from '@debrief/session-state';
+import { MockStacService } from './mocks/stacService';
+import { MockCalcService, mockTools } from './mocks/calcService';
+
+function App() {
+  // Session state (same store as VS Code uses)
+  const [store] = useState(() => createSessionStore());
+  const [temporal, setTemporal] = useState(store.getState());
+
+  // Selection (using existing hook)
+  const selection = useSelection();
+
+  // Plot data
+  const [features, setFeatures] = useState<DebriefFeature[]>([]);
+  const [catalogItems, setCatalogItems] = useState<CatalogOverviewItem[]>([]);
+
+  // Mock services
+  const stacService = useMemo(() => new MockStacService(), []);
+  const calcService = useMemo(() => new MockCalcService(), []);
+
+  // Subscribe to temporal changes
+  useEffect(() => {
+    return subscribeToTemporal(store, setTemporal);
+  }, [store]);
+
+  // Load catalog on mount
+  useEffect(() => {
+    stacService.listItems().then(setCatalogItems);
+  }, [stacService]);
+
+  const handleSelectPlot = async (itemId: string) => {
+    const data = await stacService.loadPlotData(itemId);
+    setFeatures(data.features);
+    store.getState().setTimeRange(data.timeExtent);
+  };
+
+  return (
+    <ThemeProvider>
+      <div className="web-shell">
+        <aside className="sidebar">
+          <CatalogOverview
+            items={catalogItems}
+            onSelectItem={handleSelectPlot}
+          />
+          <ActivityPanel
+            timeController={
+              <TimeController
+                store={store}
+                timeRange={temporal.timeRange}
+              />
+            }
+            featureList={
+              <FeatureList
+                features={features}
+                selectedIds={selection.selectedIds}
+                onSelect={selection.toggle}
+              />
+            }
+            toolsPanel={
+              <ToolsPanel
+                tools={mockTools}
+                selection={selection}
+                onExecute={(toolId) => calcService.execute(toolId, selection)}
+              />
+            }
+          />
+        </aside>
+        <main className="map-area">
+          <MapView
+            features={features}
+            selectedIds={selection.selectedIds}
+            onSelect={selection.toggle}
+            onBackgroundClick={selection.clear}
+            currentTime={temporal.currentTime?.epoch}
+            displayMode={temporal.displayMode}
+          />
+        </main>
+      </div>
+    </ThemeProvider>
+  );
+}
+```
+
 ### Mock Services
 
 #### Mock StacService
@@ -108,20 +198,33 @@ Implements the same interface as the real `StacService` but reads from bundled f
 ```typescript
 // apps/web-shell/src/mocks/stacService.ts
 import catalogData from './fixtures/catalog.json';
-import samplePlotItem from './fixtures/sample-plot/item.json';
 import samplePlotData from './fixtures/sample-plot/data.geojson';
+import anotherPlotData from './fixtures/another-plot/data.geojson';
 
-class MockStacService {
-  async listCatalogs(store: StacStore): Promise<Catalog[]> {
-    // Return static catalog list
+const plotDataMap: Record<string, DebriefFeatureCollection> = {
+  'sample-plot': samplePlotData,
+  'another-plot': anotherPlotData,
+};
+
+export class MockStacService {
+  async listItems(): Promise<CatalogOverviewItem[]> {
+    return catalogData.links
+      .filter(link => link.rel === 'item')
+      .map(link => ({
+        id: link.href.split('/')[0],
+        title: link.title,
+        bbox: [-5, 50, 2, 55],  // From fixture
+        timeRange: ['2024-01-15T08:00:00Z', '2024-01-15T12:00:00Z'],
+      }));
   }
 
-  async listItems(store: StacStore, catalog: Catalog): Promise<StacItemSummary[]> {
-    // Return items from fixtures
-  }
+  async loadPlotData(itemId: string): Promise<{ features: DebriefFeature[], timeExtent: [string, string] }> {
+    const data = plotDataMap[itemId];
+    if (!data) throw new Error(`Unknown plot: ${itemId}`);
 
-  async loadPlotData(store: StacStore, itemPath: string): Promise<PlotData | null> {
-    // Return GeoJSON from fixtures
+    const features = data.features as DebriefFeature[];
+    const timeExtent = calculateTimeExtent(features);
+    return { features, timeExtent };
   }
 }
 ```
@@ -132,7 +235,10 @@ Provides 2-3 simple tools implemented in JavaScript:
 
 ```typescript
 // apps/web-shell/src/mocks/calcService.ts
-const mockTools: Tool[] = [
+import { Tool, ToolExecutionResult } from '@debrief/components';
+import * as turf from '@turf/turf';
+
+export const mockTools: Tool[] = [
   {
     id: 'track-length',
     name: 'Track Length',
@@ -145,73 +251,37 @@ const mockTools: Tool[] = [
     description: 'Compute bounding box of selection',
     requirements: [{ kind: 'TRACK', min: 1 }],
   },
-  {
-    id: 'midpoint',
-    name: 'Midpoint',
-    description: 'Find midpoint between two locations',
-    requirements: [{ kind: 'POINT', min: 2, max: 2 }],
-  },
 ];
 
-class MockCalcService {
-  async listTools(): Promise<Tool[]> {
-    return mockTools;
-  }
+export class MockCalcService {
+  constructor(private getFeatures: () => DebriefFeature[]) {}
 
-  async executeTool(request: ToolExecutionRequest): Promise<ToolExecutionResult> {
-    // Simple JS implementations
-    switch (request.toolId) {
+  async execute(toolId: string, selectedIds: Set<string>): Promise<ToolExecutionResult> {
+    const features = this.getFeatures().filter(f => selectedIds.has(f.id));
+
+    switch (toolId) {
       case 'track-length':
-        return this.calculateTrackLength(request.featureIds);
+        const totalLength = features.reduce((sum, f) =>
+          sum + turf.length(f, { units: 'kilometers' }), 0);
+        return {
+          success: true,
+          features: { type: 'FeatureCollection', features: [] },
+          message: `Total length: ${totalLength.toFixed(2)} km`,
+          durationMs: 5,
+        };
+
       case 'bounding-box':
-        return this.calculateBoundingBox(request.featureIds);
-      case 'midpoint':
-        return this.calculateMidpoint(request.featureIds);
+        const bbox = turf.bbox(turf.featureCollection(features));
+        const bboxPolygon = turf.bboxPolygon(bbox);
+        return {
+          success: true,
+          features: { type: 'FeatureCollection', features: [bboxPolygon] },
+          durationMs: 3,
+        };
+
       default:
         return { success: false, error: 'Unknown tool', durationMs: 0 };
     }
-  }
-}
-```
-
-### Web Host
-
-The "extension host" equivalent that orchestrates services and message passing:
-
-```typescript
-// apps/web-shell/src/services/webHost.ts
-class WebHost {
-  private stacService = new MockStacService();
-  private calcService = new MockCalcService();
-  private sessionStore: ReturnType<typeof createSessionStore> | null = null;
-  private messageBridge: WebMessageBridge;
-
-  constructor() {
-    this.messageBridge = new WebMessageBridge();
-    this.setupMessageHandlers();
-  }
-
-  private setupMessageHandlers() {
-    this.messageBridge.onHostMessage((msg) => {
-      switch (msg.type) {
-        case 'webviewReady':
-          // Send initial data
-          break;
-        case 'selectionChanged':
-          this.handleSelectionChanged(msg);
-          break;
-        // ... other message types
-      }
-    });
-  }
-
-  async openPlot(itemPath: string) {
-    const data = await this.stacService.loadPlotData(mockStore, itemPath);
-    this.sessionStore = createSessionStore();
-    this.messageBridge.postToWebview({
-      type: 'loadPlot',
-      plot: data,
-    });
   }
 }
 ```
@@ -352,16 +422,18 @@ Add `data-testid` attributes to components for reliable Playwright selectors:
 |------|---------|
 | `apps/web-shell/index.html` | HTML entry point |
 | `apps/web-shell/src/main.tsx` | React app bootstrap |
-| `apps/web-shell/src/App.tsx` | Shell layout |
-| `apps/web-shell/src/components/StacBrowser.tsx` | Catalog tree view |
-| `apps/web-shell/src/components/Shell.tsx` | Panel orchestration |
+| `apps/web-shell/src/App.tsx` | Shell layout composing `@debrief/components` |
+| `apps/web-shell/src/App.css` | Shell layout styles |
 | `apps/web-shell/src/mocks/stacService.ts` | Mock STAC service |
 | `apps/web-shell/src/mocks/calcService.ts` | Mock calc service with JS tools |
-| `apps/web-shell/src/mocks/fixtures/*.json` | Static STAC data |
-| `apps/web-shell/src/services/webHost.ts` | Web "extension host" |
-| `apps/web-shell/src/services/messageBridge.ts` | Message abstraction |
+| `apps/web-shell/src/mocks/fixtures/catalog.json` | Static STAC catalog |
+| `apps/web-shell/src/mocks/fixtures/sample-plot/item.json` | Sample plot metadata |
+| `apps/web-shell/src/mocks/fixtures/sample-plot/data.geojson` | Sample plot tracks |
+| `apps/web-shell/src/mocks/fixtures/another-plot/item.json` | Second plot metadata |
+| `apps/web-shell/src/mocks/fixtures/another-plot/data.geojson` | Second plot tracks |
 | `apps/web-shell/vite.config.ts` | Vite build config |
 | `apps/web-shell/package.json` | Dependencies |
+| `apps/web-shell/tsconfig.json` | TypeScript config |
 | `apps/web-shell/playwright/playwright.config.ts` | Playwright config |
 | `apps/web-shell/playwright/tests/*.spec.ts` | E2E tests |
 
@@ -369,28 +441,50 @@ Add `data-testid` attributes to components for reliable Playwright selectors:
 
 | File | Change |
 |------|--------|
-| `apps/vscode/src/webview/map.ts` | Accept MessageBridge instead of direct vscode API |
-| `shared/components/src/index.ts` | Export MessageBridge types |
 | `pnpm-workspace.yaml` | Add `apps/web-shell` |
+
+## Future: VS Code MapView Migration
+
+After the web shell is working, VS Code should migrate from `webview/web/map.ts` (744 lines of vanilla JS) to `@debrief/components/MapView` (291 lines of React):
+
+| File | Change |
+|------|--------|
+| `apps/vscode/src/webview/web/map.ts` | Replace with React wrapper that renders `<MapView />` |
+| `apps/vscode/src/webview/mapPanel.ts` | Simplify to just pass props, remove manual renderers |
+
+This is out of scope for this spec but establishes the direction.
 
 ## Acceptance Criteria
 
 1. Web shell loads in browser without errors
-2. STAC browser displays mock catalog with items
-3. Clicking an item loads plot data into map
-4. Map renders tracks from GeoJSON
-5. Selecting tracks updates activity panel selection display
-6. Time slider filters track rendering
-7. Mock tools appear in tools list based on selection
-8. Executing a mock tool adds result layer to map
+2. `CatalogOverview` displays mock catalog items with bbox and time range
+3. Clicking an item loads plot features into `MapView`
+4. `MapView` renders tracks from GeoJSON
+5. Selecting tracks in `MapView` updates `FeatureList` selection via shared `useSelection`
+6. `TimeController` scrubbing updates `MapView` temporal rendering
+7. `ToolsPanel` shows tools with correct active/inactive state based on selection
+8. Executing a mock tool shows result (message or result layer)
 9. All Playwright tests pass
-10. Mock services implement same interfaces as real services
+10. `@debrief/session-state` store is used for temporal state
 
 ## Testing Strategy
 
 1. **Playwright E2E tests** — primary test mechanism, covers all acceptance criteria
-2. **Storybook stories** — for individual components (existing)
-3. **Unit tests** — for mock service logic (track length calculation, etc.)
+2. **Storybook stories** — individual components already have stories
+3. **Vitest unit tests** — for mock service logic (track length calculation, etc.)
+
+## Component Reuse Verification
+
+This spec validates that `@debrief/components` work correctly when composed:
+
+| Integration | What's Tested |
+|-------------|---------------|
+| `MapView` ↔ `useSelection` | Selection state flows to map highlight |
+| `MapView` ↔ `session-state` | Temporal position updates track rendering |
+| `FeatureList` ↔ `useSelection` | List selection syncs with map |
+| `TimeController` ↔ `session-state` | Scrubber updates store, store updates map |
+| `ToolsPanel` ↔ `useSelection` | Tool active state reflects selection |
+| `CatalogOverview` ↔ data loading | Item click loads features |
 
 ## Out of Scope
 
