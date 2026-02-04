@@ -1,9 +1,32 @@
 import type { StorybookConfig } from '@storybook/react-vite';
+import type { Plugin } from 'vite';
+import path from 'path';
+import fs from 'fs';
+
+/**
+ * Vite plugin to handle .geojson files as JSON.
+ */
+function geojsonPlugin(): Plugin {
+  return {
+    name: 'vite-plugin-geojson',
+    transform(_code, id) {
+      if (id.endsWith('.geojson')) {
+        const json = fs.readFileSync(id, 'utf-8');
+        return {
+          code: `export default ${json}`,
+          map: null,
+        };
+      }
+    },
+  };
+}
 
 const config: StorybookConfig = {
   stories: [
     '../src/**/*.mdx',
     '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    // Include web-shell app stories for integrated demos
+    '../../../apps/web-shell/src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
   ],
   addons: [
     '@storybook/addon-links',
@@ -20,13 +43,16 @@ const config: StorybookConfig = {
   },
   staticDirs: ['../public'],
   viteFinal: async (config) => {
-    // Add Leaflet CSS
-    return {
-      ...config,
-      css: {
-        ...config.css,
-      },
+    // Add geojson plugin
+    config.plugins = config.plugins || [];
+    config.plugins.push(geojsonPlugin());
+    // Add alias for web-shell test data
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@test-data': path.resolve(__dirname, '../../../apps/vscode/test-data'),
     };
+    return config;
   },
 };
 
