@@ -66,16 +66,8 @@ apps/web-shell/
 │   ├── main.tsx            # React app entry
 │   ├── App.tsx             # Shell layout composing @debrief/components
 │   ├── mocks/
-│   │   ├── stacService.ts  # Mock StacService with static data
-│   │   ├── calcService.ts  # Mock CalcService with JS tools
-│   │   └── fixtures/       # Static STAC catalog + GeoJSON
-│   │       ├── catalog.json
-│   │       ├── sample-plot/
-│   │       │   ├── item.json
-│   │       │   └── data.geojson
-│   │       └── another-plot/
-│   │           ├── item.json
-│   │           └── data.geojson
+│   │   ├── stacService.ts  # Mock StacService (imports from @test-data)
+│   │   └── calcService.ts  # Mock CalcService with JS tools
 │   └── hooks/
 │       └── useSessionStore.ts  # Zustand store integration
 ├── playwright/
@@ -86,8 +78,18 @@ apps/web-shell/
 │       ├── selection-sync.spec.ts
 │       └── tool-execution.spec.ts
 ├── package.json
-├── vite.config.ts
-└── tsconfig.json
+├── vite.config.ts          # Includes @test-data path alias
+└── tsconfig.json           # Includes @test-data path mapping
+
+# Fixture data reused from existing test store:
+apps/vscode/test-data/local-store/
+├── catalog.json
+├── exercise-alpha/
+│   ├── item.json
+│   └── exercise-alpha.geojson
+└── training-run-1/
+    ├── item.json
+    └── training-run-1.geojson
 ```
 
 ### App.tsx — Composing Existing Components
@@ -193,17 +195,18 @@ function App() {
 
 #### Mock StacService
 
-Implements the same interface as the real `StacService` but reads from bundled fixtures:
+Implements the same interface as the real `StacService` but imports from shared test data via path alias:
 
 ```typescript
 // apps/web-shell/src/mocks/stacService.ts
-import catalogData from './fixtures/catalog.json';
-import samplePlotData from './fixtures/sample-plot/data.geojson';
-import anotherPlotData from './fixtures/another-plot/data.geojson';
+// Path alias configured in vite.config.ts: @test-data → apps/vscode/test-data
+import catalogData from '@test-data/local-store/catalog.json';
+import exerciseAlphaData from '@test-data/local-store/exercise-alpha/exercise-alpha.geojson';
+import trainingRun1Data from '@test-data/local-store/training-run-1/training-run-1.geojson';
 
 const plotDataMap: Record<string, DebriefFeatureCollection> = {
-  'sample-plot': samplePlotData,
-  'another-plot': anotherPlotData,
+  'exercise-alpha': exerciseAlphaData,
+  'training-run-1': trainingRun1Data,
 };
 
 export class MockStacService {
@@ -211,9 +214,9 @@ export class MockStacService {
     return catalogData.links
       .filter(link => link.rel === 'item')
       .map(link => ({
-        id: link.href.split('/')[0],
+        id: link.href.split('/')[1].replace('/item.json', ''),
         title: link.title,
-        bbox: [-5, 50, 2, 55],  // From fixture
+        bbox: [-5, 50, 2, 55],  // Could parse from item.json
         timeRange: ['2024-01-15T08:00:00Z', '2024-01-15T12:00:00Z'],
       }));
   }
@@ -294,9 +297,9 @@ The shell layout mirrors VS Code's panel arrangement:
 ┌─────────────────────────────────────────────────────────┐
 │  STAC Browser (sidebar)  │  Map Panel (main area)       │
 │  ─────────────────────   │                              │
-│  📁 Mock Store           │     [Leaflet Map]            │
-│    📄 Sample Plot        │                              │
-│    📄 Another Plot       │                              │
+│  📁 Test Maritime Data   │     [Leaflet Map]            │
+│    📄 Exercise Alpha     │                              │
+│    📄 Training Run 1     │                              │
 │                          │                              │
 ├──────────────────────────┼──────────────────────────────┤
 │  Activity Panel          │                              │
@@ -309,48 +312,14 @@ The shell layout mirrors VS Code's panel arrangement:
 
 ### Fixture Data
 
-Create minimal but realistic STAC fixtures:
+Reuse existing test data from `apps/vscode/test-data/local-store/` (single source of truth):
 
-**catalog.json**:
-```json
-{
-  "type": "Catalog",
-  "id": "mock-store",
-  "stac_version": "1.0.0",
-  "description": "Mock STAC store for integration testing",
-  "links": [
-    { "rel": "self", "href": "./catalog.json" },
-    { "rel": "item", "href": "./sample-plot/item.json" },
-    { "rel": "item", "href": "./another-plot/item.json" }
-  ]
-}
-```
+| Plot | Path | Description |
+|------|------|-------------|
+| Exercise Alpha | `exercise-alpha/` | Multi-track maritime exercise |
+| Training Run 1 | `training-run-1/` | Single vessel training scenario |
 
-**sample-plot/item.json**:
-```json
-{
-  "type": "Feature",
-  "stac_version": "1.0.0",
-  "id": "sample-plot",
-  "geometry": null,
-  "bbox": [-5.0, 50.0, 2.0, 55.0],
-  "properties": {
-    "title": "Sample Exercise",
-    "datetime": null,
-    "start_datetime": "2024-01-15T08:00:00Z",
-    "end_datetime": "2024-01-15T12:00:00Z"
-  },
-  "assets": {
-    "data": {
-      "href": "./data.geojson",
-      "type": "application/geo+json"
-    }
-  },
-  "links": []
-}
-```
-
-**sample-plot/data.geojson**: Contains 2-3 tracks with times array, matching the format `stacService.loadPlotData()` expects.
+The existing catalog and GeoJSON files already match the format expected by `stacService.loadPlotData()`. No new fixtures needed.
 
 ## Message Protocol Compliance
 
@@ -385,7 +354,7 @@ test('selecting track on map updates activity panel', async ({ page }) => {
   await page.goto('/');
 
   // Open a plot
-  await page.click('[data-testid="stac-item-sample-plot"]');
+  await page.click('[data-testid="stac-item-exercise-alpha"]');
 
   // Wait for map to render
   await page.waitForSelector('[data-testid="map-track"]');
@@ -424,18 +393,15 @@ Add `data-testid` attributes to components for reliable Playwright selectors:
 | `apps/web-shell/src/main.tsx` | React app bootstrap |
 | `apps/web-shell/src/App.tsx` | Shell layout composing `@debrief/components` |
 | `apps/web-shell/src/App.css` | Shell layout styles |
-| `apps/web-shell/src/mocks/stacService.ts` | Mock STAC service |
+| `apps/web-shell/src/mocks/stacService.ts` | Mock STAC service (imports via `@test-data` alias) |
 | `apps/web-shell/src/mocks/calcService.ts` | Mock calc service with JS tools |
-| `apps/web-shell/src/mocks/fixtures/catalog.json` | Static STAC catalog |
-| `apps/web-shell/src/mocks/fixtures/sample-plot/item.json` | Sample plot metadata |
-| `apps/web-shell/src/mocks/fixtures/sample-plot/data.geojson` | Sample plot tracks |
-| `apps/web-shell/src/mocks/fixtures/another-plot/item.json` | Second plot metadata |
-| `apps/web-shell/src/mocks/fixtures/another-plot/data.geojson` | Second plot tracks |
-| `apps/web-shell/vite.config.ts` | Vite build config |
+| `apps/web-shell/vite.config.ts` | Vite config with `@test-data` path alias |
 | `apps/web-shell/package.json` | Dependencies |
-| `apps/web-shell/tsconfig.json` | TypeScript config |
+| `apps/web-shell/tsconfig.json` | TypeScript config with `@test-data` path mapping |
 | `apps/web-shell/playwright/playwright.config.ts` | Playwright config |
 | `apps/web-shell/playwright/tests/*.spec.ts` | E2E tests |
+
+No fixture files needed — reuses `apps/vscode/test-data/local-store/`.
 
 ## Files to Modify
 
@@ -494,6 +460,12 @@ This spec validates that `@debrief/components` work correctly when composed:
 - Production deployment
 - Authentication or multi-user
 - Persistence across sessions
+
+## Clarifications
+
+### Session 2026-02-04
+
+- Q: How should web-shell access the existing test fixtures? → A: Import directly via path alias `@test-data/local-store` (shared, single source of truth)
 
 ## Future Considerations
 
