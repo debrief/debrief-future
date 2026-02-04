@@ -188,6 +188,46 @@ importers:
         specifier: ^1.0.0
         version: 1.6.1(@types/node@20.19.30)(jsdom@27.4.0)
 
+  apps/web-shell:
+    dependencies:
+      '@debrief/components':
+        specifier: workspace:*
+        version: link:../../shared/components
+      leaflet:
+        specifier: ^1.9.4
+        version: 1.9.4
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@playwright/test':
+        specifier: ^1.40.0
+        version: 1.57.0
+      '@types/geojson':
+        specifier: ^7946.0.0
+        version: 7946.0.16
+      '@types/leaflet':
+        specifier: ^1.9.0
+        version: 1.9.21
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.27
+      '@types/react-dom':
+        specifier: ^18.2.0
+        version: 18.3.7(@types/react@18.3.27)
+      '@vitejs/plugin-react':
+        specifier: ^4.2.0
+        version: 4.7.0(vite@5.4.21(@types/node@20.19.30))
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+      vite:
+        specifier: ^5.0.0
+        version: 5.4.21(@types/node@20.19.30)
+
   services/session-state:
     dependencies:
       better-sse:
