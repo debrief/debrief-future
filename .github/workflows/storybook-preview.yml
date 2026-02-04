@@ -14,11 +14,13 @@ on:
       - main
     paths:
       - 'shared/components/**'
+      - 'apps/web-shell/**'
       - '.github/workflows/storybook-preview.yml'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     paths:
       - 'shared/components/**'
+      - 'apps/web-shell/**'
       - '.github/workflows/storybook-preview.yml'
 
 permissions:
@@ -130,6 +132,7 @@ jobs:
             **Persistent URL (main):** ${persistentUrl}
 
             ### Quick Links
+            - [Web Shell Demo](${previewUrl}?path=/story/apps-webshell--default)
             - [ToolMatch Harness](${previewUrl}?path=/story/toolmatch-harness--default)
             - [All Stories](${previewUrl})
 
