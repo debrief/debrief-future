@@ -92,12 +92,13 @@ apps/vscode/test-data/local-store/
     └── training-run-1.geojson
 ```
 
-### App.tsx — Composing Existing Components
+### App.tsx — Two-View Architecture
 
-The web shell is primarily just component composition:
+The web shell uses view state to switch between welcome page and analysis view:
 
 ```tsx
 // apps/web-shell/src/App.tsx
+import { useState, useEffect, useMemo } from 'react';
 import {
   MapView,
   ActivityPanel,
@@ -112,7 +113,13 @@ import { createSessionStore, subscribeToTemporal } from '@debrief/session-state'
 import { MockStacService } from './mocks/stacService';
 import { MockCalcService, mockTools } from './mocks/calcService';
 
+type View = 'welcome' | 'analysis';
+
 function App() {
+  // View state
+  const [view, setView] = useState<View>('welcome');
+  const [activePlot, setActivePlot] = useState<{ id: string; title: string } | null>(null);
+
   // Session state (same store as VS Code uses)
   const [store] = useState(() => createSessionStore());
   const [temporal, setTemporal] = useState(store.getState());
@@ -126,7 +133,7 @@ function App() {
 
   // Mock services
   const stacService = useMemo(() => new MockStacService(), []);
-  const calcService = useMemo(() => new MockCalcService(), []);
+  const calcService = useMemo(() => new MockCalcService(features), [features]);
 
   // Subscribe to temporal changes
   useEffect(() => {
@@ -138,54 +145,76 @@ function App() {
     stacService.listItems().then(setCatalogItems);
   }, [stacService]);
 
-  const handleSelectPlot = async (itemId: string) => {
+  // Double-click handler: open plot in analysis view
+  const handleOpenPlot = async (itemId: string) => {
+    const item = catalogItems.find(i => i.id === itemId);
     const data = await stacService.loadPlotData(itemId);
     setFeatures(data.features);
+    setActivePlot({ id: itemId, title: item?.title ?? itemId });
     store.getState().setTimeRange(data.timeExtent);
+    setView('analysis');
+  };
+
+  // Back button handler
+  const handleBackToCatalog = () => {
+    setView('welcome');
+    setActivePlot(null);
+    setFeatures([]);
+    selection.clear();
   };
 
   return (
     <ThemeProvider>
-      <div className="web-shell">
-        <aside className="sidebar">
+      {view === 'welcome' ? (
+        // Welcome Page: STAC Catalog Browser
+        <div className="welcome-view">
           <CatalogOverview
             items={catalogItems}
-            onSelectItem={handleSelectPlot}
+            onSelectItem={handleOpenPlot}  // Double-click opens plot
           />
-          <ActivityPanel
-            timeController={
-              <TimeController
-                store={store}
-                timeRange={temporal.timeRange}
+        </div>
+      ) : (
+        // Analysis View: Activity Panel + Map
+        <div className="analysis-view">
+          <header className="analysis-header">
+            <button onClick={handleBackToCatalog}>← Back to Catalog</button>
+            <h1>{activePlot?.title}</h1>
+          </header>
+          <div className="analysis-content">
+            <aside className="activity-panel">
+              <ActivityPanel
+                timeController={
+                  <TimeController store={store} timeRange={temporal.timeRange} />
+                }
+                featureList={
+                  <FeatureList
+                    features={features}
+                    selectedIds={selection.selectedIds}
+                    onSelect={selection.toggle}
+                  />
+                }
+                toolsPanel={
+                  <ToolsPanel
+                    tools={mockTools}
+                    selection={selection}
+                    onExecute={(toolId) => calcService.execute(toolId, selection.selectedIds)}
+                  />
+                }
               />
-            }
-            featureList={
-              <FeatureList
+            </aside>
+            <main className="map-panel">
+              <MapView
                 features={features}
                 selectedIds={selection.selectedIds}
                 onSelect={selection.toggle}
+                onBackgroundClick={selection.clear}
+                currentTime={temporal.currentTime?.epoch}
+                displayMode={temporal.displayMode}
               />
-            }
-            toolsPanel={
-              <ToolsPanel
-                tools={mockTools}
-                selection={selection}
-                onExecute={(toolId) => calcService.execute(toolId, selection)}
-              />
-            }
-          />
-        </aside>
-        <main className="map-area">
-          <MapView
-            features={features}
-            selectedIds={selection.selectedIds}
-            onSelect={selection.toggle}
-            onBackgroundClick={selection.clear}
-            currentTime={temporal.currentTime?.epoch}
-            displayMode={temporal.displayMode}
-          />
-        </main>
-      </div>
+            </main>
+          </div>
+        </div>
+      )}
     </ThemeProvider>
   );
 }
@@ -291,24 +320,48 @@ export class MockCalcService {
 
 ### Component Integration
 
-The shell layout mirrors VS Code's panel arrangement:
+The shell uses a **two-view architecture**:
 
+**View 1: Welcome Page (STAC Catalog Browser)**
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  STAC Browser (sidebar)  │  Map Panel (main area)       │
-│  ─────────────────────   │                              │
-│  📁 Test Maritime Data   │     [Leaflet Map]            │
-│    📄 Exercise Alpha     │                              │
-│    📄 Training Run 1     │                              │
-│                          │                              │
-├──────────────────────────┼──────────────────────────────┤
-│  Activity Panel          │                              │
-│  ─────────────────────   │                              │
-│  Time: [slider]          │                              │
-│  Tools: [list]           │                              │
-│  Selection: [display]    │                              │
+│                   STAC Catalog Browser                  │
+│  ─────────────────────────────────────────────────────  │
+│                                                         │
+│  📁 Test Maritime Data                                  │
+│    ┌─────────────────────────────────────────────┐     │
+│    │ 📄 Exercise Alpha                           │     │
+│    │    bbox: [-5, 50, 2, 55]  |  4 hours       │     │
+│    └─────────────────────────────────────────────┘     │
+│    ┌─────────────────────────────────────────────┐     │
+│    │ 📄 Training Run 1                           │     │
+│    │    bbox: [-3, 51, 0, 53]  |  2 hours       │     │
+│    └─────────────────────────────────────────────┘     │
+│                                                         │
+│              Double-click to open plot →                │
 └─────────────────────────────────────────────────────────┘
 ```
+
+**View 2: Analysis View (Activity Panel + Map)**
+```
+┌─────────────────────────────────────────────────────────┐
+│  [← Back to Catalog]           Exercise Alpha           │
+├──────────────────────┬──────────────────────────────────┤
+│  Activity Panel      │  Map Panel                       │
+│  ────────────────    │                                  │
+│  Time: [slider]      │     [Leaflet Map]                │
+│  ────────────────    │                                  │
+│  Layers:             │        ~~~~ track 1 ~~~~         │
+│    ☑ Vessel 1        │           ~~~~ track 2 ~~~~      │
+│    ☑ Vessel 2        │                                  │
+│  ────────────────    │                                  │
+│  Tools:              │                                  │
+│    Track Length      │                                  │
+│    Bounding Box      │                                  │
+└──────────────────────┴──────────────────────────────────┘
+```
+
+Navigation: Welcome page → double-click plot → Analysis view → "Back to Catalog" returns to welcome.
 
 ### Fixture Data
 
@@ -466,6 +519,7 @@ This spec validates that `@debrief/components` work correctly when composed:
 ### Session 2026-02-04
 
 - Q: How should web-shell access the existing test fixtures? → A: Import directly via path alias `@test-data/local-store` (shared, single source of truth)
+- UI: STAC Catalog Browser serves as welcome page; double-click plot opens "analysis view" (activity panel left, map right)
 
 ## Future Considerations
 
