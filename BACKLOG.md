@@ -133,7 +133,7 @@ Description formats:
 | 042 | Feature | [Add STAC catalog overview panel with map and timeline](specs/042-stac-catalog-overview-panel/spec.md) | 5 | 5 | 3 | 13 | High | specified |
 | ~~040~~ | ~~Feature~~ | ~~[Save analysis results to STAC](specs/001-save-calc-results-stac/spec.md)~~ | ~~5~~ | ~~4~~ | ~~4~~ | ~~13~~ | ~~Medium~~ | ~~complete~~ |
 | 016 | Infrastructure | [Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md) | 3 | 5 | 4 | 12 | Medium | specified |
-| 041 | Documentation | [Document tool results architecture](specs/041-document-tool-results/spec.md) | 5 | 3 | 5 | 13 | Medium | specified |
+| ~~041~~ | ~~Documentation~~ | ~~[Document tool results architecture](specs/041-document-tool-results/spec.md)~~ | ~~5~~ | ~~3~~ | ~~5~~ | ~~13~~ | ~~Medium~~ | ~~complete~~ |
 | 023 | Infrastructure | [Add epic support to speckit workflow](specs/023-epic-workflow-support/spec.md) | 4 | 3 | 4 | 11 | Medium | specified |
 | 031 | Documentation | [Document vscrui as standard component library for VS Code webviews](specs/031-vscrui-component-library/spec.md) | 3 | 1 | 5 | 9 | Low | specified |
 | 032 | Documentation | [Document Storybook VS Code theming setup](specs/032-storybook-vscode-theming/spec.md) | 2 | 2 | 5 | 9 | Low | specified |
