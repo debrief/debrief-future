@@ -1101,6 +1101,12 @@ export class MapPanel {
 
   private getHtmlForWebview(): string {
     const webview = this.panel.webview;
+    const config = vscode.workspace.getConfiguration('debrief.map');
+    const useReactWrapper = config.get<boolean>('useReactWrapper', false);
+
+    if (useReactWrapper) {
+      return this.getReactHtmlForWebview();
+    }
 
     // Get URIs for webview resources
     const scriptUri = webview.asWebviewUri(
@@ -1141,6 +1147,47 @@ export class MapPanel {
       <button id="btn-export" class="toolbar-btn" title="Export PNG">E</button>
     </div>
   </div>
+  <script src="${scriptUri.toString()}"></script>
+</body>
+</html>`;
+  }
+
+  /**
+   * Generate HTML for the React-based map wrapper.
+   * Uses the shared @debrief/components/MapView instead of vanilla Leaflet.
+   */
+  private getReactHtmlForWebview(): string {
+    const webview = this.panel.webview;
+
+    const scriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'mapView.js')
+    );
+    const stylesUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'styles.css')
+    );
+
+    const cspSource = webview.cspSource;
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; img-src ${cspSource} data: https:;">
+  <title>Debrief Map</title>
+  <link rel="stylesheet" href="${stylesUri.toString()}">
+  <style>
+    html, body, #root {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
   <script src="${scriptUri.toString()}"></script>
 </body>
 </html>`;

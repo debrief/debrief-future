@@ -54,6 +54,13 @@ export interface MapViewProps {
   /** Whether to auto-fit bounds to features */
   autoFitBounds?: boolean;
 
+  /** Controlled viewport - when provided, map will update to this center/zoom.
+   *  Use for programmatic viewport changes (e.g., setViewport messages from VS Code). */
+  viewport?: { center: [number, number]; zoom: number };
+
+  /** Programmatically trigger fit bounds. Increment to trigger a new fit. */
+  fitBoundsTrigger?: number;
+
   /** Tile layer URL (default: OpenStreetMap) */
   tileLayerUrl?: string;
 
@@ -76,16 +83,20 @@ export interface MapViewProps {
   displayMode?: DisplayMode;
 }
 
-// Component to handle map events and auto-fit
+// Component to handle map events, auto-fit, and programmatic viewport control
 function MapController({
   bounds,
   autoFitBounds,
+  viewport,
+  fitBoundsTrigger,
   onZoomChange,
   onBoundsChange,
   onBackgroundClick,
 }: {
   bounds: Bounds | null;
   autoFitBounds: boolean;
+  viewport?: { center: [number, number]; zoom: number };
+  fitBoundsTrigger?: number;
   onZoomChange?: (zoom: number) => void;
   onBoundsChange?: (bounds: Bounds) => void;
   onBackgroundClick?: () => void;
@@ -99,6 +110,21 @@ function MapController({
       map.fitBounds([[minLat, minLon], [maxLat, maxLon]] as LatLngBoundsExpression);
     }
   }, [map, bounds, autoFitBounds]);
+
+  // Handle programmatic viewport changes (for setViewport messages)
+  useEffect(() => {
+    if (viewport) {
+      map.setView(viewport.center, viewport.zoom, { animate: false });
+    }
+  }, [map, viewport]);
+
+  // Handle programmatic fit bounds trigger
+  useEffect(() => {
+    if (fitBoundsTrigger !== undefined && fitBoundsTrigger > 0 && bounds) {
+      const [minLon, minLat, maxLon, maxLat] = expandBounds(bounds, 0.1);
+      map.fitBounds([[minLat, minLon], [maxLat, maxLon]] as LatLngBoundsExpression);
+    }
+  }, [map, fitBoundsTrigger, bounds]);
 
   // Handle map events
   useMapEvents({
@@ -148,7 +174,9 @@ export function MapView({
   onBoundsChange,
   initialZoom = 10,
   initialCenter = [50.0, -4.0],
+  viewport,
   autoFitBounds = true,
+  fitBoundsTrigger,
   tileLayerUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   tileLayerAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   className,
@@ -260,6 +288,8 @@ export function MapView({
         <MapController
           bounds={bounds}
           autoFitBounds={autoFitBounds}
+          viewport={viewport}
+          fitBoundsTrigger={fitBoundsTrigger}
           onZoomChange={onZoomChange}
           onBoundsChange={onBoundsChange}
           onBackgroundClick={onBackgroundClick}
