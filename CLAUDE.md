@@ -133,6 +133,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Local filesystem STAC catalogs (read-write) (043-load-rep-new-plot)
 - TypeScript 5.x (VS Code extension) + VS Code extension API, existing `stacService`, existing `ioService`, Node.js `fs/promises`, `crypto.randomUUID()` (043-load-rep-new-plot)
 - Markdown (documentation only — no code implementation) + N/A (reads existing source files for reference content) (032-storybook-vscode-theming)
+- TypeScript 5.x (VS Code extension webview) + React 18, react-leaflet 4.2, @debrief/components, VS Code webview API (048-refactor-vscode-map-wrapper)
+- VS Code webview state persistence (setState/getState) (048-refactor-vscode-map-wrapper)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
