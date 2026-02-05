@@ -139,6 +139,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Local filesystem STAC catalogs (JSON + GeoJSON files) (048-geojson-position-metadata)
 - Python 3.11 (decorator), Markdown (specs), JSON (golden examples) + None (standard library only for decorator) (049-tool-documentation-model)
 - Filesystem only (markdown files, JSON fixtures) (049-tool-documentation-model)
+- TypeScript 5.x (VS Code extension and webview) + VS Code Extension API ^1.85.0, React 18.x, @debrief/shared-components (001-wire-file-actions)
+- Local filesystem (via VS Code workspace.fs API) (001-wire-file-actions)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
