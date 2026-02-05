@@ -5,6 +5,8 @@
  * default_position_style → interval rules (symbol_interval, label_interval) → position_style_overrides
  */
 
+/* eslint-disable react/prop-types */ // TypeScript handles prop validation
+
 import { useMemo } from 'react';
 import { CircleMarker, Tooltip, LayerGroup } from 'react-leaflet';
 import type { TrackFeature, PositionStyle } from '@debrief/schemas';
@@ -35,10 +37,14 @@ export function PositionSymbolsLayer({
   isSelected = false,
 }: PositionSymbolsLayerProps) {
   const props = feature.properties;
-  const positions = props.positions ?? [];
-  // Note: geometry.coordinates is typed as number[] in generated types but is actually [lon, lat][]
-  const coordinates = (feature.geometry.coordinates as unknown as Array<[number, number]>) ?? [];
   const color = getFeatureColor(feature);
+
+  // Memoize positions and coordinates to stabilize useMemo dependencies
+  const positions = useMemo(() => props.positions ?? [], [props.positions]);
+  const coordinates = useMemo(
+    () => (feature.geometry.coordinates as unknown as Array<[number, number]>) ?? [],
+    [feature.geometry.coordinates]
+  );
 
   // Get position styling configuration
   const defaultStyle = props.default_position_style ?? DEFAULT_POSITION_STYLE;
