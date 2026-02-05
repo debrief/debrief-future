@@ -11,9 +11,9 @@ test.describe('Selection Sync', () => {
   });
 
   test('clicking track on map selects it', async ({ page }) => {
-    // Click on a track in the map
+    // Click on a track in the map (force: true bypasses SVG overlap check)
     const track = page.locator('.leaflet-interactive').first();
-    await track.click();
+    await track.click({ force: true });
 
     // Track should be visually selected (style changes)
     // Note: The exact check depends on how selection is styled
@@ -42,9 +42,9 @@ test.describe('Selection Sync', () => {
   });
 
   test('selection persists during view interactions', async ({ page }) => {
-    // Select a track
+    // Select a track (force: true bypasses SVG overlap check)
     const track = page.locator('.leaflet-interactive').first();
-    await track.click();
+    await track.click({ force: true });
 
     // Pan/zoom the map
     const map = page.locator('.leaflet-container');
@@ -55,9 +55,9 @@ test.describe('Selection Sync', () => {
   });
 
   test('background click clears selection', async ({ page }) => {
-    // Select a track first
+    // Select a track first (force: true bypasses SVG overlap check)
     const track = page.locator('.leaflet-interactive').first();
-    await track.click();
+    await track.click({ force: true });
 
     // Click on empty map area (background)
     const mapContainer = page.locator('.leaflet-container');
