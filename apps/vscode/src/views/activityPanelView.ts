@@ -25,6 +25,7 @@ import type { SessionManager } from '../services/sessionManager';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { CalcService } from '../services/calcService';
 import type { MatchResult } from '../types/tool';
+import type { Track, ReferenceLocation } from '../types/plot';
 
 // Message types from webview
 interface TemporalSeekMessage {
@@ -95,11 +96,19 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   private _selectionUnsubscribe?: () => void;
   private _sessionChangeDisposable?: vscode.Disposable;
 
+  // Feature data from MapPanel
+  private _tracks: Track[] = [];
+  private _locations: ReferenceLocation[] = [];
+
+  // Result files for Associated Files dropdown
+  private _resultFiles: Array<{ name: string; path: string; category: 'result' }> = [];
+  private _resultsChanged = false;
+
   constructor(
     extensionUri: vscode.Uri,
     private readonly _sessionManager: SessionManager,
     private readonly _toolMatchAdapter: ToolMatchAdapter,
-    private readonly _calcService: CalcService
+    _calcService: CalcService // Kept for API compatibility, tool execution delegated to command
   ) {
     this._extensionUri = extensionUri;
 
@@ -208,6 +217,8 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     // Update tool match adapter and send new tools list
     this._toolMatchAdapter.updateSelection(selection);
     this._sendToolsUpdate();
+    // Also update layers with new toolMatches for LayersToolbar
+    this._sendLayersUpdate();
   }
 
   /**
@@ -233,22 +244,79 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
    * Send layers update to webview
    */
   private _sendLayersUpdate(): void {
-    if (!this._activeSession) {
-      return;
-    }
-
-    const state: SessionStoreWithUndo = this._activeSession.getState();
-
-    // Layers/features come from the STAC catalog, not session state.
-    // The webview receives an empty list here; full layer data will be
-    // pushed once the LayersTreeProvider is wired into this view.
-    const hiddenIds: string[] = state.hiddenFeatureIds ?? [];
+    const hiddenIds: string[] = this._activeSession?.getState().hiddenFeatureIds ?? [];
     const toolMatches: MatchResult[] = this._toolMatchAdapter.getMatchResults();
+
+    // Transform tracks and locations to DebriefFeature format
+    const features = [
+      ...this._tracks.map((track) => ({
+        type: 'Feature' as const,
+        id: track.id,
+        geometry: track.geometry,
+        properties: {
+          kind: 'TRACK' as const,
+          platform_name: track.name,
+          platform_id: track.id,
+          track_type: track.platformType ?? 'CONTACT',
+          start_time: track.startTime,
+          end_time: track.endTime,
+          positions: track.times ?? [],
+          style: { line: { color: track.color ?? '#0066cc' } },
+        },
+      })),
+      ...this._locations.map((loc) => ({
+        type: 'Feature' as const,
+        id: loc.id,
+        geometry: loc.geometry,
+        properties: {
+          kind: 'POINT' as const,
+          name: loc.name,
+          location_type: loc.locationType ?? 'REFERENCE',
+        },
+      })),
+    ];
 
     this._postMessage({
       type: 'layers:update',
-      payload: { layers: [] as unknown[], hiddenIds, toolMatches },
+      payload: {
+        layers: features,
+        hiddenIds,
+        toolMatches,
+        resultFiles: this._resultFiles,
+        resultsChanged: this._resultsChanged,
+      },
     });
+
+    // Clear resultsChanged flag after sending
+    this._resultsChanged = false;
+  }
+
+  /**
+   * Set features to display in the layers panel.
+   * Called by MapPanel when plot data is loaded/updated.
+   */
+  public setFeatures(tracks: Track[], locations: ReferenceLocation[]): void {
+    this._tracks = tracks;
+    this._locations = locations;
+    this._sendLayersUpdate();
+  }
+
+  /**
+   * Add a result file to the Associated Files dropdown.
+   * Called after tool execution completes.
+   */
+  public addResultFile(name: string, path: string): void {
+    this._resultFiles.push({ name, path, category: 'result' });
+    this._resultsChanged = true;
+    this._sendLayersUpdate();
+  }
+
+  /**
+   * Clear result files (e.g., when plot is closed).
+   */
+  public clearResultFiles(): void {
+    this._resultFiles = [];
+    this._resultsChanged = false;
   }
 
   public resolveWebviewView(
@@ -335,10 +403,25 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
           break;
 
         case 'layer:toggleVisibility':
-          // Delegate to SessionManager (future implementation)
-          void vscode.window.showInformationMessage(
-            `Toggle visibility for: ${message.payload.featureIds.join(', ')}`
-          );
+          if (this._activeSession) {
+            const state: SessionStoreWithUndo = this._activeSession.getState();
+            const hiddenSet = new Set(state.hiddenFeatureIds);
+            const featureIds = message.payload.featureIds;
+
+            // Check if all selected features are currently hidden
+            const allHidden = featureIds.every((id: string) => hiddenSet.has(id));
+
+            if (allHidden) {
+              // Show all selected features
+              state.showFeatures(featureIds);
+            } else {
+              // Hide all selected features
+              state.hideFeatures(featureIds);
+            }
+
+            // Update the layers panel with new hidden state
+            this._sendLayersUpdate();
+          }
           break;
 
         case 'layer:delete':
@@ -359,40 +442,12 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   /**
-   * Handle tool execution request
+   * Handle tool execution request - delegates to registered command
    */
   private async _handleToolRun(toolId: string): Promise<void> {
-    try {
-      // Get current selection
-      if (!this._activeSession) {
-        void vscode.window.showErrorMessage('No active session');
-        return;
-      }
-
-      const state: SessionStoreWithUndo = this._activeSession.getState();
-      const selectedIds = state.selection?.featureIds ?? [];
-
-      if (selectedIds.length === 0) {
-        void vscode.window.showWarningMessage('No features selected');
-        return;
-      }
-
-      // Show progress
-      await vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: `Running tool: ${toolId}`,
-          cancellable: false,
-        },
-        async () => {
-          await this._calcService.executeTool({ toolId, featureIds: selectedIds });
-        }
-      );
-    } catch (error) {
-      void vscode.window.showErrorMessage(
-        `Failed to run tool: ${error instanceof Error ? error.message : String(error)}`
-      );
-    }
+    // Delegate to the registered executeTool command which handles
+    // result layer creation, map updates, STAC persistence, and notifications
+    await vscode.commands.executeCommand('debrief.executeTool', toolId);
   }
 
   /**
@@ -434,7 +489,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; font-src ${cspSource};">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; font-src ${cspSource} data:;">
   <title>Activity Panel</title>
   <style>
     :root {

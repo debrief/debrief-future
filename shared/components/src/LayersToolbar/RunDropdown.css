@@ -20,10 +20,14 @@
 .debrief-run-dropdown__category-trigger {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 4px;
   padding: 5px 12px;
   cursor: pointer;
   color: var(--debrief-text-primary, #1a1a1a);
+}
+
+.debrief-run-dropdown__category:hover .debrief-run-dropdown__arrow {
+  transform: rotate(90deg);
 }
 
 .debrief-run-dropdown__category-trigger:hover {
@@ -32,22 +36,18 @@
 
 .debrief-run-dropdown__arrow {
   color: var(--debrief-text-secondary, #666666);
-  font-size: 14px;
+  font-size: 10px;
+  transition: transform 0.15s ease;
 }
 
-/* Submenu - appears on hover */
+/* Submenu - appears on hover, positioned BELOW category in narrow panels */
 .debrief-run-dropdown__submenu {
   display: none;
-  position: absolute;
-  top: 0;
-  left: 100%;
-  min-width: 200px;
+  position: relative; /* Inline below trigger, not flyout */
+  margin-left: 8px;
+  padding-left: 8px;
+  border-left: 2px solid var(--debrief-border-color-light, #e0e0e0);
   background-color: var(--debrief-bg-primary, #ffffff);
-  border: 1px solid var(--debrief-border-color, #e0e0e0);
-  border-radius: var(--debrief-border-radius, 4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  padding: 4px 0;
-  z-index: 1001; /* Above parent dropdown and Leaflet map */
 }
 
 .debrief-run-dropdown__category:hover > .debrief-run-dropdown__submenu {

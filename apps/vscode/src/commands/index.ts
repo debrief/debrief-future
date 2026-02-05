@@ -16,6 +16,7 @@ import type { StacTreeProvider } from '../providers/stacTreeProvider';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
+import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import type { MapPanel } from '../webview/mapPanel';
 
 import { createOpenPlotCommand } from './openPlot';
@@ -47,6 +48,7 @@ export function registerCommands(
   toolsTreeProvider: ToolsTreeProvider,
   layersTreeProvider: LayersTreeProvider,
   timeRangeProvider: TimeRangeViewProvider,
+  activityPanelProvider: ActivityPanelViewProvider,
   toolMatchAdapter: ToolMatchAdapter,
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void
@@ -68,6 +70,7 @@ export function registerCommands(
         toolMatchAdapter,
         layersTreeProvider,
         timeRangeProvider,
+        activityPanelProvider,
         getMapPanel,
         setMapPanel
       )
@@ -172,7 +175,7 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.executeTool',
-      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider, stacService)
+      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider, stacService, activityPanelProvider)
     )
   );
 

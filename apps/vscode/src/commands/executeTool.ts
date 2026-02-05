@@ -14,6 +14,7 @@ import type { StacService } from '../services/stacService';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { MapPanel } from '../webview/mapPanel';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
+import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 
 /**
  * Create the execute tool command
@@ -23,13 +24,15 @@ import type { LayersTreeProvider } from '../providers/layersTreeProvider';
  * @param getMapPanel - Function to get current MapPanel
  * @param layersTreeProvider - LayersTreeProvider for displaying results
  * @param stacService - StacService for persisting results to STAC
+ * @param activityPanelProvider - ActivityPanelViewProvider for updating result files
  */
 export function createExecuteToolCommand(
   calcService: CalcService,
   toolMatchAdapter: ToolMatchAdapter,
   getMapPanel: () => MapPanel | undefined,
   layersTreeProvider: LayersTreeProvider,
-  stacService?: StacService
+  stacService?: StacService,
+  activityPanelProvider?: ActivityPanelViewProvider
 ): (toolId: string) => Promise<void> {
   return async (toolId: string) => {
     // Handle both new format (toolId string) and legacy format (object with toolName)
@@ -123,6 +126,12 @@ export function createExecuteToolCommand(
                 'debrief:toolId': resolvedToolId,
                 'debrief:sourceFeatures': selectedFeatureIds,
               }
+            );
+
+            // Notify activity panel of new result file
+            activityPanelProvider?.addResultFile(
+              layer.name,
+              `assets/${result.artifactHref}`
             );
           }
         } catch (persistErr) {

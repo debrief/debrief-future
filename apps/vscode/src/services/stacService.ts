@@ -339,8 +339,8 @@ export class StacService {
             visible: true,
             selected: false,
           });
-        } else if (geom.type === 'Point' && props.kind === 'LOCATION') {
-          // Reference location: Point with kind=LOCATION
+        } else if (geom.type === 'Point' && (props.kind === 'POINT' || props.kind === 'LOCATION')) {
+          // Reference location: Point with kind=POINT or LOCATION
           const pointCoords = geom.coordinates as number[];
 
           locations.push({

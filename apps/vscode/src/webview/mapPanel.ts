@@ -22,11 +22,14 @@ import type { IoService } from '../services/ioService';
 import type { StacService } from '../services/stacService';
 import type { StacStore } from '../types/stac';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
+import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import type { SessionManager } from '../services/sessionManager';
 import {
   subscribeToSpatial,
   subscribeToSelection,
   subscribeToTemporal,
+  subscribeToSlice,
+  selectors,
   type SessionStoreApi,
   type SessionStoreWithUndo,
 } from '@debrief/session-state';
@@ -55,6 +58,7 @@ export class MapPanel {
   private stacService: StacService | null = null;
   private currentStore: StacStore | null = null;
   private layersTreeProvider: LayersTreeProvider | null = null;
+  private activityPanelProvider: ActivityPanelViewProvider | null = null;
 
   // Event handlers
   private onSelectionChangedCallback:
@@ -69,6 +73,7 @@ export class MapPanel {
   private spatialUnsubscribe?: () => void;
   private selectionUnsubscribe?: () => void;
   private temporalUnsubscribe?: () => void;
+  private hiddenUnsubscribe?: () => void;
   private sessionChangeDisposable?: vscode.Disposable;
   private viewportUpdateTimeout?: NodeJS.Timeout;
   private static readonly VIEWPORT_DEBOUNCE_MS = 100;
@@ -248,6 +253,11 @@ export class MapPanel {
       this.layersTreeProvider.setLocations(this.currentLocations);
       this.layersTreeProvider.setShapes(this.otherFeatures);
       this.layersTreeProvider.setResultLayers([...this.resultLayers]);
+    }
+
+    // Update activity panel webview if available
+    if (this.activityPanelProvider) {
+      this.activityPanelProvider.setFeatures(this.currentTracks, this.currentLocations);
     }
   }
 
@@ -496,12 +506,14 @@ export class MapPanel {
     ioService: IoService,
     stacService: StacService,
     store: StacStore,
-    layersTreeProvider: LayersTreeProvider
+    layersTreeProvider: LayersTreeProvider,
+    activityPanelProvider?: ActivityPanelViewProvider
   ): void {
     this.ioService = ioService;
     this.stacService = stacService;
     this.currentStore = store;
     this.layersTreeProvider = layersTreeProvider;
+    this.activityPanelProvider = activityPanelProvider ?? null;
   }
 
   /**
@@ -579,9 +591,11 @@ export class MapPanel {
     this.spatialUnsubscribe?.();
     this.selectionUnsubscribe?.();
     this.temporalUnsubscribe?.();
+    this.hiddenUnsubscribe?.();
     this.spatialUnsubscribe = undefined;
     this.selectionUnsubscribe = undefined;
     this.temporalUnsubscribe = undefined;
+    this.hiddenUnsubscribe = undefined;
 
     this.activeSession = session ?? undefined;
 
@@ -635,6 +649,18 @@ export class MapPanel {
           displayMode: webviewMode,
         });
       });
+
+      // Subscribe to hidden feature IDs changes (Feature: 048)
+      this.hiddenUnsubscribe = subscribeToSlice(
+        session,
+        selectors.hiddenFeatureIds,
+        (hiddenIds: string[]) => {
+          this.postMessage({
+            type: 'setHiddenIds',
+            hiddenIds,
+          });
+        }
+      );
     }
   }
 
@@ -1023,6 +1049,9 @@ export class MapPanel {
         this.layersTreeProvider?.setTracks(updatedData.tracks);
         this.layersTreeProvider?.setLocations(updatedData.locations);
         this.layersTreeProvider?.setShapes(updatedData.otherFeatures);
+
+        // Update activity panel webview
+        this.activityPanelProvider?.setFeatures(updatedData.tracks, updatedData.locations);
       }
 
       // Send completion message
@@ -1098,24 +1127,18 @@ export class MapPanel {
     });
   }
 
+  /**
+   * Generate HTML for the map webview.
+   * Uses the shared @debrief/components/MapView via thin React wrapper.
+   */
   private getHtmlForWebview(): string {
     const webview = this.panel.webview;
 
-    // Get URIs for webview resources
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'map.js')
+      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'mapView.js')
     );
     const stylesUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'styles.css')
-    );
-    const leafletCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this.extensionUri,
-        'node_modules',
-        'leaflet',
-        'dist',
-        'leaflet.css'
-      )
     );
 
     const cspSource = webview.cspSource;
@@ -1127,19 +1150,19 @@ export class MapPanel {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; img-src ${cspSource} data: https:;">
   <title>Debrief Map</title>
-  <link rel="stylesheet" href="${leafletCssUri.toString()}">
   <link rel="stylesheet" href="${stylesUri.toString()}">
+  <style>
+    html, body, #root {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
 </head>
 <body>
-  <div id="map-container">
-    <div id="map"></div>
-    <div id="toolbar" class="floating-toolbar">
-      <button id="btn-zoom-in" class="toolbar-btn" title="Zoom In">+</button>
-      <button id="btn-zoom-out" class="toolbar-btn" title="Zoom Out">-</button>
-      <button id="btn-fit-bounds" class="toolbar-btn" title="Fit to All">[]</button>
-      <button id="btn-export" class="toolbar-btn" title="Export PNG">E</button>
-    </div>
-  </div>
+  <div id="root"></div>
   <script src="${scriptUri.toString()}"></script>
 </body>
 </html>`;
