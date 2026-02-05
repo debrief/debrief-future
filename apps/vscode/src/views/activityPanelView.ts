@@ -108,7 +108,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     extensionUri: vscode.Uri,
     private readonly _sessionManager: SessionManager,
     private readonly _toolMatchAdapter: ToolMatchAdapter,
-    private readonly _calcService: CalcService
+    _calcService: CalcService // Kept for API compatibility, tool execution delegated to command
   ) {
     this._extensionUri = extensionUri;
 
