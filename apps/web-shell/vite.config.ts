@@ -22,6 +22,8 @@ function geojsonPlugin(): Plugin {
 }
 
 export default defineConfig({
+  // Use VITE_BASE_URL for GitHub Pages deployment (e.g., /debrief-future/web-shell/)
+  base: process.env.VITE_BASE_URL || '/',
   plugins: [react(), geojsonPlugin()],
   resolve: {
     alias: {

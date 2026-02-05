@@ -1,10 +1,15 @@
-# Storybook Deployment for shared/components
+# Storybook & Web Shell Deployment
 #
 # - On PRs: deploys preview to pr-preview/pr-{number}/ (cleaned up on close)
-# - On main: deploys persistent copy to components-storybook/
+# - On main: deploys persistent copies to components-storybook/ and web-shell/
 #
-# Preview URL: https://debrief.github.io/debrief-future/pr-preview/pr-{number}/
-# Persistent URL: https://debrief.github.io/debrief-future/components-storybook/
+# Preview URLs:
+#   Storybook: https://debrief.github.io/debrief-future/pr-preview/pr-{number}/
+#   Web Shell: https://debrief.github.io/debrief-future/pr-preview/pr-{number}/web-shell/
+#
+# Persistent URLs:
+#   Storybook: https://debrief.github.io/debrief-future/components-storybook/
+#   Web Shell: https://debrief.github.io/debrief-future/web-shell/
 
 name: Storybook Preview
 
@@ -28,7 +33,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  # Deploy persistent Storybook on push to main
+  # Deploy persistent Storybook and Web Shell on push to main
   deploy-main:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
@@ -58,12 +63,25 @@ jobs:
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
 
-      - name: Deploy to GitHub Pages
+      - name: Build Web Shell
+        run: pnpm --filter @debrief/web-shell build
+        env:
+          VITE_BASE_URL: /debrief-future/web-shell/
+
+      - name: Deploy Storybook to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./shared/components/storybook-static
           destination_dir: components-storybook
+          keep_files: true
+
+      - name: Deploy Web Shell to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/web-shell/dist
+          destination_dir: web-shell
           keep_files: true
 
   # Deploy PR preview
@@ -96,7 +114,12 @@ jobs:
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
 
-      - name: Deploy to GitHub Pages
+      - name: Build Web Shell
+        run: pnpm --filter @debrief/web-shell build
+        env:
+          VITE_BASE_URL: /debrief-future/pr-preview/pr-${{ github.event.pull_request.number }}/web-shell/
+
+      - name: Deploy Storybook to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -104,13 +127,24 @@ jobs:
           destination_dir: pr-preview/pr-${{ github.event.pull_request.number }}
           keep_files: true
 
+      - name: Deploy Web Shell to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/web-shell/dist
+          destination_dir: pr-preview/pr-${{ github.event.pull_request.number }}/web-shell
+          keep_files: true
+
       - name: Comment PR with preview link
         uses: actions/github-script@v7
         with:
           script: |
             const prNumber = context.payload.pull_request.number;
-            const previewUrl = `https://debrief.github.io/debrief-future/pr-preview/pr-${prNumber}/`;
-            const persistentUrl = `https://debrief.github.io/debrief-future/components-storybook/`;
+            const baseUrl = `https://debrief.github.io/debrief-future`;
+            const previewUrl = `${baseUrl}/pr-preview/pr-${prNumber}/`;
+            const webShellPreviewUrl = `${baseUrl}/pr-preview/pr-${prNumber}/web-shell/`;
+            const persistentUrl = `${baseUrl}/components-storybook/`;
+            const webShellUrl = `${baseUrl}/web-shell/`;
 
             // Check if we already commented
             const comments = await github.rest.issues.listComments({
@@ -126,17 +160,26 @@ jobs:
 
             const body = `## 📚 Storybook Preview
 
-            Your Storybook preview is ready!
+Your previews are ready!
 
-            **Preview URL:** ${previewUrl}
-            **Persistent URL (main):** ${persistentUrl}
+### PR Preview
+| App | URL |
+|-----|-----|
+| Storybook | ${previewUrl} |
+| Web Shell | ${webShellPreviewUrl} |
 
-            ### Quick Links
-            - [Web Shell Demo](${previewUrl}?path=/story/apps-webshell--default)
-            - [ToolMatch Harness](${previewUrl}?path=/story/toolmatch-harness--default)
-            - [All Stories](${previewUrl})
+### Persistent (main branch)
+| App | URL |
+|-----|-----|
+| Storybook | ${persistentUrl} |
+| Web Shell | ${webShellUrl} |
 
-            > Updated on commit ${context.sha.substring(0, 7)}`;
+### Quick Links
+- [Web Shell Demo (Storybook)](${previewUrl}?path=/story/apps-webshell--default)
+- [Web Shell (Standalone)](${webShellPreviewUrl})
+- [ToolMatch Harness](${previewUrl}?path=/story/toolmatch-harness--default)
+
+> Updated on commit ${context.sha.substring(0, 7)}`;
 
             if (botComment) {
               await github.rest.issues.updateComment({
