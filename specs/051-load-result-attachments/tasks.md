@@ -160,7 +160,7 @@
 
 ### PR Creation (REQUIRED - must be final task)
 
-- [ ] T035 Create PR and publish blog: run /speckit.pr
+- [x] T035 Create PR and publish blog: run /speckit.pr
 
 **Task T035 must run last. It depends on all evidence and media tasks being complete.**
 
