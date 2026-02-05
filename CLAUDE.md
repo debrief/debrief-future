@@ -141,6 +141,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Filesystem only (markdown files, JSON fixtures) (049-tool-documentation-model)
 - TypeScript 5.x (VS Code extension and webview) + VS Code Extension API ^1.85.0, React 18.x, @debrief/shared-components (001-wire-file-actions)
 - Local filesystem (via VS Code workspace.fs API) (001-wire-file-actions)
+- Markdown (command/agent definitions), Java (harness template) + None (Claude agent infrastructure, existing speckit patterns) (050-tool-migration-workflow)
+- Filesystem only (Markdown files, JSON golden examples) (050-tool-migration-workflow)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
