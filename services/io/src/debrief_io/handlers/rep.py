@@ -136,12 +136,12 @@ class TrackBuilder:
         # Build times array (ISO strings, parallel to coordinates)
         times = [p.timestamp.isoformat() for p in self.positions]
 
-        # Build positions array with full metadata
+        # Build positions array with temporal/kinematic metadata only
+        # Coordinates are NOT included - they live in geometry.coordinates[i]
+        # Position at index i corresponds to coordinate at index i
         positions_data = [
             {
                 "time": p.timestamp.isoformat(),
-                "lat": p.lat,
-                "lon": p.lon,
                 "course": p.course,
                 "speed": p.speed,
                 "depth": p.depth,
@@ -166,6 +166,11 @@ class TrackBuilder:
                 "end_time": self.positions[-1].timestamp.isoformat(),
                 "positions": positions_data,
                 "source_file": source_file,
+                "default_position_style": {
+                    "show_symbol": False,
+                    "symbol": "circle",
+                    "show_label": False,
+                },
             },
         }
 

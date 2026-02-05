@@ -123,6 +123,29 @@ classes:
         description: Composite styling for track line and position markers
         range: TrackStyle
         required: true
+      default_position_style:
+        description: Default styling applied to all positions
+        range: PositionStyle
+        required: true
+      symbol_interval:
+        description: >-
+          ISO 8601 duration for interval-based symbol display.
+          E.g., "PT5M" = every 5 minutes, "PT1H" = every hour.
+          Null means no interval-based symbols.
+        range: string
+        pattern: "^P(T[0-9]+[HMS])+$|^P[0-9]+D(T[0-9]+[HMS]+)?$"
+      label_interval:
+        description: >-
+          ISO 8601 duration for interval-based label display.
+          Null means no interval-based labels.
+        range: string
+        pattern: "^P(T[0-9]+[HMS])+$|^P[0-9]+D(T[0-9]+[HMS]+)?$"
+      position_style_overrides:
+        description: >-
+          Parallel array of per-position style overrides. Same length as positions
+          array. Use null entries for positions without custom styling.
+        range: PositionStyleOverride
+        multivalued: true
 
   TrackFeature:
     description: GeoJSON Feature representing a vessel track

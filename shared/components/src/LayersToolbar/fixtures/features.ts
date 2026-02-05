@@ -42,6 +42,11 @@ export function generateTracks(count: number): TrackFeature[] {
       end_time: new Date(baseTime + (i + 12) * 3600000).toISOString(),
       positions: [],
       style: defaultTrackStyle(trackColors[i % 4] ?? '#1565c0'),
+      default_position_style: {
+        show_symbol: false,
+        symbol: 'circle' as const,
+        show_label: false,
+      },
     },
   }));
 }

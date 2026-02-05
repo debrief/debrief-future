@@ -106,13 +106,11 @@ export enum SystemStateTypeEnum {
 
 
 /**
- * A position with timestamp and optional kinematic data
+ * Temporal and kinematic metadata for a single track position. Coordinates are NOT stored here - they live in geometry.coordinates[i]. Position metadata at index i corresponds to coordinate at index i.
  */
 export interface TimestampedPosition {
     /** Position timestamp (ISO8601) */
     time: string,
-    /** [longitude, latitude] in degrees */
-    coordinates: number[],
     /** Depth in meters (negative = below surface) */
     depth?: number,
     /** Course in degrees (0-360) */
@@ -209,6 +207,34 @@ export interface TrackStyle {
 
 
 /**
+ * Default styling configuration for track positions. Applied as baseline before interval rules and overrides.
+ */
+export interface PositionStyle {
+    /** Whether to display a symbol at positions */
+    show_symbol: boolean,
+    /** Shape to use for position symbols */
+    symbol: string,
+    /** Whether to display labels at positions */
+    show_label: boolean,
+}
+
+
+/**
+ * Per-position style override. Index in array determines which position. No time field - array index i applies to positions[i]. Use null for positions without custom styling.
+ */
+export interface PositionStyleOverride {
+    /** Override whether to show symbol (null = use default/interval) */
+    show_symbol?: boolean,
+    /** Override symbol shape */
+    symbol?: string,
+    /** Override whether to show label */
+    show_label?: boolean,
+    /** Custom label text (null = use timestamp) */
+    label?: string,
+}
+
+
+/**
  * GeoJSON Point geometry
  */
 export interface GeoJSONPoint {
@@ -274,6 +300,14 @@ export interface TrackProperties {
     source_file?: string,
     /** Composite styling for track line and position markers */
     style: TrackStyle,
+    /** Default styling applied to all positions */
+    default_position_style: PositionStyle,
+    /** ISO 8601 duration for interval-based symbol display. E.g., "PT5M" = every 5 minutes, "PT1H" = every hour. Null means no interval-based symbols. */
+    symbol_interval?: string,
+    /** ISO 8601 duration for interval-based label display. Null means no interval-based labels. */
+    label_interval?: string,
+    /** Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling. */
+    position_style_overrides?: PositionStyleOverride[],
 }
 
 
