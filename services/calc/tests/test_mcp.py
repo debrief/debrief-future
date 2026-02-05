@@ -80,7 +80,7 @@ class TestMCPResponseFormat:
         ]
         items = build_addition(
             features=features,
-            result_subtype="track-statistics",
+            result_subtype="track/statistics",
             source_feature_ids=["track-1"],
             label="track-stats results",
         )
@@ -90,7 +90,7 @@ class TestMCPResponseFormat:
         assert len(response["content"]) == 1
         item = response["content"][0]
         assert item["type"] == "resource"
-        assert item["annotations"]["debrief:resultType"] == "addition/track-statistics"
+        assert item["annotations"]["debrief:resultType"] == "addition/track/statistics"
         assert item["annotations"]["debrief:sourceFeatures"] == ["track-1"]
 
     def test_build_error_response(self):

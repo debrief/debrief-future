@@ -38,16 +38,41 @@ Tools return a **ToolResponse** containing one or more content items with Debrie
 
 **Response Schema**: `specs/041-document-tool-results/data-model.md#ToolResponse`
 
-**Result Type**: `{top_type}/{domain}/{specific_type}`
+### Result Type Path
+
+**Format**: `{top_type}/{domain}/{specific_type}`
+
+The `result_subtype` (used in `@tool(output_kind=...)` and builder functions) is `{domain}/{specific_type}`.
 
 | Top Type | When to Use |
 |----------|-------------|
 | `mutation` | Modifying existing features (e.g., `mutation/track/styled`) |
 | `addition` | Creating new features (e.g., `addition/analysis/cpa_point`) |
-| `deletion` | Removing features (e.g., `deletion/track`) |
-| `artifact` | Producing non-GeoJSON output (e.g., `artifact/image/bearing_time_plot`) |
+| `deletion` | Removing features (e.g., `deletion/track/outlier`) |
+| `artifact` | Producing non-GeoJSON output (e.g., `artifact/dataset/range_bearing_series`) |
 
-**Annotations** (required on each content item):
+### Naming Convention (IMPORTANT)
+
+The `result_subtype` (`{domain}/{specific_type}`) **MUST** follow these rules:
+
+1. **Use underscores, not hyphens**: `range_bearing_series` ✓, `range-bearing-series` ✗
+2. **Lowercase only**: `cpa_point` ✓, `CPA_Point` ✗
+3. **Two segments required**: `analysis/cpa_point` ✓, `cpa_point` ✗
+4. **Schema pattern**: `^[a-z_]+/[a-z_]+$`
+
+**Common domains**:
+| Domain | Description | Example Specific Types |
+|--------|-------------|------------------------|
+| `track` | Track-related outputs | `smoothed`, `interpolated`, `styled` |
+| `analysis` | Analysis results | `cpa_point`, `intercept_solution` |
+| `sensor` | Sensor data | `recalibrated`, `filtered` |
+| `dataset` | Data exports/series | `range_bearing_series`, `exported_csv` |
+| `image` | Image artifacts | `bearing_time_plot`, `range_time_plot` |
+| `report` | Report artifacts | `engagement_summary`, `track_report` |
+
+### Annotations
+
+Required on each content item:
 - `debrief:resultType`: The hierarchical result type path
 - `debrief:sourceFeatures`: IDs of input features used
 - `debrief:label`: Human-readable description (e.g., "Applied {action} to {n} features")

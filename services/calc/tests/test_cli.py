@@ -51,7 +51,7 @@ class TestCli:
         assert "resource" in item
         assert item["resource"]["mimeType"] == "application/geo+json"
         assert "annotations" in item
-        assert item["annotations"]["debrief:resultType"] == "addition/track-statistics"
+        assert item["annotations"]["debrief:resultType"] == "addition/track/statistics"
         assert item["annotations"]["debrief:sourceFeatures"] == ["track-1"]
         assert item["annotations"]["debrief:label"] == "track-stats results"
 

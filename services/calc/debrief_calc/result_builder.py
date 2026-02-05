@@ -7,6 +7,7 @@ for each of the four result types: mutation, addition, deletion, artifact.
 
 import base64
 import json
+import re
 
 from debrief_calc.result_types import ResultTypePath
 
@@ -185,6 +186,32 @@ def build_response(content_items: list[dict]) -> dict:
     return {"content": content_items}
 
 
+# Pattern for result_subtype: {domain}/{specific_type} with lowercase and underscores only
+_SUBTYPE_PATTERN = re.compile(r"^[a-z][a-z_]*(/[a-z][a-z_]*)?$")
+
+
 def _validate_subtype(subtype: str) -> None:
+    """Validate result_subtype follows naming convention.
+
+    Valid format: {domain}/{specific_type} (e.g., "track/smoothed", "dataset/range_bearing_series")
+    - Lowercase letters and underscores only (no hyphens)
+    - Two segments required (e.g., "track/statistics")
+    - Two segments recommended for clarity
+
+    Raises:
+        ValueError: If subtype is empty, not a string, or contains invalid characters.
+    """
     if not subtype or not isinstance(subtype, str):
         raise ValueError("subtype must be a non-empty string")
+
+    # Check for common mistakes
+    if "-" in subtype:
+        suggested = subtype.replace("-", "_")
+        raise ValueError(
+            f"subtype must use underscores, not hyphens. Got '{subtype}', did you mean '{suggested}'?"
+        )
+
+    if not _SUBTYPE_PATTERN.match(subtype):
+        raise ValueError(
+            f"subtype must be lowercase with underscores only, format: 'domain/specific_type'. Got: '{subtype}'"
+        )

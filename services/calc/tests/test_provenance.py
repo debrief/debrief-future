@@ -141,10 +141,10 @@ class TestSetOutputKind:
     def test_set_kind(self):
         feature = {"type": "Feature", "properties": {}, "geometry": None}
 
-        result = set_output_kind(feature, "track-statistics")
+        result = set_output_kind(feature, "track/statistics")
 
         assert result is feature
-        assert feature["properties"]["kind"] == "track-statistics"
+        assert feature["properties"]["kind"] == "track/statistics"
 
     def test_set_kind_creates_properties(self):
         feature = {"type": "Feature", "geometry": None}
