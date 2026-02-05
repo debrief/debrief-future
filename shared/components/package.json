@@ -47,6 +47,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:e2e:claude": "CLAUDE_CODE=1 playwright test",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "storybook": "storybook dev -p 6006",
@@ -93,7 +94,8 @@
     "vite-plugin-css-injected-by-js": "^3.3.0",
     "vite-plugin-dts": "^3.7.0",
     "vitest": "^1.0.0",
-    "@playwright/test": "^1.40.0"
+    "@playwright/test": "^1.40.0",
+    "@sparticuz/chromium": "^131.0.0"
   },
   "keywords": [
     "debrief",
