@@ -125,6 +125,7 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
+| 053 | Tech Debt | Remove migration-specific tool commands after Legacy Debrief migration complete (keep /tool.spec and /tool.implement for general use) | 2 | 1 | 5 | 8 | Low | proposed |
 | 051 | Bug | [Load existing result files into Attachments dropdown](specs/051-load-result-attachments/spec.md) | 5 | 3 | 4 | 12 | Low | specified |
 | 050 | Infrastructure | [Add tool migration workflow for Legacy Debrief](specs/050-tool-migration-workflow/spec.md) | 4 | 2 | 4 | 10 | Medium | specified |
 | 049 | Infrastructure | [Add language-neutral tool documentation model](specs/049-tool-documentation-model/spec.md) | 4 | 3 | 5 | 12 | Medium | implementing |
