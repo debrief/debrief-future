@@ -125,7 +125,7 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
-| 049 | Infrastructure | [Add language-neutral tool documentation model](specs/049-tool-documentation-model/spec.md) | 4 | 3 | 5 | 12 | Medium | planned |
+| 049 | Infrastructure | [Add language-neutral tool documentation model](specs/049-tool-documentation-model/spec.md) | 4 | 3 | 5 | 12 | Medium | tasked |
 | 028 | Tech Debt | [Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md) | 4 | 2 | 5 | 11 | Low | implementing |
 | 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](specs/019-needs-interview-status/spec.md) | 3 | 3 | 5 | 11 | Medium | implementing |
 | ~~046~~ | ~~Tech Debt~~ | ~~[Convert raw HTML to vscrui components and theme library](specs/046-vscrui-conversion/spec.md)~~ | ~~4~~ | ~~3~~ | ~~5~~ | ~~12~~ | ~~Medium~~ | ~~complete~~ |
