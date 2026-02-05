@@ -164,29 +164,39 @@ function getIntervalPositions(
 ## 4. PositionStyleOverride Lookup Strategy
 
 ### Decision
-Use Map keyed by ISO timestamp string for O(1) override lookup.
+Use parallel array with direct index lookup for O(1) override access.
 
 ### Rationale
 
-- Overrides are sparse (few positions have custom styling)
-- Timestamp strings are already unique identifiers
-- Map provides fast lookup without array scanning
+- Extends existing parallel array pattern: `coordinates[i] ↔ positions[i] ↔ overrides[i]`
+- Direct index lookup is simpler than Map construction
+- No orphan timestamps possible - index guarantees correspondence
+- Null entries for positions without overrides (minimal storage overhead)
+
+### Alternatives Considered
+
+| Option | Pros | Cons | Verdict |
+|--------|------|------|---------|
+| Sparse array keyed by timestamp | Smaller storage | Requires Map build, orphan risk | Rejected |
+| Parallel array with nulls | O(1) direct lookup, guaranteed correspondence | Nulls for unoverridden positions | ✅ Selected |
 
 ### Implementation Notes
 
-**Build override map once:**
+**Direct index lookup:**
 ```typescript
-const overrideMap = new Map(
-  track.position_style_overrides?.map(o => [o.time, o]) ?? []
-);
-```
-
-**Lookup per position:**
-```typescript
-const override = overrideMap.get(position.time);
+// No Map construction needed
+const override = track.position_style_overrides?.[i] ?? null;
 if (override?.show_symbol !== undefined) {
   showSymbol = override.show_symbol;
 }
+```
+
+**Consistency with existing pattern:**
+```typescript
+// All three arrays have same length
+const coord = track.geometry.coordinates[i];      // [lon, lat]
+const position = track.properties.positions[i];   // { time, course, speed, ... }
+const override = track.properties.position_style_overrides?.[i];  // { show_symbol, label, ... } or null
 ```
 
 ---

@@ -66,11 +66,10 @@ PositionStyle:
 
 **File**: `shared/schemas/src/linkml/styling.yaml`
 
-Per-position style override, keyed by timestamp.
+Per-position style override, indexed by array position. No `time` field - the array index determines which position the override applies to.
 
 | Attribute | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `time` | datetime | Yes | Timestamp of position to override |
 | `show_symbol` | boolean | No | Override: whether to show symbol |
 | `symbol` | PointShapeEnum | No | Override: symbol shape |
 | `show_label` | boolean | No | Override: whether to show label |
@@ -79,12 +78,8 @@ Per-position style override, keyed by timestamp.
 **LinkML Definition:**
 ```yaml
 PositionStyleOverride:
-  description: Per-position style override keyed by timestamp
+  description: Per-position style override. Index in array determines which position.
   attributes:
-    time:
-      description: Timestamp of position this override applies to
-      range: datetime
-      required: true
     show_symbol:
       description: Override whether to show symbol (null = use default/interval)
       range: boolean
@@ -112,7 +107,7 @@ PositionStyleOverride:
 | `default_position_style` | PositionStyle | Yes | Default styling for all positions |
 | `symbol_interval` | string | No | ISO 8601 duration for symbol display interval |
 | `label_interval` | string | No | ISO 8601 duration for label display interval |
-| `position_style_overrides` | PositionStyleOverride[] | No | Sparse array of per-position overrides |
+| `position_style_overrides` | (PositionStyleOverride \| null)[] | No | Parallel array of per-position overrides (null for no override) |
 
 **LinkML Definition (additions):**
 ```yaml
@@ -138,7 +133,9 @@ TrackProperties:
       range: string
       pattern: "^PT?[0-9HMSD.]+$"
     position_style_overrides:
-      description: Sparse array of per-position style overrides
+      description: >-
+        Parallel array of per-position style overrides. Same length as positions
+        array. Use null for positions without custom styling.
       range: PositionStyleOverride
       multivalued: true
 ```
@@ -149,7 +146,12 @@ TrackProperties:
 
 ### Parallel Array Constraint
 
-**Rule**: `len(geometry.coordinates) == len(properties.positions)`
+**Rule**: All three parallel arrays must have equal length:
+```
+len(geometry.coordinates) == len(positions) == len(position_style_overrides)
+```
+
+(When `position_style_overrides` is present. If omitted, only coordinates and positions must match.)
 
 **Implementation**: Pydantic `model_validator` (see research.md)
 
@@ -163,6 +165,15 @@ def validate_parallel_arrays(self) -> 'TrackFeature':
             f"geometry.coordinates length ({coords_len}) must equal "
             f"properties.positions length ({positions_len})"
         )
+
+    overrides = self.properties.position_style_overrides
+    if overrides is not None:
+        overrides_len = len(overrides)
+        if overrides_len != positions_len:
+            raise ValueError(
+                f"position_style_overrides length ({overrides_len}) must equal "
+                f"positions length ({positions_len})"
+            )
     return self
 ```
 
@@ -183,9 +194,9 @@ Examples:
 ```
 TrackFeature
 ├── geometry: GeoJSONLineString
-│   └── coordinates: float[][]          # [lon, lat] pairs
+│   └── coordinates: float[][]              # [lon, lat] pairs (index i)
 ├── properties: TrackProperties
-│   ├── positions: TimestampedPosition[]  # Parallel to coordinates
+│   ├── positions: TimestampedPosition[]    # Parallel array (index i)
 │   │   ├── time: datetime
 │   │   ├── depth: float?
 │   │   ├── course: float?
@@ -199,12 +210,14 @@ TrackFeature
 │   │   └── show_label: boolean
 │   ├── symbol_interval: string?               # NEW
 │   ├── label_interval: string?                # NEW
-│   └── position_style_overrides: PositionStyleOverride[]  # NEW
-│       ├── time: datetime
-│       ├── show_symbol: boolean?
+│   └── position_style_overrides: (PositionStyleOverride | null)[]  # NEW - Parallel array (index i)
+│       ├── show_symbol: boolean?              # (no 'time' - index determines position)
 │       ├── symbol: PointShapeEnum?
 │       ├── show_label: boolean?
 │       └── label: string?
+
+Parallel Array Relationship:
+  coordinates[i] ←→ positions[i] ←→ position_style_overrides[i]
 ```
 
 ---
@@ -226,16 +239,19 @@ For each position at index `i`:
    - If label_interval set AND position is at interval mark:
        show_label = true
 
-3. Apply explicit override (if exists for this position)
-   - override = position_style_overrides.find(o => o.time == positions[i].time)
-   - If override.show_symbol defined: show_symbol = override.show_symbol
-   - If override.symbol defined: symbol = override.symbol
-   - If override.show_label defined: show_label = override.show_label
-   - If override.label defined: label = override.label
+3. Apply explicit override (direct index lookup)
+   - override = position_style_overrides[i]  // O(1) lookup
+   - If override is not null:
+       - If override.show_symbol defined: show_symbol = override.show_symbol
+       - If override.symbol defined: symbol = override.symbol
+       - If override.show_label defined: show_label = override.show_label
+       - If override.label defined: label = override.label
 
 4. Determine final label text
    - If show_label AND label is null: label = formatTimestamp(positions[i].time)
 ```
+
+**Key advantage**: No Map construction needed. Override lookup is O(1) via direct array index.
 
 ---
 
@@ -264,4 +280,31 @@ All track fixtures must be updated:
 
 - `symbol_interval` (optional)
 - `label_interval` (optional)
-- `position_style_overrides` (optional, empty array if not specified)
+- `position_style_overrides` (optional - if omitted, all positions use defaults + interval rules)
+
+### Example: Track with Parallel Override Array
+
+```json
+{
+  "geometry": {
+    "coordinates": [[-5.0, 50.0], [-4.9, 50.1], [-4.8, 50.2]]
+  },
+  "properties": {
+    "positions": [
+      {"time": "2026-01-09T10:00:00Z", "course": 45, "speed": 12},
+      {"time": "2026-01-09T11:00:00Z", "course": 45, "speed": 12},
+      {"time": "2026-01-09T12:00:00Z", "course": 45, "speed": 12}
+    ],
+    "position_style_overrides": [
+      null,
+      {"show_symbol": true, "show_label": true, "label": "Contact Alpha"},
+      null
+    ]
+  }
+}
+```
+
+In this example:
+- Position 0: No override (`null`) - uses defaults + interval rules
+- Position 1: Override with custom symbol and label
+- Position 2: No override (`null`) - uses defaults + interval rules

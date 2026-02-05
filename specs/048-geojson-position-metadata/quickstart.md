@@ -107,9 +107,11 @@ Test cases:
 
 2. **Interval duration format** - Use `PT5M` not `5M` or `5 minutes`. The `T` separator is required.
 
-3. **Parallel array mismatch** - If you add/remove positions, you must also add/remove coordinates.
+3. **Parallel array mismatch** - If you add/remove positions, you must also add/remove coordinates AND overrides (if present).
 
 4. **Missing default_position_style** - This field is required. Every track must have it.
+
+5. **Override array length mismatch** - If `position_style_overrides` is present, it must have exactly the same length as `positions`. Use `null` for positions without overrides.
 
 ## Validation Commands
 
@@ -156,11 +158,9 @@ pnpm test
     "symbol_interval": "PT1H",
     "label_interval": null,
     "position_style_overrides": [
-      {
-        "time": "2026-01-09T11:00:00Z",
-        "show_label": true,
-        "label": "Contact Alpha"
-      }
+      null,
+      {"show_symbol": true, "show_label": true, "label": "Contact Alpha"},
+      null
     ],
     "style": {
       "line": {"color": "#0066CC", "weight": 2},
@@ -169,3 +169,8 @@ pnpm test
   }
 }
 ```
+
+**Note**: The `position_style_overrides` array is parallel to `positions`:
+- Index 0: `null` → position 0 uses defaults + interval rules
+- Index 1: `{...}` → position 1 has custom symbol and label
+- Index 2: `null` → position 2 uses defaults + interval rules

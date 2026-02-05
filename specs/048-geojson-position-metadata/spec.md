@@ -21,13 +21,13 @@ Additionally, the current model has no support for per-position styling or inter
 
 ## Design Decision
 
-**Principle**: Geometry holds coordinates. Properties hold metadata. Arrays are parallel.
+**Principle**: Geometry holds coordinates. Properties hold metadata. All arrays are parallel.
 
 ```
-geometry.coordinates[i] ←→ properties.positions[i]
+geometry.coordinates[i] ←→ positions[i] ←→ position_style_overrides[i]
 ```
 
-Same length, same order. Position `i` metadata describes coordinate `i`.
+Same length, same order. Position `i` metadata and styling override (if any) describe coordinate `i`. The `position_style_overrides` array contains `null` for positions without custom styling.
 
 ### Style Resolution Cascade
 
@@ -63,13 +63,13 @@ As an analyst, I want to mark specific positions with custom symbols or labels (
 
 **Why this priority**: Per-position overrides are essential for marking significant events, but less frequently used than interval-based display.
 
-**Independent Test**: Can be fully tested by adding an override for a specific timestamp and verifying that position renders with the custom style.
+**Independent Test**: Can be fully tested by adding an override at a specific index and verifying that position renders with the custom style.
 
 **Acceptance Scenarios**:
 
-1. **Given** a track with default styling (no symbols), **When** I add a `position_style_override` with `show_symbol: true` for timestamp T, **Then** only that position shows a symbol
-2. **Given** a track with `symbol_interval: "PT5M"`, **When** I add an override with `show_symbol: false` for a position that would normally show a symbol, **Then** that position has no symbol while others at 5-min intervals do
-3. **Given** a track, **When** I add an override with `label: "Contact Alpha"` and `show_label: true`, **Then** that position shows the custom label text
+1. **Given** a track with default styling (no symbols), **When** I set `position_style_overrides[i]` to `{ show_symbol: true }`, **Then** only position `i` shows a symbol
+2. **Given** a track with `symbol_interval: "PT5M"`, **When** I set an override with `show_symbol: false` at an index that would normally show a symbol, **Then** that position has no symbol while others at 5-min intervals do
+3. **Given** a track, **When** I set an override with `label: "Contact Alpha"` and `show_label: true` at index `i`, **Then** position `i` shows the custom label text
 
 ---
 
@@ -107,11 +107,12 @@ As a developer, I want the schema to store coordinates only in `geometry.coordin
 
 ### Edge Cases
 
-- What happens when `position_style_overrides` references a timestamp not in the positions array? (Ignored - no matching position to style)
+- What happens when `position_style_overrides` array length doesn't match `positions` array? (Validation fails - arrays must be same length)
 - How does system handle tracks with fewer than 2 positions? (Minimum 2 required by existing schema constraint)
 - What happens when `symbol_interval` is longer than the track duration? (No interval symbols shown, only explicit overrides apply)
 - How are labels rendered when `show_label: true` but no explicit `label` text? (Use formatted timestamp HH:MM:SS)
 - What happens when interval doesn't align exactly with position timestamps? (Show symbol at nearest position to each interval mark)
+- What if `position_style_overrides` is omitted entirely? (All positions use defaults + interval rules only)
 
 ## Requirements *(mandatory)*
 
@@ -121,12 +122,12 @@ As a developer, I want the schema to store coordinates only in `geometry.coordin
 
 - **FR-001**: System MUST remove `coordinates` attribute from `TimestampedPosition` class in LinkML schema
 - **FR-002**: System MUST add `PositionStyle` class with attributes: `show_symbol` (boolean), `symbol` (PointShapeEnum), `show_label` (boolean)
-- **FR-003**: System MUST add `PositionStyleOverride` class with attributes: `time` (datetime, required), `show_symbol` (boolean, optional), `symbol` (PointShapeEnum, optional), `show_label` (boolean, optional), `label` (string, optional)
+- **FR-003**: System MUST add `PositionStyleOverride` class with attributes: `show_symbol` (boolean, optional), `symbol` (PointShapeEnum, optional), `show_label` (boolean, optional), `label` (string, optional). No `time` field - position determined by array index.
 - **FR-004**: System MUST add `default_position_style` (PositionStyle, required) attribute to `TrackProperties`
 - **FR-005**: System MUST add `symbol_interval` (string, ISO 8601 duration format, optional) attribute to `TrackProperties`
 - **FR-006**: System MUST add `label_interval` (string, ISO 8601 duration format, optional) attribute to `TrackProperties`
-- **FR-007**: System MUST add `position_style_overrides` (array of PositionStyleOverride, optional) attribute to `TrackProperties`
-- **FR-008**: System MUST validate that `len(geometry.coordinates) == len(properties.positions)` for TrackFeatures
+- **FR-007**: System MUST add `position_style_overrides` (array of PositionStyleOverride or null, optional) attribute to `TrackProperties`. When present, must be same length as `positions` array with `null` entries for positions without overrides.
+- **FR-008**: System MUST validate that all parallel arrays have equal length: `len(geometry.coordinates) == len(positions) == len(position_style_overrides)` (when overrides present)
 
 #### Data Migration
 
@@ -147,9 +148,9 @@ As a developer, I want the schema to store coordinates only in `geometry.coordin
 
 - **PositionStyle**: Default styling configuration for track positions. Contains: show_symbol (boolean), symbol (shape enum), show_label (boolean). Applied as baseline before intervals and overrides.
 
-- **PositionStyleOverride**: Per-position style override keyed by timestamp. Contains: time (required), show_symbol (optional), symbol (optional), show_label (optional), label (optional). Sparse array - only positions with custom styling need entries.
+- **PositionStyleOverride**: Per-position style override indexed by array position. Contains: show_symbol (optional), symbol (optional), show_label (optional), label (optional). No `time` field - index `i` applies to `positions[i]`. Array entries are `null` for positions without custom styling.
 
-- **TrackProperties**: Extended with position styling fields: default_position_style (PositionStyle), symbol_interval (ISO 8601 duration), label_interval (ISO 8601 duration), position_style_overrides (array of PositionStyleOverride).
+- **TrackProperties**: Extended with position styling fields: default_position_style (PositionStyle), symbol_interval (ISO 8601 duration), label_interval (ISO 8601 duration), position_style_overrides (parallel array of PositionStyleOverride or null).
 
 ## Success Criteria *(mandatory)*
 
