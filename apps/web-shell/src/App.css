@@ -12,12 +12,22 @@
 
 html,
 body,
-#root {
+#root,
+#storybook-root {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
   overflow: hidden;
+}
+
+/* Storybook story container needs explicit height */
+.sb-show-main.sb-main-padded {
+  padding: 0 !important;
+}
+
+#storybook-root > div {
+  height: 100%;
 }
 
 body {

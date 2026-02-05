@@ -21,14 +21,16 @@ const meta: Meta<typeof App> = {
   decorators: [
     (Story) => (
       <ThemeProvider>
-        <div style={{ height: '100vh', width: '100vw', margin: '-1rem' }}>
-          <Story />
-        </div>
+        <Story />
       </ThemeProvider>
     ),
   ],
   parameters: {
     layout: 'fullscreen',
+    // Set iframe dimensions for proper fullscreen display
+    viewport: {
+      defaultViewport: 'responsive',
+    },
     docs: {
       description: {
         component: `
