@@ -43,7 +43,11 @@ export function ToolsPanel({ tools, onRunTool, className }: ToolsPanelProps) {
     <div className={`debrief-tools-panel ${className ?? ''}`}>
       <ul className="debrief-tools-panel__list" role="list">
         {activeTools.map(tool => (
-          <li key={tool.id} className="debrief-tools-panel__item debrief-tools-panel__item--active">
+          <li
+            key={tool.id}
+            className="debrief-tools-panel__item debrief-tools-panel__item--active"
+            onClick={() => onRunTool?.(tool.id)}
+          >
             <Button appearance="icon" onClick={() => onRunTool?.(tool.id)} title={`Run ${tool.name}`}>
               <Icon name="tools" />
             </Button>

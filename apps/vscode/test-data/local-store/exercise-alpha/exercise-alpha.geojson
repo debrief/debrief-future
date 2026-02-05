@@ -397,7 +397,7 @@
         "style": {
           "color": "#FF5722",
           "weight": 1,
-          "opacity": 1.0
+          "opacity": 1
         }
       }
     },
@@ -419,7 +419,7 @@
         "style": {
           "color": "#9C27B0",
           "weight": 1,
-          "opacity": 1.0
+          "opacity": 1
         }
       }
     },
@@ -442,7 +442,7 @@
         "style": {
           "color": "#3F51B5",
           "weight": 1,
-          "opacity": 1.0
+          "opacity": 1
         }
       }
     },
@@ -1047,6 +1047,40 @@
         "kind": "NARRATIVE",
         "text": "Exercise Alpha complete. All units returning to port.",
         "time": "2024-01-15T14:00:00Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "stats-7d4fdb4a",
+      "properties": {
+        "source_track": "unknown",
+        "source_name": "USS Freedom",
+        "statistics": {
+          "point_count": 15,
+          "duration_hours": 0,
+          "distance_nm": 2.22,
+          "average_speed_kts": 0
+        },
+        "kind": "track-statistics",
+        "provenance": {
+          "tool": "track-stats",
+          "version": "1.0.0",
+          "timestamp": "2026-02-05T14:08:36.599191Z",
+          "sources": [
+            {
+              "id": "unknown",
+              "kind": "track"
+            }
+          ],
+          "parameters": {}
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.107833333333334,
+          50.27972666666666
+        ]
       }
     }
   ]

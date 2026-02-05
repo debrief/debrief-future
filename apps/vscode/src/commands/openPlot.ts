@@ -15,6 +15,7 @@ import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import { createTimeInstant } from '@debrief/session-state';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
+import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import { MapPanel } from '../webview/mapPanel';
 import { parseStacUri, buildStacUri } from '../types/stac';
 
@@ -62,6 +63,7 @@ export function createOpenPlotCommand(
   toolMatchAdapter: ToolMatchAdapter,
   layersTreeProvider: LayersTreeProvider,
   timeRangeProvider: TimeRangeViewProvider,
+  activityPanelProvider: ActivityPanelViewProvider,
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void
 ): (args?: OpenPlotArgs) => Promise<void> {
@@ -183,8 +185,19 @@ export function createOpenPlotCommand(
 
       // Set up selection change handler
       panel.onSelectionChanged((selection) => {
+        const featureIds = [...selection.trackIds, ...selection.locationIds];
+
+        // Update session state - this will trigger subscriptions in ActivityPanelView
+        // which will update toolMatchAdapter and refresh the UI
+        const activeSession = sessionManager.getActiveSession();
+        if (activeSession) {
+          const state = activeSession.getState();
+          state.setSelection(featureIds);
+        }
+
+        // Also update toolMatchAdapter directly for tools tree provider
         toolMatchAdapter.updateSelection({
-          featureIds: [...selection.trackIds, ...selection.locationIds],
+          featureIds,
           primary: selection.trackIds[0] ?? selection.locationIds[0] ?? null,
           timestamp: createTimeInstant(Date.now()),
         });
@@ -214,7 +227,7 @@ export function createOpenPlotCommand(
     }
 
     // Set up import services for drag-drop functionality
-    panel.setImportServices(ioService, stacService, store, layersTreeProvider);
+    panel.setImportServices(ioService, stacService, store, layersTreeProvider, activityPanelProvider);
 
     // Load plot into panel
     panel.loadPlot(plot, plotData.tracks, plotData.locations, plotData.otherFeatures);
@@ -224,6 +237,9 @@ export function createOpenPlotCommand(
     layersTreeProvider.setLocations(plotData.locations);
     layersTreeProvider.setShapes(plotData.otherFeatures);
     layersTreeProvider.setResultLayers([]);
+
+    // Update activity panel webview with features
+    activityPanelProvider.setFeatures(plotData.tracks, plotData.locations);
 
     // Update time range panel with plot's time extent
     // Convert ISO strings to timestamps for the TimeController

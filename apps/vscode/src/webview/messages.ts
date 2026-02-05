@@ -158,6 +158,12 @@ export interface SetDisplayModeMessage {
   displayMode: 'full' | 'trail';
 }
 
+/** Set hidden feature IDs (Feature: 048) */
+export interface SetHiddenIdsMessage {
+  type: 'setHiddenIds';
+  hiddenIds: string[];
+}
+
 /** Set custom color for a track */
 export interface SetTrackColorMessage {
   type: 'setTrackColor';
@@ -298,6 +304,7 @@ export type ExtensionToWebviewMessage =
   | SetViewportMessage
   | SetCurrentTimeMessage
   | SetDisplayModeMessage
+  | SetHiddenIdsMessage
   | RequestExportPngResponse
   | RequestTrackDetailsResponse
   | ImportProgressMessage

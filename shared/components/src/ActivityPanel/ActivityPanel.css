@@ -14,6 +14,8 @@
   overflow: hidden; /* no top-level scrollbar */
   background: var(--debrief-bg-primary, #1e1e1e);
   color: var(--debrief-text-primary, #cccccc);
+  /* Contain dropdowns within panel bounds */
+  position: relative;
 }
 
 /* ── Section (shared) ──────────────────────────────────── */
