@@ -463,12 +463,13 @@ export class StacService {
    * @returns AssociatedFile object
    */
   assetToAssociatedFile(asset: StacAsset, _assetKey: string): AssociatedFile {
-    const filename = asset.title ?? path.basename(asset.href);
-    const format = this.parseFileFormat(filename);
-    const viewerType = this.parseViewerType(filename);
+    const hrefFilename = path.basename(asset.href);
+    const displayName = asset.title ?? hrefFilename;
+    const format = this.parseFileFormat(hrefFilename);
+    const viewerType = this.parseViewerType(hrefFilename);
 
     return {
-      name: filename,
+      name: displayName,
       path: asset.href.startsWith('./') ? asset.href.slice(2) : asset.href,
       category: 'result',
       viewerType,
