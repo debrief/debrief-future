@@ -1,0 +1,74 @@
+/**
+ * LeafletToolbar Component Styles
+ */
+
+.debrief-leaflet-toolbar {
+  border: 1px solid var(--debrief-border-color);
+  border-radius: var(--debrief-radius-md);
+  overflow: hidden;
+  box-shadow: var(--debrief-shadow-md);
+}
+
+.debrief-leaflet-toolbar__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background-color: var(--debrief-map-controls-bg);
+  color: var(--debrief-text-primary);
+  border-bottom: 1px solid var(--debrief-border-color);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 30px;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.debrief-leaflet-toolbar__button:hover {
+  background-color: var(--debrief-bg-tertiary);
+}
+
+.debrief-leaflet-toolbar__button:active {
+  background-color: var(--debrief-bg-secondary);
+}
+
+.debrief-leaflet-toolbar__button:last-child {
+  border-bottom: none;
+}
+
+/* Focus state for accessibility */
+.debrief-leaflet-toolbar__button:focus {
+  outline: 2px solid var(--debrief-color-primary);
+  outline-offset: -2px;
+}
+
+/* Zoom buttons specific styling */
+.debrief-leaflet-toolbar__zoom-in,
+.debrief-leaflet-toolbar__zoom-out {
+  font-family: 'Lucida Console', Monaco, monospace;
+}
+
+/* Fit button with SVG icon */
+.debrief-leaflet-toolbar__fit {
+  padding: 0;
+}
+
+.debrief-leaflet-toolbar__fit svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+
+/* Disabled state (when no features to fit) */
+.debrief-leaflet-toolbar__button--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.debrief-leaflet-toolbar__button--disabled:hover {
+  background-color: var(--debrief-map-controls-bg);
+}

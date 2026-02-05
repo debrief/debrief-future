@@ -15,7 +15,8 @@ class TestResultTopType:
         assert len(ResultTopType) == 4
 
     def test_string_conversion(self):
-        assert str(ResultTopType.MUTATION) == "ResultTopType.MUTATION"
+        # StrEnum: str() returns the value directly
+        assert str(ResultTopType.MUTATION) == "mutation"
         assert ResultTopType.MUTATION.value == "mutation"
 
 

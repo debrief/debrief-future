@@ -8,14 +8,14 @@ All exceptions include context for better error messages:
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pydantic import ValidationError as PydanticValidationError
 
 
-class ErrorCode(str, Enum):
+class ErrorCode(StrEnum):
     """Error codes for programmatic error handling.
 
     Used to categorize parse errors for automated processing.

@@ -37,8 +37,8 @@
 
 **Purpose**: Prepare project structure for implementation
 
-- [ ] T001 Create evidence directory `specs/048-geojson-position-metadata/evidence/`
-- [ ] T002 Verify LinkML and schema generation tools are available
+- [x] T001 Create evidence directory `specs/048-geojson-position-metadata/evidence/`
+- [x] T002 Verify LinkML and schema generation tools are available
 
 ---
 
@@ -50,18 +50,18 @@
 
 ### Schema Modifications
 
-- [ ] T003 Remove `coordinates` attribute from TimestampedPosition `shared/schemas/src/linkml/common.yaml`
-- [ ] T004 [P] Add PositionStyle class to styling schema `shared/schemas/src/linkml/styling.yaml`
-- [ ] T005 [P] Add PositionStyleOverride class (no time field) `shared/schemas/src/linkml/styling.yaml`
-- [ ] T006 Add default_position_style to TrackProperties `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T007 [P] Add symbol_interval to TrackProperties `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T008 [P] Add label_interval to TrackProperties `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T009 [P] Add position_style_overrides to TrackProperties `shared/schemas/src/linkml/geojson.yaml`
+- [x] T003 Remove `coordinates` attribute from TimestampedPosition `shared/schemas/src/linkml/common.yaml`
+- [x] T004 [P] Add PositionStyle class to styling schema `shared/schemas/src/linkml/styling.yaml`
+- [x] T005 [P] Add PositionStyleOverride class (no time field) `shared/schemas/src/linkml/styling.yaml`
+- [x] T006 Add default_position_style to TrackProperties `shared/schemas/src/linkml/geojson.yaml`
+- [x] T007 [P] Add symbol_interval to TrackProperties `shared/schemas/src/linkml/geojson.yaml`
+- [x] T008 [P] Add label_interval to TrackProperties `shared/schemas/src/linkml/geojson.yaml`
+- [x] T009 [P] Add position_style_overrides to TrackProperties `shared/schemas/src/linkml/geojson.yaml`
 
 ### Validation
 
-- [ ] T010 Add parallel array validation rule (coordinates == positions == overrides) `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T011 Run LinkML linting to verify schema syntax `shared/schemas/Makefile`
+- [x] T010 Add parallel array validation rule (coordinates == positions == overrides) `shared/schemas/src/linkml/geojson.yaml`
+- [x] T011 Run LinkML linting to verify schema syntax `shared/schemas/Makefile`
 
 **Checkpoint**: Schema definitions complete - proceed to migration
 
@@ -75,27 +75,27 @@
 
 ### Fixture Migration
 
-- [ ] T012 Migrate track-feature-valid-01.json - remove position coordinates, add default_position_style `shared/schemas/src/fixtures/valid/track-feature-valid-01.json`
-- [ ] T013 [P] Migrate track-feature-valid-02.json - remove position coordinates, add default_position_style `shared/schemas/src/fixtures/valid/track-feature-valid-02.json`
-- [ ] T014 Create new fixture with position styling (intervals + overrides) `shared/schemas/src/fixtures/valid/track-feature-position-styling.json`
+- [x] T012 Migrate track-feature-valid-01.json - remove position coordinates, add default_position_style `shared/schemas/src/fixtures/valid/track-feature-valid-01.json`
+- [x] T013 [P] Migrate track-feature-valid-02.json - remove position coordinates, add default_position_style `shared/schemas/src/fixtures/valid/track-feature-valid-02.json`
+- [x] T014 Create new fixture with position styling (intervals + overrides) `shared/schemas/src/fixtures/valid/track-feature-position-styling.json`
 
 ### REP Handler Migration
 
-- [ ] T050 Update REP handler to remove lat/lon from positions_data output `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T051 Add default_position_style to REP handler feature output `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T052 [test] Update REP handler tests for new schema format `services/io/tests/test_rep_handler.py`
+- [x] T050 Update REP handler to remove lat/lon from positions_data output `services/io/src/debrief_io/handlers/rep.py`
+- [x] T051 Add default_position_style to REP handler feature output `services/io/src/debrief_io/handlers/rep.py`
+- [x] T052 [test] Update REP handler tests for new schema format `services/io/tests/test_rep_handler.py`
 
 ### Schema Generation
 
-- [ ] T015 Regenerate Pydantic models from LinkML `shared/schemas/src/generated/python/`
-- [ ] T016 [P] Regenerate TypeScript types from LinkML `shared/schemas/src/generated/typescript/`
-- [ ] T017 [P] Regenerate JSON Schema from LinkML `shared/schemas/src/generated/json-schema/`
+- [x] T015 Regenerate Pydantic models from LinkML `shared/schemas/src/generated/python/`
+- [x] T016 [P] Regenerate TypeScript types from LinkML `shared/schemas/src/generated/typescript/`
+- [x] T017 [P] Regenerate JSON Schema from LinkML `shared/schemas/src/generated/json-schema/`
 
 ### Testing
 
-- [ ] T018 [test] Run golden fixture validation tests `shared/schemas/tests/test_golden.py`
-- [ ] T019 [P][test] Run round-trip serialization tests `shared/schemas/tests/test_roundtrip.py`
-- [ ] T020 [P][test] Run TypeScript type checking `shared/schemas/tests/typescript-usage.ts`
+- [x] T018 [test] Run golden fixture validation tests `shared/schemas/tests/test_golden.py`
+- [x] T019 [P][test] Run round-trip serialization tests `shared/schemas/tests/test_roundtrip.py`
+- [x] T020 [P][test] Run TypeScript type checking `shared/schemas/tests/typescript-usage.ts`
 
 **Checkpoint**: Schema migration complete - all tests pass
 
@@ -109,21 +109,21 @@
 
 ### Utility Functions
 
-- [ ] T021 Add ISO 8601 duration parser for PT durations `apps/vscode/src/webview/web/durationUtils.ts`
-- [ ] T022 [test] Write duration parser unit tests `apps/vscode/tests/unit/durationUtils.test.ts`
-- [ ] T023 Add interval position matching algorithm `apps/vscode/src/webview/web/intervalUtils.ts`
-- [ ] T024 [test] Write interval matching unit tests `apps/vscode/tests/unit/intervalUtils.test.ts`
+- [x] T021 Add ISO 8601 duration parser for PT durations `apps/vscode/src/webview/web/durationUtils.ts`
+- [x] T022 [test] Write duration parser unit tests `apps/vscode/tests/unit/durationUtils.test.ts`
+- [x] T023 Add interval position matching algorithm `apps/vscode/src/webview/web/intervalUtils.ts`
+- [x] T024 [test] Write interval matching unit tests `apps/vscode/tests/unit/intervalUtils.test.ts`
 
 ### Renderer Updates
 
-- [ ] T025 Add position symbol rendering to TrackRenderer `apps/vscode/src/webview/web/trackRenderer.ts`
-- [ ] T026 Add style resolution cascade function (defaults → intervals → overrides) `apps/vscode/src/webview/web/trackRenderer.ts`
-- [ ] T027 Integrate interval-based symbol display in renderTrack method `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T025 Add position symbol rendering to TrackRenderer `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T026 Add style resolution cascade function (defaults → intervals → overrides) `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T027 Integrate interval-based symbol display in renderTrack method `apps/vscode/src/webview/web/trackRenderer.ts`
 
 ### Integration
 
-- [ ] T028 Update Track type to include new styling properties `apps/vscode/src/webview/messages.ts`
-- [ ] T029 [test] Write integration test for interval symbol rendering `apps/vscode/tests/unit/trackRenderer.test.ts`
+- [x] T028 Update Track type to include new styling properties `apps/vscode/src/webview/messages.ts`
+- [x] T029 [test] Write integration test for interval symbol rendering `apps/vscode/tests/unit/trackRenderer.test.ts`
 
 **Checkpoint**: Tracks render symbols at configured intervals
 
@@ -137,19 +137,19 @@
 
 ### Override Handling
 
-- [ ] T030 Add override lookup by index in style resolution `apps/vscode/src/webview/web/trackRenderer.ts`
-- [ ] T031 Apply override styling (show_symbol, symbol shape) in renderer `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T030 Add override lookup by index in style resolution `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T031 Apply override styling (show_symbol, symbol shape) in renderer `apps/vscode/src/webview/web/trackRenderer.ts`
 
 ### Label Rendering
 
-- [ ] T032 Add position label rendering capability `apps/vscode/src/webview/web/trackRenderer.ts`
-- [ ] T033 Format timestamp as default label text when show_label=true `apps/vscode/src/webview/web/trackRenderer.ts`
-- [ ] T034 Apply custom label text from overrides `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T032 Add position label rendering capability `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T033 Format timestamp as default label text when show_label=true `apps/vscode/src/webview/web/trackRenderer.ts`
+- [x] T034 Apply custom label text from overrides `apps/vscode/src/webview/web/trackRenderer.ts`
 
 ### Testing
 
-- [ ] T035 [test] Write unit test for override suppressing interval symbol `apps/vscode/tests/unit/trackRenderer.test.ts`
-- [ ] T036 [P][test] Write unit test for custom label text `apps/vscode/tests/unit/trackRenderer.test.ts`
+- [x] T035 [test] Write unit test for override suppressing interval symbol `apps/vscode/tests/unit/trackRenderer.test.ts`
+- [x] T036 [P][test] Write unit test for custom label text `apps/vscode/tests/unit/trackRenderer.test.ts`
 
 **Checkpoint**: Position overrides correctly applied in rendering
 
@@ -163,9 +163,9 @@
 
 ### Verification
 
-- [ ] T037 [test] Test default show_symbol=true renders all position symbols `apps/vscode/tests/unit/trackRenderer.test.ts`
-- [ ] T038 [P][test] Test default symbol shape applied to all rendered symbols `apps/vscode/tests/unit/trackRenderer.test.ts`
-- [ ] T039 [P][test] Test default show_label=true renders labels at all positions `apps/vscode/tests/unit/trackRenderer.test.ts`
+- [x] T037 [test] Test default show_symbol=true renders all position symbols `apps/vscode/tests/unit/trackRenderer.test.ts`
+- [x] T038 [P][test] Test default symbol shape applied to all rendered symbols `apps/vscode/tests/unit/trackRenderer.test.ts`
+- [x] T039 [P][test] Test default show_label=true renders labels at all positions `apps/vscode/tests/unit/trackRenderer.test.ts`
 
 **Checkpoint**: Default position style cascade verified
 
@@ -182,16 +182,16 @@
 
 ### Evidence Collection
 
-- [ ] T042 Create evidence directory `specs/048-geojson-position-metadata/evidence/`
-- [ ] T043 Capture test summary with pass/fail counts `specs/048-geojson-position-metadata/evidence/test-summary.md`
-- [ ] T044 Create usage example showing track with position styling `specs/048-geojson-position-metadata/evidence/usage-example.md`
+- [x] T042 Create evidence directory `specs/048-geojson-position-metadata/evidence/`
+- [x] T043 Capture test summary with pass/fail counts `specs/048-geojson-position-metadata/evidence/test-summary.md`
+- [x] T044 Create usage example showing track with position styling `specs/048-geojson-position-metadata/evidence/usage-example.md`
 - [ ] T045 [P] Document before/after fixture comparison `specs/048-geojson-position-metadata/evidence/before-after-fixture.md`
 - [ ] T046 [P] Capture screenshot of rendered track with interval symbols `specs/048-geojson-position-metadata/evidence/rendered-track.png`
 
 ### Media Content
 
-- [ ] T047 Create shipped blog post `specs/048-geojson-position-metadata/media/shipped-post.md`
-- [ ] T048 [P] Create LinkedIn shipped summary `specs/048-geojson-position-metadata/media/linkedin-shipped.md`
+- [x] T047 Create shipped blog post `specs/048-geojson-position-metadata/media/shipped-post.md`
+- [x] T048 [P] Create LinkedIn shipped summary `specs/048-geojson-position-metadata/media/linkedin-shipped.md`
 
 ### PR Creation
 

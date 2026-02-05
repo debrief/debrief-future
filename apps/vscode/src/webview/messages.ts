@@ -320,5 +320,12 @@ export type WebviewToExtensionMessage =
 // Re-exports for webview
 // ============================================================================
 
-export type { Track, ReferenceLocation, SelectionContextType } from '../types/plot';
+export type {
+  Track,
+  ReferenceLocation,
+  SelectionContextType,
+  PositionStyle,
+  PositionStyleOverride,
+  TimestampedPosition,
+} from '../types/plot';
 export type { LayerStyle, ResultLayer } from '../types/tool';
