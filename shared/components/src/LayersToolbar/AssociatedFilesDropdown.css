@@ -3,7 +3,8 @@
  */
 
 .debrief-associated-files {
-  width: 260px;
+  width: 220px;
+  max-width: calc(100vw - 24px); /* Constrain to viewport minus padding */
   background-color: var(--debrief-bg-primary, #ffffff);
   border: 1px solid var(--debrief-border-color, #e0e0e0);
   border-radius: var(--debrief-border-radius, 4px);

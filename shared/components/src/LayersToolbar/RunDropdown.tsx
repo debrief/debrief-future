@@ -113,8 +113,8 @@ export function RunDropdown({
       {categories.map((category) => (
         <div key={category.id} className="debrief-run-dropdown__category">
           <div className="debrief-run-dropdown__category-trigger">
+            <span className="debrief-run-dropdown__arrow">‹</span>
             {category.label}
-            <span className="debrief-run-dropdown__arrow">›</span>
           </div>
           <div className="debrief-run-dropdown__submenu">
             {category.items.map((item) => {

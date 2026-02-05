@@ -11,6 +11,8 @@
   border: 1px solid var(--debrief-border-color, #e0e0e0);
   border-radius: var(--debrief-border-radius, 4px);
   font-family: var(--debrief-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  /* Establish positioning context for dropdowns */
+  position: relative;
 }
 
 .debrief-layers-toolbar__group {
@@ -83,11 +85,15 @@
 }
 
 .debrief-layers-toolbar__dropdown--left {
+  /* Align to left edge of button, constrain to not overflow right */
   left: 0;
+  right: auto;
 }
 
 .debrief-layers-toolbar__dropdown--right {
+  /* Align to right edge of button, constrain to not overflow left */
   right: 0;
+  left: auto;
 }
 
 /* Dark theme */

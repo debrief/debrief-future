@@ -20,7 +20,7 @@
 .debrief-run-dropdown__category-trigger {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 6px;
   padding: 5px 12px;
   cursor: pointer;
   color: var(--debrief-text-primary, #1a1a1a);
@@ -35,13 +35,15 @@
   font-size: 14px;
 }
 
-/* Submenu - appears on hover */
+/* Submenu - appears on hover, opens LEFT to stay within narrow sidebars */
 .debrief-run-dropdown__submenu {
   display: none;
   position: absolute;
   top: 0;
-  left: 100%;
-  min-width: 200px;
+  right: 100%; /* Open to left instead of right for narrow panels */
+  left: auto;
+  min-width: 160px;
+  max-width: calc(100vw - 24px);
   background-color: var(--debrief-bg-primary, #ffffff);
   border: 1px solid var(--debrief-border-color, #e0e0e0);
   border-radius: var(--debrief-border-radius, 4px);
