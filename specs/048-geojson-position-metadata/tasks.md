@@ -79,6 +79,12 @@
 - [ ] T013 [P] Migrate track-feature-valid-02.json - remove position coordinates, add default_position_style `shared/schemas/src/fixtures/valid/track-feature-valid-02.json`
 - [ ] T014 Create new fixture with position styling (intervals + overrides) `shared/schemas/src/fixtures/valid/track-feature-position-styling.json`
 
+### REP Handler Migration
+
+- [ ] T050 Update REP handler to remove lat/lon from positions_data output `services/io/src/debrief_io/handlers/rep.py`
+- [ ] T051 Add default_position_style to REP handler feature output `services/io/src/debrief_io/handlers/rep.py`
+- [ ] T052 [test] Update REP handler tests for new schema format `services/io/tests/test_rep_handler.py`
+
 ### Schema Generation
 
 - [ ] T015 Regenerate Pydantic models from LinkML `shared/schemas/src/generated/python/`
@@ -225,8 +231,9 @@ T007, T008, T009 can run in parallel (different fields in geojson.yaml)
 **Phase 3 (Migration):**
 ```
 T012, T013 can run in parallel (different fixtures)
+T050, T051 can run in parallel with T012, T013 (independent file)
 T015, T016, T017 can run in parallel (different generated outputs)
-T018, T019, T020 can run in parallel (independent test suites)
+T018, T019, T020, T052 can run in parallel (independent test suites)
 ```
 
 **Phase 4 (US1):**
@@ -261,12 +268,12 @@ T021, T023 can start in parallel, but T022, T024 tests depend on implementations
 |-------|-------|----------------------|
 | 1. Setup | 2 | 0 |
 | 2. Schema | 9 | 5 |
-| 3. Migration | 9 | 6 |
+| 3. Migration | 12 | 8 |
 | 4. US1 Intervals | 9 | 2 |
 | 5. US2 Overrides | 7 | 1 |
 | 6. US3 Defaults | 3 | 2 |
 | 7. Polish | 10 | 4 |
-| **Total** | **49** | **20** |
+| **Total** | **52** | **22** |
 
 ---
 
