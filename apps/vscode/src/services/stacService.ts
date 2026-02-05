@@ -462,13 +462,14 @@ export class StacService {
    * @param assetKey The asset key from the item
    * @returns AssociatedFile object
    */
-  assetToAssociatedFile(asset: StacAsset, assetKey: string): AssociatedFile {
-    const filename = asset.title ?? path.basename(asset.href);
-    const format = this.parseFileFormat(filename);
-    const viewerType = this.parseViewerType(filename);
+  assetToAssociatedFile(asset: StacAsset, _assetKey: string): AssociatedFile {
+    const hrefFilename = path.basename(asset.href);
+    const displayName = asset.title ?? hrefFilename;
+    const format = this.parseFileFormat(hrefFilename);
+    const viewerType = this.parseViewerType(hrefFilename);
 
     return {
-      name: filename,
+      name: displayName,
       path: asset.href.startsWith('./') ? asset.href.slice(2) : asset.href,
       category: 'result',
       viewerType,
@@ -485,7 +486,7 @@ export class StacService {
    * @param assetKey The asset key
    * @returns True if this asset is a result file
    */
-  isResultAsset(asset: StacAsset, assetKey: string): boolean {
+  isResultAsset(asset: StacAsset, _assetKey: string): boolean {
     // Primary: Check for 'result' role
     if (asset.roles?.includes('result')) {
       return true;
