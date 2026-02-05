@@ -23,6 +23,7 @@ import type { IoService } from '../services/ioService';
 import type { StacService } from '../services/stacService';
 import type { StacStore } from '../types/stac';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
+import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import type { SessionManager } from '../services/sessionManager';
 import {
   subscribeToSpatial,
@@ -56,6 +57,7 @@ export class MapPanel {
   private stacService: StacService | null = null;
   private currentStore: StacStore | null = null;
   private layersTreeProvider: LayersTreeProvider | null = null;
+  private activityPanelProvider: ActivityPanelViewProvider | null = null;
 
   // Event handlers
   private onSelectionChangedCallback:
@@ -249,6 +251,11 @@ export class MapPanel {
       this.layersTreeProvider.setLocations(this.currentLocations);
       this.layersTreeProvider.setShapes(this.otherFeatures as import('../types/import').GeoJSONFeature[]);
       this.layersTreeProvider.setResultLayers([...this.resultLayers]);
+    }
+
+    // Update activity panel webview if available
+    if (this.activityPanelProvider) {
+      this.activityPanelProvider.setFeatures(this.currentTracks, this.currentLocations);
     }
   }
 
@@ -497,12 +504,14 @@ export class MapPanel {
     ioService: IoService,
     stacService: StacService,
     store: StacStore,
-    layersTreeProvider: LayersTreeProvider
+    layersTreeProvider: LayersTreeProvider,
+    activityPanelProvider?: ActivityPanelViewProvider
   ): void {
     this.ioService = ioService;
     this.stacService = stacService;
     this.currentStore = store;
     this.layersTreeProvider = layersTreeProvider;
+    this.activityPanelProvider = activityPanelProvider ?? null;
   }
 
   /**
@@ -1024,6 +1033,9 @@ export class MapPanel {
         this.layersTreeProvider?.setTracks(updatedData.tracks);
         this.layersTreeProvider?.setLocations(updatedData.locations);
         this.layersTreeProvider?.setShapes(updatedData.otherFeatures);
+
+        // Update activity panel webview
+        this.activityPanelProvider?.setFeatures(updatedData.tracks, updatedData.locations);
       }
 
       // Send completion message

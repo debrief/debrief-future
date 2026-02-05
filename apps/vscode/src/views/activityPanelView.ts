@@ -25,6 +25,7 @@ import type { SessionManager } from '../services/sessionManager';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { CalcService } from '../services/calcService';
 import type { MatchResult } from '../types/tool';
+import type { Track, ReferenceLocation } from '../types/plot';
 
 // Message types from webview
 interface TemporalSeekMessage {
@@ -94,6 +95,10 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   private _temporalUnsubscribe?: () => void;
   private _selectionUnsubscribe?: () => void;
   private _sessionChangeDisposable?: vscode.Disposable;
+
+  // Feature data from MapPanel
+  private _tracks: Track[] = [];
+  private _locations: ReferenceLocation[] = [];
 
   constructor(
     extensionUri: vscode.Uri,
@@ -233,22 +238,51 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
    * Send layers update to webview
    */
   private _sendLayersUpdate(): void {
-    if (!this._activeSession) {
-      return;
-    }
-
-    const state: SessionStoreWithUndo = this._activeSession.getState();
-
-    // Layers/features come from the STAC catalog, not session state.
-    // The webview receives an empty list here; full layer data will be
-    // pushed once the LayersTreeProvider is wired into this view.
-    const hiddenIds: string[] = state.hiddenFeatureIds ?? [];
+    const hiddenIds: string[] = this._activeSession?.getState().hiddenFeatureIds ?? [];
     const toolMatches: MatchResult[] = this._toolMatchAdapter.getMatchResults();
+
+    // Transform tracks and locations to DebriefFeature format
+    const features = [
+      ...this._tracks.map((track) => ({
+        type: 'Feature' as const,
+        id: track.id,
+        geometry: track.geometry,
+        properties: {
+          kind: 'TRACK' as const,
+          platform_name: track.name,
+          platform_type: track.platformType,
+          start_time: track.startTime,
+          end_time: track.endTime,
+          times: track.times,
+          style: { color: track.color },
+        },
+      })),
+      ...this._locations.map((loc) => ({
+        type: 'Feature' as const,
+        id: loc.id,
+        geometry: loc.geometry,
+        properties: {
+          kind: 'POINT' as const,
+          name: loc.name,
+          location_type: loc.locationType ?? 'REFERENCE',
+        },
+      })),
+    ];
 
     this._postMessage({
       type: 'layers:update',
-      payload: { layers: [] as unknown[], hiddenIds, toolMatches },
+      payload: { layers: features, hiddenIds, toolMatches },
     });
+  }
+
+  /**
+   * Set features to display in the layers panel.
+   * Called by MapPanel when plot data is loaded/updated.
+   */
+  public setFeatures(tracks: Track[], locations: ReferenceLocation[]): void {
+    this._tracks = tracks;
+    this._locations = locations;
+    this._sendLayersUpdate();
   }
 
   public resolveWebviewView(

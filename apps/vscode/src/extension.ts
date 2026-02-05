@@ -248,6 +248,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     toolsTreeProvider,
     layersTreeProvider,
     timeRangeProvider,
+    activityPanelProvider,
     toolMatchAdapter,
     () => mapPanel,
     (panel) => {
