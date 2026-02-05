@@ -1,0 +1,296 @@
+/**
+ * AnalysisPage - Page Object Model for the analysis view.
+ *
+ * This page displays the loaded plot with:
+ * - Activity panel (TimeController, Tools, Layers)
+ * - Map view with features
+ */
+
+import type { Page, Locator } from '@playwright/test';
+import { TimeController } from '../components/TimeController';
+
+/**
+ * Page object for the Analysis view.
+ *
+ * The analysis view shows:
+ * - Header with back button and plot title
+ * - Sidebar with ActivityPanel (TimeController, Tools, Layers)
+ * - Main area with MapView
+ */
+export class AnalysisPage {
+  readonly page: Page;
+  readonly timeController: TimeController;
+
+  constructor(page: Page) {
+    this.page = page;
+    // TimeController is within the activity panel
+    this.timeController = new TimeController(page);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Navigation
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Wait for the analysis page to fully load.
+   */
+  async waitForLoad(): Promise<void> {
+    await this.page.waitForSelector('.web-shell--analysis', { state: 'visible' });
+    await this.page.waitForSelector('.leaflet-container', { state: 'visible' });
+  }
+
+  /**
+   * Navigate back to the catalog.
+   */
+  async backToCatalog(): Promise<void> {
+    await this.backButton.click();
+    await this.page.waitForSelector('.web-shell--welcome', { state: 'visible' });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Locators
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * The main container for the analysis view.
+   */
+  get container(): Locator {
+    return this.page.locator('.web-shell--analysis');
+  }
+
+  /**
+   * The page header.
+   */
+  get header(): Locator {
+    return this.page.locator('.web-shell__header');
+  }
+
+  /**
+   * The back button.
+   */
+  get backButton(): Locator {
+    return this.page.locator('.web-shell__back-button');
+  }
+
+  /**
+   * The plot title in the header.
+   */
+  get title(): Locator {
+    return this.page.locator('.web-shell--analysis .web-shell__title');
+  }
+
+  /**
+   * The sidebar containing the activity panel.
+   */
+  get sidebar(): Locator {
+    return this.page.locator('.web-shell__sidebar');
+  }
+
+  /**
+   * The activity panel component.
+   */
+  get activityPanel(): Locator {
+    return this.page.locator('.debrief-activity-panel');
+  }
+
+  /**
+   * The map container.
+   */
+  get mapContainer(): Locator {
+    return this.page.locator('.web-shell__map-container');
+  }
+
+  /**
+   * The Leaflet map.
+   */
+  get map(): Locator {
+    return this.page.locator('.leaflet-container');
+  }
+
+  /**
+   * Interactive features on the map.
+   */
+  get mapFeatures(): Locator {
+    return this.page.locator('.leaflet-interactive');
+  }
+
+  /**
+   * Tool message display (shows results).
+   */
+  get toolMessage(): Locator {
+    return this.page.locator('.web-shell__tool-message');
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Activity Panel Sections
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Get all activity panel sections.
+   */
+  get sections(): Locator {
+    return this.page.locator('.debrief-activity-panel__section');
+  }
+
+  /**
+   * Get a section by its title.
+   */
+  getSectionByTitle(title: string): Locator {
+    return this.page.locator(`.debrief-activity-panel__section:has(.debrief-activity-panel__section-title:text("${title}"))`);
+  }
+
+  /**
+   * The Time Controller section.
+   */
+  get timeControllerSection(): Locator {
+    return this.getSectionByTitle('TIME CONTROLLER');
+  }
+
+  /**
+   * The Tools section.
+   */
+  get toolsSection(): Locator {
+    return this.getSectionByTitle('TOOLS');
+  }
+
+  /**
+   * The Layers section.
+   */
+  get layersSection(): Locator {
+    return this.getSectionByTitle('LAYERS');
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Layers Panel
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Get all layer rows in the layers panel.
+   */
+  get layerRows(): Locator {
+    return this.page.locator('.debrief-feature-row');
+  }
+
+  /**
+   * Get the number of layers displayed.
+   */
+  async getLayerCount(): Promise<number> {
+    return await this.layerRows.count();
+  }
+
+  /**
+   * Find a layer by its name.
+   */
+  getLayerByName(name: string): Locator {
+    return this.page.locator(`.debrief-feature-row:has(.debrief-feature-row__name:text("${name}"))`);
+  }
+
+  /**
+   * Get all layer names.
+   */
+  async getLayerNames(): Promise<string[]> {
+    const names = await this.page.locator('.debrief-feature-row__name').allTextContents();
+    return names;
+  }
+
+  /**
+   * Click on a layer to select it.
+   */
+  async selectLayer(layer: Locator): Promise<void> {
+    await layer.click();
+  }
+
+  /**
+   * Get the selected layers.
+   */
+  get selectedLayers(): Locator {
+    return this.page.locator('.debrief-feature-row--selected');
+  }
+
+  /**
+   * Get the count of selected layers.
+   */
+  async getSelectedLayerCount(): Promise<number> {
+    return await this.selectedLayers.count();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Tools Panel
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Get all tool items.
+   */
+  get toolItems(): Locator {
+    return this.page.locator('.debrief-tools-panel__tool');
+  }
+
+  /**
+   * Find a tool by its name.
+   */
+  getToolByName(name: string): Locator {
+    return this.page.locator(`.debrief-tools-panel__tool:has-text("${name}")`);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Map Interactions
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Get the number of features rendered on the map.
+   */
+  async getMapFeatureCount(): Promise<number> {
+    return await this.mapFeatures.count();
+  }
+
+  /**
+   * Click on a map feature.
+   */
+  async clickMapFeature(index: number): Promise<void> {
+    await this.mapFeatures.nth(index).click();
+  }
+
+  /**
+   * Click on the map background (to clear selection).
+   */
+  async clickMapBackground(): Promise<void> {
+    // Click on the map container, not on a feature
+    await this.map.click({ position: { x: 10, y: 10 } });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Queries
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Get the plot title text.
+   */
+  async getTitleText(): Promise<string> {
+    return await this.title.textContent() ?? '';
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Assertions
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Check if the analysis page is currently visible.
+   */
+  async isVisible(): Promise<boolean> {
+    return await this.container.isVisible();
+  }
+
+  /**
+   * Check if the map has loaded features.
+   */
+  async hasMapFeatures(): Promise<boolean> {
+    return (await this.getMapFeatureCount()) > 0;
+  }
+
+  /**
+   * Check if the activity panel is visible.
+   */
+  async hasActivityPanel(): Promise<boolean> {
+    return await this.activityPanel.isVisible();
+  }
+}
