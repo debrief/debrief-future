@@ -8,6 +8,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ActivityPanel } from '@debrief/components';
+
+// Import codicon font CSS for vscrui icons (esbuild loads as text string)
+import codiconCss from 'vscrui/dist/codicon.css';
+
+// Inject codicon CSS into the document
+const codiconStyle = document.createElement('style');
+codiconStyle.textContent = codiconCss;
+document.head.appendChild(codiconStyle);
 import type {
   ActivityPanelCollapseState,
   ActivityPanelMessage,

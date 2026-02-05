@@ -185,8 +185,19 @@ export function createOpenPlotCommand(
 
       // Set up selection change handler
       panel.onSelectionChanged((selection) => {
+        const featureIds = [...selection.trackIds, ...selection.locationIds];
+
+        // Update session state - this will trigger subscriptions in ActivityPanelView
+        // which will update toolMatchAdapter and refresh the UI
+        const activeSession = sessionManager.getActiveSession();
+        if (activeSession) {
+          const state = activeSession.getState();
+          state.setSelection(featureIds);
+        }
+
+        // Also update toolMatchAdapter directly for tools tree provider
         toolMatchAdapter.updateSelection({
-          featureIds: [...selection.trackIds, ...selection.locationIds],
+          featureIds,
           primary: selection.trackIds[0] ?? selection.locationIds[0] ?? null,
           timestamp: createTimeInstant(Date.now()),
         });

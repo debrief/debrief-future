@@ -28,6 +28,8 @@ import {
   subscribeToSpatial,
   subscribeToSelection,
   subscribeToTemporal,
+  subscribeToSlice,
+  selectors,
   type SessionStoreApi,
   type SessionStoreWithUndo,
 } from '@debrief/session-state';
@@ -71,6 +73,7 @@ export class MapPanel {
   private spatialUnsubscribe?: () => void;
   private selectionUnsubscribe?: () => void;
   private temporalUnsubscribe?: () => void;
+  private hiddenUnsubscribe?: () => void;
   private sessionChangeDisposable?: vscode.Disposable;
   private viewportUpdateTimeout?: NodeJS.Timeout;
   private static readonly VIEWPORT_DEBOUNCE_MS = 100;
@@ -588,9 +591,11 @@ export class MapPanel {
     this.spatialUnsubscribe?.();
     this.selectionUnsubscribe?.();
     this.temporalUnsubscribe?.();
+    this.hiddenUnsubscribe?.();
     this.spatialUnsubscribe = undefined;
     this.selectionUnsubscribe = undefined;
     this.temporalUnsubscribe = undefined;
+    this.hiddenUnsubscribe = undefined;
 
     this.activeSession = session ?? undefined;
 
@@ -644,6 +649,18 @@ export class MapPanel {
           displayMode: webviewMode,
         });
       });
+
+      // Subscribe to hidden feature IDs changes (Feature: 048)
+      this.hiddenUnsubscribe = subscribeToSlice(
+        session,
+        selectors.hiddenFeatureIds,
+        (hiddenIds: string[]) => {
+          this.postMessage({
+            type: 'setHiddenIds',
+            hiddenIds,
+          });
+        }
+      );
     }
   }
 

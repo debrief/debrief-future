@@ -336,6 +336,7 @@ export function ActivityPanel({
             toolMatches={toolMatches}
             onDelete={handleDelete}
             onToggleVisibility={handleToggleVisibility}
+            onRunTool={(toolId) => onMessage?.({ type: 'tool:run', payload: { toolId } })}
           />
           <FeatureList
             features={features}

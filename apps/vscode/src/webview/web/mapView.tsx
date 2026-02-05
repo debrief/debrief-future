@@ -82,6 +82,9 @@ function MapViewApp(): React.ReactElement {
   // Selection state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
+  // Hidden features state
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
+
   // Viewport state
   const [viewport, setViewport] = useState<{ center: [number, number]; zoom: number } | undefined>();
   const [fitBoundsTrigger, setFitBoundsTrigger] = useState(0);
@@ -105,12 +108,15 @@ function MapViewApp(): React.ReactElement {
     vscode.postMessage({ type: 'webviewReady' });
   }, []);
 
-  // Merge all features
+  // Merge all features, filtering out hidden ones
   const features = useMemo((): DebriefFeature[] => {
     const trackFeatures = tracks.map(t => trackToFeature(t, trackColors[t.id]));
     const locationFeatures = locations.map(locationToFeature);
-    return [...trackFeatures, ...locationFeatures, ...resultFeatures];
-  }, [tracks, locations, resultFeatures, trackColors]);
+    const allFeatures = [...trackFeatures, ...locationFeatures, ...resultFeatures];
+    // Filter out hidden features
+    if (hiddenIds.size === 0) return allFeatures;
+    return allFeatures.filter(f => !hiddenIds.has(String(f.id)));
+  }, [tracks, locations, resultFeatures, trackColors, hiddenIds]);
 
   // Message handler
   useEffect(() => {
@@ -137,6 +143,9 @@ function MapViewApp(): React.ReactElement {
           break;
         case 'setDisplayMode':
           setDisplayMode(msg.displayMode);
+          break;
+        case 'setHiddenIds':
+          setHiddenIds(new Set(msg.hiddenIds));
           break;
         case 'setViewport':
           setViewport({ center: msg.viewport.center, zoom: msg.viewport.zoom });

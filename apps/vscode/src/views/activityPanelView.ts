@@ -213,6 +213,8 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     // Update tool match adapter and send new tools list
     this._toolMatchAdapter.updateSelection(selection);
     this._sendToolsUpdate();
+    // Also update layers with new toolMatches for LayersToolbar
+    this._sendLayersUpdate();
   }
 
   /**
@@ -250,11 +252,12 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
         properties: {
           kind: 'TRACK' as const,
           platform_name: track.name,
-          platform_type: track.platformType,
+          platform_id: track.id,
+          track_type: track.platformType ?? 'CONTACT',
           start_time: track.startTime,
           end_time: track.endTime,
-          times: track.times,
-          style: { color: track.color },
+          positions: track.times ?? [],
+          style: { line: { color: track.color ?? '#0066cc' } },
         },
       })),
       ...this._locations.map((loc) => ({
@@ -369,10 +372,25 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
           break;
 
         case 'layer:toggleVisibility':
-          // Delegate to SessionManager (future implementation)
-          void vscode.window.showInformationMessage(
-            `Toggle visibility for: ${message.payload.featureIds.join(', ')}`
-          );
+          if (this._activeSession) {
+            const state: SessionStoreWithUndo = this._activeSession.getState();
+            const hiddenSet = new Set(state.hiddenFeatureIds);
+            const featureIds = message.payload.featureIds;
+
+            // Check if all selected features are currently hidden
+            const allHidden = featureIds.every((id: string) => hiddenSet.has(id));
+
+            if (allHidden) {
+              // Show all selected features
+              state.showFeatures(featureIds);
+            } else {
+              // Hide all selected features
+              state.hideFeatures(featureIds);
+            }
+
+            // Update the layers panel with new hidden state
+            this._sendLayersUpdate();
+          }
           break;
 
         case 'layer:delete':
@@ -393,40 +411,12 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   /**
-   * Handle tool execution request
+   * Handle tool execution request - delegates to registered command
    */
   private async _handleToolRun(toolId: string): Promise<void> {
-    try {
-      // Get current selection
-      if (!this._activeSession) {
-        void vscode.window.showErrorMessage('No active session');
-        return;
-      }
-
-      const state: SessionStoreWithUndo = this._activeSession.getState();
-      const selectedIds = state.selection?.featureIds ?? [];
-
-      if (selectedIds.length === 0) {
-        void vscode.window.showWarningMessage('No features selected');
-        return;
-      }
-
-      // Show progress
-      await vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: `Running tool: ${toolId}`,
-          cancellable: false,
-        },
-        async () => {
-          await this._calcService.executeTool({ toolId, featureIds: selectedIds });
-        }
-      );
-    } catch (error) {
-      void vscode.window.showErrorMessage(
-        `Failed to run tool: ${error instanceof Error ? error.message : String(error)}`
-      );
-    }
+    // Delegate to the registered executeTool command which handles
+    // result layer creation, map updates, STAC persistence, and notifications
+    await vscode.commands.executeCommand('debrief.executeTool', toolId);
   }
 
   /**
@@ -468,7 +458,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; font-src ${cspSource};">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; font-src ${cspSource} data:;">
   <title>Activity Panel</title>
   <style>
     :root {
