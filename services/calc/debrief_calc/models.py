@@ -16,13 +16,13 @@ from __future__ import annotations
 import re
 from collections.abc import Callable
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 
-class ContextType(str, Enum):
+class ContextType(StrEnum):
     """
     Describes the selection context a tool requires.
 
