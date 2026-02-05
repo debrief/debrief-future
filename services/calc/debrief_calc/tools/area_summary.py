@@ -49,7 +49,7 @@ def _calculate_bbox_area_sq_nm(bbox: list[float]) -> float:
     name="area-summary",
     description="Summarize the geographic extent and properties of a selected region",
     input_kinds=["zone", "region", "polygon"],
-    output_kind="area-statistics",
+    output_kind="region/statistics",
     context_type=ContextType.REGION,
     parameters=[
         ToolParameter(

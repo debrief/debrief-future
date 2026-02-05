@@ -105,7 +105,7 @@ class TestToolsRun:
         data = json.loads(result.output)
         assert data["type"] == "FeatureCollection"
         assert len(data["features"]) == 1
-        assert data["features"][0]["properties"]["kind"] == "track-statistics"
+        assert data["features"][0]["properties"]["kind"] == "track/statistics"
 
     def test_run_range_bearing(self, runner, tracks_pair_path):
         result = runner.invoke(

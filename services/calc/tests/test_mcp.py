@@ -80,7 +80,7 @@ class TestMCPResponseFormat:
         ]
         items = build_addition(
             features=features,
-            result_subtype="track-statistics",
+            result_subtype="track/statistics",
             source_feature_ids=["track-1"],
             label="track-stats results",
         )
@@ -90,7 +90,7 @@ class TestMCPResponseFormat:
         assert len(response["content"]) == 1
         item = response["content"][0]
         assert item["type"] == "resource"
-        assert item["annotations"]["debrief:resultType"] == "addition/track-statistics"
+        assert item["annotations"]["debrief:resultType"] == "addition/track/statistics"
         assert item["annotations"]["debrief:sourceFeatures"] == ["track-1"]
 
     def test_build_error_response(self):
@@ -119,10 +119,10 @@ class TestMCPArtifactResponse:
         item = build_artifact(
             data=data,
             mime_type="application/json",
-            result_subtype="range-bearing-series",
+            result_subtype="dataset/range_bearing_series",
             source_feature_ids=["track-1", "track-2"],
             label="range-bearing results",
-            href="range-bearing-track-1-track-2.json",
+            href="range_bearing_series-track-1-track-2.json",
         )
         response = build_response([item])
 
@@ -130,8 +130,10 @@ class TestMCPArtifactResponse:
         assert len(response["content"]) == 1
         content = response["content"][0]
         assert content["type"] == "resource"
-        assert content["annotations"]["debrief:resultType"] == "artifact/range-bearing-series"
-        assert content["annotations"]["debrief:href"] == "range-bearing-track-1-track-2.json"
+        assert (
+            content["annotations"]["debrief:resultType"] == "artifact/dataset/range_bearing_series"
+        )
+        assert content["annotations"]["debrief:href"] == "range_bearing_series-track-1-track-2.json"
         assert content["resource"]["mimeType"] == "application/json"
 
 

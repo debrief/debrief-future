@@ -98,6 +98,17 @@ status: stable
 | result_type | string | ToolResult resultType value |
 | annotations | object | Required ToolResultAnnotations fields |
 
+**Result Type Naming Convention**:
+
+The `result_type` follows the pattern `{top_type}/{domain}/{specific_type}`:
+
+| Constraint | Rule | Example |
+|------------|------|---------|
+| Characters | Lowercase letters and underscores only | `range_bearing_series` ✓ |
+| No hyphens | Use underscores for word separation | `range-bearing` ✗ |
+| Two suffixes | Must have domain AND specific type | `dataset/range_bearing_series` ✓ |
+| Schema pattern | `^(mutation\|addition\|deletion\|artifact)/[a-z_]+/[a-z_]+$` | |
+
 **Format**: References existing schemas
 
 ```markdown
