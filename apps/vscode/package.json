@@ -319,16 +319,6 @@
           "id": "debrief.activityPanel",
           "name": "Activity",
           "type": "webview"
-        },
-        {
-          "id": "debrief.layers",
-          "name": "Layers",
-          "when": "debrief.plotOpen"
-        },
-        {
-          "id": "debrief.tools",
-          "name": "Tools",
-          "when": "debrief.plotOpen"
         }
       ],
       "explorer": [
