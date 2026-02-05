@@ -521,8 +521,8 @@
         },
         "debrief.map.useReactWrapper": {
           "type": "boolean",
-          "default": false,
-          "description": "[Experimental] Use React-based map wrapper instead of vanilla Leaflet. Enables better testability."
+          "default": true,
+          "description": "Use React-based map wrapper (delegates to shared MapView component). Set to false to use legacy vanilla Leaflet."
         }
       }
     }
