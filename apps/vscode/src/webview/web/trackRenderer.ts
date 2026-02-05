@@ -1,10 +1,20 @@
 /**
  * Track Renderer - Renders vessel tracks on the Leaflet map
+ *
+ * Features:
+ * - Track line rendering with polylines
+ * - Position symbol rendering at intervals (Feature: 048)
+ * - Position label rendering (Feature: 048)
+ * - Temporal state with highlight markers (Feature: 039)
  */
 
 import * as L from 'leaflet';
-import type { Track } from '../messages';
+import type { Track, PositionStyle } from '../messages';
 import { findNearestPointIndex, sliceTrackToTime } from './temporalUtils';
+import {
+  computeAllPositionStyles,
+  type ResolvedPositionStyle,
+} from './intervalUtils';
 
 // Default color palette
 const DEFAULT_COLORS = [
@@ -26,6 +36,21 @@ const HIGHLIGHT_MARKER_OPTS: L.CircleMarkerOptions = {
   fillOpacity: 0.9,
 };
 
+// Position symbol marker style
+const POSITION_SYMBOL_OPTS: L.CircleMarkerOptions = {
+  radius: 4,
+  weight: 1,
+  opacity: 1,
+  fillOpacity: 0.8,
+};
+
+// Default position style when none is specified
+const DEFAULT_POSITION_STYLE: PositionStyle = {
+  show_symbol: false,
+  symbol: 'circle',
+  show_label: false,
+};
+
 export class TrackRenderer {
   private map: L.Map;
   private trackLayers: Map<string, L.Polyline> = new Map();
@@ -41,6 +66,10 @@ export class TrackRenderer {
   private cachedFullLatLngs: Map<string, L.LatLng[]> = new Map();
   private currentTime: number | null = null;
   private displayMode: 'full' | 'trail' = 'full';
+
+  // Position symbol/label layers (Feature: 048)
+  private positionSymbolLayers: Map<string, L.LayerGroup> = new Map();
+  private positionLabelLayers: Map<string, L.LayerGroup> = new Map();
 
   constructor(map: L.Map) {
     this.map = map;
@@ -78,9 +107,18 @@ export class TrackRenderer {
     for (const marker of this.highlightMarkers.values()) {
       this.map.removeLayer(marker);
     }
+    // Clear position symbol/label layers (Feature: 048)
+    for (const layer of this.positionSymbolLayers.values()) {
+      this.map.removeLayer(layer);
+    }
+    for (const layer of this.positionLabelLayers.values()) {
+      this.map.removeLayer(layer);
+    }
     this.trackLayers.clear();
     this.labelLayers.clear();
     this.highlightMarkers.clear();
+    this.positionSymbolLayers.clear();
+    this.positionLabelLayers.clear();
     this.cachedTimestamps.clear();
     this.cachedFullLatLngs.clear();
     this.tracks = [];
@@ -146,6 +184,8 @@ export class TrackRenderer {
     const layer = this.trackLayers.get(trackId);
     const label = this.labelLayers.get(trackId);
     const highlight = this.highlightMarkers.get(trackId);
+    const positionSymbols = this.positionSymbolLayers.get(trackId);
+    const positionLabels = this.positionLabelLayers.get(trackId);
 
     if (visible) {
       if (layer && !this.map.hasLayer(layer)) {
@@ -157,6 +197,13 @@ export class TrackRenderer {
       if (highlight && !this.map.hasLayer(highlight)) {
         this.map.addLayer(highlight);
       }
+      // Feature: 048 - Position symbols/labels
+      if (positionSymbols && !this.map.hasLayer(positionSymbols)) {
+        this.map.addLayer(positionSymbols);
+      }
+      if (positionLabels && !this.map.hasLayer(positionLabels)) {
+        this.map.addLayer(positionLabels);
+      }
     } else {
       if (layer) {
         this.map.removeLayer(layer);
@@ -166,6 +213,13 @@ export class TrackRenderer {
       }
       if (highlight) {
         this.map.removeLayer(highlight);
+      }
+      // Feature: 048 - Position symbols/labels
+      if (positionSymbols) {
+        this.map.removeLayer(positionSymbols);
+      }
+      if (positionLabels) {
+        this.map.removeLayer(positionLabels);
       }
     }
 
@@ -290,6 +344,9 @@ export class TrackRenderer {
 
     // Add label at start point
     this.addTrackLabel(track, latLngs);
+
+    // Add position symbols and labels (Feature: 048)
+    this.renderPositionSymbolsAndLabels(track, latLngs, color);
   }
 
   /**
@@ -484,5 +541,105 @@ export class TrackRenderer {
         element.classList.remove('track-selected');
       }
     }
+  }
+
+  // ============================================================================
+  // Position Symbol & Label Rendering (Feature: 048)
+  // ============================================================================
+
+  /**
+   * Render position symbols and labels based on styling configuration.
+   * Implements the cascade: default_position_style → intervals → overrides
+   */
+  private renderPositionSymbolsAndLabels(
+    track: Track,
+    latLngs: L.LatLng[],
+    color: string
+  ): void {
+    // Get position styling configuration
+    const defaultStyle = track.defaultPositionStyle ?? DEFAULT_POSITION_STYLE;
+    const symbolInterval = track.symbolInterval ?? null;
+    const labelInterval = track.labelInterval ?? null;
+    const overrides = track.positionStyleOverrides ?? null;
+
+    // Build position array from times
+    const positions = track.times.map((time) => ({ time }));
+
+    // Compute resolved styles for all positions
+    const resolvedStyles = computeAllPositionStyles(
+      positions,
+      defaultStyle,
+      symbolInterval,
+      labelInterval,
+      overrides
+    );
+
+    // Create layer groups for symbols and labels
+    const symbolGroup = L.layerGroup();
+    const labelGroup = L.layerGroup();
+
+    // Render each position based on resolved style
+    for (let i = 0; i < latLngs.length; i++) {
+      const style = resolvedStyles[i];
+      if (!style) continue;
+
+      const pos = latLngs[i];
+
+      // Render symbol if enabled
+      if (style.showSymbol) {
+        const marker = this.createPositionSymbol(pos, style, color);
+        symbolGroup.addLayer(marker);
+      }
+
+      // Render label if enabled
+      if (style.showLabel && style.label) {
+        const label = this.createPositionLabel(pos, style.label);
+        labelGroup.addLayer(label);
+      }
+    }
+
+    // Add to map if track is visible
+    if (track.visible) {
+      symbolGroup.addTo(this.map);
+      labelGroup.addTo(this.map);
+    }
+
+    // Store layer groups for visibility control
+    this.positionSymbolLayers.set(track.id, symbolGroup);
+    this.positionLabelLayers.set(track.id, labelGroup);
+  }
+
+  /**
+   * Create a position symbol marker.
+   */
+  private createPositionSymbol(
+    position: L.LatLng,
+    style: ResolvedPositionStyle,
+    color: string
+  ): L.CircleMarker {
+    // For now, all shapes render as circle markers
+    // Future: support square and triangle shapes
+    return L.circleMarker(position, {
+      ...POSITION_SYMBOL_OPTS,
+      color,
+      fillColor: color,
+    });
+  }
+
+  /**
+   * Create a position label marker.
+   */
+  private createPositionLabel(position: L.LatLng, text: string): L.Marker {
+    const icon = L.divIcon({
+      className: 'position-label',
+      html: `<span>${text}</span>`,
+      iconSize: [80, 16],
+      iconAnchor: [-5, 8],
+    });
+
+    return L.marker(position, {
+      icon,
+      interactive: false,
+    });
   }
 }

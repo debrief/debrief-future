@@ -4,10 +4,10 @@ Result type classification for debrief-calc tool responses.
 Provides the four top-level result types and hierarchical type path matching.
 """
 
-from enum import Enum
+from enum import StrEnum
 
 
-class ResultTopType(str, Enum):
+class ResultTopType(StrEnum):
     """Four permitted top-level result types."""
 
     MUTATION = "mutation"

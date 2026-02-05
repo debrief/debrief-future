@@ -1,31 +1,44 @@
 {
   "type": "Feature",
-  "id": "track-001",
+  "id": "track-003-position-styling",
   "geometry": {
     "type": "LineString",
     "coordinates": [
       [-5.0, 50.0],
+      [-4.95, 50.05],
       [-4.9, 50.1],
+      [-4.85, 50.15],
       [-4.8, 50.2]
     ]
   },
   "properties": {
     "kind": "TRACK",
-    "platform_id": "HMS-EXAMPLE",
-    "platform_name": "HMS Example",
+    "platform_id": "HMS-STYLER",
+    "platform_name": "HMS Styler",
     "track_type": "OWNSHIP",
     "start_time": "2026-01-09T10:00:00Z",
-    "end_time": "2026-01-09T12:00:00Z",
+    "end_time": "2026-01-09T10:20:00Z",
     "positions": [
       {"time": "2026-01-09T10:00:00Z", "course": 45, "speed": 12},
-      {"time": "2026-01-09T11:00:00Z", "course": 45, "speed": 12},
-      {"time": "2026-01-09T12:00:00Z", "course": 45, "speed": 12}
+      {"time": "2026-01-09T10:05:00Z", "course": 46, "speed": 12},
+      {"time": "2026-01-09T10:10:00Z", "course": 47, "speed": 11},
+      {"time": "2026-01-09T10:15:00Z", "course": 48, "speed": 11},
+      {"time": "2026-01-09T10:20:00Z", "course": 45, "speed": 12}
     ],
     "default_position_style": {
       "show_symbol": false,
       "symbol": "circle",
       "show_label": false
     },
+    "symbol_interval": "PT5M",
+    "label_interval": "PT10M",
+    "position_style_overrides": [
+      null,
+      null,
+      {"show_symbol": true, "show_label": true, "label": "Contact Alpha"},
+      null,
+      null
+    ],
     "style": {
       "line": {
         "stroke": true,
