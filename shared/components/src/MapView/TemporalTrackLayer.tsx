@@ -10,10 +10,12 @@ import { useMemo } from 'react';
 import { GeoJSON } from 'react-leaflet';
 import type { PathOptions } from 'leaflet';
 import type { DisplayMode, DebriefFeature } from '../utils/types';
+import { isTrackFeature } from '../utils/types';
 import { useTemporalTrack } from './useTemporalTrack';
 import { TrackHighlightMarker } from './TrackHighlightMarker';
 import type { HighlightMarkerStyle } from './TrackHighlightMarker';
 import { getFeatureColor } from '../utils/labels';
+import { PositionSymbolsLayer } from './PositionSymbolsLayer';
 
 export interface TemporalTrackLayerProps {
   feature: DebriefFeature;
@@ -90,6 +92,14 @@ export function TemporalTrackLayer({
           position={markerLatLng}
           style={markerStyle}
           tooltip={(feature.properties as unknown as Record<string, string>)?.name}
+        />
+      )}
+      {isTrackFeature(feature) && (
+        <PositionSymbolsLayer
+          feature={feature}
+          currentTime={currentTime}
+          displayMode={displayMode}
+          isSelected={isSelected}
         />
       )}
     </>

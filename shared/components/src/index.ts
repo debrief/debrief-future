@@ -37,6 +37,8 @@ export { TemporalTrackLayer } from './MapView/TemporalTrackLayer';
 export type { TemporalTrackLayerProps } from './MapView/TemporalTrackLayer';
 export { TrackHighlightMarker } from './MapView/TrackHighlightMarker';
 export type { TrackHighlightMarkerProps, HighlightMarkerStyle } from './MapView/TrackHighlightMarker';
+export { PositionSymbolsLayer } from './MapView/PositionSymbolsLayer';
+export type { PositionSymbolsLayerProps } from './MapView/PositionSymbolsLayer';
 
 // Hooks
 export { useSelection } from './hooks/useSelection';
@@ -48,7 +50,14 @@ export type { DebriefFeature, DebriefFeatureCollection } from './utils/types';
 
 // Utilities
 export { calculateBounds } from './utils/bounds';
-export { calculateTimeExtent } from './utils/time';
+export {
+  calculateTimeExtent,
+  parseDuration,
+  findIntervalPositions,
+  resolvePositionStyle,
+  computeAllPositionStyles,
+} from './utils/time';
+export type { ResolvedPositionStyle } from './utils/time';
 export { getFeatureLabel, getFeatureIcon } from './utils/labels';
 
 // ToolMatch
