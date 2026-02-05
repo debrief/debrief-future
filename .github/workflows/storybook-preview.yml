@@ -158,26 +158,34 @@ jobs:
               comment.body.includes('Storybook Preview')
             );
 
-            const body = `## 📚 Storybook Preview
+            const body = `## 🚀 Preview Deployments
 
-Your previews are ready!
+### Web Shell (Standalone App)
+**${webShellPreviewUrl}**
 
-### PR Preview
-| App | URL |
-|-----|-----|
-| Storybook | ${previewUrl} |
-| Web Shell | ${webShellPreviewUrl} |
+Use this for Playwright testing and demos - runs outside Storybook.
 
-### Persistent (main branch)
-| App | URL |
-|-----|-----|
-| Storybook | ${persistentUrl} |
-| Web Shell | ${webShellUrl} |
+### Storybook (Component Library)
+**${previewUrl}**
 
-### Quick Links
-- [Web Shell Demo (Storybook)](${previewUrl}?path=/story/apps-webshell--default)
-- [Web Shell (Standalone)](${webShellPreviewUrl})
+Browse all components, stories, and documentation.
+
+---
+
+<details>
+<summary>All Links</summary>
+
+| Environment | Web Shell | Storybook |
+|-------------|-----------|-----------|
+| **This PR** | [Open App](${webShellPreviewUrl}) | [Open Storybook](${previewUrl}) |
+| **Main branch** | [Open App](${webShellUrl}) | [Open Storybook](${persistentUrl}) |
+
+**Storybook Quick Links:**
+- [Web Shell Demo](${previewUrl}?path=/story/apps-webshell--integrated-demo)
 - [ToolMatch Harness](${previewUrl}?path=/story/toolmatch-harness--default)
+- [ActivityPanel](${previewUrl}?path=/story/activitypanel--default)
+
+</details>
 
 > Updated on commit ${context.sha.substring(0, 7)}`;
 
