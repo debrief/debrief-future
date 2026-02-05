@@ -522,7 +522,7 @@
     "watch:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
     "watch:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife --watch & esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch",
     "dev": "concurrently \"npm run watch:extension\" \"npm run watch:webview\"",
-    "prelint": "pnpm --filter @debrief/session-state build",
+    "prelint": "pnpm --filter @debrief/session-state build && pnpm --filter @debrief/utils build",
     "lint": "eslint src --ext ts",
     "lint:fix": "eslint src --ext ts --fix",
     "test": "npm run test:unit",
@@ -558,6 +558,7 @@
   "dependencies": {
     "@debrief/components": "workspace:*",
     "@debrief/session-state": "workspace:*",
+    "@debrief/utils": "workspace:*",
     "leaflet": "^1.9.4",
     "leaflet-image": "^0.4.0",
     "react": "^18.2.0",

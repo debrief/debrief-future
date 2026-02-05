@@ -17,7 +17,6 @@ import type { ResultLayer } from '../types/tool';
 import type {
   ExtensionToWebviewMessage,
   WebviewToExtensionMessage,
-  GeoJSONFeature,
 } from './messages';
 import type { IoService } from '../services/ioService';
 import type { StacService } from '../services/stacService';
@@ -31,7 +30,7 @@ import {
   type SessionStoreApi,
   type SessionStoreWithUndo,
 } from '@debrief/session-state';
-import { DuplicateImportError } from '../types/import';
+import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
 import { calculateBounds, mergeBounds } from '../utils/bounds';
 
 export class MapPanel {
@@ -247,7 +246,7 @@ export class MapPanel {
     if (this.layersTreeProvider) {
       this.layersTreeProvider.setTracks(this.currentTracks);
       this.layersTreeProvider.setLocations(this.currentLocations);
-      this.layersTreeProvider.setShapes(this.otherFeatures as import('../types/import').GeoJSONFeature[]);
+      this.layersTreeProvider.setShapes(this.otherFeatures);
       this.layersTreeProvider.setResultLayers([...this.resultLayers]);
     }
   }
@@ -972,7 +971,7 @@ export class MapPanel {
       });
 
       // Convert to the format StacService expects
-      const safeFeatures = parseResult.features.map((f) => ({
+      const safeFeatures = parseResult.features.map((f: GeoJSONFeature) => ({
         type: 'Feature' as const,
         geometry: {
           type: f.geometry.type,
