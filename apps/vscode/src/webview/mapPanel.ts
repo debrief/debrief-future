@@ -32,7 +32,7 @@ import {
   type SessionStoreWithUndo,
 } from '@debrief/session-state';
 import { DuplicateImportError } from '../types/import';
-import { calculateBounds, mergeBounds } from '../utils/bounds';
+import { calculateBounds, mergeBounds } from '@debrief/utils';
 
 export class MapPanel {
   public static currentPanel: MapPanel | undefined;
