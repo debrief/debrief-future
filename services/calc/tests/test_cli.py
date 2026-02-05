@@ -87,7 +87,7 @@ class TestCli:
 
         # Check artifact format
         item = output["content"][0]
-        assert item["annotations"]["debrief:resultType"] == "artifact/range-bearing-series"
+        assert item["annotations"]["debrief:resultType"] == "artifact/dataset/range_bearing_series"
         assert "track-0" in item["annotations"]["debrief:sourceFeatures"]
         assert "track-1" in item["annotations"]["debrief:sourceFeatures"]
         assert "debrief:href" in item["annotations"]
