@@ -30,6 +30,11 @@ const mockTrackFeature: TrackFeature = {
       line: { color: '#0066cc', weight: 2 },
       point: { shape: 'circle', radius: 4, fill_color: '#0066cc', color: '#0066cc' },
     },
+    default_position_style: {
+      show_symbol: false,
+      symbol: 'circle',
+      show_label: false,
+    },
   },
 };
 

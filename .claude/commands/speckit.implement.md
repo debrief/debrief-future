@@ -90,6 +90,14 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Verify bundles: self-contained, < 500KB, renders in isolation
      - Record bundle details in evidence/
    - **Media content**: Create blog posts and LinkedIn summaries using Content Specialist agent
+   - **E2E test tasks**: Playwright tests for Storybook stories (when plan.md has "Storybook E2E Testing" entries):
+     - Create test file in `shared/components/e2e/` using pattern from `.specify/templates/e2e-test-template.ts`
+     - Use Storybook story URL: `/iframe.html?id=category-component--variant`
+     - Test all theme variants using URL globals parameter: `&globals=theme:light|dark|vscode`
+     - Add `data-testid` attributes to components for reliable selection
+     - Capture screenshots for evidence: `await page.screenshot({ path: 'specs/[feature]/evidence/screenshots/...' })`
+     - Run tests: `pnpm --filter @debrief/components test:e2e [testfile]`
+     - For Claude Code sessions: Tests run with `@sparticuz/chromium` (see key_facts.md)
 
 8. Progress tracking and error handling:
    - Report progress after each completed task

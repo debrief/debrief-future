@@ -8,6 +8,7 @@ import { getFeatureColor, getFeatureLabel } from '../utils/labels';
 import { isTrackFeature } from '../utils/types';
 import { extractTemporalData } from './temporal-utils';
 import { TemporalTrackLayer } from './TemporalTrackLayer';
+import { LeafletToolbar } from './LeafletToolbar';
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 
@@ -81,6 +82,15 @@ export interface MapViewProps {
 
   /** Track display mode: 'full' (entire track + marker) or 'trail' (snail-trail up to current time). */
   displayMode?: DisplayMode;
+
+  /** Set of visible feature IDs. When provided, fit-to-window only considers these features. */
+  visibleIds?: Set<string>;
+
+  /** Whether to show the custom toolbar with zoom and fit buttons (default: true) */
+  showToolbar?: boolean;
+
+  /** Position of the toolbar (default: 'topleft') */
+  toolbarPosition?: 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
 }
 
 // Component to handle map events, auto-fit, and programmatic viewport control
@@ -184,6 +194,9 @@ export function MapView({
   height = 400,
   currentTime,
   displayMode = 'full',
+  visibleIds,
+  showToolbar = true,
+  toolbarPosition = 'topleft',
 }: MapViewProps) {
   // Normalize features to array and filter out features that can't be rendered
   const featureArray = useMemo(() => {
@@ -216,6 +229,16 @@ export function MapView({
 
   // Calculate bounds for auto-fit (use all features regardless)
   const bounds = useMemo(() => calculateBounds(featureArray), [featureArray]);
+
+  // Calculate bounds for visible features only (for fit-to-window button)
+  const visibleBounds = useMemo(() => {
+    if (!visibleIds || visibleIds.size === 0) {
+      // If no visibleIds provided, use all features
+      return bounds;
+    }
+    const visibleFeatures = featureArray.filter((f) => visibleIds.has(f.id));
+    return calculateBounds(visibleFeatures);
+  }, [featureArray, visibleIds, bounds]);
 
   // Create GeoJSON data structure for static (non-temporal) features
   const geojsonData = useMemo(() => ({
@@ -282,8 +305,16 @@ export function MapView({
         zoom={initialZoom}
         className="debrief-mapview__container"
         style={{ height: '100%', width: '100%' }}
+        zoomControl={!showToolbar}
       >
         <TileLayer url={tileLayerUrl} attribution={tileLayerAttribution} />
+
+        {showToolbar && (
+          <LeafletToolbar
+            position={toolbarPosition}
+            visibleBounds={visibleBounds}
+          />
+        )}
 
         <MapController
           bounds={bounds}

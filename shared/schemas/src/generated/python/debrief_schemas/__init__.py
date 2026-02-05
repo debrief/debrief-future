@@ -270,16 +270,11 @@ class SystemStateTypeEnum(str, Enum):
 
 class TimestampedPosition(ConfiguredBaseModel):
     """
-    A position with timestamp and optional kinematic data
+    Temporal and kinematic metadata for a single track position. Coordinates are NOT stored here - they live in geometry.coordinates[i]. Position metadata at index i corresponds to coordinate at index i.
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/common'})
 
     time: datetime  = Field(default=..., description="""Position timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition', 'NarrativeEntryProperties']} })
-    coordinates: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
-                       'GeoJSONPoint',
-                       'GeoJSONEmptyPoint',
-                       'GeoJSONLineString',
-                       'GeoJSONPolygon']} })
     depth: Optional[float] = Field(default=None, description="""Depth in meters (negative = below surface)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition']} })
     course: Optional[float] = Field(default=None, description="""Course in degrees (0-360)""", ge=0, le=360, json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition']} })
     speed: Optional[float] = Field(default=None, description="""Speed in knots""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition']} })
@@ -346,6 +341,49 @@ class TrackStyle(ConfiguredBaseModel):
     point: PointProperties = Field(default=..., description="""Styling for position markers""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackStyle']} })
 
 
+class PositionStyle(ConfiguredBaseModel):
+    """
+    Default styling configuration for track positions. Applied as baseline before interval rules and overrides.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/styling'})
+
+    show_symbol: bool = Field(default=..., description="""Whether to display a symbol at positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride']} })
+    symbol: PointShapeEnum = Field(default=..., description="""Shape to use for position symbols""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
+                       'PositionStyleOverride',
+                       'ReferenceLocationProperties',
+                       'NarrativeEntryProperties',
+                       'CircleAnnotationProperties',
+                       'RectangleAnnotationProperties',
+                       'LineAnnotationProperties',
+                       'TextAnnotationProperties',
+                       'VectorAnnotationProperties']} })
+    show_label: bool = Field(default=..., description="""Whether to display labels at positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride']} })
+
+
+class PositionStyleOverride(ConfiguredBaseModel):
+    """
+    Per-position style override. Index in array determines which position. No time field - array index i applies to positions[i]. Use null for positions without custom styling.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/styling'})
+
+    show_symbol: Optional[bool] = Field(default=None, description="""Override whether to show symbol (null = use default/interval)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride']} })
+    symbol: Optional[PointShapeEnum] = Field(default=None, description="""Override symbol shape""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
+                       'PositionStyleOverride',
+                       'ReferenceLocationProperties',
+                       'NarrativeEntryProperties',
+                       'CircleAnnotationProperties',
+                       'RectangleAnnotationProperties',
+                       'LineAnnotationProperties',
+                       'TextAnnotationProperties',
+                       'VectorAnnotationProperties']} })
+    show_label: Optional[bool] = Field(default=None, description="""Override whether to show label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride']} })
+    label: Optional[str] = Field(default=None, description="""Custom label text (null = use timestamp)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+                       'CircleAnnotationProperties',
+                       'RectangleAnnotationProperties',
+                       'LineAnnotationProperties',
+                       'VectorAnnotationProperties']} })
+
+
 class GeoJSONPoint(ConfiguredBaseModel):
     """
     GeoJSON Point geometry
@@ -366,8 +404,7 @@ class GeoJSONPoint(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation'],
          'equals_string': 'Point'} })
-    coordinates: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
-                       'GeoJSONPoint',
+    coordinates: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon']} })
@@ -393,8 +430,7 @@ class GeoJSONEmptyPoint(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation'],
          'equals_string': 'Point'} })
-    coordinates: list[float] = Field(default=..., description="""Empty array for non-spatial features""", max_length=0, json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
-                       'GeoJSONPoint',
+    coordinates: list[float] = Field(default=..., description="""Empty array for non-spatial features""", max_length=0, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon']} })
@@ -420,8 +456,7 @@ class GeoJSONLineString(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation'],
          'equals_string': 'LineString'} })
-    coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
-                       'GeoJSONPoint',
+    coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon']} })
@@ -447,8 +482,7 @@ class GeoJSONPolygon(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation'],
          'equals_string': 'Polygon'} })
-    coordinates: list[float] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
-                       'GeoJSONPoint',
+    coordinates: list[float] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon']} })
@@ -492,6 +526,36 @@ class TrackProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties']} })
+    default_position_style: PositionStyle = Field(default=..., description="""Default styling applied to all positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
+    symbol_interval: Optional[str] = Field(default=None, description="""ISO 8601 duration for interval-based symbol display. E.g., \"PT5M\" = every 5 minutes, \"PT1H\" = every hour. Null means no interval-based symbols.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
+    label_interval: Optional[str] = Field(default=None, description="""ISO 8601 duration for interval-based label display. Null means no interval-based labels.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
+    position_style_overrides: Optional[list[PositionStyleOverride]] = Field(default=[], description="""Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
+
+    @field_validator('symbol_interval')
+    def pattern_symbol_interval(cls, v):
+        pattern=re.compile(r"^P(T[0-9]+[HMS])+$|^P[0-9]+D(T[0-9]+[HMS]+)?$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid symbol_interval format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid symbol_interval format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+    @field_validator('label_interval')
+    def pattern_label_interval(cls, v):
+        pattern=re.compile(r"^P(T[0-9]+[HMS])+$|^P[0-9]+D(T[0-9]+[HMS]+)?$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid label_interval format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid label_interval format: {v}"
+            raise ValueError(err_msg)
+        return v
 
 
 class TrackFeature(ConfiguredBaseModel):
@@ -565,7 +629,9 @@ class ReferenceLocationProperties(ConfiguredBaseModel):
     name: str = Field(default=..., description="""Reference location name""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties', 'Tool']} })
     location_type: LocationTypeEnum = Field(default=..., description="""Type of reference""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
     description: Optional[str] = Field(default=None, description="""Additional description""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties', 'Tool']} })
-    symbol: Optional[str] = Field(default=None, description="""Map symbol identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+    symbol: Optional[str] = Field(default=None, description="""Map symbol identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
+                       'PositionStyleOverride',
+                       'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -743,7 +809,9 @@ class NarrativeEntryProperties(ConfiguredBaseModel):
     time: datetime  = Field(default=..., description="""Narrative timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition', 'NarrativeEntryProperties']} })
     text: str = Field(default=..., description="""Narrative text content""", json_schema_extra = { "linkml_meta": {'domain_of': ['NarrativeEntryProperties', 'TextAnnotationProperties']} })
     track_id: Optional[str] = Field(default=None, description="""Associated track identifier (optional)""", json_schema_extra = { "linkml_meta": {'domain_of': ['NarrativeEntryProperties']} })
-    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
+                       'PositionStyleOverride',
+                       'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -836,11 +904,14 @@ class CircleAnnotationProperties(ConfiguredBaseModel):
          'equals_string': 'CIRCLE'} })
     center: list[float] = Field(default=..., description="""Circle center as [longitude, latitude] for precise reconstruction""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'CircleAnnotationProperties']} })
     radius: float = Field(default=..., description="""Circle radius in meters for precise reconstruction""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'CircleAnnotationProperties']} })
-    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['CircleAnnotationProperties',
+    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+                       'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'VectorAnnotationProperties']} })
-    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
+                       'PositionStyleOverride',
+                       'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -931,11 +1002,14 @@ class RectangleAnnotationProperties(ConfiguredBaseModel):
                        'VectorAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'RECTANGLE'} })
-    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['CircleAnnotationProperties',
+    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+                       'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'VectorAnnotationProperties']} })
-    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
+                       'PositionStyleOverride',
+                       'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -1026,11 +1100,14 @@ class LineAnnotationProperties(ConfiguredBaseModel):
                        'VectorAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'LINE'} })
-    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['CircleAnnotationProperties',
+    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+                       'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'VectorAnnotationProperties']} })
-    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
+                       'PositionStyleOverride',
+                       'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -1122,7 +1199,9 @@ class TextAnnotationProperties(ConfiguredBaseModel):
                        'SelectionRequirement'],
          'equals_string': 'TEXT'} })
     text: str = Field(default=..., description="""Text content to display""", json_schema_extra = { "linkml_meta": {'domain_of': ['NarrativeEntryProperties', 'TextAnnotationProperties']} })
-    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
+                       'PositionStyleOverride',
+                       'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -1216,11 +1295,14 @@ class VectorAnnotationProperties(ConfiguredBaseModel):
     origin: list[float] = Field(default=..., description="""Vector origin as [longitude, latitude] for precise reconstruction""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['VectorAnnotationProperties']} })
     range: float = Field(default=..., description="""Vector length/range in meters for precise reconstruction""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['VectorAnnotationProperties']} })
     bearing: float = Field(default=..., description="""Vector bearing in degrees (0-360, from north) for precise reconstruction""", ge=0, le=360, json_schema_extra = { "linkml_meta": {'domain_of': ['VectorAnnotationProperties']} })
-    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['CircleAnnotationProperties',
+    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+                       'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'VectorAnnotationProperties']} })
-    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
+                       'PositionStyleOverride',
+                       'ReferenceLocationProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -1343,6 +1425,8 @@ PointProperties.model_rebuild()
 LineProperties.model_rebuild()
 PolygonProperties.model_rebuild()
 TrackStyle.model_rebuild()
+PositionStyle.model_rebuild()
+PositionStyleOverride.model_rebuild()
 GeoJSONPoint.model_rebuild()
 GeoJSONEmptyPoint.model_rebuild()
 GeoJSONLineString.model_rebuild()

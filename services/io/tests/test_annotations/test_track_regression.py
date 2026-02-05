@@ -108,17 +108,23 @@ class TestTrackRegressionShapesRep:
 
         for track in tracks:
             positions = track["properties"]["positions"]
-            # All positions should have valid data
+            coords = track["geometry"]["coordinates"]
+
+            # All positions should have valid metadata
+            # Note: lat/lon removed from positions in Feature 048 - coordinates are only in geometry
             for pos in positions:
                 assert "time" in pos
-                assert "lat" in pos
-                assert "lon" in pos
                 assert "course" in pos
                 assert "speed" in pos
+
+            # Coordinates are parallel array in geometry
+            assert len(coords) == len(positions)
+            for coord in coords:
+                lat, lon = coord[1], coord[0]
                 # Latitude should be valid
-                assert -90 <= pos["lat"] <= 90
+                assert -90 <= lat <= 90
                 # Longitude should be valid
-                assert -180 <= pos["lon"] <= 180
+                assert -180 <= lon <= 180
 
 
 class TestAnnotationCountInShapesRep:

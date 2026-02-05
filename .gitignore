@@ -226,3 +226,7 @@ Thumbs.db
 *.tmp
 *.swp
 nul
+
+# Playwright test artifacts
+apps/web-shell/playwright-report/
+apps/web-shell/test-results/

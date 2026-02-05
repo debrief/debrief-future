@@ -130,19 +130,15 @@ types:
 
 classes:
   TimestampedPosition:
-    description: A position with timestamp and optional kinematic data
+    description: >-
+      Temporal and kinematic metadata for a single track position.
+      Coordinates are NOT stored here - they live in geometry.coordinates[i].
+      Position metadata at index i corresponds to coordinate at index i.
     attributes:
       time:
         description: Position timestamp (ISO8601)
         range: datetime
         required: true
-      coordinates:
-        description: "[longitude, latitude] in degrees"
-        range: float
-        multivalued: true
-        required: true
-        minimum_cardinality: 2
-        maximum_cardinality: 2
       depth:
         description: Depth in meters (negative = below surface)
         range: float

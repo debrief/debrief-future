@@ -79,7 +79,7 @@
   position: absolute;
   top: 100%;
   margin-top: 4px;
-  z-index: 100;
+  z-index: 1000; /* Above Leaflet map layers (which use z-index up to ~400) */
 }
 
 .debrief-layers-toolbar__dropdown--left {
