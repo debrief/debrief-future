@@ -1111,64 +1111,11 @@ export class MapPanel {
     });
   }
 
-  private getHtmlForWebview(): string {
-    const webview = this.panel.webview;
-    const config = vscode.workspace.getConfiguration('debrief.map');
-    const useReactWrapper = config.get<boolean>('useReactWrapper', false);
-
-    if (useReactWrapper) {
-      return this.getReactHtmlForWebview();
-    }
-
-    // Get URIs for webview resources
-    const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'map.js')
-    );
-    const stylesUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'styles.css')
-    );
-    const leafletCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this.extensionUri,
-        'node_modules',
-        'leaflet',
-        'dist',
-        'leaflet.css'
-      )
-    );
-
-    const cspSource = webview.cspSource;
-
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; img-src ${cspSource} data: https:;">
-  <title>Debrief Map</title>
-  <link rel="stylesheet" href="${leafletCssUri.toString()}">
-  <link rel="stylesheet" href="${stylesUri.toString()}">
-</head>
-<body>
-  <div id="map-container">
-    <div id="map"></div>
-    <div id="toolbar" class="floating-toolbar">
-      <button id="btn-zoom-in" class="toolbar-btn" title="Zoom In">+</button>
-      <button id="btn-zoom-out" class="toolbar-btn" title="Zoom Out">-</button>
-      <button id="btn-fit-bounds" class="toolbar-btn" title="Fit to All">[]</button>
-      <button id="btn-export" class="toolbar-btn" title="Export PNG">E</button>
-    </div>
-  </div>
-  <script src="${scriptUri.toString()}"></script>
-</body>
-</html>`;
-  }
-
   /**
-   * Generate HTML for the React-based map wrapper.
-   * Uses the shared @debrief/components/MapView instead of vanilla Leaflet.
+   * Generate HTML for the map webview.
+   * Uses the shared @debrief/components/MapView via thin React wrapper.
    */
-  private getReactHtmlForWebview(): string {
+  private getHtmlForWebview(): string {
     const webview = this.panel.webview;
 
     const scriptUri = webview.asWebviewUri(
