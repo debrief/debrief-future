@@ -83,3 +83,19 @@ docker run -p 3000:3000 -e DEBRIEF_VERSION=latest debrief-demo
 - Match logic: `tool.ts` → `checkRequirements()`
 - Adapter bridging session↔matching: `toolMatchAdapter.ts`
 - Feature resolution for execution: `calcService.ts` → `resolveFeatures()`
+
+### Claude Code Session: Browser Testing
+
+**Playwright/Puppeteer Installation:**
+- Standard browser downloads blocked (403 from cdn.playwright.dev)
+- Workaround: Use `@sparticuz/chromium` npm package (bundles Chromium)
+- External network from browser blocked (`ERR_TUNNEL_CONNECTION_FAILED`)
+- Local HTML/JavaScript tests work via `page.setContent()`
+- Research document: `docs/project_notes/playwright-installation-research.md`
+
+**Working Setup:**
+```bash
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install @playwright/test playwright-chromium
+npm install @sparticuz/chromium
+```
+- Config requires `executablePath: '/tmp/chromium'` and sandbox-disable flags
