@@ -31,16 +31,7 @@ export class TimeController {
    * Get the current UI state of the TimeController.
    */
   async getState(): Promise<TimeControllerState> {
-    if (await this.root.locator('.debrief-time-controller--empty').count() > 0) {
-      return 'empty';
-    }
-    if (await this.root.locator('.debrief-time-controller--loading').count() > 0) {
-      return 'loading';
-    }
-    if (await this.root.locator('.debrief-time-controller--ready').count() > 0) {
-      return 'ready';
-    }
-    // Check class on root element itself
+    // Check class on root element itself (not child elements)
     const className = await this.root.getAttribute('class') ?? '';
     if (className.includes('--empty')) return 'empty';
     if (className.includes('--loading')) return 'loading';
@@ -200,9 +191,11 @@ export class TimeController {
 
   /**
    * Wait for the TimeController to be in the ready state.
+   * Waits for the scrubber to be visible, which only appears in ready state.
    */
   async waitForReady(options?: { timeout?: number }): Promise<void> {
-    await this.root.locator('.debrief-time-controller--ready, [class*="--ready"]').waitFor({
+    // The scrubber only appears when TimeController is in ready state
+    await this.scrubber.waitFor({
       state: 'visible',
       timeout: options?.timeout ?? 10000,
     });
