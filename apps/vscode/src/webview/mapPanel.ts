@@ -17,7 +17,6 @@ import type { ResultLayer } from '../types/tool';
 import type {
   ExtensionToWebviewMessage,
   WebviewToExtensionMessage,
-  GeoJSONFeature,
 } from './messages';
 import type { IoService } from '../services/ioService';
 import type { StacService } from '../services/stacService';
@@ -31,8 +30,8 @@ import {
   type SessionStoreApi,
   type SessionStoreWithUndo,
 } from '@debrief/session-state';
-import { DuplicateImportError } from '../types/import';
-import { calculateBounds, mergeBounds, type GeoJSONFeature } from '@debrief/utils';
+import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
+import { calculateBounds, mergeBounds } from '../utils/bounds';
 
 export class MapPanel {
   public static currentPanel: MapPanel | undefined;
@@ -247,7 +246,7 @@ export class MapPanel {
     if (this.layersTreeProvider) {
       this.layersTreeProvider.setTracks(this.currentTracks);
       this.layersTreeProvider.setLocations(this.currentLocations);
-      this.layersTreeProvider.setShapes(this.otherFeatures as import('../types/import').GeoJSONFeature[]);
+      this.layersTreeProvider.setShapes(this.otherFeatures);
       this.layersTreeProvider.setResultLayers([...this.resultLayers]);
     }
   }
@@ -988,7 +987,7 @@ export class MapPanel {
       );
 
       // Calculate bounds for zoom
-      const newBounds = calculateBounds(parseResult.features as GeoJSONFeature[]);
+      const newBounds = calculateBounds(parseResult.features);
       const mergedBounds = mergeBounds(
         currentPlot.bbox,
         newBounds

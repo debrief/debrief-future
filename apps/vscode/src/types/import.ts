@@ -2,12 +2,6 @@
  * Import Error Types - Error classes for REP file import operations
  */
 
-// Re-export GeoJSON types from @debrief/utils for consistency
-export type {
-  GeoJSONFeature,
-  GeoJSONFeatureCollection,
-} from '@debrief/utils';
-
 /**
  * Error thrown when a file has already been imported to the same STAC item
  */
@@ -91,3 +85,23 @@ export interface ParseWarning {
   code: string;
 }
 
+/**
+ * GeoJSON Feature type for parsed tracks
+ */
+export interface GeoJSONFeature {
+  type: 'Feature';
+  id?: string;
+  geometry: {
+    type: string;
+    coordinates: number[] | number[][] | number[][][];
+  };
+  properties: Record<string, unknown> | null;
+}
+
+/**
+ * GeoJSON FeatureCollection
+ */
+export interface GeoJSONFeatureCollection {
+  type: 'FeatureCollection';
+  features: GeoJSONFeature[];
+}
