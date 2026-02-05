@@ -3,7 +3,11 @@
 import pytest
 
 from debrief_tools import tool_spec
-from debrief_tools.decorators import ToolSpecError, _find_repo_root, _resolve_spec_path
+from debrief_tools.decorators import (
+    ToolSpecError,
+    _find_repo_root,
+    _resolve_spec_path,
+)
 
 
 class TestFindRepoRoot:

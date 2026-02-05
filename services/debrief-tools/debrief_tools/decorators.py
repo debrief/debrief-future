@@ -8,9 +8,9 @@ stores the spec path for introspection.
 from __future__ import annotations
 
 import functools
-import os
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, TypeVar
+from typing import TypeVar
 
 F = TypeVar("F", bound=Callable[..., object])
 
