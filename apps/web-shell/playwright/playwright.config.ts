@@ -29,6 +29,8 @@ const useSparticuz = !!chromiumPath;
 console.log(`Playwright config: useSparticuz=${useSparticuz}, chromiumPath=${chromiumPath}`);
 
 // Launch options for sparticuz chromium
+// Note: --single-process causes browser to crash after each test, so we avoid it.
+// Instead we use --disable-dev-shm-usage and memory-saving flags for stability.
 const launchOptions = useSparticuz
   ? {
       executablePath: chromiumPath,
@@ -36,10 +38,16 @@ const launchOptions = useSparticuz
       args: [
         '--disable-setuid-sandbox',
         '--no-sandbox',
-        '--no-zygote',
         '--disable-gpu',
         '--disable-dev-shm-usage',
-        '--single-process',
+        '--disable-background-networking',
+        '--disable-default-apps',
+        '--disable-extensions',
+        '--disable-sync',
+        '--disable-translate',
+        '--metrics-recording-only',
+        '--mute-audio',
+        '--no-first-run',
       ],
     }
   : undefined;
@@ -48,7 +56,7 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: false, // Disable parallel to avoid chromium issues
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: 1, // Retry once to handle transient browser issues
   workers: 1, // Single worker for stability with sparticuz
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {

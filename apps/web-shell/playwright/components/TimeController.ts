@@ -93,9 +93,11 @@ export class TimeController {
 
   /**
    * Get the play/pause button.
+   * The PlaybackControls component renders a button directly in the controls row.
    */
   get playPauseButton(): Locator {
-    return this.root.locator('.debrief-playback-controls button');
+    // Find button by aria-label (Play or Pause)
+    return this.controlsRow.locator('button[aria-label="Play"], button[aria-label="Pause"]');
   }
 
   /**
@@ -126,22 +128,30 @@ export class TimeController {
   }
 
   /**
-   * Get the scrubber input (range slider).
+   * Get the scrubber track element (the clickable area).
    */
-  get scrubberInput(): Locator {
-    return this.root.locator('.debrief-time-scrubber input[type="range"]');
+  get scrubberTrack(): Locator {
+    return this.root.locator('.debrief-time-scrubber__track');
+  }
+
+  /**
+   * Get the scrubber thumb element.
+   */
+  get scrubberThumb(): Locator {
+    return this.root.locator('.debrief-time-scrubber__thumb');
   }
 
   /**
    * Get the current scrubber position (0-100 percentage).
+   * The scrubber uses aria-valuenow/min/max attributes for position.
    */
   async getScrubberPosition(): Promise<number> {
-    const value = await this.scrubberInput.inputValue();
-    const min = await this.scrubberInput.getAttribute('min') ?? '0';
-    const max = await this.scrubberInput.getAttribute('max') ?? '100';
+    const min = await this.scrubber.getAttribute('aria-valuemin') ?? '0';
+    const max = await this.scrubber.getAttribute('aria-valuemax') ?? '100';
+    const current = await this.scrubber.getAttribute('aria-valuenow') ?? '0';
     const minVal = parseFloat(min);
     const maxVal = parseFloat(max);
-    const currentVal = parseFloat(value);
+    const currentVal = parseFloat(current);
     return ((currentVal - minVal) / (maxVal - minVal)) * 100;
   }
 
@@ -171,17 +181,20 @@ export class TimeController {
 
   /**
    * Get the speed selector.
+   * The SpeedSelector uses vscrui Dropdown which renders as div.vscrui-dropdown
    */
   get speedSelector(): Locator {
-    return this.root.locator('.debrief-speed-selector');
+    return this.controlsRow.locator('.vscrui-dropdown');
   }
 
   /**
    * Get the current playback speed.
+   * The vscrui Dropdown shows the current value in the trigger button's span.
    */
   async getSpeed(): Promise<number> {
-    const speedText = await this.speedSelector.textContent() ?? '1x';
-    const match = speedText.match(/(\d+)x/);
+    const triggerSpan = this.speedSelector.locator('button span');
+    const text = await triggerSpan.textContent() ?? '1x';
+    const match = text.match(/(\d+)x/);
     return match ? parseInt(match[1], 10) : 1;
   }
 
