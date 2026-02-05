@@ -7,6 +7,7 @@
 
 import type { DebriefFeature } from '../utils/types';
 import type { MatchResult } from '../ToolMatch/types';
+import type { AssociatedFile, FileAction } from '../LayersToolbar/types';
 
 /**
  * Collapse state for each section of the ActivityPanel.
@@ -65,7 +66,8 @@ export type ActivityPanelMessage =
   | { type: 'tool:run'; payload: { toolId: string } }
   | { type: 'layer:toggleVisibility'; payload: { featureIds: string[] } }
   | { type: 'layer:delete'; payload: { featureIds: string[] } }
-  | { type: 'layer:select'; payload: { featureIds: string[] } };
+  | { type: 'layer:select'; payload: { featureIds: string[] } }
+  | { type: 'file:action'; payload: { file: AssociatedFile; action: FileAction } };
 
 /**
  * Props for the ActivityPanel component.
@@ -109,6 +111,13 @@ export interface ActivityPanelProps {
   /** Callback for messages sent to the host */
   onMessage?: (message: ActivityPanelMessage) => void;
 
+  // File action callback
+  /** Callback for file actions from AssociatedFilesDropdown */
+  onFileAction?: (file: AssociatedFile, action: FileAction) => void;
+
   /** CSS class name */
   className?: string;
 }
+
+// Re-export types for external use
+export type { AssociatedFile, FileAction } from '../LayersToolbar/types';

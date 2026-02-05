@@ -30,8 +30,8 @@
 |----------|-------------|--------------|
 | media/planning-post.md | Blog post announcing the feature | ✓ During /speckit.plan |
 | media/linkedin-planning.md | LinkedIn summary for planning | ✓ During /speckit.plan |
-| media/shipped-post.md | Blog post celebrating completion | During Polish phase |
-| media/linkedin-shipped.md | LinkedIn summary for shipped | During Polish phase |
+| media/shipped-post.md | Blog post celebrating completion | ✓ During Polish phase |
+| media/linkedin-shipped.md | LinkedIn summary for shipped | ✓ During Polish phase |
 
 ### PR Creation
 
@@ -46,8 +46,8 @@
 
 **Purpose**: Add the message type infrastructure needed for file action communication
 
-- [ ] T001 Add FileActionMessage type to ActivityPanelMessage union `apps/vscode/src/webview/types.ts`
-- [ ] T002 [P] Import AssociatedFile and FileAction types in types.ts `apps/vscode/src/webview/types.ts`
+- [x] T001 Add FileActionMessage type to ActivityPanelMessage union `shared/components/src/ActivityPanel/types.ts`
+- [x] T002 [P] Import AssociatedFile and FileAction types in types.ts `shared/components/src/ActivityPanel/types.ts`
 
 ---
 
@@ -57,10 +57,10 @@
 
 **⚠️ CRITICAL**: No action handlers can work until this chain is complete
 
-- [ ] T003 Add onFileAction prop to ActivityPanelProps interface `shared/components/src/ActivityPanel/ActivityPanel.tsx`
-- [ ] T004 Pass onFileAction prop to LayersToolbar in ActivityPanel render `shared/components/src/ActivityPanel/ActivityPanel.tsx`
-- [ ] T005 Add handleFileAction callback in activityPanel webview entry `apps/vscode/src/webview/web/activityPanel.tsx`
-- [ ] T006 Pass handleFileAction to ActivityPanel component `apps/vscode/src/webview/web/activityPanel.tsx`
+- [x] T003 Add onFileAction prop to ActivityPanelProps interface `shared/components/src/ActivityPanel/types.ts`
+- [x] T004 Pass onFileAction prop to LayersToolbar in ActivityPanel render `shared/components/src/ActivityPanel/ActivityPanel.tsx`
+- [x] T005 Add handleFileAction callback in activityPanel webview entry `apps/vscode/src/webview/web/activityPanel.tsx`
+- [x] T006 Pass handleFileAction to ActivityPanel component `apps/vscode/src/webview/web/activityPanel.tsx`
 
 **Checkpoint**: Message chain complete - webview can now send file:action messages to extension host
 
@@ -74,16 +74,16 @@
 
 ### Tests for User Story 1
 
-- [ ] T007 [test] [US1] Unit test for file:action message handler `apps/vscode/src/views/__tests__/activityPanelView.test.ts`
-- [ ] T008 [P][test] [US1] Unit test for openFile function `apps/vscode/src/views/__tests__/activityPanelView.test.ts`
+- [x] T007 [test] [US1] Unit test for file:action message handler `apps/vscode/tests/unit/views/activityPanelView.fileActions.test.ts`
+- [x] T008 [P][test] [US1] Unit test for openFile function `apps/vscode/tests/unit/views/activityPanelView.fileActions.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Add file:action case to message handler switch `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T010 [US1] Implement handleFileAction method skeleton `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T011 [US1] Implement resolveFileUri helper to convert relative paths `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T012 [US1] Implement openFile method using vscode.workspace.openTextDocument `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T013 [US1] Add error handling for file not found in openFile `apps/vscode/src/views/activityPanelView.ts`
+- [x] T009 [US1] Add file:action case to message handler switch `apps/vscode/src/views/activityPanelView.ts`
+- [x] T010 [US1] Implement handleFileAction method skeleton `apps/vscode/src/views/activityPanelView.ts`
+- [x] T011 [US1] Implement resolveFileUri helper to convert relative paths `apps/vscode/src/views/activityPanelView.ts`
+- [x] T012 [US1] Implement openFile method using vscode.workspace.openTextDocument `apps/vscode/src/views/activityPanelView.ts`
+- [x] T013 [US1] Add error handling for file not found in openFile `apps/vscode/src/views/activityPanelView.ts`
 
 **Checkpoint**: User Story 1 complete - "Open" action works independently
 
@@ -97,14 +97,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T014 [test] [US2] Unit test for revealFile function `apps/vscode/src/views/__tests__/activityPanelView.test.ts`
-- [ ] T015 [P][test] [US2] Unit test for web client detection and modal `apps/vscode/src/views/__tests__/activityPanelView.test.ts`
+- [x] T014 [test] [US2] Unit test for revealFile function `apps/vscode/tests/unit/views/activityPanelView.fileActions.test.ts`
+- [x] T015 [P][test] [US2] Unit test for web client detection and modal `apps/vscode/tests/unit/views/activityPanelView.fileActions.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T016 [US2] Implement revealFile method using revealFileInOS command `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T017 [US2] Add web client detection (vscode.env.uiKind) `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T018 [US2] Show informational modal for web client on reveal action `apps/vscode/src/views/activityPanelView.ts`
+- [x] T016 [US2] Implement revealFile method using revealFileInOS command `apps/vscode/src/views/activityPanelView.ts`
+- [x] T017 [US2] Add web client detection (vscode.env.uiKind) `apps/vscode/src/views/activityPanelView.ts`
+- [x] T018 [US2] Show informational modal for web client on reveal action `apps/vscode/src/views/activityPanelView.ts`
 
 **Checkpoint**: User Story 2 complete - "Reveal" action works independently
 
@@ -118,16 +118,16 @@
 
 ### Tests for User Story 3
 
-- [ ] T019 [test] [US3] Unit test for deleteFile with confirmation `apps/vscode/src/views/__tests__/activityPanelView.test.ts`
-- [ ] T020 [P][test] [US3] Unit test for delete cancellation `apps/vscode/src/views/__tests__/activityPanelView.test.ts`
-- [ ] T021 [P][test] [US3] Unit test for delete permission error `apps/vscode/src/views/__tests__/activityPanelView.test.ts`
+- [x] T019 [test] [US3] Unit test for deleteFile with confirmation `apps/vscode/tests/unit/views/activityPanelView.fileActions.test.ts`
+- [x] T020 [P][test] [US3] Unit test for delete cancellation `apps/vscode/tests/unit/views/activityPanelView.fileActions.test.ts`
+- [x] T021 [P][test] [US3] Unit test for delete permission error `apps/vscode/tests/unit/views/activityPanelView.fileActions.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T022 [US3] Implement deleteFile method with showWarningMessage confirmation `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T023 [US3] Add vscode.workspace.fs.delete call after confirmation `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T024 [US3] Add web client detection and modal for delete action `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T025 [US3] Add permission denied error handling `apps/vscode/src/views/activityPanelView.ts`
+- [x] T022 [US3] Implement deleteFile method with showWarningMessage confirmation `apps/vscode/src/views/activityPanelView.ts`
+- [x] T023 [US3] Add vscode.workspace.fs.delete call after confirmation `apps/vscode/src/views/activityPanelView.ts`
+- [x] T024 [US3] Add web client detection and modal for delete action `apps/vscode/src/views/activityPanelView.ts`
+- [x] T025 [US3] Add permission denied error handling `apps/vscode/src/views/activityPanelView.ts`
 
 **Checkpoint**: User Story 3 complete - "Delete" action works with confirmation
 
@@ -141,11 +141,11 @@
 
 ### Tests for User Story 4
 
-- [ ] T026 [test] [US4] Unit test for openFileWith function `apps/vscode/src/views/__tests__/activityPanelView.test.ts`
+- [x] T026 [test] [US4] Unit test for openFileWith function `apps/vscode/tests/unit/views/activityPanelView.fileActions.test.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Implement openFileWith method using vscode.openWith command `apps/vscode/src/views/activityPanelView.ts`
+- [x] T027 [US4] Implement openFileWith method using vscode.openWith command `apps/vscode/src/views/activityPanelView.ts`
 
 **Checkpoint**: User Story 4 complete - "Open With" action works independently
 
@@ -157,9 +157,9 @@
 
 ### Error Handling
 
-- [ ] T028 Implement showFileError helper for user-friendly error messages `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T029 [P] Add file not found error message `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T030 [P] Add permission denied error message `apps/vscode/src/views/activityPanelView.ts`
+- [x] T028 Implement showFileError helper for user-friendly error messages `apps/vscode/src/views/activityPanelView.ts`
+- [x] T029 [P] Add file not found error message `apps/vscode/src/views/activityPanelView.ts`
+- [x] T030 [P] Add permission denied error message `apps/vscode/src/views/activityPanelView.ts`
 
 ### E2E Tests
 
@@ -170,9 +170,9 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T035 Create evidence directory `specs/001-wire-file-actions/evidence/`
-- [ ] T036 Capture test summary in `specs/001-wire-file-actions/evidence/test-summary.md`
-- [ ] T037 Create usage demonstration in `specs/001-wire-file-actions/evidence/usage-example.md`
+- [x] T035 Create evidence directory `specs/001-wire-file-actions/evidence/`
+- [x] T036 Capture test summary in `specs/001-wire-file-actions/evidence/test-summary.md`
+- [x] T037 Create usage demonstration in `specs/001-wire-file-actions/evidence/usage-example.md`
 - [ ] T038 [P] Capture dropdown screenshots to `specs/001-wire-file-actions/evidence/screenshots/`
 
 ### E2E Evidence Collection
@@ -182,8 +182,8 @@
 
 ### Media Content
 
-- [ ] T041 Create shipped blog post in `specs/001-wire-file-actions/media/shipped-post.md`
-- [ ] T042 [P] Create LinkedIn shipped summary in `specs/001-wire-file-actions/media/linkedin-shipped.md`
+- [x] T041 Create shipped blog post in `specs/001-wire-file-actions/media/shipped-post.md`
+- [x] T042 [P] Create LinkedIn shipped summary in `specs/001-wire-file-actions/media/linkedin-shipped.md`
 
 ### PR Creation
 

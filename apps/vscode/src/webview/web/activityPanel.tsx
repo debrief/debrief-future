@@ -12,6 +12,8 @@ import type {
   ActivityPanelCollapseState,
   ActivityPanelMessage,
   ToolsPanelItem,
+  AssociatedFile,
+  FileAction,
 } from '@debrief/components';
 import type { DebriefFeature } from '@debrief/components';
 import type { MatchResult } from '@debrief/components';
@@ -166,6 +168,10 @@ function ActivityPanelApp(): React.ReactElement {
     vscode.postMessage(message);
   }, []);
 
+  const handleFileAction = useCallback((file: AssociatedFile, action: FileAction) => {
+    vscode.postMessage({ type: 'file:action', payload: { file, action } });
+  }, []);
+
   return (
     <div className="activity-panel-webview">
       <ActivityPanel
@@ -182,6 +188,7 @@ function ActivityPanelApp(): React.ReactElement {
         collapseState={collapseState}
         onCollapseStateChange={handleCollapseChange}
         onMessage={handleMessage}
+        onFileAction={handleFileAction}
       />
     </div>
   );

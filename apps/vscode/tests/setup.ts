@@ -73,6 +73,7 @@ vi.mock('vscode', () => ({
     createTreeView: vi.fn(),
     registerTreeDataProvider: vi.fn(),
     withProgress: vi.fn(),
+    showTextDocument: vi.fn(),
   },
   workspace: {
     getConfiguration: vi.fn(() => ({
@@ -82,6 +83,13 @@ vi.mock('vscode', () => ({
     workspaceFolders: [],
     onDidChangeConfiguration: vi.fn(),
     registerFileSystemProvider: vi.fn(),
+    openTextDocument: vi.fn(),
+    fs: {
+      delete: vi.fn(),
+      readFile: vi.fn(),
+      writeFile: vi.fn(),
+      stat: vi.fn(),
+    },
   },
   commands: {
     registerCommand: vi.fn(),
@@ -95,6 +103,10 @@ vi.mock('vscode', () => ({
     parse: vi.fn((uri: string) => {
       const scheme = uri.startsWith('https://') ? 'https' : uri.startsWith('http://') ? 'http' : 'file';
       return { fsPath: uri, scheme, path: uri };
+    }),
+    joinPath: vi.fn((base: { fsPath: string }, ...segments: string[]) => {
+      const fullPath = [base.fsPath, ...segments].join('/');
+      return { fsPath: fullPath, scheme: 'file', path: fullPath };
     }),
   },
   EventEmitter: MockEventEmitter,
@@ -129,5 +141,10 @@ vi.mock('vscode', () => ({
   },
   env: {
     openExternal: vi.fn(),
+    uiKind: 1, // Desktop by default
+  },
+  UIKind: {
+    Desktop: 1,
+    Web: 2,
   },
 }));

@@ -70,6 +70,23 @@ interface WebviewReadyMessage {
   type: 'webviewReady';
 }
 
+/** Associated file from STAC item */
+interface AssociatedFile {
+  name: string;
+  path: string;
+  category: 'source' | 'result';
+  viewerType?: string;
+  format?: string;
+}
+
+/** File action types */
+type FileAction = 'open' | 'openWith' | 'reveal' | 'delete';
+
+interface FileActionMessage {
+  type: 'file:action';
+  payload: { file: AssociatedFile; action: FileAction };
+}
+
 type WebviewMessage =
   | TemporalSeekMessage
   | TemporalPlayMessage
@@ -79,7 +96,8 @@ type WebviewMessage =
   | LayerToggleVisibilityMessage
   | LayerDeleteMessage
   | LayerSelectMessage
-  | WebviewReadyMessage;
+  | WebviewReadyMessage
+  | FileActionMessage;
 
 export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'debrief.activityPanel';
@@ -354,6 +372,10 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
             state.setSelection(message.payload.featureIds);
           }
           break;
+
+        case 'file:action':
+          void this._handleFileAction(message.payload.file, message.payload.action);
+          break;
       }
     });
   }
@@ -391,6 +413,113 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     } catch (error) {
       void vscode.window.showErrorMessage(
         `Failed to run tool: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Handle file action from webview
+   */
+  private async _handleFileAction(file: AssociatedFile, action: FileAction): Promise<void> {
+    // Check for web client limitations
+    const isWebClient = vscode.env.uiKind === vscode.UIKind.Web;
+    if (isWebClient && (action === 'reveal' || action === 'delete')) {
+      void vscode.window.showInformationMessage(
+        'This operation requires the desktop version of VS Code.'
+      );
+      return;
+    }
+
+    try {
+      const uri = this._resolveFileUri(file.path);
+
+      switch (action) {
+        case 'open':
+          await this._openFile(uri);
+          break;
+        case 'openWith':
+          await this._openFileWith(uri);
+          break;
+        case 'reveal':
+          await this._revealFile(uri);
+          break;
+        case 'delete':
+          await this._deleteFile(uri, file.name);
+          break;
+      }
+    } catch (error) {
+      this._showFileError(action, file.name, error);
+    }
+  }
+
+  /**
+   * Resolve relative file path to absolute URI
+   */
+  private _resolveFileUri(relativePath: string): vscode.Uri {
+    // Get workspace folder as base
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (workspaceFolders && workspaceFolders.length > 0) {
+      return vscode.Uri.joinPath(workspaceFolders[0].uri, relativePath);
+    }
+    // Fallback: treat as absolute path
+    return vscode.Uri.file(relativePath);
+  }
+
+  /**
+   * Open file in VS Code editor
+   */
+  private async _openFile(uri: vscode.Uri): Promise<void> {
+    const doc = await vscode.workspace.openTextDocument(uri);
+    await vscode.window.showTextDocument(doc);
+  }
+
+  /**
+   * Open file with system application picker
+   */
+  private async _openFileWith(uri: vscode.Uri): Promise<void> {
+    await vscode.commands.executeCommand('vscode.openWith', uri);
+  }
+
+  /**
+   * Reveal file in system file explorer
+   */
+  private async _revealFile(uri: vscode.Uri): Promise<void> {
+    await vscode.commands.executeCommand('revealFileInOS', uri);
+  }
+
+  /**
+   * Delete file with confirmation dialog
+   */
+  private async _deleteFile(uri: vscode.Uri, fileName: string): Promise<void> {
+    const confirm = await vscode.window.showWarningMessage(
+      `Delete "${fileName}"? This cannot be undone.`,
+      { modal: true },
+      'Delete'
+    );
+
+    if (confirm === 'Delete') {
+      await vscode.workspace.fs.delete(uri);
+      void vscode.window.showInformationMessage(`Deleted: ${fileName}`);
+    }
+  }
+
+  /**
+   * Show user-friendly file operation error
+   */
+  private _showFileError(action: string, fileName: string, error: unknown): void {
+    const message = error instanceof Error ? error.message : String(error);
+
+    if (message.includes('ENOENT') || message.includes('FileNotFound') || message.includes('does not exist')) {
+      void vscode.window.showErrorMessage(
+        `File not found: ${fileName}. It may have been moved or deleted.`
+      );
+    } else if (message.includes('EACCES') || message.includes('Permission')) {
+      void vscode.window.showErrorMessage(
+        `Cannot access file: ${fileName}. Check file permissions.`
+      );
+    } else {
+      void vscode.window.showErrorMessage(
+        `Failed to ${action} file: ${fileName}. ${message}`
       );
     }
   }

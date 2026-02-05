@@ -189,6 +189,7 @@ export function ActivityPanel({
   onCollapseStateChange,
   // Communication
   onMessage,
+  onFileAction,
   className,
 }: ActivityPanelProps) {
   const [internalCollapseState, setInternalCollapseState] = useState(DEFAULT_COLLAPSE_STATE);
@@ -336,6 +337,7 @@ export function ActivityPanel({
             toolMatches={toolMatches}
             onDelete={handleDelete}
             onToggleVisibility={handleToggleVisibility}
+            onFileAction={onFileAction}
           />
           <FeatureList
             features={features}
