@@ -33,6 +33,12 @@ export interface MapViewProps {
     currentTime?: number;
     /** Track display mode: 'full' (entire track + marker) or 'trail' (snail-trail up to current time). */
     displayMode?: DisplayMode;
+    /** Set of visible feature IDs. When provided, fit-to-window only considers these features. */
+    visibleIds?: Set<string>;
+    /** Whether to show the custom toolbar with zoom and fit buttons (default: true) */
+    showToolbar?: boolean;
+    /** Position of the toolbar (default: 'topleft') */
+    toolbarPosition?: 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
 }
 /**
  * MapView component for displaying GeoJSON features on an interactive map.
@@ -48,5 +54,5 @@ export interface MapViewProps {
  * />
  * ```
  */
-export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, autoFitBounds, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
+export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, autoFitBounds, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, visibleIds, showToolbar, toolbarPosition, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=MapView.d.ts.map
