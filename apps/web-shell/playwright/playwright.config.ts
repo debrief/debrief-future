@@ -6,8 +6,13 @@ import { fileURLToPath } from 'url';
 /**
  * Playwright configuration for web-shell E2E tests.
  *
- * In Claude Code environment, uses @sparticuz/chromium which bundles Chromium.
- * Standard browser downloads are blocked (403 from CDN).
+ * Two browser modes:
+ * - LOCAL (macOS/Windows): Run `pnpm exec playwright install chromium` first,
+ *   then `pnpm test`. Uses native Playwright browser.
+ * - CLOUD (CI, Claude Code, Lambda): Run `node run-playwright.mjs` which
+ *   extracts the bundled @sparticuz/chromium Linux binary.
+ *
+ * Note: @sparticuz/chromium is Linux x86-64 only — fails on local macOS/Windows.
  *
  * @see https://playwright.dev/docs/test-configuration
  * @see docs/project_notes/playwright-installation-research.md
