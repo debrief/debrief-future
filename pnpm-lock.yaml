@@ -11,6 +11,9 @@ importers:
       '@playwright/test':
         specifier: ^1.57.0
         version: 1.57.0
+      '@sparticuz/chromium':
+        specifier: ^131.0.1
+        version: 131.0.1
 
   apps/loader:
     dependencies:
