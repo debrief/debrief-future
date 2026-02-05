@@ -82,7 +82,7 @@ class TestRunSuccess:
         assert len(result.features) == 1
 
         feature = result.features[0]
-        assert feature["properties"]["kind"] == "track-statistics"
+        assert feature["properties"]["kind"] == "track/statistics"
         assert "provenance" in feature["properties"]
         assert "statistics" in feature["properties"]
 
@@ -109,7 +109,7 @@ class TestRunSuccess:
         assert len(result.features) == 1
 
         feature = result.features[0]
-        assert feature["properties"]["kind"] == "area-statistics"
+        assert feature["properties"]["kind"] == "region/statistics"
         assert "provenance" in feature["properties"]
         assert "statistics" in feature["properties"]
 

@@ -10,6 +10,28 @@
 - Network access from browsers is blocked (`net::ERR_TUNNEL_CONNECTION_FAILED`)
 - Local HTML/JavaScript tests work fully
 
+## Local vs Cloud Development
+
+| Environment | Browser Source | How to Run |
+|-------------|----------------|------------|
+| **Local macOS/Windows** | `pnpm exec playwright install chromium` | `pnpm test` |
+| **Cloud (Claude Code, CI, Lambda)** | `@sparticuz/chromium` (bundled Linux binary) | `node run-playwright.mjs` |
+
+**Important**: `@sparticuz/chromium` bundles a **Linux x86-64** binary. It will fail on local macOS/Windows with `ENOEXEC` (error -8).
+
+For local development:
+```bash
+cd apps/web-shell
+pnpm exec playwright install chromium  # Downloads native browser
+pnpm test                               # Uses native browser
+```
+
+For cloud/CI:
+```bash
+cd apps/web-shell
+node run-playwright.mjs                 # Extracts bundled Linux chromium
+```
+
 ## Environment Details
 
 | Property | Value |

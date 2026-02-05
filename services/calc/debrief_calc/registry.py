@@ -196,7 +196,7 @@ def tool(
             name="track-stats",
             description="Calculate statistics for a single track",
             input_kinds=["track"],
-            output_kind="track-statistics",
+            output_kind="track/statistics",
             context_type=ContextType.SINGLE
         )
         def track_stats(context: SelectionContext, params: dict) -> list[dict]:

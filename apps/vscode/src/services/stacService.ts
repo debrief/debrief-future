@@ -13,7 +13,25 @@ import type {
   StacItemSummary,
   StacCatalog,
   StacItem,
+  StacAsset,
 } from '../types/stac';
+
+/**
+ * Associated file from STAC item sources or results folder.
+ * Matches the interface from shared/components for compatibility.
+ */
+export interface AssociatedFile {
+  /** Display name */
+  name: string;
+  /** Path relative to STAC item */
+  path: string;
+  /** Source or result */
+  category: 'source' | 'result';
+  /** Parsed from multi-suffix convention (e.g., '2d', 'table') */
+  viewerType?: string;
+  /** File format (e.g., 'json', 'geojson', 'csv') */
+  format?: string;
+}
 import type { Plot, Track, ReferenceLocation } from '../types/plot';
 import type { GeoJSONFeature } from '../types/import';
 
@@ -397,6 +415,160 @@ export class StacService {
     } catch (err) {
       console.error('Failed to save track colors:', err);
       return false;
+    }
+  }
+
+  // ============================================================================
+  // Result File Extraction (Feature 051)
+  // ============================================================================
+
+  /**
+   * Parse multi-suffix viewer type from filename.
+   * E.g., "range-bearing.2d.json" -> "2d", "result.table.geojson" -> "table"
+   *
+   * @param filename The filename to parse
+   * @returns The viewer type if found, undefined otherwise
+   */
+  parseViewerType(filename: string): string | undefined {
+    // Split by dots and check for multi-suffix pattern
+    const parts = filename.split('.');
+    if (parts.length >= 3) {
+      // Second-to-last part is potential viewer type
+      const potentialViewerType = parts[parts.length - 2];
+      // Known viewer types
+      const knownViewerTypes = ['2d', '3d', 'table', 'chart', 'map', 'text'];
+      if (potentialViewerType && knownViewerTypes.includes(potentialViewerType.toLowerCase())) {
+        return potentialViewerType.toLowerCase();
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Parse file format from filename.
+   *
+   * @param filename The filename to parse
+   * @returns The file extension without dot, lowercase
+   */
+  parseFileFormat(filename: string): string {
+    const ext = path.extname(filename);
+    return ext ? ext.slice(1).toLowerCase() : '';
+  }
+
+  /**
+   * Transform a STAC asset to an AssociatedFile.
+   *
+   * @param asset The STAC asset
+   * @param assetKey The asset key from the item
+   * @returns AssociatedFile object
+   */
+  assetToAssociatedFile(asset: StacAsset, assetKey: string): AssociatedFile {
+    const filename = asset.title ?? path.basename(asset.href);
+    const format = this.parseFileFormat(filename);
+    const viewerType = this.parseViewerType(filename);
+
+    return {
+      name: filename,
+      path: asset.href.startsWith('./') ? asset.href.slice(2) : asset.href,
+      category: 'result',
+      viewerType,
+      format,
+    };
+  }
+
+  /**
+   * Check if a STAC asset is a result file.
+   * Primary: Check for 'result' role in roles array.
+   * Fallback: Check for debrief:toolId metadata or known result patterns.
+   *
+   * @param asset The STAC asset to check
+   * @param assetKey The asset key
+   * @returns True if this asset is a result file
+   */
+  isResultAsset(asset: StacAsset, assetKey: string): boolean {
+    // Primary: Check for 'result' role
+    if (asset.roles?.includes('result')) {
+      return true;
+    }
+
+    // Fallback: Check for debrief:toolId metadata
+    const assetWithMetadata = asset as StacAsset & { 'debrief:toolId'?: string };
+    if (assetWithMetadata['debrief:toolId']) {
+      return true;
+    }
+
+    // Fallback: Check filename patterns for known result types
+    const href = asset.href.toLowerCase();
+    const resultPatterns = [
+      'range-bearing',
+      '-result.',
+      '-analysis.',
+      '-calculation.',
+    ];
+    for (const pattern of resultPatterns) {
+      if (href.includes(pattern)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Extract result files from a loaded STAC item's assets.
+   * Identifies assets with 'result' role or matching result patterns.
+   *
+   * @param item The STAC item object
+   * @returns Array of AssociatedFile objects for result assets
+   */
+  getResultFilesFromItem(item: StacItem): AssociatedFile[] {
+    const results: AssociatedFile[] = [];
+
+    if (!item.assets) {
+      return results;
+    }
+
+    try {
+      for (const [assetKey, asset] of Object.entries(item.assets)) {
+        try {
+          if (this.isResultAsset(asset, assetKey)) {
+            results.push(this.assetToAssociatedFile(asset, assetKey));
+          }
+        } catch (err) {
+          // Skip problematic assets, log warning
+          console.warn(`[debrief] Skipping asset ${assetKey}: ${err instanceof Error ? err.message : String(err)}`);
+        }
+      }
+    } catch (err) {
+      console.warn(`[debrief] Failed to extract result files: ${err instanceof Error ? err.message : String(err)}`);
+    }
+
+    return results;
+  }
+
+  /**
+   * Load result files from a plot's STAC item.
+   * Convenience method that loads the item and extracts result files.
+   * Feature: 051-load-result-attachments
+   *
+   * @param store The STAC store containing the item
+   * @param itemPath Relative path to the item JSON file
+   * @returns Array of AssociatedFile objects for result assets
+   */
+  async loadResultFiles(store: StacStore, itemPath: string): Promise<AssociatedFile[]> {
+    try {
+      const fullPath = path.join(store.path, itemPath);
+      const item = await this.loadItem(fullPath);
+
+      if (!item) {
+        console.warn(`[debrief] Could not load item for result extraction: ${itemPath}`);
+        return [];
+      }
+
+      return this.getResultFilesFromItem(item);
+    } catch (err) {
+      console.warn(`[debrief] Failed to load result files: ${err instanceof Error ? err.message : String(err)}`);
+      return [];
     }
   }
 

@@ -26,6 +26,7 @@ import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { CalcService } from '../services/calcService';
 import type { MatchResult } from '../types/tool';
 import type { Track, ReferenceLocation } from '../types/plot';
+import type { AssociatedFile } from '../services/stacService';
 
 // Message types from webview
 interface TemporalSeekMessage {
@@ -101,7 +102,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   private _locations: ReferenceLocation[] = [];
 
   // Result files for Associated Files dropdown
-  private _resultFiles: Array<{ name: string; path: string; category: 'result' }> = [];
+  private _resultFiles: AssociatedFile[] = [];
   private _resultsChanged = false;
 
   constructor(
@@ -305,9 +306,31 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
    * Add a result file to the Associated Files dropdown.
    * Called after tool execution completes.
    */
-  public addResultFile(name: string, path: string): void {
-    this._resultFiles.push({ name, path, category: 'result' });
-    this._resultsChanged = true;
+  public addResultFile(name: string, filePath: string): void {
+    // Check for duplicates before adding
+    const exists = this._resultFiles.some((rf) => rf.path === filePath);
+    if (!exists) {
+      this._resultFiles.push({ name, path: filePath, category: 'result' });
+      this._resultsChanged = true;
+      this._sendLayersUpdate();
+    }
+  }
+
+  /**
+   * Set result files loaded from a STAC item.
+   * Called when a plot is opened to restore previously-saved result files.
+   * Feature: 051-load-result-attachments
+   *
+   * @param resultFiles Array of AssociatedFile objects extracted from STAC item
+   */
+  public setResultFiles(resultFiles: AssociatedFile[]): void {
+    // Merge with any existing runtime-added results (deduplication)
+    const existingPaths = new Set(resultFiles.map((rf) => rf.path));
+    const runtimeResults = this._resultFiles.filter((rf) => !existingPaths.has(rf.path));
+
+    // Loaded files first, then any runtime-added results not in loaded set
+    this._resultFiles = [...resultFiles, ...runtimeResults];
+    this._resultsChanged = resultFiles.length > 0;
     this._sendLayersUpdate();
   }
 

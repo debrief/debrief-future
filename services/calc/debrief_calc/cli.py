@@ -67,15 +67,18 @@ def main() -> None:
             tool = registry.get_tool(tool_name)
             source_ids = _extract_source_ids(features)
 
-            if tool.output_kind == "range-bearing-series":
+            # Check if output is a dataset artifact (domain/specific pattern starting with dataset/)
+            if tool.output_kind.startswith("dataset/"):
                 # Artifact output: serialize time-series as JSON
                 series_data = result.features[0] if result.features else {}
                 data_bytes = json.dumps(series_data, indent=2).encode("utf-8")
-                href = f"range-bearing-{'-'.join(source_ids[:2])}.json"
+                # Extract specific type for filename (e.g., "range_bearing_series" from "dataset/range_bearing_series")
+                specific_type = tool.output_kind.split("/")[-1]
+                href = f"{specific_type}-{'-'.join(source_ids[:2])}.json"
                 content_item = build_artifact(
                     data=data_bytes,
                     mime_type="application/json",
-                    result_subtype="range-bearing-series",
+                    result_subtype=tool.output_kind,
                     source_feature_ids=source_ids,
                     label=f"{tool_name} results",
                     href=href,

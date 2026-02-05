@@ -145,21 +145,21 @@ describe('CalcService logic', () => {
       const artifactItem: MCPContentItem = {
         type: 'resource',
         resource: {
-          uri: 'artifact://range-bearing-t1-t2.json',
+          uri: 'artifact://range_bearing_series-t1-t2.json',
           mimeType: 'application/json',
           text: '{"type":"range-bearing-series","entries":[]}',
         },
         annotations: {
-          'debrief:resultType': 'artifact/range-bearing-series',
+          'debrief:resultType': 'artifact/dataset/range_bearing_series',
           'debrief:sourceFeatures': ['track-1', 'track-2'],
           'debrief:label': 'range-bearing results',
-          'debrief:href': 'range-bearing-t1-t2.json',
+          'debrief:href': 'range_bearing_series-t1-t2.json',
         },
       };
 
       expect(artifactItem.type).toBe('resource');
-      expect(artifactItem.annotations['debrief:resultType']).toBe('artifact/range-bearing-series');
-      expect(artifactItem.annotations['debrief:href']).toBe('range-bearing-t1-t2.json');
+      expect(artifactItem.annotations['debrief:resultType']).toBe('artifact/dataset/range_bearing_series');
+      expect(artifactItem.annotations['debrief:href']).toBe('range_bearing_series-t1-t2.json');
       expect(artifactItem.resource?.mimeType).toBe('application/json');
     });
 
