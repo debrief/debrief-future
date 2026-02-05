@@ -215,6 +215,9 @@ importers:
       '@playwright/test':
         specifier: ^1.40.0
         version: 1.57.0
+      '@sparticuz/chromium':
+        specifier: ^143.0.4
+        version: 143.0.4
       '@types/geojson':
         specifier: ^7946.0.0
         version: 7946.0.16
@@ -1425,6 +1428,10 @@ packages:
   '@sparticuz/chromium@131.0.1':
     resolution: {integrity: sha512-VfmHkQmb/Px0zjwdSQwjRMwFw63Qfj+g4Giumz4jiAGEpXHgIZk6xEwlUz6yiUHVDveK2TEgMR2MR6I3okOE7w==}
     engines: {node: '>= 16'}
+
+  '@sparticuz/chromium@143.0.4':
+    resolution: {integrity: sha512-/6I7uQTRhRDD2/gGPQ1Gkf+Dqk0RYDACPJDZfSzz0OWk4JmUTonNHPXbrn6UIklOHlnDLf8xAAzkOZKB/cJpLA==}
+    engines: {node: '>=20.11.0'}
 
   '@storybook/addon-a11y@8.6.15':
     resolution: {integrity: sha512-hNSI28z1PCu7/mQ+skVHX+PvLwnLLiM4d+Ecr0hhZLJDwa5JoZrnszSrCoGadSzaRe270kwjYoEwgX9MGXaxrA==}
@@ -6355,6 +6362,16 @@ snapshots:
   '@sindresorhus/merge-streams@4.0.0': {}
 
   '@sparticuz/chromium@131.0.1':
+    dependencies:
+      follow-redirects: 1.15.11
+      tar-fs: 3.1.1
+    transitivePeerDependencies:
+      - bare-abort-controller
+      - bare-buffer
+      - debug
+      - react-native-b4a
+
+  '@sparticuz/chromium@143.0.4':
     dependencies:
       follow-redirects: 1.15.11
       tar-fs: 3.1.1
