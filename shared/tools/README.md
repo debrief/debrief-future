@@ -2,6 +2,26 @@
 
 Language-neutral tool documentation for consistent behavior across Python and TypeScript implementations.
 
+## ToolResult Architecture
+
+All tools return a **ToolResponse** containing content items with Debrief annotations — they do NOT return modified features directly.
+
+```
+Tool Input (FeatureCollection)
+    → Tool Processing
+    → ToolResponse { content: [MutationResult | AdditionResult | DeletionResult | ArtifactResult] }
+```
+
+**Key concepts**:
+- **Result Types**: `mutation/`, `addition/`, `deletion/`, `artifact/` — categorize what the tool does
+- **Annotations**: Every content item includes `debrief:resultType`, `debrief:sourceFeatures`, `debrief:label`
+- **Provenance**: Results carry lineage information for audit trails
+
+**Essential documentation**:
+- [ToolResult Data Model](../specs/041-document-tool-results/data-model.md) — Complete response structure
+- [Python API Contract](../specs/041-document-tool-results/contracts/python-api.md) — `build_mutation()`, `build_response()`, `build_error()`
+- [tool-result.yaml](./schemas/src/linkml/tool-result.yaml) — LinkML schema for annotations
+
 ## Structure
 
 ```
