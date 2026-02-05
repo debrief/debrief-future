@@ -167,7 +167,7 @@
 
 ### PR Creation (REQUIRED - must be final task)
 
-- [ ] T025 Create PR and publish blog: run /speckit.pr
+- [x] T025 Create PR and publish blog: run /speckit.pr (manual - gh CLI not available)
 
 **Task T025 must run last. It depends on all evidence and media tasks being complete.**
 
