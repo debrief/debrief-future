@@ -47,6 +47,30 @@ Create a shared tool specification system in `shared/tools/` with:
 - Golden examples are source of truth for testing
 - Each implementation independently validates against fixtures
 
+## Initial Tools (track/styling category)
+
+These four tools will validate the template:
+
+### 1. set-track-color
+Assign a color to a track based on explicit selection or derived from a property value.
+- **Input**: Track feature(s), color value or property-to-color mapping
+- **Output**: Track feature(s) with updated styling properties
+
+### 2. apply-symbol-style
+Set position marker symbols including type, size, and frequency.
+- **Input**: Track feature(s), symbol configuration (type, size)
+- **Output**: Track feature(s) with updated symbol styling
+
+### 3. label-interval
+Configure how often labels appear along a track (e.g., every N minutes, every N positions).
+- **Input**: Track feature(s), interval specification (time-based or position-based)
+- **Output**: Track feature(s) with label interval metadata
+
+### 4. symbol-interval
+Configure how often position symbols appear along a track.
+- **Input**: Track feature(s), interval specification (time-based or position-based)
+- **Output**: Track feature(s) with symbol interval metadata
+
 ## Out of Scope
 
 - Actual Python/TypeScript implementations of the initial tools
