@@ -462,7 +462,7 @@ export class StacService {
    * @param assetKey The asset key from the item
    * @returns AssociatedFile object
    */
-  assetToAssociatedFile(asset: StacAsset, assetKey: string): AssociatedFile {
+  assetToAssociatedFile(asset: StacAsset, _assetKey: string): AssociatedFile {
     const filename = asset.title ?? path.basename(asset.href);
     const format = this.parseFileFormat(filename);
     const viewerType = this.parseViewerType(filename);
@@ -485,7 +485,7 @@ export class StacService {
    * @param assetKey The asset key
    * @returns True if this asset is a result file
    */
-  isResultAsset(asset: StacAsset, assetKey: string): boolean {
+  isResultAsset(asset: StacAsset, _assetKey: string): boolean {
     // Primary: Check for 'result' role
     if (asset.roles?.includes('result')) {
       return true;
