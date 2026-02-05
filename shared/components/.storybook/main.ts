@@ -46,10 +46,12 @@ const config: StorybookConfig = {
     // Add geojson plugin
     config.plugins = config.plugins || [];
     config.plugins.push(geojsonPlugin());
-    // Add alias for web-shell test data
+    // Add aliases for web-shell stories
     config.resolve = config.resolve || {};
     config.resolve.alias = {
       ...config.resolve.alias,
+      // Resolve @debrief/components to source files for Storybook builds
+      '@debrief/components': path.resolve(__dirname, '../src/index.ts'),
       '@test-data': path.resolve(__dirname, '../../../apps/vscode/test-data'),
     };
     return config;
