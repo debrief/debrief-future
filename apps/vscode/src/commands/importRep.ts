@@ -14,7 +14,7 @@ import type { StacService } from '../services/stacService';
 import type { IoService } from '../services/ioService';
 import type { StacTreeProvider } from '../providers/stacTreeProvider';
 import { DuplicateImportError } from '../types/import';
-import type { ParseResult } from '../types/import';
+import type { ParseResult, GeoJSONFeature } from '../types/import';
 
 interface ImportRepArgs {
   fsPath?: string;
@@ -240,7 +240,7 @@ async function createNewPlotFromRep(
 
       // Merge all features
       const allFeatures = parseResults.flatMap((r) =>
-        r.features.map((f) => ({
+        r.features.map((f: GeoJSONFeature) => ({
           type: 'Feature' as const,
           geometry: {
             type: f.geometry.type,
@@ -402,7 +402,7 @@ async function importRepFile(
 
         // Store features
         progress.report({ message: 'Storing features...' });
-        const safeFeatures = parseResult.features.map((f) => ({
+        const safeFeatures = parseResult.features.map((f: GeoJSONFeature) => ({
           type: 'Feature' as const,
           geometry: {
             type: f.geometry.type,
