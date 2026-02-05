@@ -19,6 +19,14 @@ export interface MapViewProps {
     initialCenter?: [number, number];
     /** Whether to auto-fit bounds to features */
     autoFitBounds?: boolean;
+    /** Controlled viewport - when provided, map will update to this center/zoom.
+     *  Use for programmatic viewport changes (e.g., setViewport messages from VS Code). */
+    viewport?: {
+        center: [number, number];
+        zoom: number;
+    };
+    /** Programmatically trigger fit bounds. Increment to trigger a new fit. */
+    fitBoundsTrigger?: number;
     /** Tile layer URL (default: OpenStreetMap) */
     tileLayerUrl?: string;
     /** Tile layer attribution */
@@ -54,5 +62,5 @@ export interface MapViewProps {
  * />
  * ```
  */
-export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, autoFitBounds, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, visibleIds, showToolbar, toolbarPosition, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
+export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, viewport, autoFitBounds, fitBoundsTrigger, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, visibleIds, showToolbar, toolbarPosition, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=MapView.d.ts.map
