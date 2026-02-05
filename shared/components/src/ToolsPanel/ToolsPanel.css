@@ -6,6 +6,7 @@
 .debrief-tools-panel {
   display: flex;
   flex-direction: column;
+  font-family: var(--debrief-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
 }
 
 .debrief-tools-panel--empty {
