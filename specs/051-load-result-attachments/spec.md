@@ -1,6 +1,6 @@
 # Feature Specification: Load Existing Result Files into Attachments Dropdown
 
-**Feature Branch**: `001-load-result-attachments`
+**Feature Branch**: `051-load-result-attachments`
 **Created**: 2026-02-05
 **Status**: Draft
 **Input**: GitHub Issue #172 - Load existing result files into Attachments dropdown on plot open
