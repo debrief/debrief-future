@@ -21,6 +21,9 @@ const MINUTE = 60_000;
 
 /**
  * Create a track with position styling.
+ * Includes both:
+ * - `times` array (epoch ms) for temporal rendering (snail trail, marker)
+ * - `positions` array (objects with time strings) for position styling
  */
 function createStyledTrack(
   id: string,
@@ -28,6 +31,7 @@ function createStyledTrack(
   color: string,
   coordinates: Array<[number, number]>,
   positions: Array<{ time: string; course: number; speed: number }>,
+  times: number[], // epoch ms array for temporal rendering
   defaultStyle: PositionStyle,
   symbolInterval?: string,
   labelInterval?: string,
@@ -47,7 +51,8 @@ function createStyledTrack(
       track_type: 'CONTACT',
       start_time: positions[0]?.time ?? '',
       end_time: positions[positions.length - 1]?.time ?? '',
-      positions,
+      times, // For temporal rendering (snail trail, highlight marker)
+      positions, // For position styling (symbols, labels)
       style: {
         line: { color },
         point: { shape: 'circle', radius: 4, fill: true, fill_color: color, color },
@@ -64,20 +69,23 @@ function createStyledTrack(
 function generatePositions(startTime: number, count: number, startLon: number, startLat: number) {
   const coordinates: Array<[number, number]> = [];
   const positions: Array<{ time: string; course: number; speed: number }> = [];
+  const times: number[] = []; // epoch ms for temporal rendering
 
   for (let i = 0; i < count; i++) {
+    const timestamp = startTime + i * 4 * MINUTE; // 4-minute intervals
     coordinates.push([
       startLon + i * 0.002 + Math.sin(i * 0.2) * 0.003,
       startLat + i * 0.001 + Math.cos(i * 0.2) * 0.002,
     ]);
+    times.push(timestamp);
     positions.push({
-      time: new Date(startTime + i * 4 * MINUTE).toISOString(), // 4-minute intervals
+      time: new Date(timestamp).toISOString(),
       course: 45 + Math.sin(i * 0.3) * 10,
       speed: 12 + Math.cos(i * 0.2) * 2,
     });
   }
 
-  return { coordinates, positions };
+  return { coordinates, positions, times };
 }
 
 // Track 1: Symbols every 20 minutes (PT20M)
@@ -88,6 +96,7 @@ const track1 = createStyledTrack(
   '#2196F3',
   track1Data.coordinates,
   track1Data.positions,
+  track1Data.times,
   { show_symbol: false, symbol: 'circle', show_label: false },
   'PT20M', // symbol every 20 minutes
   undefined, // no labels
@@ -102,6 +111,7 @@ const track2 = createStyledTrack(
   '#4CAF50',
   track2Data.coordinates,
   track2Data.positions,
+  track2Data.times,
   { show_symbol: false, symbol: 'circle', show_label: false },
   undefined, // no symbols
   'PT30M', // label every 30 minutes
@@ -122,6 +132,7 @@ const track3 = createStyledTrack(
   '#FF9800',
   track3Data.coordinates,
   track3Data.positions,
+  track3Data.times,
   { show_symbol: false, symbol: 'circle', show_label: false },
   'PT15M', // symbol every 15 minutes
   'PT60M', // label every hour
