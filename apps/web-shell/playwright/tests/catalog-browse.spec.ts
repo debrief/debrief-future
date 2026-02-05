@@ -11,27 +11,26 @@ test.describe('Catalog Browse', () => {
     await expect(page.locator('.web-shell__subtitle')).toContainText('STAC Catalog Browser');
   });
 
-  test('shows catalog items from test data', async ({ page }) => {
+  test('shows catalog overview component', async ({ page }) => {
     // Wait for catalog to load
-    await expect(page.locator('.debrief-catalog-overview')).toBeVisible();
+    await expect(page.locator('.catalog-overview')).toBeVisible();
 
-    // Should show at least one item (exercise-alpha or training-run-1)
-    const items = page.locator('.debrief-catalog-overview__item');
-    await expect(items).toHaveCount(2);
+    // Should show timeline with items (as SVG bars or points)
+    await expect(page.locator('.catalog-overview__timeline')).toBeVisible();
   });
 
   test('displays item titles in catalog', async ({ page }) => {
-    // Check for known test data items
+    // Check for known test data items in timeline labels
     await expect(page.getByText('Exercise Alpha')).toBeVisible();
     await expect(page.getByText('Training Run 1')).toBeVisible();
   });
 
   test('shows item metadata on hover', async ({ page }) => {
-    // Find an item and hover
-    const item = page.locator('.debrief-catalog-overview__item').first();
-    await item.hover();
+    // Find a timeline bar/point and hover
+    const timelineBar = page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point').first();
+    await timelineBar.hover();
 
-    // Should show tooltip or additional info
-    await expect(item).toBeVisible();
+    // Should show tooltip
+    await expect(page.locator('.catalog-overview__tooltip')).toBeVisible();
   });
 });

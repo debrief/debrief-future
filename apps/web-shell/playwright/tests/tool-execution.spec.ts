@@ -3,8 +3,8 @@ import { test, expect } from '@playwright/test';
 test.describe('Tool Execution', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // Navigate to analysis view with Exercise Alpha (has 2 tracks)
-    await page.getByText('Exercise Alpha').dblclick();
+    // Navigate to analysis view via timeline bar/point
+    await page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point').first().dblclick();
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
     // Wait for map to render
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 5000 });
