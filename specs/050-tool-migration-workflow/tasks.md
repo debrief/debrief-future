@@ -47,8 +47,8 @@
 
 **Purpose**: Create directory structure for agents and documentation
 
-- [ ] T001 Create agents directory `.claude/agents/tools/`
-- [ ] T002 Create Java harness directory `docs/tool-migration/java-harness-template/`
+- [x] T001 Create agents directory `.claude/agents/tools/`
+- [x] T002 Create Java harness directory `docs/tool-migration/java-harness-template/`
 
 ---
 
@@ -58,7 +58,7 @@
 
 **CRITICAL**: Commands will reference these agents, so agent directory must exist first
 
-- [ ] T003 Create agent README documenting workflow `.claude/agents/tools/README.md`
+- [x] T003 Create agent README documenting workflow `.claude/agents/tools/README.md`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -72,8 +72,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Create legacy-tool-analyst agent `.claude/agents/tools/legacy-tool-analyst.md`
-- [ ] T005 [US1] Create /tool.discover command `.claude/commands/tool.discover.md`
+- [x] T004 [US1] Create legacy-tool-analyst agent `.claude/agents/tools/legacy-tool-analyst.md`
+- [x] T005 [US1] Create /tool.discover command `.claude/commands/tool.discover.md`
 
 **Checkpoint**: User Story 1 complete - developers can discover tools in legacy codebase
 
@@ -87,8 +87,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T006 [US2] Create tool-spec-author agent `.claude/agents/tools/tool-spec-author.md`
-- [ ] T007 [US2] Create /tool.spec command `.claude/commands/tool.spec.md`
+- [x] T006 [US2] Create tool-spec-author agent `.claude/agents/tools/tool-spec-author.md`
+- [x] T007 [US2] Create /tool.spec command `.claude/commands/tool.spec.md`
 
 **Checkpoint**: User Stories 1 AND 2 complete - developers can discover tools and create specs
 
@@ -102,8 +102,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T008 [US3] Create tool-implementer agent `.claude/agents/tools/tool-implementer.md`
-- [ ] T009 [US3] Create /tool.implement command `.claude/commands/tool.implement.md`
+- [x] T008 [US3] Create tool-implementer agent `.claude/agents/tools/tool-implementer.md`
+- [x] T009 [US3] Create /tool.implement command `.claude/commands/tool.implement.md`
 
 **Checkpoint**: User Stories 1, 2, AND 3 complete - developers can discover, spec, and implement
 
@@ -117,8 +117,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T010 [US4] Create golden-example-validator agent `.claude/agents/tools/golden-example-validator.md`
-- [ ] T011 [US4] Create /tool.verify command `.claude/commands/tool.verify.md`
+- [x] T010 [US4] Create golden-example-validator agent `.claude/agents/tools/golden-example-validator.md`
+- [x] T011 [US4] Create /tool.verify command `.claude/commands/tool.verify.md`
 
 **Checkpoint**: All four commands complete - full discover → spec → implement → verify workflow available
 
@@ -132,10 +132,10 @@
 
 ### Implementation for User Story 5
 
-- [ ] T012 [P] [US5] Create harness README `docs/tool-migration/java-harness-template/README.md`
-- [ ] T013 [P] [US5] Create Java harness template `docs/tool-migration/java-harness-template/ToolCaptureHarness.java`
-- [ ] T014 [P] [US5] Create Maven dependency fragment `docs/tool-migration/java-harness-template/pom-fragment.xml`
-- [ ] T015 [US5] Create example usage file `docs/tool-migration/java-harness-template/example-usage.java`
+- [x] T012 [P] [US5] Create harness README `docs/tool-migration/java-harness-template/README.md`
+- [x] T013 [P] [US5] Create Java harness template `docs/tool-migration/java-harness-template/ToolCaptureHarness.java`
+- [x] T014 [P] [US5] Create Maven dependency fragment `docs/tool-migration/java-harness-template/pom-fragment.xml`
+- [x] T015 [US5] Create example usage file `docs/tool-migration/java-harness-template/example-usage.java`
 
 **Checkpoint**: All user stories complete - full workflow with Java harness for golden I/O capture
 
@@ -147,23 +147,23 @@
 
 ### End-to-End Validation
 
-- [ ] T016 Validate complete workflow by migrating one sample tool end-to-end
-- [ ] T017 Update quickstart.md with any learnings from validation
+- [x] T016 Validate complete workflow by migrating one sample tool end-to-end
+- [x] T017 Update quickstart.md with any learnings from validation
 
 ### Evidence Collection (REQUIRED)
 
 > **Purpose**: Capture artifacts for PR description and future documentation
 
-- [ ] T018 Create evidence directory `specs/050-tool-migration-workflow/evidence/`
-- [ ] T019 Capture test summary (manual validation results) `specs/050-tool-migration-workflow/evidence/test-summary.md`
-- [ ] T020 Record usage example (complete workflow demo) `specs/050-tool-migration-workflow/evidence/usage-example.md`
-- [ ] T021 [P] Capture command documentation `specs/050-tool-migration-workflow/evidence/command-docs.md`
-- [ ] T022 [P] Document migration demonstration `specs/050-tool-migration-workflow/evidence/migration-demo.md`
+- [x] T018 Create evidence directory `specs/050-tool-migration-workflow/evidence/`
+- [x] T019 Capture test summary (manual validation results) `specs/050-tool-migration-workflow/evidence/test-summary.md`
+- [x] T020 Record usage example (complete workflow demo) `specs/050-tool-migration-workflow/evidence/usage-example.md`
+- [x] T021 [P] Capture command documentation `specs/050-tool-migration-workflow/evidence/command-docs.md`
+- [x] T022 [P] Document migration demonstration `specs/050-tool-migration-workflow/evidence/migration-demo.md`
 
 ### Media Content (REQUIRED)
 
-- [ ] T023 Create shipped blog post `specs/050-tool-migration-workflow/media/shipped-post.md`
-- [ ] T024 [P] Create LinkedIn shipped summary `specs/050-tool-migration-workflow/media/linkedin-shipped.md`
+- [x] T023 Create shipped blog post `specs/050-tool-migration-workflow/media/shipped-post.md`
+- [x] T024 [P] Create LinkedIn shipped summary `specs/050-tool-migration-workflow/media/linkedin-shipped.md`
 
 ### PR Creation (REQUIRED - must be final task)
 
