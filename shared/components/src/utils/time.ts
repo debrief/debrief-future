@@ -23,9 +23,26 @@ export function calculateTimeExtent(
 
   for (const feature of featureArray) {
     if (isTrackFeature(feature)) {
-      // Track has start_time and end_time
-      const startTime = parseTime(feature.properties.start_time);
-      const endTime = parseTime(feature.properties.end_time);
+      // Track has start_time and end_time (preferred)
+      let startTime = parseTime(feature.properties.start_time);
+      let endTime = parseTime(feature.properties.end_time);
+
+      // Fallback: derive from times array if start_time/end_time not present
+      if (startTime === null || endTime === null) {
+        const props = feature.properties as unknown as Record<string, unknown>;
+        const times = props.times as unknown[] | undefined;
+        if (Array.isArray(times) && times.length > 0) {
+          // times can be ISO strings or milliseconds
+          const firstTime = times[0];
+          const lastTime = times[times.length - 1];
+          if (startTime === null && firstTime !== undefined) {
+            startTime = typeof firstTime === 'number' ? firstTime : parseTime(firstTime as string);
+          }
+          if (endTime === null && lastTime !== undefined) {
+            endTime = typeof lastTime === 'number' ? lastTime : parseTime(lastTime as string);
+          }
+        }
+      }
 
       if (startTime !== null) {
         minTime = Math.min(minTime, startTime);
@@ -34,18 +51,43 @@ export function calculateTimeExtent(
         maxTime = Math.max(maxTime, endTime);
       }
     } else {
-      // ReferenceLocation may have valid_from and valid_until
-      const props = feature.properties;
+      // ReferenceLocation and other feature types may have various time properties
+      const props = feature.properties as unknown as Record<string, unknown>;
+
+      // Check for valid_from/valid_until (schema properties)
       if (props.valid_from) {
-        const validFrom = parseTime(props.valid_from);
+        const validFrom = parseTime(props.valid_from as string);
         if (validFrom !== null) {
           minTime = Math.min(minTime, validFrom);
         }
       }
       if (props.valid_until) {
-        const validUntil = parseTime(props.valid_until);
+        const validUntil = parseTime(props.valid_until as string);
         if (validUntil !== null) {
           maxTime = Math.max(maxTime, validUntil);
+        }
+      }
+
+      // Check for start_time/end_time (used by PERIODTEXT, ELLIPSE2, etc.)
+      if (props.start_time) {
+        const startTime = parseTime(props.start_time as string);
+        if (startTime !== null) {
+          minTime = Math.min(minTime, startTime);
+        }
+      }
+      if (props.end_time) {
+        const endTime = parseTime(props.end_time as string);
+        if (endTime !== null) {
+          maxTime = Math.max(maxTime, endTime);
+        }
+      }
+
+      // Check for single time property (used by TIMETEXT, ELLIPSE, SENSOR, etc.)
+      if (props.time) {
+        const time = parseTime(props.time as string);
+        if (time !== null) {
+          minTime = Math.min(minTime, time);
+          maxTime = Math.max(maxTime, time);
         }
       }
     }

@@ -25,10 +25,14 @@ export interface FeatureRowProps {
  * Get the type label for a feature.
  */
 function getFeatureType(feature: DebriefFeature): string {
+  const props = feature.properties as unknown as Record<string, unknown>;
+
   if (isTrackFeature(feature)) {
-    return feature.properties.track_type;
+    // Schema: track_type; Legacy: platformType
+    return (feature.properties.track_type || props.platformType as string) ?? 'TRACK';
   }
-  return feature.properties.location_type;
+  // Schema: location_type; Legacy: locationType
+  return (feature.properties.location_type || props.locationType as string) ?? 'POINT';
 }
 
 /**
@@ -36,8 +40,26 @@ function getFeatureType(feature: DebriefFeature): string {
  */
 function getFeatureInfo(feature: DebriefFeature): string | null {
   if (isTrackFeature(feature)) {
-    const start = feature.properties.start_time;
-    const end = feature.properties.end_time;
+    // Try start_time/end_time first (schema properties)
+    let start: string | undefined = feature.properties.start_time;
+    let end: string | undefined = feature.properties.end_time;
+
+    // Fallback: derive from times array if start_time/end_time not present
+    if (!start || !end) {
+      const props = feature.properties as unknown as Record<string, unknown>;
+      const times = props.times as unknown[] | undefined;
+      if (Array.isArray(times) && times.length > 0) {
+        const firstTime = times[0];
+        const lastTime = times[times.length - 1];
+        if (!start && typeof firstTime === 'string') {
+          start = firstTime;
+        }
+        if (!end && typeof lastTime === 'string') {
+          end = lastTime;
+        }
+      }
+    }
+
     if (start && end) {
       const startDate = new Date(start);
       const endDate = new Date(end);

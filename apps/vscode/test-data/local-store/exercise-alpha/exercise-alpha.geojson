@@ -2,6 +2,7 @@
   "type": "FeatureCollection",
   "features": [
     {
+      "id": "track-hms-defender",
       "type": "Feature",
       "geometry": {
         "type": "LineString",
@@ -94,6 +95,7 @@
       }
     },
     {
+      "id": "track-uss-freedom",
       "type": "Feature",
       "geometry": {
         "type": "LineString",
@@ -186,6 +188,7 @@
       }
     },
     {
+      "id": "loc-alpha-point",
       "type": "Feature",
       "geometry": {
         "type": "Point",
@@ -202,6 +205,7 @@
       }
     },
     {
+      "id": "loc-bravo-datum",
       "type": "Feature",
       "geometry": {
         "type": "Point",
@@ -218,6 +222,7 @@
       }
     },
     {
+      "id": "circle-exclusion-zone",
       "type": "Feature",
       "geometry": {
         "type": "Polygon",
@@ -275,6 +280,7 @@
       }
     },
     {
+      "id": "rect-exercise-area",
       "type": "Feature",
       "geometry": {
         "type": "Polygon",
@@ -320,6 +326,7 @@
       }
     },
     {
+      "id": "line-sector-boundary",
       "type": "Feature",
       "geometry": {
         "type": "LineString",
@@ -348,6 +355,7 @@
       }
     },
     {
+      "id": "vector-wind",
       "type": "Feature",
       "geometry": {
         "type": "LineString",
@@ -381,6 +389,7 @@
       }
     },
     {
+      "id": "text-nav-warning",
       "type": "Feature",
       "geometry": {
         "type": "Point",
@@ -402,6 +411,7 @@
       }
     },
     {
+      "id": "timetext-contact-report",
       "type": "Feature",
       "geometry": {
         "type": "Point",
@@ -424,6 +434,7 @@
       }
     },
     {
+      "id": "periodtext-exercise-phase",
       "type": "Feature",
       "geometry": {
         "type": "Point",
@@ -447,6 +458,7 @@
       }
     },
     {
+      "id": "poly-minefield",
       "type": "Feature",
       "geometry": {
         "type": "Polygon",
@@ -500,6 +512,7 @@
       }
     },
     {
+      "id": "polyline-shipping-lane",
       "type": "Feature",
       "geometry": {
         "type": "LineString",
@@ -540,6 +553,7 @@
       }
     },
     {
+      "id": "ellipse-uncertainty",
       "type": "Feature",
       "geometry": {
         "type": "Polygon",
@@ -616,6 +630,7 @@
       }
     },
     {
+      "id": "ellipse2-search-area",
       "type": "Feature",
       "geometry": {
         "type": "Polygon",
@@ -686,6 +701,7 @@
       }
     },
     {
+      "id": "wheel-sonar",
       "type": "Feature",
       "geometry": {
         "type": "Point",
@@ -710,6 +726,7 @@
       }
     },
     {
+      "id": "dynrect-patrol-box",
       "type": "Feature",
       "geometry": {
         "type": "Polygon",
@@ -756,6 +773,7 @@
       }
     },
     {
+      "id": "dyncircle-guard-zone",
       "type": "Feature",
       "geometry": {
         "type": "Polygon",
@@ -815,6 +833,7 @@
       }
     },
     {
+      "id": "dynpoly-moving-zone",
       "type": "Feature",
       "geometry": {
         "type": "Polygon",
@@ -870,6 +889,7 @@
       }
     },
     {
+      "id": "sensor-bearing-1",
       "type": "Feature",
       "geometry": {
         "type": "LineString",
@@ -906,6 +926,7 @@
       }
     },
     {
+      "id": "sensor2-bearing-only",
       "type": "Feature",
       "geometry": {
         "type": "LineString",
@@ -941,6 +962,7 @@
       }
     },
     {
+      "id": "tma-pos-estimate",
       "type": "Feature",
       "geometry": {
         "type": "Polygon",
@@ -1011,6 +1033,7 @@
       }
     },
     {
+      "id": "narrative-entry-1",
       "type": "Feature",
       "geometry": {
         "type": "Point",
@@ -1024,6 +1047,7 @@
       }
     },
     {
+      "id": "narrative-entry-2",
       "type": "Feature",
       "geometry": {
         "type": "Point",
@@ -1037,6 +1061,7 @@
       }
     },
     {
+      "id": "narrative-entry-3",
       "type": "Feature",
       "geometry": {
         "type": "Point",

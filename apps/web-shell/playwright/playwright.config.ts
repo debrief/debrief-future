@@ -1,4 +1,7 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
+import { readFileSync, existsSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 /**
  * Playwright configuration for web-shell E2E tests.
@@ -9,36 +12,61 @@ import { defineConfig, devices } from '@playwright/test';
  * @see https://playwright.dev/docs/test-configuration
  * @see docs/project_notes/playwright-installation-research.md
  */
+
+// ESM equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Read chromium path from file (written by run-playwright.mjs) or env var
+const chromiumPathFile = join(__dirname, '.chromium-path');
+let chromiumPath: string | undefined = process.env.CHROMIUM_PATH;
+if (!chromiumPath && existsSync(chromiumPathFile)) {
+  chromiumPath = readFileSync(chromiumPathFile, 'utf8').trim();
+}
+const useSparticuz = !!chromiumPath;
+
+// Debug: log chromium path detection
+console.log(`Playwright config: useSparticuz=${useSparticuz}, chromiumPath=${chromiumPath}`);
+
+// Launch options for sparticuz chromium
+// Note: --single-process causes browser to crash after each test, so we avoid it.
+// Instead we use --disable-dev-shm-usage and memory-saving flags for stability.
+const launchOptions = useSparticuz
+  ? {
+      executablePath: chromiumPath,
+      headless: true,
+      args: [
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--disable-background-networking',
+        '--disable-default-apps',
+        '--disable-extensions',
+        '--disable-sync',
+        '--disable-translate',
+        '--metrics-recording-only',
+        '--mute-audio',
+        '--no-first-run',
+      ],
+    }
+  : undefined;
+
 export default defineConfig({
   testDir: './tests',
-  fullyParallel: true,
+  fullyParallel: false, // Disable parallel to avoid chromium issues
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : 1, // Single worker for stability with sparticuz
-  reporter: 'html',
+  retries: 1, // Retry once to handle transient browser issues
+  workers: 1, // Single worker for stability with sparticuz
+  reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
-    // Use sparticuz chromium when CHROMIUM_PATH is set (Claude Code environment)
-    ...(process.env.CHROMIUM_PATH && {
-      launchOptions: {
-        executablePath: process.env.CHROMIUM_PATH,
-        args: [
-          '--disable-setuid-sandbox',
-          '--no-sandbox',
-          '--no-zygote',
-          '--disable-gpu',
-          '--disable-dev-shm-usage',
-        ],
-      },
-    }),
+    viewport: { width: 1280, height: 720 },
+    // Apply launch options at use level
+    launchOptions,
   },
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-  ],
+  // No projects - use single config
   webServer: {
     command: 'pnpm dev',
     url: 'http://localhost:5173',
