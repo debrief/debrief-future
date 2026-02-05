@@ -184,6 +184,9 @@ export function ActivityPanel({
   selectedFeatureIds = [],
   hiddenIds,
   toolMatches = [],
+  sourceFiles = [],
+  resultFiles = [],
+  resultsChanged = false,
   // Collapse
   collapseState: externalCollapseState,
   onCollapseStateChange,
@@ -334,6 +337,9 @@ export function ActivityPanel({
             features={features}
             hiddenIds={hiddenIds}
             toolMatches={toolMatches}
+            sourceFiles={sourceFiles}
+            resultFiles={resultFiles}
+            resultsChanged={resultsChanged}
             onDelete={handleDelete}
             onToggleVisibility={handleToggleVisibility}
             onRunTool={(toolId) => onMessage?.({ type: 'tool:run', payload: { toolId } })}

@@ -100,6 +100,10 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   private _tracks: Track[] = [];
   private _locations: ReferenceLocation[] = [];
 
+  // Result files for Associated Files dropdown
+  private _resultFiles: Array<{ name: string; path: string; category: 'result' }> = [];
+  private _resultsChanged = false;
+
   constructor(
     extensionUri: vscode.Uri,
     private readonly _sessionManager: SessionManager,
@@ -274,8 +278,17 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
 
     this._postMessage({
       type: 'layers:update',
-      payload: { layers: features, hiddenIds, toolMatches },
+      payload: {
+        layers: features,
+        hiddenIds,
+        toolMatches,
+        resultFiles: this._resultFiles,
+        resultsChanged: this._resultsChanged,
+      },
     });
+
+    // Clear resultsChanged flag after sending
+    this._resultsChanged = false;
   }
 
   /**
@@ -286,6 +299,24 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     this._tracks = tracks;
     this._locations = locations;
     this._sendLayersUpdate();
+  }
+
+  /**
+   * Add a result file to the Associated Files dropdown.
+   * Called after tool execution completes.
+   */
+  public addResultFile(name: string, path: string): void {
+    this._resultFiles.push({ name, path, category: 'result' });
+    this._resultsChanged = true;
+    this._sendLayersUpdate();
+  }
+
+  /**
+   * Clear result files (e.g., when plot is closed).
+   */
+  public clearResultFiles(): void {
+    this._resultFiles = [];
+    this._resultsChanged = false;
   }
 
   public resolveWebviewView(

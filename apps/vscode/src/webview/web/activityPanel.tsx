@@ -20,6 +20,7 @@ import type {
   ActivityPanelCollapseState,
   ActivityPanelMessage,
   ToolsPanelItem,
+  AssociatedFile,
 } from '@debrief/components';
 import type { DebriefFeature } from '@debrief/components';
 import type { MatchResult } from '@debrief/components';
@@ -61,6 +62,9 @@ interface LayersUpdateMessage {
     layers: DebriefFeature[];
     hiddenIds?: string[];
     toolMatches?: MatchResult[];
+    sourceFiles?: AssociatedFile[];
+    resultFiles?: AssociatedFile[];
+    resultsChanged?: boolean;
   };
 }
 
@@ -103,6 +107,9 @@ function ActivityPanelApp(): React.ReactElement {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [toolMatches, setToolMatches] = useState<MatchResult[]>([]);
+  const [sourceFiles, setSourceFiles] = useState<AssociatedFile[]>([]);
+  const [resultFiles, setResultFiles] = useState<AssociatedFile[]>([]);
+  const [resultsChanged, setResultsChanged] = useState(false);
 
   // Collapse state from vscode.getState
   const [collapseState, setCollapseState] = useState<ActivityPanelCollapseState>(() => {
@@ -148,6 +155,15 @@ function ActivityPanelApp(): React.ReactElement {
           if (msg.payload.toolMatches) {
             setToolMatches(msg.payload.toolMatches);
           }
+          if (msg.payload.sourceFiles) {
+            setSourceFiles(msg.payload.sourceFiles);
+          }
+          if (msg.payload.resultFiles) {
+            setResultFiles(msg.payload.resultFiles);
+          }
+          if (msg.payload.resultsChanged !== undefined) {
+            setResultsChanged(msg.payload.resultsChanged);
+          }
           break;
 
         case 'selection:update':
@@ -187,6 +203,9 @@ function ActivityPanelApp(): React.ReactElement {
         selectedFeatureIds={selectedIds}
         hiddenIds={hiddenIds}
         toolMatches={toolMatches}
+        sourceFiles={sourceFiles}
+        resultFiles={resultFiles}
+        resultsChanged={resultsChanged}
         collapseState={collapseState}
         onCollapseStateChange={handleCollapseChange}
         onMessage={handleMessage}

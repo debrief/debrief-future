@@ -175,7 +175,7 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.executeTool',
-      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider, stacService)
+      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider, stacService, activityPanelProvider)
     )
   );
 

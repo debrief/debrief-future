@@ -7,6 +7,7 @@
 
 import type { DebriefFeature } from '../utils/types';
 import type { MatchResult } from '../ToolMatch/types';
+import type { AssociatedFile } from '../LayersToolbar/types';
 
 /**
  * Collapse state for each section of the ActivityPanel.
@@ -98,6 +99,12 @@ export interface ActivityPanelProps {
   hiddenIds?: Set<string>;
   /** Tool match results for features */
   toolMatches?: MatchResult[];
+  /** Source files for Associated Files dropdown */
+  sourceFiles?: AssociatedFile[];
+  /** Result files for Associated Files dropdown */
+  resultFiles?: AssociatedFile[];
+  /** Whether new results were added (shows halo on attachments button) */
+  resultsChanged?: boolean;
 
   // Collapse state
   /** Current collapse state for all sections */
