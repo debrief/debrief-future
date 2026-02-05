@@ -32,7 +32,7 @@ import {
   type SessionStoreWithUndo,
 } from '@debrief/session-state';
 import { DuplicateImportError } from '../types/import';
-import { calculateBounds, mergeBounds } from '@debrief/utils';
+import { calculateBounds, mergeBounds, type GeoJSONFeature } from '@debrief/utils';
 
 export class MapPanel {
   public static currentPanel: MapPanel | undefined;
@@ -972,7 +972,7 @@ export class MapPanel {
       });
 
       // Convert to the format StacService expects
-      const safeFeatures = parseResult.features.map((f) => ({
+      const safeFeatures = parseResult.features.map((f: GeoJSONFeature) => ({
         type: 'Feature' as const,
         geometry: {
           type: f.geometry.type,
@@ -988,7 +988,7 @@ export class MapPanel {
       );
 
       // Calculate bounds for zoom
-      const newBounds = calculateBounds(parseResult.features);
+      const newBounds = calculateBounds(parseResult.features as GeoJSONFeature[]);
       const mergedBounds = mergeBounds(
         currentPlot.bbox,
         newBounds
