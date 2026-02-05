@@ -182,16 +182,16 @@
 
 ### Evidence Collection
 
-- [ ] T042 Create evidence directory `specs/048-geojson-position-metadata/evidence/`
-- [ ] T043 Capture test summary with pass/fail counts `specs/048-geojson-position-metadata/evidence/test-summary.md`
-- [ ] T044 Create usage example showing track with position styling `specs/048-geojson-position-metadata/evidence/usage-example.md`
+- [x] T042 Create evidence directory `specs/048-geojson-position-metadata/evidence/`
+- [x] T043 Capture test summary with pass/fail counts `specs/048-geojson-position-metadata/evidence/test-summary.md`
+- [x] T044 Create usage example showing track with position styling `specs/048-geojson-position-metadata/evidence/usage-example.md`
 - [ ] T045 [P] Document before/after fixture comparison `specs/048-geojson-position-metadata/evidence/before-after-fixture.md`
 - [ ] T046 [P] Capture screenshot of rendered track with interval symbols `specs/048-geojson-position-metadata/evidence/rendered-track.png`
 
 ### Media Content
 
-- [ ] T047 Create shipped blog post `specs/048-geojson-position-metadata/media/shipped-post.md`
-- [ ] T048 [P] Create LinkedIn shipped summary `specs/048-geojson-position-metadata/media/linkedin-shipped.md`
+- [x] T047 Create shipped blog post `specs/048-geojson-position-metadata/media/shipped-post.md`
+- [x] T048 [P] Create LinkedIn shipped summary `specs/048-geojson-position-metadata/media/linkedin-shipped.md`
 
 ### PR Creation
 
