@@ -48,8 +48,7 @@ def _find_repo_root() -> Path:
         return cwd
 
     raise ToolSpecError(
-        "Cannot find repository root. "
-        "Ensure shared/tools directory exists in the project root."
+        "Cannot find repository root. Ensure shared/tools directory exists in the project root."
     )
 
 
@@ -117,8 +116,7 @@ def tool_spec(spec_path: str, *, validate: bool = True) -> Callable[[F], F]:
             full_path = _resolve_spec_path(spec_path)
             if not full_path.exists():
                 raise ToolSpecError(
-                    f"Tool specification not found: {spec_path}\n"
-                    f"Expected at: {full_path}"
+                    f"Tool specification not found: {spec_path}\nExpected at: {full_path}"
                 )
 
         @functools.wraps(func)
