@@ -241,6 +241,10 @@ export function createOpenPlotCommand(
     // Update activity panel webview with features
     activityPanelProvider.setFeatures(plotData.tracks, plotData.locations);
 
+    // Load existing result files from STAC item (Feature: 051-load-result-attachments)
+    const resultFiles = await stacService.loadResultFiles(store, itemPath);
+    activityPanelProvider.setResultFiles(resultFiles);
+
     // Update time range panel with plot's time extent
     // Convert ISO strings to timestamps for the TimeController
     const [timeStartStr, timeEndStr] = plot.timeExtent;

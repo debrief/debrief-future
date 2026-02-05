@@ -1810,4 +1810,273 @@ describe('StacService', () => {
       expect(vi.mocked(fs.writeFileSync)).not.toHaveBeenCalled();
     });
   });
+
+  // ===========================================================================
+  // Phase: Result File Extraction tests (Feature 051)
+  // ===========================================================================
+
+  describe('parseViewerType', () => {
+    it('should parse viewer type from multi-suffix filename', () => {
+      expect(service.parseViewerType('range-bearing.2d.json')).toBe('2d');
+      expect(service.parseViewerType('result.table.geojson')).toBe('table');
+      expect(service.parseViewerType('analysis.chart.csv')).toBe('chart');
+    });
+
+    it('should return undefined for single-suffix filename', () => {
+      expect(service.parseViewerType('data.json')).toBeUndefined();
+      expect(service.parseViewerType('result.geojson')).toBeUndefined();
+    });
+
+    it('should return undefined for unknown viewer types', () => {
+      expect(service.parseViewerType('file.custom.json')).toBeUndefined();
+      expect(service.parseViewerType('file.unknown.json')).toBeUndefined();
+    });
+
+    it('should be case-insensitive', () => {
+      expect(service.parseViewerType('result.TABLE.json')).toBe('table');
+      expect(service.parseViewerType('data.2D.csv')).toBe('2d');
+    });
+  });
+
+  describe('parseFileFormat', () => {
+    it('should return lowercase file extension', () => {
+      expect(service.parseFileFormat('data.json')).toBe('json');
+      expect(service.parseFileFormat('result.GeoJSON')).toBe('geojson');
+      expect(service.parseFileFormat('export.CSV')).toBe('csv');
+    });
+
+    it('should return empty string for files without extension', () => {
+      expect(service.parseFileFormat('noextension')).toBe('');
+    });
+  });
+
+  describe('isResultAsset', () => {
+    it('should return true for asset with result role', () => {
+      const asset = { href: './assets/data.json', roles: ['result'] };
+      expect(service.isResultAsset(asset, 'data')).toBe(true);
+    });
+
+    it('should return true for asset with debrief:toolId', () => {
+      const asset = {
+        href: './assets/range-bearing.json',
+        'debrief:toolId': 'range-bearing',
+      };
+      expect(service.isResultAsset(asset as never, 'range-bearing')).toBe(true);
+    });
+
+    it('should return true for asset matching result patterns', () => {
+      const patterns = [
+        { href: './assets/range-bearing-t1-t2.json' },
+        { href: './assets/analysis-result.json' },
+        { href: './assets/track-analysis.json' },
+      ];
+
+      expect(service.isResultAsset(patterns[0], 'rb')).toBe(true);
+      expect(service.isResultAsset(patterns[1], 'ar')).toBe(true);
+    });
+
+    it('should return false for source files', () => {
+      const asset = { href: './assets/source.rep', roles: ['source'] };
+      expect(service.isResultAsset(asset, 'source')).toBe(false);
+    });
+
+    it('should return false for data files without result indicators', () => {
+      const asset = { href: './data.geojson', type: 'application/geo+json' };
+      expect(service.isResultAsset(asset, 'data')).toBe(false);
+    });
+  });
+
+  describe('assetToAssociatedFile', () => {
+    it('should transform asset to AssociatedFile', () => {
+      const asset = {
+        href: './assets/range-bearing.json',
+        title: 'Range Bearing Analysis',
+        type: 'application/json',
+      };
+
+      const result = service.assetToAssociatedFile(asset, 'range-bearing');
+
+      expect(result.name).toBe('Range Bearing Analysis');
+      expect(result.path).toBe('assets/range-bearing.json');
+      expect(result.category).toBe('result');
+      expect(result.format).toBe('json');
+    });
+
+    it('should use filename as name when title missing', () => {
+      const asset = { href: './assets/data.json' };
+
+      const result = service.assetToAssociatedFile(asset, 'data');
+
+      expect(result.name).toBe('data.json');
+    });
+
+    it('should parse viewer type from multi-suffix filename', () => {
+      const asset = { href: './assets/result.table.json', title: 'Results Table' };
+
+      const result = service.assetToAssociatedFile(asset, 'result');
+
+      expect(result.viewerType).toBe('table');
+    });
+
+    it('should strip leading ./ from path', () => {
+      const asset = { href: './assets/data.json' };
+
+      const result = service.assetToAssociatedFile(asset, 'data');
+
+      expect(result.path).toBe('assets/data.json');
+    });
+  });
+
+  describe('getResultFilesFromItem', () => {
+    it('should extract result files from item assets', () => {
+      const item = createMockItem({
+        assets: {
+          'range-bearing': {
+            href: './assets/range-bearing.json',
+            title: 'Range Bearing',
+            type: 'application/json',
+            roles: ['result'],
+          },
+          source: {
+            href: './assets/source.rep',
+            type: 'application/x-rep',
+            roles: ['source'],
+          },
+        },
+      });
+
+      const results = service.getResultFilesFromItem(item);
+
+      expect(results).toHaveLength(1);
+      expect(results[0].name).toBe('Range Bearing');
+      expect(results[0].category).toBe('result');
+    });
+
+    it('should extract multiple result files', () => {
+      const item = createMockItem({
+        assets: {
+          'result-1': {
+            href: './assets/result-1.json',
+            roles: ['result'],
+          },
+          'result-2': {
+            href: './assets/result-2.json',
+            roles: ['result'],
+          },
+          'result-3': {
+            href: './assets/result-3.json',
+            'debrief:toolId': 'some-tool',
+          },
+        },
+      });
+
+      const results = service.getResultFilesFromItem(item);
+
+      expect(results).toHaveLength(3);
+    });
+
+    it('should return empty array when no assets', () => {
+      const item = createMockItem({ assets: {} });
+
+      const results = service.getResultFilesFromItem(item);
+
+      expect(results).toEqual([]);
+    });
+
+    it('should return empty array when assets undefined', () => {
+      const item = createMockItem();
+      // @ts-expect-error - testing undefined assets
+      item.assets = undefined;
+
+      const results = service.getResultFilesFromItem(item);
+
+      expect(results).toEqual([]);
+    });
+
+    it('should filter non-result assets', () => {
+      const item = createMockItem({
+        assets: {
+          data: {
+            href: './data.geojson',
+            type: 'application/geo+json',
+            roles: ['data'],
+          },
+          thumbnail: {
+            href: './preview.png',
+            type: 'image/png',
+            roles: ['thumbnail'],
+          },
+          result: {
+            href: './assets/analysis.json',
+            roles: ['result'],
+          },
+        },
+      });
+
+      const results = service.getResultFilesFromItem(item);
+
+      expect(results).toHaveLength(1);
+      expect(results[0].path).toBe('assets/analysis.json');
+    });
+
+    it('should skip assets with missing href gracefully', () => {
+      const item = createMockItem({
+        assets: {
+          valid: {
+            href: './assets/valid.json',
+            roles: ['result'],
+          },
+          invalid: {
+            // Missing href
+            roles: ['result'],
+          } as never,
+        },
+      });
+
+      // Should not throw, just skip invalid
+      const results = service.getResultFilesFromItem(item);
+      expect(results.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe('loadResultFiles', () => {
+    it('should load result files from store and item path', async () => {
+      const store = createMockStore();
+      const item = createMockItem({
+        assets: {
+          'range-bearing': {
+            href: './assets/range-bearing.json',
+            title: 'Range Bearing',
+            roles: ['result'],
+          },
+        },
+      });
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(item));
+
+      const results = await service.loadResultFiles(store, 'test-item/item.json');
+
+      expect(results).toHaveLength(1);
+      expect(results[0].name).toBe('Range Bearing');
+    });
+
+    it('should return empty array when item not found', async () => {
+      const store = createMockStore();
+      mockMissingFile();
+
+      const results = await service.loadResultFiles(store, 'missing/item.json');
+
+      expect(results).toEqual([]);
+    });
+
+    it('should return empty array on load error', async () => {
+      const store = createMockStore();
+      mockReadError(new Error('Permission denied'));
+
+      const results = await service.loadResultFiles(store, 'test/item.json');
+
+      expect(results).toEqual([]);
+    });
+  });
 });
