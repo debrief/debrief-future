@@ -23,7 +23,8 @@
     "pnpm": ">=8.0.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.57.0"
+    "@playwright/test": "^1.57.0",
+    "@sparticuz/chromium": "^131.0.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
