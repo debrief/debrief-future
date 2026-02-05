@@ -130,7 +130,9 @@ class TestMCPArtifactResponse:
         assert len(response["content"]) == 1
         content = response["content"][0]
         assert content["type"] == "resource"
-        assert content["annotations"]["debrief:resultType"] == "artifact/dataset/range_bearing_series"
+        assert (
+            content["annotations"]["debrief:resultType"] == "artifact/dataset/range_bearing_series"
+        )
         assert content["annotations"]["debrief:href"] == "range_bearing_series-track-1-track-2.json"
         assert content["resource"]["mimeType"] == "application/json"
 
