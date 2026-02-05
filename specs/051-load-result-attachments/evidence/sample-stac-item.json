@@ -1,0 +1,84 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "exercise-alpha-2024",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [[[-5.5, 49.5], [-4.5, 49.5], [-4.5, 50.5], [-5.5, 50.5], [-5.5, 49.5]]]
+  },
+  "bbox": [-5.5, 49.5, -4.5, 50.5],
+  "properties": {
+    "datetime": "2024-01-15T09:00:00Z",
+    "start_datetime": "2024-01-15T09:00:00Z",
+    "end_datetime": "2024-01-15T17:00:00Z",
+    "title": "Exercise Alpha - January 2024"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./data.geojson",
+      "type": "application/geo+json",
+      "title": "Plot Data",
+      "roles": ["data"]
+    },
+    "source-boat1": {
+      "href": "./assets/boat1.rep",
+      "type": "application/x-rep",
+      "title": "HMS Defender Track Data",
+      "roles": ["source"]
+    },
+    "source-boat2": {
+      "href": "./assets/boat2.rep",
+      "type": "application/x-rep",
+      "title": "USS Freedom Track Data",
+      "roles": ["source"]
+    },
+    "range-bearing-track-hms-defender-track-uss-freedom": {
+      "href": "./assets/range-bearing-track-hms-defender-track-uss-freedom.json",
+      "type": "application/json",
+      "title": "Range Bearing: HMS Defender to USS Freedom",
+      "roles": ["result"],
+      "debrief:toolId": "range-bearing",
+      "debrief:sourceFeatures": ["track-hms-defender", "track-uss-freedom"]
+    },
+    "cpa-analysis-defender-freedom": {
+      "href": "./assets/cpa-analysis.json",
+      "type": "application/json",
+      "title": "CPA Analysis Results",
+      "roles": ["result"],
+      "debrief:toolId": "cpa-finder",
+      "debrief:sourceFeatures": ["track-hms-defender", "track-uss-freedom"]
+    },
+    "summary-table": {
+      "href": "./assets/exercise-summary.table.json",
+      "type": "application/json",
+      "title": "Exercise Summary Table",
+      "roles": ["result"],
+      "debrief:toolId": "summary-generator",
+      "debrief:sourceFeatures": ["track-hms-defender", "track-uss-freedom"]
+    },
+    "thumbnail": {
+      "href": "./preview.png",
+      "type": "image/png",
+      "title": "Preview Image",
+      "roles": ["thumbnail"]
+    }
+  }
+}
