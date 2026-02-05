@@ -58,6 +58,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --ignore-scripts
 
+      - name: Build Components Library
+        run: pnpm --filter @debrief/components build
+
       - name: Build Storybook
         run: pnpm --filter @debrief/components build-storybook
         env:
@@ -109,6 +112,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --ignore-scripts
 
+      - name: Build Components Library
+        run: pnpm --filter @debrief/components build
+
       - name: Build Storybook
         run: pnpm --filter @debrief/components build-storybook
         env:
@@ -158,36 +164,33 @@ jobs:
               comment.body.includes('Storybook Preview')
             );
 
-            const body = `## 🚀 Preview Deployments
-
-### Web Shell (Standalone App)
-**${webShellPreviewUrl}**
-
-Use this for Playwright testing and demos - runs outside Storybook.
-
-### Storybook (Component Library)
-**${previewUrl}**
-
-Browse all components, stories, and documentation.
-
----
-
-<details>
-<summary>All Links</summary>
-
-| Environment | Web Shell | Storybook |
-|-------------|-----------|-----------|
-| **This PR** | [Open App](${webShellPreviewUrl}) | [Open Storybook](${previewUrl}) |
-| **Main branch** | [Open App](${webShellUrl}) | [Open Storybook](${persistentUrl}) |
-
-**Storybook Quick Links:**
-- [Web Shell Demo](${previewUrl}?path=/story/apps-webshell--integrated-demo)
-- [ToolMatch Harness](${previewUrl}?path=/story/toolmatch-harness--default)
-- [ActivityPanel](${previewUrl}?path=/story/activitypanel--default)
-
-</details>
-
-> Updated on commit ${context.sha.substring(0, 7)}`;
+            const body = [
+              '## 🚀 Preview Deployments',
+              '',
+              '### Web Shell (Standalone App)',
+              `📱 [Open Web Shell](${webShellPreviewUrl})`,
+              '',
+              'Use this for Playwright testing and demos - runs outside Storybook.',
+              '',
+              '### Storybook (Component Library)',
+              `📚 [Open Storybook](${previewUrl})`,
+              '',
+              'Browse all components, stories, and documentation.',
+              '',
+              '---',
+              '',
+              '<details>',
+              '<summary>All Links</summary>',
+              '',
+              '| Environment | Web Shell | Storybook |',
+              '|-------------|-----------|-----------|',
+              `| This PR | [Open App](${webShellPreviewUrl}) | [Open Storybook](${previewUrl}) |`,
+              `| Main branch | [Open App](${webShellUrl}) | [Open Storybook](${persistentUrl}) |`,
+              '',
+              '</details>',
+              '',
+              `> Updated on commit ${context.sha.substring(0, 7)}`,
+            ].join('\n');
 
             if (botComment) {
               await github.rest.issues.updateComment({
