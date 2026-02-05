@@ -11,9 +11,62 @@ Tests cover:
 
 from debrief_io.handlers.rep import (
     REPHandler,
+    calculate_position_style_intervals,
     parse_dms_coordinate,
     parse_timestamp,
 )
+
+
+class TestPositionStyleIntervals:
+    """Tests for position style interval calculation."""
+
+    def test_short_track_under_30_minutes(self):
+        """Short tracks get 1 min symbols, 5 min labels."""
+        symbol, label = calculate_position_style_intervals(0.25)  # 15 minutes
+        assert symbol == "PT1M"
+        assert label == "PT5M"
+
+    def test_track_30_min_to_2_hours(self):
+        """Tracks 30 min - 2 hours get 5 min symbols, 15 min labels."""
+        symbol, label = calculate_position_style_intervals(1.0)  # 1 hour
+        assert symbol == "PT5M"
+        assert label == "PT15M"
+
+    def test_track_2_to_6_hours(self):
+        """Tracks 2-6 hours get 10 min symbols, 30 min labels."""
+        symbol, label = calculate_position_style_intervals(4.0)  # 4 hours
+        assert symbol == "PT10M"
+        assert label == "PT30M"
+
+    def test_track_6_to_12_hours(self):
+        """Tracks 6-12 hours get 15 min symbols, 1 hour labels."""
+        symbol, label = calculate_position_style_intervals(8.0)  # 8 hours
+        assert symbol == "PT15M"
+        assert label == "PT1H"
+
+    def test_track_12_to_24_hours(self):
+        """Tracks 12-24 hours get 30 min symbols, 2 hour labels."""
+        symbol, label = calculate_position_style_intervals(18.0)  # 18 hours
+        assert symbol == "PT30M"
+        assert label == "PT2H"
+
+    def test_track_over_24_hours(self):
+        """Tracks over 24 hours get 1 hour symbols, 4 hour labels."""
+        symbol, label = calculate_position_style_intervals(48.0)  # 2 days
+        assert symbol == "PT1H"
+        assert label == "PT4H"
+
+    def test_boundary_at_30_minutes(self):
+        """Test boundary condition at 30 minutes."""
+        # Just under 30 minutes
+        symbol, label = calculate_position_style_intervals(0.49)
+        assert symbol == "PT1M"
+        assert label == "PT5M"
+
+        # At 30 minutes
+        symbol, label = calculate_position_style_intervals(0.5)
+        assert symbol == "PT5M"
+        assert label == "PT15M"
 
 
 class TestDMSCoordinateParsing:
@@ -262,3 +315,74 @@ class TestREPHandlerRealFiles:
             positions = feature["properties"]["positions"]
             for i in range(1, len(positions)):
                 assert positions[i]["time"] >= positions[i - 1]["time"]
+
+    def test_smart_intervals_set_for_6_hour_track(self, boat2_content: str, boat2_rep):
+        """Track spanning ~6.7 hours should get 6-12 hour tier intervals."""
+        handler = REPHandler()
+        result = handler.parse(boat2_content, str(boat2_rep))
+
+        # boat2.rep spans from 05:03 to 11:45 (~6.7 hours)
+        track = result.features[0]
+        props = track["properties"]
+
+        assert "symbol_interval" in props
+        assert "label_interval" in props
+        # 6-12 hour tracks get PT15M symbols, PT1H labels
+        assert props["symbol_interval"] == "PT15M"
+        assert props["label_interval"] == "PT1H"
+
+
+class TestSmartIntervalsIntegration:
+    """Integration tests for smart interval calculation in parsed tracks."""
+
+    def test_short_track_intervals(self):
+        """Short 15-minute track should get 1 min symbols, 5 min labels."""
+        # Create a track spanning 15 minutes
+        content = """951212 050000.000 TESTSHIP @C 22 11 10.63 N 21 41 52.37 W 269.7 2.0 0
+951212 050500.000 TESTSHIP @C 22 11 10.58 N 21 42 2.98 W 269.7 2.0 0
+951212 051000.000 TESTSHIP @C 22 11 10.51 N 21 42 14.81 W 269.9 2.0 0
+951212 051500.000 TESTSHIP @C 22 11 10.51 N 21 42 27.27 W 268.7 2.0 0
+"""
+        handler = REPHandler()
+        result = handler.parse(content, "test.rep")
+
+        track = result.features[0]
+        props = track["properties"]
+
+        # < 30 minute tracks get PT1M symbols, PT5M labels
+        assert props["symbol_interval"] == "PT1M"
+        assert props["label_interval"] == "PT5M"
+
+    def test_1_hour_track_intervals(self):
+        """1-hour track should get 5 min symbols, 15 min labels."""
+        # Create a track spanning 1 hour
+        content = """951212 050000.000 TESTSHIP @C 22 11 10.63 N 21 41 52.37 W 269.7 2.0 0
+951212 053000.000 TESTSHIP @C 22 11 10.58 N 21 42 2.98 W 269.7 2.0 0
+951212 060000.000 TESTSHIP @C 22 11 10.51 N 21 42 14.81 W 269.9 2.0 0
+"""
+        handler = REPHandler()
+        result = handler.parse(content, "test.rep")
+
+        track = result.features[0]
+        props = track["properties"]
+
+        # 30 min - 2 hour tracks get PT5M symbols, PT15M labels
+        assert props["symbol_interval"] == "PT5M"
+        assert props["label_interval"] == "PT15M"
+
+    def test_12_hour_track_intervals(self):
+        """12-hour track should get 30 min symbols, 2 hour labels."""
+        # Create a track spanning 12 hours
+        content = """951212 050000.000 TESTSHIP @C 22 11 10.63 N 21 41 52.37 W 269.7 2.0 0
+951212 110000.000 TESTSHIP @C 22 11 10.58 N 21 42 2.98 W 269.7 2.0 0
+951212 170000.000 TESTSHIP @C 22 11 10.51 N 21 42 14.81 W 269.9 2.0 0
+"""
+        handler = REPHandler()
+        result = handler.parse(content, "test.rep")
+
+        track = result.features[0]
+        props = track["properties"]
+
+        # 12-24 hour tracks get PT30M symbols, PT2H labels
+        assert props["symbol_interval"] == "PT30M"
+        assert props["label_interval"] == "PT2H"

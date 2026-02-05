@@ -33,6 +33,33 @@ from debrief_io.handlers.base import BaseHandler
 from debrief_io.models import ParseResult, ParseWarning
 
 
+def calculate_position_style_intervals(duration_hours: float) -> tuple[str, str]:
+    """Calculate sensible symbol and label intervals based on track duration.
+
+    Uses a tiered approach to provide readable position markers:
+    - Short tracks get more frequent symbols/labels
+    - Long tracks get less frequent symbols/labels
+
+    Args:
+        duration_hours: Track duration in hours
+
+    Returns:
+        Tuple of (symbol_interval, label_interval) in ISO 8601 duration format
+    """
+    if duration_hours < 0.5:  # < 30 minutes
+        return ("PT1M", "PT5M")  # 1 min symbols, 5 min labels
+    elif duration_hours < 2:  # 30 min - 2 hours
+        return ("PT5M", "PT15M")  # 5 min symbols, 15 min labels
+    elif duration_hours < 6:  # 2 - 6 hours
+        return ("PT10M", "PT30M")  # 10 min symbols, 30 min labels
+    elif duration_hours < 12:  # 6 - 12 hours
+        return ("PT15M", "PT1H")  # 15 min symbols, 1 hour labels
+    elif duration_hours < 24:  # 12 - 24 hours
+        return ("PT30M", "PT2H")  # 30 min symbols, 2 hour labels
+    else:  # >= 24 hours
+        return ("PT1H", "PT4H")  # 1 hour symbols, 4 hour labels
+
+
 def parse_dms_coordinate(degrees: float, minutes: float, seconds: float, hemisphere: str) -> float:
     """Convert DMS (degrees, minutes, seconds) to decimal degrees.
 
@@ -149,6 +176,12 @@ class TrackBuilder:
             for p in self.positions
         ]
 
+        # Calculate track duration and determine smart intervals
+        start_time = self.positions[0].timestamp
+        end_time = self.positions[-1].timestamp
+        duration_hours = (end_time - start_time).total_seconds() / 3600
+        symbol_interval, label_interval = calculate_position_style_intervals(duration_hours)
+
         return {
             "type": "Feature",
             "id": str(uuid.uuid4()),
@@ -162,8 +195,8 @@ class TrackBuilder:
                 "platform_name": self.platform_id,
                 "track_type": "CONTACT",  # Default, can be overridden
                 "times": times,  # Required for track identification
-                "start_time": self.positions[0].timestamp.isoformat(),
-                "end_time": self.positions[-1].timestamp.isoformat(),
+                "start_time": start_time.isoformat(),
+                "end_time": end_time.isoformat(),
                 "positions": positions_data,
                 "source_file": source_file,
                 "default_position_style": {
@@ -171,6 +204,8 @@ class TrackBuilder:
                     "symbol": "circle",
                     "show_label": False,
                 },
+                "symbol_interval": symbol_interval,
+                "label_interval": label_interval,
             },
         }
 
