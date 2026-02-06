@@ -16,6 +16,7 @@
 - Q: How much should this feature cover tool authoring by analysts/scientists? → A: Scope limited to registration mechanics — the decorator auto-generates a valid MCP tool entry. A dedicated tool authoring guide and onboarding experience is a separate future feature.
 - Q: Should the ToolHarness Storybook fixtures add feature kinds (CONTACT, ZONE) beyond what the implemented tools require? → A: No. Keep the harness focused on feature kinds needed by implemented tools. Add CONTACT/ZONE when a tool that requires them is implemented.
 - Q: Should the ToolHarness demonstrate parameter input for the new tools (color, symbol, interval)? → A: No. The harness remains focused on selection matching logic. The 4 new tools are added as fixture entries with their selection requirements only. Parameter input UI is a separate concern addressed by FR-019 in the Layers Toolbar.
+- Q: Should the new tools share one combined Storybook story variant or have one variant each? → A: One variant per tool (4 new story variants: SetTrackColor, ApplySymbolStyle, LabelInterval, SymbolInterval).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -148,7 +149,7 @@ A developer building the web-shell application integrates tool execution using t
 
 - **FR-027**: The existing ToolMatchHarness Storybook story MUST be extended to include the 4 new styling tools (set-track-color, apply-symbol-style, label-interval, symbol-interval) as fixture entries with their selection requirements
 - **FR-028**: The harness fixture data MUST only include feature kinds required by implemented tools — do not add speculative kinds (e.g., CONTACT, ZONE) until a tool requiring them is implemented
-- **FR-029**: New Storybook story variants MUST demonstrate the selection matching behaviour for the new tools (e.g., a "StylingTools" variant showing all 4 tools active when 1+ tracks selected)
+- **FR-029**: Each of the 4 new styling tools MUST have its own Storybook story variant demonstrating its selection matching behaviour (SetTrackColor, ApplySymbolStyle, LabelInterval, SymbolInterval)
 
 #### UI Integration
 
