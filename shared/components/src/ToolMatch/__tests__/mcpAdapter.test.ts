@@ -101,8 +101,8 @@ describe('mcpAdapter', () => {
     it('converts an array of MCP tools', () => {
       const tools = fromMCPTools([sampleMCPTool, { ...sampleMCPTool, name: 'label-interval' }]);
       expect(tools).toHaveLength(2);
-      expect(tools[0].id).toBe('set-track-color');
-      expect(tools[1].id).toBe('label-interval');
+      expect(tools[0]!.id).toBe('set-track-color');
+      expect(tools[1]!.id).toBe('label-interval');
     });
 
     it('returns empty array for empty input', () => {

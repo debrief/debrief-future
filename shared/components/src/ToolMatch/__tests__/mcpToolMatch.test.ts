@@ -101,8 +101,8 @@ describe('ToolMatchService with MCP-adapted tools (T014)', () => {
       expect(tool.name).toBeTruthy();
       expect(tool.requirements).toBeDefined();
       expect(tool.requirements!.length).toBeGreaterThan(0);
-      expect(tool.requirements![0].kind).toBe('TRACK');
-      expect(tool.requirements![0].min).toBe(1);
+      expect(tool.requirements![0]!.kind).toBe('TRACK');
+      expect(tool.requirements![0]!.min).toBe(1);
     }
   });
 
