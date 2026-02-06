@@ -64,8 +64,8 @@ Log entries are stored directly on the features they describe. Each track, conta
 graph TD
     subgraph "Plot File"
         SF["🔧 System Record\n• Snapshot links\n• Branch records"]
-        T1["🚢 Track: HMS Vanguard\nLog:\n  1. Loaded from REP file\n  2. Colour changed to blue\n  3. Speed calculated"]
-        T2["🚢 Track: Contact Alpha\nLog:\n  1. Loaded from REP file\n  2. Range to Vanguard calculated"]
+        T1["🚢 Track: HMS Neptune\nLog:\n  1. Loaded from REP file\n  2. Colour changed to blue\n  3. Speed calculated"]
+        T2["🚢 Track: Contact Alpha\nLog:\n  1. Loaded from REP file\n  2. Range to Neptune calculated"]
     end
 ```
 
@@ -83,16 +83,16 @@ The Log Panel is a dedicated view the analyst opens when they need to review or 
 ├─────────────────────────────────────────────────┤
 │                                                 │
 │  14:32  Import REP file "exercise_042.rep"      │
-│         → Created HMS Vanguard, Contact Alpha   │
+│         → Created HMS Neptune, Contact Alpha   │
 │                                                 │
-│  14:35  Set property: HMS Vanguard colour → blue│
+│  14:35  Set property: HMS Neptune colour → blue│
 │         [Tune] [Revert this] [Snapshot from here│
 │                                                 │
-│  14:38  Calculate range (Vanguard ↔ Alpha)      │
+│  14:38  Calculate range (Neptune ↔ Alpha)      │
 │         interval=60s, method=linear             │
 │         [Tune] [Revert this] [Snapshot from here│
 │                                                 │
-│  14:41  Calculate bearing (Vanguard → Alpha)    │
+│  14:41  Calculate bearing (Neptune → Alpha)    │
 │         frequency=1804Hz                        │
 │         [Tune] [Revert this] [Snapshot from here│
 │                                                 │
@@ -448,7 +448,7 @@ Example Log entry as stored in `feature.properties.provenance`:
       "method": { "value": "linear", "default": false, "tunable": true }
     }
   },
-  "used": ["feature-id-vanguard", "feature-id-alpha"],
+  "used": ["feature-id-Neptune", "feature-id-alpha"],
   "generated": ["feature-id-range-result"],
   "executionDuration": "PT0.3S",
   "tune": null
@@ -483,7 +483,7 @@ Property edits are modelled as invocations of a built-in `set-property` tool:
       "previousValue": { "value": "red", "tunable": false }
     }
   },
-  "used": ["feature-id-vanguard"],
+  "used": ["feature-id-Neptune"],
   "generated": [],
   "executionDuration": "PT0.01S",
   "tune": null
