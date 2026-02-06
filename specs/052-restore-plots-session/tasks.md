@@ -43,8 +43,8 @@
 
 **Purpose**: Create project scaffolding and evidence directory
 
-- [ ] T001 Create evidence directory `specs/052-restore-plots-session/evidence/`
-- [ ] T002 Create OpenPlotReference and OpenPlotsState type definitions `apps/vscode/src/types/openPlots.ts`
+- [x] T001 Create evidence directory `specs/052-restore-plots-session/evidence/`
+- [x] T002 Create OpenPlotReference and OpenPlotsState type definitions `apps/vscode/src/types/openPlots.ts`
 
 ---
 
@@ -58,18 +58,18 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T003 [test] Write unit tests for CRUD operations (addPlot, removePlot, getOpenPlots, isOpen, clearAll) `apps/vscode/src/test/services/openPlotsService.test.ts`
-- [ ] T004 [test] Write unit tests for restoreOpenPlots (success path, empty state, corrupt state fallback) `apps/vscode/src/test/services/openPlotsService.test.ts`
+- [x] T003 [test] Write unit tests for CRUD operations (addPlot, removePlot, getOpenPlots, isOpen, clearAll) `apps/vscode/tests/unit/openPlotsService.test.ts`
+- [x] T004 [test] Write unit tests for restoreOpenPlots (success path, empty state, corrupt state fallback) `apps/vscode/tests/unit/openPlotsService.test.ts`
 
 ### Implementation for Foundation
 
-- [ ] T005 Create OpenPlotsService class with constructor accepting ExtensionContext `apps/vscode/src/services/openPlotsService.ts`
-- [ ] T006 Implement getOpenPlots with corrupt state fallback to empty array `apps/vscode/src/services/openPlotsService.ts`
-- [ ] T007 [P] Implement addPlot with duplicate URI handling (move to end, update openedAt) `apps/vscode/src/services/openPlotsService.ts`
-- [ ] T008 [P] Implement removePlot (no-op if URI not found) `apps/vscode/src/services/openPlotsService.ts`
-- [ ] T009 [P] Implement isOpen and clearAll `apps/vscode/src/services/openPlotsService.ts`
-- [ ] T010 Implement restoreOpenPlots with sequential command execution, try/catch silent skip, and persisted list cleanup `apps/vscode/src/services/openPlotsService.ts`
-- [ ] T011 Verify all foundation unit tests pass
+- [x] T005 Create OpenPlotsService class with constructor accepting ExtensionContext `apps/vscode/src/services/openPlotsService.ts`
+- [x] T006 Implement getOpenPlots with corrupt state fallback to empty array `apps/vscode/src/services/openPlotsService.ts`
+- [x] T007 [P] Implement addPlot with duplicate URI handling (move to end, update openedAt) `apps/vscode/src/services/openPlotsService.ts`
+- [x] T008 [P] Implement removePlot (no-op if URI not found) `apps/vscode/src/services/openPlotsService.ts`
+- [x] T009 [P] Implement isOpen and clearAll `apps/vscode/src/services/openPlotsService.ts`
+- [x] T010 Implement restoreOpenPlots with sequential command execution, try/catch silent skip, and persisted list cleanup `apps/vscode/src/services/openPlotsService.ts`
+- [x] T011 Verify all foundation unit tests pass
 
 **Checkpoint**: OpenPlotsService is complete and fully tested in isolation. Ready for wiring into existing code.
 
@@ -83,15 +83,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T012 [test] [US1] Write integration test: addPlot on open → restoreOpenPlots returns the single URI `apps/vscode/src/test/services/openPlotsService.test.ts`
+- [x] T012 [test] [US1] Write integration test: addPlot on open → restoreOpenPlots returns the single URI `apps/vscode/tests/unit/openPlotsService.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] Wire OpenPlotsService instantiation into extension.ts activate function `apps/vscode/src/extension.ts`
-- [ ] T014 [US1] Wire restoreOpenPlots call into extension.ts after service initialization `apps/vscode/src/extension.ts`
-- [ ] T015 [US1] Wire addPlot call into openPlot.ts after successful plot open (after recentPlotsService.addRecentPlot) `apps/vscode/src/commands/openPlot.ts`
-- [ ] T016 [US1] Pass openPlotsService to createOpenPlotCommand factory `apps/vscode/src/commands/openPlot.ts`
-- [ ] T017 [US1] Test: verify single plot persists and restores (integration)
+- [x] T013 [US1] Wire OpenPlotsService instantiation into extension.ts activate function `apps/vscode/src/extension.ts`
+- [x] T014 [US1] Wire restoreOpenPlots call into extension.ts after service initialization `apps/vscode/src/extension.ts`
+- [x] T015 [US1] Wire addPlot call into openPlot.ts after successful plot open (after recentPlotsService.addRecentPlot) `apps/vscode/src/commands/openPlot.ts`
+- [x] T016 [US1] Pass openPlotsService to createOpenPlotCommand factory `apps/vscode/src/commands/openPlot.ts`
+- [x] T017 [US1] Test: verify single plot persists and restores (integration)
 
 **Checkpoint**: Single plot restoration works end-to-end. MVP is deliverable.
 
@@ -105,13 +105,13 @@
 
 ### Tests for User Story 2
 
-- [ ] T018 [test] [US2] Write test: addPlot for 3 plots → getOpenPlots returns all 3 in order `apps/vscode/src/test/services/openPlotsService.test.ts`
-- [ ] T019 [test] [US2] Write test: restoreOpenPlots restores plots sequentially in original order `apps/vscode/src/test/services/openPlotsService.test.ts`
+- [x] T018 [test] [US2] Write test: addPlot for 3 plots → getOpenPlots returns all 3 in order `apps/vscode/tests/unit/openPlotsService.test.ts`
+- [x] T019 [test] [US2] Write test: restoreOpenPlots restores plots sequentially in original order `apps/vscode/tests/unit/openPlotsService.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Verify restoreOpenPlots iterates plots array sequentially (already implemented in Phase 2, confirm behaviour) `apps/vscode/src/services/openPlotsService.ts`
-- [ ] T021 [US2] Verify ordering tests pass with 3+ plots
+- [x] T020 [US2] Verify restoreOpenPlots iterates plots array sequentially (already implemented in Phase 2, confirm behaviour) `apps/vscode/src/services/openPlotsService.ts`
+- [x] T021 [US2] Verify ordering tests pass with 3+ plots
 
 **Checkpoint**: Multiple plots restore in correct order. US1 + US2 both functional.
 
@@ -125,16 +125,16 @@
 
 ### Tests for User Story 3
 
-- [ ] T022 [test] [US3] Write test: restoreOpenPlots skips missing STAC items silently `apps/vscode/src/test/services/openPlotsService.test.ts`
-- [ ] T023 [test] [US3] Write test: failed restoration entries are removed from persisted list `apps/vscode/src/test/services/openPlotsService.test.ts`
-- [ ] T024 [P][test] [US3] Write test: corrupt workspaceState falls back to empty list `apps/vscode/src/test/services/openPlotsService.test.ts`
-- [ ] T025 [P][test] [US3] Write test: all plots missing results in default state (empty) `apps/vscode/src/test/services/openPlotsService.test.ts`
+- [x] T022 [test] [US3] Write test: restoreOpenPlots skips missing STAC items silently `apps/vscode/tests/unit/openPlotsService.test.ts`
+- [x] T023 [test] [US3] Write test: failed restoration entries are removed from persisted list `apps/vscode/tests/unit/openPlotsService.test.ts`
+- [x] T024 [P][test] [US3] Write test: corrupt workspaceState falls back to empty list `apps/vscode/tests/unit/openPlotsService.test.ts`
+- [x] T025 [P][test] [US3] Write test: all plots missing results in default state (empty) `apps/vscode/tests/unit/openPlotsService.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Verify try/catch in restoreOpenPlots silently catches command execution failures (already implemented in T010, confirm coverage) `apps/vscode/src/services/openPlotsService.ts`
-- [ ] T027 [US3] Verify persisted list is cleaned after restoration (failed entries removed) `apps/vscode/src/services/openPlotsService.ts`
-- [ ] T028 [US3] Verify all US3 tests pass
+- [x] T026 [US3] Verify try/catch in restoreOpenPlots silently catches command execution failures (already implemented in T010, confirm coverage) `apps/vscode/src/services/openPlotsService.ts`
+- [x] T027 [US3] Verify persisted list is cleaned after restoration (failed entries removed) `apps/vscode/src/services/openPlotsService.ts`
+- [x] T028 [US3] Verify all US3 tests pass
 
 **Checkpoint**: Missing/corrupt plots handled gracefully. US1 + US2 + US3 all functional.
 
@@ -148,14 +148,14 @@
 
 ### Tests for User Story 4
 
-- [ ] T029 [test] [US4] Write test: removePlot removes correct entry from persisted list `apps/vscode/src/test/services/openPlotsService.test.ts`
-- [ ] T030 [test] [US4] Write test: closing all plots then restoring yields empty list `apps/vscode/src/test/services/openPlotsService.test.ts`
+- [x] T029 [test] [US4] Write test: removePlot removes correct entry from persisted list `apps/vscode/tests/unit/openPlotsService.test.ts`
+- [x] T030 [test] [US4] Write test: closing all plots then restoring yields empty list `apps/vscode/tests/unit/openPlotsService.test.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T031 [US4] Wire removePlot call into MapPanel dispose callback (when panel is closed by user) `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T032 [US4] Pass openPlotsService reference to MapPanel `apps/vscode/src/webview/mapPanel.ts`
-- [ ] T033 [US4] Verify all US4 tests pass
+- [x] T031 [US4] Wire clearAll call into MapPanel dispose callback and closePlot command `apps/vscode/src/commands/openPlot.ts` `apps/vscode/src/commands/index.ts`
+- [x] T032 [US4] Pass openPlotsService through command registration chain `apps/vscode/src/commands/index.ts`
+- [x] T033 [US4] Verify all US4 tests pass
 
 **Checkpoint**: All four user stories functional and tested independently.
 
@@ -167,13 +167,13 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T034 Capture test results in `specs/052-restore-plots-session/evidence/test-summary.md`
-- [ ] T035 Create usage demonstration in `specs/052-restore-plots-session/evidence/usage-example.md`
+- [x] T034 Capture test results in `specs/052-restore-plots-session/evidence/test-summary.md`
+- [x] T035 Create usage demonstration in `specs/052-restore-plots-session/evidence/usage-example.md`
 
 ### Media Content
 
-- [ ] T036 Create shipped blog post in `specs/052-restore-plots-session/media/shipped-post.md`
-- [ ] T037 [P] Create LinkedIn shipped summary in `specs/052-restore-plots-session/media/linkedin-shipped.md`
+- [x] T036 Create shipped blog post in `specs/052-restore-plots-session/media/shipped-post.md`
+- [x] T037 [P] Create LinkedIn shipped summary in `specs/052-restore-plots-session/media/linkedin-shipped.md`
 
 ### PR Creation
 
