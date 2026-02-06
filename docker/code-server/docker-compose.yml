@@ -1,0 +1,28 @@
+# E2E test environment: code-server with Debrief extension
+#
+# Usage:
+#   docker compose build    # Build the image
+#   docker compose up -d    # Start code-server
+#   docker compose down     # Stop and clean up
+#
+# Then run tests from repo root:
+#   npx playwright test --config tests/e2e/playwright.config.ts
+
+services:
+  code-server:
+    build:
+      context: ../..
+      dockerfile: docker/code-server/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PASSWORD=
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    volumes:
+      # Mount test workspace for live updates during development
+      - ../../tests/e2e/test-workspace:/workspace/test-workspace
