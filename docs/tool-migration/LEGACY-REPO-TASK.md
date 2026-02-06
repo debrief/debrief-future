@@ -81,13 +81,43 @@ public double calculate(WatchableList primary, WatchableList secondary)
 public FeatureCollection transform(FeatureCollection input)
 ```
 
+### Legacy trigger type classification
+
+For each tool, record **how the user invokes it** in legacy Debrief. This
+determines how the tool will need to be surfaced in Future Debrief's
+different UX (VS Code, MCP/LLM, webview panels).
+
+| Legacy Trigger Type | Description | Eclipse RCP pattern |
+|---------------------|-------------|---------------------|
+| `context-menu` | Right-click on a selection in the plot or outline view | `IMenuCreator`, `contributeToPopupMenu`, popup `ActionProvider` |
+| `toolbar-button` | Click a toolbar button (global or view-local) | `IAction` registered in `plugin.xml` toolbar contribution |
+| `menu-bar` | Top-level menu item (e.g., Edit, Analysis) | `plugin.xml` `<menu>` / `<command>` contribution |
+| `drag-drop` | Drag operation on the plot (track shifting, TMA) | `MouseListener`, `DragTracker`, `AbstractDragTracker` |
+| `property-edit` | Editing a value in the properties panel | `IPropertySource`, property descriptors |
+| `wizard` | Multi-step dialog with sequential pages | `IWizard`, `WizardPage` |
+| `key-binding` | Keyboard shortcut | `plugin.xml` `<key>` binding |
+| `auto/listener` | Triggered automatically by data changes (no user click) | `PropertyChangeListener`, `DataListener` |
+| `view-action` | Button or control inside a custom view (e.g., time controller) | View-specific UI components |
+| `bulk/batch` | Applied to multiple items in a loop (e.g., "apply to all tracks") | Wrapper over another trigger type |
+
+**What to capture**: For each tool, note:
+1. The trigger type(s) from the table above (a tool may have more than one).
+2. What **selection context** is required (e.g., "one track selected",
+   "two tracks selected", "time period active").
+3. Whether the tool shows **intermediate UI** before running (e.g., a colour
+   picker dialog, a parameter wizard, a confirmation prompt).
+4. Whether the tool operates on the **current selection** or requires the
+   user to **designate targets** explicitly.
+
 ### Exclusions
 
-Skip classes that are **purely UI plumbing**:
-- Dialog launchers (`*Dialog`, `*Wizard`, `*Page`)
+Skip classes that are **purely UI plumbing** with no algorithmic body:
+- Dialog launchers (`*Dialog`, `*Wizard`, `*Page`) that only gather
+  parameters — but **do** capture what parameters they gather, since
+  those become tool inputs.
 - View factories (`*ViewFactory`, `*Perspective`)
 - Preference pages (`*PreferencePage`)
-- Menu/toolbar wiring with no algorithmic body
+- Menu/toolbar wiring that delegates to a tool class (capture the tool, skip the wiring)
 - Deprecated or dead code (check for `@Deprecated`, or unreachable via callers)
 
 ### Complexity assessment
@@ -123,12 +153,52 @@ Write `_tool-migration/discovery-report.md`:
 
 ## Full Inventory
 
-| # | Name | Category | Java Class | Complexity | Description | Status |
-|---|------|----------|------------|------------|-------------|--------|
-| 1 | set-track-color | track/styling | o.m.d.core.actions.SetTrackColor | Low | Sets track display colour | Ready |
-| 2 | … | … | … | … | … | … |
+| # | Name | Category | Java Class | Complexity | Legacy Trigger | Selection Context | Has Intermediate UI | Description | Status |
+|---|------|----------|------------|------------|----------------|-------------------|---------------------|-------------|--------|
+| 1 | set-track-color | track/styling | o.m.d.core.actions.SetTrackColor | Low | context-menu | 1+ tracks selected | Yes (colour picker) | Sets track display colour | Ready |
+| 2 | cpa-analysis | track/analysis | o.m.cmap.analysis.CPAAnalyzer | High | menu-bar | 2 tracks selected | No | Calculates closest point of approach | Ready |
+| 3 | track-shift | track/manipulation | o.m.d.track_shift.DragTrackSegment | High | drag-drop | 1 track selected + drag gesture | Yes (live preview) | Shifts track segment by dragging | Needs Review |
+| … | … | … | … | … | … | … | … | … | … |
 
 Status values: Ready | Needs Review | Out of Scope
+
+## Trigger Type Summary
+
+| Legacy Trigger | Count | Example Tool |
+|----------------|-------|-------------|
+| context-menu | … | set-track-color |
+| toolbar-button | … | … |
+| menu-bar | … | cpa-analysis |
+| drag-drop | … | track-shift |
+| property-edit | … | … |
+| wizard | … | … |
+| key-binding | … | … |
+| auto/listener | … | … |
+| view-action | … | … |
+| bulk/batch | … | … |
+
+## UX Integration Mapping
+
+How each legacy trigger type maps to Future Debrief UX surfaces.
+**Flag gaps** where no clean equivalent exists — these need new UX design.
+
+| Legacy Trigger | Future: MCP/LLM Tool | Future: VS Code Command | Future: Webview Panel | Future: Context Menu | Gap / Notes |
+|----------------|----------------------|-------------------------|----------------------|----------------------|-------------|
+| context-menu | Yes — natural fit | Yes — command palette | Possible — button | Yes — webview right-click | Clean mapping |
+| toolbar-button | Yes | Yes — command palette or status bar | Yes — panel toolbar | N/A | Clean mapping |
+| menu-bar | Yes | Yes — command palette | N/A | N/A | Clean mapping |
+| drag-drop | No — not interactive | No | Possible — Leaflet drag handler | No | **GAP**: needs webview interaction design |
+| property-edit | Partial — can set values | Partial — quick pick / input box | Yes — properties panel | N/A | May need dedicated properties panel |
+| wizard | Partial — multi-turn conversation | Partial — multi-step quick pick | Yes — stepper component | N/A | **GAP**: no wizard equivalent; consider multi-step panel |
+| key-binding | N/A | Yes — keybinding | Possible — keyboard events | N/A | Clean mapping |
+| auto/listener | Yes — tool chaining | Yes — event subscription | Yes — reactive updates | N/A | Clean mapping (different mechanism) |
+| view-action | N/A | Possible — webview message | Yes — panel button | N/A | Clean mapping |
+| bulk/batch | Yes — loop in prompt | Yes — command with multi-select | Yes — "apply to all" button | N/A | Clean mapping |
+
+### Tools Requiring New UX Mechanisms
+
+{List each tool whose legacy trigger has no clean Future Debrief equivalent,
+with a brief note on what UX approach might work.}
 
 ## Ready for Migration
 

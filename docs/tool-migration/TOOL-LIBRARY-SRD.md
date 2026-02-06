@@ -24,6 +24,8 @@ This SRD governs the production of specs for the remaining migrateable tools.
 
 - **Discover** all analysis, formatting, and data-manipulation tools in the legacy Java source.
 - **Categorise** them by domain (`track/styling`, `track/analysis`, `sensor/calibration`, etc.).
+- **Classify trigger types** — record how each tool is invoked in legacy Eclipse RCP (context menu, toolbar, drag-drop, property edit, wizard, etc.) and what selection context it requires.
+- **Map UX integration** — for each legacy trigger type, identify how the tool will be surfaced in Future Debrief (MCP/LLM, VS Code command, webview panel) and flag gaps where no clean equivalent exists.
 - **Assess complexity** (Low / Medium / High) for each tool.
 - **Capture golden I/O** — run each tool in the Java environment and serialize input/output as JSON fixture pairs.
 - **Write language-neutral specs** following the `TEMPLATE.md` structure (9 required sections).
@@ -90,8 +92,30 @@ A Markdown table listing every identified tool with:
 | Category | Domain path (e.g., `track/analysis`) |
 | Java Class | Fully-qualified class name |
 | Complexity | Low / Medium / High |
+| Legacy Trigger | How the tool is invoked in Eclipse RCP (see §5.4) |
+| Selection Context | What must be selected/active for the tool to be available |
+| Has Intermediate UI | Whether the tool shows a dialog/wizard before executing |
 | Description | One-line summary of what the tool does |
 | Status | Ready / Needs Review / Out of Scope |
+
+### 5.1.1 Trigger type summary
+
+The discovery report must include a summary counting tools by legacy trigger type, plus a **UX integration mapping table** that maps each legacy trigger type to Future Debrief surfaces (MCP/LLM tool, VS Code command, webview panel, context menu) and explicitly flags gaps where no clean equivalent exists.
+
+### 5.1.2 Legacy trigger types
+
+| Trigger Type | Eclipse RCP Pattern |
+|--------------|---------------------|
+| `context-menu` | Right-click popup on selection in plot or outline view |
+| `toolbar-button` | Global or view-local toolbar button |
+| `menu-bar` | Top-level menu item (Edit, Analysis, etc.) |
+| `drag-drop` | Mouse drag on plot (track shifting, TMA) |
+| `property-edit` | Value change in properties panel |
+| `wizard` | Multi-step dialog with sequential pages |
+| `key-binding` | Keyboard shortcut |
+| `auto/listener` | Fired automatically by data changes |
+| `view-action` | Button/control inside a custom view |
+| `bulk/batch` | Applied to multiple items in a loop |
 
 ### 5.2 Golden example files
 
@@ -144,14 +168,38 @@ shared/tools/
 
 Categories should be refined during discovery. The above is a starting hypothesis.
 
+### 5.5 UX integration mapping
+
+The discovery report must include a table mapping each legacy trigger type to
+its Future Debrief equivalents, flagging gaps that need new UX design:
+
+| Legacy Trigger | MCP/LLM Tool | VS Code Command | Webview Panel | Context Menu | Gap? |
+|----------------|-------------|-----------------|---------------|-------------|------|
+| `context-menu` | Yes | Yes | Possible | Yes | No |
+| `toolbar-button` | Yes | Yes | Yes | N/A | No |
+| `menu-bar` | Yes | Yes | N/A | N/A | No |
+| `drag-drop` | No | No | Possible (Leaflet) | No | **Yes** |
+| `property-edit` | Partial | Partial (input box) | Yes (panel) | N/A | Partial |
+| `wizard` | Partial (multi-turn) | Partial (multi-step pick) | Yes (stepper) | N/A | **Yes** |
+| `key-binding` | N/A | Yes | Possible | N/A | No |
+| `auto/listener` | Yes (chaining) | Yes (events) | Yes (reactive) | N/A | No |
+| `view-action` | N/A | Possible | Yes | N/A | No |
+| `bulk/batch` | Yes (loop) | Yes (multi-select) | Yes (apply-all) | N/A | No |
+
+Tools whose legacy trigger has a gap must be listed in a "Tools Requiring New
+UX Mechanisms" section of the discovery report with a brief note on what
+alternative UX approach might work.
+
 ## 6. Process
 
 ### Phase 1: Discovery
 
 1. Run `/tool.discover` against the legacy source tree.
-2. Review the generated discovery report.
-3. Manually triage: mark tools as **Ready**, **Needs Review**, or **Out of Scope**.
-4. Prioritise by complexity (Low first, then Medium, then High).
+2. For each tool, classify its legacy trigger type(s), selection context, and whether it shows intermediate UI.
+3. Populate the UX integration mapping table; flag tools with trigger gaps.
+4. Review the generated discovery report.
+5. Manually triage: mark tools as **Ready**, **Needs Review**, or **Out of Scope**.
+6. Prioritise by complexity (Low first, then Medium, then High).
 
 ### Phase 2: Golden I/O capture
 
@@ -298,9 +346,11 @@ A tool is considered **spec-complete** when:
 The tool library is considered **complete** when:
 
 1. The discovery report covers all analysed packages.
-2. Every **Ready** tool has a spec-complete specification.
-3. Tools are organised into a coherent category hierarchy.
-4. A summary index exists listing all specs with their categories and status.
+2. Every tool in the inventory has a legacy trigger type, selection context, and intermediate-UI flag.
+3. The UX integration mapping table is populated and tools with trigger gaps are listed with proposed alternatives.
+4. Every **Ready** tool has a spec-complete specification.
+5. Tools are organised into a coherent category hierarchy.
+6. A summary index exists listing all specs with their categories and status.
 
 ## 11. Non-functional requirements
 
@@ -319,6 +369,7 @@ The tool library is considered **complete** when:
 | Legacy tool has bugs that golden I/O preserves | Spec encodes incorrect behaviour | Flag as `status: needs-review`; document known issues in spec |
 | Floating-point differences between Java and target languages | Verification failures | Use epsilon tolerance; document precision requirements |
 | Tool depends on external data (databases, files) | Cannot run in isolation for capture | Mock external dependencies in capture harness |
+| Legacy trigger type has no Future Debrief equivalent (e.g., drag-drop, wizard) | Tool cannot be invoked by users | Flag in UX integration mapping; design alternative interaction before implementation |
 
 ## 13. Reference documents
 
