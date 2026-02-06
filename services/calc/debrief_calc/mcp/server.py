@@ -102,6 +102,7 @@ def create_server() -> Server:
             build_addition,
             build_artifact,
             build_error,
+            build_mutation,
             build_response,
         )
 
@@ -174,6 +175,16 @@ def create_server() -> Server:
                         href=href,
                     )
                     response = build_response([content_item])
+                elif tool.output_kind.startswith("mutation/"):
+                    # Mutation tools: strip "mutation/" prefix for subtype
+                    subtype = tool.output_kind[len("mutation/"):]
+                    content_items = build_mutation(
+                        features=result.features or [],
+                        result_subtype=subtype,
+                        source_feature_ids=source_ids,
+                        label=f"{tool_name} results",
+                    )
+                    response = build_response(content_items)
                 else:
                     content_items = build_addition(
                         features=result.features or [],
