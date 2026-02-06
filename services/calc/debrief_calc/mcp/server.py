@@ -49,39 +49,46 @@ def create_server() -> Server:
 
     @server.list_tools()
     async def list_tools() -> list[Tool]:
-        """List all available debrief-calc tools."""
+        """List all available debrief-calc tools with Debrief annotations."""
         from debrief_calc import registry
 
         tools = []
         for tool in registry.list_all():
-            tools.append(
-                Tool(
+            # Get MCP definition with Debrief annotations from tool model
+            mcp_def = tool.to_mcp_tool()
+
+            # Add bounds to inputSchema for region context tools
+            input_schema = mcp_def["inputSchema"]
+            if "bounds" not in input_schema["properties"]:
+                input_schema["properties"]["bounds"] = {
+                    "type": "array",
+                    "description": "Geographic bounds [minx, miny, maxx, maxy] for region context",
+                    "items": {"type": "number"},
+                    "minItems": 4,
+                    "maxItems": 4,
+                }
+
+            # Create MCP Tool with annotations
+            # Note: MCP SDK Tool class may or may not support annotations parameter
+            # If it doesn't, this will raise TypeError and we'll need to use a fallback
+            try:
+                mcp_tool = Tool(
                     name=f"calc_{tool.name.replace('-', '_')}",
-                    description=tool.description,
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "features": {
-                                "type": "array",
-                                "description": "GeoJSON features to analyze",
-                                "items": {"type": "object"},
-                            },
-                            "bounds": {
-                                "type": "array",
-                                "description": "Geographic bounds [minx, miny, maxx, maxy] for region context",
-                                "items": {"type": "number"},
-                                "minItems": 4,
-                                "maxItems": 4,
-                            },
-                            "params": {
-                                "type": "object",
-                                "description": "Tool-specific parameters",
-                                "additionalProperties": True,
-                            },
-                        },
-                    },
+                    description=mcp_def["description"],
+                    inputSchema=input_schema,
+                    annotations=mcp_def["annotations"],
                 )
-            )
+            except TypeError:
+                # Fallback: MCP SDK Tool doesn't support annotations parameter
+                # Embed annotations in inputSchema as a non-schema property
+                input_schema["debrief:annotations"] = mcp_def["annotations"]
+                mcp_tool = Tool(
+                    name=f"calc_{tool.name.replace('-', '_')}",
+                    description=mcp_def["description"],
+                    inputSchema=input_schema,
+                )
+
+            tools.append(mcp_tool)
 
         return tools
 
