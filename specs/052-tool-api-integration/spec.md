@@ -13,6 +13,7 @@
 - Q: Where do tool definitions come from? → A: Each language provides its own set of tool definitions. They do not come from the central language-agnostic specifications. Both language toolsets produce a tool-list in the same JSON format (the common API contract).
 - Q: Will tools always be implemented in both languages? → A: Initially yes (for migrated legacy tools), but tools will eventually diverge to Python-only, authored by analysts and scientists. The Python tool library self-generates the tool-list (via annotations or a custom endpoint). The web-shell's tool set will be limited to tools with TypeScript implementations.
 - Q: Where should selection requirements (input kinds, min/max counts) live in tool metadata? → A: Selection requirements are encoded within MCP tool metadata — using the standard inputSchema and annotations fields. The tool-list IS the MCP tools/list response. This ensures future MCP clients automatically discover tools, and the Layers Toolbar reads the same MCP metadata for filtering. Domain-specific fields (e.g., feature kind=TRACK) use MCP annotations.
+- Q: How much should this feature cover tool authoring by analysts/scientists? → A: Scope limited to registration mechanics — the decorator auto-generates a valid MCP tool entry. A dedicated tool authoring guide and onboarding experience is a separate future feature.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -228,6 +229,7 @@ A developer building the web-shell application integrates tool execution using t
 - Server-side execution for web-shell (it is a static GitHub Pages site with no backend)
 - Real-time collaboration on tool results between multiple users
 - Tool marketplace or third-party tool installation
+- Tool authoring guide, onboarding experience, or documentation for analysts/scientists writing new tools (separate feature)
 
 ## Related
 
