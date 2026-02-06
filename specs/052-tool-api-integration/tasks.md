@@ -206,8 +206,8 @@
 
 ### Media Content
 
-- [ ] T050 Create shipped blog post in `specs/052-tool-api-integration/media/shipped-post.md`
-- [ ] T051 [P] Create LinkedIn shipped summary in `specs/052-tool-api-integration/media/linkedin-shipped.md`
+- [x] T050 Create shipped blog post in `specs/052-tool-api-integration/media/shipped-post.md`
+- [x] T051 [P] Create LinkedIn shipped summary in `specs/052-tool-api-integration/media/linkedin-shipped.md`
 
 ### PR Creation
 
