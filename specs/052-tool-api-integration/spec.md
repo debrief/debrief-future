@@ -14,6 +14,7 @@
 - Q: Will tools always be implemented in both languages? → A: Initially yes (for migrated legacy tools), but tools will eventually diverge to Python-only, authored by analysts and scientists. The Python tool library self-generates the tool-list (via annotations or a custom endpoint). The web-shell's tool set will be limited to tools with TypeScript implementations.
 - Q: Where should selection requirements (input kinds, min/max counts) live in tool metadata? → A: Selection requirements are encoded within MCP tool metadata — using the standard inputSchema and annotations fields. The tool-list IS the MCP tools/list response. This ensures future MCP clients automatically discover tools, and the Layers Toolbar reads the same MCP metadata for filtering. Domain-specific fields (e.g., feature kind=TRACK) use MCP annotations.
 - Q: How much should this feature cover tool authoring by analysts/scientists? → A: Scope limited to registration mechanics — the decorator auto-generates a valid MCP tool entry. A dedicated tool authoring guide and onboarding experience is a separate future feature.
+- Q: Should the ToolHarness Storybook fixtures add feature kinds (CONTACT, ZONE) beyond what the implemented tools require? → A: No. Keep the harness focused on feature kinds needed by implemented tools. Add CONTACT/ZONE when a tool that requires them is implemented.
 
 ## User Scenarios & Testing *(mandatory)*
 
