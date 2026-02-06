@@ -5,6 +5,14 @@
 **Status**: Draft
 **Input**: User description: "In PR #179 we defined some initial tools, produce a plan for implementing the tools in JS / Python, and integrating the tool-calls into apps/vs-code and apps/web-shell. Since both UIs use the Layers Toolbar (with dynamic tool selection) both tool backends should follow a common API. IIRC that's via the tool library producing a tool-list (in JSON), and UI logic selecting suitable tools."
 
+## Clarifications
+
+### Session 2026-02-06
+
+- Q: How does web-shell execute tools given it is hosted on GitHub Pages with no Python backend? → A: Web-shell only offers tools that have TypeScript implementations. It is a static site — no server-side execution available.
+- Q: Where do tool definitions come from? → A: Each language provides its own set of tool definitions. They do not come from the central language-agnostic specifications. Both language toolsets produce a tool-list in the same JSON format (the common API contract).
+- Q: Will tools always be implemented in both languages? → A: Initially yes (for migrated legacy tools), but tools will eventually diverge to Python-only, authored by analysts and scientists. The Python tool library self-generates the tool-list (via annotations or a custom endpoint). The web-shell's tool set will be limited to tools with TypeScript implementations.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Discover Available Tools from the Tool Library (Priority: P1)
@@ -57,7 +65,7 @@ An analyst selects features matching a tool's requirements, chooses a tool from 
 
 ### User Story 4 - Tool Implementations Match Golden Examples (Priority: P2)
 
-A developer implements a tool from an existing language-neutral specification. Both the Python implementation (for the calc service) and the TypeScript implementation (for direct in-browser use in web-shell) must produce outputs that match the golden I/O examples captured from the legacy Java implementation. When both implementations pass verification against all golden examples, the tool is considered migration-complete.
+A developer implements one of the 4 initial migrated tools. Both the Python implementation (for the calc service) and the TypeScript implementation (for in-browser web-shell use) must produce outputs that match the golden I/O examples captured from the legacy Java implementation. When both implementations pass verification against all golden examples, the tool is considered migration-complete. (Future Python-only tools need only pass Python golden-example verification.)
 
 **Why this priority**: Behavioral equivalence with the legacy system is a core requirement. Without golden-example verification, there is no confidence that migrated tools produce correct results.
 
@@ -71,19 +79,19 @@ A developer implements a tool from an existing language-neutral specification. B
 
 ---
 
-### User Story 5 - Web-Shell Uses the Same Tool Infrastructure as VS Code (Priority: P3)
+### User Story 5 - Web-Shell Uses the Same Tool-List Contract as VS Code (Priority: P3)
 
-A developer building the web-shell application can integrate tool execution using the same tool-list format and execution contract used by the VS Code extension. The web-shell's Layers Toolbar component receives tools from the shared tool-list, filters them by selection, and executes them through the same API — without needing to implement separate tool integration logic.
+A developer building the web-shell application integrates tool execution using the same tool-list JSON schema and ToolResponse contract used by the VS Code extension. The web-shell's Layers Toolbar receives tools from the TypeScript tool library's tool-list, filters them by selection using the shared matching logic, and executes them in-browser. The web-shell's tool set is limited to tools with TypeScript implementations, but the UX (toolbar, filtering, result display) is identical.
 
-**Why this priority**: Avoiding duplication across UIs is an architectural goal. Once the common API and shared components are in place (P1, P2), wiring the web-shell should be straightforward. This story validates the "write once, use everywhere" promise of the common API.
+**Why this priority**: The common tool-list schema is the key abstraction that avoids UI duplication. Once the schema is defined (P1) and execution wired for VS Code (P2), applying the same pattern to web-shell is incremental.
 
-**Independent Test**: Can be tested by loading the web-shell with a test dataset, selecting features, and running a tool — verifying the result matches what VS Code produces for the same inputs.
+**Independent Test**: Can be tested by loading the web-shell with a test dataset, selecting features, and running a tool — verifying the result uses the same ToolResponse structure as VS Code and the tool-list entries match the shared schema.
 
 **Acceptance Scenarios**:
 
-1. **Given** the web-shell application is loaded with a plot, **When** the Layers Toolbar requests the tool-list, **Then** it receives the same JSON format as VS Code does
-2. **Given** the analyst runs "set-track-color" on a track in the web-shell, **When** the result is returned, **Then** it has the same ToolResponse structure and content as when run in VS Code
-3. **Given** a new tool is added to the tool library, **When** both VS Code and web-shell request the tool-list, **Then** both see the new tool without any UI-specific changes
+1. **Given** the web-shell application is loaded with a plot, **When** the Layers Toolbar requests the tool-list from the TypeScript tool library, **Then** it receives entries in the same JSON schema as the Python tool library produces for VS Code
+2. **Given** the analyst runs "set-track-color" on a track in the web-shell, **When** the result is returned, **Then** it has the same ToolResponse structure as when the same tool runs via the Python service in VS Code
+3. **Given** a tool exists only as a Python implementation (no TypeScript), **When** the web-shell requests its tool-list, **Then** that tool does NOT appear in the web-shell's available tools
 
 ---
 
@@ -112,11 +120,18 @@ A developer building the web-shell application can integrate tool execution usin
 
 #### Tool Implementation (Python & TypeScript)
 
-- **FR-008**: Each tool specified in shared/tools/ MUST have both a Python implementation and a TypeScript implementation
-- **FR-009**: Python implementations MUST be consumable by the calc service (for VS Code and server-side execution)
-- **FR-010**: TypeScript implementations MUST be consumable by the web-shell application (for in-browser execution)
-- **FR-011**: Both implementations MUST produce identical results for identical inputs, within floating-point tolerance (1e-9)
+- **FR-008**: The 4 initial migrated tools MUST have both a Python implementation and a TypeScript implementation. New tools created after migration MAY be Python-only.
+- **FR-009**: Python implementations MUST be consumable by the calc service (for VS Code execution via MCP)
+- **FR-010**: TypeScript implementations MUST be usable by the web-shell application for in-browser execution (the web-shell is a static site with no server-side backend)
+- **FR-011**: For tools that exist in both languages, both implementations MUST produce identical results for identical inputs, within floating-point tolerance (1e-9)
 - **FR-012**: Both implementations MUST pass all golden example tests for the tool before being considered complete
+
+#### Tool Definition Ownership
+
+- **FR-023**: Each language's tool library MUST independently generate its own tool definitions (tool-list entries). Tool definitions are NOT derived from the central language-agnostic specifications.
+- **FR-024**: Python tool definitions MUST be auto-generated from code annotations (e.g., decorators or metadata on tool functions). Analysts and scientists authoring new tools MUST NOT need to maintain a separate tool definition file.
+- **FR-025**: TypeScript tool definitions MUST be generated from the TypeScript tool implementations, following the same tool-list schema as the Python side.
+- **FR-026**: Both language libraries MUST produce tool-list entries conforming to the same JSON schema, so that the Layers Toolbar can consume either language's tool-list with identical UI logic.
 
 #### Context-Sensitive Tool Matching
 
@@ -140,7 +155,7 @@ A developer building the web-shell application can integrate tool execution usin
 ### Key Entities
 
 - **Tool**: A registered analysis or manipulation operation with metadata (name, version, category, description) and selection requirements defining what input features it needs
-- **Tool-List**: The complete set of available tools exposed by the tool library as structured data, consumed by both UIs
+- **Tool-List**: The set of available tools exposed by a language's tool library as structured data. Each language (Python, TypeScript) generates its own tool-list independently, but all entries conform to the same JSON schema. VS Code consumes the Python tool-list; web-shell consumes the TypeScript tool-list.
 - **Selection Requirement**: A constraint on a tool specifying the kind of features required (e.g., TRACK), a minimum count, and an optional maximum count
 - **ToolResponse**: The standard output envelope from tool execution, containing result content items with provenance annotations
 - **Provenance**: Lineage metadata recording which tool produced a result, from which inputs, with which parameters, and when
@@ -198,17 +213,18 @@ A developer building the web-shell application can integrate tool execution usin
 
 - The Layers Toolbar (feature 045) is available as a shared component usable by both VS Code and web-shell
 - Tool specifications in shared/tools/ are stable and follow TEMPLATE.md (feature 049)
-- The web-shell application can execute TypeScript tool implementations directly in the browser without requiring a server round-trip
-- The VS Code extension continues to use the Python calc service for tool execution (via subprocess/MCP)
-- The tool-list format is a superset of what ToolMatchService already consumes — no breaking changes to existing matching logic
-- Floating-point tolerance of 1e-9 is sufficient for cross-language equivalence in all current tools
+- The web-shell is a static site hosted on GitHub Pages — it executes only TypeScript tool implementations in-browser and has no access to a Python backend
+- The VS Code extension uses the Python calc service for tool execution (via MCP)
+- The tool-list JSON schema is a common contract between both language libraries — each language generates tool-list entries independently but in the same format
+- Floating-point tolerance of 1e-9 is sufficient for cross-language equivalence in the initial migrated tools
+- Analysts and scientists will author new tools in Python only; the TypeScript tool set will eventually consist only of the initial migrated tools unless further TypeScript implementations are added
 
 ## Out of Scope
 
 - Migration of additional tools beyond the 4 already specified (that work is driven by the tool library SRD separately)
 - Drag-drop or wizard-based tool invocation (requires new UX mechanisms not yet designed)
 - Tool chaining or pipeline execution (running one tool's output as another's input automatically)
-- Server-side TypeScript execution (web-shell runs tools in-browser only)
+- Server-side execution for web-shell (it is a static GitHub Pages site with no backend)
 - Real-time collaboration on tool results between multiple users
 - Tool marketplace or third-party tool installation
 
