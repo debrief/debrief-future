@@ -1,7 +1,7 @@
-# Specification Quality Checklist: Cross-Service End-to-End Workflow Tests
+# Specification Quality Checklist: End-to-End Workflow Tests
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-02-06
+**Created**: 2026-02-06 (revised)
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -31,6 +31,6 @@
 
 ## Notes
 
-- All items pass validation. Spec is ready for `/speckit.clarify` or `/speckit.plan`.
-- UI Feature Validation section omitted — this is a backend testing feature with no UI components.
-- No [NEEDS CLARIFICATION] markers were needed. The feature description is well-scoped (tech debt item adding tests across three existing, well-defined services with established interfaces).
+- UI Feature Validation section omitted — this spec is about test infrastructure, not a user-facing UI feature. The tests *interact* with a UI but don't create one.
+- Spec intentionally names "code-server" only as an example in assumptions ("such as code-server"), not as a prescribed solution. The requirement is technology-agnostic: "browser-accessible VS Code environment."
+- This is a significant revision from the original spec, which described Python-only contract tests. The revised spec reflects discussion that concluded: (a) Python services have no orchestration layer, (b) the VS Code extension is the real production glue, (c) VNC-based solutions don't allow DOM-level interaction, (d) browser-hosted VS Code (like code-server) enables Playwright to drive real user workflows.
