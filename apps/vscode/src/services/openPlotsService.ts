@@ -30,7 +30,7 @@ export class OpenPlotsService {
       if (!state || !Array.isArray(state.plots)) {
         return [];
       }
-      return [...state.plots];
+      return (state.plots as OpenPlotReference[]).slice();
     } catch {
       return [];
     }
