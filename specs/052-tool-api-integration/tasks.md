@@ -73,14 +73,14 @@
 
 ### Tests for User Story 1
 
-- [ ] T009 [test] Contract test: MCP tools/list response matches contract schema `services/calc/tests/mcp/test_tool_list_contract.py`
-- [ ] T010 [P][test] Integration test: tools/list returns all registered tools with debrief annotations `services/calc/tests/mcp/test_server_tools_list.py`
+- [x] T009 [test] Contract test: MCP tools/list response matches contract schema `services/calc/tests/mcp/test_tool_list_contract.py`
+- [x] T010 [P][test] Integration test: tools/list returns all registered tools with debrief annotations `services/calc/tests/mcp/test_server_tools_list.py`
 
 ### Implementation for User Story 1
 
-- [ ] T011 Update MCP server `@server.list_tools()` to call `to_mcp_tool()` and emit annotations `services/calc/debrief_calc/mcp/server.py`
-- [ ] T012 [P] Create TypeScript tool definition stubs in barrel file (toolDefinition constants, execute stubs) `apps/vscode/src/tools/track/styling/index.ts`
-- [ ] T013 Verify tool-list includes all 4 tools: set-track-color, apply-symbol-style, label-interval, symbol-interval
+- [x] T011 Update MCP server `@server.list_tools()` to call `to_mcp_tool()` and emit annotations `services/calc/debrief_calc/mcp/server.py`
+- [x] T012 [P] Create TypeScript tool definition stubs in barrel file (toolDefinition constants, execute stubs) `apps/vscode/src/tools/track/styling/index.ts`
+- [x] T013 Verify tool-list includes all 4 tools: set-track-color, apply-symbol-style, label-interval, symbol-interval
 
 **Checkpoint**: Tool discovery works — MCP tools/list returns complete tool metadata
 
@@ -94,14 +94,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T014 [test] Test ToolMatchService with MCP-adapted tool definitions — verify filtering by kind and count `shared/components/src/ToolMatch/__tests__/mcpToolMatch.test.ts`
-- [ ] T015 [P][test] Test CalcService returns adapted Tool[] from MCP tools/list `apps/vscode/src/services/__tests__/calcService.test.ts`
+- [x] T014 [test] Test ToolMatchService with MCP-adapted tool definitions — verify filtering by kind and count `shared/components/src/ToolMatch/__tests__/mcpToolMatch.test.ts`
+- [x] T015 [P][test] Test CalcService returns adapted Tool[] from MCP tools/list `apps/vscode/src/services/__tests__/calcService.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T016 Create mcpToolAdapter — convert MCP tool definitions to ToolMatchService input `apps/vscode/src/services/mcpToolAdapter.ts`
-- [ ] T017 Evolve CalcService.listTools() to use MCP tools/list via adapter `apps/vscode/src/services/calcService.ts`
-- [ ] T018 Verify both UIs show same enabled/disabled tools for identical selection states
+- [x] T016 Create mcpToolAdapter — convert MCP tool definitions to ToolMatchService input `apps/vscode/src/services/mcpToolAdapter.ts`
+- [x] T017 Evolve CalcService.listTools() to use MCP tools/list via adapter `apps/vscode/src/services/calcService.ts`
+- [x] T018 Verify both UIs show same enabled/disabled tools for identical selection states
 
 **Checkpoint**: Tool filtering works — Layers Toolbar correctly enables/disables tools based on selection
 
@@ -117,35 +117,35 @@
 
 ### Python Tool Implementations
 
-- [ ] T019 [P] Implement set-track-color `services/calc/debrief_calc/tools/track/styling/set_track_color.py`
-- [ ] T020 [P] Implement apply-symbol-style `services/calc/debrief_calc/tools/track/styling/apply_symbol_style.py`
-- [ ] T021 [P] Implement label-interval `services/calc/debrief_calc/tools/track/styling/label_interval.py`
-- [ ] T022 [P] Implement symbol-interval `services/calc/debrief_calc/tools/track/styling/symbol_interval.py`
+- [x] T019 [P] Implement set-track-color `services/calc/debrief_calc/tools/track/styling/set_track_color.py`
+- [x] T020 [P] Implement apply-symbol-style `services/calc/debrief_calc/tools/track/styling/apply_symbol_style.py`
+- [x] T021 [P] Implement label-interval `services/calc/debrief_calc/tools/track/styling/label_interval.py`
+- [x] T022 [P] Implement symbol-interval `services/calc/debrief_calc/tools/track/styling/symbol_interval.py`
 
 ### Python Golden Example Tests
 
-- [ ] T023 [P][test] Golden example tests for set-track-color `services/calc/tests/tools/track/styling/test_set_track_color.py`
-- [ ] T024 [P][test] Golden example tests for apply-symbol-style `services/calc/tests/tools/track/styling/test_apply_symbol_style.py`
-- [ ] T025 [P][test] Golden example tests for label-interval `services/calc/tests/tools/track/styling/test_label_interval.py`
-- [ ] T026 [P][test] Golden example tests for symbol-interval `services/calc/tests/tools/track/styling/test_symbol_interval.py`
+- [x] T023 [P][test] Golden example tests for set-track-color `services/calc/tests/tools/track/styling/test_set_track_color.py`
+- [x] T024 [P][test] Golden example tests for apply-symbol-style `services/calc/tests/tools/track/styling/test_apply_symbol_style.py`
+- [x] T025 [P][test] Golden example tests for label-interval `services/calc/tests/tools/track/styling/test_label_interval.py`
+- [x] T026 [P][test] Golden example tests for symbol-interval `services/calc/tests/tools/track/styling/test_symbol_interval.py`
 
 ### TypeScript Tool Implementations
 
-- [ ] T027 [P] Implement setTrackColor `apps/vscode/src/tools/track/styling/setTrackColor.ts`
-- [ ] T028 [P] Implement applySymbolStyle `apps/vscode/src/tools/track/styling/applySymbolStyle.ts`
-- [ ] T029 [P] Implement labelInterval `apps/vscode/src/tools/track/styling/labelInterval.ts`
-- [ ] T030 [P] Implement symbolInterval `apps/vscode/src/tools/track/styling/symbolInterval.ts`
+- [x] T027 [P] Implement setTrackColor `apps/vscode/src/tools/track/styling/setTrackColor.ts`
+- [x] T028 [P] Implement applySymbolStyle `apps/vscode/src/tools/track/styling/applySymbolStyle.ts`
+- [x] T029 [P] Implement labelInterval `apps/vscode/src/tools/track/styling/labelInterval.ts`
+- [x] T030 [P] Implement symbolInterval `apps/vscode/src/tools/track/styling/symbolInterval.ts`
 
 ### TypeScript Golden Example Tests
 
-- [ ] T031 [P][test] Golden example tests for setTrackColor `apps/vscode/src/tools/track/styling/__tests__/setTrackColor.test.ts`
-- [ ] T032 [P][test] Golden example tests for applySymbolStyle `apps/vscode/src/tools/track/styling/__tests__/applySymbolStyle.test.ts`
-- [ ] T033 [P][test] Golden example tests for labelInterval `apps/vscode/src/tools/track/styling/__tests__/labelInterval.test.ts`
-- [ ] T034 [P][test] Golden example tests for symbolInterval `apps/vscode/src/tools/track/styling/__tests__/symbolInterval.test.ts`
+- [x] T031 [P][test] Golden example tests for setTrackColor `apps/vscode/src/tools/track/styling/__tests__/setTrackColor.test.ts`
+- [x] T032 [P][test] Golden example tests for applySymbolStyle `apps/vscode/src/tools/track/styling/__tests__/applySymbolStyle.test.ts`
+- [x] T033 [P][test] Golden example tests for labelInterval `apps/vscode/src/tools/track/styling/__tests__/labelInterval.test.ts`
+- [x] T034 [P][test] Golden example tests for symbolInterval `apps/vscode/src/tools/track/styling/__tests__/symbolInterval.test.ts`
 
 ### Cross-Language Parity
 
-- [ ] T035 [test] Cross-language parity verification: both implementations produce identical output for all golden examples `services/calc/tests/tools/track/styling/test_cross_language_parity.py`
+- [x] T035 [test] Cross-language parity verification: both implementations produce identical output for all golden examples `services/calc/tests/tools/track/styling/test_cross_language_parity.py`
 
 **Checkpoint**: All 4 tools pass golden example tests in both languages, cross-language parity verified
 
@@ -159,14 +159,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T036 [test] Integration test: MCP tools/call executes tool and returns ToolResponse with provenance `services/calc/tests/mcp/test_server_tools_call.py`
-- [ ] T037 [P][test] Test error handling: invalid input returns ToolErrorResponse with category and message `services/calc/tests/mcp/test_server_tools_call_errors.py`
+- [x] T036 [test] Integration test: MCP tools/call executes tool and returns ToolResponse with provenance `services/calc/tests/mcp/test_server_tools_call.py`
+- [x] T037 [P][test] Test error handling: invalid input returns ToolErrorResponse with category and message `services/calc/tests/mcp/test_server_tools_call_errors.py`
 
 ### Implementation for User Story 3
 
-- [ ] T038 Verify MCP tools/call handler delegates to executor for new styling tools `services/calc/debrief_calc/mcp/server.py`
-- [ ] T039 Verify provenance metadata attached to all tool results (tool name, version, sources, timestamp) `services/calc/debrief_calc/result_builder.py`
-- [ ] T040 Wire VS Code executeTool to handle styling tool results as mutation layers `apps/vscode/src/services/calcService.ts`
+- [x] T038 Verify MCP tools/call handler delegates to executor for new styling tools `services/calc/debrief_calc/mcp/server.py`
+- [x] T039 Verify provenance metadata attached to all tool results (tool name, version, sources, timestamp) `services/calc/debrief_calc/result_builder.py`
+- [x] T040 Wire VS Code executeTool to handle styling tool results as mutation layers `apps/vscode/src/services/calcService.ts`
 
 **Checkpoint**: End-to-end tool execution works — features selected, tool run, result layer displayed with provenance
 
