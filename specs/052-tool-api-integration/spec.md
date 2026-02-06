@@ -12,6 +12,7 @@
 - Q: How does web-shell execute tools given it is hosted on GitHub Pages with no Python backend? → A: Web-shell only offers tools that have TypeScript implementations. It is a static site — no server-side execution available.
 - Q: Where do tool definitions come from? → A: Each language provides its own set of tool definitions. They do not come from the central language-agnostic specifications. Both language toolsets produce a tool-list in the same JSON format (the common API contract).
 - Q: Will tools always be implemented in both languages? → A: Initially yes (for migrated legacy tools), but tools will eventually diverge to Python-only, authored by analysts and scientists. The Python tool library self-generates the tool-list (via annotations or a custom endpoint). The web-shell's tool set will be limited to tools with TypeScript implementations.
+- Q: Where should selection requirements (input kinds, min/max counts) live in tool metadata? → A: Selection requirements are encoded within MCP tool metadata — using the standard inputSchema and annotations fields. The tool-list IS the MCP tools/list response. This ensures future MCP clients automatically discover tools, and the Layers Toolbar reads the same MCP metadata for filtering. Domain-specific fields (e.g., feature kind=TRACK) use MCP annotations.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -111,8 +112,8 @@ A developer building the web-shell application integrates tool execution using t
 #### Tool Library & Common API
 
 - **FR-001**: System MUST provide a single tool library that both UIs consume via the same contract
-- **FR-002**: The tool library MUST expose a tool-list as structured data (JSON) containing name, description, version, category, and selection requirements for each registered tool
-- **FR-003**: Each tool entry in the tool-list MUST include selection requirements specifying the kind of features needed (e.g., TRACK, CONTACT, ZONE), minimum count, and optional maximum count
+- **FR-002**: The tool library MUST expose the tool-list via MCP's standard tool listing mechanism. Each tool entry includes name, description, input schema, and MCP annotations carrying selection requirements and category.
+- **FR-003**: Each tool's MCP annotations MUST include selection requirements specifying the kind of features needed (e.g., TRACK, CONTACT, ZONE), minimum count, and optional maximum count. This enables the Layers Toolbar to filter tools by current selection without custom metadata endpoints.
 - **FR-004**: The tool library MUST support tool registration so that new tools become available to all consumers without requiring consumer-side changes
 - **FR-005**: The tool execution contract MUST accept a tool identifier, a set of input features (as GeoJSON), and optional parameters, and return a ToolResponse
 - **FR-006**: The ToolResponse MUST include the result content (features or artifacts), provenance metadata (tool name, version, input sources, timestamp), and a human-readable label
@@ -131,7 +132,7 @@ A developer building the web-shell application integrates tool execution using t
 - **FR-023**: Each language's tool library MUST independently generate its own tool definitions (tool-list entries). Tool definitions are NOT derived from the central language-agnostic specifications.
 - **FR-024**: Python tool definitions MUST be auto-generated from code annotations (e.g., decorators or metadata on tool functions). Analysts and scientists authoring new tools MUST NOT need to maintain a separate tool definition file.
 - **FR-025**: TypeScript tool definitions MUST be generated from the TypeScript tool implementations, following the same tool-list schema as the Python side.
-- **FR-026**: Both language libraries MUST produce tool-list entries conforming to the same JSON schema, so that the Layers Toolbar can consume either language's tool-list with identical UI logic.
+- **FR-026**: Both language libraries MUST produce tool-list entries conforming to MCP's tool definition format (name, description, inputSchema, annotations), so that the Layers Toolbar can consume either language's tool-list with identical UI logic and any MCP client can discover the tools.
 
 #### Context-Sensitive Tool Matching
 
@@ -155,8 +156,8 @@ A developer building the web-shell application integrates tool execution using t
 ### Key Entities
 
 - **Tool**: A registered analysis or manipulation operation with metadata (name, version, category, description) and selection requirements defining what input features it needs
-- **Tool-List**: The set of available tools exposed by a language's tool library as structured data. Each language (Python, TypeScript) generates its own tool-list independently, but all entries conform to the same JSON schema. VS Code consumes the Python tool-list; web-shell consumes the TypeScript tool-list.
-- **Selection Requirement**: A constraint on a tool specifying the kind of features required (e.g., TRACK), a minimum count, and an optional maximum count
+- **Tool-List**: The set of available tools exposed via MCP's standard tool listing. Each language (Python, TypeScript) generates its own tool-list independently, but all entries conform to MCP's tool definition format. VS Code consumes the Python tool-list; web-shell consumes the TypeScript tool-list.
+- **Selection Requirement**: A constraint on a tool expressed in MCP annotations, specifying the kind of features required (e.g., TRACK), a minimum count, and an optional maximum count. Standard MCP clients see the tool but only Debrief-aware UIs interpret the selection requirements.
 - **ToolResponse**: The standard output envelope from tool execution, containing result content items with provenance annotations
 - **Provenance**: Lineage metadata recording which tool produced a result, from which inputs, with which parameters, and when
 - **Tool Parameter**: A configurable input beyond feature selection (e.g., a colour value, a threshold) with type, default value, and constraints
@@ -215,7 +216,7 @@ A developer building the web-shell application integrates tool execution using t
 - Tool specifications in shared/tools/ are stable and follow TEMPLATE.md (feature 049)
 - The web-shell is a static site hosted on GitHub Pages — it executes only TypeScript tool implementations in-browser and has no access to a Python backend
 - The VS Code extension uses the Python calc service for tool execution (via MCP)
-- The tool-list JSON schema is a common contract between both language libraries — each language generates tool-list entries independently but in the same format
+- The tool-list uses MCP's standard tool definition format as the common contract — each language generates tool-list entries independently using MCP conventions (name, description, inputSchema, annotations)
 - Floating-point tolerance of 1e-9 is sufficient for cross-language equivalence in the initial migrated tools
 - Analysts and scientists will author new tools in Python only; the TypeScript tool set will eventually consist only of the initial migrated tools unless further TypeScript implementations are added
 
