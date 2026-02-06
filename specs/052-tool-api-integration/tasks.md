@@ -180,14 +180,14 @@
 
 ### Tests for User Story 5
 
-- [ ] T041 [test] Verify web-shell tool-list contains only TypeScript-implemented tools `apps/web-shell/src/services/__tests__/toolService.test.ts`
-- [ ] T042 [P][test] Verify web-shell ToolResponse structure matches VS Code format `apps/web-shell/src/services/__tests__/toolResponse.test.ts`
+- [x] T041 [test] Verify web-shell tool-list contains only TypeScript-implemented tools `apps/web-shell/src/services/__tests__/toolService.test.ts`
+- [x] T042 [P][test] Verify web-shell ToolResponse structure matches VS Code format `apps/web-shell/src/services/__tests__/toolResponse.test.ts`
 
 ### Implementation for User Story 5
 
-- [ ] T043 Create web-shell tool service with TypeScript tool registry and direct execute() `apps/web-shell/src/services/toolService.ts`
-- [ ] T044 Wire web-shell Layers Toolbar to use toolService for tool-list and execution `apps/web-shell/src/`
-- [ ] T045 Verify Python-only tools (track-stats, range-bearing, area-summary) do NOT appear in web-shell tool-list
+- [x] T043 Create web-shell tool service with TypeScript tool registry and direct execute() `apps/web-shell/src/services/toolService.ts`
+- [x] T044 Wire web-shell Layers Toolbar to use toolService for tool-list and execution `apps/web-shell/src/`
+- [x] T045 Verify Python-only tools (track-stats, range-bearing, area-summary) do NOT appear in web-shell tool-list
 
 **Checkpoint**: Web-shell provides identical tool UX for TypeScript-implemented tools; Python-only tools correctly excluded
 
@@ -199,10 +199,10 @@
 
 ### Evidence Collection
 
-- [ ] T046 Capture test results in `specs/052-tool-api-integration/evidence/test-summary.md`
-- [ ] T047 Create usage demonstration in `specs/052-tool-api-integration/evidence/usage-example.md`
-- [ ] T048 [P] Capture MCP tools/list response sample in `specs/052-tool-api-integration/evidence/tool-list-response.json`
-- [ ] T049 [P] Capture golden example I/O samples in `specs/052-tool-api-integration/evidence/golden-example-samples.json`
+- [x] T046 Capture test results in `specs/052-tool-api-integration/evidence/test-summary.md`
+- [x] T047 Create usage demonstration in `specs/052-tool-api-integration/evidence/usage-example.md`
+- [x] T048 [P] Capture MCP tools/list response sample in `specs/052-tool-api-integration/evidence/tool-list-response.json`
+- [x] T049 [P] Capture golden example I/O samples in `specs/052-tool-api-integration/evidence/golden-example-samples.json`
 
 ### Media Content
 
