@@ -15,6 +15,7 @@
 - Q: Where should selection requirements (input kinds, min/max counts) live in tool metadata? → A: Selection requirements are encoded within MCP tool metadata — using the standard inputSchema and annotations fields. The tool-list IS the MCP tools/list response. This ensures future MCP clients automatically discover tools, and the Layers Toolbar reads the same MCP metadata for filtering. Domain-specific fields (e.g., feature kind=TRACK) use MCP annotations.
 - Q: How much should this feature cover tool authoring by analysts/scientists? → A: Scope limited to registration mechanics — the decorator auto-generates a valid MCP tool entry. A dedicated tool authoring guide and onboarding experience is a separate future feature.
 - Q: Should the ToolHarness Storybook fixtures add feature kinds (CONTACT, ZONE) beyond what the implemented tools require? → A: No. Keep the harness focused on feature kinds needed by implemented tools. Add CONTACT/ZONE when a tool that requires them is implemented.
+- Q: Should the ToolHarness demonstrate parameter input for the new tools (color, symbol, interval)? → A: No. The harness remains focused on selection matching logic. The 4 new tools are added as fixture entries with their selection requirements only. Parameter input UI is a separate concern addressed by FR-019 in the Layers Toolbar.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -47,6 +48,7 @@ An analyst selects features in the map or feature list (e.g., two tracks). Both 
 1. **Given** the analyst selects 2 tracks and the tool-list includes "range-bearing" (requires 2 tracks), **When** the Layers Toolbar evaluates available tools, **Then** "range-bearing" appears as enabled in the Run dropdown
 2. **Given** the analyst selects 1 track and the tool-list includes "range-bearing" (requires 2 tracks), **When** the Layers Toolbar evaluates available tools, **Then** "range-bearing" appears as disabled with an explanation such as "Requires 2 tracks, 1 selected"
 3. **Given** the same tool-list and the same selection, **When** viewed in VS Code and in the web-shell, **Then** both UIs show the same set of enabled/disabled tools
+4. **Given** the ToolMatchHarness Storybook story includes all 4 styling tools and the existing tools, **When** 1+ tracks are selected in the harness, **Then** set-track-color, apply-symbol-style, label-interval, and symbol-interval all appear as active alongside track-summary
 
 ---
 
@@ -142,6 +144,12 @@ A developer building the web-shell application integrates tool execution using t
 - **FR-014**: The tool matching logic MUST be shared (not duplicated) between VS Code and web-shell
 - **FR-015**: When a tool's requirements are not met by the current selection, the UI MUST show the tool as unavailable with a human-readable explanation
 
+#### Storybook ToolHarness
+
+- **FR-027**: The existing ToolMatchHarness Storybook story MUST be extended to include the 4 new styling tools (set-track-color, apply-symbol-style, label-interval, symbol-interval) as fixture entries with their selection requirements
+- **FR-028**: The harness fixture data MUST only include feature kinds required by implemented tools — do not add speculative kinds (e.g., CONTACT, ZONE) until a tool requiring them is implemented
+- **FR-029**: New Storybook story variants MUST demonstrate the selection matching behaviour for the new tools (e.g., a "StylingTools" variant showing all 4 tools active when 1+ tracks selected)
+
 #### UI Integration
 
 - **FR-016**: The VS Code extension's Layers Toolbar Run dropdown MUST be populated from the common tool-list
@@ -204,6 +212,7 @@ A developer building the web-shell application integrates tool execution using t
 - **SC-005**: Adding a new tool to the library (registering a new implementation) causes it to appear in both UIs' tool-lists without any UI code changes
 - **SC-006**: 100% of tool execution results include complete provenance metadata (tool name, version, input sources, timestamp)
 - **SC-007**: The tool matching logic is exercised by a shared test suite that both UIs reference, confirming identical filtering behaviour
+- **SC-008**: The ToolMatchHarness Storybook story includes all 4 styling tools alongside the existing tools, and demonstrates correct selection matching behaviour when tracks are selected
 
 ## Dependencies
 
