@@ -104,7 +104,7 @@ As a developer, I need an automated test that verifies meaningful error messages
 
 - The VS Code extension is sufficiently implemented to orchestrate the io → stac → calc workflow through its UI. Specifically, file loading (spec 043) and tool execution (spec 001) must be functional before e2e tests can exercise them.
 - A browser-hosted VS Code solution (such as code-server) can load and run the Debrief extension, including webview-based panels like the map view.
-- Browser automation tools can interact with VS Code's DOM structure, including webview iframe content, to drive user workflows and assert outcomes.
+- Browser automation tools can interact with VS Code's DOM structure, including webview iframe content, to drive user workflows and assert outcomes. Most test interactions will target webview components (map panel, catalog panel, tool UI) whose DOM structure is controlled by the Debrief project — not VS Code's internal chrome. This significantly reduces the risk of test brittleness from VS Code DOM changes between versions.
 - The test environment can run both locally for development and in containers for CI, using the same test scripts in both modes.
 
 ## Dependencies
