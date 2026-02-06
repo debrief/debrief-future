@@ -6,7 +6,6 @@ import pytest
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.track.styling.label_interval import label_interval
 
-
 TRACK_FEATURE = {
     "type": "Feature",
     "id": "track-001",

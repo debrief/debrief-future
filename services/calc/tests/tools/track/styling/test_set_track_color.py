@@ -6,7 +6,6 @@ import pytest
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.track.styling.set_track_color import set_track_color
 
-
 TRACK_FEATURE = {
     "type": "Feature",
     "id": "track-001",
@@ -78,9 +77,7 @@ class TestSetTrackColor:
         feature_b = copy.deepcopy(TRACK_FEATURE)
         feature_b["id"] = "track-002"
         feature_b["properties"]["platform_name"] = "Vessel Beta"
-        context = SelectionContext(
-            type=ContextType.MULTI, features=[feature_a, feature_b]
-        )
+        context = SelectionContext(type=ContextType.MULTI, features=[feature_a, feature_b])
         params = {"color": "#00FF00"}
 
         result = set_track_color(context, params)
@@ -117,9 +114,7 @@ class TestSetTrackColor:
             "geometry": {"type": "Polygon", "coordinates": [[]]},
             "properties": {"kind": "ZONE"},
         }
-        context = SelectionContext(
-            type=ContextType.MULTI, features=[track, non_track]
-        )
+        context = SelectionContext(type=ContextType.MULTI, features=[track, non_track])
         params = {"color": "#FF0000"}
 
         result = set_track_color(context, params)

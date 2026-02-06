@@ -1,7 +1,6 @@
 """Contract test: MCP tools/list response matches expected schema."""
 
-import pytest
-from debrief_calc.models import Tool, ContextType
+from debrief_calc.models import ContextType, Tool
 
 
 class TestToolListContract:

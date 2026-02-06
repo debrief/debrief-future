@@ -81,10 +81,13 @@ interface GeoJSONFeature {
 
 /**
  * Internal registry entry mapping a tool definition to its execute function.
+ * The params type uses `any` because each tool has its own specific parameter
+ * interface; validation occurs inside the tool implementation.
  */
 interface ToolRegistryEntry {
   definition: MCPToolDefinition;
-  execute: (features: GeoJSONFeature[], params: Record<string, unknown>) => GeoJSONFeature[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  execute: (features: GeoJSONFeature[], params: any) => GeoJSONFeature[];
 }
 
 /**
@@ -106,28 +109,28 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
     setTrackColorDef.name,
     {
       definition: setTrackColorDef,
-      execute: executeSetTrackColor as ToolRegistryEntry['execute'],
+      execute: executeSetTrackColor,
     },
   ],
   [
     applySymbolStyleDef.name,
     {
       definition: applySymbolStyleDef,
-      execute: executeApplySymbolStyle as ToolRegistryEntry['execute'],
+      execute: executeApplySymbolStyle,
     },
   ],
   [
     labelIntervalDef.name,
     {
       definition: labelIntervalDef,
-      execute: executeLabelInterval as ToolRegistryEntry['execute'],
+      execute: executeLabelInterval,
     },
   ],
   [
     symbolIntervalDef.name,
     {
       definition: symbolIntervalDef,
-      execute: executeSymbolInterval as ToolRegistryEntry['execute'],
+      execute: executeSymbolInterval,
     },
   ],
 ]);

@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { execute } from '../applySymbolStyle';
+import { execute } from '../../src/tools/track/styling/applySymbolStyle';
 
 function makeTrackFeature(): any {
   return {

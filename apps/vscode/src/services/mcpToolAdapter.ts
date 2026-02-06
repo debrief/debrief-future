@@ -1,31 +1,54 @@
 /**
  * MCP Tool Adapter for VS Code Extension
  *
- * Thin wrapper that delegates to the shared mcpAdapter from @debrief/components.
- * This ensures both VS Code and web-shell frontends use the same adapter logic
- * for converting MCP tool definitions to ToolMatchService-compatible Tool[].
- *
- * Both frontends consume the same shared ToolMatchService and the same shared
- * mcpAdapter, guaranteeing identical enabled/disabled tool states for a given
- * selection — see T018 verification note below.
+ * Converts MCP tool definitions (from tools/list) to ToolMatchService-compatible
+ * Tool[]. Inlines the adaptation logic using local types so that tsc can
+ * resolve all imports without requiring a pre-built @debrief/components dist.
  *
  * Feature: 052-tool-api-integration (US2 Tool Filtering, T016)
  *
  * ---
- * T018 Verification: Both the VS Code extension and the web-shell use the same
- * shared ToolMatchService (from @debrief/components/ToolMatch) and the same
- * shared fromMCPTools adapter. This means that for any given set of MCP tool
- * definitions and any given feature selection, both UIs will produce identical
- * enabled/disabled tool lists. The only difference is how each UI obtains the
- * MCP tools/list response (VS Code via CalcService Python subprocess, web-shell
- * via direct TypeScript registry), but the adaptation and matching logic is
- * shared and deterministic.
+ * T018 Verification: Both the VS Code extension and the web-shell use equivalent
+ * adaptation logic (MCP annotations → Tool requirements). The shared
+ * ToolMatchService then produces identical enabled/disabled results for any
+ * given selection. The only difference is how each UI obtains the MCP tools/list
+ * response (VS Code via CalcService Python subprocess, web-shell via direct
+ * TypeScript registry).
  * ---
  */
 
-import type { MCPToolDefinition } from '../types/tool';
-import type { Tool } from '../types/tool';
-import { fromMCPTools } from '@debrief/components/ToolMatch';
+import type { MCPToolDefinition, Tool, SelectionRequirement } from '../types/tool';
+
+/**
+ * Convert kebab-case tool name to display name.
+ * e.g., "set-track-color" → "Set Track Color"
+ */
+function formatToolName(name: string): string {
+  return name
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+/**
+ * Convert a single MCP tool definition to ToolMatchService Tool format.
+ */
+function fromMCPTool(mcpTool: MCPToolDefinition): Tool {
+  const requirements: SelectionRequirement[] =
+    mcpTool.annotations['debrief:selectionRequirements'].map((req) => ({
+      kind: req.kind,
+      min: req.min,
+      ...(req.max !== undefined ? { max: req.max } : {}),
+    }));
+
+  return {
+    id: mcpTool.name,
+    name: formatToolName(mcpTool.name),
+    description: mcpTool.description,
+    version: mcpTool.annotations['debrief:version'],
+    requirements,
+  };
+}
 
 /**
  * Adapt MCP tool definitions for use with ToolMatchService.
@@ -37,7 +60,5 @@ import { fromMCPTools } from '@debrief/components/ToolMatch';
  * @returns Tool[] for use with ToolMatchService
  */
 export function adaptMCPToolsForMatching(mcpTools: MCPToolDefinition[]): Tool[] {
-  // Delegate to shared adapter — keeps VS Code adapter thin and ensures
-  // consistency with web-shell which also uses fromMCPTools directly.
-  return fromMCPTools(mcpTools) as Tool[];
+  return mcpTools.map(fromMCPTool);
 }

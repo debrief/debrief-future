@@ -1,6 +1,5 @@
 """Integration test: tools/list returns all registered tools with debrief annotations."""
 
-import pytest
 from debrief_calc import registry
 
 
@@ -26,7 +25,12 @@ class TestServerToolsList:
         # Import styling tools
         import debrief_calc.tools.track.styling  # noqa: F401
 
-        styling_names = {"set-track-color", "apply-symbol-style", "label-interval", "symbol-interval"}
+        styling_names = {
+            "set-track-color",
+            "apply-symbol-style",
+            "label-interval",
+            "symbol-interval",
+        }
         all_tools = registry.list_all()
         styling_tools = [t for t in all_tools if t.name in styling_names]
 

@@ -2,8 +2,6 @@
 
 import json
 
-import pytest
-from debrief_calc.mcp.server import create_server
 from debrief_calc.models import ContextType
 
 # We can't easily run the async MCP server in tests, so we test the
@@ -57,8 +55,10 @@ class TestServerToolsCall:
             # Verify provenance annotations
             annotations = item["annotations"]
             assert annotations["debrief:resultType"] == "mutation/track/styled"
-            assert "track-001" in annotations["debrief:sourceFeatures"] or \
-                   "track-002" in annotations["debrief:sourceFeatures"]
+            assert (
+                "track-001" in annotations["debrief:sourceFeatures"]
+                or "track-002" in annotations["debrief:sourceFeatures"]
+            )
             assert annotations["debrief:label"] == "set-track-color results"
 
     def test_mutation_content_contains_modified_feature(self):
@@ -130,11 +130,15 @@ class TestServerToolsCall:
 
     def test_all_styling_tools_produce_mutation_results(self):
         """All 4 styling tools must produce mutation/track/styled result type."""
+        import debrief_calc.tools  # noqa: F401
         from debrief_calc import registry
 
-        import debrief_calc.tools  # noqa: F401
-
-        styling_names = {"set-track-color", "apply-symbol-style", "label-interval", "symbol-interval"}
+        styling_names = {
+            "set-track-color",
+            "apply-symbol-style",
+            "label-interval",
+            "symbol-interval",
+        }
         for tool in registry.list_all():
             if tool.name in styling_names:
                 assert tool.output_kind.startswith("mutation/"), (

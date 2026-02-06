@@ -1,7 +1,6 @@
 """Tests for Tool.to_mcp_tool() method."""
 
-import pytest
-from debrief_calc.models import Tool, ContextType, ToolParameter
+from debrief_calc.models import ContextType, Tool, ToolParameter
 
 
 class TestToMcpTool:

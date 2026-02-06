@@ -6,7 +6,6 @@ import pytest
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.track.styling.apply_symbol_style import apply_symbol_style
 
-
 TRACK_FEATURE = {
     "type": "Feature",
     "id": "track-001",

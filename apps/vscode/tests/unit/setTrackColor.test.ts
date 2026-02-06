@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { execute } from '../setTrackColor';
+import { execute } from '../../src/tools/track/styling/setTrackColor';
 
 function makeTrackFeature(): any {
   return {

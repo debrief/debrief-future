@@ -11,7 +11,6 @@ If both test suites pass, cross-language parity is proven:
 
 import copy
 
-import pytest
 from debrief_calc.models import ContextType, SelectionContext
 
 # Shared golden input fixture — identical to TypeScript test fixture
@@ -220,9 +219,7 @@ class TestCrossLanguageParity:
             features = [copy.deepcopy(TRACK_FEATURE_A)]
             context = _make_context(*features)
             result = tool_fn(context, params)
-            assert result[0]["id"] == "track-001", (
-                f"{tool_fn.__name__} did not preserve feature ID"
-            )
+            assert result[0]["id"] == "track-001", f"{tool_fn.__name__} did not preserve feature ID"
 
     def test_all_tools_preserve_geometry(self):
         """All tools must preserve geometry across both languages."""
@@ -270,6 +267,4 @@ class TestCrossLanguageParity:
             features = [copy.deepcopy(TRACK_FEATURE_A)]
             context = _make_context(*features)
             result = tool_fn(context, params)
-            assert result[0]["properties"]["kind"] == "TRACK", (
-                f"{tool_fn.__name__} modified kind"
-            )
+            assert result[0]["properties"]["kind"] == "TRACK", f"{tool_fn.__name__} modified kind"
