@@ -239,6 +239,9 @@ importers:
       vite:
         specifier: ^5.0.0
         version: 5.4.21(@types/node@20.19.30)
+      vitest:
+        specifier: ^1.0.0
+        version: 1.6.1(@types/node@20.19.30)(jsdom@27.4.0)
 
   services/session-state:
     dependencies:

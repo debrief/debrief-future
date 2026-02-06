@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['tests/unit/**/*.test.ts'],
+    include: ['tests/unit/**/*.test.ts', 'src/**/__tests__/**/*.test.ts'],
     exclude: ['tests/integration/**', 'tests/e2e/**', 'node_modules'],
     coverage: {
       provider: 'v8',
@@ -25,6 +25,9 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
       vscode: path.resolve(__dirname, 'tests/__mocks__/vscode.ts'),
+      '@debrief/components/ToolMatch': path.resolve(__dirname, '../../shared/components/src/ToolMatch/index.ts'),
+      '@debrief/components': path.resolve(__dirname, '../../shared/components/src/index.ts'),
+      '@debrief/schemas': path.resolve(__dirname, '../../shared/schemas/src/generated/typescript/index.ts'),
     },
   },
 });
