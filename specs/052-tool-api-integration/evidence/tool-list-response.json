@@ -1,0 +1,166 @@
+[
+  {
+    "name": "apply-symbol-style",
+    "description": "Applies a symbol style to position markers on track features.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "GeoJSON features to process"
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "description": "Marker shape",
+              "type": "string",
+              "enum": [
+                "circle",
+                "square",
+                "diamond",
+                "triangle",
+                "cross"
+              ]
+            },
+            "radius": {
+              "description": "Marker radius in pixels",
+              "type": "number",
+              "default": 4
+            },
+            "fill_color": {
+              "description": "Fill color for markers (CSS color string)",
+              "type": "string"
+            }
+          },
+          "description": "Tool-specific parameters"
+        }
+      }
+    },
+    "annotations": {
+      "debrief:selectionRequirements": [
+        {
+          "kind": "TRACK",
+          "min": 1
+        }
+      ],
+      "debrief:category": "track",
+      "debrief:version": "1.0.0",
+      "debrief:outputKind": "mutation/track/styled"
+    }
+  },
+  {
+    "name": "label-interval",
+    "description": "Sets the time interval for displaying labels on track positions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "GeoJSON features to process"
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "interval": {
+              "description": "ISO 8601 duration (e.g., 'PT5M' for 5 minutes)",
+              "type": "string"
+            }
+          },
+          "description": "Tool-specific parameters"
+        }
+      }
+    },
+    "annotations": {
+      "debrief:selectionRequirements": [
+        {
+          "kind": "TRACK",
+          "min": 1
+        }
+      ],
+      "debrief:category": "track",
+      "debrief:version": "1.0.0",
+      "debrief:outputKind": "mutation/track/styled"
+    }
+  },
+  {
+    "name": "set-track-color",
+    "description": "Sets the display color for track features. Modifies the line color property of each track's style.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "GeoJSON features to process"
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "color": {
+              "description": "CSS color value to apply",
+              "type": "string"
+            }
+          },
+          "description": "Tool-specific parameters"
+        }
+      }
+    },
+    "annotations": {
+      "debrief:selectionRequirements": [
+        {
+          "kind": "TRACK",
+          "min": 1
+        }
+      ],
+      "debrief:category": "track",
+      "debrief:version": "1.0.0",
+      "debrief:outputKind": "mutation/track/styled"
+    }
+  },
+  {
+    "name": "symbol-interval",
+    "description": "Sets the time interval for displaying position symbols on track features.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "GeoJSON features to process"
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "interval": {
+              "description": "ISO 8601 duration (e.g., 'PT5M' for 5 minutes)",
+              "type": "string"
+            }
+          },
+          "description": "Tool-specific parameters"
+        }
+      }
+    },
+    "annotations": {
+      "debrief:selectionRequirements": [
+        {
+          "kind": "TRACK",
+          "min": 1
+        }
+      ],
+      "debrief:category": "track",
+      "debrief:version": "1.0.0",
+      "debrief:outputKind": "mutation/track/styled"
+    }
+  }
+]

@@ -1,0 +1,107 @@
+{
+  "description": "Golden I/O examples used for cross-language parity verification",
+  "tools": [
+    {
+      "tool": "set-track-color",
+      "input": {
+        "features": [
+          {
+            "type": "Feature",
+            "id": "track-001",
+            "geometry": {"type": "LineString", "coordinates": [[-1.0, 50.0], [-1.1, 50.1]]},
+            "properties": {
+              "kind": "TRACK",
+              "style": {
+                "line": {"stroke": true, "color": "#3388ff", "weight": 3, "opacity": 1.0}
+              }
+            }
+          }
+        ],
+        "params": {"color": "#FF0000"}
+      },
+      "expectedOutput": {
+        "properties.style.line.color": "#FF0000",
+        "properties.style.line.weight": 3,
+        "properties.style.line.opacity": 1.0,
+        "id": "track-001"
+      }
+    },
+    {
+      "tool": "apply-symbol-style",
+      "input": {
+        "features": [
+          {
+            "type": "Feature",
+            "id": "track-001",
+            "geometry": {"type": "LineString", "coordinates": [[-1.0, 50.0], [-1.1, 50.1]]},
+            "properties": {
+              "kind": "TRACK",
+              "style": {
+                "point": {"shape": "circle", "radius": 4, "fill": true, "fill_color": "#3388ff", "fill_opacity": 0.8}
+              }
+            }
+          }
+        ],
+        "params": {"symbol": "diamond", "radius": 6, "fill_color": "#00FF00"}
+      },
+      "expectedOutput": {
+        "properties.style.point.shape": "diamond",
+        "properties.style.point.radius": 6,
+        "properties.style.point.fill_color": "#00FF00",
+        "properties.style.point.fill": true,
+        "properties.style.point.fill_opacity": 0.8
+      }
+    },
+    {
+      "tool": "label-interval",
+      "input": {
+        "features": [
+          {
+            "type": "Feature",
+            "id": "track-001",
+            "geometry": {"type": "LineString", "coordinates": [[-1.0, 50.0], [-1.1, 50.1]]},
+            "properties": {
+              "kind": "TRACK",
+              "default_position_style": {"show_symbol": true, "symbol": "circle", "show_label": false}
+            }
+          }
+        ],
+        "params": {"interval": "PT15M"}
+      },
+      "expectedOutput": {
+        "properties.default_position_style.show_label": true,
+        "properties.default_position_style.label_interval": "PT15M",
+        "properties.default_position_style.show_symbol": true,
+        "properties.default_position_style.symbol": "circle"
+      }
+    },
+    {
+      "tool": "symbol-interval",
+      "input": {
+        "features": [
+          {
+            "type": "Feature",
+            "id": "track-001",
+            "geometry": {"type": "LineString", "coordinates": [[-1.0, 50.0], [-1.1, 50.1]]},
+            "properties": {
+              "kind": "TRACK",
+              "default_position_style": {"show_symbol": false, "symbol": "circle", "show_label": false}
+            }
+          }
+        ],
+        "params": {"interval": "PT30M"}
+      },
+      "expectedOutput": {
+        "properties.default_position_style.show_symbol": true,
+        "properties.default_position_style.symbol_interval": "PT30M",
+        "properties.default_position_style.symbol": "circle"
+      }
+    }
+  ],
+  "verification": {
+    "python_tests": "services/calc/tests/tools/track/styling/test_cross_language_parity.py",
+    "typescript_tests": "apps/vscode/src/tools/track/styling/__tests__/*.test.ts",
+    "tolerance": "1e-9 for floating-point values",
+    "result": "ALL PASS"
+  }
+}
