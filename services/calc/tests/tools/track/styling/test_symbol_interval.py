@@ -110,11 +110,15 @@ class TestSymbolInterval:
         with pytest.raises(ValueError, match="No track features found"):
             symbol_interval(context, params)
 
-    def test_error_missing_interval(self):
-        """Missing interval param raises ValueError."""
+    def test_default_interval(self):
+        """Missing interval param defaults to PT15M."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
         params = {}
 
-        with pytest.raises(ValueError, match="interval parameter is required"):
-            symbol_interval(context, params)
+        result = symbol_interval(context, params)
+
+        assert len(result) == 1
+        dps = result[0]["properties"]["default_position_style"]
+        assert dps["show_symbol"] is True
+        assert dps["symbol_interval"] == "PT15M"

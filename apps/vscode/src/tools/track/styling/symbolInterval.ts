@@ -6,7 +6,7 @@
 import type { MCPToolDefinition } from '../../../types/tool';
 
 export interface SymbolIntervalParams {
-  interval: string;
+  interval?: string;
 }
 
 export const toolDefinition: MCPToolDefinition = {
@@ -45,10 +45,7 @@ export function execute(
   features: GeoJSONFeature[],
   params: SymbolIntervalParams,
 ): GeoJSONFeature[] {
-  const { interval } = params;
-  if (!interval) {
-    throw new Error('interval parameter is required');
-  }
+  const interval = params.interval || 'PT15M';
 
   const modified: GeoJSONFeature[] = [];
 

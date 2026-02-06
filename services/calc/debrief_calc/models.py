@@ -28,7 +28,7 @@ class ContextType(StrEnum):
 
     Values:
         SINGLE: Exactly one feature selected
-        MULTI: Two or more features selected
+        MULTI: One or more features selected
         REGION: Geographic bounds (bbox or polygon)
         NONE: No selection required
     """
@@ -166,8 +166,8 @@ class SelectionContext(BaseModel):
     def validate_context_requirements(self) -> SelectionContext:
         if self.type == ContextType.SINGLE and len(self.features) != 1:
             raise ValueError("features must have exactly 1 item when type is 'single'")
-        if self.type == ContextType.MULTI and len(self.features) < 2:
-            raise ValueError("features must have 2+ items when type is 'multi'")
+        if self.type == ContextType.MULTI and len(self.features) < 1:
+            raise ValueError("features must have 1+ items when type is 'multi'")
         if self.type == ContextType.REGION and self.bounds is None:
             raise ValueError("bounds must be provided when type is 'region'")
         return self

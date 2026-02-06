@@ -111,11 +111,15 @@ class TestLabelInterval:
         with pytest.raises(ValueError, match="No track features found"):
             label_interval(context, params)
 
-    def test_error_missing_interval(self):
-        """Missing interval param raises ValueError."""
+    def test_default_interval(self):
+        """Missing interval param defaults to PT15M."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
         params = {}
 
-        with pytest.raises(ValueError, match="interval parameter is required"):
-            label_interval(context, params)
+        result = label_interval(context, params)
+
+        assert len(result) == 1
+        dps = result[0]["properties"]["default_position_style"]
+        assert dps["show_label"] is True
+        assert dps["label_interval"] == "PT15M"

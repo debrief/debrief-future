@@ -176,10 +176,14 @@ class TestSelectionContext:
         assert context.type == ContextType.MULTI
         assert len(context.features) == 2
 
-    def test_multi_requires_at_least_two_features(self):
+    def test_multi_accepts_single_feature(self):
         feature = {"type": "Feature", "properties": {}, "geometry": None}
+        context = SelectionContext(type=ContextType.MULTI, features=[feature])
+        assert len(context.features) == 1
+
+    def test_multi_rejects_empty_features(self):
         with pytest.raises(PydanticValidationError):
-            SelectionContext(type=ContextType.MULTI, features=[feature])
+            SelectionContext(type=ContextType.MULTI, features=[])
 
     def test_region_context(self):
         context = SelectionContext(type=ContextType.REGION, bounds=[-5.0, 49.0, -3.0, 51.0])

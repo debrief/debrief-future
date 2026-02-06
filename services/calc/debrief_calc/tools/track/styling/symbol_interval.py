@@ -18,8 +18,8 @@ from debrief_calc.registry import tool
         ToolParameter(
             name="interval",
             type="string",
-            description="ISO 8601 duration (e.g., 'PT5M' for 5 minutes)",
-            required=True,
+            description="ISO 8601 duration (e.g., 'PT15M' for 15 minutes). Defaults to PT15M.",
+            required=False,
         ),
     ],
 )
@@ -29,14 +29,12 @@ def symbol_interval(context: SelectionContext, params: dict[str, Any]) -> list[d
 
     Args:
         context: SelectionContext with one or more track features
-        params: Parameters dict with 'interval' (required, ISO 8601 duration)
+        params: Parameters dict with 'interval' (ISO 8601 duration, defaults to PT15M)
 
     Returns:
         List of modified track features with updated symbol interval
     """
-    interval = params.get("interval")
-    if not interval:
-        raise ValueError("interval parameter is required")
+    interval = params.get("interval") or "PT15M"
 
     modified = []
     for feature in context.features:

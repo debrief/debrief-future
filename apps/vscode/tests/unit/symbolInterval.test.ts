@@ -84,15 +84,16 @@ describe('symbolInterval (T034)', () => {
     );
   });
 
-  it('error missing interval: throws Error when interval param is absent', () => {
+  it('default interval: uses PT15M when interval param is absent', () => {
     const feature = makeTrackFeature();
 
-    expect(() => execute([feature], { interval: '' })).toThrow(
-      'interval parameter is required',
-    );
+    const result1 = execute([feature], { interval: '' });
+    expect(result1).toHaveLength(1);
+    expect(result1[0].properties.default_position_style.symbol_interval).toBe('PT15M');
 
-    expect(() => execute([feature], {} as any)).toThrow(
-      'interval parameter is required',
-    );
+    const feature2 = makeTrackFeature();
+    const result2 = execute([feature2], {} as any);
+    expect(result2).toHaveLength(1);
+    expect(result2[0].properties.default_position_style.symbol_interval).toBe('PT15M');
   });
 });
