@@ -54,7 +54,9 @@ export function execute(
 
   for (const feature of features) {
     const props = feature.properties ?? {};
-    if (props.kind !== 'TRACK') continue;
+    if (props.kind !== 'TRACK') {
+      continue;
+    }
 
     const dps: DefaultPositionStyle = (props.default_position_style as DefaultPositionStyle) ?? {
       show_symbol: true, symbol: 'circle', show_label: false,

@@ -81,7 +81,9 @@ export function execute(
 
   for (const feature of features) {
     const props = feature.properties ?? {};
-    if (props.kind !== 'TRACK') continue;
+    if (props.kind !== 'TRACK') {
+      continue;
+    }
 
     const style = (props.style as TrackStyle) ?? {};
     const point: PointStyle = style.point ?? {
@@ -91,7 +93,9 @@ export function execute(
     };
 
     point.shape = symbol;
-    if (radius !== undefined) point.radius = radius;
+    if (radius !== undefined) {
+      point.radius = radius;
+    }
 
     if (fill_color !== undefined) {
       point.fill_color = fill_color;

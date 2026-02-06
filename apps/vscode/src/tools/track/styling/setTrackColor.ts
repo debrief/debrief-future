@@ -52,7 +52,9 @@ export function execute(
 
   for (const feature of features) {
     const props = feature.properties ?? {};
-    if (props.kind !== 'TRACK') continue;
+    if (props.kind !== 'TRACK') {
+      continue;
+    }
 
     const style = (props.style as TrackStyle) ?? {};
     const line = style.line ?? { stroke: true, color: '#3388ff', weight: 3, opacity: 1.0 };
