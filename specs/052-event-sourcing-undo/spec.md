@@ -177,6 +177,6 @@ An analyst wants to explore an alternative analysis path without losing the curr
 - Snapshots are not created at automatic intervals. They are created in three ways: (1) automatically after expensive operations like file import, (2) manually by the analyst, or (3) at the advisory suggestion of a tool. There is no system-wide "every N events" policy.
 - The set of operations considered "expensive" (triggering automatic snapshots) will be defined during planning, starting with file import as the canonical example.
 - Tool authors declare the "suggest snapshot" advisory via a flag on the tool definition; this is advisory only and does not change tool execution behavior.
-- Branching (User Story 5) is a stretch goal that may be deferred to a follow-up feature if the core event-sourcing and tuning work proves more complex than expected.
+- Branching (User Story 6) is a stretch goal that may be deferred to a follow-up feature if the core event-sourcing and tuning work proves more complex than expected.
 - The event log format aligns with STAC conventions and can be stored alongside or within the STAC catalog structure.
 - "Tunable" is the default for parameters — tool authors must explicitly mark a parameter as non-tunable if replay with different values would be unsafe or meaningless.
