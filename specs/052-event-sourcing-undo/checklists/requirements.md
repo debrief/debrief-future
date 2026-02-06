@@ -31,8 +31,9 @@
 
 ## Notes
 
-- All items pass validation
+- All items pass validation (re-validated after snapshot refinement on 2026-02-06)
 - No UI section included — this is a service-layer architectural feature
-- Branching (User Story 5 / FR-015) explicitly marked as stretch goal in Assumptions
+- Branching (User Story 6 / FR-020) explicitly marked as stretch goal in Assumptions
+- Snapshot model (User Story 4 / FR-011–016) replaces the earlier "checkpoint at configurable intervals" concept with analyst-initiated, tool-suggested, and auto-post-import snapshots persisted in the STAC store
 - Spec references existing `ToolParameter` model by name in Assumptions section for context; this is intentional domain vocabulary rather than implementation leakage
 - Ready for `/speckit.clarify` or `/speckit.plan`
