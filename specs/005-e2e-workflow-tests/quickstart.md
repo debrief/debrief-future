@@ -1,84 +1,122 @@
-# Quickstart: Cross-Service End-to-End Workflow Tests
+# Quickstart: End-to-End Workflow Tests
 
 ## Prerequisites
 
-- Python 3.11+
-- uv package manager
-- Repository cloned with all workspace members installed (`task install`)
+- Node.js 20+ and pnpm
+- Python 3.11+ and uv
+- Docker (for CI mode or containerised testing)
+- code-server (for local mode): `npm install -g code-server`
 
-## Run the E2E Tests
+## Quick Start (Local)
 
 ```bash
-# Run all e2e tests
-uv run pytest tests/e2e/ -v
+# 1. Install dependencies and build the extension
+task install
+pnpm run build --filter @debrief/vscode
 
-# Run a specific test module
-uv run pytest tests/e2e/test_full_workflow.py -v
+# 2. Package the extension as .vsix
+cd apps/vscode && pnpm run package && cd ../..
 
-# Run with coverage
-uv run pytest tests/e2e/ -v --cov
+# 3. Install extension in code-server
+code-server --install-extension apps/vscode/debrief-*.vsix
 
-# Run as part of full test suite (includes unit tests)
-task test
+# 4. Start code-server with test workspace
+code-server --auth none --port 8080 tests/e2e/test-workspace/
+
+# 5. In another terminal, run the tests
+npx playwright test --config tests/e2e/playwright.config.ts
+```
+
+## Quick Start (Docker)
+
+```bash
+# 1. Build the Docker image
+docker compose -f docker/code-server/docker-compose.yml build
+
+# 2. Run tests (starts code-server + runs Playwright + tears down)
+docker compose -f docker/code-server/docker-compose.yml up --abort-on-container-exit
+```
+
+## Running Individual Test Files
+
+```bash
+# Load and display workflow (P1)
+npx playwright test --config tests/e2e/playwright.config.ts test-load-display
+
+# Analysis tool workflow (P2)
+npx playwright test --config tests/e2e/playwright.config.ts test-analysis-tool
+
+# Error feedback workflow (P3)
+npx playwright test --config tests/e2e/playwright.config.ts test-error-feedback
+```
+
+## Debugging
+
+```bash
+# Run with Playwright UI (headed mode)
+npx playwright test --config tests/e2e/playwright.config.ts --ui
+
+# Run with trace recording
+npx playwright test --config tests/e2e/playwright.config.ts --trace on
+
+# View last test report
+npx playwright show-report
 ```
 
 ## Test Structure
 
 ```
 tests/e2e/
-├── conftest.py              # Shared fixtures
-├── test_full_workflow.py     # Parse -> Store -> Analyze -> Persist
-├── test_multi_file.py       # Multi-file ingestion
-└── test_error_propagation.py # Error handling across boundaries
+├── playwright.config.ts          # Config (baseURL, timeouts, retries)
+├── global-setup.ts               # Starts code-server before all tests
+├── global-teardown.ts            # Stops code-server after all tests
+├── fixtures/base.ts              # Custom fixture: codeServerPage
+├── models/
+│   ├── code-server-page.ts       # VS Code chrome interactions
+│   └── debrief-webview.ts        # Debrief component interactions
+├── test-workspace/               # Pre-configured workspace for tests
+├── test-load-display.spec.ts     # P1: File loading workflow
+├── test-analysis-tool.spec.ts    # P2: Tool execution workflow
+└── test-error-feedback.spec.ts   # P3: Error handling workflow
 ```
 
-## Key Fixtures (from conftest.py)
+## Key Patterns
 
-| Fixture | Scope | Description |
-|---------|-------|-------------|
-| `catalog_path` | function | Fresh STAC catalog in tmp_path |
-| `boat1_path` | session | Path to boat1.rep test fixture |
-| `boat2_path` | session | Path to boat2.rep test fixture |
-| `parsed_boat1` | function | ParseResult from parsing boat1.rep |
-| `plot_with_tracks` | function | Catalog with boat1 features already loaded |
+### Accessing Webview Content
 
-## Writing a New E2E Test
+VS Code webviews use nested iframes. Use Playwright's `frameLocator()`:
 
-```python
-def test_my_workflow(catalog_path, boat1_path):
-    """Example: parse a file and store in catalog."""
-    from debrief_io import parse
-    from debrief_stac.catalog import create_catalog
-    from debrief_stac.plot import create_plot, read_plot
-    from debrief_stac.features import add_features
-    from debrief_stac.models import PlotMetadata
+```typescript
+// Access Debrief components inside the webview
+const webview = page
+  .frameLocator("iframe.webview.ready")
+  .frameLocator("#active-frame");
 
-    # 1. Parse source file
-    result = parse(boat1_path)
-    assert len(result.features) > 0
-
-    # 2. Create catalog and plot
-    create_catalog(catalog_path)
-    plot_id = create_plot(catalog_path, PlotMetadata(title="Test"))
-
-    # 3. Store features
-    count = add_features(catalog_path, plot_id, result.features)
-    assert count == len(result.features)
-
-    # 4. Verify persistence
-    item = read_plot(catalog_path, plot_id)
-    assert item["properties"]["datetime"] is not None
+// Interact with the map
+await webview.locator(".leaflet-container").waitFor();
 ```
 
-## Debugging
+### Using Page Objects
 
-```bash
-# Run with full traceback
-uv run pytest tests/e2e/ -v --tb=long
+```typescript
+import { test } from "../fixtures/base";
 
-# Run a single test by name
-uv run pytest tests/e2e/ -v -k "test_full_parse_store_analyze"
+test("loads REP file and shows tracks", async ({ codeServerPage }) => {
+  const webview = await codeServerPage.getWebviewFrame("Map");
+  const debrief = new DebriefWebview(webview);
 
-# Show print output
-uv run pytest tests/e2e/ -v -s
+  await codeServerPage.openFile("samples/boat1.rep");
+  await debrief.waitForMapReady();
+
+  const trackCount = await debrief.getTrackCount();
+  expect(trackCount).toBeGreaterThan(0);
+});
 ```
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CODE_SERVER_URL` | `http://localhost:8080` | Base URL for code-server |
+| `CODE_SERVER_AUTH` | `none` | Authentication mode |
+| `CLAUDE_CODE` | unset | Set to `1` to use @sparticuz/chromium |

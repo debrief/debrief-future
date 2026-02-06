@@ -1,117 +1,115 @@
-# Data Model: Cross-Service End-to-End Workflow Tests
+# Data Model: End-to-End Workflow Tests
 
-## Data Flow Overview
+## Test Environment Model
 
-The e2e workflow tests validate data transformations across three service boundaries. No new entities are introduced — the tests verify that existing entities flow correctly between services.
+The e2e test environment consists of interconnected components that together provide a browser-automatable VS Code instance running the Debrief extension with sample data.
 
 ```
-REP File (text)
-    │
-    ▼
-┌──────────┐    ParseResult
-│ debrief-io│ ──────────────►  list[GeoJSON Feature]
-│  parse()  │                  + warnings, source_file, handler
-└──────────┘
-    │
-    ▼
-┌──────────────┐    FeatureCollection
-│ debrief-stac  │ ──────────────────►  STAC Item (plot)
-│ add_features()│                      + bbox, assets, provenance
-│ add_asset()   │
-└──────────────┘
-    │
-    ▼
-┌──────────────┐    ToolResult
-│ debrief-calc  │ ──────────────────►  list[GeoJSON Feature]
-│    run()      │                      + provenance, duration_ms
-└──────────────┘
-    │
-    ▼
-┌──────────────┐    Updated FeatureCollection
-│ debrief-stac  │ ──────────────────►  STAC Item (plot)
-│ add_features()│                      + updated bbox, mixed feature kinds
-└──────────────┘
+┌─────────────────────────────────────────────────────┐
+│  Docker Container (CI) or Local (Dev)               │
+│                                                      │
+│  ┌──────────────┐    ┌──────────────────────────┐   │
+│  │ code-server   │    │  Python Services          │   │
+│  │ (VS Code web) │    │  ├── debrief-io           │   │
+│  │               │◄───│  ├── debrief-stac         │   │
+│  │  Debrief Ext  │    │  └── debrief-calc         │   │
+│  └──────┬───────┘    └──────────────────────────┘   │
+│         │ :8080                                      │
+└─────────┼───────────────────────────────────────────┘
+          │ HTTP
+┌─────────┼───────────────────────────────────────────┐
+│  Playwright Test Runner                              │
+│         │                                            │
+│  ┌──────▼───────┐                                   │
+│  │   Browser     │                                   │
+│  │  (Chromium)   │                                   │
+│  │               │                                   │
+│  │  ┌─────────────────────────────────┐             │
+│  │  │ VS Code Web UI (DOM)            │             │
+│  │  │  ┌───────────────────────────┐  │             │
+│  │  │  │ iframe.webview.ready      │  │             │
+│  │  │  │  ┌─────────────────────┐  │  │             │
+│  │  │  │  │ #active-frame       │  │  │             │
+│  │  │  │  │  ┌───────────────┐  │  │  │             │
+│  │  │  │  │  │ Debrief       │  │  │  │             │
+│  │  │  │  │  │ Components    │  │  │  │             │
+│  │  │  │  │  │ (map, catalog)│  │  │  │             │
+│  │  │  │  │  └───────────────┘  │  │  │             │
+│  │  │  │  └─────────────────────┘  │  │             │
+│  │  │  └───────────────────────────┘  │             │
+│  │  └─────────────────────────────────┘             │
+│  └──────────────┘                                   │
+└─────────────────────────────────────────────────────┘
 ```
 
 ## Entity Descriptions
 
-### ParseResult (io output)
+### Test Environment
 
-The output of `debrief_io.parse()`. Contains a list of GeoJSON features extracted from a source file.
+| Property | Type | Description |
+|----------|------|-------------|
+| mode | "docker" or "local" | Whether code-server runs in Docker or locally |
+| base_url | string | URL to access code-server (default: `http://localhost:8080`) |
+| workspace_path | string | Absolute path to the test workspace inside code-server |
+| extension_vsix | string | Path to the packaged Debrief extension |
+| auth | "none" | Authentication mode (always none for testing) |
 
-| Field | Type | Description |
-|-------|------|-------------|
-| features | list[dict] | GeoJSON Feature objects (tracks, annotations) |
-| warnings | list[ParseWarning] | Non-fatal parse issues with line numbers |
-| source_file | str | Absolute path to the source file |
-| handler | str | Name of the handler that processed the file |
-| parse_time_ms | float | Duration of the parse operation |
+### Test Workspace
 
-### GeoJSON Track Feature (io -> stac boundary)
+| Property | Type | Description |
+|----------|------|-------------|
+| samples/ | directory | REP files for test scenarios (symlinks to io fixtures) |
+| .vscode/settings.json | file | Extension configuration (catalog location, default tool settings) |
+| catalog/ | directory | Pre-initialised STAC catalog (or created fresh per test) |
 
-A track parsed from REP format. This is the primary entity that flows from io to stac.
+### Page Object: CodeServerPage
 
-| Field | Path | Type | Description |
-|-------|------|------|-------------|
-| type | `.type` | "Feature" | GeoJSON type |
-| id | `.id` | str (UUID) | Unique feature identifier |
-| geometry.type | `.geometry.type` | "LineString" | Track geometry type |
-| geometry.coordinates | `.geometry.coordinates` | list[list[float]] | [lon, lat] coordinate pairs |
-| kind | `.properties.kind` | "TRACK" | Feature classification |
-| platform_id | `.properties.platform_id` | str | Track identifier (e.g., "NELSON") |
-| times | `.properties.times` | list[str] | ISO 8601 timestamps parallel to coordinates |
-| source_file | `.properties.source_file` | str | Original file path |
-| positions | `.properties.positions` | list[dict] | Kinematic data (time, course, speed, depth) |
+Encapsulates VS Code chrome interactions.
 
-### PlotMetadata (stac input)
+| Method | Description |
+|--------|-------------|
+| `waitForReady()` | Wait for VS Code to fully load (extensions activated) |
+| `openFile(path)` | Open a file in the editor via explorer or command palette |
+| `executeCommand(command)` | Trigger a VS Code command via command palette |
+| `getNotifications()` | Read notification messages from VS Code's notification area |
+| `getWebviewFrame(title)` | Access a webview panel's iframe by panel title |
 
-Metadata for creating a new STAC plot.
+### Page Object: DebriefWebview
 
-| Field | Type | Description |
-|-------|------|-------------|
-| title | str | Human-readable plot title (required) |
-| description | str or None | Optional description |
-| timestamp | datetime | Creation timestamp (defaults to UTC now) |
+Encapsulates Debrief webview component interactions. Operates within the nested iframe context.
 
-### SelectionContext (stac -> calc boundary)
+| Method | Description |
+|--------|-------------|
+| `waitForMapReady()` | Wait for Leaflet map to initialise inside the webview |
+| `getTrackCount()` | Count visible track features on the map |
+| `selectTrack(name)` | Click a track feature to select it |
+| `getCatalogEntries()` | List items in the STAC catalog panel |
+| `getFeatureCount(plotId)` | Get feature count for a specific plot |
+| `verifyProvenance(featureId)` | Check provenance chain for a feature |
 
-The input to `debrief_calc.run()`. Wraps features from a STAC plot for analysis.
+### Iframe Hierarchy
 
-| Field | Type | Description |
-|-------|------|-------------|
-| type | ContextType enum | SINGLE, MULTI, REGION, or NONE |
-| features | list[dict] | GeoJSON features from the STAC plot |
-| bounds | list[float] or None | Geographic bounds [minx, miny, maxx, maxy] |
+VS Code webviews use a two-level iframe nesting:
 
-### ToolResult (calc output)
+| Level | Selector | Content |
+|-------|----------|---------|
+| 0 | `page` | VS Code main window (editor, sidebar, panels) |
+| 1 | `iframe.webview.ready` | Outer webview container (VS Code managed) |
+| 2 | `#active-frame` | Inner content frame (Debrief React components) |
 
-The output of `debrief_calc.run()`. Contains analysis results as GeoJSON features.
+**Access pattern**:
+```
+page.frameLocator("iframe.webview.ready").frameLocator("#active-frame")
+```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| tool | str | Name of the executed tool |
-| success | bool | Whether execution succeeded |
-| features | list[dict] or None | Output GeoJSON features (if success) |
-| error | ToolError or None | Error details (if failure) |
-| duration_ms | float | Execution time in milliseconds |
+## Data Flow Under Test
 
-### Provenance Record (calc -> stac boundary)
-
-Embedded in `properties.provenance` of calc output features. Verified by tests.
-
-| Field | Type | Description |
-|-------|------|-------------|
-| tool | str | Tool name that produced the feature |
-| version | str | Tool version |
-| timestamp | str (ISO 8601) | When the analysis was executed |
-| sources | list[SourceRef] | References to input features (id + kind) |
-| parameters | dict | Parameters passed to the tool |
-
-## Validation Points
-
-Tests must verify data conformance at each boundary:
-
-1. **io -> stac**: Every feature from `ParseResult.features` has `type: "Feature"`, valid `geometry`, and `properties.kind`
-2. **stac storage**: After `add_features()`, the plot's FeatureCollection contains all features and `bbox` reflects actual geometry bounds
-3. **stac -> calc**: Features read from the plot can construct a valid `SelectionContext` with the correct `ContextType`
-4. **calc -> stac**: `ToolResult.features` each have `properties.provenance` with source references matching the input feature IDs
+| Step | User Action | Extension Code | Python Service | Observable Result |
+|------|-------------|----------------|----------------|-------------------|
+| 1 | Open REP file | File watcher triggers parse | io.parse() | Editor shows file |
+| 2 | — | Extension stores features | stac.add_features() | Catalog panel updates |
+| 3 | — | Extension renders map | — | Map shows track lines |
+| 4 | Select track | Click handler in webview | — | Track highlighted |
+| 5 | Run tool | Command palette / context menu | calc.run() | — |
+| 6 | — | Extension stores results | stac.add_features() | Catalog feature count increases |
+| 7 | — | Extension renders results | — | Map shows analysis overlay |

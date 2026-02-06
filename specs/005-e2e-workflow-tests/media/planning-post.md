@@ -1,44 +1,46 @@
 ---
 layout: future-post
-title: "Planning: Cross-Service End-to-End Workflow Tests"
+title: "Planning: End-to-End Workflow Tests with Code-Server and Playwright"
 date: 2026-02-06
 track: [momentum]
 author: Ian
-reading_time: 3
-tags: [tracer-bullet, testing, integration, io, stac, calc]
-excerpt: "Adding integration tests that exercise the full io-to-stac-to-calc pipeline to catch cross-service regressions"
+reading_time: 4
+tags: [tracer-bullet, testing, e2e, playwright, code-server]
+excerpt: "Planning browser-driven tests that exercise the full user workflow through VS Code -- file load to map display to analysis results"
 ---
 
 ## What We're Building
 
-Each of Debrief's three core services -- io (file parsing), stac (catalog storage), and calc (analysis tools) -- already has its own unit tests. But nothing currently verifies that data flows correctly across the boundaries between them. A change to how io formats a parsed track could silently break what stac expects to receive. A shift in how stac structures its feature collections could confuse calc when it tries to run an analysis. These are the kinds of bugs that only show up when everything is wired together, and they tend to surface at the worst possible time.
+Debrief's three Python services each have solid unit tests. The VS Code extension has its own test suite. But nothing currently verifies the workflow that actually matters to an analyst: open a REP file, see tracks on the map, select features, run an analysis tool, check the results in the catalog. That complete journey passes through io (parsing), stac (storage), calc (analysis), and the extension's TypeScript orchestration layer that wires them together. A subtle regression at any boundary could break the entire experience, and no existing test would notice.
 
-So we're adding a set of end-to-end workflow tests that exercise the complete pipeline: parse a REP file with debrief-io, store the resulting features in a STAC catalog with debrief-stac, run an analysis tool with debrief-calc, and persist the results back into the catalog. The tests verify that the data contracts hold at every handoff point, and that provenance metadata -- the chain of custody from source file to analysis result -- survives the entire journey.
+We are adding true end-to-end tests that drive the real extension UI in a browser. code-server hosts VS Code as a web application, Playwright automates a Chromium browser pointed at it, and the tests interact with the actual panels, webviews, command palette, and notifications that a user would see. No mocks, no simulated environment -- the real extension running against real Python services, exercised through real DOM interactions.
 
 ## How It Fits
 
-This sits squarely in the "defence-grade reliability" territory from our constitution. The three services are designed to be independent, with clean API boundaries and no shared mutable state. That independence is valuable, but it creates seams where things can go wrong without anyone noticing. These tests are the stitching that keeps those seams honest. They live at the repository root in `tests/e2e/`, a workspace-level concern that doesn't belong to any single service. They slot into the existing `uv run pytest` pipeline with zero configuration changes -- run `task test` and they just appear.
+The tracer bullet roadmap calls for proving that the components integrate correctly before investing in breadth. These e2e tests are the verification layer for that integration. They sit above the unit and service-level tests, exercising the exact path a DSTL scientist would follow in daily work.
+
+This also extends infrastructure the project already has. Playwright is already in the project at version 1.57 with seven test files across four configurations. The web shell tests (`plot-load.spec.ts`, `tool-execution.spec.ts`, `catalog-browse.spec.ts`) already exercise similar workflows against a Vite dev server. What changes here is the target: instead of a lightweight shell, we test against the full VS Code environment where the extension actually runs. Same patterns, higher fidelity.
 
 ## Key Decisions
 
-- **Tests at the repository root, not inside a service.** Cross-service tests are a workspace concern. Putting them inside `services/stac/tests/` or `services/calc/tests/` would give a misleading signal about ownership. The `tests/e2e/` directory is auto-discovered by pytest through the existing root config.
+- **code-server as the VS Code host.** MIT-licensed, Docker-ready, and its own test suite uses Playwright -- so we have a reference implementation for the nested iframe patterns we need. Authentication disabled for testing (`--auth none`). Current release tracks VS Code 1.108.
 
-- **Reusing existing io test fixtures.** The `boat1.rep` and `boat2.rep` files already in the io test suite give us well-characterised data (NELSON with 30 positions, COLLINGWOOD track). Duplicating them would create a maintenance burden and violate DRY. STAC catalogs are created fresh in `tmp_path` for each test to ensure isolation.
+- **Webview access via nested frameLocator().** VS Code renders extension webviews inside two layers of iframe: an outer `iframe.webview.ready` container and an inner `#active-frame`. Playwright's `frameLocator` handles this at the CDP level. The key insight: most of our test assertions target Debrief-controlled components (Leaflet map, catalog tree, tool result panel) whose DOM we own, not VS Code's internal chrome. That reduces brittleness significantly.
 
-- **Three test modules, aligned with user stories.** `test_full_workflow.py` covers the complete parse-store-analyse-persist cycle. `test_multi_file.py` covers loading two REP files into the same plot and running multi-track analysis. `test_error_propagation.py` covers malformed input handling and kind mismatches. Each module runs independently, which makes debugging faster.
+- **Page object model for maintainability.** `CodeServerPage` encapsulates VS Code chrome interactions (open file, trigger command palette, read notifications). `DebriefWebview` encapsulates project-owned components (wait for map ready, count tracks, check catalog entries). Tests read like user stories.
 
-- **Direct Python imports, not MCP wrappers.** Tests call `from debrief_io import parse` and `from debrief_calc import run` directly. This tests the actual service API surface -- the same interface a real orchestrator would use. Wrapping calls in MCP would test the serialisation layer, not the contracts.
+- **Docker for CI, local code-server for dev.** The Dockerfile layers code-server, Python services, and the packaged .vsix extension into a reproducible image. Developers install code-server locally and run the same Playwright test scripts. Same tests, both environments, single `npx playwright test` command.
 
-- **Provenance verified at every stage.** From `source_file` in the parsed features, through `debrief:provenance` in STAC assets, to `properties.provenance` in calc output with tool name, version, timestamp, and source references. The full chain must be internally consistent -- IDs match, timestamps are ordered.
+- **Three test files aligned to user stories.** Load-and-display (P1) covers the fundamental workflow every user hits first. Analysis-tool (P2) covers the core analytical round-trip through calc and back to the catalog. Error-feedback (P3) verifies that failures at any service boundary surface as clear user-visible messages rather than silent corruption.
 
-- **Zero new dependencies, zero CI changes.** Everything uses existing workspace members and standard pytest. The tests complete in under 30 seconds.
+- **Test workspace with symlinked fixtures.** Sample REP files point back to existing io test fixtures rather than duplicating data. STAC catalogs are created fresh for test isolation.
 
 ## What We'd Love Feedback On
 
-- **Coverage priority**: We've chosen three test modules aligned with the most common user workflows. Are there cross-service scenarios specific to maritime analysis that we should add? For instance, handling tracks that cross the antimeridian, or plots that accumulate analysis results from repeated tool runs.
+- **Iframe stability in CI.** Playwright issue #36943 documents intermittent failures with nested iframe access under load. Our mitigation is generous timeouts, waiting for `.ready` class before drilling into iframes, and retry logic. If you have experience testing VS Code webviews with Playwright -- particularly in Docker-based CI -- we would value hearing what worked and what did not.
 
-- **Error scenarios**: We're testing malformed REP input and kind mismatches. Are there failure modes at the service boundaries that have bitten you in pipeline architectures before? Particularly interested in subtle data corruption cases versus loud failures.
+- **Which workflows matter most.** We have prioritised file loading, single-track analysis, multi-track analysis, and error feedback. For maritime analysts: are there interaction sequences you find yourself repeating that we should add? Selecting tracks across multiple plots, perhaps, or re-running a tool with different parameters?
 
-- **Fixture data**: We're reusing the existing boat1.rep and boat2.rep test fixtures. If you have REP files with interesting edge cases -- unusual coordinate formats, very long tracks, mixed feature types -- those would make the test suite more robust.
+- **code-server versus OpenVSCode Server.** We chose code-server for its documented Playwright patterns and auth handling. OpenVSCode Server (from Gitpod) tracks upstream VS Code more closely but has less Playwright reference material. If you have operational experience with either for automated testing, that context would inform whether we have picked the right horse.
 
 > [Join the discussion](https://github.com/debrief/debrief-future/discussions)
