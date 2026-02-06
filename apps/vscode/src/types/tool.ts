@@ -457,6 +457,46 @@ export interface MCPErrorResponse {
 }
 
 /**
+ * Selection requirement in MCP annotation format.
+ */
+export interface MCPSelectionRequirement {
+  /** Feature kind (e.g., "TRACK", "POINT") */
+  kind: string;
+  /** Minimum count required */
+  min: number;
+  /** Maximum count allowed (absent = no limit) */
+  max?: number;
+}
+
+/**
+ * MCP tool definition with Debrief-specific annotations.
+ * Represents a tool as returned by MCP tools/list response.
+ * Both Python and TypeScript tool libraries produce this format.
+ */
+export interface MCPToolDefinition {
+  /** Tool identifier (kebab-case) */
+  name: string;
+  /** Human-readable description */
+  description: string;
+  /** JSON Schema for tool input parameters */
+  inputSchema: {
+    type: 'object';
+    properties: Record<string, unknown>;
+  };
+  /** MCP annotations with Debrief extensions */
+  annotations: {
+    /** Selection requirements for this tool */
+    'debrief:selectionRequirements': MCPSelectionRequirement[];
+    /** Tool category (e.g., "track/styling") */
+    'debrief:category': string;
+    /** Semantic version */
+    'debrief:version': string;
+    /** Output kind identifier */
+    'debrief:outputKind': string;
+  };
+}
+
+/**
  * Create a default layer style for results
  */
 export function createDefaultResultStyle(toolName: string): LayerStyle {

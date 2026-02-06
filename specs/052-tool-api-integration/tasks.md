@@ -43,9 +43,9 @@
 
 **Purpose**: Create directory structure and package scaffolding for new tool modules
 
-- [ ] T001 Create Python tool package init `services/calc/debrief_calc/tools/track/styling/__init__.py`
-- [ ] T002 [P] Create Python test package init `services/calc/tests/tools/track/styling/__init__.py`
-- [ ] T003 [P] Create evidence directory `specs/052-tool-api-integration/evidence/`
+- [x] T001 Create Python tool package init `services/calc/debrief_calc/tools/track/styling/__init__.py`
+- [x] T002 [P] Create Python test package init `services/calc/tests/tools/track/styling/__init__.py`
+- [x] T003 [P] Create evidence directory `specs/052-tool-api-integration/evidence/`
 
 ---
 
@@ -55,11 +55,11 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Add `to_mcp_tool()` method on Tool model with ContextType→SelectionRequirement mapping `services/calc/debrief_calc/models.py`
-- [ ] T005 [P] Add MCPToolDefinition TypeScript interface `apps/vscode/src/types/tool.ts`
-- [ ] T006 [P] Create shared MCP → ToolMatchService adapter `shared/components/src/ToolMatch/mcpAdapter.ts`
-- [ ] T007 [test] Unit test for `to_mcp_tool()` — verify all ContextType mappings (SINGLE→max:1, MULTI→min:1 per kind, REGION→kind:REGION, NONE→empty) `services/calc/tests/test_models_mcp.py`
-- [ ] T008 [P][test] Unit test for shared MCP adapter — verify MCPToolDefinition→Tool mapping `shared/components/src/ToolMatch/__tests__/mcpAdapter.test.ts`
+- [x] T004 Add `to_mcp_tool()` method on Tool model with ContextType→SelectionRequirement mapping `services/calc/debrief_calc/models.py`
+- [x] T005 [P] Add MCPToolDefinition TypeScript interface `apps/vscode/src/types/tool.ts`
+- [x] T006 [P] Create shared MCP → ToolMatchService adapter `shared/components/src/ToolMatch/mcpAdapter.ts`
+- [x] T007 [test] Unit test for `to_mcp_tool()` — verify all ContextType mappings (SINGLE→max:1, MULTI→min:1 per kind, REGION→kind:REGION, NONE→empty) `services/calc/tests/test_models_mcp.py`
+- [x] T008 [P][test] Unit test for shared MCP adapter — verify MCPToolDefinition→Tool mapping `shared/components/src/ToolMatch/__tests__/mcpAdapter.test.ts`
 
 **Checkpoint**: Foundation types established — user story phases can now begin
 
