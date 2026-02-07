@@ -71,6 +71,15 @@ export interface StacItemSummary {
 
   /** Parent store ID (needed for URI construction) */
   storeId: string;
+
+  /** Bounding box [west, south, east, north] */
+  bbox?: [number, number, number, number] | null;
+
+  /** Range start datetime (ISO 8601) */
+  startDatetime?: string | null;
+
+  /** Range end datetime (ISO 8601) */
+  endDatetime?: string | null;
 }
 
 /**

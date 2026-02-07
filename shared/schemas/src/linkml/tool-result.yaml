@@ -1,0 +1,91 @@
+id: https://debrief.com/schemas/tool-result
+name: tool-result
+description: >
+  LinkML schema for Debrief tool result annotations.
+  Defines result types, annotations, and validation rules for MCP tool responses.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.com/
+  xsd: http://www.w3.org/2001/XMLSchema#
+
+default_prefix: debrief
+
+imports:
+  - linkml:types
+
+enums:
+  ResultTopType:
+    description: Top-level result type categories
+    permissible_values:
+      mutation:
+        description: Modification of existing features (e.g., track smoothing)
+      addition:
+        description: Creation of new features (e.g., analysis results)
+      deletion:
+        description: Removal of features (e.g., outlier deletion)
+      artifact:
+        description: Non-GeoJSON outputs (e.g., plots, reports)
+
+  ErrorCategory:
+    description: Categories of tool execution errors
+    permissible_values:
+      invalid_input:
+        description: User-provided input failed validation
+      algorithm_failure:
+        description: Algorithm encountered unrecoverable error
+      resource_not_found:
+        description: Required feature or data not found
+
+classes:
+  ResultTypePath:
+    description: >
+      Slash-delimited hierarchical type path.
+      Format: {top_type}/{domain}/{specific_type}
+      Example: mutation/track/smoothed
+    attributes:
+      path:
+        description: Full hierarchical path
+        range: string
+        required: true
+        pattern: "^(mutation|addition|deletion|artifact)/[a-z_]+/[a-z_]+$"
+
+  ToolResultAnnotations:
+    description: >
+      Annotations for MCP tool result content items.
+      All results MUST include resultType, sourceFeatures, and label.
+      Deletions MUST include deletedFeatures.
+      Artifacts MUST include href.
+    attributes:
+      resultType:
+        description: Hierarchical result type (e.g., mutation/track/smoothed)
+        range: string
+        required: true
+        pattern: "^(mutation|addition|deletion|artifact)/[a-z_]+/[a-z_]+$"
+        slot_uri: debrief:resultType
+
+      sourceFeatures:
+        description: IDs of input features used to generate this result
+        range: string
+        multivalued: true
+        required: true
+        minimum_cardinality: 1
+        slot_uri: debrief:sourceFeatures
+
+      label:
+        description: Human-readable description of the result
+        range: string
+        required: true
+        slot_uri: debrief:label
+
+      href:
+        description: Relative path to artifact file (REQUIRED for artifacts)
+        range: string
+        slot_uri: debrief:href
+
+      deletedFeatures:
+        description: IDs of features removed (REQUIRED for deletions)
+        range: string
+        multivalued: true
+        minimum_cardinality: 1
+        slot_uri: debrief:deletedFeatures

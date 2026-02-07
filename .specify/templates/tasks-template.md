@@ -136,6 +136,16 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
 
+### E2E Tests for User Story 1 (REQUIRED for UI components) 🎭
+
+> **NOTE**: Include this section when the user story involves visual components with Storybook stories.
+> See plan.md "Storybook E2E Testing" section for which stories need tests.
+
+- [ ] T0XX [P] [US1] Create Playwright test `shared/components/e2e/[Component].spec.ts`
+- [ ] T0XX [P] [US1] Add theme variant tests (light, dark, vscode)
+- [ ] T0XX [P] [US1] Add interaction tests for user flows
+- [ ] T0XX [US1] Run e2e tests: `pnpm --filter @debrief/components test:e2e [Component]`
+
 ### Implementation for User Story 1
 
 - [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
@@ -215,6 +225,30 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX Capture test summary with pass/fail counts in evidence/test-summary.md
 - [ ] TXXX Record usage example demonstrating feature in evidence/usage-example.md
 - [ ] TXXX [Add feature-specific evidence - screenshots, CLI output, API samples, etc.]
+
+### E2E Evidence Collection (REQUIRED for UI components) 🎭
+
+> **Purpose**: Capture visual evidence from Playwright tests for PR and blog posts
+
+- [ ] TXXX Run full e2e suite: `pnpm --filter @debrief/components test:e2e`
+- [ ] TXXX [P] Capture theme variant screenshots to specs/[feature]/evidence/screenshots/
+- [ ] TXXX Document e2e results in evidence/e2e-summary.md
+
+**E2E Summary Template** (`evidence/e2e-summary.md`):
+```markdown
+# E2E Test Summary
+
+| Suite | Passed | Failed | Skipped |
+|-------|--------|--------|---------|
+| Rendering | X | 0 | 0 |
+| Theme Variants | 3 | 0 | 0 |
+| Interactions | X | 0 | 0 |
+
+## Screenshots Captured
+- [ ] Light theme: `screenshots/component-light.png`
+- [ ] Dark theme: `screenshots/component-dark.png`
+- [ ] VS Code theme: `screenshots/component-vscode.png`
+```
 
 **Checkpoint**: Evidence collected - ready for PR creation via `/speckit.pr`
 

@@ -156,3 +156,39 @@ classes:
         description: Styling for position markers
         range: PointProperties
         required: true
+
+  PositionStyle:
+    description: >-
+      Default styling configuration for track positions.
+      Applied as baseline before interval rules and overrides.
+    attributes:
+      show_symbol:
+        description: Whether to display a symbol at positions
+        range: boolean
+        required: true
+      symbol:
+        description: Shape to use for position symbols
+        range: PointShapeEnum
+        required: true
+      show_label:
+        description: Whether to display labels at positions
+        range: boolean
+        required: true
+
+  PositionStyleOverride:
+    description: >-
+      Per-position style override. Index in array determines which position.
+      No time field - array index i applies to positions[i].
+      Use null for positions without custom styling.
+    attributes:
+      show_symbol:
+        description: Override whether to show symbol (null = use default/interval)
+        range: boolean
+      symbol:
+        description: Override symbol shape
+        range: PointShapeEnum
+      show_label:
+        description: Override whether to show label
+        range: boolean
+      label:
+        description: Custom label text (null = use timestamp)

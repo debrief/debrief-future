@@ -1,0 +1,80 @@
+/**
+ * ToolsPanel component styles.
+ * Uses CSS custom properties for theming (from ThemeProvider).
+ */
+
+.debrief-tools-panel {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--debrief-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+.debrief-tools-panel--empty {
+  padding: 12px;
+}
+
+.debrief-tools-panel__message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--debrief-text-muted, #808080);
+  font-size: 12px;
+}
+
+.debrief-tools-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.debrief-tools-panel__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  cursor: default;
+}
+
+.debrief-tools-panel__item--active {
+  cursor: pointer;
+}
+
+.debrief-tools-panel__item--active:hover {
+  background: var(--debrief-bg-tertiary, #2a2d2e);
+}
+
+.debrief-tools-panel__item--inactive {
+  opacity: 0.5;
+}
+
+.debrief-tools-panel__item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.debrief-tools-panel__item-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.debrief-tools-panel__item-name {
+  font-size: 13px;
+  color: var(--debrief-text-primary, #cccccc);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.debrief-tools-panel__item-desc {
+  font-size: 11px;
+  color: var(--debrief-text-muted, #808080);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

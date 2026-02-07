@@ -1,31 +1,45 @@
-# Storybook PR Preview Deployment
+# Storybook & Web Shell Deployment
 #
-# Deploys Storybook to GitHub Pages for each PR, enabling visual review
-# of component changes directly in the PR.
+# - On PRs: deploys preview to pr-preview/pr-{number}/ (cleaned up on close)
+# - On main: deploys persistent copies to components-storybook/ and web-shell/
 #
-# Preview URL: https://debrief.github.io/debrief-future/pr-preview/pr-{number}/
+# Preview URLs:
+#   Storybook: https://debrief.github.io/debrief-future/pr-preview/pr-{number}/
+#   Web Shell: https://debrief.github.io/debrief-future/pr-preview/pr-{number}/web-shell/
+#
+# Persistent URLs:
+#   Storybook: https://debrief.github.io/debrief-future/components-storybook/
+#   Web Shell: https://debrief.github.io/debrief-future/web-shell/
 
 name: Storybook Preview
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'shared/components/**'
+      - 'apps/web-shell/**'
+      - '.github/workflows/storybook-preview.yml'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     paths:
       - 'shared/components/**'
+      - 'apps/web-shell/**'
       - '.github/workflows/storybook-preview.yml'
 
 permissions:
   contents: write
   pull-requests: write
 
-concurrency:
-  group: storybook-preview-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
 jobs:
-  build-and-deploy:
+  # Deploy persistent Storybook and Web Shell on push to main
+  deploy-main:
     runs-on: ubuntu-latest
-    if: github.event.action != 'closed'
+    if: github.event_name == 'push'
+    concurrency:
+      group: storybook-main
+      cancel-in-progress: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,12 +58,74 @@ jobs:
       - name: Install dependencies
         run: pnpm install --ignore-scripts
 
+      - name: Build Components Library
+        run: pnpm --filter @debrief/components build
+
       - name: Build Storybook
         run: pnpm --filter @debrief/components build-storybook
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
 
-      - name: Deploy to GitHub Pages
+      - name: Build Web Shell
+        run: pnpm --filter @debrief/web-shell build
+        env:
+          VITE_BASE_URL: /debrief-future/web-shell/
+
+      - name: Deploy Storybook to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./shared/components/storybook-static
+          destination_dir: components-storybook
+          keep_files: true
+
+      - name: Deploy Web Shell to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/web-shell/dist
+          destination_dir: web-shell
+          keep_files: true
+
+  # Deploy PR preview
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    concurrency:
+      group: storybook-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --ignore-scripts
+
+      - name: Build Components Library
+        run: pnpm --filter @debrief/components build
+
+      - name: Build Storybook
+        run: pnpm --filter @debrief/components build-storybook
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+
+      - name: Build Web Shell
+        run: pnpm --filter @debrief/web-shell build
+        env:
+          VITE_BASE_URL: /debrief-future/pr-preview/pr-${{ github.event.pull_request.number }}/web-shell/
+
+      - name: Deploy Storybook to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -57,12 +133,24 @@ jobs:
           destination_dir: pr-preview/pr-${{ github.event.pull_request.number }}
           keep_files: true
 
+      - name: Deploy Web Shell to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/web-shell/dist
+          destination_dir: pr-preview/pr-${{ github.event.pull_request.number }}/web-shell
+          keep_files: true
+
       - name: Comment PR with preview link
         uses: actions/github-script@v7
         with:
           script: |
             const prNumber = context.payload.pull_request.number;
-            const previewUrl = `https://debrief.github.io/debrief-future/pr-preview/pr-${prNumber}/`;
+            const baseUrl = `https://debrief.github.io/debrief-future`;
+            const previewUrl = `${baseUrl}/pr-preview/pr-${prNumber}/`;
+            const webShellPreviewUrl = `${baseUrl}/pr-preview/pr-${prNumber}/web-shell/`;
+            const persistentUrl = `${baseUrl}/components-storybook/`;
+            const webShellUrl = `${baseUrl}/web-shell/`;
 
             // Check if we already commented
             const comments = await github.rest.issues.listComments({
@@ -76,17 +164,33 @@ jobs:
               comment.body.includes('Storybook Preview')
             );
 
-            const body = `## 📚 Storybook Preview
-
-            Your Storybook preview is ready!
-
-            **Preview URL:** ${previewUrl}
-
-            ### Quick Links
-            - [ToolMatch Harness](${previewUrl}?path=/story/toolmatch-harness--default)
-            - [All Stories](${previewUrl})
-
-            > Updated on commit ${context.sha.substring(0, 7)}`;
+            const body = [
+              '## 🚀 Preview Deployments',
+              '',
+              '### Web Shell (Standalone App)',
+              `📱 [Open Web Shell](${webShellPreviewUrl})`,
+              '',
+              'Use this for Playwright testing and demos - runs outside Storybook.',
+              '',
+              '### Storybook (Component Library)',
+              `📚 [Open Storybook](${previewUrl})`,
+              '',
+              'Browse all components, stories, and documentation.',
+              '',
+              '---',
+              '',
+              '<details>',
+              '<summary>All Links</summary>',
+              '',
+              '| Environment | Web Shell | Storybook |',
+              '|-------------|-----------|-----------|',
+              `| This PR | [Open App](${webShellPreviewUrl}) | [Open Storybook](${previewUrl}) |`,
+              `| Main branch | [Open App](${webShellUrl}) | [Open Storybook](${persistentUrl}) |`,
+              '',
+              '</details>',
+              '',
+              `> Updated on commit ${context.sha.substring(0, 7)}`,
+            ].join('\n');
 
             if (botComment) {
               await github.rest.issues.updateComment({
@@ -107,7 +211,7 @@ jobs:
   # Cleanup old previews when PR is closed
   cleanup:
     runs-on: ubuntu-latest
-    if: github.event.action == 'closed'
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
     steps:
       - name: Checkout gh-pages
         uses: actions/checkout@v4

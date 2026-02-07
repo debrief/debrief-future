@@ -164,7 +164,7 @@ def _parse_annotation(
         "DYNAMIC_CIRCLE": builders.build_dynamic_circle,
         "DYNAMIC_POLY": builders.build_dynamic_poly,
         "SENSOR": builders.build_sensor,
-        "SENSOR2": builders.build_sensor,
+        "SENSOR2": builders.build_sensor2,
         "TMA_POS": builders.build_tma,
         "TMA_RB": builders.build_tma,
         "TRACKSPLIT": builders.build_tracksplit,

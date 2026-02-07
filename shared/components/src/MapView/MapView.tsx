@@ -1,12 +1,31 @@
 import { useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
 import type { PathOptions, LatLngBoundsExpression } from 'leaflet';
-import type { DebriefFeature, DebriefFeatureCollection, Bounds } from '../utils/types';
+import type { DebriefFeature, DebriefFeatureCollection, Bounds, DisplayMode } from '../utils/types';
 import { calculateBounds, expandBounds } from '../utils/bounds';
 import { getFeatureColor, getFeatureLabel } from '../utils/labels';
 import { isTrackFeature } from '../utils/types';
+import { extractTemporalData } from './temporal-utils';
+import { TemporalTrackLayer } from './TemporalTrackLayer';
+import { LeafletToolbar } from './LeafletToolbar';
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
+
+// Import marker icons as modules so Vite bundles them with correct paths
+// Icons bundled for offline support (CONSTITUTION.md)
+import markerIcon from '../assets/marker-icon.png';
+import markerIcon2x from '../assets/marker-icon-2x.png';
+import markerShadow from '../assets/marker-shadow.png';
+
+// Fix Leaflet marker icons not loading in bundled environments
+// @ts-expect-error - Leaflet types don't include _getIconUrl
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
+});
 
 export interface MapViewProps {
   /** GeoJSON features to display */
@@ -36,6 +55,13 @@ export interface MapViewProps {
   /** Whether to auto-fit bounds to features */
   autoFitBounds?: boolean;
 
+  /** Controlled viewport - when provided, map will update to this center/zoom.
+   *  Use for programmatic viewport changes (e.g., setViewport messages from VS Code). */
+  viewport?: { center: [number, number]; zoom: number };
+
+  /** Programmatically trigger fit bounds. Increment to trigger a new fit. */
+  fitBoundsTrigger?: number;
+
   /** Tile layer URL (default: OpenStreetMap) */
   tileLayerUrl?: string;
 
@@ -50,18 +76,37 @@ export interface MapViewProps {
 
   /** Height of the map (default: 400px) */
   height?: number | string;
+
+  /** Current time position for temporal rendering (epoch ms). Enables temporal track rendering when provided. */
+  currentTime?: number;
+
+  /** Track display mode: 'full' (entire track + marker) or 'trail' (snail-trail up to current time). */
+  displayMode?: DisplayMode;
+
+  /** Set of visible feature IDs. When provided, fit-to-window only considers these features. */
+  visibleIds?: Set<string>;
+
+  /** Whether to show the custom toolbar with zoom and fit buttons (default: true) */
+  showToolbar?: boolean;
+
+  /** Position of the toolbar (default: 'topleft') */
+  toolbarPosition?: 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
 }
 
-// Component to handle map events and auto-fit
+// Component to handle map events, auto-fit, and programmatic viewport control
 function MapController({
   bounds,
   autoFitBounds,
+  viewport,
+  fitBoundsTrigger,
   onZoomChange,
   onBoundsChange,
   onBackgroundClick,
 }: {
   bounds: Bounds | null;
   autoFitBounds: boolean;
+  viewport?: { center: [number, number]; zoom: number };
+  fitBoundsTrigger?: number;
   onZoomChange?: (zoom: number) => void;
   onBoundsChange?: (bounds: Bounds) => void;
   onBackgroundClick?: () => void;
@@ -75,6 +120,21 @@ function MapController({
       map.fitBounds([[minLat, minLon], [maxLat, maxLon]] as LatLngBoundsExpression);
     }
   }, [map, bounds, autoFitBounds]);
+
+  // Handle programmatic viewport changes (for setViewport messages)
+  useEffect(() => {
+    if (viewport) {
+      map.setView(viewport.center, viewport.zoom, { animate: false });
+    }
+  }, [map, viewport]);
+
+  // Handle programmatic fit bounds trigger
+  useEffect(() => {
+    if (fitBoundsTrigger !== undefined && fitBoundsTrigger > 0 && bounds) {
+      const [minLon, minLat, maxLon, maxLat] = expandBounds(bounds, 0.1);
+      map.fitBounds([[minLat, minLon], [maxLat, maxLon]] as LatLngBoundsExpression);
+    }
+  }, [map, fitBoundsTrigger, bounds]);
 
   // Handle map events
   useMapEvents({
@@ -124,25 +184,66 @@ export function MapView({
   onBoundsChange,
   initialZoom = 10,
   initialCenter = [50.0, -4.0],
+  viewport,
   autoFitBounds = true,
+  fitBoundsTrigger,
   tileLayerUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   tileLayerAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   className,
   style,
   height = 400,
+  currentTime,
+  displayMode = 'full',
+  visibleIds,
+  showToolbar = true,
+  toolbarPosition = 'topleft',
 }: MapViewProps) {
-  // Normalize features to array
+  // Normalize features to array and filter out features that can't be rendered
   const featureArray = useMemo(() => {
-    return Array.isArray(features) ? features : features.features;
+    const arr = Array.isArray(features) ? features : features.features;
+    // Filter out features with null geometry or empty coordinates
+    return arr.filter((f) => {
+      if (!f.geometry) return false;
+      const coords = f.geometry.coordinates;
+      if (Array.isArray(coords) && coords.length === 0) return false;
+      return true;
+    });
   }, [features]);
 
-  // Calculate bounds for auto-fit
+  // Separate temporal tracks from static features when temporal rendering is active
+  const { temporalFeatures, staticFeatures } = useMemo(() => {
+    if (currentTime === undefined) {
+      return { temporalFeatures: [] as DebriefFeature[], staticFeatures: featureArray };
+    }
+    const temporal: DebriefFeature[] = [];
+    const nonTemporal: DebriefFeature[] = [];
+    for (const f of featureArray) {
+      if (extractTemporalData(f)) {
+        temporal.push(f);
+      } else {
+        nonTemporal.push(f);
+      }
+    }
+    return { temporalFeatures: temporal, staticFeatures: nonTemporal };
+  }, [featureArray, currentTime]);
+
+  // Calculate bounds for auto-fit (use all features regardless)
   const bounds = useMemo(() => calculateBounds(featureArray), [featureArray]);
 
-  // Create GeoJSON data structure
+  // Calculate bounds for visible features only (for fit-to-window button)
+  const visibleBounds = useMemo(() => {
+    if (!visibleIds || visibleIds.size === 0) {
+      // If no visibleIds provided, use all features
+      return bounds;
+    }
+    const visibleFeatures = featureArray.filter((f) => visibleIds.has(f.id));
+    return calculateBounds(visibleFeatures);
+  }, [featureArray, visibleIds, bounds]);
+
+  // Create GeoJSON data structure for static (non-temporal) features
   const geojsonData = useMemo(() => ({
     type: 'FeatureCollection' as const,
-    features: featureArray.map((f) => ({
+    features: staticFeatures.map((f) => ({
       ...f,
       geometry: {
         ...f.geometry,
@@ -150,7 +251,7 @@ export function MapView({
         coordinates: f.geometry.coordinates,
       },
     })),
-  }), [featureArray]);
+  }), [staticFeatures]);
 
   // Style function for features
   const featureStyle = useMemo(() => {
@@ -204,25 +305,46 @@ export function MapView({
         zoom={initialZoom}
         className="debrief-mapview__container"
         style={{ height: '100%', width: '100%' }}
+        zoomControl={!showToolbar}
       >
         <TileLayer url={tileLayerUrl} attribution={tileLayerAttribution} />
+
+        {showToolbar && (
+          <LeafletToolbar
+            position={toolbarPosition}
+            visibleBounds={visibleBounds}
+          />
+        )}
 
         <MapController
           bounds={bounds}
           autoFitBounds={autoFitBounds}
+          viewport={viewport}
+          fitBoundsTrigger={fitBoundsTrigger}
           onZoomChange={onZoomChange}
           onBoundsChange={onBoundsChange}
           onBackgroundClick={onBackgroundClick}
         />
 
-        {featureArray.length > 0 && (
+        {staticFeatures.length > 0 && (
           <GeoJSON
-            key={JSON.stringify(selectedIds.size) + featureArray.length}
+            key={JSON.stringify(selectedIds.size) + staticFeatures.length}
             data={geojsonData}
             style={featureStyle}
             onEachFeature={onEachFeature}
           />
         )}
+
+        {currentTime !== undefined && temporalFeatures.map((f) => (
+          <TemporalTrackLayer
+            key={String(f.id)}
+            feature={f}
+            currentTime={currentTime}
+            displayMode={displayMode}
+            isSelected={selectedIds.has(f.id)}
+            onClick={onSelect}
+          />
+        ))}
       </MapContainer>
     </div>
   );

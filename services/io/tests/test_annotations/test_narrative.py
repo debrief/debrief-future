@@ -15,7 +15,7 @@ class TestBuildNarrative:
         result = build_narrative(line, 1, "test.rep")
 
         assert result["type"] == "Feature"
-        assert result["geometry"] is None
+        assert result["geometry"] == {"type": "Point", "coordinates": []}
         assert result["properties"]["kind"] == "NARRATIVE"
         assert result["properties"]["time"] == "1995-12-12T05:02:00+00:00"
         assert result["properties"]["track_id"] == "NEL_STYLE"

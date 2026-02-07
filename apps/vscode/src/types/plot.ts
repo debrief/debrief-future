@@ -49,6 +49,54 @@ export interface Plot {
 }
 
 /**
+ * Position style configuration for track positions (Feature: 048)
+ */
+export interface PositionStyle {
+  /** Whether to display a symbol at positions */
+  show_symbol: boolean;
+
+  /** Shape to use for position symbols */
+  symbol: 'circle' | 'square' | 'triangle';
+
+  /** Whether to display labels at positions */
+  show_label: boolean;
+}
+
+/**
+ * Per-position style override (Feature: 048)
+ */
+export interface PositionStyleOverride {
+  /** Override whether to show symbol */
+  show_symbol?: boolean;
+
+  /** Override symbol shape */
+  symbol?: 'circle' | 'square' | 'triangle';
+
+  /** Override whether to show label */
+  show_label?: boolean;
+
+  /** Custom label text */
+  label?: string;
+}
+
+/**
+ * Position metadata (coordinates are in geometry.coordinates[i]) (Feature: 048)
+ */
+export interface TimestampedPosition {
+  /** Position timestamp (ISO 8601) */
+  time: string;
+
+  /** Depth in meters (optional) */
+  depth?: number;
+
+  /** Course in degrees (0-360, optional) */
+  course?: number;
+
+  /** Speed in knots (optional) */
+  speed?: number;
+}
+
+/**
  * A track representing a vessel's movement over time
  */
 export interface Track {
@@ -67,6 +115,9 @@ export interface Track {
   /** Time values for each coordinate (ISO 8601) */
   times: string[];
 
+  /** Position metadata array (parallel to geometry.coordinates) (Feature: 048) */
+  positions?: TimestampedPosition[];
+
   /** Start time of track */
   startTime: string;
 
@@ -81,6 +132,20 @@ export interface Track {
 
   /** Whether this track is currently selected */
   selected: boolean;
+
+  // Position styling fields (Feature: 048)
+
+  /** Default styling for all positions */
+  defaultPositionStyle?: PositionStyle;
+
+  /** ISO 8601 duration for interval-based symbol display (e.g., "PT5M") */
+  symbolInterval?: string;
+
+  /** ISO 8601 duration for interval-based label display */
+  labelInterval?: string;
+
+  /** Parallel array of per-position style overrides (null for no override) */
+  positionStyleOverrides?: (PositionStyleOverride | null)[];
 }
 
 /**
@@ -131,6 +196,8 @@ export type SelectionContextType =
   | 'single-track'
   | 'multi-track'
   | 'location'
+  | 'position'         // Feature 053: single position selected
+  | 'multi-position'   // Feature 053: multiple positions selected
   | 'mixed';
 
 /**

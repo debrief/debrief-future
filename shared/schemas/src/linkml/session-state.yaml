@@ -1,0 +1,322 @@
+id: https://debrief.info/schemas/session-state
+name: session_state
+title: Debrief Session State Schema
+description: >-
+  LinkML schema for session state management in the Debrief VS Code extension.
+  Tracks temporal navigation, spatial viewport, feature selection, and document lifecycle.
+  Feature 024-document-session-state.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+
+# ============================================================================
+# Enums
+# ============================================================================
+
+enums:
+  PlaybackStateEnum:
+    description: Current state of time playback
+    permissible_values:
+      stopped:
+        description: Playback is stopped
+      playing:
+        description: Playback is running
+      paused:
+        description: Playback is paused
+
+  DisplayModeEnum:
+    description: Track visualization display mode
+    permissible_values:
+      normal:
+        description: Standard track display
+      snailTrail:
+        description: Trail showing recent positions
+
+  TimeUnitEnum:
+    description: Units for time step navigation
+    permissible_values:
+      millisecond:
+        description: Milliseconds
+      second:
+        description: Seconds
+      minute:
+        description: Minutes
+      hour:
+        description: Hours
+      day:
+        description: Days
+
+  AddressingMode:
+    description: How addresses in a selection path level are interpreted (Feature 053)
+    permissible_values:
+      id:
+        description: Address is a string identifier
+      index:
+        description: Address is a numeric position index
+
+# ============================================================================
+# Core Types
+# ============================================================================
+
+classes:
+
+  TimeInstant:
+    description: A point in time with dual representations (FR-032, FR-033)
+    attributes:
+      epoch:
+        description: Milliseconds since Unix epoch
+        range: integer
+        required: true
+      iso:
+        description: ISO 8601 UTC format string
+        range: string
+        required: true
+        pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$"
+
+  TimeRange:
+    description: A temporal interval with inclusive start and end
+    attributes:
+      start:
+        description: Start of interval
+        range: TimeInstant
+        required: true
+      end:
+        description: End of interval
+        range: TimeInstant
+        required: true
+    rules:
+      - postconditions:
+          description: Start must be less than or equal to end
+          # start.epoch <= end.epoch
+
+  TimeFilter:
+    description: Constraints on the visible time window
+    attributes:
+      start:
+        description: Filter start (null = unbounded)
+        range: TimeInstant
+      end:
+        description: Filter end (null = unbounded)
+        range: TimeInstant
+
+  TimeStep:
+    description: Step size for discrete time navigation (FR-008)
+    attributes:
+      value:
+        description: Numeric step value
+        range: float
+        required: true
+        minimum_value: 0
+      unit:
+        description: Unit of the step
+        range: TimeUnitEnum
+        required: true
+
+  Coordinate:
+    description: A geographic coordinate [longitude, latitude]
+    attributes:
+      longitude:
+        description: Longitude in degrees (-180 to 180)
+        range: float
+        required: true
+        minimum_value: -180
+        maximum_value: 180
+      latitude:
+        description: Latitude in degrees (-90 to 90)
+        range: float
+        required: true
+        minimum_value: -90
+        maximum_value: 90
+
+  ViewportPolygon:
+    description: Geographic area as a 4-corner polygon supporting rotated views (FR-012, FR-013)
+    attributes:
+      coordinates:
+        description: Four corners in clockwise order [NW, NE, SE, SW]
+        range: Coordinate
+        multivalued: true
+        required: true
+        minimum_cardinality: 4
+        maximum_cardinality: 4
+
+  LevelDefinition:
+    description: >-
+      Named nesting level within a feature hierarchy (Feature 053, FR-010).
+      Defines how addresses at this level are interpreted.
+    attributes:
+      name:
+        description: Level identifier used in selection paths
+        range: string
+        required: true
+      addressingMode:
+        description: How addresses at this level are interpreted
+        range: AddressingMode
+        required: true
+      description:
+        description: Human-readable description
+        range: string
+
+  FeatureSelection:
+    description: >-
+      Set of selected feature identifiers with metadata (FR-017).
+      featureIds accepts selection path strings: forward-slash-separated
+      segments following RFC 6901 escaping. A single-segment path is
+      a flat feature ID (backward compatible). Feature 053.
+    attributes:
+      featureIds:
+        description: >-
+          Selected feature paths. Each entry is a forward-slash-separated
+          selection path (e.g. "track-001/positions/4") or a flat feature ID.
+        range: string
+        multivalued: true
+        required: true
+      primary:
+        description: Primary selection path for properties display
+        range: string
+      timestamp:
+        description: When selection was made
+        range: TimeInstant
+        required: true
+
+# ============================================================================
+# State Slices
+# ============================================================================
+
+  TemporalSlice:
+    description: Time-related state including navigation, playback, and filtering
+    attributes:
+      currentTime:
+        description: Current playback/display time (FR-005)
+        range: TimeInstant
+      timeRange:
+        description: Full temporal extent of loaded data (FR-006)
+        range: TimeRange
+      timeFilter:
+        description: Optional visible time window constraint (FR-007)
+        range: TimeFilter
+      stepSize:
+        description: Step size for discrete navigation (FR-008)
+        range: TimeStep
+        required: true
+      playbackRate:
+        description: Playback speed multiplier 0.1-100x (FR-009)
+        range: float
+        required: true
+        minimum_value: 0.1
+        maximum_value: 100.0
+      playbackState:
+        description: Current playback state - ephemeral (FR-010)
+        range: PlaybackStateEnum
+        required: true
+      displayMode:
+        description: Track visualization mode (FR-011)
+        range: DisplayModeEnum
+        required: true
+
+  SpatialSlice:
+    description: Geographic view state for the map display
+    attributes:
+      viewport:
+        description: Visible map area as 4-corner polygon (FR-012)
+        range: ViewportPolygon
+      rotation:
+        description: Map rotation in degrees 0-360 (FR-013)
+        range: float
+        required: true
+        minimum_value: 0
+        maximum_value: 360
+
+  FeaturesSlice:
+    description: Feature selection and visibility state
+    attributes:
+      featureCollectionUri:
+        description: Reference to external feature collection (FR-016)
+        range: uri
+      selection:
+        description: Currently selected features (FR-017)
+        range: FeatureSelection
+        required: true
+      hiddenFeatureIds:
+        description: Features hidden from display (FR-018)
+        range: string
+        multivalued: true
+
+  DocumentSlice:
+    description: Editor lifecycle state including dirty tracking and undo history
+    attributes:
+      dirty:
+        description: Unsaved changes exist - ephemeral (FR-020)
+        range: boolean
+        required: true
+      savePath:
+        description: Last save location
+        range: string
+
+# ============================================================================
+# Root Entity
+# ============================================================================
+
+  SessionState:
+    description: Root entity containing all session state slices (FR-001, FR-002)
+    tree_root: true
+    attributes:
+      schemaVersion:
+        description: Schema version for persistence compatibility (FR-026)
+        range: string
+        required: true
+        pattern: "^\\d+\\.\\d+\\.\\d+$"
+      temporal:
+        description: Time-related state
+        range: TemporalSlice
+        required: true
+      spatial:
+        description: Geographic view state
+        range: SpatialSlice
+        required: true
+      features:
+        description: Feature-related state
+        range: FeaturesSlice
+        required: true
+      document:
+        description: Editor state
+        range: DocumentSlice
+        required: true
+
+# ============================================================================
+# Persistence Schema
+# ============================================================================
+
+  SessionFile:
+    description: Persisted session file format (FR-024)
+    attributes:
+      $schema:
+        description: JSON Schema URI
+        range: uri
+      version:
+        description: Schema version
+        range: string
+        required: true
+        pattern: "^\\d+\\.\\d+\\.\\d+$"
+      savedAt:
+        description: When the session was saved
+        range: datetime
+        required: true
+      temporal:
+        description: Temporal state (excluding ephemeral playbackState)
+        range: TemporalSlice
+        required: true
+      spatial:
+        description: Spatial state
+        range: SpatialSlice
+        required: true
+      features:
+        description: Features state
+        range: FeaturesSlice
+        required: true

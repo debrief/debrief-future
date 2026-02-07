@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "migrate_store JSON-RPC method",
+  "description": "JSON-RPC request/response for STAC store migration",
+  "definitions": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "type": ["string", "integer"] },
+        "method": { "const": "migrate_store" },
+        "params": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Absolute path to the STAC catalog directory"
+            }
+          },
+          "required": ["path"]
+        }
+      },
+      "required": ["jsonrpc", "id", "method", "params"]
+    },
+    "response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "type": ["string", "integer"] },
+        "result": {
+          "type": "object",
+          "properties": {
+            "migrated_items": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "List of item IDs that were migrated"
+            },
+            "count": {
+              "type": "integer",
+              "description": "Number of items migrated"
+            }
+          },
+          "required": ["migrated_items", "count"]
+        }
+      },
+      "required": ["jsonrpc", "id", "result"]
+    }
+  }
+}

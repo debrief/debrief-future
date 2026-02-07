@@ -16,7 +16,7 @@ Add an "interview deferred" workflow to the backlog system:
 3. **New /interview command**: Create a skill that:
    - Lists all items with `needs-interview` status
    - Allows selection and processing of deferred items
-   - Conducts the full interview
+   - Conducts the full interview. Favours multiple choice questions, asked one at a time.
    - Updates item with complete detail and refined scores
 
 ## Success Criteria

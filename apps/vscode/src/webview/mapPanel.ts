@@ -3,6 +3,11 @@
  *
  * This controller manages the webview lifecycle, message passing,
  * and state persistence for the map panel.
+ *
+ * Feature: 029-session-state-vscode
+ * - Subscribes to session manager for active session changes
+ * - Updates webview when viewport/selection/time changes in session
+ * - Sends viewport changes to session state (debounced)
  */
 
 import * as vscode from 'vscode';
@@ -12,13 +17,23 @@ import type { ResultLayer } from '../types/tool';
 import type {
   ExtensionToWebviewMessage,
   WebviewToExtensionMessage,
-  GeoJSONFeature,
 } from './messages';
 import type { IoService } from '../services/ioService';
 import type { StacService } from '../services/stacService';
 import type { StacStore } from '../types/stac';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
-import { DuplicateImportError } from '../types/import';
+import type { ActivityPanelViewProvider } from '../views/activityPanelView';
+import type { SessionManager } from '../services/sessionManager';
+import {
+  subscribeToSpatial,
+  subscribeToSelection,
+  subscribeToTemporal,
+  subscribeToSlice,
+  selectors,
+  type SessionStoreApi,
+  type SessionStoreWithUndo,
+} from '@debrief/session-state';
+import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
 import { calculateBounds, mergeBounds } from '../utils/bounds';
 
 export class MapPanel {
@@ -33,6 +48,7 @@ export class MapPanel {
   private currentPlot: Plot | null = null;
   private currentTracks: Track[] = [];
   private currentLocations: ReferenceLocation[] = [];
+  private otherFeatures: GeoJSONFeature[] = [];
   private resultLayers: ResultLayer[] = [];
   private isWebviewReady = false;
   private pendingMessages: ExtensionToWebviewMessage[] = [];
@@ -42,6 +58,7 @@ export class MapPanel {
   private stacService: StacService | null = null;
   private currentStore: StacStore | null = null;
   private layersTreeProvider: LayersTreeProvider | null = null;
+  private activityPanelProvider: ActivityPanelViewProvider | null = null;
 
   // Event handlers
   private onSelectionChangedCallback:
@@ -50,6 +67,16 @@ export class MapPanel {
   private onExportPngCallback:
     | ((requestId: string) => Promise<void>)
     | undefined;
+
+  // Session manager integration (Feature: 029)
+  private activeSession?: SessionStoreApi;
+  private spatialUnsubscribe?: () => void;
+  private selectionUnsubscribe?: () => void;
+  private temporalUnsubscribe?: () => void;
+  private hiddenUnsubscribe?: () => void;
+  private sessionChangeDisposable?: vscode.Disposable;
+  private viewportUpdateTimeout?: NodeJS.Timeout;
+  private static readonly VIEWPORT_DEBOUNCE_MS = 100;
 
   private constructor(
     panel: vscode.WebviewPanel,
@@ -155,6 +182,7 @@ export class MapPanel {
     this.currentPlot = plot;
     this.currentTracks = tracks;
     this.currentLocations = locations;
+    this.otherFeatures = otherFeatures;
     this.resultLayers = [];
 
     // Update panel title
@@ -179,6 +207,61 @@ export class MapPanel {
   }
 
   /**
+   * Remove features by ID from all in-memory arrays, then re-send loadPlot to webview.
+   */
+  public removeFeatures(ids: string[]): void {
+    if (!this.currentPlot) {
+      return;
+    }
+
+    const idSet = new Set(ids);
+
+    this.currentTracks = this.currentTracks.filter((t) => !idSet.has(t.id));
+    this.currentLocations = this.currentLocations.filter((l) => !idSet.has(l.id));
+    this.otherFeatures = this.otherFeatures.filter((f) => {
+      const fId = (f.properties as Record<string, unknown>)?.id as string | undefined;
+      return !fId || !idSet.has(fId);
+    });
+    this.resultLayers = this.resultLayers.filter((l) => !idSet.has(l.id));
+
+    // Re-send full plot data so webview rebuilds from source of truth
+    this.postMessage({
+      type: 'loadPlot',
+      plot: {
+        id: this.currentPlot.id,
+        title: this.currentPlot.title,
+        tracks: this.currentTracks,
+        locations: this.currentLocations,
+        otherFeatures: this.otherFeatures,
+        bbox: this.currentPlot.bbox,
+        timeExtent: this.currentPlot.timeExtent,
+      },
+    });
+
+    // Update result layers context
+    if (this.resultLayers.length === 0) {
+      void vscode.commands.executeCommand(
+        'setContext',
+        'debrief.hasResultLayers',
+        false
+      );
+    }
+
+    // Update layers tree provider if available
+    if (this.layersTreeProvider) {
+      this.layersTreeProvider.setTracks(this.currentTracks);
+      this.layersTreeProvider.setLocations(this.currentLocations);
+      this.layersTreeProvider.setShapes(this.otherFeatures);
+      this.layersTreeProvider.setResultLayers([...this.resultLayers]);
+    }
+
+    // Update activity panel webview if available
+    if (this.activityPanelProvider) {
+      this.activityPanelProvider.setFeatures(this.currentTracks, this.currentLocations);
+    }
+  }
+
+  /**
    * Update tracks (e.g., after time filter change)
    */
   public updateTracks(tracks: Track[]): void {
@@ -192,10 +275,10 @@ export class MapPanel {
   /**
    * Set selection
    */
-  public setSelection(trackIds: string[], locationIds: string[]): void {
+  public setSelection(featureIds: string[]): void {
     this.postMessage({
       type: 'setSelection',
-      selection: { trackIds, locationIds },
+      featureIds,
     });
   }
 
@@ -211,6 +294,17 @@ export class MapPanel {
    */
   public addResultLayer(layer: ResultLayer): void {
     this.resultLayers.push(layer);
+
+    // Skip webview message for artifact layers (no map geometry)
+    if (layer.artifactHref) {
+      void vscode.commands.executeCommand(
+        'setContext',
+        'debrief.hasResultLayers',
+        true
+      );
+      return;
+    }
+
     this.postMessage({
       type: 'addResultLayer',
       layer: {
@@ -401,6 +495,10 @@ export class MapPanel {
     return this.resultLayers;
   }
 
+  public getOtherFeatures(): GeoJSONFeature[] {
+    return this.otherFeatures;
+  }
+
   /**
    * Set services for REP import functionality
    */
@@ -408,12 +506,14 @@ export class MapPanel {
     ioService: IoService,
     stacService: StacService,
     store: StacStore,
-    layersTreeProvider: LayersTreeProvider
+    layersTreeProvider: LayersTreeProvider,
+    activityPanelProvider?: ActivityPanelViewProvider
   ): void {
     this.ioService = ioService;
     this.stacService = stacService;
     this.currentStore = store;
     this.layersTreeProvider = layersTreeProvider;
+    this.activityPanelProvider = activityPanelProvider ?? null;
   }
 
   /**
@@ -424,6 +524,43 @@ export class MapPanel {
   }
 
   /**
+   * Get the feature kind for a feature ID (Feature: 038).
+   *
+   * Looks up the 'kind' property of features from the current plot data.
+   * Returns the kind string (e.g., 'TRACK', 'POINT', 'CIRCLE') or undefined if unknown.
+   *
+   * @param featureId - The feature ID to look up
+   * @returns The feature kind string or undefined
+   */
+  public getFeatureKind(featureId: string): string | undefined {
+    // Check tracks first (most common)
+    const track = this.currentTracks.find((t) => t.id === featureId);
+    if (track) {
+      return 'TRACK';
+    }
+
+    // Check locations
+    const location = this.currentLocations.find((l) => l.id === featureId);
+    if (location) {
+      return 'POINT';
+    }
+
+    // Check shapes (other features)
+    const shape = this.otherFeatures.find((f) => (f.properties as Record<string, unknown>)?.id === featureId);
+    if (shape) {
+      return 'SHAPE';
+    }
+
+    // Check result layers
+    const resultLayer = this.resultLayers.find((l) => l.id === featureId);
+    if (resultLayer) {
+      return 'RESULT';
+    }
+
+    return undefined;
+  }
+
+  /**
    * Get current store
    */
   public getCurrentStore(): StacStore | null {
@@ -431,10 +568,149 @@ export class MapPanel {
   }
 
   /**
+   * Set session manager for state synchronization (Feature: 029)
+   */
+  public setSessionManager(sessionManager: SessionManager): void {
+    // Subscribe to active session changes
+    this.sessionChangeDisposable = sessionManager.onActiveSessionChange(
+      (session) => this.handleActiveSessionChange(session)
+    );
+
+    // Initialize with current session if any
+    const currentSession = sessionManager.getActiveSession();
+    if (currentSession) {
+      this.handleActiveSessionChange(currentSession);
+    }
+  }
+
+  /**
+   * Handle active session change (Feature: 029)
+   */
+  private handleActiveSessionChange(session: SessionStoreApi | null): void {
+    // Unsubscribe from previous session
+    this.spatialUnsubscribe?.();
+    this.selectionUnsubscribe?.();
+    this.temporalUnsubscribe?.();
+    this.hiddenUnsubscribe?.();
+    this.spatialUnsubscribe = undefined;
+    this.selectionUnsubscribe = undefined;
+    this.temporalUnsubscribe = undefined;
+    this.hiddenUnsubscribe = undefined;
+
+    this.activeSession = session ?? undefined;
+
+    if (session) {
+      // Subscribe to spatial (viewport) changes
+      // Track last viewport sent to map to avoid redundant messages
+      let lastSentViewportKey = '';
+      this.spatialUnsubscribe = subscribeToSpatial(session, (spatial) => {
+        const zoom = spatial.viewport?.zoom;
+        if (spatial.viewport !== null && zoom !== undefined) {
+          // Calculate center from coordinates: [NW, NE, SE, SW] in [lng, lat] order
+          const coords = spatial.viewport.coordinates;
+          const centerLng = (coords[0][0] + coords[1][0] + coords[2][0] + coords[3][0]) / 4;
+          const centerLat = (coords[0][1] + coords[1][1] + coords[2][1] + coords[3][1]) / 4;
+          const viewportKey = `${centerLat.toFixed(6)},${centerLng.toFixed(6)},${zoom}`;
+
+          // Only send if actually different from last sent
+          if (viewportKey !== lastSentViewportKey) {
+            lastSentViewportKey = viewportKey;
+            this.postMessage({
+              type: 'setViewport',
+              viewport: {
+                center: [centerLat, centerLng],
+                zoom,
+              },
+            });
+          }
+        }
+      });
+
+      // Subscribe to selection changes
+      this.selectionUnsubscribe = subscribeToSelection(session, (selection) => {
+        this.postMessage({
+          type: 'setSelection',
+          featureIds: selection.featureIds,
+        });
+      });
+
+      // Subscribe to temporal (time + displayMode) changes (Feature: 039)
+      this.temporalUnsubscribe = subscribeToTemporal(session, (temporal) => {
+        if (temporal.currentTime) {
+          this.postMessage({
+            type: 'setCurrentTime',
+            time: temporal.currentTime.epoch,
+          });
+        }
+        // Forward display mode to map webview
+        const webviewMode = temporal.displayMode === 'snailTrail' ? 'trail' : 'full';
+        this.postMessage({
+          type: 'setDisplayMode',
+          displayMode: webviewMode,
+        });
+      });
+
+      // Subscribe to hidden feature IDs changes (Feature: 048)
+      this.hiddenUnsubscribe = subscribeToSlice(
+        session,
+        selectors.hiddenFeatureIds,
+        (hiddenIds: string[]) => {
+          this.postMessage({
+            type: 'setHiddenIds',
+            hiddenIds,
+          });
+        }
+      );
+    }
+  }
+
+  /**
+   * Handle viewport change from webview with debouncing (Feature: 029)
+   */
+  private handleViewportChanged(viewport: {
+    center: [number, number];
+    zoom: number;
+    bounds?: [[number, number], [number, number], [number, number], [number, number]];
+  }): void {
+    // Clear existing timeout
+    if (this.viewportUpdateTimeout) {
+      clearTimeout(this.viewportUpdateTimeout);
+    }
+
+    // Debounce viewport updates to session state
+    this.viewportUpdateTimeout = setTimeout(() => {
+      if (this.activeSession && viewport.bounds) {
+        // bounds is [NW, NE, SE, SW] in [lng, lat] order - matches ViewportPolygon format
+        const newViewport = {
+          coordinates: viewport.bounds,
+          zoom: viewport.zoom,
+        };
+        // Only update if viewport actually changed (avoid feedback loop)
+        const state: SessionStoreWithUndo = this.activeSession.getState();
+        const currentViewport = state.viewport;
+        if (!currentViewport ||
+            JSON.stringify(currentViewport.coordinates) !== JSON.stringify(newViewport.coordinates) ||
+            currentViewport.zoom !== newViewport.zoom) {
+          state.setViewport(newViewport);
+        }
+      }
+    }, MapPanel.VIEWPORT_DEBOUNCE_MS);
+  }
+
+  /**
    * Dispose the panel
    */
   public dispose(): void {
     MapPanel.currentPanel = undefined;
+
+    // Clean up session subscriptions (Feature: 029)
+    this.spatialUnsubscribe?.();
+    this.selectionUnsubscribe?.();
+    this.temporalUnsubscribe?.();
+    this.sessionChangeDisposable?.dispose();
+    if (this.viewportUpdateTimeout) {
+      clearTimeout(this.viewportUpdateTimeout);
+    }
 
     // Clean up resources
     this.panel.dispose();
@@ -485,7 +761,19 @@ export class MapPanel {
         break;
 
       case 'viewStateChanged':
-        // View state changes are handled automatically by webview persistence
+        // Forward viewport changes to session state (Feature: 029)
+        if (message.state?.bounds) {
+          this.handleViewportChanged({
+            center: message.state.center,
+            zoom: message.state.zoom,
+            bounds: message.state.bounds,
+          });
+        }
+        break;
+
+      case 'viewportChanged':
+        // Debounced viewport update to session state (Feature: 029)
+        this.handleViewportChanged(message.viewport);
         break;
 
       case 'requestExportPng':
@@ -505,6 +793,26 @@ export class MapPanel {
 
       case 'repFileDrop':
         void this.handleRepFileDrop(message.uris);
+        break;
+
+      case 'requestUndo':
+        // Handle undo request from webview keyboard shortcut (Feature: 029)
+        if (this.activeSession) {
+          const state: SessionStoreWithUndo = this.activeSession.getState();
+          if (state.canUndo()) {
+            state.undo();
+          }
+        }
+        break;
+
+      case 'requestRedo':
+        // Handle redo request from webview keyboard shortcut (Feature: 029)
+        if (this.activeSession) {
+          const state: SessionStoreWithUndo = this.activeSession.getState();
+          if (state.canRedo()) {
+            state.redo();
+          }
+        }
         break;
     }
   }
@@ -630,16 +938,13 @@ export class MapPanel {
       );
 
       if (isDuplicate) {
-        const result = await vscode.window.showWarningMessage(
+        // Show warning - only option is Cancel, so any result means abort
+        await vscode.window.showWarningMessage(
           `File "${filename}" has already been imported to this plot.`,
           'Cancel'
         );
-
         this.postMessage({ type: 'importProgress', stage: 'complete' });
-
-        if (result === 'Cancel' || !result) {
-          return;
-        }
+        return;
       }
 
       // Parse REP file
@@ -692,7 +997,7 @@ export class MapPanel {
       });
 
       // Convert to the format StacService expects
-      const safeFeatures = parseResult.features.map((f) => ({
+      const safeFeatures = parseResult.features.map((f: GeoJSONFeature) => ({
         type: 'Feature' as const,
         geometry: {
           type: f.geometry.type,
@@ -743,6 +1048,10 @@ export class MapPanel {
         // Update layers panel
         this.layersTreeProvider?.setTracks(updatedData.tracks);
         this.layersTreeProvider?.setLocations(updatedData.locations);
+        this.layersTreeProvider?.setShapes(updatedData.otherFeatures);
+
+        // Update activity panel webview
+        this.activityPanelProvider?.setFeatures(updatedData.tracks, updatedData.locations);
       }
 
       // Send completion message
@@ -818,24 +1127,18 @@ export class MapPanel {
     });
   }
 
+  /**
+   * Generate HTML for the map webview.
+   * Uses the shared @debrief/components/MapView via thin React wrapper.
+   */
   private getHtmlForWebview(): string {
     const webview = this.panel.webview;
 
-    // Get URIs for webview resources
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'map.js')
+      vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'mapView.js')
     );
     const stylesUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview', 'styles.css')
-    );
-    const leafletCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this.extensionUri,
-        'node_modules',
-        'leaflet',
-        'dist',
-        'leaflet.css'
-      )
     );
 
     const cspSource = webview.cspSource;
@@ -847,19 +1150,19 @@ export class MapPanel {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; img-src ${cspSource} data: https:;">
   <title>Debrief Map</title>
-  <link rel="stylesheet" href="${leafletCssUri.toString()}">
   <link rel="stylesheet" href="${stylesUri.toString()}">
+  <style>
+    html, body, #root {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
 </head>
 <body>
-  <div id="map-container">
-    <div id="map"></div>
-    <div id="toolbar" class="floating-toolbar">
-      <button id="btn-zoom-in" class="toolbar-btn" title="Zoom In">+</button>
-      <button id="btn-zoom-out" class="toolbar-btn" title="Zoom Out">-</button>
-      <button id="btn-fit-bounds" class="toolbar-btn" title="Fit to All">[]</button>
-      <button id="btn-export" class="toolbar-btn" title="Export PNG">E</button>
-    </div>
-  </div>
+  <div id="root"></div>
   <script src="${scriptUri.toString()}"></script>
 </body>
 </html>`;

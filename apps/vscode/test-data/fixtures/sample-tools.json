@@ -1,0 +1,106 @@
+{
+  "tools": [
+    {
+      "id": "range-bearing",
+      "name": "Range & Bearing",
+      "description": "Calculate distance and bearing between two tracks at matching times",
+      "version": "1.0.0",
+      "requirements": [
+        { "kind": "TRACK", "min": 2, "max": 2 }
+      ]
+    },
+    {
+      "id": "closest-approach",
+      "name": "Closest Point of Approach",
+      "description": "Find when and where the tracks came closest to each other",
+      "version": "1.0.0",
+      "requirements": [
+        { "kind": "TRACK", "min": 2, "max": 2 }
+      ]
+    },
+    {
+      "id": "relative-motion",
+      "name": "Relative Motion Analysis",
+      "description": "Compute motion of one track relative to another",
+      "version": "1.0.0",
+      "requirements": [
+        { "kind": "TRACK", "min": 2, "max": 2 }
+      ]
+    },
+    {
+      "id": "track-stats",
+      "name": "Track Statistics",
+      "description": "Calculate speed, course, and distance statistics for a track",
+      "version": "1.0.0",
+      "requirements": [
+        { "kind": "TRACK", "min": 1, "max": 1 }
+      ]
+    },
+    {
+      "id": "distance-to-point",
+      "name": "Distance to Point",
+      "description": "Calculate distance from track to a reference point over time",
+      "version": "1.0.0",
+      "requirements": [
+        { "kind": "TRACK", "min": 1, "max": 1 },
+        { "kind": "POINT", "min": 1, "max": 1 }
+      ]
+    },
+    {
+      "id": "track-interpolate",
+      "name": "Interpolate Position",
+      "description": "Get track position at a specific time",
+      "version": "1.0.0",
+      "requirements": [
+        { "kind": "TRACK", "min": 1 }
+      ]
+    },
+    {
+      "id": "circle-coverage",
+      "name": "Circle Coverage Analysis",
+      "description": "Analyze track time spent within a circle area",
+      "version": "1.0.0",
+      "requirements": [
+        { "kind": "TRACK", "min": 1 },
+        { "kind": "CIRCLE", "min": 1, "max": 1 }
+      ]
+    },
+    {
+      "id": "rectangle-entry-exit",
+      "name": "Area Entry/Exit Times",
+      "description": "Find times when tracks enter and exit a rectangular area",
+      "version": "1.0.0",
+      "requirements": [
+        { "kind": "TRACK", "min": 1 },
+        { "kind": "RECTANGLE", "min": 1, "max": 1 }
+      ]
+    },
+    {
+      "id": "line-crossing",
+      "name": "Line Crossing Detection",
+      "description": "Detect when tracks cross a line boundary",
+      "version": "1.0.0",
+      "requirements": [
+        { "kind": "TRACK", "min": 1 },
+        { "kind": "LINE", "min": 1, "max": 1 }
+      ]
+    },
+    {
+      "id": "vector-alignment",
+      "name": "Vector Alignment Check",
+      "description": "Check if track heading aligns with a reference vector",
+      "version": "1.0.0",
+      "requirements": [
+        { "kind": "TRACK", "min": 1, "max": 1 },
+        { "kind": "VECTOR", "min": 1, "max": 1 }
+      ]
+    },
+    {
+      "id": "universal-info",
+      "name": "Feature Information",
+      "description": "Display detailed information about any selected feature",
+      "version": "1.0.0",
+      "requirements": []
+    }
+  ]
+}

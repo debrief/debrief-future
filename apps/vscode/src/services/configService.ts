@@ -224,7 +224,8 @@ export class ConfigService {
     try {
       if (fs.existsSync(CONFIG_FILE)) {
         const content = fs.readFileSync(CONFIG_FILE, 'utf-8');
-        this.config = JSON.parse(content) as DebriefConfig;
+        const rawConfig = JSON.parse(content) as DebriefConfig;
+        this.config = this.migrateConfig(rawConfig);
       } else {
         this.config = { stores: [], preferences: {} };
       }
@@ -232,6 +233,50 @@ export class ConfigService {
       console.error('Failed to load config:', err);
       this.config = { stores: [], preferences: {} };
     }
+  }
+
+  /**
+   * Migrate old config formats to current format
+   */
+  private migrateConfig(config: DebriefConfig): DebriefConfig {
+    let needsSave = false;
+
+    // Ensure stores array exists
+    if (!config.stores) {
+      config.stores = [];
+    }
+
+    // Migrate each store
+    for (const store of config.stores) {
+      // Add missing status field (old configs don't have it)
+      if (!store.status) {
+        store.status = 'checking';
+        needsSave = true;
+      }
+
+      // Migrate 'name' to 'displayName' (old format used 'name')
+      const storeAny = store as unknown as Record<string, unknown>;
+      if (storeAny.name && !store.displayName) {
+        store.displayName = storeAny.name as string;
+        delete storeAny.name;
+        needsSave = true;
+      }
+    }
+
+    // Ensure preferences exists
+    if (!config.preferences) {
+      config.preferences = {};
+    }
+
+    // Save migrated config
+    if (needsSave) {
+      this.config = config;
+      this.saveConfig().catch((err) =>
+        console.error('Failed to save migrated config:', err)
+      );
+    }
+
+    return config;
   }
 
   private saveConfig(): Promise<void> {

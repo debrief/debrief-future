@@ -98,6 +98,126 @@ def add_features(
     return len(fc["features"])
 
 
+def update_features(
+    catalog_path: CatalogPath,
+    plot_id: str,
+    features: Sequence[GeoJSONFeature],
+) -> int:
+    """Update existing features in-place in a plot's FeatureCollection.
+
+    Matches features by ID and replaces them. Features not found are ignored.
+    Updates bbox after modifications.
+
+    Args:
+        catalog_path: Path to the catalog directory
+        plot_id: ID of the plot
+        features: Updated GeoJSON Feature dicts (must have matching IDs)
+
+    Returns:
+        Number of features successfully updated
+
+    Raises:
+        PlotNotFoundError: If the plot doesn't exist
+        ValueError: If features are invalid GeoJSON
+    """
+    catalog_path = Path(catalog_path)
+
+    for feature in features:
+        _validate_feature(feature)
+
+    item = read_plot(catalog_path, plot_id)
+    plot_dir = catalog_path / plot_id
+    features_path = plot_dir / "features.geojson"
+
+    if not features_path.exists():
+        return 0
+
+    with open(features_path) as f:
+        fc: GeoJSONFeatureCollection = json.load(f)
+
+    # Build lookup of updates by ID
+    updates = {}
+    for feat in features:
+        fid = feat.get("id") or feat.get("properties", {}).get("id")
+        if fid:
+            updates[fid] = feat
+
+    updated_count = 0
+    for i, existing in enumerate(fc["features"]):
+        eid = existing.get("id") or existing.get("properties", {}).get("id")
+        if eid in updates:
+            fc["features"][i] = updates[eid]
+            updated_count += 1
+
+    with open(features_path, "w") as f:
+        json.dump(fc, f, indent=2)
+
+    bbox = _calculate_bbox(fc["features"])
+    if bbox:
+        item["bbox"] = list(bbox)
+        item["geometry"] = _bbox_to_polygon(bbox)
+
+    _save_plot(catalog_path, plot_id, item)
+    return updated_count
+
+
+def delete_features(
+    catalog_path: CatalogPath,
+    plot_id: str,
+    feature_ids: list[str],
+) -> int:
+    """Remove features from a plot's FeatureCollection by ID.
+
+    Removes features with matching IDs. IDs not found are ignored.
+    Updates bbox after removals.
+
+    Args:
+        catalog_path: Path to the catalog directory
+        plot_id: ID of the plot
+        feature_ids: IDs of features to remove
+
+    Returns:
+        Number of features actually removed
+
+    Raises:
+        PlotNotFoundError: If the plot doesn't exist
+    """
+    catalog_path = Path(catalog_path)
+
+    item = read_plot(catalog_path, plot_id)
+    plot_dir = catalog_path / plot_id
+    features_path = plot_dir / "features.geojson"
+
+    if not features_path.exists():
+        return 0
+
+    with open(features_path) as f:
+        fc: GeoJSONFeatureCollection = json.load(f)
+
+    ids_to_remove = set(feature_ids)
+    original_count = len(fc["features"])
+    fc["features"] = [
+        f
+        for f in fc["features"]
+        if (f.get("id") or f.get("properties", {}).get("id")) not in ids_to_remove
+    ]
+    removed_count = original_count - len(fc["features"])
+
+    with open(features_path, "w") as f:
+        json.dump(fc, f, indent=2)
+
+    bbox = _calculate_bbox(fc["features"])
+    if bbox:
+        item["bbox"] = list(bbox)
+        item["geometry"] = _bbox_to_polygon(bbox)
+    else:
+        item["bbox"] = None
+        item["geometry"] = None
+
+    _save_plot(catalog_path, plot_id, item)
+    return removed_count
+
+
 def _validate_feature(feature: GeoJSONFeature) -> None:
     """Validate a GeoJSON feature has required fields.
 

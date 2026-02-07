@@ -40,50 +40,7 @@ debrief/
 
 ## Demo Environment
 
-A browser-accessible demo environment is available for testing and stakeholder demonstrations.
-
-**URL**: https://debrief-demo.fly.dev
-
-### Key Components
-
-| Component | Description |
-|-----------|-------------|
-| `demo/Dockerfile` | Container with XFCE desktop, VNC, noVNC |
-| `demo/fly.toml` | Fly.io deployment configuration |
-| `demo/99-debrief-setup` | Startup script for artifact download |
-| `.github/workflows/build-demo-artifact.yml` | CI for building demo artifacts |
-| `.github/workflows/test-demo.yml` | 7-layer test suite |
-
-### Test Layers
-
-The demo environment uses a 7-layer test strategy:
-1. URL Availability - HTTP 200 check
-2. Service Running - VNC/XFCE process check
-3. VNC Connectivity - WebSocket/RFB handshake
-4. Component Installation - Python packages, entry points
-5. Desktop Integration - .desktop files, MIME types
-6. Data Pipeline - REP parsing, GeoJSON output
-7. E2E Workflow - STAC integration, visual smoke test
-
-### Local Development
-
-```bash
-# Build locally
-cd demo && docker build -t debrief-demo .
-
-# Run locally
-docker run -p 3000:3000 -e DEBRIEF_VERSION=latest debrief-demo
-
-# Access at http://localhost:3000
-```
-
-### Version Updates
-
-```bash
-# Update to specific version
-fly secrets set DEBRIEF_VERSION=v0.2.0 --app debrief-demo
-fly machines restart --app debrief-demo
-```
+**URL**: https://debrief-demo.fly.dev — browser-accessible XFCE desktop via noVNC. See `demo/` directory and `.github/workflows/test-demo.yml` for 7-layer test suite.
 
 ## Build Sequence (Tracer Bullet)
 
@@ -115,87 +72,7 @@ fly machines restart --app debrief-demo
 
 ## Parallel Sessions (Worktrees)
 
-Run multiple Claude Code sessions concurrently using git worktrees.
-
-### How It Works
-
-| Environment | Behavior | Detection |
-|-------------|----------|-----------|
-| **Local device** | Creates worktree in `../worktrees/` | `../worktrees/` directory exists |
-| **Cloud (Claude Code)** | Creates branch (single session) | `CLAUDE_CODE_SESSION_ID` env var |
-
-### Setup for Local Parallel Development
-
-```bash
-# One-time setup: create worktrees directory
-mkdir ../worktrees
-
-# Now /speckit.start will automatically create worktrees
-```
-
-### Environment Variables
-
-| Variable | Values | Effect |
-|----------|--------|--------|
-| `SPECKIT_WORKTREES` | `true` | Force worktree mode |
-| `SPECKIT_WORKTREES` | `false` | Force branch mode |
-| (unset) | — | Auto-detect based on environment |
-
-### Workflow
-
-1. Run `/speckit.start 007` in main repo
-2. Script creates `../worktrees/007-feature-name/`
-3. Output shows: `cd ../worktrees/007-feature-name`
-4. Open new terminal/Claude session in that directory
-5. Continue with `/speckit.specify`, `/speckit.plan`, etc.
-
-### Managing Worktrees
-
-```bash
-# List all worktrees
-git worktree list
-
-# Remove a worktree (after PR merged)
-git worktree remove ../worktrees/007-feature-name
-
-# Prune stale worktree entries
-git worktree prune
-```
-
-### Cleanup Utilities
-
-The `common.sh` script provides cleanup functions:
-
-```bash
-# Source the utilities
-source .specify/scripts/bash/common.sh
-
-# List worktrees with status (active/merged/stale)
-list_worktrees_with_status
-
-# Get count of cleanable worktrees
-get_stale_worktree_count
-
-# Preview cleanup (dry run)
-cleanup_stale_worktrees --dry-run
-
-# Execute cleanup (removes merged/stale worktrees)
-cleanup_stale_worktrees
-
-# Force cleanup (removes even with uncommitted changes)
-cleanup_stale_worktrees --force
-```
-
-**When cleanup happens:**
-- `/speckit.start` checks for stale worktrees (where backlog item is complete)
-- Manual cleanup anytime via `cleanup_stale_worktrees`
-- Worktrees persist through PR review cycle for feedback iterations
-
-### Script Flags
-
-The `create-new-feature.sh` script accepts:
-- `--worktree` — Force worktree creation
-- `--no-worktree` — Force branch checkout (current behavior)
+`/speckit.start` auto-creates worktrees in `../worktrees/` (local) or branches (cloud). Set `SPECKIT_WORKTREES=true|false` to override. Cleanup: `source .specify/scripts/bash/common.sh && cleanup_stale_worktrees`.
 
 ## Key Documents
 
@@ -203,6 +80,7 @@ The `create-new-feature.sh` script accepts:
 - `ARCHITECTURE.md` — technical design decisions
 - `VISION.md` — strategic context
 - `docs/tracer-delivery-plan.md` — implementation roadmap
+- `docs/storybook-vscode-theming.md` — Storybook VS Code theming guide
 
 ## Schema Test Strategy
 
@@ -211,40 +89,9 @@ Three approaches required:
 2. **Round-trip tests** — Python → JSON → TypeScript → JSON → Python
 3. **Schema comparison** — Pydantic-generated JSON Schema must match LinkML-generated
 
-## Active Technologies
-- Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS) (000-schemas)
-- N/A (schema package produces generated code, not persisted data) (000-schemas)
-- Python 3.11+ + Pydantic >=2.0.0, debrief-schemas (workspace), mcp >=1.0.0 (optional) (002-debrief-io)
-- N/A (pure transformation service - no persistence) (002-debrief-io)
-- Python 3.11+ (primary), TypeScript 5.x (mirror library) + Pydantic >=2.0.0 (Python), platformdirs (XDG paths), zod (TypeScript validation) (003-debrief-config)
-- JSON file at XDG config location (~/.config/debrief/config.json on Linux) (003-debrief-config)
-- Markdown (command prompts and templates) + None (pure markdown files interpreted by Claude Code) (004-speckit-ui-workflow)
-- N/A (no persistent data - modifies workflow templates) (004-speckit-ui-workflow)
-- TypeScript 5.x (Electron main + React renderer) + Electron 28+, React 18+, debrief-config (TypeScript), debrief-io (Python via IPC), debrief-stac (Python via IPC) (004-loader-mini-app)
-- N/A (all persistence via debrief-stac service) (004-loader-mini-app)
-- Python 3.11+ + Pydantic >=2.0.0, debrief-schemas (workspace), mcp >=1.0.0 (optional), click (CLI) (005-debrief-calc)
-- N/A (pure transformation service — no persistence) (005-debrief-calc)
-- TypeScript 5.x (VS Code Extension API) + @vscode/api (extension host), Leaflet (map rendering), debrief-config (TypeScript), debrief-stac (via IPC), debrief-calc (via MCP) (006-speckit-vscode-extension)
-- TypeScript 5.x + React 18+, react-leaflet v5+ (map), @tanstack/react-virtual (lists), HTML5 Canvas (timeline), CSS Custom Properties (theming), Storybook 10.x (component preview) (001-shared-react-components)
-- N/A (pure display components — no persistence) (001-shared-react-components)
-- Python 3.11+ (LinkML, Pydantic), TypeScript 5.x (generated types) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS) (014-geojson-styling-schemas)
-- N/A (schema definitions only - no persistence) (014-geojson-styling-schemas)
-- YAML (Taskfile.yml v3 syntax) + Task v3.x (go-task/task), uv (Python), pnpm (Node.js) (017-task-build)
-- N/A (configuration only) (017-task-build)
-- TypeScript 5.x (VS Code Extension) + @vscode/api ^1.85.0 (017-vscode-hide-activities)
-- VS Code `context.globalState` for initialization tracking, user settings for visibility config (017-vscode-hide-activities)
-- Python 3.11+ (LinkML generators, Pydantic models), TypeScript 5.x (generated types) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS) (022-system-kind-discriminator)
-- Markdown (skill definition), Bash (gh CLI integration) + Claude Code Skill system, GitHub CLI (`gh`), Opus model (023-epic-workflow-support)
-- BACKLOG.md (epics and items tables), GitHub issues (023-epic-workflow-support)
-- TypeScript 5.x (shared library, Storybook harness, VS Code extension) + React 18+, Storybook 8.x, Vitest, Playwright (027-context-tool-offering)
-- N/A (pure matching logic, no persistence in Phases 1-2) (027-context-tool-offering)
-- TypeScript 5.x (state server + VS Code extension), Python 3.11+ (MCP client library) + Zustand ^5.0.0, Zundo ^2.0.0, Express ^4.18.0, @modelcontextprotocol/sdk ^1.0.0, better-sse ^1.0.0, Zod ^3.22.0, Vitest ^1.0.0, Playwright ^1.40.0 (024-document-session-state)
-- JSON file at user-defined path (session persistence) (024-document-session-state)
+## Tech Stack Summary
 
-## Recent Changes
-- 024-document-session-state: Added TypeScript 5.x + Zustand, Zundo, Express, MCP SDK, better-sse for session state management with Python client library
-- 001-shared-react-components: Added TypeScript 5.x + React 18+, react-leaflet v5+, @tanstack/react-virtual, HTML5 Canvas, CSS Custom Properties, Storybook 10.x
-- 000-schemas: Added Python 3.11+ (generators, Pydantic models), TypeScript 5.x (generated interfaces) + LinkML, linkml-runtime, Pydantic v2, AJV (JSON Schema validation in JS)
+Python 3.11+ (services, schemas), TypeScript 5.x (frontends, VS Code), React 18+, LinkML, Pydantic v2, Storybook. Per-feature details in individual spec files under `.specify/`.
 
 ## Project Memory System
 
@@ -272,3 +119,32 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 
 **When completing work:**
 - Log in `docs/project_notes/issues.md` with ticket ID and URL
+
+## Active Technologies
+- TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store) (039-wire-timecontroller-temporal-track)
+- N/A (in-memory temporal state only) (039-wire-timecontroller-temporal-track)
+- Python 3.11 + None (stdlib only — json, pathlib, shutil) (040-stac-store-organization)
+- Local filesystem (STAC 1.0.0 catalogs) (040-stac-store-organization)
+- Python 3.11 (debrief-stac service), TypeScript 5.x (VS Code extension) + pystac concepts (manual STAC JSON), MCP SDK, VS Code extension API (001-save-calc-results-stac)
+- Local filesystem STAC catalog (JSON + GeoJSON files) (001-save-calc-results-stac)
+- TypeScript 5.x (VS Code extension webview) + Leaflet ^1.9.4 (already in project), VS Code extension API, esbuild (042-stac-catalog-overview-panel)
+- Local filesystem STAC catalogs (read-only) (042-stac-catalog-overview-panel)
+- TypeScript 5.x (VS Code extension) + VS Code extension API, debrief-io (REP parser), stacService (043-load-rep-new-plot)
+- Local filesystem STAC catalogs (read-write) (043-load-rep-new-plot)
+- TypeScript 5.x (VS Code extension) + VS Code extension API, existing `stacService`, existing `ioService`, Node.js `fs/promises`, `crypto.randomUUID()` (043-load-rep-new-plot)
+- Markdown (documentation only — no code implementation) + N/A (reads existing source files for reference content) (032-storybook-vscode-theming)
+- TypeScript 5.x (VS Code extension webview) + React 18, react-leaflet 4.2, @debrief/components, VS Code webview API (048-refactor-vscode-map-wrapper)
+- VS Code webview state persistence (setState/getState) (048-refactor-vscode-map-wrapper)
+- Python 3.11 (LinkML schemas, Pydantic models), TypeScript 5.x (generated types, VS Code extension webview) + LinkML (schema source), Pydantic v2 (Python validation), Leaflet 1.9.x (map rendering) (048-geojson-position-metadata)
+- Local filesystem STAC catalogs (JSON + GeoJSON files) (048-geojson-position-metadata)
+- Python 3.11 (decorator), Markdown (specs), JSON (golden examples) + None (standard library only for decorator) (049-tool-documentation-model)
+- Filesystem only (markdown files, JSON fixtures) (049-tool-documentation-model)
+- TypeScript 5.x (VS Code extension and webview) + VS Code Extension API ^1.85.0, React 18.x, @debrief/shared-components (001-wire-file-actions)
+- Local filesystem (via VS Code workspace.fs API) (001-wire-file-actions)
+- Markdown (command/agent definitions), Java (harness template) + None (Claude agent infrastructure, existing speckit patterns) (050-tool-migration-workflow)
+- Filesystem only (Markdown files, JSON golden examples) (050-tool-migration-workflow)
+- TypeScript 5.x (session-state package, VS Code extension, shared components), Python 3.11 (LinkML schemas, Pydantic models) + Zustand (state management), React 18.x (shared components), Leaflet 1.9.x (map rendering), LinkML (schema source), VS Code Extension API ^1.85.0 (053-nested-child-selection)
+- In-memory Zustand store (session state); no persistent storage changes (053-nested-child-selection)
+
+## Recent Changes
+- 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)

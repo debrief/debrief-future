@@ -10,10 +10,26 @@ import { isTrackFeature } from './types';
  * @returns A display label string
  */
 export function getFeatureLabel(feature: DebriefFeature): string {
+  // Access properties with type assertion to handle legacy data formats
+  const props = feature.properties as unknown as Record<string, unknown>;
+
   if (isTrackFeature(feature)) {
-    return feature.properties.platform_name || feature.properties.platform_id || feature.id;
+    // Schema: platform_name, platform_id; Legacy: name
+    return (
+      feature.properties.platform_name ||
+      feature.properties.platform_id ||
+      (props.name as string) ||
+      feature.id ||
+      'Unnamed Track'
+    );
   } else {
-    return feature.properties.name || feature.id;
+    // Schema: name; Legacy: label (used by shapes like CIRCLE, RECTANGLE, etc.)
+    return (
+      feature.properties.name ||
+      (props.label as string) ||
+      feature.id ||
+      'Unnamed Feature'
+    );
   }
 }
 

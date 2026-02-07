@@ -659,6 +659,64 @@
       "title": "PolygonProperties",
       "type": "object"
     },
+    "PositionStyle": {
+      "additionalProperties": false,
+      "description": "Default styling configuration for track positions. Applied as baseline before interval rules and overrides.",
+      "properties": {
+        "show_label": {
+          "description": "Whether to display labels at positions",
+          "type": "boolean"
+        },
+        "show_symbol": {
+          "description": "Whether to display a symbol at positions",
+          "type": "boolean"
+        },
+        "symbol": {
+          "$ref": "#/$defs/PointShapeEnum",
+          "description": "Shape to use for position symbols"
+        }
+      },
+      "required": [
+        "show_symbol",
+        "symbol",
+        "show_label"
+      ],
+      "title": "PositionStyle",
+      "type": "object"
+    },
+    "PositionStyleOverride": {
+      "additionalProperties": false,
+      "description": "Per-position style override. Index in array determines which position. No time field - array index i applies to positions[i]. Use null for positions without custom styling.",
+      "properties": {
+        "label": {
+          "description": "Custom label text (null = use timestamp)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "show_label": {
+          "description": "Override whether to show label",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "show_symbol": {
+          "description": "Override whether to show symbol (null = use default/interval)",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "symbol": {
+          "$ref": "#/$defs/PointShapeEnum",
+          "description": "Override symbol shape"
+        }
+      },
+      "title": "PositionStyleOverride",
+      "type": "object"
+    },
     "RectangleAnnotation": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for rectangle annotations. Geometry is a Polygon with 4 corners (plus closing point).",
@@ -1044,17 +1102,8 @@
     },
     "TimestampedPosition": {
       "additionalProperties": false,
-      "description": "A position with timestamp and optional kinematic data",
+      "description": "Temporal and kinematic metadata for a single track position. Coordinates are NOT stored here - they live in geometry.coordinates[i]. Position metadata at index i corresponds to coordinate at index i.",
       "properties": {
-        "coordinates": {
-          "description": "[longitude, latitude] in degrees",
-          "items": {
-            "type": "number"
-          },
-          "maxItems": 2,
-          "minItems": 2,
-          "type": "array"
-        },
         "course": {
           "description": "Course in degrees (0-360)",
           "maximum": 360,
@@ -1086,8 +1135,7 @@
         }
       },
       "required": [
-        "time",
-        "coordinates"
+        "time"
       ],
       "title": "TimestampedPosition",
       "type": "object"
@@ -1183,6 +1231,10 @@
       "additionalProperties": false,
       "description": "Properties for a TrackFeature",
       "properties": {
+        "default_position_style": {
+          "$ref": "#/$defs/PositionStyle",
+          "description": "Default styling applied to all positions"
+        },
         "end_time": {
           "description": "Track end time (ISO8601)",
           "format": "date-time",
@@ -1193,6 +1245,14 @@
           "const": "TRACK",
           "description": "Feature type discriminator"
         },
+        "label_interval": {
+          "description": "ISO 8601 duration for interval-based label display. Null means no interval-based labels.",
+          "pattern": "^P(T[0-9]+[HMS])+$|^P[0-9]+D(T[0-9]+[HMS]+)?$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "platform_id": {
           "description": "Platform/vessel identifier",
           "type": "string"
@@ -1201,6 +1261,16 @@
           "description": "Human-readable platform name",
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "position_style_overrides": {
+          "description": "Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling.",
+          "items": {
+            "$ref": "#/$defs/PositionStyleOverride"
+          },
+          "type": [
+            "array",
             "null"
           ]
         },
@@ -1228,6 +1298,14 @@
           "$ref": "#/$defs/TrackStyle",
           "description": "Composite styling for track line and position markers"
         },
+        "symbol_interval": {
+          "description": "ISO 8601 duration for interval-based symbol display. E.g., \"PT5M\" = every 5 minutes, \"PT1H\" = every hour. Null means no interval-based symbols.",
+          "pattern": "^P(T[0-9]+[HMS])+$|^P[0-9]+D(T[0-9]+[HMS]+)?$",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "track_type": {
           "$ref": "#/$defs/TrackTypeEnum",
           "description": "Type of track"
@@ -1240,7 +1318,8 @@
         "start_time",
         "end_time",
         "positions",
-        "style"
+        "style",
+        "default_position_style"
       ],
       "title": "TrackProperties",
       "type": "object"

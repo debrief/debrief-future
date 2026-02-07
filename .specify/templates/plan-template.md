@@ -116,6 +116,31 @@ directories captured above]
 
 *If no components identified, write "None - backend/infrastructure feature"*
 
+## Storybook E2E Testing
+
+*Identify which Storybook stories require automated Playwright tests. Skip if feature has no visual components.*
+
+| Story | Test Coverage | Theme Variants | Interactions |
+|-------|--------------|----------------|--------------|
+| `ComponentName.stories.tsx` | Rendering, accessibility | light, dark, vscode | [click, fill, hover, etc.] |
+
+**Testing Strategy**:
+- [ ] Component renders correctly in all theme variants
+- [ ] Interactive elements respond to user input
+- [ ] Accessibility attributes present (data-testid, aria-*)
+- [ ] Screenshots captured for evidence
+
+**Test File Location**: `shared/components/e2e/{ComponentName}.spec.ts`
+
+**Theme Variant URLs** (for Storybook):
+```
+/iframe.html?id=category-component--story-name&globals=theme:light
+/iframe.html?id=category-component--story-name&globals=theme:dark
+/iframe.html?id=category-component--story-name&globals=theme:vscode
+```
+
+*If no e2e tests needed, write "None - no interactive UI components"*
+
 ## Complexity Tracking
 
 > **Fill ONLY if Constitution Check has violations that must be justified**

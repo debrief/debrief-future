@@ -17,13 +17,27 @@ def runner():
 @pytest.fixture
 def single_track_path():
     """Path to single track fixture."""
-    return Path(__file__).parent.parent / "calc" / "fixtures" / "track-single.geojson"
+    return (
+        Path(__file__).parent.parent.parent
+        / "services"
+        / "calc"
+        / "tests"
+        / "fixtures"
+        / "track-single.geojson"
+    )
 
 
 @pytest.fixture
 def tracks_pair_path():
     """Path to tracks pair fixture."""
-    return Path(__file__).parent.parent / "calc" / "fixtures" / "tracks-pair.geojson"
+    return (
+        Path(__file__).parent.parent.parent
+        / "services"
+        / "calc"
+        / "tests"
+        / "fixtures"
+        / "tracks-pair.geojson"
+    )
 
 
 class TestToolsList:
@@ -91,7 +105,7 @@ class TestToolsRun:
         data = json.loads(result.output)
         assert data["type"] == "FeatureCollection"
         assert len(data["features"]) == 1
-        assert data["features"][0]["properties"]["kind"] == "track-statistics"
+        assert data["features"][0]["properties"]["kind"] == "track/statistics"
 
     def test_run_range_bearing(self, runner, tracks_pair_path):
         result = runner.invoke(
@@ -101,7 +115,10 @@ class TestToolsRun:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["type"] == "FeatureCollection"
-        assert len(data["features"]) == 3  # start, mid, end
+        assert len(data["features"]) == 1  # single range-bearing-series
+        series = data["features"][0]
+        assert series["type"] == "range-bearing-series"
+        assert len(series["entries"]) == 5  # one per matching timestamp
 
     def test_run_with_parameters(self, runner, tracks_pair_path):
         result = runner.invoke(

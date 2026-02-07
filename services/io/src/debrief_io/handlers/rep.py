@@ -33,6 +33,33 @@ from debrief_io.handlers.base import BaseHandler
 from debrief_io.models import ParseResult, ParseWarning
 
 
+def calculate_position_style_intervals(duration_hours: float) -> tuple[str, str]:
+    """Calculate sensible symbol and label intervals based on track duration.
+
+    Uses a tiered approach to provide readable position markers:
+    - Short tracks get more frequent symbols/labels
+    - Long tracks get less frequent symbols/labels
+
+    Args:
+        duration_hours: Track duration in hours
+
+    Returns:
+        Tuple of (symbol_interval, label_interval) in ISO 8601 duration format
+    """
+    if duration_hours < 0.5:  # < 30 minutes
+        return ("PT1M", "PT5M")  # 1 min symbols, 5 min labels
+    elif duration_hours < 2:  # 30 min - 2 hours
+        return ("PT5M", "PT15M")  # 5 min symbols, 15 min labels
+    elif duration_hours < 6:  # 2 - 6 hours
+        return ("PT10M", "PT30M")  # 10 min symbols, 30 min labels
+    elif duration_hours < 12:  # 6 - 12 hours
+        return ("PT15M", "PT1H")  # 15 min symbols, 1 hour labels
+    elif duration_hours < 24:  # 12 - 24 hours
+        return ("PT30M", "PT2H")  # 30 min symbols, 2 hour labels
+    else:  # >= 24 hours
+        return ("PT1H", "PT4H")  # 1 hour symbols, 4 hour labels
+
+
 def parse_dms_coordinate(degrees: float, minutes: float, seconds: float, hemisphere: str) -> float:
     """Convert DMS (degrees, minutes, seconds) to decimal degrees.
 
@@ -130,21 +157,30 @@ class TrackBuilder:
         # Sort positions by timestamp
         self.positions.sort(key=lambda p: p.timestamp)
 
-        # Build coordinates array [lon, lat, elevation?, time?]
+        # Build coordinates array [lon, lat]
         coordinates = [[p.lon, p.lat] for p in self.positions]
 
-        # Build positions array with full metadata
+        # Build times array (ISO strings, parallel to coordinates)
+        times = [p.timestamp.isoformat() for p in self.positions]
+
+        # Build positions array with temporal/kinematic metadata only
+        # Coordinates are NOT included - they live in geometry.coordinates[i]
+        # Position at index i corresponds to coordinate at index i
         positions_data = [
             {
                 "time": p.timestamp.isoformat(),
-                "lat": p.lat,
-                "lon": p.lon,
                 "course": p.course,
                 "speed": p.speed,
                 "depth": p.depth,
             }
             for p in self.positions
         ]
+
+        # Calculate track duration and determine smart intervals
+        start_time = self.positions[0].timestamp
+        end_time = self.positions[-1].timestamp
+        duration_hours = (end_time - start_time).total_seconds() / 3600
+        symbol_interval, label_interval = calculate_position_style_intervals(duration_hours)
 
         return {
             "type": "Feature",
@@ -158,10 +194,18 @@ class TrackBuilder:
                 "platform_id": self.platform_id,
                 "platform_name": self.platform_id,
                 "track_type": "CONTACT",  # Default, can be overridden
-                "start_time": self.positions[0].timestamp.isoformat(),
-                "end_time": self.positions[-1].timestamp.isoformat(),
+                "times": times,  # Required for track identification
+                "start_time": start_time.isoformat(),
+                "end_time": end_time.isoformat(),
                 "positions": positions_data,
                 "source_file": source_file,
+                "default_position_style": {
+                    "show_symbol": False,
+                    "symbol": "circle",
+                    "show_label": False,
+                },
+                "symbol_interval": symbol_interval,
+                "label_interval": label_interval,
             },
         }
 
@@ -175,12 +219,14 @@ class REPHandler(BaseHandler):
 
     # Pattern for track position records
     # Format: YYMMDD HHMMSS.SSS TRACKNAME SYMBOL LAT(DMS) LON(DMS) COURSE SPEED DEPTH [LABEL]
+    # Track name: unquoted (no spaces) or "quoted with spaces"
+    # Symbol formats: @A, @A@00, @BA10, BBA10, @C[SYMBOL=missile], @B[LAYER=LIGHT_TRACKS]
     POSITION_PATTERN = re.compile(
         r"^\s*"
         r"(\d{6})\s+"  # Date YYMMDD
         r"(\d{6}(?:\.\d+)?)\s+"  # Time HHMMSS.SSS
-        r"(\S+)\s+"  # Track name
-        r"(@\w+)\s+"  # Symbol
+        r'(?:"([^"]+)"|(\S+))\s+'  # Track name (quoted or unquoted)
+        r"(@?\w+(?:@@?\w+)?(?:\[[\w=,]+\])?)\s+"  # Symbol (various formats inc. @@)
         r"(\d+)\s+(\d+)\s+([\d.]+)\s+([NS])\s+"  # Lat DMS
         r"(\d+)\s+(\d+)\s+([\d.]+)\s+([EW])\s+"  # Lon DMS
         r"([\d.]+)\s+"  # Course
@@ -301,25 +347,26 @@ class REPHandler(BaseHandler):
 
         date_str = groups[0]
         time_str = groups[1]
-        track_name = groups[2]
-        symbol = groups[3]
+        # Track name: quoted (group 2) or unquoted (group 3)
+        track_name = groups[2] or groups[3]
+        symbol = groups[4]
 
         # Parse latitude DMS
-        lat_deg = float(groups[4])
-        lat_min = float(groups[5])
-        lat_sec = float(groups[6])
-        lat_hem = groups[7]
+        lat_deg = float(groups[5])
+        lat_min = float(groups[6])
+        lat_sec = float(groups[7])
+        lat_hem = groups[8]
 
         # Parse longitude DMS
-        lon_deg = float(groups[8])
-        lon_min = float(groups[9])
-        lon_sec = float(groups[10])
-        lon_hem = groups[11]
+        lon_deg = float(groups[9])
+        lon_min = float(groups[10])
+        lon_sec = float(groups[11])
+        lon_hem = groups[12]
 
-        course = float(groups[12])
-        speed = float(groups[13])
-        depth = float(groups[14])
-        label = groups[15].strip() if groups[15] else None
+        course = float(groups[13])
+        speed = float(groups[14])
+        depth = float(groups[15])
+        label = groups[16].strip() if groups[16] else None
 
         # Convert DMS to decimal
         lat = parse_dms_coordinate(lat_deg, lat_min, lat_sec, lat_hem)

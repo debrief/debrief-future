@@ -1,0 +1,20 @@
+/**
+ * Yellow halo animation for toolbar buttons.
+ * Applied when available tools or results change.
+ */
+
+@keyframes debrief-yellow-halo {
+  0% {
+    box-shadow: 0 0 0 0 var(--debrief-color-attention);
+  }
+  20% {
+    box-shadow: 0 0 8px 3px color-mix(in srgb, var(--debrief-color-attention) 83%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.debrief-toolbar-btn--halo {
+  animation: debrief-yellow-halo 6s ease-out;
+}

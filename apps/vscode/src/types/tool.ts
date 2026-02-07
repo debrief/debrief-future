@@ -1,11 +1,213 @@
 /**
  * Tool-related type definitions for the Debrief VS Code Extension
+ *
+ * This module re-exports types from @debrief/components/ToolMatch and defines
+ * additional extension-specific types for tool execution and result layers.
  */
 
-import type { SelectionContextType, FeatureKind } from './plot';
+/**
+ * Selection requirement for a tool (from @debrief/schemas).
+ * Defines what feature kinds and counts a tool needs.
+ */
+export interface SelectionRequirement {
+  /** Feature kind (e.g., 'TRACK', 'POINT', 'CIRCLE') */
+  kind: string;
+  /** Minimum count required (default: 1) */
+  min?: number;
+  /** Maximum count allowed (undefined = no limit) */
+  max?: number;
+}
 
-// Type-safe properties to avoid any from geojson
-type SafeProperties = Record<string, unknown> | null;
+/**
+ * Tool definition (from @debrief/schemas).
+ * Describes an analysis tool and its requirements.
+ */
+export interface Tool {
+  /** Unique tool identifier */
+  id: string;
+  /** Display name */
+  name: string;
+  /** Description of what the tool does */
+  description?: string;
+  /** Tool version */
+  version?: string;
+  /** Selection requirements for the tool to be active */
+  requirements?: SelectionRequirement[];
+  /** Minimum total features across all kinds (for multi-kind tools) */
+  minFeatures?: number;
+}
+
+/**
+ * Selection map - feature kind to count.
+ */
+export type ToolSelection = Map<string, number>;
+
+/**
+ * Result of checking a tool against a selection.
+ */
+export interface MatchResult {
+  /** The tool being checked */
+  tool: Tool;
+  /** Whether the tool is active for the selection */
+  isActive: boolean;
+  /** Explanation of why the tool is active/inactive */
+  explanation?: string;
+}
+
+/**
+ * Create an empty selection.
+ */
+export function createSelection(): ToolSelection {
+  return new Map();
+}
+
+/**
+ * Create a selection from a record of kind → count.
+ */
+export function createSelectionFromCounts(counts: Record<string, number>): ToolSelection {
+  return new Map(Object.entries(counts));
+}
+
+/**
+ * Check if a tool's requirements are satisfied by a selection.
+ */
+function checkRequirements(requirements: SelectionRequirement[], selection: ToolSelection): boolean {
+  const acceptedKinds = new Set(requirements.map((r) => r.kind));
+
+  // Reject if selection contains kinds the tool doesn't accept
+  for (const kind of selection.keys()) {
+    if (!acceptedKinds.has(kind) && (selection.get(kind) ?? 0) > 0) {
+      return false;
+    }
+  }
+
+  for (const req of requirements) {
+    const count = selection.get(req.kind) ?? 0;
+    const min = req.min ?? 1;
+    const max = req.max;
+
+    if (count < min) {
+      return false;
+    }
+    if (max !== undefined && count > max) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Get the reason why a tool is inactive for a selection.
+ */
+export function getInactiveReason(tool: Tool, selection: ToolSelection): string {
+  if (!tool.requirements || tool.requirements.length === 0) {
+    return '';
+  }
+
+  const reasons: string[] = [];
+  const acceptedKinds = new Set(tool.requirements.map((r) => r.kind));
+
+  for (const [kind, count] of selection) {
+    if (!acceptedKinds.has(kind) && count > 0) {
+      reasons.push(`Unexpected ${kind} in selection`);
+    }
+  }
+
+  for (const req of tool.requirements) {
+    const count = selection.get(req.kind) ?? 0;
+    const min = req.min ?? 1;
+    const max = req.max;
+
+    if (count < min) {
+      reasons.push(`Need ${min} ${req.kind}, have ${count}`);
+    } else if (max !== undefined && count > max) {
+      reasons.push(`Need at most ${max} ${req.kind}, have ${count}`);
+    }
+  }
+
+  if (tool.minFeatures !== undefined) {
+    let total = 0;
+    for (const count of selection.values()) {
+      total += count;
+    }
+    if (total < tool.minFeatures) {
+      reasons.push(`Need ${tool.minFeatures} features total, have ${total}`);
+    }
+  }
+
+  return reasons.join('; ');
+}
+
+/**
+ * Get all inactive reasons for a tool.
+ */
+export function getAllInactiveReasons(tool: Tool, selection: ToolSelection): string[] {
+  const reason = getInactiveReason(tool, selection);
+  return reason ? [reason] : [];
+}
+
+/**
+ * Tool matching service.
+ * Matches tools to feature selections based on requirements.
+ */
+export class ToolMatchService {
+  private tools: Tool[];
+
+  constructor(tools: Tool[]) {
+    // Sort tools alphabetically by name
+    this.tools = [...tools].sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  /**
+   * Get all tools in the inventory.
+   */
+  getAllTools(): Tool[] {
+    return [...this.tools];
+  }
+
+  /**
+   * Check if a tool is active for a selection.
+   */
+  isToolActive(tool: Tool, selection: ToolSelection): boolean {
+    if (!tool.requirements || tool.requirements.length === 0) {
+      return true; // No requirements = always active
+    }
+    if (!checkRequirements(tool.requirements, selection)) {
+      return false;
+    }
+    if (tool.minFeatures !== undefined) {
+      let total = 0;
+      for (const count of selection.values()) {
+        total += count;
+      }
+      if (total < tool.minFeatures) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Get all active tools for a selection.
+   */
+  getActiveTools(selection: ToolSelection): Tool[] {
+    return this.tools.filter((tool) => this.isToolActive(tool, selection));
+  }
+
+  /**
+   * Get match results for all tools.
+   */
+  getMatchResults(selection: ToolSelection): MatchResult[] {
+    return this.tools.map((tool) => {
+      const isActive = this.isToolActive(tool, selection);
+      return {
+        tool,
+        isActive,
+        explanation: isActive ? undefined : getInactiveReason(tool, selection),
+      };
+    });
+  }
+}
 
 // Self-contained geometry type to avoid any
 interface SafeGeometry {
@@ -17,36 +219,13 @@ interface SafeGeometry {
 interface SafeFeature {
   type: 'Feature';
   geometry: SafeGeometry;
-  properties: SafeProperties;
+  properties: Record<string, unknown> | null;
 }
 
 // Self-contained FeatureCollection type to avoid any from geojson
 interface SafeFeatureCollection {
   type: 'FeatureCollection';
   features: SafeFeature[];
-}
-
-/**
- * An analysis tool from debrief-calc
- */
-export interface AnalysisTool {
-  /** Tool identifier (from debrief-calc) */
-  name: string;
-
-  /** Human-readable display name */
-  displayName: string;
-
-  /** Tool description */
-  description: string;
-
-  /** Required selection context type */
-  contextType: SelectionContextType | 'any';
-
-  /** Accepted input feature kinds */
-  inputKinds: FeatureKind[];
-
-  /** JSON Schema for tool parameters */
-  inputSchema: Record<string, unknown>;
 }
 
 /**
@@ -67,6 +246,9 @@ export interface ToolExecution {
   id: string;
 
   /** Tool being executed */
+  toolId: string;
+
+  /** Tool name for display */
   toolName: string;
 
   /** Execution state */
@@ -121,6 +303,9 @@ export interface ResultLayer {
   /** Display name */
   name: string;
 
+  /** Source tool ID */
+  toolId: string;
+
   /** Source tool name */
   toolName: string;
 
@@ -141,20 +326,49 @@ export interface ResultLayer {
 
   /** Z-order (higher = on top) */
   zIndex: number;
+
+  /** Provenance metadata */
+  provenance: ToolProvenance;
+
+  /** Artifact file href (for non-GeoJSON results) */
+  artifactHref?: string;
+
+  /** Artifact MIME type */
+  artifactMimeType?: string;
+}
+
+/**
+ * Provenance metadata for tracking tool execution history (FR-024)
+ */
+export interface ToolProvenance {
+  /** Tool identifier */
+  toolId: string;
+
+  /** Tool name */
+  toolName: string;
+
+  /** Tool version string */
+  toolVersion: string;
+
+  /** Execution timestamp (ISO 8601) */
+  executionTime: string;
+
+  /** Source feature IDs that were inputs */
+  sourceFeatureIds: string[];
+
+  /** Execution duration in milliseconds */
+  durationMs: number;
 }
 
 /**
  * Tool execution request
  */
 export interface ToolExecutionRequest {
-  /** Tool name */
-  toolName: string;
+  /** Tool ID (from Tool.id) */
+  toolId: string;
 
-  /** Selected track IDs */
-  trackIds: string[];
-
-  /** Selected location IDs */
-  locationIds: string[];
+  /** Selected feature IDs grouped by kind */
+  featureIds: string[];
 
   /** Additional parameters */
   params?: Record<string, unknown>;
@@ -175,32 +389,71 @@ export interface ToolExecutionResult {
 
   /** Execution duration in ms */
   durationMs: number;
+
+  /** MCP result type (e.g. "addition/track-statistics") */
+  resultType?: string;
+
+  /** Display label from annotations */
+  label?: string;
+
+  /** Source feature IDs from annotations */
+  sourceFeatureIds?: string[];
+
+  /** Artifact data string (for non-GeoJSON results like time-series) */
+  artifactData?: string;
+
+  /** Artifact filename hint from debrief:href annotation */
+  artifactHref?: string;
+}
+
+// ---------------------------------------------------------------------------
+// MCP Content Types (#041 Tool Results Architecture)
+// ---------------------------------------------------------------------------
+
+/**
+ * Debrief-specific annotations on MCP content items.
+ */
+export interface DebriefAnnotations {
+  'debrief:resultType': string;
+  'debrief:sourceFeatures': string[];
+  'debrief:label': string;
+  'debrief:href'?: string;
+  'debrief:deletedFeatures'?: string[];
 }
 
 /**
- * Check if a tool is applicable to the given selection context
+ * A single MCP content item (resource, text, or image).
  */
-export function isToolApplicable(
-  tool: AnalysisTool,
-  contextType: SelectionContextType,
-  featureKinds: FeatureKind[]
-): boolean {
-  // Check context type
-  if (tool.contextType !== 'any' && tool.contextType !== contextType) {
-    return false;
-  }
+export interface MCPContentItem {
+  type: 'resource' | 'text' | 'image';
+  resource?: { uri: string; mimeType: string; text: string };
+  text?: string;
+  data?: string;
+  mimeType?: string;
+  annotations: DebriefAnnotations;
+}
 
-  // Check feature kinds
-  if (tool.inputKinds.length > 0) {
-    const hasRequiredKind = tool.inputKinds.some((kind) =>
-      featureKinds.includes(kind)
-    );
-    if (!hasRequiredKind) {
-      return false;
-    }
-  }
+/**
+ * Successful MCP tool response with content array.
+ */
+export interface MCPToolResponse {
+  content: MCPContentItem[];
+  duration_ms: number;
+}
 
-  return true;
+/**
+ * MCP error response with structured error data.
+ */
+export interface MCPErrorResponse {
+  error: {
+    code: number;
+    message: string;
+    data: {
+      'debrief:errorCategory': string;
+      'debrief:affectedFeatures': string[];
+    };
+  };
+  duration_ms?: number;
 }
 
 /**
@@ -216,8 +469,8 @@ export function createDefaultResultStyle(toolName: string): LayerStyle {
   const hue = Math.abs(hash) % 360;
 
   return {
-    strokeColor: `hsl(${hue}, 70%, 50%)`,
-    strokeWidth: 2,
+    strokeColor: '#ff0000',
+    strokeWidth: 4,
     dashArray: [8, 4],
     fillColor: `hsl(${hue}, 70%, 50%)`,
     fillOpacity: 0.3,
@@ -227,11 +480,10 @@ export function createDefaultResultStyle(toolName: string): LayerStyle {
 /**
  * Create a new tool execution record
  */
-export function createToolExecution(
-  toolName: string
-): ToolExecution {
+export function createToolExecution(toolId: string, toolName: string): ToolExecution {
   return {
     id: `exec-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    toolId,
     toolName,
     status: 'pending',
     startedAt: new Date().toISOString(),

@@ -5,6 +5,7 @@
  */
 
 import * as fs from 'fs';
+import * as crypto from 'crypto';
 import * as path from 'path';
 import type {
   StacStore,
@@ -12,7 +13,25 @@ import type {
   StacItemSummary,
   StacCatalog,
   StacItem,
+  StacAsset,
 } from '../types/stac';
+
+/**
+ * Associated file from STAC item sources or results folder.
+ * Matches the interface from shared/components for compatibility.
+ */
+export interface AssociatedFile {
+  /** Display name */
+  name: string;
+  /** Path relative to STAC item */
+  path: string;
+  /** Source or result */
+  category: 'source' | 'result';
+  /** Parsed from multi-suffix convention (e.g., '2d', 'table') */
+  viewerType?: string;
+  /** File format (e.g., 'json', 'geojson', 'csv') */
+  format?: string;
+}
 import type { Plot, Track, ReferenceLocation } from '../types/plot';
 import type { GeoJSONFeature } from '../types/import';
 
@@ -164,6 +183,8 @@ export class StacService {
         const item = await this.loadItem(itemPath);
 
         if (item) {
+          const startDatetime = (item.properties.start_datetime as string | undefined) ?? null;
+          const endDatetime = (item.properties.end_datetime as string | undefined) ?? null;
           items.push({
             id: item.id,
             title: item.properties.title ?? item.id,
@@ -171,6 +192,9 @@ export class StacService {
             itemPath: relativePath,
             catalogId: catalog.id,
             storeId: store.id,
+            bbox: item.bbox ?? null,
+            startDatetime,
+            endDatetime,
           });
         }
       }
@@ -311,8 +335,8 @@ export class StacService {
         const props = feature.properties ?? {};
         const geom = feature.geometry;
 
-        // Skip features with no geometry
-        if (!geom) {
+        // Skip features with no geometry or empty coordinates
+        if (!geom || !geom.coordinates || (Array.isArray(geom.coordinates) && geom.coordinates.length === 0)) {
           continue;
         }
 
@@ -333,8 +357,8 @@ export class StacService {
             visible: true,
             selected: false,
           });
-        } else if (geom.type === 'Point' && props.kind === 'LOCATION') {
-          // Reference location: Point with kind=LOCATION
+        } else if (geom.type === 'Point' && (props.kind === 'POINT' || props.kind === 'LOCATION')) {
+          // Reference location: Point with kind=POINT or LOCATION
           const pointCoords = geom.coordinates as number[];
 
           locations.push({
@@ -391,6 +415,161 @@ export class StacService {
     } catch (err) {
       console.error('Failed to save track colors:', err);
       return false;
+    }
+  }
+
+  // ============================================================================
+  // Result File Extraction (Feature 051)
+  // ============================================================================
+
+  /**
+   * Parse multi-suffix viewer type from filename.
+   * E.g., "range-bearing.2d.json" -> "2d", "result.table.geojson" -> "table"
+   *
+   * @param filename The filename to parse
+   * @returns The viewer type if found, undefined otherwise
+   */
+  parseViewerType(filename: string): string | undefined {
+    // Split by dots and check for multi-suffix pattern
+    const parts = filename.split('.');
+    if (parts.length >= 3) {
+      // Second-to-last part is potential viewer type
+      const potentialViewerType = parts[parts.length - 2];
+      // Known viewer types
+      const knownViewerTypes = ['2d', '3d', 'table', 'chart', 'map', 'text'];
+      if (potentialViewerType && knownViewerTypes.includes(potentialViewerType.toLowerCase())) {
+        return potentialViewerType.toLowerCase();
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Parse file format from filename.
+   *
+   * @param filename The filename to parse
+   * @returns The file extension without dot, lowercase
+   */
+  parseFileFormat(filename: string): string {
+    const ext = path.extname(filename);
+    return ext ? ext.slice(1).toLowerCase() : '';
+  }
+
+  /**
+   * Transform a STAC asset to an AssociatedFile.
+   *
+   * @param asset The STAC asset
+   * @param assetKey The asset key from the item
+   * @returns AssociatedFile object
+   */
+  assetToAssociatedFile(asset: StacAsset, _assetKey: string): AssociatedFile {
+    const hrefFilename = path.basename(asset.href);
+    const displayName = asset.title ?? hrefFilename;
+    const format = this.parseFileFormat(hrefFilename);
+    const viewerType = this.parseViewerType(hrefFilename);
+
+    return {
+      name: displayName,
+      path: asset.href.startsWith('./') ? asset.href.slice(2) : asset.href,
+      category: 'result',
+      viewerType,
+      format,
+    };
+  }
+
+  /**
+   * Check if a STAC asset is a result file.
+   * Primary: Check for 'result' role in roles array.
+   * Fallback: Check for debrief:toolId metadata or known result patterns.
+   *
+   * @param asset The STAC asset to check
+   * @param assetKey The asset key
+   * @returns True if this asset is a result file
+   */
+  isResultAsset(asset: StacAsset, _assetKey: string): boolean {
+    // Primary: Check for 'result' role
+    if (asset.roles?.includes('result')) {
+      return true;
+    }
+
+    // Fallback: Check for debrief:toolId metadata
+    const assetWithMetadata = asset as StacAsset & { 'debrief:toolId'?: string };
+    if (assetWithMetadata['debrief:toolId']) {
+      return true;
+    }
+
+    // Fallback: Check filename patterns for known result types
+    const href = asset.href.toLowerCase();
+    const resultPatterns = [
+      'range-bearing',
+      '-result.',
+      '-analysis.',
+      '-calculation.',
+    ];
+    for (const pattern of resultPatterns) {
+      if (href.includes(pattern)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Extract result files from a loaded STAC item's assets.
+   * Identifies assets with 'result' role or matching result patterns.
+   *
+   * @param item The STAC item object
+   * @returns Array of AssociatedFile objects for result assets
+   */
+  getResultFilesFromItem(item: StacItem): AssociatedFile[] {
+    const results: AssociatedFile[] = [];
+
+    if (!item.assets) {
+      return results;
+    }
+
+    try {
+      for (const [assetKey, asset] of Object.entries(item.assets)) {
+        try {
+          if (this.isResultAsset(asset, assetKey)) {
+            results.push(this.assetToAssociatedFile(asset, assetKey));
+          }
+        } catch (err) {
+          // Skip problematic assets, log warning
+          console.warn(`[debrief] Skipping asset ${assetKey}: ${err instanceof Error ? err.message : String(err)}`);
+        }
+      }
+    } catch (err) {
+      console.warn(`[debrief] Failed to extract result files: ${err instanceof Error ? err.message : String(err)}`);
+    }
+
+    return results;
+  }
+
+  /**
+   * Load result files from a plot's STAC item.
+   * Convenience method that loads the item and extracts result files.
+   * Feature: 051-load-result-attachments
+   *
+   * @param store The STAC store containing the item
+   * @param itemPath Relative path to the item JSON file
+   * @returns Array of AssociatedFile objects for result assets
+   */
+  async loadResultFiles(store: StacStore, itemPath: string): Promise<AssociatedFile[]> {
+    try {
+      const fullPath = path.join(store.path, itemPath);
+      const item = await this.loadItem(fullPath);
+
+      if (!item) {
+        console.warn(`[debrief] Could not load item for result extraction: ${itemPath}`);
+        return [];
+      }
+
+      return this.getResultFilesFromItem(item);
+    } catch (err) {
+      console.warn(`[debrief] Failed to load result files: ${err instanceof Error ? err.message : String(err)}`);
+      return [];
     }
   }
 
@@ -493,11 +672,199 @@ export class StacService {
   }
 
   /**
+   * Write artifact data as a STAC asset on a plot item.
+   *
+   * @param storePath Path to the STAC store root
+   * @param itemPath Relative path to the item JSON file
+   * @param filename Asset filename (e.g. "range-bearing-t1-t2.json")
+   * @param data String data to write
+   * @param mimeType MIME type of the asset
+   * @param metadata Extra metadata fields for the asset entry
+   * @returns Absolute path to the written file
+   */
+  async addResultAsset(
+    storePath: string,
+    itemPath: string,
+    filename: string,
+    data: string,
+    mimeType: string,
+    metadata?: Record<string, unknown>
+  ): Promise<string> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+
+    if (!item) {
+      throw new Error(`Item not found: ${itemPath}`);
+    }
+
+    // Create assets directory if needed
+    const itemDir = path.dirname(fullItemPath);
+    const assetsDir = path.join(itemDir, 'assets');
+    if (!fs.existsSync(assetsDir)) {
+      fs.mkdirSync(assetsDir, { recursive: true });
+    }
+
+    // Write data file
+    const destPath = path.join(assetsDir, filename);
+    fs.writeFileSync(destPath, data, 'utf-8');
+
+    // Add asset reference to item
+    const key = path.parse(filename).name;
+    const relativeHref = `./assets/${filename}`;
+    item.assets[key] = {
+      href: relativeHref,
+      type: mimeType,
+      title: filename,
+      roles: ['result'],
+      ...metadata,
+    };
+
+    // Write updated item
+    fs.writeFileSync(fullItemPath, JSON.stringify(item, null, 2));
+
+    // Clear cache for this item
+    this.itemCache.delete(fullItemPath);
+
+    return destPath;
+  }
+
+  /**
    * Clear all caches
    */
   clearCache(): void {
     this.catalogCache.clear();
     this.itemCache.clear();
+  }
+
+  // ============================================================================
+  // Item Creation (New Plot)
+  // ============================================================================
+
+  /**
+   * Create a new STAC Item in a store.
+   * Creates the per-item folder structure with item.json and assets/ directory,
+   * and updates catalog.json to link the new item.
+   *
+   * @param storePath Absolute path to the STAC store root
+   * @param options Title and optional ID for the new item
+   * @returns Created item path (relative) and ID
+   */
+  createItem(
+    storePath: string,
+    options: { title: string; id?: string }
+  ): { itemPath: string; itemId: string; itemDir: string } {
+    const itemId = options.id ?? crypto.randomUUID();
+    const folderName = options.title
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+    const itemDir = path.join(storePath, folderName || itemId);
+    const assetsDir = path.join(itemDir, 'assets');
+    const itemJsonPath = path.join(itemDir, 'item.json');
+
+    // Check for existing item with same ID
+    if (fs.existsSync(itemDir)) {
+      throw new Error(`Item already exists: ${folderName || itemId}`);
+    }
+
+    // Create directories
+    fs.mkdirSync(itemDir, { recursive: true });
+    fs.mkdirSync(assetsDir, { recursive: true });
+
+    // Build STAC Item JSON
+    const now = new Date().toISOString();
+    const item = {
+      type: 'Feature',
+      stac_version: '1.0.0',
+      id: itemId,
+      geometry: null,
+      bbox: null,
+      properties: {
+        title: options.title,
+        datetime: null,
+        start_datetime: null,
+        end_datetime: null,
+        created: now,
+      },
+      links: [
+        { rel: 'root', href: '../catalog.json', type: 'application/json' },
+        { rel: 'parent', href: '../catalog.json', type: 'application/json' },
+        { rel: 'self', href: './item.json', type: 'application/json' },
+      ],
+      assets: {},
+    };
+
+    // Write item.json
+    fs.writeFileSync(itemJsonPath, JSON.stringify(item, null, 2));
+
+    // Update catalog.json to link the new item
+    const catalogPath = path.join(storePath, 'catalog.json');
+    if (fs.existsSync(catalogPath)) {
+      const catalogContent = fs.readFileSync(catalogPath, 'utf-8');
+      const catalog = JSON.parse(catalogContent) as { links: Array<{ rel: string; href: string; type?: string; title?: string }> };
+
+      catalog.links.push({
+        rel: 'item',
+        href: `./${folderName || itemId}/item.json`,
+        type: 'application/json',
+        title: options.title,
+      });
+
+      fs.writeFileSync(catalogPath, JSON.stringify(catalog, null, 2));
+
+      // Clear catalog cache
+      this.catalogCache.delete(catalogPath);
+    }
+
+    const itemPath = `${folderName || itemId}/item.json`;
+    return { itemPath, itemId, itemDir };
+  }
+
+  /**
+   * Update temporal metadata on a STAC item from its GeoJSON features.
+   * Scans track features for time arrays and sets start_datetime/end_datetime.
+   */
+  async updateTemporalMetadata(
+    storePath: string,
+    itemPath: string
+  ): Promise<void> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+    if (!item) {return;}
+
+    // Find GeoJSON asset and load features
+    const geoJsonAsset = Object.values(item.assets).find(
+      (asset) =>
+        asset.type === 'application/geo+json' ||
+        asset.href.endsWith('.geojson')
+    );
+    if (!geoJsonAsset) {return;}
+
+    const geoJsonPath = path.resolve(path.dirname(fullItemPath), geoJsonAsset.href);
+    const fc = await this.loadGeoJson(geoJsonPath);
+    if (!fc) {return;}
+
+    let earliest: string | null = null;
+    let latest: string | null = null;
+
+    for (const feature of fc.features) {
+      const props = feature.properties ?? {};
+      const times = props.times as string[] | undefined;
+      if (times && times.length > 0) {
+        const first = times[0];
+        const last = times[times.length - 1];
+        if (first && (!earliest || first < earliest)) {earliest = first;}
+        if (last && (!latest || last > latest)) {latest = last;}
+      }
+    }
+
+    if (earliest || latest) {
+      item.properties.start_datetime = earliest;
+      item.properties.end_datetime = latest;
+      fs.writeFileSync(fullItemPath, JSON.stringify(item, null, 2));
+      this.itemCache.delete(fullItemPath);
+    }
   }
 
   // ============================================================================

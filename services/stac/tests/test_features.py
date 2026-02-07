@@ -8,14 +8,14 @@ import json
 from pathlib import Path
 
 import pytest
-from tests.fixtures import (
+from fixtures import (
     make_sample_feature_collection,
     make_sample_reference_location,
     make_sample_track_feature,
 )
 
 from debrief_stac.catalog import create_catalog
-from debrief_stac.features import add_features
+from debrief_stac.features import add_features, delete_features, update_features
 from debrief_stac.models import PlotMetadata
 from debrief_stac.plot import create_plot, read_plot
 from debrief_stac.types import ASSET_ROLE_DATA, MEDIA_TYPE_GEOJSON
@@ -160,3 +160,76 @@ class TestAddFeatures:
             stored_fc = json.load(f)
 
         assert len(stored_fc["features"]) == 2
+
+
+@pytest.fixture
+def catalog_with_features(tmp_path: Path) -> tuple[Path, str]:
+    """Create a catalog with a plot that has some features."""
+    catalog_path = tmp_path / "catalog"
+    create_catalog(str(catalog_path), "Test Catalog")
+    metadata = PlotMetadata(title="Test Plot")
+    plot_id = create_plot(str(catalog_path), metadata, plot_id="plot-001")
+
+    # Add two features
+    features = [
+        make_sample_track_feature(feature_id="track_a"),
+        make_sample_reference_location(feature_id="track_b"),
+    ]
+    add_features(str(catalog_path), plot_id, features)
+
+    return catalog_path, plot_id
+
+
+class TestUpdateFeatures:
+    def test_update_existing_feature(self, catalog_with_features):
+        catalog_path, plot_id = catalog_with_features
+        updated = {
+            "type": "Feature",
+            "id": "track_a",
+            "geometry": {"type": "Point", "coordinates": [99, 99]},
+            "properties": {"kind": "track", "name": "Updated Track A"},
+        }
+        count = update_features(str(catalog_path), plot_id, [updated])
+        assert count == 1
+
+    def test_update_nonexistent_feature(self, catalog_with_features):
+        catalog_path, plot_id = catalog_with_features
+        updated = {
+            "type": "Feature",
+            "id": "nonexistent",
+            "geometry": {"type": "Point", "coordinates": [0, 0]},
+            "properties": {"kind": "track"},
+        }
+        count = update_features(str(catalog_path), plot_id, [updated])
+        assert count == 0
+
+    def test_update_no_features_file(self, tmp_path):
+        catalog_path = tmp_path / "catalog"
+        create_catalog(str(catalog_path), "Test")
+        plot_id = create_plot(str(catalog_path), PlotMetadata(title="Empty"))
+        count = update_features(str(catalog_path), plot_id, [])
+        assert count == 0
+
+
+class TestDeleteFeatures:
+    def test_delete_existing_feature(self, catalog_with_features):
+        catalog_path, plot_id = catalog_with_features
+        count = delete_features(str(catalog_path), plot_id, ["track_a"])
+        assert count == 1
+
+    def test_delete_nonexistent_feature(self, catalog_with_features):
+        catalog_path, plot_id = catalog_with_features
+        count = delete_features(str(catalog_path), plot_id, ["nonexistent"])
+        assert count == 0
+
+    def test_delete_multiple(self, catalog_with_features):
+        catalog_path, plot_id = catalog_with_features
+        count = delete_features(str(catalog_path), plot_id, ["track_a", "track_b"])
+        assert count == 2
+
+    def test_delete_no_features_file(self, tmp_path):
+        catalog_path = tmp_path / "catalog"
+        create_catalog(str(catalog_path), "Test")
+        plot_id = create_plot(str(catalog_path), PlotMetadata(title="Empty"))
+        count = delete_features(str(catalog_path), plot_id, ["x"])
+        assert count == 0

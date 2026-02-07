@@ -66,3 +66,36 @@ docker run -p 3000:3000 -e DEBRIEF_VERSION=latest debrief-demo
 
 **External:**
 - Demo: https://debrief-demo.fly.dev
+
+### Dynamic Tool Selection (Calc Service)
+
+**How tool matching works:**
+- Python calc tools declare `context_type` (SINGLE/MULTI/REGION/NONE) and `input_kinds`
+- `fetchToolsFromMcp()` in `calcService.ts` converts these to `SelectionRequirement[]` (kind + min/max)
+- `ToolMatchAdapter` converts session selection (feature IDs) → kind counts via `mapPanel.getFeatureKind()`
+- `checkRequirements()` in `tool.ts` uses **closed-world matching** (ADR-005): tool active only if all selected kinds are in its requirements, and counts are within bounds
+
+**Feature kinds recognized:** `TRACK`, `POINT`, `RESULT`, `REGION`
+
+**Key files:**
+- Tool requirements generation: `calcService.ts` → `fetchToolsFromMcp()`
+- Feature kind resolution: `mapPanel.ts` → `getFeatureKind()`
+- Match logic: `tool.ts` → `checkRequirements()`
+- Adapter bridging session↔matching: `toolMatchAdapter.ts`
+- Feature resolution for execution: `calcService.ts` → `resolveFeatures()`
+
+### Claude Code Session: Browser Testing
+
+**Playwright/Puppeteer Installation:**
+- Standard browser downloads blocked (403 from cdn.playwright.dev)
+- Workaround: Use `@sparticuz/chromium` npm package (bundles Chromium)
+- External network from browser blocked (`ERR_TUNNEL_CONNECTION_FAILED`)
+- Local HTML/JavaScript tests work via `page.setContent()`
+- Research document: `docs/project_notes/playwright-installation-research.md`
+
+**Working Setup:**
+```bash
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install @playwright/test playwright-chromium
+npm install @sparticuz/chromium
+```
+- Config requires `executablePath: '/tmp/chromium'` and sandbox-disable flags

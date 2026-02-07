@@ -89,10 +89,7 @@ export interface UpdateTracksMessage {
 /** Set the current selection (from external source like Outline click) */
 export interface SetSelectionMessage {
   type: 'setSelection';
-  selection: {
-    trackIds: string[];
-    locationIds: string[];
-  };
+  featureIds: string[];
 }
 
 /** Clear all selection */
@@ -139,6 +136,34 @@ export interface SetTimeRangeMessage {
   };
 }
 
+/** Set viewport from session state (Feature: 029) */
+export interface SetViewportMessage {
+  type: 'setViewport';
+  viewport: {
+    center: [number, number]; // [lat, lng]
+    zoom: number;
+  };
+}
+
+/** Set current time position from session state (Feature: 029) */
+export interface SetCurrentTimeMessage {
+  type: 'setCurrentTime';
+  time: number; // epoch ms
+}
+
+/** Set display mode for temporal track rendering (Feature: 039) */
+export interface SetDisplayModeMessage {
+  type: 'setDisplayMode';
+  /** 'full' = entire track + highlight marker; 'trail' = snail-trail to current time */
+  displayMode: 'full' | 'trail';
+}
+
+/** Set hidden feature IDs (Feature: 048) */
+export interface SetHiddenIdsMessage {
+  type: 'setHiddenIds';
+  hiddenIds: string[];
+}
+
 /** Set custom color for a track */
 export interface SetTrackColorMessage {
   type: 'setTrackColor';
@@ -174,6 +199,8 @@ export interface SelectionChangedMessage {
   selection: {
     trackIds: string[];
     locationIds: string[];
+    /** Full selection paths for all selected elements (Feature 053) */
+    paths?: string[];
     contextType: SelectionContextType;
   };
 }
@@ -185,6 +212,8 @@ export interface ViewStateChangedMessage {
     center: [number, number];
     zoom: number;
     timeRange: { start: string; end: string };
+    /** Viewport bounds as [NW, NE, SE, SW] corners in [lng, lat] order */
+    bounds?: [[number, number], [number, number], [number, number], [number, number]];
   };
 }
 
@@ -209,6 +238,25 @@ export interface RequestTrackDetailsRequest extends RequestMessage {
 /** Signal that webview has initialized and is ready to receive data */
 export interface WebviewReadyMessage {
   type: 'webviewReady';
+}
+
+/** Request undo from webview (keyboard shortcut) */
+export interface RequestUndoMessage {
+  type: 'requestUndo';
+}
+
+/** Request redo from webview (keyboard shortcut) */
+export interface RequestRedoMessage {
+  type: 'requestRedo';
+}
+
+/** Notify extension of viewport change for session state (Feature: 029) */
+export interface ViewportChangedMessage {
+  type: 'viewportChanged';
+  viewport: {
+    center: [number, number]; // [lat, lng]
+    zoom: number;
+  };
 }
 
 // ============================================================================
@@ -255,6 +303,10 @@ export type ExtensionToWebviewMessage =
   | FitBoundsMessage
   | SetTimeRangeMessage
   | SetTrackColorMessage
+  | SetViewportMessage
+  | SetCurrentTimeMessage
+  | SetDisplayModeMessage
+  | SetHiddenIdsMessage
   | RequestExportPngResponse
   | RequestTrackDetailsResponse
   | ImportProgressMessage
@@ -264,15 +316,25 @@ export type ExtensionToWebviewMessage =
 export type WebviewToExtensionMessage =
   | SelectionChangedMessage
   | ViewStateChangedMessage
+  | ViewportChangedMessage
   | RequestExportPngRequest
   | RequestTrackColorChangeMessage
   | RequestTrackDetailsRequest
   | WebviewReadyMessage
-  | RepFileDropMessage;
+  | RepFileDropMessage
+  | RequestUndoMessage
+  | RequestRedoMessage;
 
 // ============================================================================
 // Re-exports for webview
 // ============================================================================
 
-export type { Track, ReferenceLocation, SelectionContextType } from '../types/plot';
+export type {
+  Track,
+  ReferenceLocation,
+  SelectionContextType,
+  PositionStyle,
+  PositionStyleOverride,
+  TimestampedPosition,
+} from '../types/plot';
 export type { LayerStyle, ResultLayer } from '../types/tool';

@@ -3,18 +3,47 @@
  */
 
 import * as vscode from 'vscode';
+import { access } from 'fs/promises';
+import { loadSession } from '@debrief/session-state';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { IoService } from '../services/ioService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
+import type { SessionManager } from '../services/sessionManager';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
+import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
+import { createTimeInstant } from '@debrief/session-state';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
+import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import { MapPanel } from '../webview/mapPanel';
 import { parseStacUri, buildStacUri } from '../types/stac';
 
 interface OpenPlotArgs {
   uri?: string;
+}
+
+/**
+ * Derive session file path from store path and item path.
+ * Converts item.json to item.debrief-session.
+ */
+function deriveSessionPath(storePath: string, itemPath: string): string {
+  const sessionItemPath = itemPath.replace(/\.json$/, '.debrief-session');
+  // Normalize path separators
+  const normalizedStorePath = storePath.replace(/\\/g, '/');
+  return `${normalizedStorePath}/${sessionItemPath}`;
+}
+
+/**
+ * Check if a file exists.
+ */
+async function fileExists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 interface PlotQuickPickItem extends vscode.QuickPickItem {
@@ -29,9 +58,12 @@ export function createOpenPlotCommand(
   stacService: StacService,
   ioService: IoService,
   recentPlotsService: RecentPlotsService,
+  sessionManager: SessionManager,
   toolsTreeProvider: ToolsTreeProvider,
+  toolMatchAdapter: ToolMatchAdapter,
   layersTreeProvider: LayersTreeProvider,
   timeRangeProvider: TimeRangeViewProvider,
+  activityPanelProvider: ActivityPanelViewProvider,
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void
 ): (args?: OpenPlotArgs) => Promise<void> {
@@ -95,6 +127,40 @@ export function createOpenPlotCommand(
       return;
     }
 
+    // Create session for this document
+    const plotUri = buildStacUri(storeId, itemPath);
+    const session = sessionManager.createSession(plotUri, {
+      plot,
+      tracks: plotData.tracks,
+      locations: plotData.locations,
+      featureCollectionUri: plotUri,
+    });
+
+    // Check for existing session file and load it (Feature: 029 - T053-T055)
+    const sessionPath = deriveSessionPath(store.path, itemPath);
+    if (await fileExists(sessionPath)) {
+      const loadResult = await loadSession(session, sessionPath);
+      if (loadResult.success) {
+        // Session loaded successfully
+        void vscode.window.showInformationMessage(
+          `Restored session from ${sessionPath.split('/').pop()}`
+        );
+      } else if (loadResult.error?.includes('newer than supported')) {
+        // Future version - warn user (T055)
+        void vscode.window.showWarningMessage(
+          `Session file was created with a newer version of Debrief. Some settings may not be restored. ${loadResult.error}`
+        );
+      } else if (loadResult.error) {
+        // Other error - warn but continue
+        void vscode.window.showWarningMessage(
+          `Could not restore session: ${loadResult.error}`
+        );
+      }
+    }
+
+    // Set as active document
+    sessionManager.setActiveDocument(plotUri);
+
     // Create or get map panel
     let panel = getMapPanel();
 
@@ -114,22 +180,54 @@ export function createOpenPlotCommand(
       panel = MapPanel.createOrShow(context.extensionUri, plot.title);
       setMapPanel(panel);
 
+      // Wire session manager for state synchronization (Feature: 029)
+      panel.setSessionManager(sessionManager);
+
       // Set up selection change handler
       panel.onSelectionChanged((selection) => {
-        toolsTreeProvider.updateSelection(selection);
+        const featureIds = [...selection.trackIds, ...selection.locationIds];
+
+        // Update session state - this will trigger subscriptions in ActivityPanelView
+        // which will update toolMatchAdapter and refresh the UI
+        const activeSession = sessionManager.getActiveSession();
+        if (activeSession) {
+          const state = activeSession.getState();
+          state.setSelection(featureIds);
+        }
+
+        // Also update toolMatchAdapter directly for tools tree provider
+        toolMatchAdapter.updateSelection({
+          featureIds,
+          primary: selection.trackIds[0] ?? selection.locationIds[0] ?? null,
+          timestamp: createTimeInstant(Date.now()),
+        });
+        toolsTreeProvider.refresh();
       });
 
-      // Clear reference and layers when panel is disposed
+      // Clear reference, layers, and sessions when panel is disposed
       panel.getPanel().onDidDispose(() => {
+        // Check for dirty sessions and warn user (Feature: 029 - T058)
+        if (sessionManager.hasDirtySessions()) {
+          const count = sessionManager.getDirtySessionCount();
+          void vscode.window.showWarningMessage(
+            count === 1
+              ? 'Session changes were discarded. Use Ctrl+S to save before closing next time.'
+              : `${count} session changes were discarded. Use Ctrl+S to save before closing next time.`
+          );
+        }
+
         setMapPanel(undefined);
         layersTreeProvider.setTracks([]);
         layersTreeProvider.setLocations([]);
+        layersTreeProvider.setShapes([]);
         layersTreeProvider.setResultLayers([]);
+        // Dispose all sessions since they're no longer visible (T028)
+        sessionManager.disposeAllSessions();
       });
     }
 
     // Set up import services for drag-drop functionality
-    panel.setImportServices(ioService, stacService, store, layersTreeProvider);
+    panel.setImportServices(ioService, stacService, store, layersTreeProvider, activityPanelProvider);
 
     // Load plot into panel
     panel.loadPlot(plot, plotData.tracks, plotData.locations, plotData.otherFeatures);
@@ -137,11 +235,22 @@ export function createOpenPlotCommand(
     // Update layers panel
     layersTreeProvider.setTracks(plotData.tracks);
     layersTreeProvider.setLocations(plotData.locations);
+    layersTreeProvider.setShapes(plotData.otherFeatures);
     layersTreeProvider.setResultLayers([]);
 
+    // Update activity panel webview with features
+    activityPanelProvider.setFeatures(plotData.tracks, plotData.locations);
+
+    // Load existing result files from STAC item (Feature: 051-load-result-attachments)
+    const resultFiles = await stacService.loadResultFiles(store, itemPath);
+    activityPanelProvider.setResultFiles(resultFiles);
+
     // Update time range panel with plot's time extent
-    const [timeStart, timeEnd] = plot.timeExtent;
-    timeRangeProvider.updateTimeRange(timeStart, timeEnd, timeStart, timeEnd);
+    // Convert ISO strings to timestamps for the TimeController
+    const [timeStartStr, timeEndStr] = plot.timeExtent;
+    const timeStart = new Date(timeStartStr).getTime();
+    const timeEnd = new Date(timeEndStr).getTime();
+    timeRangeProvider.updateTimeExtent(timeStart, timeEnd);
 
     // Add to recent plots
     await recentPlotsService.addRecentPlot(

@@ -1,0 +1,32 @@
+<!--
+  Maven dependency fragment for Tool Capture Harness
+
+  Add these dependencies to your Legacy Debrief module's pom.xml to use
+  the ToolCaptureHarness for capturing golden I/O examples.
+
+  Location: Copy into your module's <dependencies> section
+-->
+
+<!-- Required: Gson for JSON serialization -->
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.10.1</version>
+    <scope>test</scope>
+</dependency>
+
+<!--
+  Note: The harness uses only standard Java libraries beyond Gson.
+  No additional dependencies are required.
+
+  If you need to serialize complex Debrief domain objects, consider adding:
+
+  <dependency>
+      <groupId>org.locationtech.jts</groupId>
+      <artifactId>jts-core</artifactId>
+      <version>1.19.0</version>
+      <scope>test</scope>
+  </dependency>
+
+  This provides JTS geometry classes if your tools work with spatial data.
+-->

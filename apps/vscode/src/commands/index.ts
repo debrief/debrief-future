@@ -3,24 +3,38 @@
  */
 
 import * as vscode from 'vscode';
+import * as path from 'path';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { CalcService } from '../services/calcService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
 import type { IoService } from '../services/ioService';
+import type { SessionManager } from '../services/sessionManager';
+import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
+import type { SessionStoreApi, SessionStoreWithUndo } from '@debrief/session-state';
 import type { StacTreeProvider } from '../providers/stacTreeProvider';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
+import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import type { MapPanel } from '../webview/mapPanel';
 
 import { createOpenPlotCommand } from './openPlot';
 import { createAddStoreCommand, createRemoveStoreCommand, createUpdateStorePathCommand } from './addStore';
 import { createSelectAllCommand, createClearSelectionCommand } from './selectAll';
-import { createExecuteToolCommand, createCancelToolExecutionCommand } from './executeTool';
+import {
+  createExecuteToolCommand,
+  createCancelToolExecutionCommand,
+  createShowToolRequirementsCommand,
+  createToggleInactiveToolsCommand,
+} from './executeTool';
 import { createExportPngCommand } from './exportPng';
 import { createChangeTrackColorCommand } from './changeTrackColor';
 import { createImportRepCommand } from './importRep';
+import { createUndoCommand, createRedoCommand } from './undoRedo';
+import { createSaveSessionCommand } from './saveSession';
+import { createDeleteSelectionCommand } from './deleteSelection';
+import { createOpenCatalogOverviewCommand } from './openCatalogOverview';
 
 export function registerCommands(
   context: vscode.ExtensionContext,
@@ -29,10 +43,13 @@ export function registerCommands(
   calcService: CalcService,
   recentPlotsService: RecentPlotsService,
   ioService: IoService,
+  sessionManager: SessionManager,
   stacTreeProvider: StacTreeProvider,
   toolsTreeProvider: ToolsTreeProvider,
   layersTreeProvider: LayersTreeProvider,
   timeRangeProvider: TimeRangeViewProvider,
+  activityPanelProvider: ActivityPanelViewProvider,
+  toolMatchAdapter: ToolMatchAdapter,
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void
 ): vscode.Disposable[] {
@@ -48,9 +65,12 @@ export function registerCommands(
         stacService,
         ioService,
         recentPlotsService,
+        sessionManager,
         toolsTreeProvider,
+        toolMatchAdapter,
         layersTreeProvider,
         timeRangeProvider,
+        activityPanelProvider,
         getMapPanel,
         setMapPanel
       )
@@ -151,11 +171,11 @@ export function registerCommands(
     })
   );
 
-  // Tool commands
+  // Tool commands (Feature: 038 - uses toolMatchAdapter for selection)
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.executeTool',
-      createExecuteToolCommand(calcService, getMapPanel, layersTreeProvider)
+      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider, stacService, activityPanelProvider)
     )
   );
 
@@ -166,14 +186,93 @@ export function registerCommands(
     )
   );
 
+  // Tool helper commands (Feature: 038)
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.showToolRequirements',
+      createShowToolRequirementsCommand()
+    )
+  );
+
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.toggleInactiveTools',
+      createToggleInactiveToolsCommand(toolsTreeProvider)
+    )
+  );
+
+  // Tool-specific commands for command palette (FR-019, FR-020)
+  // These provide direct tool execution with proper enablement
+  const toolCommandMap: Record<string, string> = {
+    'debrief.tool.rangeBearing': 'range-bearing',
+    'debrief.tool.closestApproach': 'closest-approach',
+    'debrief.tool.relativeMotion': 'relative-motion',
+    'debrief.tool.trackStats': 'track-stats',
+    'debrief.tool.distanceToPoint': 'distance-to-point',
+  };
+
+  for (const [command, toolId] of Object.entries(toolCommandMap)) {
+    disposables.push(
+      vscode.commands.registerCommand(command, async () => {
+        await vscode.commands.executeCommand('debrief.executeTool', toolId);
+      })
+    );
+  }
+
+  // Open result artifact in editor
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.openResultArtifact',
+      async (layer: { artifactHref?: string }) => {
+        if (!layer?.artifactHref) {
+          return;
+        }
+        const panel = getMapPanel();
+        const store = panel?.getCurrentStore?.();
+        const plot = panel?.getCurrentPlot?.();
+        if (!store?.path || !plot?.itemPath) {
+          void vscode.window.showWarningMessage('No plot open');
+          return;
+        }
+        const itemDir = path.dirname(
+          path.join(store.path, plot.itemPath)
+        );
+        const filePath = path.join(itemDir, 'assets', layer.artifactHref);
+        try {
+          const doc = await vscode.workspace.openTextDocument(filePath);
+          await vscode.window.showTextDocument(doc);
+        } catch {
+          void vscode.window.showErrorMessage(`Could not open artifact: ${layer.artifactHref}`);
+        }
+      }
+    )
+  );
+
   // Layer commands
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.toggleLayerVisibility',
-      (args: { layerId: string }) => {
+      (args: { layerId: string; featureId?: string }) => {
         const panel = getMapPanel();
-        if (panel && args?.layerId) {
-          // Toggle visibility - need to track current state
+        if (!panel || !args?.layerId) {
+          return;
+        }
+
+        // Use session state if featureId is provided
+        const featureId = args.featureId;
+        const activeSession: SessionStoreApi | null = sessionManager.getActiveSession();
+
+        if (featureId !== undefined && activeSession !== null) {
+          // Toggle via session state - this will trigger subscriptions
+          const state: SessionStoreWithUndo = activeSession.getState();
+          state.toggleFeatureVisibility(featureId);
+
+          // Also update map panel for immediate visual feedback
+          const hiddenIds = state.hiddenFeatureIds;
+          const isVisible = !hiddenIds.includes(featureId);
+          panel.setLayerVisibility(args.layerId, isVisible);
+        } else {
+          // Fallback to legacy behavior for backward compatibility
           const tracks = panel.getTracks();
           const locations = panel.getLocations();
           const results = panel.getResultLayers();
@@ -242,9 +341,17 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.setTimeRange',
-      (args: { start: string; end: string }) => {
+      (args: { time?: number; start?: string; end?: string }) => {
         const panel = getMapPanel();
-        if (panel && args?.start && args?.end) {
+        if (!panel) {
+          return;
+        }
+        // Support both timestamp-based (from TimeController) and ISO string-based calls
+        if (args?.time !== undefined) {
+          // Convert timestamp to ISO string for map panel
+          const isoTime = new Date(args.time).toISOString();
+          panel.setTimeRange(isoTime, isoTime);
+        } else if (args?.start && args?.end) {
           panel.setTimeRange(args.start, args.end);
         }
       }
@@ -256,9 +363,32 @@ export function registerCommands(
       const panel = getMapPanel();
       if (panel) {
         // Reset to full range - need plot data
-        // TODO: Implement full range reset
+        const plot = panel.getCurrentPlot();
+        if (plot) {
+          const [timeStart, timeEnd] = plot.timeExtent;
+          panel.setTimeRange(timeStart, timeEnd);
+          timeRangeProvider.updateTimeExtent(
+            new Date(timeStart).getTime(),
+            new Date(timeEnd).getTime()
+          );
+        }
       }
     })
+  );
+
+  // Display mode command
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.setDisplayMode',
+      (args: { mode: 'full' | 'trail' }) => {
+        const panel = getMapPanel();
+        if (panel && args?.mode) {
+          // Send display mode to map panel
+          // The map panel will handle rendering full track or trail mode
+          // For now this is a placeholder - full implementation requires map updates
+        }
+      }
+    )
   );
 
   // Export commands
@@ -279,6 +409,48 @@ export function registerCommands(
         ioService,
         stacTreeProvider
       )
+    )
+  );
+
+  // Undo/Redo commands (Feature: 029 - Phase 6)
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.undo',
+      createUndoCommand(sessionManager)
+    )
+  );
+
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.redo',
+      createRedoCommand(sessionManager)
+    )
+  );
+
+  // Session persistence command (Feature: 029 - Phase 7)
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.saveSession',
+      createSaveSessionCommand(sessionManager, (storeId) => {
+        const store = configService.getStore(storeId);
+        return store?.path;
+      })
+    )
+  );
+
+  // Delete selection command
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.deleteSelection',
+      createDeleteSelectionCommand(sessionManager, getMapPanel, layersTreeProvider)
+    )
+  );
+
+  // Catalog overview command (Feature: 042)
+  disposables.push(
+    vscode.commands.registerCommand(
+      'debrief.openCatalogOverview',
+      createOpenCatalogOverviewCommand(context, configService, stacService)
     )
   );
 

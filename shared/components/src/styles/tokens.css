@@ -19,6 +19,7 @@
   --debrief-color-warning: #ffc107;
   --debrief-color-danger: #dc3545;
   --debrief-color-info: #17a2b8;
+  --debrief-color-attention: rgba(255, 193, 7, 0.6);
 
   /* Colors - Track Types */
   --debrief-color-ownship: #0066cc;

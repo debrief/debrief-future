@@ -11,8 +11,11 @@ export interface FeatureRowProps {
   /** Whether this row is selected */
   isSelected: boolean;
 
+  /** Whether this feature is hidden (shows eye-slash indicator) */
+  isHidden?: boolean;
+
   /** Click handler */
-  onClick: () => void;
+  onClick: (event: React.MouseEvent) => void;
 
   /** Optional inline style */
   style?: CSSProperties;
@@ -22,10 +25,14 @@ export interface FeatureRowProps {
  * Get the type label for a feature.
  */
 function getFeatureType(feature: DebriefFeature): string {
+  const props = feature.properties as unknown as Record<string, unknown>;
+
   if (isTrackFeature(feature)) {
-    return feature.properties.track_type;
+    // Schema: track_type; Legacy: platformType
+    return (feature.properties.track_type || props.platformType as string) ?? 'TRACK';
   }
-  return feature.properties.location_type;
+  // Schema: location_type; Legacy: locationType
+  return (feature.properties.location_type || props.locationType as string) ?? 'POINT';
 }
 
 /**
@@ -33,8 +40,26 @@ function getFeatureType(feature: DebriefFeature): string {
  */
 function getFeatureInfo(feature: DebriefFeature): string | null {
   if (isTrackFeature(feature)) {
-    const start = feature.properties.start_time;
-    const end = feature.properties.end_time;
+    // Try start_time/end_time first (schema properties)
+    let start: string | undefined = feature.properties.start_time;
+    let end: string | undefined = feature.properties.end_time;
+
+    // Fallback: derive from times array if start_time/end_time not present
+    if (!start || !end) {
+      const props = feature.properties as unknown as Record<string, unknown>;
+      const times = props.times as unknown[] | undefined;
+      if (Array.isArray(times) && times.length > 0) {
+        const firstTime = times[0];
+        const lastTime = times[times.length - 1];
+        if (!start && typeof firstTime === 'string') {
+          start = firstTime;
+        }
+        if (!end && typeof lastTime === 'string') {
+          end = lastTime;
+        }
+      }
+    }
+
     if (start && end) {
       const startDate = new Date(start);
       const endDate = new Date(end);
@@ -50,6 +75,7 @@ function getFeatureInfo(feature: DebriefFeature): string | null {
 export function FeatureRow({
   feature,
   isSelected,
+  isHidden = false,
   onClick,
   style,
 }: FeatureRowProps) {
@@ -61,6 +87,7 @@ export function FeatureRow({
   const className = [
     'debrief-feature-row',
     isSelected && 'debrief-feature-row--selected',
+    isHidden && 'debrief-feature-row--hidden',
   ]
     .filter(Boolean)
     .join(' ');
@@ -74,7 +101,7 @@ export function FeatureRow({
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          onClick();
+          onClick(e as unknown as React.MouseEvent);
         }
       }}
       style={style}
@@ -87,7 +114,17 @@ export function FeatureRow({
         <span className="debrief-feature-row__name">{label}</span>
         <span className="debrief-feature-row__type">{type}</span>
       </div>
-      {info && <span className="debrief-feature-row__info">{info}</span>}
+      {isHidden && (
+        <span className="debrief-feature-row__hidden-icon" title="Hidden">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 2l12 12" />
+            <path d="M6.5 6.5a2 2 0 0 0 3 3" />
+            <path d="M3.5 5.5C2.2 6.8 1.5 8 1.5 8s2.5 4.5 6.5 4.5c1 0 1.9-.3 2.7-.7" />
+            <path d="M10.7 10.7c2-1.3 3.3-2.7 3.3-2.7S11.5 3.5 8 3.5c-.7 0-1.3.1-1.9.3" />
+          </svg>
+        </span>
+      )}
+      {!isHidden && info && <span className="debrief-feature-row__info">{info}</span>}
     </div>
   );
 }

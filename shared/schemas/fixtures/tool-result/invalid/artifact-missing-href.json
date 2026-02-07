@@ -1,0 +1,14 @@
+{
+  "content": [
+    {
+      "type": "image",
+      "data": "iVBORw0KGgo=",
+      "mimeType": "image/png",
+      "annotations": {
+        "debrief:resultType": "artifact/image/plot",
+        "debrief:sourceFeatures": ["track_a"],
+        "debrief:label": "Missing href artifact"
+      }
+    }
+  ]
+}

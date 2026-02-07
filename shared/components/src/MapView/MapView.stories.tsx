@@ -386,3 +386,108 @@ import { MapView } from '@debrief/components/MapView';
     },
   },
 };
+
+// Fit to visible features example
+function FitToVisibleExample() {
+  const [visibleIds, setVisibleIds] = useState<Set<string>>(
+    new Set(['track-001', 'track-002', 'ref-001', 'ref-002'])
+  );
+
+  const toggleVisibility = (id: string) => {
+    setVisibleIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const allIds = ['track-001', 'track-002', 'ref-001', 'ref-002'];
+
+  return (
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <strong>Toggle Visibility:</strong>
+        <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+          {allIds.map((id) => (
+            <label key={id} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <input
+                type="checkbox"
+                checked={visibleIds.has(id)}
+                onChange={() => toggleVisibility(id)}
+              />
+              {id}
+            </label>
+          ))}
+        </div>
+        <small style={{ display: 'block', marginTop: 8 }}>
+          Use the toolbar's fit-to-window button (bottom icon) to zoom to visible features only.
+        </small>
+      </div>
+      <MapView
+        features={sampleData}
+        visibleIds={visibleIds}
+        height={500}
+      />
+    </div>
+  );
+}
+
+export const FitToVisible: Story = {
+  render: () => <FitToVisibleExample />,
+  parameters: {
+    docs: {
+      description: {
+        story: 'Toggle feature visibility and use the fit-to-window button to zoom to only the visible features.',
+      },
+    },
+  },
+};
+
+export const ToolbarPositions: Story = {
+  render: () => (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div>
+        <div style={{ marginBottom: 8 }}><strong>Top Left (default)</strong></div>
+        <MapView features={sampleData} height={250} toolbarPosition="topleft" />
+      </div>
+      <div>
+        <div style={{ marginBottom: 8 }}><strong>Top Right</strong></div>
+        <MapView features={sampleData} height={250} toolbarPosition="topright" />
+      </div>
+      <div>
+        <div style={{ marginBottom: 8 }}><strong>Bottom Left</strong></div>
+        <MapView features={sampleData} height={250} toolbarPosition="bottomleft" />
+      </div>
+      <div>
+        <div style={{ marginBottom: 8 }}><strong>Bottom Right</strong></div>
+        <MapView features={sampleData} height={250} toolbarPosition="bottomright" />
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Toolbar can be positioned at any corner of the map using the toolbarPosition prop.',
+      },
+    },
+  },
+};
+
+export const NoToolbar: Story = {
+  args: {
+    features: sampleData,
+    height: 400,
+    showToolbar: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Map with custom toolbar hidden, showing the default Leaflet zoom control.',
+      },
+    },
+  },
+};

@@ -154,6 +154,83 @@
         "title": "Load into Debrief...",
         "category": "Debrief",
         "icon": "$(file-add)"
+      },
+      {
+        "command": "debrief.setDisplayMode",
+        "title": "Set Display Mode",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.undo",
+        "title": "Undo",
+        "category": "Debrief",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "debrief.redo",
+        "title": "Redo",
+        "category": "Debrief",
+        "icon": "$(redo)"
+      },
+      {
+        "command": "debrief.saveSession",
+        "title": "Save Session",
+        "category": "Debrief",
+        "icon": "$(save)"
+      },
+      {
+        "command": "debrief.showToolRequirements",
+        "title": "Show Tool Requirements",
+        "category": "Debrief"
+      },
+      {
+        "command": "debrief.toggleInactiveTools",
+        "title": "Toggle Inactive Tools",
+        "category": "Debrief",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "debrief.deleteSelection",
+        "title": "Delete Selected Features",
+        "category": "Debrief",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "debrief.tool.rangeBearing",
+        "title": "Debrief: Range & Bearing",
+        "enablement": "debrief.tool.range-bearing.active"
+      },
+      {
+        "command": "debrief.tool.closestApproach",
+        "title": "Debrief: Closest Point of Approach",
+        "enablement": "debrief.tool.closest-approach.active"
+      },
+      {
+        "command": "debrief.tool.relativeMotion",
+        "title": "Debrief: Relative Motion Analysis",
+        "enablement": "debrief.tool.relative-motion.active"
+      },
+      {
+        "command": "debrief.tool.trackStats",
+        "title": "Debrief: Track Statistics",
+        "enablement": "debrief.tool.track-stats.active"
+      },
+      {
+        "command": "debrief.tool.distanceToPoint",
+        "title": "Debrief: Distance to Point",
+        "enablement": "debrief.tool.distance-to-point.active"
+      },
+      {
+        "command": "debrief.openResultArtifact",
+        "title": "Open Result Artifact",
+        "category": "Debrief",
+        "icon": "$(file)"
+      },
+      {
+        "command": "debrief.openCatalogOverview",
+        "title": "Open Catalog Overview",
+        "category": "Debrief",
+        "icon": "$(map)"
       }
     ],
     "keybindings": [
@@ -195,6 +272,36 @@
         "command": "debrief.openPlot",
         "key": "ctrl+shift+o",
         "mac": "cmd+shift+o"
+      },
+      {
+        "command": "debrief.undo",
+        "key": "ctrl+z",
+        "mac": "cmd+z",
+        "when": "debrief.mapFocused"
+      },
+      {
+        "command": "debrief.redo",
+        "key": "ctrl+y",
+        "mac": "cmd+shift+z",
+        "when": "debrief.mapFocused"
+      },
+      {
+        "command": "debrief.saveSession",
+        "key": "ctrl+s",
+        "mac": "cmd+s",
+        "when": "debrief.mapFocused"
+      },
+      {
+        "command": "debrief.deleteSelection",
+        "key": "delete",
+        "mac": "backspace",
+        "when": "focusedView == 'debrief.activityPanel' && debrief.hasSelection"
+      },
+      {
+        "command": "debrief.deleteSelection",
+        "key": "delete",
+        "mac": "delete",
+        "when": "focusedView == 'debrief.activityPanel' && debrief.hasSelection"
       }
     ],
     "viewsContainers": {
@@ -209,17 +316,9 @@
     "views": {
       "debrief": [
         {
-          "id": "debrief.timeRange",
-          "name": "Time Range",
+          "id": "debrief.activityPanel",
+          "name": "Activity",
           "type": "webview"
-        },
-        {
-          "id": "debrief.tools",
-          "name": "Tools"
-        },
-        {
-          "id": "debrief.layers",
-          "name": "Layers"
         }
       ],
       "explorer": [
@@ -232,16 +331,17 @@
     "viewsWelcome": [
       {
         "view": "debrief.stacExplorer",
-        "contents": "No STAC stores configured.\n[Add Store](command:debrief.addStore)\nA STAC store is a folder containing maritime plot data."
+        "contents": "Loading stores…",
+        "when": "!debrief.storesReady"
       },
       {
-        "view": "debrief.tools",
-        "contents": "Select tracks on the map to see available analysis tools.\n\nTools require debrief-calc Python service.",
-        "when": "!debrief.hasSelection"
+        "view": "debrief.stacExplorer",
+        "contents": "No STAC stores configured.\n[Add Store](command:debrief.addStore)\nA STAC store is a folder containing maritime plot data.",
+        "when": "debrief.noStores"
       },
       {
-        "view": "debrief.layers",
-        "contents": "No layers yet.\n\nOpen a plot to see track layers, or run analysis tools to add result layers."
+        "view": "debrief.activityPanel",
+        "contents": "No plot loaded.\n\nOpen a plot to see time controls, layers, and available analysis tools."
       }
     ],
     "menus": {
@@ -260,7 +360,12 @@
         },
         {
           "command": "debrief.clearAllResults",
-          "when": "view == debrief.layers && debrief.hasResultLayers"
+          "when": "view == debrief.activityPanel && debrief.hasResultLayers"
+        },
+        {
+          "command": "debrief.toggleInactiveTools",
+          "when": "view == debrief.activityPanel && debrief.calcAvailable",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -280,19 +385,39 @@
           "group": "3_modify"
         },
         {
+          "command": "debrief.openCatalogOverview",
+          "when": "view == debrief.stacExplorer && viewItem == catalog",
+          "group": "1_navigation"
+        },
+        {
           "command": "debrief.openPlot",
           "when": "view == debrief.stacExplorer && viewItem == plot",
           "group": "1_navigation"
         },
         {
           "command": "debrief.removeResultLayer",
-          "when": "view == debrief.layers && viewItem == resultLayer",
+          "when": "view == debrief.activityPanel && viewItem == resultLayer",
           "group": "3_modify"
         },
         {
+          "command": "debrief.removeResultLayer",
+          "when": "view == debrief.activityPanel && viewItem == artifactResultLayer",
+          "group": "3_modify"
+        },
+        {
+          "command": "debrief.openResultArtifact",
+          "when": "view == debrief.activityPanel && viewItem == artifactResultLayer",
+          "group": "1_navigation"
+        },
+        {
           "command": "debrief.changeTrackColor",
-          "when": "view == debrief.layers && viewItem == track",
+          "when": "view == debrief.activityPanel && viewItem == track",
           "group": "2_style"
+        },
+        {
+          "command": "debrief.executeTool",
+          "when": "view == debrief.activityPanel && viewItem == tool.active",
+          "group": "1_execute"
         }
       ],
       "commandPalette": [
@@ -319,6 +444,10 @@
         {
           "command": "debrief.exportPng",
           "when": "debrief.plotOpen"
+        },
+        {
+          "command": "debrief.deleteSelection",
+          "when": "debrief.plotOpen && debrief.hasSelection"
         }
       ]
     },
@@ -368,6 +497,13 @@
           "default": 10,
           "description": "Maximum number of recent plots to remember"
         },
+        "debrief.mcp.port": {
+          "type": "number",
+          "default": 3001,
+          "minimum": 1024,
+          "maximum": 65535,
+          "description": "Port for the MCP session state server (used by Python tools)"
+        },
         "debrief.hideActivities.enabled": {
           "type": "boolean",
           "default": true,
@@ -378,13 +514,15 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
+    "build": "pnpm --filter @debrief/components build && npm run compile",
     "compile": "npm run compile:extension && npm run compile:webview",
     "compile:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
-    "compile:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife && cp src/webview/web/styles.css dist/webview/styles.css",
+    "compile:webview": "esbuild src/webview/web/mapView.tsx --bundle --outfile=dist/webview/mapView.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/catalogOverview.tsx --bundle --outfile=dist/webview/catalogOverview.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && cpy src/webview/web/styles.css dist/webview/",
     "watch": "npm run watch:extension & npm run watch:webview",
     "watch:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
-    "watch:webview": "esbuild src/webview/web/map.ts --bundle --outfile=dist/webview/map.js --format=iife --watch",
+    "watch:webview": "esbuild src/webview/web/mapView.tsx --bundle --outfile=dist/webview/mapView.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch",
     "dev": "concurrently \"npm run watch:extension\" \"npm run watch:webview\"",
+    "prelint": "pnpm --filter @debrief/session-state build && pnpm --filter @debrief/utils build",
     "lint": "eslint src --ext ts",
     "lint:fix": "eslint src --ext ts --fix",
     "test": "npm run test:unit",
@@ -394,11 +532,14 @@
     "test:integration": "vscode-test",
     "test:e2e": "playwright test",
     "package": "vsce package --no-dependencies",
-    "pretest": "npm run compile"
+    "pretest": "npm run build"
   },
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/leaflet": "^1.9.8",
     "@types/node": "^20.10.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0",
@@ -406,6 +547,7 @@
     "@vscode/test-electron": "^2.3.8",
     "@vscode/vsce": "^2.22.0",
     "concurrently": "^8.2.2",
+    "cpy-cli": "^6.0.0",
     "esbuild": "^0.19.8",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
@@ -414,7 +556,12 @@
     "vitest": "^1.0.0"
   },
   "dependencies": {
+    "@debrief/components": "workspace:*",
+    "@debrief/session-state": "workspace:*",
+    "@debrief/utils": "workspace:*",
     "leaflet": "^1.9.4",
-    "leaflet-image": "^0.4.0"
+    "leaflet-image": "^0.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }

@@ -1,0 +1,13 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Some result",
+      "annotations": {
+        "debrief:resultType": "unknown/something",
+        "debrief:sourceFeatures": ["track_a"],
+        "debrief:label": "Bad result"
+      }
+    }
+  ]
+}
