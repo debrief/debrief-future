@@ -125,6 +125,7 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
+| 055 | Tech Debt | [Restore web-shell Playwright tests](specs/054-restore-web-shell-tests/spec.md) — implement app components so 34 skipped tests across 5 files pass (3 phases: catalog+plot, selection+time, tools) | 4 | 2 | 5 | 11 | High | specified |
 | 054 | Infrastructure | [Discover and spec all migrateable tools from Legacy Debrief](docs/tool-migration/TOOL-LIBRARY-SRD.md) — scan legacy Java source, classify trigger types and UX integration, capture golden I/O, author language-neutral specs (requires #049, #050) | 5 | 3 | 3 | 11 | High | proposed |
 | 053 | Tech Debt | Remove migration-specific tool commands after Legacy Debrief migration complete (keep /tool.spec and /tool.implement for general use) | 2 | 1 | 5 | 8 | Low | proposed |
 | 051 | Bug | [Load existing result files into Attachments dropdown](specs/051-load-result-attachments/spec.md) | 5 | 3 | 4 | 12 | Low | specified |
@@ -146,6 +147,7 @@ Description formats:
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
 | 002 | Feature | Add MCP wrapper for debrief-io service | 4 | 3 | 4 | 11 | Medium | approved |
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | Low | approved |
+| 029 | Tech Debt | [Add unit tests for VS Code extension providers](https://github.com/debrief/debrief-future/issues/104) | 4 | 2 | 5 | 11 | Low | proposed |
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | 5 | 2 | 4 | 11 | Low | approved |
 | 027 | Infrastructure | [Add automated screenshot capture for Storybook stories](docs/ideas/027-automated-screenshots.md) | 3 | 4 | 4 | 11 | Medium | approved |
 | 036 | Infrastructure | [Reinstate Playwright E2E testing in CI](docs/ideas/030-reinstate-playwright-ci.md) | 4 | 2 | 5 | 11 | Medium | approved |

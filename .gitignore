@@ -217,6 +217,9 @@ node_modules/
 apps/loader/release/
 apps/loader/packaging/dist/
 
+# VS Code extension build artifacts
+*.vsix
+
 # Task runner cache
 .task/
 
@@ -228,5 +231,12 @@ Thumbs.db
 nul
 
 # Playwright test artifacts
+playwright-report/
+test-results/
+
+# E2E test environment files
+tests/e2e/.chromium-path
+tests/e2e/.code-server-pid
+tests/e2e/.vscode-server-data/
 apps/web-shell/playwright-report/
 apps/web-shell/test-results/

@@ -41,7 +41,7 @@ jobs:
         run: task install
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Run linting
         run: task lint

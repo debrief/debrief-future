@@ -1,0 +1,5 @@
+{
+  "debrief.catalog.rootPath": "${workspaceFolder}/catalog",
+  "debrief.io.defaultFormat": "rep",
+  "debrief.calc.enabled": true
+}
