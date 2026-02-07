@@ -125,6 +125,7 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
+| 055 | Tech Debt | [Restore web-shell Playwright tests](specs/054-restore-web-shell-tests/spec.md) — implement app components so 34 skipped tests across 5 files pass (3 phases: catalog+plot, selection+time, tools) | 4 | 2 | 5 | 11 | High | specified |
 | 054 | Infrastructure | [Discover and spec all migrateable tools from Legacy Debrief](docs/tool-migration/TOOL-LIBRARY-SRD.md) — scan legacy Java source, classify trigger types and UX integration, capture golden I/O, author language-neutral specs (requires #049, #050) | 5 | 3 | 3 | 11 | High | proposed |
 | 053 | Tech Debt | Remove migration-specific tool commands after Legacy Debrief migration complete (keep /tool.spec and /tool.implement for general use) | 2 | 1 | 5 | 8 | Low | proposed |
 | 051 | Bug | [Load existing result files into Attachments dropdown](specs/051-load-result-attachments/spec.md) | 5 | 3 | 4 | 12 | Low | specified |
