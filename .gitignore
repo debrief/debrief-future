@@ -217,6 +217,9 @@ node_modules/
 apps/loader/release/
 apps/loader/packaging/dist/
 
+# VS Code extension build artifacts
+*.vsix
+
 # Task runner cache
 .task/
 
