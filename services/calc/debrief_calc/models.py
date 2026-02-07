@@ -223,7 +223,7 @@ class Tool(BaseModel):
 
     def accepts_kind(self, kind: str) -> bool:
         """Check if this tool accepts features of the given kind."""
-        return kind in self.input_kinds
+        return kind.lower() in (k.lower() for k in self.input_kinds)
 
     def accepts_context(self, context_type: ContextType) -> bool:
         """Check if this tool works with the given context type."""
