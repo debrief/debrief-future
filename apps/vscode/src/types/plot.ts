@@ -203,7 +203,7 @@ export type SelectionContextType =
 /**
  * Feature kinds
  */
-export type FeatureKind = 'track' | 'location';
+export type FeatureKind = 'UI_TRACK' | 'UI_LOCATION';
 
 /**
  * Time range for filtering

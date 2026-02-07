@@ -21,7 +21,7 @@ describe('Selection Workflow', () => {
         trackIds: ['track-1'],
         locationIds: [],
         contextType: 'none',
-        featureKinds: ['track'],
+        featureKinds: ['UI_TRACK'],
       };
 
       const contextType = computeContextType(selection);
@@ -33,7 +33,7 @@ describe('Selection Workflow', () => {
         trackIds: ['track-1', 'track-2'],
         locationIds: [],
         contextType: 'none',
-        featureKinds: ['track'],
+        featureKinds: ['UI_TRACK'],
       };
 
       const contextType = computeContextType(selection);
@@ -45,7 +45,7 @@ describe('Selection Workflow', () => {
         trackIds: ['track-1'],
         locationIds: ['loc-1'],
         contextType: 'none',
-        featureKinds: ['track', 'location'],
+        featureKinds: ['UI_TRACK', 'UI_LOCATION'],
       };
 
       const contextType = computeContextType(selection);
@@ -60,7 +60,7 @@ describe('Selection Workflow', () => {
         trackIds: ['track-1', 'track-2'],
         locationIds: [],
         contextType: 'multi-track',
-        featureKinds: ['track'],
+        featureKinds: ['UI_TRACK'],
       };
 
       // Simulate selection change triggering tools update
@@ -106,7 +106,7 @@ describe('Selection Workflow', () => {
         trackIds: ['track-1', 'track-2'],
         locationIds: ['loc-1'],
         contextType: 'mixed',
-        featureKinds: ['track', 'location'],
+        featureKinds: ['UI_TRACK', 'UI_LOCATION'],
       };
 
       const serialized = JSON.stringify(selection);
@@ -130,9 +130,9 @@ describe('Selection Workflow', () => {
           trackIds: allTrackIds,
           locationIds: [],
           contextType: 'none',
-          featureKinds: ['track'],
+          featureKinds: ['UI_TRACK'],
         }),
-        featureKinds: ['track'],
+        featureKinds: ['UI_TRACK'],
       };
 
       expect(selection.trackIds).toHaveLength(3);
@@ -144,7 +144,7 @@ describe('Selection Workflow', () => {
         trackIds: ['track-1'],
         locationIds: [],
         contextType: 'single-track',
-        featureKinds: ['track'],
+        featureKinds: ['UI_TRACK'],
       };
 
       // Simulate Escape/Delete clearing selection
