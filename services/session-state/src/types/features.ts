@@ -8,11 +8,16 @@ import { createTimeInstant } from './temporal.js';
 
 /**
  * Set of selected feature identifiers with metadata (FR-017).
+ *
+ * Feature 053: featureIds accepts selection path strings — forward-slash-separated
+ * segments following RFC 6901 escaping. A single-segment path (e.g., "track-001")
+ * is a flat feature ID (backward compatible). Multi-segment paths identify child
+ * elements (e.g., "track-001/positions/4").
  */
 export interface FeatureSelection {
-  /** Selected feature IDs */
+  /** Selected feature paths (or flat IDs for backward compatibility) */
   featureIds: string[];
-  /** Primary selection for properties display */
+  /** Primary selection path for properties display */
   primary: string | null;
   /** When selection was made */
   timestamp: TimeInstant;

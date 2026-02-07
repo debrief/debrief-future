@@ -1,0 +1,172 @@
+{
+  "$comment": "Golden fixtures for selection path validation (053-nested-child-selection)",
+  "valid_paths": [
+    {
+      "path": "track-hms-defender",
+      "description": "Root-only (whole feature, backward compatible)",
+      "parsed": {
+        "root": "track-hms-defender",
+        "levels": [],
+        "depth": 0
+      }
+    },
+    {
+      "path": "track-hms-defender/positions/4",
+      "description": "Position within track (depth 1)",
+      "parsed": {
+        "root": "track-hms-defender",
+        "levels": [
+          { "levelName": "positions", "address": "4" }
+        ],
+        "depth": 1
+      }
+    },
+    {
+      "path": "track-hms-defender/segments/leg-alpha/positions/3",
+      "description": "Position within segment within track (depth 2)",
+      "parsed": {
+        "root": "track-hms-defender",
+        "levels": [
+          { "levelName": "segments", "address": "leg-alpha" },
+          { "levelName": "positions", "address": "3" }
+        ],
+        "depth": 2
+      }
+    },
+    {
+      "path": "track~1alpha",
+      "description": "Root ID containing escaped forward slash (track/alpha)",
+      "parsed": {
+        "root": "track~1alpha",
+        "levels": [],
+        "depth": 0
+      }
+    },
+    {
+      "path": "track~0test",
+      "description": "Root ID containing escaped tilde (track~test)",
+      "parsed": {
+        "root": "track~0test",
+        "levels": [],
+        "depth": 0
+      }
+    },
+    {
+      "path": "track-001/segments/seg~1a/positions/0",
+      "description": "Segment ID with escaped slash, position at index 0",
+      "parsed": {
+        "root": "track-001",
+        "levels": [
+          { "levelName": "segments", "address": "seg~1a" },
+          { "levelName": "positions", "address": "0" }
+        ],
+        "depth": 2
+      }
+    }
+  ],
+  "invalid_paths": [
+    {
+      "path": "",
+      "error": "Empty path",
+      "description": "Empty string is rejected"
+    },
+    {
+      "path": "   ",
+      "error": "Empty path after trimming",
+      "description": "Whitespace-only is rejected"
+    },
+    {
+      "path": "track-001/",
+      "error": "Trailing slash",
+      "description": "Trailing slash after normalisation leaves empty last segment — normalised to track-001",
+      "normalised": "track-001"
+    },
+    {
+      "path": "track-001//positions/4",
+      "error": "Empty segment",
+      "description": "Double slash produces empty segment"
+    },
+    {
+      "path": "track-001/positions",
+      "error": "Incomplete level (missing address)",
+      "description": "Level name without address is structurally invalid"
+    },
+    {
+      "path": "track-001/~2invalid",
+      "error": "Invalid escape sequence",
+      "description": "Only ~0 and ~1 are valid escape sequences"
+    }
+  ],
+  "selection_scenarios": [
+    {
+      "description": "Single position selection",
+      "input": {
+        "action": "setSelection",
+        "featureIds": ["track-hms-defender/positions/4"]
+      },
+      "expected": {
+        "featureIds": ["track-hms-defender/positions/4"],
+        "primary": "track-hms-defender/positions/4",
+        "rootIds": ["track-hms-defender"]
+      }
+    },
+    {
+      "description": "Mixed-depth multi-selection",
+      "input": {
+        "action": "setSelection",
+        "featureIds": ["track-001", "track-002/positions/5"]
+      },
+      "expected": {
+        "featureIds": ["track-001", "track-002/positions/5"],
+        "primary": "track-001",
+        "rootIds": ["track-001", "track-002"]
+      }
+    },
+    {
+      "description": "Parent and child coexist",
+      "input": {
+        "action": "setSelection",
+        "featureIds": ["track-001", "track-001/positions/4"]
+      },
+      "expected": {
+        "featureIds": ["track-001", "track-001/positions/4"],
+        "primary": "track-001",
+        "rootIds": ["track-001"]
+      }
+    },
+    {
+      "description": "Add child to existing root selection",
+      "input": {
+        "initial": ["track-001"],
+        "action": "addToSelection",
+        "featureIds": ["track-002/positions/7"]
+      },
+      "expected": {
+        "featureIds": ["track-001", "track-002/positions/7"],
+        "rootIds": ["track-001", "track-002"]
+      }
+    },
+    {
+      "description": "Remove child path preserves root",
+      "input": {
+        "initial": ["track-001", "track-001/positions/4"],
+        "action": "removeFromSelection",
+        "featureIds": ["track-001/positions/4"]
+      },
+      "expected": {
+        "featureIds": ["track-001"],
+        "rootIds": ["track-001"]
+      }
+    },
+    {
+      "description": "Leaf-only: tool receives exact paths",
+      "input": {
+        "selection": ["track-hms-defender/positions/4"]
+      },
+      "expected": {
+        "toolReceives": ["track-hms-defender/positions/4"],
+        "toolDoesNotReceive": ["track-hms-defender"]
+      }
+    }
+  ]
+}

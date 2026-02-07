@@ -1,6 +1,6 @@
 /**
  * Features state slice implementation.
- * Feature: 024-document-session-state
+ * Feature: 024-document-session-state, 053-nested-child-selection
  */
 
 import type { StateCreator } from 'zustand';
@@ -14,6 +14,22 @@ import {
   createEmptySelection,
   createSelection,
 } from '../../types/index.js';
+import { normalisePath } from '../../utils/selectionPath.js';
+
+/**
+ * Normalise and filter selection paths.
+ * Strips trailing slashes, trims whitespace, removes empty paths.
+ */
+function sanitisePaths(paths: string[]): string[] {
+  const result: string[] = [];
+  for (const p of paths) {
+    const normalised = normalisePath(p);
+    if (normalised.length > 0) {
+      result.push(normalised);
+    }
+  }
+  return result;
+}
 
 export type FeaturesSliceWithActions = FeaturesSlice & FeaturesActions;
 
@@ -33,7 +49,9 @@ export const createFeaturesSlice: StateCreator<
   },
 
   setSelection: (featureIds: string[], primary?: string) => {
-    set({ selection: createSelection(featureIds, primary) });
+    const sanitised = sanitisePaths(featureIds);
+    const sanitisedPrimary = primary ? normalisePath(primary) || undefined : undefined;
+    set({ selection: createSelection(sanitised, sanitisedPrimary) });
   },
 
   clearSelection: () => {
@@ -42,8 +60,9 @@ export const createFeaturesSlice: StateCreator<
 
   addToSelection: (featureIds: string[]) => {
     const { selection } = get();
+    const sanitised = sanitisePaths(featureIds);
     const existingIds = new Set(selection.featureIds);
-    const newIds = featureIds.filter((id) => !existingIds.has(id));
+    const newIds = sanitised.filter((id) => !existingIds.has(id));
 
     if (newIds.length === 0) return;
 

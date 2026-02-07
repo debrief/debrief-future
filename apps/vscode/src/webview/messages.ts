@@ -199,6 +199,8 @@ export interface SelectionChangedMessage {
   selection: {
     trackIds: string[];
     locationIds: string[];
+    /** Full selection paths for all selected elements (Feature 053) */
+    paths?: string[];
     contextType: SelectionContextType;
   };
 }
