@@ -1,0 +1,27 @@
+Golden Fixture Test Results
+===========================
+vitest 1.6.1 | Node.js
+Tests: 18 passed | 0 failed
+Duration: 5ms
+
+Valid Paths (12 assertions):
+  ✓ should parse: Root-only (whole feature, backward compatible)
+  ✓ should validate structurally: Root-only (whole feature, backward compatible)
+  ✓ should parse: Position within track (depth 1)
+  ✓ should validate structurally: Position within track (depth 1)
+  ✓ should parse: Position within segment within track (depth 2)
+  ✓ should validate structurally: Position within segment within track (depth 2)
+  ✓ should parse: Root ID containing escaped forward slash (track/alpha)
+  ✓ should validate structurally: Root ID containing escaped forward slash (track/alpha)
+  ✓ should parse: Root ID containing escaped tilde (track~test)
+  ✓ should validate structurally: Root ID containing escaped tilde (track~test)
+  ✓ should parse: Segment ID with escaped slash, position at index 0
+  ✓ should validate structurally: Segment ID with escaped slash, position at index 0
+
+Invalid Paths (6 assertions):
+  ✓ should reject: Empty string is rejected
+  ✓ should reject: Whitespace-only is rejected
+  ✓ should normalise: Trailing slash normalised to track-001
+  ✓ should reject: Double slash produces empty segment
+  ✓ should reject: Level name without address is structurally invalid
+  ✓ should reject: Only ~0 and ~1 are valid escape sequences

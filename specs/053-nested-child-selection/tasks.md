@@ -47,13 +47,13 @@
 
 **Purpose**: Add schema definitions and project scaffolding before any implementation
 
-- [ ] T001 Add AddressingMode enum to LinkML schema `shared/schemas/src/linkml/session-state.yaml`
-- [ ] T002 Add LevelDefinition class to LinkML schema `shared/schemas/src/linkml/session-state.yaml`
-- [ ] T003 Update FeatureSelection description in LinkML schema to document path semantics `shared/schemas/src/linkml/session-state.yaml`
-- [ ] T004 Regenerate TypeScript types from updated LinkML schema `shared/schemas/src/generated/typescript/types.ts`
-- [ ] T005 Regenerate Pydantic models from updated LinkML schema `shared/schemas/src/generated/python/models.py`
-- [ ] T006 [P] Create selectionPath.ts module stub with type exports `services/session-state/src/utils/selectionPath.ts`
-- [ ] T007 [P] Create evidence directory `specs/053-nested-child-selection/evidence/`
+- [x] T001 Add AddressingMode enum to LinkML schema `shared/schemas/src/linkml/session-state.yaml`
+- [x] T002 Add LevelDefinition class to LinkML schema `shared/schemas/src/linkml/session-state.yaml`
+- [x] T003 Update FeatureSelection description in LinkML schema to document path semantics `shared/schemas/src/linkml/session-state.yaml`
+- [x] T004 Regenerate TypeScript types from updated LinkML schema `shared/schemas/src/generated/typescript/types.ts`
+- [x] T005 Regenerate Pydantic models from updated LinkML schema `shared/schemas/src/generated/python/models.py`
+- [x] T006 [P] Create selectionPath.ts module stub with type exports `services/session-state/src/utils/selectionPath.ts`
+- [x] T007 [P] Create evidence directory `specs/053-nested-child-selection/evidence/`
 
 ---
 
@@ -67,31 +67,31 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T008 [test] Write golden fixture tests from contracts/golden-fixtures.json `services/session-state/src/utils/__tests__/selectionPath.golden.test.ts`
-- [ ] T009 [test] Write unit tests for escapeSegment and unescapeSegment `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T010 [P][test] Write unit tests for normalisePath `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T011 [P][test] Write unit tests for parsePath (root-only, single-level, multi-level, escaped) `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T012 [P][test] Write unit tests for buildPath round-trips `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T013 [P][test] Write unit tests for getRoot, getDepth, isRootPath, getParent `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T014 [P][test] Write unit tests for validatePathStructure (valid + all invalid cases) `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T015 [P][test] Write unit tests for validatePathSemantics against level registry `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T016 [P][test] Write unit tests for getLevelRegistry `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T008 [test] Write golden fixture tests from contracts/golden-fixtures.json `services/session-state/src/utils/__tests__/selectionPath.golden.test.ts`
+- [x] T009 [test] Write unit tests for escapeSegment and unescapeSegment `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T010 [P][test] Write unit tests for normalisePath `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T011 [P][test] Write unit tests for parsePath (root-only, single-level, multi-level, escaped) `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T012 [P][test] Write unit tests for buildPath round-trips `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T013 [P][test] Write unit tests for getRoot, getDepth, isRootPath, getParent `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T014 [P][test] Write unit tests for validatePathStructure (valid + all invalid cases) `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T015 [P][test] Write unit tests for validatePathSemantics against level registry `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T016 [P][test] Write unit tests for getLevelRegistry `services/session-state/src/utils/__tests__/selectionPath.test.ts`
 
 ### Implementation for Foundation
 
-- [ ] T017 Implement getLevelRegistry with positions (index) and segments (id) `services/session-state/src/utils/selectionPath.ts`
-- [ ] T018 Implement escapeSegment and unescapeSegment per RFC 6901 `services/session-state/src/utils/selectionPath.ts`
-- [ ] T019 Implement normalisePath (trim, strip trailing slash) `services/session-state/src/utils/selectionPath.ts`
-- [ ] T020 Implement parsePath (split on /, pair level/address, build ParsedPath) `services/session-state/src/utils/selectionPath.ts`
-- [ ] T021 Implement buildPath (join root + level/address pairs) `services/session-state/src/utils/selectionPath.ts`
-- [ ] T022 [P] Implement getRoot (fast: split on first /) `services/session-state/src/utils/selectionPath.ts`
-- [ ] T023 [P] Implement getDepth, isRootPath `services/session-state/src/utils/selectionPath.ts`
-- [ ] T024 [P] Implement getParent (remove last two segments) `services/session-state/src/utils/selectionPath.ts`
-- [ ] T025 Implement validatePathStructure (non-empty, no empty segments, valid escapes, even child segments) `services/session-state/src/utils/selectionPath.ts`
-- [ ] T026 Implement validatePathSemantics (level names known, addressing mode conformance) `services/session-state/src/utils/selectionPath.ts`
-- [ ] T027 Export all path utilities from session-state package index `services/session-state/src/index.ts`
-- [ ] T028 Run all path utility tests — verify all pass `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T029 Run golden fixture tests — verify all pass `services/session-state/src/utils/__tests__/selectionPath.golden.test.ts`
+- [x] T017 Implement getLevelRegistry with positions (index) and segments (id) `services/session-state/src/utils/selectionPath.ts`
+- [x] T018 Implement escapeSegment and unescapeSegment per RFC 6901 `services/session-state/src/utils/selectionPath.ts`
+- [x] T019 Implement normalisePath (trim, strip trailing slash) `services/session-state/src/utils/selectionPath.ts`
+- [x] T020 Implement parsePath (split on /, pair level/address, build ParsedPath) `services/session-state/src/utils/selectionPath.ts`
+- [x] T021 Implement buildPath (join root + level/address pairs) `services/session-state/src/utils/selectionPath.ts`
+- [x] T022 [P] Implement getRoot (fast: split on first /) `services/session-state/src/utils/selectionPath.ts`
+- [x] T023 [P] Implement getDepth, isRootPath `services/session-state/src/utils/selectionPath.ts`
+- [x] T024 [P] Implement getParent (remove last two segments) `services/session-state/src/utils/selectionPath.ts`
+- [x] T025 Implement validatePathStructure (non-empty, no empty segments, valid escapes, even child segments) `services/session-state/src/utils/selectionPath.ts`
+- [x] T026 Implement validatePathSemantics (level names known, addressing mode conformance) `services/session-state/src/utils/selectionPath.ts`
+- [x] T027 Export all path utilities from session-state package index `services/session-state/src/index.ts`
+- [x] T028 Run all path utility tests — verify all pass `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T029 Run golden fixture tests — verify all pass `services/session-state/src/utils/__tests__/selectionPath.golden.test.ts`
 
 **Checkpoint**: Path utilities complete and tested. All golden fixtures pass. User story implementation can now begin.
 
@@ -107,23 +107,23 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T030 [test] [US1] Write store test: setSelection with position path records correct state `services/session-state/src/store/__tests__/features.selection-path.test.ts`
-- [ ] T031 [P][test] [US1] Write store test: clicking different position on same track replaces selection `services/session-state/src/store/__tests__/features.selection-path.test.ts`
-- [ ] T032 [P][test] [US1] Write store test: single-segment path (flat ID) works identically to current behaviour `services/session-state/src/store/__tests__/features.selection-path.test.ts`
-- [ ] T033 [P][test] [US1] Write store test: primary is set to the path when setSelection called with one path `services/session-state/src/store/__tests__/features.selection-path.test.ts`
-- [ ] T034 [P][test] [US1] Write selector test: selectedRootIds extracts unique roots from paths `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T030 [test] [US1] Write store test: setSelection with position path records correct state `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T031 [P][test] [US1] Write store test: clicking different position on same track replaces selection `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T032 [P][test] [US1] Write store test: single-segment path (flat ID) works identically to current behaviour `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T033 [P][test] [US1] Write store test: primary is set to the path when setSelection called with one path `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T034 [P][test] [US1] Write selector test: selectedRootIds extracts unique roots from paths `services/session-state/src/store/__tests__/features.selection-path.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T035 [US1] Add selectedRootIds selector to features slice `services/session-state/src/store/slices/features.ts`
-- [ ] T036 [US1] Add getPathsForRoot selector to features slice `services/session-state/src/store/slices/features.ts`
-- [ ] T037 [US1] Update setSelection action to normalise paths before storing `services/session-state/src/store/slices/features.ts`
-- [ ] T038 [US1] Update FeatureSelection type documentation to note path semantics `services/session-state/src/types/features.ts`
-- [ ] T039 [US1] Update webview SelectionChangedMessage to include paths `apps/vscode/src/webview/messages.ts`
-- [ ] T040 [US1] Update mapView click handler to emit position-level paths when position points are clicked `apps/vscode/src/webview/web/mapView.tsx`
-- [ ] T041 [US1] Update MapView component to highlight child-selected positions distinctly `shared/components/src/MapView/MapView.tsx`
-- [ ] T042 [US1] Update SetSelectionMessage in extension to accept paths `apps/vscode/src/webview/messages.ts`
-- [ ] T043 [US1] Run US1 store tests — verify all pass `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T035 [US1] Add selectedRootIds selector to features slice `services/session-state/src/store/slices/features.ts`
+- [x] T036 [US1] Add getPathsForRoot selector to features slice `services/session-state/src/store/slices/features.ts`
+- [x] T037 [US1] Update setSelection action to normalise paths before storing `services/session-state/src/store/slices/features.ts`
+- [x] T038 [US1] Update FeatureSelection type documentation to note path semantics `services/session-state/src/types/features.ts`
+- [x] T039 [US1] Update webview SelectionChangedMessage to include paths `apps/vscode/src/webview/messages.ts`
+- [x] T040 [US1] Update mapView click handler to emit position-level paths when position points are clicked `apps/vscode/src/webview/web/mapView.tsx`
+- [x] T041 [US1] Update MapView component to highlight child-selected positions distinctly `shared/components/src/MapView/MapView.tsx`
+- [x] T042 [US1] Update SetSelectionMessage in extension to accept paths `apps/vscode/src/webview/messages.ts`
+- [x] T043 [US1] Run US1 store tests — verify all pass `services/session-state/src/store/__tests__/features.selection-path.test.ts`
 
 **Checkpoint**: User Story 1 complete. Position selection works end-to-end. Backward compatibility verified with flat IDs.
 
@@ -143,24 +143,24 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T044 [test] [US2] Write store test: addToSelection with child path alongside existing root path `services/session-state/src/store/__tests__/features.selection-path.test.ts`
-- [ ] T045 [P][test] [US2] Write store test: parent and child paths coexist in same selection `services/session-state/src/store/__tests__/features.selection-path.test.ts`
-- [ ] T046 [P][test] [US2] Write store test: clearSelection removes all paths at all depths `services/session-state/src/store/__tests__/features.selection-path.test.ts`
-- [ ] T047 [P][test] [US2] Write store test: multi-position paths from different parents coexist `services/session-state/src/store/__tests__/features.selection-path.test.ts`
-- [ ] T048 [test] [US4] Write tool match test: selectedRootIds for tool matching extracts correct kinds `apps/vscode/src/services/__tests__/toolMatchAdapter.selection-path.test.ts`
-- [ ] T049 [P][test] [US4] Write tool match test: position-only selection does not produce phantom parent entry `apps/vscode/src/services/__tests__/toolMatchAdapter.selection-path.test.ts`
-- [ ] T050 [P][test] [US4] Write tool match test: tool requiring whole-track does not match position-only selection `apps/vscode/src/services/__tests__/toolMatchAdapter.selection-path.test.ts`
+- [x] T044 [test] [US2] Write store test: addToSelection with child path alongside existing root path `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T045 [P][test] [US2] Write store test: parent and child paths coexist in same selection `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T046 [P][test] [US2] Write store test: clearSelection removes all paths at all depths `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T047 [P][test] [US2] Write store test: multi-position paths from different parents coexist `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T048 [test] [US4] Write tool match test: selectedRootIds for tool matching extracts correct kinds `apps/vscode/src/services/__tests__/toolMatchAdapter.selection-path.test.ts`
+- [x] T049 [P][test] [US4] Write tool match test: position-only selection does not produce phantom parent entry `apps/vscode/src/services/__tests__/toolMatchAdapter.selection-path.test.ts`
+- [x] T050 [P][test] [US4] Write tool match test: tool requiring whole-track does not match position-only selection `apps/vscode/src/services/__tests__/toolMatchAdapter.selection-path.test.ts`
 
 ### Implementation for User Stories 2 & 4
 
-- [ ] T051 [US2] Update addToSelection to normalise paths and deduplicate `services/session-state/src/store/slices/features.ts`
-- [ ] T052 [US2] Update removeFromSelection to use exact path match `services/session-state/src/store/slices/features.ts`
-- [ ] T053 [US2] Add isPathSelected and hasChildSelection selectors `services/session-state/src/store/slices/features.ts`
-- [ ] T054 [US2] Update useSelection hook to support path-based toggle and add `shared/components/src/hooks/useSelection.ts`
-- [ ] T055 [US4] Update ToolMatchAdapter.updateSelection to use getRoot for root extraction `apps/vscode/src/services/toolMatchAdapter.ts`
-- [ ] T056 [US4] Verify leaf-only semantics: tool receives exactly the paths in featureIds, not parents `apps/vscode/src/services/toolMatchAdapter.ts`
-- [ ] T057 [US4] Update MCP setSelection tool to pass paths through without modification `services/session-state/src/server/tools/setSelection.ts`
-- [ ] T058 Run US2 + US4 tests — verify all pass
+- [x] T051 [US2] Update addToSelection to normalise paths and deduplicate `services/session-state/src/store/slices/features.ts`
+- [x] T052 [US2] Update removeFromSelection to use exact path match `services/session-state/src/store/slices/features.ts`
+- [x] T053 [US2] Add isPathSelected and hasChildSelection selectors `services/session-state/src/store/slices/features.ts`
+- [x] T054 [US2] Update useSelection hook to support path-based toggle and add `shared/components/src/hooks/useSelection.ts`
+- [x] T055 [US4] Update ToolMatchAdapter.updateSelection to use getRoot for root extraction `apps/vscode/src/services/toolMatchAdapter.ts`
+- [x] T056 [US4] Verify leaf-only semantics: tool receives exactly the paths in featureIds, not parents `apps/vscode/src/services/toolMatchAdapter.ts`
+- [x] T057 [US4] Update MCP setSelection tool to pass paths through without modification `services/session-state/src/server/tools/setSelection.ts`
+- [x] T058 Run US2 + US4 tests — verify all pass
 
 **Checkpoint**: Mixed-depth selection works. Leaf-only semantics verified. Tool matching uses root extraction.
 
@@ -176,20 +176,20 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T059 [test] [US3] Write store test: setSelection with 3-level path stores correctly `services/session-state/src/store/__tests__/features.selection-path.test.ts`
-- [ ] T060 [P][test] [US3] Write path test: parsePath extracts all 3 levels from track/segments/id/positions/idx `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T061 [P][test] [US3] Write path test: getParent on 3-level path returns 2-level path `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T062 [P][test] [US3] Write path test: getDepth returns 2 for 3-level path `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T063 [P][test] [US3] Write round-trip test: buildPath → parsePath → buildPath produces identical output `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T064 [P][test] [US3] Write performance test: parse/validate 1000 paths with 4+ depth completes < 16ms `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T059 [test] [US3] Write store test: setSelection with 3-level path stores correctly `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T060 [P][test] [US3] Write path test: parsePath extracts all 3 levels from track/segments/id/positions/idx `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T061 [P][test] [US3] Write path test: getParent on 3-level path returns 2-level path `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T062 [P][test] [US3] Write path test: getDepth returns 2 for 3-level path `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T063 [P][test] [US3] Write round-trip test: buildPath → parsePath → buildPath produces identical output `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T064 [P][test] [US3] Write performance test: parse/validate 1000 paths with 4+ depth completes < 16ms `services/session-state/src/utils/__tests__/selectionPath.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T065 [US3] Verify parsePath handles arbitrary depth (no hard-coded limits) `services/session-state/src/utils/selectionPath.ts`
-- [ ] T066 [US3] Verify validatePathSemantics validates multi-level paths correctly `services/session-state/src/utils/selectionPath.ts`
-- [ ] T067 [US3] Verify selectedRootIds works correctly with deeply nested paths `services/session-state/src/store/slices/features.ts`
-- [ ] T068 [US3] Add segments level to MapView selection highlighting (if visual representation exists) `shared/components/src/MapView/MapView.tsx`
-- [ ] T069 Run US3 tests — verify all pass including performance
+- [x] T065 [US3] Verify parsePath handles arbitrary depth (no hard-coded limits) `services/session-state/src/utils/selectionPath.ts`
+- [x] T066 [US3] Verify validatePathSemantics validates multi-level paths correctly `services/session-state/src/utils/selectionPath.ts`
+- [x] T067 [US3] Verify selectedRootIds works correctly with deeply nested paths `services/session-state/src/store/slices/features.ts`
+- [x] T068 [US3] Add segments level to MapView selection highlighting (if visual representation exists) `shared/components/src/MapView/MapView.tsx`
+- [x] T069 Run US3 tests — verify all pass including performance
 
 **Checkpoint**: Arbitrary nesting depth verified. 4+ levels parse and validate within performance budget. Round-trip integrity confirmed.
 
@@ -201,18 +201,18 @@
 
 ### Tests for Edge Cases
 
-- [ ] T070 [test] Write test: unresolvable path retained in selection, not removed `services/session-state/src/store/__tests__/features.selection-path.test.ts`
-- [ ] T071 [P][test] Write test: feature ID with escaped slash (track~1alpha) parses correctly `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T072 [P][test] Write test: parent and child coexist — no deduplication or collapsing `services/session-state/src/store/__tests__/features.selection-path.test.ts`
-- [ ] T073 [P][test] Write test: empty path rejected by validatePathStructure `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T074 [P][test] Write test: trailing slash normalised away `services/session-state/src/utils/__tests__/selectionPath.test.ts`
-- [ ] T075 [P][test] Write test: invalid escape sequence (~2) detected by validation `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T070 [test] Write test: unresolvable path retained in selection, not removed `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T071 [P][test] Write test: feature ID with escaped slash (track~1alpha) parses correctly `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T072 [P][test] Write test: parent and child coexist — no deduplication or collapsing `services/session-state/src/store/__tests__/features.selection-path.test.ts`
+- [x] T073 [P][test] Write test: empty path rejected by validatePathStructure `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T074 [P][test] Write test: trailing slash normalised away `services/session-state/src/utils/__tests__/selectionPath.test.ts`
+- [x] T075 [P][test] Write test: invalid escape sequence (~2) detected by validation `services/session-state/src/utils/__tests__/selectionPath.test.ts`
 
 ### Implementation for Edge Cases
 
-- [ ] T076 Verify normalisePath strips trailing slash in store actions `services/session-state/src/store/slices/features.ts`
-- [ ] T077 Verify setSelection silently filters empty/invalid paths `services/session-state/src/store/slices/features.ts`
-- [ ] T078 Run all edge case tests — verify all pass
+- [x] T076 Verify normalisePath strips trailing slash in store actions `services/session-state/src/store/slices/features.ts`
+- [x] T077 Verify setSelection silently filters empty/invalid paths `services/session-state/src/store/slices/features.ts`
+- [x] T078 Run all edge case tests — verify all pass
 
 **Checkpoint**: All spec edge cases covered. Validation handles malformed paths gracefully.
 
@@ -222,27 +222,27 @@
 
 **Purpose**: Evidence collection, documentation, media content, and PR creation
 
-- [ ] T079 Run full test suite and verify all tests pass
-- [ ] T080 [P] Run quickstart.md validation — verify all code examples are accurate `specs/053-nested-child-selection/quickstart.md`
-- [ ] T081 [P] Update session-state package exports to include all new utilities `services/session-state/src/index.ts`
+- [x] T079 Run full test suite and verify all tests pass
+- [x] T080 [P] Run quickstart.md validation — verify all code examples are accurate `specs/053-nested-child-selection/quickstart.md`
+- [x] T081 [P] Update session-state package exports to include all new utilities `services/session-state/src/index.ts`
 
 ### Evidence Collection (REQUIRED)
 
 > **Purpose**: Capture artifacts for PR description and future documentation
 
-- [ ] T082 Capture test summary with pass/fail counts and coverage `specs/053-nested-child-selection/evidence/test-summary.md`
-- [ ] T083 Create usage demonstration showing path utilities and store actions `specs/053-nested-child-selection/evidence/usage-example.md`
-- [ ] T084 [P] Capture golden fixture test output `specs/053-nested-child-selection/evidence/golden-fixture-results.txt`
-- [ ] T085 [P] Create round-trip evidence showing path serialisation integrity `specs/053-nested-child-selection/evidence/round-trip-evidence.md`
+- [x] T082 Capture test summary with pass/fail counts and coverage `specs/053-nested-child-selection/evidence/test-summary.md`
+- [x] T083 Create usage demonstration showing path utilities and store actions `specs/053-nested-child-selection/evidence/usage-example.md`
+- [x] T084 [P] Capture golden fixture test output `specs/053-nested-child-selection/evidence/golden-fixture-results.txt`
+- [x] T085 [P] Create round-trip evidence showing path serialisation integrity `specs/053-nested-child-selection/evidence/round-trip-evidence.md`
 
 ### Media Content
 
-- [ ] T086 Create shipped blog post `specs/053-nested-child-selection/media/shipped-post.md`
-- [ ] T087 [P] Create LinkedIn shipped summary `specs/053-nested-child-selection/media/linkedin-shipped.md`
+- [x] T086 Create shipped blog post `specs/053-nested-child-selection/media/shipped-post.md`
+- [x] T087 [P] Create LinkedIn shipped summary `specs/053-nested-child-selection/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T088 Create PR and publish blog: run /speckit.pr
+- [x] T088 Create PR and publish blog: run /speckit.pr
 
 **Task T088 must run last. It depends on all evidence and media tasks being complete.**
 
