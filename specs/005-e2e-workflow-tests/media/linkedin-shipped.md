@@ -1,9 +1,11 @@
-End-to-end tests for maritime analysis platforms are surprisingly hard. The workflows users actually perform — open a file, inspect data on a map, run an analytical tool, verify results — touch four different software layers. A silent failure at any boundary goes undetected by unit tests.
+Four attempts to run Playwright against a VS Code workbench inside a sandboxed environment. Four failures. Then the pieces came together.
 
-We've built the test infrastructure to catch these failures. code-server hosts VS Code as a web application, Playwright automates the browser, and tests interact with the actual panels, webviews, and command palette that analysts use. No mocks, no simulation — the real extension running against real Python services.
+Standard Playwright CDN downloads are blocked (403). The Lambda-optimized @sparticuz/chromium crashes on VS Code's complex DOM. code-server's WebSocket auth depends on a proprietary module. And multi-process Chromium kills its own renderer when you take a screenshot in a container.
 
-This is the foundation for E2E testing across the complete workflow. When file loading and tool execution specs are implemented in the extension, these tests become the acceptance criteria: the work is done when the user journey passes.
+The fix was three substitutions and a flag: host Chromium as a GitHub Release asset instead of using CDN, use openvscode-server instead of code-server, run `--single-process --no-zygote` instead of default multi-process, and close the Welcome tab that silently captures keyboard focus.
+
+Result: Playwright driving a full VS Code command palette, Quick Open dialog, and file navigation -- all inside the sandbox. The E2E test infrastructure is ready for real workflow tests.
 
 [Read the full story][BLOG_URL]
 
-#FutureDebrief #MaritimeAnalysis #TestingInfrastructure
+#FutureDebrief #Playwright #VSCode
