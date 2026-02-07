@@ -27,6 +27,27 @@
 // Types
 export * from './types/index.js';
 
+// Selection Path Utilities (Feature: 053)
+export {
+  getLevelRegistry,
+  escapeSegment,
+  unescapeSegment,
+  normalisePath,
+  parsePath,
+  buildPath,
+  getRoot,
+  getDepth,
+  isRootPath,
+  getParent,
+  validatePathStructure,
+  validatePathSemantics,
+  type AddressingMode,
+  type LevelDefinition,
+  type PathLevel,
+  type ParsedPath,
+  type PathValidationResult,
+} from './utils/selectionPath.js';
+
 // Store
 export {
   createSessionStore,

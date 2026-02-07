@@ -28,9 +28,10 @@ import {
   type MatchResult,
 } from '../types/tool';
 import type { FeatureSelection } from '@debrief/session-state';
+import { getRoot } from '@debrief/session-state';
 
 /**
- * Function to look up the feature kind for a feature ID.
+ * Function to look up the feature kind for a feature ID (root ID, not path).
  * Returns the kind string (e.g., 'TRACK', 'POINT', 'CIRCLE') or undefined if unknown.
  */
 export type FeatureKindLookup = (featureId: string) => string | undefined;
@@ -161,16 +162,20 @@ export class ToolMatchAdapter {
   // ============================================================================
 
   /**
-   * Convert an array of feature IDs to a Selection map (kind → count).
+   * Convert an array of feature paths/IDs to a Selection map (kind → count).
    *
-   * @param featureIds - Array of feature IDs from session selection
+   * Feature 053: Extracts root feature ID from selection paths before looking up kind.
+   * This ensures that "track-001/positions/4" is counted as one TRACK selection.
+   *
+   * @param featureIds - Array of feature paths from session selection
    * @returns Selection map for ToolMatchService
    */
   private featureIdsToSelection(featureIds: string[]): ToolSelection {
     const kindCounts: Record<string, number> = {};
 
-    for (const id of featureIds) {
-      const kind = this.getFeatureKind(id);
+    for (const path of featureIds) {
+      const rootId = getRoot(path);
+      const kind = this.getFeatureKind(rootId);
       if (kind) {
         kindCounts[kind] = (kindCounts[kind] ?? 0) + 1;
       }
