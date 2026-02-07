@@ -50,12 +50,9 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install chromium
 
-      - name: Build VS Code extension and dependencies
-        run: pnpm --filter @debrief/vscode... build
-
-      - name: Package extension as .vsix
+      - name: Build and package VS Code extension
         working-directory: apps/vscode
-        run: pnpm run package
+        run: pnpm run build && pnpm run package
 
       # Build and start code-server Docker container
       - name: Build Docker image
