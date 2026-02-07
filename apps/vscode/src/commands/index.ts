@@ -8,6 +8,7 @@ import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { CalcService } from '../services/calcService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
+import type { OpenPlotsService } from '../services/openPlotsService';
 import type { IoService } from '../services/ioService';
 import type { SessionManager } from '../services/sessionManager';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
@@ -42,6 +43,7 @@ export function registerCommands(
   stacService: StacService,
   calcService: CalcService,
   recentPlotsService: RecentPlotsService,
+  openPlotsService: OpenPlotsService,
   ioService: IoService,
   sessionManager: SessionManager,
   stacTreeProvider: StacTreeProvider,
@@ -65,6 +67,7 @@ export function registerCommands(
         stacService,
         ioService,
         recentPlotsService,
+        openPlotsService,
         sessionManager,
         toolsTreeProvider,
         toolMatchAdapter,
@@ -81,6 +84,8 @@ export function registerCommands(
     vscode.commands.registerCommand('debrief.closePlot', () => {
       const panel = getMapPanel();
       if (panel) {
+        // Clear open plots state before disposing (Feature: 052)
+        void openPlotsService.clearAll();
         panel.dispose();
         setMapPanel(undefined);
       }
