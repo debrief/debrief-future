@@ -46,12 +46,12 @@
 
 **Purpose**: Prepare the working environment in the legacy repo and review reference materials
 
-- [ ] T001 Create staging directory structure `_tool-migration/tools/` in legacy repo `debrief/debrief`
-- [ ] T002 [P] Review 4 existing reference specs in `shared/tools/track/styling/` for tone and detail level
-- [ ] T003 [P] Review TEMPLATE.md for the 9-section structure `shared/tools/TEMPLATE.md`
-- [ ] T004 [P] Review LEGACY-REPO-TASK.md for inline instructions `docs/tool-migration/LEGACY-REPO-TASK.md`
-- [ ] T005 [P] Review Java capture harness template `docs/tool-migration/java-harness-template/`
-- [ ] T006 Create reusable validation checklist document for Phase 4 `_tool-migration/validation-checklist.md`
+- [x] T001 Create staging directory structure `_tool-migration/tools/` in legacy repo `debrief/debrief`
+- [x] T002 [P] Review 4 existing reference specs in `shared/tools/track/styling/` for tone and detail level
+- [x] T003 [P] Review TEMPLATE.md for the 9-section structure `shared/tools/TEMPLATE.md`
+- [x] T004 [P] Review LEGACY-REPO-TASK.md for inline instructions `docs/tool-migration/LEGACY-REPO-TASK.md`
+- [x] T005 [P] Review Java capture harness template `docs/tool-migration/java-harness-template/`
+- [x] T006 Create reusable validation checklist document for Phase 4 `_tool-migration/validation-checklist.md`
 
 ---
 
@@ -59,10 +59,10 @@
 
 **Purpose**: Establish the identification patterns and discovery report skeleton before scanning begins
 
-- [ ] T007 Document initial tool identification patterns (class names, interfaces, method signatures) `_tool-migration/identification-patterns.md`
-- [ ] T008 [P] Create discovery report skeleton with all required sections `_tool-migration/discovery-report.md`
-- [ ] T009 [P] Create category directory structure for all 9 starting categories `_tool-migration/tools/{category}/`
-- [ ] T010 [P] Document exclusion rules (UI plumbing, deprecated code, view factories) in identification patterns
+- [x] T007 Document initial tool identification patterns (class names, interfaces, method signatures) `_tool-migration/identification-patterns.md`
+- [x] T008 [P] Create discovery report skeleton with all required sections `_tool-migration/discovery-report.md`
+- [x] T009 [P] Create category directory structure for all 9 starting categories `_tool-migration/tools/{category}/`
+- [x] T010 [P] Document exclusion rules (UI plumbing, deprecated code, view factories) in identification patterns
 
 **Checkpoint**: Foundation ready — discovery scanning can now begin
 
@@ -76,40 +76,40 @@
 
 ### Initial Scan
 
-- [ ] T011 Scan package root `org.mwc.debrief.core/src/` for tool classes using identification patterns
-- [ ] T012 Scan package root `org.mwc.debrief.track_shift/src/` for tool classes using identification patterns
-- [ ] T013 Scan package root `org.mwc.cmap.plotViewer/src/` for tool classes using identification patterns
-- [ ] T014 Scan package root `Debrief/` for tool classes using identification patterns
+- [x] T011 Scan package root `org.mwc.debrief.core/src/` for tool classes using identification patterns
+- [x] T012 Scan package root `org.mwc.debrief.track_shift/src/` for tool classes using identification patterns
+- [x] T013 Scan package root `org.mwc.cmap.plotViewer/src/` for tool classes using identification patterns
+- [x] T014 Scan package root `Debrief/` for tool classes using identification patterns
 
 ### Pattern Discovery and Re-scan
 
-- [ ] T015 Analyse initial scan results to identify additional tool patterns (base classes, common method signatures, registration hooks, package conventions) that the initial patterns missed `_tool-migration/identification-patterns.md`
-- [ ] T016 Re-scan all 4 package roots with expanded patterns to catch tools that fell through the initial scan
-- [ ] T017 Cross-reference discovered tools against Eclipse plugin.xml registrations to catch menu/toolbar-registered tools not found by class-pattern scan
-- [ ] T018 Review classes in utility/helper packages for embedded algorithmic logic that should be extracted as standalone tools
+- [x] T015 Analyse initial scan results to identify additional tool patterns (base classes, common method signatures, registration hooks, package conventions) that the initial patterns missed `_tool-migration/identification-patterns.md`
+- [x] T016 Re-scan all 4 package roots with expanded patterns to catch tools that fell through the initial scan
+- [x] T017 Cross-reference discovered tools against Eclipse plugin.xml registrations to catch menu/toolbar-registered tools not found by class-pattern scan
+- [x] T018 Review classes in utility/helper packages for embedded algorithmic logic that should be extracted as standalone tools
 
 ### Complexity Assessment
 
-- [ ] T019 Rate each discovered tool as Low/Medium/High using the 5-factor assessment (algorithm, dependencies, state, I/O shape, UI coupling)
+- [x] T019 Rate each discovered tool as Low/Medium/High using the 5-factor assessment (algorithm, dependencies, state, I/O shape, UI coupling)
 
 ### Trigger Type and UX Mapping
 
-- [ ] T020 Classify legacy trigger type for each tool (context-menu, toolbar-button, menu-bar, drag-drop, property-edit, wizard, key-binding, auto/listener, view-action, bulk/batch)
-- [ ] T021 [P] Record selection context and intermediate UI for each tool
-- [ ] T022 Compile trigger type summary table (count per type)
-- [ ] T023 Build UX integration mapping table (10 legacy triggers × 4 Future Debrief surfaces) with gap flags
-- [ ] T024 Write "Tools Requiring New UX Mechanisms" section for drag-drop and wizard-triggered tools
+- [x] T020 Classify legacy trigger type for each tool (context-menu, toolbar-button, menu-bar, drag-drop, property-edit, wizard, key-binding, auto/listener, view-action, bulk/batch)
+- [x] T021 [P] Record selection context and intermediate UI for each tool
+- [x] T022 Compile trigger type summary table (count per type)
+- [x] T023 Build UX integration mapping table (10 legacy triggers × 4 Future Debrief surfaces) with gap flags
+- [x] T024 Write "Tools Requiring New UX Mechanisms" section for drag-drop and wizard-triggered tools
 
 ### Triage and Report Assembly
 
-- [ ] T025 Triage all tools: mark each as Ready, Needs Review, or Out of Scope with rationale
-- [ ] T026 [P] Refine category taxonomy based on actual tool groupings (merge/split/add categories as needed)
-- [ ] T027 Assemble full inventory table with all 9 columns populated for every tool
-- [ ] T028 Write summary table (tools per category by complexity and scope)
-- [ ] T029 [P] Write "Ready for Migration" section listing Low-complexity tools first
-- [ ] T030 [P] Write "Needs Review" section with notes per tool
-- [ ] T031 [P] Write "Out of Scope" section with exclusion reasons
-- [ ] T032 Review discovery report for completeness: verify every tool-bearing class is present, all columns filled, all sections non-empty
+- [x] T025 Triage all tools: mark each as Ready, Needs Review, or Out of Scope with rationale
+- [x] T026 [P] Refine category taxonomy based on actual tool groupings (merge/split/add categories as needed)
+- [x] T027 Assemble full inventory table with all 9 columns populated for every tool
+- [x] T028 Write summary table (tools per category by complexity and scope)
+- [x] T029 [P] Write "Ready for Migration" section listing Low-complexity tools first
+- [x] T030 [P] Write "Needs Review" section with notes per tool
+- [x] T031 [P] Write "Out of Scope" section with exclusion reasons
+- [x] T032 Review discovery report for completeness: verify every tool-bearing class is present, all columns filled, all sections non-empty
 
 **Checkpoint**: Discovery report complete — golden I/O capture can begin for Ready tools
 
