@@ -9,7 +9,9 @@
  */
 import { test, expect } from './fixtures/base';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const EVIDENCE_DIR = path.join(
   __dirname,
   '../../specs/005-e2e-workflow-tests/evidence/screenshots'
