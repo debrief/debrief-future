@@ -9,6 +9,7 @@ import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { IoService } from '../services/ioService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
+import type { OpenPlotsService } from '../services/openPlotsService';
 import type { SessionManager } from '../services/sessionManager';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
@@ -58,6 +59,7 @@ export function createOpenPlotCommand(
   stacService: StacService,
   ioService: IoService,
   recentPlotsService: RecentPlotsService,
+  openPlotsService: OpenPlotsService,
   sessionManager: SessionManager,
   toolsTreeProvider: ToolsTreeProvider,
   toolMatchAdapter: ToolMatchAdapter,
@@ -216,6 +218,9 @@ export function createOpenPlotCommand(
           );
         }
 
+        // Clear open plots state on panel dispose (Feature: 052)
+        void openPlotsService.clearAll();
+
         setMapPanel(undefined);
         layersTreeProvider.setTracks([]);
         layersTreeProvider.setLocations([]);
@@ -258,6 +263,14 @@ export function createOpenPlotCommand(
       plot.title,
       storeId,
       buildStacUri(storeId, itemPath)
+    );
+
+    // Track as open plot for session restoration (Feature: 052)
+    await openPlotsService.addPlot(
+      plotUri,
+      plot.title,
+      storeId,
+      itemPath
     );
   };
 }

@@ -17,6 +17,7 @@ import { StacService } from './services/stacService';
 import { ConfigService } from './services/configService';
 import { CalcService } from './services/calcService';
 import { RecentPlotsService } from './services/recentPlotsService';
+import { OpenPlotsService } from './services/openPlotsService';
 import { ActivityBarService } from './services/activityBarService';
 import { IoService } from './services/ioService';
 import { SessionManager } from './services/sessionManager';
@@ -39,6 +40,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const stacService = new StacService();
   const calcService = new CalcService(context, () => mapPanel);
   const recentPlotsService = new RecentPlotsService(context);
+  const openPlotsService = new OpenPlotsService(context);
   const ioService = new IoService(context.extensionPath);
   const sessionManager = new SessionManager();
   context.subscriptions.push(sessionManager);
@@ -219,6 +221,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     stacService,
     calcService,
     recentPlotsService,
+    openPlotsService,
     ioService,
     sessionManager,
     stacTreeProvider,
@@ -243,6 +246,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   await vscode.commands.executeCommand('setContext', 'debrief.hasSelection', false);
   await vscode.commands.executeCommand('setContext', 'debrief.hasResultLayers', false);
   await vscode.commands.executeCommand('setContext', 'debrief.calcAvailable', false);
+
+  // Restore previously-open plots (Feature: 052)
+  void openPlotsService.restoreOpenPlots();
 
   // Check debrief-calc availability and load tools (Feature: 038)
   calcService.checkAvailability().then(async (available) => {
