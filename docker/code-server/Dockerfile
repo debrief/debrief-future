@@ -25,13 +25,16 @@ COPY services/stac /workspace/services/stac
 COPY services/calc /workspace/services/calc
 COPY shared/schemas /workspace/shared/schemas
 
-# Install Python services
+# Install Python services in a virtual environment
+# Debian-managed Python blocks --system installs
 WORKDIR /workspace
-RUN uv pip install --system \
+RUN uv venv /opt/debrief-venv && \
+    VIRTUAL_ENV=/opt/debrief-venv uv pip install \
     ./shared/schemas \
     ./services/io \
     ./services/stac \
     ./services/calc
+ENV PATH="/opt/debrief-venv/bin:$PATH"
 
 # Install the Debrief VS Code extension
 # The .vsix must be built before Docker build: pnpm run package --filter @debrief/vscode
