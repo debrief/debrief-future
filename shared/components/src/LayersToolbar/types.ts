@@ -91,6 +91,8 @@ export interface AssociatedFile {
   viewerType?: string;
   /** File format (e.g., 'json', 'geojson', 'csv') */
   format?: string;
+  /** File modification time (epoch ms) for chronological ordering */
+  mtime?: number;
 }
 
 /**

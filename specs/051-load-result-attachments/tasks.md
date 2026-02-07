@@ -102,12 +102,12 @@
 ### Tests for User Story 2
 
 - [x] T015 [P] [test] [US2] Unit test for deduplication when merging loaded and runtime results `apps/vscode/tests/unit/stacService.test.ts`
-- [ ] T016 [P] [test] [US2] Unit test for chronological ordering of merged results `apps/vscode/tests/unit/stacService.test.ts`
+- [x] T016 [P] [test] [US2] Unit test for chronological ordering of merged results `apps/vscode/tests/unit/stacService.test.ts`
 
 ### Implementation for User Story 2
 
 - [x] T017 [US2] Add deduplication logic when merging loaded results with runtime results `apps/vscode/src/views/activityPanelView.ts`
-- [ ] T018 [US2] Add sorting by modification time (most recent first) `apps/vscode/src/views/activityPanelView.ts`
+- [x] T018 [US2] Add sorting by modification time (most recent first) `apps/vscode/src/views/activityPanelView.ts`
 - [x] T019 [US2] Ensure runtime-added results don't duplicate already-loaded files `apps/vscode/src/views/activityPanelView.ts`
 
 **Checkpoint**: User Story 2 complete - results from all sessions persist
@@ -144,7 +144,7 @@
 - [x] T025 [P] [test] Unit test for missing assets property in STAC item `apps/vscode/tests/unit/stacService.test.ts`
 - [x] T026 [P] [test] Unit test for asset with invalid/missing href `apps/vscode/tests/unit/stacService.test.ts`
 - [x] T027 Add warning log when skipping assets with invalid data `apps/vscode/src/services/stacService.ts`
-- [ ] T028 Verify performance with 50+ assets (should be < 500ms) `apps/vscode/tests/unit/stacService.test.ts`
+- [x] T028 Verify performance with 50+ assets (should be < 500ms) `apps/vscode/tests/unit/stacService.test.ts`
 
 ### Evidence Collection (REQUIRED)
 

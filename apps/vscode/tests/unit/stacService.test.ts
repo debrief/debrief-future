@@ -24,6 +24,7 @@ vi.mock('fs', () => ({
   mkdirSync: vi.fn(),
   copyFileSync: vi.fn(),
   rmSync: vi.fn(),
+  statSync: vi.fn(),
 }));
 
 vi.mock('crypto', () => ({
@@ -2054,6 +2055,7 @@ describe('StacService', () => {
 
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(item));
+      vi.mocked(fs.statSync).mockReturnValue({ mtimeMs: 1000 } as fs.Stats);
 
       const results = await service.loadResultFiles(store, 'test-item/item.json');
 
@@ -2077,6 +2079,118 @@ describe('StacService', () => {
       const results = await service.loadResultFiles(store, 'test/item.json');
 
       expect(results).toEqual([]);
+    });
+
+    it('should populate mtime from filesystem and sort by mtime descending', async () => {
+      const store = createMockStore();
+      const item = createMockItem({
+        assets: {
+          'old-result': {
+            href: './assets/old-result.json',
+            title: 'Old Result',
+            roles: ['result'],
+          },
+          'new-result': {
+            href: './assets/new-result.json',
+            title: 'New Result',
+            roles: ['result'],
+          },
+          'mid-result': {
+            href: './assets/mid-result.json',
+            title: 'Mid Result',
+            roles: ['result'],
+          },
+        },
+      });
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(item));
+      vi.mocked(fs.statSync).mockImplementation((p) => {
+        const filePath = String(p);
+        if (filePath.includes('old-result')) return { mtimeMs: 1000 } as fs.Stats;
+        if (filePath.includes('new-result')) return { mtimeMs: 3000 } as fs.Stats;
+        if (filePath.includes('mid-result')) return { mtimeMs: 2000 } as fs.Stats;
+        return { mtimeMs: 0 } as fs.Stats;
+      });
+
+      const results = await service.loadResultFiles(store, 'test-item/item.json');
+
+      expect(results).toHaveLength(3);
+      // Most recent first
+      expect(results[0].name).toBe('New Result');
+      expect(results[0].mtime).toBe(3000);
+      expect(results[1].name).toBe('Mid Result');
+      expect(results[1].mtime).toBe(2000);
+      expect(results[2].name).toBe('Old Result');
+      expect(results[2].mtime).toBe(1000);
+    });
+
+    it('should handle missing files gracefully when populating mtime', async () => {
+      const store = createMockStore();
+      const item = createMockItem({
+        assets: {
+          'exists': {
+            href: './assets/exists.json',
+            title: 'Exists',
+            roles: ['result'],
+          },
+          'missing': {
+            href: './assets/missing.json',
+            title: 'Missing',
+            roles: ['result'],
+          },
+        },
+      });
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(item));
+      vi.mocked(fs.statSync).mockImplementation((p) => {
+        const filePath = String(p);
+        if (filePath.includes('missing')) throw new Error('ENOENT');
+        return { mtimeMs: 5000 } as fs.Stats;
+      });
+
+      const results = await service.loadResultFiles(store, 'test-item/item.json');
+
+      expect(results).toHaveLength(2);
+      // File with mtime should come first, missing mtime last
+      expect(results[0].mtime).toBe(5000);
+      expect(results[1].mtime).toBeUndefined();
+    });
+  });
+
+  // ===========================================================================
+  // Phase: Performance tests (Feature 051 - T028)
+  // ===========================================================================
+
+  describe('getResultFilesFromItem - performance', () => {
+    it('should handle 50+ assets in under 500ms', () => {
+      // Generate 60 result assets
+      const assets: Record<string, { href: string; title: string; roles: string[] }> = {};
+      for (let i = 0; i < 60; i++) {
+        assets[`result-${i}`] = {
+          href: `./assets/result-${i}.2d.json`,
+          title: `Result ${i}`,
+          roles: ['result'],
+        };
+      }
+      // Add 20 non-result assets for filtering
+      for (let i = 0; i < 20; i++) {
+        assets[`source-${i}`] = {
+          href: `./sources/data-${i}.rep`,
+          title: `Source ${i}`,
+          roles: ['source'],
+        };
+      }
+
+      const item = createMockItem({ assets });
+
+      const start = performance.now();
+      const results = service.getResultFilesFromItem(item);
+      const elapsed = performance.now() - start;
+
+      expect(results).toHaveLength(60);
+      expect(elapsed).toBeLessThan(500);
     });
   });
 });
