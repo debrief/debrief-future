@@ -143,6 +143,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Local filesystem (via VS Code workspace.fs API) (001-wire-file-actions)
 - Markdown (command/agent definitions), Java (harness template) + None (Claude agent infrastructure, existing speckit patterns) (050-tool-migration-workflow)
 - Filesystem only (Markdown files, JSON golden examples) (050-tool-migration-workflow)
+- TypeScript 5.x (session-state package, VS Code extension, shared components), Python 3.11 (LinkML schemas, Pydantic models) + Zustand (state management), React 18.x (shared components), Leaflet 1.9.x (map rendering), LinkML (schema source), VS Code Extension API ^1.85.0 (053-nested-child-selection)
+- In-memory Zustand store (session state); no persistent storage changes (053-nested-child-selection)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
