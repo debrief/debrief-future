@@ -43,7 +43,7 @@ A standalone browser application for reviewing Debrief component integration.
 - **Welcome Page**: STAC Catalog browser showing available plots
 - **Analysis View**: ActivityPanel (left) + MapView (right)
 - **Selection Sync**: Click features on map or in list
-- **Tool Execution**: Track Length and Bounding Box tools
+- **Tool Execution**: Track Length, Bounding Box, and 4 styling tools
 
 ## Usage
 
