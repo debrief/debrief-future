@@ -134,7 +134,7 @@ Description formats:
 | 019 | Enhancement | [Add 'needs-interview' status to backlog workflow](specs/019-needs-interview-status/spec.md) | 3 | 3 | 5 | 11 | Medium | implementing |
 | ~~046~~ | ~~Tech Debt~~ | ~~[Convert raw HTML to vscrui components and theme library](specs/046-vscrui-conversion/spec.md)~~ | ~~4~~ | ~~3~~ | ~~5~~ | ~~12~~ | ~~Medium~~ | ~~complete~~ |
 | ~~045~~ | ~~Feature~~ | ~~[Add layers toolbar to FeatureList in shared-components](specs/045-featurelist-layers-toolbar/spec.md) (prerequisite for #044)~~ | ~~5~~ | ~~5~~ | ~~4~~ | ~~14~~ | ~~High~~ | ~~complete~~ |
-| 043 | Feature | [Load REP files into new plot via "Add to new plot in store"](specs/043-load-rep-new-plot/spec.md) | 5 | 5 | 4 | 14 | Medium | specified |
+| ~~043~~ | ~~Feature~~ | ~~[Load REP files into new plot via "Add to new plot in store"](specs/043-load-rep-new-plot/spec.md)~~ | ~~5~~ | ~~5~~ | ~~4~~ | ~~14~~ | ~~Medium~~ | ~~complete~~ |
 | 042 | Feature | [Add STAC catalog overview panel with map and timeline](specs/042-stac-catalog-overview-panel/spec.md) | 5 | 5 | 3 | 13 | High | specified |
 | ~~040~~ | ~~Feature~~ | ~~[Save analysis results to STAC](specs/001-save-calc-results-stac/spec.md)~~ | ~~5~~ | ~~4~~ | ~~4~~ | ~~13~~ | ~~Medium~~ | ~~complete~~ |
 | 016 | Infrastructure | [Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md) | 3 | 5 | 4 | 12 | Medium | specified |
