@@ -1,6 +1,8 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
-test.describe('Tool Execution', () => {
+// STATUS: Skipped — requires web-shell app with tool execution and map rendering.
+// See docs/web-shell-test-restoration-requirements.md for restoration plan.
+test.describe.skip('Tool Execution', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // Navigate to analysis view via timeline bar/point

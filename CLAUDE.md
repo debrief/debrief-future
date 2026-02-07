@@ -145,6 +145,10 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Filesystem only (Markdown files, JSON golden examples) (050-tool-migration-workflow)
 - TypeScript 5.x (session-state package, VS Code extension, shared components), Python 3.11 (LinkML schemas, Pydantic models) + Zustand (state management), React 18.x (shared components), Leaflet 1.9.x (map rendering), LinkML (schema source), VS Code Extension API ^1.85.0 (053-nested-child-selection)
 - In-memory Zustand store (session state); no persistent storage changes (053-nested-child-selection)
+- Python 3.11 + debrief-io, debrief-stac, debrief-calc (workspace members), pytest, pytest-cov (005-e2e-workflow-tests)
+- Local filesystem (temporary STAC catalogs via pytest `tmp_path`) (005-e2e-workflow-tests)
+- TypeScript 5.x (test code), Python 3.11 (services under test) + code-server ^4.x, @playwright/test ^1.57.0 (already in project), @sparticuz/chromium (already in project) (005-e2e-workflow-tests)
+- Local filesystem (STAC catalogs in test workspace) (005-e2e-workflow-tests)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
