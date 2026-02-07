@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://generate-sensor-range-plot/TOWED_ARRAY-range-plot.json",
+      "mimeType": "application/json",
+      "text": "{\"title\":\"Sensor Range Plot: TOWED_ARRAY\",\"sensor_name\":\"TOWED_ARRAY\",\"ownship\":\"OWNSHIP\",\"target\":\"Target Alpha\",\"time_series\":[{\"time\":\"2024-01-15T10:00:00Z\",\"range_m\":6576.8,\"bearing\":45.0,\"ownship_position\":[-1.0,50.0],\"target_position\":[-0.95,50.05]},{\"time\":\"2024-01-15T10:02:00Z\",\"range_m\":6123.5,\"bearing\":49.0,\"ownship_position\":[-0.98,50.01],\"target_position\":[-0.93,50.06]},{\"time\":\"2024-01-15T10:04:00Z\",\"range_m\":5670.3,\"bearing\":53.0,\"ownship_position\":[-0.96,50.02],\"target_position\":[-0.91,50.07]}],\"statistics\":{\"min_range_m\":5670.3,\"max_range_m\":6576.8,\"mean_range_m\":6123.5,\"data_points\":3},\"notes\":\"Target positions interpolated at sensor cut times\"}",
+      "annotations": {
+        "debrief:resultType": "artifact/analysis/sensor_range_plot",
+        "debrief:sourceFeatures": ["sensor-sparse", "track-ownship", "track-target"],
+        "debrief:label": "Generated range plot for TOWED_ARRAY: 3 data points, range 5670-6577m (target positions interpolated)",
+        "debrief:href": "TOWED_ARRAY-range-plot.json"
+      }
+    }
+  ]
+}

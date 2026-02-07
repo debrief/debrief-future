@@ -1,0 +1,26 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://sensor-port",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-port\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Port Array\",\"platform_id\":\"VESSEL-A\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"port-001\",\"time\":\"2024-01-15T08:00:00Z\",\"bearing\":270.0,\"frequency\":100.0,\"style\":{\"color\":\"rgb(0,0,255)\"}},{\"id\":\"port-002\",\"time\":\"2024-01-15T09:00:00Z\",\"bearing\":265.0,\"frequency\":102.0,\"style\":{\"color\":\"rgb(64,0,191)\"}},{\"id\":\"port-003\",\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":260.0,\"frequency\":105.0,\"style\":{\"color\":\"rgb(128,0,127)\"}},{\"id\":\"port-004\",\"time\":\"2024-01-15T11:00:00Z\",\"bearing\":255.0,\"frequency\":108.0,\"style\":{\"color\":\"rgb(191,0,64)\"}},{\"id\":\"port-005\",\"time\":\"2024-01-15T12:00:00Z\",\"bearing\":250.0,\"frequency\":110.0,\"style\":{\"color\":\"rgb(255,0,0)\"}}]}}",
+      "annotations": {
+        "debrief:resultType": "mutation/sensor/shaded",
+        "debrief:sourceFeatures": ["sensor-port"],
+        "debrief:label": "Blue-red spectrum shaded 5 sonar contact(s) on Port Array"
+      }
+    },
+    {
+      "type": "resource",
+      "uri": "feature://sensor-stbd",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-stbd\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Starboard Array\",\"platform_id\":\"VESSEL-A\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"stbd-001\",\"time\":\"2024-01-15T08:30:00Z\",\"bearing\":90.0,\"frequency\":120.0,\"style\":{\"color\":\"rgb(0,0,255)\"}},{\"id\":\"stbd-002\",\"time\":\"2024-01-15T09:30:00Z\",\"bearing\":85.0,\"frequency\":122.0,\"style\":{\"color\":\"rgb(128,0,127)\"}},{\"id\":\"stbd-003\",\"time\":\"2024-01-15T10:30:00Z\",\"bearing\":80.0,\"frequency\":125.0,\"style\":{\"color\":\"rgb(255,0,0)\"}}]}}",
+      "annotations": {
+        "debrief:resultType": "mutation/sensor/shaded",
+        "debrief:sourceFeatures": ["sensor-stbd"],
+        "debrief:label": "Blue-red spectrum shaded 3 sonar contact(s) on Starboard Array"
+      }
+    }
+  ]
+}

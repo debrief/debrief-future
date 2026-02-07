@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://export-rtf/plot-export.rtf",
+      "mimeType": "application/rtf",
+      "text": "[RTF document content with embedded plot graphic]",
+      "annotations": {
+        "debrief:resultType": "artifact/dataset/exported_rtf",
+        "debrief:sourceFeatures": ["track-001"],
+        "debrief:label": "Exported plot as RTF with 1 visible layer(s)",
+        "debrief:href": "plot-export.rtf"
+      }
+    }
+  ]
+}

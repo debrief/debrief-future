@@ -1,0 +1,27 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "track-min",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-2.0, 51.0], [-1.99, 51.01], [-1.97, 51.02], [-1.94, 51.03]]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "VESSEL-C",
+        "platform_name": "Vessel Charlie",
+        "track_type": "SURFACE",
+        "start_time": "2024-01-15T14:00:00Z",
+        "end_time": "2024-01-15T14:15:00Z",
+        "positions": [
+          {"time": "2024-01-15T14:00:00Z", "coordinates": [-2.0, 51.0], "course": 45.0, "speed": 12},
+          {"time": "2024-01-15T14:05:00Z", "coordinates": [-1.99, 51.01], "course": 60.0, "speed": 12},
+          {"time": "2024-01-15T14:10:00Z", "coordinates": [-1.97, 51.02], "course": 70.0, "speed": 12},
+          {"time": "2024-01-15T14:15:00Z", "coordinates": [-1.94, 51.03], "course": 85.0, "speed": 12}
+        ]
+      }
+    }
+  ]
+}

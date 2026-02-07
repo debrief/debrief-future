@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://segment-multi-jump",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"segment-multi-jump\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-1.01,50.01],[-1.02,50.02],[-1.03,50.03],[-1.04,50.04],[-1.05,50.05],[-1.06,50.06],[-1.07,50.07],[-1.08,50.08]]},\"properties\":{\"kind\":\"TRACK_SEGMENT\",\"platform_id\":\"VESSEL-D\",\"platform_name\":\"Vessel Delta\",\"track_type\":\"SURFACE\",\"parent_track_id\":\"track-004\",\"start_time\":\"2024-01-15T08:00:00Z\",\"end_time\":\"2024-01-15T08:40:00Z\",\"nominal_speed_kn\":10.0,\"positions\":[{\"time\":\"2024-01-15T08:00:00Z\",\"coordinates\":[-1.0,50.0],\"course\":225,\"speed\":10},{\"time\":\"2024-01-15T08:05:00Z\",\"coordinates\":[-1.01,50.01],\"course\":225,\"speed\":10},{\"time\":\"2024-01-15T08:10:00Z\",\"coordinates\":[-1.02,50.02],\"course\":225,\"speed\":10},{\"time\":\"2024-01-15T08:15:00Z\",\"coordinates\":[-1.03,50.03],\"course\":225,\"speed\":10,\"smoothed\":true},{\"time\":\"2024-01-15T08:20:00Z\",\"coordinates\":[-1.04,50.04],\"course\":225,\"speed\":10},{\"time\":\"2024-01-15T08:25:00Z\",\"coordinates\":[-1.05,50.05],\"course\":225,\"speed\":10},{\"time\":\"2024-01-15T08:30:00Z\",\"coordinates\":[-1.06,50.06],\"course\":225,\"speed\":10},{\"time\":\"2024-01-15T08:35:00Z\",\"coordinates\":[-1.07,50.07],\"course\":225,\"speed\":10,\"smoothed\":true},{\"time\":\"2024-01-15T08:40:00Z\",\"coordinates\":[-1.08,50.08],\"course\":225,\"speed\":10}],\"smoothed_count\":2}}",
+      "annotations": {
+        "debrief:resultType": "mutation/track/smoothed",
+        "debrief:sourceFeatures": ["segment-multi-jump"],
+        "debrief:label": "Smoothed 2 position jump(s) in Vessel Delta segment"
+      }
+    }
+  ]
+}

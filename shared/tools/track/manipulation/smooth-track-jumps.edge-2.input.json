@@ -1,0 +1,34 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "segment-consec-jumps",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-1.0, 50.0], [-1.01, 50.01], [-2.0, 51.0], [-3.0, 52.0], [-1.04, 50.04], [-1.05, 50.05]]
+      },
+      "properties": {
+        "kind": "TRACK_SEGMENT",
+        "platform_id": "VESSEL-C",
+        "platform_name": "Vessel Charlie",
+        "track_type": "SURFACE",
+        "parent_track_id": "track-003",
+        "start_time": "2024-01-15T14:00:00Z",
+        "end_time": "2024-01-15T14:25:00Z",
+        "nominal_speed_kn": 10.0,
+        "positions": [
+          {"time": "2024-01-15T14:00:00Z", "coordinates": [-1.0, 50.0], "course": 225, "speed": 10},
+          {"time": "2024-01-15T14:05:00Z", "coordinates": [-1.01, 50.01], "course": 225, "speed": 10},
+          {"time": "2024-01-15T14:10:00Z", "coordinates": [-2.0, 51.0], "course": 225, "speed": 10},
+          {"time": "2024-01-15T14:15:00Z", "coordinates": [-3.0, 52.0], "course": 225, "speed": 10},
+          {"time": "2024-01-15T14:20:00Z", "coordinates": [-1.04, 50.04], "course": 225, "speed": 10},
+          {"time": "2024-01-15T14:25:00Z", "coordinates": [-1.05, 50.05], "course": 225, "speed": 10}
+        ]
+      }
+    }
+  ],
+  "_parameters": {
+    "speed_threshold_multiplier": 3.0
+  }
+}

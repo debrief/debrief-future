@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-bearing-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-bearing-001\",\"geometry\":null,\"properties\":{\"debrief:kind\":\"measurement\",\"debrief:measurement_type\":\"bearing\",\"debrief:value\":32.8,\"debrief:units\":\"degs\",\"debrief:time\":\"2024-01-15T10:30:00Z\",\"debrief:primary_track\":\"track-001\",\"debrief:secondary_track\":\"track-002\",\"debrief:primary_position\":[-1.0,50.0],\"debrief:secondary_position\":[-0.95,50.05]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/bearing",
+        "debrief:sourceFeatures": ["track-001", "track-002"],
+        "debrief:label": "Calculated bearing: 32.8 degs"
+      }
+    }
+  ]
+}

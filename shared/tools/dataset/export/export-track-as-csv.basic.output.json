@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://export-track-as-csv/OWNSHIP.csv",
+      "mimeType": "text/csv",
+      "text": "// UK Track Exchange Format V1.0\n// Exported from Debrief\n// Unit Name: OWNSHIP\n// Case Number: CASE-2024-001\n// Classification: UNCLASSIFIED\nLat,Long,DTG,UnitName,CaseNumber,Type,Flag,Sensor,MajorAxis,SemiMajorAxis,SemiMinorAxis,Course,Speed,Depth,Likelihood,Confidence,SuppliedBy,Provenance,InfoCutoffDate,Purpose,Classification,DistributionStatement\n50.0,-1.0,2024-01-15T10:00:00Z,OWNSHIP,CASE-2024-001,SURFACE,GBR,,,,,,45.0,12.0,0.0,,,Debrief Export,Debrief track replay,2024-01-15,Exercise Analysis,UNCLASSIFIED,Distribution A\n50.01,-1.02,2024-01-15T10:05:00Z,OWNSHIP,CASE-2024-001,SURFACE,GBR,,,,,,47.0,12.5,0.0,,,Debrief Export,Debrief track replay,2024-01-15,Exercise Analysis,UNCLASSIFIED,Distribution A",
+      "annotations": {
+        "debrief:resultType": "artifact/dataset/exported_csv",
+        "debrief:sourceFeatures": ["track-ownship"],
+        "debrief:label": "Exported track OWNSHIP as CSV (2 positions)",
+        "debrief:href": "OWNSHIP.csv"
+      }
+    }
+  ]
+}

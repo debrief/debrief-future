@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://copy-bearings-to-clipboard/TOWED_ARRAY",
+      "mimeType": "text/plain",
+      "text": "Time\tBearing (deg)\tFrequency (Hz)\n2024-01-15T10:00:00Z\t45.0\t150.2\n2024-01-15T10:05:00Z\t47.0\t150.3",
+      "annotations": {
+        "debrief:resultType": "artifact/dataset/bearing_table",
+        "debrief:sourceFeatures": ["sensor-towed-array"],
+        "debrief:label": "Copied 2 bearing cuts from sensor TOWED_ARRAY to clipboard"
+      }
+    }
+  ]
+}

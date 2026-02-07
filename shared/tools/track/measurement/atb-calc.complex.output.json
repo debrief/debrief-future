@@ -1,0 +1,18 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-atb-002",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-atb-002\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-0.95,50.03]},\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"angle_to_bow\",\"value\":62.5892,\"units\":\"degrees\",\"format\":\"US\",\"bearing_target_to_ownship\":242.5892,\"target_course\":180.0,\"time\":\"2024-01-15T10:35:00Z\",\"source_tracks\":[\"track-ownship\",\"track-target\"]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/angle_to_bow",
+        "debrief:sourceFeatures": [
+          "track-ownship",
+          "track-target"
+        ],
+        "debrief:label": "Angle to bow: 62.59 deg (US) from target perspective at T10:35"
+      }
+    }
+  ]
+}

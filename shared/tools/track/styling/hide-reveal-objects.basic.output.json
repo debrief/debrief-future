@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://track-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"track-001\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-1.02,50.01],[-1.04,50.02]]},\"properties\":{\"kind\":\"TRACK\",\"platform_id\":\"VESSEL-A\",\"platform_name\":\"Vessel Alpha\",\"track_type\":\"SURFACE\",\"start_time\":\"2024-01-01T10:00:00Z\",\"end_time\":\"2024-01-01T10:10:00Z\",\"positions\":[{\"time\":\"2024-01-01T10:00:00Z\",\"coordinates\":[-1.0,50.0],\"symbol\":\"SQUARE\",\"label\":\"FIX-001\",\"show_label\":true,\"visible\":false},{\"time\":\"2024-01-01T10:05:00Z\",\"coordinates\":[-1.02,50.01],\"symbol\":\"SQUARE\",\"label\":\"FIX-002\",\"show_label\":true,\"visible\":false},{\"time\":\"2024-01-01T10:10:00Z\",\"coordinates\":[-1.04,50.02],\"symbol\":\"SQUARE\",\"label\":\"FIX-003\",\"show_label\":true,\"visible\":true}],\"style\":{\"line\":{\"stroke\":true,\"color\":\"#3388ff\",\"weight\":3,\"opacity\":1.0},\"point\":{\"shape\":\"SQUARE\",\"radius\":4,\"fill\":true,\"fill_color\":\"#3388ff\",\"fill_opacity\":0.8,\"stroke\":true,\"color\":\"#ffffff\",\"weight\":1,\"opacity\":1.0}},\"default_position_style\":{\"show_symbol\":true,\"symbol\":\"SQUARE\",\"show_label\":true}}}",
+      "annotations": {
+        "debrief:resultType": "mutation/track/styled",
+        "debrief:sourceFeatures": ["track-001"],
+        "debrief:label": "Hidden 2 object(s) in time period 2024-01-01T10:00:00Z to 2024-01-01T10:05:00Z across 1 track(s)"
+      }
+    }
+  ]
+}

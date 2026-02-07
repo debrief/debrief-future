@@ -1,0 +1,12 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "Infill segment must contain at least 2 positions to calculate course and speed",
+    "data": {
+      "debrief:errorCategory": "insufficient_data",
+      "debrief:affectedFeatures": ["infill-single"],
+      "positions_found": 1,
+      "minimum_required": 2
+    }
+  }
+}

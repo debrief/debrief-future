@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://doppler-curve/OWNSHIP-Target_Parallel-doppler.json",
+      "mimeType": "application/json",
+      "text": "{\"title\":\"Doppler Curve: OWNSHIP vs Target Parallel\",\"source_frequency_hz\":150.0,\"speed_of_sound_kts\":3032,\"ownship\":\"OWNSHIP\",\"target\":\"Target Parallel\",\"time_series\":[{\"time\":\"2024-01-15T10:00:00Z\",\"predicted_frequency_hz\":150.0,\"radial_velocity_kts\":0.0,\"range_m\":11119.5,\"bearing_deg\":0.0},{\"time\":\"2024-01-15T10:01:00Z\",\"predicted_frequency_hz\":150.0,\"radial_velocity_kts\":0.0,\"range_m\":11119.5,\"bearing_deg\":0.0},{\"time\":\"2024-01-15T10:02:00Z\",\"predicted_frequency_hz\":150.0,\"radial_velocity_kts\":0.0,\"range_m\":11119.5,\"bearing_deg\":0.0}],\"statistics\":{\"min_frequency_hz\":150.0,\"max_frequency_hz\":150.0,\"frequency_shift_hz\":0.0,\"data_points\":3}}",
+      "annotations": {
+        "debrief:resultType": "artifact/analysis/doppler_curve",
+        "debrief:sourceFeatures": ["track-ownship", "track-target"],
+        "debrief:label": "Doppler curve for OWNSHIP vs Target Parallel: 3 points, f_source=150.0Hz, zero Doppler shift (parallel tracks)",
+        "debrief:href": "OWNSHIP-Target_Parallel-doppler.json"
+      }
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "track-ownship",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-1.0, 50.0], [-0.995, 50.0], [-0.99, 50.0], [-0.985, 50.0], [-0.98, 50.0], [-0.975, 50.0], [-0.97, 50.0], [-0.965, 50.0]]
+        },
+        "properties": {
+          "kind": "TRACK",
+          "platform_id": "OWNSHIP",
+          "platform_name": "OWNSHIP",
+          "track_type": "SURFACE",
+          "start_time": "2024-01-15T10:00:00Z",
+          "end_time": "2024-01-15T10:07:00Z",
+          "positions": [
+            {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.0, 50.0], "course": 90.0, "speed": 10.0},
+            {"time": "2024-01-15T10:01:00Z", "coordinates": [-0.995, 50.0], "course": 90.0, "speed": 10.0},
+            {"time": "2024-01-15T10:02:00Z", "coordinates": [-0.99, 50.0], "course": 90.0, "speed": 10.0},
+            {"time": "2024-01-15T10:03:00Z", "coordinates": [-0.985, 50.0], "course": 90.0, "speed": 10.0},
+            {"time": "2024-01-15T10:04:00Z", "coordinates": [-0.98, 50.0], "course": 90.0, "speed": 10.0},
+            {"time": "2024-01-15T10:05:00Z", "coordinates": [-0.975, 50.0], "course": 90.0, "speed": 10.0},
+            {"time": "2024-01-15T10:06:00Z", "coordinates": [-0.97, 50.0], "course": 90.0, "speed": 10.0},
+            {"time": "2024-01-15T10:07:00Z", "coordinates": [-0.965, 50.0], "course": 90.0, "speed": 10.0}
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "track-target-crossing",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-0.98, 50.03], [-0.98, 50.025], [-0.98, 50.02], [-0.98, 50.015], [-0.98, 50.01], [-0.98, 50.005], [-0.98, 50.0], [-0.98, 49.995]]
+        },
+        "properties": {
+          "kind": "TRACK",
+          "platform_id": "TARGET-CROSS",
+          "platform_name": "Target Crossing",
+          "track_type": "SUBMARINE",
+          "start_time": "2024-01-15T10:00:00Z",
+          "end_time": "2024-01-15T10:07:00Z",
+          "positions": [
+            {"time": "2024-01-15T10:00:00Z", "coordinates": [-0.98, 50.03], "course": 180.0, "speed": 8.0},
+            {"time": "2024-01-15T10:01:00Z", "coordinates": [-0.98, 50.025], "course": 180.0, "speed": 8.0},
+            {"time": "2024-01-15T10:02:00Z", "coordinates": [-0.98, 50.02], "course": 180.0, "speed": 8.0},
+            {"time": "2024-01-15T10:03:00Z", "coordinates": [-0.98, 50.015], "course": 180.0, "speed": 8.0},
+            {"time": "2024-01-15T10:04:00Z", "coordinates": [-0.98, 50.01], "course": 180.0, "speed": 8.0},
+            {"time": "2024-01-15T10:05:00Z", "coordinates": [-0.98, 50.005], "course": 180.0, "speed": 8.0},
+            {"time": "2024-01-15T10:06:00Z", "coordinates": [-0.98, 50.0], "course": 180.0, "speed": 8.0},
+            {"time": "2024-01-15T10:07:00Z", "coordinates": [-0.98, 49.995], "course": 180.0, "speed": 8.0}
+          ]
+        }
+      }
+    ]
+  },
+  "source_frequency_hz": 150.0,
+  "speed_of_sound_kts": 3032
+}

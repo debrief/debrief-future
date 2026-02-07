@@ -1,0 +1,50 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "tma-abs-single",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.1, 50.1]
+      },
+      "properties": {
+        "kind": "TMA_SEGMENT",
+        "segment_type": "ABSOLUTE",
+        "platform_id": "CONTACT-Z",
+        "platform_name": "Contact Zulu",
+        "track_type": "SUBMARINE",
+        "parent_track_id": "track-tgt-003",
+        "start_time": "2024-01-15T10:00:00Z",
+        "end_time": "2024-01-15T10:00:00Z",
+        "course": 270.0,
+        "speed": 6.0,
+        "positions": [
+          {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.1, 50.1], "course": 270.0, "speed": 6.0}
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "track-ownship-single",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-1.0, 50.0], [-1.01, 50.01]]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "OWNSHIP",
+        "platform_name": "HMS Ownship",
+        "track_type": "SURFACE",
+        "is_ownship": true,
+        "start_time": "2024-01-15T10:00:00Z",
+        "end_time": "2024-01-15T10:05:00Z",
+        "sensor_array_center": [-1.0, 50.0],
+        "positions": [
+          {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.0, 50.0], "course": 90, "speed": 12},
+          {"time": "2024-01-15T10:05:00Z", "coordinates": [-1.01, 50.01], "course": 90, "speed": 12}
+        ]
+      }
+    }
+  ]
+}

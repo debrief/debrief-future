@@ -1,0 +1,45 @@
+{
+  "features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "sensor-001",
+        "geometry": {
+          "type": "GeometryCollection",
+          "geometries": []
+        },
+        "properties": {
+          "kind": "SENSOR",
+          "sensor_name": "Towed Array",
+          "platform_id": "VESSEL-A",
+          "sensor_type": "SONAR",
+          "contacts": [
+            {
+              "id": "contact-001",
+              "time": "2024-01-15T10:00:00Z",
+              "bearing": 45.0,
+              "frequency": 150.0,
+              "style": {"color": "#3388ff"}
+            },
+            {
+              "id": "contact-002",
+              "time": "2024-01-15T10:05:00Z",
+              "bearing": 47.0,
+              "frequency": 152.0,
+              "style": {"color": "#3388ff"}
+            },
+            {
+              "id": "contact-003",
+              "time": "2024-01-15T10:10:00Z",
+              "bearing": 50.0,
+              "frequency": 155.0,
+              "style": {"color": "#3388ff"}
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "mode": "RAINBOW_SHADE"
+}

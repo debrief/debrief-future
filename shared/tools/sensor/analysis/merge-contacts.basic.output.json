@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://merged-sensor-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"merged-sensor-001\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Merged Contacts\",\"platform_id\":\"VESSEL-A\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"pa-001\",\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":270.0,\"frequency\":100.0,\"source_sensor\":\"Port Array\"},{\"id\":\"sa-001\",\"time\":\"2024-01-15T10:05:00Z\",\"bearing\":90.0,\"frequency\":120.0,\"source_sensor\":\"Starboard Array\"},{\"id\":\"pa-002\",\"time\":\"2024-01-15T10:10:00Z\",\"bearing\":265.0,\"frequency\":102.0,\"source_sensor\":\"Port Array\"}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/sensor/merged",
+        "debrief:sourceFeatures": ["sensor-port", "sensor-stbd"],
+        "debrief:label": "Merged 3 contacts from 2 sensors into Merged Contacts"
+      }
+    }
+  ]
+}

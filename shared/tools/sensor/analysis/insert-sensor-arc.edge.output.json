@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://sensor-empty",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-empty\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Hull Sonar\",\"platform_id\":\"VESSEL-B\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"arc-generated-001\",\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":0.0,\"arc_width\":5.0,\"range\":null,\"frequency\":null,\"contact_type\":\"ARC\"}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/sensor/arc",
+        "debrief:sourceFeatures": ["sensor-empty"],
+        "debrief:label": "Inserted sensor arc at bearing 0.0 deg on Hull Sonar"
+      }
+    }
+  ]
+}

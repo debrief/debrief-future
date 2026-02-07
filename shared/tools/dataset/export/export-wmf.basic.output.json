@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://export-wmf/plot-export.wmf",
+      "mimeType": "image/x-wmf",
+      "text": "[binary WMF content - base64 encoded in actual implementation]",
+      "annotations": {
+        "debrief:resultType": "artifact/dataset/exported_wmf",
+        "debrief:sourceFeatures": ["track-001"],
+        "debrief:label": "Exported plot as WMF with 1 visible layer(s)",
+        "debrief:href": "plot-export.wmf"
+      }
+    }
+  ]
+}

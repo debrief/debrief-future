@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://generate-sensor-range-plot/HULL_SONAR-range-plot.json",
+      "mimeType": "application/json",
+      "text": "{\"title\":\"Sensor Range Plot: HULL_SONAR\",\"sensor_name\":\"HULL_SONAR\",\"ownship\":\"OWNSHIP\",\"target\":\"Target Bravo\",\"time_series\":[{\"time\":\"2024-01-15T10:00:00Z\",\"range_m\":7134.2,\"bearing\":90.0,\"ownship_position\":[-1.0,50.0],\"target_position\":[-0.9,50.0]}],\"statistics\":{\"min_range_m\":7134.2,\"max_range_m\":7134.2,\"mean_range_m\":7134.2,\"data_points\":1}}",
+      "annotations": {
+        "debrief:resultType": "artifact/analysis/sensor_range_plot",
+        "debrief:sourceFeatures": ["sensor-single-cut", "track-ownship", "track-target"],
+        "debrief:label": "Generated range plot for HULL_SONAR: 1 data point, range 7134m",
+        "debrief:href": "HULL_SONAR-range-plot.json"
+      }
+    }
+  ]
+}

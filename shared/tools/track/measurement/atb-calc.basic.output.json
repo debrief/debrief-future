@@ -1,0 +1,18 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-atb-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-atb-001\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-0.95,50.05]},\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"angle_to_bow\",\"value\":32.738,\"units\":\"degrees\",\"format\":\"UK\",\"bearing_target_to_ownship\":212.738,\"target_course\":180.0,\"time\":\"2024-01-15T10:30:00Z\",\"source_tracks\":[\"track-ownship\",\"track-target\"]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/angle_to_bow",
+        "debrief:sourceFeatures": [
+          "track-ownship",
+          "track-target"
+        ],
+        "debrief:label": "Angle to bow: 32.74 deg (UK) from target perspective"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://export-rtf/exercise-report.rtf",
+      "mimeType": "application/rtf",
+      "text": "[RTF document content with embedded multi-layer plot graphic]",
+      "annotations": {
+        "debrief:resultType": "artifact/dataset/exported_rtf",
+        "debrief:sourceFeatures": ["track-ownship", "track-target", "sensor-001"],
+        "debrief:label": "Exported plot as RTF with 3 visible layer(s)",
+        "debrief:href": "exercise-report.rtf"
+      }
+    }
+  ]
+}

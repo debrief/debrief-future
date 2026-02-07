@@ -1,0 +1,27 @@
+{
+  "features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "sensor-empty",
+        "geometry": {
+          "type": "GeometryCollection",
+          "geometries": []
+        },
+        "properties": {
+          "kind": "SENSOR",
+          "sensor_name": "Hull Sonar",
+          "platform_id": "VESSEL-B",
+          "sensor_type": "SONAR",
+          "contacts": []
+        }
+      }
+    ]
+  },
+  "arc_params": {
+    "time": "2024-01-15T10:00:00Z",
+    "bearing": 0.0,
+    "arc_width": 5.0
+  }
+}

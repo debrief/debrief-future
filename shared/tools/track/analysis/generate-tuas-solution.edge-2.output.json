@@ -1,0 +1,13 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "Aimpoint time 2024-01-15T10:30:00Z is outside the sensor data time range (2024-01-15T10:00:00Z - 2024-01-15T10:02:00Z)",
+    "data": {
+      "debrief:errorCategory": "invalid_input",
+      "debrief:affectedFeatures": ["ownship-001", "sensor-tuas-002"],
+      "aimpoint_time": "2024-01-15T10:30:00Z",
+      "data_start": "2024-01-15T10:00:00Z",
+      "data_end": "2024-01-15T10:02:00Z"
+    }
+  }
+}

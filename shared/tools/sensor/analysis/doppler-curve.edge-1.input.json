@@ -1,0 +1,51 @@
+{
+  "features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "track-ownship",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-1.0, 50.0], [-0.99, 50.0], [-0.98, 50.0]]
+        },
+        "properties": {
+          "kind": "TRACK",
+          "platform_id": "OWNSHIP",
+          "platform_name": "OWNSHIP",
+          "track_type": "SURFACE",
+          "start_time": "2024-01-15T10:00:00Z",
+          "end_time": "2024-01-15T10:02:00Z",
+          "positions": [
+            {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.0, 50.0], "course": 90.0, "speed": 10.0},
+            {"time": "2024-01-15T10:01:00Z", "coordinates": [-0.99, 50.0], "course": 90.0, "speed": 10.0},
+            {"time": "2024-01-15T10:02:00Z", "coordinates": [-0.98, 50.0], "course": 90.0, "speed": 10.0}
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "track-target",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-1.0, 50.1], [-0.99, 50.1], [-0.98, 50.1]]
+        },
+        "properties": {
+          "kind": "TRACK",
+          "platform_id": "TARGET-1",
+          "platform_name": "Target Parallel",
+          "track_type": "SURFACE",
+          "start_time": "2024-01-15T10:00:00Z",
+          "end_time": "2024-01-15T10:02:00Z",
+          "positions": [
+            {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.0, 50.1], "course": 90.0, "speed": 10.0},
+            {"time": "2024-01-15T10:01:00Z", "coordinates": [-0.99, 50.1], "course": 90.0, "speed": 10.0},
+            {"time": "2024-01-15T10:02:00Z", "coordinates": [-0.98, 50.1], "course": 90.0, "speed": 10.0}
+          ]
+        }
+      }
+    ]
+  },
+  "source_frequency_hz": 150.0,
+  "speed_of_sound_kts": 3032
+}

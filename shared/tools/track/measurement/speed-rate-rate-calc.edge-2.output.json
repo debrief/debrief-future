@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-speed-rate-rate-track-min-speed",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-speed-rate-rate-track-min-speed\",\"geometry\":null,\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"speed_rate_rate\",\"source_track_id\":\"track-min-speed\",\"unit\":\"kn/s^2\",\"values\":[{\"time\":\"2024-01-15T14:05:00Z\",\"value\":-0.000033},{\"time\":\"2024-01-15T14:10:00Z\",\"value\":0.000044}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/measurement/speed_rate_rate",
+        "debrief:sourceFeatures": ["track-min-speed"],
+        "debrief:label": "Speed rate rate for Vessel Charlie (2 values computed)"
+      }
+    }
+  ]
+}

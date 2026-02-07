@@ -1,0 +1,17 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-speed-rate-002",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-speed-rate-002\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[0.0,50.0]},\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"speed_rate\",\"mode\":\"multi_point\",\"rates\":[{\"time_start\":\"2024-01-15T10:30:00Z\",\"time_end\":\"2024-01-15T10:35:00Z\",\"speed_start\":10.0,\"speed_end\":15.0,\"rate\":0.0167,\"units\":\"kts/sec\"},{\"time_start\":\"2024-01-15T10:35:00Z\",\"time_end\":\"2024-01-15T10:40:00Z\",\"speed_start\":15.0,\"speed_end\":20.0,\"rate\":0.0167,\"units\":\"kts/sec\"}],\"mean_rate\":0.0167,\"units\":\"kts/sec\",\"time\":\"2024-01-15T10:30:00Z\",\"source_tracks\":[\"track-accelerating\"]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/speed_rate",
+        "debrief:sourceFeatures": [
+          "track-accelerating"
+        ],
+        "debrief:label": "Speed rate: mean 0.0167 kts/sec over 3 positions (constant acceleration)"
+      }
+    }
+  ]
+}

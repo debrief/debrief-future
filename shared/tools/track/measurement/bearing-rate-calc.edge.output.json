@@ -1,0 +1,13 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "Range between tracks is zero; bearing rate is undefined (division by zero)",
+    "data": {
+      "debrief:errorCategory": "computation_error",
+      "debrief:affectedFeatures": [
+        "track-ownship",
+        "track-target"
+      ]
+    }
+  }
+}

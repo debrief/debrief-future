@@ -1,0 +1,12 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "Sensor has no bearing contacts; TUAS solution requires at least 3 bearings",
+    "data": {
+      "debrief:errorCategory": "insufficient_data",
+      "debrief:affectedFeatures": ["sensor-no-contacts"],
+      "contacts_found": 0,
+      "minimum_required": 3
+    }
+  }
+}

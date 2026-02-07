@@ -1,0 +1,12 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "Sensor contacts must include range data (active cuts). Passive-only contacts found without range_nm values.",
+    "data": {
+      "debrief:errorCategory": "invalid_input",
+      "debrief:affectedFeatures": ["passive-sensor"],
+      "sensor_type": "PASSIVE_TOWED",
+      "contacts_missing_range": 2
+    }
+  }
+}

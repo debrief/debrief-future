@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-speed-rate-rate-track-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-speed-rate-rate-track-001\",\"geometry\":null,\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"speed_rate_rate\",\"source_track_id\":\"track-001\",\"unit\":\"kn/s^2\",\"values\":[{\"time\":\"2024-01-15T10:05:00Z\",\"value\":0.000011},{\"time\":\"2024-01-15T10:10:00Z\",\"value\":-0.000044},{\"time\":\"2024-01-15T10:15:00Z\",\"value\":0.000033}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/measurement/speed_rate_rate",
+        "debrief:sourceFeatures": ["track-001"],
+        "debrief:label": "Speed rate rate for Vessel Alpha (3 values computed)"
+      }
+    }
+  ]
+}

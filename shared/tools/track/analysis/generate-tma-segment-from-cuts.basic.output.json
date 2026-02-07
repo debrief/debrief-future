@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://tma-segment-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"tma-segment-001\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-0.918,50.072],[-0.918,50.068],[-0.918,50.064],[-0.918,50.060],[-0.918,50.056],[-0.918,50.052],[-0.918,50.048],[-0.918,50.044],[-0.918,50.040],[-0.918,50.036]]},\"properties\":{\"kind\":\"TMA_SEGMENT\",\"segment_type\":\"ABSOLUTE\",\"platform_id\":\"TMA-TARGET\",\"platform_name\":\"TMA Solution from cuts\",\"host_track_id\":\"ownship-001\",\"sensor_id\":\"sensor-cuts-001\",\"start_time\":\"2024-01-15T10:00:00Z\",\"end_time\":\"2024-01-15T10:09:00Z\",\"estimated_course\":180.0,\"estimated_speed\":8.0,\"positions\":[{\"time\":\"2024-01-15T10:00:00Z\",\"coordinates\":[-0.918,50.072],\"course\":180.0,\"speed\":8.0},{\"time\":\"2024-01-15T10:01:00Z\",\"coordinates\":[-0.918,50.068],\"course\":180.0,\"speed\":8.0},{\"time\":\"2024-01-15T10:02:00Z\",\"coordinates\":[-0.918,50.064],\"course\":180.0,\"speed\":8.0},{\"time\":\"2024-01-15T10:03:00Z\",\"coordinates\":[-0.918,50.060],\"course\":180.0,\"speed\":8.0},{\"time\":\"2024-01-15T10:04:00Z\",\"coordinates\":[-0.918,50.056],\"course\":180.0,\"speed\":8.0},{\"time\":\"2024-01-15T10:05:00Z\",\"coordinates\":[-0.918,50.052],\"course\":180.0,\"speed\":8.0},{\"time\":\"2024-01-15T10:06:00Z\",\"coordinates\":[-0.918,50.048],\"course\":180.0,\"speed\":8.0},{\"time\":\"2024-01-15T10:07:00Z\",\"coordinates\":[-0.918,50.044],\"course\":180.0,\"speed\":8.0},{\"time\":\"2024-01-15T10:08:00Z\",\"coordinates\":[-0.918,50.040],\"course\":180.0,\"speed\":8.0},{\"time\":\"2024-01-15T10:09:00Z\",\"coordinates\":[-0.918,50.036],\"course\":180.0,\"speed\":8.0}],\"bearing_residuals\":[0.12,0.08,-0.05,0.15,-0.10,0.07,-0.03,0.11,-0.09,0.06],\"rms_bearing_error\":0.092,\"style\":{\"line\":{\"stroke\":true,\"color\":\"#FF6600\",\"weight\":2,\"opacity\":0.8,\"dashArray\":\"5,5\"}}}}",
+      "annotations": {
+        "debrief:resultType": "addition/analysis/tma_segment",
+        "debrief:sourceFeatures": ["ownship-001", "sensor-cuts-001"],
+        "debrief:label": "Generated TMA segment from 10 bearing cuts (course=180.0, speed=8.0 kts, RMS error=0.092 deg)"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-course-rate-002",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-course-rate-002\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[0.0,50.0]},\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"course_rate\",\"mode\":\"multi_point\",\"rates\":[{\"time_start\":\"2024-01-15T10:30:00Z\",\"time_end\":\"2024-01-15T10:35:00Z\",\"course_start\":0.0,\"course_end\":30.0,\"rate\":0.1,\"units\":\"deg/sec\"},{\"time_start\":\"2024-01-15T10:35:00Z\",\"time_end\":\"2024-01-15T10:40:00Z\",\"course_start\":30.0,\"course_end\":60.0,\"rate\":0.1,\"units\":\"deg/sec\"}],\"mean_rate\":0.1,\"units\":\"deg/sec\",\"time\":\"2024-01-15T10:30:00Z\",\"source_tracks\":[\"track-turning\"]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/course_rate",
+        "debrief:sourceFeatures": [
+          "track-turning"
+        ],
+        "debrief:label": "Course rate: mean 0.1 deg/sec over 3 positions (steady starboard turn)"
+      }
+    }
+  ]
+}

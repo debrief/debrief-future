@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-speed-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-speed-001\",\"geometry\":null,\"properties\":{\"debrief:kind\":\"measurement\",\"debrief:measurement_type\":\"speed\",\"debrief:value\":12.0,\"debrief:units\":\"kts\",\"debrief:time\":\"2024-01-15T10:30:00Z\",\"debrief:primary_track\":\"track-001\",\"debrief:primary_position\":[-1.0,50.0]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/speed",
+        "debrief:sourceFeatures": ["track-001"],
+        "debrief:label": "Calculated speed: 12.0 kts"
+      }
+    }
+  ]
+}

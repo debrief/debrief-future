@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-course-delta-rate-rate-track-complex",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-course-delta-rate-rate-track-complex\",\"geometry\":null,\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"course_delta_rate_rate\",\"source_track_id\":\"track-complex\",\"unit\":\"deg/s^2\",\"values\":[{\"time\":\"2024-01-15T08:05:00Z\",\"value\":0.0},{\"time\":\"2024-01-15T08:10:00Z\",\"value\":-0.000278},{\"time\":\"2024-01-15T08:15:00Z\",\"value\":0.000111},{\"time\":\"2024-01-15T08:20:00Z\",\"value\":0.000056}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/measurement/course_delta_rate_rate",
+        "debrief:sourceFeatures": ["track-complex"],
+        "debrief:label": "Course delta rate rate for Vessel Delta (4 values computed)"
+      }
+    }
+  ]
+}

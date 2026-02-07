@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://export-as-geo-pdf/plot-export.pdf",
+      "mimeType": "application/pdf",
+      "text": "[binary PDF content with geospatial metadata - base64 encoded in actual implementation]",
+      "annotations": {
+        "debrief:resultType": "artifact/dataset/exported_geo_pdf",
+        "debrief:sourceFeatures": ["track-001"],
+        "debrief:label": "Exported georeferenced PDF with 1 visible layer(s), bounds: 49.95S-50.05N, 1.10W-0.95W",
+        "debrief:href": "plot-export.pdf"
+      }
+    }
+  ]
+}

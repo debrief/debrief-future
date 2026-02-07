@@ -1,0 +1,41 @@
+{
+  "features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "sensor-only",
+        "geometry": {
+          "type": "GeometryCollection",
+          "geometries": []
+        },
+        "properties": {
+          "kind": "SENSOR",
+          "sensor_name": "Solo Sensor",
+          "platform_id": "VESSEL-B",
+          "sensor_type": "SONAR",
+          "contacts": [
+            {"id": "c-001", "time": "2024-01-15T10:00:00Z", "bearing": 180.0},
+            {"id": "c-002", "time": "2024-01-15T10:05:00Z", "bearing": 182.0}
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "sensor-empty",
+        "geometry": {
+          "type": "GeometryCollection",
+          "geometries": []
+        },
+        "properties": {
+          "kind": "SENSOR",
+          "sensor_name": "Empty Sensor",
+          "platform_id": "VESSEL-B",
+          "sensor_type": "SONAR",
+          "contacts": []
+        }
+      }
+    ]
+  },
+  "target_sensor_name": "Merged Result"
+}

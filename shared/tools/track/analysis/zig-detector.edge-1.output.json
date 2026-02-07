@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "analysis://zig-detection-target-straight",
+      "mimeType": "application/json",
+      "text": "{\"track_id\":\"target-straight\",\"platform_name\":\"Target Bravo\",\"course_change_threshold_deg\":30.0,\"zig_events\":[],\"total_zigs\":0,\"mean_zig_interval_seconds\":null,\"analysis_period\":{\"start\":\"2024-01-15T10:00:00Z\",\"end\":\"2024-01-15T10:02:00Z\"}}",
+      "annotations": {
+        "debrief:resultType": "analysis/zig_detection",
+        "debrief:sourceFeatures": ["target-straight", "ownship-001"],
+        "debrief:label": "No zig events detected in Target Bravo (threshold=30.0 deg)"
+      }
+    }
+  ]
+}

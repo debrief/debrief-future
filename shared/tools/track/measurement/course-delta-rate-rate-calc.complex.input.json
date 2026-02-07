@@ -1,0 +1,29 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "track-complex",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-3.0, 52.0], [-2.99, 52.01], [-2.97, 52.02], [-2.96, 52.025], [-2.94, 52.03], [-2.93, 52.035]]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "VESSEL-D",
+        "platform_name": "Vessel Delta",
+        "track_type": "SURFACE",
+        "start_time": "2024-01-15T08:00:00Z",
+        "end_time": "2024-01-15T08:25:00Z",
+        "positions": [
+          {"time": "2024-01-15T08:00:00Z", "coordinates": [-3.0, 52.0], "course": 350.0, "speed": 15},
+          {"time": "2024-01-15T08:05:00Z", "coordinates": [-2.99, 52.01], "course": 5.0, "speed": 14},
+          {"time": "2024-01-15T08:10:00Z", "coordinates": [-2.97, 52.02], "course": 20.0, "speed": 13},
+          {"time": "2024-01-15T08:15:00Z", "coordinates": [-2.96, 52.025], "course": 355.0, "speed": 14},
+          {"time": "2024-01-15T08:20:00Z", "coordinates": [-2.94, 52.03], "course": 340.0, "speed": 15},
+          {"time": "2024-01-15T08:25:00Z", "coordinates": [-2.93, 52.035], "course": 330.0, "speed": 15}
+        ]
+      }
+    }
+  ]
+}

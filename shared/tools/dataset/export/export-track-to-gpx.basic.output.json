@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://export-track-to-gpx/OWNSHIP.gpx",
+      "mimeType": "application/gpx+xml",
+      "text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gpx version=\"1.1\" creator=\"Debrief\" xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:debrief=\"http://www.debrief.info/gpx/extensions\">\n  <trk>\n    <name>OWNSHIP</name>\n    <type>SURFACE</type>\n    <trkseg>\n      <trkpt lat=\"50.0\" lon=\"-1.0\">\n        <ele>0.0</ele>\n        <time>2024-01-15T10:00:00Z</time>\n        <extensions>\n          <debrief:course>45.0</debrief:course>\n          <debrief:speed>12.0</debrief:speed>\n        </extensions>\n      </trkpt>\n      <trkpt lat=\"50.01\" lon=\"-1.02\">\n        <ele>0.0</ele>\n        <time>2024-01-15T10:05:00Z</time>\n        <extensions>\n          <debrief:course>47.0</debrief:course>\n          <debrief:speed>12.5</debrief:speed>\n        </extensions>\n      </trkpt>\n    </trkseg>\n  </trk>\n</gpx>",
+      "annotations": {
+        "debrief:resultType": "artifact/dataset/exported_gpx",
+        "debrief:sourceFeatures": ["track-ownship"],
+        "debrief:label": "Exported track OWNSHIP as GPX (2 trackpoints)",
+        "debrief:href": "OWNSHIP.gpx"
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://track-ownship",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"track-ownship\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-1.02,50.01],[-0.95,50.05],[-0.93,50.03]]},\"properties\":{\"kind\":\"TRACK\",\"platform_id\":\"PLAT-001\",\"platform_name\":\"OWNSHIP\",\"track_type\":\"SURFACE\",\"start_time\":\"2024-06-15T10:00:00Z\",\"end_time\":\"2024-06-15T10:07:00Z\",\"segments\":[{\"name\":\"OWNSHIP\",\"start_time\":\"2024-06-15T10:00:00Z\",\"end_time\":\"2024-06-15T10:05:00Z\",\"positions\":[{\"time\":\"2024-06-15T10:00:00Z\",\"coordinates\":[-1.0,50.0],\"course\":45.0,\"speed\":12.0},{\"time\":\"2024-06-15T10:05:00Z\",\"coordinates\":[-1.02,50.01],\"course\":47.0,\"speed\":12.5}]},{\"name\":\"TARGET-1\",\"start_time\":\"2024-06-15T10:02:00Z\",\"end_time\":\"2024-06-15T10:07:00Z\",\"positions\":[{\"time\":\"2024-06-15T10:02:00Z\",\"coordinates\":[-0.95,50.05],\"course\":180.0,\"speed\":8.0},{\"time\":\"2024-06-15T10:07:00Z\",\"coordinates\":[-0.93,50.03],\"course\":175.0,\"speed\":8.5}]}],\"style\":{\"line\":{\"stroke\":true,\"color\":\"#FF0000\",\"weight\":3,\"opacity\":1.0},\"point\":{\"shape\":\"circle\",\"radius\":4,\"fill\":true,\"fill_color\":\"#FF0000\",\"fill_opacity\":0.8}}}}",
+      "annotations": {
+        "debrief:resultType": "mutation/track/grouped",
+        "debrief:sourceFeatures": ["track-ownship", "track-target1"],
+        "debrief:label": "Grouped 2 tracks into OWNSHIP"
+      }
+    }
+  ]
+}

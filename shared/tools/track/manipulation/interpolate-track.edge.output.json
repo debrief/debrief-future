@@ -1,0 +1,10 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "Track track-solo has fewer than 2 positions; interpolation requires at least 2",
+    "data": {
+      "debrief:errorCategory": "invalid_input",
+      "debrief:affectedFeatures": ["track-solo"]
+    }
+  }
+}

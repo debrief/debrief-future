@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://sensor-towed-array",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-towed-array\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-0.99,50.005],[-0.98,50.01],[-0.97,50.015],[-0.96,50.02]]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"TOWED_ARRAY\",\"sensor_type\":\"PASSIVE\",\"host_track_id\":\"track-ownship\",\"host_platform_name\":\"OWNSHIP\",\"cuts\":[{\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":45.0,\"ambiguous_bearing\":315.0,\"ambiguous\":false,\"resolved_bearing\":45.0,\"resolution_method\":\"leg_bearing_rate\",\"leg_id\":\"leg-1\",\"frequency\":150.1,\"origin\":[-1.0,50.0]},{\"time\":\"2024-01-15T10:01:00Z\",\"bearing\":47.0,\"ambiguous_bearing\":313.0,\"ambiguous\":false,\"resolved_bearing\":47.0,\"resolution_method\":\"leg_bearing_rate\",\"leg_id\":\"leg-1\",\"frequency\":150.2,\"origin\":[-0.99,50.005]},{\"time\":\"2024-01-15T10:02:00Z\",\"bearing\":49.0,\"ambiguous_bearing\":311.0,\"ambiguous\":false,\"resolved_bearing\":49.0,\"resolution_method\":\"leg_bearing_rate\",\"leg_id\":\"leg-1\",\"frequency\":150.3,\"origin\":[-0.98,50.01]},{\"time\":\"2024-01-15T10:03:00Z\",\"bearing\":51.0,\"ambiguous_bearing\":309.0,\"ambiguous\":false,\"resolved_bearing\":51.0,\"resolution_method\":\"leg_bearing_rate\",\"leg_id\":\"leg-1\",\"frequency\":150.25,\"origin\":[-0.97,50.015]},{\"time\":\"2024-01-15T10:04:00Z\",\"bearing\":53.0,\"ambiguous_bearing\":307.0,\"ambiguous\":false,\"resolved_bearing\":53.0,\"resolution_method\":\"leg_bearing_rate\",\"leg_id\":\"leg-1\",\"frequency\":150.15,\"origin\":[-0.96,50.02]}]}}",
+      "annotations": {
+        "debrief:resultType": "mutation/sensor/resolved",
+        "debrief:sourceFeatures": ["sensor-towed-array"],
+        "debrief:label": "Resolved ambiguity for 5 cut(s) on TOWED_ARRAY across 1 leg(s) using bearing rate analysis"
+      }
+    }
+  ]
+}

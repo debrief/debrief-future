@@ -1,0 +1,42 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "track-002",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-0.95, 50.05], [-0.95, 50.03]]
+      },
+      "properties": {
+        "debrief:kind": "track",
+        "debrief:platform_id": "PLATFORM-002",
+        "debrief:platform_name": "TARGET",
+        "debrief:track_type": "SURFACE",
+        "debrief:start_time": "2024-01-15T10:30:00Z",
+        "debrief:end_time": "2024-01-15T10:35:00Z",
+        "debrief:positions": [
+          {
+            "time": "2024-01-15T10:30:00Z",
+            "coordinates": [-0.95, 50.05],
+            "course": 180.0,
+            "speed": 8.0,
+            "depth": 50.0
+          },
+          {
+            "time": "2024-01-15T10:35:00Z",
+            "coordinates": [-0.95, 50.03],
+            "course": 180.0,
+            "speed": 8.0,
+            "depth": 50.0
+          }
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "tool": "depth-calc",
+    "params": {},
+    "time": "2024-01-15T10:30:00Z"
+  }
+}

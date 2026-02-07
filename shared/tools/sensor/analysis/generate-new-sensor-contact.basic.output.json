@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://sensor-towed-array",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-towed-array\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-1.02,50.01]]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"TOWED_ARRAY\",\"sensor_type\":\"PASSIVE\",\"host_track_id\":\"track-ownship\",\"host_platform_name\":\"OWNSHIP\",\"cuts\":[{\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":45.0,\"frequency\":150.2,\"origin\":[-1.0,50.0]},{\"time\":\"2024-01-15T10:02:30Z\",\"bearing\":46.0,\"range\":5000.0,\"frequency\":150.25,\"label\":\"Manual Contact 1\",\"origin\":[-1.01,50.005]},{\"time\":\"2024-01-15T10:05:00Z\",\"bearing\":47.0,\"frequency\":150.3,\"origin\":[-1.02,50.01]}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/sensor/contact",
+        "debrief:sourceFeatures": ["sensor-towed-array"],
+        "debrief:label": "Added manual contact 'Manual Contact 1' to sensor TOWED_ARRAY at 2024-01-15T10:02:30Z"
+      }
+    }
+  ]
+}

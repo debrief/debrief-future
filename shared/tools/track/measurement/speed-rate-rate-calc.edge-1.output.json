@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-speed-rate-rate-track-const-speed",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-speed-rate-rate-track-const-speed\",\"geometry\":null,\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"speed_rate_rate\",\"source_track_id\":\"track-const-speed\",\"unit\":\"kn/s^2\",\"values\":[{\"time\":\"2024-01-15T12:05:00Z\",\"value\":0.0},{\"time\":\"2024-01-15T12:10:00Z\",\"value\":0.0},{\"time\":\"2024-01-15T12:15:00Z\",\"value\":0.0}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/measurement/speed_rate_rate",
+        "debrief:sourceFeatures": ["track-const-speed"],
+        "debrief:label": "Speed rate rate for Vessel Bravo (3 values computed)"
+      }
+    }
+  ]
+}

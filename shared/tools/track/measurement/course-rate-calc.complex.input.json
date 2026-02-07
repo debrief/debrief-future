@@ -1,0 +1,76 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "track-turning",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.0,
+            50.0
+          ],
+          [
+            0.01,
+            50.05
+          ],
+          [
+            0.04,
+            50.08
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "PLATFORM-C",
+        "platform_name": "HMS Turner",
+        "track_type": "SURFACE",
+        "start_time": "2024-01-15T10:30:00Z",
+        "end_time": "2024-01-15T10:40:00Z",
+        "positions": [
+          {
+            "time": "2024-01-15T10:30:00Z",
+            "coordinates": [
+              0.0,
+              50.0
+            ],
+            "course": 0.0,
+            "speed": 10.0
+          },
+          {
+            "time": "2024-01-15T10:35:00Z",
+            "coordinates": [
+              0.01,
+              50.05
+            ],
+            "course": 30.0,
+            "speed": 10.0
+          },
+          {
+            "time": "2024-01-15T10:40:00Z",
+            "coordinates": [
+              0.04,
+              50.08
+            ],
+            "course": 60.0,
+            "speed": 10.0
+          }
+        ],
+        "style": {
+          "line": {
+            "stroke": true,
+            "color": "#00AA00",
+            "weight": 3,
+            "opacity": 1.0
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "tool": "course-rate-calc",
+    "params": {},
+    "time": "2024-01-15T10:30:00Z"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://inflection-point-detector/HULL_SONAR-inflections.json",
+      "mimeType": "application/json",
+      "text": "{\"title\":\"Inflection Points: HULL_SONAR\",\"sensor_name\":\"HULL_SONAR\",\"source_frequency_hz\":200.0,\"min_confidence\":0.7,\"inflection_points\":[{\"time\":\"2024-01-15T10:01:58Z\",\"interpolated_residual_hz\":0.0,\"type\":\"zero_crossing\",\"direction\":\"positive_to_negative\",\"confidence\":0.85,\"estimated_cpa\":true,\"surrounding_rate_hz_per_min\":-0.063,\"before_index\":1,\"after_index\":2}],\"filtered_inflection_points\":[{\"time\":\"2024-01-15T10:02:20Z\",\"interpolated_residual_hz\":0.0,\"type\":\"zero_crossing\",\"direction\":\"negative_to_positive\",\"confidence\":0.15,\"estimated_cpa\":false,\"note\":\"Filtered: confidence 0.15 below threshold 0.7 (noise-induced oscillation)\"},{\"time\":\"2024-01-15T10:03:38Z\",\"interpolated_residual_hz\":0.0,\"type\":\"zero_crossing\",\"direction\":\"positive_to_negative\",\"confidence\":0.12,\"estimated_cpa\":false,\"note\":\"Filtered: confidence 0.12 below threshold 0.7 (noise-induced oscillation)\"}],\"summary\":{\"total_inflection_points\":1,\"filtered_count\":2,\"cpa_candidates\":1,\"analysis_window\":{\"start\":\"2024-01-15T10:00:00Z\",\"end\":\"2024-01-15T10:06:00Z\",\"duration_minutes\":6},\"data_points\":7,\"note\":\"2 low-confidence zero-crossings filtered (likely noise)\"}}",
+      "annotations": {
+        "debrief:resultType": "artifact/analysis/inflection_points",
+        "debrief:sourceFeatures": ["freq-residuals-noisy"],
+        "debrief:label": "Detected 1 inflection point(s) in HULL_SONAR frequency residuals (2 noise-induced crossings filtered); 1 CPA candidate(s)",
+        "debrief:href": "HULL_SONAR-inflections.json"
+      }
+    }
+  ]
+}

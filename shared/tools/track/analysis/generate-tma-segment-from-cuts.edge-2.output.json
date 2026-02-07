@@ -1,0 +1,12 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "Bearing lines are nearly parallel; cannot triangulate target position. Ownship manoeuvre required for bearing rate.",
+    "data": {
+      "debrief:errorCategory": "insufficient_data",
+      "debrief:affectedFeatures": ["ownship-001", "sensor-parallel"],
+      "bearing_spread_degrees": 0.0,
+      "minimum_spread_required": 5.0
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://track-multi-leg-leg-1",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"track-multi-leg-leg-1\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-1.01,50.01],[-1.02,50.02]]},\"properties\":{\"kind\":\"TRACK_SEGMENT\",\"platform_id\":\"VESSEL-D\",\"platform_name\":\"Vessel Delta\",\"track_type\":\"SURFACE\",\"parent_track_id\":\"track-multi-leg\",\"leg_number\":1,\"start_time\":\"2024-01-15T06:00:00Z\",\"end_time\":\"2024-01-15T06:10:00Z\",\"positions\":[{\"time\":\"2024-01-15T06:00:00Z\",\"coordinates\":[-1.0,50.0],\"course\":45,\"speed\":10},{\"time\":\"2024-01-15T06:05:00Z\",\"coordinates\":[-1.01,50.01],\"course\":45,\"speed\":10},{\"time\":\"2024-01-15T06:10:00Z\",\"coordinates\":[-1.02,50.02],\"course\":45,\"speed\":10}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/track/split_legs",
+        "debrief:sourceFeatures": ["track-multi-leg"],
+        "debrief:label": "Leg 1 of Vessel Delta (3 positions, 06:00:00Z - 06:10:00Z)"
+      }
+    },
+    {
+      "type": "resource",
+      "uri": "feature://track-multi-leg-leg-2",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"track-multi-leg-leg-2\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-2.0,51.0],[-2.01,51.01]]},\"properties\":{\"kind\":\"TRACK_SEGMENT\",\"platform_id\":\"VESSEL-D\",\"platform_name\":\"Vessel Delta\",\"track_type\":\"SURFACE\",\"parent_track_id\":\"track-multi-leg\",\"leg_number\":2,\"start_time\":\"2024-01-15T10:00:00Z\",\"end_time\":\"2024-01-15T10:05:00Z\",\"positions\":[{\"time\":\"2024-01-15T10:00:00Z\",\"coordinates\":[-2.0,51.0],\"course\":135,\"speed\":12},{\"time\":\"2024-01-15T10:05:00Z\",\"coordinates\":[-2.01,51.01],\"course\":135,\"speed\":12}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/track/split_legs",
+        "debrief:sourceFeatures": ["track-multi-leg"],
+        "debrief:label": "Leg 2 of Vessel Delta (2 positions, 10:00:00Z - 10:05:00Z)"
+      }
+    },
+    {
+      "type": "resource",
+      "uri": "feature://track-multi-leg-leg-3",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"track-multi-leg-leg-3\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-3.0,52.0],[-3.01,52.01],[-3.02,52.02],[-3.03,52.03]]},\"properties\":{\"kind\":\"TRACK_SEGMENT\",\"platform_id\":\"VESSEL-D\",\"platform_name\":\"Vessel Delta\",\"track_type\":\"SURFACE\",\"parent_track_id\":\"track-multi-leg\",\"leg_number\":3,\"start_time\":\"2024-01-15T20:00:00Z\",\"end_time\":\"2024-01-15T20:15:00Z\",\"positions\":[{\"time\":\"2024-01-15T20:00:00Z\",\"coordinates\":[-3.0,52.0],\"course\":270,\"speed\":6},{\"time\":\"2024-01-15T20:05:00Z\",\"coordinates\":[-3.01,52.01],\"course\":270,\"speed\":6},{\"time\":\"2024-01-15T20:10:00Z\",\"coordinates\":[-3.02,52.02],\"course\":270,\"speed\":6},{\"time\":\"2024-01-15T20:15:00Z\",\"coordinates\":[-3.03,52.03],\"course\":270,\"speed\":6}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/track/split_legs",
+        "debrief:sourceFeatures": ["track-multi-leg"],
+        "debrief:label": "Leg 3 of Vessel Delta (4 positions, 20:00:00Z - 20:15:00Z)"
+      }
+    }
+  ]
+}

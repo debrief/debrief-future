@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://imported-track-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"imported-track-001\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-1.02,50.01]]},\"properties\":{\"kind\":\"TRACK\",\"platform_id\":\"VESSEL-A\",\"platform_name\":\"VESSEL-A\",\"track_type\":\"SURFACE\",\"start_time\":\"2010-01-12T12:00:00Z\",\"end_time\":\"2010-01-12T12:05:00Z\",\"positions\":[{\"time\":\"2010-01-12T12:00:00Z\",\"coordinates\":[-1.0,50.0],\"course\":45.0,\"speed\":12.0,\"depth\":0.0},{\"time\":\"2010-01-12T12:05:00Z\",\"coordinates\":[-1.02,50.01],\"course\":47.0,\"speed\":12.5,\"depth\":0.0}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/track/imported",
+        "debrief:sourceFeatures": [],
+        "debrief:label": "Imported track VESSEL-A from REP clipboard (2 positions)"
+      }
+    }
+  ]
+}

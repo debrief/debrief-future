@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://sensor-single",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-single\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Hull Sonar\",\"platform_id\":\"VESSEL-B\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"contact-only\",\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":90.0,\"frequency\":200.0,\"style\":{\"color\":\"#3388ff\"}}]}}",
+      "annotations": {
+        "debrief:resultType": "mutation/sensor/shaded",
+        "debrief:sourceFeatures": ["sensor-single"],
+        "debrief:label": "Cleared shading on 1 sonar contact(s) on Hull Sonar"
+      }
+    }
+  ]
+}

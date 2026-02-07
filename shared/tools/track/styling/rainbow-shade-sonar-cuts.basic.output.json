@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://sensor-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-001\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Towed Array\",\"platform_id\":\"VESSEL-A\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"contact-001\",\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":45.0,\"frequency\":150.0,\"style\":{\"color\":\"hsb(0.000,0.8,0.7)\"}},{\"id\":\"contact-002\",\"time\":\"2024-01-15T10:05:00Z\",\"bearing\":47.0,\"frequency\":152.0,\"style\":{\"color\":\"hsb(0.500,0.8,0.7)\"}},{\"id\":\"contact-003\",\"time\":\"2024-01-15T10:10:00Z\",\"bearing\":50.0,\"frequency\":155.0,\"style\":{\"color\":\"hsb(1.000,0.8,0.7)\"}}]}}",
+      "annotations": {
+        "debrief:resultType": "mutation/sensor/shaded",
+        "debrief:sourceFeatures": ["sensor-001"],
+        "debrief:label": "Rainbow shaded 3 sonar contact(s) on Towed Array"
+      }
+    }
+  ]
+}

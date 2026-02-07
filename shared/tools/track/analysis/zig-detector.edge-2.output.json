@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "analysis://zig-detection-target-single",
+      "mimeType": "application/json",
+      "text": "{\"track_id\":\"target-single\",\"platform_name\":\"Target Bravo\",\"course_change_threshold_deg\":30.0,\"zig_events\":[],\"total_zigs\":0,\"mean_zig_interval_seconds\":null,\"analysis_period\":{\"start\":\"2024-01-15T10:00:00Z\",\"end\":\"2024-01-15T10:00:00Z\"},\"note\":\"Insufficient positions (1) for zig detection; minimum 3 required\"}",
+      "annotations": {
+        "debrief:resultType": "analysis/zig_detection",
+        "debrief:sourceFeatures": ["target-single", "ownship-001"],
+        "debrief:label": "Insufficient data for zig detection in Target Bravo (1 position)"
+      }
+    }
+  ]
+}
