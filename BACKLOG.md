@@ -125,6 +125,7 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
+| 062 | Tech Debt | [Add missing FeatureKindEnum values for tool migration](docs/ideas/062-missing-feature-kind-enum-values.md) — add 7 new kinds (SENSOR, TMA_SEGMENT, etc.) and Feature classes to LinkML schemas; blocks 30+ tool implementations | 5 | 2 | 5 | 12 | Medium | approved |
 | 061 | Feature | [Add generate courses and speeds for track tool spec](docs/ideas/061-generate-courses-speeds.md) (requires #049) | 4 | 3 | 5 | 12 | Low | approved |
 | 060 | Feature | [Add resample track tool spec](docs/ideas/060-resample-track.md) (requires #049) | 4 | 3 | 4 | 11 | Medium | approved |
 | 055 | Feature | [Add track-position to track range/bearing tool spec](docs/ideas/055-track-position-range-bearing.md) (requires #049, #053) | 4 | 4 | 5 | 13 | Medium | approved |
