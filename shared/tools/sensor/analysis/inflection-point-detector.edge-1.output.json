@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://inflection-point-detector/TOWED_ARRAY-inflections.json",
+      "mimeType": "application/json",
+      "text": "{\"title\":\"Inflection Points: TOWED_ARRAY\",\"sensor_name\":\"TOWED_ARRAY\",\"source_frequency_hz\":150.0,\"min_confidence\":0.5,\"inflection_points\":[],\"summary\":{\"total_inflection_points\":0,\"cpa_candidates\":0,\"analysis_window\":{\"start\":\"2024-01-15T10:00:00Z\",\"end\":\"2024-01-15T10:05:00Z\",\"duration_minutes\":5},\"data_points\":6,\"note\":\"Monotonically decreasing residuals; no zero-crossings detected\"}}",
+      "annotations": {
+        "debrief:resultType": "artifact/analysis/inflection_points",
+        "debrief:sourceFeatures": ["freq-residuals-monotonic"],
+        "debrief:label": "Detected 0 inflection point(s) in TOWED_ARRAY frequency residuals; monotonic data, no CPA candidates",
+        "debrief:href": "TOWED_ARRAY-inflections.json"
+      }
+    }
+  ]
+}

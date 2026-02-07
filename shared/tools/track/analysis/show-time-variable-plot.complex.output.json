@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://time-variable-plot-multi",
+      "mimeType": "application/json",
+      "text": "{\"plot_type\":\"time_variable\",\"title\":\"Course vs Time - Multi-track comparison\",\"variable\":\"course\",\"x_axis\":{\"label\":\"Time\",\"type\":\"datetime\",\"min\":\"2024-01-15T10:00:00Z\",\"max\":\"2024-01-15T10:09:00Z\"},\"y_axis\":{\"label\":\"Course (deg)\",\"type\":\"numeric\",\"min\":0.0,\"max\":360.0},\"series\":[{\"track_id\":\"ownship-001\",\"platform_name\":\"HMS Ownship\",\"color\":\"#00FF00\",\"data_points\":[{\"time\":\"2024-01-15T10:00:00Z\",\"value\":45.0},{\"time\":\"2024-01-15T10:01:00Z\",\"value\":45.0},{\"time\":\"2024-01-15T10:02:00Z\",\"value\":48.0},{\"time\":\"2024-01-15T10:03:00Z\",\"value\":60.0},{\"time\":\"2024-01-15T10:04:00Z\",\"value\":75.0},{\"time\":\"2024-01-15T10:05:00Z\",\"value\":90.0},{\"time\":\"2024-01-15T10:06:00Z\",\"value\":90.0},{\"time\":\"2024-01-15T10:07:00Z\",\"value\":90.0},{\"time\":\"2024-01-15T10:08:00Z\",\"value\":88.0},{\"time\":\"2024-01-15T10:09:00Z\",\"value\":45.0}],\"statistics\":{\"min\":45.0,\"max\":90.0,\"mean\":67.6,\"std_dev\":19.45}},{\"track_id\":\"target-001\",\"platform_name\":\"Target Bravo\",\"color\":\"#FF0000\",\"data_points\":[{\"time\":\"2024-01-15T10:00:00Z\",\"value\":180.0},{\"time\":\"2024-01-15T10:01:00Z\",\"value\":180.0},{\"time\":\"2024-01-15T10:02:00Z\",\"value\":180.0},{\"time\":\"2024-01-15T10:03:00Z\",\"value\":180.0},{\"time\":\"2024-01-15T10:04:00Z\",\"value\":180.0},{\"time\":\"2024-01-15T10:05:00Z\",\"value\":180.0},{\"time\":\"2024-01-15T10:06:00Z\",\"value\":180.0},{\"time\":\"2024-01-15T10:07:00Z\",\"value\":180.0},{\"time\":\"2024-01-15T10:08:00Z\",\"value\":180.0},{\"time\":\"2024-01-15T10:09:00Z\",\"value\":180.0}],\"statistics\":{\"min\":180.0,\"max\":180.0,\"mean\":180.0,\"std_dev\":0.0}}]}",
+      "annotations": {
+        "debrief:resultType": "artifact/analysis/time_variable_plot",
+        "debrief:sourceFeatures": ["ownship-001", "target-001"],
+        "debrief:label": "Course vs Time plot for 2 tracks (HMS Ownship, Target Bravo) - 10 data points each",
+        "debrief:href": "plots/time-variable-plot-multi.json"
+      }
+    }
+  ]
+}

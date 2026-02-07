@@ -1,0 +1,10 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "Merge requires at least 2 track features; only 1 provided",
+    "data": {
+      "debrief:errorCategory": "invalid_input",
+      "debrief:affectedFeatures": ["track-001"]
+    }
+  }
+}

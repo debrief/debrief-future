@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-speed-rate-rate-track-accel-decel",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-speed-rate-rate-track-accel-decel\",\"geometry\":null,\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"speed_rate_rate\",\"source_track_id\":\"track-accel-decel\",\"unit\":\"kn/s^2\",\"values\":[{\"time\":\"2024-01-15T08:05:00Z\",\"value\":0.000022},{\"time\":\"2024-01-15T08:10:00Z\",\"value\":0.000022},{\"time\":\"2024-01-15T08:15:00Z\",\"value\":-0.000089},{\"time\":\"2024-01-15T08:20:00Z\",\"value\":0.000022},{\"time\":\"2024-01-15T08:25:00Z\",\"value\":0.000022}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/measurement/speed_rate_rate",
+        "debrief:sourceFeatures": ["track-accel-decel"],
+        "debrief:label": "Speed rate rate for Vessel Delta (5 values computed)"
+      }
+    }
+  ]
+}

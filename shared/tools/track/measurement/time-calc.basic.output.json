@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-time-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-time-001\",\"geometry\":null,\"properties\":{\"debrief:kind\":\"measurement\",\"debrief:measurement_type\":\"time\",\"debrief:value\":\"2024-01-15T10:30:00Z\",\"debrief:units\":\"ISO8601\",\"debrief:time\":\"2024-01-15T10:30:00Z\",\"debrief:primary_track\":\"track-001\",\"debrief:primary_position\":[-1.0,50.0]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/time",
+        "debrief:sourceFeatures": ["track-001"],
+        "debrief:label": "Current time: 2024-01-15T10:30:00Z"
+      }
+    }
+  ]
+}

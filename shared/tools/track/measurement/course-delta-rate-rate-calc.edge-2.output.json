@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-course-delta-rate-rate-track-min",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-course-delta-rate-rate-track-min\",\"geometry\":null,\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"course_delta_rate_rate\",\"source_track_id\":\"track-min\",\"unit\":\"deg/s^2\",\"values\":[{\"time\":\"2024-01-15T14:05:00Z\",\"value\":-0.000056},{\"time\":\"2024-01-15T14:10:00Z\",\"value\":0.000056}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/measurement/course_delta_rate_rate",
+        "debrief:sourceFeatures": ["track-min"],
+        "debrief:label": "Course delta rate rate for Vessel Charlie (2 values computed)"
+      }
+    }
+  ]
+}

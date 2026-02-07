@@ -1,0 +1,24 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "infill-single",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-0.920, 50.080]]
+      },
+      "properties": {
+        "kind": "TRACK_SEGMENT",
+        "segment_type": "INFILL",
+        "parent_track_id": "target-track-001",
+        "start_time": "2024-01-15T10:00:00Z",
+        "end_time": "2024-01-15T10:00:00Z",
+        "positions": [
+          {"time": "2024-01-15T10:00:00Z", "coordinates": [-0.920, 50.080], "course": 180, "speed": 8}
+        ]
+      }
+    }
+  ],
+  "_parameters": {}
+}

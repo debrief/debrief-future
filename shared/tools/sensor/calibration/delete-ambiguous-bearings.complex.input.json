@@ -1,0 +1,85 @@
+{
+  "features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "sensor-port",
+        "geometry": {
+          "type": "GeometryCollection",
+          "geometries": []
+        },
+        "properties": {
+          "kind": "SENSOR",
+          "sensor_name": "Port Array",
+          "platform_id": "VESSEL-A",
+          "sensor_type": "SONAR",
+          "contacts": [
+            {
+              "id": "pa-001",
+              "time": "2024-01-15T08:00:00Z",
+              "bearing": 270.0,
+              "ambiguous": true,
+              "ambiguous_bearing": 90.0
+            },
+            {
+              "id": "pa-002",
+              "time": "2024-01-15T08:05:00Z",
+              "bearing": 265.0,
+              "ambiguous": false
+            },
+            {
+              "id": "pa-003",
+              "time": "2024-01-15T08:10:00Z",
+              "bearing": 260.0,
+              "ambiguous": true,
+              "ambiguous_bearing": 100.0
+            },
+            {
+              "id": "pa-004",
+              "time": "2024-01-15T08:15:00Z",
+              "bearing": 255.0,
+              "ambiguous": true,
+              "ambiguous_bearing": 105.0
+            },
+            {
+              "id": "pa-005",
+              "time": "2024-01-15T08:20:00Z",
+              "bearing": 250.0,
+              "ambiguous": false
+            }
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "sensor-stbd",
+        "geometry": {
+          "type": "GeometryCollection",
+          "geometries": []
+        },
+        "properties": {
+          "kind": "SENSOR",
+          "sensor_name": "Starboard Array",
+          "platform_id": "VESSEL-A",
+          "sensor_type": "SONAR",
+          "contacts": [
+            {
+              "id": "sa-001",
+              "time": "2024-01-15T08:00:00Z",
+              "bearing": 90.0,
+              "ambiguous": true,
+              "ambiguous_bearing": 270.0
+            },
+            {
+              "id": "sa-002",
+              "time": "2024-01-15T08:05:00Z",
+              "bearing": 85.0,
+              "ambiguous": false
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

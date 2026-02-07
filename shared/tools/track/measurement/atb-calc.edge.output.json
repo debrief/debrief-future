@@ -1,0 +1,13 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "Tracks are co-located at requested time; bearing is undefined",
+    "data": {
+      "debrief:errorCategory": "computation_error",
+      "debrief:affectedFeatures": [
+        "track-ownship",
+        "track-target"
+      ]
+    }
+  }
+}

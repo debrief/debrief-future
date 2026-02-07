@@ -28,6 +28,15 @@ Tool Input (FeatureCollection)
 shared/tools/
 ├── TEMPLATE.md           # Master template for new tool specs
 ├── README.md             # This file
+├── dataset/
+│   └── export/           # Data export and clipboard tools
+│       ├── export-track-as-csv.1.0.md
+│       ├── copy-bearings-to-clipboard.1.0.md
+│       ├── export-track-to-gpx.1.0.md
+│       └── copy-time-data-to-clipboard.1.0.md
+├── sensor/
+│   └── analysis/         # Sensor analysis and data entry tools
+│       └── generate-new-sensor-contact.1.0.md
 └── track/
     └── styling/          # Track styling tools
         ├── set-track-color.1.0.md
@@ -40,6 +49,8 @@ shared/tools/
 
 | Category | Description |
 |----------|-------------|
+| `dataset/export` | Data export (CSV, GPX) and clipboard copy operations |
+| `sensor/analysis` | Sensor analysis and manual data entry |
 | `track/styling` | Visual appearance of tracks (colors, symbols, labels) |
 | `track/analysis` | Track analysis operations (future) |
 | `track/transform` | Track modifications (future) |

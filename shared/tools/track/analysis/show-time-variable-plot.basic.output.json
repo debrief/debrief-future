@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://time-variable-plot-001",
+      "mimeType": "application/json",
+      "text": "{\"plot_type\":\"time_variable\",\"title\":\"Speed vs Time\",\"variable\":\"speed\",\"x_axis\":{\"label\":\"Time\",\"type\":\"datetime\",\"min\":\"2024-01-15T10:00:00Z\",\"max\":\"2024-01-15T10:05:00Z\"},\"y_axis\":{\"label\":\"Speed (kts)\",\"type\":\"numeric\",\"min\":10.0,\"max\":12.0},\"series\":[{\"track_id\":\"track-001\",\"platform_name\":\"Vessel Alpha\",\"color\":\"#3388ff\",\"data_points\":[{\"time\":\"2024-01-15T10:00:00Z\",\"value\":10.0},{\"time\":\"2024-01-15T10:01:00Z\",\"value\":11.0},{\"time\":\"2024-01-15T10:02:00Z\",\"value\":12.0},{\"time\":\"2024-01-15T10:03:00Z\",\"value\":12.0},{\"time\":\"2024-01-15T10:04:00Z\",\"value\":11.0},{\"time\":\"2024-01-15T10:05:00Z\",\"value\":12.0}],\"statistics\":{\"min\":10.0,\"max\":12.0,\"mean\":11.33,\"std_dev\":0.75}}]}",
+      "annotations": {
+        "debrief:resultType": "artifact/analysis/time_variable_plot",
+        "debrief:sourceFeatures": ["track-001"],
+        "debrief:label": "Speed vs Time plot for Vessel Alpha (6 data points)",
+        "debrief:href": "plots/time-variable-plot-001.json"
+      }
+    }
+  ]
+}

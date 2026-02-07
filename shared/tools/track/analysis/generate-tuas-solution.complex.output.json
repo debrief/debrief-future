@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://tuas-solution-complex",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"tuas-solution-complex\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-0.930,50.056],[-0.930,50.052],[-0.930,50.048],[-0.930,50.044],[-0.930,50.040],[-0.930,50.036],[-0.930,50.032],[-0.930,50.028],[-0.930,50.024],[-0.930,50.020],[-0.930,50.016],[-0.930,50.012],[-0.930,50.008],[-0.930,50.004],[-0.930,50.000]]},\"properties\":{\"kind\":\"TUAS_SOLUTION\",\"platform_id\":\"TUAS-TARGET\",\"platform_name\":\"TUAS Solution\",\"host_track_id\":\"ownship-manoeuvre\",\"sensor_id\":\"sensor-tuas-long\",\"start_time\":\"2024-01-15T10:00:00Z\",\"end_time\":\"2024-01-15T10:14:00Z\",\"aimpoint_time\":\"2024-01-15T10:07:00Z\",\"estimated_course\":180.0,\"estimated_speed\":7.8,\"estimated_range_nm\":4.9,\"aimpoint_position\":[-0.930,50.028],\"ownship_legs_used\":2,\"positions\":[{\"time\":\"2024-01-15T10:00:00Z\",\"coordinates\":[-0.930,50.056],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:01:00Z\",\"coordinates\":[-0.930,50.052],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:02:00Z\",\"coordinates\":[-0.930,50.048],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:03:00Z\",\"coordinates\":[-0.930,50.044],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:04:00Z\",\"coordinates\":[-0.930,50.040],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:05:00Z\",\"coordinates\":[-0.930,50.036],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:06:00Z\",\"coordinates\":[-0.930,50.032],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:07:00Z\",\"coordinates\":[-0.930,50.028],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:08:00Z\",\"coordinates\":[-0.930,50.024],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:09:00Z\",\"coordinates\":[-0.930,50.020],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:10:00Z\",\"coordinates\":[-0.930,50.016],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:11:00Z\",\"coordinates\":[-0.930,50.012],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:12:00Z\",\"coordinates\":[-0.930,50.008],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:13:00Z\",\"coordinates\":[-0.930,50.004],\"course\":180.0,\"speed\":7.8},{\"time\":\"2024-01-15T10:14:00Z\",\"coordinates\":[-0.930,50.000],\"course\":180.0,\"speed\":7.8}],\"bearing_residuals\":[0.22,-0.15,0.08,0.18,-0.12,0.05,-0.09,0.14,-0.07,0.11,-0.20,0.16,-0.08,0.13,-0.06],\"rms_bearing_error\":0.135,\"style\":{\"line\":{\"stroke\":true,\"color\":\"#CC00FF\",\"weight\":2,\"opacity\":0.8,\"dashArray\":\"8,4\"}}}}",
+      "annotations": {
+        "debrief:resultType": "addition/analysis/tuas_solution",
+        "debrief:sourceFeatures": ["ownship-manoeuvre", "sensor-tuas-long"],
+        "debrief:label": "Generated TUAS solution across 2 ownship legs (course=180.0, speed=7.8 kts, range=4.9nm, RMS error=0.135 deg)"
+      }
+    }
+  ]
+}

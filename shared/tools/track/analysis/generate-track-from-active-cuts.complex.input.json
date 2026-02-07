@@ -1,0 +1,64 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "ownship-manoeuvre",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-1.0, 50.0], [-1.005, 50.004], [-1.01, 50.008], [-1.015, 50.012], [-1.02, 50.016],
+          [-1.025, 50.02], [-1.03, 50.024], [-1.035, 50.028], [-1.04, 50.032], [-1.045, 50.036]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "OWNSHIP-A",
+        "platform_name": "HMS Ownship",
+        "track_type": "SURFACE",
+        "is_ownship": true,
+        "start_time": "2024-01-15T10:00:00Z",
+        "end_time": "2024-01-15T10:09:00Z",
+        "positions": [
+          {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.0, 50.0], "course": 45, "speed": 12, "depth": 0},
+          {"time": "2024-01-15T10:01:00Z", "coordinates": [-1.005, 50.004], "course": 45, "speed": 12, "depth": 0},
+          {"time": "2024-01-15T10:02:00Z", "coordinates": [-1.01, 50.008], "course": 45, "speed": 12, "depth": 0},
+          {"time": "2024-01-15T10:03:00Z", "coordinates": [-1.015, 50.012], "course": 45, "speed": 12, "depth": 0},
+          {"time": "2024-01-15T10:04:00Z", "coordinates": [-1.02, 50.016], "course": 45, "speed": 12, "depth": 0},
+          {"time": "2024-01-15T10:05:00Z", "coordinates": [-1.025, 50.02], "course": 90, "speed": 12, "depth": 0},
+          {"time": "2024-01-15T10:06:00Z", "coordinates": [-1.03, 50.024], "course": 90, "speed": 12, "depth": 0},
+          {"time": "2024-01-15T10:07:00Z", "coordinates": [-1.035, 50.028], "course": 90, "speed": 12, "depth": 0},
+          {"time": "2024-01-15T10:08:00Z", "coordinates": [-1.04, 50.032], "course": 90, "speed": 12, "depth": 0},
+          {"time": "2024-01-15T10:09:00Z", "coordinates": [-1.045, 50.036], "course": 90, "speed": 12, "depth": 0}
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "active-sensor-dense",
+      "geometry": {
+        "type": "GeometryCollection",
+        "geometries": []
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "sensor_type": "ACTIVE_SONAR",
+        "sensor_name": "Hull Sonar",
+        "host_track_id": "ownship-manoeuvre",
+        "contacts": [
+          {"time": "2024-01-15T10:00:00Z", "bearing": 90.0, "range_nm": 5.0, "origin": [-1.0, 50.0], "label": "ACTIVE-01"},
+          {"time": "2024-01-15T10:01:00Z", "bearing": 89.0, "range_nm": 4.95, "origin": [-1.005, 50.004], "label": "ACTIVE-02"},
+          {"time": "2024-01-15T10:02:00Z", "bearing": 87.5, "range_nm": 4.88, "origin": [-1.01, 50.008], "label": "ACTIVE-03"},
+          {"time": "2024-01-15T10:03:00Z", "bearing": 86.0, "range_nm": 4.80, "origin": [-1.015, 50.012], "label": "ACTIVE-04"},
+          {"time": "2024-01-15T10:04:00Z", "bearing": 84.0, "range_nm": 4.72, "origin": [-1.02, 50.016], "label": "ACTIVE-05"},
+          {"time": "2024-01-15T10:05:00Z", "bearing": 60.0, "range_nm": 4.65, "origin": [-1.025, 50.02], "label": "ACTIVE-06"},
+          {"time": "2024-01-15T10:06:00Z", "bearing": 45.0, "range_nm": 4.58, "origin": [-1.03, 50.024], "label": "ACTIVE-07"},
+          {"time": "2024-01-15T10:07:00Z", "bearing": 32.0, "range_nm": 4.50, "origin": [-1.035, 50.028], "label": "ACTIVE-08"},
+          {"time": "2024-01-15T10:08:00Z", "bearing": 22.0, "range_nm": 4.42, "origin": [-1.04, 50.032], "label": "ACTIVE-09"},
+          {"time": "2024-01-15T10:09:00Z", "bearing": 14.0, "range_nm": 4.35, "origin": [-1.045, 50.036], "label": "ACTIVE-10"}
+        ]
+      }
+    }
+  ],
+  "_parameters": {}
+}

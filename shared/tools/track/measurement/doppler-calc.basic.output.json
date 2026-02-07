@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-doppler-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-doppler-001\",\"geometry\":null,\"properties\":{\"debrief:kind\":\"measurement\",\"debrief:measurement_type\":\"doppler\",\"debrief:value\":150.92,\"debrief:units\":\"Hz\",\"debrief:time\":\"2024-01-15T10:30:00Z\",\"debrief:primary_track\":\"track-001\",\"debrief:secondary_track\":\"track-002\",\"debrief:fNought\":150.0,\"debrief:speedOfSound\":3032.0,\"debrief:bearing\":32.8,\"debrief:primary_position\":[-1.0,50.0],\"debrief:secondary_position\":[-0.95,50.05]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/doppler",
+        "debrief:sourceFeatures": ["track-001", "track-002"],
+        "debrief:label": "Calculated Doppler frequency: 150.92 Hz"
+      }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "type": "FeatureCollection",
+  "features": [],
+  "_parameters": {
+    "start_time": "2024-01-15T10:00:00Z",
+    "end_time": "2024-01-15T10:09:00Z",
+    "range_offset_nm": 5.0,
+    "bearing_offset_deg": 90.0,
+    "initial_course": 180,
+    "initial_speed": 8
+  }
+}

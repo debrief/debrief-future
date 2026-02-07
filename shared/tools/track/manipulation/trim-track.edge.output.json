@@ -1,0 +1,10 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "No track features found in input",
+    "data": {
+      "debrief:errorCategory": "invalid_input",
+      "debrief:affectedFeatures": []
+    }
+  }
+}

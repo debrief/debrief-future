@@ -1,0 +1,18 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-rel-bearing-002",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-rel-bearing-002\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-1.0,50.0]},\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"relative_bearing\",\"value\":347.6997,\"units\":\"degrees\",\"format\":\"US\",\"absolute_bearing\":32.6997,\"ownship_course\":45.0,\"time\":\"2024-01-15T10:30:00Z\",\"source_tracks\":[\"track-ownship\",\"track-target\"]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/relative_bearing",
+        "debrief:sourceFeatures": [
+          "track-ownship",
+          "track-target"
+        ],
+        "debrief:label": "Relative bearing: 347.7 deg (US) from ownship to target"
+      }
+    }
+  ]
+}

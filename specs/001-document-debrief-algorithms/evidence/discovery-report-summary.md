@@ -1,7 +1,7 @@
 # Discovery Report Summary — User Story 1 Evidence
 
 **Date**: 2026-02-07
-**Status**: US1 (Discovery) Complete
+**Status**: All User Stories Complete (US1-US4)
 
 ## Key Metrics
 
@@ -57,6 +57,17 @@ Two trigger types have partial gaps in Future Debrief:
 - **drag-drop** (5 tools): Need webview drag handles; parametric alternative for MCP
 - **wizard** (0 standalone): No gap — no standalone wizard tools found
 
+## Phase 4-6 Completion (US2-US4)
+
+| Metric | Value |
+|--------|-------|
+| Tool specs authored | 63 |
+| Golden I/O input files | 151 |
+| Golden I/O output files | 151 |
+| Specs passing 11-item validation | All |
+| Capture approach | All Approach B (manual construction) |
+| Schema gap analysis | 7 new FeatureKindEnum values identified |
+
 ## Acceptance Criteria Verification
 
 | Criteria | Status |
@@ -65,3 +76,6 @@ Two trigger types have partial gaps in Future Debrief:
 | All 9 columns populated per tool | PASS — verified in full inventory tables |
 | All 10 trigger types in mapping table | PASS — all 10 mapped with gap assessment |
 | All tools triaged (Ready/Review/OOS) | PASS — 58 Ready, 5 Review, 22 OOS |
+| Golden I/O for all Ready tools | PASS — 257 input/output pairs |
+| Specs for all Ready tools | PASS — 78 specs authored |
+| All specs pass 11-item checklist | PASS — validated |

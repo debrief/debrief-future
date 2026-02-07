@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://tuas-solution-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"tuas-solution-001\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-0.937,50.008],[-0.937,50.004],[-0.937,50.000],[-0.937,49.996],[-0.937,49.992],[-0.937,49.988]]},\"properties\":{\"kind\":\"TUAS_SOLUTION\",\"platform_id\":\"TUAS-TARGET\",\"platform_name\":\"TUAS Solution\",\"host_track_id\":\"ownship-001\",\"sensor_id\":\"sensor-tuas-001\",\"start_time\":\"2024-01-15T10:00:00Z\",\"end_time\":\"2024-01-15T10:05:00Z\",\"aimpoint_time\":\"2024-01-15T10:02:00Z\",\"estimated_course\":180.0,\"estimated_speed\":8.2,\"estimated_range_nm\":5.1,\"aimpoint_position\":[-0.937,50.000],\"positions\":[{\"time\":\"2024-01-15T10:00:00Z\",\"coordinates\":[-0.937,50.008],\"course\":180.0,\"speed\":8.2},{\"time\":\"2024-01-15T10:01:00Z\",\"coordinates\":[-0.937,50.004],\"course\":180.0,\"speed\":8.2},{\"time\":\"2024-01-15T10:02:00Z\",\"coordinates\":[-0.937,50.000],\"course\":180.0,\"speed\":8.2},{\"time\":\"2024-01-15T10:03:00Z\",\"coordinates\":[-0.937,49.996],\"course\":180.0,\"speed\":8.2},{\"time\":\"2024-01-15T10:04:00Z\",\"coordinates\":[-0.937,49.992],\"course\":180.0,\"speed\":8.2},{\"time\":\"2024-01-15T10:05:00Z\",\"coordinates\":[-0.937,49.988],\"course\":180.0,\"speed\":8.2}],\"bearing_residuals\":[0.15,-0.08,0.03,-0.12,0.09,-0.05],\"rms_bearing_error\":0.095,\"style\":{\"line\":{\"stroke\":true,\"color\":\"#CC00FF\",\"weight\":2,\"opacity\":0.8,\"dashArray\":\"8,4\"}}}}",
+      "annotations": {
+        "debrief:resultType": "addition/analysis/tuas_solution",
+        "debrief:sourceFeatures": ["ownship-001", "sensor-tuas-001"],
+        "debrief:label": "Generated TUAS solution (course=180.0, speed=8.2 kts, range=5.1nm, RMS error=0.095 deg)"
+      }
+    }
+  ]
+}

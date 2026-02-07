@@ -1,0 +1,12 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "Input segment must be of type INFILL, but found PLAN",
+    "data": {
+      "debrief:errorCategory": "invalid_input",
+      "debrief:affectedFeatures": ["not-infill-segment"],
+      "expected_segment_type": "INFILL",
+      "actual_segment_type": "PLAN"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "FeatureCollection",
+  "features": [],
+  "properties": {
+    "tool": "rel-bearing-calc",
+    "params": {
+      "format": "UK"
+    },
+    "time": "2024-01-15T10:30:00Z"
+  }
+}

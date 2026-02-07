@@ -1,0 +1,37 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://track-all-gaps-leg-1",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"track-all-gaps-leg-1\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-1.0,50.0]},\"properties\":{\"kind\":\"TRACK_SEGMENT\",\"platform_id\":\"VESSEL-C\",\"platform_name\":\"Vessel Charlie\",\"track_type\":\"SURFACE\",\"parent_track_id\":\"track-all-gaps\",\"leg_number\":1,\"start_time\":\"2024-01-15T08:00:00Z\",\"end_time\":\"2024-01-15T08:00:00Z\",\"positions\":[{\"time\":\"2024-01-15T08:00:00Z\",\"coordinates\":[-1.0,50.0],\"course\":180,\"speed\":10}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/track/split_legs",
+        "debrief:sourceFeatures": ["track-all-gaps"],
+        "debrief:label": "Leg 1 of Vessel Charlie (1 position, 08:00:00Z - 08:00:00Z)"
+      }
+    },
+    {
+      "type": "resource",
+      "uri": "feature://track-all-gaps-leg-2",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"track-all-gaps-leg-2\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-2.0,51.0]},\"properties\":{\"kind\":\"TRACK_SEGMENT\",\"platform_id\":\"VESSEL-C\",\"platform_name\":\"Vessel Charlie\",\"track_type\":\"SURFACE\",\"parent_track_id\":\"track-all-gaps\",\"leg_number\":2,\"start_time\":\"2024-01-15T12:00:00Z\",\"end_time\":\"2024-01-15T12:00:00Z\",\"positions\":[{\"time\":\"2024-01-15T12:00:00Z\",\"coordinates\":[-2.0,51.0],\"course\":90,\"speed\":8}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/track/split_legs",
+        "debrief:sourceFeatures": ["track-all-gaps"],
+        "debrief:label": "Leg 2 of Vessel Charlie (1 position, 12:00:00Z - 12:00:00Z)"
+      }
+    },
+    {
+      "type": "resource",
+      "uri": "feature://track-all-gaps-leg-3",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"track-all-gaps-leg-3\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-3.0,52.0]},\"properties\":{\"kind\":\"TRACK_SEGMENT\",\"platform_id\":\"VESSEL-C\",\"platform_name\":\"Vessel Charlie\",\"track_type\":\"SURFACE\",\"parent_track_id\":\"track-all-gaps\",\"leg_number\":3,\"start_time\":\"2024-01-15T16:00:00Z\",\"end_time\":\"2024-01-15T16:00:00Z\",\"positions\":[{\"time\":\"2024-01-15T16:00:00Z\",\"coordinates\":[-3.0,52.0],\"course\":270,\"speed\":6}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/track/split_legs",
+        "debrief:sourceFeatures": ["track-all-gaps"],
+        "debrief:label": "Leg 3 of Vessel Charlie (1 position, 16:00:00Z - 16:00:00Z)"
+      }
+    }
+  ]
+}

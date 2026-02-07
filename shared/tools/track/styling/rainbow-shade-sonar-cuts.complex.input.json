@@ -1,0 +1,96 @@
+{
+  "features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "sensor-port",
+        "geometry": {
+          "type": "GeometryCollection",
+          "geometries": []
+        },
+        "properties": {
+          "kind": "SENSOR",
+          "sensor_name": "Port Array",
+          "platform_id": "VESSEL-A",
+          "sensor_type": "SONAR",
+          "contacts": [
+            {
+              "id": "port-001",
+              "time": "2024-01-15T08:00:00Z",
+              "bearing": 270.0,
+              "frequency": 100.0,
+              "style": {"color": "#3388ff"}
+            },
+            {
+              "id": "port-002",
+              "time": "2024-01-15T09:00:00Z",
+              "bearing": 265.0,
+              "frequency": 102.0,
+              "style": {"color": "#3388ff"}
+            },
+            {
+              "id": "port-003",
+              "time": "2024-01-15T10:00:00Z",
+              "bearing": 260.0,
+              "frequency": 105.0,
+              "style": {"color": "#3388ff"}
+            },
+            {
+              "id": "port-004",
+              "time": "2024-01-15T11:00:00Z",
+              "bearing": 255.0,
+              "frequency": 108.0,
+              "style": {"color": "#3388ff"}
+            },
+            {
+              "id": "port-005",
+              "time": "2024-01-15T12:00:00Z",
+              "bearing": 250.0,
+              "frequency": 110.0,
+              "style": {"color": "#3388ff"}
+            }
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "sensor-stbd",
+        "geometry": {
+          "type": "GeometryCollection",
+          "geometries": []
+        },
+        "properties": {
+          "kind": "SENSOR",
+          "sensor_name": "Starboard Array",
+          "platform_id": "VESSEL-A",
+          "sensor_type": "SONAR",
+          "contacts": [
+            {
+              "id": "stbd-001",
+              "time": "2024-01-15T08:30:00Z",
+              "bearing": 90.0,
+              "frequency": 120.0,
+              "style": {"color": "#3388ff"}
+            },
+            {
+              "id": "stbd-002",
+              "time": "2024-01-15T09:30:00Z",
+              "bearing": 85.0,
+              "frequency": 122.0,
+              "style": {"color": "#3388ff"}
+            },
+            {
+              "id": "stbd-003",
+              "time": "2024-01-15T10:30:00Z",
+              "bearing": 80.0,
+              "frequency": 125.0,
+              "style": {"color": "#3388ff"}
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "mode": "BLUE_RED_SPECTRUM"
+}

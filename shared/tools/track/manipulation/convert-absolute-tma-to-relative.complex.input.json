@@ -1,0 +1,57 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "tma-abs-diverge",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-1.05, 50.05], [-1.08, 50.08], [-1.12, 50.10], [-1.16, 50.11], [-1.20, 50.12]]
+      },
+      "properties": {
+        "kind": "TMA_SEGMENT",
+        "segment_type": "ABSOLUTE",
+        "platform_id": "CONTACT-W",
+        "platform_name": "Contact Whiskey",
+        "track_type": "SUBMARINE",
+        "parent_track_id": "track-tgt-004",
+        "start_time": "2024-01-15T10:00:00Z",
+        "end_time": "2024-01-15T10:20:00Z",
+        "course": 290.0,
+        "speed": 10.0,
+        "positions": [
+          {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.05, 50.05], "course": 290.0, "speed": 10.0},
+          {"time": "2024-01-15T10:05:00Z", "coordinates": [-1.08, 50.08], "course": 295.0, "speed": 10.0},
+          {"time": "2024-01-15T10:10:00Z", "coordinates": [-1.12, 50.10], "course": 300.0, "speed": 10.0},
+          {"time": "2024-01-15T10:15:00Z", "coordinates": [-1.16, 50.11], "course": 305.0, "speed": 10.0},
+          {"time": "2024-01-15T10:20:00Z", "coordinates": [-1.20, 50.12], "course": 310.0, "speed": 10.0}
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "track-ownship-maneuver",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-1.0, 50.0], [-0.98, 50.01], [-0.95, 50.02], [-0.91, 50.03], [-0.87, 50.04]]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "OWNSHIP",
+        "platform_name": "HMS Ownship",
+        "track_type": "SURFACE",
+        "is_ownship": true,
+        "start_time": "2024-01-15T10:00:00Z",
+        "end_time": "2024-01-15T10:20:00Z",
+        "sensor_array_center": [-1.0, 50.0],
+        "positions": [
+          {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.0, 50.0], "course": 45, "speed": 15},
+          {"time": "2024-01-15T10:05:00Z", "coordinates": [-0.98, 50.01], "course": 50, "speed": 15},
+          {"time": "2024-01-15T10:10:00Z", "coordinates": [-0.95, 50.02], "course": 55, "speed": 15},
+          {"time": "2024-01-15T10:15:00Z", "coordinates": [-0.91, 50.03], "course": 60, "speed": 15},
+          {"time": "2024-01-15T10:20:00Z", "coordinates": [-0.87, 50.04], "course": 65, "speed": 15}
+        ]
+      }
+    }
+  ]
+}

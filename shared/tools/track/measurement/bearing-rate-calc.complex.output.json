@@ -1,0 +1,18 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-bearing-rate-002",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-bearing-rate-002\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-0.98,50.02]},\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"bearing_rate\",\"value\":7.8641,\"units\":\"deg/min\",\"direction\":\"Right\",\"signed_value\":7.8641,\"range_yards\":2638.66,\"bearing\":62.5662,\"time\":\"2024-01-15T10:35:00Z\",\"source_tracks\":[\"track-ownship\",\"track-target\"]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/bearing_rate",
+        "debrief:sourceFeatures": [
+          "track-ownship",
+          "track-target"
+        ],
+        "debrief:label": "Bearing rate: 7.8641 deg/min Right at T10:35"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://export-rtf/empty-plot.rtf",
+      "mimeType": "application/rtf",
+      "text": "[RTF document content with empty plot graphic]",
+      "annotations": {
+        "debrief:resultType": "artifact/dataset/exported_rtf",
+        "debrief:sourceFeatures": [],
+        "debrief:label": "Exported plot as RTF with 0 visible layer(s)",
+        "debrief:href": "empty-plot.rtf"
+      }
+    }
+  ]
+}

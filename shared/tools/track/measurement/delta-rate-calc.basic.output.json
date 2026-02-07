@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-delta-rate-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-delta-rate-001\",\"geometry\":null,\"properties\":{\"debrief:kind\":\"measurement\",\"debrief:measurement_type\":\"delta_range_rate\",\"debrief:value\":-15.3,\"debrief:units\":\"yds/s\",\"debrief:time\":\"2024-01-15T10:30:00Z\",\"debrief:primary_track\":\"track-001\",\"debrief:secondary_track\":\"track-002\",\"debrief:range_at_t1\":7230,\"debrief:range_at_t2\":2645,\"debrief:time_interval_secs\":300}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/delta_range_rate",
+        "debrief:sourceFeatures": ["track-001", "track-002"],
+        "debrief:label": "Calculated delta range rate: -15.3 yds/s"
+      }
+    }
+  ]
+}

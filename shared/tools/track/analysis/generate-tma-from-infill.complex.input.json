@@ -1,0 +1,41 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "infill-varying",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-0.920, 50.080], [-0.919, 50.076], [-0.917, 50.072],
+          [-0.914, 50.069], [-0.910, 50.067], [-0.905, 50.066],
+          [-0.900, 50.066], [-0.895, 50.067], [-0.891, 50.069],
+          [-0.888, 50.072]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK_SEGMENT",
+        "segment_type": "INFILL",
+        "parent_track_id": "target-track-002",
+        "start_time": "2024-01-15T10:00:00Z",
+        "end_time": "2024-01-15T10:09:00Z",
+        "positions": [
+          {"time": "2024-01-15T10:00:00Z", "coordinates": [-0.920, 50.080], "course": 175, "speed": 8},
+          {"time": "2024-01-15T10:01:00Z", "coordinates": [-0.919, 50.076], "course": 170, "speed": 8},
+          {"time": "2024-01-15T10:02:00Z", "coordinates": [-0.917, 50.072], "course": 160, "speed": 7},
+          {"time": "2024-01-15T10:03:00Z", "coordinates": [-0.914, 50.069], "course": 145, "speed": 7},
+          {"time": "2024-01-15T10:04:00Z", "coordinates": [-0.910, 50.067], "course": 120, "speed": 6},
+          {"time": "2024-01-15T10:05:00Z", "coordinates": [-0.905, 50.066], "course": 95, "speed": 6},
+          {"time": "2024-01-15T10:06:00Z", "coordinates": [-0.900, 50.066], "course": 70, "speed": 6},
+          {"time": "2024-01-15T10:07:00Z", "coordinates": [-0.895, 50.067], "course": 50, "speed": 7},
+          {"time": "2024-01-15T10:08:00Z", "coordinates": [-0.891, 50.069], "course": 35, "speed": 7},
+          {"time": "2024-01-15T10:09:00Z", "coordinates": [-0.888, 50.072], "course": 20, "speed": 8}
+        ],
+        "style": {
+          "line": {"stroke": true, "color": "#999999", "weight": 1, "opacity": 0.5, "dashArray": "2,4"}
+        }
+      }
+    }
+  ],
+  "_parameters": {}
+}

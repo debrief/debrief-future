@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-depth-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-depth-001\",\"geometry\":null,\"properties\":{\"debrief:kind\":\"measurement\",\"debrief:measurement_type\":\"depth\",\"debrief:value\":50.0,\"debrief:units\":\"m\",\"debrief:time\":\"2024-01-15T10:30:00Z\",\"debrief:primary_track\":\"track-002\",\"debrief:primary_position\":[-0.95,50.05]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/depth",
+        "debrief:sourceFeatures": ["track-002"],
+        "debrief:label": "Calculated depth: 50.0 m"
+      }
+    }
+  ]
+}

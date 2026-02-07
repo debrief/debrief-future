@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://track-single",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"track-single\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0]]},\"properties\":{\"kind\":\"TRACK\",\"platform_id\":\"VESSEL-A\",\"platform_name\":\"Vessel Alpha\",\"track_type\":\"SURFACE\",\"start_time\":\"2024-01-15T10:00:00Z\",\"end_time\":\"2024-01-15T10:00:00Z\",\"time_zero\":\"2024-01-15T10:00:00Z\",\"positions\":[{\"time\":\"2024-01-15T10:00:00Z\",\"coordinates\":[-1.0,50.0],\"course\":225,\"speed\":10,\"visible\":true,\"relative_time_seconds\":0}],\"style\":{\"line\":{\"stroke\":true,\"color\":\"#3388ff\",\"weight\":3,\"opacity\":1.0},\"point\":{\"shape\":\"circle\",\"radius\":4,\"fill\":true,\"fill_color\":\"#3388ff\",\"fill_opacity\":0.8}}}}",
+      "annotations": {
+        "debrief:resultType": "mutation/track/time_referenced",
+        "debrief:sourceFeatures": ["track-single"],
+        "debrief:label": "Set time zero to 2024-01-15T10:00:00Z for 1 track(s)"
+      }
+    }
+  ]
+}

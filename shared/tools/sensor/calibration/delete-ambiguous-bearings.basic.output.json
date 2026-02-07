@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://sensor-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-001\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Towed Array\",\"platform_id\":\"VESSEL-A\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"contact-001\",\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":45.0,\"ambiguous\":false},{\"id\":\"contact-003\",\"time\":\"2024-01-15T10:10:00Z\",\"bearing\":50.0,\"ambiguous\":false}]}}",
+      "annotations": {
+        "debrief:resultType": "mutation/sensor/filtered",
+        "debrief:sourceFeatures": ["sensor-001"],
+        "debrief:deletedFeatures": ["contact-002"],
+        "debrief:label": "Deleted 1 ambiguous bearing(s) from Towed Array (2 contacts remaining)"
+      }
+    }
+  ]
+}

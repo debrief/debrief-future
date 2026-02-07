@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://sensor-ta",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"sensor-ta\",\"geometry\":{\"type\":\"GeometryCollection\",\"geometries\":[]},\"properties\":{\"kind\":\"SENSOR\",\"sensor_name\":\"Towed Array\",\"platform_id\":\"VESSEL-A\",\"sensor_type\":\"SONAR\",\"contacts\":[{\"id\":\"existing-001\",\"time\":\"2024-01-15T08:00:00Z\",\"bearing\":30.0,\"frequency\":100.0},{\"id\":\"arc-generated-001\",\"time\":\"2024-01-15T08:30:00Z\",\"bearing\":32.5,\"arc_width\":15.0,\"range\":8000.0,\"frequency\":101.0,\"contact_type\":\"ARC\"},{\"id\":\"existing-002\",\"time\":\"2024-01-15T09:00:00Z\",\"bearing\":35.0,\"frequency\":102.0},{\"id\":\"existing-003\",\"time\":\"2024-01-15T10:00:00Z\",\"bearing\":40.0,\"frequency\":105.0}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/sensor/arc",
+        "debrief:sourceFeatures": ["sensor-ta"],
+        "debrief:label": "Inserted sensor arc at bearing 32.5 deg, range 8000.0m on Towed Array"
+      }
+    }
+  ]
+}

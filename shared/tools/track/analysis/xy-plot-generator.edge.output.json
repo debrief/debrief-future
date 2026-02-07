@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://xy-plot-generator/vessel-charlie-course-time.json",
+      "mimeType": "application/json",
+      "text": "{\"plot_type\":\"course_time\",\"title\":\"Course vs Time - Vessel Charlie\",\"x_axis\":{\"label\":\"Time\",\"variable\":\"time\",\"unit\":\"ISO8601\"},\"y_axis\":{\"label\":\"Course\",\"variable\":\"course\",\"unit\":\"degrees\"},\"series\":[{\"track_id\":\"track-single\",\"track_name\":\"Vessel Charlie\",\"data_points\":[{\"x\":\"2024-01-15T10:00:00Z\",\"y\":90.0}]}]}",
+      "annotations": {
+        "debrief:resultType": "artifact/analysis/xy_plot",
+        "debrief:sourceFeatures": ["track-single"],
+        "debrief:label": "Generated course vs time plot for 1 track(s) with 1 data points",
+        "debrief:href": "vessel-charlie-course-time.json"
+      }
+    }
+  ]
+}

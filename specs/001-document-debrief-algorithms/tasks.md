@@ -123,35 +123,35 @@
 
 ### Harness Setup
 
-- [ ] T033 Determine which Ready tools can run in isolation (Approach A: harness) vs require manual construction (Approach B)
-- [ ] T034 Integrate Java capture harness into legacy Maven build for Approach A tools (if applicable) `_tool-migration/harness-setup.md`
+- [x] T033 Determine which Ready tools can run in isolation (Approach A: harness) vs require manual construction (Approach B)
+- [x] T034 Integrate Java capture harness into legacy Maven build for Approach A tools (if applicable) `_tool-migration/harness-setup.md`
 
 ### Low-Complexity Tools — Batch 1 (track/styling, track/measurement)
 
-- [ ] T035 [P] Capture golden I/O for Low-complexity `track/styling` tools (1 basic pair each) `_tool-migration/tools/track/styling/`
-- [ ] T036 [P] Capture golden I/O for Low-complexity `track/measurement` tools (1 basic pair each) `_tool-migration/tools/track/measurement/`
+- [x] T035 [P] Capture golden I/O for Low-complexity `track/styling` tools (1 basic pair each) `_tool-migration/tools/track/styling/`
+- [x] T036 [P] Capture golden I/O for Low-complexity `track/measurement` tools (1 basic pair each) `_tool-migration/tools/track/measurement/`
 
 ### Low-Complexity Tools — Batch 2 (dataset/export, narrative/formatting)
 
-- [ ] T037 [P] Capture golden I/O for Low-complexity `dataset/export` tools (1 basic pair each) `_tool-migration/tools/dataset/export/`
-- [ ] T038 [P] Capture golden I/O for Low-complexity `narrative/formatting` tools (1 basic pair each) `_tool-migration/tools/narrative/formatting/`
+- [x] T037 [P] Capture golden I/O for Low-complexity `dataset/export` tools (1 basic pair each) `_tool-migration/tools/dataset/export/`
+- [x] T038 [P] Capture golden I/O for Low-complexity `narrative/formatting` tools (1 basic pair each) `_tool-migration/tools/narrative/formatting/`
 
 ### Medium-Complexity Tools
 
-- [ ] T039 Capture golden I/O for Medium-complexity tools (3 pairs each: basic, edge, complex) `_tool-migration/tools/{category}/`
+- [x] T039 Capture golden I/O for Medium-complexity tools (3 pairs each: basic, edge, complex) `_tool-migration/tools/{category}/`
 
 ### High-Complexity Tools
 
-- [ ] T040 Capture golden I/O for High-complexity tools (4+ pairs each: basic, edge-1, edge-2, complex) `_tool-migration/tools/{category}/`
+- [x] T040 Capture golden I/O for High-complexity tools (4+ pairs each: basic, edge-1, edge-2, complex) `_tool-migration/tools/{category}/`
 
 ### Eclipse-Coupled Tools (Manual Construction)
 
-- [ ] T041 Manually construct golden I/O for tools that cannot run in isolation; annotate status in discovery report `_tool-migration/tools/{category}/`
+- [x] T041 Manually construct golden I/O for tools that cannot run in isolation; annotate status in discovery report `_tool-migration/tools/{category}/`
 
 ### Validation
 
-- [ ] T042 Validate all golden JSON files: parse check, floating-point precision, UTC timestamps, GeoJSON coordinates, deterministic ordering
-- [ ] T043 Verify example counts meet minimums: Low ≥ 1, Medium ≥ 3, High ≥ 4
+- [x] T042 Validate all golden JSON files: parse check, floating-point precision, UTC timestamps, GeoJSON coordinates, deterministic ordering
+- [x] T043 Verify example counts meet minimums: Low ≥ 1, Medium ≥ 3, High ≥ 4
 
 **Checkpoint**: Golden I/O complete for all Ready tools — spec authoring can begin
 
@@ -165,25 +165,25 @@
 
 ### Low-Complexity Specs — Batch 1
 
-- [ ] T044 [P] Author specs for `track/styling` tools `_tool-migration/tools/track/styling/{tool}.1.0.md`
-- [ ] T045 [P] Author specs for `track/measurement` tools `_tool-migration/tools/track/measurement/{tool}.1.0.md`
+- [x] T044 [P] Author specs for `track/styling` tools `_tool-migration/tools/track/styling/{tool}.1.0.md`
+- [x] T045 [P] Author specs for `track/measurement` tools `_tool-migration/tools/track/measurement/{tool}.1.0.md`
 
 ### Low-Complexity Specs — Batch 2
 
-- [ ] T046 [P] Author specs for `dataset/export` tools `_tool-migration/tools/dataset/export/{tool}.1.0.md`
-- [ ] T047 [P] Author specs for `narrative/formatting` tools `_tool-migration/tools/narrative/formatting/{tool}.1.0.md`
+- [x] T046 [P] Author specs for `dataset/export` tools `_tool-migration/tools/dataset/export/{tool}.1.0.md`
+- [x] T047 [P] Author specs for `narrative/formatting` tools `_tool-migration/tools/narrative/formatting/{tool}.1.0.md`
 
 ### Medium-Complexity Specs
 
-- [ ] T048 Author specs for `track/analysis` tools `_tool-migration/tools/track/analysis/{tool}.1.0.md`
-- [ ] T049 [P] Author specs for `sensor/calibration` tools `_tool-migration/tools/sensor/calibration/{tool}.1.0.md`
-- [ ] T050 [P] Author specs for `track/manipulation` tools `_tool-migration/tools/track/manipulation/{tool}.1.0.md`
+- [x] T048 Author specs for `track/analysis` tools `_tool-migration/tools/track/analysis/{tool}.1.0.md`
+- [x] T049 [P] Author specs for `sensor/calibration` tools `_tool-migration/tools/sensor/calibration/{tool}.1.0.md`
+- [x] T050 [P] Author specs for `track/manipulation` tools `_tool-migration/tools/track/manipulation/{tool}.1.0.md`
 
 ### High-Complexity Specs
 
-- [ ] T051 Author specs for `spatial/geometry` tools `_tool-migration/tools/spatial/geometry/{tool}.1.0.md`
-- [ ] T052 [P] Author specs for `sensor/analysis` tools `_tool-migration/tools/sensor/analysis/{tool}.1.0.md`
-- [ ] T053 Author specs for any remaining High-complexity tools in other categories `_tool-migration/tools/{category}/{tool}.1.0.md`
+- [x] T051 Author specs for `spatial/geometry` tools `_tool-migration/tools/spatial/geometry/{tool}.1.0.md`
+- [x] T052 [P] Author specs for `sensor/analysis` tools `_tool-migration/tools/sensor/analysis/{tool}.1.0.md`
+- [x] T053 Author specs for any remaining High-complexity tools in other categories `_tool-migration/tools/{category}/{tool}.1.0.md`
 
 **Checkpoint**: All specs authored — validation can begin
 
@@ -197,19 +197,19 @@
 
 ### Validation Pass
 
-- [ ] T054 Run 11-item validation checklist against all Low-complexity specs
-- [ ] T055 [P] Run 11-item validation checklist against all Medium-complexity specs
-- [ ] T056 [P] Run 11-item validation checklist against all High-complexity specs
+- [x] T054 Run 11-item validation checklist against all Low-complexity specs
+- [x] T055 [P] Run 11-item validation checklist against all Medium-complexity specs
+- [x] T056 [P] Run 11-item validation checklist against all High-complexity specs
 
 ### Remediation
 
-- [ ] T057 Fix any checklist failures (missing sections, keyword violations, naming issues, missing golden references)
-- [ ] T058 Re-validate fixed specs until all pass
+- [x] T057 Fix any checklist failures (missing sections, keyword violations, naming issues, missing golden references)
+- [x] T058 Re-validate fixed specs until all pass
 
 ### Status Update
 
-- [ ] T059 Update discovery report tool statuses to reflect final state (Ready → Spec-Complete, or unchanged if still pending) `_tool-migration/discovery-report.md`
-- [ ] T060 Write final summary section in discovery report with counts: total tools, Spec-Complete, Needs Review, Out of Scope
+- [x] T059 Update discovery report tool statuses to reflect final state (Ready → Spec-Complete, or unchanged if still pending) `_tool-migration/discovery-report.md`
+- [x] T060 Write final summary section in discovery report with counts: total tools, Spec-Complete, Needs Review, Out of Scope
 
 **Checkpoint**: All specs validated — ready for transfer and PR
 
@@ -221,22 +221,22 @@
 
 ### Transfer to debrief-future
 
-- [ ] T061 Copy discovery report to `docs/tool-migration/discovery-report.md`
-- [ ] T062 Copy tool specs and golden I/O from `_tool-migration/tools/` to `shared/tools/` (preserving category structure)
-- [ ] T063 Verify transferred files are intact (file count, no corruption, paths correct)
+- [x] T061 Copy discovery report to `docs/tool-migration/discovery-report.md`
+- [x] T062 Copy tool specs and golden I/O from `_tool-migration/tools/` to `shared/tools/` (preserving category structure)
+- [x] T063 Verify transferred files are intact (file count, no corruption, paths correct)
 
 ### Evidence Collection
 
-- [ ] T064 Capture validation results summary in `specs/001-document-debrief-algorithms/evidence/test-summary.md`
-- [ ] T065 Create usage example walkthrough of a completed tool spec with golden I/O `specs/001-document-debrief-algorithms/evidence/usage-example.md`
-- [ ] T066 [P] Capture discovery report statistics (tool count, complexity distribution, category breakdown) `specs/001-document-debrief-algorithms/evidence/discovery-report-summary.md`
-- [ ] T067 [P] Copy a representative completed spec as evidence `specs/001-document-debrief-algorithms/evidence/sample-spec.md`
-- [ ] T068 [P] Create annotated golden I/O example as evidence `specs/001-document-debrief-algorithms/evidence/sample-golden-io.md`
+- [x] T064 Capture validation results summary in `specs/001-document-debrief-algorithms/evidence/test-summary.md`
+- [x] T065 Create usage example walkthrough of a completed tool spec with golden I/O `specs/001-document-debrief-algorithms/evidence/usage-example.md`
+- [x] T066 [P] Capture discovery report statistics (tool count, complexity distribution, category breakdown) `specs/001-document-debrief-algorithms/evidence/discovery-report-summary.md`
+- [x] T067 [P] Copy a representative completed spec as evidence `specs/001-document-debrief-algorithms/evidence/sample-spec.md`
+- [x] T068 [P] Create annotated golden I/O example as evidence `specs/001-document-debrief-algorithms/evidence/sample-golden-io.md`
 
 ### Media Content
 
-- [ ] T069 Create shipped blog post `specs/001-document-debrief-algorithms/media/shipped-post.md`
-- [ ] T070 [P] Create LinkedIn shipped summary `specs/001-document-debrief-algorithms/media/linkedin-shipped.md`
+- [x] T069 Create shipped blog post `specs/001-document-debrief-algorithms/media/shipped-post.md`
+- [x] T070 [P] Create LinkedIn shipped summary `specs/001-document-debrief-algorithms/media/linkedin-shipped.md`
 
 ### PR Creation
 

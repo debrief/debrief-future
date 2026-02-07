@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-track-length-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-track-length-001\",\"geometry\":null,\"properties\":{\"debrief:kind\":\"measurement\",\"debrief:measurement_type\":\"track_length\",\"debrief:value\":1.42,\"debrief:units\":\"nm\",\"debrief:time\":\"2024-01-15T10:30:00Z\",\"debrief:primary_track\":\"track-001\",\"debrief:num_segments\":1,\"debrief:num_visible_positions\":2}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/track_length",
+        "debrief:sourceFeatures": ["track-001"],
+        "debrief:label": "Calculated track length: 1.42 nm"
+      }
+    }
+  ]
+}

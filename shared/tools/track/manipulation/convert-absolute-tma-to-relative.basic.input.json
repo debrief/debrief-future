@@ -1,0 +1,53 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "tma-abs-001",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-1.05, 50.05], [-1.06, 50.06], [-1.07, 50.07]]
+      },
+      "properties": {
+        "kind": "TMA_SEGMENT",
+        "segment_type": "ABSOLUTE",
+        "platform_id": "CONTACT-X",
+        "platform_name": "Contact X-ray",
+        "track_type": "SUBMARINE",
+        "parent_track_id": "track-tgt-001",
+        "start_time": "2024-01-15T10:00:00Z",
+        "end_time": "2024-01-15T10:10:00Z",
+        "course": 135.0,
+        "speed": 8.0,
+        "positions": [
+          {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.05, 50.05], "course": 135.0, "speed": 8.0},
+          {"time": "2024-01-15T10:05:00Z", "coordinates": [-1.06, 50.06], "course": 135.0, "speed": 8.0},
+          {"time": "2024-01-15T10:10:00Z", "coordinates": [-1.07, 50.07], "course": 135.0, "speed": 8.0}
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "track-ownship",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-1.0, 50.0], [-1.01, 50.01], [-1.02, 50.02]]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "OWNSHIP",
+        "platform_name": "HMS Ownship",
+        "track_type": "SURFACE",
+        "is_ownship": true,
+        "start_time": "2024-01-15T10:00:00Z",
+        "end_time": "2024-01-15T10:10:00Z",
+        "sensor_array_center": [-1.0, 50.0],
+        "positions": [
+          {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.0, 50.0], "course": 90, "speed": 12},
+          {"time": "2024-01-15T10:05:00Z", "coordinates": [-1.01, 50.01], "course": 90, "speed": 12},
+          {"time": "2024-01-15T10:10:00Z", "coordinates": [-1.02, 50.02], "course": 90, "speed": 12}
+        ]
+      }
+    }
+  ]
+}

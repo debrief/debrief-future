@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://tma-rel-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"tma-rel-001\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.05,50.05],[-1.06,50.06],[-1.07,50.07]]},\"properties\":{\"kind\":\"TMA_SEGMENT\",\"segment_type\":\"RELATIVE\",\"platform_id\":\"CONTACT-X\",\"platform_name\":\"Contact X-ray\",\"track_type\":\"SUBMARINE\",\"parent_track_id\":\"track-tgt-001\",\"ownship_track_id\":\"track-ownship\",\"start_time\":\"2024-01-15T10:00:00Z\",\"end_time\":\"2024-01-15T10:10:00Z\",\"course\":135.0,\"speed\":8.0,\"origin_offset\":{\"range_nm\":3.535,\"bearing_deg\":225.0},\"positions\":[{\"time\":\"2024-01-15T10:00:00Z\",\"coordinates\":[-1.05,50.05],\"bearing_from_ownship\":225.0,\"range_from_ownship_nm\":3.535,\"course\":135.0,\"speed\":8.0},{\"time\":\"2024-01-15T10:05:00Z\",\"coordinates\":[-1.06,50.06],\"bearing_from_ownship\":225.8,\"range_from_ownship_nm\":3.953,\"course\":135.0,\"speed\":8.0},{\"time\":\"2024-01-15T10:10:00Z\",\"coordinates\":[-1.07,50.07],\"bearing_from_ownship\":226.6,\"range_from_ownship_nm\":4.372,\"course\":135.0,\"speed\":8.0}]}}",
+      "annotations": {
+        "debrief:resultType": "mutation/track/tma_converted",
+        "debrief:sourceFeatures": ["tma-abs-001", "track-ownship"],
+        "debrief:label": "Converted Contact X-ray TMA from absolute to relative (ref: HMS Ownship)"
+      }
+    }
+  ]
+}

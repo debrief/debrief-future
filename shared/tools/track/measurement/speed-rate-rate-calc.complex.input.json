@@ -1,0 +1,30 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "track-accel-decel",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-3.0, 52.0], [-2.99, 52.01], [-2.97, 52.02], [-2.95, 52.03], [-2.92, 52.04], [-2.90, 52.05], [-2.87, 52.06]]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "VESSEL-D",
+        "platform_name": "Vessel Delta",
+        "track_type": "SURFACE",
+        "start_time": "2024-01-15T08:00:00Z",
+        "end_time": "2024-01-15T08:30:00Z",
+        "positions": [
+          {"time": "2024-01-15T08:00:00Z", "coordinates": [-3.0, 52.0], "course": 45.0, "speed": 6.0},
+          {"time": "2024-01-15T08:05:00Z", "coordinates": [-2.99, 52.01], "course": 45.0, "speed": 8.0},
+          {"time": "2024-01-15T08:10:00Z", "coordinates": [-2.97, 52.02], "course": 45.0, "speed": 12.0},
+          {"time": "2024-01-15T08:15:00Z", "coordinates": [-2.95, 52.03], "course": 45.0, "speed": 18.0},
+          {"time": "2024-01-15T08:20:00Z", "coordinates": [-2.92, 52.04], "course": 45.0, "speed": 16.0},
+          {"time": "2024-01-15T08:25:00Z", "coordinates": [-2.90, 52.05], "course": 45.0, "speed": 10.0},
+          {"time": "2024-01-15T08:30:00Z", "coordinates": [-2.87, 52.06], "course": 45.0, "speed": 8.0}
+        ]
+      }
+    }
+  ]
+}

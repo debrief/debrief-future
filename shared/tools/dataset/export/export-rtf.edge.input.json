@@ -1,0 +1,13 @@
+{
+  "features": {
+    "type": "FeatureCollection",
+    "features": []
+  },
+  "view_bounds": {
+    "north": 51.0,
+    "south": 50.0,
+    "east": 0.0,
+    "west": -1.0
+  },
+  "output_filename": "empty-plot.rtf"
+}

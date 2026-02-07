@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-swt-range-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-swt-range-001\",\"geometry\":null,\"properties\":{\"debrief:kind\":\"measurement\",\"debrief:measurement_type\":\"range\",\"debrief:value\":7230,\"debrief:units\":\"yds\",\"debrief:time\":\"2024-01-15T10:30:00Z\",\"debrief:primary_track\":\"track-001\",\"debrief:secondary_track\":\"track-002\",\"debrief:primary_position\":[-1.0,50.0],\"debrief:secondary_position\":[-0.95,50.05]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/range",
+        "debrief:sourceFeatures": ["track-001", "track-002"],
+        "debrief:label": "Calculated range: 7230 yds"
+      }
+    }
+  ]
+}

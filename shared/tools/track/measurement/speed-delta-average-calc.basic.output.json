@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-speed-delta-avg-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-speed-delta-avg-001\",\"geometry\":null,\"properties\":{\"debrief:kind\":\"measurement\",\"debrief:measurement_type\":\"speed_delta_average\",\"debrief:value\":0.0,\"debrief:units\":\"kts\",\"debrief:time\":\"2024-01-15T10:30:00Z\",\"debrief:primary_track\":\"track-001\",\"debrief:num_positions\":2,\"debrief:period_start\":\"2024-01-15T10:30:00Z\",\"debrief:period_end\":\"2024-01-15T10:35:00Z\"}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/speed_delta_average",
+        "debrief:sourceFeatures": ["track-001"],
+        "debrief:label": "Calculated average speed change: 0.0 kts"
+      }
+    }
+  ]
+}

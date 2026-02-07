@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://track-from-active-gaps",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"track-from-active-gaps\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-0.926,50.000],[-0.938,50.009]]},\"properties\":{\"kind\":\"TRACK\",\"platform_id\":\"FROM-ACTIVE-CUTS\",\"platform_name\":\"Track from active cuts\",\"track_type\":\"SURFACE\",\"source_sensor_id\":\"active-sensor-gaps\",\"source_ownship_id\":\"ownship-001\",\"start_time\":\"2024-01-15T10:00:00Z\",\"end_time\":\"2024-01-15T10:02:00Z\",\"has_temporal_gaps\":true,\"gap_intervals\":[{\"start\":\"2024-01-15T10:00:00Z\",\"end\":\"2024-01-15T10:02:00Z\",\"duration_seconds\":120}],\"positions\":[{\"time\":\"2024-01-15T10:00:00Z\",\"coordinates\":[-0.926,50.000],\"course\":null,\"speed\":null},{\"time\":\"2024-01-15T10:02:00Z\",\"coordinates\":[-0.938,50.009],\"course\":193.2,\"speed\":8.4}],\"style\":{\"line\":{\"stroke\":true,\"color\":\"#FF3300\",\"weight\":2,\"opacity\":0.8}}}}",
+      "annotations": {
+        "debrief:resultType": "addition/track/from_cuts",
+        "debrief:sourceFeatures": ["ownship-001", "active-sensor-gaps"],
+        "debrief:label": "Generated track from 2 active sensor cuts (1 temporal gap detected)"
+      }
+    }
+  ]
+}

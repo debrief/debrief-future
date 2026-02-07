@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://track-no-gap-leg-1",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"track-no-gap-leg-1\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-1.0,50.0],[-1.01,50.01],[-1.02,50.02],[-1.03,50.03],[-1.04,50.04]]},\"properties\":{\"kind\":\"TRACK_SEGMENT\",\"platform_id\":\"VESSEL-B\",\"platform_name\":\"Vessel Bravo\",\"track_type\":\"SURFACE\",\"parent_track_id\":\"track-no-gap\",\"leg_number\":1,\"start_time\":\"2024-01-15T10:00:00Z\",\"end_time\":\"2024-01-15T10:20:00Z\",\"positions\":[{\"time\":\"2024-01-15T10:00:00Z\",\"coordinates\":[-1.0,50.0],\"course\":90,\"speed\":12},{\"time\":\"2024-01-15T10:05:00Z\",\"coordinates\":[-1.01,50.01],\"course\":90,\"speed\":12},{\"time\":\"2024-01-15T10:10:00Z\",\"coordinates\":[-1.02,50.02],\"course\":90,\"speed\":12},{\"time\":\"2024-01-15T10:15:00Z\",\"coordinates\":[-1.03,50.03],\"course\":90,\"speed\":12},{\"time\":\"2024-01-15T10:20:00Z\",\"coordinates\":[-1.04,50.04],\"course\":90,\"speed\":12}]}}",
+      "annotations": {
+        "debrief:resultType": "addition/track/split_legs",
+        "debrief:sourceFeatures": ["track-no-gap"],
+        "debrief:label": "Leg 1 of Vessel Bravo (5 positions, 10:00:00Z - 10:20:00Z)"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://export-as-geo-pdf/exercise-alpha-geopdf.pdf",
+      "mimeType": "application/pdf",
+      "text": "[binary PDF content with geospatial metadata, scale bar, grid, and 4 layers - base64 encoded in actual implementation]",
+      "annotations": {
+        "debrief:resultType": "artifact/dataset/exported_geo_pdf",
+        "debrief:sourceFeatures": ["track-ownship", "track-target", "sensor-001", "zone-oparea"],
+        "debrief:label": "Exported georeferenced PDF with 4 visible layer(s), bounds: 49.85S-50.25N, 1.25W-0.75W",
+        "debrief:href": "exercise-alpha-geopdf.pdf"
+      }
+    }
+  ]
+}

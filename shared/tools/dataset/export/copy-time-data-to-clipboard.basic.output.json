@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://copy-time-data-to-clipboard/OWNSHIP",
+      "mimeType": "text/plain",
+      "text": "Track\tTime\tLat\tLon\tCourse (deg)\tSpeed (kts)\tDepth (m)\nOWNSHIP\t2024-01-15T10:00:00Z\t50.0\t-1.0\t45.0\t12.0\t0.0\nOWNSHIP\t2024-01-15T10:05:00Z\t50.01\t-1.02\t47.0\t12.5\t0.0",
+      "annotations": {
+        "debrief:resultType": "artifact/dataset/time_series_table",
+        "debrief:sourceFeatures": ["track-ownship"],
+        "debrief:label": "Copied time data for 1 track(s) (2 positions) to clipboard"
+      }
+    }
+  ]
+}

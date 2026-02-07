@@ -1,0 +1,10 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "No ownship track found in input features",
+    "data": {
+      "debrief:errorCategory": "invalid_input",
+      "debrief:affectedFeatures": []
+    }
+  }
+}

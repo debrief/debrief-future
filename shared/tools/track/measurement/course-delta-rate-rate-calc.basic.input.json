@@ -1,0 +1,28 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "track-001",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-1.0, 50.0], [-0.99, 50.01], [-0.97, 50.02], [-0.94, 50.03], [-0.92, 50.04]]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "VESSEL-A",
+        "platform_name": "Vessel Alpha",
+        "track_type": "SURFACE",
+        "start_time": "2024-01-15T10:00:00Z",
+        "end_time": "2024-01-15T10:20:00Z",
+        "positions": [
+          {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.0, 50.0], "course": 90.0, "speed": 10},
+          {"time": "2024-01-15T10:05:00Z", "coordinates": [-0.99, 50.01], "course": 95.0, "speed": 10},
+          {"time": "2024-01-15T10:10:00Z", "coordinates": [-0.97, 50.02], "course": 105.0, "speed": 10},
+          {"time": "2024-01-15T10:15:00Z", "coordinates": [-0.94, 50.03], "course": 110.0, "speed": 10},
+          {"time": "2024-01-15T10:20:00Z", "coordinates": [-0.92, 50.04], "course": 112.0, "speed": 10}
+        ]
+      }
+    }
+  ]
+}

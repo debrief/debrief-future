@@ -1,0 +1,76 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "track-stationary",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -2.0,
+            51.0
+          ],
+          [
+            -2.0,
+            51.0
+          ],
+          [
+            -2.0,
+            51.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "PLATFORM-D",
+        "platform_name": "Buoy Alpha",
+        "track_type": "SURFACE",
+        "start_time": "2024-01-15T10:30:00Z",
+        "end_time": "2024-01-15T10:40:00Z",
+        "positions": [
+          {
+            "time": "2024-01-15T10:30:00Z",
+            "coordinates": [
+              -2.0,
+              51.0
+            ],
+            "course": 0.0,
+            "speed": 0.0
+          },
+          {
+            "time": "2024-01-15T10:35:00Z",
+            "coordinates": [
+              -2.0,
+              51.0
+            ],
+            "course": 0.0,
+            "speed": 0.0
+          },
+          {
+            "time": "2024-01-15T10:40:00Z",
+            "coordinates": [
+              -2.0,
+              51.0
+            ],
+            "course": 0.0,
+            "speed": 0.0
+          }
+        ],
+        "style": {
+          "line": {
+            "stroke": true,
+            "color": "#888888",
+            "weight": 3,
+            "opacity": 1.0
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "tool": "speed-rate-calc",
+    "params": {},
+    "time": "2024-01-15T10:30:00Z"
+  }
+}

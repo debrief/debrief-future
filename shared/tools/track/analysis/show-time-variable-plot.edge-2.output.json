@@ -1,0 +1,12 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "Variable 'depth' is not available in any of the selected track positions",
+    "data": {
+      "debrief:errorCategory": "invalid_input",
+      "debrief:affectedFeatures": ["track-001"],
+      "requested_variable": "depth",
+      "available_variables": ["course", "speed"]
+    }
+  }
+}

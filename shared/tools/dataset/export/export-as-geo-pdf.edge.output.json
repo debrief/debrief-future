@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://export-as-geo-pdf/station-export.pdf",
+      "mimeType": "application/pdf",
+      "text": "[binary PDF content with geospatial metadata - base64 encoded in actual implementation]",
+      "annotations": {
+        "debrief:resultType": "artifact/dataset/exported_geo_pdf",
+        "debrief:sourceFeatures": ["track-short"],
+        "debrief:label": "Exported georeferenced PDF with 1 visible layer(s), bounds: 49.99S-50.01N, 1.01W-0.99W",
+        "debrief:href": "station-export.pdf"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-course-rate-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"measurement-course-rate-001\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-1.0,50.0]},\"properties\":{\"kind\":\"MEASUREMENT\",\"measurement_type\":\"course_rate\",\"value\":45.0,\"units\":\"degrees\",\"mode\":\"single_point\",\"time\":\"2024-01-15T10:30:00Z\",\"source_tracks\":[\"track-ownship\"]}}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/course_rate",
+        "debrief:sourceFeatures": [
+          "track-ownship"
+        ],
+        "debrief:label": "Course at T10:30: 45.0 deg (single point, no rate)"
+      }
+    }
+  ]
+}

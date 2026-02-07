@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://xy-plot-generator/vessel-alpha-speed-time.json",
+      "mimeType": "application/json",
+      "text": "{\"plot_type\":\"speed_time\",\"title\":\"Speed vs Time - Vessel Alpha\",\"x_axis\":{\"label\":\"Time\",\"variable\":\"time\",\"unit\":\"ISO8601\"},\"y_axis\":{\"label\":\"Speed\",\"variable\":\"speed\",\"unit\":\"kts\"},\"series\":[{\"track_id\":\"track-001\",\"track_name\":\"Vessel Alpha\",\"data_points\":[{\"x\":\"2024-01-15T10:00:00Z\",\"y\":12.0},{\"x\":\"2024-01-15T10:05:00Z\",\"y\":12.5},{\"x\":\"2024-01-15T10:10:00Z\",\"y\":13.0}]}]}",
+      "annotations": {
+        "debrief:resultType": "artifact/analysis/xy_plot",
+        "debrief:sourceFeatures": ["track-001"],
+        "debrief:label": "Generated speed vs time plot for 1 track(s) with 3 data points",
+        "debrief:href": "vessel-alpha-speed-time.json"
+      }
+    }
+  ]
+}

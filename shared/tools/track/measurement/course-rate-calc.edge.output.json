@@ -1,0 +1,10 @@
+{
+  "error": {
+    "code": -32000,
+    "message": "Input requires at least one track feature",
+    "data": {
+      "debrief:errorCategory": "invalid_input",
+      "debrief:affectedFeatures": []
+    }
+  }
+}

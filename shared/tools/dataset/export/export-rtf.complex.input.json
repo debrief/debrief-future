@@ -1,0 +1,80 @@
+{
+  "features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "track-ownship",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-1.0, 50.0], [-1.02, 50.01], [-1.04, 50.02]]
+        },
+        "properties": {
+          "kind": "TRACK",
+          "platform_id": "OWNSHIP",
+          "platform_name": "OWNSHIP",
+          "track_type": "SURFACE",
+          "start_time": "2024-01-15T10:00:00Z",
+          "end_time": "2024-01-15T10:10:00Z",
+          "positions": [
+            {"time": "2024-01-15T10:00:00Z", "coordinates": [-1.0, 50.0], "course": 45.0, "speed": 12.0},
+            {"time": "2024-01-15T10:05:00Z", "coordinates": [-1.02, 50.01], "course": 47.0, "speed": 12.5},
+            {"time": "2024-01-15T10:10:00Z", "coordinates": [-1.04, 50.02], "course": 50.0, "speed": 13.0}
+          ],
+          "style": {
+            "line": {"stroke": true, "color": "#FF0000", "weight": 3, "opacity": 1.0}
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "track-target",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-0.9, 50.1], [-0.92, 50.09]]
+        },
+        "properties": {
+          "kind": "TRACK",
+          "platform_id": "TARGET-1",
+          "platform_name": "Target One",
+          "track_type": "SURFACE",
+          "start_time": "2024-01-15T10:00:00Z",
+          "end_time": "2024-01-15T10:05:00Z",
+          "positions": [
+            {"time": "2024-01-15T10:00:00Z", "coordinates": [-0.9, 50.1], "course": 220.0, "speed": 8.0},
+            {"time": "2024-01-15T10:05:00Z", "coordinates": [-0.92, 50.09], "course": 225.0, "speed": 8.5}
+          ],
+          "style": {
+            "line": {"stroke": true, "color": "#0000FF", "weight": 3, "opacity": 1.0}
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "sensor-001",
+        "geometry": {
+          "type": "GeometryCollection",
+          "geometries": []
+        },
+        "properties": {
+          "kind": "SENSOR",
+          "sensor_name": "Towed Array",
+          "platform_id": "OWNSHIP",
+          "sensor_type": "SONAR",
+          "contacts": [
+            {"id": "c1", "time": "2024-01-15T10:00:00Z", "bearing": 30.0},
+            {"id": "c2", "time": "2024-01-15T10:05:00Z", "bearing": 32.0},
+            {"id": "c3", "time": "2024-01-15T10:10:00Z", "bearing": 35.0}
+          ]
+        }
+      }
+    ]
+  },
+  "view_bounds": {
+    "north": 50.15,
+    "south": 49.95,
+    "east": -0.85,
+    "west": -1.10
+  },
+  "output_filename": "exercise-report.rtf"
+}

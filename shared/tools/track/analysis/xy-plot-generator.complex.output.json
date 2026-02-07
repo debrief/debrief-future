@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "artifact://xy-plot-generator/radar-range-time.json",
+      "mimeType": "application/json",
+      "text": "{\"plot_type\":\"range_time\",\"title\":\"Range vs Time - Radar\",\"x_axis\":{\"label\":\"Time\",\"variable\":\"time\",\"unit\":\"ISO8601\"},\"y_axis\":{\"label\":\"Range\",\"variable\":\"range\",\"unit\":\"metres\"},\"series\":[{\"sensor_id\":\"sensor-001\",\"sensor_name\":\"Radar\",\"data_points\":[{\"x\":\"2024-01-15T10:00:00Z\",\"y\":5000.0},{\"x\":\"2024-01-15T10:05:00Z\",\"y\":4500.0},{\"x\":\"2024-01-15T10:10:00Z\",\"y\":4000.0},{\"x\":\"2024-01-15T10:15:00Z\",\"y\":3500.0}]}]}",
+      "annotations": {
+        "debrief:resultType": "artifact/analysis/xy_plot",
+        "debrief:sourceFeatures": ["sensor-001"],
+        "debrief:label": "Generated range vs time plot for 1 sensor(s) with 4 data points",
+        "debrief:href": "radar-range-time.json"
+      }
+    }
+  ]
+}

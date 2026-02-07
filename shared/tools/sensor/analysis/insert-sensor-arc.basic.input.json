@@ -1,0 +1,35 @@
+{
+  "features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "sensor-001",
+        "geometry": {
+          "type": "GeometryCollection",
+          "geometries": []
+        },
+        "properties": {
+          "kind": "SENSOR",
+          "sensor_name": "Towed Array",
+          "platform_id": "VESSEL-A",
+          "sensor_type": "SONAR",
+          "contacts": [
+            {
+              "id": "contact-001",
+              "time": "2024-01-15T10:00:00Z",
+              "bearing": 45.0
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "arc_params": {
+    "time": "2024-01-15T10:05:00Z",
+    "bearing": 90.0,
+    "arc_width": 10.0,
+    "range": 5000.0,
+    "frequency": 150.0
+  }
+}

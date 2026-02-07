@@ -1,0 +1,36 @@
+{
+  "features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "freq-residuals-multi-cpa",
+        "geometry": null,
+        "properties": {
+          "kind": "FREQUENCY_RESIDUALS",
+          "sensor_name": "TOWED_ARRAY",
+          "source_frequency_hz": 150.0,
+          "residuals": [
+            {"time": "2024-01-15T10:00:00Z", "residual_hz": 0.120},
+            {"time": "2024-01-15T10:02:00Z", "residual_hz": 0.085},
+            {"time": "2024-01-15T10:04:00Z", "residual_hz": 0.040},
+            {"time": "2024-01-15T10:06:00Z", "residual_hz": 0.005},
+            {"time": "2024-01-15T10:08:00Z", "residual_hz": -0.035},
+            {"time": "2024-01-15T10:10:00Z", "residual_hz": -0.070},
+            {"time": "2024-01-15T10:12:00Z", "residual_hz": -0.090},
+            {"time": "2024-01-15T10:14:00Z", "residual_hz": -0.065},
+            {"time": "2024-01-15T10:16:00Z", "residual_hz": -0.030},
+            {"time": "2024-01-15T10:18:00Z", "residual_hz": 0.010},
+            {"time": "2024-01-15T10:20:00Z", "residual_hz": 0.050},
+            {"time": "2024-01-15T10:22:00Z", "residual_hz": 0.075},
+            {"time": "2024-01-15T10:24:00Z", "residual_hz": 0.055},
+            {"time": "2024-01-15T10:26:00Z", "residual_hz": 0.020},
+            {"time": "2024-01-15T10:28:00Z", "residual_hz": -0.015},
+            {"time": "2024-01-15T10:30:00Z", "residual_hz": -0.045}
+          ]
+        }
+      }
+    ]
+  },
+  "min_confidence": 0.5
+}
