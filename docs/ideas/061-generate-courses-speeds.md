@@ -12,7 +12,7 @@ Create a language-neutral tool specification (following #049 tool documentation 
 - **Operation**: For each consecutive pair of positions, calculate:
   - **Course** — initial bearing from position N to position N+1 (degrees, 0-360)
   - **Speed** — distance / time between positions (knots, i.e. nautical miles per hour)
-- **Output**: Dataset with time-series of course and speed values, one entry per position pair, provenance recording the source track
+- **Output**: Mutated track feature with course and speed values inserted into each position's properties according to the existing schema, plus provenance recording the transformation
 
 ## Success Criteria
 
@@ -21,10 +21,12 @@ Create a language-neutral tool specification (following #049 tool documentation 
 - Covers edge cases: stationary vessel (zero distance), single-position track, very short time intervals
 - Uses great-circle bearing and Haversine distance (consistent with existing range_bearing.py math)
 - Speed in knots, course in degrees (0-360)
+- Output is a mutation of the input track (enriched positions), not a separate dataset
 
 ## Constraints
 
 - Must follow tool documentation model from #049
+- Populates existing `TimestampedPosition.course` and `TimestampedPosition.speed` schema fields (defined in `shared/schemas/src/linkml/common.yaml`)
 - Great-circle math (not rhumb line)
 - Must work offline (CONSTITUTION Art. I)
 - Provenance must record source track
