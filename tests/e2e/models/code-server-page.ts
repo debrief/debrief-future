@@ -41,6 +41,15 @@ export class CodeServerPage {
 
     // Brief pause for extensions to activate
     await this.page.waitForTimeout(2_000);
+
+    // Close the Welcome tab if open — it captures keyboard focus into an
+    // iframe, preventing command palette and Quick Open from working.
+    await this.page.keyboard.press('Control+KeyW');
+    await this.page.waitForTimeout(500);
+
+    // Click the title bar to ensure main window has focus (not an iframe)
+    await this.page.locator('.part.titlebar').click().catch(() => {});
+    await this.page.waitForTimeout(300);
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
