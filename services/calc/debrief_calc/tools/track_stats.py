@@ -75,7 +75,7 @@ def _calculate_track_stats(coordinates: list[list[float]]) -> dict[str, Any]:
 @tool(
     name="track-stats",
     description="Calculate statistics for a single track including point count, duration, distance, and average speed",
-    input_kinds=["track"],
+    input_kinds=["TRACK"],
     output_kind="track/statistics",
     context_type=ContextType.SINGLE,
     parameters=[

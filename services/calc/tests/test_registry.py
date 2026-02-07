@@ -18,7 +18,7 @@ def sample_tool():
     return Tool(
         name="test-tool",
         description="A test tool",
-        input_kinds=["track"],
+        input_kinds=["TRACK"],
         output_kind="result",
         context_type=ContextType.SINGLE,
         handler=lambda ctx, params: [],
@@ -31,7 +31,7 @@ def multi_tool():
     return Tool(
         name="multi-tool",
         description="A multi-track tool",
-        input_kinds=["track"],
+        input_kinds=["TRACK"],
         output_kind="comparison",
         context_type=ContextType.MULTI,
         handler=lambda ctx, params: [],
@@ -44,7 +44,7 @@ def zone_tool():
     return Tool(
         name="zone-tool",
         description="A zone analysis tool",
-        input_kinds=["zone"],
+        input_kinds=["ZONE"],
         output_kind="zone-stats",
         context_type=ContextType.SINGLE,
         handler=lambda ctx, params: [],
@@ -103,11 +103,11 @@ class TestToolRegistry:
         fresh_registry.register(sample_tool)
         fresh_registry.register(zone_tool)
 
-        track_tools = fresh_registry.find_tools(kinds={"track"})
+        track_tools = fresh_registry.find_tools(kinds={"TRACK"})
         assert len(track_tools) == 1
         assert track_tools[0].name == "test-tool"
 
-        zone_tools = fresh_registry.find_tools(kinds={"zone"})
+        zone_tools = fresh_registry.find_tools(kinds={"ZONE"})
         assert len(zone_tools) == 1
         assert zone_tools[0].name == "zone-tool"
 
@@ -119,12 +119,12 @@ class TestToolRegistry:
         fresh_registry.register(zone_tool)
 
         # Single context + track kind -> only test-tool
-        tools = fresh_registry.find_tools(context_type=ContextType.SINGLE, kinds={"track"})
+        tools = fresh_registry.find_tools(context_type=ContextType.SINGLE, kinds={"TRACK"})
         assert len(tools) == 1
         assert tools[0].name == "test-tool"
 
         # Single context + zone kind -> only zone-tool
-        tools = fresh_registry.find_tools(context_type=ContextType.SINGLE, kinds={"zone"})
+        tools = fresh_registry.find_tools(context_type=ContextType.SINGLE, kinds={"ZONE"})
         assert len(tools) == 1
         assert tools[0].name == "zone-tool"
 
@@ -136,7 +136,7 @@ class TestToolRegistry:
         assert tools == []
 
         # No tools accept "point" kind
-        tools = fresh_registry.find_tools(kinds={"point"})
+        tools = fresh_registry.find_tools(kinds={"POINT"})
         assert tools == []
 
     def test_find_tools_for_context(self, fresh_registry, sample_tool, multi_tool):
@@ -144,7 +144,7 @@ class TestToolRegistry:
         fresh_registry.register(multi_tool)
 
         # Create a single-track context
-        feature = {"type": "Feature", "properties": {"kind": "track"}, "geometry": None}
+        feature = {"type": "Feature", "properties": {"kind": "TRACK"}, "geometry": None}
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
 
         tools = fresh_registry.find_tools_for_context(context)
@@ -157,7 +157,7 @@ class TestToolRegistry:
         metadata = fresh_registry.describe("test-tool")
         assert metadata["name"] == "test-tool"
         assert metadata["description"] == "A test tool"
-        assert metadata["input_kinds"] == ["track"]
+        assert metadata["input_kinds"] == ["TRACK"]
         assert metadata["context_type"] == "single"
 
     def test_describe_nonexistent_raises(self, fresh_registry):
@@ -195,7 +195,7 @@ class TestToolDecorator:
         tool_instance = Tool(
             name="decorator-test",
             description="Test",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="result",
             context_type=ContextType.SINGLE,
             handler=my_handler,
@@ -209,7 +209,7 @@ class TestToolDecorator:
         tool_instance = Tool(
             name="param-tool",
             description="Tool with params",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="result",
             context_type=ContextType.SINGLE,
             parameters=[
@@ -237,7 +237,7 @@ class TestFindToolsEdgeCases:
         multi_kind_tool = Tool(
             name="multi-kind",
             description="Accepts track or zone",
-            input_kinds=["track", "zone"],
+            input_kinds=["TRACK", "ZONE"],
             output_kind="result",
             context_type=ContextType.SINGLE,
             handler=lambda ctx, params: [],
@@ -245,15 +245,15 @@ class TestFindToolsEdgeCases:
         fresh_registry.register(multi_kind_tool)
 
         # Should match track
-        tools = fresh_registry.find_tools(kinds={"track"})
+        tools = fresh_registry.find_tools(kinds={"TRACK"})
         assert len(tools) == 1
 
         # Should match zone
-        tools = fresh_registry.find_tools(kinds={"zone"})
+        tools = fresh_registry.find_tools(kinds={"ZONE"})
         assert len(tools) == 1
 
         # Should match either
-        tools = fresh_registry.find_tools(kinds={"track", "zone"})
+        tools = fresh_registry.find_tools(kinds={"TRACK", "ZONE"})
         assert len(tools) == 1
 
     def test_empty_kinds_filter_returns_all(self, fresh_registry, sample_tool, zone_tool):

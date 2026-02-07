@@ -11,7 +11,7 @@ from debrief_calc.registry import tool
 @tool(
     name="label-interval",
     description="Sets the time interval for displaying labels on track positions.",
-    input_kinds=["track"],
+    input_kinds=["TRACK"],
     output_kind="mutation/track/styled",
     context_type=ContextType.MULTI,
     parameters=[

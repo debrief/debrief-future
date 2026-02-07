@@ -14,7 +14,7 @@ class TestCreateProvenance:
     """Tests for create_provenance function."""
 
     def test_create_basic_provenance(self):
-        features = [{"id": "track-001", "properties": {"kind": "track"}, "geometry": None}]
+        features = [{"id": "track-001", "properties": {"kind": "TRACK"}, "geometry": None}]
         prov = create_provenance(
             tool_name="track-stats", tool_version="1.0.0", source_features=features
         )
@@ -23,12 +23,12 @@ class TestCreateProvenance:
         assert prov.version == "1.0.0"
         assert len(prov.sources) == 1
         assert prov.sources[0].id == "track-001"
-        assert prov.sources[0].kind == "track"
+        assert prov.sources[0].kind == "TRACK"
         assert prov.parameters == {}
         assert isinstance(prov.timestamp, datetime)
 
     def test_create_provenance_with_parameters(self):
-        features = [{"id": "f1", "properties": {"kind": "track"}, "geometry": None}]
+        features = [{"id": "f1", "properties": {"kind": "TRACK"}, "geometry": None}]
         prov = create_provenance(
             tool_name="tool",
             tool_version="2.0.0",
@@ -39,7 +39,7 @@ class TestCreateProvenance:
         assert prov.parameters == {"unit": "nm", "format": "json"}
 
     def test_create_provenance_with_custom_timestamp(self):
-        features = [{"id": "f1", "properties": {"kind": "track"}, "geometry": None}]
+        features = [{"id": "f1", "properties": {"kind": "TRACK"}, "geometry": None}]
         custom_time = datetime(2026, 1, 15, 12, 0, 0)
 
         prov = create_provenance(
@@ -50,9 +50,9 @@ class TestCreateProvenance:
 
     def test_create_provenance_multiple_sources(self):
         features = [
-            {"id": "track-001", "properties": {"kind": "track"}, "geometry": None},
-            {"id": "track-002", "properties": {"kind": "track"}, "geometry": None},
-            {"id": "zone-001", "properties": {"kind": "zone"}, "geometry": None},
+            {"id": "track-001", "properties": {"kind": "TRACK"}, "geometry": None},
+            {"id": "track-002", "properties": {"kind": "TRACK"}, "geometry": None},
+            {"id": "zone-001", "properties": {"kind": "ZONE"}, "geometry": None},
         ]
         prov = create_provenance(
             tool_name="multi-tool", tool_version="1.0.0", source_features=features
@@ -62,10 +62,10 @@ class TestCreateProvenance:
         assert prov.sources[0].id == "track-001"
         assert prov.sources[1].id == "track-002"
         assert prov.sources[2].id == "zone-001"
-        assert prov.sources[2].kind == "zone"
+        assert prov.sources[2].kind == "ZONE"
 
     def test_create_provenance_missing_id(self):
-        features = [{"properties": {"kind": "track"}, "geometry": None}]
+        features = [{"properties": {"kind": "TRACK"}, "geometry": None}]
         prov = create_provenance(tool_name="tool", tool_version="1.0.0", source_features=features)
 
         assert prov.sources[0].id == "unknown"
@@ -83,7 +83,7 @@ class TestAttachProvenance:
     def test_attach_provenance_to_feature(self):
         feature = {"type": "Feature", "properties": {"data": "test"}, "geometry": None}
         prov = Provenance(
-            tool="test-tool", version="1.0.0", sources=[SourceRef(id="src-1", kind="track")]
+            tool="test-tool", version="1.0.0", sources=[SourceRef(id="src-1", kind="TRACK")]
         )
 
         result = attach_provenance(feature, prov)
@@ -107,15 +107,15 @@ class TestAttachProvenance:
         prov = Provenance(
             tool="tool",
             version="1.0.0",
-            sources=[SourceRef(id="a", kind="track"), SourceRef(id="b", kind="zone")],
+            sources=[SourceRef(id="a", kind="TRACK"), SourceRef(id="b", kind="ZONE")],
         )
 
         attach_provenance(feature, prov)
 
         sources = feature["properties"]["provenance"]["sources"]
         assert len(sources) == 2
-        assert sources[0] == {"id": "a", "kind": "track"}
-        assert sources[1] == {"id": "b", "kind": "zone"}
+        assert sources[0] == {"id": "a", "kind": "TRACK"}
+        assert sources[1] == {"id": "b", "kind": "ZONE"}
 
     def test_attach_provenance_includes_parameters(self):
         feature = {"type": "Feature", "properties": {}, "geometry": None}

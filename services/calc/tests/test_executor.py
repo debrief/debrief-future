@@ -18,7 +18,7 @@ def single_track_context():
     feature = {
         "type": "Feature",
         "id": "track-001",
-        "properties": {"kind": "track", "name": "Test Track"},
+        "properties": {"kind": "TRACK", "name": "Test Track"},
         "geometry": {
             "type": "LineString",
             "coordinates": [
@@ -38,7 +38,7 @@ def multi_track_context():
         "type": "Feature",
         "id": "track-alpha",
         "properties": {
-            "kind": "track",
+            "kind": "TRACK",
             "name": "Alpha",
             "times": ["2024-01-15T08:00:00Z", "2024-01-15T09:00:00Z"],
         },
@@ -51,7 +51,7 @@ def multi_track_context():
         "type": "Feature",
         "id": "track-bravo",
         "properties": {
-            "kind": "track",
+            "kind": "TRACK",
             "name": "Bravo",
             "times": ["2024-01-15T08:00:00Z", "2024-01-15T09:00:00Z"],
         },
@@ -130,7 +130,7 @@ class TestRunSuccess:
         assert "timestamp" in provenance
         assert len(provenance["sources"]) == 1
         assert provenance["sources"][0]["id"] == "track-001"
-        assert provenance["sources"][0]["kind"] == "track"
+        assert provenance["sources"][0]["kind"] == "TRACK"
 
 
 class TestRunErrors:
@@ -158,7 +158,7 @@ class TestRunErrors:
         feature = {
             "type": "Feature",
             "id": "zone-001",
-            "properties": {"kind": "zone"},
+            "properties": {"kind": "ZONE"},
             "geometry": None,
         }
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])

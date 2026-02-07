@@ -223,7 +223,7 @@ class Tool(BaseModel):
 
     def accepts_kind(self, kind: str) -> bool:
         """Check if this tool accepts features of the given kind."""
-        return kind.lower() in (k.lower() for k in self.input_kinds)
+        return kind in self.input_kinds
 
     def accepts_context(self, context_type: ContextType) -> bool:
         """Check if this tool works with the given context type."""
@@ -290,9 +290,9 @@ class Tool(BaseModel):
     def _build_selection_requirements(self) -> list[dict[str, Any]]:
         """Build selection requirements from context_type and input_kinds."""
         if self.context_type == ContextType.SINGLE:
-            return [{"kind": self.input_kinds[0].upper(), "min": 1, "max": 1}]
+            return [{"kind": self.input_kinds[0], "min": 1, "max": 1}]
         elif self.context_type == ContextType.MULTI:
-            return [{"kind": k.upper(), "min": 1} for k in self.input_kinds]
+            return [{"kind": k, "min": 1} for k in self.input_kinds]
         elif self.context_type == ContextType.REGION:
             return [{"kind": "REGION", "min": 1, "max": 1}]
         else:  # ContextType.NONE

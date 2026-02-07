@@ -13,7 +13,7 @@ VALID_SYMBOLS = ("circle", "square", "diamond", "triangle", "cross")
 @tool(
     name="apply-symbol-style",
     description="Applies a symbol style to position markers on track features.",
-    input_kinds=["track"],
+    input_kinds=["TRACK"],
     output_kind="mutation/track/styled",
     context_type=ContextType.MULTI,
     parameters=[

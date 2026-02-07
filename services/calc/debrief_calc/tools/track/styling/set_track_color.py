@@ -11,7 +11,7 @@ from debrief_calc.registry import tool
 @tool(
     name="set-track-color",
     description="Sets the display color for track features. Modifies the line color property of each track's style.",
-    input_kinds=["track"],
+    input_kinds=["TRACK"],
     output_kind="mutation/track/styled",
     context_type=ContextType.MULTI,
     parameters=[

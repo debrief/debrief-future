@@ -10,7 +10,7 @@ class TestToMcpTool:
         tool = Tool(
             name="track-stats",
             description="Calculate track statistics",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="track/statistics",
             context_type=ContextType.SINGLE,
         )
@@ -23,7 +23,7 @@ class TestToMcpTool:
         tool = Tool(
             name="range-bearing",
             description="Calculate range and bearing",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="dataset/range_bearing_series",
             context_type=ContextType.MULTI,
         )
@@ -36,7 +36,7 @@ class TestToMcpTool:
         tool = Tool(
             name="mixed-analysis",
             description="Analyze mixed features",
-            input_kinds=["track", "point"],
+            input_kinds=["TRACK", "POINT"],
             output_kind="analysis/mixed",
             context_type=ContextType.MULTI,
         )
@@ -50,7 +50,7 @@ class TestToMcpTool:
         tool = Tool(
             name="area-summary",
             description="Summarize area",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="analysis/area",
             context_type=ContextType.REGION,
         )
@@ -63,7 +63,7 @@ class TestToMcpTool:
         tool = Tool(
             name="global-stats",
             description="Show global statistics",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="analysis/global",
             context_type=ContextType.NONE,
         )
@@ -75,7 +75,7 @@ class TestToMcpTool:
         tool = Tool(
             name="set-track-color",
             description="Set display color for tracks",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="mutation/track/styled",
             context_type=ContextType.MULTI,
             version="1.0.0",
@@ -91,7 +91,7 @@ class TestToMcpTool:
         tool = Tool(
             name="set-track-color",
             description="Set display color for tracks",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="mutation/track/styled",
             context_type=ContextType.MULTI,
             version="1.0.0",
@@ -109,7 +109,7 @@ class TestToMcpTool:
         tool = Tool(
             name="set-track-color",
             description="Set color",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="mutation/track/styled",
             context_type=ContextType.MULTI,
         )
@@ -120,7 +120,7 @@ class TestToMcpTool:
         tool = Tool(
             name="range-bearing",
             description="Range and bearing",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="dataset/range_bearing_series",
             context_type=ContextType.MULTI,
         )
@@ -131,7 +131,7 @@ class TestToMcpTool:
         tool = Tool(
             name="set-track-color",
             description="Set color",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="mutation/track/styled",
             context_type=ContextType.MULTI,
             parameters=[

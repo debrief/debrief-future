@@ -11,7 +11,7 @@ class TestToolListContract:
         tool = Tool(
             name="set-track-color",
             description="Set display color",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="mutation/track/styled",
             context_type=ContextType.MULTI,
         )
@@ -26,7 +26,7 @@ class TestToolListContract:
         tool = Tool(
             name="set-track-color",
             description="Set display color",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="mutation/track/styled",
             context_type=ContextType.MULTI,
         )
@@ -46,7 +46,7 @@ class TestToolListContract:
         tool = Tool(
             name="set-track-color",
             description="Set display color",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="mutation/track/styled",
             context_type=ContextType.MULTI,
         )
@@ -63,7 +63,7 @@ class TestToolListContract:
         tool = Tool(
             name="set-track-color",
             description="Set display color",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="mutation/track/styled",
             context_type=ContextType.MULTI,
         )

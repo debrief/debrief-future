@@ -155,5 +155,5 @@ class TestLLMSupervisorMetadata:
         """LLM can use accepts_kind to filter tools."""
         track_tool = registry.get_tool("track-stats")
 
-        assert track_tool.accepts_kind("track") is True
-        assert track_tool.accepts_kind("zone") is False
+        assert track_tool.accepts_kind("TRACK") is True
+        assert track_tool.accepts_kind("ZONE") is False

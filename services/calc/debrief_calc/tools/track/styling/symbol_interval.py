@@ -11,7 +11,7 @@ from debrief_calc.registry import tool
 @tool(
     name="symbol-interval",
     description="Sets the time interval for displaying position symbols on track features.",
-    input_kinds=["track"],
+    input_kinds=["TRACK"],
     output_kind="mutation/track/styled",
     context_type=ContextType.MULTI,
     parameters=[

@@ -595,7 +595,7 @@ print(json.dumps(tools))
           geometry: shape.geometry,
           properties: {
             ...props,
-            kind: (props.kind as string) ?? 'shape',
+            kind: (props.kind as string) ?? 'SHAPE',
           },
         });
         continue;
