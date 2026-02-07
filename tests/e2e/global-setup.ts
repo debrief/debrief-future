@@ -26,8 +26,14 @@ async function waitForReady(url: string, timeoutMs: number): Promise<void> {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
     try {
-      const response = await fetch(`${url}/healthz`);
-      if (response.ok) {
+      // Try /healthz first (code-server), fall back to root (openvscode-server)
+      const healthz = await fetch(`${url}/healthz`).catch(() => null);
+      if (healthz?.ok) {
+        console.log(`code-server ready at ${url}`);
+        return;
+      }
+      const root = await fetch(url).catch(() => null);
+      if (root?.ok) {
         console.log(`code-server ready at ${url}`);
         return;
       }
@@ -49,8 +55,9 @@ async function globalSetup(): Promise<void> {
 
   // Check if code-server is already running
   try {
-    const response = await fetch(`${CODE_SERVER_URL}/healthz`);
-    if (response.ok) {
+    const healthz = await fetch(`${CODE_SERVER_URL}/healthz`).catch(() => null);
+    const root = await fetch(CODE_SERVER_URL).catch(() => null);
+    if (healthz?.ok || root?.ok) {
       console.log(`code-server already running at ${CODE_SERVER_URL}`);
       return;
     }

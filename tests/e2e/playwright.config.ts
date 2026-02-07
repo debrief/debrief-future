@@ -52,6 +52,8 @@ const launchOptions = useSparticuz
         '--metrics-recording-only',
         '--mute-audio',
         '--no-first-run',
+        '--disable-features=IsolateOrigins,site-per-process',
+        '--js-flags=--max-old-space-size=4096',
       ],
     }
   : undefined;
