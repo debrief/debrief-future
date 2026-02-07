@@ -149,6 +149,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Local filesystem (temporary STAC catalogs via pytest `tmp_path`) (005-e2e-workflow-tests)
 - TypeScript 5.x (test code), Python 3.11 (services under test) + code-server ^4.x, @playwright/test ^1.57.0 (already in project), @sparticuz/chromium (already in project) (005-e2e-workflow-tests)
 - Local filesystem (STAC catalogs in test workspace) (005-e2e-workflow-tests)
+- Markdown (specifications, discovery report), JSON (golden I/O fixtures), Java (legacy source analysis, optional capture harness using Gson 2.10.1) + None for the feature itself. The optional Java capture harness requires Gson 2.10.1. Four existing Claude Code commands (`/tool.discover`, `/tool.spec`, `/tool.implement`, `/tool.verify`) and four agents (`legacy-tool-analyst`, `tool-spec-author`, `tool-implementer`, `golden-example-validator`) from feature 050 are available in `debrief-future` but NOT in the legacy repo. (001-document-debrief-algorithms)
+- Filesystem only (Markdown files, JSON fixtures staged in `_tool-migration/` at legacy repo root) (001-document-debrief-algorithms)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
