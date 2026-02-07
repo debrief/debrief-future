@@ -196,6 +196,8 @@ export type SelectionContextType =
   | 'single-track'
   | 'multi-track'
   | 'location'
+  | 'position'         // Feature 053: single position selected
+  | 'multi-position'   // Feature 053: multiple positions selected
   | 'mixed';
 
 /**

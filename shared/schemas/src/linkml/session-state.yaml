@@ -53,6 +53,14 @@ enums:
       day:
         description: Days
 
+  AddressingMode:
+    description: How addresses in a selection path level are interpreted (Feature 053)
+    permissible_values:
+      id:
+        description: Address is a string identifier
+      index:
+        description: Address is a numeric position index
+
 # ============================================================================
 # Core Types
 # ============================================================================
@@ -138,16 +146,39 @@ classes:
         minimum_cardinality: 4
         maximum_cardinality: 4
 
+  LevelDefinition:
+    description: >-
+      Named nesting level within a feature hierarchy (Feature 053, FR-010).
+      Defines how addresses at this level are interpreted.
+    attributes:
+      name:
+        description: Level identifier used in selection paths
+        range: string
+        required: true
+      addressingMode:
+        description: How addresses at this level are interpreted
+        range: AddressingMode
+        required: true
+      description:
+        description: Human-readable description
+        range: string
+
   FeatureSelection:
-    description: Set of selected feature identifiers with metadata (FR-017)
+    description: >-
+      Set of selected feature identifiers with metadata (FR-017).
+      featureIds accepts selection path strings: forward-slash-separated
+      segments following RFC 6901 escaping. A single-segment path is
+      a flat feature ID (backward compatible). Feature 053.
     attributes:
       featureIds:
-        description: Selected feature IDs
+        description: >-
+          Selected feature paths. Each entry is a forward-slash-separated
+          selection path (e.g. "track-001/positions/4") or a flat feature ID.
         range: string
         multivalued: true
         required: true
       primary:
-        description: Primary selection for properties display
+        description: Primary selection path for properties display
         range: string
       timestamp:
         description: When selection was made

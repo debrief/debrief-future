@@ -1,6 +1,9 @@
 /**
  * MCP tool: session.setSelection
- * Feature: 024-document-session-state
+ * Feature: 024-document-session-state, 053-nested-child-selection
+ *
+ * Feature 053: featureIds now accepts selection path strings (e.g., "track-001/positions/4")
+ * in addition to flat IDs. Paths are passed through to the store, which normalises them.
  */
 
 import type { SessionStoreApi } from '../../store/index.js';
