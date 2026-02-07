@@ -50,8 +50,8 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install chromium
 
-      - name: Build VS Code extension
-        run: pnpm --filter @debrief/vscode build
+      - name: Build VS Code extension and dependencies
+        run: pnpm --filter @debrief/vscode... build
 
       - name: Package extension as .vsix
         working-directory: apps/vscode
