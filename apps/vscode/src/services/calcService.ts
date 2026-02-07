@@ -480,10 +480,8 @@ for t in registry.list_all():
         reqs = []
     elif ctx == ContextType.SINGLE:
         reqs = [{"kind": k.upper(), "min": 1, "max": 1} for k in t.input_kinds]
-    elif ctx == ContextType.MULTI and len(t.input_kinds) > 1:
-        reqs = [{"kind": k.upper(), "min": 0, "max": 99} for k in t.input_kinds]
     else:
-        reqs = [{"kind": k.upper(), "min": 2, "max": 99} for k in t.input_kinds]
+        reqs = [{"kind": k.upper(), "min": 1} for k in t.input_kinds]
     entry = {
         "name": t.name,
         "description": t.description,
@@ -524,17 +522,11 @@ for t in registry.list_all():
     elif ctx == ContextType.NONE:
         reqs = []
     else:
-        multi_kind = ctx == ContextType.MULTI and len(t.input_kinds) > 1
         if ctx == ContextType.SINGLE:
-            min_count, max_count = 1, 1
-        elif multi_kind:
-            min_count, max_count = 0, 99
+            reqs = [{"kind": k.upper(), "min": 1, "max": 1} for k in t.input_kinds]
         else:
-            min_count, max_count = 2, 99
-        reqs = [{"kind": k.upper(), "min": min_count, "max": max_count} for k in t.input_kinds]
+            reqs = [{"kind": k.upper(), "min": 1} for k in t.input_kinds]
     entry = {"id": t.name, "name": t.name, "description": t.description, "version": t.version, "requirements": reqs}
-    if multi_kind:
-        entry["minFeatures"] = 2
     tools.append(entry)
 print(json.dumps(tools))
 `;
@@ -570,7 +562,7 @@ print(json.dumps(tools))
           properties: {
             id: track.id,
             name: track.name,
-            kind: 'track',
+            kind: 'TRACK',
             platformType: track.platformType,
             times: track.times,
             startTime: track.startTime,
@@ -588,7 +580,7 @@ print(json.dumps(tools))
           properties: {
             id: location.id,
             name: location.name,
-            kind: 'location',
+            kind: 'LOCATION',
             locationType: location.locationType,
           },
         });
