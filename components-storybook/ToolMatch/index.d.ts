@@ -16,5 +16,7 @@ export { ToolMatchService } from './ToolMatchService';
 export { getInactiveReason, getAllInactiveReasons } from './explanations';
 export type { Selection, MatchResult } from './types';
 export { createSelection, createSelectionFromCounts } from './types';
+export { fromMCPTool, fromMCPTools } from './mcpAdapter';
+export type { MCPToolDefinition, MCPSelectionRequirement } from './mcpAdapter';
 export type { Tool, SelectionRequirement } from './types';
 //# sourceMappingURL=index.d.ts.map
