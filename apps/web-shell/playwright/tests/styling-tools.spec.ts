@@ -15,6 +15,21 @@ const STYLING_TOOL_NAMES = [
   'Symbol Interval',
 ];
 
+/**
+ * Helper: select a track feature via the feature list sidebar.
+ * Uses the feature list rather than map clicks because the first
+ * .leaflet-interactive element may be a non-track shape (polygon, circle).
+ */
+async function selectTrackViaFeatureList(page: import('@playwright/test').Page) {
+  const featureRow = page.locator('.debrief-feature-row:has-text("HMS Defender")');
+  // Fall back to first feature row if name not found
+  const target = (await featureRow.count()) > 0
+    ? featureRow
+    : page.locator('.debrief-feature-row').first();
+  await target.click();
+  await page.waitForTimeout(200);
+}
+
 test.describe('Styling Tools Integration', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -53,9 +68,8 @@ test.describe('Styling Tools Integration', () => {
   });
 
   test('styling tools activate when a track is selected', async ({ page }) => {
-    // Select a track on the map
-    await page.locator('.leaflet-interactive').first().click({ force: true });
-    await page.waitForTimeout(100);
+    // Select a track via the feature list
+    await selectTrackViaFeatureList(page);
 
     // All 4 styling tools should now be active
     for (const name of STYLING_TOOL_NAMES) {
@@ -67,13 +81,13 @@ test.describe('Styling Tools Integration', () => {
   });
 
   test('running Set Track Color shows result message', async ({ page }) => {
-    // Select a track
-    await page.locator('.leaflet-interactive').first().click({ force: true });
+    // Select a track via the feature list
+    await selectTrackViaFeatureList(page);
     await expect(
-      page.locator('.debrief-tools-panel__item--active').first()
+      page.locator('.debrief-tools-panel__item--active:has-text("Set Track Color")')
     ).toBeVisible({ timeout: 2000 });
 
-    // Find and click the Set Track Color tool
+    // Click the Set Track Color tool
     const tool = page.locator(
       '.debrief-tools-panel__item--active:has-text("Set Track Color")'
     );
@@ -86,13 +100,13 @@ test.describe('Styling Tools Integration', () => {
   });
 
   test('running Label Interval shows result message', async ({ page }) => {
-    // Select a track
-    await page.locator('.leaflet-interactive').first().click({ force: true });
+    // Select a track via the feature list
+    await selectTrackViaFeatureList(page);
     await expect(
-      page.locator('.debrief-tools-panel__item--active').first()
+      page.locator('.debrief-tools-panel__item--active:has-text("Label Interval")')
     ).toBeVisible({ timeout: 2000 });
 
-    // Find and click the Label Interval tool
+    // Click the Label Interval tool
     const tool = page.locator(
       '.debrief-tools-panel__item--active:has-text("Label Interval")'
     );
@@ -105,13 +119,13 @@ test.describe('Styling Tools Integration', () => {
   });
 
   test('running Symbol Interval shows result message', async ({ page }) => {
-    // Select a track
-    await page.locator('.leaflet-interactive').first().click({ force: true });
+    // Select a track via the feature list
+    await selectTrackViaFeatureList(page);
     await expect(
-      page.locator('.debrief-tools-panel__item--active').first()
+      page.locator('.debrief-tools-panel__item--active:has-text("Symbol Interval")')
     ).toBeVisible({ timeout: 2000 });
 
-    // Find and click the Symbol Interval tool
+    // Click the Symbol Interval tool
     const tool = page.locator(
       '.debrief-tools-panel__item--active:has-text("Symbol Interval")'
     );
@@ -124,13 +138,13 @@ test.describe('Styling Tools Integration', () => {
   });
 
   test('running Apply Symbol Style shows result message', async ({ page }) => {
-    // Select a track
-    await page.locator('.leaflet-interactive').first().click({ force: true });
+    // Select a track via the feature list
+    await selectTrackViaFeatureList(page);
     await expect(
-      page.locator('.debrief-tools-panel__item--active').first()
+      page.locator('.debrief-tools-panel__item--active:has-text("Apply Symbol Style")')
     ).toBeVisible({ timeout: 2000 });
 
-    // Find and click the Apply Symbol Style tool
+    // Click the Apply Symbol Style tool
     const tool = page.locator(
       '.debrief-tools-panel__item--active:has-text("Apply Symbol Style")'
     );
@@ -156,15 +170,13 @@ test.describe('Styling Tools Integration', () => {
     expect(title).toContain('track');
   });
 
-  test('selecting via feature list also activates styling tools', async ({
+  test('selecting via feature list activates styling tools', async ({
     page,
   }) => {
-    // Click on a feature row in the layers panel instead of the map
-    const featureRow = page.locator('.debrief-feature-row').first();
-    await featureRow.click();
-    await page.waitForTimeout(100);
+    // Click on the first feature row (which is a track)
+    await selectTrackViaFeatureList(page);
 
-    // Styling tools should be active (feature row selects a track)
+    // Styling tools should be active
     const activeStylingTool = page.locator(
       '.debrief-tools-panel__item--active:has-text("Set Track Color")'
     );
@@ -172,9 +184,8 @@ test.describe('Styling Tools Integration', () => {
   });
 
   test('clearing selection deactivates styling tools', async ({ page }) => {
-    // Select a track
-    await page.locator('.leaflet-interactive').first().click({ force: true });
-    await page.waitForTimeout(100);
+    // Select a track via the feature list
+    await selectTrackViaFeatureList(page);
 
     // Verify tools are active
     await expect(
@@ -183,7 +194,7 @@ test.describe('Styling Tools Integration', () => {
 
     // Clear selection by clicking map background
     await page.locator('.leaflet-container').click({ position: { x: 10, y: 10 } });
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(200);
 
     // Styling tools should be inactive again
     await expect(

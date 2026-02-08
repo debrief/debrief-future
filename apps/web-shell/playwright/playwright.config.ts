@@ -43,8 +43,11 @@ const launchOptions = useSparticuz
       args: [
         '--disable-setuid-sandbox',
         '--no-sandbox',
+        '--no-zygote',
         '--disable-gpu',
         '--disable-dev-shm-usage',
+        '--disable-features=IsolateOrigins,site-per-process',
+        '--disable-site-isolation-trials',
         '--disable-background-networking',
         '--disable-default-apps',
         '--disable-extensions',

@@ -27,6 +27,7 @@ export default defineConfig({
   plugins: [react(), geojsonPlugin()],
   resolve: {
     alias: {
+      '@debrief/components': path.resolve(__dirname, '../../shared/components/src/index.ts'),
       '@test-data': path.resolve(__dirname, '../vscode/test-data'),
     },
   },

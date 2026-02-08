@@ -269,8 +269,14 @@ export function createMockCalcService(): MockCalcService {
       // Delegate styling tools to toolService
       if (stylingToolIds.has(toolId)) {
         try {
+          // Provide sensible default params for tools that require them
+          const defaultParams: Record<string, Record<string, unknown>> = {
+            'set-track-color': { color: '#ff0000' },
+            'apply-symbol-style': { symbol: 'circle' },
+          };
+          const params = defaultParams[toolId] ?? {};
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const response = executeTool(toolId, selectedFeatures as any, {});
+          const response = executeTool(toolId, selectedFeatures as any, params);
           const item = response.content[0];
           const label = item?.annotations?.['debrief:label'] ?? `${toolId} applied`;
           return { success: true, message: String(label) };
