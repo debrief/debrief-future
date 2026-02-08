@@ -1,138 +1,200 @@
-# Feature Specification: Add Missing FeatureKindEnum Values for Tool Migration
+# Feature Specification: Compound Track Model with Embedded Children
 
 **Feature Branch**: `062-missing-feature-kind-enum-values`
 **Created**: 2026-02-07
+**Revised**: 2026-02-08
 **Status**: Draft
-**Input**: User description: "Add missing FeatureKindEnum values for tool migration — add 7 new kinds (SENSOR, TMA_SEGMENT, TRACK_SEGMENT, TUAS_SOLUTION, LIGHTWEIGHT_TRACK, FREQUENCY_RESIDUALS, ZONE) and Feature classes to LinkML schemas; blocks 30+ tool implementations"
+**Supersedes**: Original flat FeatureKindEnum approach
+**Input**: User description: "Add missing FeatureKindEnum values for tool migration" — revised after design review to compound track model with embedded children (see `docs/062-compound-track-model-srd.md`)
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Sensor Feature Schema Support (Priority: P1)
+### User Story 1 — Compound Track Geometry (Priority: P1)
 
-A tool implementer is building sensor analysis tools (e.g., generate-sensor-range-plot, resolve-ambiguity). They need to represent sensor contact data — bearings, ranges, frequencies — as GeoJSON features with `kind: "SENSOR"`. The schema must define `SensorFeature` and `SensorProperties` so that golden I/O fixtures validate against the schema and Pydantic models can be generated for the service layer.
+A tool implementer is building track analysis tools that operate on multi-segment tracks. A track may consist of multiple segments from disparate data sources, or a mix of recorded TrackSegments, AbsoluteTMA legs, RelativeTMA legs, and DynamicInfill segments. The schema must support both simple single-segment tracks (LineString) and compound multi-segment tracks (MultiLineString) with per-segment metadata.
 
-**Why this priority**: 9+ tools depend on the SENSOR kind, making it the highest-impact addition. Without it, the entire sensor analysis and sensor calibration tool categories are blocked.
+**Why this priority**: Multi-segment tracks are fundamental to TMA workflows. Without compound geometry support, no TMA tools can be implemented and tracks from multiple data sources cannot be faithfully represented.
 
-**Independent Test**: Can be fully tested by adding `SENSOR` to `FeatureKindEnum`, creating `SensorFeature` and `SensorProperties` classes, regenerating derived schemas, and validating existing sensor golden I/O fixtures against the generated Pydantic models.
-
-**Acceptance Scenarios**:
-
-1. **Given** the updated schema with SENSOR kind, **When** a sensor golden I/O fixture (e.g., `generate-sensor-range-plot.basic.input.json`) is validated against the generated Pydantic model, **Then** validation passes without errors.
-2. **Given** the updated schema, **When** derived schemas are regenerated (Pydantic, JSON Schema, TypeScript), **Then** all three outputs include `SensorFeature`, `SensorProperties`, and the `SENSOR` enum value.
-3. **Given** a SensorFeature with properties including `sensor_name`, `sensor_type`, `host_track_id`, and a `cuts` array, **When** validated, **Then** all required fields are enforced and optional fields are accepted.
-
----
-
-### User Story 2 - TMA and Track Segment Schema Support (Priority: P2)
-
-A tool implementer is building track analysis tools (e.g., generate-tma-from-ownship, generate-tma-from-infill). They need to represent TMA segments and track segments as GeoJSON features. The schema must define `TMASegmentFeature`, `TMASegmentProperties`, `TrackSegmentFeature`, and `TrackSegmentProperties` so that the 5+ tools producing these types can be implemented.
-
-**Why this priority**: TMA and track segment types are used by the core track analysis tools. TMA_SEGMENT is referenced by 5+ tools and TRACK_SEGMENT is a prerequisite for infill-based analysis.
-
-**Independent Test**: Can be fully tested by adding TMA_SEGMENT and TRACK_SEGMENT to the enum, creating the corresponding Feature and Properties classes, and validating the existing golden I/O fixtures for track analysis tools.
+**Independent Test**: Can be tested by creating TrackFeature instances with MultiLineString geometry and a parallel `segments` metadata array, then validating against the generated Pydantic models.
 
 **Acceptance Scenarios**:
 
-1. **Given** the updated schema with TMA_SEGMENT kind, **When** a TMA golden I/O fixture (e.g., `convert-absolute-tma-to-relative.complex.input.json`) is validated, **Then** validation passes with segment_type, parent_track_id, course, and speed fields accepted.
-2. **Given** the updated schema with TRACK_SEGMENT kind, **When** a track segment fixture (e.g., `generate-tma-from-infill.basic.input.json`) is validated, **Then** validation passes with segment_type, parent_track_id, and positions array accepted.
-3. **Given** a TMASegmentFeature with `segment_type: "ABSOLUTE"`, **When** validated, **Then** the segment_type value is accepted. **Given** `segment_type: "INVALID"`, **When** validated, **Then** validation fails.
+1. **Given** a simple single-segment track, **When** represented as a TrackFeature with LineString geometry and a flat `positions` array, **Then** validation passes (backward compatible with existing schema).
+2. **Given** a multi-segment track with 3 segments (TrackSegment, AbsoluteTMA, DynamicInfill), **When** represented as a TrackFeature with MultiLineString geometry and `segments[0..2]` metadata, **Then** validation passes with each segment's type, positions, and type-specific properties accepted.
+3. **Given** a TrackFeature with MultiLineString geometry, **When** `segments` array length does not match the number of LineStrings in the geometry, **Then** validation fails with a clear error.
+4. **Given** a RelativeTMA segment, **When** validated, **Then** the `host_track_id` and offset properties are accepted alongside `segment_type`, `course`, and `speed`.
 
 ---
 
-### User Story 3 - Remaining Feature Kinds (Priority: P3)
+### User Story 2 — Embedded Sensor Data (Priority: P1)
 
-A tool implementer needs the remaining feature kinds — TUAS_SOLUTION, LIGHTWEIGHT_TRACK, FREQUENCY_RESIDUALS, and ZONE — to implement their respective tools. Each kind has a smaller number of dependent tools but is still required for full tool migration coverage.
+A tool implementer is building sensor analysis tools (e.g., generate-sensor-range-plot, resolve-ambiguity). Sensor data is represented as an embedded array within TrackProperties. Each sensor entry has metadata (name, type, base frequency) and an array of child contact measurements (time, bearing, optional frequency, range, ambiguous bearing).
 
-**Why this priority**: These kinds each serve 1-3 tools. They complete the full set of 7 missing kinds and unblock the remaining tool implementations.
+**Why this priority**: 9+ tools depend on sensor data. Sensors have no independent geometry — they are rendered dynamically from the host track's interpolated position at contact time, with bearing lines extending to the viewport edge.
 
-**Independent Test**: Can be fully tested by adding all four kinds, creating their Feature and Properties classes, and validating the corresponding golden I/O fixtures.
+**Independent Test**: Can be tested by creating a TrackFeature with a `sensors` array containing sensor entries with contact measurements, then validating against generated Pydantic models.
 
 **Acceptance Scenarios**:
 
-1. **Given** the updated schema with TUAS_SOLUTION kind, **When** a TUAS fixture is validated, **Then** validation passes with the solution-specific properties accepted.
-2. **Given** the updated schema with LIGHTWEIGHT_TRACK kind, **When** a lightweight track fixture (e.g., `convert-lightweight-to-track.basic.input.json`) is validated, **Then** validation passes with the minimal track properties (platform_name, positions, start_time, end_time).
-3. **Given** the updated schema with FREQUENCY_RESIDUALS kind, **When** a frequency residuals fixture is validated, **Then** validation passes with null geometry, sensor_name, source_frequency_hz, and residuals array.
-4. **Given** the updated schema with ZONE kind, **When** a zone fixture (e.g., from `export-as-geo-pdf.complex.input.json`) is validated, **Then** validation passes with Polygon geometry, zone_name, and zone_type.
+1. **Given** a TrackFeature with one sensor containing 5 contacts, **When** validated, **Then** the sensor's `name` (required), `base_frequency` (optional), and contacts array are accepted, with each contact's `time` and `bearing` enforced as required.
+2. **Given** a sensor contact with bearing only (no range, no frequency), **When** validated, **Then** validation passes — bearing-only contacts are the common case.
+3. **Given** a sensor contact with an ambiguous bearing, **When** validated, **Then** both `bearing` and `ambiguous_bearing` fields are accepted.
+4. **Given** a TrackFeature with zero sensors, **When** validated, **Then** validation passes — sensors are optional.
 
 ---
 
-### User Story 4 - Schema Adherence Tests Pass (Priority: P1)
+### User Story 3 — Embedded TUA Data (Priority: P2)
 
-A schema maintainer regenerates derived schemas after adding new types. All three schema adherence test strategies must pass: golden fixtures validate, round-trip serialization (Python to JSON to TypeScript to JSON to Python) preserves data, and Pydantic-generated JSON Schema structurally matches LinkML-generated JSON Schema.
+A tool implementer needs to represent Target Uncertainty Area solutions within a track. TUAs are time-indexed ellipsoidal estimates with centre position (absolute or relative), orientation, and major/minor axes.
+
+**Why this priority**: TUA display and analysis tools require this data. TUAs derive their rendered position from the host track, particularly for relative TUAs where the centre is expressed as bearing/range from ownship.
+
+**Independent Test**: Can be tested by creating a TrackFeature with a `tuas` array containing TUA solution entries, then validating against generated Pydantic models.
+
+**Acceptance Scenarios**:
+
+1. **Given** a TrackFeature with a TUA array containing absolute TUA solutions, **When** validated, **Then** each solution's `time`, `centre` (lat/lon), `orientation`, `maxima`, and `minima` are accepted.
+2. **Given** a relative TUA solution with `bearing` and `range` instead of absolute `centre`, **When** validated, **Then** validation passes with the relative positioning fields accepted.
+3. **Given** a TUA solution with null ellipse dimensions (orientation, maxima, minima all null), **When** validated, **Then** validation passes — ellipse data is optional.
+4. **Given** a TrackFeature with zero TUAs, **When** validated, **Then** validation passes — TUAs are optional.
+
+---
+
+### User Story 4 — Hierarchical Tool Selection Model (Priority: P2)
+
+A tool designer needs to specify that their tool requires a sensor contact, a track segment, or a TUA as input. With sensors, segments, and TUAs embedded inside tracks, the selection model must support hierarchical kind paths so the presentation layer can derive selectable types from the track's internal structure.
+
+**Why this priority**: Without hierarchical selection, tools cannot target embedded children. This blocks all sensor analysis, TMA manipulation, and TUA analysis tools.
+
+**Independent Test**: Can be tested by defining tools with hierarchical kind requirements and verifying that the selection matching logic correctly identifies applicable tools given a track with embedded children.
+
+**Acceptance Scenarios**:
+
+1. **Given** a tool with requirement `kind: "TRACK.SENSOR"`, **When** a track containing sensors is selected, **Then** the tool is offered as applicable.
+2. **Given** a tool with requirement `kind: "TRACK.SENSOR.CONTACT"`, **When** a specific sensor contact within a track is selected, **Then** the tool is offered.
+3. **Given** a tool with requirement `kind: "TRACK.SEGMENT"` and `segment_type: "ABSOLUTE_TMA"`, **When** a track containing an AbsoluteTMA segment is selected, **Then** the tool is offered.
+4. **Given** a tool with requirement `kind: "TRACK"`, **When** a track is selected, **Then** existing track-level tools continue to work (backward compatible).
+
+---
+
+### User Story 5 — Schema Adherence Tests Pass (Priority: P1)
+
+A schema maintainer regenerates derived schemas after adding compound track support. All schema adherence test strategies must pass: golden fixtures validate, round-trip serialisation preserves data, and Pydantic-generated JSON Schema structurally matches LinkML-generated JSON Schema.
 
 **Why this priority**: Schema integrity is a constitutional requirement (Article II). Without passing adherence tests, no schema changes can be merged.
 
-**Independent Test**: Can be tested by running the existing schema test suite after regeneration.
-
 **Acceptance Scenarios**:
 
-1. **Given** the updated schemas and regenerated outputs, **When** golden fixture tests run, **Then** all valid fixtures pass validation and all invalid fixtures are rejected.
-2. **Given** a feature instance created with Python Pydantic models, **When** serialized to JSON, parsed by TypeScript types, serialized back to JSON, and parsed back by Pydantic, **Then** the round-trip produces an equivalent object.
-3. **Given** the regenerated Pydantic JSON Schema and the LinkML-generated JSON Schema, **When** structurally compared, **Then** they are equivalent for all new types.
+1. **Given** the updated schemas and regenerated outputs, **When** golden fixture tests run, **Then** all existing fixtures continue to pass (zero regressions) and new compound track fixtures pass.
+2. **Given** a compound TrackFeature with MultiLineString geometry, segments, sensors, and TUAs, **When** round-trip serialised (Python to JSON to TypeScript to JSON to Python), **Then** all data is preserved.
+3. **Given** the regenerated Pydantic JSON Schema and the LinkML-generated JSON Schema, **When** structurally compared, **Then** they are equivalent for all new and modified types.
 
 ---
 
 ### Edge Cases
 
-- What happens when a feature has `kind: "SENSOR"` but is missing required properties like `sensor_name`? Validation must reject it with a clear error indicating which required field is missing.
-- What happens when a FREQUENCY_RESIDUALS feature has null geometry? It must be accepted, since frequency residuals are non-spatial data (similar to SYSTEM kind).
-- What happens when a ZONE feature uses a Polygon geometry that is not a simple closed ring? The schema should accept any valid GeoJSON Polygon, delegating geometric validity checks to consumers.
-- What happens when a TMA_SEGMENT has an unrecognised `segment_type` value? Validation should reject it if segment_type is constrained to an enum, or accept it if left as a free string.
-- What happens when TUAS_SOLUTION shares most properties with TMA_SEGMENT? The schema should define TUAS_SOLUTION as a distinct kind even if its properties overlap, to preserve semantic clarity for tool consumers.
+- **Mixed geometry types on TrackFeature**: A TrackFeature uses LineString for simple tracks or MultiLineString for compound tracks. If `segments` array is present, geometry MUST be MultiLineString. If geometry is LineString, `segments` MUST be absent and the flat `positions` array is used.
+- **Segment array / geometry coordinate count mismatch**: `segments.length` must equal the number of LineStrings in MultiLineString `coordinates`. Validation must reject mismatches.
+- **Positions array / coordinate count mismatch per segment**: `segments[i].positions.length` must equal the number of coordinate pairs in `geometry.coordinates[i]`. Validation must reject mismatches.
+- **Sensor contact with no bearing**: Invalid — `bearing` is required on every contact. Validation must reject.
+- **TUA with neither absolute centre nor relative bearing/range**: Invalid — one positioning mode must be provided. Validation must reject.
+- **Empty sensors or TUAs array**: Permitted — an empty array is equivalent to the field being absent.
+- **Existing simple TrackFeature fixtures**: Must continue to validate without modification. The compound model is additive.
 
 ## Requirements *(mandatory)*
 
-### Functional Requirements
+### Functional Requirements — Compound Track Geometry
 
-- **FR-001**: Schema MUST add 7 new values to `FeatureKindEnum`: `SENSOR`, `TMA_SEGMENT`, `TRACK_SEGMENT`, `TUAS_SOLUTION`, `LIGHTWEIGHT_TRACK`, `FREQUENCY_RESIDUALS`, `ZONE`.
-- **FR-002**: Schema MUST define `SensorFeature` and `SensorProperties` with required properties: `kind` (= "SENSOR"), `sensor_name`, `sensor_type`, `host_track_id`. Optional properties: `host_platform_name`, `cuts` (array of sensor contact records with `time`, `bearing`, and optional `frequency`, `range`, `origin`, `label`).
-- **FR-003**: Schema MUST define `TMASegmentFeature` and `TMASegmentProperties` with required properties: `kind` (= "TMA_SEGMENT"), `segment_type`, `parent_track_id`, `start_time`, `end_time`. Optional properties: `platform_id`, `platform_name`, `track_type`, `course`, `speed`, `positions`.
-- **FR-004**: Schema MUST define `TrackSegmentFeature` and `TrackSegmentProperties` with required properties: `kind` (= "TRACK_SEGMENT"), `segment_type`, `parent_track_id`, `start_time`, `end_time`. Optional properties: `positions`, `style`.
-- **FR-005**: Schema MUST define `TUASSolutionFeature` and `TUASSolutionProperties` with required properties: `kind` (= "TUAS_SOLUTION"), `parent_track_id`, `start_time`, `end_time`. Optional properties: `platform_id`, `platform_name`, `course`, `speed`, `positions`.
-- **FR-006**: Schema MUST define `LightweightTrackFeature` and `LightweightTrackProperties` with required properties: `kind` (= "LIGHTWEIGHT_TRACK"), `platform_name`, `start_time`, `end_time`, `positions`. Optional properties: `style`.
-- **FR-007**: Schema MUST define `FrequencyResidualsFeature` and `FrequencyResidualsProperties` with required properties: `kind` (= "FREQUENCY_RESIDUALS"), `sensor_name`, `source_frequency_hz`, `residuals` (array of records with `time` and `residual_hz`). Geometry MUST allow null.
-- **FR-008**: Schema MUST define `ZoneFeature` and `ZoneProperties` with required properties: `kind` (= "ZONE"), `zone_name`. Optional properties: `zone_type`, `style`.
-- **FR-009**: All new Feature classes MUST follow the existing GeoJSON Feature pattern: `type` (= "Feature"), `id` (unique identifier), `geometry` (appropriate GeoJSON geometry type), `properties` (typed properties class).
-- **FR-010**: Derived schemas MUST be regenerated after changes: Pydantic models, JSON Schema, and TypeScript types.
-- **FR-011**: All existing schema adherence tests MUST continue to pass after the additions (no regressions).
-- **FR-012**: New golden fixture files MUST be created for each new Feature type, containing at least one valid and one invalid example per type.
-- **FR-013**: Each new kind's `SensorContact` record type (used in SensorProperties.cuts) and `FrequencyResidual` record type (used in FrequencyResidualsProperties.residuals) MUST be defined as reusable schema classes.
+- **FR-001**: `TrackFeature.geometry` MUST accept either LineString (simple track) or MultiLineString (compound track) as a union type.
+- **FR-002**: Schema MUST define a MultiLineString geometry class with `type: "MultiLineString"` and nested coordinate arrays.
+- **FR-003**: `TrackProperties` MUST define an optional `segments` array of segment metadata objects. When present, geometry MUST be MultiLineString. When absent, geometry MUST be LineString and the existing flat `positions` array is used.
+- **FR-004**: Segment metadata MUST include required properties: `segment_type` (enum), `start_time`, `end_time`, `positions` (array of timestamped positions).
+- **FR-005**: Schema MUST define a segment type enum with values: `TRACK`, `ABSOLUTE_TMA`, `RELATIVE_TMA`, `DYNAMIC_INFILL`.
+- **FR-006**: Segment metadata MUST include optional properties common to all segment types: `name`, `style`.
+- **FR-007**: Segment metadata MUST include optional TMA-specific properties: `course` (degrees), `speed` (knots), `base_frequency` (Hz). These are meaningful for TMA segment types and ignored for plain TRACK segments.
+- **FR-008**: Segment metadata for RELATIVE_TMA segments MUST include: `host_track_id` (required — the track this solution is relative to), `host_sensor_name` (optional), `offset_bearing` (degrees), `offset_range` (metres).
+- **FR-009**: Segment metadata for DYNAMIC_INFILL segments MUST include: `before_leg` (required — name of preceding TMA leg), `after_leg` (required — name of following TMA leg).
+- **FR-010**: The parallel array invariant MUST be enforced: `segments[i].positions.length` corresponds to the number of coordinate pairs in `geometry.coordinates[i]`.
+
+### Functional Requirements — Embedded Sensors
+
+- **FR-011**: `TrackProperties` MUST define an optional `sensors` array of sensor data objects.
+- **FR-012**: Sensor data MUST include required properties: `name` (string).
+- **FR-013**: Sensor data MUST include optional properties: `base_frequency` (Hz), `offset` (sensor offset distance from host platform, in metres), `worm_in_hole` (boolean — display mode).
+- **FR-014**: Sensor data MUST include a `contacts` array of sensor contact objects.
+- **FR-015**: Sensor contact MUST include required properties: `time` (datetime), `bearing` (degrees 0-360).
+- **FR-016**: Sensor contact MUST include optional properties: `range` (metres), `frequency` (Hz), `ambiguous_bearing` (degrees 0-360), `label` (string), `comment` (string).
+- **FR-017**: Sensors have no independent geometry. Rendering (origin position from host track at contact time, bearing line to viewport edge) is a presentation concern, not a schema concern.
+
+### Functional Requirements — Embedded TUAs
+
+- **FR-018**: `TrackProperties` MUST define an optional `tuas` array of TUA data objects. Each entry represents a named collection of TUA solutions.
+- **FR-019**: TUA data MUST include required properties: `name` (string), `host_track_name` (string — the track this TUA set relates to).
+- **FR-020**: TUA data MUST include a `solutions` array of TUA solution objects.
+- **FR-021**: TUA solution MUST include required properties: `time` (datetime), `label` (string).
+- **FR-022**: TUA solution MUST include optional absolute positioning: `centre_lat` (degrees), `centre_lon` (degrees).
+- **FR-023**: TUA solution MUST include optional relative positioning: `bearing` (degrees), `range` (metres). Relative positioning is resolved against the host track's position at solution time.
+- **FR-024**: TUA solution MUST include optional ellipse properties: `orientation` (degrees from north), `maxima` (metres — semi-major axis), `minima` (metres — semi-minor axis). All three may be null when ellipse data is unavailable.
+- **FR-025**: TUA solution MUST include optional properties: `course` (degrees), `speed` (knots), `depth` (metres).
+- **FR-026**: TUAs have no independent geometry. Rendering (ellipse at resolved position) is a presentation concern.
+
+### Functional Requirements — Hierarchical Tool Selection
+
+- **FR-027**: `SelectionRequirement.kind` MUST accept dot-delimited hierarchical kind paths (e.g., `TRACK.SENSOR`, `TRACK.SENSOR.CONTACT`, `TRACK.SEGMENT`).
+- **FR-028**: The presentation layer MUST derive selectable types from track structure — when a track contains sensors, the selection model must expose `TRACK.SENSOR` as a matchable kind.
+- **FR-029**: Existing flat kind values (e.g., `TRACK`, `POINT`, `CIRCLE`) MUST continue to work unchanged.
+- **FR-030**: `SelectionRequirement` for `TRACK.SEGMENT` MAY include an optional `segment_type` filter to match specific segment types.
+
+### Functional Requirements — Schema Integrity
+
+- **FR-031**: All new and modified types MUST follow the schema-first development approach. Generated models and types are derived from the master schema.
+- **FR-032**: Derived schemas MUST be regenerated after changes.
+- **FR-033**: All existing schema adherence tests MUST continue to pass (zero regressions).
+- **FR-034**: New golden fixture files MUST be created for: simple track (backward compatible), compound track (MultiLineString with mixed segment types), track with sensors, track with TUAs, track with all embedded children.
 
 ### Key Entities
 
-- **SensorFeature**: Represents sensor contact data (bearings, ranges, frequencies) associated with a host platform. Uses LineString geometry following the sensor's spatial extent. Contains an array of sensor contact records ("cuts") with time-indexed measurements.
-- **TMASegmentFeature**: Represents a Target Motion Analysis segment with estimated course and speed. Uses LineString geometry. Can be ABSOLUTE (geographic coordinates) or RELATIVE (relative to ownship). Always references a parent track.
-- **TrackSegmentFeature**: Represents a sub-segment of a track, typically infill between known positions. Uses LineString geometry. References a parent track and includes a segment type classifier.
-- **TUASSolutionFeature**: Represents a Target Under Active Sonar solution. Uses LineString geometry. Structurally similar to TMA segments but semantically distinct (active sonar vs. passive bearing analysis).
-- **LightweightTrackFeature**: A simplified track representation with fewer required properties than a full TrackFeature. Uses LineString geometry. Useful as an intermediate format before conversion to a full track.
-- **FrequencyResidualsFeature**: Non-spatial data representing frequency calibration residuals. Uses null geometry. Contains an array of time-indexed residual values relative to a source frequency.
-- **ZoneFeature**: A spatial zone or area used for sensor analysis. Uses Polygon geometry. Includes a zone name and type classifier.
-- **SensorContact**: A single sensor measurement record within a SensorFeature's cuts array. Contains time, bearing, and optional frequency, range, origin coordinates, and label.
-- **FrequencyResidual**: A single frequency residual record within a FrequencyResidualsFeature's residuals array. Contains time and residual value in Hz.
+- **MultiLineString Geometry**: GeoJSON MultiLineString geometry type. Each LineString represents one track segment.
+- **SegmentMetadata**: Per-segment metadata for compound tracks. Contains segment type discriminator, temporal extent, positions array, and type-specific properties (TMA course/speed, relative offset, infill leg references).
+- **SegmentTypeEnum**: Discriminator for track segment types: `TRACK`, `ABSOLUTE_TMA`, `RELATIVE_TMA`, `DYNAMIC_INFILL`.
+- **SensorData**: A named sensor with metadata and an array of contacts. Embedded within `TrackProperties.sensors`. Contains sensor name, optional base frequency, optional offset, and contacts array.
+- **SensorContact**: A single sensor measurement. Contains time, bearing (required), and optional range, frequency, ambiguous bearing, label, comment.
+- **TUAData**: A named collection of TUA solutions associated with a host track. Embedded within `TrackProperties.tuas`.
+- **TUASolution**: A single TUA estimate at a point in time. Contains time, label, positioning (absolute or relative), optional ellipse parameters, and optional kinematic estimates.
 
 ### Assumptions
 
-- **Geometry types**: SensorFeature, TMASegmentFeature, TrackSegmentFeature, TUASSolutionFeature, and LightweightTrackFeature use LineString geometry (consistent with golden I/O fixtures). ZoneFeature uses Polygon geometry. FrequencyResidualsFeature uses null geometry.
-- **Segment type values**: TMASegmentProperties.segment_type accepts at minimum ABSOLUTE and RELATIVE. TrackSegmentProperties.segment_type accepts values like INFILL, MANUAL, INTERPOLATED. These will be modelled as enums if the set is closed, or as free strings if extensibility is needed.
-- **TUAS_SOLUTION as distinct kind**: Although structurally similar to TMA_SEGMENT, TUAS_SOLUTION is kept as a separate kind to preserve the semantic distinction between active sonar solutions and passive bearing TMA.
-- **ZONE is distinct from CIRCLE/RECTANGLE**: ZONE represents an analytical region (e.g., operating area, exclusion zone) with arbitrary polygon boundaries, which is semantically different from the existing annotation shapes.
-- **No changes to TimestampedPosition**: Inter-feature properties (bearing, range, frequency) on position records are out of scope. The `positions` arrays in new types use inline coordinate/time records rather than extending `TimestampedPosition`.
-- **Schema file organisation**: New types will be added to existing schema files (geojson.yaml for Feature classes, common.yaml for the enum) rather than creating new schema files, to follow the existing pattern. Supporting record types (SensorContact, FrequencyResidual) and any new enums will be added to common.yaml.
+- **Geometry union on TrackFeature**: The schema's union construct or equivalent will be used to allow TrackFeature.geometry to accept either LineString or MultiLineString. If the schema language does not cleanly support this, an abstract geometry base or runtime validation will be used.
+- **Parallel array enforcement**: The coordinate-count / positions-count invariant is documented as a schema constraint. If the schema language cannot express cross-field cardinality rules, enforcement will be in validation code and tested via golden fixtures.
+- **No changes to FeatureKindEnum**: No new enum values are added. All new concepts are embedded within TrackFeature.
+- **TUA positioning modes**: A TUASolution has either absolute positioning (centre_lat/centre_lon) or relative positioning (bearing/range), never both. This is a logical constraint documented in the schema description.
+- **Backward compatibility**: Existing simple TrackFeature instances with LineString geometry and flat `positions` array remain valid. The compound model is purely additive.
 
 ### Dependencies
 
-- Existing schema infrastructure (LinkML, Pydantic, JSON Schema, TypeScript generators) must be functional.
-- 151 golden I/O fixtures in `shared/tools/` provide the validation targets.
-- Feature 049 (tool documentation model) must be at least partially complete to provide the fixture format context.
+- Existing schema infrastructure (generators for Pydantic, JSON Schema, TypeScript) must be functional.
+- Feature 053 (hierarchical selection paths) provides the selection path mechanism that the hierarchical tool selection model builds upon.
+- Existing golden I/O fixtures in `shared/tools/` must not be broken by the changes.
+
+### Items Out of Scope
+
+- **Frequency residuals**: These are STAC assets (separate documents), not GeoJSON features. Addressed in a separate spec.
+- **Lightweight tracks**: Dropped. The concept saw limited adoption in legacy Debrief.
+- **Zones**: Existing annotation types (CIRCLE, RECTANGLE) cover the zone use case. No new kind needed.
+- **Sensor rendering logic**: How bearing lines are drawn from host track position to viewport edge is a frontend concern.
+- **TUA rendering logic**: How ellipses are drawn at resolved positions is a frontend concern.
+- **SATC (Semi-Automated Track Construction)**: The SATC algorithm is a calculation service concern. SATC outputs will conform to the compound track model.
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001**: All 7 new `FeatureKindEnum` values are present and usable in feature definitions.
-- **SC-002**: Each of the 7 new Feature types has a corresponding Properties class with required and optional fields matching the golden I/O fixture structures.
-- **SC-003**: 100% of existing schema adherence tests pass after the changes (zero regressions).
-- **SC-004**: At least one valid and one invalid golden fixture per new Feature type validates correctly against the generated Pydantic models.
-- **SC-005**: Round-trip serialization (Python Pydantic to JSON to TypeScript to JSON to Python Pydantic) preserves all data for each new Feature type.
-- **SC-006**: The 30+ tools that depend on these kinds can reference the new types in their implementations without schema validation errors.
-- **SC-007**: Pydantic-generated JSON Schema and LinkML-generated JSON Schema are structurally equivalent for all new types.
+- **SC-001**: TrackFeature supports both LineString (simple) and MultiLineString (compound) geometry with appropriate validation.
+- **SC-002**: Segment metadata captures all legacy segment types (TrackSegment, AbsoluteTMA, RelativeTMA, DynamicInfill) with their type-specific properties.
+- **SC-003**: Sensor data and sensor contact types capture all domain-relevant fields from the legacy sensor model.
+- **SC-004**: TUA data and TUA solution types capture both absolute and relative positioning with optional ellipse parameters.
+- **SC-005**: 100% of existing schema adherence tests pass after changes (zero regressions).
+- **SC-006**: At least one golden fixture per new structure (compound track, sensors, TUAs) validates correctly.
+- **SC-007**: Round-trip serialisation preserves all data for compound TrackFeature instances.
+- **SC-008**: Hierarchical kind paths are accepted in selection requirements and backward compatible with existing flat kind values.
+- **SC-009**: No new `FeatureKindEnum` values are added — the enum remains unchanged.

@@ -1,7 +1,8 @@
-# Specification Quality Checklist: Add Missing FeatureKindEnum Values
+# Specification Quality Checklist: Compound Track Model with Embedded Children
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-02-07
+**Revised**: 2026-02-08
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -33,4 +34,5 @@
 
 - All items pass validation. Spec is ready for `/speckit.clarify` or `/speckit.plan`.
 - No UI section included (this is a schema/data-modelling feature with no visual components).
-- Assumptions section documents key design decisions that may surface during clarification (e.g., segment_type as enum vs. free string, schema file organisation).
+- Spec revised 2026-02-08 to reflect compound track model (embedded children) replacing original flat FeatureKindEnum approach. See `docs/062-compound-track-model-srd.md` for design rationale.
+- Key design change: zero new FeatureKindEnum values. Sensors, segments, and TUAs are embedded within TrackFeature. Frequency residuals become STAC assets. Lightweight tracks dropped. Zones covered by existing annotations.
