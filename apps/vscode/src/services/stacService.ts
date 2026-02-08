@@ -31,6 +31,8 @@ export interface AssociatedFile {
   viewerType?: string;
   /** File format (e.g., 'json', 'geojson', 'csv') */
   format?: string;
+  /** File modification time (epoch ms) for chronological ordering */
+  mtime?: number;
 }
 import type { Plot, Track, ReferenceLocation } from '../types/plot';
 import type { GeoJSONFeature } from '../types/import';
@@ -566,7 +568,24 @@ export class StacService {
         return [];
       }
 
-      return this.getResultFilesFromItem(item);
+      const results = this.getResultFilesFromItem(item);
+
+      // Populate mtime from filesystem for chronological ordering
+      const itemDir = path.dirname(fullPath);
+      for (const result of results) {
+        try {
+          const filePath = path.join(itemDir, result.path);
+          const stat = fs.statSync(filePath);
+          result.mtime = stat.mtimeMs;
+        } catch {
+          // File may not exist on disk; leave mtime undefined
+        }
+      }
+
+      // Sort by mtime descending (most recent first), files without mtime go last
+      results.sort((a, b) => (b.mtime ?? 0) - (a.mtime ?? 0));
+
+      return results;
     } catch (err) {
       console.warn(`[debrief] Failed to load result files: ${err instanceof Error ? err.message : String(err)}`);
       return [];

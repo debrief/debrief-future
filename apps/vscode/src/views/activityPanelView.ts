@@ -328,8 +328,10 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     const existingPaths = new Set(resultFiles.map((rf) => rf.path));
     const runtimeResults = this._resultFiles.filter((rf) => !existingPaths.has(rf.path));
 
-    // Loaded files first, then any runtime-added results not in loaded set
-    this._resultFiles = [...resultFiles, ...runtimeResults];
+    // Merge loaded and runtime results, then sort by mtime descending (most recent first)
+    const merged = [...resultFiles, ...runtimeResults];
+    merged.sort((a, b) => (b.mtime ?? 0) - (a.mtime ?? 0));
+    this._resultFiles = merged;
     this._resultsChanged = resultFiles.length > 0;
     this._sendLayersUpdate();
   }

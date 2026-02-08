@@ -15,9 +15,10 @@
 | isResultAsset | 5 | Result asset identification |
 | assetToAssociatedFile | 4 | STAC asset transformation |
 | getResultFilesFromItem | 6 | Result extraction from item |
-| loadResultFiles | 3 | Async loading with store |
+| loadResultFiles | 5 | Async loading with store, mtime sorting |
+| getResultFilesFromItem (perf) | 1 | Performance with 50+ assets |
 
-**Total New Tests**: 24
+**Total New Tests**: 28
 
 ### Test Categories
 
@@ -58,6 +59,11 @@
    - Loads from store and item path
    - Returns empty when item not found
    - Returns empty on load error
+   - Populates mtime from filesystem and sorts by mtime descending
+   - Handles missing files gracefully when populating mtime
+
+7. **getResultFilesFromItem - performance**
+   - Handles 50+ assets (80 total) in under 500ms
 
 ## Acceptance Criteria Coverage
 
@@ -70,6 +76,8 @@
 | FR-005: Consistent format | assetToAssociatedFile | PASS |
 | FR-006: Handle missing | getResultFilesFromItem empty | PASS |
 | FR-007: Skip corrupted | getResultFilesFromItem graceful | PASS |
+| FR-008: Chronological order | loadResultFiles mtime sort | PASS |
+| SC-004: < 500ms for 50 files | Performance test (80 assets) | PASS |
 
 ## Edge Cases Tested
 
@@ -79,6 +87,9 @@
 - Assets without result role
 - Mixed result and non-result assets
 - Load errors (file not found, permission denied)
+- Chronological ordering by modification time
+- Files with missing mtime sorted to end
+- Performance with 80 assets (60 results + 20 sources)
 
 ## Run Instructions
 
