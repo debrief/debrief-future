@@ -110,7 +110,7 @@ def _feature_name(feature: dict[str, Any], fallback: str) -> str:
 @tool(
     name="range-bearing",
     description="Calculate range and bearing time-series between two features (tracks, points, polygons)",
-    input_kinds=["track", "shape"],
+    input_kinds=["TRACK", "SHAPE"],
     output_kind="dataset/range_bearing_series",
     context_type=ContextType.MULTI,
     parameters=[],

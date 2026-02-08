@@ -28,7 +28,7 @@ class ContextType(StrEnum):
 
     Values:
         SINGLE: Exactly one feature selected
-        MULTI: Two or more features selected
+        MULTI: One or more features selected
         REGION: Geographic bounds (bbox or polygon)
         NONE: No selection required
     """
@@ -166,8 +166,8 @@ class SelectionContext(BaseModel):
     def validate_context_requirements(self) -> SelectionContext:
         if self.type == ContextType.SINGLE and len(self.features) != 1:
             raise ValueError("features must have exactly 1 item when type is 'single'")
-        if self.type == ContextType.MULTI and len(self.features) < 2:
-            raise ValueError("features must have 2+ items when type is 'multi'")
+        if self.type == ContextType.MULTI and len(self.features) < 1:
+            raise ValueError("features must have 1+ items when type is 'multi'")
         if self.type == ContextType.REGION and self.bounds is None:
             raise ValueError("bounds must be provided when type is 'region'")
         return self
@@ -240,3 +240,93 @@ class Tool(BaseModel):
             "context_type": self.context_type.value,
             "parameters": [p.model_dump() for p in self.parameters],
         }
+
+    def to_mcp_tool(self) -> dict[str, Any]:
+        """
+        Convert tool to MCP tool format with Debrief-specific annotations.
+
+        Returns:
+            MCP tool definition with Debrief annotations for selection requirements,
+            category, version, and output kind.
+        """
+        # Generate selection requirements from context_type and input_kinds
+        selection_requirements = self._build_selection_requirements()
+
+        # Derive category from output_kind
+        category = self._derive_category()
+
+        # Build parameter schema from tool parameters
+        param_properties = {}
+        for param in self.parameters:
+            param_schema = self._param_to_json_schema(param)
+            param_properties[param.name] = param_schema
+
+        return {
+            "name": self.name,
+            "description": self.description,
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "features": {
+                        "type": "array",
+                        "items": {"type": "object"},
+                        "description": "GeoJSON features to process",
+                    },
+                    "params": {
+                        "type": "object",
+                        "properties": param_properties,
+                        "description": "Tool-specific parameters",
+                    },
+                },
+            },
+            "annotations": {
+                "debrief:selectionRequirements": selection_requirements,
+                "debrief:category": category,
+                "debrief:version": self.version,
+                "debrief:outputKind": self.output_kind,
+            },
+        }
+
+    def _build_selection_requirements(self) -> list[dict[str, Any]]:
+        """Build selection requirements from context_type and input_kinds."""
+        if self.context_type == ContextType.SINGLE:
+            return [{"kind": self.input_kinds[0], "min": 1, "max": 1}]
+        elif self.context_type == ContextType.MULTI:
+            return [{"kind": k, "min": 1} for k in self.input_kinds]
+        elif self.context_type == ContextType.REGION:
+            return [{"kind": "REGION", "min": 1, "max": 1}]
+        else:  # ContextType.NONE
+            return []
+
+    def _derive_category(self) -> str:
+        """Derive category from output_kind."""
+        parts = self.output_kind.split("/")
+        if parts[0] == "mutation" and len(parts) >= 3:
+            # "mutation/track/styled" → "track/styling"
+            return "/".join(parts[1:-1])
+        elif parts[0] == "dataset":
+            return "analysis"
+        elif len(parts) >= 2:
+            # "track/statistics" → "track"
+            return parts[0]
+        return "general"
+
+    def _param_to_json_schema(self, param: ToolParameter) -> dict[str, Any]:
+        """Convert a ToolParameter to JSON Schema property."""
+        schema: dict[str, Any] = {"description": param.description}
+
+        if param.type == "string":
+            schema["type"] = "string"
+        elif param.type == "number":
+            schema["type"] = "number"
+        elif param.type == "boolean":
+            schema["type"] = "boolean"
+        elif param.type == "enum":
+            schema["type"] = "string"
+            if param.choices:
+                schema["enum"] = param.choices
+
+        if param.default is not None:
+            schema["default"] = param.default
+
+        return schema

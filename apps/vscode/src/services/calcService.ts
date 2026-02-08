@@ -6,6 +6,7 @@
  * is unavailable.
  *
  * Feature: 038-context-tool-vscode - Updated to return Tool[] from @debrief/schemas
+ * Feature: 052-tool-api-integration - listTools() now uses MCP adapter (T017)
  */
 
 import * as vscode from 'vscode';
@@ -20,6 +21,7 @@ import type {
   ToolExecutionResult,
   ResultLayer,
   ToolProvenance,
+  MCPToolDefinition,
   MCPToolResponse,
   MCPErrorResponse,
 } from '../types/tool';
@@ -27,6 +29,7 @@ import {
   createToolExecution,
   createDefaultResultStyle,
 } from '../types/tool';
+import { adaptMCPToolsForMatching } from './mcpToolAdapter';
 import type { MapPanel } from '../webview/mapPanel';
 
 const execFileAsync = promisify(execFile);
@@ -165,6 +168,14 @@ export class CalcService {
    *
    * Returns Tool[] compatible with ToolMatchService.
    * Tools use the SelectionRequirement format from @debrief/schemas.
+   *
+   * The method first attempts to fetch MCP tool definitions (with Debrief
+   * annotations) and adapts them via the shared mcpToolAdapter. This ensures
+   * the same adapter logic is used as in the web-shell frontend. If MCP
+   * tool definitions are not available, it falls back to the legacy Python
+   * registry fetch.
+   *
+   * Feature: 052-tool-api-integration (T017)
    */
   async listTools(): Promise<Tool[]> {
     // Check cache
@@ -176,8 +187,15 @@ export class CalcService {
     await this.connect();
 
     try {
-      // Note: In a real implementation, this would call the MCP server
-      const tools = await this.fetchToolsFromMcp();
+      // Try MCP tools/list with annotations first (052-tool-api-integration)
+      let tools: Tool[];
+      try {
+        const mcpToolDefs = await this.fetchMCPToolDefinitions();
+        tools = adaptMCPToolsForMatching(mcpToolDefs);
+      } catch {
+        // Fall back to legacy Python registry fetch
+        tools = await this.fetchToolsFromMcp();
+      }
 
       // Update cache
       this.toolCache = {
@@ -439,7 +457,53 @@ export class CalcService {
   }
 
   /**
-   * Fetch tools from debrief-calc Python registry.
+   * Fetch MCP tool definitions with Debrief annotations from debrief-calc.
+   *
+   * Returns MCPToolDefinition[] in the standard MCP tools/list format with
+   * debrief:selectionRequirements annotations. These are then adapted via
+   * the shared mcpToolAdapter for use with ToolMatchService.
+   *
+   * Feature: 052-tool-api-integration (T017)
+   */
+  private async fetchMCPToolDefinitions(): Promise<MCPToolDefinition[]> {
+    const pythonPath = this.getPythonPath();
+    const script = `
+import json
+from debrief_calc.registry import registry
+from debrief_calc.models import ContextType
+tools = []
+for t in registry.list_all():
+    ctx = t.context_type
+    if ctx == ContextType.REGION:
+        reqs = [{"kind": "REGION", "min": 1, "max": 1}]
+    elif ctx == ContextType.NONE:
+        reqs = []
+    elif ctx == ContextType.SINGLE:
+        reqs = [{"kind": k.upper(), "min": 1, "max": 1} for k in t.input_kinds]
+    else:
+        reqs = [{"kind": k.upper(), "min": 1} for k in t.input_kinds]
+    entry = {
+        "name": t.name,
+        "description": t.description,
+        "inputSchema": {"type": "object", "properties": {}},
+        "annotations": {
+            "debrief:selectionRequirements": reqs,
+            "debrief:category": getattr(t, "category", "general"),
+            "debrief:version": t.version,
+            "debrief:outputKind": getattr(t, "output_kind", "unknown")
+        }
+    }
+    tools.append(entry)
+print(json.dumps(tools))
+`;
+    const { stdout } = await execFileAsync(pythonPath, ['-c', script], {
+      timeout: 10000,
+    });
+    return JSON.parse(stdout.trim()) as MCPToolDefinition[];
+  }
+
+  /**
+   * Fetch tools from debrief-calc Python registry (legacy path).
    *
    * Returns Tool[] with SelectionRequirement format for ToolMatchService.
    */
@@ -458,17 +522,11 @@ for t in registry.list_all():
     elif ctx == ContextType.NONE:
         reqs = []
     else:
-        multi_kind = ctx == ContextType.MULTI and len(t.input_kinds) > 1
         if ctx == ContextType.SINGLE:
-            min_count, max_count = 1, 1
-        elif multi_kind:
-            min_count, max_count = 0, 99
+            reqs = [{"kind": k.upper(), "min": 1, "max": 1} for k in t.input_kinds]
         else:
-            min_count, max_count = 2, 99
-        reqs = [{"kind": k.upper(), "min": min_count, "max": max_count} for k in t.input_kinds]
+            reqs = [{"kind": k.upper(), "min": 1} for k in t.input_kinds]
     entry = {"id": t.name, "name": t.name, "description": t.description, "version": t.version, "requirements": reqs}
-    if multi_kind:
-        entry["minFeatures"] = 2
     tools.append(entry)
 print(json.dumps(tools))
 `;
@@ -504,7 +562,7 @@ print(json.dumps(tools))
           properties: {
             id: track.id,
             name: track.name,
-            kind: 'track',
+            kind: 'TRACK',
             platformType: track.platformType,
             times: track.times,
             startTime: track.startTime,
@@ -522,7 +580,7 @@ print(json.dumps(tools))
           properties: {
             id: location.id,
             name: location.name,
-            kind: 'location',
+            kind: 'LOCATION',
             locationType: location.locationType,
           },
         });
@@ -537,7 +595,7 @@ print(json.dumps(tools))
           geometry: shape.geometry,
           properties: {
             ...props,
-            kind: (props.kind as string) ?? 'shape',
+            kind: (props.kind as string) ?? 'SHAPE',
           },
         });
         continue;

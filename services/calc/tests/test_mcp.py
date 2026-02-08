@@ -38,7 +38,7 @@ class TestMCPToolExecution:
         """Test context building for single-feature tools."""
         from debrief_calc.models import ContextType, SelectionContext
 
-        features = [{"type": "Feature", "properties": {"kind": "track"}, "geometry": None}]
+        features = [{"type": "Feature", "properties": {"kind": "TRACK"}, "geometry": None}]
         context = SelectionContext(type=ContextType.SINGLE, features=features)
 
         assert context.type == ContextType.SINGLE
@@ -49,8 +49,8 @@ class TestMCPToolExecution:
         from debrief_calc.models import ContextType, SelectionContext
 
         features = [
-            {"type": "Feature", "properties": {"kind": "track"}, "geometry": None},
-            {"type": "Feature", "properties": {"kind": "track"}, "geometry": None},
+            {"type": "Feature", "properties": {"kind": "TRACK"}, "geometry": None},
+            {"type": "Feature", "properties": {"kind": "TRACK"}, "geometry": None},
         ]
         context = SelectionContext(type=ContextType.MULTI, features=features)
 

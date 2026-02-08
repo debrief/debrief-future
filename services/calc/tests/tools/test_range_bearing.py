@@ -32,7 +32,7 @@ def _make_track(name, coords, times):
     return {
         "type": "Feature",
         "id": name,
-        "properties": {"name": name, "kind": "track", "times": times},
+        "properties": {"name": name, "kind": "TRACK", "times": times},
         "geometry": {"type": "LineString", "coordinates": coords},
     }
 
@@ -41,7 +41,7 @@ def _make_point(name, lon, lat):
     return {
         "type": "Feature",
         "id": name,
-        "properties": {"name": name, "kind": "point"},
+        "properties": {"name": name, "kind": "POINT"},
         "geometry": {"type": "Point", "coordinates": [lon, lat]},
     }
 
@@ -50,7 +50,7 @@ def _make_polygon(name, ring):
     return {
         "type": "Feature",
         "id": name,
-        "properties": {"name": name, "kind": "shape"},
+        "properties": {"name": name, "kind": "SHAPE"},
         "geometry": {"type": "Polygon", "coordinates": [ring]},
     }
 
@@ -186,7 +186,7 @@ class TestRangeBearingEdgeCases:
         feature = {
             "type": "Feature",
             "id": "track-1",
-            "properties": {"kind": "track"},
+            "properties": {"kind": "TRACK"},
             "geometry": {"type": "LineString", "coordinates": [[-4.0, 50.0], [-3.9, 50.1]]},
         }
         context = SelectionContext(type=ContextType.MULTI, features=[feature, feature])
@@ -197,13 +197,13 @@ class TestRangeBearingEdgeCases:
         feature1 = {
             "type": "Feature",
             "id": "track-1",
-            "properties": {"kind": "track", "times": ["2024-01-01T00:00:00Z"]},
+            "properties": {"kind": "TRACK", "times": ["2024-01-01T00:00:00Z"]},
             "geometry": {"type": "LineString", "coordinates": []},
         }
         feature2 = {
             "type": "Feature",
             "id": "track-2",
-            "properties": {"kind": "track", "times": ["2024-01-01T00:00:00Z"]},
+            "properties": {"kind": "TRACK", "times": ["2024-01-01T00:00:00Z"]},
             "geometry": {"type": "LineString", "coordinates": [[-4.0, 50.0]]},
         }
         context = SelectionContext(type=ContextType.MULTI, features=[feature1, feature2])

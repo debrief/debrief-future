@@ -1,10 +1,13 @@
 /**
  * Mock calc service for web-shell.
- * Implements track-length and bounding-box tools using JavaScript calculations.
+ * Implements track-length and bounding-box tools using JavaScript calculations,
+ * plus styling tools from the real toolService (set-track-color, apply-symbol-style,
+ * label-interval, symbol-interval).
  */
 
 import type { Feature, LineString, Position, Polygon } from 'geojson';
 import type { ToolsPanelItem } from '@debrief/components';
+import { listTools, executeTool } from '../services/toolService';
 
 /** Feature with properties containing an id */
 interface IdentifiableFeature extends Feature {
@@ -207,12 +210,35 @@ export interface MockCalcService {
 }
 
 /**
+ * Convert kebab-case to Title Case for display.
+ */
+function formatToolName(name: string): string {
+  return name
+    .split('-')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
+/**
+ * Check if any selected features are tracks (by kind property).
+ */
+function hasTrackFeatures(features: Feature[]): boolean {
+  return features.some(f =>
+    (f.properties as Record<string, unknown> | null)?.kind === 'TRACK'
+  );
+}
+
+/** IDs of styling tools from toolService */
+const stylingToolIds = new Set(listTools().map(t => t.name));
+
+/**
  * Create a mock calc service instance.
  */
 export function createMockCalcService(): MockCalcService {
   return {
     getTools(selectedFeatures: Feature[]): ToolsPanelItem[] {
-      return TOOLS.map(tool => {
+      // Built-in analysis tools
+      const builtinTools = TOOLS.map(tool => {
         const { applicable, explanation } = getToolApplicability(
           tool,
           selectedFeatures as IdentifiableFeature[]
@@ -225,9 +251,41 @@ export function createMockCalcService(): MockCalcService {
           explanation,
         };
       });
+
+      // Styling tools from toolService
+      const hasTracks = hasTrackFeatures(selectedFeatures);
+      const stylingTools: ToolsPanelItem[] = listTools().map(def => ({
+        id: def.name,
+        name: formatToolName(def.name),
+        description: def.description,
+        applicable: hasTracks,
+        explanation: hasTracks ? undefined : 'Requires at least 1 track selected',
+      }));
+
+      return [...builtinTools, ...stylingTools];
     },
 
     runTool(toolId: string, selectedFeatures: Feature[]): ToolResult {
+      // Delegate styling tools to toolService
+      if (stylingToolIds.has(toolId)) {
+        try {
+          // Provide sensible default params for tools that require them
+          const defaultParams: Record<string, Record<string, unknown>> = {
+            'set-track-color': { color: '#ff0000' },
+            'apply-symbol-style': { symbol: 'circle' },
+          };
+          const params = defaultParams[toolId] ?? {};
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const response = executeTool(toolId, selectedFeatures as any, params);
+          const item = response.content[0];
+          const label = item?.annotations?.['debrief:label'] ?? `${toolId} applied`;
+          return { success: true, message: String(label) };
+        } catch (err) {
+          return { success: false, message: String(err) };
+        }
+      }
+
+      // Built-in tools
       const tool = TOOLS.find(t => t.id === toolId);
       if (!tool) {
         return { success: false, message: `Unknown tool: ${toolId}` };

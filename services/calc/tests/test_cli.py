@@ -31,7 +31,7 @@ class TestCli:
             "properties": {
                 "id": "track-1",
                 "name": "Test Track",
-                "kind": "track",
+                "kind": "TRACK",
                 "times": [
                     "2024-01-01T00:00:00Z",
                     "2024-01-01T01:00:00Z",
@@ -74,7 +74,7 @@ class TestCli:
                 "properties": {
                     "id": f"track-{i}",
                     "name": f"Track {i}",
-                    "kind": "track",
+                    "kind": "TRACK",
                     "times": times,
                 },
             }

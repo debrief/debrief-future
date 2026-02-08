@@ -2,7 +2,7 @@
   "type": "Feature",
   "id": "zone-001",
   "properties": {
-    "kind": "zone",
+    "kind": "ZONE",
     "name": "Exercise Area Alpha",
     "zone_type": "exercise",
     "classification": "unclassified"

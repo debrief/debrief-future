@@ -5,7 +5,7 @@
       "type": "Feature",
       "id": "track-alpha",
       "properties": {
-        "kind": "track",
+        "kind": "TRACK",
         "name": "Alpha",
         "platform_type": "surface",
         "start_time": "2026-01-15T08:00:00Z",
@@ -33,7 +33,7 @@
       "type": "Feature",
       "id": "track-bravo",
       "properties": {
-        "kind": "track",
+        "kind": "TRACK",
         "name": "Bravo",
         "platform_type": "surface",
         "start_time": "2026-01-15T08:00:00Z",

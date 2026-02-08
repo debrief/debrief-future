@@ -11,7 +11,7 @@ Usage:
     @tool(
         name="track-stats",
         description="Calculate track statistics",
-        input_kinds=["track"],
+        input_kinds=["TRACK"],
         output_kind="analysis-result",
         context_type=ContextType.SINGLE
     )
@@ -20,7 +20,7 @@ Usage:
         pass
 
     # Query available tools
-    tools = registry.find_tools(context_type=ContextType.SINGLE, kinds={"track"})
+    tools = registry.find_tools(context_type=ContextType.SINGLE, kinds={"TRACK"})
 """
 
 from __future__ import annotations
@@ -195,7 +195,7 @@ def tool(
         @tool(
             name="track-stats",
             description="Calculate statistics for a single track",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="track/statistics",
             context_type=ContextType.SINGLE
         )

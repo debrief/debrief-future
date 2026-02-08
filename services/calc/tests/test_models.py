@@ -34,13 +34,13 @@ class TestSourceRef:
     """Tests for SourceRef model."""
 
     def test_create_source_ref(self):
-        ref = SourceRef(id="track-001", kind="track")
+        ref = SourceRef(id="track-001", kind="TRACK")
         assert ref.id == "track-001"
-        assert ref.kind == "track"
+        assert ref.kind == "TRACK"
 
     def test_source_ref_requires_id(self):
         with pytest.raises(PydanticValidationError):
-            SourceRef(kind="track")
+            SourceRef(kind="TRACK")
 
     def test_source_ref_requires_kind(self):
         with pytest.raises(PydanticValidationError):
@@ -52,7 +52,7 @@ class TestProvenance:
 
     def test_create_provenance(self):
         prov = Provenance(
-            tool="track-stats", version="1.0.0", sources=[SourceRef(id="track-001", kind="track")]
+            tool="track-stats", version="1.0.0", sources=[SourceRef(id="track-001", kind="TRACK")]
         )
         assert prov.tool == "track-stats"
         assert prov.version == "1.0.0"
@@ -113,9 +113,9 @@ class TestToolError:
         error = ToolError(
             code="KIND_MISMATCH",
             message="Kind mismatch",
-            details={"expected": ["track"], "actual": ["zone"]},
+            details={"expected": ["TRACK"], "actual": ["ZONE"]},
         )
-        assert error.details == {"expected": ["track"], "actual": ["zone"]}
+        assert error.details == {"expected": ["TRACK"], "actual": ["ZONE"]}
 
 
 class TestToolResult:
@@ -156,7 +156,7 @@ class TestSelectionContext:
     """Tests for SelectionContext model."""
 
     def test_single_context(self):
-        feature = {"type": "Feature", "properties": {"kind": "track"}, "geometry": None}
+        feature = {"type": "Feature", "properties": {"kind": "TRACK"}, "geometry": None}
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
         assert context.type == ContextType.SINGLE
         assert len(context.features) == 1
@@ -170,16 +170,20 @@ class TestSelectionContext:
             SelectionContext(type=ContextType.SINGLE, features=[feature, feature])
 
     def test_multi_context(self):
-        feature1 = {"type": "Feature", "properties": {"kind": "track"}, "geometry": None}
-        feature2 = {"type": "Feature", "properties": {"kind": "track"}, "geometry": None}
+        feature1 = {"type": "Feature", "properties": {"kind": "TRACK"}, "geometry": None}
+        feature2 = {"type": "Feature", "properties": {"kind": "TRACK"}, "geometry": None}
         context = SelectionContext(type=ContextType.MULTI, features=[feature1, feature2])
         assert context.type == ContextType.MULTI
         assert len(context.features) == 2
 
-    def test_multi_requires_at_least_two_features(self):
+    def test_multi_accepts_single_feature(self):
         feature = {"type": "Feature", "properties": {}, "geometry": None}
+        context = SelectionContext(type=ContextType.MULTI, features=[feature])
+        assert len(context.features) == 1
+
+    def test_multi_rejects_empty_features(self):
         with pytest.raises(PydanticValidationError):
-            SelectionContext(type=ContextType.MULTI, features=[feature])
+            SelectionContext(type=ContextType.MULTI, features=[])
 
     def test_region_context(self):
         context = SelectionContext(type=ContextType.REGION, bounds=[-5.0, 49.0, -3.0, 51.0])
@@ -200,11 +204,11 @@ class TestSelectionContext:
         assert context.features == []
 
     def test_get_kinds(self):
-        feature1 = {"type": "Feature", "properties": {"kind": "track"}, "geometry": None}
-        feature2 = {"type": "Feature", "properties": {"kind": "zone"}, "geometry": None}
+        feature1 = {"type": "Feature", "properties": {"kind": "TRACK"}, "geometry": None}
+        feature2 = {"type": "Feature", "properties": {"kind": "ZONE"}, "geometry": None}
         context = SelectionContext(type=ContextType.MULTI, features=[feature1, feature2])
         kinds = context.get_kinds()
-        assert kinds == {"track", "zone"}
+        assert kinds == {"TRACK", "ZONE"}
 
 
 class TestTool:
@@ -214,7 +218,7 @@ class TestTool:
         tool = Tool(
             name="track-stats",
             description="Calculate track statistics",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="analysis-result",
             context_type=ContextType.SINGLE,
         )
@@ -226,7 +230,7 @@ class TestTool:
             Tool(
                 name="trackStats",  # camelCase not allowed
                 description="Test",
-                input_kinds=["track"],
+                input_kinds=["TRACK"],
                 output_kind="result",
                 context_type=ContextType.SINGLE,
             )
@@ -236,7 +240,7 @@ class TestTool:
             Tool(
                 name="123-tool",
                 description="Test",
-                input_kinds=["track"],
+                input_kinds=["TRACK"],
                 output_kind="result",
                 context_type=ContextType.SINGLE,
             )
@@ -255,19 +259,19 @@ class TestTool:
         tool = Tool(
             name="test",
             description="Test",
-            input_kinds=["track", "zone"],
+            input_kinds=["TRACK", "ZONE"],
             output_kind="result",
             context_type=ContextType.SINGLE,
         )
-        assert tool.accepts_kind("track") is True
-        assert tool.accepts_kind("zone") is True
-        assert tool.accepts_kind("point") is False
+        assert tool.accepts_kind("TRACK") is True
+        assert tool.accepts_kind("ZONE") is True
+        assert tool.accepts_kind("POINT") is False
 
     def test_accepts_context(self):
         tool = Tool(
             name="test",
             description="Test",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="result",
             context_type=ContextType.SINGLE,
         )
@@ -279,7 +283,7 @@ class TestTool:
             name="track-stats",
             description="Calculate statistics",
             version="2.0.0",
-            input_kinds=["track"],
+            input_kinds=["TRACK"],
             output_kind="analysis-result",
             context_type=ContextType.SINGLE,
             parameters=[ToolParameter(name="unit", type="string", description="Unit")],

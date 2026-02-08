@@ -840,12 +840,12 @@ export class MapPanel {
 
     // Notify callback
     if (this.onSelectionChangedCallback) {
-      const featureKinds: Array<'track' | 'location'> = [];
+      const featureKinds: Array<'UI_TRACK' | 'UI_LOCATION'> = [];
       if (message.selection.trackIds.length > 0) {
-        featureKinds.push('track');
+        featureKinds.push('UI_TRACK');
       }
       if (message.selection.locationIds.length > 0) {
-        featureKinds.push('location');
+        featureKinds.push('UI_LOCATION');
       }
 
       this.onSelectionChangedCallback({

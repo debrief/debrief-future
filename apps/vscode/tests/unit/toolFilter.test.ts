@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { AnalysisTool } from '../../src/types/tool';
-import type { SelectionContextType, FeatureKind } from '../../src/types/plot';
+import type { SelectionContextType } from '../../src/types/plot';
 
 describe('Tool filtering', () => {
   const mockTools: AnalysisTool[] = [
@@ -9,7 +9,7 @@ describe('Tool filtering', () => {
       displayName: 'Range & Bearing',
       description: 'Calculate range and bearing between tracks',
       contextType: 'multi-track',
-      inputKinds: ['track'],
+      inputKinds: ['TRACK'],
       inputSchema: {},
     },
     {
@@ -17,7 +17,7 @@ describe('Tool filtering', () => {
       displayName: 'Closest Point of Approach',
       description: 'Find closest point between two tracks',
       contextType: 'multi-track',
-      inputKinds: ['track'],
+      inputKinds: ['TRACK'],
       inputSchema: {},
     },
     {
@@ -25,7 +25,7 @@ describe('Tool filtering', () => {
       displayName: 'Track Statistics',
       description: 'Calculate statistics for a single track',
       contextType: 'single-track',
-      inputKinds: ['track'],
+      inputKinds: ['TRACK'],
       inputSchema: {},
     },
     {
@@ -33,7 +33,7 @@ describe('Tool filtering', () => {
       displayName: 'Distance to Point',
       description: 'Calculate distance from track to location',
       contextType: 'mixed',
-      inputKinds: ['track', 'location'],
+      inputKinds: ['TRACK', 'LOCATION'],
       inputSchema: {},
     },
     {
@@ -41,7 +41,7 @@ describe('Tool filtering', () => {
       displayName: 'Universal Tool',
       description: 'Works with any selection',
       contextType: 'any',
-      inputKinds: ['track', 'location'],
+      inputKinds: ['TRACK', 'LOCATION'],
       inputSchema: {},
     },
   ];
@@ -49,7 +49,7 @@ describe('Tool filtering', () => {
   const filterTools = (
     tools: AnalysisTool[],
     contextType: SelectionContextType,
-    featureKinds: FeatureKind[]
+    featureKinds: string[]
   ): AnalysisTool[] => {
     return tools.filter((tool) => {
       // Check context type
@@ -73,7 +73,7 @@ describe('Tool filtering', () => {
 
   describe('context type filtering', () => {
     it('returns tools matching single-track context', () => {
-      const filtered = filterTools(mockTools, 'single-track', ['track']);
+      const filtered = filterTools(mockTools, 'single-track', ['TRACK']);
 
       expect(filtered.map((t) => t.name)).toContain('track-stats');
       expect(filtered.map((t) => t.name)).toContain('universal-tool');
@@ -81,7 +81,7 @@ describe('Tool filtering', () => {
     });
 
     it('returns tools matching multi-track context', () => {
-      const filtered = filterTools(mockTools, 'multi-track', ['track']);
+      const filtered = filterTools(mockTools, 'multi-track', ['TRACK']);
 
       expect(filtered.map((t) => t.name)).toContain('range-bearing');
       expect(filtered.map((t) => t.name)).toContain('closest-approach');
@@ -90,7 +90,7 @@ describe('Tool filtering', () => {
     });
 
     it('returns tools matching mixed context', () => {
-      const filtered = filterTools(mockTools, 'mixed', ['track', 'location']);
+      const filtered = filterTools(mockTools, 'mixed', ['TRACK', 'LOCATION']);
 
       expect(filtered.map((t) => t.name)).toContain('distance-to-point');
       expect(filtered.map((t) => t.name)).toContain('universal-tool');
@@ -107,7 +107,7 @@ describe('Tool filtering', () => {
   describe('feature kind filtering', () => {
     it('filters by required input kinds', () => {
       const locationOnlyTools = mockTools.filter((t) =>
-        t.inputKinds.includes('location')
+        t.inputKinds.includes('LOCATION')
       );
 
       expect(locationOnlyTools.map((t) => t.name)).toContain(
@@ -122,9 +122,9 @@ describe('Tool filtering', () => {
 
   describe('any context type', () => {
     it('universal tools appear in all valid contexts', () => {
-      const singleTrack = filterTools(mockTools, 'single-track', ['track']);
-      const multiTrack = filterTools(mockTools, 'multi-track', ['track']);
-      const location = filterTools(mockTools, 'location', ['location']);
+      const singleTrack = filterTools(mockTools, 'single-track', ['TRACK']);
+      const multiTrack = filterTools(mockTools, 'multi-track', ['TRACK']);
+      const location = filterTools(mockTools, 'location', ['LOCATION']);
 
       expect(singleTrack.map((t) => t.name)).toContain('universal-tool');
       expect(multiTrack.map((t) => t.name)).toContain('universal-tool');
