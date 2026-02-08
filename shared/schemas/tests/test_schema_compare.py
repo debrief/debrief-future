@@ -86,6 +86,18 @@ class TestEnumConsistency:
             f"LocationTypeEnum values mismatch: {enum_values} vs {expected}"
         )
 
+    def test_segment_type_enum_values(self):
+        """SegmentTypeEnum should have consistent values."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+
+        segment_type_def = main_schema.get("$defs", {}).get("SegmentTypeEnum", {})
+        enum_values = segment_type_def.get("enum", [])
+
+        expected = ["TRACK", "ABSOLUTE_TMA", "RELATIVE_TMA", "DYNAMIC_INFILL"]
+        assert set(enum_values) == set(expected), (
+            f"SegmentTypeEnum values mismatch: {enum_values} vs {expected}"
+        )
+
 
 class TestRequiredFields:
     """Test that required fields are properly defined."""
@@ -99,6 +111,34 @@ class TestRequiredFields:
 
         for field in expected:
             assert field in required, f"TrackFeature should require {field}"
+
+    def test_track_feature_geometry_union(self):
+        """TrackFeature geometry should accept LineString or MultiLineString."""
+        schema = json.loads((JSONSCHEMA_DIR / "TrackFeature.schema.json").read_text())
+
+        geometry_prop = schema.get("properties", {}).get("geometry", {})
+        any_of = geometry_prop.get("anyOf", [])
+        assert len(any_of) >= 2, "geometry should have anyOf with at least 2 options"
+
+        refs = [opt.get("$ref", "") for opt in any_of]
+        assert any("GeoJSONLineString" in r for r in refs), (
+            "geometry anyOf should include GeoJSONLineString"
+        )
+        assert any("GeoJSONMultiLineString" in r for r in refs), (
+            "geometry anyOf should include GeoJSONMultiLineString"
+        )
+
+    def test_track_properties_has_compound_fields(self):
+        """TrackProperties should have segments, sensors, tuas fields."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+
+        track_props = main_schema.get("$defs", {}).get("TrackProperties", {})
+        properties = track_props.get("properties", {})
+
+        for field in ["segments", "sensors", "tuas"]:
+            assert field in properties, (
+                f"TrackProperties should have {field} field"
+            )
 
     def test_reference_location_required_fields(self):
         """ReferenceLocation should require type, id, geometry, properties."""

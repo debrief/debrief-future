@@ -110,7 +110,16 @@ def is_known_geometry_limitation(entity_type: str, error: ValidationError) -> bo
     for err in error.errors():
         loc = err.get("loc", ())
         # Check if error is in geometry.coordinates path
+        # Direct: geometry -> coordinates (pre-union)
         if len(loc) >= 2 and loc[0] == "geometry" and loc[1] == "coordinates":
+            return True
+        # Union variant: geometry -> GeoJSONLineString/GeoJSONMultiLineString -> coordinates/type
+        if (
+            len(loc) >= 2
+            and loc[0] == "geometry"
+            and isinstance(loc[1], str)
+            and loc[1].startswith("GeoJSON")
+        ):
             return True
     return False
 

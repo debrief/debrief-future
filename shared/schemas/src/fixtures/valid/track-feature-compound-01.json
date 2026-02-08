@@ -1,0 +1,90 @@
+{
+  "type": "Feature",
+  "id": "track-compound-001",
+  "geometry": {
+    "type": "MultiLineString",
+    "coordinates": [
+      [[-5.0, 50.0], [-4.9, 50.1], [-4.8, 50.2]],
+      [[-4.8, 50.2], [-4.7, 50.3]],
+      [[-4.7, 50.3], [-4.6, 50.4], [-4.5, 50.5]]
+    ]
+  },
+  "properties": {
+    "kind": "TRACK",
+    "platform_id": "HMS-COMPOUND",
+    "platform_name": "HMS Compound",
+    "track_type": "CONTACT",
+    "start_time": "2026-01-09T08:00:00Z",
+    "end_time": "2026-01-09T14:00:00Z",
+    "positions": [
+      {"time": "2026-01-09T08:00:00Z", "course": 45, "speed": 12},
+      {"time": "2026-01-09T10:00:00Z", "course": 45, "speed": 12}
+    ],
+    "segments": [
+      {
+        "segment_type": "TRACK",
+        "start_time": "2026-01-09T08:00:00Z",
+        "end_time": "2026-01-09T10:00:00Z",
+        "name": "Initial Leg",
+        "positions": [
+          {"time": "2026-01-09T08:00:00Z", "course": 45, "speed": 12},
+          {"time": "2026-01-09T09:00:00Z", "course": 45, "speed": 12},
+          {"time": "2026-01-09T10:00:00Z", "course": 46, "speed": 12}
+        ]
+      },
+      {
+        "segment_type": "ABSOLUTE_TMA",
+        "start_time": "2026-01-09T10:00:00Z",
+        "end_time": "2026-01-09T12:00:00Z",
+        "name": "TMA Leg 1",
+        "course": 90,
+        "speed": 8,
+        "base_frequency": 150.5,
+        "positions": [
+          {"time": "2026-01-09T10:00:00Z", "course": 90, "speed": 8},
+          {"time": "2026-01-09T12:00:00Z", "course": 90, "speed": 8}
+        ]
+      },
+      {
+        "segment_type": "DYNAMIC_INFILL",
+        "start_time": "2026-01-09T12:00:00Z",
+        "end_time": "2026-01-09T14:00:00Z",
+        "name": "Infill",
+        "before_leg": "TMA Leg 1",
+        "after_leg": "Final Leg",
+        "positions": [
+          {"time": "2026-01-09T12:00:00Z", "course": 60, "speed": 10},
+          {"time": "2026-01-09T13:00:00Z", "course": 65, "speed": 10},
+          {"time": "2026-01-09T14:00:00Z", "course": 70, "speed": 10}
+        ]
+      }
+    ],
+    "default_position_style": {
+      "show_symbol": false,
+      "symbol": "circle",
+      "show_label": false
+    },
+    "style": {
+      "line": {
+        "stroke": true,
+        "color": "#CC0000",
+        "weight": 2,
+        "opacity": 1.0,
+        "line_cap": "round",
+        "line_join": "round",
+        "dash_array": null
+      },
+      "point": {
+        "shape": "circle",
+        "radius": 4,
+        "fill": true,
+        "fill_color": "#CC0000",
+        "fill_opacity": 1.0,
+        "stroke": true,
+        "color": "#FFFFFF",
+        "weight": 1,
+        "opacity": 1.0
+      }
+    }
+  }
+}
