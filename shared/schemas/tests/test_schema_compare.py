@@ -136,9 +136,7 @@ class TestRequiredFields:
         properties = track_props.get("properties", {})
 
         for field in ["segments", "sensors", "tuas"]:
-            assert field in properties, (
-                f"TrackProperties should have {field} field"
-            )
+            assert field in properties, f"TrackProperties should have {field} field"
 
     def test_reference_location_required_fields(self):
         """ReferenceLocation should require type, id, geometry, properties."""
