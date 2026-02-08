@@ -470,7 +470,7 @@ export interface TrackFeature {
     /** Unique identifier (UUID recommended) */
     id: string,
     /** Track path as LineString (simple) or MultiLineString (compound) */
-    geometry: string,
+    geometry: GeoJSONLineString | GeoJSONMultiLineString,
     /** Track metadata */
     properties: TrackProperties,
     /** Bounding box [minLon, minLat, maxLon, maxLat] */
