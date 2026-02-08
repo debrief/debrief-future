@@ -52,9 +52,10 @@ Every change to the plot's data is recorded as a Log entry:
 |--------|---------|-----------------|
 | File import | Load a REP file | Source file, format, features created |
 | Tool invocation | Calculate range between two tracks | Tool name, version, parameters, inputs, outputs |
+| Tool re-run (artifact) | Re-run bearing-time plot with different frequency | Tool name, version, new parameters, new versioned artifact path |
 | Property edit | Change a track's colour from red to blue | Feature, property, old value, new value |
 
-From the Log's perspective, changing a track's colour is no different from running a bearing calculation — both are recorded operations that modify the plot.
+From the Log's perspective, changing a track's colour is no different from running a bearing calculation — both are recorded operations that modify the plot. When a tool that produces artifacts is re-run (whether manually or via parameter tuning), a new Log entry is created and the artifact is stored with an incremented version index rather than overwriting the previous output.
 
 ### 3.2 Where Log Entries Live
 
@@ -114,7 +115,7 @@ Every Log entry records enough to fully reproduce the operation:
 - **What tool** (or built-in operation) ran, and which version
 - **All parameters** including defaults — making the entry self-contained
 - **Which features** were modified, and what changed
-- **Any new outputs** created (features or result files)
+- **Any new outputs** created (features or artifact files) — for artifacts, the `generated` field records the full versioned path (e.g., `./results/bt_plot_001_v2.png`), not the logical result ID, so each entry is an immutable pointer to the exact artifact it produced
 - **How long** the operation took
 
 ---
@@ -259,6 +260,65 @@ Branching lets an analyst explore an alternative analysis path without losing th
 5. If the branch point is before the current snapshot, the system reconstructs the state from the appropriate snapshot
 
 Source and branch are independent plots — changes to one do not affect the other — but the analyst can navigate between them and compare results.
+
+### 4.7 Artifact Versioning on Re-Run
+
+Some tools produce **artifact** outputs — images, reports, or datasets stored as files attached to the STAC Item (in the `results/` subfolder). When such a tool is re-run, the system creates a **new version** of the artifact rather than overwriting the previous one.
+
+#### How versioning works
+
+1. Each artifact has a stable **result ID** (e.g., `bt_plot_001`) that identifies the logical result. The result ID is determined by the tool and its inputs — a bearing-time plot for Track A always produces the same result ID regardless of how many times it is generated
+2. Each time the tool runs, the system assigns the next **version index** — a monotonically increasing integer (`v1`, `v2`, `v3`, ...)
+3. The file is written as `results/{resultId}_v{N}.{ext}` (e.g., `bt_plot_001_v2.png`)
+4. A new asset entry is added to `item.json` with the versioned key, `debrief:resultId`, and `debrief:version`
+5. Previous versions are **never overwritten or deleted** — they remain accessible via the Log Panel or direct file browsing
+
+```
+results/
+  bt_plot_001_v1.png    ← first run (frequency=1804Hz)
+  bt_plot_001_v2.png    ← re-run after tuning (frequency=2400Hz)
+  bt_plot_001_v3.png    ← re-run after tuning (frequency=3000Hz)
+```
+
+#### STAC Item representation
+
+Each version appears as a separate asset in `item.json`, linked by `debrief:resultId`:
+
+```json
+{
+  "assets": {
+    "bt_plot_001_v1": {
+      "href": "./results/bt_plot_001_v1.png",
+      "type": "image/png",
+      "roles": ["result"],
+      "debrief:resultId": "bt_plot_001",
+      "debrief:version": 1
+    },
+    "bt_plot_001_v2": {
+      "href": "./results/bt_plot_001_v2.png",
+      "type": "image/png",
+      "roles": ["result"],
+      "debrief:resultId": "bt_plot_001",
+      "debrief:version": 2
+    }
+  }
+}
+```
+
+#### Provenance recording
+
+The Log entry for each run records the **full versioned path** in its `generated` field (e.g., `./results/bt_plot_001_v2.png`) and the stable `generatedResultId` (e.g., `bt_plot_001`). This ensures each Log entry is an immutable pointer to the exact artifact version it produced, while the result ID links all versions of the same logical result.
+
+#### Editor auto-refresh
+
+When an artifact is open in an editor or panel view:
+
+- **Views are keyed by result ID**, not by filename. A view opened for result `bt_plot_001` remains logically the same view regardless of which version is currently displayed
+- A setting `debrief.autoRefreshArtifacts` (default: **true**) controls whether an open artifact view automatically updates when the tool is re-run:
+  - **When true** — the orchestrator detects that a view for the same result ID is already open and replaces its content with the newly generated version. A subtle indicator shows the version has changed (e.g., "Updated to v3")
+  - **When false** — the new version opens in a separate view alongside the existing one, allowing side-by-side comparison
+
+This auto-refresh mechanism is what makes parameter tuning practical for artifact-producing tools: the analyst tunes a parameter in the Log Panel, the tool re-runs, and the existing view updates in-place to show the new output — without the analyst needing to close and reopen anything.
 
 ---
 
@@ -468,6 +528,55 @@ A **tune annotation** is appended when a parameter is modified:
 }
 ```
 
+When a tool produces an artifact, the `generated` field records the full versioned path. If the same tool is re-run (e.g., after tuning), a new Log entry is created with the next version:
+
+```json
+{
+  "activityId": "act-003",
+  "timestamp": "2026-02-06T14:45:00Z",
+  "wasGeneratedBy": {
+    "tool": "bearing-time-plot",
+    "toolVersion": "1.0.0",
+    "parameters": {
+      "frequency": { "value": 1804, "default": false, "tunable": true }
+    }
+  },
+  "used": ["feature-id-Neptune", "feature-id-alpha"],
+  "generated": ["./results/bt_plot_001_v1.png"],
+  "generatedResultId": "bt_plot_001",
+  "executionDuration": "PT1.2S",
+  "tune": null
+}
+```
+
+After tuning frequency to 2400Hz and re-running:
+
+```json
+{
+  "activityId": "act-004",
+  "timestamp": "2026-02-06T15:20:00Z",
+  "wasGeneratedBy": {
+    "tool": "bearing-time-plot",
+    "toolVersion": "1.0.0",
+    "parameters": {
+      "frequency": { "value": 2400, "default": false, "tunable": true }
+    }
+  },
+  "used": ["feature-id-Neptune", "feature-id-alpha"],
+  "generated": ["./results/bt_plot_001_v2.png"],
+  "generatedResultId": "bt_plot_001",
+  "executionDuration": "PT1.1S",
+  "tune": {
+    "timestamp": "2026-02-06T15:20:00Z",
+    "parameter": "frequency",
+    "previousValue": 1804,
+    "newValue": 2400
+  }
+}
+```
+
+Both entries share the same `generatedResultId` (`bt_plot_001`) — this is the stable logical identity of the result. The `generated` field differs (`_v1` vs `_v2`) — this is the immutable pointer to the exact artifact produced. Previous versions are never overwritten or deleted; they remain in the `results/` directory and in `item.json` as historical assets.
+
 Property edits are modelled as invocations of a built-in `set-property` tool:
 
 ```json
@@ -648,13 +757,13 @@ The ToolResult is the contract between Python services and the Log service. Ever
 |-------|-------------|
 | `modifiedFeatures` | List of feature IDs + which properties changed on each |
 | `createdFeatures` | References to any new features added to the plot |
-| `createdAssets` | References to any new result files (e.g. exported reports) |
+| `createdAssets` | References to any new artifact files. Each entry carries a `resultId` (stable logical identity) and a `path` (the full versioned path assigned by `store_artifact`, e.g., `./results/bt_plot_001_v2.png`) |
 | `tool` | Tool identifier string |
 | `toolVersion` | Semantic version of the tool |
 | `parameters` | Full resolved parameter set including defaults |
 | `executionDuration` | Wall-clock time for the operation |
 
-The Log service adds `activityId` and `timestamp`, then distributes the entry to the appropriate features.
+The Log service adds `activityId` and `timestamp`, then distributes the entry to the appropriate features. For artifact-producing tools, the `createdAssets[].path` is written to the Log entry's `generated` field and the `createdAssets[].resultId` is written to the `generatedResultId` field.
 
 ### A.9 Global Timeline Assembly
 
@@ -704,6 +813,8 @@ The Python services remain thick: they contain all domain logic, validation, and
 | Term | Definition |
 |------|-----------|
 | **Activity ID** | Unique identifier for an operation. Shared across features when one operation affects multiple features. |
+| **Artifact version** | A monotonically increasing integer suffix (`v1`, `v2`, ...) appended to an artifact's filename when the producing tool is re-run. Previous versions are never overwritten. |
+| **Auto-refresh** | Behaviour (controlled by `debrief.autoRefreshArtifacts`, default true) where an open artifact view automatically updates to display the latest version when the tool is re-run. |
 | **Branch** | A new plot created from a point in another plot's history. Two-way linked to the source. |
 | **Capture snapshot from here** | Log Panel action to create a snapshot at any entry — useful after expensive operations or before branching. |
 | **Load more** | Log Panel action to reveal earlier history by following the snapshot chain backward. |
@@ -711,6 +822,7 @@ The Python services remain thick: they contain all domain logic, validation, and
 | **Log entry** | A single recorded operation: timestamp, tool, parameters, inputs, outputs. |
 | **Log Panel** | The analyst's on-demand interface for reviewing, tuning, and reverting the analytical timeline. |
 | **Positional replay** | Re-executing all entries after a tuned entry in timeline order. |
+| **Result ID** | A stable logical identifier for an artifact that remains constant across all versions (re-runs). Editor views are keyed by result ID so they can be updated in-place on re-run. |
 | **Revert this** | Remove a single entry and replay subsequent entries. Recoverable. Halts on downstream failure. |
 | **Revert to here** | Discard everything after the selected entry. Permanent. |
 | **Snapshot** | A clean copy of the plot with Log entries removed, forming a waypoint in the history chain. Doubly-linked for both history navigation and impact tracing. |
