@@ -128,8 +128,8 @@ The Log Panel displays an action bar with buttons for future capabilities: Tune,
 - **FR-002**: System MUST display a chronological timeline of all Log entries from the current plot, with the most recent entry at the top.
 - **FR-003**: System MUST deduplicate multi-feature operations in the timeline — a single tool execution affecting N features appears as one timeline entry, not N.
 - **FR-004**: System MUST update the timeline automatically when a new tool execution is recorded, without requiring the analyst to manually refresh.
-- **FR-005**: System MUST highlight the affected features on the map when the analyst selects a Log entry, using the entry's `used` and `generated` feature references.
-- **FR-006**: System MUST clear map highlights when the analyst deselects a Log entry.
+- **FR-005**: System MUST select the affected features on the map when the analyst selects a Log entry, replacing any existing feature selection with the entry's `used` and `generated` feature references.
+- **FR-006**: System MUST clear the feature selection when the analyst deselects a Log entry.
 - **FR-007**: System MUST provide three presentation modes — Compact, Normal, and Detailed — that control the level of information shown per entry.
 - **FR-008**: Compact mode MUST display the tool name and primary affected feature name only.
 - **FR-009**: Normal mode MUST additionally display parameter values and a summary of before/after changes.
@@ -223,13 +223,19 @@ The Log Panel displays an action bar with buttons for future capabilities: Tune,
 - **SC-007**: New tool executions appear at the top of the timeline automatically without manual refresh, confirmed by executing a tool while the panel is open.
 - **SC-008**: The Log Panel correctly switches context when the analyst switches between open plots, showing the correct timeline for each.
 
+## Clarifications
+
+### Session 2026-02-09
+
+- Q: Should selecting a Log entry replace the map's feature selection or use a separate visual highlight? → A: Replace selection. When the analyst opens the Log Panel they have switched from analysis mode to log retrospection, so replacing the feature selection is the expected behaviour.
+
 ## Assumptions
 
 - **A-001**: Phase 1 (#071 — Log Recording Service) is complete before this feature begins implementation, providing the `getTimeline()` function that returns deduplicated, sorted Log entries.
 - **A-002**: The Log Panel has its own activity bar icon, separate from the Debrief Activity Panel (#044). Clicking the Log icon shows the Log Panel in the sidebar; clicking the Debrief icon shows the Activity Panel. They occupy the same sidebar space and swap when toggled.
 - **A-003**: Presentation mode preference is stored using the application's standard user settings/state persistence mechanism.
 - **A-004**: The Log Panel is read-only in Phase 2. All action buttons (Tune, Revert to Here, Revert This, Snapshot, Rationale) are placeholders that display "not yet available" messages. They become functional in Phases 4-6.
-- **A-005**: Feature highlighting on entry selection reuses the existing map highlight/selection mechanism. No new highlighting system is introduced.
+- **A-005**: Selecting a Log entry replaces the map's current feature selection (not a separate highlight layer). When the analyst opens the Log Panel they have switched to retrospection mode, so taking over the selection is expected. This reuses the existing selection mechanism — no new highlighting system is introduced.
 - **A-006**: The "Show earlier history" control at snapshot boundaries loads entries lazily. In Phase 2, if no snapshot mechanism exists yet, the full timeline is shown without pagination.
 - **A-007**: Shared components for the Log Panel are framework-agnostic (no direct VS Code dependencies) and include visual showcase stories for each component.
 - **A-008**: The filter row's tool type dropdown is populated dynamically from the set of tool names appearing in the current timeline.
