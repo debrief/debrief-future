@@ -101,7 +101,7 @@
 #### Area 5: System Record Feature
 
 - [x] T019 [US1] Write Current State subsection: document that SYSTEM kind exists (feature 022) but no system record features are created; reference `specs/022-system-kind-discriminator/spec.md` `docs/architecture/prov-transition-plan.md`
-- [x] T020 [US1] Write Target State subsection: null-geometry feature structure from SRD Annex A.4 with `snapshotLinks`, `branches`, and `provenance` arrays; include full JSON example `docs/architecture/prov-transition-plan.md`
+- [x] T020 [US1] Write Target State subsection: non-spatial feature structure (Point with empty coordinates) from SRD Annex A.4 with `snapshotLinks`, `branches`, and `provenance` arrays; include full JSON example `docs/architecture/prov-transition-plan.md`
 - [x] T021 [US1] Write Migration Steps subsection: LinkML schema addition, creation logic (when plot is first created), update to stacService to ensure system record persists `docs/architecture/prov-transition-plan.md`
 
 #### Area 6: Phased Implementation Sequence

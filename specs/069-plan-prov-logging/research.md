@@ -99,15 +99,16 @@ Both must be replaced by the SRD's PROV-aligned model (Annex A.3): `{activityId,
 
 ## 5. System Record Feature
 
-### Decision: Add null-geometry Feature per SRD Annex A.4
+### Decision: Add non-spatial Feature (Point with empty coordinates) per SRD Annex A.4
 
 **Rationale**: The system record carries plot-level metadata (snapshot links, branch records) that doesn't belong on any spatial feature. The `SYSTEM` featureType kind already exists in the schema (added in feature 022).
 
-**Key finding**: Feature 022 added `SYSTEM` kind discriminator (`specs/022-system-kind-discriminator/spec.md`), providing the schema foundation. The system record is a Feature with `geometry: null` and `properties.featureType: "system"`.
+**Key finding**: Feature 022 added `SYSTEM` kind discriminator (`specs/022-system-kind-discriminator/spec.md`), providing the schema foundation. The system record is a Feature with `geometry: {"type": "Point", "coordinates": []}` and `properties.featureType: "system"`. We use Point with empty coordinates rather than `geometry: null` because many GeoJSON renderers fail on null geometries.
 
 **Alternatives considered**:
 - **Store in STAC Item metadata**: Rejected — snapshot links and branch records are per-plot, and the STAC Item may contain multiple GeoJSON files
-- **Separate sidecar file**: Rejected — adds file management complexity; GeoJSON already supports null-geometry features
+- **Separate sidecar file**: Rejected — adds file management complexity; GeoJSON already supports non-spatial features
+- **`geometry: null`**: Rejected — while valid per RFC 7946, many GeoJSON renderers fail on null geometries; Point with empty coordinates is safer and already used by feature 022
 
 ## 6. Phased Implementation Sequence
 

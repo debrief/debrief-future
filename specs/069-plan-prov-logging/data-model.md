@@ -131,7 +131,10 @@ Does not exist as a concrete implementation. The `SYSTEM` kind discriminator was
 ```json
 {
   "type": "Feature",
-  "geometry": null,
+  "geometry": {
+    "type": "Point",
+    "coordinates": []
+  },
   "properties": {
     "featureType": "system",
     "snapshotLinks": {

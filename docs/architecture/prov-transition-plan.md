@@ -33,7 +33,7 @@ This document bridges the gap between the current Debrief codebase and the SRD p
 2. **Log Service design** — a new TypeScript library that wraps ToolResults in PROV-vocabulary Log entries
 3. **Undo/redo split** — separating UI undo (viewport, time) from data-change history (the Log)
 4. **Provenance schema migration** — replacing the current flat model with a PROV-aligned schema
-5. **System record feature** — a null-geometry GeoJSON feature for snapshot and branch metadata
+5. **System record feature** — a non-spatial GeoJSON feature (Point with empty coordinates) for snapshot and branch metadata
 6. **Phased implementation sequence** — 7 phases mapping SRD priorities P1-P6 to concrete backlog items
 7. **Session-state integration** — how the Log Service interacts with Zustand, dirty tracking, and persistence
 
@@ -546,12 +546,15 @@ The existing `SYSTEM` kind is defined in the LinkML schema and supported by the 
 
 **Source**: SRD Annex A.4
 
-Each plot's GeoJSON contains a system record — a Feature with `geometry: null` and `properties.featureType: "system"`:
+Each plot's GeoJSON contains a system record — a Feature with Point geometry (empty coordinates) and `properties.featureType: "system"`. We use `{"type": "Point", "coordinates": []}` rather than `geometry: null` because many GeoJSON renderers fail on null geometries (consistent with feature 022's shipped implementation):
 
 ```json
 {
   "type": "Feature",
-  "geometry": null,
+  "geometry": {
+    "type": "Point",
+    "coordinates": []
+  },
   "properties": {
     "featureType": "system",
     "snapshotLinks": {
@@ -600,7 +603,7 @@ The system record carries:
 
 1. Add LinkML schema for system record properties: `snapshotLinks`, `branches`, file-level provenance entries
 2. Add system feature creation to plot initialisation logic (when a new plot is created via stacService)
-3. Ensure `stacService.addFeatures()` correctly handles null-geometry features
+3. Ensure `stacService.addFeatures()` correctly handles non-spatial features (Point with empty coordinates)
 4. Ensure existing renderers (map, feature list) skip or handle system features appropriately (e.g., by filtering on `featureType !== "system"`)
 5. Add tests for system feature creation and persistence
 6. Defer snapshot and branch logic to Phases 4 and 5 — Phase 0 only creates the empty system record structure

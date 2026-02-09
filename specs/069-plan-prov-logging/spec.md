@@ -71,7 +71,7 @@ A developer working on an unrelated feature needs to know whether their work wil
 - **FR-004**: The Log Service design MUST define the TypeScript API surface, its relationship to the Zustand session-state store, and the data flow from Python ToolResult to persisted Log entry
 - **FR-005**: The undo/redo split MUST define which current `StateSnapshot` fields remain in UI undo/redo and which move to the Log, with the decision rationale for each field
 - **FR-006**: The provenance schema migration MUST provide before/after JSON examples for `feature.properties.provenance`, covering tool invocations, property edits, and artifact-producing tools
-- **FR-007**: The system record section MUST define the null-geometry feature structure for snapshot links and branch records, consistent with SRD Annex A.4
+- **FR-007**: The system record section MUST define the non-spatial feature structure (Point geometry with empty coordinates) for snapshot links and branch records, consistent with SRD Annex A.4 and the precedent from feature 022
 - **FR-008**: The phased implementation sequence MUST produce a Mermaid dependency graph and a table mapping each phase to SRD priorities, prerequisite backlog items, and estimated scope
 - **FR-009**: The session-state integration section MUST define how the Log Service interacts with dirty tracking, the existing `enableDirtyTracking()` subscription, and persistence via stacService
 - **FR-010**: The plan MUST identify all breaking changes to existing interfaces with a migration checklist (files to update, tests to modify, sample data to regenerate)
@@ -83,9 +83,15 @@ A developer working on an unrelated feature needs to know whether their work wil
 - **ToolResult**: The Python model returned by calc services after tool execution. Currently defined in `services/calc/debrief_calc/models.py`. Will be expanded with `modifiedFeatures`, `createdFeatures`, `createdAssets`, full resolved parameters
 - **Log Entry**: A PROV-vocabulary record of a data change, stored on `feature.properties.provenance`. Defined in SRD Annex A.3. Wraps a ToolResult with `activityId`, `timestamp`, and optional `tune` annotation
 - **Log Service**: A new TypeScript shared library that converts ToolResults into Log entries and manages the timeline. Defined in SRD Annex A.2
-- **System Record**: A null-geometry GeoJSON feature carrying plot-level metadata (snapshot links, branch records). Defined in SRD Annex A.4
+- **System Record**: A non-spatial GeoJSON feature (Point geometry with empty coordinates) carrying plot-level metadata (snapshot links, branch records). Defined in SRD Annex A.4. Uses `{"type": "Point", "coordinates": []}` rather than `geometry: null` because many GeoJSON renderers fail on null geometries (precedent: feature 022)
 - **StateSnapshot**: The current undo history record in the session-state store (`services/session-state/src/store/index.ts`). Will be narrowed to UI-only fields after the split
 - **Provenance (current)**: The simple lineage model in `services/calc/debrief_calc/models.py` (tool, version, timestamp, sources, parameters). Will be replaced by the richer PROV-aligned schema
+
+## Clarifications
+
+### Session 2026-02-09
+
+- Q: System record geometry — should it use `geometry: null` or a Point with empty coordinates? → A: Use `{"type": "Point", "coordinates": []}` — many GeoJSON renderers fail on null geometries. Consistent with feature 022 shipped implementation.
 
 ## Success Criteria *(mandatory)*
 
