@@ -216,23 +216,23 @@
 
 ### E2E Tests
 
-- [ ] T054 [P] Create Playwright E2E test for LogPanel rendering and theme variants `shared/components/e2e/LogPanel.spec.ts`
-- [ ] T055 [P] Add E2E interaction tests — entry selection, mode toggle, filter, view switch `shared/components/e2e/LogPanel.spec.ts`
-- [ ] T056 Run full E2E suite: `pnpm --filter @debrief/components test:e2e LogPanel`
+- [x] T054 [P] Create Playwright E2E test for LogPanel rendering and theme variants `shared/components/e2e/LogPanel.spec.ts`
+- [x] T055 [P] Add E2E interaction tests — entry selection, mode toggle, filter, view switch `shared/components/e2e/LogPanel.spec.ts`
+- [x] T056 Run full E2E suite: `pnpm --filter @debrief/components test:e2e LogPanel`
 
 ### Evidence Collection
 
-- [ ] T057 Create evidence directory `specs/072-log-panel/evidence/`
-- [ ] T058 Capture test summary with pass/fail counts `specs/072-log-panel/evidence/test-summary.md`
-- [ ] T059 Create usage demonstration walkthrough `specs/072-log-panel/evidence/usage-example.md`
-- [ ] T060 [P] Capture screenshots: timeline modes (compact, normal, detailed) `specs/072-log-panel/evidence/screenshots/`
-- [ ] T061 [P] Capture screenshots: filter active, by-feature view, empty state `specs/072-log-panel/evidence/screenshots/`
-- [ ] T062 Document E2E results `specs/072-log-panel/evidence/e2e-summary.md`
+- [x] T057 Create evidence directory `specs/072-log-panel/evidence/`
+- [x] T058 Capture test summary with pass/fail counts `specs/072-log-panel/evidence/test-summary.md`
+- [x] T059 Create usage demonstration walkthrough `specs/072-log-panel/evidence/usage-example.md`
+- [x] T060 [P] Capture screenshots: timeline modes (compact, normal, detailed) `specs/072-log-panel/evidence/screenshots/`
+- [x] T061 [P] Capture screenshots: filter active, by-feature view, empty state `specs/072-log-panel/evidence/screenshots/`
+- [x] T062 Document E2E results `specs/072-log-panel/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T063 Create shipped blog post `specs/072-log-panel/media/shipped-post.md`
-- [ ] T064 [P] Create LinkedIn shipped summary `specs/072-log-panel/media/linkedin-shipped.md`
+- [x] T063 Create shipped blog post `specs/072-log-panel/media/shipped-post.md`
+- [x] T064 [P] Create LinkedIn shipped summary `specs/072-log-panel/media/linkedin-shipped.md`
 
 ### PR Creation
 
