@@ -158,6 +158,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Python 3.11 (LinkML schemas, Pydantic models), standard library only (plus `pydantic>=2.0.0`) + LinkML >= 1.7.0 (schema definition + generators), Pydantic v2 (Python model validation) (070-prov-schema-foundation)
 - TypeScript 5.x (Log Service, type updates, VS Code extension, web-shell) + Zustand ^5.0.0 (session-state store), existing stacService (file I/O), existing calcService (MCP parsing). No new external dependencies. (071-log-recording-service)
 - Local filesystem -- GeoJSON files within STAC Item directories (read/write via stacService) (071-log-recording-service)
+- TypeScript 5.x (VS Code extension + webview + shared components) + VS Code Extension API ^1.85.0, React 18.x, @debrief/components, Zustand ^5.0.0 (session-state), esbuild (webview bundling) (072-log-panel)
+- VS Code webview state (getState/setState) for transient UI; VS Code globalState for cross-session presentation mode persistence (072-log-panel)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
