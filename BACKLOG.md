@@ -133,7 +133,7 @@ Description formats:
 | 065 | Feature | [Implement Phase 2 tools: track/styling + dataset/export](docs/ideas/065-implement-tools-phase2-styling-export.md) [E01] — 15 styling and export tools (requires #064) | 4 | 3 | 4 | 11 | Medium | approved |
 | 064 | Feature | [Implement Phase 1 tools: track/measurement](docs/ideas/064-implement-tools-phase1-measurement.md) [E01] — 19 foundational calculation tools (requires #049, #062, #063) | 5 | 4 | 4 | 13 | High | approved |
 | 063 | Infrastructure | [Analyse tool specs for phased implementation sequence](docs/ideas/063-tool-implementation-sequence.md) [E01] — dependency graph, phase groupings, and per-phase backlog items for 63 documented tools | 5 | 3 | 4 | 12 | Medium | approved |
-| 062 | Tech Debt | [Compound track model with embedded children](specs/062-missing-feature-kind-enum-values/spec.md) [E01] — extend TrackFeature with MultiLineString compound geometry, embedded sensors, TUAs, and per-segment metadata; blocks 30+ tool implementations | 5 | 2 | 5 | 12 | Medium | approved |
+| ~~062~~ | ~~Tech Debt~~ | ~~[Compound track model with embedded children](specs/062-missing-feature-kind-enum-values/spec.md) [E01] — extend TrackFeature with MultiLineString compound geometry, embedded sensors, TUAs, and per-segment metadata; blocks 30+ tool implementations~~ | ~~5~~ | ~~2~~ | ~~5~~ | ~~12~~ | ~~Medium~~ | ~~complete~~ |
 | 070 | Infrastructure | [Implement PROV schema foundation](docs/ideas/070-prov-schema-foundation.md) [E02] — LinkML Log Entry schema, expanded ToolResult model, provenance migration, system record (requires #062) | - | - | - | - | High | proposed |
 | 071 | Feature | [Implement Log Recording service](docs/ideas/071-log-recording-service.md) [E02] — TypeScript Log Service, recordToolResult, getTimeline, session-state integration (requires #070) | - | - | - | - | High | proposed |
 | 072 | Feature | [Implement Log Panel](docs/ideas/072-log-panel.md) [E02] — VS Code activity panel, timeline view, entry display, filter/search (requires #071, optionally #044) | - | - | - | - | High | proposed |
@@ -166,7 +166,7 @@ Description formats:
 | 023 | Infrastructure | [Add epic support to speckit workflow](specs/023-epic-workflow-support/spec.md) | 4 | 3 | 4 | 11 | Medium | specified |
 | 031 | Documentation | [Document vscrui as standard component library for VS Code webviews](specs/031-vscrui-component-library/spec.md) | 3 | 1 | 5 | 9 | Low | specified |
 | 032 | Documentation | [Document Storybook VS Code theming setup](specs/032-storybook-vscode-theming/spec.md) | 2 | 2 | 5 | 9 | Low | specified |
-| 044 | Enhancement | [Build unified Debrief activity panel as single webview](docs/ideas/044-unified-activity-panel.md) (requires #031, #045) | 5 | 5 | 3 | 13 | High | approved |
+| ~~044~~ | ~~Enhancement~~ | ~~[Build unified Debrief activity panel as single webview](docs/ideas/044-unified-activity-panel.md) (requires #031, #045)~~ | ~~5~~ | ~~5~~ | ~~3~~ | ~~13~~ | ~~High~~ | ~~complete~~ |
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
 | 002 | Feature | Add MCP wrapper for debrief-io service | 4 | 3 | 4 | 11 | Medium | approved |
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | Low | approved |
