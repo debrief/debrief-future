@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/schemas/log-entry",
+  "title": "LogEntry",
+  "description": "PROV-aligned provenance record stored on GeoJSON features. Target schema for validation — implementation will be generated from LinkML.",
+  "type": "object",
+  "required": ["activityId", "timestamp", "wasGeneratedBy", "used", "generated", "executionDuration"],
+  "additionalProperties": false,
+  "properties": {
+    "activityId": {
+      "type": "string",
+      "description": "Unique operation identifier (UUID v4). Shared across features in multi-feature operations.",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "When the operation occurred (ISO 8601 with timezone).",
+      "format": "date-time"
+    },
+    "wasGeneratedBy": {
+      "$ref": "#/$defs/WasGeneratedBy"
+    },
+    "used": {
+      "type": "array",
+      "description": "Feature IDs of inputs. May be empty for operations with no explicit inputs.",
+      "items": { "type": "string" }
+    },
+    "generated": {
+      "type": "array",
+      "description": "Feature IDs or versioned asset paths of outputs. May be empty for in-place modifications.",
+      "items": { "type": "string" }
+    },
+    "executionDuration": {
+      "type": "string",
+      "description": "Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S).",
+      "pattern": "^PT[0-9]+(\\.[0-9]+)?S$"
+    },
+    "generatedResultId": {
+      "type": ["string", "null"],
+      "description": "Stable logical identity for artifact-producing tools (e.g., bt_plot_001). Null for non-artifact tools.",
+      "default": null
+    },
+    "tune": {
+      "oneOf": [
+        { "$ref": "#/$defs/TuneAnnotation" },
+        { "type": "null" }
+      ],
+      "description": "Parameter tuning record. Null until a tuning operation modifies this entry.",
+      "default": null
+    }
+  },
+  "$defs": {
+    "WasGeneratedBy": {
+      "type": "object",
+      "description": "Identifies the tool and its parameters for a specific invocation.",
+      "required": ["tool", "toolVersion", "parameters"],
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "description": "Tool identifier (kebab-case)."
+        },
+        "toolVersion": {
+          "type": "string",
+          "description": "Semantic version of the tool."
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Full resolved parameter set. Keys are parameter names, values are ParameterValue objects.",
+          "additionalProperties": { "$ref": "#/$defs/ParameterValue" }
+        }
+      }
+    },
+    "ParameterValue": {
+      "type": "object",
+      "description": "A typed parameter value with replay metadata.",
+      "required": ["value"],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "description": "The parameter value (any JSON type)."
+        },
+        "default": {
+          "type": "boolean",
+          "description": "Whether this is the default value.",
+          "default": false
+        },
+        "tunable": {
+          "type": "boolean",
+          "description": "Whether this parameter can be modified during replay.",
+          "default": true
+        }
+      }
+    },
+    "TuneAnnotation": {
+      "type": "object",
+      "description": "Records a parameter modification.",
+      "required": ["timestamp", "parameter", "previousValue", "newValue"],
+      "additionalProperties": false,
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "description": "When the tuning occurred.",
+          "format": "date-time"
+        },
+        "parameter": {
+          "type": "string",
+          "description": "Name of the parameter that was changed."
+        },
+        "previousValue": {
+          "description": "Value before tuning."
+        },
+        "newValue": {
+          "description": "Value after tuning."
+        }
+      }
+    }
+  }
+}
