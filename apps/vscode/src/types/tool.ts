@@ -404,6 +404,17 @@ export interface ToolExecutionResult {
 
   /** Artifact filename hint from debrief:href annotation */
   artifactHref?: string;
+
+  /** Tool version from expanded contract (Phase 0) */
+  toolVersion?: string;
+  /** Modified features with property deltas (Phase 0) */
+  modifiedFeatures?: Array<{ featureId: string; changedProperties: Record<string, { previousValue: unknown; newValue: unknown }> }>;
+  /** Created feature IDs (Phase 0) */
+  createdFeatures?: string[];
+  /** Created artifacts (Phase 0) */
+  createdAssets?: Array<{ resultId: string; path: string; mimeType?: string }>;
+  /** Full resolved parameters (Phase 0) */
+  parameters?: Record<string, { value: unknown; default: boolean; tunable: boolean }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -419,6 +430,11 @@ export interface DebriefAnnotations {
   'debrief:label': string;
   'debrief:href'?: string;
   'debrief:deletedFeatures'?: string[];
+  'debrief:toolVersion'?: string;
+  'debrief:modifiedFeatures'?: Array<{ featureId: string; changedProperties: Record<string, { previousValue: unknown; newValue: unknown }> }>;
+  'debrief:createdFeatures'?: string[];
+  'debrief:createdAssets'?: Array<{ resultId: string; path: string; mimeType?: string }>;
+  'debrief:parameters'?: Record<string, { value: unknown; default: boolean; tunable: boolean }>;
 }
 
 /**

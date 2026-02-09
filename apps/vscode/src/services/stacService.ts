@@ -1018,6 +1018,123 @@ export class StacService {
   }
 
   /**
+   * Append provenance Log entries to existing features in a STAC item's GeoJSON.
+   * Feature: 071-log-recording-service
+   *
+   * @param storePath Path to the STAC store root
+   * @param itemPath Relative path to the item JSON file
+   * @param provenance Array of feature ID + Log entry pairs
+   * @returns Number of features successfully updated
+   */
+  async appendProvenance(
+    storePath: string,
+    itemPath: string,
+    provenance: Array<{ featureId: string; entry: Record<string, unknown> }>
+  ): Promise<number> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+
+    if (!item) {
+      throw new Error(`Item not found: ${itemPath}`);
+    }
+
+    // Find GeoJSON asset
+    const geoJsonAsset = Object.values(item.assets).find(
+      (asset) =>
+        asset.type === 'application/geo+json' ||
+        asset.href.endsWith('.geojson')
+    );
+
+    if (!geoJsonAsset) {
+      throw new Error(`No GeoJSON asset found for item: ${itemPath}`);
+    }
+
+    const itemDir = path.dirname(fullItemPath);
+    const geoJsonPath = path.resolve(itemDir, geoJsonAsset.href);
+    const featureCollection = await this.loadGeoJson(geoJsonPath);
+
+    if (!featureCollection) {
+      throw new Error(`GeoJSON file not found: ${geoJsonPath}`);
+    }
+
+    // Build a map of feature ID -> feature for quick lookup
+    const featureMap = new Map<string, SafeFeature>();
+    for (const feature of featureCollection.features) {
+      const id = (feature as unknown as Record<string, unknown>).id as string | undefined;
+      const propsId = feature.properties?.['id'] as string | undefined;
+      const featureId = id ?? propsId;
+      if (featureId) {
+        featureMap.set(featureId, feature);
+      }
+    }
+
+    let updated = 0;
+    for (const { featureId, entry } of provenance) {
+      const feature = featureMap.get(featureId);
+      if (!feature) { continue; }
+
+      // Ensure properties exists
+      if (!feature.properties) {
+        (feature as unknown as Record<string, unknown>).properties = {};
+      }
+
+      const props = feature.properties!;
+      // Normalise provenance to array (FR-006: handle legacy single-object format)
+      let existing = props['provenance'];
+      if (existing === undefined || existing === null) {
+        existing = [];
+      } else if (!Array.isArray(existing)) {
+        existing = [existing];
+      }
+
+      // Append the new entry
+      (existing as unknown[]).push(entry);
+      props['provenance'] = existing;
+      updated++;
+    }
+
+    if (updated > 0) {
+      // Write updated GeoJSON
+      fs.writeFileSync(geoJsonPath, JSON.stringify(featureCollection, null, 2));
+
+      // Clear cache
+      this.itemCache.delete(fullItemPath);
+    }
+
+    return updated;
+  }
+
+  /**
+   * Load the GeoJSON FeatureCollection for a STAC item.
+   * Feature: 071-log-recording-service
+   *
+   * @param storePath Path to the STAC store root
+   * @param itemPath Relative path to the item JSON file
+   * @returns FeatureCollection or null
+   */
+  async loadGeoJsonForItem(
+    storePath: string,
+    itemPath: string
+  ): Promise<SafeFeatureCollection | null> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+
+    if (!item) { return null; }
+
+    const geoJsonAsset = Object.values(item.assets).find(
+      (asset) =>
+        asset.type === 'application/geo+json' ||
+        asset.href.endsWith('.geojson')
+    );
+
+    if (!geoJsonAsset) { return null; }
+
+    const itemDir = path.dirname(fullItemPath);
+    const geoJsonPath = path.resolve(itemDir, geoJsonAsset.href);
+    return this.loadGeoJson(geoJsonPath);
+  }
+
+  /**
    * Check if an asset key already exists on a STAC item.
    * Used for duplicate import detection.
    *

@@ -97,6 +97,30 @@ export {
   type LoadResult,
 } from './persistence/index.js';
 
+// Log Service (Feature: 071)
+export {
+  buildLogEntry,
+  msToIsoDuration,
+  generateActivityId,
+  extractActivityIdFromOutputFeatures,
+  assembleTimeline,
+  type LogEntry,
+  type WasGeneratedBy,
+  type ParameterValue,
+  type TuneAnnotation,
+  type ExpandedToolResultFields,
+  type ModifiedFeature,
+  type PropertyDelta,
+  type CreatedAsset,
+  type RecordResult,
+  type TimelineOptions,
+  type ToolResultForLog,
+  type FeatureProvenance,
+  type LogService,
+  type LogServiceDeps,
+  createLogService,
+} from './log/index.js';
+
 // Server (for standalone mode)
 export {
   createApp,
