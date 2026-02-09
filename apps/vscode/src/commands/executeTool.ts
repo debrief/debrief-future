@@ -15,6 +15,7 @@ import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { MapPanel } from '../webview/mapPanel';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
+import type { LogService } from '@debrief/session-state';
 
 /**
  * Create the execute tool command
@@ -25,6 +26,7 @@ import type { ActivityPanelViewProvider } from '../views/activityPanelView';
  * @param layersTreeProvider - LayersTreeProvider for displaying results
  * @param stacService - StacService for persisting results to STAC
  * @param activityPanelProvider - ActivityPanelViewProvider for updating result files
+ * @param logService - LogService for recording provenance (Feature: 071)
  */
 export function createExecuteToolCommand(
   calcService: CalcService,
@@ -32,7 +34,8 @@ export function createExecuteToolCommand(
   getMapPanel: () => MapPanel | undefined,
   layersTreeProvider: LayersTreeProvider,
   stacService?: StacService,
-  activityPanelProvider?: ActivityPanelViewProvider
+  activityPanelProvider?: ActivityPanelViewProvider,
+  logService?: LogService
 ): (toolId: string) => Promise<void> {
   return async (toolId: string) => {
     // Handle both new format (toolId string) and legacy format (object with toolName)
@@ -153,6 +156,38 @@ export function createExecuteToolCommand(
           }
         } catch (persistErr) {
           console.warn('[debrief] Failed to persist result to STAC:', persistErr);
+        }
+      }
+
+      // Record provenance via Log Service (Feature: 071)
+      if (logService && stacService) {
+        try {
+          const store = panel.getCurrentStore?.();
+          const plot = panel.getCurrentPlot?.();
+          if (store?.path && plot?.itemPath) {
+            await logService.recordToolResult(
+              {
+                success: true,
+                features: result.features,
+                durationMs: result.durationMs,
+                resultType: result.resultType,
+                sourceFeatureIds: result.sourceFeatureIds ?? selectedFeatureIds,
+                artifactHref: result.artifactHref,
+                toolId: resolvedToolId,
+              },
+              result.toolVersion || result.parameters ? {
+                toolVersion: result.toolVersion,
+                modifiedFeatures: result.modifiedFeatures,
+                createdFeatures: result.createdFeatures,
+                createdAssets: result.createdAssets,
+                parameters: result.parameters,
+              } : undefined,
+              store.path,
+              plot.itemPath
+            );
+          }
+        } catch (logErr) {
+          console.warn('[debrief] Failed to record provenance:', logErr);
         }
       }
 

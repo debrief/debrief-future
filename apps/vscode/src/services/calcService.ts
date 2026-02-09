@@ -257,6 +257,11 @@ export class CalcService {
         sourceFeatureIds: result.sourceFeatureIds,
         artifactData: result.artifactData,
         artifactHref: result.artifactHref,
+        toolVersion: result.toolVersion,
+        modifiedFeatures: result.modifiedFeatures,
+        createdFeatures: result.createdFeatures,
+        createdAssets: result.createdAssets,
+        parameters: result.parameters,
       };
     } catch (err) {
       execution.status = 'failed';
@@ -629,7 +634,7 @@ print(json.dumps(tools))
     toolId: string,
     featureIds: string[],
     params?: Record<string, unknown>
-  ): Promise<{ features: SafeFeatureCollection; resultType?: string; label?: string; sourceFeatureIds?: string[]; artifactData?: string; artifactHref?: string }> {
+  ): Promise<{ features: SafeFeatureCollection; resultType?: string; label?: string; sourceFeatureIds?: string[]; artifactData?: string; artifactHref?: string; toolVersion?: string; modifiedFeatures?: ToolExecutionResult['modifiedFeatures']; createdFeatures?: string[]; createdAssets?: ToolExecutionResult['createdAssets']; parameters?: ToolExecutionResult['parameters'] }> {
     const features = this.resolveFeatures(featureIds);
 
     const input = JSON.stringify({
@@ -663,6 +668,11 @@ print(json.dumps(tools))
     let sourceFeatureIds: string[] | undefined;
     let artifactData: string | undefined;
     let artifactHref: string | undefined;
+    let toolVersion: string | undefined;
+    let modifiedFeatures: ToolExecutionResult['modifiedFeatures'] | undefined;
+    let createdFeatures: string[] | undefined;
+    let createdAssets: ToolExecutionResult['createdAssets'] | undefined;
+    let parameters: ToolExecutionResult['parameters'] | undefined;
 
     for (const item of response.content) {
       // Grab annotations from first item
@@ -670,6 +680,23 @@ print(json.dumps(tools))
         resultType = item.annotations['debrief:resultType'];
         label = item.annotations['debrief:label'];
         sourceFeatureIds = item.annotations['debrief:sourceFeatures'];
+      }
+
+      // Parse expanded ToolResult fields (Phase 0, Feature 071)
+      if (item.annotations?.['debrief:toolVersion']) {
+        toolVersion = item.annotations['debrief:toolVersion'];
+      }
+      if (item.annotations?.['debrief:modifiedFeatures']) {
+        modifiedFeatures = item.annotations['debrief:modifiedFeatures'];
+      }
+      if (item.annotations?.['debrief:createdFeatures']) {
+        createdFeatures = item.annotations['debrief:createdFeatures'];
+      }
+      if (item.annotations?.['debrief:createdAssets']) {
+        createdAssets = item.annotations['debrief:createdAssets'];
+      }
+      if (item.annotations?.['debrief:parameters']) {
+        parameters = item.annotations['debrief:parameters'];
       }
 
       // Detect artifact items via debrief:href annotation
@@ -694,6 +721,11 @@ print(json.dumps(tools))
       sourceFeatureIds,
       artifactData,
       artifactHref,
+      toolVersion,
+      modifiedFeatures,
+      createdFeatures,
+      createdAssets,
+      parameters,
     };
   }
 }
