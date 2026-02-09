@@ -136,7 +136,7 @@ The Log Panel displays an action bar with buttons for future capabilities: Tune,
 - **FR-010**: Detailed mode MUST additionally display timestamp, execution duration, attachment count, and file size.
 - **FR-011**: System MUST show tool version as a tooltip on hover in all presentation modes.
 - **FR-012**: System MUST persist the selected presentation mode across sessions so the analyst's preference survives panel close/reopen and application restart.
-- **FR-013**: System MUST provide a filter row with text search (matching tool name, feature name, and parameter values), tool type dropdown, and operation category filter.
+- **FR-013**: System MUST provide a filter row with text search (matching tool name, feature name, and parameter values), tool type dropdown, and operation category filter. Operation categories are: calculation, import, property-edit, and export.
 - **FR-014**: Filters MUST combine with AND logic to progressively narrow results.
 - **FR-015**: The filter row MUST be collapsible. Active filters remain applied when the filter row is collapsed.
 - **FR-016**: System MUST provide a By-Feature view that groups entries under feature name headings, with chronological order (most recent first) within each group.
@@ -228,6 +228,7 @@ The Log Panel displays an action bar with buttons for future capabilities: Tune,
 ### Session 2026-02-09
 
 - Q: Should selecting a Log entry replace the map's feature selection or use a separate visual highlight? → A: Replace selection. When the analyst opens the Log Panel they have switched from analysis mode to log retrospection, so replacing the feature selection is the expected behaviour.
+- Q: What categories should the "operation category" filter use? → A: Operation type — calculation, import, property-edit, export. This is orthogonal to tool type and matches how analysts think about their workflow.
 
 ## Assumptions
 
