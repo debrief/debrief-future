@@ -82,6 +82,211 @@ classes:
         multivalued: true
         required: true
 
+  GeoJSONMultiLineString:
+    description: GeoJSON MultiLineString geometry for compound tracks
+    attributes:
+      type:
+        description: Geometry type discriminator
+        range: string
+        required: true
+        equals_string: "MultiLineString"
+      coordinates:
+        description: Array of LineString coordinate arrays
+        range: float
+        multivalued: true
+        required: true
+
+# ============================================================================
+# Compound Track Embedded Types
+# ============================================================================
+
+  SegmentMetadata:
+    description: >-
+      Per-segment metadata for compound tracks. Each segment corresponds to
+      one LineString within a MultiLineString geometry. segments[i] describes
+      geometry.coordinates[i].
+    attributes:
+      segment_type:
+        description: Segment type discriminator
+        range: SegmentTypeEnum
+        required: true
+      start_time:
+        description: Segment start timestamp (ISO8601)
+        range: datetime
+        required: true
+      end_time:
+        description: Segment end timestamp (ISO8601)
+        range: datetime
+        required: true
+      positions:
+        description: Per-position metadata (parallel to coordinates)
+        range: TimestampedPosition
+        multivalued: true
+        required: true
+        inlined_as_list: true
+      name:
+        description: Human-readable segment name
+      style:
+        description: Per-segment line styling override
+        range: LineProperties
+      course:
+        description: Estimated course in degrees (TMA segments)
+        range: float
+        minimum_value: 0
+        maximum_value: 360
+      speed:
+        description: Estimated speed in knots (TMA segments)
+        range: float
+        minimum_value: 0
+      base_frequency:
+        description: Base frequency in Hz (TMA segments)
+        range: float
+      host_track_id:
+        description: ID of track this solution is relative to (RELATIVE_TMA)
+      host_sensor_name:
+        description: Towed array sensor name (RELATIVE_TMA)
+      offset_bearing:
+        description: Bearing offset in degrees (RELATIVE_TMA)
+        range: float
+        minimum_value: 0
+        maximum_value: 360
+      offset_range:
+        description: Range offset in metres (RELATIVE_TMA)
+        range: float
+        minimum_value: 0
+      before_leg:
+        description: Name of preceding TMA leg (DYNAMIC_INFILL)
+      after_leg:
+        description: Name of following TMA leg (DYNAMIC_INFILL)
+
+  SensorContact:
+    description: >-
+      Single sensor measurement record. Represents one bearing/range
+      observation at a point in time.
+    attributes:
+      time:
+        description: Contact measurement timestamp (ISO8601)
+        range: datetime
+        required: true
+      bearing:
+        description: Bearing to contact in degrees (0-360)
+        range: float
+        required: true
+        minimum_value: 0
+        maximum_value: 360
+      range:
+        description: Range to contact in metres
+        range: float
+        minimum_value: 0
+      frequency:
+        description: Measured frequency in Hz
+        range: float
+      ambiguous_bearing:
+        description: Ambiguous bearing (second solution) in degrees
+        range: float
+        minimum_value: 0
+        maximum_value: 360
+      label:
+        description: Display label
+      comment:
+        description: Operator note
+
+  SensorData:
+    description: >-
+      Named sensor with contact measurements. Embedded in TrackProperties
+      to associate sensor data with the host track.
+    attributes:
+      name:
+        description: Sensor identifier (e.g., "TOWED_ARRAY")
+        required: true
+      base_frequency:
+        description: Reference frequency in Hz
+        range: float
+      offset:
+        description: Sensor offset from host platform in metres
+        range: float
+      worm_in_hole:
+        description: Display mode flag
+        range: boolean
+      contacts:
+        description: Array of sensor measurements
+        range: SensorContact
+        multivalued: true
+        required: true
+        inlined_as_list: true
+
+  TUASolution:
+    description: >-
+      Single Target Uncertainty Area estimate. Has either absolute
+      positioning (centre_lat/centre_lon) or relative positioning
+      (bearing/range), plus optional ellipse and kinematics.
+    attributes:
+      time:
+        description: Solution timestamp (ISO8601)
+        range: datetime
+        required: true
+      label:
+        description: Solution label
+        required: true
+      centre_lat:
+        description: Absolute latitude (mutual exclusive with bearing/range)
+        range: float
+      centre_lon:
+        description: Absolute longitude (mutual exclusive with bearing/range)
+        range: float
+      bearing:
+        description: Relative bearing from host track in degrees
+        range: float
+        minimum_value: 0
+        maximum_value: 360
+      range:
+        description: Relative range from host track in metres
+        range: float
+        minimum_value: 0
+      orientation:
+        description: Ellipse orientation from north in degrees
+        range: float
+        minimum_value: 0
+        maximum_value: 360
+      maxima:
+        description: Semi-major axis in metres
+        range: float
+        minimum_value: 0
+      minima:
+        description: Semi-minor axis in metres
+        range: float
+        minimum_value: 0
+      course:
+        description: Estimated course in degrees
+        range: float
+        minimum_value: 0
+        maximum_value: 360
+      speed:
+        description: Estimated speed in knots
+        range: float
+        minimum_value: 0
+      depth:
+        description: Estimated depth in metres
+        range: float
+
+  TUAData:
+    description: >-
+      Named TUA solution collection. Embedded in TrackProperties to
+      associate TUA data with the host track.
+    attributes:
+      name:
+        description: TUA collection name
+        required: true
+      host_track_name:
+        description: Name of track this TUA set relates to
+        required: true
+      solutions:
+        description: Array of TUA estimates
+        range: TUASolution
+        multivalued: true
+        required: true
+        inlined_as_list: true
+
 # ============================================================================
 # TrackFeature
 # ============================================================================
@@ -146,6 +351,28 @@ classes:
           array. Use null entries for positions without custom styling.
         range: PositionStyleOverride
         multivalued: true
+      segments:
+        description: >-
+          Per-segment metadata for compound tracks. When present, geometry MUST
+          be MultiLineString and segments[i] describes coordinates[i]. When
+          absent, geometry is LineString and the flat positions array is used.
+        range: SegmentMetadata
+        multivalued: true
+        inlined_as_list: true
+      sensors:
+        description: >-
+          Embedded sensor data associated with this track. Each sensor contains
+          named metadata and an array of contact measurements.
+        range: SensorData
+        multivalued: true
+        inlined_as_list: true
+      tuas:
+        description: >-
+          Embedded Target Uncertainty Area data associated with this track.
+          Each TUA entry is a named collection of time-indexed solutions.
+        range: TUAData
+        multivalued: true
+        inlined_as_list: true
 
   TrackFeature:
     description: GeoJSON Feature representing a vessel track
@@ -159,9 +386,11 @@ classes:
         description: Unique identifier (UUID recommended)
         required: true
       geometry:
-        description: Track path as GeoJSON LineString
-        range: GeoJSONLineString
+        description: Track path as LineString (simple) or MultiLineString (compound)
         required: true
+        any_of:
+          - range: GeoJSONLineString
+          - range: GeoJSONMultiLineString
       properties:
         description: Track metadata
         range: TrackProperties

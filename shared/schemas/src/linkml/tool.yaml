@@ -29,11 +29,19 @@ classes:
     attributes:
       kind:
         description: >-
-          The feature kind this requirement applies to (e.g., "track",
-          "point", "reference_location"). Must match the 'kind' property
-          of GeoJSON features.
+          The feature kind this requirement applies to. Supports flat values
+          (e.g., "TRACK", "POINT") matching the 'kind' property of GeoJSON
+          features, and dot-delimited hierarchical paths (e.g., "TRACK.SENSOR",
+          "TRACK.SEGMENT") for targeting embedded children within compound
+          features.
         range: string
         required: true
+      segment_type:
+        description: >-
+          Optional filter for segment type when kind targets TRACK.SEGMENT.
+          Must be a valid SegmentTypeEnum value (e.g., "ABSOLUTE_TMA").
+          Only meaningful when kind is "TRACK.SEGMENT".
+        range: SegmentTypeEnum
       min:
         description: >-
           Minimum number of features of this kind required.

@@ -1,0 +1,152 @@
+{
+  "type": "Feature",
+  "id": "track-full-001",
+  "geometry": {
+    "type": "MultiLineString",
+    "coordinates": [
+      [[-5.0, 50.0], [-4.9, 50.1], [-4.8, 50.2]],
+      [[-4.8, 50.2], [-4.7, 50.3]],
+      [[-4.7, 50.3], [-4.6, 50.4], [-4.5, 50.5]]
+    ]
+  },
+  "properties": {
+    "kind": "TRACK",
+    "platform_id": "HMS-FULL",
+    "platform_name": "HMS Full Compound",
+    "track_type": "CONTACT",
+    "start_time": "2026-01-09T08:00:00Z",
+    "end_time": "2026-01-09T14:00:00Z",
+    "positions": [
+      {"time": "2026-01-09T08:00:00Z", "course": 45, "speed": 12},
+      {"time": "2026-01-09T10:00:00Z", "course": 45, "speed": 12}
+    ],
+    "segments": [
+      {
+        "segment_type": "TRACK",
+        "start_time": "2026-01-09T08:00:00Z",
+        "end_time": "2026-01-09T10:00:00Z",
+        "name": "Initial Track",
+        "positions": [
+          {"time": "2026-01-09T08:00:00Z", "course": 45, "speed": 12},
+          {"time": "2026-01-09T09:00:00Z", "course": 46, "speed": 12},
+          {"time": "2026-01-09T10:00:00Z", "course": 47, "speed": 12}
+        ]
+      },
+      {
+        "segment_type": "RELATIVE_TMA",
+        "start_time": "2026-01-09T10:00:00Z",
+        "end_time": "2026-01-09T12:00:00Z",
+        "name": "Relative TMA",
+        "course": 90,
+        "speed": 8,
+        "host_track_id": "ownship-001",
+        "host_sensor_name": "TOWED_ARRAY",
+        "offset_bearing": 45.0,
+        "offset_range": 200.0,
+        "positions": [
+          {"time": "2026-01-09T10:00:00Z", "course": 90, "speed": 8},
+          {"time": "2026-01-09T12:00:00Z", "course": 90, "speed": 8}
+        ]
+      },
+      {
+        "segment_type": "DYNAMIC_INFILL",
+        "start_time": "2026-01-09T12:00:00Z",
+        "end_time": "2026-01-09T14:00:00Z",
+        "name": "Infill Segment",
+        "before_leg": "Relative TMA",
+        "after_leg": "Next Leg",
+        "positions": [
+          {"time": "2026-01-09T12:00:00Z", "course": 60, "speed": 10},
+          {"time": "2026-01-09T13:00:00Z", "course": 65, "speed": 10},
+          {"time": "2026-01-09T14:00:00Z", "course": 70, "speed": 10}
+        ]
+      }
+    ],
+    "sensors": [
+      {
+        "name": "TOWED_ARRAY",
+        "base_frequency": 150.0,
+        "offset": 200.0,
+        "worm_in_hole": false,
+        "contacts": [
+          {
+            "time": "2026-01-09T08:30:00Z",
+            "bearing": 45.0,
+            "range": 5000.0,
+            "frequency": 152.3,
+            "label": "C1"
+          },
+          {
+            "time": "2026-01-09T09:00:00Z",
+            "bearing": 47.2,
+            "frequency": 152.1,
+            "ambiguous_bearing": 227.2,
+            "label": "C2"
+          },
+          {
+            "time": "2026-01-09T09:30:00Z",
+            "bearing": 50.1,
+            "frequency": 151.8,
+            "label": "C3",
+            "comment": "Strong contact"
+          }
+        ]
+      }
+    ],
+    "tuas": [
+      {
+        "name": "TUA Alpha",
+        "host_track_name": "HMS-FULL",
+        "solutions": [
+          {
+            "time": "2026-01-09T10:00:00Z",
+            "label": "Sol1",
+            "centre_lat": 50.15,
+            "centre_lon": -4.85,
+            "orientation": 30.0,
+            "maxima": 2000.0,
+            "minima": 800.0,
+            "course": 90.0,
+            "speed": 8.0
+          },
+          {
+            "time": "2026-01-09T12:00:00Z",
+            "label": "Sol2",
+            "bearing": 47.0,
+            "range": 4500.0,
+            "orientation": 35.0,
+            "maxima": 1500.0,
+            "minima": 600.0
+          }
+        ]
+      }
+    ],
+    "default_position_style": {
+      "show_symbol": false,
+      "symbol": "circle",
+      "show_label": false
+    },
+    "style": {
+      "line": {
+        "stroke": true,
+        "color": "#CC0000",
+        "weight": 2,
+        "opacity": 1.0,
+        "line_cap": "round",
+        "line_join": "round",
+        "dash_array": null
+      },
+      "point": {
+        "shape": "circle",
+        "radius": 4,
+        "fill": true,
+        "fill_color": "#CC0000",
+        "fill_opacity": 1.0,
+        "stroke": true,
+        "color": "#FFFFFF",
+        "weight": 1,
+        "opacity": 1.0
+      }
+    }
+  }
+}

@@ -100,6 +100,18 @@ enums:
       bevel:
         description: Flat corner
 
+  SegmentTypeEnum:
+    description: Discriminator for track segment types within compound tracks
+    permissible_values:
+      TRACK:
+        description: Plain recorded track segment
+      ABSOLUTE_TMA:
+        description: Target Motion Analysis leg with absolute geographic coordinates
+      RELATIVE_TMA:
+        description: Target Motion Analysis leg relative to ownship position
+      DYNAMIC_INFILL:
+        description: Interpolated segment between TMA legs
+
   SystemStateTypeEnum:
     description: Discriminator for system state variants
     permissible_values:
