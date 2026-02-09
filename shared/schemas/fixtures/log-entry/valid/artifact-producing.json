@@ -1,0 +1,17 @@
+{
+  "activityId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "timestamp": "2026-01-15T14:22:00Z",
+  "wasGeneratedBy": {
+    "tool": "bearing-time-plot",
+    "toolVersion": "2.1.0",
+    "parameters": {
+      "ownship": { "value": "track-alpha", "default": false, "tunable": false },
+      "resolution": { "value": 300, "default": true, "tunable": true }
+    }
+  },
+  "used": ["track-alpha", "track-bravo"],
+  "generated": ["./results/bt_plot_001_v1.png"],
+  "executionDuration": "PT1.2S",
+  "generatedResultId": "bt_plot_001",
+  "tune": null
+}

@@ -1,0 +1,36 @@
+{
+  "featureType": "system",
+  "snapshotLinks": {
+    "prev": {
+      "asset": "./snapshots/plot_v2.geojson",
+      "provEntryCount": 5
+    },
+    "next": null
+  },
+  "branches": [
+    {
+      "branchId": "branch-001",
+      "branchedFrom": "550e8400-e29b-41d4-a716-446655440000",
+      "branchedAt": "2026-01-16T09:00:00Z",
+      "targetAsset": "./branches/branch-001/plot.geojson"
+    }
+  ],
+  "provenance": [
+    {
+      "activityId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "type": "snapshot",
+      "timestamp": "2026-01-15T12:00:00Z",
+      "asset": "./snapshots/plot_v2.geojson",
+      "branchId": null,
+      "direction": null
+    },
+    {
+      "activityId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "type": "branch",
+      "timestamp": "2026-01-16T09:00:00Z",
+      "asset": null,
+      "branchId": "branch-001",
+      "direction": "source"
+    }
+  ]
+}

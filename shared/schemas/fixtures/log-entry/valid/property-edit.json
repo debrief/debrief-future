@@ -1,0 +1,17 @@
+{
+  "activityId": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+  "timestamp": "2026-01-15T11:00:00Z",
+  "wasGeneratedBy": {
+    "tool": "set-property",
+    "toolVersion": "1.0.0",
+    "parameters": {
+      "property": { "value": "color", "default": false, "tunable": false },
+      "value": { "value": "#FF0000", "default": false, "tunable": false }
+    }
+  },
+  "used": ["track-alpha"],
+  "generated": [],
+  "executionDuration": "PT0.01S",
+  "generatedResultId": null,
+  "tune": null
+}
