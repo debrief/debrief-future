@@ -1071,7 +1071,7 @@ export class StacService {
     let updated = 0;
     for (const { featureId, entry } of provenance) {
       const feature = featureMap.get(featureId);
-      if (!feature) continue;
+      if (!feature) { continue; }
 
       // Ensure properties exists
       if (!feature.properties) {
@@ -1079,8 +1079,8 @@ export class StacService {
       }
 
       // Normalise provenance to array (FR-006: handle legacy single-object format)
-      let existing = feature.properties!['provenance'] as unknown;
-      if (existing == null) {
+      let existing = feature.properties['provenance'];
+      if (existing === undefined || existing === null) {
         existing = [];
       } else if (!Array.isArray(existing)) {
         existing = [existing];
@@ -1118,7 +1118,7 @@ export class StacService {
     const fullItemPath = path.join(storePath, itemPath);
     const item = await this.loadItem(fullItemPath);
 
-    if (!item) return null;
+    if (!item) { return null; }
 
     const geoJsonAsset = Object.values(item.assets).find(
       (asset) =>
@@ -1126,7 +1126,7 @@ export class StacService {
         asset.href.endsWith('.geojson')
     );
 
-    if (!geoJsonAsset) return null;
+    if (!geoJsonAsset) { return null; }
 
     const itemDir = path.dirname(fullItemPath);
     const geoJsonPath = path.resolve(itemDir, geoJsonAsset.href);
