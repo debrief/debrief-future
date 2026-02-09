@@ -92,6 +92,20 @@ export enum LineJoinEnum {
     bevel = "bevel",
 };
 /**
+* Discriminator for track segment types within compound tracks
+*/
+export enum SegmentTypeEnum {
+    
+    /** Plain recorded track segment */
+    TRACK = "TRACK",
+    /** Target Motion Analysis leg with absolute geographic coordinates */
+    ABSOLUTE_TMA = "ABSOLUTE_TMA",
+    /** Target Motion Analysis leg relative to ownship position */
+    RELATIVE_TMA = "RELATIVE_TMA",
+    /** Interpolated segment between TMA legs */
+    DYNAMIC_INFILL = "DYNAMIC_INFILL",
+};
+/**
 * Discriminator for system state variants
 */
 export enum SystemStateTypeEnum {
@@ -279,6 +293,136 @@ export interface GeoJSONPolygon {
 
 
 /**
+ * GeoJSON MultiLineString geometry for compound tracks
+ */
+export interface GeoJSONMultiLineString {
+    /** Geometry type discriminator */
+    type: string,
+    /** Array of LineString coordinate arrays */
+    coordinates: number[],
+}
+
+
+/**
+ * Per-segment metadata for compound tracks. Each segment corresponds to one LineString within a MultiLineString geometry. segments[i] describes geometry.coordinates[i].
+ */
+export interface SegmentMetadata {
+    /** Segment type discriminator */
+    segment_type: string,
+    /** Segment start timestamp (ISO8601) */
+    start_time: string,
+    /** Segment end timestamp (ISO8601) */
+    end_time: string,
+    /** Per-position metadata (parallel to coordinates) */
+    positions: TimestampedPosition[],
+    /** Human-readable segment name */
+    name?: string,
+    /** Per-segment line styling override */
+    style?: LineProperties,
+    /** Estimated course in degrees (TMA segments) */
+    course?: number,
+    /** Estimated speed in knots (TMA segments) */
+    speed?: number,
+    /** Base frequency in Hz (TMA segments) */
+    base_frequency?: number,
+    /** ID of track this solution is relative to (RELATIVE_TMA) */
+    host_track_id?: string,
+    /** Towed array sensor name (RELATIVE_TMA) */
+    host_sensor_name?: string,
+    /** Bearing offset in degrees (RELATIVE_TMA) */
+    offset_bearing?: number,
+    /** Range offset in metres (RELATIVE_TMA) */
+    offset_range?: number,
+    /** Name of preceding TMA leg (DYNAMIC_INFILL) */
+    before_leg?: string,
+    /** Name of following TMA leg (DYNAMIC_INFILL) */
+    after_leg?: string,
+}
+
+
+/**
+ * Single sensor measurement record. Represents one bearing/range observation at a point in time.
+ */
+export interface SensorContact {
+    /** Contact measurement timestamp (ISO8601) */
+    time: string,
+    /** Bearing to contact in degrees (0-360) */
+    bearing: number,
+    /** Range to contact in metres */
+    range?: number,
+    /** Measured frequency in Hz */
+    frequency?: number,
+    /** Ambiguous bearing (second solution) in degrees */
+    ambiguous_bearing?: number,
+    /** Display label */
+    label?: string,
+    /** Operator note */
+    comment?: string,
+}
+
+
+/**
+ * Named sensor with contact measurements. Embedded in TrackProperties to associate sensor data with the host track.
+ */
+export interface SensorData {
+    /** Sensor identifier (e.g., "TOWED_ARRAY") */
+    name: string,
+    /** Reference frequency in Hz */
+    base_frequency?: number,
+    /** Sensor offset from host platform in metres */
+    offset?: number,
+    /** Display mode flag */
+    worm_in_hole?: boolean,
+    /** Array of sensor measurements */
+    contacts: SensorContact[],
+}
+
+
+/**
+ * Single Target Uncertainty Area estimate. Has either absolute positioning (centre_lat/centre_lon) or relative positioning (bearing/range), plus optional ellipse and kinematics.
+ */
+export interface TUASolution {
+    /** Solution timestamp (ISO8601) */
+    time: string,
+    /** Solution label */
+    label: string,
+    /** Absolute latitude (mutual exclusive with bearing/range) */
+    centre_lat?: number,
+    /** Absolute longitude (mutual exclusive with bearing/range) */
+    centre_lon?: number,
+    /** Relative bearing from host track in degrees */
+    bearing?: number,
+    /** Relative range from host track in metres */
+    range?: number,
+    /** Ellipse orientation from north in degrees */
+    orientation?: number,
+    /** Semi-major axis in metres */
+    maxima?: number,
+    /** Semi-minor axis in metres */
+    minima?: number,
+    /** Estimated course in degrees */
+    course?: number,
+    /** Estimated speed in knots */
+    speed?: number,
+    /** Estimated depth in metres */
+    depth?: number,
+}
+
+
+/**
+ * Named TUA solution collection. Embedded in TrackProperties to associate TUA data with the host track.
+ */
+export interface TUAData {
+    /** TUA collection name */
+    name: string,
+    /** Name of track this TUA set relates to */
+    host_track_name: string,
+    /** Array of TUA estimates */
+    solutions: TUASolution[],
+}
+
+
+/**
  * Properties for a TrackFeature
  */
 export interface TrackProperties {
@@ -308,6 +452,12 @@ export interface TrackProperties {
     label_interval?: string,
     /** Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling. */
     position_style_overrides?: PositionStyleOverride[],
+    /** Per-segment metadata for compound tracks. When present, geometry MUST be MultiLineString and segments[i] describes coordinates[i]. When absent, geometry is LineString and the flat positions array is used. */
+    segments?: SegmentMetadata[],
+    /** Embedded sensor data associated with this track. Each sensor contains named metadata and an array of contact measurements. */
+    sensors?: SensorData[],
+    /** Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions. */
+    tuas?: TUAData[],
 }
 
 
@@ -319,8 +469,8 @@ export interface TrackFeature {
     type: string,
     /** Unique identifier (UUID recommended) */
     id: string,
-    /** Track path as GeoJSON LineString */
-    geometry: GeoJSONLineString,
+    /** Track path as LineString (simple) or MultiLineString (compound) */
+    geometry: GeoJSONLineString | GeoJSONMultiLineString,
     /** Track metadata */
     properties: TrackProperties,
     /** Bounding box [minLon, minLat, maxLon, maxLat] */
@@ -614,8 +764,10 @@ export interface VectorAnnotation {
  * A constraint specifying which feature kinds a tool accepts, with minimum and maximum counts. Used to determine if a tool is applicable to the current selection.
  */
 export interface SelectionRequirement {
-    /** The feature kind this requirement applies to (e.g., "track", "point", "reference_location"). Must match the 'kind' property of GeoJSON features. */
+    /** The feature kind this requirement applies to. Supports flat values (e.g., "TRACK", "POINT") matching the 'kind' property of GeoJSON features, and dot-delimited hierarchical paths (e.g., "TRACK.SENSOR", "TRACK.SEGMENT") for targeting embedded children within compound features. */
     kind: string,
+    /** Optional filter for segment type when kind targets TRACK.SEGMENT. Must be a valid SegmentTypeEnum value (e.g., "ABSOLUTE_TMA"). Only meaningful when kind is "TRACK.SEGMENT". */
+    segment_type?: string,
     /** Minimum number of features of this kind required. Must be >= 0. Defaults to 0 if not specified. */
     min?: number,
     /** Maximum number of features of this kind allowed. Must be >= min if both specified. Null means no upper limit. */

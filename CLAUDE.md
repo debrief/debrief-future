@@ -153,6 +153,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Filesystem only (Markdown files, JSON fixtures staged in `_tool-migration/` at legacy repo root) (001-document-debrief-algorithms)
 - Python 3.11 (calc service), TypeScript 5.x (VS Code extension, web-shell, shared components) + Pydantic v2 (Python models), MCP SDK (Python server), VS Code Extension API ^1.85.0, React 18 (shared components), Leaflet 1.9.x (map rendering) (052-tool-api-integration)
 - Local filesystem STAC catalogs (for persisted results via existing stacService) (052-tool-api-integration)
+- Python 3.11 (LinkML schemas, Pydantic v2 models), TypeScript 5.x (generated types) + LinkML 1.7+, gen-pydantic, gen-json-schema, gen-typescript (existing schema generators) (062-missing-feature-kind-enum-values)
+- Local filesystem (STAC catalogs with GeoJSON payloads) (062-missing-feature-kind-enum-values)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)

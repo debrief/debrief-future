@@ -191,6 +191,30 @@
       "title": "GeoJSONLineString",
       "type": "object"
     },
+    "GeoJSONMultiLineString": {
+      "additionalProperties": false,
+      "description": "GeoJSON MultiLineString geometry for compound tracks",
+      "properties": {
+        "coordinates": {
+          "description": "Array of LineString coordinate arrays",
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "type": {
+          "const": "MultiLineString",
+          "description": "Geometry type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "GeoJSONMultiLineString",
+      "type": "object"
+    },
     "GeoJSONPoint": {
       "additionalProperties": false,
       "description": "GeoJSON Point geometry",
@@ -882,12 +906,145 @@
       "title": "ReferenceLocationProperties",
       "type": "object"
     },
+    "SegmentMetadata": {
+      "additionalProperties": false,
+      "description": "Per-segment metadata for compound tracks. Each segment corresponds to one LineString within a MultiLineString geometry. segments[i] describes geometry.coordinates[i].",
+      "properties": {
+        "after_leg": {
+          "description": "Name of following TMA leg (DYNAMIC_INFILL)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "base_frequency": {
+          "description": "Base frequency in Hz (TMA segments)",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "before_leg": {
+          "description": "Name of preceding TMA leg (DYNAMIC_INFILL)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "course": {
+          "description": "Estimated course in degrees (TMA segments)",
+          "maximum": 360,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "end_time": {
+          "description": "Segment end timestamp (ISO8601)",
+          "format": "date-time",
+          "type": "string"
+        },
+        "host_sensor_name": {
+          "description": "Towed array sensor name (RELATIVE_TMA)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "host_track_id": {
+          "description": "ID of track this solution is relative to (RELATIVE_TMA)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "description": "Human-readable segment name",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "offset_bearing": {
+          "description": "Bearing offset in degrees (RELATIVE_TMA)",
+          "maximum": 360,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "offset_range": {
+          "description": "Range offset in metres (RELATIVE_TMA)",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "positions": {
+          "description": "Per-position metadata (parallel to coordinates)",
+          "items": {
+            "$ref": "#/$defs/TimestampedPosition"
+          },
+          "type": "array"
+        },
+        "segment_type": {
+          "$ref": "#/$defs/SegmentTypeEnum",
+          "description": "Segment type discriminator"
+        },
+        "speed": {
+          "description": "Estimated speed in knots (TMA segments)",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "start_time": {
+          "description": "Segment start timestamp (ISO8601)",
+          "format": "date-time",
+          "type": "string"
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LineProperties"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Per-segment line styling override"
+        }
+      },
+      "required": [
+        "segment_type",
+        "start_time",
+        "end_time",
+        "positions"
+      ],
+      "title": "SegmentMetadata",
+      "type": "object"
+    },
+    "SegmentTypeEnum": {
+      "description": "Discriminator for track segment types within compound tracks",
+      "enum": [
+        "TRACK",
+        "ABSOLUTE_TMA",
+        "RELATIVE_TMA",
+        "DYNAMIC_INFILL"
+      ],
+      "title": "SegmentTypeEnum",
+      "type": "string"
+    },
     "SelectionRequirement": {
       "additionalProperties": false,
       "description": "A constraint specifying which feature kinds a tool accepts, with minimum and maximum counts. Used to determine if a tool is applicable to the current selection.",
       "properties": {
         "kind": {
-          "description": "The feature kind this requirement applies to (e.g., \"track\", \"point\", \"reference_location\"). Must match the 'kind' property of GeoJSON features.",
+          "description": "The feature kind this requirement applies to. Supports flat values (e.g., \"TRACK\", \"POINT\") matching the 'kind' property of GeoJSON features, and dot-delimited hierarchical paths (e.g., \"TRACK.SENSOR\", \"TRACK.SEGMENT\") for targeting embedded children within compound features.",
           "type": "string"
         },
         "max": {
@@ -905,12 +1062,121 @@
             "integer",
             "null"
           ]
+        },
+        "segment_type": {
+          "$ref": "#/$defs/SegmentTypeEnum",
+          "description": "Optional filter for segment type when kind targets TRACK.SEGMENT. Must be a valid SegmentTypeEnum value (e.g., \"ABSOLUTE_TMA\"). Only meaningful when kind is \"TRACK.SEGMENT\"."
         }
       },
       "required": [
         "kind"
       ],
       "title": "SelectionRequirement",
+      "type": "object"
+    },
+    "SensorContact": {
+      "additionalProperties": false,
+      "description": "Single sensor measurement record. Represents one bearing/range observation at a point in time.",
+      "properties": {
+        "ambiguous_bearing": {
+          "description": "Ambiguous bearing (second solution) in degrees",
+          "maximum": 360,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "bearing": {
+          "description": "Bearing to contact in degrees (0-360)",
+          "maximum": 360,
+          "minimum": 0,
+          "type": "number"
+        },
+        "comment": {
+          "description": "Operator note",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "frequency": {
+          "description": "Measured frequency in Hz",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "label": {
+          "description": "Display label",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "range": {
+          "description": "Range to contact in metres",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "time": {
+          "description": "Contact measurement timestamp (ISO8601)",
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "time",
+        "bearing"
+      ],
+      "title": "SensorContact",
+      "type": "object"
+    },
+    "SensorData": {
+      "additionalProperties": false,
+      "description": "Named sensor with contact measurements. Embedded in TrackProperties to associate sensor data with the host track.",
+      "properties": {
+        "base_frequency": {
+          "description": "Reference frequency in Hz",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "contacts": {
+          "description": "Array of sensor measurements",
+          "items": {
+            "$ref": "#/$defs/SensorContact"
+          },
+          "type": "array"
+        },
+        "name": {
+          "description": "Sensor identifier (e.g., \"TOWED_ARRAY\")",
+          "type": "string"
+        },
+        "offset": {
+          "description": "Sensor offset from host platform in metres",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "worm_in_hole": {
+          "description": "Display mode flag",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "contacts"
+      ],
+      "title": "SensorData",
       "type": "object"
     },
     "SystemState": {
@@ -1028,6 +1294,135 @@
       ],
       "title": "SystemStateTypeEnum",
       "type": "string"
+    },
+    "TUAData": {
+      "additionalProperties": false,
+      "description": "Named TUA solution collection. Embedded in TrackProperties to associate TUA data with the host track.",
+      "properties": {
+        "host_track_name": {
+          "description": "Name of track this TUA set relates to",
+          "type": "string"
+        },
+        "name": {
+          "description": "TUA collection name",
+          "type": "string"
+        },
+        "solutions": {
+          "description": "Array of TUA estimates",
+          "items": {
+            "$ref": "#/$defs/TUASolution"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "host_track_name",
+        "solutions"
+      ],
+      "title": "TUAData",
+      "type": "object"
+    },
+    "TUASolution": {
+      "additionalProperties": false,
+      "description": "Single Target Uncertainty Area estimate. Has either absolute positioning (centre_lat/centre_lon) or relative positioning (bearing/range), plus optional ellipse and kinematics.",
+      "properties": {
+        "bearing": {
+          "description": "Relative bearing from host track in degrees",
+          "maximum": 360,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "centre_lat": {
+          "description": "Absolute latitude (mutual exclusive with bearing/range)",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "centre_lon": {
+          "description": "Absolute longitude (mutual exclusive with bearing/range)",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "course": {
+          "description": "Estimated course in degrees",
+          "maximum": 360,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "depth": {
+          "description": "Estimated depth in metres",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "label": {
+          "description": "Solution label",
+          "type": "string"
+        },
+        "maxima": {
+          "description": "Semi-major axis in metres",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "minima": {
+          "description": "Semi-minor axis in metres",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "orientation": {
+          "description": "Ellipse orientation from north in degrees",
+          "maximum": 360,
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "range": {
+          "description": "Relative range from host track in metres",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "speed": {
+          "description": "Estimated speed in knots",
+          "minimum": 0,
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "time": {
+          "description": "Solution timestamp (ISO8601)",
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "time",
+        "label"
+      ],
+      "title": "TUASolution",
+      "type": "object"
     },
     "TextAnnotation": {
       "additionalProperties": false,
@@ -1201,8 +1596,16 @@
           ]
         },
         "geometry": {
-          "$ref": "#/$defs/GeoJSONLineString",
-          "description": "Track path as GeoJSON LineString"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GeoJSONLineString"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONMultiLineString"
+            }
+          ],
+          "description": "Track path as LineString (simple) or MultiLineString (compound)",
+          "type": "string"
         },
         "id": {
           "description": "Unique identifier (UUID recommended)",
@@ -1282,6 +1685,26 @@
           "minItems": 2,
           "type": "array"
         },
+        "segments": {
+          "description": "Per-segment metadata for compound tracks. When present, geometry MUST be MultiLineString and segments[i] describes coordinates[i]. When absent, geometry is LineString and the flat positions array is used.",
+          "items": {
+            "$ref": "#/$defs/SegmentMetadata"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "sensors": {
+          "description": "Embedded sensor data associated with this track. Each sensor contains named metadata and an array of contact measurements.",
+          "items": {
+            "$ref": "#/$defs/SensorData"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "source_file": {
           "description": "Original source file path",
           "type": [
@@ -1309,6 +1732,16 @@
         "track_type": {
           "$ref": "#/$defs/TrackTypeEnum",
           "description": "Type of track"
+        },
+        "tuas": {
+          "description": "Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions.",
+          "items": {
+            "$ref": "#/$defs/TUAData"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [

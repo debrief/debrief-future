@@ -150,7 +150,19 @@ def generate_typescript() -> bool:
 
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        output_file.write_text(result.stdout)
+        content = result.stdout
+
+        # Post-process: gen-typescript doesn't support any_of unions,
+        # so it falls back to 'string' for union geometry fields.
+        # Patch TrackFeature.geometry to use the proper union type.
+        content = content.replace(
+            "/** Track path as LineString (simple) or MultiLineString (compound) */\n"
+            "    geometry: string,",
+            "/** Track path as LineString (simple) or MultiLineString (compound) */\n"
+            "    geometry: GeoJSONLineString | GeoJSONMultiLineString,",
+        )
+
+        output_file.write_text(content)
         print(f"  [OK] Generated: {output_file}")
 
         # Create index.ts that re-exports everything
