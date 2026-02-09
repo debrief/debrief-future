@@ -73,7 +73,7 @@ export interface TimelineOptions {
 // Minimal ToolResult shape the Log Service needs (avoids importing vscode types)
 export interface ToolResultForLog {
   success: boolean;
-  features?: { type: 'FeatureCollection'; features: Array<Record<string, unknown>> };
+  features?: { type: 'FeatureCollection'; features: unknown[] };
   durationMs: number;
   resultType?: string;
   sourceFeatureIds?: string[];

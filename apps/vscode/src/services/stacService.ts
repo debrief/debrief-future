@@ -1060,7 +1060,7 @@ export class StacService {
     // Build a map of feature ID -> feature for quick lookup
     const featureMap = new Map<string, SafeFeature>();
     for (const feature of featureCollection.features) {
-      const id = (feature as Record<string, unknown>).id as string | undefined;
+      const id = (feature as unknown as Record<string, unknown>).id as string | undefined;
       const propsId = feature.properties?.['id'] as string | undefined;
       const featureId = id ?? propsId;
       if (featureId) {
@@ -1075,11 +1075,12 @@ export class StacService {
 
       // Ensure properties exists
       if (!feature.properties) {
-        (feature as Record<string, unknown>).properties = {};
+        (feature as unknown as Record<string, unknown>).properties = {};
       }
 
+      const props = feature.properties!;
       // Normalise provenance to array (FR-006: handle legacy single-object format)
-      let existing = feature.properties['provenance'];
+      let existing = props['provenance'];
       if (existing === undefined || existing === null) {
         existing = [];
       } else if (!Array.isArray(existing)) {
@@ -1088,7 +1089,7 @@ export class StacService {
 
       // Append the new entry
       (existing as unknown[]).push(entry);
-      (feature.properties as Record<string, unknown>)['provenance'] = existing;
+      props['provenance'] = existing;
       updated++;
     }
 
