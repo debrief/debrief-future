@@ -236,7 +236,7 @@
 
 ### PR Creation
 
-- [ ] T065 Create PR and publish blog: run /speckit.pr
+- [x] T065 Create PR and publish blog: run /speckit.pr
 
 **Task T065 must run last. It depends on all evidence and media tasks being complete.**
 
