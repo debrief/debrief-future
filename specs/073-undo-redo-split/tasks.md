@@ -44,9 +44,9 @@
 
 **Purpose**: Verify prerequisites are met and all target files exist
 
-- [ ] T001 Verify #071 Log Recording Service is merged (check logService.ts exists and markDirty integration works) `services/session-state/src/log/logService.ts`
-- [ ] T002 [P] Read current StateSnapshot interface and document the 12-field baseline `services/session-state/src/store/index.ts`
-- [ ] T003 [P] Read current DIRTY_TRIGGER_FIELDS and document the 11-field baseline `services/session-state/src/store/middleware/dirty.ts`
+- [x] T001 Verify #071 Log Recording Service is merged (check logService.ts exists and markDirty integration works) `services/session-state/src/log/logService.ts`
+- [x] T002 [P] Read current StateSnapshot interface and document the 12-field baseline `services/session-state/src/store/index.ts`
+- [x] T003 [P] Read current DIRTY_TRIGGER_FIELDS and document the 11-field baseline `services/session-state/src/store/middleware/dirty.ts`
 
 **Checkpoint**: Prerequisites confirmed — implementation can begin
 
@@ -56,10 +56,10 @@
 
 **Purpose**: Write tests that define the target state BEFORE making changes. Tests should FAIL initially.
 
-- [ ] T004 [test] Add snapshot field-count assertion test: StateSnapshot must contain exactly 10 fields `services/session-state/tests/unit/undo.test.ts`
-- [ ] T005 [test] Add test that featureCollectionUri changes do NOT create undo history entries `services/session-state/tests/unit/undo.test.ts`
-- [ ] T006 [test] Add test that savePath changes do NOT create undo history entries `services/session-state/tests/unit/undo.test.ts`
-- [ ] T007 Run test suite and confirm new tests FAIL (existing tests still pass) `services/session-state/`
+- [x] T004 [test] Add snapshot field-count assertion test: StateSnapshot must contain exactly 10 fields `services/session-state/tests/unit/undo.test.ts`
+- [x] T005 [test] Add test that featureCollectionUri changes do NOT create undo history entries `services/session-state/tests/unit/undo.test.ts`
+- [x] T006 [test] Add test that savePath changes do NOT create undo history entries `services/session-state/tests/unit/undo.test.ts`
+- [x] T007 Run test suite and confirm new tests FAIL (existing tests still pass) `services/session-state/`
 
 **Checkpoint**: New tests written and failing — target state is defined
 
@@ -73,12 +73,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Remove `featureCollectionUri` and `savePath` from local StateSnapshot interface `services/session-state/src/store/index.ts`
-- [ ] T009 [US1] Update `createSnapshot()` to exclude removed fields (only capture 10 UI fields) `services/session-state/src/store/index.ts`
-- [ ] T010 [US1] Update `applySnapshot()` to not restore removed fields (only apply 10 UI fields) `services/session-state/src/store/index.ts`
-- [ ] T011 [US1] Simplify exported StateSnapshot type to `Omit<SessionState, 'document'>` `services/session-state/src/types/index.ts`
-- [ ] T012 [US1] Remove `featureCollectionUri` from DIRTY_TRIGGER_FIELDS `services/session-state/src/store/middleware/dirty.ts`
-- [ ] T013 [US1] Run test suite: new field-count test (T004) passes, existing undo tests pass `services/session-state/`
+- [x] T008 [US1] Remove `featureCollectionUri` and `savePath` from local StateSnapshot interface `services/session-state/src/store/index.ts`
+- [x] T009 [US1] Update `createSnapshot()` to exclude removed fields (only capture 10 UI fields) `services/session-state/src/store/index.ts`
+- [x] T010 [US1] Update `applySnapshot()` to not restore removed fields (only apply 10 UI fields) `services/session-state/src/store/index.ts`
+- [x] T011 [US1] Simplify exported StateSnapshot type to `Omit<SessionState, 'document'>` `services/session-state/src/types/index.ts`
+- [x] T012 [US1] Remove `featureCollectionUri` from DIRTY_TRIGGER_FIELDS `services/session-state/src/store/middleware/dirty.ts`
+- [x] T013 [US1] Run test suite: new field-count test (T004) passes, existing undo tests pass `services/session-state/`
 
 **Checkpoint**: StateSnapshot narrowed to 10 fields. Ctrl+Z only affects UI state. All tests green.
 
@@ -92,9 +92,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Verify featureCollectionUri-change test (T005) now passes after Phase 3 changes `services/session-state/tests/unit/undo.test.ts`
-- [ ] T015 [US2] Verify savePath-change test (T006) now passes after Phase 3 changes `services/session-state/tests/unit/undo.test.ts`
-- [ ] T016 [US2] Run full test suite and confirm all tests pass `services/session-state/`
+- [x] T014 [US2] Verify featureCollectionUri-change test (T005) now passes after Phase 3 changes `services/session-state/tests/unit/undo.test.ts`
+- [x] T015 [US2] Verify savePath-change test (T006) now passes after Phase 3 changes `services/session-state/tests/unit/undo.test.ts`
+- [x] T016 [US2] Run full test suite and confirm all tests pass `services/session-state/`
 
 **Checkpoint**: Tool execution (via featureCollectionUri) confirmed non-undoable. Log Service handles data-change tracking.
 
@@ -108,10 +108,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T017 [US3] Run existing undo tests: basic undo/redo, canUndo/canRedo, clearHistory `services/session-state/tests/unit/undo.test.ts`
-- [ ] T018 [US3] Run existing undo tests: 50-step history limit `services/session-state/tests/unit/undo.test.ts`
-- [ ] T019 [US3] Run existing undo tests: ephemeral field exclusion, cross-slice undo `services/session-state/tests/unit/undo.test.ts`
-- [ ] T020 [US3] Run complete session-state test suite (all packages) to check for regressions `services/session-state/`
+- [x] T017 [US3] Run existing undo tests: basic undo/redo, canUndo/canRedo, clearHistory `services/session-state/tests/unit/undo.test.ts`
+- [x] T018 [US3] Run existing undo tests: 50-step history limit `services/session-state/tests/unit/undo.test.ts`
+- [x] T019 [US3] Run existing undo tests: ephemeral field exclusion, cross-slice undo `services/session-state/tests/unit/undo.test.ts`
+- [x] T020 [US3] Run complete session-state test suite (all packages) to check for regressions `services/session-state/`
 
 **Checkpoint**: All existing undo/redo mechanics preserved. Zero regressions.
 

@@ -21,7 +21,25 @@ import { DIRTY_TRIGGER_FIELDS } from './middleware/dirty.js';
 import { isEphemeralField } from './middleware/partialize.js';
 
 /**
+ * Fields tracked in undo/redo snapshots (073-undo-redo-split).
+ * Only UI-state fields — data changes are tracked by the Log Service.
+ */
+const UNDO_TRACKED_FIELDS = new Set([
+  'currentTime',
+  'timeRange',
+  'timeFilter',
+  'stepSize',
+  'playbackRate',
+  'displayMode',
+  'viewport',
+  'rotation',
+  'selection',
+  'hiddenFeatureIds',
+]);
+
+/**
  * State snapshot for undo/redo.
+ * UI-only fields — data changes tracked by Log Service (073-undo-redo-split).
  */
 interface StateSnapshot {
   currentTime: SessionStore['currentTime'];
@@ -32,10 +50,8 @@ interface StateSnapshot {
   displayMode: SessionStore['displayMode'];
   viewport: SessionStore['viewport'];
   rotation: SessionStore['rotation'];
-  featureCollectionUri: SessionStore['featureCollectionUri'];
   selection: SessionStore['selection'];
   hiddenFeatureIds: SessionStore['hiddenFeatureIds'];
-  savePath: SessionStore['savePath'];
 }
 
 /**
@@ -70,10 +86,8 @@ function createSnapshot(state: SessionStore): StateSnapshot {
     displayMode: state.displayMode,
     viewport: state.viewport,
     rotation: state.rotation,
-    featureCollectionUri: state.featureCollectionUri,
     selection: state.selection,
     hiddenFeatureIds: state.hiddenFeatureIds,
-    savePath: state.savePath,
   };
 }
 
@@ -90,10 +104,8 @@ function applySnapshot(set: Function, snapshot: StateSnapshot): void {
     displayMode: snapshot.displayMode,
     viewport: snapshot.viewport,
     rotation: snapshot.rotation,
-    featureCollectionUri: snapshot.featureCollectionUri,
     selection: snapshot.selection,
     hiddenFeatureIds: snapshot.hiddenFeatureIds,
-    savePath: snapshot.savePath,
   });
 }
 
@@ -140,12 +152,12 @@ export function createSessionStore() {
           ? [] // Can't determine for function updates
           : Object.keys(partial as Record<string, unknown>);
 
-        // Check if any non-ephemeral field is being changed
-        const hasNonEphemeralChange = changedFields.length === 0 ||
-          changedFields.some((field) => !isEphemeralField(field));
+        // Check if any undo-tracked field is being changed
+        const hasUndoableChange = changedFields.length === 0 ||
+          changedFields.some((field) => UNDO_TRACKED_FIELDS.has(field));
 
-        // Record history before change (unless we're undoing/redoing or only ephemeral fields)
-        if (!isUndoRedo && hasNonEphemeralChange) {
+        // Record history before change (unless we're undoing/redoing or only non-tracked fields)
+        if (!isUndoRedo && hasUndoableChange) {
           const snapshot = createSnapshot(prev);
 
           // Only push if different from last
