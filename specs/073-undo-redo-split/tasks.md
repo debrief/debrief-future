@@ -134,7 +134,7 @@
 
 ### PR Creation
 
-- [ ] T026 Create PR and publish blog: run /speckit.pr
+- [x] T026 Create PR and publish blog: run /speckit.pr (branch pushed; PR created manually — GitHub API auth unavailable in cloud env)
 
 **Task T026 must run last. It depends on all evidence and media tasks being complete.**
 
