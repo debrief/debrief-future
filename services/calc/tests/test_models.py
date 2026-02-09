@@ -1,22 +1,34 @@
 """Unit tests for debrief-calc models."""
 
-from datetime import datetime
+import json
+from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 from debrief_calc.models import (
+    BranchRecord,
     ContextType,
     CreatedAsset,
+    FileProvEntry,
+    LogEntry,
     ModifiedFeature,
     ParameterValue,
     PropertyDelta,
     Provenance,
     SelectionContext,
+    SnapshotLinks,
+    SnapshotRef,
     SourceRef,
+    SystemRecordProperties,
     Tool,
     ToolError,
     ToolParameter,
     ToolResult,
+    TuneAnnotation,
+    WasGeneratedBy,
 )
+
+FIXTURES_ROOT = Path(__file__).resolve().parents[2] / ".." / "shared" / "schemas" / "fixtures"
 from pydantic import ValidationError as PydanticValidationError
 
 
@@ -468,3 +480,167 @@ class TestCreatedAsset:
     def test_create_asset_requires_path(self):
         with pytest.raises(PydanticValidationError):
             CreatedAsset(result_id="bt_plot_001")
+
+
+class TestLogEntry:
+    """Tests for LogEntry model."""
+
+    def test_create_log_entry(self):
+        entry = LogEntry(
+            activity_id="550e8400-e29b-41d4-a716-446655440000",
+            timestamp=datetime(2026, 1, 15, 10, 30, 0, tzinfo=timezone.utc),
+            was_generated_by=WasGeneratedBy(
+                tool="calculate-range",
+                tool_version="1.0.0",
+                parameters={"interval": ParameterValue(value=60, default=True, tunable=True)},
+            ),
+            used=["track-alpha"],
+            generated=["range-001"],
+            execution_duration="PT0.3S",
+        )
+        assert entry.activity_id == "550e8400-e29b-41d4-a716-446655440000"
+        assert entry.was_generated_by.tool == "calculate-range"
+        assert entry.execution_duration == "PT0.3S"
+        assert entry.tune is None
+        assert entry.generated_result_id is None
+
+    def test_log_entry_invalid_duration(self):
+        with pytest.raises(PydanticValidationError):
+            LogEntry(
+                activity_id="test",
+                timestamp=datetime.now(timezone.utc),
+                was_generated_by=WasGeneratedBy(
+                    tool="t", tool_version="1.0", parameters={}
+                ),
+                used=[],
+                generated=[],
+                execution_duration="300ms",  # Invalid format
+            )
+
+    def test_log_entry_serialization_camelcase(self):
+        entry = LogEntry(
+            activity_id="test-id",
+            timestamp=datetime(2026, 1, 15, 10, 0, 0, tzinfo=timezone.utc),
+            was_generated_by=WasGeneratedBy(
+                tool="t", tool_version="1.0", parameters={}
+            ),
+            used=[],
+            generated=[],
+            execution_duration="PT1S",
+        )
+        data = entry.model_dump(mode="json", by_alias=True)
+        assert "activityId" in data
+        assert "wasGeneratedBy" in data
+        assert "executionDuration" in data
+        assert "toolVersion" in data["wasGeneratedBy"]
+
+    def test_log_entry_from_fixture(self):
+        fixture = FIXTURES_ROOT / "log-entry" / "valid" / "tool-invocation.json"
+        data = json.loads(fixture.read_text())
+        entry = LogEntry.model_validate(data)
+        assert entry.activity_id == "550e8400-e29b-41d4-a716-446655440000"
+        assert entry.was_generated_by.tool == "calculate-range"
+        assert len(entry.was_generated_by.parameters) == 2
+        assert entry.execution_duration == "PT0.3S"
+
+    def test_log_entry_roundtrip(self):
+        """SC-007: Round-trip test for LogEntry serialisation."""
+        fixture = FIXTURES_ROOT / "log-entry" / "valid" / "artifact-producing.json"
+        data = json.loads(fixture.read_text())
+        entry = LogEntry.model_validate(data)
+        serialized = entry.model_dump(mode="json", by_alias=True)
+        restored = LogEntry.model_validate(serialized)
+        assert restored.activity_id == entry.activity_id
+        assert restored.generated_result_id == entry.generated_result_id
+        assert restored.was_generated_by.tool == entry.was_generated_by.tool
+
+    def test_invalid_fixture_missing_activity_id(self):
+        fixture = FIXTURES_ROOT / "log-entry" / "invalid" / "missing-activity-id.json"
+        data = json.loads(fixture.read_text())
+        with pytest.raises(PydanticValidationError):
+            LogEntry.model_validate(data)
+
+    def test_invalid_fixture_bad_duration(self):
+        fixture = FIXTURES_ROOT / "log-entry" / "invalid" / "bad-duration-format.json"
+        data = json.loads(fixture.read_text())
+        with pytest.raises(PydanticValidationError):
+            LogEntry.model_validate(data)
+
+
+class TestSystemRecordProperties:
+    """Tests for system record models."""
+
+    def test_create_empty_system_record(self):
+        sr = SystemRecordProperties()
+        assert sr.feature_type == "system"
+        assert sr.snapshot_links is None
+        assert sr.branches == []
+        assert sr.provenance == []
+
+    def test_system_record_with_snapshot_links(self):
+        sr = SystemRecordProperties(
+            snapshot_links=SnapshotLinks(
+                prev=SnapshotRef(asset="./snapshots/v1.geojson", prov_entry_count=3),
+                next=None,
+            ),
+        )
+        assert sr.snapshot_links.prev.asset == "./snapshots/v1.geojson"
+        assert sr.snapshot_links.prev.prov_entry_count == 3
+        assert sr.snapshot_links.next is None
+
+    def test_system_record_with_branches(self):
+        sr = SystemRecordProperties(
+            branches=[
+                BranchRecord(
+                    branch_id="branch-001",
+                    branched_from="act-123",
+                    branched_at=datetime(2026, 1, 16, 9, 0, 0, tzinfo=timezone.utc),
+                    target_asset="./branches/branch-001/plot.geojson",
+                ),
+            ],
+        )
+        assert len(sr.branches) == 1
+        assert sr.branches[0].branch_id == "branch-001"
+
+    def test_system_record_from_empty_fixture(self):
+        fixture = FIXTURES_ROOT / "system-record" / "valid" / "empty-system-record.json"
+        data = json.loads(fixture.read_text())
+        sr = SystemRecordProperties.model_validate(data)
+        assert sr.feature_type == "system"
+        assert sr.snapshot_links is None
+        assert sr.branches == []
+
+    def test_system_record_from_populated_fixture(self):
+        fixture = FIXTURES_ROOT / "system-record" / "valid" / "populated-system-record.json"
+        data = json.loads(fixture.read_text())
+        sr = SystemRecordProperties.model_validate(data)
+        assert sr.feature_type == "system"
+        assert sr.snapshot_links.prev is not None
+        assert sr.snapshot_links.prev.prov_entry_count == 5
+        assert len(sr.branches) == 1
+        assert sr.branches[0].branch_id == "branch-001"
+        assert len(sr.provenance) == 2
+        assert sr.provenance[0].type == "snapshot"
+        assert sr.provenance[1].type == "branch"
+        assert sr.provenance[1].direction == "source"
+
+    def test_system_record_invalid_feature_type(self):
+        with pytest.raises(PydanticValidationError):
+            SystemRecordProperties(feature_type="not-system")
+
+    def test_file_prov_entry_invalid_type(self):
+        with pytest.raises(PydanticValidationError):
+            FileProvEntry(
+                activity_id="test",
+                type="invalid",
+                timestamp=datetime.now(timezone.utc),
+            )
+
+    def test_file_prov_entry_invalid_direction(self):
+        with pytest.raises(PydanticValidationError):
+            FileProvEntry(
+                activity_id="test",
+                type="branch",
+                timestamp=datetime.now(timezone.utc),
+                direction="invalid",
+            )

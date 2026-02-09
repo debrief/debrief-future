@@ -473,3 +473,111 @@ class Tool(BaseModel):
             schema["default"] = param.default
 
         return schema
+
+
+# ============================================================================
+# System Record Models (FR-008)
+# ============================================================================
+
+
+class SnapshotRef(BaseModel):
+    """Reference to a snapshot file."""
+
+    asset: str = Field(..., description="Relative path to snapshot GeoJSON file")
+    prov_entry_count: int = Field(
+        ..., alias="provEntryCount", ge=0,
+        description="Number of provenance entries in the snapshot",
+    )
+
+    model_config = {"populate_by_name": True}
+
+
+class SnapshotLinks(BaseModel):
+    """Doubly-linked references to adjacent snapshots."""
+
+    prev: SnapshotRef | None = Field(
+        default=None, description="Link to previous snapshot"
+    )
+    next: SnapshotRef | None = Field(
+        default=None, description="Link to next snapshot"
+    )
+
+
+class BranchRecord(BaseModel):
+    """Reference to a branched plot."""
+
+    branch_id: str = Field(..., alias="branchId", description="Unique branch identifier")
+    branched_from: str = Field(
+        ..., alias="branchedFrom", description="Activity ID of the branch point"
+    )
+    branched_at: datetime = Field(
+        ..., alias="branchedAt", description="When the branch was created"
+    )
+    target_asset: str = Field(
+        ..., alias="targetAsset", description="Relative path to the branched plot file"
+    )
+
+    model_config = {"populate_by_name": True}
+
+
+class FileProvEntry(BaseModel):
+    """File-level provenance event (snapshot or branch creation)."""
+
+    activity_id: str = Field(..., alias="activityId", description="Unique event identifier")
+    type: str = Field(..., description="Event type: snapshot or branch")
+    timestamp: datetime = Field(..., description="When the event occurred")
+    asset: str | None = Field(default=None, description="Path to snapshot file")
+    branch_id: str | None = Field(
+        default=None, alias="branchId", description="Branch identifier"
+    )
+    direction: str | None = Field(
+        default=None, description="'source' or 'target' (for branch events)"
+    )
+
+    model_config = {"populate_by_name": True}
+
+    @field_validator("type")
+    @classmethod
+    def validate_event_type(cls, v: str) -> str:
+        if v not in ("snapshot", "branch"):
+            raise ValueError(f"type must be 'snapshot' or 'branch', got: {v}")
+        return v
+
+    @field_validator("direction")
+    @classmethod
+    def validate_direction(cls, v: str | None) -> str | None:
+        if v is not None and v not in ("source", "target"):
+            raise ValueError(f"direction must be 'source' or 'target', got: {v}")
+        return v
+
+
+class SystemRecordProperties(BaseModel):
+    """
+    Properties for the non-spatial system record feature.
+
+    A system record is a GeoJSON Feature with featureType "system"
+    and Point geometry with empty coordinates.
+    """
+
+    feature_type: str = Field(
+        default="system", alias="featureType", description="Discriminator, always 'system'"
+    )
+    snapshot_links: SnapshotLinks | None = Field(
+        default=None, alias="snapshotLinks",
+        description="Doubly-linked snapshot chain",
+    )
+    branches: list[BranchRecord] = Field(
+        default_factory=list, description="Branch records"
+    )
+    provenance: list[FileProvEntry] = Field(
+        default_factory=list, description="File-level provenance events"
+    )
+
+    model_config = {"populate_by_name": True}
+
+    @field_validator("feature_type")
+    @classmethod
+    def validate_feature_type(cls, v: str) -> str:
+        if v != "system":
+            raise ValueError(f"feature_type must be 'system', got: {v}")
+        return v
