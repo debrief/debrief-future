@@ -49,10 +49,10 @@
 
 **Purpose**: Create directory structure, icon asset, and build configuration for the Log Panel
 
-- [ ] T001 Create shared component directory structure `shared/components/src/LogPanel/`
-- [ ] T002 [P] Create Log Panel activity bar icon `apps/vscode/resources/log-icon.svg`
-- [ ] T003 [P] Add Log Panel webview esbuild entry point to compile script `apps/vscode/package.json`
-- [ ] T004 Register Log Panel view container and view in VS Code package.json contributions `apps/vscode/package.json`
+- [x] T001 Create shared component directory structure `shared/components/src/LogPanel/`
+- [x] T002 [P] Create Log Panel activity bar icon `apps/vscode/resources/log-icon.svg`
+- [x] T003 [P] Add Log Panel webview esbuild entry point to compile script `apps/vscode/package.json`
+- [x] T004 Register Log Panel view container and view in VS Code package.json contributions `apps/vscode/package.json`
 
 ---
 
@@ -60,14 +60,14 @@
 
 **Purpose**: Shared types, strings, utilities, and message protocol that ALL user stories depend on
 
-- [ ] T005 Define shared TypeScript types (TimelineEntry, PresentationMode, ViewMode, FilterState, OperationCategory, LogPanelMessage) `shared/components/src/LogPanel/types.ts`
-- [ ] T006 [P] Create externalisable user-facing strings module `shared/components/src/LogPanel/strings.ts`
-- [ ] T007 [P] Implement operation category classification and filter logic utilities `shared/components/src/LogPanel/utils.ts`
-- [ ] T008 [P] Create LogPanel CSS with VS Code theme variable mapping `shared/components/src/LogPanel/LogPanel.css`
-- [ ] T009 Create LogPanelViewProvider skeleton (WebviewViewProvider, pending message queue, HTML with CSP) `apps/vscode/src/views/logPanelView.ts`
-- [ ] T010 Create webview entry script skeleton (acquireVsCodeApi, React mount, webviewReady signal) `apps/vscode/src/webview/web/logPanel.tsx`
-- [ ] T011 Register LogPanelViewProvider in extension activation `apps/vscode/src/extension.ts`
-- [ ] T012 Create public exports index `shared/components/src/LogPanel/index.ts`
+- [x] T005 Define shared TypeScript types (TimelineEntry, PresentationMode, ViewMode, FilterState, OperationCategory, LogPanelMessage) `shared/components/src/LogPanel/types.ts`
+- [x] T006 [P] Create externalisable user-facing strings module `shared/components/src/LogPanel/strings.ts`
+- [x] T007 [P] Implement operation category classification and filter logic utilities `shared/components/src/LogPanel/utils.ts`
+- [x] T008 [P] Create LogPanel CSS with VS Code theme variable mapping `shared/components/src/LogPanel/LogPanel.css`
+- [x] T009 Create LogPanelViewProvider skeleton (WebviewViewProvider, pending message queue, HTML with CSP) `apps/vscode/src/views/logPanelView.ts`
+- [x] T010 Create webview entry script skeleton (acquireVsCodeApi, React mount, webviewReady signal) `apps/vscode/src/webview/web/logPanel.tsx`
+- [x] T011 Register LogPanelViewProvider in extension activation `apps/vscode/src/extension.ts`
+- [x] T012 Create public exports index `shared/components/src/LogPanel/index.ts`
 
 **Checkpoint**: Foundation ready — panel opens in sidebar with empty shell. User story implementation can now begin.
 
@@ -81,19 +81,19 @@
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] Implement LogEntry component — renders a single timeline entry with tool name and affected feature names `shared/components/src/LogPanel/LogEntry.tsx`
-- [ ] T014 [US1] Implement LogTimeline component — flat chronological list rendering LogEntry items, most recent first `shared/components/src/LogPanel/LogTimeline.tsx`
-- [ ] T015 [US1] Implement LogPanel root component — layout shell with timeline area and empty state handling `shared/components/src/LogPanel/LogPanel.tsx`
-- [ ] T016 [US1] Wire LogPanelViewProvider to SessionManager — subscribe to active session changes, call logService.getTimeline() `apps/vscode/src/views/logPanelView.ts`
-- [ ] T017 [US1] Implement timeline:update message — send timeline data from provider to webview on load, session change, and tool execution `apps/vscode/src/views/logPanelView.ts`
-- [ ] T018 [US1] Implement session:change message — notify webview when active plot changes or closes `apps/vscode/src/views/logPanelView.ts`
-- [ ] T019 [US1] Wire webview entry script to receive timeline:update and session:change, pass data to LogPanel component `apps/vscode/src/webview/web/logPanel.tsx`
-- [ ] T020 [US1] Implement empty states — "No plot is open" and "No operations recorded yet" `shared/components/src/LogPanel/LogPanel.tsx`
-- [ ] T021 [US1] Implement SnapshotBoundary component — visual separator with "Show earlier history" placeholder `shared/components/src/LogPanel/SnapshotBoundary.tsx`
+- [x] T013 [US1] Implement LogEntry component — renders a single timeline entry with tool name and affected feature names `shared/components/src/LogPanel/LogEntry.tsx`
+- [x] T014 [US1] Implement LogTimeline component — flat chronological list rendering LogEntry items, most recent first `shared/components/src/LogPanel/LogTimeline.tsx`
+- [x] T015 [US1] Implement LogPanel root component — layout shell with timeline area and empty state handling `shared/components/src/LogPanel/LogPanel.tsx`
+- [x] T016 [US1] Wire LogPanelViewProvider to SessionManager — subscribe to active session changes, call logService.getTimeline() `apps/vscode/src/views/logPanelView.ts`
+- [x] T017 [US1] Implement timeline:update message — send timeline data from provider to webview on load, session change, and tool execution `apps/vscode/src/views/logPanelView.ts`
+- [x] T018 [US1] Implement session:change message — notify webview when active plot changes or closes `apps/vscode/src/views/logPanelView.ts`
+- [x] T019 [US1] Wire webview entry script to receive timeline:update and session:change, pass data to LogPanel component `apps/vscode/src/webview/web/logPanel.tsx`
+- [x] T020 [US1] Implement empty states — "No plot is open" and "No operations recorded yet" `shared/components/src/LogPanel/LogPanel.tsx`
+- [x] T021 [US1] Implement SnapshotBoundary component — visual separator with "Show earlier history" placeholder `shared/components/src/LogPanel/SnapshotBoundary.tsx`
 
 ### Storybook for User Story 1
 
-- [ ] T022 [P][US1] Create Storybook stories: Timeline Default, Empty State (no plot), Empty State (no entries), Loading State `shared/components/src/LogPanel/LogPanel.stories.tsx`
+- [x] T022 [P][US1] Create Storybook stories: Timeline Default, Empty State (no plot), Empty State (no entries), Loading State `shared/components/src/LogPanel/LogPanel.stories.tsx`
 
 **Checkpoint**: Log Panel opens, shows timeline of entries. Core MVP is functional.
 
@@ -107,16 +107,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T023 [US2] Add selected state to LogEntry component — visual highlight for selected entry, click handler `shared/components/src/LogPanel/LogEntry.tsx`
-- [ ] T024 [US2] Implement entry:select and entry:deselect messages in LogPanel — track selectedEntryId, emit messages via onMessage callback `shared/components/src/LogPanel/LogPanel.tsx`
-- [ ] T025 [US2] Handle entry:select in LogPanelViewProvider — call store.setSelection() with affected feature IDs `apps/vscode/src/views/logPanelView.ts`
-- [ ] T026 [US2] Handle entry:deselect in LogPanelViewProvider — clear feature selection `apps/vscode/src/views/logPanelView.ts`
-- [ ] T027 [US2] Wire webview entry script to send entry:select/entry:deselect messages to extension `apps/vscode/src/webview/web/logPanel.tsx`
-- [ ] T028 [US2] Handle deleted features — show "(deleted)" label, skip in selection `shared/components/src/LogPanel/utils.ts`
+- [x] T023 [US2] Add selected state to LogEntry component — visual highlight for selected entry, click handler `shared/components/src/LogPanel/LogEntry.tsx`
+- [x] T024 [US2] Implement entry:select and entry:deselect messages in LogPanel — track selectedEntryId, emit messages via onMessage callback `shared/components/src/LogPanel/LogPanel.tsx`
+- [x] T025 [US2] Handle entry:select in LogPanelViewProvider — call store.setSelection() with affected feature IDs `apps/vscode/src/views/logPanelView.ts`
+- [x] T026 [US2] Handle entry:deselect in LogPanelViewProvider — clear feature selection `apps/vscode/src/views/logPanelView.ts`
+- [x] T027 [US2] Wire webview entry script to send entry:select/entry:deselect messages to extension `apps/vscode/src/webview/web/logPanel.tsx`
+- [x] T028 [US2] Handle deleted features — show "(deleted)" label, skip in selection `shared/components/src/LogPanel/utils.ts`
 
 ### Storybook for User Story 2
 
-- [ ] T029 [P][US2] Add Storybook stories: Entry Selected, Entry with deleted feature `shared/components/src/LogPanel/LogPanel.stories.tsx`
+- [x] T029 [P][US2] Add Storybook stories: Entry Selected, Entry with deleted feature `shared/components/src/LogPanel/LogPanel.stories.tsx`
 
 **Checkpoint**: Clicking entries selects features on map. Core interactive functionality complete.
 
@@ -130,16 +130,16 @@
 
 ### Implementation for User Story 3
 
-- [ ] T030 [US3] Extend LogEntry component with Compact/Normal/Detailed rendering — show additional fields per mode `shared/components/src/LogPanel/LogEntry.tsx`
-- [ ] T031 [US3] Add presentation mode toggle control to LogPanel — three-way toggle (Compact/Normal/Detailed) `shared/components/src/LogPanel/LogPanel.tsx`
-- [ ] T032 [US3] Add tool version tooltip on hover in LogEntry `shared/components/src/LogPanel/LogEntry.tsx`
-- [ ] T033 [US3] Implement mode:change message — webview sends mode changes to extension for persistence `apps/vscode/src/webview/web/logPanel.tsx`
-- [ ] T034 [US3] Persist presentation mode in LogPanelViewProvider — save to context.globalState, restore on panel open `apps/vscode/src/views/logPanelView.ts`
-- [ ] T035 [US3] Send initial presentation mode to webview on panel load `apps/vscode/src/views/logPanelView.ts`
+- [x] T030 [US3] Extend LogEntry component with Compact/Normal/Detailed rendering — show additional fields per mode `shared/components/src/LogPanel/LogEntry.tsx`
+- [x] T031 [US3] Add presentation mode toggle control to LogPanel — three-way toggle (Compact/Normal/Detailed) `shared/components/src/LogPanel/LogPanel.tsx`
+- [x] T032 [US3] Add tool version tooltip on hover in LogEntry `shared/components/src/LogPanel/LogEntry.tsx`
+- [x] T033 [US3] Implement mode:change message — webview sends mode changes to extension for persistence `apps/vscode/src/webview/web/logPanel.tsx`
+- [x] T034 [US3] Persist presentation mode in LogPanelViewProvider — save to context.globalState, restore on panel open `apps/vscode/src/views/logPanelView.ts`
+- [x] T035 [US3] Send initial presentation mode to webview on panel load `apps/vscode/src/views/logPanelView.ts`
 
 ### Storybook for User Story 3
 
-- [ ] T036 [P][US3] Add Storybook stories: Compact Mode, Normal Mode, Detailed Mode `shared/components/src/LogPanel/LogPanel.stories.tsx`
+- [x] T036 [P][US3] Add Storybook stories: Compact Mode, Normal Mode, Detailed Mode `shared/components/src/LogPanel/LogPanel.stories.tsx`
 
 **Checkpoint**: Three presentation modes work with persistence. Visual completeness for entries.
 
@@ -153,15 +153,15 @@
 
 ### Implementation for User Story 4
 
-- [ ] T037 [US4] Implement LogFilterRow component — search input, tool type dropdown, category dropdown, collapse toggle `shared/components/src/LogPanel/LogFilterRow.tsx`
-- [ ] T038 [US4] Implement filter application logic — text search across tool name, feature name, parameter values; AND combination of filters `shared/components/src/LogPanel/utils.ts`
-- [ ] T039 [US4] Integrate LogFilterRow into LogPanel — manage FilterState, apply filters to timeline, show "N of M entries" indicator `shared/components/src/LogPanel/LogPanel.tsx`
-- [ ] T040 [US4] Populate tool type dropdown dynamically from current timeline entries `shared/components/src/LogPanel/utils.ts`
-- [ ] T041 [US4] Add filter chip/badge display for active filters `shared/components/src/LogPanel/LogPanel.tsx`
+- [x] T037 [US4] Implement LogFilterRow component — search input, tool type dropdown, category dropdown, collapse toggle `shared/components/src/LogPanel/LogFilterRow.tsx`
+- [x] T038 [US4] Implement filter application logic — text search across tool name, feature name, parameter values; AND combination of filters `shared/components/src/LogPanel/utils.ts`
+- [x] T039 [US4] Integrate LogFilterRow into LogPanel — manage FilterState, apply filters to timeline, show "N of M entries" indicator `shared/components/src/LogPanel/LogPanel.tsx`
+- [x] T040 [US4] Populate tool type dropdown dynamically from current timeline entries `shared/components/src/LogPanel/utils.ts`
+- [x] T041 [US4] Add filter chip/badge display for active filters `shared/components/src/LogPanel/LogPanel.tsx`
 
 ### Storybook for User Story 4
 
-- [ ] T042 [P][US4] Add Storybook stories: Filter Active (text search), Filter Active (tool type), Filter Active (category), Collapsed filter row `shared/components/src/LogPanel/LogPanel.stories.tsx`
+- [x] T042 [P][US4] Add Storybook stories: Filter Active (text search), Filter Active (tool type), Filter Active (category), Collapsed filter row `shared/components/src/LogPanel/LogPanel.stories.tsx`
 
 **Checkpoint**: Filtering works. Panel usable at scale with many entries.
 
@@ -175,14 +175,14 @@
 
 ### Implementation for User Story 5
 
-- [ ] T043 [US5] Implement LogByFeature component — group entries by feature, render headings with per-feature entry lists `shared/components/src/LogPanel/LogByFeature.tsx`
-- [ ] T044 [US5] Implement feature grouping logic — distribute multi-feature entries across groups, sort within groups `shared/components/src/LogPanel/utils.ts`
-- [ ] T045 [US5] Add view mode toggle to LogPanel — switch between Timeline and By-Feature views `shared/components/src/LogPanel/LogPanel.tsx`
-- [ ] T046 [US5] Ensure filters apply in both view modes `shared/components/src/LogPanel/LogPanel.tsx`
+- [x] T043 [US5] Implement LogByFeature component — group entries by feature, render headings with per-feature entry lists `shared/components/src/LogPanel/LogByFeature.tsx`
+- [x] T044 [US5] Implement feature grouping logic — distribute multi-feature entries across groups, sort within groups `shared/components/src/LogPanel/utils.ts`
+- [x] T045 [US5] Add view mode toggle to LogPanel — switch between Timeline and By-Feature views `shared/components/src/LogPanel/LogPanel.tsx`
+- [x] T046 [US5] Ensure filters apply in both view modes `shared/components/src/LogPanel/LogPanel.tsx`
 
 ### Storybook for User Story 5
 
-- [ ] T047 [P][US5] Add Storybook stories: By-Feature View, By-Feature with multi-feature entry `shared/components/src/LogPanel/LogPanel.stories.tsx`
+- [x] T047 [P][US5] Add Storybook stories: By-Feature View, By-Feature with multi-feature entry `shared/components/src/LogPanel/LogPanel.stories.tsx`
 
 **Checkpoint**: Both view modes work. Panel provides two perspectives on analytical history.
 
@@ -196,15 +196,15 @@
 
 ### Implementation for User Story 6
 
-- [ ] T048 [US6] Implement LogActionBar component — 5 action buttons with disabled state based on selection `shared/components/src/LogPanel/LogActionBar.tsx`
-- [ ] T049 [US6] Implement action:invoke message handling — webview sends action type and activityId `shared/components/src/LogPanel/LogPanel.tsx`
-- [ ] T050 [US6] Handle action:invoke in LogPanelViewProvider — return action:result with "not available" message `apps/vscode/src/views/logPanelView.ts`
-- [ ] T051 [US6] Display action result notification in webview `apps/vscode/src/webview/web/logPanel.tsx`
-- [ ] T052 [US6] Integrate LogActionBar into LogPanel layout `shared/components/src/LogPanel/LogPanel.tsx`
+- [x] T048 [US6] Implement LogActionBar component — 5 action buttons with disabled state based on selection `shared/components/src/LogPanel/LogActionBar.tsx`
+- [x] T049 [US6] Implement action:invoke message handling — webview sends action type and activityId `shared/components/src/LogPanel/LogPanel.tsx`
+- [x] T050 [US6] Handle action:invoke in LogPanelViewProvider — return action:result with "not available" message `apps/vscode/src/views/logPanelView.ts`
+- [x] T051 [US6] Display action result notification in webview `apps/vscode/src/webview/web/logPanel.tsx`
+- [x] T052 [US6] Integrate LogActionBar into LogPanel layout `shared/components/src/LogPanel/LogPanel.tsx`
 
 ### Storybook for User Story 6
 
-- [ ] T053 [P][US6] Add Storybook stories: Actions Enabled (entry selected), Actions Disabled (no selection) `shared/components/src/LogPanel/LogPanel.stories.tsx`
+- [x] T053 [P][US6] Add Storybook stories: Actions Enabled (entry selected), Actions Disabled (no selection) `shared/components/src/LogPanel/LogPanel.stories.tsx`
 
 **Checkpoint**: Full panel layout complete. All UI elements present including placeholder actions.
 

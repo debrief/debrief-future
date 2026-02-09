@@ -1,0 +1,38 @@
+/**
+ * LogTimeline component — flat chronological list of LogEntry items.
+ * Entries are expected to be pre-sorted most-recent-first.
+ *
+ * Feature: 072-log-panel
+ */
+
+import React from 'react';
+import type { LogTimelineProps } from './types';
+import { LogEntry } from './LogEntry';
+
+export function LogTimeline({
+  entries,
+  featureNames,
+  presentationMode,
+  selectedEntryId,
+  onEntryClick,
+  className,
+}: LogTimelineProps): React.ReactElement {
+  return (
+    <div
+      className={`log-panel__timeline ${className ?? ''}`}
+      data-testid="log-timeline"
+      role="list"
+    >
+      {entries.map((entry) => (
+        <LogEntry
+          key={entry.activityId}
+          entry={entry}
+          featureNames={featureNames}
+          presentationMode={presentationMode}
+          isSelected={entry.activityId === selectedEntryId}
+          onClick={onEntryClick}
+        />
+      ))}
+    </div>
+  );
+}
