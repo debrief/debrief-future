@@ -1,7 +1,7 @@
 """Unit tests for debrief-calc models."""
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -24,12 +24,11 @@ from debrief_calc.models import (
     ToolError,
     ToolParameter,
     ToolResult,
-    TuneAnnotation,
     WasGeneratedBy,
 )
+from pydantic import ValidationError as PydanticValidationError
 
 FIXTURES_ROOT = Path(__file__).resolve().parents[2] / ".." / "shared" / "schemas" / "fixtures"
-from pydantic import ValidationError as PydanticValidationError
 
 
 class TestContextType:
@@ -488,7 +487,7 @@ class TestLogEntry:
     def test_create_log_entry(self):
         entry = LogEntry(
             activity_id="550e8400-e29b-41d4-a716-446655440000",
-            timestamp=datetime(2026, 1, 15, 10, 30, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2026, 1, 15, 10, 30, 0, tzinfo=UTC),
             was_generated_by=WasGeneratedBy(
                 tool="calculate-range",
                 tool_version="1.0.0",
@@ -508,10 +507,8 @@ class TestLogEntry:
         with pytest.raises(PydanticValidationError):
             LogEntry(
                 activity_id="test",
-                timestamp=datetime.now(timezone.utc),
-                was_generated_by=WasGeneratedBy(
-                    tool="t", tool_version="1.0", parameters={}
-                ),
+                timestamp=datetime.now(UTC),
+                was_generated_by=WasGeneratedBy(tool="t", tool_version="1.0", parameters={}),
                 used=[],
                 generated=[],
                 execution_duration="300ms",  # Invalid format
@@ -520,10 +517,8 @@ class TestLogEntry:
     def test_log_entry_serialization_camelcase(self):
         entry = LogEntry(
             activity_id="test-id",
-            timestamp=datetime(2026, 1, 15, 10, 0, 0, tzinfo=timezone.utc),
-            was_generated_by=WasGeneratedBy(
-                tool="t", tool_version="1.0", parameters={}
-            ),
+            timestamp=datetime(2026, 1, 15, 10, 0, 0, tzinfo=UTC),
+            was_generated_by=WasGeneratedBy(tool="t", tool_version="1.0", parameters={}),
             used=[],
             generated=[],
             execution_duration="PT1S",
@@ -594,7 +589,7 @@ class TestSystemRecordProperties:
                 BranchRecord(
                     branch_id="branch-001",
                     branched_from="act-123",
-                    branched_at=datetime(2026, 1, 16, 9, 0, 0, tzinfo=timezone.utc),
+                    branched_at=datetime(2026, 1, 16, 9, 0, 0, tzinfo=UTC),
                     target_asset="./branches/branch-001/plot.geojson",
                 ),
             ],
@@ -633,7 +628,7 @@ class TestSystemRecordProperties:
             FileProvEntry(
                 activity_id="test",
                 type="invalid",
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
             )
 
     def test_file_prov_entry_invalid_direction(self):
@@ -641,6 +636,6 @@ class TestSystemRecordProperties:
             FileProvEntry(
                 activity_id="test",
                 type="branch",
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 direction="invalid",
             )

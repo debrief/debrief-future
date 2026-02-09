@@ -14,7 +14,7 @@ The Log entry format follows W3C PROV vocabulary:
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from debrief_calc.models import LogEntry, ParameterValue, Provenance, SourceRef, WasGeneratedBy
@@ -76,7 +76,7 @@ def create_log_entry(
 
     return LogEntry(
         activity_id=activity_id or str(uuid.uuid4()),
-        timestamp=timestamp or datetime.now(timezone.utc),
+        timestamp=timestamp or datetime.now(UTC),
         was_generated_by=WasGeneratedBy(
             tool=tool_name,
             tool_version=tool_version,
@@ -154,7 +154,7 @@ def create_provenance(
     return Provenance(
         tool=tool_name,
         version=tool_version,
-        timestamp=timestamp or datetime.now(timezone.utc),
+        timestamp=timestamp or datetime.now(UTC),
         sources=sources,
         parameters=parameters or {},
     )

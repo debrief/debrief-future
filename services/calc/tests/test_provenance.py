@@ -1,8 +1,8 @@
 """Unit tests for debrief-calc provenance module."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from debrief_calc.models import LogEntry, ParameterValue, Provenance, SourceRef
+from debrief_calc.models import ParameterValue, Provenance, SourceRef
 from debrief_calc.provenance import (
     _duration_ms_to_iso8601,
     attach_log_entry,
@@ -84,7 +84,7 @@ class TestCreateLogEntry:
 
     def test_create_log_entry_with_custom_timestamp(self):
         features = [{"id": "f1", "properties": {"kind": "TRACK"}, "geometry": None}]
-        custom_time = datetime(2026, 1, 15, 12, 0, 0, tzinfo=timezone.utc)
+        custom_time = datetime(2026, 1, 15, 12, 0, 0, tzinfo=UTC)
 
         entry = create_log_entry(
             tool_name="tool",

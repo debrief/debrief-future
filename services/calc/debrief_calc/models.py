@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
@@ -78,7 +78,9 @@ class ParameterValue(BaseModel):
 
     value: Any = Field(..., description="The parameter value")
     default: bool = Field(default=False, description="Whether this is the default value")
-    tunable: bool = Field(default=True, description="Whether this parameter can be modified during replay")
+    tunable: bool = Field(
+        default=True, description="Whether this parameter can be modified during replay"
+    )
 
 
 class PropertyDelta(BaseModel):
@@ -160,17 +162,18 @@ class LogEntry(BaseModel):
     was_generated_by: WasGeneratedBy = Field(
         ..., alias="wasGeneratedBy", description="Tool identity and parameters"
     )
-    used: list[str] = Field(
-        default_factory=list, description="Feature IDs of inputs"
-    )
+    used: list[str] = Field(default_factory=list, description="Feature IDs of inputs")
     generated: list[str] = Field(
         default_factory=list, description="Feature IDs or asset paths of outputs"
     )
     execution_duration: str = Field(
-        ..., alias="executionDuration", description="Wall-clock time in ISO 8601 duration (e.g., PT0.3S)"
+        ...,
+        alias="executionDuration",
+        description="Wall-clock time in ISO 8601 duration (e.g., PT0.3S)",
     )
     generated_result_id: str | None = Field(
-        default=None, alias="generatedResultId",
+        default=None,
+        alias="generatedResultId",
         description="Stable logical identity for artifact-producing tools",
     )
     tune: TuneAnnotation | None = Field(
@@ -185,7 +188,9 @@ class LogEntry(BaseModel):
         import re as _re
 
         if not _re.match(r"^PT[0-9]+(\.[0-9]+)?S$", v):
-            raise ValueError(f"execution_duration must be ISO 8601 duration (e.g., PT0.3S), got: {v}")
+            raise ValueError(
+                f"execution_duration must be ISO 8601 duration (e.g., PT0.3S), got: {v}"
+            )
         return v
 
 
@@ -485,7 +490,9 @@ class SnapshotRef(BaseModel):
 
     asset: str = Field(..., description="Relative path to snapshot GeoJSON file")
     prov_entry_count: int = Field(
-        ..., alias="provEntryCount", ge=0,
+        ...,
+        alias="provEntryCount",
+        ge=0,
         description="Number of provenance entries in the snapshot",
     )
 
@@ -495,12 +502,8 @@ class SnapshotRef(BaseModel):
 class SnapshotLinks(BaseModel):
     """Doubly-linked references to adjacent snapshots."""
 
-    prev: SnapshotRef | None = Field(
-        default=None, description="Link to previous snapshot"
-    )
-    next: SnapshotRef | None = Field(
-        default=None, description="Link to next snapshot"
-    )
+    prev: SnapshotRef | None = Field(default=None, description="Link to previous snapshot")
+    next: SnapshotRef | None = Field(default=None, description="Link to next snapshot")
 
 
 class BranchRecord(BaseModel):
@@ -527,9 +530,7 @@ class FileProvEntry(BaseModel):
     type: str = Field(..., description="Event type: snapshot or branch")
     timestamp: datetime = Field(..., description="When the event occurred")
     asset: str | None = Field(default=None, description="Path to snapshot file")
-    branch_id: str | None = Field(
-        default=None, alias="branchId", description="Branch identifier"
-    )
+    branch_id: str | None = Field(default=None, alias="branchId", description="Branch identifier")
     direction: str | None = Field(
         default=None, description="'source' or 'target' (for branch events)"
     )
@@ -563,12 +564,11 @@ class SystemRecordProperties(BaseModel):
         default="system", alias="featureType", description="Discriminator, always 'system'"
     )
     snapshot_links: SnapshotLinks | None = Field(
-        default=None, alias="snapshotLinks",
+        default=None,
+        alias="snapshotLinks",
         description="Doubly-linked snapshot chain",
     )
-    branches: list[BranchRecord] = Field(
-        default_factory=list, description="Branch records"
-    )
+    branches: list[BranchRecord] = Field(default_factory=list, description="Branch records")
     provenance: list[FileProvEntry] = Field(
         default_factory=list, description="File-level provenance events"
     )
