@@ -129,34 +129,50 @@ def validate_tool_output(
                 {"feature_index": i, "error": f"Expected kind '{expected_kind}', got '{kind}'"}
             )
 
-        # Check provenance
+        # Check provenance (PROV-aligned array format)
         provenance = properties.get("provenance")
         if provenance is None:
             validation_errors.append(
                 {"feature_index": i, "error": "Feature.properties.provenance is required"}
             )
-        elif not isinstance(provenance, dict):
+        elif not isinstance(provenance, list):
             validation_errors.append(
-                {"feature_index": i, "error": "Feature.properties.provenance must be a dictionary"}
+                {"feature_index": i, "error": "Feature.properties.provenance must be an array"}
+            )
+        elif len(provenance) == 0:
+            validation_errors.append(
+                {"feature_index": i, "error": "Feature.properties.provenance must not be empty"}
             )
         else:
-            # Validate provenance structure
-            if "tool" not in provenance:
+            # Validate the most recent entry has PROV fields
+            latest = provenance[-1]
+            if not isinstance(latest, dict):
                 validation_errors.append(
-                    {"feature_index": i, "error": "provenance.tool is required"}
+                    {"feature_index": i, "error": "provenance entry must be a dictionary"}
                 )
-            if "version" not in provenance:
-                validation_errors.append(
-                    {"feature_index": i, "error": "provenance.version is required"}
-                )
-            if "timestamp" not in provenance:
-                validation_errors.append(
-                    {"feature_index": i, "error": "provenance.timestamp is required"}
-                )
-            if "sources" not in provenance:
-                validation_errors.append(
-                    {"feature_index": i, "error": "provenance.sources is required"}
-                )
+            else:
+                if "activityId" not in latest:
+                    validation_errors.append(
+                        {"feature_index": i, "error": "provenance entry activityId is required"}
+                    )
+                if "timestamp" not in latest:
+                    validation_errors.append(
+                        {"feature_index": i, "error": "provenance entry timestamp is required"}
+                    )
+                wgb = latest.get("wasGeneratedBy")
+                if wgb is None:
+                    validation_errors.append(
+                        {"feature_index": i, "error": "provenance entry wasGeneratedBy is required"}
+                    )
+                elif isinstance(wgb, dict):
+                    if "tool" not in wgb:
+                        validation_errors.append(
+                            {"feature_index": i, "error": "wasGeneratedBy.tool is required"}
+                        )
+                    if "toolVersion" not in wgb:
+                        validation_errors.append(
+                            {"feature_index": i, "error": "wasGeneratedBy.toolVersion is required"}
+                        )
 
     if validation_errors:
         raise ValidationError(f"Tool '{tool_name}' produced invalid output", validation_errors)

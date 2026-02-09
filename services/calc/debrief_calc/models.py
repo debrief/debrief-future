@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import StrEnum
 from typing import Any
 
@@ -103,6 +103,90 @@ class CreatedAsset(BaseModel):
     result_id: str = Field(..., description="Stable logical identity (e.g., bt_plot_001)")
     path: str = Field(..., description="Full versioned path (e.g., ./results/bt_plot_001_v2.png)")
     mime_type: str | None = Field(default=None, description="MIME type of the artifact")
+
+
+class TuneAnnotation(BaseModel):
+    """Records a parameter modification (appended, not replacing original)."""
+
+    timestamp: datetime = Field(..., description="When the tuning occurred")
+    parameter: str = Field(..., description="Name of the parameter that was changed")
+    previous_value: Any = Field(..., description="Value before tuning")
+    new_value: Any = Field(..., description="Value after tuning")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "timestamp": "2026-01-15T12:00:00Z",
+                    "parameter": "interval",
+                    "previousValue": 60,
+                    "newValue": 120,
+                }
+            ]
+        }
+    }
+
+
+class WasGeneratedBy(BaseModel):
+    """
+    Identifies the tool and its parameters for a specific invocation.
+
+    Named after the W3C PROV vocabulary term.
+    """
+
+    tool: str = Field(..., description="Tool identifier (kebab-case)")
+    tool_version: str = Field(..., alias="toolVersion", description="Semantic version of the tool")
+    parameters: dict[str, ParameterValue] = Field(
+        default_factory=dict,
+        description="Full resolved parameter set",
+    )
+
+    model_config = {"populate_by_name": True}
+
+
+class LogEntry(BaseModel):
+    """
+    A PROV-aligned provenance record stored on GeoJSON features.
+
+    Replaces the deprecated Provenance class. Each LogEntry captures a single
+    tool invocation with W3C PROV vocabulary. Entries are stored as an
+    append-only array in feature.properties.provenance.
+    """
+
+    activity_id: str = Field(
+        ..., alias="activityId", description="Unique operation identifier (UUID v4)"
+    )
+    timestamp: datetime = Field(..., description="When the operation occurred")
+    was_generated_by: WasGeneratedBy = Field(
+        ..., alias="wasGeneratedBy", description="Tool identity and parameters"
+    )
+    used: list[str] = Field(
+        default_factory=list, description="Feature IDs of inputs"
+    )
+    generated: list[str] = Field(
+        default_factory=list, description="Feature IDs or asset paths of outputs"
+    )
+    execution_duration: str = Field(
+        ..., alias="executionDuration", description="Wall-clock time in ISO 8601 duration (e.g., PT0.3S)"
+    )
+    generated_result_id: str | None = Field(
+        default=None, alias="generatedResultId",
+        description="Stable logical identity for artifact-producing tools",
+    )
+    tune: TuneAnnotation | None = Field(
+        default=None, description="Parameter tuning record (null until tuned)"
+    )
+
+    model_config = {"populate_by_name": True}
+
+    @field_validator("execution_duration")
+    @classmethod
+    def validate_duration_format(cls, v: str) -> str:
+        import re as _re
+
+        if not _re.match(r"^PT[0-9]+(\.[0-9]+)?S$", v):
+            raise ValueError(f"execution_duration must be ISO 8601 duration (e.g., PT0.3S), got: {v}")
+        return v
 
 
 class ToolParameter(BaseModel):

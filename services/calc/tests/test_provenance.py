@@ -1,17 +1,252 @@
 """Unit tests for debrief-calc provenance module."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 
-from debrief_calc.models import Provenance, SourceRef
+from debrief_calc.models import LogEntry, ParameterValue, Provenance, SourceRef
 from debrief_calc.provenance import (
+    _duration_ms_to_iso8601,
+    attach_log_entry,
     attach_provenance,
+    create_log_entry,
     create_provenance,
     set_output_kind,
 )
 
 
+class TestDurationConversion:
+    """Tests for ISO 8601 duration conversion."""
+
+    def test_whole_seconds(self):
+        assert _duration_ms_to_iso8601(1000.0) == "PT1S"
+        assert _duration_ms_to_iso8601(0.0) == "PT0S"
+
+    def test_fractional_seconds(self):
+        assert _duration_ms_to_iso8601(300.0) == "PT0.3S"
+        assert _duration_ms_to_iso8601(1200.0) == "PT1.2S"
+
+    def test_small_fractions(self):
+        result = _duration_ms_to_iso8601(10.0)
+        assert result == "PT0.01S"
+
+
+class TestCreateLogEntry:
+    """Tests for create_log_entry function."""
+
+    def test_create_basic_log_entry(self):
+        features = [{"id": "track-001", "properties": {"kind": "TRACK"}, "geometry": None}]
+        entry = create_log_entry(
+            tool_name="track-stats",
+            tool_version="1.0.0",
+            source_features=features,
+            duration_ms=300.0,
+        )
+
+        assert entry.was_generated_by.tool == "track-stats"
+        assert entry.was_generated_by.tool_version == "1.0.0"
+        assert entry.used == ["track-001"]
+        assert entry.generated == []
+        assert entry.execution_duration == "PT0.3S"
+        assert entry.generated_result_id is None
+        assert entry.tune is None
+        assert isinstance(entry.activity_id, str)
+        assert len(entry.activity_id) == 36  # UUID format
+        assert isinstance(entry.timestamp, datetime)
+
+    def test_create_log_entry_with_parameters(self):
+        features = [{"id": "f1", "properties": {"kind": "TRACK"}, "geometry": None}]
+        entry = create_log_entry(
+            tool_name="tool",
+            tool_version="2.0.0",
+            source_features=features,
+            parameters={"unit": "nm", "format": "json"},
+            duration_ms=100.0,
+        )
+
+        assert len(entry.was_generated_by.parameters) == 2
+        assert entry.was_generated_by.parameters["unit"].value == "nm"
+        assert entry.was_generated_by.parameters["unit"].default is False
+        assert entry.was_generated_by.parameters["unit"].tunable is True
+
+    def test_create_log_entry_with_typed_parameters(self):
+        features = [{"id": "f1", "properties": {"kind": "TRACK"}, "geometry": None}]
+        entry = create_log_entry(
+            tool_name="tool",
+            tool_version="1.0.0",
+            source_features=features,
+            parameters={"interval": ParameterValue(value=60, default=True, tunable=True)},
+            duration_ms=0.0,
+        )
+
+        pv = entry.was_generated_by.parameters["interval"]
+        assert pv.value == 60
+        assert pv.default is True
+        assert pv.tunable is True
+
+    def test_create_log_entry_with_custom_timestamp(self):
+        features = [{"id": "f1", "properties": {"kind": "TRACK"}, "geometry": None}]
+        custom_time = datetime(2026, 1, 15, 12, 0, 0, tzinfo=timezone.utc)
+
+        entry = create_log_entry(
+            tool_name="tool",
+            tool_version="1.0.0",
+            source_features=features,
+            timestamp=custom_time,
+            duration_ms=0.0,
+        )
+
+        assert entry.timestamp == custom_time
+
+    def test_create_log_entry_multiple_sources(self):
+        features = [
+            {"id": "track-001", "properties": {"kind": "TRACK"}, "geometry": None},
+            {"id": "track-002", "properties": {"kind": "TRACK"}, "geometry": None},
+            {"id": "zone-001", "properties": {"kind": "ZONE"}, "geometry": None},
+        ]
+        entry = create_log_entry(
+            tool_name="multi-tool",
+            tool_version="1.0.0",
+            source_features=features,
+            duration_ms=0.0,
+        )
+
+        assert entry.used == ["track-001", "track-002", "zone-001"]
+
+    def test_create_log_entry_missing_id(self):
+        features = [{"properties": {"kind": "TRACK"}, "geometry": None}]
+        entry = create_log_entry(
+            tool_name="tool", tool_version="1.0.0", source_features=features, duration_ms=0.0
+        )
+
+        assert entry.used == ["unknown"]
+
+    def test_create_log_entry_with_custom_activity_id(self):
+        features = [{"id": "f1", "properties": {"kind": "TRACK"}, "geometry": None}]
+        entry = create_log_entry(
+            tool_name="tool",
+            tool_version="1.0.0",
+            source_features=features,
+            duration_ms=0.0,
+            activity_id="custom-id-123",
+        )
+
+        assert entry.activity_id == "custom-id-123"
+
+    def test_create_log_entry_with_generated(self):
+        features = [{"id": "f1", "properties": {"kind": "TRACK"}, "geometry": None}]
+        entry = create_log_entry(
+            tool_name="tool",
+            tool_version="1.0.0",
+            source_features=features,
+            duration_ms=0.0,
+            generated=["result-001", "./assets/output.png"],
+            generated_result_id="bt_plot_001",
+        )
+
+        assert entry.generated == ["result-001", "./assets/output.png"]
+        assert entry.generated_result_id == "bt_plot_001"
+
+
+class TestAttachLogEntry:
+    """Tests for attach_log_entry function."""
+
+    def _make_entry(self, tool="test-tool", activity_id="act-001"):
+        return create_log_entry(
+            tool_name=tool,
+            tool_version="1.0.0",
+            source_features=[{"id": "src-1", "properties": {"kind": "TRACK"}, "geometry": None}],
+            duration_ms=100.0,
+            activity_id=activity_id,
+        )
+
+    def test_attach_log_entry_creates_array(self):
+        feature = {"type": "Feature", "properties": {"data": "test"}, "geometry": None}
+        entry = self._make_entry()
+
+        result = attach_log_entry(feature, entry)
+
+        assert result is feature
+        prov = feature["properties"]["provenance"]
+        assert isinstance(prov, list)
+        assert len(prov) == 1
+        assert prov[0]["activityId"] == "act-001"
+        assert prov[0]["wasGeneratedBy"]["tool"] == "test-tool"
+        assert prov[0]["wasGeneratedBy"]["toolVersion"] == "1.0.0"
+
+    def test_attach_log_entry_appends_to_array(self):
+        feature = {"type": "Feature", "properties": {"provenance": []}, "geometry": None}
+        entry1 = self._make_entry(activity_id="act-001")
+        entry2 = self._make_entry(tool="second-tool", activity_id="act-002")
+
+        attach_log_entry(feature, entry1)
+        attach_log_entry(feature, entry2)
+
+        prov = feature["properties"]["provenance"]
+        assert len(prov) == 2
+        assert prov[0]["activityId"] == "act-001"
+        assert prov[1]["activityId"] == "act-002"
+
+    def test_attach_log_entry_creates_properties(self):
+        feature = {"type": "Feature", "geometry": None}
+        entry = self._make_entry()
+
+        attach_log_entry(feature, entry)
+
+        assert "properties" in feature
+        assert "provenance" in feature["properties"]
+
+    def test_attach_log_entry_wraps_legacy_dict(self):
+        legacy_prov = {"tool": "old-tool", "version": "1.0.0", "timestamp": "2026-01-01T00:00:00Z"}
+        feature = {"type": "Feature", "properties": {"provenance": legacy_prov}, "geometry": None}
+        entry = self._make_entry()
+
+        attach_log_entry(feature, entry)
+
+        prov = feature["properties"]["provenance"]
+        assert isinstance(prov, list)
+        assert len(prov) == 2
+        assert prov[0] == legacy_prov  # Legacy entry preserved
+        assert prov[1]["activityId"] == "act-001"  # New entry appended
+
+    def test_attach_log_entry_shared_activity_id(self):
+        feature1 = {"type": "Feature", "properties": {}, "geometry": None}
+        feature2 = {"type": "Feature", "properties": {}, "geometry": None}
+        entry = self._make_entry(activity_id="shared-uuid")
+
+        attach_log_entry(feature1, entry)
+        attach_log_entry(feature2, entry)
+
+        assert feature1["properties"]["provenance"][0]["activityId"] == "shared-uuid"
+        assert feature2["properties"]["provenance"][0]["activityId"] == "shared-uuid"
+
+    def test_attach_log_entry_iso_duration(self):
+        feature = {"type": "Feature", "properties": {}, "geometry": None}
+        entry = self._make_entry()
+
+        attach_log_entry(feature, entry)
+
+        prov = feature["properties"]["provenance"][0]
+        assert prov["executionDuration"] == "PT0.1S"
+
+    def test_attach_log_entry_camelcase_keys(self):
+        feature = {"type": "Feature", "properties": {}, "geometry": None}
+        entry = self._make_entry()
+
+        attach_log_entry(feature, entry)
+
+        prov = feature["properties"]["provenance"][0]
+        # Verify camelCase keys
+        assert "activityId" in prov
+        assert "wasGeneratedBy" in prov
+        assert "executionDuration" in prov
+        assert "generatedResultId" in prov
+        # Verify no snake_case keys
+        assert "activity_id" not in prov
+        assert "was_generated_by" not in prov
+        assert "execution_duration" not in prov
+
+
 class TestCreateProvenance:
-    """Tests for create_provenance function."""
+    """Tests for deprecated create_provenance function (backward compat)."""
 
     def test_create_basic_provenance(self):
         features = [{"id": "track-001", "properties": {"kind": "TRACK"}, "geometry": None}]
@@ -27,58 +262,9 @@ class TestCreateProvenance:
         assert prov.parameters == {}
         assert isinstance(prov.timestamp, datetime)
 
-    def test_create_provenance_with_parameters(self):
-        features = [{"id": "f1", "properties": {"kind": "TRACK"}, "geometry": None}]
-        prov = create_provenance(
-            tool_name="tool",
-            tool_version="2.0.0",
-            source_features=features,
-            parameters={"unit": "nm", "format": "json"},
-        )
-
-        assert prov.parameters == {"unit": "nm", "format": "json"}
-
-    def test_create_provenance_with_custom_timestamp(self):
-        features = [{"id": "f1", "properties": {"kind": "TRACK"}, "geometry": None}]
-        custom_time = datetime(2026, 1, 15, 12, 0, 0)
-
-        prov = create_provenance(
-            tool_name="tool", tool_version="1.0.0", source_features=features, timestamp=custom_time
-        )
-
-        assert prov.timestamp == custom_time
-
-    def test_create_provenance_multiple_sources(self):
-        features = [
-            {"id": "track-001", "properties": {"kind": "TRACK"}, "geometry": None},
-            {"id": "track-002", "properties": {"kind": "TRACK"}, "geometry": None},
-            {"id": "zone-001", "properties": {"kind": "ZONE"}, "geometry": None},
-        ]
-        prov = create_provenance(
-            tool_name="multi-tool", tool_version="1.0.0", source_features=features
-        )
-
-        assert len(prov.sources) == 3
-        assert prov.sources[0].id == "track-001"
-        assert prov.sources[1].id == "track-002"
-        assert prov.sources[2].id == "zone-001"
-        assert prov.sources[2].kind == "ZONE"
-
-    def test_create_provenance_missing_id(self):
-        features = [{"properties": {"kind": "TRACK"}, "geometry": None}]
-        prov = create_provenance(tool_name="tool", tool_version="1.0.0", source_features=features)
-
-        assert prov.sources[0].id == "unknown"
-
-    def test_create_provenance_missing_kind(self):
-        features = [{"id": "f1", "properties": {}, "geometry": None}]
-        prov = create_provenance(tool_name="tool", tool_version="1.0.0", source_features=features)
-
-        assert prov.sources[0].kind == "unknown"
-
 
 class TestAttachProvenance:
-    """Tests for attach_provenance function."""
+    """Tests for deprecated attach_provenance function (backward compat)."""
 
     def test_attach_provenance_to_feature(self):
         feature = {"type": "Feature", "properties": {"data": "test"}, "geometry": None}
@@ -88,51 +274,9 @@ class TestAttachProvenance:
 
         result = attach_provenance(feature, prov)
 
-        assert result is feature  # Returns same object
+        assert result is feature
         assert "provenance" in feature["properties"]
         assert feature["properties"]["provenance"]["tool"] == "test-tool"
-        assert feature["properties"]["provenance"]["version"] == "1.0.0"
-
-    def test_attach_provenance_creates_properties(self):
-        feature = {"type": "Feature", "geometry": None}
-        prov = Provenance(tool="t", version="1.0.0")
-
-        attach_provenance(feature, prov)
-
-        assert "properties" in feature
-        assert "provenance" in feature["properties"]
-
-    def test_attach_provenance_includes_sources(self):
-        feature = {"type": "Feature", "properties": {}, "geometry": None}
-        prov = Provenance(
-            tool="tool",
-            version="1.0.0",
-            sources=[SourceRef(id="a", kind="TRACK"), SourceRef(id="b", kind="ZONE")],
-        )
-
-        attach_provenance(feature, prov)
-
-        sources = feature["properties"]["provenance"]["sources"]
-        assert len(sources) == 2
-        assert sources[0] == {"id": "a", "kind": "TRACK"}
-        assert sources[1] == {"id": "b", "kind": "ZONE"}
-
-    def test_attach_provenance_includes_parameters(self):
-        feature = {"type": "Feature", "properties": {}, "geometry": None}
-        prov = Provenance(tool="tool", version="1.0.0", parameters={"unit": "nm"})
-
-        attach_provenance(feature, prov)
-
-        assert feature["properties"]["provenance"]["parameters"] == {"unit": "nm"}
-
-    def test_attach_provenance_timestamp_format(self):
-        feature = {"type": "Feature", "properties": {}, "geometry": None}
-        prov = Provenance(tool="tool", version="1.0.0", timestamp=datetime(2026, 1, 15, 10, 30, 0))
-
-        attach_provenance(feature, prov)
-
-        ts = feature["properties"]["provenance"]["timestamp"]
-        assert ts == "2026-01-15T10:30:00Z"
 
 
 class TestSetOutputKind:

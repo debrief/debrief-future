@@ -27,7 +27,7 @@ from debrief_calc.models import (
     ToolError,
     ToolResult,
 )
-from debrief_calc.provenance import attach_provenance, create_provenance, set_output_kind
+from debrief_calc.provenance import attach_log_entry, create_log_entry, set_output_kind
 from debrief_calc.registry import registry
 from debrief_calc.validation import validate_tool_output
 
@@ -73,12 +73,15 @@ def run(
         # Execute the tool handler
         output_features = _execute_handler(tool, context, params)
 
-        # Attach provenance to output features
-        provenance = create_provenance(
+        duration_ms = (time.perf_counter() - start_time) * 1000
+
+        # Attach PROV-aligned log entries to output features
+        log_entry = create_log_entry(
             tool_name=tool.name,
             tool_version=tool.version,
             source_features=context.features,
             parameters=params,
+            duration_ms=duration_ms,
         )
 
         # Attach provenance only to GeoJSON Feature outputs (not artifact data)
@@ -86,13 +89,11 @@ def run(
         if is_geojson:
             for feature in output_features:
                 set_output_kind(feature, tool.output_kind)
-                attach_provenance(feature, provenance)
+                attach_log_entry(feature, log_entry)
 
             # Validate output if requested
             if validate_output:
                 validate_tool_output(output_features, tool.output_kind, tool.name)
-
-        duration_ms = (time.perf_counter() - start_time) * 1000
 
         return ToolResult(
             tool=tool_name, success=True, features=output_features, duration_ms=duration_ms

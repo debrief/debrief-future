@@ -125,12 +125,19 @@ class TestRunSuccess:
         assert result.success is True
         provenance = result.features[0]["properties"]["provenance"]
 
-        assert provenance["tool"] == "track-stats"
-        assert provenance["version"] == "1.0.0"
-        assert "timestamp" in provenance
-        assert len(provenance["sources"]) == 1
-        assert provenance["sources"][0]["id"] == "track-001"
-        assert provenance["sources"][0]["kind"] == "TRACK"
+        # Provenance is now an array of PROV-aligned entries
+        assert isinstance(provenance, list)
+        assert len(provenance) == 1
+
+        entry = provenance[0]
+        assert "activityId" in entry
+        assert "timestamp" in entry
+        assert "executionDuration" in entry
+
+        wgb = entry["wasGeneratedBy"]
+        assert wgb["tool"] == "track-stats"
+        assert wgb["toolVersion"] == "1.0.0"
+        assert entry["used"] == ["track-001"]
 
 
 class TestRunErrors:
