@@ -166,7 +166,7 @@ Description formats:
 | 023 | Infrastructure | [Add epic support to speckit workflow](specs/023-epic-workflow-support/spec.md) | 4 | 3 | 4 | 11 | Medium | specified |
 | 031 | Documentation | [Document vscrui as standard component library for VS Code webviews](specs/031-vscrui-component-library/spec.md) | 3 | 1 | 5 | 9 | Low | specified |
 | 032 | Documentation | [Document Storybook VS Code theming setup](specs/032-storybook-vscode-theming/spec.md) | 2 | 2 | 5 | 9 | Low | specified |
-| 044 | Enhancement | [Build unified Debrief activity panel as single webview](docs/ideas/044-unified-activity-panel.md) (requires #031, #045) | 5 | 5 | 3 | 13 | High | approved |
+| ~~044~~ | ~~Enhancement~~ | ~~[Build unified Debrief activity panel as single webview](docs/ideas/044-unified-activity-panel.md) (requires #031, #045)~~ | ~~5~~ | ~~5~~ | ~~3~~ | ~~13~~ | ~~High~~ | ~~complete~~ |
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
 | 002 | Feature | Add MCP wrapper for debrief-io service | 4 | 3 | 4 | 11 | Medium | approved |
 | 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | Low | approved |
