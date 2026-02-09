@@ -123,14 +123,14 @@
 
 ### Evidence Collection
 
-- [ ] T021 Capture test results in `specs/073-undo-redo-split/evidence/test-summary.md`
-- [ ] T022 Create usage demonstration in `specs/073-undo-redo-split/evidence/usage-example.md`
-- [ ] T023 [P] Document before/after StateSnapshot comparison in `specs/073-undo-redo-split/evidence/before-after-snapshot.md`
+- [x] T021 Capture test results in `specs/073-undo-redo-split/evidence/test-summary.md`
+- [x] T022 Create usage demonstration in `specs/073-undo-redo-split/evidence/usage-example.md`
+- [x] T023 [P] Document before/after StateSnapshot comparison in `specs/073-undo-redo-split/evidence/before-after-snapshot.md`
 
 ### Media Content
 
-- [ ] T024 Create shipped blog post in `specs/073-undo-redo-split/media/shipped-post.md`
-- [ ] T025 [P] Create LinkedIn shipped summary in `specs/073-undo-redo-split/media/linkedin-shipped.md`
+- [x] T024 Create shipped blog post in `specs/073-undo-redo-split/media/shipped-post.md`
+- [x] T025 [P] Create LinkedIn shipped summary in `specs/073-undo-redo-split/media/linkedin-shipped.md`
 
 ### PR Creation
 
