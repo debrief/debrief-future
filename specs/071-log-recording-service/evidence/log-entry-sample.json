@@ -1,0 +1,25 @@
+{
+  "activityId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "timestamp": "2026-02-09T14:23:45.123Z",
+  "wasGeneratedBy": {
+    "tool": "calculate-range",
+    "toolVersion": "1.2.0",
+    "parameters": {
+      "units": {
+        "value": "nautical_miles",
+        "default": true,
+        "tunable": true
+      },
+      "method": {
+        "value": "geodesic",
+        "default": false,
+        "tunable": true
+      }
+    }
+  },
+  "used": ["track-alpha", "track-bravo"],
+  "generated": ["range-result-001"],
+  "executionDuration": "PT0.342S",
+  "generatedResultId": null,
+  "tune": null
+}

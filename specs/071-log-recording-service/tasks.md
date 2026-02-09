@@ -43,9 +43,9 @@
 
 **Purpose**: Create directory structure and base files for the Log Service module
 
-- [ ] T001 Create log module directory and index `services/session-state/src/log/index.ts`
-- [ ] T002 [P] Create log types file `services/session-state/src/log/types.ts`
-- [ ] T003 [P] Create test directory structure `services/session-state/tests/unit/log/`
+- [x] T001 Create log module directory and index `services/session-state/src/log/index.ts`
+- [x] T002 [P] Create log types file `services/session-state/src/log/types.ts`
+- [x] T003 [P] Create test directory structure `services/session-state/tests/unit/log/`
 
 **Checkpoint**: Directory structure ready, type foundations in place
 
@@ -57,13 +57,13 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 [US-all] Define LogEntry, WasGeneratedBy, ParameterValue, TuneAnnotation types in `services/session-state/src/log/types.ts`
-- [ ] T005 [P] [US-all] Define ExpandedToolResultFields, ModifiedFeature, PropertyDelta, CreatedAsset types in `services/session-state/src/log/types.ts`
-- [ ] T006 [P] [US-all] Define RecordResult, TimelineOptions, LogService interface in `services/session-state/src/log/types.ts`
-- [ ] T007 [US-all] Implement buildLogEntry() pure function in `services/session-state/src/log/entryBuilder.ts`
-- [ ] T008 [test] Write entryBuilder unit tests `services/session-state/tests/unit/log/entryBuilder.test.ts`
-- [ ] T009 [US-all] Implement msToIsoDuration() helper for duration conversion in `services/session-state/src/log/entryBuilder.ts`
-- [ ] T010 [US-all] Export log module types from `services/session-state/src/index.ts`
+- [x] T004 [US-all] Define LogEntry, WasGeneratedBy, ParameterValue, TuneAnnotation types in `services/session-state/src/log/types.ts`
+- [x] T005 [P] [US-all] Define ExpandedToolResultFields, ModifiedFeature, PropertyDelta, CreatedAsset types in `services/session-state/src/log/types.ts`
+- [x] T006 [P] [US-all] Define RecordResult, TimelineOptions, LogService interface in `services/session-state/src/log/types.ts`
+- [x] T007 [US-all] Implement buildLogEntry() pure function in `services/session-state/src/log/entryBuilder.ts`
+- [x] T008 [test] Write entryBuilder unit tests `services/session-state/tests/unit/log/entryBuilder.test.ts`
+- [x] T009 [US-all] Implement msToIsoDuration() helper for duration conversion in `services/session-state/src/log/entryBuilder.ts`
+- [x] T010 [US-all] Export log module types from `services/session-state/src/index.ts`
 
 **Checkpoint**: Foundation ready -- LogEntry types defined, entry builder tested, duration conversion working
 
@@ -77,13 +77,13 @@
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Add appendProvenance() method to stacService `apps/vscode/src/services/stacService.ts`
-- [ ] T012 [US1] Implement createLogService() factory and recordToolResult() in `services/session-state/src/log/logService.ts`
-- [ ] T013 [US1] Handle legacy provenance format (single object -> array wrapping) in logService `services/session-state/src/log/logService.ts`
-- [ ] T014 [US1] Add Phase 4-6 stub methods (tuneEntry, revertTo, revertThis, createSnapshot, branchFrom) in `services/session-state/src/log/logService.ts`
-- [ ] T015 [US1] Export LogService factory from `services/session-state/src/log/index.ts`
-- [ ] T016 [test] Write logService unit tests (mock stacService and store) `services/session-state/tests/unit/log/logService.test.ts`
-- [ ] T017 [test] Write integration test with real stacService and temp files `services/session-state/tests/integration/logIntegration.test.ts`
+- [x] T011 [US1] Add appendProvenance() method to stacService `apps/vscode/src/services/stacService.ts`
+- [x] T012 [US1] Implement createLogService() factory and recordToolResult() in `services/session-state/src/log/logService.ts`
+- [x] T013 [US1] Handle legacy provenance format (single object -> array wrapping) in logService `services/session-state/src/log/logService.ts`
+- [x] T014 [US1] Add Phase 4-6 stub methods (tuneEntry, revertTo, revertThis, createSnapshot, branchFrom) in `services/session-state/src/log/logService.ts`
+- [x] T015 [US1] Export LogService factory from `services/session-state/src/log/index.ts`
+- [x] T016 [test] Write logService unit tests (mock stacService and store) `services/session-state/tests/unit/log/logService.test.ts`
+- [x] T017 [test] Write integration test with real stacService and temp files `services/session-state/tests/integration/logIntegration.test.ts`
 
 **Checkpoint**: Core recording works -- tool results produce Log entries on features, markDirty() fires, entries persist via stacService
 
@@ -97,9 +97,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Implement assembleTimeline() pure function in `services/session-state/src/log/timeline.ts`
-- [ ] T019 [US2] Integrate getTimeline() into LogService using stacService to load GeoJSON `services/session-state/src/log/logService.ts`
-- [ ] T020 [test] Write timeline unit tests (dedup, sort, empty case) `services/session-state/tests/unit/log/timeline.test.ts`
+- [x] T018 [US2] Implement assembleTimeline() pure function in `services/session-state/src/log/timeline.ts`
+- [x] T019 [US2] Integrate getTimeline() into LogService using stacService to load GeoJSON `services/session-state/src/log/logService.ts`
+- [x] T020 [test] Write timeline unit tests (dedup, sort, empty case) `services/session-state/tests/unit/log/timeline.test.ts`
 
 **Checkpoint**: Timeline assembly works -- entries deduplicated on activityId, sorted ascending by timestamp, empty plot returns empty array
 
@@ -113,11 +113,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Add expanded fields to ToolExecutionResult type `apps/vscode/src/types/tool.ts`
-- [ ] T022 [P] [US3] Add expanded annotation keys to DebriefAnnotations type `apps/vscode/src/types/tool.ts`
-- [ ] T023 [US3] Parse new MCP annotations in calcService.executeToolOnMcp() `apps/vscode/src/services/calcService.ts`
-- [ ] T024 [US3] Update buildLogEntry() to use expanded fields when available `services/session-state/src/log/entryBuilder.ts`
-- [ ] T025 [test] Add entryBuilder tests for expanded vs legacy ToolResult `services/session-state/tests/unit/log/entryBuilder.test.ts`
+- [x] T021 [US3] Add expanded fields to ToolExecutionResult type `apps/vscode/src/types/tool.ts`
+- [x] T022 [P] [US3] Add expanded annotation keys to DebriefAnnotations type `apps/vscode/src/types/tool.ts`
+- [x] T023 [US3] Parse new MCP annotations in calcService.executeToolOnMcp() `apps/vscode/src/services/calcService.ts`
+- [x] T024 [US3] Update buildLogEntry() to use expanded fields when available `services/session-state/src/log/entryBuilder.ts`
+- [x] T025 [test] Add entryBuilder tests for expanded vs legacy ToolResult `services/session-state/tests/unit/log/entryBuilder.test.ts`
 
 **Checkpoint**: Expanded parsing works -- new fields extracted from MCP, mapped to Log entries, legacy tools still produce valid entries
 
@@ -131,11 +131,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T026 [US4] Integrate logService.recordToolResult() call into executeTool.ts `apps/vscode/src/commands/executeTool.ts`
-- [ ] T027 [US4] Create and wire LogService instance in VS Code extension activation `apps/vscode/src/extension.ts`
-- [ ] T028 [US4] Update web-shell toolService to handle expanded ToolResult fields `apps/web-shell/src/services/toolService.ts`
-- [ ] T029 [US4] Verify existing tool execution tests still pass (no regressions)
-- [ ] T030 [test] Write integration test: full flow from executeTool through Log Service `services/session-state/tests/integration/logIntegration.test.ts`
+- [x] T026 [US4] Integrate logService.recordToolResult() call into executeTool.ts `apps/vscode/src/commands/executeTool.ts`
+- [x] T027 [US4] Create and wire LogService instance in VS Code extension activation `apps/vscode/src/extension.ts`
+- [x] T028 [US4] Update web-shell toolService to handle expanded ToolResult fields `apps/web-shell/src/services/toolService.ts`
+- [x] T029 [US4] Verify existing tool execution tests still pass (no regressions)
+- [x] T030 [test] Write integration test: full flow from executeTool through Log Service `services/session-state/tests/integration/logIntegration.test.ts`
 
 **Checkpoint**: Full integration works -- tool execution triggers recording, dirty flag set, web-shell handles new fields without errors, existing tests pass
 
@@ -147,15 +147,15 @@
 
 ### Evidence Collection
 
-- [ ] T031 Capture test summary with pass/fail counts in `specs/071-log-recording-service/evidence/test-summary.md`
-- [ ] T032 Create usage demonstration in `specs/071-log-recording-service/evidence/usage-example.md`
-- [ ] T033 [P] Capture sample Log entry JSON in `specs/071-log-recording-service/evidence/log-entry-sample.json`
-- [ ] T034 [P] Capture sample timeline output in `specs/071-log-recording-service/evidence/timeline-sample.json`
+- [x] T031 Capture test summary with pass/fail counts in `specs/071-log-recording-service/evidence/test-summary.md`
+- [x] T032 Create usage demonstration in `specs/071-log-recording-service/evidence/usage-example.md`
+- [x] T033 [P] Capture sample Log entry JSON in `specs/071-log-recording-service/evidence/log-entry-sample.json`
+- [x] T034 [P] Capture sample timeline output in `specs/071-log-recording-service/evidence/timeline-sample.json`
 
 ### Media Content
 
-- [ ] T035 Create shipped blog post in `specs/071-log-recording-service/media/shipped-post.md`
-- [ ] T036 [P] Create LinkedIn shipped summary in `specs/071-log-recording-service/media/linkedin-shipped.md`
+- [x] T035 Create shipped blog post in `specs/071-log-recording-service/media/shipped-post.md`
+- [x] T036 [P] Create LinkedIn shipped summary in `specs/071-log-recording-service/media/linkedin-shipped.md`
 
 ### PR Creation
 

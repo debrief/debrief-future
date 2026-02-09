@@ -1,0 +1,49 @@
+[
+  {
+    "activityId": "11111111-aaaa-bbbb-cccc-111111111111",
+    "timestamp": "2026-02-09T10:00:00.000Z",
+    "wasGeneratedBy": {
+      "tool": "calculate-range",
+      "toolVersion": "1.2.0",
+      "parameters": {
+        "units": { "value": "nautical_miles", "default": true, "tunable": true }
+      }
+    },
+    "used": ["track-alpha", "track-bravo"],
+    "generated": [],
+    "executionDuration": "PT0.342S",
+    "tune": null
+  },
+  {
+    "activityId": "22222222-aaaa-bbbb-cccc-222222222222",
+    "timestamp": "2026-02-09T10:05:00.000Z",
+    "wasGeneratedBy": {
+      "tool": "calculate-bearing",
+      "toolVersion": "1.0.0",
+      "parameters": {
+        "method": { "value": "true", "default": true, "tunable": true }
+      }
+    },
+    "used": ["track-alpha"],
+    "generated": ["bearing-result-001"],
+    "executionDuration": "PT0.150S",
+    "tune": null
+  },
+  {
+    "activityId": "33333333-aaaa-bbbb-cccc-333333333333",
+    "timestamp": "2026-02-09T10:12:30.000Z",
+    "wasGeneratedBy": {
+      "tool": "generate-plot",
+      "toolVersion": "2.1.0",
+      "parameters": {
+        "format": { "value": "png", "default": true, "tunable": false },
+        "dpi": { "value": 150, "default": false, "tunable": true }
+      }
+    },
+    "used": ["track-alpha", "track-bravo", "bearing-result-001"],
+    "generated": [],
+    "executionDuration": "PT1.2S",
+    "generatedResultId": "bt_plot_001",
+    "tune": null
+  }
+]
