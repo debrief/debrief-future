@@ -21,6 +21,8 @@ imports:
   - geojson
   - annotations
   - tool
+  - log-entry
+  - system-record
 
 # Root schema imports all modules - no additional classes needed here.
 # All entity definitions are in their respective module files:
@@ -29,3 +31,5 @@ imports:
 #   - geojson.yaml: TrackFeature, ReferenceLocation
 #   - annotations.yaml: NarrativeEntry, CircleAnnotation, RectangleAnnotation,
 #                       LineAnnotation, TextAnnotation, VectorAnnotation
+#   - log-entry.yaml: LogEntry, WasGeneratedBy, ParameterValue, TuneAnnotation
+#   - system-record.yaml: SystemRecordProperties, SnapshotLinks, BranchRecord

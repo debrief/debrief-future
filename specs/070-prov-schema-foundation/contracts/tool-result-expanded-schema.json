@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/schemas/tool-result-expanded",
+  "title": "ToolResult (Expanded)",
+  "description": "Expanded ToolResult contract between Python services and the orchestration layer. New fields are optional for backward compatibility. Target schema — Pydantic model is the source of truth.",
+  "type": "object",
+  "required": ["tool", "success", "duration_ms"],
+  "properties": {
+    "tool": {
+      "type": "string",
+      "description": "Tool identifier (kebab-case)."
+    },
+    "success": {
+      "type": "boolean",
+      "description": "Whether the tool execution succeeded."
+    },
+    "features": {
+      "type": ["array", "null"],
+      "description": "Output GeoJSON features. Required when success=true.",
+      "items": { "type": "object" },
+      "default": null
+    },
+    "error": {
+      "type": ["object", "null"],
+      "description": "Structured error details. Required when success=false.",
+      "default": null
+    },
+    "duration_ms": {
+      "type": "number",
+      "description": "Execution time in milliseconds.",
+      "minimum": 0
+    },
+    "tool_version": {
+      "type": ["string", "null"],
+      "description": "NEW: Semantic version of the tool.",
+      "default": null
+    },
+    "modified_features": {
+      "type": ["array", "null"],
+      "description": "NEW: Feature IDs + changed properties.",
+      "items": { "$ref": "#/$defs/ModifiedFeature" },
+      "default": null
+    },
+    "created_features": {
+      "type": ["array", "null"],
+      "description": "NEW: IDs of new features created.",
+      "items": { "type": "string" },
+      "default": null
+    },
+    "created_assets": {
+      "type": ["array", "null"],
+      "description": "NEW: Artifact files produced.",
+      "items": { "$ref": "#/$defs/CreatedAsset" },
+      "default": null
+    },
+    "parameters": {
+      "type": ["object", "null"],
+      "description": "NEW: Full resolved parameter set with typed values.",
+      "additionalProperties": { "$ref": "#/$defs/ParameterValue" },
+      "default": null
+    }
+  },
+  "$defs": {
+    "ModifiedFeature": {
+      "type": "object",
+      "required": ["feature_id", "changed_properties"],
+      "additionalProperties": false,
+      "properties": {
+        "feature_id": {
+          "type": "string",
+          "description": "ID of the modified feature."
+        },
+        "changed_properties": {
+          "type": "object",
+          "description": "Property name to PropertyDelta mapping.",
+          "additionalProperties": { "$ref": "#/$defs/PropertyDelta" }
+        }
+      }
+    },
+    "PropertyDelta": {
+      "type": "object",
+      "required": ["previous_value", "new_value"],
+      "additionalProperties": false,
+      "properties": {
+        "previous_value": {
+          "description": "Value before the change."
+        },
+        "new_value": {
+          "description": "Value after the change."
+        }
+      }
+    },
+    "CreatedAsset": {
+      "type": "object",
+      "required": ["result_id", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "result_id": {
+          "type": "string",
+          "description": "Stable logical identity (e.g., bt_plot_001)."
+        },
+        "path": {
+          "type": "string",
+          "description": "Full versioned path (e.g., ./results/bt_plot_001_v2.png)."
+        },
+        "mime_type": {
+          "type": ["string", "null"],
+          "description": "MIME type of the artifact.",
+          "default": null
+        }
+      }
+    },
+    "ParameterValue": {
+      "type": "object",
+      "required": ["value"],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "description": "The parameter value."
+        },
+        "default": {
+          "type": "boolean",
+          "default": false
+        },
+        "tunable": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  }
+}

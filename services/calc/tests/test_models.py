@@ -1,19 +1,34 @@
 """Unit tests for debrief-calc models."""
 
-from datetime import datetime
+import json
+from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 from debrief_calc.models import (
+    BranchRecord,
     ContextType,
+    CreatedAsset,
+    FileProvEntry,
+    LogEntry,
+    ModifiedFeature,
+    ParameterValue,
+    PropertyDelta,
     Provenance,
     SelectionContext,
+    SnapshotLinks,
+    SnapshotRef,
     SourceRef,
+    SystemRecordProperties,
     Tool,
     ToolError,
     ToolParameter,
     ToolResult,
+    WasGeneratedBy,
 )
 from pydantic import ValidationError as PydanticValidationError
+
+FIXTURES_ROOT = Path(__file__).resolve().parents[2] / ".." / "shared" / "schemas" / "fixtures"
 
 
 class TestContextType:
@@ -150,6 +165,67 @@ class TestToolResult:
     def test_failure_requires_error(self):
         with pytest.raises(PydanticValidationError):
             ToolResult(tool="test", success=False, duration_ms=10.0)
+
+    def test_new_fields_default_to_none(self):
+        """SC-006: All new ToolResult fields are optional with None defaults."""
+        result = ToolResult(
+            tool="track-stats",
+            success=True,
+            features=[{"type": "Feature", "properties": {}, "geometry": None}],
+            duration_ms=42.5,
+        )
+        assert result.tool_version is None
+        assert result.modified_features is None
+        assert result.created_features is None
+        assert result.created_assets is None
+        assert result.parameters is None
+
+    def test_expanded_result_with_all_fields(self):
+        result = ToolResult(
+            tool="set-track-color",
+            success=True,
+            features=[{"type": "Feature", "properties": {}, "geometry": None}],
+            duration_ms=42.5,
+            tool_version="1.2.0",
+            modified_features=[
+                ModifiedFeature(
+                    feature_id="track-001",
+                    changed_properties={
+                        "color": PropertyDelta(previous_value="blue", new_value="red"),
+                    },
+                )
+            ],
+            created_features=["result-001"],
+            created_assets=[
+                CreatedAsset(result_id="bt_plot_001", path="./results/bt_plot_001_v1.png")
+            ],
+            parameters={
+                "color": ParameterValue(value="#FF0000", default=False, tunable=False),
+            },
+        )
+        assert result.tool_version == "1.2.0"
+        assert len(result.modified_features) == 1
+        assert result.modified_features[0].feature_id == "track-001"
+        assert len(result.created_features) == 1
+        assert len(result.created_assets) == 1
+        assert result.parameters["color"].value == "#FF0000"
+
+    def test_expanded_result_serialization_roundtrip(self):
+        result = ToolResult(
+            tool="test",
+            success=True,
+            features=[{"type": "Feature", "properties": {}, "geometry": None}],
+            duration_ms=10.0,
+            tool_version="2.0.0",
+            parameters={
+                "interval": ParameterValue(value=60, default=True, tunable=True),
+            },
+        )
+        data = result.model_dump()
+        restored = ToolResult.model_validate(data)
+        assert restored.tool_version == "2.0.0"
+        assert restored.parameters["interval"].value == 60
+        assert restored.parameters["interval"].default is True
 
 
 class TestSelectionContext:
@@ -293,3 +369,273 @@ class TestTool:
         assert meta["version"] == "2.0.0"
         assert meta["context_type"] == "single"
         assert len(meta["parameters"]) == 1
+
+
+class TestParameterValue:
+    """Tests for ParameterValue model."""
+
+    def test_create_basic_parameter_value(self):
+        pv = ParameterValue(value=60)
+        assert pv.value == 60
+        assert pv.default is False
+        assert pv.tunable is True
+
+    def test_parameter_value_with_defaults(self):
+        pv = ParameterValue(value="nm", default=True, tunable=True)
+        assert pv.value == "nm"
+        assert pv.default is True
+        assert pv.tunable is True
+
+    def test_parameter_value_non_tunable(self):
+        pv = ParameterValue(value="track-alpha", default=False, tunable=False)
+        assert pv.tunable is False
+
+    def test_parameter_value_requires_value(self):
+        with pytest.raises(PydanticValidationError):
+            ParameterValue()
+
+    def test_parameter_value_accepts_any_type(self):
+        assert ParameterValue(value=42).value == 42
+        assert ParameterValue(value="text").value == "text"
+        assert ParameterValue(value=True).value is True
+        assert ParameterValue(value=[1, 2, 3]).value == [1, 2, 3]
+        assert ParameterValue(value=None).value is None
+
+
+class TestPropertyDelta:
+    """Tests for PropertyDelta model."""
+
+    def test_create_property_delta(self):
+        delta = PropertyDelta(previous_value="blue", new_value="red")
+        assert delta.previous_value == "blue"
+        assert delta.new_value == "red"
+
+    def test_property_delta_accepts_any_types(self):
+        delta = PropertyDelta(previous_value=10, new_value=20)
+        assert delta.previous_value == 10
+        assert delta.new_value == 20
+
+    def test_property_delta_requires_both_values(self):
+        with pytest.raises(PydanticValidationError):
+            PropertyDelta(previous_value="old")
+        with pytest.raises(PydanticValidationError):
+            PropertyDelta(new_value="new")
+
+
+class TestModifiedFeature:
+    """Tests for ModifiedFeature model."""
+
+    def test_create_modified_feature(self):
+        mf = ModifiedFeature(
+            feature_id="track-001",
+            changed_properties={
+                "color": PropertyDelta(previous_value="blue", new_value="red"),
+            },
+        )
+        assert mf.feature_id == "track-001"
+        assert len(mf.changed_properties) == 1
+        assert mf.changed_properties["color"].new_value == "red"
+
+    def test_modified_feature_multiple_properties(self):
+        mf = ModifiedFeature(
+            feature_id="track-002",
+            changed_properties={
+                "color": PropertyDelta(previous_value="#000", new_value="#FFF"),
+                "weight": PropertyDelta(previous_value=1, new_value=3),
+            },
+        )
+        assert len(mf.changed_properties) == 2
+
+    def test_modified_feature_requires_feature_id(self):
+        with pytest.raises(PydanticValidationError):
+            ModifiedFeature(changed_properties={})
+
+    def test_modified_feature_requires_changed_properties(self):
+        with pytest.raises(PydanticValidationError):
+            ModifiedFeature(feature_id="track-001")
+
+
+class TestCreatedAsset:
+    """Tests for CreatedAsset model."""
+
+    def test_create_asset_basic(self):
+        asset = CreatedAsset(result_id="bt_plot_001", path="./results/bt_plot_001_v1.png")
+        assert asset.result_id == "bt_plot_001"
+        assert asset.path == "./results/bt_plot_001_v1.png"
+        assert asset.mime_type is None
+
+    def test_create_asset_with_mime_type(self):
+        asset = CreatedAsset(
+            result_id="bt_plot_001",
+            path="./results/bt_plot_001_v1.png",
+            mime_type="image/png",
+        )
+        assert asset.mime_type == "image/png"
+
+    def test_create_asset_requires_result_id(self):
+        with pytest.raises(PydanticValidationError):
+            CreatedAsset(path="./results/output.png")
+
+    def test_create_asset_requires_path(self):
+        with pytest.raises(PydanticValidationError):
+            CreatedAsset(result_id="bt_plot_001")
+
+
+class TestLogEntry:
+    """Tests for LogEntry model."""
+
+    def test_create_log_entry(self):
+        entry = LogEntry(
+            activity_id="550e8400-e29b-41d4-a716-446655440000",
+            timestamp=datetime(2026, 1, 15, 10, 30, 0, tzinfo=UTC),
+            was_generated_by=WasGeneratedBy(
+                tool="calculate-range",
+                tool_version="1.0.0",
+                parameters={"interval": ParameterValue(value=60, default=True, tunable=True)},
+            ),
+            used=["track-alpha"],
+            generated=["range-001"],
+            execution_duration="PT0.3S",
+        )
+        assert entry.activity_id == "550e8400-e29b-41d4-a716-446655440000"
+        assert entry.was_generated_by.tool == "calculate-range"
+        assert entry.execution_duration == "PT0.3S"
+        assert entry.tune is None
+        assert entry.generated_result_id is None
+
+    def test_log_entry_invalid_duration(self):
+        with pytest.raises(PydanticValidationError):
+            LogEntry(
+                activity_id="test",
+                timestamp=datetime.now(UTC),
+                was_generated_by=WasGeneratedBy(tool="t", tool_version="1.0", parameters={}),
+                used=[],
+                generated=[],
+                execution_duration="300ms",  # Invalid format
+            )
+
+    def test_log_entry_serialization_camelcase(self):
+        entry = LogEntry(
+            activity_id="test-id",
+            timestamp=datetime(2026, 1, 15, 10, 0, 0, tzinfo=UTC),
+            was_generated_by=WasGeneratedBy(tool="t", tool_version="1.0", parameters={}),
+            used=[],
+            generated=[],
+            execution_duration="PT1S",
+        )
+        data = entry.model_dump(mode="json", by_alias=True)
+        assert "activityId" in data
+        assert "wasGeneratedBy" in data
+        assert "executionDuration" in data
+        assert "toolVersion" in data["wasGeneratedBy"]
+
+    def test_log_entry_from_fixture(self):
+        fixture = FIXTURES_ROOT / "log-entry" / "valid" / "tool-invocation.json"
+        data = json.loads(fixture.read_text())
+        entry = LogEntry.model_validate(data)
+        assert entry.activity_id == "550e8400-e29b-41d4-a716-446655440000"
+        assert entry.was_generated_by.tool == "calculate-range"
+        assert len(entry.was_generated_by.parameters) == 2
+        assert entry.execution_duration == "PT0.3S"
+
+    def test_log_entry_roundtrip(self):
+        """SC-007: Round-trip test for LogEntry serialisation."""
+        fixture = FIXTURES_ROOT / "log-entry" / "valid" / "artifact-producing.json"
+        data = json.loads(fixture.read_text())
+        entry = LogEntry.model_validate(data)
+        serialized = entry.model_dump(mode="json", by_alias=True)
+        restored = LogEntry.model_validate(serialized)
+        assert restored.activity_id == entry.activity_id
+        assert restored.generated_result_id == entry.generated_result_id
+        assert restored.was_generated_by.tool == entry.was_generated_by.tool
+
+    def test_invalid_fixture_missing_activity_id(self):
+        fixture = FIXTURES_ROOT / "log-entry" / "invalid" / "missing-activity-id.json"
+        data = json.loads(fixture.read_text())
+        with pytest.raises(PydanticValidationError):
+            LogEntry.model_validate(data)
+
+    def test_invalid_fixture_bad_duration(self):
+        fixture = FIXTURES_ROOT / "log-entry" / "invalid" / "bad-duration-format.json"
+        data = json.loads(fixture.read_text())
+        with pytest.raises(PydanticValidationError):
+            LogEntry.model_validate(data)
+
+
+class TestSystemRecordProperties:
+    """Tests for system record models."""
+
+    def test_create_empty_system_record(self):
+        sr = SystemRecordProperties()
+        assert sr.feature_type == "system"
+        assert sr.snapshot_links is None
+        assert sr.branches == []
+        assert sr.provenance == []
+
+    def test_system_record_with_snapshot_links(self):
+        sr = SystemRecordProperties(
+            snapshot_links=SnapshotLinks(
+                prev=SnapshotRef(asset="./snapshots/v1.geojson", prov_entry_count=3),
+                next=None,
+            ),
+        )
+        assert sr.snapshot_links.prev.asset == "./snapshots/v1.geojson"
+        assert sr.snapshot_links.prev.prov_entry_count == 3
+        assert sr.snapshot_links.next is None
+
+    def test_system_record_with_branches(self):
+        sr = SystemRecordProperties(
+            branches=[
+                BranchRecord(
+                    branch_id="branch-001",
+                    branched_from="act-123",
+                    branched_at=datetime(2026, 1, 16, 9, 0, 0, tzinfo=UTC),
+                    target_asset="./branches/branch-001/plot.geojson",
+                ),
+            ],
+        )
+        assert len(sr.branches) == 1
+        assert sr.branches[0].branch_id == "branch-001"
+
+    def test_system_record_from_empty_fixture(self):
+        fixture = FIXTURES_ROOT / "system-record" / "valid" / "empty-system-record.json"
+        data = json.loads(fixture.read_text())
+        sr = SystemRecordProperties.model_validate(data)
+        assert sr.feature_type == "system"
+        assert sr.snapshot_links is None
+        assert sr.branches == []
+
+    def test_system_record_from_populated_fixture(self):
+        fixture = FIXTURES_ROOT / "system-record" / "valid" / "populated-system-record.json"
+        data = json.loads(fixture.read_text())
+        sr = SystemRecordProperties.model_validate(data)
+        assert sr.feature_type == "system"
+        assert sr.snapshot_links.prev is not None
+        assert sr.snapshot_links.prev.prov_entry_count == 5
+        assert len(sr.branches) == 1
+        assert sr.branches[0].branch_id == "branch-001"
+        assert len(sr.provenance) == 2
+        assert sr.provenance[0].type == "snapshot"
+        assert sr.provenance[1].type == "branch"
+        assert sr.provenance[1].direction == "source"
+
+    def test_system_record_invalid_feature_type(self):
+        with pytest.raises(PydanticValidationError):
+            SystemRecordProperties(feature_type="not-system")
+
+    def test_file_prov_entry_invalid_type(self):
+        with pytest.raises(PydanticValidationError):
+            FileProvEntry(
+                activity_id="test",
+                type="invalid",
+                timestamp=datetime.now(UTC),
+            )
+
+    def test_file_prov_entry_invalid_direction(self):
+        with pytest.raises(PydanticValidationError):
+            FileProvEntry(
+                activity_id="test",
+                type="branch",
+                timestamp=datetime.now(UTC),
+                direction="invalid",
+            )

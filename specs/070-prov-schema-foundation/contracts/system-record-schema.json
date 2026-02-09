@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/schemas/system-record",
+  "title": "SystemRecordProperties",
+  "description": "Properties for the non-spatial system record feature. Target schema for validation — implementation will be generated from LinkML.",
+  "type": "object",
+  "required": ["featureType"],
+  "additionalProperties": false,
+  "properties": {
+    "featureType": {
+      "type": "string",
+      "const": "system",
+      "description": "Discriminator, always 'system'."
+    },
+    "snapshotLinks": {
+      "oneOf": [
+        { "$ref": "#/$defs/SnapshotLinks" },
+        { "type": "null" }
+      ],
+      "description": "Doubly-linked snapshot chain. Null when no snapshots exist.",
+      "default": null
+    },
+    "branches": {
+      "type": "array",
+      "description": "Branch records. Empty array when no branches exist.",
+      "items": { "$ref": "#/$defs/BranchRecord" },
+      "default": []
+    },
+    "provenance": {
+      "type": "array",
+      "description": "File-level provenance events (snapshot and branch creation).",
+      "items": { "$ref": "#/$defs/FileProvEntry" },
+      "default": []
+    }
+  },
+  "$defs": {
+    "SnapshotLinks": {
+      "type": "object",
+      "description": "Doubly-linked references to adjacent snapshots.",
+      "additionalProperties": false,
+      "properties": {
+        "prev": {
+          "oneOf": [
+            { "$ref": "#/$defs/SnapshotRef" },
+            { "type": "null" }
+          ],
+          "description": "Link to previous snapshot. Null if this is the first snapshot.",
+          "default": null
+        },
+        "next": {
+          "oneOf": [
+            { "$ref": "#/$defs/SnapshotRef" },
+            { "type": "null" }
+          ],
+          "description": "Link to next snapshot. Null if this is the current working file.",
+          "default": null
+        }
+      }
+    },
+    "SnapshotRef": {
+      "type": "object",
+      "description": "Reference to a snapshot file.",
+      "required": ["asset", "provEntryCount"],
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "type": "string",
+          "description": "Relative path to snapshot GeoJSON file."
+        },
+        "provEntryCount": {
+          "type": "integer",
+          "description": "Number of provenance entries in the snapshot.",
+          "minimum": 0
+        }
+      }
+    },
+    "BranchRecord": {
+      "type": "object",
+      "description": "Reference to a branched plot.",
+      "required": ["branchId", "branchedFrom", "branchedAt", "targetAsset"],
+      "additionalProperties": false,
+      "properties": {
+        "branchId": {
+          "type": "string",
+          "description": "Unique branch identifier."
+        },
+        "branchedFrom": {
+          "type": "string",
+          "description": "Activity ID of the branch point."
+        },
+        "branchedAt": {
+          "type": "string",
+          "description": "When the branch was created (ISO 8601).",
+          "format": "date-time"
+        },
+        "targetAsset": {
+          "type": "string",
+          "description": "Relative path to the branched plot file."
+        }
+      }
+    },
+    "FileProvEntry": {
+      "type": "object",
+      "description": "File-level provenance event.",
+      "required": ["activityId", "type", "timestamp"],
+      "additionalProperties": false,
+      "properties": {
+        "activityId": {
+          "type": "string",
+          "description": "Unique event identifier."
+        },
+        "type": {
+          "type": "string",
+          "description": "Event type.",
+          "enum": ["snapshot", "branch"]
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "When the event occurred.",
+          "format": "date-time"
+        },
+        "asset": {
+          "type": ["string", "null"],
+          "description": "Path to snapshot file (for snapshot events).",
+          "default": null
+        },
+        "branchId": {
+          "type": ["string", "null"],
+          "description": "Branch identifier (for branch events).",
+          "default": null
+        },
+        "direction": {
+          "type": ["string", "null"],
+          "description": "'source' or 'target' (for branch events).",
+          "enum": ["source", "target", null],
+          "default": null
+        }
+      }
+    }
+  }
+}

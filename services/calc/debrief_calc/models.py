@@ -8,7 +8,12 @@ Defines the entities used throughout the tool registry and execution system:
 - ToolParameter: Configurable parameter for a tool
 - ToolResult: Output of tool execution
 - ToolError: Structured error information
-- Provenance: Lineage tracking for outputs
+- Provenance: Lineage tracking for outputs (deprecated, use LogEntry)
+- LogEntry: PROV-aligned provenance record (replaces Provenance)
+- ParameterValue: Typed parameter value with replay metadata
+- PropertyDelta: Before/after value for a property change
+- ModifiedFeature: Feature ID + changed properties
+- CreatedAsset: Artifact file produced by a tool
 """
 
 from __future__ import annotations
@@ -50,8 +55,8 @@ class Provenance(BaseModel):
     """
     Lineage information attached to output features.
 
-    Records the tool, version, timestamp, and source features that
-    produced a given output, enabling full traceability per Constitution III.1.
+    Deprecated: Use LogEntry for new code. Retained for backward compatibility
+    during migration. Will be removed in a future cleanup pass.
     """
 
     tool: str = Field(..., description="Tool that produced this feature")
@@ -61,6 +66,132 @@ class Provenance(BaseModel):
     parameters: dict[str, Any] = Field(
         default_factory=dict, description="Parameters passed to tool"
     )
+
+
+class ParameterValue(BaseModel):
+    """
+    A typed parameter value with replay metadata.
+
+    Records the value of a tool parameter along with whether it was
+    the default value and whether it can be tuned during replay.
+    """
+
+    value: Any = Field(..., description="The parameter value")
+    default: bool = Field(default=False, description="Whether this is the default value")
+    tunable: bool = Field(
+        default=True, description="Whether this parameter can be modified during replay"
+    )
+
+
+class PropertyDelta(BaseModel):
+    """Captures the previous and new value of a single property change."""
+
+    previous_value: Any = Field(..., description="Value before the change")
+    new_value: Any = Field(..., description="Value after the change")
+
+
+class ModifiedFeature(BaseModel):
+    """Associates a feature ID with the properties that were changed."""
+
+    feature_id: str = Field(..., description="ID of the modified feature")
+    changed_properties: dict[str, PropertyDelta] = Field(
+        ..., description="Property name to before/after delta mapping"
+    )
+
+
+class CreatedAsset(BaseModel):
+    """Identifies an artifact file produced by a tool."""
+
+    result_id: str = Field(..., description="Stable logical identity (e.g., bt_plot_001)")
+    path: str = Field(..., description="Full versioned path (e.g., ./results/bt_plot_001_v2.png)")
+    mime_type: str | None = Field(default=None, description="MIME type of the artifact")
+
+
+class TuneAnnotation(BaseModel):
+    """Records a parameter modification (appended, not replacing original)."""
+
+    timestamp: datetime = Field(..., description="When the tuning occurred")
+    parameter: str = Field(..., description="Name of the parameter that was changed")
+    previous_value: Any = Field(..., description="Value before tuning")
+    new_value: Any = Field(..., description="Value after tuning")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "timestamp": "2026-01-15T12:00:00Z",
+                    "parameter": "interval",
+                    "previousValue": 60,
+                    "newValue": 120,
+                }
+            ]
+        }
+    }
+
+
+class WasGeneratedBy(BaseModel):
+    """
+    Identifies the tool and its parameters for a specific invocation.
+
+    Named after the W3C PROV vocabulary term.
+    """
+
+    tool: str = Field(..., description="Tool identifier (kebab-case)")
+    tool_version: str = Field(..., alias="toolVersion", description="Semantic version of the tool")
+    parameters: dict[str, ParameterValue] = Field(
+        default_factory=dict,
+        description="Full resolved parameter set",
+    )
+
+    model_config = {"populate_by_name": True}
+
+
+class LogEntry(BaseModel):
+    """
+    A PROV-aligned provenance record stored on GeoJSON features.
+
+    Replaces the deprecated Provenance class. Each LogEntry captures a single
+    tool invocation with W3C PROV vocabulary. Entries are stored as an
+    append-only array in feature.properties.provenance.
+    """
+
+    activity_id: str = Field(
+        ..., alias="activityId", description="Unique operation identifier (UUID v4)"
+    )
+    timestamp: datetime = Field(..., description="When the operation occurred")
+    was_generated_by: WasGeneratedBy = Field(
+        ..., alias="wasGeneratedBy", description="Tool identity and parameters"
+    )
+    used: list[str] = Field(default_factory=list, description="Feature IDs of inputs")
+    generated: list[str] = Field(
+        default_factory=list, description="Feature IDs or asset paths of outputs"
+    )
+    execution_duration: str = Field(
+        ...,
+        alias="executionDuration",
+        description="Wall-clock time in ISO 8601 duration (e.g., PT0.3S)",
+    )
+    generated_result_id: str | None = Field(
+        default=None,
+        alias="generatedResultId",
+        description="Stable logical identity for artifact-producing tools",
+    )
+    tune: TuneAnnotation | None = Field(
+        default=None, description="Parameter tuning record (null until tuned)"
+    )
+
+    model_config = {"populate_by_name": True}
+
+    @field_validator("execution_duration")
+    @classmethod
+    def validate_duration_format(cls, v: str) -> str:
+        import re as _re
+
+        if not _re.match(r"^PT[0-9]+(\.[0-9]+)?S$", v):
+            raise ValueError(
+                f"execution_duration must be ISO 8601 duration (e.g., PT0.3S), got: {v}"
+            )
+        return v
 
 
 class ToolParameter(BaseModel):
@@ -117,7 +248,9 @@ class ToolResult(BaseModel):
     The output of a tool execution.
 
     Contains either successful output features with provenance,
-    or error information explaining the failure.
+    or error information explaining the failure. New optional fields
+    (tool_version, modified_features, created_features, created_assets,
+    parameters) support structured change tracking for the PROV Log Service.
     """
 
     tool: str = Field(..., description="Name of tool that produced this result")
@@ -127,6 +260,21 @@ class ToolResult(BaseModel):
     )
     error: ToolError | None = Field(default=None, description="Error details if not success")
     duration_ms: float = Field(..., description="Execution time in milliseconds")
+
+    # --- New optional fields for expanded ToolResult contract (FR-002) ---
+    tool_version: str | None = Field(default=None, description="Semantic version of the tool")
+    modified_features: list[ModifiedFeature] | None = Field(
+        default=None, description="Feature IDs + changed properties"
+    )
+    created_features: list[str] | None = Field(
+        default=None, description="IDs of new features created"
+    )
+    created_assets: list[CreatedAsset] | None = Field(
+        default=None, description="Artifact files produced"
+    )
+    parameters: dict[str, ParameterValue] | None = Field(
+        default=None, description="Full resolved parameter set with typed values"
+    )
 
     @model_validator(mode="after")
     def validate_result_consistency(self) -> ToolResult:
@@ -330,3 +478,106 @@ class Tool(BaseModel):
             schema["default"] = param.default
 
         return schema
+
+
+# ============================================================================
+# System Record Models (FR-008)
+# ============================================================================
+
+
+class SnapshotRef(BaseModel):
+    """Reference to a snapshot file."""
+
+    asset: str = Field(..., description="Relative path to snapshot GeoJSON file")
+    prov_entry_count: int = Field(
+        ...,
+        alias="provEntryCount",
+        ge=0,
+        description="Number of provenance entries in the snapshot",
+    )
+
+    model_config = {"populate_by_name": True}
+
+
+class SnapshotLinks(BaseModel):
+    """Doubly-linked references to adjacent snapshots."""
+
+    prev: SnapshotRef | None = Field(default=None, description="Link to previous snapshot")
+    next: SnapshotRef | None = Field(default=None, description="Link to next snapshot")
+
+
+class BranchRecord(BaseModel):
+    """Reference to a branched plot."""
+
+    branch_id: str = Field(..., alias="branchId", description="Unique branch identifier")
+    branched_from: str = Field(
+        ..., alias="branchedFrom", description="Activity ID of the branch point"
+    )
+    branched_at: datetime = Field(
+        ..., alias="branchedAt", description="When the branch was created"
+    )
+    target_asset: str = Field(
+        ..., alias="targetAsset", description="Relative path to the branched plot file"
+    )
+
+    model_config = {"populate_by_name": True}
+
+
+class FileProvEntry(BaseModel):
+    """File-level provenance event (snapshot or branch creation)."""
+
+    activity_id: str = Field(..., alias="activityId", description="Unique event identifier")
+    type: str = Field(..., description="Event type: snapshot or branch")
+    timestamp: datetime = Field(..., description="When the event occurred")
+    asset: str | None = Field(default=None, description="Path to snapshot file")
+    branch_id: str | None = Field(default=None, alias="branchId", description="Branch identifier")
+    direction: str | None = Field(
+        default=None, description="'source' or 'target' (for branch events)"
+    )
+
+    model_config = {"populate_by_name": True}
+
+    @field_validator("type")
+    @classmethod
+    def validate_event_type(cls, v: str) -> str:
+        if v not in ("snapshot", "branch"):
+            raise ValueError(f"type must be 'snapshot' or 'branch', got: {v}")
+        return v
+
+    @field_validator("direction")
+    @classmethod
+    def validate_direction(cls, v: str | None) -> str | None:
+        if v is not None and v not in ("source", "target"):
+            raise ValueError(f"direction must be 'source' or 'target', got: {v}")
+        return v
+
+
+class SystemRecordProperties(BaseModel):
+    """
+    Properties for the non-spatial system record feature.
+
+    A system record is a GeoJSON Feature with featureType "system"
+    and Point geometry with empty coordinates.
+    """
+
+    feature_type: str = Field(
+        default="system", alias="featureType", description="Discriminator, always 'system'"
+    )
+    snapshot_links: SnapshotLinks | None = Field(
+        default=None,
+        alias="snapshotLinks",
+        description="Doubly-linked snapshot chain",
+    )
+    branches: list[BranchRecord] = Field(default_factory=list, description="Branch records")
+    provenance: list[FileProvEntry] = Field(
+        default_factory=list, description="File-level provenance events"
+    )
+
+    model_config = {"populate_by_name": True}
+
+    @field_validator("feature_type")
+    @classmethod
+    def validate_feature_type(cls, v: str) -> str:
+        if v != "system":
+            raise ValueError(f"feature_type must be 'system', got: {v}")
+        return v
