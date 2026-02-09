@@ -1,0 +1,120 @@
+id: https://debrief.info/schemas/log-entry
+name: log-entry
+title: Debrief Log Entry Schema
+description: >-
+  PROV-aligned provenance records stored on GeoJSON features.
+  Follows W3C PROV vocabulary (wasGeneratedBy, used, generated).
+  Part of E02: PROV Logging Implementation (Phase 0).
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+
+classes:
+  LogEntry:
+    description: >-
+      A PROV-aligned provenance record stored on GeoJSON features.
+      Contains activity identity, timestamp, generator information,
+      input/output references, execution duration, and tuning annotations.
+    attributes:
+      activity_id:
+        description: Unique operation identifier (UUID v4). Shared across features in multi-feature operations.
+        range: string
+        required: true
+      timestamp:
+        description: When the operation occurred (ISO 8601 with timezone).
+        range: datetime
+        required: true
+      was_generated_by:
+        description: Tool identity and parameters for this invocation.
+        range: WasGeneratedBy
+        required: true
+      used:
+        description: Feature IDs of inputs. May be empty for operations with no explicit inputs.
+        range: string
+        multivalued: true
+        required: true
+      generated:
+        description: Feature IDs or versioned asset paths of outputs. May be empty for in-place modifications.
+        range: string
+        multivalued: true
+        required: true
+      execution_duration:
+        description: Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S).
+        range: string
+        required: true
+        pattern: "^PT[0-9]+(\\.[0-9]+)?S$"
+      generated_result_id:
+        description: Stable logical identity for artifact-producing tools. Null for non-artifact tools.
+        range: string
+        required: false
+      tune:
+        description: Parameter tuning record. Null until a tuning operation modifies this entry.
+        range: TuneAnnotation
+        required: false
+
+  WasGeneratedBy:
+    description: >-
+      Identifies the tool and its parameters for a specific invocation.
+      Named after the W3C PROV vocabulary term.
+    attributes:
+      tool:
+        description: Tool identifier (kebab-case, e.g., calculate-range).
+        range: string
+        required: true
+      tool_version:
+        description: Semantic version of the tool (e.g., 1.2.0).
+        range: string
+        required: true
+      parameters:
+        description: >-
+          Full resolved parameter set. Keys are parameter names,
+          values are ParameterValue objects. May be empty dict.
+        range: ParameterValue
+        multivalued: true
+        inlined: true
+        required: true
+
+  ParameterValue:
+    description: A typed parameter value with replay metadata.
+    attributes:
+      value:
+        description: The parameter value (any JSON type).
+        range: string
+        required: true
+      default:
+        description: Whether this is the default value.
+        range: boolean
+        required: false
+        ifabsent: "false"
+      tunable:
+        description: Whether this parameter can be modified during replay.
+        range: boolean
+        required: false
+        ifabsent: "true"
+
+  TuneAnnotation:
+    description: Records a parameter modification (appended, not replacing original).
+    attributes:
+      timestamp:
+        description: When the tuning occurred (ISO 8601 with timezone).
+        range: datetime
+        required: true
+      parameter:
+        description: Name of the parameter that was changed.
+        range: string
+        required: true
+      previous_value:
+        description: Value before tuning.
+        range: string
+        required: true
+      new_value:
+        description: Value after tuning.
+        range: string
+        required: true

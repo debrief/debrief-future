@@ -1,0 +1,134 @@
+id: https://debrief.info/schemas/system-record
+name: system-record
+title: Debrief System Record Schema
+description: >-
+  Properties for non-spatial system record features.
+  Carries plot-level metadata: snapshot chain links and branch records.
+  Part of E02: PROV Logging Implementation (Phase 0).
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+
+classes:
+  SystemRecordProperties:
+    description: >-
+      Properties for the non-spatial system record feature.
+      A system record is a GeoJSON Feature with featureType "system"
+      and Point geometry with empty coordinates.
+    attributes:
+      feature_type:
+        description: Discriminator, always "system".
+        range: string
+        required: true
+        equals_string: "system"
+      snapshot_links:
+        description: Doubly-linked snapshot chain. Null when no snapshots exist.
+        range: SnapshotLinks
+        required: false
+      branches:
+        description: Branch records. Empty array when no branches exist.
+        range: BranchRecord
+        multivalued: true
+        required: false
+      provenance:
+        description: File-level provenance events (snapshot and branch creation).
+        range: FileProvEntry
+        multivalued: true
+        required: false
+
+  SnapshotLinks:
+    description: Doubly-linked references to adjacent snapshots.
+    attributes:
+      prev:
+        description: Link to previous snapshot. Null if this is the first snapshot.
+        range: SnapshotRef
+        required: false
+      next:
+        description: Link to next snapshot. Null if this is the current working file.
+        range: SnapshotRef
+        required: false
+
+  SnapshotRef:
+    description: Reference to a snapshot file.
+    attributes:
+      asset:
+        description: Relative path to snapshot GeoJSON file.
+        range: string
+        required: true
+      prov_entry_count:
+        description: Number of provenance entries in the snapshot.
+        range: integer
+        required: true
+        minimum_value: 0
+
+  BranchRecord:
+    description: Reference to a branched plot.
+    attributes:
+      branch_id:
+        description: Unique branch identifier.
+        range: string
+        required: true
+      branched_from:
+        description: Activity ID of the branch point.
+        range: string
+        required: true
+      branched_at:
+        description: When the branch was created (ISO 8601 with timezone).
+        range: datetime
+        required: true
+      target_asset:
+        description: Relative path to the branched plot file.
+        range: string
+        required: true
+
+  FileProvEntry:
+    description: File-level provenance event (snapshot or branch creation).
+    attributes:
+      activity_id:
+        description: Unique event identifier.
+        range: string
+        required: true
+      type:
+        description: "Event type: snapshot or branch."
+        range: FileProvEventTypeEnum
+        required: true
+      timestamp:
+        description: When the event occurred (ISO 8601 with timezone).
+        range: datetime
+        required: true
+      asset:
+        description: Path to snapshot file (for snapshot events).
+        range: string
+        required: false
+      branch_id:
+        description: Branch identifier (for branch events).
+        range: string
+        required: false
+      direction:
+        description: "'source' or 'target' (for branch events)."
+        range: FileProvDirectionEnum
+        required: false
+
+enums:
+  FileProvEventTypeEnum:
+    description: Type of file-level provenance event.
+    permissible_values:
+      snapshot:
+        description: Snapshot creation event
+      branch:
+        description: Branch creation event
+
+  FileProvDirectionEnum:
+    description: Direction of a branch event.
+    permissible_values:
+      source:
+        description: This file is the source of the branch
+      target:
+        description: This file is the target of the branch

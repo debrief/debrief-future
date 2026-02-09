@@ -8,7 +8,12 @@ Defines the entities used throughout the tool registry and execution system:
 - ToolParameter: Configurable parameter for a tool
 - ToolResult: Output of tool execution
 - ToolError: Structured error information
-- Provenance: Lineage tracking for outputs
+- Provenance: Lineage tracking for outputs (deprecated, use LogEntry)
+- LogEntry: PROV-aligned provenance record (replaces Provenance)
+- ParameterValue: Typed parameter value with replay metadata
+- PropertyDelta: Before/after value for a property change
+- ModifiedFeature: Feature ID + changed properties
+- CreatedAsset: Artifact file produced by a tool
 """
 
 from __future__ import annotations
@@ -50,8 +55,8 @@ class Provenance(BaseModel):
     """
     Lineage information attached to output features.
 
-    Records the tool, version, timestamp, and source features that
-    produced a given output, enabling full traceability per Constitution III.1.
+    Deprecated: Use LogEntry for new code. Retained for backward compatibility
+    during migration. Will be removed in a future cleanup pass.
     """
 
     tool: str = Field(..., description="Tool that produced this feature")
@@ -61,6 +66,43 @@ class Provenance(BaseModel):
     parameters: dict[str, Any] = Field(
         default_factory=dict, description="Parameters passed to tool"
     )
+
+
+class ParameterValue(BaseModel):
+    """
+    A typed parameter value with replay metadata.
+
+    Records the value of a tool parameter along with whether it was
+    the default value and whether it can be tuned during replay.
+    """
+
+    value: Any = Field(..., description="The parameter value")
+    default: bool = Field(default=False, description="Whether this is the default value")
+    tunable: bool = Field(default=True, description="Whether this parameter can be modified during replay")
+
+
+class PropertyDelta(BaseModel):
+    """Captures the previous and new value of a single property change."""
+
+    previous_value: Any = Field(..., description="Value before the change")
+    new_value: Any = Field(..., description="Value after the change")
+
+
+class ModifiedFeature(BaseModel):
+    """Associates a feature ID with the properties that were changed."""
+
+    feature_id: str = Field(..., description="ID of the modified feature")
+    changed_properties: dict[str, PropertyDelta] = Field(
+        ..., description="Property name to before/after delta mapping"
+    )
+
+
+class CreatedAsset(BaseModel):
+    """Identifies an artifact file produced by a tool."""
+
+    result_id: str = Field(..., description="Stable logical identity (e.g., bt_plot_001)")
+    path: str = Field(..., description="Full versioned path (e.g., ./results/bt_plot_001_v2.png)")
+    mime_type: str | None = Field(default=None, description="MIME type of the artifact")
 
 
 class ToolParameter(BaseModel):

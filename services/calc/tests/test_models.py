@@ -5,6 +5,10 @@ from datetime import datetime
 import pytest
 from debrief_calc.models import (
     ContextType,
+    CreatedAsset,
+    ModifiedFeature,
+    ParameterValue,
+    PropertyDelta,
     Provenance,
     SelectionContext,
     SourceRef,
@@ -293,3 +297,113 @@ class TestTool:
         assert meta["version"] == "2.0.0"
         assert meta["context_type"] == "single"
         assert len(meta["parameters"]) == 1
+
+
+class TestParameterValue:
+    """Tests for ParameterValue model."""
+
+    def test_create_basic_parameter_value(self):
+        pv = ParameterValue(value=60)
+        assert pv.value == 60
+        assert pv.default is False
+        assert pv.tunable is True
+
+    def test_parameter_value_with_defaults(self):
+        pv = ParameterValue(value="nm", default=True, tunable=True)
+        assert pv.value == "nm"
+        assert pv.default is True
+        assert pv.tunable is True
+
+    def test_parameter_value_non_tunable(self):
+        pv = ParameterValue(value="track-alpha", default=False, tunable=False)
+        assert pv.tunable is False
+
+    def test_parameter_value_requires_value(self):
+        with pytest.raises(PydanticValidationError):
+            ParameterValue()
+
+    def test_parameter_value_accepts_any_type(self):
+        assert ParameterValue(value=42).value == 42
+        assert ParameterValue(value="text").value == "text"
+        assert ParameterValue(value=True).value is True
+        assert ParameterValue(value=[1, 2, 3]).value == [1, 2, 3]
+        assert ParameterValue(value=None).value is None
+
+
+class TestPropertyDelta:
+    """Tests for PropertyDelta model."""
+
+    def test_create_property_delta(self):
+        delta = PropertyDelta(previous_value="blue", new_value="red")
+        assert delta.previous_value == "blue"
+        assert delta.new_value == "red"
+
+    def test_property_delta_accepts_any_types(self):
+        delta = PropertyDelta(previous_value=10, new_value=20)
+        assert delta.previous_value == 10
+        assert delta.new_value == 20
+
+    def test_property_delta_requires_both_values(self):
+        with pytest.raises(PydanticValidationError):
+            PropertyDelta(previous_value="old")
+        with pytest.raises(PydanticValidationError):
+            PropertyDelta(new_value="new")
+
+
+class TestModifiedFeature:
+    """Tests for ModifiedFeature model."""
+
+    def test_create_modified_feature(self):
+        mf = ModifiedFeature(
+            feature_id="track-001",
+            changed_properties={
+                "color": PropertyDelta(previous_value="blue", new_value="red"),
+            },
+        )
+        assert mf.feature_id == "track-001"
+        assert len(mf.changed_properties) == 1
+        assert mf.changed_properties["color"].new_value == "red"
+
+    def test_modified_feature_multiple_properties(self):
+        mf = ModifiedFeature(
+            feature_id="track-002",
+            changed_properties={
+                "color": PropertyDelta(previous_value="#000", new_value="#FFF"),
+                "weight": PropertyDelta(previous_value=1, new_value=3),
+            },
+        )
+        assert len(mf.changed_properties) == 2
+
+    def test_modified_feature_requires_feature_id(self):
+        with pytest.raises(PydanticValidationError):
+            ModifiedFeature(changed_properties={})
+
+    def test_modified_feature_requires_changed_properties(self):
+        with pytest.raises(PydanticValidationError):
+            ModifiedFeature(feature_id="track-001")
+
+
+class TestCreatedAsset:
+    """Tests for CreatedAsset model."""
+
+    def test_create_asset_basic(self):
+        asset = CreatedAsset(result_id="bt_plot_001", path="./results/bt_plot_001_v1.png")
+        assert asset.result_id == "bt_plot_001"
+        assert asset.path == "./results/bt_plot_001_v1.png"
+        assert asset.mime_type is None
+
+    def test_create_asset_with_mime_type(self):
+        asset = CreatedAsset(
+            result_id="bt_plot_001",
+            path="./results/bt_plot_001_v1.png",
+            mime_type="image/png",
+        )
+        assert asset.mime_type == "image/png"
+
+    def test_create_asset_requires_result_id(self):
+        with pytest.raises(PydanticValidationError):
+            CreatedAsset(path="./results/output.png")
+
+    def test_create_asset_requires_path(self):
+        with pytest.raises(PydanticValidationError):
+            CreatedAsset(result_id="bt_plot_001")
