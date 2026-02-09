@@ -114,6 +114,7 @@ Record significant prioritisation decisions here for future reference.
 | 2026-01-26 | Approved #019 needs-interview backlog workflow | Workflow infrastructure has precedent (023, 027, 028); high autonomy score; addresses idea capture friction |
 | 2026-01-26 | Approved #035 calc tool invocation from VS Code | Completes tracer bullet ("run analysis tool → see results"); high demo value for stakeholder engagement |
 | 2026-01-27 | Approved #038 context-sensitive tool offering (absorbs #035) | Completes Phase 3 of 027-context-tool-offering; full dynamic tool discovery + execution; absorbs #035 as broader scope |
+| 2026-02-09 | Approved E02 PROV Logging epic (#070-#076) | 7 phased items implementing SRD provenance priorities P1-P6; serves all three themes (architecture validation, scientist self-service, stakeholder demos); Constitution Article III mandates provenance; #069 transition plan complete |
 
 ---
 

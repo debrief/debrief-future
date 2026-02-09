@@ -109,7 +109,7 @@ Large features broken down into multiple backlog items.
 |----|-------|-------------|--------|-------|
 | 024 | [Storyboarding Briefings](docs/ideas/017-storyboarding-briefings.md) | Add storyboarding capability for mission/exercise briefings | proposed | — |
 | E01 | Tool Implementation Sequence | Implement 63 documented legacy tools in phased order | approved | #062, #063, #064, #065, #066, #067, #068 |
-| E02 | PROV Logging Implementation | [Implement PROV logging system per SRD priorities P1-P6](docs/architecture/prov-transition-plan.md) | proposed | #070, #071, #072, #073, #074, #075, #076 |
+| E02 | PROV Logging Implementation | [Implement PROV logging system per SRD priorities P1-P6](docs/architecture/prov-transition-plan.md) | approved | #070, #071, #072, #073, #074, #075, #076 |
 
 ## Items
 
@@ -134,13 +134,13 @@ Description formats:
 | 064 | Feature | [Implement Phase 1 tools: track/measurement](docs/ideas/064-implement-tools-phase1-measurement.md) [E01] — 19 foundational calculation tools (requires #049, #062, #063) | 5 | 4 | 4 | 13 | High | approved |
 | 063 | Infrastructure | [Analyse tool specs for phased implementation sequence](docs/ideas/063-tool-implementation-sequence.md) [E01] — dependency graph, phase groupings, and per-phase backlog items for 63 documented tools | 5 | 3 | 4 | 12 | Medium | approved |
 | ~~062~~ | ~~Tech Debt~~ | ~~[Compound track model with embedded children](specs/062-missing-feature-kind-enum-values/spec.md) [E01] — extend TrackFeature with MultiLineString compound geometry, embedded sensors, TUAs, and per-segment metadata; blocks 30+ tool implementations~~ | ~~5~~ | ~~2~~ | ~~5~~ | ~~12~~ | ~~Medium~~ | ~~complete~~ |
-| 070 | Infrastructure | [Implement PROV schema foundation](docs/ideas/070-prov-schema-foundation.md) [E02] — LinkML Log Entry schema, expanded ToolResult model, provenance migration, system record (requires #062) | - | - | - | - | High | proposed |
-| 071 | Feature | [Implement Log Recording service](docs/ideas/071-log-recording-service.md) [E02] — TypeScript Log Service, recordToolResult, getTimeline, session-state integration (requires #070) | - | - | - | - | High | proposed |
-| 072 | Feature | [Implement Log Panel](docs/ideas/072-log-panel.md) [E02] — VS Code activity panel, timeline view, entry display, filter/search (requires #071, optionally #044) | - | - | - | - | High | proposed |
-| 073 | Tech Debt | [Split undo/redo: UI-only undo, data changes via Log](docs/ideas/073-undo-redo-split.md) [E02] — narrow StateSnapshot, remove featureCollectionUri and savePath (requires #071) | - | - | - | - | Low | proposed |
-| 074 | Feature | [Implement snapshots with doubly-linked chain](docs/ideas/074-snapshots.md) [E02] — clean-state checkpoints, snapshot assets in STAC (requires #071) | - | - | - | - | Medium | proposed |
-| 075 | Feature | [Implement branching from history point](docs/ideas/075-branching.md) [E02] — plot duplication, two-way links, branch records (requires #074) | - | - | - | - | Medium | proposed |
-| 076 | Feature | [Implement replay and parameter tuning](docs/ideas/076-replay-tune.md) [E02] — parameter editing, positional replay, revert operations (requires #071, #074) | - | - | - | - | High | proposed |
+| 070 | Infrastructure | [Implement PROV schema foundation](docs/ideas/070-prov-schema-foundation.md) [E02] — LinkML Log Entry schema, expanded ToolResult model, provenance migration, system record (requires #062) | 5 | 3 | 4 | 12 | High | approved |
+| 071 | Feature | [Implement Log Recording service](docs/ideas/071-log-recording-service.md) [E02] — TypeScript Log Service, recordToolResult, getTimeline, session-state integration (requires #070) | 5 | 4 | 3 | 12 | High | approved |
+| 072 | Feature | [Implement Log Panel](docs/ideas/072-log-panel.md) [E02] — VS Code activity panel, timeline view, entry display, filter/search (requires #071, optionally #044) | 5 | 5 | 3 | 13 | High | approved |
+| 073 | Tech Debt | [Split undo/redo: UI-only undo, data changes via Log](docs/ideas/073-undo-redo-split.md) [E02] — narrow StateSnapshot, remove featureCollectionUri and savePath (requires #071) | 4 | 2 | 5 | 11 | Low | approved |
+| 074 | Feature | [Implement snapshots with doubly-linked chain](docs/ideas/074-snapshots.md) [E02] — clean-state checkpoints, snapshot assets in STAC (requires #071) | 5 | 3 | 3 | 11 | Medium | approved |
+| 075 | Feature | [Implement branching from history point](docs/ideas/075-branching.md) [E02] — plot duplication, two-way links, branch records (requires #074) | 4 | 3 | 3 | 10 | Medium | approved |
+| 076 | Feature | [Implement replay and parameter tuning](docs/ideas/076-replay-tune.md) [E02] — parameter editing, positional replay, revert operations (requires #071, #074) | 5 | 4 | 2 | 11 | High | approved |
 | 061 | Feature | [Add generate courses and speeds for track tool spec](docs/ideas/061-generate-courses-speeds.md) (requires #049) | 4 | 3 | 5 | 12 | Low | approved |
 | 060 | Feature | [Add resample track tool spec](docs/ideas/060-resample-track.md) (requires #049) | 4 | 3 | 4 | 11 | Medium | approved |
 | 055 | Feature | [Add track-position to track range/bearing tool spec](docs/ideas/055-track-position-range-bearing.md) (requires #049, #053) | 4 | 4 | 5 | 13 | Medium | approved |
