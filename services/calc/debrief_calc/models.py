@@ -243,7 +243,9 @@ class ToolResult(BaseModel):
     The output of a tool execution.
 
     Contains either successful output features with provenance,
-    or error information explaining the failure.
+    or error information explaining the failure. New optional fields
+    (tool_version, modified_features, created_features, created_assets,
+    parameters) support structured change tracking for the PROV Log Service.
     """
 
     tool: str = Field(..., description="Name of tool that produced this result")
@@ -253,6 +255,21 @@ class ToolResult(BaseModel):
     )
     error: ToolError | None = Field(default=None, description="Error details if not success")
     duration_ms: float = Field(..., description="Execution time in milliseconds")
+
+    # --- New optional fields for expanded ToolResult contract (FR-002) ---
+    tool_version: str | None = Field(default=None, description="Semantic version of the tool")
+    modified_features: list[ModifiedFeature] | None = Field(
+        default=None, description="Feature IDs + changed properties"
+    )
+    created_features: list[str] | None = Field(
+        default=None, description="IDs of new features created"
+    )
+    created_assets: list[CreatedAsset] | None = Field(
+        default=None, description="Artifact files produced"
+    )
+    parameters: dict[str, ParameterValue] | None = Field(
+        default=None, description="Full resolved parameter set with typed values"
+    )
 
     @model_validator(mode="after")
     def validate_result_consistency(self) -> ToolResult:

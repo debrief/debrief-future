@@ -155,6 +155,67 @@ class TestToolResult:
         with pytest.raises(PydanticValidationError):
             ToolResult(tool="test", success=False, duration_ms=10.0)
 
+    def test_new_fields_default_to_none(self):
+        """SC-006: All new ToolResult fields are optional with None defaults."""
+        result = ToolResult(
+            tool="track-stats",
+            success=True,
+            features=[{"type": "Feature", "properties": {}, "geometry": None}],
+            duration_ms=42.5,
+        )
+        assert result.tool_version is None
+        assert result.modified_features is None
+        assert result.created_features is None
+        assert result.created_assets is None
+        assert result.parameters is None
+
+    def test_expanded_result_with_all_fields(self):
+        result = ToolResult(
+            tool="set-track-color",
+            success=True,
+            features=[{"type": "Feature", "properties": {}, "geometry": None}],
+            duration_ms=42.5,
+            tool_version="1.2.0",
+            modified_features=[
+                ModifiedFeature(
+                    feature_id="track-001",
+                    changed_properties={
+                        "color": PropertyDelta(previous_value="blue", new_value="red"),
+                    },
+                )
+            ],
+            created_features=["result-001"],
+            created_assets=[
+                CreatedAsset(result_id="bt_plot_001", path="./results/bt_plot_001_v1.png")
+            ],
+            parameters={
+                "color": ParameterValue(value="#FF0000", default=False, tunable=False),
+            },
+        )
+        assert result.tool_version == "1.2.0"
+        assert len(result.modified_features) == 1
+        assert result.modified_features[0].feature_id == "track-001"
+        assert len(result.created_features) == 1
+        assert len(result.created_assets) == 1
+        assert result.parameters["color"].value == "#FF0000"
+
+    def test_expanded_result_serialization_roundtrip(self):
+        result = ToolResult(
+            tool="test",
+            success=True,
+            features=[{"type": "Feature", "properties": {}, "geometry": None}],
+            duration_ms=10.0,
+            tool_version="2.0.0",
+            parameters={
+                "interval": ParameterValue(value=60, default=True, tunable=True),
+            },
+        )
+        data = result.model_dump()
+        restored = ToolResult.model_validate(data)
+        assert restored.tool_version == "2.0.0"
+        assert restored.parameters["interval"].value == 60
+        assert restored.parameters["interval"].default is True
+
 
 class TestSelectionContext:
     """Tests for SelectionContext model."""
