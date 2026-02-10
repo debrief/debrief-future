@@ -15,8 +15,6 @@ import type {
   LogPanelProps,
   TimelineEntry,
   ActionType,
-  ViewMode,
-  PresentationMode,
 } from './types';
 import { LogTimeline } from './LogTimeline';
 import { LogByFeature } from './LogByFeature';
@@ -34,7 +32,6 @@ export function LogPanel({
   selectedEntryId,
   filterState,
   hasActiveSession,
-  plotName,
   actionResultMessage,
   onMessage,
   onPresentationModeChange,
