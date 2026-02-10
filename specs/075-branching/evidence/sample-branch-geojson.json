@@ -1,0 +1,90 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-1.154, 50.735, 0, 1707580800000],
+          [-1.162, 50.741, 0, 1707584400000],
+          [-1.171, 50.748, 0, 1707588000000]
+        ]
+      },
+      "properties": {
+        "featureType": "track",
+        "featureKind": "SURFACE",
+        "name": "VANGUARD",
+        "provenance": [
+          {
+            "activityId": "act-001",
+            "type": "import",
+            "timestamp": "2026-02-10T14:00:00.000Z",
+            "tool": "debrief-io:rep-parser",
+            "description": "Imported from REP file"
+          },
+          {
+            "activityId": "act-003",
+            "type": "edit",
+            "timestamp": "2026-02-10T14:30:00.000Z",
+            "tool": "debrief-calc:track-smooth",
+            "description": "Applied track smoothing"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-1.200, 50.760, 0, 1707580800000],
+          [-1.210, 50.765, 0, 1707584400000],
+          [-1.220, 50.770, 0, 1707588000000]
+        ]
+      },
+      "properties": {
+        "featureType": "track",
+        "featureKind": "SUBMARINE",
+        "name": "AMBUSH",
+        "provenance": [
+          {
+            "activityId": "act-002",
+            "type": "import",
+            "timestamp": "2026-02-10T14:10:00.000Z",
+            "tool": "debrief-io:rep-parser",
+            "description": "Imported from REP file"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "featureType": "system",
+        "snapshotLinks": {
+          "prev": null,
+          "next": null
+        },
+        "branches": [],
+        "branchOrigin": {
+          "sourceAsset": "../plot-alpha/plot.geojson",
+          "branchedFrom": "act-003",
+          "branchedAt": "2026-02-10T16:00:00.000Z",
+          "branchId": "branch-a1b2c3d4"
+        },
+        "provenance": [
+          {
+            "activityId": "prov-branch-001",
+            "type": "branch",
+            "timestamp": "2026-02-10T16:00:00.000Z",
+            "asset": "../plot-alpha/plot.geojson",
+            "branchId": "branch-a1b2c3d4",
+            "direction": "target"
+          }
+        ]
+      }
+    }
+  ]
+}
