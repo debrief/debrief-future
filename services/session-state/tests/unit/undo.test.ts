@@ -147,6 +147,80 @@ describe('Undo/Redo Middleware', () => {
     });
   });
 
+  describe('snapshot field boundary (073-undo-redo-split)', () => {
+    it('should not include featureCollectionUri or savePath in undo snapshots', () => {
+      // Set featureCollectionUri and savePath to known values
+      store.getState().setFeatureCollectionUri('stac://plot-1');
+      store.getState().setSavePath('/tmp/plot.json');
+
+      // Make a UI change that creates an undo entry
+      store.getState().setPlaybackRate(2.0);
+
+      // Now change featureCollectionUri and savePath again
+      store.getState().setFeatureCollectionUri('stac://plot-2');
+      store.getState().setSavePath('/tmp/plot2.json');
+
+      // Undo the featureCollectionUri change — should revert to snapshot
+      // before that change, but featureCollectionUri should NOT be reverted
+      store.getState().undo();
+      expect(store.getState().featureCollectionUri).toBe('stac://plot-2'); // NOT reverted
+      expect(store.getState().savePath).toBe('/tmp/plot2.json'); // NOT reverted
+    });
+
+    it('should only track UI-state fields in undo snapshot', () => {
+      // Change fields that should NOT be in snapshot
+      store.getState().setFeatureCollectionUri('stac://test');
+      store.getState().setSavePath('/tmp/test.json');
+
+      // Change a UI field
+      store.getState().setPlaybackRate(2.0);
+
+      // Change non-snapshot fields again
+      store.getState().setFeatureCollectionUri('stac://test-2');
+      store.getState().setSavePath('/tmp/test2.json');
+
+      // Make another UI change
+      store.getState().setPlaybackRate(3.0);
+
+      // Undo should revert playbackRate but NOT featureCollectionUri/savePath
+      store.getState().undo();
+      expect(store.getState().playbackRate).toBe(2.0);
+      expect(store.getState().featureCollectionUri).toBe('stac://test-2'); // unchanged
+      expect(store.getState().savePath).toBe('/tmp/test2.json'); // unchanged
+    });
+  });
+
+  describe('featureCollectionUri exclusion (073-undo-redo-split)', () => {
+    it('should not create undo history when only featureCollectionUri changes', () => {
+      expect(store.getState().canUndo()).toBe(false);
+
+      // Change only featureCollectionUri — should NOT create an undo entry
+      store.getState().setFeatureCollectionUri('stac://plot-1');
+      expect(store.getState().canUndo()).toBe(false);
+
+      store.getState().setFeatureCollectionUri('stac://plot-2');
+      expect(store.getState().canUndo()).toBe(false);
+    });
+  });
+
+  describe('savePath exclusion (073-undo-redo-split)', () => {
+    it('should not restore savePath during undo', () => {
+      // Set initial savePath
+      store.getState().setSavePath('/tmp/original.json');
+
+      // Make a UI change (creates undo entry with snapshot)
+      store.getState().setPlaybackRate(2.0);
+
+      // Change savePath after the UI change
+      store.getState().setSavePath('/tmp/new.json');
+
+      // Undo reverts playbackRate but should NOT touch savePath
+      store.getState().undo();
+      expect(store.getState().playbackRate).toBe(1.0);
+      expect(store.getState().savePath).toBe('/tmp/new.json'); // NOT reverted
+    });
+  });
+
   describe('cross-slice undo', () => {
     it('should undo changes across different slices', () => {
       store.getState().setPlaybackRate(2.0);
