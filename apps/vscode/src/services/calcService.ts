@@ -49,7 +49,13 @@ function spawnWithStdin(
     proc.stderr.on('data', (d: Buffer) => { stderr += d.toString(); });
     proc.on('close', (code) => {
       if (code !== 0) {
-        reject(new Error(stderr || `Process exited with code ${code}`));
+        // Prefer stdout JSON error response over generic stderr message.
+        // The Python CLI writes error details to stdout before exiting.
+        if (stdout.trim()) {
+          resolve(stdout);
+        } else {
+          reject(new Error(stderr || `Process exited with code ${code}`));
+        }
       } else {
         resolve(stdout);
       }
