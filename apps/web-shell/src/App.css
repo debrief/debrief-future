@@ -131,6 +131,15 @@ body {
   overflow: hidden;
 }
 
+/* File tree in sidebar */
+.web-shell__file-tree {
+  height: 200px;
+  min-height: 120px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--vscode-panel-border, #454545);
+  overflow-y: auto;
+}
+
 /* Map container */
 .web-shell__map-container {
   flex: 1;
