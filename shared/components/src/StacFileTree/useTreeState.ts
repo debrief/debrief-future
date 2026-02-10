@@ -1,8 +1,9 @@
 /**
- * Custom hook for managing tree state with lazy loading
+ * Custom hook for managing tree state with lazy loading.
+ * Preserves expanded node state across refreshKey changes.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { FilesystemAdapter, TreeNodeData, NodeType } from './types';
 
 interface UseTreeStateReturn {
@@ -80,12 +81,49 @@ async function loadChildren(
 }
 
 /**
+ * Recursively build a tree node, expanding any paths in the expandedPaths set.
+ */
+async function buildExpandedNode(
+  fs: FilesystemAdapter,
+  path: string,
+  expandedPaths: Set<string>
+): Promise<TreeNodeData> {
+  const nodeType = await detectNodeType(fs, path, true);
+  const children = await loadChildren(fs, path);
+
+  // Recursively expand children that are in the expanded set
+  const resolvedChildren = await Promise.all(
+    children.map(async (child) => {
+      if (child.isExpandable && expandedPaths.has(child.path)) {
+        try {
+          return await buildExpandedNode(fs, child.path, expandedPaths);
+        } catch {
+          // If loading a previously-expanded child fails, return it collapsed
+          return child;
+        }
+      }
+      return child;
+    })
+  );
+
+  return {
+    path,
+    name: path.split('/').filter(Boolean).pop() || path,
+    nodeType,
+    isExpandable: true,
+    children: resolvedChildren,
+    isLoading: false,
+  };
+}
+
+/**
  * Hook for managing tree state with lazy loading.
  * Loads children on first expand and caches them.
+ * Preserves expanded state across refreshKey changes.
  *
  * @param fs - Filesystem adapter
  * @param rootPath - Root directory path
- * @param refreshKey - Change this to clear cache and reload
+ * @param refreshKey - Change this to reload data while preserving expanded state
  * @returns Tree state and toggle function
  */
 export function useTreeState(
@@ -97,11 +135,17 @@ export function useTreeState(
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initial load: create root node
+  // Track which paths are expanded — persists across refreshKey changes
+  const expandedPathsRef = useRef<Set<string>>(new Set([rootPath]));
+
+  // Ensure root is always tracked as expanded
+  expandedPathsRef.current.add(rootPath);
+
+  // Load (or reload) tree, preserving expanded state
   useEffect(() => {
     let cancelled = false;
 
-    async function loadRoot() {
+    async function loadTree() {
       setIsLoading(true);
       setError(null);
 
@@ -115,21 +159,12 @@ export function useTreeState(
           return;
         }
 
-        const nodeType = await detectNodeType(fs, rootPath, true);
+        const rootNode = await buildExpandedNode(
+          fs,
+          rootPath,
+          expandedPathsRef.current
+        );
         if (cancelled) return;
-
-        // Load immediate children of root
-        const children = await loadChildren(fs, rootPath);
-        if (cancelled) return;
-
-        const rootNode: TreeNodeData = {
-          path: rootPath,
-          name: rootPath.split('/').filter(Boolean).pop() || rootPath,
-          nodeType,
-          isExpandable: true,
-          children, // Root starts expanded with children loaded
-          isLoading: false,
-        };
 
         setNodes([rootNode]);
         setIsLoading(false);
@@ -141,7 +176,7 @@ export function useTreeState(
       }
     }
 
-    loadRoot();
+    loadTree();
 
     return () => {
       cancelled = true;
@@ -154,37 +189,9 @@ export function useTreeState(
    */
   const toggleNode = useCallback(
     async (path: string) => {
-      setNodes((prevNodes) => {
-        // Helper to recursively find and update node
-        function updateNode(nodes: TreeNodeData[]): TreeNodeData[] {
-          return nodes.map((node) => {
-            if (node.path === path) {
-              // Found the node to toggle
-              if (node.children === null) {
-                // Not loaded yet - start loading
-                return { ...node, isLoading: true };
-              } else {
-                // Already loaded - just toggle by setting children to null (collapsed)
-                // We'll keep the cache and restore on next expand
-                return {
-                  ...node,
-                  children: node.children.length > 0 ? null : node.children,
-                };
-              }
-            } else if (node.children && node.children.length > 0) {
-              // Recurse into children
-              return { ...node, children: updateNode(node.children) };
-            }
-            return node;
-          });
-        }
-
-        return updateNode(prevNodes);
-      });
-
-      // Find the node to check if we need to load children
-      function findNode(nodes: TreeNodeData[], targetPath: string): TreeNodeData | null {
-        for (const node of nodes) {
+      // Check current state to decide expand vs collapse
+      function findNode(items: TreeNodeData[], targetPath: string): TreeNodeData | null {
+        for (const node of items) {
           if (node.path === targetPath) return node;
           if (node.children) {
             const found = findNode(node.children, targetPath);
@@ -195,49 +202,82 @@ export function useTreeState(
       }
 
       const targetNode = findNode(nodes, path);
-      if (!targetNode || targetNode.children !== null) {
-        // Either not found or already loaded/collapsed
-        return;
-      }
+      if (!targetNode) return;
 
-      // Load children
-      try {
-        const children = await loadChildren(fs, path);
+      if (targetNode.children !== null) {
+        // Currently expanded → collapse
+        expandedPathsRef.current.delete(path);
 
         setNodes((prevNodes) => {
-          function updateNode(nodes: TreeNodeData[]): TreeNodeData[] {
-            return nodes.map((node) => {
+          function updateNode(items: TreeNodeData[]): TreeNodeData[] {
+            return items.map((node) => {
               if (node.path === path) {
-                return { ...node, children, isLoading: false };
+                return { ...node, children: node.children && node.children.length > 0 ? null : node.children };
               } else if (node.children && node.children.length > 0) {
                 return { ...node, children: updateNode(node.children) };
               }
               return node;
             });
           }
-
           return updateNode(prevNodes);
         });
-      } catch (err) {
-        // Update node with error
+      } else {
+        // Currently collapsed → expand
+        expandedPathsRef.current.add(path);
+
+        // Set loading state
         setNodes((prevNodes) => {
-          function updateNode(nodes: TreeNodeData[]): TreeNodeData[] {
-            return nodes.map((node) => {
+          function updateNode(items: TreeNodeData[]): TreeNodeData[] {
+            return items.map((node) => {
               if (node.path === path) {
-                return {
-                  ...node,
-                  isLoading: false,
-                  error: err instanceof Error ? err.message : String(err),
-                };
+                return { ...node, isLoading: true };
               } else if (node.children && node.children.length > 0) {
                 return { ...node, children: updateNode(node.children) };
               }
               return node;
             });
           }
-
           return updateNode(prevNodes);
         });
+
+        // Load children
+        try {
+          const children = await loadChildren(fs, path);
+
+          setNodes((prevNodes) => {
+            function updateNode(items: TreeNodeData[]): TreeNodeData[] {
+              return items.map((node) => {
+                if (node.path === path) {
+                  return { ...node, children, isLoading: false };
+                } else if (node.children && node.children.length > 0) {
+                  return { ...node, children: updateNode(node.children) };
+                }
+                return node;
+              });
+            }
+            return updateNode(prevNodes);
+          });
+        } catch (err) {
+          expandedPathsRef.current.delete(path);
+
+          setNodes((prevNodes) => {
+            function updateNode(items: TreeNodeData[]): TreeNodeData[] {
+              return items.map((node) => {
+                if (node.path === path) {
+                  return {
+                    ...node,
+                    isLoading: false,
+                    error: err instanceof Error ? err.message : String(err),
+                  };
+                } else if (node.children && node.children.length > 0) {
+                  return { ...node, children: updateNode(node.children) };
+                }
+                return node;
+              });
+            }
+            return updateNode(prevNodes);
+          });
+        }
       }
     },
     [fs, nodes]
