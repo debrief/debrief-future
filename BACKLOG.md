@@ -146,7 +146,7 @@ Description formats:
 | 060 | Feature | [Add resample track tool spec](docs/ideas/060-resample-track.md) (requires #049) | 4 | 3 | 4 | 11 | Medium | approved |
 | 055 | Feature | [Add track-position to track range/bearing tool spec](docs/ideas/055-track-position-range-bearing.md) (requires #049, #053) | 4 | 4 | 5 | 13 | Medium | approved |
 | 056 | Feature | [Add move shape tool spec](specs/056-move-shape/spec.md) (requires #049) | 3 | 3 | 5 | 11 | Low | specified |
-| 057 | Feature | [Add enlarge shape tool spec](docs/ideas/057-enlarge-shape.md) (requires #049) | 3 | 3 | 5 | 11 | Low | approved |
+| 057 | Feature | [Add enlarge shape tool spec](specs/057-enlarge-shape/spec.md) (requires #049) | 3 | 3 | 5 | 11 | Low | specified |
 | 058 | Feature | [Add flip shape horizontal tool spec](docs/ideas/058-flip-shape-horizontal.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
 | 059 | Feature | [Add flip shape vertical tool spec](docs/ideas/059-flip-shape-vertical.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
 | ~~069~~ | ~~Infrastructure~~ | ~~[Plan PROV logging integration with application state](specs/069-plan-prov-logging/spec.md) — transition plan from current state to SRD provenance target; covers ToolResult contract, Log Service, undo/redo split, schema migration, phased implementation sequence~~ | ~~5~~ | ~~3~~ | ~~3~~ | ~~11~~ | ~~High~~ | ~~complete~~ |
