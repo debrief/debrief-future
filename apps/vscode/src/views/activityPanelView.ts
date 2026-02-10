@@ -237,7 +237,11 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
 
     this._postMessage({
       type: 'tools:update',
-      payload: { tools },
+      payload: {
+        tools,
+        hasToolInventory: this._toolMatchAdapter.getAllTools().length > 0,
+        hasSelection: this._toolMatchAdapter.hasSelection(),
+      },
     });
   }
 
@@ -290,6 +294,14 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
 
     // Clear resultsChanged flag after sending
     this._resultsChanged = false;
+  }
+
+  /**
+   * Refresh the tools display.
+   * Called when the tool inventory changes (e.g., calcService finishes loading).
+   */
+  public refreshTools(): void {
+    this._sendToolsUpdate();
   }
 
   /**
