@@ -185,12 +185,12 @@ describe('generateSnapshotFilename', () => {
   it('generates filename with hyphens replacing colons', () => {
     const timestamp = new Date('2026-02-09T14:30:00.000Z');
     const filename = generateSnapshotFilename(timestamp);
-    expect(filename).toBe('plot-snap-2026-02-09T14-30-00.geojson');
+    expect(filename).toBe('plot-snap-2026-02-09T14-30-00-000.geojson');
   });
 
   it('uses current time when no timestamp provided', () => {
     const filename = generateSnapshotFilename();
-    expect(filename).toMatch(/^plot-snap-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.geojson$/);
+    expect(filename).toMatch(/^plot-snap-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}\.geojson$/);
   });
 });
 

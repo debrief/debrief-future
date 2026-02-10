@@ -71,12 +71,14 @@ export function countLogEntries(fc: GeoJsonFeatureCollection): number {
 
 /**
  * Generate a snapshot filename from a timestamp.
- * Format: plot-snap-{ISO-timestamp-with-hyphens}.geojson
+ * Format: plot-snap-{ISO-timestamp-with-hyphens-and-millis}.geojson
+ * Includes milliseconds for uniqueness when snapshots are created rapidly.
  */
 export function generateSnapshotFilename(timestamp: Date = new Date()): string {
   const iso = timestamp.toISOString()
     .replace(/:/g, '-')
-    .replace(/\.\d{3}Z$/, '');
+    .replace(/\./g, '-')
+    .replace(/Z$/, '');
   return `plot-snap-${iso}.geojson`;
 }
 
