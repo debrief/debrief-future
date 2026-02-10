@@ -113,7 +113,7 @@ export default function App() {
   });
 
   // Derive selection as a Set<string> from store (for components that need it)
-  const selectedIds = useMemo(() => {
+  const selectedIds = useMemo<Set<string>>(() => {
     return new Set(state.selection.featureIds);
   }, [state.selection.featureIds]);
 

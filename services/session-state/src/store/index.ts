@@ -18,7 +18,6 @@ import { createFeaturesSlice } from './slices/features.js';
 import { createDocumentSlice } from './slices/document.js';
 import { MAX_UNDO_STEPS } from './middleware/undo.js';
 import { DIRTY_TRIGGER_FIELDS } from './middleware/dirty.js';
-import { isEphemeralField } from './middleware/partialize.js';
 
 /**
  * Fields tracked in undo/redo snapshots (073-undo-redo-split).
