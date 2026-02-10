@@ -29,6 +29,7 @@ export function createSystemRecord(): GeoJsonFeature {
       featureType: 'system',
       snapshotLinks: null,
       branches: [],
+      branchOrigin: null,
       provenance: [],
     },
   };

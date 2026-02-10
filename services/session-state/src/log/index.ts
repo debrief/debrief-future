@@ -23,6 +23,14 @@ export type {
   FileProvEntry,
   SystemRecordProperties,
   BranchRecord,
+  // Branch types (Feature: 075)
+  BranchOrigin,
+  BranchFromOptions,
+  BranchResult,
+  BranchPointLocation,
+  BranchErrorCode,
+  BranchServiceDeps,
+  BranchService,
   CreateSnapshotOptions,
   SnapshotResult,
   SnapshotBoundary,
@@ -56,3 +64,13 @@ export {
   normaliseProvenance,
   trimProvenanceAfterEntry,
 } from './snapshotHelpers.js';
+
+// Branch Service (Feature: 075)
+export { createBranchService } from './branchService.js';
+export {
+  findEntryInFeatures,
+  trimProvenanceToEntry,
+  createBranchRecord,
+  createBranchOrigin,
+  createBranchProvEntry,
+} from './branchService.js';

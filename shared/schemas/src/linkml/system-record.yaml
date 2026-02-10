@@ -37,6 +37,10 @@ classes:
         range: BranchRecord
         multivalued: true
         required: false
+      branch_origin:
+        description: Reverse link to source plot (set when this plot is a branch).
+        range: BranchOrigin
+        required: false
       provenance:
         description: File-level provenance events (snapshot and branch creation).
         range: FileProvEntry
@@ -85,6 +89,26 @@ classes:
         required: true
       target_asset:
         description: Relative path to the branched plot file.
+        range: string
+        required: true
+
+  BranchOrigin:
+    description: Reverse link on a branch plot's system record, pointing to the source plot.
+    attributes:
+      source_asset:
+        description: Relative path to the source plot file.
+        range: string
+        required: true
+      branched_from:
+        description: Activity ID of the branch point.
+        range: string
+        required: true
+      branched_at:
+        description: When the branch was created (ISO 8601 with timezone).
+        range: datetime
+        required: true
+      branch_id:
+        description: Branch identifier matching the source BranchRecord.
         range: string
         required: true
 
