@@ -310,11 +310,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       } catch (err) {
         // Graceful degradation - tools won't be available
         toolsTreeProvider.setCalcAvailable(false);
+        activityPanelProvider.notifyCalcUnavailable();
         pythonStatus.text = '$(warning) Python';
         pythonStatus.tooltip = 'debrief-calc connected but tools failed to load';
         outputChannel.appendLine(`[startup] debrief-calc: tool loading failed — ${err instanceof Error ? err.message : String(err)}`);
       }
     } else {
+      activityPanelProvider.notifyCalcUnavailable();
       pythonStatus.text = '$(error) Python';
       pythonStatus.tooltip = 'debrief-calc unavailable — click for details';
       outputChannel.appendLine('[startup] debrief-calc: unavailable — analysis tools disabled');
@@ -322,6 +324,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   }).catch((err) => {
     // Graceful degradation - tools won't be available but extension works
     toolsTreeProvider.setCalcAvailable(false);
+    activityPanelProvider.notifyCalcUnavailable();
     pythonStatus.text = '$(error) Python';
     pythonStatus.tooltip = 'debrief-calc unavailable — click for details';
     outputChannel.appendLine(`[startup] debrief-calc: check failed — ${err instanceof Error ? err.message : String(err)}`);
