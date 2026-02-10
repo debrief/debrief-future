@@ -137,10 +137,11 @@ Description formats:
 | 070 | Infrastructure | [Implement PROV schema foundation](specs/070-prov-schema-foundation/spec.md) [E02] — LinkML Log Entry schema, expanded ToolResult model, provenance migration, system record (requires #062) | 5 | 3 | 4 | 12 | High | implementing |
 | 071 | Feature | [Implement Log Recording service](specs/071-log-recording-service/spec.md) [E02] — TypeScript Log Service, recordToolResult, getTimeline, session-state integration (requires #070) | 5 | 4 | 3 | 12 | High | specified |
 | 072 | Feature | [Implement Log Panel](docs/ideas/072-log-panel.md) [E02] — VS Code activity panel, timeline view, entry display, filter/search (requires #071, optionally #044) | 5 | 5 | 3 | 13 | High | approved |
-| 073 | Tech Debt | [Split undo/redo: UI-only undo, data changes via Log](specs/073-undo-redo-split/spec.md) [E02] — narrow StateSnapshot, remove featureCollectionUri and savePath (requires #071) | 4 | 2 | 5 | 11 | Low | specified |
-| 074 | Feature | [Implement snapshots with doubly-linked chain](docs/ideas/074-snapshots.md) [E02] — clean-state checkpoints, snapshot assets in STAC (requires #071) | 5 | 3 | 3 | 11 | Medium | approved |
+| 073 | Tech Debt | [Split undo/redo: UI-only undo, data changes via Log](specs/073-undo-redo-split/spec.md) [E02] — narrow StateSnapshot, remove featureCollectionUri and savePath (requires #071) | 4 | 2 | 5 | 11 | Low | implementing |
+| 074 | Feature | [Implement snapshots with doubly-linked chain](specs/074-snapshots/spec.md) [E02] — clean-state checkpoints, snapshot assets in STAC (requires #071) | 5 | 3 | 3 | 11 | Medium | specified |
 | 075 | Feature | [Implement branching from history point](docs/ideas/075-branching.md) [E02] — plot duplication, two-way links, branch records (requires #074) | 4 | 3 | 3 | 10 | Medium | approved |
 | 076 | Feature | [Implement replay and parameter tuning](docs/ideas/076-replay-tune.md) [E02] — parameter editing, positional replay, revert operations (requires #071, #074) | 5 | 4 | 2 | 11 | High | approved |
+| 077 | Feature | [STAC File Tree Component](docs/ideas/077-stac-file-tree.md) — shared React tree view of STAC catalog filesystem backed by memfs; highlights new files from snapshots, opens plots from tree (requires #074, #071) | 4 | 4 | 4 | 12 | Medium | proposed |
 | 061 | Feature | [Add generate courses and speeds for track tool spec](docs/ideas/061-generate-courses-speeds.md) (requires #049) | 4 | 3 | 5 | 12 | Low | approved |
 | 060 | Feature | [Add resample track tool spec](docs/ideas/060-resample-track.md) (requires #049) | 4 | 3 | 4 | 11 | Medium | approved |
 | 055 | Feature | [Add track-position to track range/bearing tool spec](docs/ideas/055-track-position-range-bearing.md) (requires #049, #053) | 4 | 4 | 5 | 13 | Medium | approved |
@@ -174,6 +175,7 @@ Description formats:
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | 5 | 2 | 4 | 11 | Low | approved |
 | 027 | Infrastructure | [Add automated screenshot capture for Storybook stories](docs/ideas/027-automated-screenshots.md) | 3 | 4 | 4 | 11 | Medium | approved |
 | 036 | Infrastructure | [Reinstate Playwright E2E testing in CI](docs/ideas/030-reinstate-playwright-ci.md) | 4 | 2 | 5 | 11 | Medium | approved |
+| 077 | Bug | [Fix VS Code extension: time slider, location marker, trail mode, and tool offering](https://github.com/debrief/debrief-future/issues/208) | 5 | 2 | 3 | 10 | Medium | approved |
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
 | 033 | Tech Debt | [Re-enable debrief-stac tests in pytest](docs/ideas/033-reenable-stac-tests.md) | 4 | 2 | 4 | 10 | Low | proposed |

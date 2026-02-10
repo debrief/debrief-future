@@ -149,7 +149,10 @@ export function createLogService(deps: LogServiceDeps): LogService {
     },
 
     async createSnapshot(): Promise<void> {
-      throw new Error('createSnapshot is not implemented (Phase 4)');
+      throw new Error(
+        'createSnapshot moved to SnapshotService. ' +
+        'Use createSnapshotService() from snapshot service module.'
+      );
     },
 
     async branchFrom(_activityId: string): Promise<string> {

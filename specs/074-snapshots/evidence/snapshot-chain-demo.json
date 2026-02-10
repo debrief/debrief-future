@@ -1,0 +1,48 @@
+{
+  "_description": "Sample STAC Item with working file + 2 snapshot assets",
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "plot-alpha",
+  "geometry": null,
+  "bbox": [-1.5, 50.5, -1.0, 51.0],
+  "properties": {
+    "title": "Plot Alpha",
+    "datetime": null,
+    "start_datetime": "2026-02-09T08:00:00Z",
+    "end_datetime": "2026-02-09T16:00:00Z",
+    "created": "2026-02-09T08:00:00Z"
+  },
+  "links": [
+    { "rel": "root", "href": "../catalog.json", "type": "application/json" },
+    { "rel": "parent", "href": "../catalog.json", "type": "application/json" },
+    { "rel": "self", "href": "./item.json", "type": "application/json" }
+  ],
+  "assets": {
+    "data": {
+      "href": "./plot-alpha.geojson",
+      "type": "application/geo+json",
+      "title": "Plot Data",
+      "roles": ["data"]
+    },
+    "source-exercise-042": {
+      "href": "./assets/exercise_042.rep",
+      "type": "application/x-rep",
+      "title": "exercise_042.rep",
+      "roles": ["source"]
+    },
+    "plot-snap-2026-02-09T12-00-00": {
+      "href": "./assets/plot-snap-2026-02-09T12-00-00.geojson",
+      "type": "application/geo+json",
+      "title": "Snapshot 2026-02-09 12:00",
+      "roles": ["snapshot"],
+      "debrief:snapshotTimestamp": "2026-02-09T12:00:00.000Z"
+    },
+    "plot-snap-2026-02-09T14-00-00": {
+      "href": "./assets/plot-snap-2026-02-09T14-00-00.geojson",
+      "type": "application/geo+json",
+      "title": "Snapshot 2026-02-09 14:00",
+      "roles": ["snapshot"],
+      "debrief:snapshotTimestamp": "2026-02-09T14:00:00.000Z"
+    }
+  }
+}
