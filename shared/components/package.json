@@ -93,6 +93,7 @@
     "vite": "^5.0.0",
     "vite-plugin-css-injected-by-js": "^3.3.0",
     "vite-plugin-dts": "^3.7.0",
+    "memfs": "^4.0.0",
     "vitest": "^1.0.0",
     "@playwright/test": "^1.40.0",
     "@sparticuz/chromium": "^131.0.0"
