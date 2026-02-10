@@ -489,13 +489,18 @@ export class CalcService {
     }
 
     // Try workspace folders and their ancestors for .venv (common with uv/poetry monorepos)
+    const isWindows = process.platform === 'win32';
+    const venvBin = isWindows
+      ? path.join('.venv', 'Scripts', 'python.exe')
+      : path.join('.venv', 'bin', 'python');
+
     const folders = vscode.workspace.workspaceFolders;
     if (folders) {
       for (const folder of folders) {
         let dir = folder.uri.fsPath;
         // Walk up to 5 levels looking for .venv
         for (let i = 0; i < 5; i++) {
-          const venvPython = path.join(dir, '.venv', 'bin', 'python');
+          const venvPython = path.join(dir, venvBin);
           if (fs.existsSync(venvPython)) {
             this.log(`Found .venv Python at: ${venvPython}`);
             return venvPython;

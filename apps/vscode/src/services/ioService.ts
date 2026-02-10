@@ -26,7 +26,6 @@ export class IoService {
 
     // Use configured path if explicitly set, otherwise auto-detect from project .venv
     this.pythonPath = configuredPath || this.findPythonPath(extensionPath);
-    this.log(`Python path: ${this.pythonPath}`);
   }
 
   /**
@@ -34,6 +33,8 @@ export class IoService {
    */
   setOutputChannel(channel: vscode.OutputChannel): void {
     this.outputChannel = channel;
+    // Log the Python path that was resolved during construction
+    this.log(`Python path: ${this.pythonPath}`);
   }
 
   private log(message: string): void {
@@ -47,11 +48,16 @@ export class IoService {
   private findPythonPath(extensionPath?: string): string {
     // Look for .venv in extension's parent directories (monorepo structure)
     // apps/vscode -> apps -> repo-root/.venv
+    const isWindows = process.platform === 'win32';
+    const venvBin = isWindows
+      ? path.join('.venv', 'Scripts', 'python.exe')
+      : path.join('.venv', 'bin', 'python');
+
     if (extensionPath) {
       const candidates = [
-        path.join(extensionPath, '..', '..', '.venv', 'bin', 'python'),
-        path.join(extensionPath, '..', '.venv', 'bin', 'python'),
-        path.join(extensionPath, '.venv', 'bin', 'python'),
+        path.join(extensionPath, '..', '..', venvBin),
+        path.join(extensionPath, '..', venvBin),
+        path.join(extensionPath, venvBin),
       ];
 
       for (const candidate of candidates) {
