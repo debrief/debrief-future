@@ -185,27 +185,6 @@ export function createOpenPlotCommand(
       // Wire session manager for state synchronization (Feature: 029)
       panel.setSessionManager(sessionManager);
 
-      // Set up selection change handler
-      panel.onSelectionChanged((selection) => {
-        const featureIds = [...selection.trackIds, ...selection.locationIds];
-
-        // Update session state - this will trigger subscriptions in ActivityPanelView
-        // which will update toolMatchAdapter and refresh the UI
-        const activeSession = sessionManager.getActiveSession();
-        if (activeSession) {
-          const state = activeSession.getState();
-          state.setSelection(featureIds);
-        }
-
-        // Also update toolMatchAdapter directly for tools tree provider
-        toolMatchAdapter.updateSelection({
-          featureIds,
-          primary: selection.trackIds[0] ?? selection.locationIds[0] ?? null,
-          timestamp: createTimeInstant(Date.now()),
-        });
-        toolsTreeProvider.refresh();
-      });
-
       // Clear reference, layers, and sessions when panel is disposed
       panel.getPanel().onDidDispose(() => {
         // Check for dirty sessions and warn user (Feature: 029 - T058)
@@ -230,6 +209,28 @@ export function createOpenPlotCommand(
         sessionManager.disposeAllSessions();
       });
     }
+
+    // Register selection change handler (runs for both new and reused panels)
+    // Fix: 077 — previously only registered inside if(!panel), missing on reuse
+    panel.onSelectionChanged((selection) => {
+      const featureIds = [...selection.trackIds, ...selection.locationIds];
+
+      // Update session state - this will trigger subscriptions in ActivityPanelView
+      // which will update toolMatchAdapter and refresh the UI
+      const activeSession = sessionManager.getActiveSession();
+      if (activeSession) {
+        const state = activeSession.getState();
+        state.setSelection(featureIds);
+      }
+
+      // Also update toolMatchAdapter directly for tools tree provider
+      toolMatchAdapter.updateSelection({
+        featureIds,
+        primary: selection.trackIds[0] ?? selection.locationIds[0] ?? null,
+        timestamp: createTimeInstant(Date.now()),
+      });
+      toolsTreeProvider.refresh();
+    });
 
     // Set up import services for drag-drop functionality
     panel.setImportServices(ioService, stacService, store, layersTreeProvider, activityPanelProvider);

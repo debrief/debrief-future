@@ -49,7 +49,7 @@ function trackToFeature(track: Track, customColor?: string): DebriefFeature {
       platform_type: track.platformType,
       start_time: track.startTime,
       end_time: track.endTime,
-      times: track.times,
+      times: track.times.map(t => new Date(t).getTime()),
       style: { color: customColor ?? track.color },
     },
   };
