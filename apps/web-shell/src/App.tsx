@@ -11,6 +11,7 @@ import {
   CatalogOverview,
   MapView,
   ActivityPanel,
+  StacFileTree,
   useSelection,
   useTimePlayback,
   calculateTimeExtent,
@@ -25,6 +26,7 @@ import type {
 import { stacService } from './mocks/stacService';
 import { calcService } from './mocks/calcService';
 import type { ToolResult } from './mocks/calcService';
+import { mockFsAdapter } from './mocks/fsAdapter';
 
 /** Current view state */
 type View = 'welcome' | 'analysis';
@@ -214,6 +216,12 @@ export default function App() {
 
       <main className="web-shell__main web-shell__main--split">
         <aside className="web-shell__sidebar">
+          <StacFileTree
+            fs={mockFsAdapter}
+            rootPath="/local-store"
+            currentItemPath={currentPlot ? `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}` : undefined}
+            className="web-shell__file-tree"
+          />
           <ActivityPanel
             timeExtent={timeExtent}
             currentTime={playback.currentTime}

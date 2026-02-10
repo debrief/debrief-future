@@ -2,12 +2,11 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { StacFileTree } from './StacFileTree';
 import {
-  createPopulatedStore,
-  createEmptyStore,
-  createSingleItemStore,
-  createStoreWithSnapshots,
-  createMemfsAdapter,
-} from './fixtures';
+  createPopulatedStoreAdapter,
+  createEmptyStoreAdapter,
+  createSingleItemStoreAdapter,
+  createSnapshotStoreAdapter,
+} from './storyFixtures';
 import { ThemeProvider } from '../ThemeProvider';
 
 const meta: Meta<typeof StacFileTree> = {
@@ -40,8 +39,7 @@ export default meta;
 type Story = StoryObj<typeof StacFileTree>;
 
 // Default story with populated catalog
-const populatedStore = createPopulatedStore();
-const populatedFs = createMemfsAdapter(populatedStore);
+const populatedFs = createPopulatedStoreAdapter();
 
 export const Default: Story = {
   args: {
@@ -60,8 +58,7 @@ export const Default: Story = {
 };
 
 // Empty catalog
-const emptyStore = createEmptyStore();
-const emptyFs = createMemfsAdapter(emptyStore);
+const emptyFs = createEmptyStoreAdapter();
 
 export const Empty: Story = {
   args: {
@@ -78,8 +75,7 @@ export const Empty: Story = {
 };
 
 // Single item catalog
-const singleItemStore = createSingleItemStore();
-const singleItemFs = createMemfsAdapter(singleItemStore);
+const singleItemFs = createSingleItemStoreAdapter();
 
 export const SingleItem: Story = {
   args: {
@@ -96,8 +92,7 @@ export const SingleItem: Story = {
 };
 
 // With highlights (snapshots)
-const snapshotStore = createStoreWithSnapshots();
-const snapshotFs = createMemfsAdapter(snapshotStore);
+const snapshotFs = createSnapshotStoreAdapter();
 
 export const WithHighlights: Story = {
   args: {
@@ -320,8 +315,7 @@ export const WithRefresh: Story = {
 };
 
 // Multiple catalogs
-const multipleCatalogsStore = createPopulatedStore();
-const multipleCatalogsFs = createMemfsAdapter(multipleCatalogsStore);
+const multipleCatalogsFs = createPopulatedStoreAdapter();
 
 export const MultipleCatalogs: Story = {
   render: () => (

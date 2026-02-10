@@ -12,10 +12,4 @@ export type {
   NodeType,
 } from './types';
 export { computeHighlightSets } from './highlightUtils';
-export {
-  createPopulatedStore,
-  createEmptyStore,
-  createSingleItemStore,
-  createStoreWithSnapshots,
-  createMemfsAdapter,
-} from './fixtures';
+export { createMapAdapter } from './storyFixtures';
