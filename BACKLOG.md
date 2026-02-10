@@ -174,7 +174,7 @@ Description formats:
 | 013 | Bug | [Time Range and Tools panels show empty](https://github.com/debrief/debrief-future/issues/30) | 5 | 2 | 4 | 11 | Low | approved |
 | 027 | Infrastructure | [Add automated screenshot capture for Storybook stories](docs/ideas/027-automated-screenshots.md) | 3 | 4 | 4 | 11 | Medium | approved |
 | 036 | Infrastructure | [Reinstate Playwright E2E testing in CI](docs/ideas/030-reinstate-playwright-ci.md) | 4 | 2 | 5 | 11 | Medium | approved |
-| 077 | Bug | [Fix VS Code extension: time slider, location marker, trail mode, and tool offering](https://github.com/debrief/debrief-future/issues/208) | 5 | 2 | 3 | 10 | Medium | approved |
+| 077 | Bug | [Fix VS Code extension: time slider, location marker, trail mode, and tool offering](specs/077-fix-vscode-extension-bugs/spec.md) | 5 | 2 | 3 | 10 | Medium | specified |
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
 | 033 | Tech Debt | [Re-enable debrief-stac tests in pytest](docs/ideas/033-reenable-stac-tests.md) | 4 | 2 | 4 | 10 | Low | proposed |
