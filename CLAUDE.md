@@ -162,6 +162,7 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - In-memory only (undo stacks not persisted) (073-undo-redo-split)
 - TypeScript 5.x (Log Service in session-state package, VS Code extension stacService) + Existing Log Service (#071), stacService, session-state Zustand store, Node.js `fs/promises`, `crypto.randomUUID()` (074-snapshots)
 - Local filesystem — GeoJSON files within STAC Item directories (read/write via stacService) (074-snapshots)
+- TypeScript 5.x (Log Service in session-state package, VS Code extension stacService) + Existing Log Service (#071), Snapshot Service (#074), stacService, session-state Zustand store, Node.js `fs/promises`, `crypto.randomUUID()` (075-branching)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
