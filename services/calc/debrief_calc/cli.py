@@ -23,7 +23,13 @@ import sys
 from debrief_calc.executor import run
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.registry import registry
-from debrief_calc.result_builder import build_addition, build_artifact, build_error, build_mutation, build_response
+from debrief_calc.result_builder import (
+    build_addition,
+    build_artifact,
+    build_error,
+    build_mutation,
+    build_response,
+)
 
 
 def _context_type_from_features(features: list) -> ContextType:
