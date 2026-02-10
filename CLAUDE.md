@@ -166,6 +166,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Filesystem only (`shared/tools/shape/manipulation/`) (056-move-shape)
 - TypeScript 5.x (shared component library) + React 18.x (peer), vscrui ^0.1.0 (icons, existing), memfs ^4.x (devDependency for fixtures) (077-stac-file-tree)
 - N/A — reads filesystem via injected adapter, does not persist state (077-stac-file-tree)
+- Python 3.11 (debrief-calc service), TypeScript 5.x (VS Code extension, web-shell) + `debrief_calc` registry + `@tool` decorator (Python), `MCPToolDefinition` types (TypeScript). Standard library `math` module for trig functions — no external geo libraries. (056-move-shape)
+- N/A — pure transformation tool, no persistence (caller handles STAC writes) (056-move-shape)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
