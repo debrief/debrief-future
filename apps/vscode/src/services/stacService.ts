@@ -776,13 +776,17 @@ export class StacService {
   ): Promise<SafeFeatureCollection | null> {
     const fullItemPath = path.join(storePath, itemPath);
     const item = await this.loadItem(fullItemPath);
-    if (!item) return null;
+    if (!item) {
+      return null;
+    }
 
     // Find asset by filename match in href
     const assetEntry = Object.values(item.assets).find(a =>
       a.href.endsWith(assetFilename)
     );
-    if (!assetEntry) return null;
+    if (!assetEntry) {
+      return null;
+    }
 
     const itemDir = path.dirname(fullItemPath);
     const geoJsonPath = path.resolve(itemDir, assetEntry.href);
