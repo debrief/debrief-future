@@ -33,8 +33,8 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
 | **clarified** | Ambiguities resolved | `/speckit.clarify` |
 | **planned** | Implementation plan ready | `/speckit.plan` |
 | **tasked** | Tasks broken down | `/speckit.tasks` |
-| **implementing** | Active development | `/speckit.implement` |
-| **complete** | Done (row struck through) | `/speckit.pr` merged |
+| **implementing** | Active development | `/speckit.implement` or `/bugfix` |
+| **complete** | Done (row struck through) | `/speckit.pr` merged or `/bugfix` PR merged |
 
 ### Backlog Flow
 
@@ -69,6 +69,10 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
                               │
 5. SPECIFICATION              ▼
    /speckit.start {ID} ← requires status: approved
+                              │
+   OR (for Bug items only):   │
+   /bugfix {ID} ──────────────┼──> implementing ──> complete
+                              │    (skips specify → tasked)
 ```
 
 ### Status Validation Rules
@@ -100,6 +104,25 @@ This bridges backlog approval to the speckit workflow by:
 1. Validating the item exists and has status `approved`
 2. Creating a feature branch and specification
 3. Updating this file: status → `specified`, description → link to spec
+
+### Bug Fast-Track
+
+Bug items (`Category: Bug`) skip the full speckit pipeline. A bug fix restores existing specified behaviour — it doesn't need a new spec, plan, or task breakdown.
+
+```bash
+/bugfix 013    # Validates item is approved + Category is Bug, then fix → test → PR
+```
+
+**Fast-track status flow**:
+```
+approved → implementing → complete
+```
+
+**What is skipped**: specification, clarification, planning, task breakdown, media content, evidence artifacts.
+
+**What still applies**: tests required (Constitution Art. VI), atomic commits (Art. XIII), PR with summary and test plan.
+
+**Constitution note**: Article VIII ("Specs before code") applies to *significant new implementations*. A bug fix restores behaviour already defined by a prior feature's spec, so it falls outside this gate.
 
 ## Epics
 
