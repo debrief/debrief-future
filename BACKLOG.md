@@ -33,8 +33,8 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
 | **clarified** | Ambiguities resolved | `/speckit.clarify` |
 | **planned** | Implementation plan ready | `/speckit.plan` |
 | **tasked** | Tasks broken down | `/speckit.tasks` |
-| **implementing** | Active development | `/speckit.implement` |
-| **complete** | Done (row struck through) | `/speckit.pr` merged |
+| **implementing** | Active development | `/speckit.implement` or `/bugfix` |
+| **complete** | Done (row struck through) | `/speckit.pr` merged or `/bugfix` PR merged |
 
 ### Backlog Flow
 
@@ -69,6 +69,10 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
                               │
 5. SPECIFICATION              ▼
    /speckit.start {ID} ← requires status: approved
+                              │
+   OR (for Bug items only):   │
+   /bugfix {ID} ──────────────┼──> implementing ──> complete
+                              │    (skips specify → tasked)
 ```
 
 ### Status Validation Rules
@@ -100,6 +104,25 @@ This bridges backlog approval to the speckit workflow by:
 1. Validating the item exists and has status `approved`
 2. Creating a feature branch and specification
 3. Updating this file: status → `specified`, description → link to spec
+
+### Bug Fast-Track
+
+Bug items (`Category: Bug`) skip the full speckit pipeline. A bug fix restores existing specified behaviour — it doesn't need a new spec, plan, or task breakdown.
+
+```bash
+/bugfix 013    # Validates item is approved + Category is Bug, then fix → test → PR
+```
+
+**Fast-track status flow**:
+```
+approved → implementing → complete
+```
+
+**What is skipped**: specification, clarification, planning, task breakdown, media content, evidence artifacts.
+
+**What still applies**: tests required (Constitution Art. VI), atomic commits (Art. XIII), PR with summary and test plan.
+
+**Constitution note**: Article VIII ("Specs before code") applies to *significant new implementations*. A bug fix restores behaviour already defined by a prior feature's spec, so it falls outside this gate.
 
 ## Epics
 
@@ -137,10 +160,11 @@ Description formats:
 | 070 | Infrastructure | [Implement PROV schema foundation](specs/070-prov-schema-foundation/spec.md) [E02] — LinkML Log Entry schema, expanded ToolResult model, provenance migration, system record (requires #062) | 5 | 3 | 4 | 12 | High | implementing |
 | 071 | Feature | [Implement Log Recording service](specs/071-log-recording-service/spec.md) [E02] — TypeScript Log Service, recordToolResult, getTimeline, session-state integration (requires #070) | 5 | 4 | 3 | 12 | High | specified |
 | 072 | Feature | [Implement Log Panel](docs/ideas/072-log-panel.md) [E02] — VS Code activity panel, timeline view, entry display, filter/search (requires #071, optionally #044) | 5 | 5 | 3 | 13 | High | approved |
-| 073 | Tech Debt | [Split undo/redo: UI-only undo, data changes via Log](docs/ideas/073-undo-redo-split.md) [E02] — narrow StateSnapshot, remove featureCollectionUri and savePath (requires #071) | 4 | 2 | 5 | 11 | Low | approved |
+| 073 | Tech Debt | [Split undo/redo: UI-only undo, data changes via Log](specs/073-undo-redo-split/spec.md) [E02] — narrow StateSnapshot, remove featureCollectionUri and savePath (requires #071) | 4 | 2 | 5 | 11 | Low | implementing |
 | 074 | Feature | [Implement snapshots with doubly-linked chain](specs/074-snapshots/spec.md) [E02] — clean-state checkpoints, snapshot assets in STAC (requires #071) | 5 | 3 | 3 | 11 | Medium | specified |
 | 075 | Feature | [Implement branching from history point](docs/ideas/075-branching.md) [E02] — plot duplication, two-way links, branch records (requires #074) | 4 | 3 | 3 | 10 | Medium | approved |
 | 076 | Feature | [Implement replay and parameter tuning](docs/ideas/076-replay-tune.md) [E02] — parameter editing, positional replay, revert operations (requires #071, #074) | 5 | 4 | 2 | 11 | High | approved |
+| 077 | Feature | [STAC File Tree Component](specs/077-stac-file-tree/spec.md) — shared React tree view of STAC catalog filesystem backed by memfs; highlights new files from snapshots, opens plots from tree (requires #074, #071) | 4 | 4 | 4 | 12 | Medium | specified |
 | 061 | Feature | [Add generate courses and speeds for track tool spec](docs/ideas/061-generate-courses-speeds.md) (requires #049) | 4 | 3 | 5 | 12 | Low | approved |
 | 060 | Feature | [Add resample track tool spec](docs/ideas/060-resample-track.md) (requires #049) | 4 | 3 | 4 | 11 | Medium | approved |
 | 055 | Feature | [Add track-position to track range/bearing tool spec](docs/ideas/055-track-position-range-bearing.md) (requires #049, #053) | 4 | 4 | 5 | 13 | Medium | approved |

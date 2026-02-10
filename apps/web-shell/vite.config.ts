@@ -28,6 +28,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@debrief/components': path.resolve(__dirname, '../../shared/components/src/index.ts'),
+      // Use browser-only re-export — the full barrel re-exports Node-only modules (server, persistence)
+      '@debrief/session-state': path.resolve(__dirname, 'src/session-state-browser.ts'),
       '@test-data': path.resolve(__dirname, '../vscode/test-data'),
     },
   },
