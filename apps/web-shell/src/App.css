@@ -118,7 +118,7 @@ body {
   flex-direction: row;
 }
 
-/* Sidebar with tab panel */
+/* Sidebar: StacFileTree (top) + Activity/Log tab panel (bottom) */
 .web-shell__sidebar {
   width: 320px;
   min-width: 240px;
@@ -131,7 +131,16 @@ body {
   overflow: hidden;
 }
 
-/* Tab bar at top of sidebar */
+/* File tree in sidebar (top section, fixed height) */
+.web-shell__file-tree {
+  height: 200px;
+  min-height: 120px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--vscode-panel-border, #454545);
+  overflow-y: auto;
+}
+
+/* Tab bar between file tree and panel content */
 .web-shell__tab-bar {
   display: flex;
   flex-shrink: 0;
@@ -163,7 +172,7 @@ body {
   border-bottom-color: var(--vscode-focusBorder, #007fd4);
 }
 
-/* Tab content fills remaining space */
+/* Tab content fills remaining space below tree + tab bar */
 .web-shell__tab-content {
   flex: 1;
   min-height: 0;

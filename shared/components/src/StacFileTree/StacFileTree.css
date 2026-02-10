@@ -1,0 +1,295 @@
+/**
+ * StacFileTree component styles
+ * Uses CSS custom properties for theming
+ */
+
+/* Container */
+.debrief-file-tree {
+  position: relative;
+  overflow-y: auto;
+  background-color: var(--debrief-bg-primary, #ffffff);
+  border: 1px solid var(--debrief-border-color, #e0e0e0);
+  border-radius: var(--debrief-border-radius, 4px);
+  font-family: var(--debrief-font-family, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-size: var(--debrief-font-size-sm, 13px);
+  padding: 4px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--debrief-scrollbar-thumb, #c1c1c1) var(--debrief-scrollbar-track, #f1f1f1);
+}
+
+.debrief-file-tree::-webkit-scrollbar {
+  width: 8px;
+}
+
+.debrief-file-tree::-webkit-scrollbar-track {
+  background: var(--debrief-scrollbar-track, #f1f1f1);
+}
+
+.debrief-file-tree::-webkit-scrollbar-thumb {
+  background: var(--debrief-scrollbar-thumb, #c1c1c1);
+  border-radius: 4px;
+}
+
+.debrief-file-tree::-webkit-scrollbar-thumb:hover {
+  background: var(--debrief-scrollbar-thumb-hover, #a8a8a8);
+}
+
+/* Tree node */
+.debrief-file-tree__node {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  user-select: none;
+  min-height: 28px;
+}
+
+.debrief-file-tree__node:hover {
+  background-color: var(--debrief-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.debrief-file-tree__node:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--debrief-focus-ring, rgba(0, 102, 204, 0.4));
+}
+
+/* Chevron icon */
+.debrief-file-tree__chevron {
+  flex-shrink: 0;
+  color: var(--debrief-text-secondary, #666666);
+  transition: transform 0.15s ease;
+}
+
+/* Spacer for non-expandable nodes */
+.debrief-file-tree__spacer {
+  display: inline-block;
+  width: 16px;
+  flex-shrink: 0;
+}
+
+/* Node type icon */
+.debrief-file-tree__icon {
+  flex-shrink: 0;
+  color: var(--debrief-text-secondary, #666666);
+}
+
+/* Node label */
+.debrief-file-tree__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--debrief-text-primary, #1a1a1a);
+}
+
+/* Loading spinner */
+.debrief-file-tree__loading {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--debrief-text-secondary, #666666);
+}
+
+.debrief-file-tree__loading-icon {
+  animation: debrief-file-tree-spin 1s linear infinite;
+}
+
+@keyframes debrief-file-tree-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Children container */
+.debrief-file-tree__children {
+  /* No additional styling needed - indentation handled by padding */
+}
+
+/* Empty directory message */
+.debrief-file-tree__empty {
+  padding: 4px 8px;
+  color: var(--debrief-text-secondary, #666666);
+  font-style: italic;
+  font-size: var(--debrief-font-size-xs, 11px);
+}
+
+.debrief-file-tree__empty-text {
+  margin-left: 20px;
+}
+
+/* Error message */
+.debrief-file-tree__error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  color: var(--debrief-error-text, #d32f2f);
+  background-color: var(--debrief-error-bg, #ffebee);
+  border-left: 3px solid var(--debrief-error-border, #d32f2f);
+  font-size: var(--debrief-font-size-xs, 11px);
+}
+
+/* Highlighted node (direct) */
+.debrief-file-tree__node--highlighted {
+  background-color: var(--debrief-highlight-bg, #fff3cd);
+  border-left: 3px solid var(--debrief-highlight-border, #ffc107);
+}
+
+.debrief-file-tree__node--highlighted:hover {
+  background-color: var(--debrief-highlight-bg-hover, #ffe69c);
+}
+
+.debrief-file-tree__node--highlighted .debrief-file-tree__label {
+  font-weight: 600;
+}
+
+/* Node containing highlighted descendants */
+.debrief-file-tree__node--contains-highlight {
+  border-left: 2px solid var(--debrief-highlight-border-subtle, #ffd54f);
+}
+
+/* Current selected item node */
+.debrief-file-tree__node--current {
+  background-color: var(--debrief-selection-bg, rgba(0, 102, 204, 0.1));
+  border-left: 3px solid var(--debrief-selection-border, #0066cc);
+}
+
+.debrief-file-tree__node--current:hover {
+  background-color: var(--debrief-selection-bg-hover, rgba(0, 102, 204, 0.15));
+}
+
+.debrief-file-tree__node--current .debrief-file-tree__label {
+  font-weight: 600;
+  color: var(--debrief-selection-text, #0066cc);
+}
+
+/* Loading state */
+.debrief-file-tree__loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  color: var(--debrief-text-secondary, #666666);
+}
+
+/* Error state */
+.debrief-file-tree__error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: var(--debrief-error-text, #d32f2f);
+}
+
+.debrief-file-tree__retry-button {
+  padding: 6px 12px;
+  background-color: var(--debrief-button-bg, #0066cc);
+  color: var(--debrief-button-text, #ffffff);
+  border: none;
+  border-radius: var(--debrief-border-radius, 4px);
+  cursor: pointer;
+  font-size: var(--debrief-font-size-sm, 13px);
+  transition: background-color 0.15s ease;
+}
+
+.debrief-file-tree__retry-button:hover {
+  background-color: var(--debrief-button-bg-hover, #0052a3);
+}
+
+/* Empty state */
+.debrief-file-tree--empty .debrief-file-tree__empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--debrief-text-secondary, #666666);
+  font-style: italic;
+}
+
+/* Dark theme support */
+[data-theme='dark'] .debrief-file-tree {
+  background-color: var(--debrief-bg-primary, #1e1e1e);
+  border-color: var(--debrief-border-color, #3a3a3a);
+}
+
+[data-theme='dark'] .debrief-file-tree::-webkit-scrollbar-track {
+  background: var(--debrief-scrollbar-track, #2d2d2d);
+}
+
+[data-theme='dark'] .debrief-file-tree::-webkit-scrollbar-thumb {
+  background: var(--debrief-scrollbar-thumb, #555555);
+}
+
+[data-theme='dark'] .debrief-file-tree__node:hover {
+  background-color: var(--debrief-hover-bg, rgba(255, 255, 255, 0.06));
+}
+
+[data-theme='dark'] .debrief-file-tree__chevron,
+[data-theme='dark'] .debrief-file-tree__icon,
+[data-theme='dark'] .debrief-file-tree__loading {
+  color: var(--debrief-text-secondary, #888888);
+}
+
+[data-theme='dark'] .debrief-file-tree__label {
+  color: var(--debrief-text-primary, #e0e0e0);
+}
+
+[data-theme='dark'] .debrief-file-tree__empty,
+[data-theme='dark'] .debrief-file-tree__loading-state,
+[data-theme='dark'] .debrief-file-tree__empty-state {
+  color: var(--debrief-text-secondary, #888888);
+}
+
+[data-theme='dark'] .debrief-file-tree__error {
+  color: var(--debrief-error-text, #f44336);
+  background-color: var(--debrief-error-bg, #3a1e1e);
+  border-left-color: var(--debrief-error-border, #f44336);
+}
+
+[data-theme='dark'] .debrief-file-tree__error-state {
+  color: var(--debrief-error-text, #f44336);
+}
+
+[data-theme='dark'] .debrief-file-tree__node--highlighted {
+  background-color: var(--debrief-highlight-bg, #3a3520);
+  border-left-color: var(--debrief-highlight-border, #ffc107);
+}
+
+[data-theme='dark'] .debrief-file-tree__node--highlighted:hover {
+  background-color: var(--debrief-highlight-bg-hover, #4a4530);
+}
+
+[data-theme='dark'] .debrief-file-tree__node--contains-highlight {
+  border-left-color: var(--debrief-highlight-border-subtle, #806a2a);
+}
+
+[data-theme='dark'] .debrief-file-tree__node--current {
+  background-color: var(--debrief-selection-bg, rgba(100, 150, 255, 0.15));
+  border-left-color: var(--debrief-selection-border, #64a3ff);
+}
+
+[data-theme='dark'] .debrief-file-tree__node--current:hover {
+  background-color: var(--debrief-selection-bg-hover, rgba(100, 150, 255, 0.2));
+}
+
+[data-theme='dark'] .debrief-file-tree__node--current .debrief-file-tree__label {
+  color: var(--debrief-selection-text, #64a3ff);
+}
+
+[data-theme='dark'] .debrief-file-tree__retry-button {
+  background-color: var(--debrief-button-bg, #0078d4);
+  color: var(--debrief-button-text, #ffffff);
+}
+
+[data-theme='dark'] .debrief-file-tree__retry-button:hover {
+  background-color: var(--debrief-button-bg-hover, #006cc1);
+}

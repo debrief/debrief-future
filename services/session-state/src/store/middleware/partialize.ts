@@ -5,8 +5,6 @@
  * Defines which state is persistent vs ephemeral.
  */
 
-import type { SessionStore } from '../../types/index.js';
-
 /**
  * Ephemeral fields that are NOT tracked in undo history.
  */

@@ -16,7 +16,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@test-data/*": ["../vscode/test-data/*"]
+      "@test-data/*": ["../vscode/test-data/*"],
+      "@debrief/session-state": ["./src/session-state-browser.ts"]
     },
     "baseUrl": "."
   },

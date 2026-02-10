@@ -72,8 +72,6 @@ export interface PersistentSessionState {
 
 /**
  * State snapshot for undo/redo history.
- * Only persistent state that should be tracked (FR-021).
+ * UI-only fields — data changes tracked by Log Service (073-undo-redo-split).
  */
-export type StateSnapshot = Omit<SessionState, 'document'> & {
-  document: Pick<DocumentSlice, 'savePath'>;
-};
+export type StateSnapshot = Omit<SessionState, 'document'>;

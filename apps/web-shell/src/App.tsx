@@ -1,18 +1,28 @@
 /**
- * App shell with two-view architecture.
+ * App shell with two-view architecture, backed by @debrief/session-state.
  *
  * - Welcome view: CatalogOverview showing available plots
- * - Analysis view: ActivityPanel (left) + MapView (right) for plot analysis
+ * - Analysis view: StacFileTree + Activity/Log tabs (left) + MapView (right)
+ *
+ * State flow:
+ *   session-state store  <->  React (via useSessionStore)
+ *   useTimePlayback      ->   store.setCurrentTime (sync on change)
+ *   store.selection      ->   ActivityPanel + MapView
+ *   store.featureCollectionUri  (set on plot load, NOT undoable)
+ *   store.displayMode    (set via UI, undoable)
+ *   Ctrl+Z / Ctrl+Y      ->   store.undo() / store.redo()
+ *
+ * Feature: 073-undo-redo-split (runtime verification)
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import type { Feature, FeatureCollection } from 'geojson';
 import {
   CatalogOverview,
   MapView,
   ActivityPanel,
   LogPanel,
-  useSelection,
+  StacFileTree,
   useTimePlayback,
   calculateTimeExtent,
   getFeatureLabel,
@@ -21,7 +31,6 @@ import type {
   CatalogOverviewItem,
   ToolsPanelItem,
   ActivityPanelMessage,
-  DisplayMode,
   DebriefFeature,
   TimelineEntry,
   PresentationMode,
@@ -30,9 +39,33 @@ import type {
 } from '@debrief/components';
 import type { LogFilterState } from '@debrief/components';
 import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
+import {
+  getSessionStore,
+  resetSessionStore,
+  createTimeInstant,
+  type DisplayMode as StoreDisplayMode,
+} from '@debrief/session-state';
+import type { DisplayMode as ComponentDisplayMode } from '@debrief/components';
+
+// Map between session-state DisplayMode ('normal'|'snailTrail') and
+// components DisplayMode ('full'|'trail') — the two enums diverged historically.
+const toComponentMode = (m: StoreDisplayMode): ComponentDisplayMode =>
+  m === 'snailTrail' ? 'trail' : 'full';
+const toStoreMode = (m: string): StoreDisplayMode =>
+  m === 'trail' ? 'snailTrail' : 'normal';
+import { useSessionStore } from './hooks/useSessionStore';
 import { stacService } from './mocks/stacService';
 import { calcService } from './mocks/calcService';
 import type { ToolResult } from './mocks/calcService';
+import { mockFsAdapter } from './mocks/fsAdapter';
+
+// Expose session store on window for Playwright test introspection
+declare global {
+  interface Window {
+    __sessionStore: ReturnType<typeof getSessionStore>;
+  }
+}
+window.__sessionStore = getSessionStore();
 
 /** Current view state */
 type View = 'welcome' | 'analysis';
@@ -51,12 +84,16 @@ interface PlotState {
  * Main application component.
  */
 export default function App() {
-  // View state
+  // Session-state store (reactive via useSyncExternalStore)
+  const state = useSessionStore();
+  const store = getSessionStore();
+
+  // View state (local — not part of session-state)
   const [view, setView] = useState<View>('welcome');
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
   const [resultLayers, setResultLayers] = useState<Feature[]>([]);
   const [toolMessage, setToolMessage] = useState<string | null>(null);
-  const [displayMode, setDisplayMode] = useState<DisplayMode>('full');
+  const [treeRefreshKey, setTreeRefreshKey] = useState(0);
 
   // Sidebar tab
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('activity');
@@ -76,9 +113,6 @@ export default function App() {
   const catalogItems = useMemo<CatalogOverviewItem[]>(() => {
     return stacService.getItems();
   }, []);
-
-  // Selection state
-  const selection = useSelection();
 
   // Extract features array from current plot
   const plotFeatures = useMemo<DebriefFeature[]>(() => {
@@ -107,26 +141,77 @@ export default function App() {
     return calculateTimeExtent(plotFeatures);
   }, [plotFeatures]);
 
-  // Temporal playback state
+  // Temporal playback state — animation loop lives here,
+  // but we sync currentTime changes into session-state
   const playback = useTimePlayback({
     timeExtent,
+    onTimeChange: useCallback((time: number) => {
+      store.getState().setCurrentTime(createTimeInstant(time));
+    }, [store]),
   });
+
+  // Derive selection as a Set<string> from store (for components that need it)
+  const selectedIds = useMemo<Set<string>>(() => {
+    return new Set(state.selection.featureIds);
+  }, [state.selection.featureIds]);
 
   // Selected features for tool applicability
   const selectedFeatures = useMemo(() => {
-    return plotFeatures.filter(f => selection.selectedIds.has(f.id));
-  }, [plotFeatures, selection.selectedIds]);
+    return plotFeatures.filter(f => selectedIds.has(String(f.id)));
+  }, [plotFeatures, selectedIds]);
 
   // Tools based on current selection
   const tools = useMemo<ToolsPanelItem[]>(() => {
     return calcService.getTools(selectedFeatures as Feature[]);
   }, [selectedFeatures]);
 
+  // --- Keyboard: Ctrl+Z / Ctrl+Y for undo/redo ---
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const isMod = e.ctrlKey || e.metaKey;
+      if (!isMod) return;
+
+      if (e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        store.getState().undo();
+      } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
+        e.preventDefault();
+        store.getState().redo();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [store]);
+
   // Handle plot selection from catalog
   const handlePlotSelect = useCallback((itemPath: string) => {
     try {
       const plotData = stacService.getPlotData(itemPath);
       const item = stacService.getItem(itemPath);
+
+      // Reset session store for new plot
+      resetSessionStore();
+      window.__sessionStore = getSessionStore();
+      const freshStore = getSessionStore();
+
+      // Set data reference (NOT undoable — tracked by Log Service)
+      freshStore.getState().setFeatureCollectionUri(itemPath);
+
+      // Initialise time range from plot data
+      const features = plotData.features as DebriefFeature[];
+      const extent = calculateTimeExtent(features);
+      if (extent) {
+        freshStore.getState().setTimeRange({
+          start: createTimeInstant(extent[0]),
+          end: createTimeInstant(extent[1]),
+        });
+        freshStore.getState().setCurrentTime(createTimeInstant(extent[0]));
+      }
+
+      // Clear undo history — initialization isn't a user action
+      freshStore.getState().clearHistory();
+      freshStore.getState().markClean();
+
       setCurrentPlot({
         itemPath,
         title: item?.properties.title ?? itemPath,
@@ -134,12 +219,13 @@ export default function App() {
       });
       setResultLayers([]);
       setToolMessage(null);
-      selection.clear();
+      setLogEntries([]);
+      setSidebarTab('activity');
       setView('analysis');
     } catch (error) {
       console.error('Failed to load plot:', error);
     }
-  }, [selection]);
+  }, []);
 
   // Handle back to catalog
   const handleBackToCatalog = useCallback(() => {
@@ -149,43 +235,63 @@ export default function App() {
     setToolMessage(null);
     setLogEntries([]);
     setSidebarTab('activity');
-    selection.clear();
-  }, [selection]);
+    store.getState().clearSelection();
+  }, [store]);
 
   // Handle LogPanel messages
   const handleLogMessage = useCallback((message: LogPanelMessage) => {
     if (message.type === 'entry:select') {
-      // Select affected features on the map
-      selection.selectMultiple(message.payload.featureIds);
+      store.getState().setSelection(message.payload.featureIds);
     } else if (message.type === 'entry:deselect') {
-      selection.clear();
+      store.getState().clearSelection();
     } else if (message.type === 'action:invoke') {
       setLogNotification(`Action "${message.payload.actionType}" is not yet available.`);
       setTimeout(() => setLogNotification(null), 3000);
     }
-  }, [selection]);
+  }, [store]);
 
-  // Handle map feature selection
+  // Handle map feature selection (goes through session-state)
   const handleMapSelect = useCallback((featureId: string, event: React.MouseEvent) => {
+    const s = store.getState();
     if (event.ctrlKey || event.metaKey) {
-      selection.toggle(featureId);
+      // Toggle: add or remove
+      const current = s.selection.featureIds;
+      if (current.includes(featureId)) {
+        s.removeFromSelection([featureId]);
+      } else {
+        s.addToSelection([featureId]);
+      }
     } else {
-      selection.select(featureId);
+      s.setSelection([featureId], featureId);
     }
-  }, [selection]);
+  }, [store]);
 
-  // Handle background click (clear selection)
+  // Handle background click (clear selection via session-state)
   const handleBackgroundClick = useCallback(() => {
-    selection.clear();
-  }, [selection]);
+    store.getState().clearSelection();
+  }, [store]);
 
-  // Handle tool execution — also records a log entry
+  // Handle tool execution — persist result to STAC assets and record a log entry
   const handleRunTool = useCallback((toolId: string) => {
     const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[]);
     setToolMessage(result.message);
 
     if (result.resultLayer) {
       setResultLayers(prev => [...prev, result.resultLayer!]);
+
+      // Persist result as a STAC asset in the current item's assets/ directory
+      if (currentPlot) {
+        const itemDir = `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`;
+        const sourceNames = selectedFeatures
+          .map(f => (f.properties as unknown as Record<string, unknown>)?.name ?? f.id ?? 'unknown')
+          .map(n => String(n).toLowerCase().replace(/\s+/g, '-'))
+          .join('-');
+        const fileName = `${toolId}-${sourceNames}.json`;
+        const assetPath = `${itemDir}/assets/${fileName}`;
+
+        mockFsAdapter.writeFile(assetPath, JSON.stringify(result.resultLayer, null, 2));
+        setTreeRefreshKey(k => k + 1);
+      }
     }
 
     // Record a log entry
@@ -212,7 +318,7 @@ export default function App() {
     };
 
     setLogEntries(prev => [entry, ...prev]);
-  }, [selectedFeatures, activityCounter]);
+  }, [selectedFeatures, activityCounter, currentPlot]);
 
   // Handle ActivityPanel messages
   const handleActivityMessage = useCallback((message: ActivityPanelMessage) => {
@@ -227,18 +333,18 @@ export default function App() {
         playback.pause();
         break;
       case 'temporal:displayMode':
-        setDisplayMode(message.payload.mode);
+        store.getState().setDisplayMode(toStoreMode(message.payload.mode));
         break;
       case 'tool:run':
         handleRunTool(message.payload.toolId);
         break;
       case 'layer:select':
-        selection.selectMultiple(message.payload.featureIds);
+        store.getState().setSelection(message.payload.featureIds);
         break;
       default:
         break;
     }
-  }, [playback, selection, handleRunTool]);
+  }, [playback, store, handleRunTool]);
 
   // Render welcome view
   if (view === 'welcome') {
@@ -272,6 +378,18 @@ export default function App() {
           &larr; Back to Catalog
         </button>
         <h1 className="web-shell__title">{currentPlot?.title ?? 'Analysis'}</h1>
+        {/* Undo/redo status indicator */}
+        <span
+          className="web-shell__undo-status"
+          data-testid="undo-status"
+          data-can-undo={state.canUndo()}
+          data-can-redo={state.canRedo()}
+          data-dirty={state.dirty}
+          data-feature-uri={state.featureCollectionUri ?? ''}
+        >
+          {state.canUndo() ? 'Undo available' : ''}
+          {state.canRedo() ? ' | Redo available' : ''}
+        </span>
       </header>
 
       {toolMessage && (
@@ -289,6 +407,13 @@ export default function App() {
 
       <main className="web-shell__main web-shell__main--split">
         <aside className="web-shell__sidebar">
+          <StacFileTree
+            fs={mockFsAdapter}
+            rootPath="/local-store"
+            currentItemPath={currentPlot ? `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}` : undefined}
+            refreshKey={treeRefreshKey}
+            className="web-shell__file-tree"
+          />
           <div className="web-shell__tab-bar" role="tablist">
             <button
               type="button"
@@ -321,11 +446,11 @@ export default function App() {
                 currentTime={playback.currentTime}
                 playbackState={playback.playbackState}
                 playbackSpeed={playback.speed}
-                displayMode={displayMode}
+                displayMode={toComponentMode(state.displayMode)}
                 timeUiState={timeExtent ? 'ready' : 'empty'}
                 tools={tools}
                 features={allFeatures}
-                selectedFeatureIds={Array.from(selection.selectedIds)}
+                selectedFeatureIds={state.selection.featureIds}
                 onMessage={handleActivityMessage}
               />
             ) : (
@@ -351,11 +476,11 @@ export default function App() {
         <section className="web-shell__map-container">
           <MapView
             features={allFeatures}
-            selectedIds={selection.selectedIds}
+            selectedIds={selectedIds}
             onSelect={handleMapSelect}
             onBackgroundClick={handleBackgroundClick}
             currentTime={playback.currentTime}
-            displayMode={displayMode}
+            displayMode={toComponentMode(state.displayMode)}
             height="100%"
             className="web-shell__map"
           />

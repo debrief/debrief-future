@@ -52,6 +52,8 @@ const config: StorybookConfig = {
       ...config.resolve.alias,
       // Resolve @debrief/components to source files for Storybook builds
       '@debrief/components': path.resolve(__dirname, '../src/index.ts'),
+      // Resolve @debrief/session-state to browser-safe shim (web-shell stories import it)
+      '@debrief/session-state': path.resolve(__dirname, '../../../apps/web-shell/src/session-state-browser.ts'),
       '@test-data': path.resolve(__dirname, '../../../apps/vscode/test-data'),
     };
     return config;

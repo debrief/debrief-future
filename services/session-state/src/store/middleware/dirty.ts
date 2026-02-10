@@ -11,6 +11,7 @@ import { isEphemeralField } from './partialize.js';
 
 /**
  * Fields that when changed should mark the document as dirty.
+ * Data-change dirty tracking handled by Log Service markDirty() (073-undo-redo-split).
  */
 export const DIRTY_TRIGGER_FIELDS = new Set([
   'currentTime',
@@ -21,7 +22,6 @@ export const DIRTY_TRIGGER_FIELDS = new Set([
   'displayMode',
   'viewport',
   'rotation',
-  'featureCollectionUri',
   'selection',
   'hiddenFeatureIds',
 ]);
