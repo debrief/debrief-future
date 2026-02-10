@@ -1,0 +1,65 @@
+{
+  "before": {
+    "_description": "Working file with 3 provenance entries, no snapshots",
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [] },
+    "properties": {
+      "featureType": "system",
+      "snapshotLinks": null,
+      "branches": [],
+      "provenance": []
+    }
+  },
+  "after": {
+    "_description": "Working file after first snapshot — provenance cleared, prev link set",
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [] },
+    "properties": {
+      "featureType": "system",
+      "snapshotLinks": {
+        "prev": {
+          "asset": "plot-snap-2026-02-09T14-30-00.geojson",
+          "provEntryCount": 3
+        },
+        "next": null
+      },
+      "branches": [],
+      "provenance": [
+        {
+          "activityId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+          "type": "snapshot",
+          "timestamp": "2026-02-09T14:30:00.000Z",
+          "asset": "plot-snap-2026-02-09T14-30-00.geojson",
+          "branchId": null,
+          "direction": null
+        }
+      ]
+    }
+  },
+  "snapshot": {
+    "_description": "The snapshot file — clean (no spatial provenance), linked back to working file",
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [] },
+    "properties": {
+      "featureType": "system",
+      "snapshotLinks": {
+        "prev": null,
+        "next": {
+          "asset": "plot.geojson",
+          "provEntryCount": 0
+        }
+      },
+      "branches": [],
+      "provenance": [
+        {
+          "activityId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+          "type": "snapshot",
+          "timestamp": "2026-02-09T14:30:00.000Z",
+          "asset": "plot-snap-2026-02-09T14-30-00.geojson",
+          "branchId": null,
+          "direction": null
+        }
+      ]
+    }
+  }
+}

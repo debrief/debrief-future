@@ -1,0 +1,21 @@
+{
+  "featureType": "system",
+  "snapshotLinks": {
+    "prev": {
+      "asset": "plot-snap-2026-02-09T10-30-00.geojson",
+      "provEntryCount": 7
+    },
+    "next": null
+  },
+  "branches": [],
+  "provenance": [
+    {
+      "activityId": "snap-boundary-001",
+      "type": "snapshot",
+      "timestamp": "2026-02-09T10:30:00Z",
+      "asset": "plot-snap-2026-02-09T10-30-00.geojson",
+      "branchId": null,
+      "direction": null
+    }
+  ]
+}

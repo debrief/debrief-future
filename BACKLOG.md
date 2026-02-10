@@ -138,7 +138,7 @@ Description formats:
 | 071 | Feature | [Implement Log Recording service](specs/071-log-recording-service/spec.md) [E02] — TypeScript Log Service, recordToolResult, getTimeline, session-state integration (requires #070) | 5 | 4 | 3 | 12 | High | specified |
 | 072 | Feature | [Implement Log Panel](docs/ideas/072-log-panel.md) [E02] — VS Code activity panel, timeline view, entry display, filter/search (requires #071, optionally #044) | 5 | 5 | 3 | 13 | High | approved |
 | 073 | Tech Debt | [Split undo/redo: UI-only undo, data changes via Log](docs/ideas/073-undo-redo-split.md) [E02] — narrow StateSnapshot, remove featureCollectionUri and savePath (requires #071) | 4 | 2 | 5 | 11 | Low | approved |
-| 074 | Feature | [Implement snapshots with doubly-linked chain](docs/ideas/074-snapshots.md) [E02] — clean-state checkpoints, snapshot assets in STAC (requires #071) | 5 | 3 | 3 | 11 | Medium | approved |
+| 074 | Feature | [Implement snapshots with doubly-linked chain](specs/074-snapshots/spec.md) [E02] — clean-state checkpoints, snapshot assets in STAC (requires #071) | 5 | 3 | 3 | 11 | Medium | specified |
 | 075 | Feature | [Implement branching from history point](docs/ideas/075-branching.md) [E02] — plot duplication, two-way links, branch records (requires #074) | 4 | 3 | 3 | 10 | Medium | approved |
 | 076 | Feature | [Implement replay and parameter tuning](docs/ideas/076-replay-tune.md) [E02] — parameter editing, positional replay, revert operations (requires #071, #074) | 5 | 4 | 2 | 11 | High | approved |
 | 061 | Feature | [Add generate courses and speeds for track tool spec](docs/ideas/061-generate-courses-speeds.md) (requires #049) | 4 | 3 | 5 | 12 | Low | approved |
