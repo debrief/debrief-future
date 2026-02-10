@@ -50,10 +50,10 @@
 
 **Purpose**: Create the component directory structure and add the memfs devDependency
 
-- [ ] T001 Create StacFileTree component directory `shared/components/src/StacFileTree/`
-- [ ] T002 [P] Add memfs devDependency to shared/components `shared/components/package.json`
-- [ ] T003 [P] Add memfs dependency to web-shell for runtime demo `apps/web-shell/package.json`
-- [ ] T004 Run pnpm install to resolve new dependencies
+- [x] T001 Create StacFileTree component directory `shared/components/src/StacFileTree/`
+- [x] T002 [P] Add memfs devDependency to shared/components `shared/components/package.json`
+- [x] T003 [P] Add memfs dependency to web-shell for runtime demo `apps/web-shell/package.json`
+- [x] T004 Run pnpm install to resolve new dependencies
 
 **Checkpoint**: Directory structure exists, memfs available for import
 
@@ -65,11 +65,11 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Define TypeScript interfaces (FilesystemAdapter, TreeNode, NodeType, DirectoryEntry, FileStat, HighlightSet) `shared/components/src/StacFileTree/types.ts`
-- [ ] T006 Implement highlight propagation utility (computeAncestorPaths) `shared/components/src/StacFileTree/highlightUtils.ts`
-- [ ] T007 [test] Write unit tests for highlightUtils `shared/components/src/StacFileTree/highlightUtils.test.ts`
-- [ ] T008 Create memfs fixture data (populated store, empty store, single-item store, store with snapshots) `shared/components/src/StacFileTree/fixtures.ts`
-- [ ] T009 Create barrel export `shared/components/src/StacFileTree/index.ts`
+- [x] T005 Define TypeScript interfaces (FilesystemAdapter, TreeNode, NodeType, DirectoryEntry, FileStat, HighlightSet) `shared/components/src/StacFileTree/types.ts`
+- [x] T006 Implement highlight propagation utility (computeAncestorPaths) `shared/components/src/StacFileTree/highlightUtils.ts`
+- [x] T007 [test] Write unit tests for highlightUtils `shared/components/src/StacFileTree/highlightUtils.test.ts`
+- [x] T008 Create memfs fixture data (populated store, empty store, single-item store, store with snapshots) `shared/components/src/StacFileTree/fixtures.ts`
+- [x] T009 Create barrel export `shared/components/src/StacFileTree/index.ts`
 
 **Checkpoint**: Foundation ready — user story implementation can begin
 
@@ -85,17 +85,17 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [test] Write unit tests for useTreeState hook (expand, collapse, lazy load, cache, refresh) `shared/components/src/StacFileTree/useTreeState.test.ts`
-- [ ] T011 [P][test] Write component render tests (renders root, expands nodes, shows correct icons, empty state, error state, loading state) `shared/components/src/StacFileTree/StacFileTree.test.tsx`
+- [x] T010 [test] Write unit tests for useTreeState hook (expand, collapse, lazy load, cache, refresh) `shared/components/src/StacFileTree/useTreeState.test.ts`
+- [x] T011 [P][test] Write component render tests (renders root, expands nodes, shows correct icons, empty state, error state, loading state) `shared/components/src/StacFileTree/StacFileTree.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T012 Implement useTreeState custom hook (expand/collapse state, lazy child loading, cache, refreshKey support) `shared/components/src/StacFileTree/useTreeState.ts`
-- [ ] T013 Implement StacFileTree component (recursive tree rendering, node type detection, expand/collapse controls, icons via vscrui, empty state, error state, loading spinner) `shared/components/src/StacFileTree/StacFileTree.tsx`
-- [ ] T014 Create component styles (BEM classes, CSS custom properties, dark theme support, indentation, truncation) `shared/components/src/StacFileTree/StacFileTree.css`
-- [ ] T015 Create Storybook stories: Default (populated catalog) and Empty `shared/components/src/StacFileTree/StacFileTree.stories.tsx`
-- [ ] T016 Add StacFileTree export to component library barrel `shared/components/src/index.ts`
-- [ ] T017 Verify: run unit tests `pnpm --filter @debrief/components test -- StacFileTree`
+- [x] T012 Implement useTreeState custom hook (expand/collapse state, lazy child loading, cache, refreshKey support) `shared/components/src/StacFileTree/useTreeState.ts`
+- [x] T013 Implement StacFileTree component (recursive tree rendering, node type detection, expand/collapse controls, icons via vscrui, empty state, error state, loading spinner) `shared/components/src/StacFileTree/StacFileTree.tsx`
+- [x] T014 Create component styles (BEM classes, CSS custom properties, dark theme support, indentation, truncation) `shared/components/src/StacFileTree/StacFileTree.css`
+- [x] T015 Create Storybook stories: Default (populated catalog) and Empty `shared/components/src/StacFileTree/StacFileTree.stories.tsx`
+- [x] T016 Add StacFileTree export to component library barrel `shared/components/src/index.ts`
+- [x] T017 Verify: run unit tests `pnpm --filter @debrief/components test -- StacFileTree`
 
 **Checkpoint**: Tree renders a STAC catalog structure with expand/collapse. Independently testable and demonstrable in Storybook.
 
@@ -109,14 +109,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T018 [test] Write interaction tests (double-click item emits event, double-click non-item does not emit, current item visual distinction) `shared/components/src/StacFileTree/StacFileTree.test.tsx`
+- [x] T018 [test] Write interaction tests (double-click item emits event, double-click non-item does not emit, current item visual distinction) `shared/components/src/StacFileTree/StacFileTree.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T019 Add double-click handler to item nodes, emit onItemSelect with item path `shared/components/src/StacFileTree/StacFileTree.tsx`
-- [ ] T020 Add currentItemPath prop and visual distinction styles (.debrief-file-tree__node--current) `shared/components/src/StacFileTree/StacFileTree.css`
-- [ ] T021 Add Storybook story: CurrentItemSelected `shared/components/src/StacFileTree/StacFileTree.stories.tsx`
-- [ ] T022 Verify: run unit tests `pnpm --filter @debrief/components test -- StacFileTree`
+- [x] T019 Add double-click handler to item nodes, emit onItemSelect with item path `shared/components/src/StacFileTree/StacFileTree.tsx`
+- [x] T020 Add currentItemPath prop and visual distinction styles (.debrief-file-tree__node--current) `shared/components/src/StacFileTree/StacFileTree.css`
+- [x] T021 Add Storybook story: CurrentItemSelected `shared/components/src/StacFileTree/StacFileTree.stories.tsx`
+- [x] T022 Verify: run unit tests `pnpm --filter @debrief/components test -- StacFileTree`
 
 **Checkpoint**: Users can open plots from the tree. Current item is visually distinct. Independently testable.
 
@@ -130,14 +130,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T023 [test] Write highlight tests (direct highlight on leaf, ancestor propagation when collapsed, clear highlights) `shared/components/src/StacFileTree/StacFileTree.test.tsx`
+- [x] T023 [test] Write highlight tests (direct highlight on leaf, ancestor propagation when collapsed, clear highlights) `shared/components/src/StacFileTree/StacFileTree.test.tsx`
 
 ### Implementation for User Story 3
 
-- [ ] T024 Add highlightedPaths prop, integrate computeAncestorPaths from highlightUtils `shared/components/src/StacFileTree/StacFileTree.tsx`
-- [ ] T025 Add highlight styles (.debrief-file-tree__node--highlighted, .debrief-file-tree__node--contains-highlight) `shared/components/src/StacFileTree/StacFileTree.css`
-- [ ] T026 Add Storybook story: WithHighlights (catalog with highlighted snapshot files) `shared/components/src/StacFileTree/StacFileTree.stories.tsx`
-- [ ] T027 Verify: run unit tests `pnpm --filter @debrief/components test -- StacFileTree`
+- [x] T024 Add highlightedPaths prop, integrate computeAncestorPaths from highlightUtils `shared/components/src/StacFileTree/StacFileTree.tsx`
+- [x] T025 Add highlight styles (.debrief-file-tree__node--highlighted, .debrief-file-tree__node--contains-highlight) `shared/components/src/StacFileTree/StacFileTree.css`
+- [x] T026 Add Storybook story: WithHighlights (catalog with highlighted snapshot files) `shared/components/src/StacFileTree/StacFileTree.stories.tsx`
+- [x] T027 Verify: run unit tests `pnpm --filter @debrief/components test -- StacFileTree`
 
 **Checkpoint**: New files are highlighted after snapshots. Ancestor nodes show "contains changes" indicator. Independently testable.
 
@@ -151,11 +151,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T028 Add Storybook stories: SingleItem and DarkTheme variants `shared/components/src/StacFileTree/StacFileTree.stories.tsx`
-- [ ] T029 Create memfs adapter factory function (createMemfsAdapter) `shared/components/src/StacFileTree/fixtures.ts`
-- [ ] T030 Integrate StacFileTree in web-shell sidebar above ActivityPanel `apps/web-shell/src/App.tsx`
-- [ ] T031 Build component library to verify exports `pnpm --filter @debrief/components build`
-- [ ] T032 Verify web-shell renders tree correctly `pnpm --filter @debrief/web-shell dev`
+- [x] T028 Add Storybook stories: SingleItem and DarkTheme variants `shared/components/src/StacFileTree/StacFileTree.stories.tsx`
+- [x] T029 Create memfs adapter factory function (createMemfsAdapter) `shared/components/src/StacFileTree/fixtures.ts`
+- [x] T030 Integrate StacFileTree in web-shell sidebar above ActivityPanel `apps/web-shell/src/App.tsx`
+- [x] T031 Build component library to verify exports `pnpm --filter @debrief/components build`
+- [x] T032 Verify web-shell renders tree correctly `pnpm --filter @debrief/web-shell dev`
 
 **Checkpoint**: All 6 Storybook stories render. Web-shell shows tree in sidebar. Component library builds cleanly.
 
@@ -167,12 +167,12 @@
 
 ### E2E Tests
 
-- [ ] T033 Create Playwright E2E test file `shared/components/e2e/StacFileTree.spec.ts`
-- [ ] T034 [P] Add rendering tests: tree renders with correct hierarchy in light, dark, vscode themes
-- [ ] T035 [P] Add interaction tests: expand, collapse, double-click item
-- [ ] T036 [P] Add highlight tests: highlighted nodes visible, ancestor propagation
-- [ ] T037 [P] Add state tests: empty state, loading state, error state
-- [ ] T038 Run E2E tests: `pnpm --filter @debrief/components test:e2e StacFileTree`
+- [x] T033 Create Playwright E2E test file `shared/components/e2e/StacFileTree.spec.ts`
+- [x] T034 [P] Add rendering tests: tree renders with correct hierarchy in light, dark, vscode themes
+- [x] T035 [P] Add interaction tests: expand, collapse, double-click item
+- [x] T036 [P] Add highlight tests: highlighted nodes visible, ancestor propagation
+- [x] T037 [P] Add state tests: empty state, loading state, error state
+- [x] T038 Run E2E tests: `pnpm --filter @debrief/components test:e2e StacFileTree`
 
 **Checkpoint**: All E2E tests pass across theme variants. Screenshots captured.
 
@@ -184,24 +184,24 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T039 Create evidence directory `specs/077-stac-file-tree/evidence/`
-- [ ] T040 Capture test summary with pass/fail counts and coverage `specs/077-stac-file-tree/evidence/test-summary.md`
-- [ ] T041 Record usage example demonstrating the component in Storybook `specs/077-stac-file-tree/evidence/usage-example.md`
+- [x] T039 Create evidence directory `specs/077-stac-file-tree/evidence/`
+- [x] T040 Capture test summary with pass/fail counts and coverage `specs/077-stac-file-tree/evidence/test-summary.md`
+- [x] T041 Record usage example demonstrating the component in Storybook `specs/077-stac-file-tree/evidence/usage-example.md`
 
 ### E2E Evidence Collection (REQUIRED)
 
-- [ ] T042 Run full E2E suite: `pnpm --filter @debrief/components test:e2e StacFileTree`
-- [ ] T043 [P] Capture theme variant screenshots to `specs/077-stac-file-tree/evidence/screenshots/`
-- [ ] T044 Document E2E results `specs/077-stac-file-tree/evidence/e2e-summary.md`
+- [x] T042 Run full E2E suite: `pnpm --filter @debrief/components test:e2e StacFileTree`
+- [x] T043 [P] Capture theme variant screenshots to `specs/077-stac-file-tree/evidence/screenshots/`
+- [x] T044 Document E2E results `specs/077-stac-file-tree/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T045 Create shipped blog post `specs/077-stac-file-tree/media/shipped-post.md`
-- [ ] T046 [P] Create LinkedIn shipped summary `specs/077-stac-file-tree/media/linkedin-shipped.md`
+- [x] T045 Create shipped blog post `specs/077-stac-file-tree/media/shipped-post.md`
+- [x] T046 [P] Create LinkedIn shipped summary `specs/077-stac-file-tree/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T047 Create PR and publish blog: run /speckit.pr
+- [x] T047 Create PR and publish blog: run /speckit.pr
 
 **Task T047 must run last. It depends on all evidence and media tasks being complete.**
 
