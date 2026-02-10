@@ -1,7 +1,8 @@
 /**
- * Browser-safe FilesystemAdapter for the web-shell.
+ * Browser-safe writable FilesystemAdapter for the web-shell.
  * Wraps statically-imported test data into a FilesystemAdapter
  * so StacFileTree can render the local-store catalog.
+ * Supports writeFile for persisting tool results to the in-memory store.
  */
 
 import type { FilesystemAdapter, DirectoryEntry, FileStat } from '@debrief/components';
@@ -32,10 +33,15 @@ interface DirEntry {
 
 type FsEntry = FileEntry | DirEntry;
 
+/** Writable adapter: FilesystemAdapter + writeFile */
+export interface WritableFsAdapter extends FilesystemAdapter {
+  writeFile(path: string, content: string): void;
+}
+
 /**
- * Create a browser-safe FilesystemAdapter from the test data.
+ * Create a browser-safe writable FilesystemAdapter from the test data.
  */
-export function createMockFsAdapter(): FilesystemAdapter {
+export function createMockFsAdapter(): WritableFsAdapter {
   const entries = new Map<string, FsEntry>();
 
   for (const [path, content] of Object.entries(files)) {
@@ -54,7 +60,23 @@ export function createMockFsAdapter(): FilesystemAdapter {
     }
   }
 
+  /** Ensure all parent directories exist for a given file path. */
+  function ensureParentDirs(filePath: string): void {
+    const parts = filePath.split('/').filter(Boolean);
+    for (let i = 1; i < parts.length; i++) {
+      const dirPath = '/' + parts.slice(0, i).join('/');
+      if (!entries.has(dirPath)) {
+        entries.set(dirPath, { isDirectory: true });
+      }
+    }
+  }
+
   return {
+    writeFile(path: string, content: string): void {
+      ensureParentDirs(path);
+      entries.set(path, { content, isDirectory: false });
+    },
+
     async readDirectory(path: string): Promise<DirectoryEntry[]> {
       const normalizedPath = path.endsWith('/') && path !== '/' ? path.slice(0, -1) : path;
       const entry = entries.get(normalizedPath);

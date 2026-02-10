@@ -82,6 +82,7 @@ export default function App() {
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
   const [resultLayers, setResultLayers] = useState<Feature[]>([]);
   const [toolMessage, setToolMessage] = useState<string | null>(null);
+  const [treeRefreshKey, setTreeRefreshKey] = useState(0);
 
   // Catalog items
   const catalogItems = useMemo<CatalogOverviewItem[]>(() => {
@@ -219,15 +220,29 @@ export default function App() {
     store.getState().clearSelection();
   }, [store]);
 
-  // Handle tool execution
+  // Handle tool execution — persist result to STAC assets and refresh tree
   const handleRunTool = useCallback((toolId: string) => {
     const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[]);
     setToolMessage(result.message);
 
     if (result.resultLayer) {
       setResultLayers(prev => [...prev, result.resultLayer!]);
+
+      // Persist result as a STAC asset in the current item's assets/ directory
+      if (currentPlot) {
+        const itemDir = `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`;
+        const sourceNames = selectedFeatures
+          .map(f => (f.properties as unknown as Record<string, unknown>)?.name ?? f.id ?? 'unknown')
+          .map(n => String(n).toLowerCase().replace(/\s+/g, '-'))
+          .join('-');
+        const fileName = `${toolId}-${sourceNames}.json`;
+        const assetPath = `${itemDir}/assets/${fileName}`;
+
+        mockFsAdapter.writeFile(assetPath, JSON.stringify(result.resultLayer, null, 2));
+        setTreeRefreshKey(k => k + 1);
+      }
     }
-  }, [selectedFeatures]);
+  }, [selectedFeatures, currentPlot]);
 
   // Handle ActivityPanel messages
   const handleActivityMessage = useCallback((message: ActivityPanelMessage) => {
@@ -320,6 +335,7 @@ export default function App() {
             fs={mockFsAdapter}
             rootPath="/local-store"
             currentItemPath={currentPlot ? `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}` : undefined}
+            refreshKey={treeRefreshKey}
             className="web-shell__file-tree"
           />
           <ActivityPanel
