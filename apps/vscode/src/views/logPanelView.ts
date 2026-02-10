@@ -16,12 +16,28 @@ import {
   type LogEntry,
 } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
-import type {
-  TimelineEntry,
-  OperationCategory,
-  LogParameterValue,
-  PresentationMode,
-} from '@debrief/components';
+
+// Locally-defined types matching @debrief/components LogPanel types.
+// Defined here to avoid ESM-from-CJS import issues with @debrief/components.
+type OperationCategory = 'calculation' | 'import' | 'property-edit' | 'export';
+type PresentationMode = 'compact' | 'normal' | 'detailed';
+interface LogParameterValue {
+  value: unknown;
+  default: boolean;
+  tunable: boolean;
+}
+interface TimelineEntry {
+  activityId: string;
+  timestamp: string;
+  toolName: string;
+  toolVersion: string;
+  parameters: Record<string, LogParameterValue>;
+  usedFeatureIds: string[];
+  generatedFeatureIds: string[];
+  executionDuration: string;
+  generatedResultId: string | null;
+  operationCategory: OperationCategory;
+}
 
 // Webview → Extension messages
 interface EntrySelectMessage {
