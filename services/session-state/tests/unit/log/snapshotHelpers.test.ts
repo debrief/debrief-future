@@ -52,6 +52,7 @@ describe('createSystemRecord', () => {
       featureType: 'system',
       snapshotLinks: null,
       branches: [],
+      branchOrigin: null,
       provenance: [],
     });
   });
