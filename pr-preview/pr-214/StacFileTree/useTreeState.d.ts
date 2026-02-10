@@ -13,10 +13,11 @@ interface UseTreeStateReturn {
 /**
  * Hook for managing tree state with lazy loading.
  * Loads children on first expand and caches them.
+ * Preserves expanded state across refreshKey changes.
  *
  * @param fs - Filesystem adapter
  * @param rootPath - Root directory path
- * @param refreshKey - Change this to clear cache and reload
+ * @param refreshKey - Change this to reload data while preserving expanded state
  * @returns Tree state and toggle function
  */
 export declare function useTreeState(fs: FilesystemAdapter, rootPath: string, refreshKey?: string | number): UseTreeStateReturn;
