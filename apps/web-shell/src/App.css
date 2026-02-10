@@ -118,7 +118,7 @@ body {
   flex-direction: row;
 }
 
-/* Sidebar with ActivityPanel */
+/* Sidebar with tab panel */
 .web-shell__sidebar {
   width: 320px;
   min-width: 240px;
@@ -129,6 +129,54 @@ body {
   background: var(--vscode-sideBar-background, #252526);
   border-right: 1px solid var(--vscode-panel-border, #454545);
   overflow: hidden;
+}
+
+/* Tab bar at top of sidebar */
+.web-shell__tab-bar {
+  display: flex;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--vscode-panel-border, #454545);
+  background: var(--vscode-sideBarSectionHeader-background, #333333);
+}
+
+.web-shell__tab {
+  flex: 1;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--vscode-sideBarTitle-foreground, #bbbbbb);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: color 0.1s, border-color 0.1s;
+}
+
+.web-shell__tab:hover {
+  color: var(--vscode-foreground, #cccccc);
+}
+
+.web-shell__tab--active {
+  color: var(--vscode-foreground, #cccccc);
+  border-bottom-color: var(--vscode-focusBorder, #007fd4);
+}
+
+/* Tab content fills remaining space */
+.web-shell__tab-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* LogPanel fills tab content */
+.web-shell__tab-content .log-panel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* Map container */

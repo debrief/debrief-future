@@ -11,6 +11,7 @@ import {
   CatalogOverview,
   MapView,
   ActivityPanel,
+  LogPanel,
   useSelection,
   useTimePlayback,
   calculateTimeExtent,
@@ -21,13 +22,22 @@ import type {
   ActivityPanelMessage,
   DisplayMode,
   DebriefFeature,
+  TimelineEntry,
+  PresentationMode,
+  ViewMode,
+  LogPanelMessage,
 } from '@debrief/components';
+import type { LogFilterState } from '@debrief/components';
+import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
 import { stacService } from './mocks/stacService';
 import { calcService } from './mocks/calcService';
 import type { ToolResult } from './mocks/calcService';
 
 /** Current view state */
 type View = 'welcome' | 'analysis';
+
+/** Sidebar tab */
+type SidebarTab = 'activity' | 'log';
 
 /** State for the currently loaded plot */
 interface PlotState {
@@ -47,6 +57,20 @@ export default function App() {
   const [toolMessage, setToolMessage] = useState<string | null>(null);
   const [displayMode, setDisplayMode] = useState<DisplayMode>('full');
 
+  // Sidebar tab
+  const [sidebarTab, setSidebarTab] = useState<SidebarTab>('activity');
+
+  // Log panel state
+  const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
+  const [logPresentationMode, setLogPresentationMode] = useState<PresentationMode>('normal');
+  const [logViewMode, setLogViewMode] = useState<ViewMode>('timeline');
+  const [logSelectedEntryId, setLogSelectedEntryId] = useState<string | null>(null);
+  const [logFilterState, setLogFilterState] = useState<LogFilterState>(LOG_DEFAULT_FILTER_STATE);
+  const [logNotification, setLogNotification] = useState<string | null>(null);
+
+  // Counter for generating unique activity IDs
+  const [activityCounter, setActivityCounter] = useState(0);
+
   // Catalog items
   const catalogItems = useMemo<CatalogOverviewItem[]>(() => {
     return stacService.getItems();
@@ -65,6 +89,17 @@ export default function App() {
   const allFeatures = useMemo<DebriefFeature[]>(() => {
     return [...plotFeatures, ...resultLayers as DebriefFeature[]];
   }, [plotFeatures, resultLayers]);
+
+  // Feature names map for LogPanel
+  const featureNames = useMemo<Record<string, string>>(() => {
+    const names: Record<string, string> = {};
+    for (const f of allFeatures) {
+      const id = String(f.id ?? f.properties?.id ?? '');
+      const name = String(f.properties?.name ?? f.properties?.label ?? id);
+      if (id) names[id] = name;
+    }
+    return names;
+  }, [allFeatures]);
 
   // Calculate time extent from features
   const timeExtent = useMemo<[number, number] | null>(() => {
@@ -112,7 +147,22 @@ export default function App() {
     setCurrentPlot(null);
     setResultLayers([]);
     setToolMessage(null);
+    setLogEntries([]);
+    setSidebarTab('activity');
     selection.clear();
+  }, [selection]);
+
+  // Handle LogPanel messages
+  const handleLogMessage = useCallback((message: LogPanelMessage) => {
+    if (message.type === 'entry:select') {
+      // Select affected features on the map
+      selection.selectMultiple(message.payload.featureIds);
+    } else if (message.type === 'entry:deselect') {
+      selection.clear();
+    } else if (message.type === 'action:invoke') {
+      setLogNotification(`Action "${message.payload.actionType}" is not yet available.`);
+      setTimeout(() => setLogNotification(null), 3000);
+    }
   }, [selection]);
 
   // Handle map feature selection
@@ -129,7 +179,7 @@ export default function App() {
     selection.clear();
   }, [selection]);
 
-  // Handle tool execution
+  // Handle tool execution — also records a log entry
   const handleRunTool = useCallback((toolId: string) => {
     const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[]);
     setToolMessage(result.message);
@@ -137,7 +187,34 @@ export default function App() {
     if (result.resultLayer) {
       setResultLayers(prev => [...prev, result.resultLayer!]);
     }
-  }, [selectedFeatures]);
+
+    // Record a log entry
+    const nextId = activityCounter + 1;
+    setActivityCounter(nextId);
+
+    const usedIds = selectedFeatures.map(f =>
+      String((f as DebriefFeature).id ?? (f.properties as Record<string, unknown>)?.id ?? '')
+    ).filter(Boolean);
+
+    const generatedIds = result.resultLayer
+      ? [String((result.resultLayer.properties as Record<string, unknown>)?.id ?? `result-${nextId}`)]
+      : [];
+
+    const entry: TimelineEntry = {
+      activityId: `act-${String(nextId).padStart(3, '0')}`,
+      timestamp: new Date().toISOString(),
+      toolName: toolId,
+      toolVersion: '1.0.0',
+      parameters: {},
+      usedFeatureIds: usedIds,
+      generatedFeatureIds: generatedIds,
+      executionDuration: 'PT0.1S',
+      generatedResultId: generatedIds[0] ?? null,
+      operationCategory: 'calculation',
+    };
+
+    setLogEntries(prev => [entry, ...prev]);
+  }, [selectedFeatures, activityCounter]);
 
   // Handle ActivityPanel messages
   const handleActivityMessage = useCallback((message: ActivityPanelMessage) => {
@@ -214,18 +291,64 @@ export default function App() {
 
       <main className="web-shell__main web-shell__main--split">
         <aside className="web-shell__sidebar">
-          <ActivityPanel
-            timeExtent={timeExtent}
-            currentTime={playback.currentTime}
-            playbackState={playback.playbackState}
-            playbackSpeed={playback.speed}
-            displayMode={displayMode}
-            timeUiState={timeExtent ? 'ready' : 'empty'}
-            tools={tools}
-            features={allFeatures}
-            selectedFeatureIds={Array.from(selection.selectedIds)}
-            onMessage={handleActivityMessage}
-          />
+          <div className="web-shell__tab-bar" role="tablist">
+            <button
+              type="button"
+              className={`web-shell__tab ${sidebarTab === 'activity' ? 'web-shell__tab--active' : ''}`}
+              role="tab"
+              aria-selected={sidebarTab === 'activity'}
+              aria-controls="sidebar-activity"
+              data-testid="sidebar-tab-activity"
+              onClick={() => setSidebarTab('activity')}
+            >
+              Activity
+            </button>
+            <button
+              type="button"
+              className={`web-shell__tab ${sidebarTab === 'log' ? 'web-shell__tab--active' : ''}`}
+              role="tab"
+              aria-selected={sidebarTab === 'log'}
+              aria-controls="sidebar-log"
+              data-testid="sidebar-tab-log"
+              onClick={() => setSidebarTab('log')}
+            >
+              Log
+            </button>
+          </div>
+
+          <div className="web-shell__tab-content">
+            {sidebarTab === 'activity' ? (
+              <ActivityPanel
+                timeExtent={timeExtent}
+                currentTime={playback.currentTime}
+                playbackState={playback.playbackState}
+                playbackSpeed={playback.speed}
+                displayMode={displayMode}
+                timeUiState={timeExtent ? 'ready' : 'empty'}
+                tools={tools}
+                features={allFeatures}
+                selectedFeatureIds={Array.from(selection.selectedIds)}
+                onMessage={handleActivityMessage}
+              />
+            ) : (
+              <LogPanel
+                entries={logEntries}
+                featureNames={featureNames}
+                presentationMode={logPresentationMode}
+                viewMode={logViewMode}
+                selectedEntryId={logSelectedEntryId}
+                filterState={logFilterState}
+                hasActiveSession={true}
+                plotName={currentPlot?.title ?? null}
+                actionResultMessage={logNotification}
+                onMessage={handleLogMessage}
+                onPresentationModeChange={setLogPresentationMode}
+                onViewModeChange={setLogViewMode}
+                onFilterStateChange={setLogFilterState}
+                onSelectedEntryChange={setLogSelectedEntryId}
+              />
+            )}
+          </div>
         </aside>
         <section className="web-shell__map-container">
           <MapView
