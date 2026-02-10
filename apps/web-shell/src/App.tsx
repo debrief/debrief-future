@@ -15,6 +15,7 @@ import {
   useSelection,
   useTimePlayback,
   calculateTimeExtent,
+  getFeatureLabel,
 } from '@debrief/components';
 import type {
   CatalogOverviewItem,
@@ -94,9 +95,8 @@ export default function App() {
   const featureNames = useMemo<Record<string, string>>(() => {
     const names: Record<string, string> = {};
     for (const f of allFeatures) {
-      const id = String(f.id ?? f.properties?.id ?? '');
-      const name = String(f.properties?.name ?? f.properties?.label ?? id);
-      if (id) names[id] = name;
+      const id = f.id;
+      if (id) names[id] = getFeatureLabel(f);
     }
     return names;
   }, [allFeatures]);
@@ -192,12 +192,10 @@ export default function App() {
     const nextId = activityCounter + 1;
     setActivityCounter(nextId);
 
-    const usedIds = selectedFeatures.map(f =>
-      String((f as DebriefFeature).id ?? (f.properties as Record<string, unknown>)?.id ?? '')
-    ).filter(Boolean);
+    const usedIds = selectedFeatures.map(f => f.id).filter(Boolean);
 
     const generatedIds = result.resultLayer
-      ? [String((result.resultLayer.properties as Record<string, unknown>)?.id ?? `result-${nextId}`)]
+      ? [String((result.resultLayer.properties as Record<string, unknown> | null)?.id ?? `result-${nextId}`)]
       : [];
 
     const entry: TimelineEntry = {
