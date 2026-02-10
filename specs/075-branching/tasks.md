@@ -47,11 +47,11 @@
 
 **Purpose**: Create the branch service module skeleton and extend the type system
 
-- [ ] T001 [US1] Add BranchOrigin interface to session-state types `services/session-state/src/log/types.ts`
-- [ ] T002 [P][US1] Add BranchResult, BranchFromOptions, BranchPointLocation, BranchErrorCode types `services/session-state/src/log/types.ts`
-- [ ] T003 [P][US1] Add BranchServiceDeps interface to session-state types `services/session-state/src/log/types.ts`
-- [ ] T004 [US1] Extend SystemRecordProperties with branchOrigin field `services/session-state/src/log/types.ts`
-- [ ] T005 [US1] Create branchService.ts module skeleton with factory function `services/session-state/src/log/branchService.ts`
+- [x] T001 [US1] Add BranchOrigin interface to session-state types `services/session-state/src/log/types.ts`
+- [x] T002 [P][US1] Add BranchResult, BranchFromOptions, BranchPointLocation, BranchErrorCode types `services/session-state/src/log/types.ts`
+- [x] T003 [P][US1] Add BranchServiceDeps interface to session-state types `services/session-state/src/log/types.ts`
+- [x] T004 [US1] Extend SystemRecordProperties with branchOrigin field `services/session-state/src/log/types.ts`
+- [x] T005 [US1] Create branchService.ts module skeleton with factory function `services/session-state/src/log/branchService.ts`
 
 **Checkpoint**: Type system extended, service skeleton exists. All existing tests still pass.
 
@@ -63,12 +63,12 @@
 
 **CRITICAL**: No user story work can begin until these helpers are complete
 
-- [ ] T006 [P][US1] Implement findEntryInFeatures() — search for activityId across feature provenance arrays `services/session-state/src/log/branchService.ts`
-- [ ] T007 [P][US1] Implement trimProvenanceToEntry() — deep-copy FeatureCollection and trim provenance to branch point `services/session-state/src/log/branchService.ts`
-- [ ] T008 [P][US1] Implement createBranchRecord() — build source-side BranchRecord `services/session-state/src/log/branchService.ts`
-- [ ] T009 [P][US1] Implement createBranchOrigin() — build branch-side BranchOrigin `services/session-state/src/log/branchService.ts`
-- [ ] T010 [P][US1] Implement createBranchProvEntry() — build FileProvEntry for branch events `services/session-state/src/log/branchService.ts`
-- [ ] T011 [test] Write unit tests for pure helper functions `services/session-state/src/log/__tests__/branchService.test.ts`
+- [x] T006 [P][US1] Implement findEntryInFeatures() — search for activityId across feature provenance arrays `services/session-state/src/log/branchService.ts`
+- [x] T007 [P][US1] Implement trimProvenanceToEntry() — deep-copy FeatureCollection and trim provenance to branch point `services/session-state/src/log/branchService.ts`
+- [x] T008 [P][US1] Implement createBranchRecord() — build source-side BranchRecord `services/session-state/src/log/branchService.ts`
+- [x] T009 [P][US1] Implement createBranchOrigin() — build branch-side BranchOrigin `services/session-state/src/log/branchService.ts`
+- [x] T010 [P][US1] Implement createBranchProvEntry() — build FileProvEntry for branch events `services/session-state/src/log/branchService.ts`
+- [x] T011 [test] Write unit tests for pure helper functions `services/session-state/tests/unit/log/branchService.test.ts`
 
 **Checkpoint**: Foundation ready — all pure helpers tested and working. User story implementation can now begin.
 
@@ -84,25 +84,25 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T012 [test][US1] Test branchFrom() with mid-point entry — branch has trimmed Log `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T013 [P][test][US1] Test branchFrom() with first entry — branch has single entry `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T014 [P][test][US1] Test branchFrom() with last entry — branch is full duplicate `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T015 [P][test][US1] Test two-way links — source BranchRecord matches branch BranchOrigin `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T016 [P][test][US1] Test source unchanged after branch — all original entries intact `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T017 [P][test][US1] Test file-level provenance — both system records have FileProvEntry type "branch" `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T018 [P][test][US1] Test entry not found — error thrown with ENTRY_NOT_FOUND code `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T019 [P][test][US1] Test markDirty called after successful branch `services/session-state/src/log/__tests__/branchService.test.ts`
+- [x] T012 [test][US1] Test branchFrom() with mid-point entry — branch has trimmed Log `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T013 [P][test][US1] Test branchFrom() with first entry — branch has single entry `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T014 [P][test][US1] Test branchFrom() with last entry — branch is full duplicate `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T015 [P][test][US1] Test two-way links — source BranchRecord matches branch BranchOrigin `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T016 [P][test][US1] Test source unchanged after branch — all original entries intact `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T017 [P][test][US1] Test file-level provenance — both system records have FileProvEntry type "branch" `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T018 [P][test][US1] Test entry not found — error thrown with ENTRY_NOT_FOUND code `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T019 [P][test][US1] Test markDirty called after successful branch `services/session-state/tests/unit/log/branchService.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T020 [US1] Implement stacService.createBranchItem() — create new STAC Item directory with item.json and plot.geojson `apps/vscode/src/services/stacService.ts`
-- [ ] T021 [US1] Implement locateBranchPoint() — search current segment for activityId `services/session-state/src/log/branchService.ts`
-- [ ] T022 [US1] Implement branchFrom() core logic — deep-copy, trim, write branch, update source, mark dirty `services/session-state/src/log/branchService.ts`
-- [ ] T023 [US1] Wire branchFrom() into Log Service — replace stub thrown by #071 `services/session-state/src/log/logService.ts`
-- [ ] T024 [US1] Add golden fixture for branched system record `shared/schemas/fixtures/system-record/valid/branched-system-record.json`
-- [ ] T025 [US1] Extend LinkML system-record schema with BranchOrigin class and branchOrigin slot `shared/schemas/src/linkml/system-record.yaml`
-- [ ] T026 [US1] Run schema generators to update derived types from LinkML changes
-- [ ] T027 [US1] Verify all existing tests pass (session-state, schema adherence)
+- [x] T020 [US1] Implement stacService.createBranchItem() — create new STAC Item directory with item.json and plot.geojson `apps/vscode/src/services/stacService.ts`
+- [x] T021 [US1] Implement locateBranchPoint() — search current segment for activityId `services/session-state/src/log/branchService.ts`
+- [x] T022 [US1] Implement branchFrom() core logic — deep-copy, trim, write branch, update source, mark dirty `services/session-state/src/log/branchService.ts`
+- [x] T023 [US1] Wire branchFrom() into Log Service — replace stub thrown by #071 `services/session-state/src/log/logService.ts`
+- [x] T024 [US1] Add golden fixture for branched system record `shared/schemas/fixtures/system-record/valid/branched-system-record.json`
+- [x] T025 [US1] Extend LinkML system-record schema with BranchOrigin class and branchOrigin slot `shared/schemas/src/linkml/system-record.yaml`
+- [x] T026 [US1] Run schema generators to update derived types from LinkML changes
+- [x] T027 [US1] Verify all existing tests pass (session-state, schema adherence)
 
 **Checkpoint**: User Story 1 fully functional — branch from any entry in current segment, two-way links, stored as STAC Item.
 
@@ -116,17 +116,17 @@
 
 ### Tests for User Story 2
 
-- [ ] T028 [test][US2] Test getBranches() returns all branch records from source `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T029 [P][test][US2] Test getBranchOrigin() returns origin from branch plot `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T030 [P][test][US2] Test multiple branches from same source — all listed correctly `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T031 [P][test][US2] Test getBranches() on plot with no branches — returns empty array `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T032 [P][test][US2] Test getBranchOrigin() on original plot — returns null `services/session-state/src/log/__tests__/branchService.test.ts`
+- [x] T028 [test][US2] Test getBranches() returns all branch records from source `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T029 [P][test][US2] Test getBranchOrigin() returns origin from branch plot `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T030 [P][test][US2] Test multiple branches from same source — all listed correctly `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T031 [P][test][US2] Test getBranches() on plot with no branches — returns empty array `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T032 [P][test][US2] Test getBranchOrigin() on original plot — returns null `services/session-state/tests/unit/log/branchService.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T033 [US2] Implement getBranches() — read system record branches[] array `services/session-state/src/log/branchService.ts`
-- [ ] T034 [US2] Implement getBranchOrigin() — read system record branchOrigin field `services/session-state/src/log/branchService.ts`
-- [ ] T035 [US2] Test multiple branches: create two branches from different points, verify both listed `services/session-state/src/log/__tests__/branchService.test.ts`
+- [x] T033 [US2] Implement getBranches() — read system record branches[] array `services/session-state/src/log/branchService.ts`
+- [x] T034 [US2] Implement getBranchOrigin() — read system record branchOrigin field `services/session-state/src/log/branchService.ts`
+- [x] T035 [US2] Test multiple branches: create two branches from different points, verify both listed `services/session-state/tests/unit/log/branchService.test.ts`
 
 **Checkpoint**: Navigation API complete — consumers (Log Panel, future features) can discover and traverse branch relationships.
 
@@ -140,17 +140,17 @@
 
 ### Tests for User Story 3
 
-- [ ] T036 [test][US3] Test locateBranchPoint() walks snapshot chain to find entry `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T037 [P][test][US3] Test branchFrom() at snapshot boundary — branch contains snapshot state `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T038 [P][test][US3] Test branchFrom() at pre-snapshot arbitrary entry — REPLAY_NOT_AVAILABLE error `services/session-state/src/log/__tests__/branchService.test.ts`
-- [ ] T039 [P][test][US3] Test branchFrom() when snapshot file missing — SNAPSHOT_NOT_FOUND error `services/session-state/src/log/__tests__/branchService.test.ts`
+- [x] T036 [test][US3] Test locateBranchPoint() walks snapshot chain to find entry `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T037 [P][test][US3] Test branchFrom() at snapshot boundary — branch contains snapshot state `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T038 [P][test][US3] Test branchFrom() at pre-snapshot arbitrary entry — REPLAY_NOT_AVAILABLE error `services/session-state/tests/unit/log/branchService.test.ts`
+- [x] T039 [P][test][US3] Test branchFrom() when snapshot file missing — SNAPSHOT_NOT_FOUND error `services/session-state/tests/unit/log/branchService.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T040 [US3] Extend locateBranchPoint() to walk snapshot chain via snapshotService `services/session-state/src/log/branchService.ts`
-- [ ] T041 [US3] Extend branchFrom() to handle snapshot-boundary branch points `services/session-state/src/log/branchService.ts`
-- [ ] T042 [US3] Add REPLAY_NOT_AVAILABLE error for pre-snapshot arbitrary entries `services/session-state/src/log/branchService.ts`
-- [ ] T043 [US3] Test nested branching: branch from a branch plot `services/session-state/src/log/__tests__/branchService.test.ts`
+- [x] T040 [US3] Extend locateBranchPoint() to walk snapshot chain via snapshotService `services/session-state/src/log/branchService.ts`
+- [x] T041 [US3] Extend branchFrom() to handle snapshot-boundary branch points `services/session-state/src/log/branchService.ts`
+- [x] T042 [US3] Add REPLAY_NOT_AVAILABLE error for pre-snapshot arbitrary entries `services/session-state/src/log/branchService.ts`
+- [x] T043 [US3] Test nested branching: branch from a branch plot `services/session-state/tests/unit/log/branchService.test.ts`
 
 **Checkpoint**: All user stories functional — branching works for current segment and snapshot boundaries, with clear error for unsupported cases.
 
@@ -162,16 +162,16 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T044 Create evidence directory `specs/075-branching/evidence/`
-- [ ] T045 Capture test summary with pass/fail counts `specs/075-branching/evidence/test-summary.md`
-- [ ] T046 Create usage demonstration showing branchFrom() API `specs/075-branching/evidence/usage-example.md`
-- [ ] T047 [P] Capture sample branch plot GeoJSON `specs/075-branching/evidence/sample-branch-geojson.json`
-- [ ] T048 [P] Document branch creation flow step-by-step `specs/075-branching/evidence/branch-creation-flow.md`
+- [x] T044 Create evidence directory `specs/075-branching/evidence/`
+- [x] T045 Capture test summary with pass/fail counts `specs/075-branching/evidence/test-summary.md`
+- [x] T046 Create usage demonstration showing branchFrom() API `specs/075-branching/evidence/usage-example.md`
+- [x] T047 [P] Capture sample branch plot GeoJSON `specs/075-branching/evidence/sample-branch-geojson.json`
+- [x] T048 [P] Document branch creation flow step-by-step `specs/075-branching/evidence/branch-creation-flow.md`
 
 ### Media Content
 
-- [ ] T049 Create shipped blog post `specs/075-branching/media/shipped-post.md`
-- [ ] T050 [P] Create LinkedIn shipped summary `specs/075-branching/media/linkedin-shipped.md`
+- [x] T049 Create shipped blog post `specs/075-branching/media/shipped-post.md`
+- [x] T050 [P] Create LinkedIn shipped summary `specs/075-branching/media/linkedin-shipped.md`
 
 ### PR Creation
 
