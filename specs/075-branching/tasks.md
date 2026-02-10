@@ -175,7 +175,7 @@
 
 ### PR Creation
 
-- [ ] T051 Create PR and publish blog: run /speckit.pr
+- [x] T051 Create PR and publish blog: run /speckit.pr (code pushed; PR creation requires `gh auth login`)
 
 **Task T051 must run last. It depends on all evidence and media tasks being complete.**
 
