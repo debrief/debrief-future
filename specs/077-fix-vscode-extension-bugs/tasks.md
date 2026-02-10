@@ -45,8 +45,8 @@
 
 **Purpose**: Verify build health before making changes
 
-- [ ] T001 Verify VS Code extension builds cleanly: `cd apps/vscode && npx tsc --noEmit`
-- [ ] T002 [P] Verify shared components build cleanly: `cd shared/components && npx tsc --noEmit`
+- [x] T001 Verify VS Code extension builds cleanly: `cd apps/vscode && npx tsc --noEmit`
+- [x] T002 [P] Verify shared components build cleanly: `cd shared/components && npx tsc --noEmit`
 
 **Checkpoint**: Both packages compile without errors — safe to make changes.
 
@@ -62,7 +62,7 @@
 
 > **NOTE: Write test FIRST, ensure it FAILS before implementation**
 
-- [ ] T003 [test] Write conversion unit test `apps/vscode/src/webview/web/__tests__/mapView.test.ts`
+- [x] T003 [test] Write conversion unit test `apps/vscode/tests/unit/temporalConversion.test.ts`
   - Test that `trackToFeature()` converts ISO string times to epoch ms numbers
   - Test with sample ISO strings: `"2024-01-15T10:00:00Z"` → `1705312800000`
   - Test edge case: empty times array → empty array
@@ -70,16 +70,16 @@
 
 ### Implementation for Fix 1
 
-- [ ] T004 Convert Track.times from ISO strings to epoch ms in `trackToFeature()` `apps/vscode/src/webview/web/mapView.tsx`
+- [x] T004 Convert Track.times from ISO strings to epoch ms in `trackToFeature()` `apps/vscode/src/webview/web/mapView.tsx`
   - Change `times: track.times` to `times: track.times.map(t => new Date(t).getTime())`
   - This single change fixes bugs 1, 2, and 3 simultaneously
 
-- [ ] T005 [P] Add defensive type check in `extractTemporalData()` `shared/components/src/MapView/temporal-utils.ts`
+- [x] T005 [P] Add defensive type check in `extractTemporalData()` `shared/components/src/MapView/temporal-utils.ts`
   - After extracting `times`, verify `typeof times[0] === 'number'`
   - If strings detected, log a console warning and return `null`
   - Prevents silent failure if another consumer passes wrong types in future
 
-- [ ] T006 Run shared components tests: `cd shared/components && npx vitest run`
+- [x] T006 Run shared components tests: `cd shared/components && npx vitest run`
 
 **Checkpoint**: Time slider, location marker, and trail mode should all work with Exercise Alpha.
 
@@ -93,17 +93,17 @@
 
 ### Implementation for Fix 2
 
-- [ ] T007 Verify `onSelectionChanged` callback behavior in MapPanel `apps/vscode/src/webview/mapPanel.ts`
+- [x] T007 Verify `onSelectionChanged` callback behavior in MapPanel `apps/vscode/src/webview/mapPanel.ts`
   - Check if `onSelectionChanged()` replaces or stacks callbacks
   - If it stacks, add a method to clear previous callback before re-registering
 
-- [ ] T008 Move selection callback registration outside `if (!panel)` block `apps/vscode/src/commands/openPlot.ts`
+- [x] T008 Move selection callback registration outside `if (!panel)` block `apps/vscode/src/commands/openPlot.ts`
   - Extract the `panel.onSelectionChanged(...)` call (lines 189-207)
   - Place it after the `if (!panel) { ... }` block (after line 232)
   - Ensure it runs for both newly created and reused panels
   - Keep the callback body unchanged (session state update + toolMatchAdapter + refresh)
 
-- [ ] T009 Run VS Code extension tests: `cd apps/vscode && npx vitest run`
+- [x] T009 Run VS Code extension tests: `cd apps/vscode && npx vitest run`
 
 **Checkpoint**: Selecting features should show available tools in both first-load and panel-reuse scenarios.
 
@@ -113,9 +113,9 @@
 
 **Purpose**: Verify all four fixes work together
 
-- [ ] T010 Run full TypeScript build: `npx tsc --noEmit` from workspace root
-- [ ] T011 [P] Run ESLint: `npx eslint apps/vscode/src/webview/web/mapView.tsx apps/vscode/src/commands/openPlot.ts`
-- [ ] T012 Verify quickstart.md steps pass `specs/077-fix-vscode-extension-bugs/quickstart.md`
+- [x] T010 Run full TypeScript build: `npx tsc --noEmit` from workspace root
+- [x] T011 [P] Run ESLint: `npx eslint apps/vscode/src/webview/web/mapView.tsx apps/vscode/src/commands/openPlot.ts`
+- [x] T012 Verify quickstart.md steps pass `specs/077-fix-vscode-extension-bugs/quickstart.md`
 
 **Checkpoint**: All four bugs fixed, build passes, lint clean.
 
@@ -125,17 +125,17 @@
 
 ### Evidence Collection
 
-- [ ] T013 Create evidence directory and capture test summary `specs/077-fix-vscode-extension-bugs/evidence/test-summary.md`
-- [ ] T014 [P] Create usage demonstration showing all four fixes `specs/077-fix-vscode-extension-bugs/evidence/usage-example.md`
+- [x] T013 Create evidence directory and capture test summary `specs/077-fix-vscode-extension-bugs/evidence/test-summary.md`
+- [x] T014 [P] Create usage demonstration showing all four fixes `specs/077-fix-vscode-extension-bugs/evidence/usage-example.md`
 
 ### Media Content
 
-- [ ] T015 Create shipped blog post `specs/077-fix-vscode-extension-bugs/media/shipped-post.md`
-- [ ] T016 [P] Create LinkedIn shipped summary `specs/077-fix-vscode-extension-bugs/media/linkedin-shipped.md`
+- [x] T015 Create shipped blog post `specs/077-fix-vscode-extension-bugs/media/shipped-post.md`
+- [x] T016 [P] Create LinkedIn shipped summary `specs/077-fix-vscode-extension-bugs/media/linkedin-shipped.md`
 
 ### Mark All Tasks Complete
 
-- [ ] T017 Update all task checkboxes and verify completion
+- [x] T017 Update all task checkboxes and verify completion
 
 ### PR Creation
 
