@@ -27,12 +27,23 @@ function normaliseProvenance(raw: unknown): unknown[] {
  * 4. Sorts by timestamp ascending
  *
  * @param featureCollection - A GeoJSON FeatureCollection (parsed from disk)
+ * @param options - Optional previous entries for cross-snapshot assembly
  * @returns Sorted, deduplicated LogEntry array
  */
 export function assembleTimeline(
-  featureCollection: { features: Array<Record<string, unknown>> }
+  featureCollection: { features: Array<Record<string, unknown>> },
+  options?: { previousEntries?: LogEntry[] }
 ): LogEntry[] {
   const seen = new Map<string, LogEntry>();
+
+  // Merge previous snapshot entries first (cross-snapshot assembly)
+  if (options?.previousEntries) {
+    for (const entry of options.previousEntries) {
+      if (entry.activityId && !seen.has(entry.activityId)) {
+        seen.set(entry.activityId, entry);
+      }
+    }
+  }
 
   for (const feature of featureCollection.features) {
     const props = feature.properties as Record<string, unknown> | null;

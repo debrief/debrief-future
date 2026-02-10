@@ -160,6 +160,10 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Local filesystem -- GeoJSON files within STAC Item directories (read/write via stacService) (071-log-recording-service)
 - TypeScript 5.x (VS Code extension + webview + shared components) + VS Code Extension API ^1.85.0, React 18.x, @debrief/components, Zustand ^5.0.0 (session-state), esbuild (webview bundling) (072-log-panel)
 - VS Code webview state (getState/setState) for transient UI; VS Code globalState for cross-session presentation mode persistence (072-log-panel)
+- TypeScript 5.x (Log Service in session-state package, VS Code extension stacService) + Existing Log Service (#071), stacService, session-state Zustand store, Node.js `fs/promises`, `crypto.randomUUID()` (074-snapshots)
+- Local filesystem — GeoJSON files within STAC Item directories (read/write via stacService) (074-snapshots)
+- TypeScript 5.x (VS Code extension webview, shared components) + React 18.x, react-leaflet 4.2, Leaflet 1.9.x, Zustand (session-state), VS Code Extension API ^1.85.0 (077-fix-vscode-extension-bugs)
+- N/A (no storage changes) (077-fix-vscode-extension-bugs)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)

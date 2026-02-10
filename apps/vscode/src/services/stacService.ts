@@ -747,6 +747,85 @@ export class StacService {
     return destPath;
   }
 
+  // ============================================================================
+  // Snapshot Operations (Feature: 074-snapshots)
+  // ============================================================================
+
+  /**
+   * Write a snapshot GeoJSON as a STAC asset with role "snapshot".
+   */
+  async writeSnapshotAsset(
+    storePath: string,
+    itemPath: string,
+    filename: string,
+    data: string
+  ): Promise<string> {
+    return this.addResultAsset(storePath, itemPath, filename, data, 'application/geo+json', {
+      roles: ['snapshot'],
+      'debrief:snapshotTimestamp': new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Load a snapshot GeoJSON by its asset filename.
+   */
+  async loadSnapshotGeoJson(
+    storePath: string,
+    itemPath: string,
+    assetFilename: string
+  ): Promise<SafeFeatureCollection | null> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+    if (!item) {
+      return null;
+    }
+
+    // Find asset by filename match in href
+    const assetEntry = Object.values(item.assets).find(a =>
+      a.href.endsWith(assetFilename)
+    );
+    if (!assetEntry) {
+      return null;
+    }
+
+    const itemDir = path.dirname(fullItemPath);
+    const geoJsonPath = path.resolve(itemDir, assetEntry.href);
+    return this.loadGeoJson(geoJsonPath);
+  }
+
+  /**
+   * Overwrite the working GeoJSON file for a STAC item.
+   */
+  async writeGeoJson(
+    storePath: string,
+    itemPath: string,
+    featureCollection: SafeFeatureCollection
+  ): Promise<void> {
+    const fullItemPath = path.join(storePath, itemPath);
+    const item = await this.loadItem(fullItemPath);
+    if (!item) {
+      throw new Error(`Item not found: ${itemPath}`);
+    }
+
+    const geoJsonAsset = Object.values(item.assets).find(
+      (asset) =>
+        asset.type === 'application/geo+json' ||
+        asset.href.endsWith('.geojson')
+    );
+
+    if (!geoJsonAsset) {
+      throw new Error(`No GeoJSON asset found for item: ${itemPath}`);
+    }
+
+    const itemDir = path.dirname(fullItemPath);
+    const geoJsonPath = path.resolve(itemDir, geoJsonAsset.href);
+
+    fs.writeFileSync(geoJsonPath, JSON.stringify(featureCollection, null, 2));
+
+    // Clear cache
+    this.itemCache.delete(fullItemPath);
+  }
+
   /**
    * Clear all caches
    */

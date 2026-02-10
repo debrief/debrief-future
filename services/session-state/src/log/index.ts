@@ -17,6 +17,21 @@ export type {
   ToolResultForLog,
   FeatureProvenance,
   LogService,
+  // Snapshot types (Feature: 074)
+  SnapshotRef,
+  SnapshotLinks,
+  FileProvEntry,
+  SystemRecordProperties,
+  BranchRecord,
+  CreateSnapshotOptions,
+  SnapshotResult,
+  SnapshotBoundary,
+  SnapshotEntriesResult,
+  CrossSnapshotTimelineOptions,
+  GeoJsonFeatureCollection,
+  GeoJsonFeature,
+  SnapshotServiceDeps,
+  SnapshotService,
 } from './types.js';
 
 export {
@@ -29,3 +44,15 @@ export {
 export { assembleTimeline } from './timeline.js';
 
 export { createLogService, type LogServiceDeps } from './logService.js';
+
+// Snapshot Service (Feature: 074)
+export { createSnapshotService } from './snapshotService.js';
+export {
+  findSystemRecord,
+  createSystemRecord,
+  stripSpatialProvenance,
+  countLogEntries,
+  generateSnapshotFilename,
+  normaliseProvenance,
+  trimProvenanceAfterEntry,
+} from './snapshotHelpers.js';

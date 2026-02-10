@@ -270,6 +270,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         toolMatchAdapter.updateTools(tools);
         toolsTreeProvider.setCalcAvailable(true);
         toolsTreeProvider.refresh();
+        // Notify activity panel so its webview shows tools (Fix: 077)
+        activityPanelProvider.refreshTools();
       } catch {
         // Graceful degradation - tools won't be available
         toolsTreeProvider.setCalcAvailable(false);

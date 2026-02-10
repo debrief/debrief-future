@@ -1,0 +1,79 @@
+[
+  {
+    "_comment": "Snapshot A (earliest — chain head)",
+    "featureType": "system",
+    "snapshotLinks": {
+      "prev": null,
+      "next": {
+        "asset": "plot-snap-2026-02-09T14-00-00.geojson",
+        "provEntryCount": 12
+      }
+    },
+    "branches": [],
+    "provenance": [
+      {
+        "activityId": "snap-001",
+        "type": "snapshot",
+        "timestamp": "2026-02-09T12:00:00Z",
+        "asset": "plot-snap-2026-02-09T12-00-00.geojson",
+        "branchId": null,
+        "direction": null
+      }
+    ]
+  },
+  {
+    "_comment": "Snapshot B (middle)",
+    "featureType": "system",
+    "snapshotLinks": {
+      "prev": {
+        "asset": "plot-snap-2026-02-09T12-00-00.geojson",
+        "provEntryCount": 8
+      },
+      "next": {
+        "asset": "plot.geojson",
+        "provEntryCount": 5
+      }
+    },
+    "branches": [],
+    "provenance": [
+      {
+        "activityId": "snap-002",
+        "type": "snapshot",
+        "timestamp": "2026-02-09T14:00:00Z",
+        "asset": "plot-snap-2026-02-09T14-00-00.geojson",
+        "branchId": null,
+        "direction": null
+      }
+    ]
+  },
+  {
+    "_comment": "Working File (current — chain tail)",
+    "featureType": "system",
+    "snapshotLinks": {
+      "prev": {
+        "asset": "plot-snap-2026-02-09T14-00-00.geojson",
+        "provEntryCount": 12
+      },
+      "next": null
+    },
+    "branches": [],
+    "provenance": [
+      {
+        "activityId": "snap-001",
+        "type": "snapshot",
+        "timestamp": "2026-02-09T12:00:00Z",
+        "asset": "plot-snap-2026-02-09T12-00-00.geojson",
+        "branchId": null,
+        "direction": null
+      },
+      {
+        "activityId": "snap-002",
+        "type": "snapshot",
+        "timestamp": "2026-02-09T14:00:00Z",
+        "asset": "plot-snap-2026-02-09T14-00-00.geojson",
+        "branchId": null,
+        "direction": null
+      }
+    ]
+  }
+]

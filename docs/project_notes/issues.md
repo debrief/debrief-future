@@ -15,6 +15,11 @@ Each entry should include:
 
 <!-- Add new entries below this line -->
 
+### 2026-02-10 - #208: VS Code Extension Bugs (Backlog #077)
+- **Status**: In-progress (approved, awaiting implementation)
+- **Description**: 4 symptoms: time slider doesn't update tracks, no location marker in Full mode, trail mode shows no tracks, no tools offered. Added as backlog item #077, approved.
+- **URL**: https://github.com/debrief/debrief-future/issues/208
+
 ### 2025-01-23 - #61: REP Special Comments Parser
 - **Status**: Completed
 - **Description**: Added annotation parsing infrastructure for REP special comments
