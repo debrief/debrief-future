@@ -14,5 +14,5 @@ import { ToolsPanelProps } from '../ActivityPanel/types';
  * />
  * ```
  */
-export declare function ToolsPanel({ tools, onRunTool, className }: ToolsPanelProps): import("react/jsx-runtime").JSX.Element;
+export declare function ToolsPanel({ tools, hasToolInventory, hasSelection, onRunTool, className }: ToolsPanelProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=ToolsPanel.d.ts.map

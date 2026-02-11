@@ -35,6 +35,10 @@ export interface ToolsPanelItem {
 export interface ToolsPanelProps {
     /** List of tools to display */
     tools: ToolsPanelItem[];
+    /** Whether the tool inventory has been loaded (false = calc service unavailable) */
+    hasToolInventory?: boolean;
+    /** Whether features are currently selected */
+    hasSelection?: boolean;
     /** Callback when a tool is run */
     onRunTool?: (toolId: string) => void;
     /** CSS class name */
@@ -99,6 +103,10 @@ export interface ActivityPanelProps {
     timeUiState?: 'empty' | 'loading' | 'ready';
     /** List of available tools */
     tools?: ToolsPanelItem[];
+    /** Whether the tool inventory has been loaded */
+    hasToolInventory?: boolean;
+    /** Whether features are currently selected */
+    hasToolSelection?: boolean;
     /** Features to display in the layers list */
     features?: DebriefFeature[];
     /** IDs of selected features */
