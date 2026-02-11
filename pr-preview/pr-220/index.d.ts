@@ -35,4 +35,8 @@ export { ToolsPanel } from './ToolsPanel';
 export type { ToolsPanelProps, ToolsPanelItem, ActivityPanelProps, ActivityPanelCollapseState, ActivityPanelMessage, } from './ActivityPanel/types';
 export { ActivityPanel } from './ActivityPanel';
 export { DEFAULT_COLLAPSE_STATE } from './ActivityPanel/types';
+export { LogPanel } from './LogPanel';
+export type { LogPanelProps, LogEntryProps, LogTimelineProps, LogByFeatureProps, LogFilterRowProps, LogActionBarProps, SnapshotBoundaryProps, TimelineEntry, OperationCategory, PresentationMode, ViewMode, ParameterValue as LogParameterValue, FeatureDisplayInfo, ActionType, LogPanelMessage, ExtensionToWebviewMessage, TimelineUpdatePayload, SessionChangePayload, SelectionUpdatePayload, ActionResultPayload, ModeInitPayload, } from './LogPanel';
+export { DEFAULT_FILTER_STATE as LOG_DEFAULT_FILTER_STATE, } from './LogPanel';
+export type { FilterState as LogFilterState, } from './LogPanel';
 //# sourceMappingURL=index.d.ts.map
