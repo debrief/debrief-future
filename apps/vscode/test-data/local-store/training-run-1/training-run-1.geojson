@@ -34,7 +34,26 @@
           "2024-01-14T11:30:00Z",
           "2024-01-14T12:00:00Z",
           "2024-01-14T12:30:00Z"
-        ]
+        ],
+        "positions": [
+          {"time": "2024-01-14T08:00:00Z", "course": 35, "speed": 8},
+          {"time": "2024-01-14T08:30:00Z", "course": 35, "speed": 8},
+          {"time": "2024-01-14T09:00:00Z", "course": 36, "speed": 8},
+          {"time": "2024-01-14T09:30:00Z", "course": 36, "speed": 8},
+          {"time": "2024-01-14T10:00:00Z", "course": 35, "speed": 8},
+          {"time": "2024-01-14T10:30:00Z", "course": 35, "speed": 8},
+          {"time": "2024-01-14T11:00:00Z", "course": 34, "speed": 8},
+          {"time": "2024-01-14T11:30:00Z", "course": 34, "speed": 8},
+          {"time": "2024-01-14T12:00:00Z", "course": 35, "speed": 8},
+          {"time": "2024-01-14T12:30:00Z", "course": 35, "speed": 8}
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1H",
+        "label_interval": "PT2H"
       }
     },
     {
