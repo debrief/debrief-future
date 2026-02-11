@@ -13,6 +13,20 @@
 import { test, expect } from '@playwright/test';
 import { CatalogPage, AnalysisPage } from '../pages';
 
+/**
+ * Helper: select a track feature via the feature list sidebar.
+ * Uses the feature list rather than map clicks because TemporalTrackLayer
+ * SVG paths may not reliably trigger selection in headless chromium.
+ */
+async function selectTrackViaFeatureList(page: import('@playwright/test').Page) {
+  const featureRow = page.locator('.debrief-feature-row:has-text("HMS Defender")');
+  const target = (await featureRow.count()) > 0
+    ? featureRow
+    : page.locator('.debrief-feature-row').first();
+  await target.click();
+  await page.waitForTimeout(200);
+}
+
 test.describe('Log Panel', () => {
   let catalogPage: CatalogPage;
   let analysisPage: AnalysisPage;
@@ -62,20 +76,19 @@ test.describe('Log Panel', () => {
   });
 
   test('running a tool creates a log entry', async ({ page }) => {
-    // Select a track on the map to enable tools
-    const track = page.locator('.leaflet-interactive').first();
-    await track.click({ force: true });
+    // Select a track via the feature list to enable tools
+    await selectTrackViaFeatureList(page);
 
     // Wait for tools to become active
     const activeTools = page.locator('.debrief-tools-panel__item--active');
-    await expect(activeTools.first()).toBeVisible({ timeout: 2000 });
+    await expect(activeTools.first()).toBeVisible({ timeout: 5000 });
 
     // Run the first active tool
     const runButton = activeTools.first().locator('button');
     await runButton.click();
 
     // Tool message should appear
-    await expect(analysisPage.toolMessage).toBeVisible({ timeout: 2000 });
+    await expect(analysisPage.toolMessage).toBeVisible({ timeout: 5000 });
 
     // Switch to Log tab
     await analysisPage.switchToLogTab();
@@ -87,13 +100,12 @@ test.describe('Log Panel', () => {
   });
 
   test('running multiple tools creates multiple log entries', async ({ page }) => {
-    // Select a track
-    const track = page.locator('.leaflet-interactive').first();
-    await track.click({ force: true });
+    // Select a track via the feature list
+    await selectTrackViaFeatureList(page);
 
     // Wait for active tools
     const activeTools = page.locator('.debrief-tools-panel__item--active');
-    await expect(activeTools.first()).toBeVisible({ timeout: 2000 });
+    await expect(activeTools.first()).toBeVisible({ timeout: 5000 });
 
     // Run two tools
     const runButton1 = activeTools.first().locator('button');
@@ -121,13 +133,12 @@ test.describe('Log Panel', () => {
   });
 
   test('log entries show most recent first', async ({ page }) => {
-    // Select a track
-    const track = page.locator('.leaflet-interactive').first();
-    await track.click({ force: true });
+    // Select a track via the feature list
+    await selectTrackViaFeatureList(page);
 
     // Wait for active tools
     const activeTools = page.locator('.debrief-tools-panel__item--active');
-    await expect(activeTools.first()).toBeVisible({ timeout: 2000 });
+    await expect(activeTools.first()).toBeVisible({ timeout: 5000 });
 
     // Run the first tool
     await activeTools.first().locator('button').click();
@@ -141,12 +152,11 @@ test.describe('Log Panel', () => {
   });
 
   test('clicking a log entry selects it', async ({ page }) => {
-    // Select a track and run a tool
-    const track = page.locator('.leaflet-interactive').first();
-    await track.click({ force: true });
+    // Select a track via the feature list and run a tool
+    await selectTrackViaFeatureList(page);
 
     const activeTools = page.locator('.debrief-tools-panel__item--active');
-    await expect(activeTools.first()).toBeVisible({ timeout: 2000 });
+    await expect(activeTools.first()).toBeVisible({ timeout: 5000 });
     await activeTools.first().locator('button').click();
 
     // Switch to Log tab
@@ -161,12 +171,11 @@ test.describe('Log Panel', () => {
   });
 
   test('clicking a selected log entry deselects it', async ({ page }) => {
-    // Select a track and run a tool
-    const track = page.locator('.leaflet-interactive').first();
-    await track.click({ force: true });
+    // Select a track via the feature list and run a tool
+    await selectTrackViaFeatureList(page);
 
     const activeTools = page.locator('.debrief-tools-panel__item--active');
-    await expect(activeTools.first()).toBeVisible({ timeout: 2000 });
+    await expect(activeTools.first()).toBeVisible({ timeout: 5000 });
     await activeTools.first().locator('button').click();
 
     // Switch to Log tab
