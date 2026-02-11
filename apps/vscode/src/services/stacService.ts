@@ -353,11 +353,16 @@ export class StacService {
             platformType: (props.track_type as string) ?? (props.platformType as string) ?? undefined,
             geometry: { type: 'LineString' as const, coordinates: lineCoords },
             times,
+            positions: props.positions as Track['positions'],
             startTime: times[0] ?? '',
             endTime: times[times.length - 1] ?? '',
             color: props.color as string | undefined,
             visible: true,
             selected: false,
+            defaultPositionStyle: props.default_position_style as Track['defaultPositionStyle'],
+            symbolInterval: props.symbol_interval as string | undefined,
+            labelInterval: props.label_interval as string | undefined,
+            positionStyleOverrides: props.position_style_overrides as Track['positionStyleOverrides'],
           });
         } else if (geom.type === 'Point' && (props.kind === 'POINT' || props.kind === 'LOCATION')) {
           // Reference location: Point with kind=POINT or LOCATION
