@@ -163,7 +163,7 @@ Description formats:
 | 073 | Tech Debt | [Split undo/redo: UI-only undo, data changes via Log](specs/073-undo-redo-split/spec.md) [E02] — narrow StateSnapshot, remove featureCollectionUri and savePath (requires #071) | 4 | 2 | 5 | 11 | Low | implementing |
 | 074 | Feature | [Implement snapshots with doubly-linked chain](specs/074-snapshots/spec.md) [E02] — clean-state checkpoints, snapshot assets in STAC (requires #071) | 5 | 3 | 3 | 11 | Medium | specified |
 | 075 | Feature | [Implement branching from history point](docs/ideas/075-branching.md) [E02] — plot duplication, two-way links, branch records (requires #074) | 4 | 3 | 3 | 10 | Medium | approved |
-| 076 | Feature | [Implement replay and parameter tuning](docs/ideas/076-replay-tune.md) [E02] — parameter editing, positional replay, revert operations (requires #071, #074) | 5 | 4 | 2 | 11 | High | approved |
+| 076 | Feature | [Implement replay and parameter tuning](specs/076-replay-tune/spec.md) [E02] — parameter editing, positional replay, revert operations (requires #071, #074) | 5 | 4 | 2 | 11 | High | specified |
 | 077 | Feature | [STAC File Tree Component](specs/077-stac-file-tree/spec.md) — shared React tree view of STAC catalog filesystem backed by memfs; highlights new files from snapshots, opens plots from tree (requires #074, #071) | 4 | 4 | 4 | 12 | Medium | specified |
 | 061 | Feature | [Add generate courses and speeds for track tool spec](docs/ideas/061-generate-courses-speeds.md) (requires #049) | 4 | 3 | 5 | 12 | Low | approved |
 | 060 | Feature | [Add resample track tool spec](docs/ideas/060-resample-track.md) (requires #049) | 4 | 3 | 4 | 11 | Medium | approved |
