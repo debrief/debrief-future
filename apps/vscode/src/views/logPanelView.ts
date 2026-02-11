@@ -138,8 +138,8 @@ function toTimelineEntry(entry: LogEntry): TimelineEntry {
     executionDuration: entry.executionDuration,
     generatedResultId: entry.generatedResultId ?? null,
     operationCategory: classifyOperation(entry.wasGeneratedBy.tool),
-    deleted: entry.deleted,
-    tuneAnnotation: entry.tune
+    deleted: entry.deleted === true,
+    tuneAnnotation: entry.tune != null
       ? { parameter: entry.tune.parameter, previousValue: entry.tune.previousValue, newValue: entry.tune.newValue }
       : null,
   };
@@ -452,10 +452,14 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     parameter: string;
     newValue: unknown;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) return;
+    if (!this._logService || !this._getStorePath || !this._getItemPath) {
+      return;
+    }
     const storePath = this._getStorePath();
     const itemPath = this._getItemPath();
-    if (!storePath || !itemPath) return;
+    if (!storePath || !itemPath) {
+      return;
+    }
 
     try {
       const result = await this._logService.tuneEntry(
@@ -475,10 +479,14 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   private async _handleRevertToRequest(payload: {
     activityId: string;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) return;
+    if (!this._logService || !this._getStorePath || !this._getItemPath) {
+      return;
+    }
     const storePath = this._getStorePath();
     const itemPath = this._getItemPath();
-    if (!storePath || !itemPath) return;
+    if (!storePath || !itemPath) {
+      return;
+    }
 
     try {
       await this._logService.revertTo(storePath, itemPath, payload.activityId);
@@ -502,10 +510,14 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   private async _handleRevertThisRequest(payload: {
     activityId: string;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) return;
+    if (!this._logService || !this._getStorePath || !this._getItemPath) {
+      return;
+    }
     const storePath = this._getStorePath();
     const itemPath = this._getItemPath();
-    if (!storePath || !itemPath) return;
+    if (!storePath || !itemPath) {
+      return;
+    }
 
     try {
       const result = await this._logService.revertThis(
@@ -524,10 +536,14 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   private async _handleRestoreRequest(payload: {
     activityId: string;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) return;
+    if (!this._logService || !this._getStorePath || !this._getItemPath) {
+      return;
+    }
     const storePath = this._getStorePath();
     const itemPath = this._getItemPath();
-    if (!storePath || !itemPath) return;
+    if (!storePath || !itemPath) {
+      return;
+    }
 
     try {
       const result = await this._logService.restoreEntry(
