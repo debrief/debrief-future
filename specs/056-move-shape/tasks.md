@@ -46,11 +46,11 @@
 
 **Purpose**: Create directory structure for spec, Python, and TypeScript
 
-- [ ] T001 Create tool spec directory `shared/tools/shape/manipulation/`
-- [ ] T002 [P] Create Python package directories with __init__.py files `services/calc/debrief_calc/tools/shape/manipulation/__init__.py`
-- [ ] T003 [P] Create Python test directory `services/calc/tests/tools/shape/manipulation/`
-- [ ] T004 [P] Create VS Code tool directory `apps/vscode/src/tools/shape/manipulation/`
-- [ ] T005 [P] Create web-shell tool directory `apps/web-shell/src/tools/shape/manipulation/`
+- [x] T001 Create tool spec directory `shared/tools/shape/manipulation/`
+- [x] T002 [P] Create Python package directories with __init__.py files `services/calc/debrief_calc/tools/shape/manipulation/__init__.py`
+- [x] T003 [P] Create Python test directory `services/calc/tests/tools/shape/manipulation/`
+- [x] T004 [P] Create VS Code tool directory `apps/vscode/src/tools/shape/manipulation/`
+- [x] T005 [P] Create web-shell tool directory `apps/web-shell/src/tools/shape/manipulation/`
 
 **Checkpoint**: All directories exist. Python `__init__.py` files in place for `shape/` and `shape/manipulation/`.
 
@@ -62,25 +62,25 @@
 
 ### Tool Spec Foundation
 
-- [ ] T006 Create spec file with YAML front matter and all 9 section headings `shared/tools/shape/manipulation/move-shape.1.0.md`
-- [ ] T007 Write MCP section (description, when-to-use, parameters, returns) `shared/tools/shape/manipulation/move-shape.1.0.md`
-- [ ] T008 [P] Write Inputs section (schema refs to annotations.yaml, constraints, defaults) `shared/tools/shape/manipulation/move-shape.1.0.md`
-- [ ] T009 [P] Write Outputs section (ToolResponse, result type `mutation/shape/translated`, annotations) `shared/tools/shape/manipulation/move-shape.1.0.md`
-- [ ] T010 Write Algorithm section: `translate_point` helper (Vincenty destination formula) and main `move_shape` skeleton with input validation and kind dispatch `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T006 Create spec file with YAML front matter and all 9 section headings `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T007 Write MCP section (description, when-to-use, parameters, returns) `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T008 [P] Write Inputs section (schema refs to annotations.yaml, constraints, defaults) `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T009 [P] Write Outputs section (ToolResponse, result type `mutation/shape/translated`, annotations) `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T010 Write Algorithm section: `translate_point` helper (Vincenty destination formula) and main `move_shape` skeleton with input validation and kind dispatch `shared/tools/shape/manipulation/move-shape.1.0.md`
 
 ### Python Foundation
 
-- [ ] T011 Implement `translate_point(lat, lon, bearing, distance_km)` helper function using `math` module `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
-- [ ] T012 Implement `move_shape` function scaffold with `@tool` decorator, input validation, feature loop, and kind dispatch `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
-- [ ] T013 Register shape tools: update `services/calc/debrief_calc/tools/__init__.py` to import `shape` module
-- [ ] T014 [P] Write `shape/__init__.py` to import manipulation subpackage `services/calc/debrief_calc/tools/shape/__init__.py`
-- [ ] T015 [P] Write `shape/manipulation/__init__.py` to import move_shape `services/calc/debrief_calc/tools/shape/manipulation/__init__.py`
+- [x] T011 Implement `translate_point(lat, lon, bearing, distance_km)` helper function using `math` module `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
+- [x] T012 Implement `move_shape` function scaffold with `@tool` decorator, input validation, feature loop, and kind dispatch `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
+- [x] T013 Register shape tools: update `services/calc/debrief_calc/tools/__init__.py` to import `shape` module
+- [x] T014 [P] Write `shape/__init__.py` to import manipulation subpackage `services/calc/debrief_calc/tools/shape/__init__.py`
+- [x] T015 [P] Write `shape/manipulation/__init__.py` to import move_shape `services/calc/debrief_calc/tools/shape/manipulation/__init__.py`
 
 ### TypeScript Foundation
 
-- [ ] T016 Implement `translatePoint(lat, lon, bearing, distanceKm)` helper and `execute(features, params)` scaffold with `MCPToolDefinition` `apps/vscode/src/tools/shape/manipulation/moveShape.ts`
-- [ ] T017 [P] Copy TypeScript implementation for web-shell `apps/web-shell/src/tools/shape/manipulation/moveShape.ts`
-- [ ] T018 Register move-shape in web-shell toolService `apps/web-shell/src/services/toolService.ts`
+- [x] T016 Implement `translatePoint(lat, lon, bearing, distanceKm)` helper and `execute(features, params)` scaffold with `MCPToolDefinition` `apps/vscode/src/tools/shape/manipulation/moveShape.ts`
+- [x] T017 [P] Copy TypeScript implementation for web-shell `apps/web-shell/src/tools/shape/manipulation/moveShape.ts`
+- [x] T018 Register move-shape in web-shell toolService `apps/web-shell/src/services/toolService.ts`
 
 **Checkpoint**: `translate_point` helper works in both languages. `@tool` decorator registered in Python. `MCPToolDefinition` exported in TypeScript. Both frontends know about the tool.
 
@@ -94,25 +94,25 @@
 
 ### Tests for User Story 1
 
-- [ ] T019 [test] [US1] Write pytest golden example test for circle translation `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
-- [ ] T020 [P] [test] [US1] Write pytest test for rectangle translation `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T019 [test] [US1] Write pytest golden example test for circle translation `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T020 [P] [test] [US1] Write pytest test for rectangle translation `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
 
 ### Spec for User Story 1
 
-- [ ] T021 [US1] Add CIRCLE branch to algorithm pseudocode: translate polygon vertices + update `center` `shared/tools/shape/manipulation/move-shape.1.0.md`
-- [ ] T022 [P] [US1] Add RECTANGLE branch to algorithm pseudocode: translate polygon vertices `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T021 [US1] Add CIRCLE branch to algorithm pseudocode: translate polygon vertices + update `center` `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T022 [P] [US1] Add RECTANGLE branch to algorithm pseudocode: translate polygon vertices `shared/tools/shape/manipulation/move-shape.1.0.md`
 
 ### Implementation for User Story 1
 
-- [ ] T023 [US1] Implement CIRCLE handling in Python: translate all polygon vertices + update `center` property `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
-- [ ] T024 [P] [US1] Implement RECTANGLE handling in Python: translate all polygon vertices `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
-- [ ] T025 [US1] Implement CIRCLE + RECTANGLE handling in TypeScript (VS Code) `apps/vscode/src/tools/shape/manipulation/moveShape.ts`
-- [ ] T026 [P] [US1] Sync TypeScript implementation to web-shell `apps/web-shell/src/tools/shape/manipulation/moveShape.ts`
+- [x] T023 [US1] Implement CIRCLE handling in Python: translate all polygon vertices + update `center` property `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
+- [x] T024 [P] [US1] Implement RECTANGLE handling in Python: translate all polygon vertices `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
+- [x] T025 [US1] Implement CIRCLE + RECTANGLE handling in TypeScript (VS Code) `apps/vscode/src/tools/shape/manipulation/moveShape.ts`
+- [x] T026 [P] [US1] Sync TypeScript implementation to web-shell `apps/web-shell/src/tools/shape/manipulation/moveShape.ts`
 
 ### Golden Example for User Story 1
 
-- [ ] T027 [US1] Create golden input: CircleAnnotation at [0, 50], direction=90, distance_km=5 `shared/tools/shape/manipulation/move-shape.basic-polygon.input.json`
-- [ ] T028 [US1] Create golden output: ToolResponse with translated circle (pre-computed Vincenty coordinates) `shared/tools/shape/manipulation/move-shape.basic-polygon.output.json`
+- [x] T027 [US1] Create golden input: CircleAnnotation at [0, 50], direction=90, distance_km=5 `shared/tools/shape/manipulation/move-shape.basic-polygon.input.json`
+- [x] T028 [US1] Create golden output: ToolResponse with translated circle (pre-computed Vincenty coordinates) `shared/tools/shape/manipulation/move-shape.basic-polygon.output.json`
 
 **Checkpoint**: Python tests pass for CIRCLE and RECTANGLE. TypeScript produces identical output for golden input. SC-001 partially satisfied.
 
@@ -126,25 +126,25 @@
 
 ### Tests for User Story 2
 
-- [ ] T029 [test] [US2] Write pytest golden example test for vector translation (origin updated, range/bearing preserved) `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
-- [ ] T030 [P] [test] [US2] Write pytest test for line translation `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T029 [test] [US2] Write pytest golden example test for vector translation (origin updated, range/bearing preserved) `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T030 [P] [test] [US2] Write pytest test for line translation `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
 
 ### Spec for User Story 2
 
-- [ ] T031 [US2] Add LINE branch to algorithm pseudocode: translate LineString coordinates `shared/tools/shape/manipulation/move-shape.1.0.md`
-- [ ] T032 [US2] Add VECTOR branch to algorithm pseudocode: translate geometry + update `origin`, preserve `range`/`bearing` `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T031 [US2] Add LINE branch to algorithm pseudocode: translate LineString coordinates `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T032 [US2] Add VECTOR branch to algorithm pseudocode: translate geometry + update `origin`, preserve `range`/`bearing` `shared/tools/shape/manipulation/move-shape.1.0.md`
 
 ### Implementation for User Story 2
 
-- [ ] T033 [US2] Implement LINE handling in Python `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
-- [ ] T034 [US2] Implement VECTOR handling in Python: update `origin`, preserve `range`/`bearing` `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
-- [ ] T035 [US2] Implement LINE + VECTOR handling in TypeScript (VS Code) `apps/vscode/src/tools/shape/manipulation/moveShape.ts`
-- [ ] T036 [P] [US2] Sync TypeScript implementation to web-shell `apps/web-shell/src/tools/shape/manipulation/moveShape.ts`
+- [x] T033 [US2] Implement LINE handling in Python `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
+- [x] T034 [US2] Implement VECTOR handling in Python: update `origin`, preserve `range`/`bearing` `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
+- [x] T035 [US2] Implement LINE + VECTOR handling in TypeScript (VS Code) `apps/vscode/src/tools/shape/manipulation/moveShape.ts`
+- [x] T036 [P] [US2] Sync TypeScript implementation to web-shell `apps/web-shell/src/tools/shape/manipulation/moveShape.ts`
 
 ### Golden Example for User Story 2
 
-- [ ] T037 [US2] Create golden input: VectorAnnotation at [0, 50], direction=0 (North), distance_km=10 `shared/tools/shape/manipulation/move-shape.vector.input.json`
-- [ ] T038 [US2] Create golden output: ToolResponse with translated vector (origin shifted, range/bearing unchanged) `shared/tools/shape/manipulation/move-shape.vector.output.json`
+- [x] T037 [US2] Create golden input: VectorAnnotation at [0, 50], direction=0 (North), distance_km=10 `shared/tools/shape/manipulation/move-shape.vector.input.json`
+- [x] T038 [US2] Create golden output: ToolResponse with translated vector (origin shifted, range/bearing unchanged) `shared/tools/shape/manipulation/move-shape.vector.output.json`
 
 **Checkpoint**: Python tests pass for all 4 geometry-bearing kinds. Both golden example pairs validate. SC-002 satisfied.
 
@@ -158,14 +158,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T039 [test] [US3] Write pytest test for text annotation translation `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T039 [test] [US3] Write pytest test for text annotation translation `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
 
 ### Spec + Implementation for User Story 3
 
-- [ ] T040 [US3] Add TEXT branch to algorithm pseudocode: translate Point coordinate `shared/tools/shape/manipulation/move-shape.1.0.md`
-- [ ] T041 [US3] Implement TEXT handling in Python `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
-- [ ] T042 [US3] Implement TEXT handling in TypeScript (VS Code) `apps/vscode/src/tools/shape/manipulation/moveShape.ts`
-- [ ] T043 [P] [US3] Sync TypeScript implementation to web-shell `apps/web-shell/src/tools/shape/manipulation/moveShape.ts`
+- [x] T040 [US3] Add TEXT branch to algorithm pseudocode: translate Point coordinate `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T041 [US3] Implement TEXT handling in Python `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
+- [x] T042 [US3] Implement TEXT handling in TypeScript (VS Code) `apps/vscode/src/tools/shape/manipulation/moveShape.ts`
+- [x] T043 [P] [US3] Sync TypeScript implementation to web-shell `apps/web-shell/src/tools/shape/manipulation/moveShape.ts`
 
 **Checkpoint**: Algorithm covers all 5 annotation kinds. SC-003 satisfied.
 
@@ -177,20 +177,20 @@
 
 ### Tests
 
-- [ ] T044 [test] Write pytest test for zero distance (no-op) `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
-- [ ] T045 [P] [test] Write pytest test for empty feature collection (error) `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
-- [ ] T046 [P] [test] Write pytest test for non-annotation features (skip silently) `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
-- [ ] T047 [P] [test] Write pytest test for antimeridian crossing (longitude wrap) `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T044 [test] Write pytest test for zero distance (no-op) `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T045 [P] [test] Write pytest test for empty feature collection (error) `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T046 [P] [test] Write pytest test for non-annotation features (skip silently) `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T047 [P] [test] Write pytest test for antimeridian crossing (longitude wrap) `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
 
 ### Spec
 
-- [ ] T048 Write Edge Cases table (empty input, zero distance, antimeridian, polar, non-annotations, missing properties) `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T048 Write Edge Cases table (empty input, zero distance, antimeridian, polar, non-annotations, missing properties) `shared/tools/shape/manipulation/move-shape.1.0.md`
 
 ### Implementation
 
-- [ ] T049 Implement edge case handling in Python (zero distance, longitude wrap, non-annotation skip) `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
-- [ ] T050 [P] Implement matching edge case handling in TypeScript `apps/vscode/src/tools/shape/manipulation/moveShape.ts`
-- [ ] T051 [P] Sync TypeScript edge cases to web-shell `apps/web-shell/src/tools/shape/manipulation/moveShape.ts`
+- [x] T049 Implement edge case handling in Python (zero distance, longitude wrap, non-annotation skip) `services/calc/debrief_calc/tools/shape/manipulation/move_shape.py`
+- [x] T050 [P] Implement matching edge case handling in TypeScript `apps/vscode/src/tools/shape/manipulation/moveShape.ts`
+- [x] T051 [P] Sync TypeScript edge cases to web-shell `apps/web-shell/src/tools/shape/manipulation/moveShape.ts`
 
 **Checkpoint**: All edge case tests pass. SC-004 satisfied.
 
@@ -202,31 +202,31 @@
 
 ### Spec Completion
 
-- [ ] T052 Write inline Examples section with abbreviated input/output and references to golden files `shared/tools/shape/manipulation/move-shape.1.0.md`
-- [ ] T053 [P] Write Changelog section (1.0, 2026-02-10) `shared/tools/shape/manipulation/move-shape.1.0.md`
-- [ ] T054 [P] Write References section (schemas, template, related tools) `shared/tools/shape/manipulation/move-shape.1.0.md`
-- [ ] T055 Run quickstart.md validation checklist against completed spec
+- [x] T052 Write inline Examples section with abbreviated input/output and references to golden files `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T053 [P] Write Changelog section (1.0, 2026-02-10) `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T054 [P] Write References section (schemas, template, related tools) `shared/tools/shape/manipulation/move-shape.1.0.md`
+- [x] T055 Run quickstart.md validation checklist against completed spec
 
 ### Full Test Run
 
-- [ ] T056 Run full pytest suite for move-shape and capture output `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
-- [ ] T057 [P] Validate golden I/O JSON files are well-formed
+- [x] T056 Run full pytest suite for move-shape and capture output `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T057 [P] Validate golden I/O JSON files are well-formed
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T058 Create evidence directory `specs/056-move-shape/evidence/`
-- [ ] T059 Capture test summary: pytest results, golden validation, spec section checklist `specs/056-move-shape/evidence/test-summary.md`
-- [ ] T060 Create usage examples showing Python and TypeScript invocation `specs/056-move-shape/evidence/usage-example.md`
-- [ ] T061 [P] Capture cross-language golden validation (Python output == TypeScript output == expected) `specs/056-move-shape/evidence/golden-validation.md`
+- [x] T058 Create evidence directory `specs/056-move-shape/evidence/`
+- [x] T059 Capture test summary: pytest results, golden validation, spec section checklist `specs/056-move-shape/evidence/test-summary.md`
+- [x] T060 Create usage examples showing Python and TypeScript invocation `specs/056-move-shape/evidence/usage-example.md`
+- [x] T061 [P] Capture cross-language golden validation (Python output == TypeScript output == expected) `specs/056-move-shape/evidence/golden-validation.md`
 
 ### Media Content
 
-- [ ] T062 Create shipped blog post `specs/056-move-shape/media/shipped-post.md`
-- [ ] T063 [P] Create LinkedIn shipped summary `specs/056-move-shape/media/linkedin-shipped.md`
+- [x] T062 Create shipped blog post `specs/056-move-shape/media/shipped-post.md`
+- [x] T063 [P] Create LinkedIn shipped summary `specs/056-move-shape/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T064 Create PR and publish blog: run /speckit.pr
+- [x] T064 Create PR and publish blog: run /speckit.pr
 
 **Task T064 must run last. It depends on all evidence and media tasks being complete.**
 
