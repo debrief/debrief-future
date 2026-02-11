@@ -8,6 +8,7 @@ import { getFeatureColor, getFeatureLabel } from '../utils/labels';
 import { isTrackFeature } from '../utils/types';
 import { extractTemporalData } from './temporal-utils';
 import { TemporalTrackLayer } from './TemporalTrackLayer';
+import { PositionSymbolsLayer } from './PositionSymbolsLayer';
 import { LeafletToolbar } from './LeafletToolbar';
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
@@ -334,6 +335,14 @@ export function MapView({
             onEachFeature={onEachFeature}
           />
         )}
+
+        {staticFeatures.filter(isTrackFeature).map((f) => (
+          <PositionSymbolsLayer
+            key={`pos-${String(f.id)}`}
+            feature={f}
+            isSelected={selectedIds.has(f.id)}
+          />
+        ))}
 
         {currentTime !== undefined && temporalFeatures.map((f) => (
           <TemporalTrackLayer
