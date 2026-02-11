@@ -76,7 +76,7 @@ def main() -> None:
             # Route to the correct builder based on output_kind prefix
             if tool.output_kind.startswith("mutation/"):
                 # Mutation output: modified features returned to the caller
-                subtype = tool.output_kind[len("mutation/"):]
+                subtype = tool.output_kind[len("mutation/") :]
                 content_items = build_mutation(
                     features=result.features or [],
                     result_subtype=subtype,
