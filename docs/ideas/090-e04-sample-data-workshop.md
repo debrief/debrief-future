@@ -14,18 +14,10 @@ A **collaborative workshop** (human + AI) to identify the realistic tools and op
 
 ## Success Criteria
 
-- Every result type category has at least one generator:
-  - `addition/dataset/*` (e.g., zone histogram, range/bearing series)
-  - `addition/*/statistics` (e.g., track stats, region stats)
-  - `addition/analysis/*` (e.g., reference points, buffer zones, CPA)
-  - `mutation/track/*` (e.g., offset, styled, smoothed)
-  - `mutation/analysis/*` (e.g., zone-classified points)
-  - `deletion/*` (e.g., sensor contact removal)
-  - `artifact/image/*` (e.g., bearing-time plot)
-  - `artifact/report/*` (e.g., outlier summary)
-- Pseudocode is language-neutral (implementable in Python or TypeScript)
-- Golden fixture files pass existing tool-result schema validation
-- Data is realistic — based on E03 demo scenario, not synthetic/random
+- Workshop identifies which tools/operations produce each result type category (`addition/dataset/*`, `mutation/track/*`, `deletion/*`, `artifact/*`, etc.)
+- Each identified generator has language-neutral pseudocode (implementable in Python or TypeScript)
+- Golden fixture files conform to MCP content envelope format and pass tool-result schema validation
+- Data is realistic — grounded in E03 demo scenario and actual Debrief analysis workflows, not synthetic/random
 
 ## Constraints
 
