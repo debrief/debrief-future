@@ -13,7 +13,9 @@ EARTH_RADIUS_KM = 6371.0
 ANNOTATION_KINDS = {"CIRCLE", "RECTANGLE", "LINE", "TEXT", "VECTOR"}
 
 
-def translate_point(lat_deg: float, lon_deg: float, bearing_deg: float, distance_km: float) -> tuple[float, float]:
+def translate_point(
+    lat_deg: float, lon_deg: float, bearing_deg: float, distance_km: float
+) -> tuple[float, float]:
     """
     Compute destination point given start, bearing, and distance on a sphere.
 
@@ -51,14 +53,18 @@ def translate_point(lat_deg: float, lon_deg: float, bearing_deg: float, distance
     return (math.degrees(lat2), lon2_deg)
 
 
-def _translate_coordinate(coord: list[float], bearing_deg: float, distance_km: float) -> list[float]:
+def _translate_coordinate(
+    coord: list[float], bearing_deg: float, distance_km: float
+) -> list[float]:
     """Translate a single [lon, lat] coordinate and return [lon, lat]."""
     lon, lat = coord[0], coord[1]
     new_lat, new_lon = translate_point(lat, lon, bearing_deg, distance_km)
     return [new_lon, new_lat]
 
 
-def _translate_coords_list(coords: list[list[float]], bearing_deg: float, distance_km: float) -> list[list[float]]:
+def _translate_coords_list(
+    coords: list[list[float]], bearing_deg: float, distance_km: float
+) -> list[list[float]]:
     """Translate a list of [lon, lat] coordinates."""
     return [_translate_coordinate(c, bearing_deg, distance_km) for c in coords]
 
@@ -110,7 +116,9 @@ def move_shape(context: SelectionContext, params: dict[str, Any]) -> list[dict[s
 
     # Zero distance is a no-op — return features unchanged
     if distance_km == 0:
-        return [f for f in context.features if f.get("properties", {}).get("kind") in ANNOTATION_KINDS]
+        return [
+            f for f in context.features if f.get("properties", {}).get("kind") in ANNOTATION_KINDS
+        ]
 
     if distance_km < 0:
         raise ValueError("distance_km must be >= 0")
@@ -128,10 +136,7 @@ def move_shape(context: SelectionContext, params: dict[str, Any]) -> list[dict[s
 
         if kind == "CIRCLE":
             # Polygon geometry: translate all vertices in all rings
-            new_coords = [
-                _translate_coords_list(ring, direction, distance_km)
-                for ring in coords
-            ]
+            new_coords = [_translate_coords_list(ring, direction, distance_km) for ring in coords]
             geometry["coordinates"] = new_coords
             # Update center property
             if "center" in props:
@@ -141,10 +146,7 @@ def move_shape(context: SelectionContext, params: dict[str, Any]) -> list[dict[s
 
         elif kind == "RECTANGLE":
             # Polygon geometry: translate all vertices in all rings
-            new_coords = [
-                _translate_coords_list(ring, direction, distance_km)
-                for ring in coords
-            ]
+            new_coords = [_translate_coords_list(ring, direction, distance_km) for ring in coords]
             geometry["coordinates"] = new_coords
 
         elif kind == "LINE":

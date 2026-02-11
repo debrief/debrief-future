@@ -23,7 +23,13 @@ import sys
 from debrief_calc.executor import run
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.registry import registry
-from debrief_calc.result_builder import build_addition, build_artifact, build_error, build_response
+from debrief_calc.result_builder import (
+    build_addition,
+    build_artifact,
+    build_error,
+    build_mutation,
+    build_response,
+)
 
 
 def _context_type_from_features(features: list) -> ContextType:
@@ -67,8 +73,18 @@ def main() -> None:
             tool = registry.get_tool(tool_name)
             source_ids = _extract_source_ids(features)
 
-            # Check if output is a dataset artifact (domain/specific pattern starting with dataset/)
-            if tool.output_kind.startswith("dataset/"):
+            # Route to the correct builder based on output_kind prefix
+            if tool.output_kind.startswith("mutation/"):
+                # Mutation output: modified features returned to the caller
+                subtype = tool.output_kind[len("mutation/") :]
+                content_items = build_mutation(
+                    features=result.features or [],
+                    result_subtype=subtype,
+                    source_feature_ids=source_ids,
+                    label=f"{tool_name} results",
+                )
+                response = build_response(content_items)
+            elif tool.output_kind.startswith("dataset/"):
                 # Artifact output: serialize time-series as JSON
                 series_data = result.features[0] if result.features else {}
                 data_bytes = json.dumps(series_data, indent=2).encode("utf-8")
@@ -119,7 +135,6 @@ def main() -> None:
             },
             sys.stdout,
         )
-        sys.exit(1)
 
 
 if __name__ == "__main__":

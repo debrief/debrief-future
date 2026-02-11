@@ -163,7 +163,9 @@ class TestMoveShapeCircle:
 
         # Verify all longitudes increased (moved East)
         for i, (orig_pt, result_pt) in enumerate(zip(original_coords, result_coords, strict=True)):
-            assert result_pt[0] > orig_pt[0], f"Vertex {i} longitude should increase when moving East"
+            assert result_pt[0] > orig_pt[0], (
+                f"Vertex {i} longitude should increase when moving East"
+            )
             # Latitudes should be approximately equal
             assert result_pt[1] == pytest.approx(orig_pt[1], abs=0.001)
 
@@ -213,7 +215,9 @@ class TestMoveShapeRectangle:
 
         # Verify all latitudes increased (moved North)
         for i, (orig_pt, result_pt) in enumerate(zip(original_coords, result_coords, strict=True)):
-            assert result_pt[1] > orig_pt[1], f"Vertex {i} latitude should increase when moving North"
+            assert result_pt[1] > orig_pt[1], (
+                f"Vertex {i} latitude should increase when moving North"
+            )
             # Longitudes should be approximately equal
             assert result_pt[0] == pytest.approx(orig_pt[0], abs=0.001)
 
