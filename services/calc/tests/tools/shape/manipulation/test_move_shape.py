@@ -6,7 +6,6 @@ import pytest
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.shape.manipulation.move_shape import move_shape, translate_point
 
-
 # Test fixtures - module-level feature dictionaries
 CIRCLE_FEATURE = {
     "type": "Feature",
@@ -163,7 +162,7 @@ class TestMoveShapeCircle:
         result_coords = result[0]["geometry"]["coordinates"][0]
 
         # Verify all longitudes increased (moved East)
-        for i, (orig_pt, result_pt) in enumerate(zip(original_coords, result_coords)):
+        for i, (orig_pt, result_pt) in enumerate(zip(original_coords, result_coords, strict=True)):
             assert result_pt[0] > orig_pt[0], f"Vertex {i} longitude should increase when moving East"
             # Latitudes should be approximately equal
             assert result_pt[1] == pytest.approx(orig_pt[1], abs=0.001)
@@ -213,7 +212,7 @@ class TestMoveShapeRectangle:
         result_coords = result[0]["geometry"]["coordinates"][0]
 
         # Verify all latitudes increased (moved North)
-        for i, (orig_pt, result_pt) in enumerate(zip(original_coords, result_coords)):
+        for i, (orig_pt, result_pt) in enumerate(zip(original_coords, result_coords, strict=True)):
             assert result_pt[1] > orig_pt[1], f"Vertex {i} latitude should increase when moving North"
             # Longitudes should be approximately equal
             assert result_pt[0] == pytest.approx(orig_pt[0], abs=0.001)
@@ -235,7 +234,7 @@ class TestMoveShapeVector:
         result_coords = result[0]["geometry"]["coordinates"]
 
         # Verify both points moved North
-        for orig_pt, result_pt in zip(original_coords, result_coords):
+        for orig_pt, result_pt in zip(original_coords, result_coords, strict=True):
             assert result_pt[1] > orig_pt[1]
             assert result_pt[0] == pytest.approx(orig_pt[0], abs=0.001)
 
@@ -285,7 +284,7 @@ class TestMoveShapeLine:
         result_coords = result[0]["geometry"]["coordinates"]
 
         # Verify both points moved South (latitude decreased)
-        for orig_pt, result_pt in zip(original_coords, result_coords):
+        for orig_pt, result_pt in zip(original_coords, result_coords, strict=True):
             assert result_pt[1] < orig_pt[1], "Latitude should decrease when moving South"
             # Longitudes should be approximately equal
             assert result_pt[0] == pytest.approx(orig_pt[0], abs=0.001)

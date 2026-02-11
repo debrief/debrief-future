@@ -124,7 +124,6 @@ def move_shape(context: SelectionContext, params: dict[str, Any]) -> list[dict[s
             continue
 
         geometry = feature.get("geometry", {})
-        geom_type = geometry.get("type")
         coords = geometry.get("coordinates")
 
         if kind == "CIRCLE":
