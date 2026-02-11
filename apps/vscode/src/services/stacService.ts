@@ -353,7 +353,7 @@ export class StacService {
             platformType: (props.track_type as string) ?? (props.platformType as string) ?? undefined,
             geometry: { type: 'LineString' as const, coordinates: lineCoords },
             times,
-            positions: props.positions as Track['positions'],
+            positions: (props.positions as Track['positions']) ?? times.map(t => ({ time: t })),
             startTime: times[0] ?? '',
             endTime: times[times.length - 1] ?? '',
             color: props.color as string | undefined,
