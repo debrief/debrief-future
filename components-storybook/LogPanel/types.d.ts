@@ -37,6 +37,12 @@ export interface TimelineEntry {
     executionDuration: string;
     generatedResultId: string | null;
     operationCategory: OperationCategory;
+    deleted?: boolean;
+    tuneAnnotation?: {
+        parameter: string;
+        previousValue: unknown;
+        newValue: unknown;
+    } | null;
 }
 /**
  * Feature display info for resolving names.
@@ -136,6 +142,17 @@ export interface LogPanelProps {
     onViewModeChange?: (mode: ViewMode) => void;
     onFilterStateChange?: (state: FilterState) => void;
     onSelectedEntryChange?: (entryId: string | null) => void;
+    replayProgress?: {
+        current: number;
+        total: number;
+        currentToolId: string;
+        phase: string;
+    } | null;
+    onTuneRequest?: (activityId: string, parameter: string, newValue: unknown) => void;
+    onRevertToRequest?: (activityId: string) => void;
+    onRevertThisRequest?: (activityId: string) => void;
+    onRestoreRequest?: (activityId: string) => void;
+    onReplayCancel?: () => void;
     className?: string;
 }
 /**
@@ -147,6 +164,8 @@ export interface LogEntryProps {
     presentationMode: PresentationMode;
     isSelected: boolean;
     onClick?: (entry: TimelineEntry) => void;
+    onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
+    onRestoreClick?: (entry: TimelineEntry) => void;
     className?: string;
 }
 /**

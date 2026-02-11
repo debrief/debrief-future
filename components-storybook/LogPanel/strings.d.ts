@@ -39,5 +39,24 @@ export declare const LOG_PANEL_STRINGS: {
     readonly snapshotBoundary: "Snapshot boundary";
     readonly showEarlierHistory: "Show earlier history";
     readonly toolVersionTooltip: (version: string) => string;
+    readonly tunePanelTitle: "Edit Parameter";
+    readonly tuneCommit: "Apply";
+    readonly tuneCancel: "Cancel";
+    readonly tuneNotTunable: "This parameter cannot be modified.";
+    readonly replayProgressLoading: "Loading snapshot…";
+    readonly replayProgressReplaying: (current: number, total: number) => string;
+    readonly replayProgressFinalising: "Finalising…";
+    readonly replayCancel: "Cancel replay";
+    readonly replayCompleted: (count: number) => string;
+    readonly replayHalted: (toolId: string, reason: string) => string;
+    readonly replayCancelled: "Replay cancelled. Previous state restored.";
+    readonly revertToConfirmTitle: "Revert to here?";
+    readonly revertToConfirmMessage: "All operations after this point will be permanently removed. This cannot be undone.";
+    readonly revertToConfirmButton: "Revert";
+    readonly revertThisLabel: "Remove this operation";
+    readonly restoreLabel: "Restore this operation";
+    readonly deletedEntryBadge: "Removed";
+    readonly tunedEntryBadge: "Tuned";
+    readonly versionMismatch: (tool: string, expected: string, installed: string) => string;
 };
 //# sourceMappingURL=strings.d.ts.map
