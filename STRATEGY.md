@@ -116,6 +116,8 @@ Record significant prioritisation decisions here for future reference.
 | 2026-01-27 | Approved #038 context-sensitive tool offering (absorbs #035) | Completes Phase 3 of 027-context-tool-offering; full dynamic tool discovery + execution; absorbs #035 as broader scope |
 | 2026-02-09 | Approved E02 PROV Logging epic (#070-#076) | 7 phased items implementing SRD provenance priorities P1-P6; serves all three themes (architecture validation, scientist self-service, stakeholder demos); Constitution Article III mandates provenance; #069 transition plan complete |
 | 2026-02-10 | Approved #077 STAC File Tree Component | Natural companion to E02 PROV logging; fills visibility gap (users cannot see what STAC store contains); strong Theme 3 fit (demo-able provenance story via change highlighting); memfs dependency justified for browser/Storybook compatibility; depends on #074 and #071 (both in pipeline) |
+| 2026-02-11 | Approved E03 Buffer Zone Analysis Demo (#078-#084) | 6 items (after #083 absorbed by E04): 5 demo tools + end-to-end integration; reactive PROV cascade where moving a track updates buffer zones, recolors points, and refreshes a histogram; serves all three themes; depends on E02 PROV infra (#076) and E04 results visualization (#085, #086, #089) for histogram display |
+| 2026-02-11 | Approved E04 Results Visualization (#085-#089) | 5 items implementing Vega-Lite results viewing infrastructure; absorbs E03 #083 as #089; Vega-Lite chosen for schema-first philosophy (JSON specs, not code); bottom panel with tabs + editor tab for drag-to-float; logical result ID registry for stable view binding; critical enabler for E03 demo and all future tool output visualization |
 
 ---
 

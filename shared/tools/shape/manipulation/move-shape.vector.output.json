@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://vector-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"vector-001\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[0.0,50.08993216059187],[0.11890594010469613,50.1661814489817]]},\"properties\":{\"kind\":\"VECTOR\",\"origin\":[0.0,50.08993216059187],\"range\":12000,\"bearing\":45,\"label\":\"Search Vector\",\"style\":{\"stroke\":true,\"color\":\"#00FF00\",\"weight\":2,\"opacity\":1.0}}}",
+      "annotations": {
+        "debrief:resultType": "mutation/shape/translated",
+        "debrief:sourceFeatures": ["vector-001"],
+        "debrief:label": "Translated 1 shape(s) 10 km bearing 000°"
+      }
+    }
+  ]
+}
