@@ -53,6 +53,8 @@ interface ToolsUpdateMessage {
   type: 'tools:update';
   payload: {
     tools: ToolsPanelItem[];
+    hasToolInventory?: boolean;
+    hasSelection?: boolean;
   };
 }
 
@@ -103,6 +105,8 @@ function ActivityPanelApp(): React.ReactElement {
   const [displayMode, setDisplayMode] = useState<'full' | 'trail' | undefined>(undefined);
   const [timeUiState, setTimeUiState] = useState<'empty' | 'loading' | 'ready'>('empty');
   const [tools, setTools] = useState<ToolsPanelItem[]>([]);
+  const [hasToolInventory, setHasToolInventory] = useState<boolean | undefined>(undefined);
+  const [hasSelection, setHasSelection] = useState(false);
   const [features, setFeatures] = useState<DebriefFeature[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
@@ -145,6 +149,12 @@ function ActivityPanelApp(): React.ReactElement {
 
         case 'tools:update':
           setTools(msg.payload.tools);
+          if (msg.payload.hasToolInventory !== undefined) {
+            setHasToolInventory(msg.payload.hasToolInventory);
+          }
+          if (msg.payload.hasSelection !== undefined) {
+            setHasSelection(msg.payload.hasSelection);
+          }
           break;
 
         case 'layers:update':
@@ -199,6 +209,8 @@ function ActivityPanelApp(): React.ReactElement {
         displayMode={displayMode}
         timeUiState={timeUiState}
         tools={tools}
+        hasToolInventory={hasToolInventory}
+        hasToolSelection={hasSelection}
         features={features}
         selectedFeatureIds={selectedIds}
         hiddenIds={hiddenIds}

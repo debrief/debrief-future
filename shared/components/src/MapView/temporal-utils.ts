@@ -106,6 +106,11 @@ export function extractTemporalData(
   const times = (feature.properties as unknown as Record<string, unknown>).times as number[] | undefined;
 
   if (!times || !Array.isArray(times) || times.length === 0) return null;
+  // Defensive check: times must be numbers (epoch ms), not strings
+  if (typeof times[0] !== 'number') {
+    console.warn('[temporal-utils] extractTemporalData: times array contains non-numeric values — expected epoch ms');
+    return null;
+  }
   if (coordinates.length === 0) return null;
   // times and coordinates must match in length
   if (times.length !== coordinates.length) return null;

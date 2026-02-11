@@ -179,6 +179,8 @@ export function ActivityPanel({
   timeUiState,
   // Tools props
   tools = [],
+  hasToolInventory,
+  hasToolSelection,
   // Layers props
   features = [],
   selectedFeatureIds = [],
@@ -315,7 +317,7 @@ export function ActivityPanel({
         style={toolsStyle}
       >
         <SectionErrorBoundary sectionName="Tools">
-          <ToolsPanel tools={tools} onRunTool={handleRunTool} />
+          <ToolsPanel tools={tools} hasToolInventory={hasToolInventory} hasSelection={hasToolSelection} onRunTool={handleRunTool} />
         </SectionErrorBoundary>
       </PaneSection>
 

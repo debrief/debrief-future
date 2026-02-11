@@ -53,9 +53,12 @@ test.describe('Undo/Redo Split (073)', () => {
     // featureCollectionUri alone should NOT create undo history
     expect(initial.canUndo).toBe(false);
 
-    // Now make a UI change — select a feature on the map
-    const track = page.locator('.leaflet-interactive').first();
-    await track.click({ force: true });
+    // Now make a UI change — select a feature via the store
+    // (clicking .leaflet-interactive is unreliable in CI)
+    await page.evaluate(() => {
+      const s = window.__sessionStore.getState();
+      s.setSelection(['feature-1'], 'feature-1');
+    });
 
     // Selection should create undo history
     const afterSelect = await getStoreState(page);

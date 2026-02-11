@@ -49,7 +49,13 @@ function spawnWithStdin(
     proc.stderr.on('data', (d: Buffer) => { stderr += d.toString(); });
     proc.on('close', (code) => {
       if (code !== 0) {
-        reject(new Error(stderr || `Process exited with code ${code}`));
+        // Prefer stdout JSON error response over generic stderr message.
+        // The Python CLI writes error details to stdout before exiting.
+        if (stdout.trim()) {
+          resolve(stdout);
+        } else {
+          reject(new Error(stderr || `Process exited with code ${code}`));
+        }
       } else {
         resolve(stdout);
       }
@@ -94,10 +100,23 @@ export class CalcService {
   private lastFailureTime = 0;
   private currentExecution: ToolExecution | null = null;
   private getMapPanel: () => MapPanel | undefined;
+  private outputChannel: vscode.OutputChannel | undefined;
 
   constructor(context: vscode.ExtensionContext, getMapPanel: () => MapPanel | undefined) {
     this.context = context;
     this.getMapPanel = getMapPanel;
+  }
+
+  /**
+   * Set the output channel for diagnostic logging.
+   */
+  setOutputChannel(channel: vscode.OutputChannel): void {
+    this.outputChannel = channel;
+  }
+
+  private log(message: string): void {
+    const line = `[calcService] ${message}`;
+    this.outputChannel?.appendLine(line);
   }
 
   // Reserved for future use (e.g., storing execution history)
@@ -111,14 +130,18 @@ export class CalcService {
   async checkAvailability(): Promise<boolean> {
     // Check circuit breaker
     if (this.isCircuitOpen()) {
+      this.log('Circuit breaker open — skipping availability check');
       return false;
     }
 
     try {
       // Attempt to connect
       await this.connect();
+      this.log('debrief-calc available');
       return this.connectionState === 'connected';
-    } catch {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.log(`debrief-calc unavailable: ${msg}`);
       return false;
     }
   }
@@ -141,6 +164,7 @@ export class CalcService {
 
     try {
       const pythonPath = this.getPythonPath();
+      this.log(`Python path: ${pythonPath}`);
       const config = vscode.workspace.getConfiguration('debrief');
       const timeout = config.get<number>('calc.connectionTimeout') ?? 5000;
 
@@ -148,9 +172,12 @@ export class CalcService {
 
       this.connectionState = 'connected';
       this.failureCount = 0;
+      this.log('Connected successfully');
     } catch (err) {
       this.connectionState = 'error';
       this.recordFailure();
+      const msg = err instanceof Error ? err.message : String(err);
+      this.log(`Connection failed: ${msg}`);
       throw err;
     }
   }
@@ -192,9 +219,11 @@ export class CalcService {
       try {
         const mcpToolDefs = await this.fetchMCPToolDefinitions();
         tools = adaptMCPToolsForMatching(mcpToolDefs);
+        this.log(`Loaded ${tools.length} tools via MCP annotations`);
       } catch {
         // Fall back to legacy Python registry fetch
         tools = await this.fetchToolsFromMcp();
+        this.log(`Loaded ${tools.length} tools via legacy registry`);
       }
 
       // Update cache
@@ -206,6 +235,8 @@ export class CalcService {
       return tools;
     } catch (err) {
       this.recordFailure();
+      const msg = err instanceof Error ? err.message : String(err);
+      this.log(`Failed to list tools: ${msg}`);
       throw err;
     }
   }
@@ -269,6 +300,7 @@ export class CalcService {
       execution.completedAt = new Date().toISOString();
 
       this.recordFailure();
+      this.log(`Tool execution failed (${request.toolId}): ${execution.error}`);
 
       return {
         success: false,
@@ -421,11 +453,32 @@ export class CalcService {
     pythonPath: string,
     timeout: number
   ): Promise<void> {
+    // First check the Python interpreter itself
     try {
-      await execFileAsync(pythonPath, ['-c', 'import debrief_calc'], {
-        timeout,
-      });
+      const { stdout } = await execFileAsync(
+        pythonPath,
+        ['-c', 'import sys; print(f"{sys.version} | {sys.executable}")'],
+        { timeout }
+      );
+      this.log(`Python interpreter: ${stdout.trim()}`);
     } catch {
+      this.log(`Python interpreter not found at: ${pythonPath}`);
+      throw new Error(
+        `Python not found at '${pythonPath}'. ` +
+        'Set debrief.calc.pythonPath in settings or ensure a .venv exists in the workspace.'
+      );
+    }
+
+    // Then check for debrief_calc
+    try {
+      const { stdout } = await execFileAsync(
+        pythonPath,
+        ['-c', 'import debrief_calc; print(getattr(debrief_calc, "__version__", "unknown"))'],
+        { timeout }
+      );
+      this.log(`debrief_calc version: ${stdout.trim()}`);
+    } catch {
+      this.log('debrief_calc package not installed');
       throw new Error(
         `debrief-calc not available via '${pythonPath}'. ` +
         'Ensure debrief_calc is installed in the configured Python environment.'
@@ -437,18 +490,25 @@ export class CalcService {
     const config = vscode.workspace.getConfiguration('debrief');
     const configured = config.get<string>('calc.pythonPath');
     if (configured) {
+      this.log(`Using configured Python path: ${configured}`);
       return configured;
     }
 
     // Try workspace folders and their ancestors for .venv (common with uv/poetry monorepos)
+    const isWindows = process.platform === 'win32';
+    const venvBin = isWindows
+      ? path.join('.venv', 'Scripts', 'python.exe')
+      : path.join('.venv', 'bin', 'python');
+
     const folders = vscode.workspace.workspaceFolders;
     if (folders) {
       for (const folder of folders) {
         let dir = folder.uri.fsPath;
         // Walk up to 5 levels looking for .venv
         for (let i = 0; i < 5; i++) {
-          const venvPython = path.join(dir, '.venv', 'bin', 'python');
+          const venvPython = path.join(dir, venvBin);
           if (fs.existsSync(venvPython)) {
+            this.log(`Found .venv Python at: ${venvPython}`);
             return venvPython;
           }
           const parent = path.dirname(dir);
@@ -458,6 +518,7 @@ export class CalcService {
       }
     }
 
+    this.log('No .venv found — falling back to system "python"');
     return 'python';
   }
 
