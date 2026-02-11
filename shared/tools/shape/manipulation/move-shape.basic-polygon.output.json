@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://circle-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"circle-001\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[0.069967871095173,50.00897218107309],[0.07985844789635621,50.006337710403805],[0.0839457412349418,49.999978130587365],[0.07983732483305062,49.99361939190051],[0.06994169976110243,49.99098576236087],[0.06005373556317295,49.99361939190051],[0.05596382055452409,49.999978130587365],[0.060069624353161544,50.006337710403805],[0.069967871095173,50.00897218107309]]]},\"properties\":{\"kind\":\"CIRCLE\",\"center\":[0.0699547821186286,49.99997897171822],\"radius\":1000,\"label\":\"Exercise Area\",\"style\":{\"fill\":true,\"fill_color\":\"#FF5733\",\"fill_opacity\":0.3,\"stroke\":true,\"color\":\"#FF0000\",\"weight\":2,\"opacity\":1.0}}}",
+      "annotations": {
+        "debrief:resultType": "mutation/shape/translated",
+        "debrief:sourceFeatures": ["circle-001"],
+        "debrief:label": "Translated 1 shape(s) 5 km bearing 090°"
+      }
+    }
+  ]
+}
