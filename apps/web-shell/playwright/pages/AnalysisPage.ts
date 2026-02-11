@@ -259,6 +259,77 @@ export class AnalysisPage {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // Sidebar Tabs
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * The tab bar in the sidebar.
+   */
+  get tabBar(): Locator {
+    return this.page.locator('.web-shell__tab-bar');
+  }
+
+  /**
+   * The Activity tab button.
+   */
+  get activityTab(): Locator {
+    return this.page.getByTestId('sidebar-tab-activity');
+  }
+
+  /**
+   * The Log tab button.
+   */
+  get logTab(): Locator {
+    return this.page.getByTestId('sidebar-tab-log');
+  }
+
+  /**
+   * Switch to the Activity tab.
+   */
+  async switchToActivityTab(): Promise<void> {
+    await this.activityTab.click();
+  }
+
+  /**
+   * Switch to the Log tab.
+   */
+  async switchToLogTab(): Promise<void> {
+    await this.logTab.click();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Log Panel
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * The log panel component.
+   */
+  get logPanel(): Locator {
+    return this.page.getByTestId('log-panel');
+  }
+
+  /**
+   * Log timeline entries.
+   */
+  get logEntries(): Locator {
+    return this.page.locator('.log-panel__entry');
+  }
+
+  /**
+   * Log empty state (no entries).
+   */
+  get logEmptyNoEntries(): Locator {
+    return this.page.getByTestId('log-panel-empty-no-entries');
+  }
+
+  /**
+   * Get the count of log entries.
+   */
+  async getLogEntryCount(): Promise<number> {
+    return await this.logEntries.count();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // Queries
   // ─────────────────────────────────────────────────────────────────────────────
 

@@ -70,6 +70,22 @@ body {
   color: var(--vscode-descriptionForeground, #969696);
 }
 
+/* Storybook link in welcome header */
+.web-shell__storybook-link {
+  margin-left: auto;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--vscode-textLink-foreground, #3794ff);
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background-color 0.1s;
+}
+
+.web-shell__storybook-link:hover {
+  background: var(--vscode-button-secondaryBackground, #3a3d41);
+  color: var(--vscode-textLink-activeForeground, #3794ff);
+}
+
 /* Back button */
 .web-shell__back-button {
   display: flex;
@@ -118,7 +134,7 @@ body {
   flex-direction: row;
 }
 
-/* Sidebar with ActivityPanel */
+/* Sidebar: StacFileTree (top) + Activity/Log tab panel (bottom) */
 .web-shell__sidebar {
   width: 320px;
   min-width: 240px;
@@ -131,12 +147,60 @@ body {
   overflow: hidden;
 }
 
-/* File tree in sidebar */
+/* File tree in sidebar (top section, fixed height) */
 .web-shell__file-tree {
   height: 200px;
   min-height: 120px;
   flex-shrink: 0;
   border-bottom: 1px solid var(--vscode-panel-border, #454545);
+  overflow-y: auto;
+}
+
+/* Tab bar between file tree and panel content */
+.web-shell__tab-bar {
+  display: flex;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--vscode-panel-border, #454545);
+  background: var(--vscode-sideBarSectionHeader-background, #333333);
+}
+
+.web-shell__tab {
+  flex: 1;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--vscode-sideBarTitle-foreground, #bbbbbb);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: color 0.1s, border-color 0.1s;
+}
+
+.web-shell__tab:hover {
+  color: var(--vscode-foreground, #cccccc);
+}
+
+.web-shell__tab--active {
+  color: var(--vscode-foreground, #cccccc);
+  border-bottom-color: var(--vscode-focusBorder, #007fd4);
+}
+
+/* Tab content fills remaining space below tree + tab bar */
+.web-shell__tab-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* LogPanel fills tab content */
+.web-shell__tab-content .log-panel {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 
