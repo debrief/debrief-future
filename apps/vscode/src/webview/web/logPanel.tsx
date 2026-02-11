@@ -1,0 +1,155 @@
+/**
+ * LogPanel Webview Entry Point
+ *
+ * Bridges VS Code webview API to the LogPanel React component.
+ * Handles message passing between extension host and React component.
+ *
+ * Feature: 072-log-panel (E02, Phase 2)
+ */
+
+import React, { useEffect, useState, useCallback } from 'react';
+import { createRoot } from 'react-dom/client';
+import { LogPanel, LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
+import type {
+  TimelineEntry,
+  PresentationMode,
+  ViewMode,
+  LogFilterState,
+  LogPanelMessage,
+  ExtensionToWebviewMessage,
+} from '@debrief/components';
+
+// VS Code API type
+declare function acquireVsCodeApi(): {
+  postMessage(message: unknown): void;
+  getState(): LogPanelWebviewState | undefined;
+  setState(state: LogPanelWebviewState): void;
+};
+
+// Webview state persisted across reloads
+interface LogPanelWebviewState {
+  viewMode?: ViewMode;
+}
+
+// VS Code API instance
+const vscode = acquireVsCodeApi();
+
+/**
+ * LogPanel Webview App
+ */
+function LogPanelApp(): React.ReactElement {
+  // Timeline data
+  const [entries, setEntries] = useState<TimelineEntry[]>([]);
+  const [featureNames, setFeatureNames] = useState<Record<string, string>>({});
+
+  // Session state
+  const [hasActiveSession, setHasActiveSession] = useState(false);
+  const [plotName, setPlotName] = useState<string | null>(null);
+
+  // UI state
+  const [presentationMode, setPresentationMode] = useState<PresentationMode>('normal');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = vscode.getState();
+    return saved?.viewMode ?? 'timeline';
+  });
+  const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
+  const [filterState, setFilterState] = useState<LogFilterState>(LOG_DEFAULT_FILTER_STATE);
+  const [actionResultMessage, setActionResultMessage] = useState<string | null>(null);
+
+  // Listen for messages from extension
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent<ExtensionToWebviewMessage>) => {
+      const msg = event.data;
+
+      switch (msg.type) {
+        case 'timeline:update':
+          setEntries(msg.payload.entries);
+          setFeatureNames(msg.payload.featureNames);
+          break;
+
+        case 'session:change':
+          setHasActiveSession(msg.payload.hasActiveSession);
+          setPlotName(msg.payload.plotName);
+          if (!msg.payload.hasActiveSession) {
+            setEntries([]);
+            setFeatureNames({});
+            setSelectedEntryId(null);
+          }
+          break;
+
+        case 'selection:update':
+          // Sync selection state from extension (not currently used in Phase 2)
+          break;
+
+        case 'action:result':
+          setActionResultMessage(msg.payload.message);
+          // Auto-dismiss after 3 seconds
+          setTimeout(() => setActionResultMessage(null), 3000);
+          break;
+
+        case 'mode:init':
+          setPresentationMode(msg.payload.presentationMode);
+          break;
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  // Handle messages from LogPanel component → forward to extension
+  const handleMessage = useCallback((message: LogPanelMessage) => {
+    vscode.postMessage(message);
+  }, []);
+
+  // Handle presentation mode change → forward to extension for persistence
+  const handlePresentationModeChange = useCallback((mode: PresentationMode) => {
+    setPresentationMode(mode);
+    vscode.postMessage({ type: 'mode:change', payload: { presentationMode: mode } });
+  }, []);
+
+  // Handle view mode change → persist in webview state
+  const handleViewModeChange = useCallback((mode: ViewMode) => {
+    setViewMode(mode);
+    const currentState = vscode.getState() ?? {};
+    vscode.setState({ ...currentState, viewMode: mode });
+  }, []);
+
+  // Handle entry selection
+  const handleSelectedEntryChange = useCallback((entryId: string | null) => {
+    setSelectedEntryId(entryId);
+  }, []);
+
+  return (
+    <LogPanel
+      entries={entries}
+      featureNames={featureNames}
+      presentationMode={presentationMode}
+      viewMode={viewMode}
+      selectedEntryId={selectedEntryId}
+      filterState={filterState}
+      hasActiveSession={hasActiveSession}
+      plotName={plotName}
+      actionResultMessage={actionResultMessage}
+      onMessage={handleMessage}
+      onPresentationModeChange={handlePresentationModeChange}
+      onViewModeChange={handleViewModeChange}
+      onFilterStateChange={setFilterState}
+      onSelectedEntryChange={handleSelectedEntryChange}
+    />
+  );
+}
+
+// Mount the app
+const container = document.getElementById('root');
+if (container) {
+  const root = createRoot(container);
+  root.render(
+    <React.StrictMode>
+      <LogPanelApp />
+    </React.StrictMode>
+  );
+}
+
+// Notify extension that webview is ready
+vscode.postMessage({ type: 'webviewReady' });

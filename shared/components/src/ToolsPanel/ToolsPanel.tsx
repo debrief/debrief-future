@@ -68,7 +68,7 @@ export function ToolsPanel({ tools, hasToolInventory, hasSelection, onRunTool, c
             className="debrief-tools-panel__item debrief-tools-panel__item--active"
             onClick={() => onRunTool?.(tool.id)}
           >
-            <Button appearance="icon" onClick={() => onRunTool?.(tool.id)} title={`Run ${tool.name}`}>
+            <Button appearance="icon" title={`Run ${tool.name}`}>
               <Icon name="tools" />
             </Button>
             <div className="debrief-tools-panel__item-text">

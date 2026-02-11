@@ -12,6 +12,7 @@ import { LayersTreeProvider } from './providers/layersTreeProvider';
 import { OutlineProvider } from './providers/outlineProvider';
 import { TimeRangeViewProvider } from './views/timeRangeView';
 import { ActivityPanelViewProvider } from './views/activityPanelView';
+import { LogPanelViewProvider } from './views/logPanelView';
 import { MapPanel } from './webview/mapPanel';
 import { StacService } from './services/stacService';
 import { ConfigService } from './services/configService';
@@ -177,9 +178,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     calcService
   );
 
+  // Register Log Panel (Feature: 072-log-panel)
+  const logPanelProvider = new LogPanelViewProvider(
+    context.extensionUri,
+    context,
+    sessionManager
+  );
+
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
-    vscode.window.registerWebviewViewProvider('debrief.activityPanel', activityPanelProvider)
+    vscode.window.registerWebviewViewProvider('debrief.activityPanel', activityPanelProvider),
+    vscode.window.registerWebviewViewProvider('debrief.logPanel', logPanelProvider)
   );
 
   // Register outline provider for selection
