@@ -18,6 +18,7 @@ import { RepParseError } from '../types/import';
 
 export class IoService {
   private pythonPath: string;
+  private outputChannel: vscode.OutputChannel | undefined;
 
   constructor(extensionPath?: string) {
     const config = vscode.workspace.getConfiguration('debrief');
@@ -25,7 +26,20 @@ export class IoService {
 
     // Use configured path if explicitly set, otherwise auto-detect from project .venv
     this.pythonPath = configuredPath || this.findPythonPath(extensionPath);
-    console.log('[IoService] Using Python:', this.pythonPath);
+  }
+
+  /**
+   * Set the output channel for diagnostic logging.
+   */
+  setOutputChannel(channel: vscode.OutputChannel): void {
+    this.outputChannel = channel;
+    // Log the Python path that was resolved during construction
+    this.log(`Python path: ${this.pythonPath}`);
+  }
+
+  private log(message: string): void {
+    const line = `[ioService] ${message}`;
+    this.outputChannel?.appendLine(line);
   }
 
   /**
@@ -34,11 +48,16 @@ export class IoService {
   private findPythonPath(extensionPath?: string): string {
     // Look for .venv in extension's parent directories (monorepo structure)
     // apps/vscode -> apps -> repo-root/.venv
+    const isWindows = process.platform === 'win32';
+    const venvBin = isWindows
+      ? path.join('.venv', 'Scripts', 'python.exe')
+      : path.join('.venv', 'bin', 'python');
+
     if (extensionPath) {
       const candidates = [
-        path.join(extensionPath, '..', '..', '.venv', 'bin', 'python'),
-        path.join(extensionPath, '..', '.venv', 'bin', 'python'),
-        path.join(extensionPath, '.venv', 'bin', 'python'),
+        path.join(extensionPath, '..', '..', venvBin),
+        path.join(extensionPath, '..', venvBin),
+        path.join(extensionPath, venvBin),
       ];
 
       for (const candidate of candidates) {
@@ -93,7 +112,7 @@ export class IoService {
       const message = error instanceof Error ? error.message : String(error);
 
       // Log full error for debugging
-      console.error('[IoService] Parse error:', message);
+      this.log(`Parse error: ${message}`);
 
       // Try to extract line number from error message
       const lineMatch = message.match(/line\s+(\d+)/i);
@@ -112,9 +131,15 @@ export class IoService {
   async checkAvailability(): Promise<boolean> {
     try {
       // Try to import debrief_io module
-      await this.runPython('-c', 'import debrief_io; print("ok")');
+      const output = await this.runPython(
+        '-c',
+        'import debrief_io; print(getattr(debrief_io, "__version__", "ok"))'
+      );
+      this.log(`debrief-io available (${output.trim()})`);
       return true;
-    } catch {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.log(`debrief-io unavailable: ${msg}`);
       return false;
     }
   }

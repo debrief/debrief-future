@@ -70,6 +70,22 @@ body {
   color: var(--vscode-descriptionForeground, #969696);
 }
 
+/* Storybook link in welcome header */
+.web-shell__storybook-link {
+  margin-left: auto;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--vscode-textLink-foreground, #3794ff);
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background-color 0.1s;
+}
+
+.web-shell__storybook-link:hover {
+  background: var(--vscode-button-secondaryBackground, #3a3d41);
+  color: var(--vscode-textLink-activeForeground, #3794ff);
+}
+
 /* Back button */
 .web-shell__back-button {
   display: flex;

@@ -105,6 +105,10 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   private _resultFiles: AssociatedFile[] = [];
   private _resultsChanged = false;
 
+  // Whether the calc service availability check has completed
+  // undefined = not checked yet (loading), true = available, false = unavailable
+  private _calcAvailable: boolean | undefined = undefined;
+
   constructor(
     extensionUri: vscode.Uri,
     private readonly _sessionManager: SessionManager,
@@ -235,11 +239,17 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
       explanation: match.isActive ? undefined : match.explanation,
     }));
 
+    // hasToolInventory: undefined = still checking (show loading),
+    // false = unavailable, true = tools loaded
+    const hasToolInventory = this._calcAvailable === undefined
+      ? undefined
+      : this._calcAvailable && this._toolMatchAdapter.getAllTools().length > 0;
+
     this._postMessage({
       type: 'tools:update',
       payload: {
         tools,
-        hasToolInventory: this._toolMatchAdapter.getAllTools().length > 0,
+        hasToolInventory,
         hasSelection: this._toolMatchAdapter.hasSelection(),
       },
     });
@@ -301,6 +311,16 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
    * Called when the tool inventory changes (e.g., calcService finishes loading).
    */
   public refreshTools(): void {
+    this._calcAvailable = true;
+    this._sendToolsUpdate();
+  }
+
+  /**
+   * Notify the panel that the calc service is unavailable.
+   * Transitions the tools display from "loading" to "unavailable".
+   */
+  public notifyCalcUnavailable(): void {
+    this._calcAvailable = false;
     this._sendToolsUpdate();
   }
 

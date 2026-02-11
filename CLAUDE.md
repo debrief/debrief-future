@@ -166,6 +166,7 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Local filesystem — GeoJSON files within STAC Item directories (read/write via stacService) (074-snapshots)
 - TypeScript 5.x (VS Code extension webview, shared components) + React 18.x, react-leaflet 4.2, Leaflet 1.9.x, Zustand (session-state), VS Code Extension API ^1.85.0 (077-fix-vscode-extension-bugs)
 - N/A (no storage changes) (077-fix-vscode-extension-bugs)
+- TypeScript 5.x (Log Service in session-state package, VS Code extension stacService) + Existing Log Service (#071), Snapshot Service (#074), stacService, session-state Zustand store, Node.js `fs/promises`, `crypto.randomUUID()` (075-branching)
 - TypeScript 5.x (shared component library) + React 18.x (peer), vscrui ^0.1.0 (icons, existing), memfs ^4.x (devDependency for fixtures) (077-stac-file-tree)
 - N/A — reads filesystem via injected adapter, does not persist state (077-stac-file-tree)
 

@@ -138,15 +138,86 @@ export interface SystemRecordProperties {
   featureType: 'system';
   snapshotLinks: SnapshotLinks | null;
   branches: BranchRecord[];
+  branchOrigin: BranchOrigin | null;
   provenance: FileProvEntry[];
 }
 
-/** Branch record (out of scope for #074). */
+/** Branch record on the source plot's system record. */
 export interface BranchRecord {
   branchId: string;
   branchedFrom: string;
   branchedAt: string;
   targetAsset: string;
+}
+
+// ─── Branch Types (Feature: 075-branching) ──────────────────────────────
+
+/** Reverse link on a branch plot's system record. */
+export interface BranchOrigin {
+  sourceAsset: string;
+  branchedFrom: string;
+  branchedAt: string;
+  branchId: string;
+}
+
+/** Options for branchFrom(). */
+export interface BranchFromOptions {
+  activityId: string;
+}
+
+/** Result of a successful branch creation. */
+export interface BranchResult {
+  branchId: string;
+  branchItemPath: string;
+  branchGeoJsonPath: string;
+  branchedFrom: string;
+  entriesIncluded: number;
+  timestamp: string;
+}
+
+/** Where a branch point entry is located in the history. */
+export type BranchPointLocation =
+  | { type: 'current-segment'; entryIndex: number }
+  | { type: 'snapshot-boundary'; snapshotAsset: string }
+  | { type: 'pre-snapshot-arbitrary'; snapshotAsset: string; entryIndex: number };
+
+/** Branch-specific error codes. */
+export type BranchErrorCode =
+  | 'ENTRY_NOT_FOUND'
+  | 'SNAPSHOT_NOT_FOUND'
+  | 'REPLAY_NOT_AVAILABLE'
+  | 'WRITE_FAILED'
+  | 'SOURCE_LOAD_FAILED';
+
+/** Dependencies for the branch service (extends snapshot deps). */
+export interface BranchServiceDeps extends SnapshotServiceDeps {
+  createItem: (storePath: string, title: string) => { itemPath: string; itemId: string; itemDir: string };
+  generateBranchId: () => string;
+}
+
+/** Branch service interface. */
+export interface BranchService {
+  branchFrom(
+    storePath: string,
+    itemPath: string,
+    options: BranchFromOptions
+  ): Promise<BranchResult>;
+
+  locateBranchPoint(
+    storePath: string,
+    itemPath: string,
+    activityId: string
+  ): Promise<BranchPointLocation | null>;
+
+  getBranches(
+    storePath: string,
+    itemPath: string
+  ): Promise<BranchRecord[]>;
+
+  getBranchOrigin(
+    storePath: string,
+    itemPath: string
+  ): Promise<BranchOrigin | null>;
 }
 
 /** Options for creating a snapshot. */

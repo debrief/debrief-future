@@ -105,7 +105,7 @@ function ActivityPanelApp(): React.ReactElement {
   const [displayMode, setDisplayMode] = useState<'full' | 'trail' | undefined>(undefined);
   const [timeUiState, setTimeUiState] = useState<'empty' | 'loading' | 'ready'>('empty');
   const [tools, setTools] = useState<ToolsPanelItem[]>([]);
-  const [hasToolInventory, setHasToolInventory] = useState(false);
+  const [hasToolInventory, setHasToolInventory] = useState<boolean | undefined>(undefined);
   const [hasSelection, setHasSelection] = useState(false);
   const [features, setFeatures] = useState<DebriefFeature[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);

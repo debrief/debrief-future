@@ -30,19 +30,29 @@ export function ToolsPanel({ tools, hasToolInventory, hasSelection, onRunTool, c
 
   if (tools.length === 0) {
     // Determine the appropriate empty-state message
+    // hasToolInventory: undefined = still checking, false = unavailable, true = loaded
     let message: string;
-    if (hasToolInventory === false) {
-      message = 'Analysis tools unavailable — debrief-calc not connected';
+    let icon: 'loading' | 'warning' | 'info';
+    let spin = false;
+    if (hasToolInventory === undefined) {
+      message = 'Loading analysis tools\u2026';
+      icon = 'loading';
+      spin = true;
+    } else if (hasToolInventory === false) {
+      message = 'Analysis tools unavailable \u2014 debrief-calc not connected';
+      icon = 'warning';
     } else if (hasSelection === false || hasSelection === undefined) {
       message = 'Select features to see available tools';
+      icon = 'info';
     } else {
       message = 'No matching tools for current selection';
+      icon = 'info';
     }
 
     return (
       <div className={`debrief-tools-panel debrief-tools-panel--empty ${className ?? ''}`}>
         <div className="debrief-tools-panel__message">
-          <Icon name={hasToolInventory === false ? 'warning' : 'info'} />
+          <Icon name={icon} spin={spin} />
           <span>{message}</span>
         </div>
       </div>

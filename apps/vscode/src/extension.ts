@@ -31,6 +31,26 @@ let mapPanel: MapPanel | undefined;
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   // Extension activation begins
 
+  // Create shared output channel for cross-ecosystem diagnostics (ARCHITECTURE.md)
+  const outputChannel = vscode.window.createOutputChannel('Debrief');
+  context.subscriptions.push(outputChannel);
+  outputChannel.appendLine(`Debrief extension activating — ${new Date().toISOString()}`);
+
+  // Create Python status bar indicator (cross-ecosystem monitoring)
+  const pythonStatus = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Right,
+    50
+  );
+  pythonStatus.command = 'debrief.showOutput';
+  context.subscriptions.push(pythonStatus);
+
+  // Register command to reveal the output channel
+  context.subscriptions.push(
+    vscode.commands.registerCommand('debrief.showOutput', () => {
+      outputChannel.show(true);
+    })
+  );
+
   // Initialize activity bar service early (before tree providers)
   // This hides non-essential activities on first activation
   const activityBarService = new ActivityBarService(context);
@@ -45,6 +65,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const ioService = new IoService(context.extensionPath);
   const sessionManager = new SessionManager();
   context.subscriptions.push(sessionManager);
+
+  // Wire output channel to services for cross-ecosystem diagnostics
+  calcService.setOutputChannel(outputChannel);
+  ioService.setOutputChannel(outputChannel);
 
   // Configure MCP server port from settings (Feature: 029 - Phase 5)
   const mcpConfig = vscode.workspace.getConfiguration('debrief');
@@ -259,6 +283,22 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // Restore previously-open plots (Feature: 052)
   void openPlotsService.restoreOpenPlots();
 
+  // Check Python service availability and update status indicator
+  pythonStatus.text = '$(sync~spin) Python';
+  pythonStatus.tooltip = 'Checking Python services…';
+  pythonStatus.show();
+
+  // Check debrief-io availability (Feature: 077 diagnostics)
+  ioService.checkAvailability().then((ioAvailable) => {
+    outputChannel.appendLine(
+      ioAvailable
+        ? '[startup] debrief-io: available'
+        : '[startup] debrief-io: unavailable — REP file import will not work'
+    );
+  }).catch(() => {
+    outputChannel.appendLine('[startup] debrief-io: check failed');
+  });
+
   // Check debrief-calc availability and load tools (Feature: 038)
   calcService.checkAvailability().then(async (available) => {
     void vscode.commands.executeCommand('setContext', 'debrief.calcAvailable', available);
@@ -272,14 +312,31 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         toolsTreeProvider.refresh();
         // Notify activity panel so its webview shows tools (Fix: 077)
         activityPanelProvider.refreshTools();
-      } catch {
+
+        pythonStatus.text = '$(check) Python';
+        pythonStatus.tooltip = `debrief-calc connected — ${tools.length} tools loaded`;
+        outputChannel.appendLine(`[startup] debrief-calc: ${tools.length} analysis tools loaded`);
+      } catch (err) {
         // Graceful degradation - tools won't be available
         toolsTreeProvider.setCalcAvailable(false);
+        activityPanelProvider.notifyCalcUnavailable();
+        pythonStatus.text = '$(warning) Python';
+        pythonStatus.tooltip = 'debrief-calc connected but tools failed to load';
+        outputChannel.appendLine(`[startup] debrief-calc: tool loading failed — ${err instanceof Error ? err.message : String(err)}`);
       }
+    } else {
+      activityPanelProvider.notifyCalcUnavailable();
+      pythonStatus.text = '$(error) Python';
+      pythonStatus.tooltip = 'debrief-calc unavailable — click for details';
+      outputChannel.appendLine('[startup] debrief-calc: unavailable — analysis tools disabled');
     }
-  }).catch(() => {
+  }).catch((err) => {
     // Graceful degradation - tools won't be available but extension works
     toolsTreeProvider.setCalcAvailable(false);
+    activityPanelProvider.notifyCalcUnavailable();
+    pythonStatus.text = '$(error) Python';
+    pythonStatus.tooltip = 'debrief-calc unavailable — click for details';
+    outputChannel.appendLine(`[startup] debrief-calc: check failed — ${err instanceof Error ? err.message : String(err)}`);
   });
 
   // Extension activation complete

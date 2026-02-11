@@ -148,6 +148,27 @@ The architecture supports:
 3. **Team deployment** — STAC server for shared catalogs (future)
 4. **Air-gapped** — fully offline, local static catalogs only
 
+## Cross-Ecosystem Dependency Monitoring
+
+Debrief's TypeScript frontends depend on Python services (debrief-calc, debrief-io) running as subprocesses. These cross-ecosystem boundaries are inherently fragile — Python version mismatches, missing packages, virtual environment issues, and PATH problems can all cause silent failures.
+
+**Principle:** When any component in the JS/VS Code ecosystem depends on something outside that ecosystem (Python services, system binaries, external processes), the dependency boundary must implement:
+
+1. **Health checks on activation** — validate the dependency is reachable and functional at startup, not on first use
+2. **Structured logging** — all cross-ecosystem interactions log to a dedicated output channel (not just `console.log`) with timestamps, paths resolved, versions detected, and errors encountered
+3. **Status indicators** — a persistent, visible indicator (status bar item, panel state) shows the current health of each external dependency
+4. **Actionable error messages** — when a dependency is unavailable, tell the user *what* failed, *why* it likely failed, and *how* to fix it
+5. **Periodic heartbeats** — for long-running or repeatedly-used dependencies, re-validate availability periodically rather than assuming initial success persists
+
+This requirement applies at minimum until all cross-ecosystem components are verified robust in production use. It operationalises Constitution Article I.3 ("No silent failures") at ecosystem boundaries.
+
+### Current Cross-Ecosystem Dependencies
+
+| Frontend Component | External Dependency | Protocol |
+|---|---|---|
+| VS Code extension (calcService) | `debrief-calc` Python package | subprocess / MCP |
+| VS Code extension (ioService) | `debrief-io` Python package | subprocess |
+
 ## Risks and Mitigations
 
 | Risk | Mitigation |
