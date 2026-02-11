@@ -169,6 +169,7 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - TypeScript 5.x (Log Service in session-state package, VS Code extension stacService) + Existing Log Service (#071), Snapshot Service (#074), stacService, session-state Zustand store, Node.js `fs/promises`, `crypto.randomUUID()` (075-branching)
 - TypeScript 5.x (shared component library) + React 18.x (peer), vscrui ^0.1.0 (icons, existing), memfs ^4.x (devDependency for fixtures) (077-stac-file-tree)
 - N/A — reads filesystem via injected adapter, does not persist state (077-stac-file-tree)
+- TypeScript 5.x (session-state package, VS Code extension, shared components) + Zustand ^5.0.0 (session-state store), React 18.x (shared components), VS Code Extension API ^1.85.0, existing `@debrief/session-state` (Log Service, Snapshot Service), existing `calcService` (MCP tool invocation), existing `stacService` (file I/O) (076-replay-tune)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
