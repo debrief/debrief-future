@@ -178,20 +178,20 @@ describe('createLogService', () => {
     });
   });
 
-  describe('Phase 4-6 stubs', () => {
-    it('tuneEntry throws not implemented', async () => {
+  describe('Phase 4-6: missing replay deps', () => {
+    it('tuneEntry throws when replay deps not provided', async () => {
       const service = createLogService(createMockDeps());
-      await expect(service.tuneEntry('act-1', 'param', 42)).rejects.toThrow('not implemented');
+      await expect(service.tuneEntry('/store', 'item.json', 'act-1', 'param', 42)).rejects.toThrow('not available');
     });
 
-    it('revertTo throws not implemented', async () => {
+    it('revertTo throws when writeGeoJson dep not provided', async () => {
       const service = createLogService(createMockDeps());
-      await expect(service.revertTo('act-1')).rejects.toThrow('not implemented');
+      await expect(service.revertTo('/store', 'item.json', 'act-1')).rejects.toThrow('not available');
     });
 
-    it('revertThis throws not implemented', async () => {
+    it('revertThis throws when replay deps not provided', async () => {
       const service = createLogService(createMockDeps());
-      await expect(service.revertThis('act-1')).rejects.toThrow('not implemented');
+      await expect(service.revertThis('/store', 'item.json', 'act-1')).rejects.toThrow('not available');
     });
 
     it('createSnapshot throws with redirect to SnapshotService', async () => {

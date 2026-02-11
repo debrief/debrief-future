@@ -139,7 +139,7 @@ function toTimelineEntry(entry: LogEntry): TimelineEntry {
     generatedResultId: entry.generatedResultId ?? null,
     operationCategory: classifyOperation(entry.wasGeneratedBy.tool),
     deleted: entry.deleted === true,
-    tuneAnnotation: entry.tune != null
+    tuneAnnotation: entry.tune !== null
       ? { parameter: entry.tune.parameter, previousValue: entry.tune.previousValue, newValue: entry.tune.newValue }
       : null,
   };
