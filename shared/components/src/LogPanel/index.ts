@@ -29,3 +29,7 @@ export type {
   ModeInitPayload,
 } from './types';
 export { DEFAULT_FILTER_STATE } from './types';
+export { ParameterEditor } from './ParameterEditor';
+export type { ParameterEditorProps } from './ParameterEditor';
+export { ReplayProgress } from './ReplayProgress';
+export type { ReplayProgressProps } from './ReplayProgress';

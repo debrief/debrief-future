@@ -32,6 +32,7 @@ export interface LogEntry {
   executionDuration: string;
   generatedResultId?: string | null;
   tune: TuneAnnotation | null;
+  deleted?: boolean;
 }
 
 // Expanded ToolResult fields (Phase 0 contract)
@@ -101,12 +102,160 @@ export interface LogService {
     options?: TimelineOptions
   ): Promise<LogEntry[]>;
 
-  // Phase 4-6 stubs
-  tuneEntry(activityId: string, parameter: string, newValue: unknown): Promise<void>;
-  revertTo(activityId: string): Promise<void>;
-  revertThis(activityId: string): Promise<void>;
+  // Phase 6 methods (Feature: 076-replay-tune)
+  tuneEntry(
+    storePath: string,
+    itemPath: string,
+    activityId: string,
+    parameter: string,
+    newValue: unknown
+  ): Promise<ReplayResult>;
+
+  revertTo(
+    storePath: string,
+    itemPath: string,
+    activityId: string
+  ): Promise<void>;
+
+  revertThis(
+    storePath: string,
+    itemPath: string,
+    activityId: string
+  ): Promise<ReplayResult>;
+
+  restoreEntry(
+    storePath: string,
+    itemPath: string,
+    activityId: string
+  ): Promise<ReplayResult>;
+
+  // Delegated stubs (moved to dedicated services)
   createSnapshot(): Promise<void>;
   branchFrom(activityId: string): Promise<string>;
+}
+
+// ─── Replay Engine Types (Feature: 076-replay-tune) ────────────────────
+
+/** Describes a single entry in a replay plan. */
+export interface ReplayEntry {
+  activityId: string;
+  toolId: string;
+  toolVersion: string;
+  parameters: Record<string, unknown>;
+  featureIds: string[];
+  isTuneTarget: boolean;
+}
+
+/** Describes the parameter being tuned. */
+export interface TuneTarget {
+  activityId: string;
+  parameter: string;
+  previousValue: unknown;
+  newValue: unknown;
+}
+
+/** Full replay plan built from timeline analysis. */
+export interface ReplayPlan {
+  startFromSnapshot: string | null;
+  entries: ReplayEntry[];
+  tuneTarget: TuneTarget | null;
+  preReplayState: GeoJsonFeatureCollection;
+}
+
+/** Progress update emitted during replay. */
+export interface ReplayProgress {
+  current: number;
+  total: number;
+  currentToolId: string;
+  phase: 'loading-snapshot' | 'replaying' | 'finalising';
+}
+
+/** New versioned artifact produced during replay. */
+export interface ArtifactVersion {
+  resultId: string;
+  version: number;
+  path: string;
+  previousPath: string;
+}
+
+/** Why replay stopped before completing. */
+export interface ReplayHaltReason {
+  type: 'version-mismatch' | 'dependency-missing' | 'execution-error';
+  entryActivityId: string;
+  toolId: string;
+  message: string;
+}
+
+/** Outcome of a replay operation. */
+export interface ReplayResult {
+  status: 'completed' | 'halted' | 'cancelled';
+  entriesReplayed: number;
+  totalEntries: number;
+  haltReason: ReplayHaltReason | null;
+  tuneAnnotation: TuneAnnotation | null;
+  artifactsCreated: ArtifactVersion[];
+}
+
+/** Minimal tool execution result for the Replay Engine. */
+export interface ToolExecutionResultForReplay {
+  success: boolean;
+  features?: { type: 'FeatureCollection'; features: unknown[] };
+  durationMs: number;
+  toolVersion?: string;
+  artifactHref?: string;
+  resultId?: string;
+}
+
+/** Callback to execute a single tool during replay. */
+export type ToolExecutor = (
+  toolId: string,
+  featureIds: string[],
+  params: Record<string, unknown>
+) => Promise<ToolExecutionResultForReplay>;
+
+/** Callback to load a snapshot GeoJSON for cross-snapshot replay. */
+export type SnapshotLoader = (
+  storePath: string,
+  itemPath: string,
+  assetFilename: string
+) => Promise<GeoJsonFeatureCollection | null>;
+
+/** Callback to get the installed version of a tool. */
+export type ToolVersionResolver = (toolId: string) => Promise<string | null>;
+
+/** Callback to report progress to the UI. */
+export type ProgressReporter = (progress: ReplayProgress) => void;
+
+/** All dependencies the Replay Engine needs. */
+export interface ReplayEngineDeps {
+  executeTool: ToolExecutor;
+  loadSnapshot: SnapshotLoader;
+  resolveToolVersion: ToolVersionResolver;
+  onProgress: ProgressReporter;
+  signal: AbortSignal;
+}
+
+/** Replay Engine interface. */
+export interface ReplayEngine {
+  buildPlan(
+    timeline: LogEntry[],
+    tuneTarget: TuneTarget | null,
+    deletedActivityIds: string[],
+    currentState: GeoJsonFeatureCollection,
+    snapshotAsset: string | null
+  ): ReplayPlan;
+
+  execute(plan: ReplayPlan): Promise<ReplayResult>;
+}
+
+/** Type info for parameter validation. */
+export interface ParameterTypeInfo {
+  type: 'float' | 'integer' | 'duration' | 'enum' | 'boolean' | 'string';
+  min?: number;
+  max?: number;
+  allowedValues?: string[];
+  pattern?: string;
+  label: string;
 }
 
 // ─── Snapshot Types (Feature: 074-snapshots) ─────────────────────────────

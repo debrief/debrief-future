@@ -1,0 +1,136 @@
+/**
+ * ParameterEditor component styles.
+ * Uses VS Code CSS variables for theme integration.
+ *
+ * Feature: 076-replay-tune (Phase 3)
+ */
+
+.log-panel__param-editor {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 4px 0;
+  font-size: var(--vscode-font-size, 13px);
+  color: var(--vscode-foreground);
+}
+
+.log-panel__param-editor--editing {
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-focusBorder);
+  border-radius: 3px;
+}
+
+/* Read-only value display */
+.log-panel__param-editor-value {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 0.9em;
+  color: var(--vscode-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.log-panel__param-editor-value--clickable {
+  cursor: pointer;
+  border-bottom: 1px dashed var(--vscode-descriptionForeground);
+}
+
+.log-panel__param-editor-value--clickable:hover {
+  color: var(--vscode-textLink-foreground);
+  border-bottom-color: var(--vscode-textLink-foreground);
+}
+
+/* Input wrapper */
+.log-panel__param-editor-input {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.log-panel__param-editor-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--vscode-descriptionForeground);
+}
+
+.log-panel__param-editor-input-field {
+  width: 100%;
+  padding: 3px 6px;
+  font-size: 12px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+  border-radius: 2px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.log-panel__param-editor-input-field:focus {
+  border-color: var(--vscode-focusBorder);
+}
+
+/* Checkbox specific: don't stretch to full width */
+.log-panel__param-editor-input-field[type='checkbox'] {
+  width: auto;
+  margin: 2px 0;
+}
+
+/* Select specific */
+select.log-panel__param-editor-input-field {
+  background: var(--vscode-dropdown-background);
+  color: var(--vscode-dropdown-foreground);
+  border-color: var(--vscode-dropdown-border, var(--vscode-panel-border));
+}
+
+/* Validation error text */
+.log-panel__param-editor-error {
+  font-size: 11px;
+  color: var(--vscode-errorForeground, #f44747);
+  padding: 2px 0;
+}
+
+/* Commit/Cancel button row */
+.log-panel__param-editor-actions {
+  display: flex;
+  gap: 4px;
+  align-self: flex-end;
+}
+
+/* Action button base */
+.log-panel__param-editor-btn {
+  padding: 2px 8px;
+  font-size: 12px;
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: 2px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.log-panel__param-editor-btn:hover {
+  opacity: 0.9;
+}
+
+/* Commit (checkmark) button */
+.log-panel__param-editor-btn--commit {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.log-panel__param-editor-btn--commit:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+
+/* Cancel (X) button */
+.log-panel__param-editor-btn--cancel {
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+}
+
+.log-panel__param-editor-btn--cancel:hover {
+  background: var(--vscode-button-secondaryHoverBackground);
+}

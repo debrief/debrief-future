@@ -60,4 +60,26 @@ export const LOG_PANEL_STRINGS = {
 
   // Tooltips
   toolVersionTooltip: (version: string) => `Tool version: ${version}`,
+
+  // Replay and tuning (Feature: 076)
+  tunePanelTitle: 'Edit Parameter',
+  tuneCommit: 'Apply',
+  tuneCancel: 'Cancel',
+  tuneNotTunable: 'This parameter cannot be modified.',
+  replayProgressLoading: 'Loading snapshot\u2026',
+  replayProgressReplaying: (current: number, total: number) => `Replaying ${current}/${total}\u2026`,
+  replayProgressFinalising: 'Finalising\u2026',
+  replayCancel: 'Cancel replay',
+  replayCompleted: (count: number) => `Replay completed: ${count} operations replayed.`,
+  replayHalted: (toolId: string, reason: string) => `Replay halted at "${toolId}": ${reason}`,
+  replayCancelled: 'Replay cancelled. Previous state restored.',
+  revertToConfirmTitle: 'Revert to here?',
+  revertToConfirmMessage: 'All operations after this point will be permanently removed. This cannot be undone.',
+  revertToConfirmButton: 'Revert',
+  revertThisLabel: 'Remove this operation',
+  restoreLabel: 'Restore this operation',
+  deletedEntryBadge: 'Removed',
+  tunedEntryBadge: 'Tuned',
+  versionMismatch: (tool: string, expected: string, installed: string) =>
+    `"${tool}" version mismatch: expected ${expected}, found ${installed}.`,
 } as const;

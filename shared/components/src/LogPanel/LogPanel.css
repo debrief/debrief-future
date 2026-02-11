@@ -324,3 +324,62 @@
   color: var(--vscode-foreground);
   border-bottom: 1px solid var(--vscode-panel-border);
 }
+
+/* Deleted entry styling (Feature: 076) */
+.log-panel__entry--deleted {
+  opacity: 0.5;
+}
+
+.log-panel__entry--deleted .log-panel__entry-tool {
+  text-decoration: line-through;
+}
+
+/* Entry badges (Feature: 076) */
+.log-panel__entry-badge {
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.log-panel__entry-badge--tuned {
+  background: var(--vscode-editorInfo-background, rgba(0, 120, 212, 0.15));
+  color: var(--vscode-editorInfo-foreground, #3794ff);
+}
+
+.log-panel__entry-badge--deleted {
+  background: var(--vscode-editorWarning-background, rgba(255, 140, 0, 0.15));
+  color: var(--vscode-editorWarning-foreground, #ff8c00);
+}
+
+/* Tunable parameter value — clickable (Feature: 076) */
+.log-panel__entry-param-value--tunable {
+  cursor: pointer;
+  border-bottom: 1px dashed var(--vscode-descriptionForeground);
+}
+
+.log-panel__entry-param-value--tunable:hover {
+  color: var(--vscode-textLink-foreground);
+  border-bottom-color: var(--vscode-textLink-foreground);
+}
+
+/* Restore button for deleted entries (Feature: 076) */
+.log-panel__entry-restore {
+  margin-top: 4px;
+}
+
+.log-panel__entry-restore-btn {
+  padding: 2px 6px;
+  font-size: 11px;
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.log-panel__entry-restore-btn:hover {
+  background: var(--vscode-button-secondaryHoverBackground);
+}
