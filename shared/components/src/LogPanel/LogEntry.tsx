@@ -14,6 +14,7 @@ import type { LogEntryProps } from './types';
 import { resolveFeatureDisplay, getAffectedFeatureIds, formatDuration, formatTimestamp } from './utils';
 import { LOG_PANEL_STRINGS } from './strings';
 import './LogPanel.css';
+import './ParameterEditor.css';
 
 export function LogEntry({
   entry,
@@ -21,6 +22,8 @@ export function LogEntry({
   presentationMode,
   isSelected,
   onClick,
+  onTuneClick,
+  onRestoreClick,
   className,
 }: LogEntryProps): React.ReactElement {
   const affectedIds = getAffectedFeatureIds(entry);
@@ -34,6 +37,7 @@ export function LogEntry({
   const entryClass = [
     'log-panel__entry',
     isSelected ? 'log-panel__entry--selected' : '',
+    entry.deleted ? 'log-panel__entry--deleted' : '',
     className ?? '',
   ]
     .filter(Boolean)
@@ -55,7 +59,7 @@ export function LogEntry({
         }
       }}
     >
-      {/* Header: tool name + primary feature (all modes) */}
+      {/* Header: tool name + primary feature + badges (all modes) */}
       <div className="log-panel__entry-header">
         <span className="log-panel__entry-tool">{entry.toolName}</span>
         {primaryFeature && (
@@ -64,6 +68,16 @@ export function LogEntry({
           >
             {primaryFeature.displayName}
             {features.length > 1 && ` +${features.length - 1}`}
+          </span>
+        )}
+        {entry.tuneAnnotation && (
+          <span className="log-panel__entry-badge log-panel__entry-badge--tuned" data-testid="badge-tuned">
+            {LOG_PANEL_STRINGS.tunedEntryBadge}
+          </span>
+        )}
+        {entry.deleted && (
+          <span className="log-panel__entry-badge log-panel__entry-badge--deleted" data-testid="badge-deleted">
+            {LOG_PANEL_STRINGS.deletedEntryBadge}
           </span>
         )}
       </div>
@@ -78,9 +92,31 @@ export function LogEntry({
               .map(([key, param]) => (
                 <div key={key} className="log-panel__entry-param">
                   <span className="log-panel__entry-param-key">{key}:</span>
-                  <span className="log-panel__entry-param-value">
-                    {String(param.value)}
-                  </span>
+                  {param.tunable && onTuneClick ? (
+                    <span
+                      className="log-panel__entry-param-value log-panel__entry-param-value--tunable"
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onTuneClick(entry, key);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          onTuneClick(entry, key);
+                        }
+                      }}
+                      data-testid={`tune-param-${key}`}
+                    >
+                      {String(param.value)}
+                    </span>
+                  ) : (
+                    <span className="log-panel__entry-param-value">
+                      {String(param.value)}
+                    </span>
+                  )}
                 </div>
               ))}
           </div>
@@ -107,6 +143,22 @@ export function LogEntry({
               <span>{entry.generatedResultId}</span>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Restore button for deleted entries */}
+      {entry.deleted && onRestoreClick && (
+        <div className="log-panel__entry-restore">
+          <button
+            className="log-panel__entry-restore-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRestoreClick(entry);
+            }}
+            data-testid={`restore-entry-${entry.activityId}`}
+          >
+            {LOG_PANEL_STRINGS.restoreLabel}
+          </button>
         </div>
       )}
     </div>

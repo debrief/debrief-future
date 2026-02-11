@@ -17,6 +17,22 @@ export type {
   ToolResultForLog,
   FeatureProvenance,
   LogService,
+  // Replay Engine types (Feature: 076)
+  ReplayEntry,
+  TuneTarget,
+  ReplayPlan,
+  ReplayProgress,
+  ArtifactVersion,
+  ReplayHaltReason,
+  ReplayResult,
+  ToolExecutionResultForReplay,
+  ToolExecutor,
+  SnapshotLoader,
+  ToolVersionResolver,
+  ProgressReporter,
+  ReplayEngineDeps,
+  ReplayEngine,
+  ParameterTypeInfo,
   // Snapshot types (Feature: 074)
   SnapshotRef,
   SnapshotLinks,
@@ -52,6 +68,10 @@ export {
 export { assembleTimeline } from './timeline.js';
 
 export { createLogService, type LogServiceDeps } from './logService.js';
+
+// Replay Engine (Feature: 076)
+export { createReplayEngine } from './replayEngine.js';
+export { validateParameter, isValidIsoDuration, type ValidationResult } from './parameterValidation.js';
 
 // Snapshot Service (Feature: 074)
 export { createSnapshotService } from './snapshotService.js';

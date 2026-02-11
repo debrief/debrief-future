@@ -5,8 +5,10 @@
  * Subscribes to SessionManager for active session changes.
  * Calls logService.getTimeline() to fetch timeline entries.
  * Routes messages between webview and extension.
+ * Handles Phase 6 replay/tune/revert operations.
  *
  * Feature: 072-log-panel (E02, Phase 2)
+ * Updated: 076-replay-tune (E02, Phase 6)
  */
 
 import * as vscode from 'vscode';
@@ -14,6 +16,7 @@ import {
   type SessionStoreApi,
   type LogService,
   type LogEntry,
+  type ReplayResult,
 } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
 
@@ -37,6 +40,8 @@ interface TimelineEntry {
   executionDuration: string;
   generatedResultId: string | null;
   operationCategory: OperationCategory;
+  deleted?: boolean;
+  tuneAnnotation?: { parameter: string; previousValue: unknown; newValue: unknown } | null;
 }
 
 // Webview → Extension messages
@@ -63,12 +68,42 @@ interface WebviewReadyMessage {
   type: 'webviewReady';
 }
 
+// Phase 6 messages (Feature: 076-replay-tune)
+interface TuneRequestMessage {
+  type: 'tune:request';
+  payload: { activityId: string; parameter: string; newValue: unknown };
+}
+
+interface RevertToRequestMessage {
+  type: 'revert-to:request';
+  payload: { activityId: string };
+}
+
+interface RevertThisRequestMessage {
+  type: 'revert-this:request';
+  payload: { activityId: string };
+}
+
+interface RestoreRequestMessage {
+  type: 'restore:request';
+  payload: { activityId: string };
+}
+
+interface ReplayCancelMessage {
+  type: 'replay:cancel';
+}
+
 type WebviewMessage =
   | EntrySelectMessage
   | EntryDeselectMessage
   | ActionInvokeMessage
   | ModeChangeMessage
-  | WebviewReadyMessage;
+  | WebviewReadyMessage
+  | TuneRequestMessage
+  | RevertToRequestMessage
+  | RevertThisRequestMessage
+  | RestoreRequestMessage
+  | ReplayCancelMessage;
 
 // Tool category mapping for operation classification
 const TOOL_CATEGORY_MAP: Record<string, OperationCategory> = {
@@ -103,16 +138,17 @@ function toTimelineEntry(entry: LogEntry): TimelineEntry {
     executionDuration: entry.executionDuration,
     generatedResultId: entry.generatedResultId ?? null,
     operationCategory: classifyOperation(entry.wasGeneratedBy.tool),
+    deleted: entry.deleted,
+    tuneAnnotation: entry.tune
+      ? { parameter: entry.tune.parameter, previousValue: entry.tune.previousValue, newValue: entry.tune.newValue }
+      : null,
   };
 }
 
-// Phase/action availability messages
-const ACTION_MESSAGES: Record<string, string> = {
-  tune: 'Parameter tuning is planned for Phase 6.',
-  revertTo: 'Revert to Here is planned for Phase 4.',
-  revertThis: 'Revert This is planned for Phase 4.',
-  snapshot: 'Snapshot creation is planned for Phase 4.',
-  rationale: 'Rationale annotations are planned for Phase 6.',
+// Action availability messages (snapshot and rationale remain stubs)
+const STUB_ACTION_MESSAGES: Record<string, string> = {
+  snapshot: 'Snapshot creation — use the Snapshot Service directly.',
+  rationale: 'Rationale annotations are planned for a future phase.',
 };
 
 export class LogPanelViewProvider implements vscode.WebviewViewProvider {
@@ -135,6 +171,9 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
   // Feature name resolution
   private _featureNames: Record<string, string> = {};
+
+  // Phase 6: active replay abort controller
+  private _replayAbortController?: AbortController;
 
   constructor(
     extensionUri: vscode.Uri,
@@ -329,19 +368,58 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
           break;
 
         case 'action:invoke':
-          // All actions return "not available" in Phase 2
+          // Phase 6 actions are wired via dedicated message types.
+          // action:invoke now only handles stubs (snapshot, rationale).
           {
-            const actionMsg =
-              ACTION_MESSAGES[message.payload.actionType] ??
-              'This action is not yet available.';
-            this._postMessage({
-              type: 'action:result',
-              payload: {
-                actionType: message.payload.actionType,
-                available: false,
-                message: actionMsg,
-              },
-            });
+            const actionType = message.payload.actionType;
+            if (actionType === 'tune' || actionType === 'revertTo' || actionType === 'revertThis') {
+              // These are handled via dedicated Phase 6 messages from the webview.
+              // If the webview sends action:invoke for them, it's the old path — inform it.
+              this._postMessage({
+                type: 'action:result',
+                payload: {
+                  actionType,
+                  available: false,
+                  message: 'Use the inline parameter editor or revert buttons.',
+                },
+              });
+            } else {
+              const actionMsg =
+                STUB_ACTION_MESSAGES[actionType] ??
+                'This action is not yet available.';
+              this._postMessage({
+                type: 'action:result',
+                payload: {
+                  actionType,
+                  available: false,
+                  message: actionMsg,
+                },
+              });
+            }
+          }
+          break;
+
+        // Phase 6: tune/revert/restore operations (Feature: 076-replay-tune)
+        case 'tune:request':
+          void this._handleTuneRequest(message.payload);
+          break;
+
+        case 'revert-to:request':
+          void this._handleRevertToRequest(message.payload);
+          break;
+
+        case 'revert-this:request':
+          void this._handleRevertThisRequest(message.payload);
+          break;
+
+        case 'restore:request':
+          void this._handleRestoreRequest(message.payload);
+          break;
+
+        case 'replay:cancel':
+          if (this._replayAbortController) {
+            this._replayAbortController.abort();
+            this._replayAbortController = undefined;
           }
           break;
 
@@ -366,6 +444,113 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
       this._pendingMessages.push(message);
     }
   }
+
+  // ─── Phase 6 handlers (Feature: 076-replay-tune) ──────────────────
+
+  private async _handleTuneRequest(payload: {
+    activityId: string;
+    parameter: string;
+    newValue: unknown;
+  }): Promise<void> {
+    if (!this._logService || !this._getStorePath || !this._getItemPath) return;
+    const storePath = this._getStorePath();
+    const itemPath = this._getItemPath();
+    if (!storePath || !itemPath) return;
+
+    try {
+      const result = await this._logService.tuneEntry(
+        storePath, itemPath,
+        payload.activityId, payload.parameter, payload.newValue
+      );
+      this._sendReplayResult(result);
+      await this._sendTimelineUpdate();
+    } catch (err) {
+      this._postMessage({
+        type: 'replay:error',
+        payload: { message: err instanceof Error ? err.message : String(err) },
+      });
+    }
+  }
+
+  private async _handleRevertToRequest(payload: {
+    activityId: string;
+  }): Promise<void> {
+    if (!this._logService || !this._getStorePath || !this._getItemPath) return;
+    const storePath = this._getStorePath();
+    const itemPath = this._getItemPath();
+    if (!storePath || !itemPath) return;
+
+    try {
+      await this._logService.revertTo(storePath, itemPath, payload.activityId);
+      this._postMessage({
+        type: 'action:result',
+        payload: {
+          actionType: 'revertTo',
+          available: false,
+          message: 'Reverted successfully. Operations after the selected point have been removed.',
+        },
+      });
+      await this._sendTimelineUpdate();
+    } catch (err) {
+      this._postMessage({
+        type: 'replay:error',
+        payload: { message: err instanceof Error ? err.message : String(err) },
+      });
+    }
+  }
+
+  private async _handleRevertThisRequest(payload: {
+    activityId: string;
+  }): Promise<void> {
+    if (!this._logService || !this._getStorePath || !this._getItemPath) return;
+    const storePath = this._getStorePath();
+    const itemPath = this._getItemPath();
+    if (!storePath || !itemPath) return;
+
+    try {
+      const result = await this._logService.revertThis(
+        storePath, itemPath, payload.activityId
+      );
+      this._sendReplayResult(result);
+      await this._sendTimelineUpdate();
+    } catch (err) {
+      this._postMessage({
+        type: 'replay:error',
+        payload: { message: err instanceof Error ? err.message : String(err) },
+      });
+    }
+  }
+
+  private async _handleRestoreRequest(payload: {
+    activityId: string;
+  }): Promise<void> {
+    if (!this._logService || !this._getStorePath || !this._getItemPath) return;
+    const storePath = this._getStorePath();
+    const itemPath = this._getItemPath();
+    if (!storePath || !itemPath) return;
+
+    try {
+      const result = await this._logService.restoreEntry(
+        storePath, itemPath, payload.activityId
+      );
+      this._sendReplayResult(result);
+      await this._sendTimelineUpdate();
+    } catch (err) {
+      this._postMessage({
+        type: 'replay:error',
+        payload: { message: err instanceof Error ? err.message : String(err) },
+      });
+    }
+  }
+
+  private _sendReplayResult(result: ReplayResult): void {
+    this._postMessage({
+      type: 'replay:result',
+      payload: result as unknown as Record<string, unknown>,
+    });
+  }
+
+  // ─── End Phase 6 handlers ────────────────────────────────────────
 
   /**
    * Dispose resources.

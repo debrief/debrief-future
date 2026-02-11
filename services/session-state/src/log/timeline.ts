@@ -32,15 +32,18 @@ function normaliseProvenance(raw: unknown): unknown[] {
  */
 export function assembleTimeline(
   featureCollection: { features: Array<Record<string, unknown>> },
-  options?: { previousEntries?: LogEntry[] }
+  options?: { previousEntries?: LogEntry[]; includeDeleted?: boolean }
 ): LogEntry[] {
   const seen = new Map<string, LogEntry>();
+  const includeDeleted = options?.includeDeleted ?? false;
 
   // Merge previous snapshot entries first (cross-snapshot assembly)
   if (options?.previousEntries) {
     for (const entry of options.previousEntries) {
       if (entry.activityId && !seen.has(entry.activityId)) {
-        seen.set(entry.activityId, entry);
+        if (includeDeleted || !(entry as LogEntry).deleted) {
+          seen.set(entry.activityId, entry);
+        }
       }
     }
   }
@@ -54,6 +57,11 @@ export function assembleTimeline(
       const entry = raw as Record<string, unknown>;
       const activityId = entry.activityId;
       if (typeof activityId !== 'string' || activityId.length === 0) continue;
+
+      // Skip deleted entries unless includeDeleted is true
+      if (!includeDeleted && (entry as Record<string, unknown>).deleted === true) {
+        continue;
+      }
 
       // First occurrence wins (dedup)
       if (!seen.has(activityId)) {

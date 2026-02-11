@@ -3,8 +3,10 @@
  *
  * Bridges VS Code webview API to the LogPanel React component.
  * Handles message passing between extension host and React component.
+ * Phase 6: Adds tune/revert/replay message forwarding.
  *
  * Feature: 072-log-panel (E02, Phase 2)
+ * Updated: 076-replay-tune (E02, Phase 6)
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -18,6 +20,28 @@ import type {
   LogPanelMessage,
   ExtensionToWebviewMessage,
 } from '@debrief/components';
+
+// Phase 6 message types from the extension
+interface ReplayProgressPayload {
+  current: number;
+  total: number;
+  currentToolId: string;
+  phase: string;
+}
+
+interface ReplayResultPayload {
+  status: 'completed' | 'halted' | 'cancelled';
+  entriesReplayed: number;
+  totalEntries: number;
+  haltReason: { type: string; toolId: string; message: string } | null;
+}
+
+// Extended message type to include Phase 6 messages
+type ExtendedExtensionMessage =
+  | ExtensionToWebviewMessage
+  | { type: 'replay:progress'; payload: ReplayProgressPayload }
+  | { type: 'replay:result'; payload: ReplayResultPayload }
+  | { type: 'replay:error'; payload: { message: string } };
 
 // VS Code API type
 declare function acquireVsCodeApi(): {
@@ -56,9 +80,12 @@ function LogPanelApp(): React.ReactElement {
   const [filterState, setFilterState] = useState<LogFilterState>(LOG_DEFAULT_FILTER_STATE);
   const [actionResultMessage, setActionResultMessage] = useState<string | null>(null);
 
+  // Phase 6: Replay state
+  const [replayProgress, setReplayProgress] = useState<ReplayProgressPayload | null>(null);
+
   // Listen for messages from extension
   useEffect(() => {
-    const handleMessage = (event: MessageEvent<ExtensionToWebviewMessage>) => {
+    const handleMessage = (event: MessageEvent<ExtendedExtensionMessage>) => {
       const msg = event.data;
 
       switch (msg.type) {
@@ -78,17 +105,44 @@ function LogPanelApp(): React.ReactElement {
           break;
 
         case 'selection:update':
-          // Sync selection state from extension (not currently used in Phase 2)
           break;
 
         case 'action:result':
           setActionResultMessage(msg.payload.message);
-          // Auto-dismiss after 3 seconds
           setTimeout(() => setActionResultMessage(null), 3000);
           break;
 
         case 'mode:init':
           setPresentationMode(msg.payload.presentationMode);
+          break;
+
+        // Phase 6: replay messages
+        case 'replay:progress':
+          setReplayProgress(msg.payload);
+          break;
+
+        case 'replay:result': {
+          setReplayProgress(null);
+          const result = msg.payload;
+          if (result.status === 'completed') {
+            setActionResultMessage(
+              `Replay completed: ${result.entriesReplayed} operations replayed.`
+            );
+          } else if (result.status === 'halted' && result.haltReason) {
+            setActionResultMessage(
+              `Replay halted at "${result.haltReason.toolId}": ${result.haltReason.message}`
+            );
+          } else if (result.status === 'cancelled') {
+            setActionResultMessage('Replay cancelled. Previous state restored.');
+          }
+          setTimeout(() => setActionResultMessage(null), 5000);
+          break;
+        }
+
+        case 'replay:error':
+          setReplayProgress(null);
+          setActionResultMessage(msg.payload.message);
+          setTimeout(() => setActionResultMessage(null), 5000);
           break;
       }
     };
@@ -120,6 +174,42 @@ function LogPanelApp(): React.ReactElement {
     setSelectedEntryId(entryId);
   }, []);
 
+  // Phase 6: tune/revert handlers → send dedicated messages to extension
+  const handleTuneRequest = useCallback(
+    (activityId: string, parameter: string, newValue: unknown) => {
+      vscode.postMessage({
+        type: 'tune:request',
+        payload: { activityId, parameter, newValue },
+      });
+    },
+    []
+  );
+
+  const handleRevertToRequest = useCallback((activityId: string) => {
+    vscode.postMessage({
+      type: 'revert-to:request',
+      payload: { activityId },
+    });
+  }, []);
+
+  const handleRevertThisRequest = useCallback((activityId: string) => {
+    vscode.postMessage({
+      type: 'revert-this:request',
+      payload: { activityId },
+    });
+  }, []);
+
+  const handleRestoreRequest = useCallback((activityId: string) => {
+    vscode.postMessage({
+      type: 'restore:request',
+      payload: { activityId },
+    });
+  }, []);
+
+  const handleReplayCancel = useCallback(() => {
+    vscode.postMessage({ type: 'replay:cancel' });
+  }, []);
+
   return (
     <LogPanel
       entries={entries}
@@ -131,11 +221,17 @@ function LogPanelApp(): React.ReactElement {
       hasActiveSession={hasActiveSession}
       plotName={plotName}
       actionResultMessage={actionResultMessage}
+      replayProgress={replayProgress}
       onMessage={handleMessage}
       onPresentationModeChange={handlePresentationModeChange}
       onViewModeChange={handleViewModeChange}
       onFilterStateChange={setFilterState}
       onSelectedEntryChange={handleSelectedEntryChange}
+      onTuneRequest={handleTuneRequest}
+      onRevertToRequest={handleRevertToRequest}
+      onRevertThisRequest={handleRevertThisRequest}
+      onRestoreRequest={handleRestoreRequest}
+      onReplayCancel={handleReplayCancel}
     />
   );
 }
