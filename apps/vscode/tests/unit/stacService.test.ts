@@ -1004,7 +1004,7 @@ describe('StacService', () => {
           type: 'Feature',
           geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
           properties: {
-            times: ['2024-01-01T00:00:00Z', '2024-12-31T23:59:59Z'],
+            times: [1704067200000, 1735689599000],
           },
         },
       ]);
@@ -1020,8 +1020,8 @@ describe('StacService', () => {
 
       const result = await service.loadPlot(store, 'items/plot.json');
 
-      expect(result!.timeExtent[0]).toBe('2024-01-01T00:00:00Z');
-      expect(result!.timeExtent[1]).toBe('2024-12-31T23:59:59Z');
+      expect(result!.timeExtent[0]).toBe('2024-01-01T00:00:00.000Z');
+      expect(result!.timeExtent[1]).toBe('2024-12-31T23:59:59.000Z');
     });
 
     it('should return null when item not found', async () => {
@@ -1747,14 +1747,14 @@ describe('StacService', () => {
             type: 'Feature',
             geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
             properties: {
-              times: ['2024-01-01T00:00:00Z', '2024-01-01T12:00:00Z'],
+              times: [1704067200000, 1704110400000],
             },
           },
           {
             type: 'Feature',
             geometry: { type: 'LineString', coordinates: [[2, 2], [3, 3]] },
             properties: {
-              times: ['2024-01-02T00:00:00Z', '2024-01-02T18:00:00Z'],
+              times: [1704153600000, 1704218400000],
             },
           },
         ],
@@ -1775,8 +1775,8 @@ describe('StacService', () => {
       );
       expect(writeCall).toBeDefined();
       const updatedItem = JSON.parse(writeCall![1] as string);
-      expect(updatedItem.properties.start_datetime).toBe('2024-01-01T00:00:00Z');
-      expect(updatedItem.properties.end_datetime).toBe('2024-01-02T18:00:00Z');
+      expect(updatedItem.properties.start_datetime).toBe('2024-01-01T00:00:00.000Z');
+      expect(updatedItem.properties.end_datetime).toBe('2024-01-02T18:00:00.000Z');
     });
 
     it('should not write if no temporal data found', async () => {

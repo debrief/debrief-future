@@ -112,8 +112,8 @@ export interface Track {
   /** GeoJSON LineString geometry */
   geometry: LineString;
 
-  /** Time values for each coordinate (ISO 8601) */
-  times: string[];
+  /** Time values for each coordinate (epoch ms) */
+  times: number[];
 
   /** Position metadata array (parallel to geometry.coordinates) (Feature: 048) */
   positions?: TimestampedPosition[];

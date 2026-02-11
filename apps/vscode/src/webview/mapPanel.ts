@@ -634,6 +634,22 @@ export class MapPanel {
         });
       });
 
+      // Send initial temporal state (subscriptions only fire on changes)
+      const initialState = session.getState();
+      if (initialState.currentTime) {
+        this.postMessage({
+          type: 'setCurrentTime',
+          time: initialState.currentTime.epoch,
+        });
+      }
+      {
+        const webviewMode = initialState.displayMode === 'snailTrail' ? 'trail' : 'full';
+        this.postMessage({
+          type: 'setDisplayMode',
+          displayMode: webviewMode,
+        });
+      }
+
       // Subscribe to temporal (time + displayMode) changes (Feature: 039)
       this.temporalUnsubscribe = subscribeToTemporal(session, (temporal) => {
         if (temporal.currentTime) {
@@ -754,6 +770,22 @@ export class MapPanel {
           void this.panel.webview.postMessage(pending);
         }
         this.pendingMessages = [];
+        // Send current temporal state so the map can render temporally
+        // (subscriptions only fire on changes, not initial state)
+        if (this.activeSession) {
+          const state = this.activeSession.getState();
+          if (state.currentTime) {
+            this.postMessage({
+              type: 'setCurrentTime',
+              time: state.currentTime.epoch,
+            });
+          }
+          const webviewMode = state.displayMode === 'snailTrail' ? 'trail' : 'full';
+          this.postMessage({
+            type: 'setDisplayMode',
+            displayMode: webviewMode,
+          });
+        }
         break;
 
       case 'selectionChanged':

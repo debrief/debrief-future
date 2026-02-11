@@ -91,12 +91,12 @@ describe('extractTemporalData', () => {
     } as any)).toBeNull();
   });
 
-  it('returns null when times length does not match coordinates', () => {
-    expect(extractTemporalData({
-      id: '1',
+  it('throws when times length does not match coordinates', () => {
+    expect(() => extractTemporalData({
+      id: 'mismatched',
       geometry: { type: 'LineString', coordinates: [[-4, 50], [-4.1, 50.1]] },
       properties: { times: [1000] },
-    } as any)).toBeNull();
+    } as any)).toThrow('mismatched arrays');
   });
 
   it('extracts valid temporal data', () => {
@@ -120,5 +120,20 @@ describe('extractTemporalData', () => {
       timestamps: [1000, 2000, 3000],
       timeExtent: [1000, 3000],
     });
+  });
+
+  it('throws on non-numeric times (ISO strings)', () => {
+    expect(() => extractTemporalData({
+      id: 'string-times',
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [[-4, 50], [-4.1, 50.1], [-4.2, 50.2]],
+      },
+      properties: {
+        kind: 'TRACK',
+        times: ['2024-01-14T08:00:00Z', '2024-01-14T09:00:00Z', '2024-01-14T10:00:00Z'],
+      },
+    } as any)).toThrow('non-numeric times');
   });
 });
