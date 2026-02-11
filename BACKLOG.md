@@ -134,7 +134,7 @@ Large features broken down into multiple backlog items.
 | E01 | Tool Implementation Sequence | Implement 63 documented legacy tools in phased order | approved | #062, #063, #064, #065, #066, #067, #068 |
 | E02 | PROV Logging Implementation | [Implement PROV logging system per SRD priorities P1-P6](docs/architecture/prov-transition-plan.md) | approved | #070, #071, #072, #073, #074, #075, #076 |
 | E03 | Buffer Zone Analysis Demo | [Reactive PROV cascade with 5-tool chain for stakeholder demo](docs/ideas/E03-buffer-zone-analysis-demo.md) | approved | #078, #079, #080, #081, #082, #084 |
-| E04 | Results Visualization | [Vega-Lite based results viewing infrastructure](docs/ideas/E04-results-visualization.md) | approved | #085, #086, #087, #088, #089 |
+| E04 | Results Visualization | [Vega-Lite based results viewing infrastructure](docs/ideas/E04-results-visualization.md) | approved | #085, #086, #087, #088, #089, #090 |
 
 ## Items
 
@@ -195,6 +195,7 @@ Description formats:
 | 086 | Feature | [Results bottom panel with tabbed layout](docs/ideas/E04-results-visualization.md) [E04] — VS Code panel hosting Vega-Lite renderer tabs (requires #085) | 4 | 4 | 3 | 11 | Medium | approved |
 | 087 | Infrastructure | [Logical result ID registry](docs/ideas/E04-results-visualization.md) [E04] — maps stable logical IDs to current result files, emits change events (requires #071) | 4 | 3 | 4 | 11 | Medium | approved |
 | 088 | Feature | [Custom editor provider for result datasets](docs/ideas/E04-results-visualization.md) [E04] — opens results as editor tabs, supports drag-to-float via auxiliary windows (requires #085) | 3 | 4 | 4 | 11 | Medium | approved |
+| 090 | Infrastructure | [E04 sample data workshop: identify realistic generators for all result types](docs/ideas/090-e04-sample-data-workshop.md) [E04] — collaborative workshop using E03 demo scenario; pseudocode + golden fixtures for all result categories (prerequisite for #085) | 5 | 3 | 2 | 10 | Low | approved |
 | 054 | Infrastructure | [Discover and spec all migrateable tools from Legacy Debrief](docs/tool-migration/TOOL-LIBRARY-SRD.md) — scan legacy Java source, classify trigger types and UX integration, capture golden I/O, author language-neutral specs (requires #049, #050) | 5 | 3 | 3 | 11 | High | proposed |
 | 029 | Tech Debt | [Add unit tests for VS Code extension providers](https://github.com/debrief/debrief-future/issues/104) | 4 | 2 | 5 | 11 | Low | proposed |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
