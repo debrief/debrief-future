@@ -99,7 +99,7 @@ describe('extractTemporalData', () => {
     } as any)).toBeNull();
   });
 
-  it('extracts valid temporal data', () => {
+  it('extracts valid temporal data with numeric timestamps', () => {
     const result = extractTemporalData({
       id: 'track-1',
       type: 'Feature',
@@ -120,5 +120,42 @@ describe('extractTemporalData', () => {
       timestamps: [1000, 2000, 3000],
       timeExtent: [1000, 3000],
     });
+  });
+
+  it('extracts valid temporal data with ISO 8601 string timestamps', () => {
+    const result = extractTemporalData({
+      id: 'track-2',
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [[-4, 50], [-4.1, 50.1], [-4.2, 50.2]],
+      },
+      properties: {
+        kind: 'TRACK',
+        name: 'OWNSHIP',
+        times: ['2024-01-14T08:00:00Z', '2024-01-14T09:00:00Z', '2024-01-14T10:00:00Z'],
+      },
+    } as any);
+
+    expect(result).not.toBeNull();
+    expect(result!.trackId).toBe('track-2');
+    expect(result!.coordinates).toEqual([[-4, 50], [-4.1, 50.1], [-4.2, 50.2]]);
+    expect(result!.timestamps).toEqual([
+      new Date('2024-01-14T08:00:00Z').getTime(),
+      new Date('2024-01-14T09:00:00Z').getTime(),
+      new Date('2024-01-14T10:00:00Z').getTime(),
+    ]);
+    expect(result!.timeExtent).toEqual([
+      new Date('2024-01-14T08:00:00Z').getTime(),
+      new Date('2024-01-14T10:00:00Z').getTime(),
+    ]);
+  });
+
+  it('returns null for invalid ISO 8601 strings', () => {
+    expect(extractTemporalData({
+      id: '1',
+      geometry: { type: 'LineString', coordinates: [[-4, 50], [-4.1, 50.1]] },
+      properties: { times: ['not-a-date', 'also-bad'] },
+    } as any)).toBeNull();
   });
 });

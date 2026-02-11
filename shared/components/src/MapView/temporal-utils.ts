@@ -103,25 +103,32 @@ export function extractTemporalData(
   if (feature.geometry.type !== 'LineString') return null;
 
   const coordinates = feature.geometry.coordinates as unknown as [number, number][];
-  const times = (feature.properties as unknown as Record<string, unknown>).times as number[] | undefined;
+  const rawTimes = (feature.properties as unknown as Record<string, unknown>).times as unknown[] | undefined;
 
-  if (!times || !Array.isArray(times) || times.length === 0) return null;
-  // Defensive check: times must be numbers (epoch ms), not strings
-  if (typeof times[0] !== 'number') {
-    console.warn('[temporal-utils] extractTemporalData: times array contains non-numeric values — expected epoch ms');
+  if (!rawTimes || !Array.isArray(rawTimes) || rawTimes.length === 0) return null;
+
+  // Accept both epoch ms (number) and ISO 8601 strings
+  let timestamps: number[];
+  if (typeof rawTimes[0] === 'number') {
+    timestamps = rawTimes as number[];
+  } else if (typeof rawTimes[0] === 'string') {
+    timestamps = (rawTimes as string[]).map(t => new Date(t).getTime());
+    if (timestamps.some(t => isNaN(t))) return null;
+  } else {
     return null;
   }
+
   if (coordinates.length === 0) return null;
   // times and coordinates must match in length
-  if (times.length !== coordinates.length) return null;
+  if (timestamps.length !== coordinates.length) return null;
 
-  const first = times[0]!;
-  const last = times[times.length - 1]!;
+  const first = timestamps[0]!;
+  const last = timestamps[timestamps.length - 1]!;
 
   return {
     trackId: String(feature.id ?? ''),
     coordinates,
-    timestamps: times,
+    timestamps,
     timeExtent: [first, last],
   };
 }
