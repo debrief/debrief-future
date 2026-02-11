@@ -199,9 +199,9 @@ describe('createLogService', () => {
       await expect(service.createSnapshot()).rejects.toThrow('SnapshotService');
     });
 
-    it('branchFrom throws not implemented', async () => {
+    it('branchFrom throws with redirect to BranchService', async () => {
       const service = createLogService(createMockDeps());
-      await expect(service.branchFrom('act-1')).rejects.toThrow('not implemented');
+      await expect(service.branchFrom('act-1')).rejects.toThrow('BranchService');
     });
   });
 });

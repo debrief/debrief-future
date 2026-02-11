@@ -10,6 +10,7 @@
       }
     },
     "branches": [],
+    "branchOrigin": null,
     "provenance": [
       {
         "activityId": "snap-001",
@@ -35,6 +36,7 @@
       }
     },
     "branches": [],
+    "branchOrigin": null,
     "provenance": [
       {
         "activityId": "snap-002",
@@ -57,6 +59,7 @@
       "next": null
     },
     "branches": [],
+    "branchOrigin": null,
     "provenance": [
       {
         "activityId": "snap-001",

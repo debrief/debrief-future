@@ -156,7 +156,10 @@ export function createLogService(deps: LogServiceDeps): LogService {
     },
 
     async branchFrom(_activityId: string): Promise<string> {
-      throw new Error('branchFrom is not implemented (Phase 5)');
+      throw new Error(
+        'branchFrom moved to BranchService. ' +
+        'Use createBranchService() from branch service module.'
+      );
     },
   };
 }
