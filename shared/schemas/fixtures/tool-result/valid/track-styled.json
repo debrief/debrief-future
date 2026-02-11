@@ -1,0 +1,17 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "feature://COLLINGWOOD",
+        "mimeType": "application/geo+json",
+        "text": "{\"type\":\"Feature\",\"id\":\"COLLINGWOOD\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-4.22,50.34],[-4.20,50.35],[-4.18,50.36],[-4.16,50.37],[-4.14,50.38]]},\"properties\":{\"kind\":\"TRACK\",\"name\":\"COLLINGWOOD\",\"times\":[\"2024-03-15T06:00:00Z\",\"2024-03-15T07:30:00Z\",\"2024-03-15T09:00:00Z\",\"2024-03-15T10:30:00Z\",\"2024-03-15T12:00:00Z\"],\"style\":{\"line\":{\"stroke\":true,\"color\":\"#2980b9\",\"weight\":3,\"opacity\":0.9},\"point\":{\"shape\":\"circle\",\"radius\":4,\"fill\":true,\"fill_color\":\"#2980b9\"}}}}"
+      },
+      "annotations": {
+        "debrief:resultType": "mutation/track/styled",
+        "debrief:sourceFeatures": ["COLLINGWOOD"],
+        "debrief:label": "Set COLLINGWOOD color to blue"
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "artifact://./results/outlier_report_001.json",
+        "mimeType": "application/json",
+        "text": "{\"outliers\":5,\"threshold_sigma\":2.5,\"method\":\"modified_z_score\",\"affected_contacts\":[{\"id\":\"contact_012\",\"z_score\":3.1,\"time\":\"2024-03-15T08:15:00Z\"},{\"id\":\"contact_027\",\"z_score\":2.8,\"time\":\"2024-03-15T09:30:00Z\"},{\"id\":\"contact_034\",\"z_score\":4.2,\"time\":\"2024-03-15T10:05:00Z\"},{\"id\":\"contact_041\",\"z_score\":2.7,\"time\":\"2024-03-15T10:45:00Z\"},{\"id\":\"contact_058\",\"z_score\":3.5,\"time\":\"2024-03-15T11:20:00Z\"}],\"total_contacts\":72,\"retention_rate\":0.931}"
+      },
+      "annotations": {
+        "debrief:resultType": "artifact/report/outlier_summary",
+        "debrief:sourceFeatures": ["NELSON"],
+        "debrief:label": "Outlier analysis: 5 of 72 contacts removed (\u03c3 > 2.5)",
+        "debrief:href": "./results/outlier_report_001.json"
+      }
+    }
+  ]
+}

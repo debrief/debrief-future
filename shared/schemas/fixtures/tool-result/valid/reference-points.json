@@ -1,0 +1,43 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "feature://ref-pt-000",
+        "mimeType": "application/geo+json",
+        "text": "{\"type\":\"Feature\",\"id\":\"ref-pt-000\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-4.20,50.33]},\"properties\":{\"kind\":\"reference\",\"name\":\"ref-pt-000\",\"grid_row\":0,\"grid_col\":0}}"
+      },
+      "annotations": {
+        "debrief:resultType": "addition/analysis/reference_points",
+        "debrief:sourceFeatures": ["exercise-area-alpha"],
+        "debrief:label": "Generated 25 reference points (5x5 grid)"
+      }
+    },
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "feature://ref-pt-001",
+        "mimeType": "application/geo+json",
+        "text": "{\"type\":\"Feature\",\"id\":\"ref-pt-001\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-4.18,50.33]},\"properties\":{\"kind\":\"reference\",\"name\":\"ref-pt-001\",\"grid_row\":0,\"grid_col\":1}}"
+      },
+      "annotations": {
+        "debrief:resultType": "addition/analysis/reference_points",
+        "debrief:sourceFeatures": ["exercise-area-alpha"],
+        "debrief:label": "Generated 25 reference points (5x5 grid)"
+      }
+    },
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "feature://ref-pt-012",
+        "mimeType": "application/geo+json",
+        "text": "{\"type\":\"Feature\",\"id\":\"ref-pt-012\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-4.16,50.37]},\"properties\":{\"kind\":\"reference\",\"name\":\"ref-pt-012\",\"grid_row\":2,\"grid_col\":2}}"
+      },
+      "annotations": {
+        "debrief:resultType": "addition/analysis/reference_points",
+        "debrief:sourceFeatures": ["exercise-area-alpha"],
+        "debrief:label": "Generated 25 reference points (5x5 grid)"
+      }
+    }
+  ]
+}

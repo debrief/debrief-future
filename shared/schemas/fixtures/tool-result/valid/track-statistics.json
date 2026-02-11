@@ -1,0 +1,17 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "feature://stats-nelson-001",
+        "mimeType": "application/geo+json",
+        "text": "{\"type\":\"Feature\",\"id\":\"stats-nelson-001\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-4.15,50.37]},\"properties\":{\"kind\":\"analysis\",\"source_track\":\"NELSON\",\"source_name\":\"NELSON\",\"statistics\":{\"point_count\":145,\"duration_hours\":6.25,\"distance_nm\":48.3,\"average_speed_kts\":7.73}}}"
+      },
+      "annotations": {
+        "debrief:resultType": "addition/track/statistics",
+        "debrief:sourceFeatures": ["NELSON"],
+        "debrief:label": "Statistics for NELSON"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "dataset://zone-histogram-001",
+        "mimeType": "application/json",
+        "text": "{\"type\":\"zone-histogram\",\"source_track\":\"NELSON\",\"sensor_model\":\"active-sonar-shallow\",\"zones\":[{\"name\":\"inner\",\"distance_nm\":2.0,\"confidence\":0.90,\"color\":\"#e74c3c\",\"count\":12},{\"name\":\"middle\",\"distance_nm\":5.0,\"confidence\":0.50,\"color\":\"#f39c12\",\"count\":27},{\"name\":\"outer\",\"distance_nm\":10.0,\"confidence\":0.10,\"color\":\"#27ae60\",\"count\":18},{\"name\":\"beyond\",\"distance_nm\":null,\"color\":\"#95a5a6\",\"count\":43}],\"total_points\":100}"
+      },
+      "annotations": {
+        "debrief:resultType": "addition/dataset/zone_histogram",
+        "debrief:sourceFeatures": ["NELSON", "ref-points-001"],
+        "debrief:label": "Buffer zone point counts for NELSON"
+      }
+    }
+  ]
+}
