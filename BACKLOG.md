@@ -133,7 +133,8 @@ Large features broken down into multiple backlog items.
 | 024 | [Storyboarding Briefings](docs/ideas/017-storyboarding-briefings.md) | Add storyboarding capability for mission/exercise briefings | proposed | — |
 | E01 | Tool Implementation Sequence | Implement 63 documented legacy tools in phased order | approved | #062, #063, #064, #065, #066, #067, #068 |
 | E02 | PROV Logging Implementation | [Implement PROV logging system per SRD priorities P1-P6](docs/architecture/prov-transition-plan.md) | approved | #070, #071, #072, #073, #074, #075, #076 |
-| E03 | Buffer Zone Analysis Demo | [Reactive PROV cascade with 5-tool chain for stakeholder demo](docs/ideas/E03-buffer-zone-analysis-demo.md) | approved | #078, #079, #080, #081, #082, #083, #084 |
+| E03 | Buffer Zone Analysis Demo | [Reactive PROV cascade with 5-tool chain for stakeholder demo](docs/ideas/E03-buffer-zone-analysis-demo.md) | approved | #078, #079, #080, #081, #082, #084 |
+| E04 | Results Visualization | [Vega-Lite based results viewing infrastructure](docs/ideas/E04-results-visualization.md) | approved | #085, #086, #087, #088, #089 |
 
 ## Items
 
@@ -182,13 +183,18 @@ Description formats:
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
 | 058 | Feature | [Add flip shape horizontal tool spec](docs/ideas/058-flip-shape-horizontal.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
 | 059 | Feature | [Add flip shape vertical tool spec](docs/ideas/059-flip-shape-vertical.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
-| 084 | Feature | [Wire buffer zone analysis demo end-to-end](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — 5-step reactive PROV cascade with edit-mode map interaction (requires #076, #078-083) | 5 | 5 | 2 | 12 | High | approved |
-| 083 | Feature | [Add auto-refresh for open STAC result views](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — detect upstream PROV changes, re-render while preserving viewport (requires #071, #074) | 4 | 4 | 3 | 11 | Medium | approved |
+| 084 | Feature | [Wire buffer zone analysis demo end-to-end](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — 5-step reactive PROV cascade with edit-mode map interaction (requires #076, #078-082, E04 #086, E04 #089) | 5 | 5 | 2 | 12 | High | approved |
+| ~~083~~ | ~~Feature~~ | ~~[Add auto-refresh for open STAC result views](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03]~~ | ~~4~~ | ~~4~~ | ~~3~~ | ~~11~~ | ~~Medium~~ | ~~absorbed by #089~~ |
 | 079 | Feature | [Implement move-track tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — offset track by range/bearing with map drag support (requires #049, #062) | 4 | 4 | 4 | 12 | Medium | approved |
 | 080 | Feature | [Implement buffer-zone-generator tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — stub sensor model returning 3 detection-likelihood buffer polygons (requires #049, #079) | 4 | 4 | 4 | 12 | Medium | approved |
 | 081 | Feature | [Implement point-in-zone-classifier tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — classify and recolor reference points by buffer zone membership (requires #049, #078, #080) | 4 | 4 | 4 | 12 | Medium | approved |
-| 082 | Feature | [Implement zone-histogram-generator tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — STAC-persisted bar chart of point counts per zone (requires #049, #081) | 4 | 4 | 4 | 12 | Medium | approved |
+| 082 | Feature | [Implement zone-histogram-generator tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — Vega-Lite .vl.json bar chart of point counts per zone (requires #049, #081, E04 #085) | 4 | 4 | 4 | 12 | Medium | approved |
 | 078 | Feature | [Implement generate-reference-points tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — creates grid/scatter of reference points on plot (requires #049) | 3 | 3 | 5 | 11 | Low | approved |
+| 089 | Feature | [Result view auto-refresh on logical ID change](docs/ideas/E04-results-visualization.md) [E04] — watches logical result IDs, re-renders preserving viewport; absorbs E03 #083 (requires #086, #087, #088) | 4 | 4 | 3 | 11 | Medium | approved |
+| 085 | Feature | [Vega-Lite renderer shared component](docs/ideas/E04-results-visualization.md) [E04] — React component rendering .vl.json specs, Storybook-ready | 4 | 4 | 4 | 12 | Medium | approved |
+| 086 | Feature | [Results bottom panel with tabbed layout](docs/ideas/E04-results-visualization.md) [E04] — VS Code panel hosting Vega-Lite renderer tabs (requires #085) | 4 | 4 | 3 | 11 | Medium | approved |
+| 087 | Infrastructure | [Logical result ID registry](docs/ideas/E04-results-visualization.md) [E04] — maps stable logical IDs to current result files, emits change events (requires #071) | 4 | 3 | 4 | 11 | Medium | approved |
+| 088 | Feature | [Custom editor provider for .vl.json files](docs/ideas/E04-results-visualization.md) [E04] — opens results as editor tabs, supports drag-to-float via auxiliary windows (requires #085) | 3 | 4 | 4 | 11 | Medium | approved |
 | 054 | Infrastructure | [Discover and spec all migrateable tools from Legacy Debrief](docs/tool-migration/TOOL-LIBRARY-SRD.md) — scan legacy Java source, classify trigger types and UX integration, capture golden I/O, author language-neutral specs (requires #049, #050) | 5 | 3 | 3 | 11 | High | proposed |
 | 029 | Tech Debt | [Add unit tests for VS Code extension providers](https://github.com/debrief/debrief-future/issues/104) | 4 | 2 | 5 | 11 | Low | proposed |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |

@@ -48,6 +48,16 @@ Build a 5-step operation chain where moving a track causes buffer zones, point c
 - 3D buffer zones (2D only)
 - Performance optimization for very large point sets
 
+## Cross-Epic Dependencies
+
+Most E03 items (#078-081) can proceed independently of E04 (Results Visualization). Only the histogram and demo integration need E04:
+
+- **#082** (histogram tool) needs E04 #085 (Vega-Lite renderer) to know the output format
+- **#084** (end-to-end demo) needs E04 #086 (results panel) + #089 (auto-refresh) for viewable, refreshing results
+- **#078-081** have NO dependency on E04 — pure geometry/map operations
+
+E03 #083 was absorbed into E04 #089 (result view auto-refresh).
+
 ## Epic Breakdown
 
 | Item | Description | Dependencies |
@@ -56,6 +66,5 @@ Build a 5-step operation chain where moving a track causes buffer zones, point c
 | 079 | Move track by range/bearing offset tool | #049, #062 |
 | 080 | Stub sensor model + buffer zone generator tool | #049, #079 |
 | 081 | Point-in-zone classifier tool (with coloring) | #049, #078, #080 |
-| 082 | Zone histogram generator tool (STAC output) | #049, #081 |
-| 083 | Auto-refresh for open STAC result views | #071, #074 |
-| 084 | Wire buffer zone analysis demo end-to-end | #076, #078-083 |
+| 082 | Zone histogram generator tool (Vega-Lite .vl.json output) | #049, #081, E04 #085 |
+| 084 | Wire buffer zone analysis demo end-to-end | #076, #078-082, E04 #086, E04 #089 |
