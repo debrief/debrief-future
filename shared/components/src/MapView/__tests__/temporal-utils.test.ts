@@ -91,15 +91,15 @@ describe('extractTemporalData', () => {
     } as any)).toBeNull();
   });
 
-  it('returns null when times length does not match coordinates', () => {
-    expect(extractTemporalData({
-      id: '1',
+  it('throws when times length does not match coordinates', () => {
+    expect(() => extractTemporalData({
+      id: 'mismatched',
       geometry: { type: 'LineString', coordinates: [[-4, 50], [-4.1, 50.1]] },
       properties: { times: [1000] },
-    } as any)).toBeNull();
+    } as any)).toThrow('mismatched arrays');
   });
 
-  it('extracts valid temporal data with numeric timestamps', () => {
+  it('extracts valid temporal data', () => {
     const result = extractTemporalData({
       id: 'track-1',
       type: 'Feature',
@@ -122,9 +122,9 @@ describe('extractTemporalData', () => {
     });
   });
 
-  it('extracts valid temporal data with ISO 8601 string timestamps', () => {
-    const result = extractTemporalData({
-      id: 'track-2',
+  it('throws on non-numeric times (ISO strings)', () => {
+    expect(() => extractTemporalData({
+      id: 'string-times',
       type: 'Feature',
       geometry: {
         type: 'LineString',
@@ -132,30 +132,8 @@ describe('extractTemporalData', () => {
       },
       properties: {
         kind: 'TRACK',
-        name: 'OWNSHIP',
         times: ['2024-01-14T08:00:00Z', '2024-01-14T09:00:00Z', '2024-01-14T10:00:00Z'],
       },
-    } as any);
-
-    expect(result).not.toBeNull();
-    expect(result!.trackId).toBe('track-2');
-    expect(result!.coordinates).toEqual([[-4, 50], [-4.1, 50.1], [-4.2, 50.2]]);
-    expect(result!.timestamps).toEqual([
-      new Date('2024-01-14T08:00:00Z').getTime(),
-      new Date('2024-01-14T09:00:00Z').getTime(),
-      new Date('2024-01-14T10:00:00Z').getTime(),
-    ]);
-    expect(result!.timeExtent).toEqual([
-      new Date('2024-01-14T08:00:00Z').getTime(),
-      new Date('2024-01-14T10:00:00Z').getTime(),
-    ]);
-  });
-
-  it('returns null for invalid ISO 8601 strings', () => {
-    expect(extractTemporalData({
-      id: '1',
-      geometry: { type: 'LineString', coordinates: [[-4, 50], [-4.1, 50.1]] },
-      properties: { times: ['not-a-date', 'also-bad'] },
-    } as any)).toBeNull();
+    } as any)).toThrow('non-numeric times');
   });
 });

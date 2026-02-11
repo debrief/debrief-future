@@ -255,17 +255,19 @@ export class StacService {
             if (geom.type === 'LineString') {
               trackCount++;
 
-              // Update time extent from track times
+              // Update time extent from track times (epoch ms)
               const props = feature.properties ?? {};
-              const times = props.times as string[] | undefined;
+              const times = props.times as number[] | undefined;
               if (times && times.length > 0) {
-                const firstTime = times[0];
-                const lastTime = times[times.length - 1];
-                if (firstTime && new Date(firstTime) < new Date(timeExtent[0])) {
-                  timeExtent[0] = firstTime;
+                const firstTime = times[0]!;
+                const lastTime = times[times.length - 1]!;
+                const firstIso = new Date(firstTime).toISOString();
+                const lastIso = new Date(lastTime).toISOString();
+                if (firstIso < timeExtent[0]) {
+                  timeExtent[0] = firstIso;
                 }
-                if (lastTime && new Date(lastTime) > new Date(timeExtent[1])) {
-                  timeExtent[1] = lastTime;
+                if (lastIso > timeExtent[1]) {
+                  timeExtent[1] = lastIso;
                 }
               }
             } else if (geom.type === 'Point') {
@@ -343,8 +345,8 @@ export class StacService {
         }
 
         if (geom.type === 'LineString' && props.times) {
-          // Track: LineString with times array
-          const times = (props.times as string[]) ?? [];
+          // Track: LineString with times array (epoch ms)
+          const times = (props.times as number[]) ?? [];
           const lineCoords = geom.coordinates as number[][];
 
           tracks.push({
@@ -353,9 +355,9 @@ export class StacService {
             platformType: (props.track_type as string) ?? (props.platformType as string) ?? undefined,
             geometry: { type: 'LineString' as const, coordinates: lineCoords },
             times,
-            positions: (props.positions as Track['positions']) ?? times.map(t => ({ time: t })),
-            startTime: times[0] ?? '',
-            endTime: times[times.length - 1] ?? '',
+            positions: (props.positions as Track['positions']) ?? times.map(t => ({ time: new Date(t).toISOString() })),
+            startTime: times[0] ? new Date(times[0]).toISOString() : '',
+            endTime: times[times.length - 1] ? new Date(times[times.length - 1]!).toISOString() : '',
             color: props.color as string | undefined,
             visible: true,
             selected: false,
@@ -953,12 +955,12 @@ export class StacService {
 
     for (const feature of fc.features) {
       const props = feature.properties ?? {};
-      const times = props.times as string[] | undefined;
+      const times = props.times as number[] | undefined;
       if (times && times.length > 0) {
-        const first = times[0];
-        const last = times[times.length - 1];
-        if (first && (!earliest || first < earliest)) {earliest = first;}
-        if (last && (!latest || last > latest)) {latest = last;}
+        const first = new Date(times[0]!).toISOString();
+        const last = new Date(times[times.length - 1]!).toISOString();
+        if (!earliest || first < earliest) {earliest = first;}
+        if (!latest || last > latest) {latest = last;}
       }
     }
 

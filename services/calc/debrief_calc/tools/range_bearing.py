@@ -47,8 +47,8 @@ def _extract_coords(feature: dict[str, Any]) -> list[list[float]]:
     return coords
 
 
-def _extract_times(feature: dict[str, Any]) -> list[str] | None:
-    """Extract ISO time strings from properties.times."""
+def _extract_times(feature: dict[str, Any]) -> list[int] | None:
+    """Extract epoch ms timestamps from properties.times."""
     props = feature.get("properties", {}) or {}
     times = props.get("times")
     if isinstance(times, list) and len(times) > 0:

@@ -160,8 +160,8 @@ class TrackBuilder:
         # Build coordinates array [lon, lat]
         coordinates = [[p.lon, p.lat] for p in self.positions]
 
-        # Build times array (ISO strings, parallel to coordinates)
-        times = [p.timestamp.isoformat() for p in self.positions]
+        # Build times array (epoch ms, parallel to coordinates)
+        times = [int(p.timestamp.timestamp() * 1000) for p in self.positions]
 
         # Build positions array with temporal/kinematic metadata only
         # Coordinates are NOT included - they live in geometry.coordinates[i]

@@ -49,7 +49,7 @@ function trackToFeature(track: Track, customColor?: string): DebriefFeature {
       platform_type: track.platformType,
       start_time: track.startTime,
       end_time: track.endTime,
-      times: track.times.map(t => new Date(t).getTime()),
+      times: track.times,
       positions: track.positions ?? track.times.map(t => ({ time: t })),
       default_position_style: track.defaultPositionStyle,
       symbol_interval: track.symbolInterval,

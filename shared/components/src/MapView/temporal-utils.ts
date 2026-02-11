@@ -103,24 +103,28 @@ export function extractTemporalData(
   if (feature.geometry.type !== 'LineString') return null;
 
   const coordinates = feature.geometry.coordinates as unknown as [number, number][];
-  const rawTimes = (feature.properties as unknown as Record<string, unknown>).times as unknown[] | undefined;
+  const times = (feature.properties as unknown as Record<string, unknown>).times as unknown[] | undefined;
 
-  if (!rawTimes || !Array.isArray(rawTimes) || rawTimes.length === 0) return null;
+  if (!times || !Array.isArray(times) || times.length === 0) return null;
 
-  // Accept both epoch ms (number) and ISO 8601 strings
-  let timestamps: number[];
-  if (typeof rawTimes[0] === 'number') {
-    timestamps = rawTimes as number[];
-  } else if (typeof rawTimes[0] === 'string') {
-    timestamps = (rawTimes as string[]).map(t => new Date(t).getTime());
-    if (timestamps.some(t => isNaN(t))) return null;
-  } else {
-    return null;
+  // times must be epoch ms numbers — fail fast on wrong format (Constitution XIV.4)
+  if (typeof times[0] !== 'number') {
+    throw new Error(
+      `[temporal-utils] Feature "${String(feature.id)}" has non-numeric times ` +
+      `(got ${typeof times[0]}). times[] must contain epoch ms numbers. ` +
+      `Fix the data source, do not add format conversion here.`
+    );
   }
+  const timestamps = times as number[];
 
   if (coordinates.length === 0) return null;
   // times and coordinates must match in length
-  if (timestamps.length !== coordinates.length) return null;
+  if (timestamps.length !== coordinates.length) {
+    throw new Error(
+      `[temporal-utils] Feature "${String(feature.id)}" has mismatched arrays: ` +
+      `${timestamps.length} times vs ${coordinates.length} coordinates. These must be parallel arrays.`
+    );
+  }
 
   const first = timestamps[0]!;
   const last = timestamps[timestamps.length - 1]!;

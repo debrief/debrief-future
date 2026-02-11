@@ -40,7 +40,7 @@ def multi_track_context():
         "properties": {
             "kind": "TRACK",
             "name": "Alpha",
-            "times": ["2024-01-15T08:00:00Z", "2024-01-15T09:00:00Z"],
+            "times": [1705305600000, 1705309200000],
         },
         "geometry": {
             "type": "LineString",
@@ -53,7 +53,7 @@ def multi_track_context():
         "properties": {
             "kind": "TRACK",
             "name": "Bravo",
-            "times": ["2024-01-15T08:00:00Z", "2024-01-15T09:00:00Z"],
+            "times": [1705305600000, 1705309200000],
         },
         "geometry": {
             "type": "LineString",

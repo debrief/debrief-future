@@ -172,6 +172,7 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 1. **Breaking changes permitted** — no backwards compatibility obligations to pre-release versions.
 2. **Schema evolution expected** — the data model will change as we learn.
 3. **Deprecation rules suspended** — features may be added and removed without deprecation periods.
+4. **Strict on import, fail fast** — do not write forgiving parsers or accept multiple input formats. Validate inputs strictly and throw errors immediately when data does not match the expected format. Lenient import code pushes complexity downstream and masks data issues that should be fixed at the source. Fix the data, not the consumer.
 
 **Trigger point:** Upon release of v4.0.0, Articles II (schema versioning), VIII (changelog), and XIII (contribution standards) become strictly enforced for all subsequent releases.
 

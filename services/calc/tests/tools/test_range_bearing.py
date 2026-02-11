@@ -128,10 +128,10 @@ class TestRangeBearingTrackTrack:
         for entry in wrapper["entries"]:
             assert entry["range_nm"] >= 0
 
-    def test_times_are_iso_strings(self, multi_track_context):
+    def test_times_are_epoch_ms(self, multi_track_context):
         wrapper = range_bearing(multi_track_context, {})[0]
         for entry in wrapper["entries"]:
-            assert entry["time"].endswith("Z")
+            assert isinstance(entry["time"], int)
 
 
 class TestRangeBearingTrackPoint:
@@ -139,7 +139,7 @@ class TestRangeBearingTrackPoint:
 
     def test_track_point_series(self):
         track = _make_track(
-            "T1", [[-5.0, 50.0], [-4.0, 50.0]], ["2024-01-01T00:00:00Z", "2024-01-01T01:00:00Z"]
+            "T1", [[-5.0, 50.0], [-4.0, 50.0]], [1704067200000, 1704070800000]
         )
         point = _make_point("P1", -4.5, 50.5)
         ctx = SelectionContext(type=ContextType.MULTI, features=[track, point])
@@ -154,7 +154,7 @@ class TestRangeBearingTrackPoint:
         """Point first, track second — still produces series."""
         point = _make_point("P1", -4.5, 50.5)
         track = _make_track(
-            "T1", [[-5.0, 50.0], [-4.0, 50.0]], ["2024-01-01T00:00:00Z", "2024-01-01T01:00:00Z"]
+            "T1", [[-5.0, 50.0], [-4.0, 50.0]], [1704067200000, 1704070800000]
         )
         ctx = SelectionContext(type=ContextType.MULTI, features=[point, track])
         results = range_bearing(ctx, {})
@@ -167,7 +167,7 @@ class TestRangeBearingTrackPolygon:
 
     def test_track_polygon_series(self):
         track = _make_track(
-            "T1", [[-5.0, 50.0], [-4.0, 50.0]], ["2024-01-01T00:00:00Z", "2024-01-01T01:00:00Z"]
+            "T1", [[-5.0, 50.0], [-4.0, 50.0]], [1704067200000, 1704070800000]
         )
         ring = [[-3.0, 49.0], [-2.0, 49.0], [-2.0, 50.0], [-3.0, 50.0], [-3.0, 49.0]]
         poly = _make_polygon("Zone", ring)
@@ -197,13 +197,13 @@ class TestRangeBearingEdgeCases:
         feature1 = {
             "type": "Feature",
             "id": "track-1",
-            "properties": {"kind": "TRACK", "times": ["2024-01-01T00:00:00Z"]},
+            "properties": {"kind": "TRACK", "times": [1704067200000]},
             "geometry": {"type": "LineString", "coordinates": []},
         }
         feature2 = {
             "type": "Feature",
             "id": "track-2",
-            "properties": {"kind": "TRACK", "times": ["2024-01-01T00:00:00Z"]},
+            "properties": {"kind": "TRACK", "times": [1704067200000]},
             "geometry": {"type": "LineString", "coordinates": [[-4.0, 50.0]]},
         }
         context = SelectionContext(type=ContextType.MULTI, features=[feature1, feature2])
