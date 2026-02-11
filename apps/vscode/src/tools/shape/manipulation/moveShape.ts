@@ -93,7 +93,7 @@ function translateCoordinate(
   bearingDeg: number,
   distanceKm: number,
 ): number[] {
-  const [newLat, newLon] = translatePoint(coord[1], coord[0], bearingDeg, distanceKm);
+  const [newLat, newLon] = translatePoint(coord[1]!, coord[0]!, bearingDeg, distanceKm);
   return [newLon, newLat];
 }
 
