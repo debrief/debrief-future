@@ -66,6 +66,11 @@ import {
   execute as executeSymbolInterval,
 } from '../../../vscode/src/tools/track/styling/symbolInterval';
 
+import {
+  toolDefinition as moveShapeDef,
+  execute as executeMoveShape,
+} from '../tools/shape/manipulation/moveShape';
+
 // Re-export types for consumers
 export type { MCPToolDefinition, MCPToolResponse, MCPContentItem, DebriefAnnotations };
 
@@ -131,6 +136,13 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
     {
       definition: symbolIntervalDef,
       execute: executeSymbolInterval,
+    },
+  ],
+  [
+    moveShapeDef.name,
+    {
+      definition: moveShapeDef,
+      execute: executeMoveShape,
     },
   ],
 ]);

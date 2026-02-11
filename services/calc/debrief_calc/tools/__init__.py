@@ -17,10 +17,12 @@ Built-in tools:
 # Import tools to trigger registration via @tool decorator
 from debrief_calc.tools import area_summary, range_bearing, track_stats
 from debrief_calc.tools.track import styling
+from debrief_calc.tools.shape import manipulation
 
 __all__ = [
     "track_stats",
     "range_bearing",
     "area_summary",
     "styling",
+    "manipulation",
 ]

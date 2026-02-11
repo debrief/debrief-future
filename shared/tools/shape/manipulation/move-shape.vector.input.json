@@ -1,0 +1,33 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "vector-001",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [0.0, 50.0],
+          [0.11890594010469613, 50.07624928838983]
+        ]
+      },
+      "properties": {
+        "kind": "VECTOR",
+        "origin": [0.0, 50.0],
+        "range": 12000,
+        "bearing": 45,
+        "label": "Search Vector",
+        "style": {
+          "stroke": true,
+          "color": "#00FF00",
+          "weight": 2,
+          "opacity": 1.0
+        }
+      }
+    }
+  ],
+  "parameters": {
+    "direction": 0,
+    "distance_km": 10
+  }
+}
