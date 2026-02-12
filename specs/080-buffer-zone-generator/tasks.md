@@ -46,11 +46,11 @@
 
 **Purpose**: Create directory structure and package scaffolding
 
-- [ ] T001 Create tool directory structure `services/calc/debrief_calc/tools/sensor/__init__.py`
-- [ ] T002 [P] Create detection subdirectory `services/calc/debrief_calc/tools/sensor/detection/__init__.py`
-- [ ] T003 [P] Create test directory structure `services/calc/tests/tools/sensor/__init__.py`
-- [ ] T004 [P] Create test detection subdirectory `services/calc/tests/tools/sensor/detection/__init__.py`
-- [ ] T005 [P] Create tool spec directory `shared/tools/sensor/detection/`
+- [x] T001 Create tool directory structure `services/calc/debrief_calc/tools/sensor/__init__.py`
+- [x] T002 [P] Create detection subdirectory `services/calc/debrief_calc/tools/sensor/detection/__init__.py`
+- [x] T003 [P] Create test directory structure `services/calc/tests/tools/sensor/__init__.py`
+- [x] T004 [P] Create test detection subdirectory `services/calc/tests/tools/sensor/detection/__init__.py`
+- [x] T005 [P] Create tool spec directory `shared/tools/sensor/detection/`
 
 ---
 
@@ -60,13 +60,13 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T006 [test] Write sensor model interface tests `services/calc/tests/tools/sensor/detection/test_sensor_model.py`
-- [ ] T007 Implement SensorModel Protocol and SensorModelZone dataclass `services/calc/debrief_calc/tools/sensor/detection/sensor_model.py`
-- [ ] T008 Implement StubSensorModel returning 3nm/75%, 6nm/50%, 12nm/25% `services/calc/debrief_calc/tools/sensor/detection/sensor_model.py`
-- [ ] T009 [test] Write Vincenty offset helper tests (reuse move-shape math patterns) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T010 Implement translate_point helper (Vincenty destination formula with nm→km conversion) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T011 [test] Write convex hull algorithm tests `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T012 Implement convex_hull function (Graham scan or gift wrapping, stdlib math only) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T006 [test] Write sensor model interface tests `services/calc/tests/tools/sensor/detection/test_sensor_model.py`
+- [x] T007 Implement SensorModel Protocol and SensorModelZone dataclass `services/calc/debrief_calc/tools/sensor/detection/sensor_model.py`
+- [x] T008 Implement StubSensorModel returning 3nm/75%, 6nm/50%, 12nm/25% `services/calc/debrief_calc/tools/sensor/detection/sensor_model.py`
+- [x] T009 [test] Write Vincenty offset helper tests (reuse move-shape math patterns) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T010 Implement translate_point helper (Vincenty destination formula with nm→km conversion) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T011 [test] Write convex hull algorithm tests `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T012 Implement convex_hull function (Graham scan or gift wrapping, stdlib math only) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
 
 **Checkpoint**: Foundation ready — sensor model, point offset, and polygon construction all tested
 
@@ -82,23 +82,23 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T013 [test] [US1] Test 3 zones generated with default distances `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T014 [P][test] [US1] Test zone properties (kind=ZONE, name, likelihood_pct, distance_nm) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T015 [P][test] [US1] Test zones ordered innermost to outermost `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T016 [P][test] [US1] Test each zone fully encloses track (point-in-polygon validation) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T017 [P][test] [US1] Test concentric containment (inner zone within outer zone) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T018 [P][test] [US1] Test error on empty input `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T019 [P][test] [US1] Test error on no TRACK features `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T020 [P][test] [US1] Test non-track features silently skipped `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T021 [P][test] [US1] Test single-point track produces circular zones `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T013 [test] [US1] Test 3 zones generated with default distances `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T014 [P][test] [US1] Test zone properties (kind=ZONE, name, likelihood_pct, distance_nm) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T015 [P][test] [US1] Test zones ordered innermost to outermost `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T016 [P][test] [US1] Test each zone fully encloses track (point-in-polygon validation) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T017 [P][test] [US1] Test concentric containment (inner zone within outer zone) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T018 [P][test] [US1] Test error on empty input `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T019 [P][test] [US1] Test error on no TRACK features `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T020 [P][test] [US1] Test non-track features silently skipped `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T021 [P][test] [US1] Test single-point track produces circular zones `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
 
 ### Implementation for User Story 1
 
-- [ ] T022 [US1] Implement generate_buffer_polygon function (offset vertices + convex hull) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T023 [US1] Implement @tool decorated buffer_zone_generator handler with ContextType.SINGLE `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T024 [US1] Wire input validation (empty input, no tracks, distance validation) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T025 [US1] Wire result builder (build_addition with result_subtype="feature") `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T026 [US1] Verify all US1 tests pass `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T022 [US1] Implement generate_buffer_polygon function (offset vertices + convex hull) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T023 [US1] Implement @tool decorated buffer_zone_generator handler with ContextType.SINGLE `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T024 [US1] Wire input validation (empty input, no tracks, distance validation) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T025 [US1] Wire result builder (build_addition with result_subtype="feature") `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T026 [US1] Verify all US1 tests pass `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
 
 **Checkpoint**: Core zone generation works with defaults — MVP complete
 
@@ -112,17 +112,17 @@
 
 ### Tests for User Story 2
 
-- [ ] T027 [test] [US2] Test custom distances produce zones at specified ranges `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T028 [P][test] [US2] Test non-ascending distances are reordered `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T029 [P][test] [US2] Test error on zero distance `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T030 [P][test] [US2] Test error on negative distance `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T027 [test] [US2] Test custom distances produce zones at specified ranges `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T028 [P][test] [US2] Test non-ascending distances are reordered `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T029 [P][test] [US2] Test error on zero distance `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T030 [P][test] [US2] Test error on negative distance `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
 
 ### Implementation for User Story 2
 
-- [ ] T031 [US2] Add distance_1_nm, distance_2_nm, distance_3_nm ToolParameters to @tool decorator `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T032 [US2] Implement parameter extraction with defaults and distance sorting `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T033 [US2] Add distance validation (positive values only) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T034 [US2] Verify all US2 tests pass `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T031 [US2] Add distance_1_nm, distance_2_nm, distance_3_nm ToolParameters to @tool decorator `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T032 [US2] Implement parameter extraction with defaults and distance sorting `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T033 [US2] Add distance validation (positive values only) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T034 [US2] Verify all US2 tests pass `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
 
 **Checkpoint**: Custom distances work — US1 + US2 both functional
 
@@ -136,15 +136,15 @@
 
 ### Tests for User Story 3
 
-- [ ] T035 [test] [US3] Test stateless re-invocation (different tracks produce different zones) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T036 [P][test] [US3] Test provenance annotations (debrief:resultType, debrief:sourceFeatures, debrief:label) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T037 [P][test] [US3] Test sensor model swappability (inject test double with different distances) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T035 [test] [US3] Test stateless re-invocation (different tracks produce different zones) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T036 [P][test] [US3] Test provenance annotations (debrief:resultType, debrief:sourceFeatures, debrief:label) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T037 [P][test] [US3] Test sensor model swappability (inject test double with different distances) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
 
 ### Implementation for User Story 3
 
-- [ ] T038 [US3] Verify stateless behaviour (no instance state, no side effects) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T039 [US3] Verify provenance label format: "Generated 3 detection zones (75%, 50%, 25%) for track" `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T040 [US3] Verify all US3 tests pass `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T038 [US3] Verify stateless behaviour (no instance state, no side effects) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T039 [US3] Verify provenance label format: "Generated 3 detection zones (75%, 50%, 25%) for track" `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T040 [US3] Verify all US3 tests pass `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
 
 **Checkpoint**: All user stories complete — tool is cascade-ready
 
@@ -154,14 +154,14 @@
 
 **Purpose**: Handle remaining edge cases and create the 9-section tool specification document
 
-- [ ] T041 [test] Test antimeridian-crossing track `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T042 [P][test] Test track with very close positions (sub-metre) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T043 [P][test] Test two-point track (line segment) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
-- [ ] T044 Implement antimeridian longitude normalisation `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T045 Write 9-section tool specification `shared/tools/sensor/detection/buffer-zone-generator.1.0.md`
-- [ ] T046 Create golden example input fixture `shared/tools/sensor/detection/buffer-zone-generator.basic-track.input.json`
-- [ ] T047 [P] Create golden example output fixture `shared/tools/sensor/detection/buffer-zone-generator.basic-track.output.json`
-- [ ] T048 Verify all tests pass (full suite) `services/calc/tests/tools/sensor/detection/`
+- [x] T041 [test] Test antimeridian-crossing track `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T042 [P][test] Test track with very close positions (sub-metre) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T043 [P][test] Test two-point track (line segment) `services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py`
+- [x] T044 Implement antimeridian longitude normalisation `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T045 Write 9-section tool specification `shared/tools/sensor/detection/buffer-zone-generator.1.0.md`
+- [x] T046 Create golden example input fixture `shared/tools/sensor/detection/buffer-zone-generator.basic-track.input.json`
+- [x] T047 [P] Create golden example output fixture `shared/tools/sensor/detection/buffer-zone-generator.basic-track.output.json`
+- [x] T048 Verify all tests pass (full suite) `services/calc/tests/tools/sensor/detection/`
 
 **Checkpoint**: All edge cases handled, tool spec and golden examples complete
 
