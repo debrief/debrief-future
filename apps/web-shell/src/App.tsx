@@ -93,7 +93,7 @@ export default function App() {
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
   const [resultLayers, setResultLayers] = useState<Feature[]>([]);
   /** Maps activityId → original feature snapshots so revert can restore them */
-  const [activitySnapshots, setActivitySnapshots] = useState<
+  const [, setActivitySnapshots] = useState<
     Record<string, Feature[]>
   >({});
   const [toolMessage, setToolMessage] = useState<string | null>(null);
