@@ -245,10 +245,83 @@ export default function App() {
     } else if (message.type === 'entry:deselect') {
       store.getState().clearSelection();
     } else if (message.type === 'action:invoke') {
-      setLogNotification(`Action "${message.payload.actionType}" is not yet available.`);
-      setTimeout(() => setLogNotification(null), 3000);
+      const { actionType, activityId } = message.payload;
+      if (actionType === 'tune') {
+        // Tune is handled inline via onTuneRequest — prompt user
+        setLogNotification('Click a tunable parameter value to edit it.');
+        setTimeout(() => setLogNotification(null), 3000);
+      } else if (actionType === 'revertTo') {
+        // Remove all entries after the target
+        setLogEntries(prev => {
+          const idx = prev.findIndex(e => e.activityId === activityId);
+          if (idx < 0) return prev;
+          // Entries are most-recent-first, so keep idx..end (target + older)
+          return prev.slice(idx);
+        });
+        setLogNotification('Reverted. Operations after the selected point removed.');
+        setTimeout(() => setLogNotification(null), 3000);
+      } else if (actionType === 'revertThis') {
+        // Mark entry as deleted
+        setLogEntries(prev =>
+          prev.map(e =>
+            e.activityId === activityId ? { ...e, deleted: true } : e
+          )
+        );
+        setLogNotification('Operation removed.');
+        setTimeout(() => setLogNotification(null), 3000);
+      } else {
+        setLogNotification(`Action "${actionType}" is not yet available.`);
+        setTimeout(() => setLogNotification(null), 3000);
+      }
     }
   }, [store]);
+
+  // Phase 6: Handle tune request from inline parameter click
+  const handleTuneRequest = useCallback(
+    (activityId: string, parameter: string, currentValue: unknown) => {
+      // Prompt for new value (simple approach for web-shell demo)
+      const input = window.prompt(
+        `Tune "${parameter}" (current: ${String(currentValue)}):`,
+        String(currentValue)
+      );
+      if (input === null) return; // cancelled
+
+      // Coerce to number if the current value is numeric
+      const newValue = typeof currentValue === 'number' ? Number(input) : input;
+
+      setLogEntries(prev =>
+        prev.map(e => {
+          if (e.activityId !== activityId) return e;
+          const updatedParams = { ...e.parameters };
+          if (updatedParams[parameter]) {
+            updatedParams[parameter] = {
+              ...updatedParams[parameter],
+              value: newValue,
+            };
+          }
+          return {
+            ...e,
+            parameters: updatedParams,
+            tuneAnnotation: { parameter, previousValue: currentValue, newValue },
+          };
+        })
+      );
+      setLogNotification(`Tuned "${parameter}" to ${String(newValue)}.`);
+      setTimeout(() => setLogNotification(null), 3000);
+    },
+    []
+  );
+
+  // Phase 6: Handle restore request for deleted entries
+  const handleRestoreRequest = useCallback((activityId: string) => {
+    setLogEntries(prev =>
+      prev.map(e =>
+        e.activityId === activityId ? { ...e, deleted: false } : e
+      )
+    );
+    setLogNotification('Operation restored.');
+    setTimeout(() => setLogNotification(null), 3000);
+  }, []);
 
   // Handle map feature selection (goes through session-state)
   const handleMapSelect = useCallback((featureId: string, event: React.MouseEvent) => {
@@ -477,6 +550,8 @@ export default function App() {
                 onViewModeChange={setLogViewMode}
                 onFilterStateChange={setLogFilterState}
                 onSelectedEntryChange={setLogSelectedEntryId}
+                onTuneRequest={handleTuneRequest}
+                onRestoreRequest={handleRestoreRequest}
               />
             )}
           </div>

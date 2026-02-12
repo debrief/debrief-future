@@ -15,6 +15,8 @@ export function LogTimeline({
   presentationMode,
   selectedEntryId,
   onEntryClick,
+  onTuneClick,
+  onRestoreClick,
   className,
 }: LogTimelineProps): React.ReactElement {
   return (
@@ -31,6 +33,8 @@ export function LogTimeline({
           presentationMode={presentationMode}
           isSelected={entry.activityId === selectedEntryId}
           onClick={onEntryClick}
+          onTuneClick={onTuneClick}
+          onRestoreClick={onRestoreClick}
         />
       ))}
     </div>

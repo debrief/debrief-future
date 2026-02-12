@@ -173,6 +173,8 @@ export interface LogTimelineProps {
   presentationMode: PresentationMode;
   selectedEntryId: string | null;
   onEntryClick?: (entry: TimelineEntry) => void;
+  onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
+  onRestoreClick?: (entry: TimelineEntry) => void;
   className?: string;
 }
 
@@ -185,6 +187,8 @@ export interface LogByFeatureProps {
   presentationMode: PresentationMode;
   selectedEntryId: string | null;
   onEntryClick?: (entry: TimelineEntry) => void;
+  onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
+  onRestoreClick?: (entry: TimelineEntry) => void;
   className?: string;
 }
 
