@@ -88,7 +88,7 @@ export function execute(
 
     const style = (props.style as TrackStyle) ?? {};
     const point: PointStyle = style.point ?? {
-      shape: 'circle', radius: 4, fill: true,
+      shape: 'square', radius: 4, fill: true,
       fill_color: '#3388ff', fill_opacity: 0.8,
       stroke: true, color: '#ffffff', weight: 1, opacity: 1.0,
     };
