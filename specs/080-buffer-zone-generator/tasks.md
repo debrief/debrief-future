@@ -173,17 +173,17 @@
 
 ### Evidence Collection
 
-- [ ] T049 Create evidence directory `specs/080-buffer-zone-generator/evidence/`
-- [ ] T050 Capture test summary with pass/fail counts and coverage `specs/080-buffer-zone-generator/evidence/test-summary.md`
-- [ ] T051 Create usage demonstration (Python code generating zones) `specs/080-buffer-zone-generator/evidence/usage-example.md`
-- [ ] T052 [P] Capture sample zone output as GeoJSON `specs/080-buffer-zone-generator/evidence/sample-output.json`
-- [ ] T053 [P] Capture golden example input `specs/080-buffer-zone-generator/evidence/golden-input.json`
-- [ ] T054 [P] Capture golden example output `specs/080-buffer-zone-generator/evidence/golden-output.json`
+- [x] T049 Create evidence directory `specs/080-buffer-zone-generator/evidence/`
+- [x] T050 Capture test summary with pass/fail counts and coverage `specs/080-buffer-zone-generator/evidence/test-summary.md`
+- [x] T051 Create usage demonstration (Python code generating zones) `specs/080-buffer-zone-generator/evidence/usage-example.md`
+- [x] T052 [P] Capture sample zone output as GeoJSON `specs/080-buffer-zone-generator/evidence/sample-output.json`
+- [x] T053 [P] Capture golden example input `specs/080-buffer-zone-generator/evidence/golden-input.json`
+- [x] T054 [P] Capture golden example output `specs/080-buffer-zone-generator/evidence/golden-output.json`
 
 ### Media Content
 
-- [ ] T055 Create shipped blog post `specs/080-buffer-zone-generator/media/shipped-post.md`
-- [ ] T056 [P] Create LinkedIn shipped summary `specs/080-buffer-zone-generator/media/linkedin-shipped.md`
+- [x] T055 Create shipped blog post `specs/080-buffer-zone-generator/media/shipped-post.md`
+- [x] T056 [P] Create LinkedIn shipped summary `specs/080-buffer-zone-generator/media/linkedin-shipped.md`
 
 ### PR Creation
 
