@@ -382,7 +382,7 @@ export default function App() {
       timestamp: new Date().toISOString(),
       toolName: toolId,
       toolVersion: '1.0.0',
-      parameters: {},
+      parameters: result.parameters ?? {},
       usedFeatureIds: usedIds,
       generatedFeatureIds: generatedIds,
       executionDuration: 'PT0.1S',
