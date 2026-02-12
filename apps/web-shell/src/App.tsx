@@ -92,6 +92,12 @@ export default function App() {
   const [view, setView] = useState<View>('welcome');
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
   const [resultLayers, setResultLayers] = useState<Feature[]>([]);
+  /** Feature IDs hidden because a tool replaced them (e.g. move-shape) */
+  const [hiddenFeatureIds, setHiddenFeatureIds] = useState<Set<string>>(new Set());
+  /** Maps activityId → result/hidden IDs so revert can undo them */
+  const [activityEffects, setActivityEffects] = useState<
+    Record<string, { resultIds: string[]; hiddenIds: string[] }>
+  >({});
   const [toolMessage, setToolMessage] = useState<string | null>(null);
   const [treeRefreshKey, setTreeRefreshKey] = useState(0);
 
@@ -120,10 +126,13 @@ export default function App() {
     return currentPlot.features.features as DebriefFeature[];
   }, [currentPlot]);
 
-  // All features including result layers
+  // All features including result layers, excluding hidden originals
   const allFeatures = useMemo<DebriefFeature[]>(() => {
-    return [...plotFeatures, ...resultLayers as DebriefFeature[]];
-  }, [plotFeatures, resultLayers]);
+    const visible = hiddenFeatureIds.size > 0
+      ? plotFeatures.filter(f => !hiddenFeatureIds.has(String(f.id)))
+      : plotFeatures;
+    return [...visible, ...resultLayers as DebriefFeature[]];
+  }, [plotFeatures, resultLayers, hiddenFeatureIds]);
 
   // Feature names map for LogPanel
   const featureNames = useMemo<Record<string, string>>(() => {
@@ -238,6 +247,35 @@ export default function App() {
     store.getState().clearSelection();
   }, [store]);
 
+  // Undo map effects for an activity (remove result layers, unhide originals)
+  const undoActivityEffect = useCallback((aid: string) => {
+    setActivityEffects(prev => {
+      const effects = prev[aid];
+      if (!effects) return prev;
+      // Remove generated result layers
+      if (effects.resultIds.length > 0) {
+        const idsToRemove = new Set(effects.resultIds);
+        setResultLayers(rl =>
+          rl.filter(f => {
+            const fid = (f.properties as Record<string, unknown> | null)?.id ?? f.id;
+            return !idsToRemove.has(String(fid));
+          })
+        );
+      }
+      // Unhide original features
+      if (effects.hiddenIds.length > 0) {
+        setHiddenFeatureIds(h => {
+          const next = new Set(h);
+          for (const id of effects.hiddenIds) next.delete(id);
+          return next;
+        });
+      }
+      // Remove the effects record
+      const { [aid]: _, ...rest } = prev;
+      return rest;
+    });
+  }, []);
+
   // Handle LogPanel messages
   const handleLogMessage = useCallback((message: LogPanelMessage) => {
     if (message.type === 'entry:select') {
@@ -251,17 +289,22 @@ export default function App() {
         setLogNotification('Click a tunable parameter value to edit it.');
         setTimeout(() => setLogNotification(null), 3000);
       } else if (actionType === 'revertTo') {
-        // Remove all entries after the target
+        // Remove all entries after the target and undo their map effects
         setLogEntries((prev: TimelineEntry[]) => {
           const idx = prev.findIndex((e: TimelineEntry) => e.activityId === activityId);
           if (idx < 0) return prev;
-          // Entries are most-recent-first, so keep idx..end (target + older)
+          // Entries before idx (most-recent-first) are the ones being removed
+          const removed = prev.slice(0, idx);
+          for (const r of removed) {
+            undoActivityEffect(r.activityId);
+          }
           return prev.slice(idx);
         });
         setLogNotification('Reverted. Operations after the selected point removed.');
         setTimeout(() => setLogNotification(null), 3000);
       } else if (actionType === 'revertThis') {
-        // Mark entry as deleted
+        // Mark entry as deleted and undo its map effects
+        undoActivityEffect(activityId);
         setLogEntries((prev: TimelineEntry[]) =>
           prev.map((e: TimelineEntry) =>
             e.activityId === activityId ? { ...e, deleted: true } : e
@@ -274,7 +317,7 @@ export default function App() {
         setTimeout(() => setLogNotification(null), 3000);
       }
     }
-  }, [store]);
+  }, [store, undoActivityEffect]);
 
   // Phase 6: Handle tune request from inline parameter click
   const handleTuneRequest = useCallback(
@@ -349,8 +392,23 @@ export default function App() {
     const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[]);
     setToolMessage(result.message);
 
+    // Track which original feature IDs this tool replaces (move-shape replaces originals)
+    const replacesOriginals = toolId === 'move-shape';
+    const hiddenIds: string[] = [];
+
     if (result.resultLayer) {
       setResultLayers(prev => [...prev, result.resultLayer!]);
+
+      // For tools that transform features in-place, hide the originals
+      if (replacesOriginals) {
+        const ids = selectedFeatures.map(f => String(f.id)).filter(Boolean);
+        hiddenIds.push(...ids);
+        setHiddenFeatureIds(prev => {
+          const next = new Set(prev);
+          for (const id of ids) next.add(id);
+          return next;
+        });
+      }
 
       // Persist result as a STAC asset in the current item's assets/ directory
       if (currentPlot) {
@@ -377,8 +435,10 @@ export default function App() {
       ? [String((result.resultLayer.properties as Record<string, unknown> | null)?.id ?? `result-${nextId}`)]
       : [];
 
+    const activityId = `act-${String(nextId).padStart(3, '0')}`;
+
     const entry: TimelineEntry = {
-      activityId: `act-${String(nextId).padStart(3, '0')}`,
+      activityId,
       timestamp: new Date().toISOString(),
       toolName: toolId,
       toolVersion: '1.0.0',
@@ -389,6 +449,14 @@ export default function App() {
       generatedResultId: generatedIds[0] ?? null,
       operationCategory: 'calculation',
     };
+
+    // Track effects so revert can undo them
+    if (generatedIds.length > 0 || hiddenIds.length > 0) {
+      setActivityEffects(prev => ({
+        ...prev,
+        [activityId]: { resultIds: generatedIds, hiddenIds },
+      }));
+    }
 
     setLogEntries(prev => [entry, ...prev]);
   }, [selectedFeatures, activityCounter, currentPlot]);
