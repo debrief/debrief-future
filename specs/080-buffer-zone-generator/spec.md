@@ -17,8 +17,8 @@ An analyst has a track representing a vessel's predicted path (possibly offset v
 
 **Acceptance Scenarios**:
 
-1. **Given** a track feature (LineString geometry), **When** the analyst invokes buffer-zone-generator with default parameters, **Then** three new polygon features are returned representing high, medium, and low detection likelihood zones at increasing distances from the track.
-2. **Given** a track feature, **When** the tool completes, **Then** each returned polygon fully encloses the track at its specified buffer distance, and each polygon's properties include a detection likelihood value and a human-readable zone label.
+1. **Given** a track feature (LineString geometry), **When** the analyst invokes buffer-zone-generator with default parameters, **Then** three new polygon features are returned at 3 nm, 6 nm, and 12 nm from the track, named "75%", "50%", and "25%" respectively.
+2. **Given** a track feature, **When** the tool completes, **Then** each returned polygon fully encloses the track at its specified buffer distance, and each polygon's properties include a detection likelihood percentage and the polygon is named with that percentage.
 3. **Given** a track feature, **When** the tool completes, **Then** the result includes provenance annotations linking each zone back to the source track feature.
 
 ---
@@ -33,7 +33,7 @@ An analyst wants to explore different detection scenarios by adjusting the three
 
 **Acceptance Scenarios**:
 
-1. **Given** a track feature and custom distances (e.g., 2 km, 8 km, 20 km), **When** the analyst invokes the tool with those distances, **Then** three zones are returned at exactly those distances.
+1. **Given** a track feature and custom distances (e.g., 2 nm, 8 nm, 15 nm), **When** the analyst invokes the tool with those distances, **Then** three zones are returned at exactly those distances.
 2. **Given** custom distances provided in non-ascending order, **When** the tool processes them, **Then** the returned zones are ordered from smallest to largest distance regardless of input order.
 
 ---
@@ -67,8 +67,8 @@ As part of the E03 reactive PROV cascade, when the analyst modifies the move-tra
 ### Functional Requirements
 
 - **FR-001**: System MUST accept a single track feature (with LineString geometry) as input and generate three buffer polygon features around it.
-- **FR-002**: System MUST use a sensor model interface to obtain the three buffer distances; the default (stub) sensor model returns hardcoded distances of 5 km, 10 km, and 20 km.
-- **FR-003**: Each generated polygon MUST be labelled with its detection likelihood: high (innermost zone, e.g., 90%), medium (middle zone, e.g., 60%), low (outermost zone, e.g., 30%).
+- **FR-002**: System MUST use a sensor model interface to obtain the three buffer distances; the default (stub) sensor model returns hardcoded distances of 3 nm, 6 nm, and 12 nm (nautical miles).
+- **FR-003**: Each generated polygon MUST be named with its detection likelihood percentage: "75%" (innermost zone at 3 nm), "50%" (middle zone at 6 nm), "25%" (outermost zone at 12 nm).
 - **FR-004**: System MUST allow the analyst to override the three buffer distances via tool parameters, bypassing the stub sensor model values.
 - **FR-005**: The sensor model interface MUST be designed as a swappable component — replacing the stub with a real sensor model should require no changes to the buffer generation logic.
 - **FR-006**: Each generated zone feature MUST include provenance annotations linking back to the source track feature (using `debrief:sourceFeatures`).
@@ -78,14 +78,14 @@ As part of the E03 reactive PROV cascade, when the analyst modifies the move-tra
 - **FR-010**: System MUST silently skip non-track features in the input and process only the first track feature found.
 - **FR-011**: System MUST return an error when any buffer distance is zero or negative.
 - **FR-012**: System MUST handle tracks that cross the antimeridian by correctly normalising longitudes in the generated polygons.
-- **FR-013**: The result type for each zone MUST be `addition/sensor/detection_zone`.
+- **FR-013**: The result type for each zone MUST be `addition/feature`.
 - **FR-014**: System MUST work entirely offline with no network dependencies.
 
 ### Key Entities
 
 - **Track Feature**: A GeoJSON Feature with LineString geometry representing a vessel's path. Contains position coordinates as `[longitude, latitude, altitude, timestamp_ms]` tuples. This is the input to the buffer zone generator.
-- **Detection Zone**: A GeoJSON Feature with Polygon geometry representing an area around a track at a specific buffer distance. Properties include the detection likelihood (percentage), zone label (high/medium/low), and the buffer distance used to generate it.
-- **Sensor Model**: An abstraction that provides detection-likelihood distances. The stub implementation returns three hardcoded values. The interface accepts a track and returns an ordered list of `{distance_km, likelihood, label}` entries.
+- **Detection Zone**: A GeoJSON Feature with Polygon geometry representing an area around a track at a specific buffer distance. Named with its detection likelihood percentage (e.g., "75%"). Properties include the detection likelihood percentage and the buffer distance in nautical miles.
+- **Sensor Model**: An abstraction that provides detection-likelihood distances. The stub implementation returns three hardcoded values. The interface accepts a track and returns an ordered list of `{distance_nm, likelihood_pct, name}` entries.
 
 ## Success Criteria *(mandatory)*
 
@@ -98,10 +98,19 @@ As part of the E03 reactive PROV cascade, when the analyst modifies the move-tra
 - **SC-005**: The tool handles tracks of 1 position (point), 2 positions (segment), and 1,000+ positions without errors or invalid geometry.
 - **SC-006**: Golden example input/output pairs pass validation, confirming the tool produces deterministic, reproducible results for known inputs.
 
+## Clarifications
+
+### Session 2026-02-12
+
+- Q: What detection likelihood percentages should the stub sensor model use? → A: 75%, 50%, 25%
+- Q: What buffer distances should the stub sensor model use? → A: 3 nm, 6 nm, 12 nm (nautical miles)
+- Q: What result type should the zones use? → A: `addition/feature`
+- Q: How should the zone polygons be named? → A: Each polygon named with its percentage (e.g., "75%", "50%", "25%")
+
 ## Assumptions
 
 - The input track feature follows the existing Debrief GeoJSON conventions with `kind: "TRACK"` and LineString geometry using `[lon, lat, altitude, timestamp_ms]` coordinate tuples.
-- The stub sensor model distances (5 km, 10 km, 20 km) and likelihoods (90%, 60%, 30%) are reasonable defaults for demonstration purposes.
+- The stub sensor model distances (3 nm, 6 nm, 12 nm) and likelihoods (75%, 50%, 25%) are the specified defaults for demonstration purposes. Distances are in nautical miles (1 nm = 1.852 km).
 - Buffer polygons are generated using great-circle offsetting of each track vertex at regular angular intervals (e.g., every 10 degrees) to approximate a tube around the track — the same Vincenty destination formula used by the move-shape tool.
 - Only the first track feature in the input is processed; if multiple tracks are present, subsequent ones are ignored (matching the `ContextType.SINGLE` pattern).
 - Detection zone polygons use the `ZONE` feature kind (or equivalent from the FeatureKindEnum).
