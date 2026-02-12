@@ -106,18 +106,15 @@ TRACK_FEATURE_B = {
 
 
 def _make_context(*features):
-    """Create a MULTI selection context from features.
+    """Create a selection context from features.
 
-    MULTI requires 2+ features. If only 1 is provided, duplicate it
-    with a different ID to satisfy the validator.
+    MULTI accepts 1+ features. Uses SINGLE for exactly 1 feature,
+    MULTI for 2+ features.
     """
     feature_list = list(features)
-    if len(feature_list) == 1:
-        dup = copy.deepcopy(feature_list[0])
-        dup["id"] = f"{dup.get('id', 'track')}-dup"
-        feature_list.append(dup)
+    ctx_type = ContextType.SINGLE if len(feature_list) == 1 else ContextType.MULTI
     return SelectionContext(
-        type=ContextType.MULTI,
+        type=ctx_type,
         features=feature_list,
     )
 

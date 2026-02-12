@@ -102,15 +102,15 @@ describe('applySymbolStyle (T032)', () => {
     );
   });
 
-  it('error for missing symbol: throws Error when symbol is not provided', () => {
+  it('default symbol: omitting symbol defaults to square', () => {
     const feature = makeTrackFeature();
+    // Remove existing point style so we can verify the default shape
+    delete feature.properties.style.point;
 
-    expect(() => execute([feature], {} as any)).toThrow(
-      'symbol must be one of:',
-    );
+    const result = execute([feature], {} as any);
 
-    expect(() => execute([feature], { symbol: '' } as any)).toThrow(
-      'symbol must be one of:',
-    );
+    expect(result).toHaveLength(1);
+    const point = result[0].properties.style.point;
+    expect(point.shape).toBe('square');
   });
 });

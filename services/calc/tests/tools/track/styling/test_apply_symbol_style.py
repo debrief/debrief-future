@@ -142,11 +142,15 @@ class TestApplySymbolStyle:
         with pytest.raises(ValueError, match="symbol must be one of"):
             apply_symbol_style(context, params)
 
-    def test_error_missing_symbol(self):
-        """No symbol param raises ValueError."""
+    def test_default_symbol(self):
+        """No symbol param defaults to square."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
         params = {}
 
-        with pytest.raises(ValueError, match="symbol must be one of"):
-            apply_symbol_style(context, params)
+        result = apply_symbol_style(context, params)
+
+        assert len(result) == 1
+        point = result[0]["properties"]["style"]["point"]
+        assert point["shape"] == "square"
+        assert point["radius"] == 4
