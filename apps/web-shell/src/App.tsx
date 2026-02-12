@@ -92,11 +92,9 @@ export default function App() {
   const [view, setView] = useState<View>('welcome');
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
   const [resultLayers, setResultLayers] = useState<Feature[]>([]);
-  /** Feature IDs hidden because a tool replaced them (e.g. move-shape) */
-  const [hiddenFeatureIds, setHiddenFeatureIds] = useState<Set<string>>(new Set());
-  /** Maps activityId → result/hidden IDs so revert can undo them */
-  const [activityEffects, setActivityEffects] = useState<
-    Record<string, { resultIds: string[]; hiddenIds: string[] }>
+  /** Maps activityId → original feature snapshots so revert can restore them */
+  const [activitySnapshots, setActivitySnapshots] = useState<
+    Record<string, Feature[]>
   >({});
   const [toolMessage, setToolMessage] = useState<string | null>(null);
   const [treeRefreshKey, setTreeRefreshKey] = useState(0);
@@ -126,13 +124,10 @@ export default function App() {
     return currentPlot.features.features as DebriefFeature[];
   }, [currentPlot]);
 
-  // All features including result layers, excluding hidden originals
+  // All features including result layers
   const allFeatures = useMemo<DebriefFeature[]>(() => {
-    const visible = hiddenFeatureIds.size > 0
-      ? plotFeatures.filter(f => !hiddenFeatureIds.has(String(f.id)))
-      : plotFeatures;
-    return [...visible, ...resultLayers as DebriefFeature[]];
-  }, [plotFeatures, resultLayers, hiddenFeatureIds]);
+    return [...plotFeatures, ...resultLayers as DebriefFeature[]];
+  }, [plotFeatures, resultLayers]);
 
   // Feature names map for LogPanel
   const featureNames = useMemo<Record<string, string>>(() => {
@@ -247,30 +242,23 @@ export default function App() {
     store.getState().clearSelection();
   }, [store]);
 
-  // Undo map effects for an activity (remove result layers, unhide originals)
-  const undoActivityEffect = useCallback((aid: string) => {
-    setActivityEffects(prev => {
-      const effects = prev[aid];
-      if (!effects) return prev;
-      // Remove generated result layers
-      if (effects.resultIds.length > 0) {
-        const idsToRemove = new Set(effects.resultIds);
-        setResultLayers(rl =>
-          rl.filter(f => {
-            const fid = (f.properties as Record<string, unknown> | null)?.id ?? f.id;
-            return !idsToRemove.has(String(fid));
-          })
+  // Restore original features for a reverted activity
+  const restoreSnapshots = useCallback((aid: string) => {
+    setActivitySnapshots(prev => {
+      const originals = prev[aid];
+      if (!originals || originals.length === 0) return prev;
+      // Swap moved features back to originals in currentPlot
+      const idMap = new Map(originals.map(f => [String(f.id), f]));
+      setCurrentPlot(plot => {
+        if (!plot) return plot;
+        const updatedFeatures = plot.features.features.map(f =>
+          idMap.has(String(f.id)) ? idMap.get(String(f.id))! : f
         );
-      }
-      // Unhide original features
-      if (effects.hiddenIds.length > 0) {
-        setHiddenFeatureIds(h => {
-          const next = new Set(h);
-          for (const id of effects.hiddenIds) next.delete(id);
-          return next;
-        });
-      }
-      // Remove the effects record
+        return {
+          ...plot,
+          features: { ...plot.features, features: updatedFeatures },
+        };
+      });
       const { [aid]: _, ...rest } = prev;
       return rest;
     });
@@ -289,22 +277,22 @@ export default function App() {
         setLogNotification('Click a tunable parameter value to edit it.');
         setTimeout(() => setLogNotification(null), 3000);
       } else if (actionType === 'revertTo') {
-        // Remove all entries after the target and undo their map effects
+        // Remove all entries after the target and restore their original features
         setLogEntries((prev: TimelineEntry[]) => {
           const idx = prev.findIndex((e: TimelineEntry) => e.activityId === activityId);
           if (idx < 0) return prev;
           // Entries before idx (most-recent-first) are the ones being removed
           const removed = prev.slice(0, idx);
           for (const r of removed) {
-            undoActivityEffect(r.activityId);
+            restoreSnapshots(r.activityId);
           }
           return prev.slice(idx);
         });
         setLogNotification('Reverted. Operations after the selected point removed.');
         setTimeout(() => setLogNotification(null), 3000);
       } else if (actionType === 'revertThis') {
-        // Mark entry as deleted and undo its map effects
-        undoActivityEffect(activityId);
+        // Mark entry as deleted and restore original features
+        restoreSnapshots(activityId);
         setLogEntries((prev: TimelineEntry[]) =>
           prev.map((e: TimelineEntry) =>
             e.activityId === activityId ? { ...e, deleted: true } : e
@@ -317,7 +305,7 @@ export default function App() {
         setTimeout(() => setLogNotification(null), 3000);
       }
     }
-  }, [store, undoActivityEffect]);
+  }, [store, restoreSnapshots]);
 
   // Phase 6: Handle tune request from inline parameter click
   const handleTuneRequest = useCallback(
@@ -392,23 +380,25 @@ export default function App() {
     const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[]);
     setToolMessage(result.message);
 
-    // Track which original feature IDs this tool replaces (move-shape replaces originals)
-    const replacesOriginals = toolId === 'move-shape';
-    const hiddenIds: string[] = [];
+    // Tools that transform features in-place (e.g. move-shape): replace in currentPlot
+    const replacesInPlace = toolId === 'move-shape';
 
-    if (result.resultLayer) {
+    if (result.resultLayer && replacesInPlace) {
+      // Replace the original feature in the plot with the moved version
+      const movedId = String(result.resultLayer.id);
+      setCurrentPlot(plot => {
+        if (!plot) return plot;
+        const updatedFeatures = plot.features.features.map(f =>
+          String(f.id) === movedId ? result.resultLayer! : f
+        );
+        return {
+          ...plot,
+          features: { ...plot.features, features: updatedFeatures },
+        };
+      });
+    } else if (result.resultLayer) {
+      // Additive tools (e.g. analysis): add result as a new layer
       setResultLayers(prev => [...prev, result.resultLayer!]);
-
-      // For tools that transform features in-place, hide the originals
-      if (replacesOriginals) {
-        const ids = selectedFeatures.map(f => String(f.id)).filter(Boolean);
-        hiddenIds.push(...ids);
-        setHiddenFeatureIds(prev => {
-          const next = new Set(prev);
-          for (const id of ids) next.add(id);
-          return next;
-        });
-      }
 
       // Persist result as a STAC asset in the current item's assets/ directory
       if (currentPlot) {
@@ -450,11 +440,14 @@ export default function App() {
       operationCategory: 'calculation',
     };
 
-    // Track effects so revert can undo them
-    if (generatedIds.length > 0 || hiddenIds.length > 0) {
-      setActivityEffects(prev => ({
+    // Snapshot originals so revert can restore them
+    if (replacesInPlace && selectedFeatures.length > 0) {
+      const originals = selectedFeatures.map(f =>
+        JSON.parse(JSON.stringify(f)) as Feature
+      );
+      setActivitySnapshots(prev => ({
         ...prev,
-        [activityId]: { resultIds: generatedIds, hiddenIds },
+        [activityId]: originals,
       }));
     }
 

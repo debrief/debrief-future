@@ -307,15 +307,6 @@ function moveShapeFeatures(
     if (!kind || !MOVE_SHAPE_KINDS.has(kind as string)) continue;
 
     const moved = JSON.parse(JSON.stringify(f)) as Feature;
-
-    // Assign a new unique ID so the moved copy is distinct from the original
-    const originalId = String(f.id ?? 'shape');
-    const newId = `${originalId}-moved`;
-    moved.id = newId;
-    if (moved.properties) {
-      (moved.properties as Record<string, unknown>).id = newId;
-    }
-
     const geom = moved.geometry;
     if (!geom || !('coordinates' in geom)) continue;
 
