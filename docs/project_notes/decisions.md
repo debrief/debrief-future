@@ -136,3 +136,32 @@ Each decision should include:
 - ✅ Result layers are first-class selectable features
 - ❌ New feature kinds must be added to tool requirements to be accepted
 - ❌ REGION tools inactive until region selection UX is built
+
+### ADR-006: Tool-Provided Undo via Inverse Slug (2026-02-12)
+
+**Context:**
+- Move-shape modifies a feature in-place; revert needs to restore the original
+- Current approach: orchestrator deep-copies entire features before each operation (activitySnapshots in App.tsx)
+- This scales badly — a track with 10,000 positions is ~1MB of JSON cloned every operation
+- The orchestrator also needs per-tool knowledge of which tools are "in-place" vs "additive" (`replacesInPlace` flag) — leaky abstraction
+
+**Decision:**
+- Tools provide their own undo capability via a lightweight metadata slug returned in the tool result
+- The orchestrator stores the slug in the log entry and calls `tool.undo(features, slug)` on revert
+- Three undo categories:
+  1. **Additive tools** (bounding-box, analysis): undo = remove `generatedFeatureIds`. No slug needed — the orchestrator handles this generically from existing log entry data
+  2. **Transform tools** (move-shape): undo = call `tool.undo(currentFeatures, slug)`. E.g. move 5nm @ 45° produces slug `{ distance_nm: 5, direction_deg: 225 }` — a few bytes, and the tool applies the inverse
+  3. **Non-undoable tools**: declare themselves as such
+
+**Alternatives Considered:**
+- Orchestrator snapshots (full feature deep-copy) → Rejected: O(n) storage per operation where n = feature size; orchestrator needs per-tool revert logic
+- Generic diff/patch (JSON Patch) → Rejected: still large for coordinate arrays, no semantic understanding of the operation
+- Event sourcing (replay from initial state) → Rejected: expensive for long operation chains, loses tuned intermediate states
+
+**Consequences:**
+- ✅ Minimal storage — inverse metadata is typically a few bytes (parameter negation)
+- ✅ Tools own their inverse logic — no leaky abstractions in the orchestrator
+- ✅ Orchestrator stays generic — stores slug, calls undo, no per-tool branching
+- ✅ Additive tools need no new code — existing `generatedFeatureIds` already sufficient
+- ❌ Each transform tool must implement an `undo` method
+- ❌ Not all transformations are cleanly invertible (e.g. lossy operations like snapping to grid)
