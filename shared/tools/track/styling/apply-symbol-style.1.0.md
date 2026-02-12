@@ -17,7 +17,7 @@ status: stable
 
 **Parameters**:
 - `features`: Track features to modify (GeoJSON FeatureCollection containing TrackFeature objects)
-- `symbol`: Optional marker shape to apply (circle, square, diamond, triangle, cross; default: "circle")
+- `symbol`: Optional marker shape to apply (circle, square, diamond, triangle, cross; default: "square")
 - `radius`: Optional marker radius in pixels (default: 4)
 - `fill_color`: Optional fill color for markers (CSS color string)
 
@@ -34,7 +34,7 @@ status: stable
 - Radius must be positive if provided
 
 **Defaults**:
-- `symbol`: "circle"
+- `symbol`: "square"
 - `radius`: 4
 - `fill_color`: Use existing fill_color or track line color
 
@@ -75,9 +75,9 @@ FUNCTION apply_symbol_style(features: FeatureCollection, symbol: string?, radius
         RETURN build_error("Input features required", "invalid_input", [])
     END IF
 
-    // Default symbol to "circle" if not provided
+    // Default symbol to "square" if not provided
     IF symbol IS NULL:
-        symbol = "circle"
+        symbol = "square"
     END IF
 
     valid_symbols = ["circle", "square", "diamond", "triangle", "cross"]
@@ -167,7 +167,7 @@ END FUNCTION
 | No track features in input | Return error response: "No track features found in input" |
 | Non-track features mixed in | Skip non-track features, process only tracks |
 | Feature with no style property | Initialize with default TrackStyle before applying symbol |
-| No symbol provided | Default to "circle" |
+| No symbol provided | Default to "square" |
 | Invalid symbol name | Return error response with list of valid symbols |
 | Negative radius | Return error response: "radius must be positive" |
 | Zero radius | Return error response: "radius must be positive" |

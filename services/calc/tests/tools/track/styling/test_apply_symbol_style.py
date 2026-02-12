@@ -143,7 +143,7 @@ class TestApplySymbolStyle:
             apply_symbol_style(context, params)
 
     def test_default_symbol(self):
-        """No symbol param defaults to circle."""
+        """No symbol param defaults to square."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
         params = {}
@@ -152,5 +152,5 @@ class TestApplySymbolStyle:
 
         assert len(result) == 1
         point = result[0]["properties"]["style"]["point"]
-        assert point["shape"] == "circle"
+        assert point["shape"] == "square"
         assert point["radius"] == 4

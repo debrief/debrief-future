@@ -24,7 +24,7 @@ export const toolDefinition: MCPToolDefinition = {
       params: {
         type: 'object',
         properties: {
-          symbol: { type: 'string', enum: [...VALID_SYMBOLS], default: 'circle' },
+          symbol: { type: 'string', enum: [...VALID_SYMBOLS], default: 'square' },
           radius: { type: 'number', default: 4 },
           fill_color: { type: 'string' },
         },
@@ -68,7 +68,7 @@ export function execute(
   params: ApplySymbolStyleParams,
 ): GeoJSONFeature[] {
   const { symbol: rawSymbol, radius = 4, fill_color } = params;
-  const symbol: SymbolType = rawSymbol || 'circle';
+  const symbol: SymbolType = rawSymbol || 'square';
 
   if (!VALID_SYMBOLS.includes(symbol)) {
     throw new Error(`symbol must be one of: ${VALID_SYMBOLS.join(', ')}`);

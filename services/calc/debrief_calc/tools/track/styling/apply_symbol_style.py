@@ -20,10 +20,10 @@ VALID_SYMBOLS = ("circle", "square", "diamond", "triangle", "cross")
         ToolParameter(
             name="symbol",
             type="enum",
-            description="Marker shape (default: circle)",
+            description="Marker shape (default: square)",
             required=False,
             choices=list(VALID_SYMBOLS),
-            default="circle",
+            default="square",
         ),
         ToolParameter(
             name="radius",
@@ -49,7 +49,7 @@ def apply_symbol_style(context: SelectionContext, params: dict[str, Any]) -> lis
     Returns:
         List of modified track features with updated symbol style
     """
-    symbol = params.get("symbol") or "circle"
+    symbol = params.get("symbol") or "square"
     if symbol not in VALID_SYMBOLS:
         raise ValueError(f"symbol must be one of: {', '.join(VALID_SYMBOLS)}")
 
