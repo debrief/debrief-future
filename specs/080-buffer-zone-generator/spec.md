@@ -80,6 +80,7 @@ As part of the E03 reactive PROV cascade, when the analyst modifies the move-tra
 - **FR-012**: System MUST handle tracks that cross the antimeridian by correctly normalising longitudes in the generated polygons.
 - **FR-013**: The result type for each zone MUST be `addition/feature`.
 - **FR-014**: System MUST work entirely offline with no network dependencies.
+- **FR-015**: The three zone polygons MUST be concentric (nested) — each polygon is a complete buffer around the track at its distance. The 75% zone (3 nm) is fully contained within the 50% zone (6 nm), which is fully contained within the 25% zone (12 nm).
 
 ### Key Entities
 
@@ -106,6 +107,7 @@ As part of the E03 reactive PROV cascade, when the analyst modifies the move-tra
 - Q: What buffer distances should the stub sensor model use? → A: 3 nm, 6 nm, 12 nm (nautical miles)
 - Q: What result type should the zones use? → A: `addition/feature`
 - Q: How should the zone polygons be named? → A: Each polygon named with its percentage (e.g., "75%", "50%", "25%")
+- Q: Should zones be concentric (nested) or rings (annular)? → A: Concentric (nested) — each polygon is a complete buffer; the 75% zone is fully contained within the 50% zone, which is fully contained within the 25% zone. Downstream classifier assigns the innermost zone.
 
 ## Assumptions
 
