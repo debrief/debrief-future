@@ -252,8 +252,8 @@ export default function App() {
         setTimeout(() => setLogNotification(null), 3000);
       } else if (actionType === 'revertTo') {
         // Remove all entries after the target
-        setLogEntries(prev => {
-          const idx = prev.findIndex(e => e.activityId === activityId);
+        setLogEntries((prev: TimelineEntry[]) => {
+          const idx = prev.findIndex((e: TimelineEntry) => e.activityId === activityId);
           if (idx < 0) return prev;
           // Entries are most-recent-first, so keep idx..end (target + older)
           return prev.slice(idx);
@@ -262,8 +262,8 @@ export default function App() {
         setTimeout(() => setLogNotification(null), 3000);
       } else if (actionType === 'revertThis') {
         // Mark entry as deleted
-        setLogEntries(prev =>
-          prev.map(e =>
+        setLogEntries((prev: TimelineEntry[]) =>
+          prev.map((e: TimelineEntry) =>
             e.activityId === activityId ? { ...e, deleted: true } : e
           )
         );
@@ -289,8 +289,8 @@ export default function App() {
       // Coerce to number if the current value is numeric
       const newValue = typeof currentValue === 'number' ? Number(input) : input;
 
-      setLogEntries(prev =>
-        prev.map(e => {
+      setLogEntries((prev: TimelineEntry[]) =>
+        prev.map((e: TimelineEntry) => {
           if (e.activityId !== activityId) return e;
           const updatedParams = { ...e.parameters };
           if (updatedParams[parameter]) {
@@ -314,8 +314,8 @@ export default function App() {
 
   // Phase 6: Handle restore request for deleted entries
   const handleRestoreRequest = useCallback((activityId: string) => {
-    setLogEntries(prev =>
-      prev.map(e =>
+    setLogEntries((prev: TimelineEntry[]) =>
+      prev.map((e: TimelineEntry) =>
         e.activityId === activityId ? { ...e, deleted: false } : e
       )
     );
