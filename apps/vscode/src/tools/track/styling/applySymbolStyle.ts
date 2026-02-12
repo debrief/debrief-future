@@ -9,7 +9,7 @@ const VALID_SYMBOLS = ['circle', 'square', 'diamond', 'triangle', 'cross'] as co
 type SymbolType = typeof VALID_SYMBOLS[number];
 
 export interface ApplySymbolStyleParams {
-  symbol: SymbolType;
+  symbol?: SymbolType;
   radius?: number;
   fill_color?: string;
 }
@@ -24,7 +24,7 @@ export const toolDefinition: MCPToolDefinition = {
       params: {
         type: 'object',
         properties: {
-          symbol: { type: 'string', enum: [...VALID_SYMBOLS] },
+          symbol: { type: 'string', enum: [...VALID_SYMBOLS], default: 'circle' },
           radius: { type: 'number', default: 4 },
           fill_color: { type: 'string' },
         },
@@ -67,9 +67,10 @@ export function execute(
   features: GeoJSONFeature[],
   params: ApplySymbolStyleParams,
 ): GeoJSONFeature[] {
-  const { symbol, radius = 4, fill_color } = params;
+  const { symbol: rawSymbol, radius = 4, fill_color } = params;
+  const symbol: SymbolType = rawSymbol || 'circle';
 
-  if (!symbol || !VALID_SYMBOLS.includes(symbol)) {
+  if (!VALID_SYMBOLS.includes(symbol)) {
     throw new Error(`symbol must be one of: ${VALID_SYMBOLS.join(', ')}`);
   }
 

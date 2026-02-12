@@ -17,7 +17,7 @@ status: stable
 
 **Parameters**:
 - `features`: Track features to modify (GeoJSON FeatureCollection containing TrackFeature objects)
-- `symbol`: Marker shape to apply (circle, square, diamond, triangle, cross)
+- `symbol`: Optional marker shape to apply (circle, square, diamond, triangle, cross; default: "circle")
 - `radius`: Optional marker radius in pixels (default: 4)
 - `fill_color`: Optional fill color for markers (CSS color string)
 
@@ -30,10 +30,11 @@ status: stable
 **Constraints**:
 - Features must have `properties.kind == "TRACK"`
 - At least one feature required
-- Symbol must be one of: circle, square, diamond, triangle, cross
+- Symbol must be one of: circle, square, diamond, triangle, cross (if provided)
 - Radius must be positive if provided
 
 **Defaults**:
+- `symbol`: "circle"
 - `radius`: 4
 - `fill_color`: Use existing fill_color or track line color
 
@@ -68,14 +69,19 @@ Tools return a **ToolResponse** containing one or more content items with Debrie
 ## Algorithm
 
 ```pseudocode
-FUNCTION apply_symbol_style(features: FeatureCollection, symbol: string, radius: float?, fill_color: string?) -> ToolResponse:
+FUNCTION apply_symbol_style(features: FeatureCollection, symbol: string?, radius: float?, fill_color: string?) -> ToolResponse:
     // Validate inputs
     IF features IS NULL OR features.features IS EMPTY:
         RETURN build_error("Input features required", "invalid_input", [])
     END IF
 
+    // Default symbol to "circle" if not provided
+    IF symbol IS NULL:
+        symbol = "circle"
+    END IF
+
     valid_symbols = ["circle", "square", "diamond", "triangle", "cross"]
-    IF symbol IS NULL OR symbol NOT IN valid_symbols:
+    IF symbol NOT IN valid_symbols:
         RETURN build_error("symbol must be one of: circle, square, diamond, triangle, cross", "invalid_input", [])
     END IF
 
@@ -161,6 +167,7 @@ END FUNCTION
 | No track features in input | Return error response: "No track features found in input" |
 | Non-track features mixed in | Skip non-track features, process only tracks |
 | Feature with no style property | Initialize with default TrackStyle before applying symbol |
+| No symbol provided | Default to "circle" |
 | Invalid symbol name | Return error response with list of valid symbols |
 | Negative radius | Return error response: "radius must be positive" |
 | Zero radius | Return error response: "radius must be positive" |

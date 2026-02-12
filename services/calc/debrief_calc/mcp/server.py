@@ -143,8 +143,8 @@ def create_server() -> Server:
                     raise ValueError(f"Tool requires exactly 1 feature, got {len(features)}")
                 context = SelectionContext(type=ContextType.SINGLE, features=features)
             elif tool.context_type == ContextType.MULTI:
-                if len(features) < 2:
-                    raise ValueError(f"Tool requires 2+ features, got {len(features)}")
+                if len(features) < 1:
+                    raise ValueError(f"Tool requires 1+ features, got {len(features)}")
                 context = SelectionContext(type=ContextType.MULTI, features=features)
             elif tool.context_type == ContextType.REGION:
                 if not bounds:

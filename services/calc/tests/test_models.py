@@ -354,6 +354,18 @@ class TestTool:
         assert tool.accepts_context(ContextType.SINGLE) is True
         assert tool.accepts_context(ContextType.MULTI) is False
 
+    def test_multi_tool_accepts_single_context(self):
+        tool = Tool(
+            name="test-multi",
+            description="Test multi",
+            input_kinds=["TRACK"],
+            output_kind="mutation/track/styled",
+            context_type=ContextType.MULTI,
+        )
+        assert tool.accepts_context(ContextType.MULTI) is True
+        assert tool.accepts_context(ContextType.SINGLE) is True
+        assert tool.accepts_context(ContextType.REGION) is False
+
     def test_to_metadata(self):
         tool = Tool(
             name="track-stats",
