@@ -375,6 +375,12 @@ class Tool(BaseModel):
 
     def accepts_context(self, context_type: ContextType) -> bool:
         """Check if this tool works with the given context type."""
+        # MULTI tools accept both SINGLE and MULTI contexts (1+ features)
+        if self.context_type == ContextType.MULTI and context_type in (
+            ContextType.SINGLE,
+            ContextType.MULTI,
+        ):
+            return True
         return self.context_type == context_type
 
     def to_metadata(self) -> dict[str, Any]:

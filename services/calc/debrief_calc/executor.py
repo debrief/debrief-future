@@ -151,6 +151,12 @@ def run(
 
 def _validate_context_type(tool: Tool, context: SelectionContext) -> None:
     """Validate that context type matches tool requirements."""
+    # MULTI tools accept both SINGLE and MULTI contexts (1+ features)
+    if tool.context_type == ContextType.MULTI and context.type in (
+        ContextType.SINGLE,
+        ContextType.MULTI,
+    ):
+        return
     if tool.context_type != context.type:
         raise InvalidContextError(tool.name, tool.context_type.value, context.type.value)
 
