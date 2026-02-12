@@ -1,20 +1,16 @@
 """Tests for the buffer-zone-generator tool."""
 
 import copy
-import math
 
 import pytest
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.sensor.detection.buffer_zone_generator import (
     buffer_zone_generator,
     convex_hull,
-    generate_buffer_polygon,
     translate_point,
 )
 from debrief_calc.tools.sensor.detection.sensor_model import (
-    SensorModel,
     SensorModelZone,
-    StubSensorModel,
 )
 
 # ============================================================
@@ -496,7 +492,6 @@ class TestBufferZoneGeneratorUS3:
         track = copy.deepcopy(SIMPLE_TRACK)
         context = SelectionContext(type=ContextType.SINGLE, features=[track])
 
-        result_stub = buffer_zone_generator(context, {})
         result_custom = buffer_zone_generator(context, {}, sensor_model=TestSensorModel())
 
         # Custom model should produce different distances

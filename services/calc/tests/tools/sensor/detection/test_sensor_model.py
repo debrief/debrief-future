@@ -1,5 +1,6 @@
 """Tests for the sensor model interface and stub implementation."""
 
+import pytest
 from debrief_calc.tools.sensor.detection.sensor_model import (
     SensorModel,
     SensorModelZone,
@@ -28,11 +29,8 @@ class TestSensorModelZone:
 
     def test_zone_is_frozen(self):
         zone = SensorModelZone(distance_nm=3.0, likelihood_pct=75, name="75%")
-        try:
+        with pytest.raises(AttributeError):
             zone.distance_nm = 5.0  # type: ignore[misc]
-            assert False, "Should raise FrozenInstanceError"
-        except AttributeError:
-            pass
 
 
 class TestStubSensorModel:

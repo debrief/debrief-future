@@ -329,7 +329,7 @@ def buffer_zone_generator(
                 likelihood_pct=lik,
                 name=name,
             )
-            for dist, (lik, name) in zip(custom_distances, likelihoods)
+            for dist, (lik, name) in zip(custom_distances, likelihoods, strict=True)
         ]
     else:
         # Validate default distances
