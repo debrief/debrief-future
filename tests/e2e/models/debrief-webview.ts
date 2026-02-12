@@ -141,6 +141,64 @@ export class DebriefWebview {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // Log Panel (Feature 072/076)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /** The log panel root container. */
+  get logPanel(): Locator {
+    return this.frame.locator('[data-testid="log-panel"]');
+  }
+
+  /** All log timeline entries. */
+  get logEntries(): Locator {
+    return this.frame.locator('.log-panel__entry');
+  }
+
+  /** Empty state: no log entries yet. */
+  get logEmptyNoEntries(): Locator {
+    return this.frame.locator('[data-testid="log-panel-empty-no-entries"]');
+  }
+
+  /** Log panel notification banner. */
+  get logNotification(): Locator {
+    return this.frame.locator('[data-testid="log-panel-notification"]');
+  }
+
+  /** Tunable parameter values (clickable to tune). */
+  get tunableParams(): Locator {
+    return this.frame.locator('.log-panel__entry-param-value--tunable');
+  }
+
+  /** Get a specific tunable parameter value by parameter name. */
+  getTunableParam(paramName: string): Locator {
+    return this.frame.locator(`[data-testid="tune-param-${paramName}"]`);
+  }
+
+  /** Tuned badge on a log entry. */
+  get tunedBadge(): Locator {
+    return this.frame.locator('[data-testid="badge-tuned"]');
+  }
+
+  /** Replay progress indicator. */
+  get replayProgress(): Locator {
+    return this.frame.locator('[data-testid="replay-progress"]');
+  }
+
+  /**
+   * Count visible log entries.
+   */
+  async getLogEntryCount(): Promise<number> {
+    return await this.logEntries.count();
+  }
+
+  /**
+   * Click a log entry by index to select it.
+   */
+  async selectLogEntry(index: number): Promise<void> {
+    await this.logEntries.nth(index).click();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // Tool UI
   // ─────────────────────────────────────────────────────────────────────────────
 
