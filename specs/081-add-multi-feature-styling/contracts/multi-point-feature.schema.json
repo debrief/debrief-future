@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "https://debrief.info/schemas/MultiPointFeature",
+  "title": "MultiPointFeature",
+  "description": "GeoJSON Feature for multi-point tool results",
+  "type": "object",
+  "required": ["type", "id", "geometry", "properties"],
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "Feature",
+      "description": "GeoJSON type discriminator"
+    },
+    "id": {
+      "type": "string",
+      "description": "Unique identifier (UUID recommended)"
+    },
+    "geometry": {
+      "$ref": "#/$defs/GeoJSONMultiPoint"
+    },
+    "properties": {
+      "$ref": "#/$defs/MultiPointFeatureProperties"
+    },
+    "bbox": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 4,
+      "maxItems": 4,
+      "description": "Bounding box [minLon, minLat, maxLon, maxLat]"
+    }
+  },
+  "$defs": {
+    "GeoJSONMultiPoint": {
+      "type": "object",
+      "required": ["type", "coordinates"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "MultiPoint"
+        },
+        "coordinates": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "description": "Array of [longitude, latitude] positions"
+        }
+      }
+    },
+    "MultiPointFeatureProperties": {
+      "type": "object",
+      "required": ["kind", "label", "style"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "MULTI_POINT",
+          "description": "Feature type discriminator"
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable result label"
+        },
+        "style": {
+          "$ref": "#/$defs/PointProperties"
+        },
+        "source_tool": {
+          "type": "string",
+          "description": "Name of calculation tool that produced this result"
+        },
+        "source_features": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "IDs of input features used to generate this result"
+        },
+        "description": {
+          "type": "string",
+          "description": "Additional description or notes"
+        }
+      }
+    },
+    "PointProperties": {
+      "type": "object",
+      "required": ["shape", "radius", "fill_color", "color"],
+      "additionalProperties": false,
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["circle", "square", "triangle"]
+        },
+        "radius": {
+          "type": "number",
+          "minimum": 0
+        },
+        "fill": { "type": "boolean" },
+        "fill_color": {
+          "type": "string",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$"
+        },
+        "fill_opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "stroke": { "type": "boolean" },
+        "color": {
+          "type": "string",
+          "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$"
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "legacy_style": { "type": "string" }
+      }
+    }
+  }
+}
