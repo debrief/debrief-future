@@ -45,11 +45,11 @@
 
 **Purpose**: Create directory structure and scaffold all files
 
-- [ ] T001 Create tool spec directory `shared/tools/reference/generation/`
-- [ ] T002 [P] Create Python tool package `services/calc/debrief_calc/tools/reference/__init__.py`
-- [ ] T003 [P] Create Python test package `services/calc/tests/tools/reference/__init__.py`
-- [ ] T004 [P] Create TypeScript tool directory `apps/vscode/src/tools/reference/generation/`
-- [ ] T005 [P] Create TypeScript test directory `apps/vscode/tests/unit/tools/reference/`
+- [x] T001 Create tool spec directory `shared/tools/reference/generation/`
+- [x] T002 [P] Create Python tool package `services/calc/debrief_calc/tools/reference/__init__.py`
+- [x] T003 [P] Create Python test package `services/calc/tests/tools/reference/__init__.py`
+- [x] T004 [P] Create TypeScript tool directory `apps/vscode/src/tools/reference/generation/`
+- [x] T005 [P] Create TypeScript test directory `apps/vscode/tests/unit/tools/reference/`
 
 ---
 
@@ -61,24 +61,24 @@
 
 ### Schema Update
 
-- [ ] T006 Update ReferenceLocation geometry to allow MultiPoint in LinkML schema `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T007 Add PointMetadataEntry class and pointMetadata attribute to ReferenceLocationProperties `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T008 Regenerate derived schemas (Pydantic, JSON Schema, TypeScript types) from updated LinkML
+- [x] T006 Update ReferenceLocation geometry to allow MultiPoint in LinkML schema `shared/schemas/src/linkml/geojson.yaml`
+- [x] T007 Add PointMetadataEntry class and pointMetadata attribute to ReferenceLocationProperties `shared/schemas/src/linkml/geojson.yaml`
+- [x] T008 Regenerate derived schemas (Pydantic, JSON Schema, TypeScript types) from updated LinkML
 
 ### Tool Spec Document (FR-001)
 
-- [ ] T009 Write language-neutral tool spec with all 9 required sections `shared/tools/reference/generation/generate-reference-points.1.0.md`
+- [x] T009 Write language-neutral tool spec with all 9 required sections `shared/tools/reference/generation/generate-reference-points.1.0.md`
 
 ### Golden I/O Examples (FR-014)
 
-- [ ] T010 [P] Write grid golden input example (3×4, bounds [-5,49,1,52]) `shared/tools/reference/generation/generate-reference-points.grid.input.json`
-- [ ] T011 [P] Write grid golden output example (12-coordinate MultiPoint) `shared/tools/reference/generation/generate-reference-points.grid.output.json`
-- [ ] T012 [P] Write scatter golden input example (count=20, seed=42, same bounds) `shared/tools/reference/generation/generate-reference-points.scatter.input.json`
-- [ ] T013 [P] Write scatter golden output example (20-coordinate MultiPoint) `shared/tools/reference/generation/generate-reference-points.scatter.output.json`
+- [x] T010 [P] Write grid golden input example (3×4, bounds [-5,49,1,52]) `shared/tools/reference/generation/generate-reference-points.grid.input.json`
+- [x] T011 [P] Write grid golden output example (12-coordinate MultiPoint) `shared/tools/reference/generation/generate-reference-points.grid.output.json`
+- [x] T012 [P] Write scatter golden input example (count=20, seed=42, same bounds) `shared/tools/reference/generation/generate-reference-points.scatter.input.json`
+- [x] T013 [P] Write scatter golden output example (20-coordinate MultiPoint) `shared/tools/reference/generation/generate-reference-points.scatter.output.json`
 
 ### Cross-Language LCG PRNG
 
-- [ ] T014 Document LCG constants and algorithm in tool spec (multiplier=1664525, increment=1013904223, mod=2^32)
+- [x] T014 Document LCG constants and algorithm in tool spec (multiplier=1664525, increment=1013904223, mod=2^32)
 
 **Checkpoint**: Schema updated, tool spec written, golden examples ready — implementation can begin
 

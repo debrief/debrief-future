@@ -1,0 +1,6 @@
+{
+  "pattern": "scatter",
+  "bounds": [-5, 49, 1, 52],
+  "count": 20,
+  "seed": 42
+}

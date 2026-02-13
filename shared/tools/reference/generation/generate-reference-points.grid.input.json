@@ -1,0 +1,6 @@
+{
+  "pattern": "grid",
+  "bounds": [-5, 49, 1, 52],
+  "rows": 3,
+  "cols": 4
+}
