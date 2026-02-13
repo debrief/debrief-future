@@ -191,7 +191,7 @@ Description formats:
 | 093 | Feature | [[E05] Add drawing toolbar with shape palette](docs/ideas/093-drawing-toolbar-shape-palette.md) (requires #092) [E05] | 4 | 4 | 3 | 11 | Medium | approved |
 | 095 | Feature | [[E05] Implement polygon and polyline drawing](docs/ideas/095-polygon-polyline-drawing.md) (requires #091, #092, #093) [E05] | 4 | 4 | 3 | 11 | Medium | approved |
 | 029 | Tech Debt | [Add unit tests for VS Code extension providers](https://github.com/debrief/debrief-future/issues/104) | 4 | 2 | 5 | 11 | Low | proposed |
-| 092 | Infrastructure | [[E05] Integrate Geoman drawing library](docs/ideas/092-integrate-geoman-drawing-library.md) [E05] | 4 | 3 | 3 | 10 | Medium | approved |
+| 092 | Infrastructure | [[E05] Integrate Geoman drawing library](specs/092-integrate-geoman-drawing-library/spec.md) [E05] | 4 | 3 | 3 | 10 | Medium | specified |
 | 091 | Infrastructure | [[E05] Add POLY FeatureKind for arbitrary polygons](specs/091-poly-featurekind/spec.md) [E05] | 3 | 2 | 5 | 10 | Low | specified |
 | 096 | Enhancement | [[E05] Drawing UX guidance and STAC persistence](docs/ideas/096-drawing-ux-persistence.md) (requires #094, #095) [E05] | 4 | 3 | 3 | 10 | Medium | approved |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
