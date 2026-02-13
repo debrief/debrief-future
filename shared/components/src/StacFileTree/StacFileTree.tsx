@@ -176,6 +176,7 @@ export function StacFileTree({
   highlightedPaths = [],
   currentItemPath,
   onItemSelect,
+  onFileSelect,
   refreshKey,
   className,
 }: StacFileTreeProps) {
@@ -213,6 +214,8 @@ export function StacFileTree({
     const handleClick = () => {
       if (hasChildren) {
         toggleNode(node.path);
+      } else if (onFileSelect) {
+        onFileSelect(node.path);
       }
     };
 

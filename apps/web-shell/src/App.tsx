@@ -26,7 +26,10 @@ import {
   useTimePlayback,
   calculateTimeExtent,
   getFeatureLabel,
+  ChartRenderer,
+  transformDataset,
 } from '@debrief/components';
+import type { DatasetEnvelope } from '@debrief/components';
 import type {
   CatalogOverviewItem,
   ToolsPanelItem,
@@ -80,6 +83,14 @@ interface PlotState {
   features: FeatureCollection;
 }
 
+/** An open chart tab in the bottom panel */
+interface ChartTab {
+  id: string;
+  title: string;
+  path: string;
+  dataset: DatasetEnvelope;
+}
+
 /**
  * Main application component.
  */
@@ -115,6 +126,10 @@ export default function App() {
 
   // Counter for generating unique activity IDs
   const [activityCounter, setActivityCounter] = useState(0);
+
+  // Chart panel state — tabs opened by clicking dataset files in the STAC tree
+  const [chartTabs, setChartTabs] = useState<ChartTab[]>([]);
+  const [activeChartTabId, setActiveChartTabId] = useState<string | null>(null);
 
   // Catalog items
   const catalogItems = useMemo<CatalogOverviewItem[]>(() => {
@@ -434,6 +449,63 @@ export default function App() {
     store.getState().clearSelection();
   }, [store]);
 
+  // Handle file selection from STAC tree — open dataset files as chart tabs
+  const handleFileSelect = useCallback(async (filePath: string) => {
+    // Only handle .dataset.json files
+    if (!filePath.endsWith('.dataset.json')) return;
+
+    // Already open? Just activate the tab
+    const existing = chartTabs.find(t => t.path === filePath);
+    if (existing) {
+      setActiveChartTabId(existing.id);
+      return;
+    }
+
+    try {
+      const content = await mockFsAdapter.readFile(filePath);
+      const parsed = JSON.parse(content) as DatasetEnvelope;
+
+      // Quick sanity check — must have type + title
+      if (!parsed.type || !parsed.title) return;
+
+      const tab: ChartTab = {
+        id: filePath,
+        title: parsed.title,
+        path: filePath,
+        dataset: parsed,
+      };
+      setChartTabs(prev => [...prev, tab]);
+      setActiveChartTabId(tab.id);
+    } catch {
+      // Not a valid dataset file — ignore silently
+    }
+  }, [chartTabs]);
+
+  // Close a chart tab
+  const handleCloseChartTab = useCallback((tabId: string) => {
+    setChartTabs(prev => {
+      const next = prev.filter(t => t.id !== tabId);
+      // If closing the active tab, switch to the last remaining or null
+      if (tabId === activeChartTabId) {
+        setActiveChartTabId(next.length > 0 ? next[next.length - 1].id : null);
+      }
+      return next;
+    });
+  }, [activeChartTabId]);
+
+  // Active chart tab data
+  const activeChartTab = useMemo(
+    () => chartTabs.find(t => t.id === activeChartTabId) ?? null,
+    [chartTabs, activeChartTabId]
+  );
+
+  // Transform active chart dataset to Vega-Lite spec
+  const activeChartSpec = useMemo(() => {
+    if (!activeChartTab) return null;
+    const result = transformDataset(activeChartTab.dataset);
+    return result.ok ? result.spec : null;
+  }, [activeChartTab]);
+
   // Handle tool execution — persist result to STAC assets and record a log entry
   const handleRunTool = useCallback((toolId: string, params?: Record<string, unknown>) => {
     const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[], params);
@@ -652,6 +724,7 @@ export default function App() {
                 fs={mockFsAdapter}
                 rootPath="/local-store"
                 currentItemPath={currentPlot ? `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}` : undefined}
+                onFileSelect={handleFileSelect}
                 refreshKey={treeRefreshKey}
                 className="web-shell__file-tree"
               />
@@ -718,17 +791,54 @@ export default function App() {
             )}
           </div>
         </aside>
-        <section className="web-shell__map-container">
-          <MapView
-            features={allFeatures}
-            selectedIds={selectedIds}
-            onSelect={handleMapSelect}
-            onBackgroundClick={handleBackgroundClick}
-            currentTime={playback.currentTime}
-            displayMode={toComponentMode(state.displayMode)}
-            height="100%"
-            className="web-shell__map"
-          />
+        <section className="web-shell__right-panel">
+          <div className={`web-shell__map-container ${chartTabs.length > 0 ? 'web-shell__map-container--with-panel' : ''}`}>
+            <MapView
+              features={allFeatures}
+              selectedIds={selectedIds}
+              onSelect={handleMapSelect}
+              onBackgroundClick={handleBackgroundClick}
+              currentTime={playback.currentTime}
+              displayMode={toComponentMode(state.displayMode)}
+              height="100%"
+              className="web-shell__map"
+            />
+          </div>
+          {chartTabs.length > 0 && (
+            <div className="web-shell__chart-panel" data-testid="chart-panel">
+              <div className="web-shell__chart-tabs" role="tablist">
+                {chartTabs.map(tab => (
+                  <div
+                    key={tab.id}
+                    className={`web-shell__chart-tab ${tab.id === activeChartTabId ? 'web-shell__chart-tab--active' : ''}`}
+                    role="tab"
+                    aria-selected={tab.id === activeChartTabId}
+                    onClick={() => setActiveChartTabId(tab.id)}
+                  >
+                    <span className="web-shell__chart-tab-label">{tab.title}</span>
+                    <button
+                      type="button"
+                      className="web-shell__chart-tab-close"
+                      onClick={(e) => { e.stopPropagation(); handleCloseChartTab(tab.id); }}
+                      aria-label={`Close ${tab.title}`}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="web-shell__chart-content">
+                {activeChartSpec && (
+                  <ChartRenderer spec={activeChartSpec} className="web-shell__chart" />
+                )}
+                {activeChartTab && !activeChartSpec && (
+                  <div className="web-shell__chart-error">
+                    Unable to render dataset: {activeChartTab.dataset.type}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </section>
       </main>
     </div>

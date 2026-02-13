@@ -25,11 +25,12 @@ export default defineConfig({
         'Timeline/index': resolve(__dirname, 'src/Timeline/index.ts'),
         'FeatureList/index': resolve(__dirname, 'src/FeatureList/index.ts'),
         'ThemeProvider/index': resolve(__dirname, 'src/ThemeProvider/index.ts'),
+        'ChartRenderer/index': resolve(__dirname, 'src/ChartRenderer/index.ts'),
       },
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime', 'leaflet', 'react-leaflet'],
+      external: ['react', 'react-dom', 'react/jsx-runtime', 'leaflet', 'react-leaflet', 'vega', 'vega-lite', 'vega-embed'],
       output: {
         preserveModules: true,
         preserveModulesRoot: 'src',
