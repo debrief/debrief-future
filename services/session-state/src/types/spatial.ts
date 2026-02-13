@@ -52,6 +52,8 @@ export interface SpatialSlice {
   viewport: ViewportPolygon | null;
   /** Map rotation in degrees 0-360 (FR-013) */
   rotation: number;
+  /** Active drawing mode for shape creation (FR-093) — EPHEMERAL */
+  drawingMode: DrawingMode;
 }
 
 /**
@@ -60,6 +62,7 @@ export interface SpatialSlice {
 export const DEFAULT_SPATIAL_SLICE: SpatialSlice = {
   viewport: null,
   rotation: 0,
+  drawingMode: null,
 };
 
 /**
@@ -68,9 +71,15 @@ export const DEFAULT_SPATIAL_SLICE: SpatialSlice = {
 export interface SpatialActions {
   setViewport: (viewport: ViewportPolygon | null) => void;
   setRotation: (rotation: number) => void;
+  setDrawingMode: (mode: DrawingMode) => void;
   /** Get the derived center point (not stored) */
   getCenter: () => Coordinate | null;
 }
+
+/**
+ * Drawing mode for shape creation (FR-093).
+ */
+export type DrawingMode = 'point' | 'rectangle' | 'polygon' | 'polyline' | null;
 
 /**
  * Normalize rotation to [0, 360) range.
