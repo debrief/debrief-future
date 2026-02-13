@@ -214,15 +214,15 @@
 
 ### Evidence Collection
 
-- [ ] T054 Create evidence directory `specs/087-logical-result-id-registry/evidence/`
-- [ ] T055 Capture test results in `specs/087-logical-result-id-registry/evidence/test-summary.md`
-- [ ] T056 Create usage demonstration in `specs/087-logical-result-id-registry/evidence/usage-example.md`
-- [ ] T057 [P] Validate implementation matches API contract in `specs/087-logical-result-id-registry/evidence/api-contract-validation.md`
+- [x] T054 Create evidence directory `specs/087-logical-result-id-registry/evidence/`
+- [x] T055 Capture test results in `specs/087-logical-result-id-registry/evidence/test-summary.md`
+- [x] T056 Create usage demonstration in `specs/087-logical-result-id-registry/evidence/usage-example.md`
+- [x] T057 [P] Validate implementation matches API contract in `specs/087-logical-result-id-registry/evidence/api-contract-validation.md`
 
 ### Media Content
 
-- [ ] T058 Create shipped blog post in `specs/087-logical-result-id-registry/media/shipped-post.md`
-- [ ] T059 [P] Create LinkedIn shipped summary in `specs/087-logical-result-id-registry/media/linkedin-shipped.md`
+- [x] T058 Create shipped blog post in `specs/087-logical-result-id-registry/media/shipped-post.md`
+- [x] T059 [P] Create LinkedIn shipped summary in `specs/087-logical-result-id-registry/media/linkedin-shipped.md`
 
 ### PR Creation
 
