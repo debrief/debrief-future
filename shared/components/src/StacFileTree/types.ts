@@ -90,6 +90,8 @@ export interface StacFileTreeProps {
   currentItemPath?: string;
   /** Callback when an item node is double-clicked to open */
   onItemSelect?: (itemPath: string) => void;
+  /** Callback when a leaf (non-expandable) file node is clicked */
+  onFileSelect?: (filePath: string) => void;
   /** Key to trigger refresh/cache clear (change this value to refresh) */
   refreshKey?: string | number;
   /** Additional CSS class name */

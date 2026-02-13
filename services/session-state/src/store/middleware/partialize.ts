@@ -13,6 +13,7 @@ export const EPHEMERAL_FIELDS = [
   'dirty',          // Document dirty flag is ephemeral
   'undoStack',      // Undo/redo stacks are ephemeral
   'redoStack',
+  'drawingMode',    // FR-093: drawing toolbar state is ephemeral
 ] as const;
 
 /**

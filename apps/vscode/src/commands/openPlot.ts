@@ -3,8 +3,8 @@
  */
 
 import * as vscode from 'vscode';
-import { access } from 'fs/promises';
-import { loadSession } from '@debrief/session-state';
+import { access, readFile } from 'fs/promises';
+import { loadSession, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { IoService } from '../services/ioService';
@@ -67,7 +67,8 @@ export function createOpenPlotCommand(
   timeRangeProvider: TimeRangeViewProvider,
   activityPanelProvider: ActivityPanelViewProvider,
   getMapPanel: () => MapPanel | undefined,
-  setMapPanel: (panel: MapPanel | undefined) => void
+  setMapPanel: (panel: MapPanel | undefined) => void,
+  resultIdRegistry?: ResultIdRegistry
 ): (args?: OpenPlotArgs) => Promise<void> {
   return async (args?: OpenPlotArgs) => {
     let storeId: string;
@@ -250,6 +251,22 @@ export function createOpenPlotCommand(
     // Load existing result files from STAC item (Feature: 051-load-result-attachments)
     const resultFiles = await stacService.loadResultFiles(store, itemPath);
     activityPanelProvider.setResultFiles(resultFiles);
+
+    // Hydrate Result ID Registry from STAC assets (Feature: 087)
+    if (resultIdRegistry) {
+      resultIdRegistry.clear();
+      try {
+        const normalizedStorePath = store.path.replace(/\\/g, '/');
+        const itemJsonPath = `${normalizedStorePath}/${itemPath}`;
+        const itemJson = await readFile(itemJsonPath, 'utf-8');
+        const item = JSON.parse(itemJson) as { assets?: Record<string, unknown> };
+        if (item.assets) {
+          resultIdRegistry.hydrateFromAssets(item.assets as Record<string, StacAssetForHydration>);
+        }
+      } catch {
+        // Item file may not exist or be malformed — skip hydration silently
+      }
+    }
 
     // Update time range panel with plot's time extent
     // Convert ISO strings to timestamps for the TimeController
