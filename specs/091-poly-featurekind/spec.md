@@ -2,7 +2,7 @@
 
 **Feature Branch**: `091-poly-featurekind`
 **Created**: 2026-02-13
-**Status**: Draft
+**Status**: Clarified
 **Epic**: E05 — Shape Drawing Tools
 **Input**: User description: "Add POLY kind to FeatureKindEnum. Add PolyAnnotationProperties class. Regenerate types. Add fixtures. Run schema tests. Confirm LINE kind works for polylines."
 
