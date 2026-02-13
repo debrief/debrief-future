@@ -268,21 +268,25 @@ export function MapView({
     })),
   }), [staticFeatures]);
 
-  // Style function for features
+  // Style function for features — reads from properties.style when available
   const featureStyle = useMemo(() => {
     return (feature: GeoJSON.Feature | undefined): PathOptions => {
       if (!feature) return {};
 
       const debriefFeature = feature as unknown as DebriefFeature;
       const isSelected = selectedIds.has(debriefFeature.id);
+      const props = debriefFeature.properties as unknown as Record<string, unknown>;
+      const style = props.style as Record<string, unknown> | undefined;
       const color = getFeatureColor(debriefFeature);
+      const fillColor = (style?.fill_color as string) ?? color;
 
       return {
         color: isSelected ? 'var(--debrief-selection-border)' : color,
-        weight: isSelected ? 4 : isTrackFeature(debriefFeature) ? 3 : 2,
-        opacity: 1,
-        fillColor: color,
-        fillOpacity: isSelected ? 0.4 : 0.2,
+        weight: isSelected ? 4 : (style?.weight as number) ?? (isTrackFeature(debriefFeature) ? 3 : 2),
+        opacity: (style?.opacity as number) ?? 1,
+        fillColor: isSelected ? 'var(--debrief-selection-border)' : fillColor,
+        fillOpacity: isSelected ? 0.4 : (style?.fill_opacity as number) ?? 0.2,
+        dashArray: (style?.dash_array as string) ?? undefined,
       };
     };
   }, [selectedIds]);
@@ -306,6 +310,27 @@ export function MapView({
       });
     };
   }, [onSelect]);
+
+  // pointToLayer callback — renders Point and MultiPoint geometries as circle markers
+  const pointToLayer = useMemo(() => {
+    return (feature: GeoJSON.Feature, latlng: L.LatLng): L.Layer => {
+      const debriefFeature = feature as unknown as DebriefFeature;
+      const isSelected = selectedIds.has(debriefFeature.id);
+      const props = debriefFeature.properties as unknown as Record<string, unknown>;
+      const featureStyle = props.style as Record<string, unknown> | undefined;
+      const color = (featureStyle?.color as string) ?? getFeatureColor(debriefFeature);
+      const fillColor = (featureStyle?.fill_color as string) ?? color;
+
+      return L.circleMarker(latlng, {
+        radius: (featureStyle?.radius as number) ?? 6,
+        fillColor: isSelected ? 'var(--debrief-selection-border)' : fillColor,
+        fillOpacity: isSelected ? 0.6 : (featureStyle?.fill_opacity as number) ?? 0.7,
+        color: isSelected ? 'var(--debrief-selection-border)' : color,
+        weight: isSelected ? 3 : (featureStyle?.weight as number) ?? 2,
+        opacity: (featureStyle?.opacity as number) ?? 1,
+      });
+    };
+  }, [selectedIds]);
 
   // Track a revision counter for the GeoJSON key — react-leaflet's GeoJSON
   // component only renders on mount, so the key must change whenever data changes.
@@ -355,6 +380,7 @@ export function MapView({
             key={`geojson-${geojsonRevision.current}-${selectedIds.size}`}
             data={geojsonData}
             style={featureStyle}
+            pointToLayer={pointToLayer}
             onEachFeature={onEachFeature}
           />
         )}

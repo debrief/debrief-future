@@ -27,6 +27,8 @@ from debrief_schemas import (
     CircleAnnotation,
     LineAnnotation,
     LineProperties,
+    MultiPointFeature,
+    MultiPolygonFeature,
     NarrativeEntry,
     PointProperties,
     PolygonProperties,
@@ -62,6 +64,9 @@ ENTITY_MAP = {
     "line-properties": LineProperties,
     "polygon-properties": PolygonProperties,
     "track-style": TrackStyle,
+    # Multi-geometry tool result types
+    "multi-point-feature": MultiPointFeature,
+    "multi-polygon-feature": MultiPolygonFeature,
 }
 
 
@@ -104,6 +109,8 @@ def is_known_geometry_limitation(entity_type: str, error: ValidationError) -> bo
         "line-annotation",
         "circle-annotation",
         "vector-annotation",
+        "multi-point-feature",
+        "multi-polygon-feature",
     }
     if entity_type not in nested_coord_types:
         return False

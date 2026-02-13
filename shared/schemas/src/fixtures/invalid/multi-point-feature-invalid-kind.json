@@ -1,0 +1,25 @@
+{
+  "type": "Feature",
+  "id": "mp-invalid-wrong-kind",
+  "geometry": {
+    "type": "MultiPoint",
+    "coordinates": [
+      [-4.1234, 50.3456]
+    ]
+  },
+  "properties": {
+    "kind": "POINT",
+    "label": "Wrong Kind Value",
+    "style": {
+      "shape": "circle",
+      "radius": 6,
+      "fill": true,
+      "fill_color": "#FF0000",
+      "fill_opacity": 0.8,
+      "stroke": true,
+      "color": "#CC0000",
+      "weight": 2,
+      "opacity": 1.0
+    }
+  }
+}
