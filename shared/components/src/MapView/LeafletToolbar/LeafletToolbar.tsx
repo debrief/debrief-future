@@ -39,6 +39,9 @@ class ToolbarControl extends L.Control {
   private fitPadding: number = 0.1;
   private showZoomControls: boolean = true;
   private showFitButton: boolean = true;
+  // TEMPORARY: 092-proof-of-concept — remove when #093 lands
+  private drawRectButton: HTMLAnchorElement | null = null;
+  private isDrawingRect: boolean = false;
 
   constructor(options: L.ControlOptions & {
     visibleBounds: Bounds | null;
@@ -61,6 +64,16 @@ class ToolbarControl extends L.Control {
   }
 
   onRemove(): void {
+    // TEMPORARY: 092-proof-of-concept — remove when #093 lands
+    if (this.map?.pm) {
+      this.map.off('pm:create', this.onRectCreated);
+      if (this.isDrawingRect) {
+        this.map.pm.disableDraw();
+      }
+    }
+    this.drawRectButton = null;
+    this.isDrawingRect = false;
+
     this.map = null;
     this.container = null;
   }
@@ -115,6 +128,26 @@ class ToolbarControl extends L.Control {
       fitButton.innerHTML = this.getFitIcon();
       this.container.appendChild(fitButton);
     }
+
+    // TEMPORARY: 092-proof-of-concept — remove when #093 lands
+    // Draw Rectangle button to prove Geoman integration works end-to-end
+    if (this.map?.pm) {
+      this.drawRectButton = this.createButton(
+        this.getRectangleIcon(),
+        'Draw rectangle',
+        'debrief-leaflet-toolbar__button debrief-leaflet-toolbar__draw-rect',
+        () => this.handleDrawRectangle()
+      );
+      this.drawRectButton.innerHTML = this.getRectangleIcon();
+      if (this.isDrawingRect) {
+        this.drawRectButton.classList.add('debrief-leaflet-toolbar__button--active');
+      }
+      this.container.appendChild(this.drawRectButton);
+
+      // Listen for pm:create to exit drawing mode after rectangle is drawn
+      this.map.off('pm:create', this.onRectCreated);
+      this.map.on('pm:create', this.onRectCreated);
+    }
   }
 
   private createButton(
@@ -155,6 +188,34 @@ class ToolbarControl extends L.Control {
     const [minLon, minLat, maxLon, maxLat] = expandBounds(this.visibleBounds, this.fitPadding);
     this.map.fitBounds([[minLat, minLon], [maxLat, maxLon]]);
   }
+
+  // TEMPORARY: 092-proof-of-concept — remove when #093 lands
+  private getRectangleIcon(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="5" width="18" height="14" rx="1"></rect>
+    </svg>`;
+  }
+
+  // TEMPORARY: 092-proof-of-concept — remove when #093 lands
+  private handleDrawRectangle(): void {
+    if (!this.map?.pm) return;
+
+    if (this.isDrawingRect) {
+      this.map.pm.disableDraw();
+      this.isDrawingRect = false;
+      this.drawRectButton?.classList.remove('debrief-leaflet-toolbar__button--active');
+    } else {
+      this.map.pm.enableDraw('Rectangle');
+      this.isDrawingRect = true;
+      this.drawRectButton?.classList.add('debrief-leaflet-toolbar__button--active');
+    }
+  }
+
+  // TEMPORARY: 092-proof-of-concept — remove when #093 lands
+  private onRectCreated = (): void => {
+    this.isDrawingRect = false;
+    this.drawRectButton?.classList.remove('debrief-leaflet-toolbar__button--active');
+  };
 }
 
 /**
