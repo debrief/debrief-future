@@ -45,9 +45,9 @@ test.describe('Styling Tools Integration', () => {
     });
   });
 
-  test('tools panel lists all 10 tools (3 built-in + 4 styling + 1 shape + 1 reference + 1 sensor)', async ({ page }) => {
+  test('tools panel lists all 11 tools (3 built-in + 4 styling + 1 shape + 1 reference + 1 sensor + 1 track-manipulation)', async ({ page }) => {
     const toolItems = page.locator('.debrief-tools-panel__item');
-    await expect(toolItems).toHaveCount(10);
+    await expect(toolItems).toHaveCount(11);
   });
 
   test('styling tools are listed by name', async ({ page }) => {
@@ -87,11 +87,16 @@ test.describe('Styling Tools Integration', () => {
       page.locator('.debrief-tools-panel__item--active:has-text("Set Track Color")')
     ).toBeVisible({ timeout: 2000 });
 
-    // Click the Set Track Color tool
+    // Click the Set Track Color tool — opens ParameterCollector context menu
     const tool = page.locator(
       '.debrief-tools-panel__item--active:has-text("Set Track Color")'
     );
     await tool.click();
+
+    // Select the first color from the context menu
+    const contextMenu = page.locator('.debrief-context-menu');
+    await expect(contextMenu).toBeVisible({ timeout: 2000 });
+    await contextMenu.locator('.debrief-context-menu__item').first().click();
 
     // Result message should appear
     const toolMessage = page.locator('.web-shell__tool-message');
@@ -106,11 +111,16 @@ test.describe('Styling Tools Integration', () => {
       page.locator('.debrief-tools-panel__item--active:has-text("Label Interval")')
     ).toBeVisible({ timeout: 2000 });
 
-    // Click the Label Interval tool
+    // Click the Label Interval tool — opens ParameterCollector context menu
     const tool = page.locator(
       '.debrief-tools-panel__item--active:has-text("Label Interval")'
     );
     await tool.click();
+
+    // Select the first duration preset from the context menu
+    const contextMenu = page.locator('.debrief-context-menu');
+    await expect(contextMenu).toBeVisible({ timeout: 2000 });
+    await contextMenu.locator('.debrief-context-menu__item').first().click();
 
     // Result message should appear
     const toolMessage = page.locator('.web-shell__tool-message');
@@ -125,11 +135,16 @@ test.describe('Styling Tools Integration', () => {
       page.locator('.debrief-tools-panel__item--active:has-text("Symbol Interval")')
     ).toBeVisible({ timeout: 2000 });
 
-    // Click the Symbol Interval tool
+    // Click the Symbol Interval tool — opens ParameterCollector context menu
     const tool = page.locator(
       '.debrief-tools-panel__item--active:has-text("Symbol Interval")'
     );
     await tool.click();
+
+    // Select the first duration preset from the context menu
+    const contextMenu = page.locator('.debrief-context-menu');
+    await expect(contextMenu).toBeVisible({ timeout: 2000 });
+    await contextMenu.locator('.debrief-context-menu__item').first().click();
 
     // Result message should appear
     const toolMessage = page.locator('.web-shell__tool-message');
@@ -144,11 +159,16 @@ test.describe('Styling Tools Integration', () => {
       page.locator('.debrief-tools-panel__item--active:has-text("Apply Symbol Style")')
     ).toBeVisible({ timeout: 2000 });
 
-    // Click the Apply Symbol Style tool
+    // Click the Apply Symbol Style tool — opens ParameterCollector context menu
     const tool = page.locator(
       '.debrief-tools-panel__item--active:has-text("Apply Symbol Style")'
     );
     await tool.click();
+
+    // Select the first symbol from the context menu
+    const contextMenu = page.locator('.debrief-context-menu');
+    await expect(contextMenu).toBeVisible({ timeout: 2000 });
+    await contextMenu.locator('.debrief-context-menu__item').first().click();
 
     // Result message should appear
     const toolMessage = page.locator('.web-shell__tool-message');

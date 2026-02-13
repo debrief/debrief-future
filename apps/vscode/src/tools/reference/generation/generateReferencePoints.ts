@@ -99,8 +99,8 @@ function extractBoundsFromPolygon(
   if (!coords || coords.length === 0) {
     throw new Error('Polygon feature has no coordinates');
   }
-  const lons = coords.map((c) => c[0]);
-  const lats = coords.map((c) => c[1]);
+  const lons: number[] = coords.map((c) => c[0]!);
+  const lats: number[] = coords.map((c) => c[1]!);
   return [Math.min(...lons), Math.min(...lats), Math.max(...lons), Math.max(...lats)];
 }
 
@@ -242,7 +242,7 @@ export function execute(
     throw new Error("Pattern must be 'grid' or 'scatter'");
   }
 
-  const bounds = extractBoundsFromPolygon(features[0]);
+  const bounds = extractBoundsFromPolygon(features[0]!);
   const [west, south, east, north] = validateBounds(bounds);
 
   if (pattern === 'grid') {

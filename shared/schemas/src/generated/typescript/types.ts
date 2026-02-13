@@ -22,6 +22,8 @@ export enum FeatureKindEnum {
     VECTOR = "VECTOR",
     /** Non-spatial system state (null geometry, reserved state.* IDs) */
     SYSTEM = "SYSTEM",
+    /** Arbitrary polygon annotation (Polygon geometry) */
+    POLY = "POLY",
     /** Multi-point tool result (MultiPoint geometry) */
     MULTI_POINT = "MULTI_POINT",
     /** Multi-polygon tool result (MultiPolygon geometry) */
@@ -63,13 +65,17 @@ export enum LocationTypeEnum {
 * Valid shapes for point markers
 */
 export enum PointShapeEnum {
-    
+
     /** Filled/stroked circle (default marker) */
     circle = "circle",
     /** Filled/stroked square (reference points) */
     square = "square",
     /** Filled/stroked triangle (directional indicators) */
     triangle = "triangle",
+    /** Diamond shape */
+    diamond = "diamond",
+    /** Cross/plus shape */
+    cross = "cross",
 };
 /**
 * How line endpoints are rendered (SVG/CSS standard)
@@ -135,11 +141,137 @@ export enum FileProvEventTypeEnum {
 * Direction of a branch event.
 */
 export enum FileProvDirectionEnum {
-    
+
     /** This file is the source of the branch */
     source = "source",
     /** This file is the target of the branch */
     target = "target",
+};
+/**
+* Predefined named colours for styling tool parameters
+*/
+export enum NamedColorEnum {
+
+    /** Red */
+    red = "red",
+    /** Green */
+    green = "green",
+    /** Blue */
+    blue = "blue",
+    /** Yellow */
+    yellow = "yellow",
+    /** Orange */
+    orange = "orange",
+    /** Purple */
+    purple = "purple",
+    /** Cyan */
+    cyan = "cyan",
+    /** Magenta */
+    magenta = "magenta",
+    /** White */
+    white = "white",
+    /** Black */
+    black = "black",
+    /** Grey */
+    grey = "grey",
+};
+/**
+* Marker shapes for tool parameter choices (superset of PointShapeEnum)
+*/
+export enum MarkerSymbolEnum {
+
+    /** Filled/stroked circle (default marker) */
+    circle = "circle",
+    /** Filled/stroked square (reference points) */
+    square = "square",
+    /** Filled/stroked triangle (directional indicators) */
+    triangle = "triangle",
+    /** Diamond shape */
+    diamond = "diamond",
+    /** Cross/plus shape */
+    cross = "cross",
+};
+/**
+* Eight-point compass directions
+*/
+export enum CardinalDirectionEnum {
+
+    /** North */
+    N = "N",
+    /** North-East */
+    NE = "NE",
+    /** East */
+    E = "E",
+    /** South-East */
+    SE = "SE",
+    /** South */
+    S = "S",
+    /** South-West */
+    SW = "SW",
+    /** West */
+    W = "W",
+    /** North-West */
+    NW = "NW",
+};
+/**
+* Common ISO 8601 duration presets for interval parameters
+*/
+export enum DurationPresetEnum {
+
+    /** 1 minute */
+    PT1M = "PT1M",
+    /** 5 minutes */
+    PT5M = "PT5M",
+    /** 15 minutes */
+    PT15M = "PT15M",
+    /** 30 minutes */
+    PT30M = "PT30M",
+    /** 1 hour */
+    PT1H = "PT1H",
+    /** 2 hours */
+    PT2H = "PT2H",
+    /** 6 hours */
+    PT6H = "PT6H",
+    /** 12 hours */
+    PT12H = "PT12H",
+    /** 24 hours */
+    PT24H = "PT24H",
+};
+/**
+* Common numeric presets for count and distance parameters
+*/
+export enum NumericPresetEnum {
+
+    /** One */
+    n_1 = "n_1",
+    /** Two */
+    n_2 = "n_2",
+    /** Five */
+    n_5 = "n_5",
+    /** Ten */
+    n_10 = "n_10",
+    /** Twenty-five */
+    n_25 = "n_25",
+    /** Fifty */
+    n_50 = "n_50",
+    /** One hundred */
+    n_100 = "n_100",
+};
+/**
+* Names of available schema-defined parameter types
+*/
+export enum ParameterTypeEnum {
+
+    /** Predefined named colours (maps to NamedColorEnum) */
+    NamedColor = "NamedColor",
+    /** Marker shapes (maps to MarkerSymbolEnum) */
+    MarkerSymbol = "MarkerSymbol",
+    /** Eight-point compass directions (maps to CardinalDirectionEnum) */
+    CardinalDirection = "CardinalDirection",
+    /** Common ISO 8601 duration intervals (maps to DurationPresetEnum) */
+    DurationPreset = "DurationPreset",
+    /** Common numeric values (maps to NumericPresetEnum) */
+    NumericPreset = "NumericPreset",
 };
 
 
@@ -875,6 +1007,42 @@ export interface VectorAnnotation {
     geometry: GeoJSONLineString,
     /** Vector metadata including origin, range, and bearing for reconstruction */
     properties: VectorAnnotationProperties,
+}
+
+
+/**
+ * Properties for a PolyAnnotation
+ */
+export interface PolyAnnotationProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Number of unique vertices (excluding ring closure point) */
+    vertex_count: number,
+    /** Annotation label text */
+    label?: string,
+    /** Display symbol code from REP file */
+    symbol?: string,
+    /** Polygon styling properties for the polygon area */
+    style: PolygonProperties,
+    /** Original source file path */
+    source_file?: string,
+    /** Source line number for debugging */
+    line_number?: number,
+}
+
+
+/**
+ * GeoJSON Feature for arbitrary polygon annotations. Geometry is a Polygon with user-defined vertices (freeform shape). Used for patrol zones, exclusion areas, search grids, etc.
+ */
+export interface PolyAnnotation {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Unique identifier */
+    id: string,
+    /** Polygon with user-defined vertices (closed ring) */
+    geometry: GeoJSONPolygon,
+    /** Polygon metadata including vertex count and styling */
+    properties: PolyAnnotationProperties,
 }
 
 

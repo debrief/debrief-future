@@ -115,6 +115,7 @@ class TestEnumConsistency:
             "TEXT",
             "VECTOR",
             "SYSTEM",
+            "POLY",
             "MULTI_POINT",
             "MULTI_POLYGON",
         ]

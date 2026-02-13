@@ -1,0 +1,19 @@
+{
+  "type": "Feature",
+  "id": "poly-no-style",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [[
+      [-5.0, 50.0],
+      [-4.0, 50.0],
+      [-4.0, 51.0],
+      [-5.0, 51.0],
+      [-5.0, 50.0]
+    ]]
+  },
+  "properties": {
+    "kind": "POLY",
+    "vertex_count": 4,
+    "label": "Missing Style"
+  }
+}

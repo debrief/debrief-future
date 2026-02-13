@@ -13,6 +13,7 @@ Built-in tools:
 - label-interval: Set time interval for label display
 - symbol-interval: Set time interval for symbol display
 - generate-reference-points: Generate grid/scatter reference points in a bounding box
+- generate-courses-speeds: Derive course and speed from consecutive positions
 - buffer-zone-generator: Generate detection likelihood buffer zones around a track
 """
 

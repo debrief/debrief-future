@@ -241,8 +241,8 @@ export function ActivityPanel({
   );
 
   const handleRunTool = useCallback(
-    (toolId: string) => {
-      onMessage?.({ type: 'tool:run', payload: { toolId } });
+    (toolId: string, params?: Record<string, unknown>) => {
+      onMessage?.({ type: 'tool:run', payload: { toolId, params } });
     },
     [onMessage]
   );

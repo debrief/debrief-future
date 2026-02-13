@@ -110,20 +110,6 @@ classes:
         multivalued: true
         required: true
 
-  GeoJSONMultiPoint:
-    description: GeoJSON MultiPoint geometry for multi-point tool results
-    attributes:
-      type:
-        description: Geometry type discriminator
-        range: string
-        required: true
-        equals_string: "MultiPoint"
-      coordinates:
-        description: Array of [longitude, latitude] positions
-        range: float
-        multivalued: true
-        required: true
-
   GeoJSONMultiPolygon:
     description: GeoJSON MultiPolygon geometry for multi-polygon tool results
     attributes:

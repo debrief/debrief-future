@@ -194,6 +194,16 @@ class LogEntry(BaseModel):
         return v
 
 
+VALID_PARAM_TYPES = {
+    "NamedColor",
+    "MarkerSymbol",
+    "CardinalDirection",
+    "DurationPreset",
+    "NumericPreset",
+}
+"""Valid values for ToolParameter.param_type, referencing schema-defined parameter-type enums."""
+
+
 class ToolParameter(BaseModel):
     """
     A configurable parameter for a tool.
@@ -208,6 +218,9 @@ class ToolParameter(BaseModel):
     required: bool = Field(default=False, description="Whether parameter is required")
     default: Any | None = Field(default=None, description="Default value if not provided")
     choices: list[Any] | None = Field(default=None, description="Valid values for enum type")
+    param_type: str | None = Field(
+        default=None, description="References a schema-defined parameter-type enum by name"
+    )
 
     @field_validator("type")
     @classmethod
@@ -217,10 +230,17 @@ class ToolParameter(BaseModel):
             raise ValueError(f"type must be one of {valid_types}")
         return v
 
+    @field_validator("param_type")
+    @classmethod
+    def validate_param_type(cls, v: str | None) -> str | None:
+        if v is not None and v not in VALID_PARAM_TYPES:
+            raise ValueError(f"param_type must be one of {VALID_PARAM_TYPES}")
+        return v
+
     @model_validator(mode="after")
     def validate_enum_choices(self) -> ToolParameter:
-        if self.type == "enum" and not self.choices:
-            raise ValueError("choices must be provided when type is 'enum'")
+        if self.type == "enum" and not self.choices and not self.param_type:
+            raise ValueError("choices or param_type must be provided when type is 'enum'")
         return self
 
 
@@ -483,6 +503,9 @@ class Tool(BaseModel):
 
         if param.default is not None:
             schema["default"] = param.default
+
+        if param.param_type is not None:
+            schema["x-debrief-param-type"] = param.param_type
 
         return schema
 

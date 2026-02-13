@@ -24,7 +24,7 @@ export const toolDefinition: MCPToolDefinition = {
       params: {
         type: 'object',
         properties: {
-          symbol: { type: 'string', enum: [...VALID_SYMBOLS], default: 'square' },
+          symbol: { type: 'string', enum: [...VALID_SYMBOLS], default: 'square', 'x-debrief-param-type': 'MarkerSymbol' },
           radius: { type: 'number', default: 4 },
           fill_color: { type: 'string' },
         },

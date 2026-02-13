@@ -29,6 +29,26 @@ export interface MatchResult {
 }
 
 /**
+ * A configurable parameter for a tool, extracted from MCP annotations.
+ */
+export interface ToolParameter {
+  /** Parameter identifier */
+  name: string;
+  /** Value type: string, number, boolean, enum, duration */
+  valueType: 'string' | 'number' | 'boolean' | 'enum' | 'duration';
+  /** Human-readable description */
+  description: string;
+  /** Whether parameter is required */
+  required?: boolean;
+  /** Default value */
+  defaultValue?: unknown;
+  /** Explicit choices (for enum type) */
+  choices?: string[];
+  /** Schema-defined parameter type name (from x-debrief-param-type) */
+  paramType?: string;
+}
+
+/**
  * Creates a Selection map from an array of feature kinds.
  *
  * @param kinds - Array of feature kinds from selected features

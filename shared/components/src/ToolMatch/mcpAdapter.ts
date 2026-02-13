@@ -6,7 +6,7 @@
  * feed tool definitions into the shared ToolMatchService.
  */
 
-import type { Tool, SelectionRequirement } from './types';
+import type { Tool, SelectionRequirement, ToolParameter } from './types';
 
 /**
  * MCP tool definition with Debrief-specific annotations.
@@ -66,6 +66,53 @@ export function fromMCPTool(mcpTool: MCPToolDefinition): Tool {
  */
 export function fromMCPTools(mcpTools: MCPToolDefinition[]): Tool[] {
   return mcpTools.map(fromMCPTool);
+}
+
+/**
+ * Schema for a single parameter within the MCP inputSchema params section.
+ */
+interface MCPParamSchema {
+  type?: string;
+  description?: string;
+  enum?: unknown[];
+  default?: unknown;
+  'x-debrief-param-type'?: string;
+}
+
+/**
+ * Map an MCP parameter schema to a ToolParameter valueType.
+ */
+function mapParamType(schema: MCPParamSchema): ToolParameter['valueType'] {
+  if (schema.enum || schema['x-debrief-param-type']) return 'enum';
+  if (schema.type === 'number') return 'number';
+  if (schema.type === 'boolean') return 'boolean';
+  return 'string';
+}
+
+/**
+ * Extract tool parameters from MCP tool definition's inputSchema.
+ * Parses the params.properties section and extracts x-debrief-param-type annotations.
+ *
+ * @param mcpTool - MCP tool definition with inputSchema
+ * @returns Array of ToolParameter descriptors
+ */
+export function extractParameters(mcpTool: MCPToolDefinition): ToolParameter[] {
+  const paramsSchema = mcpTool.inputSchema?.properties?.params as
+    | { type: 'object'; properties: Record<string, MCPParamSchema> }
+    | undefined;
+  if (!paramsSchema?.properties) return [];
+
+  return Object.entries(paramsSchema.properties).map(([name, schema]) => {
+    const param: ToolParameter = {
+      name,
+      valueType: mapParamType(schema),
+      description: schema.description ?? '',
+    };
+    if (schema.enum) param.choices = schema.enum as string[];
+    if (schema.default !== undefined) param.defaultValue = schema.default;
+    if (schema['x-debrief-param-type']) param.paramType = schema['x-debrief-param-type'] as string;
+    return param;
+  });
 }
 
 /**

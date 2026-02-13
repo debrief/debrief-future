@@ -20,6 +20,7 @@ from debrief_calc.registry import tool
             type="string",
             description="CSS color value to apply",
             required=True,
+            param_type="NamedColor",
         ),
     ],
 )

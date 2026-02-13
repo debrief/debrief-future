@@ -15,7 +15,7 @@ You **MUST** have an epic ID provided (e.g., `E01`, `E02`, `e03`, or just `01`).
 This command provides an epic-level workflow view — a progress dashboard that shows where an epic stands and which item to work on next. It reads all state from BACKLOG.md (no context accumulation across sessions) so you can re-run it cheaply after completing each item.
 
 ```
-/epic.backlog E02 → parse → read BACKLOG.md → gather items → resolve deps → dashboard → next item
+/epic.backlog EXX → parse → read BACKLOG.md → gather items → resolve deps → dashboard → next item
 ```
 
 ## Execution Flow
@@ -193,4 +193,4 @@ End with a compact summary line:
 ## Example Usage
 
 ```
-Human: /epic.backlog E02
+Human: /epic.backlog EXX
