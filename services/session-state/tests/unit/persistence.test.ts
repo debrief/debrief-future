@@ -71,6 +71,15 @@ describe('Persistence', () => {
       expect((persistent.temporal as Record<string, unknown>).playbackState).toBeUndefined();
     });
 
+    it('should exclude ephemeral drawingMode (T006)', () => {
+      store.getState().setDrawingMode('rectangle');
+
+      const persistent = extractPersistentState(store);
+
+      // drawingMode should always be null in persistent state (FR-010)
+      expect((persistent.spatial as Record<string, unknown>).drawingMode).toBeNull();
+    });
+
     it('should include schema version', () => {
       const persistent = extractPersistentState(store);
       expect(persistent.schemaVersion).toBe('1.0.0');

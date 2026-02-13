@@ -48,6 +48,7 @@ export function getState(
         spatial: {
           viewport: state.viewport,
           rotation: state.rotation,
+          drawingMode: state.drawingMode,
         },
         features: {
           featureCollectionUri: state.featureCollectionUri,
@@ -82,6 +83,7 @@ export function getState(
         state: {
           viewport: state.viewport,
           rotation: state.rotation,
+          drawingMode: state.drawingMode,
         },
       };
     case 'features':

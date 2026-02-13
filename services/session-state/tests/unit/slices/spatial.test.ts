@@ -164,4 +164,42 @@ describe('Spatial Slice', () => {
       expect(center).toEqual([10, 5]);
     });
   });
+
+  describe('drawingMode (FR-093)', () => {
+    it('should have null drawingMode by default (T004)', () => {
+      expect(store.getState().drawingMode).toBeNull();
+    });
+
+    it('should set drawingMode value (T004)', () => {
+      store.getState().setDrawingMode('rectangle');
+      expect(store.getState().drawingMode).toBe('rectangle');
+
+      store.getState().setDrawingMode('polygon');
+      expect(store.getState().drawingMode).toBe('polygon');
+
+      store.getState().setDrawingMode(null);
+      expect(store.getState().drawingMode).toBeNull();
+    });
+
+    it('should not create undo history when drawingMode changes (T005)', () => {
+      const initialCanUndo = store.getState().canUndo();
+      expect(initialCanUndo).toBe(false);
+
+      store.getState().setDrawingMode('point');
+      expect(store.getState().drawingMode).toBe('point');
+      expect(store.getState().canUndo()).toBe(false);
+
+      store.getState().setDrawingMode('polyline');
+      expect(store.getState().drawingMode).toBe('polyline');
+      expect(store.getState().canUndo()).toBe(false);
+    });
+
+    it('should reset drawingMode to null on store.reset() (T007)', () => {
+      store.getState().setDrawingMode('rectangle');
+      expect(store.getState().drawingMode).toBe('rectangle');
+
+      store.getState().reset();
+      expect(store.getState().drawingMode).toBeNull();
+    });
+  });
 });

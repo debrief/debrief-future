@@ -12,7 +12,7 @@ import type { OpenPlotsService } from '../services/openPlotsService';
 import type { IoService } from '../services/ioService';
 import type { SessionManager } from '../services/sessionManager';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
-import type { SessionStoreApi, SessionStoreWithUndo } from '@debrief/session-state';
+import type { SessionStoreApi, SessionStoreWithUndo, ResultIdRegistry } from '@debrief/session-state';
 import type { StacTreeProvider } from '../providers/stacTreeProvider';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
@@ -53,7 +53,8 @@ export function registerCommands(
   activityPanelProvider: ActivityPanelViewProvider,
   toolMatchAdapter: ToolMatchAdapter,
   getMapPanel: () => MapPanel | undefined,
-  setMapPanel: (panel: MapPanel | undefined) => void
+  setMapPanel: (panel: MapPanel | undefined) => void,
+  resultIdRegistry?: ResultIdRegistry
 ): vscode.Disposable[] {
   const disposables: vscode.Disposable[] = [];
 
@@ -75,7 +76,8 @@ export function registerCommands(
         timeRangeProvider,
         activityPanelProvider,
         getMapPanel,
-        setMapPanel
+        setMapPanel,
+        resultIdRegistry
       )
     )
   );
@@ -180,7 +182,7 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.executeTool',
-      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider, stacService, activityPanelProvider)
+      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider, stacService, activityPanelProvider, undefined, resultIdRegistry)
     )
   );
 

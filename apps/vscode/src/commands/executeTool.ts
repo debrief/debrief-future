@@ -15,7 +15,7 @@ import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { MapPanel } from '../webview/mapPanel';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
-import type { LogService, InputFeatureState } from '@debrief/session-state';
+import type { LogService, InputFeatureState, ResultIdRegistry } from '@debrief/session-state';
 
 /**
  * Create the execute tool command
@@ -27,6 +27,7 @@ import type { LogService, InputFeatureState } from '@debrief/session-state';
  * @param stacService - StacService for persisting results to STAC
  * @param activityPanelProvider - ActivityPanelViewProvider for updating result files
  * @param logService - LogService for recording provenance (Feature: 071)
+ * @param resultIdRegistry - ResultIdRegistry for tracking result IDs (Feature: 087)
  */
 export function createExecuteToolCommand(
   calcService: CalcService,
@@ -35,7 +36,8 @@ export function createExecuteToolCommand(
   layersTreeProvider: LayersTreeProvider,
   stacService?: StacService,
   activityPanelProvider?: ActivityPanelViewProvider,
-  logService?: LogService
+  logService?: LogService,
+  resultIdRegistry?: ResultIdRegistry
 ): (toolIdOrMessage: string | { toolId: string; params?: Record<string, unknown> }) => Promise<void> {
   return async (toolIdOrMessage: string | { toolId: string; params?: Record<string, unknown> }) => {
     // Handle string, { toolId, params } object, and legacy { toolName } format
@@ -195,7 +197,7 @@ export function createExecuteToolCommand(
           if (store?.path && plot?.itemPath) {
             // Include pre-tool inputState for mutation tools
             const isMutation = result.resultType?.startsWith('mutation/');
-            await logService.recordToolResult(
+            const recordResult = await logService.recordToolResult(
               {
                 success: true,
                 features: result.features,
@@ -216,6 +218,11 @@ export function createExecuteToolCommand(
               store.path,
               plot.itemPath
             );
+
+            // Update Result ID Registry from recorded entries (Feature: 087)
+            if (resultIdRegistry) {
+              resultIdRegistry.registerFromRecordResult(recordResult);
+            }
           }
         } catch (logErr) {
           console.warn('[debrief] Failed to record provenance:', logErr);
