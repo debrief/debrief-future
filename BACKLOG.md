@@ -157,7 +157,7 @@ Description formats:
 | ~~028~~ | ~~Tech Debt~~ | ~~[Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md)~~ | ~~4~~ | ~~2~~ | ~~5~~ | ~~11~~ | ~~Low~~ | ~~complete~~ |
 | 076 | Feature | [Implement replay and parameter tuning](specs/076-replay-tune/spec.md) [E02] — parameter editing, positional replay, revert operations (requires #071, #074) | 5 | 4 | 2 | 11 | High | implementing |
 | 056 | Feature | [Add move shape tool spec](specs/056-move-shape/spec.md) (requires #049) | 3 | 3 | 5 | 11 | Low | implementing |
-| 016 | Infrastructure | [Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md) | 3 | 5 | 4 | 12 | Medium | specified |
+| ~~016~~ | ~~Infrastructure~~ | ~~[Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md)~~ | ~~3~~ | ~~5~~ | ~~4~~ | ~~12~~ | ~~Medium~~ | ~~complete~~ |
 | 080 | Feature | [Implement buffer-zone-generator tool](specs/080-buffer-zone-generator/spec.md) [E03] — stub sensor model returning 3 detection-likelihood buffer polygons (requires #049, #079) | 4 | 4 | 4 | 12 | Medium | specified |
 | 091 | Feature | [Add tool parameter context menus for pre-execution configuration](specs/091-tool-parameter-context-menus/spec.md) — successive inline context menus in webview to collect parameter values before tool execution; presets defined in LinkML | 4 | 4 | 3 | 11 | High | specified |
 | 092 | Infrastructure | [[E05] Integrate Geoman drawing library](specs/092-integrate-geoman-drawing-library/spec.md) [E05] | 4 | 3 | 3 | 10 | Medium | specified |
