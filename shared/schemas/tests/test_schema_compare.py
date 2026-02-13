@@ -106,8 +106,17 @@ class TestEnumConsistency:
         enum_values = feature_kind_def.get("enum", [])
 
         expected = [
-            "TRACK", "POINT", "NARRATIVE", "CIRCLE", "RECTANGLE",
-            "LINE", "TEXT", "VECTOR", "SYSTEM", "MULTI_POINT", "MULTI_POLYGON",
+            "TRACK",
+            "POINT",
+            "NARRATIVE",
+            "CIRCLE",
+            "RECTANGLE",
+            "LINE",
+            "TEXT",
+            "VECTOR",
+            "SYSTEM",
+            "MULTI_POINT",
+            "MULTI_POLYGON",
         ]
         assert set(enum_values) == set(expected), (
             f"FeatureKindEnum values mismatch: {enum_values} vs {expected}"
