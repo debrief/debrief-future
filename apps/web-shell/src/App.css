@@ -147,6 +147,43 @@ body {
   overflow: hidden;
 }
 
+/* Collapsible section header (used for STAC Catalog toggle) */
+.web-shell__section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 12px;
+  background: var(--vscode-sideBarSectionHeader-background, #333333);
+  border: none;
+  border-bottom: 1px solid var(--vscode-panel-border, #454545);
+  color: var(--vscode-sideBarTitle-foreground, #bbbbbb);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.web-shell__section-header:hover {
+  color: var(--vscode-foreground, #cccccc);
+}
+
+.web-shell__section-header:focus {
+  outline: 1px solid var(--vscode-focusBorder, #007fd4);
+  outline-offset: -1px;
+}
+
+.web-shell__section-chevron {
+  font-size: 8px;
+  transition: transform 0.15s ease;
+}
+
+.web-shell__section-chevron--expanded {
+  transform: rotate(90deg);
+}
+
 /* File tree in sidebar (top section, fixed height) */
 .web-shell__file-tree {
   height: 200px;

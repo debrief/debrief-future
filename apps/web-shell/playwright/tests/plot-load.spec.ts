@@ -61,6 +61,39 @@ test.describe.skip('Plot Load', () => {
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 5000 });
   });
 
+  test('STAC Catalog section is collapsed by default', async ({ page }) => {
+    // Navigate to analysis view
+    await page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point').first().dblclick();
+    await expect(page.locator('.web-shell--analysis')).toBeVisible();
+
+    // Toggle button should exist and indicate collapsed state
+    const toggle = page.getByTestId('file-tree-toggle');
+    await expect(toggle).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+
+    // File tree should NOT be visible
+    await expect(page.locator('#sidebar-file-tree')).not.toBeVisible();
+  });
+
+  test('STAC Catalog section expands on click', async ({ page }) => {
+    // Navigate to analysis view
+    await page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point').first().dblclick();
+    await expect(page.locator('.web-shell--analysis')).toBeVisible();
+
+    // Click toggle to expand
+    const toggle = page.getByTestId('file-tree-toggle');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    // File tree should now be visible
+    await expect(page.locator('#sidebar-file-tree')).toBeVisible();
+
+    // Click again to collapse
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('#sidebar-file-tree')).not.toBeVisible();
+  });
+
   test('back button returns to catalog', async ({ page }) => {
     // Navigate to analysis view via timeline bar
     await page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point').first().dblclick();
