@@ -40,8 +40,8 @@
 
 **Purpose**: No project scaffolding needed — changes are within existing `shared/schemas` workspace.
 
-- [ ] T001 Verify schema generation pipeline works: `cd shared/schemas && make generate` `shared/schemas/Makefile`
-- [ ] T002 Run existing tests to establish baseline: `cd shared/schemas && make test` `shared/schemas/tests/test_golden.py`
+- [x] T001 Verify schema generation pipeline works: `cd shared/schemas && make generate` `shared/schemas/Makefile`
+- [x] T002 Run existing tests to establish baseline: `cd shared/schemas && make test` `shared/schemas/tests/test_golden.py`
 
 **Checkpoint**: Baseline green — existing schema generates and tests pass.
 
@@ -51,13 +51,13 @@
 
 **Purpose**: Add POLY enum value and annotation classes to LinkML schema. ALL user stories depend on this.
 
-- [ ] T003 Add POLY to FeatureKindEnum in `shared/schemas/src/linkml/common.yaml`
-- [ ] T004 Add PolyAnnotationProperties class in `shared/schemas/src/linkml/annotations.yaml`
-- [ ] T005 Add PolyAnnotation class in `shared/schemas/src/linkml/annotations.yaml`
-- [ ] T006 Regenerate all derived types: `cd shared/schemas && make generate` `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
-- [ ] T007 Verify POLY appears in generated Pydantic enum `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
-- [ ] T008 [P] Verify POLY appears in generated TypeScript types `shared/schemas/src/generated/typescript/types.ts`
-- [ ] T009 [P] Verify PolyAnnotation JSON Schema generated `shared/schemas/src/generated/json-schema/PolyAnnotation.schema.json`
+- [x] T003 Add POLY to FeatureKindEnum in `shared/schemas/src/linkml/common.yaml`
+- [x] T004 Add PolyAnnotationProperties class in `shared/schemas/src/linkml/annotations.yaml`
+- [x] T005 Add PolyAnnotation class in `shared/schemas/src/linkml/annotations.yaml`
+- [x] T006 Regenerate all derived types: `cd shared/schemas && make generate` `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
+- [x] T007 Verify POLY appears in generated Pydantic enum `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
+- [x] T008 [P] Verify POLY appears in generated TypeScript types `shared/schemas/src/generated/typescript/types.ts`
+- [x] T009 [P] Verify PolyAnnotation JSON Schema generated `shared/schemas/src/generated/json-schema/PolyAnnotation.schema.json`
 
 **Checkpoint**: Schema defined and types generated — fixture and test work can begin.
 
@@ -71,20 +71,20 @@
 
 ### Fixtures
 
-- [ ] T010 [P] Create valid simple polygon fixture (4 vertices) `shared/schemas/src/fixtures/valid/poly-annotation-valid-01.json`
-- [ ] T011 [P] Create valid complex polygon fixture (8+ vertices) `shared/schemas/src/fixtures/valid/poly-annotation-valid-02.json`
-- [ ] T012 [P] Create invalid fixture: wrong kind value `shared/schemas/src/fixtures/invalid/poly-annotation-invalid-kind.json`
-- [ ] T013 [P] Create invalid fixture: missing style property `shared/schemas/src/fixtures/invalid/poly-annotation-missing-style.json`
+- [x] T010 [P] Create valid simple polygon fixture (4 vertices) `shared/schemas/src/fixtures/valid/poly-annotation-valid-01.json`
+- [x] T011 [P] Create valid complex polygon fixture (8+ vertices) `shared/schemas/src/fixtures/valid/poly-annotation-valid-02.json`
+- [x] T012 [P] Create invalid fixture: wrong kind value `shared/schemas/src/fixtures/invalid/poly-annotation-invalid-kind.json`
+- [x] T013 [P] Create invalid fixture: missing style property `shared/schemas/src/fixtures/invalid/poly-annotation-missing-style.json`
 
 ### Test Runner Update
 
-- [ ] T014 Add PolyAnnotation import and ENTITY_MAP entry in `shared/schemas/tests/test_golden.py`
-- [ ] T015 Add poly-annotation to nested_coord_types set in `shared/schemas/tests/test_golden.py`
+- [x] T014 Add PolyAnnotation import and ENTITY_MAP entry in `shared/schemas/tests/test_golden.py`
+- [x] T015 Add poly-annotation to nested_coord_types set in `shared/schemas/tests/test_golden.py`
 
 ### Validation
 
-- [ ] T016 Run full test suite: `cd shared/schemas && make test` — zero regressions, POLY fixtures pass
-- [ ] T017 Verify build_polygon() IO output matches PolyAnnotation model (manual check or script)
+- [x] T016 Run full test suite: `cd shared/schemas && make test` — zero regressions, POLY fixtures pass
+- [x] T017 Verify build_polygon() IO output matches PolyAnnotation model (manual check or script)
 
 **Checkpoint**: POLY is fully schema-validated with golden fixtures. User Stories 1 and 2 are both satisfied.
 
@@ -96,9 +96,9 @@
 
 **Independent Test**: Validate a 5-point LINE fixture passes LineAnnotation schema validation.
 
-- [ ] T018 Create multi-vertex LINE fixture (5 points) `shared/schemas/src/fixtures/valid/line-annotation-valid-02.json`
-- [ ] T019 Run test suite to confirm LINE multi-vertex fixture passes `shared/schemas/tests/test_golden.py`
-- [ ] T020 Document LINE polyline confirmation in spec.md or evidence
+- [x] T018 Create multi-vertex LINE fixture (5 points) `shared/schemas/src/fixtures/valid/line-annotation-valid-02.json`
+- [x] T019 Run test suite to confirm LINE multi-vertex fixture passes `shared/schemas/tests/test_golden.py`
+- [x] T020 Document LINE polyline confirmation in spec.md or evidence
 
 **Checkpoint**: LINE confirmed to support polylines. No POLYLINE kind needed for E05.
 
@@ -108,15 +108,15 @@
 
 ### Evidence Collection
 
-- [ ] T021 Create evidence directory `specs/091-poly-featurekind/evidence/`
-- [ ] T022 Capture test results in `specs/091-poly-featurekind/evidence/test-summary.md`
-- [ ] T023 Create usage demonstration in `specs/091-poly-featurekind/evidence/usage-example.md`
-- [ ] T024 [P] Copy sample POLY fixture to `specs/091-poly-featurekind/evidence/sample-poly-output.json`
+- [x] T021 Create evidence directory `specs/091-poly-featurekind/evidence/`
+- [x] T022 Capture test results in `specs/091-poly-featurekind/evidence/test-summary.md`
+- [x] T023 Create usage demonstration in `specs/091-poly-featurekind/evidence/usage-example.md`
+- [x] T024 [P] Copy sample POLY fixture to `specs/091-poly-featurekind/evidence/sample-poly-output.json`
 
 ### Media Content
 
-- [ ] T025 Create shipped blog post in `specs/091-poly-featurekind/media/shipped-post.md`
-- [ ] T026 [P] Create LinkedIn shipped summary in `specs/091-poly-featurekind/media/linkedin-shipped.md`
+- [x] T025 Create shipped blog post in `specs/091-poly-featurekind/media/shipped-post.md`
+- [x] T026 [P] Create LinkedIn shipped summary in `specs/091-poly-featurekind/media/linkedin-shipped.md`
 
 ### PR Creation
 
