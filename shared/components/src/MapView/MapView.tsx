@@ -15,10 +15,6 @@ import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import './MapView.css';
 
-// Opt-in mode: Geoman only manages layers explicitly opted in, preventing
-// interference with existing GeoJSON track layers.
-L.PM.setOptIn(true);
-
 // Import marker icons as modules so Vite bundles them with correct paths
 // Icons bundled for offline support (CONSTITUTION.md)
 import markerIcon from '../assets/marker-icon.png';
@@ -388,9 +384,6 @@ export function MapView({
         className="debrief-mapview__container"
         style={{ height: '100%', width: '100%' }}
         zoomControl={!showToolbar}
-        // Opt the map into Geoman (L.PM.setOptIn(true) requires this).
-        // Individual GeoJSON layers still default to pmIgnore=true.
-        pmIgnore={false}
       >
         <TileLayer url={tileLayerUrl} attribution={tileLayerAttribution} />
 

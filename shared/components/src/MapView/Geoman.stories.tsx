@@ -164,7 +164,6 @@ export const GeomanToolbar: Story = {
           center={[50.5, -4.5]}
           zoom={10}
           style={{ height: '100%', width: '100%' }}
-          pmIgnore={false}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <GeomanWithToolbar onShapeCreated={setLastShape} />
@@ -208,7 +207,6 @@ export const Programmatic: Story = {
           center={[50.5, -4.5]}
           zoom={10}
           style={{ height: '100%', width: '100%' }}
-          pmIgnore={false}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <GeomanProgrammatic onShapeCreated={setLastShape} />
@@ -252,7 +250,6 @@ export const Dormant: Story = {
           center={[50.5, -4.5]}
           zoom={10}
           style={{ height: '100%', width: '100%' }}
-          pmIgnore={false}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         </MapContainer>
