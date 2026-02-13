@@ -167,16 +167,16 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T040 Create evidence directory `specs/078-generate-reference-points/evidence/`
-- [ ] T041 Capture test summary with pass/fail counts from pytest and vitest `specs/078-generate-reference-points/evidence/test-summary.md`
-- [ ] T042 Create usage demonstration showing both grid and scatter in Python and TypeScript `specs/078-generate-reference-points/evidence/usage-example.md`
-- [ ] T043 [P] Capture cross-language parity proof (identical output comparison) `specs/078-generate-reference-points/evidence/cross-language-parity.md`
-- [ ] T044 [P] Copy golden grid output as sample evidence `specs/078-generate-reference-points/evidence/golden-grid-output.json`
+- [x] T040 Create evidence directory `specs/078-generate-reference-points/evidence/`
+- [x] T041 Capture test summary with pass/fail counts from pytest and vitest `specs/078-generate-reference-points/evidence/test-summary.md`
+- [x] T042 Create usage demonstration showing both grid and scatter in Python and TypeScript `specs/078-generate-reference-points/evidence/usage-example.md`
+- [x] T043 [P] Capture cross-language parity proof (identical output comparison) `specs/078-generate-reference-points/evidence/cross-language-parity.md`
+- [x] T044 [P] Copy golden grid output as sample evidence `specs/078-generate-reference-points/evidence/golden-grid-output.json`
 
 ### Media Content
 
-- [ ] T045 Create shipped blog post `specs/078-generate-reference-points/media/shipped-post.md`
-- [ ] T046 [P] Create LinkedIn shipped summary `specs/078-generate-reference-points/media/linkedin-shipped.md`
+- [x] T045 Create shipped blog post `specs/078-generate-reference-points/media/shipped-post.md`
+- [x] T046 [P] Create LinkedIn shipped summary `specs/078-generate-reference-points/media/linkedin-shipped.md`
 
 ### PR Creation
 
