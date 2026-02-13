@@ -45,9 +45,9 @@
 
 **Purpose**: Verify the existing schema pipeline works before making changes
 
-- [ ] T001 Verify existing tests pass: run `uv run pytest tests/ -v` in `shared/schemas/`
-- [ ] T002 Verify existing generation works: run `make generate` in `shared/schemas/`
-- [ ] T003 Verify TypeScript compilation: run `pnpm exec tsc --noEmit` in `shared/schemas/`
+- [x] T001 Verify existing tests pass: run `uv run pytest tests/ -v` in `shared/schemas/`
+- [x] T002 Verify existing generation works: run `make generate` in `shared/schemas/`
+- [x] T003 Verify TypeScript compilation: run `pnpm exec tsc --noEmit` in `shared/schemas/`
 
 **Checkpoint**: Baseline confirmed — existing schema infrastructure is healthy
 
@@ -59,10 +59,10 @@
 
 **CRITICAL**: No feature type work can begin until geometry classes and enum values exist
 
-- [ ] T004 Add MULTI_POINT and MULTI_POLYGON to FeatureKindEnum `shared/schemas/src/linkml/common.yaml`
-- [ ] T005 Add GeoJSONMultiPoint geometry class `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T006 [P] Add GeoJSONMultiPolygon geometry class `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T007 Run LinkML validation: `make validate-linkml` in `shared/schemas/`
+- [x] T004 Add MULTI_POINT and MULTI_POLYGON to FeatureKindEnum `shared/schemas/src/linkml/common.yaml`
+- [x] T005 Add GeoJSONMultiPoint geometry class `shared/schemas/src/linkml/geojson.yaml`
+- [x] T006 [P] Add GeoJSONMultiPolygon geometry class `shared/schemas/src/linkml/geojson.yaml`
+- [x] T007 Run LinkML validation: `make validate-linkml` in `shared/schemas/`
 
 **Checkpoint**: Foundation ready — enum values and geometry classes exist in LinkML
 
@@ -78,22 +78,22 @@
 
 > **NOTE: Write fixtures FIRST — they define the expected valid/invalid shapes**
 
-- [ ] T008 [P] [US1] Create valid MultiPoint fixture with full properties `shared/schemas/src/fixtures/valid/multi-point-feature-valid-01.json`
-- [ ] T009 [P] [US1] Create valid MultiPoint fixture with provenance fields `shared/schemas/src/fixtures/valid/multi-point-feature-valid-02.json`
-- [ ] T010 [P] [US1] Create invalid MultiPoint fixture missing style `shared/schemas/src/fixtures/invalid/multi-point-feature-missing-style.json`
-- [ ] T011 [P] [US1] Create invalid MultiPoint fixture with wrong kind `shared/schemas/src/fixtures/invalid/multi-point-feature-invalid-kind.json`
+- [x] T008 [P] [US1] Create valid MultiPoint fixture with full properties `shared/schemas/src/fixtures/valid/multi-point-feature-valid-01.json`
+- [x] T009 [P] [US1] Create valid MultiPoint fixture with provenance fields `shared/schemas/src/fixtures/valid/multi-point-feature-valid-02.json`
+- [x] T010 [P] [US1] Create invalid MultiPoint fixture missing style `shared/schemas/src/fixtures/invalid/multi-point-feature-missing-style.json`
+- [x] T011 [P] [US1] Create invalid MultiPoint fixture with wrong kind `shared/schemas/src/fixtures/invalid/multi-point-feature-invalid-kind.json`
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Add MultiPointFeatureProperties class `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T013 [US1] Add MultiPointFeature class `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T014 [US1] Run schema generation: `make generate` in `shared/schemas/`
-- [ ] T015 [US1] Add MultiPointFeature to entity_types in generation script `shared/schemas/scripts/generate.py`
-- [ ] T016 [US1] Re-run generation to produce per-entity JSON Schema: `make generate` in `shared/schemas/`
-- [ ] T017 [US1] Add MultiPointFeature import and ENTITY_MAP entry to test_golden.py `shared/schemas/tests/test_golden.py`
-- [ ] T018 [US1] Add multi-point-feature to nested_coord_types in test_golden.py `shared/schemas/tests/test_golden.py`
-- [ ] T019 [US1] Run golden fixture tests: `uv run pytest tests/test_golden.py -v` in `shared/schemas/`
-- [ ] T020 [US1] Verify TypeScript compilation: `pnpm exec tsc --noEmit` in `shared/schemas/`
+- [x] T012 [US1] Add MultiPointFeatureProperties class `shared/schemas/src/linkml/geojson.yaml`
+- [x] T013 [US1] Add MultiPointFeature class `shared/schemas/src/linkml/geojson.yaml`
+- [x] T014 [US1] Run schema generation: `make generate` in `shared/schemas/`
+- [x] T015 [US1] Add MultiPointFeature to entity_types in generation script `shared/schemas/scripts/generate.py`
+- [x] T016 [US1] Re-run generation to produce per-entity JSON Schema: `make generate` in `shared/schemas/`
+- [x] T017 [US1] Add MultiPointFeature import and ENTITY_MAP entry to test_golden.py `shared/schemas/tests/test_golden.py`
+- [x] T018 [US1] Add multi-point-feature to nested_coord_types in test_golden.py `shared/schemas/tests/test_golden.py`
+- [x] T019 [US1] Run golden fixture tests: `uv run pytest tests/test_golden.py -v` in `shared/schemas/`
+- [x] T020 [US1] Verify TypeScript compilation: `pnpm exec tsc --noEmit` in `shared/schemas/`
 
 **Checkpoint**: MultiPoint Features validated by golden fixtures in Python, generated as JSON Schema and TypeScript
 
@@ -109,22 +109,22 @@
 
 > **NOTE: Write fixtures FIRST — they define the expected valid/invalid shapes**
 
-- [ ] T021 [P] [US2] Create valid MultiPolygon fixture with full properties `shared/schemas/src/fixtures/valid/multi-polygon-feature-valid-01.json`
-- [ ] T022 [P] [US2] Create valid MultiPolygon fixture with holes and provenance `shared/schemas/src/fixtures/valid/multi-polygon-feature-valid-02.json`
-- [ ] T023 [P] [US2] Create invalid MultiPolygon fixture missing style `shared/schemas/src/fixtures/invalid/multi-polygon-feature-missing-style.json`
-- [ ] T024 [P] [US2] Create invalid MultiPolygon fixture with wrong kind `shared/schemas/src/fixtures/invalid/multi-polygon-feature-invalid-kind.json`
+- [x] T021 [P] [US2] Create valid MultiPolygon fixture with full properties `shared/schemas/src/fixtures/valid/multi-polygon-feature-valid-01.json`
+- [x] T022 [P] [US2] Create valid MultiPolygon fixture with holes and provenance `shared/schemas/src/fixtures/valid/multi-polygon-feature-valid-02.json`
+- [x] T023 [P] [US2] Create invalid MultiPolygon fixture missing style `shared/schemas/src/fixtures/invalid/multi-polygon-feature-missing-style.json`
+- [x] T024 [P] [US2] Create invalid MultiPolygon fixture with wrong kind `shared/schemas/src/fixtures/invalid/multi-polygon-feature-invalid-kind.json`
 
 ### Implementation for User Story 2
 
-- [ ] T025 [US2] Add MultiPolygonFeatureProperties class `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T026 [US2] Add MultiPolygonFeature class `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T027 [US2] Run schema generation: `make generate` in `shared/schemas/`
-- [ ] T028 [US2] Add MultiPolygonFeature to entity_types in generation script `shared/schemas/scripts/generate.py`
-- [ ] T029 [US2] Re-run generation to produce per-entity JSON Schema: `make generate` in `shared/schemas/`
-- [ ] T030 [US2] Add MultiPolygonFeature import and ENTITY_MAP entry to test_golden.py `shared/schemas/tests/test_golden.py`
-- [ ] T031 [US2] Add multi-polygon-feature to nested_coord_types in test_golden.py `shared/schemas/tests/test_golden.py`
-- [ ] T032 [US2] Run golden fixture tests: `uv run pytest tests/test_golden.py -v` in `shared/schemas/`
-- [ ] T033 [US2] Verify TypeScript compilation: `pnpm exec tsc --noEmit` in `shared/schemas/`
+- [x] T025 [US2] Add MultiPolygonFeatureProperties class `shared/schemas/src/linkml/geojson.yaml`
+- [x] T026 [US2] Add MultiPolygonFeature class `shared/schemas/src/linkml/geojson.yaml`
+- [x] T027 [US2] Run schema generation: `make generate` in `shared/schemas/`
+- [x] T028 [US2] Add MultiPolygonFeature to entity_types in generation script `shared/schemas/scripts/generate.py`
+- [x] T029 [US2] Re-run generation to produce per-entity JSON Schema: `make generate` in `shared/schemas/`
+- [x] T030 [US2] Add MultiPolygonFeature import and ENTITY_MAP entry to test_golden.py `shared/schemas/tests/test_golden.py`
+- [x] T031 [US2] Add multi-polygon-feature to nested_coord_types in test_golden.py `shared/schemas/tests/test_golden.py`
+- [x] T032 [US2] Run golden fixture tests: `uv run pytest tests/test_golden.py -v` in `shared/schemas/`
+- [x] T033 [US2] Verify TypeScript compilation: `pnpm exec tsc --noEmit` in `shared/schemas/`
 
 **Checkpoint**: MultiPolygon Features validated by golden fixtures in Python, generated as JSON Schema and TypeScript
 
@@ -138,13 +138,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T034 [US3] Update FeatureKindEnum expected values in test_schema_compare.py `shared/schemas/tests/test_schema_compare.py`
-- [ ] T035 [US3] Run full Python test suite: `uv run pytest tests/ -v` in `shared/schemas/`
-- [ ] T036 [US3] Run TypeScript compilation check: `pnpm exec tsc --noEmit` in `shared/schemas/`
-- [ ] T037 [US3] Verify existing fixtures still pass (zero regressions): review test output for all entity types
-- [ ] T038 [US3] Verify generated Pydantic models include all new classes: inspect `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
-- [ ] T039 [US3] Verify generated JSON Schema includes all new definitions: inspect `shared/schemas/src/generated/json-schema/debrief.schema.json`
-- [ ] T040 [US3] Verify generated TypeScript includes all new interfaces: inspect `shared/schemas/src/generated/typescript/types.ts`
+- [x] T034 [US3] Update FeatureKindEnum expected values in test_schema_compare.py `shared/schemas/tests/test_schema_compare.py`
+- [x] T035 [US3] Run full Python test suite: `uv run pytest tests/ -v` in `shared/schemas/`
+- [x] T036 [US3] Run TypeScript compilation check: `pnpm exec tsc --noEmit` in `shared/schemas/`
+- [x] T037 [US3] Verify existing fixtures still pass (zero regressions): review test output for all entity types
+- [x] T038 [US3] Verify generated Pydantic models include all new classes: inspect `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
+- [x] T039 [US3] Verify generated JSON Schema includes all new definitions: inspect `shared/schemas/src/generated/json-schema/debrief.schema.json`
+- [x] T040 [US3] Verify generated TypeScript includes all new interfaces: inspect `shared/schemas/src/generated/typescript/types.ts`
 
 **Checkpoint**: Full schema pipeline validated — all existing tests pass, all new types generated correctly
 
@@ -158,9 +158,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T041 [US4] Create edge case fixture: MultiPoint with single point `shared/schemas/src/fixtures/valid/multi-point-feature-single-point.json`
-- [ ] T042 [P] [US4] Create edge case fixture: MultiPolygon with polygon containing holes `shared/schemas/src/fixtures/valid/multi-polygon-feature-with-holes.json`
-- [ ] T043 [US4] Run golden fixture tests to verify edge cases: `uv run pytest tests/test_golden.py -v` in `shared/schemas/`
+- [x] T041 [US4] Create edge case fixture: MultiPoint with single point `shared/schemas/src/fixtures/valid/multi-point-feature-single-point.json`
+- [x] T042 [P] [US4] Create edge case fixture: MultiPolygon with polygon containing holes `shared/schemas/src/fixtures/valid/multi-polygon-feature-with-holes.json`
+- [x] T043 [US4] Run golden fixture tests to verify edge cases: `uv run pytest tests/test_golden.py -v` in `shared/schemas/`
 
 **Checkpoint**: Mixed-geometry composition validated with edge cases
 
@@ -172,24 +172,24 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T044 Create evidence directory `specs/081-add-multi-feature-styling/evidence/`
-- [ ] T045 Capture test summary with pass/fail counts `specs/081-add-multi-feature-styling/evidence/test-summary.md`
-- [ ] T046 Record usage example demonstrating MultiPoint/MultiPolygon feature creation `specs/081-add-multi-feature-styling/evidence/usage-example.md`
-- [ ] T047 [P] Copy sample valid MultiPoint fixture to evidence `specs/081-add-multi-feature-styling/evidence/sample-multipoint.json`
-- [ ] T048 [P] Copy sample valid MultiPolygon fixture to evidence `specs/081-add-multi-feature-styling/evidence/sample-multipolygon.json`
+- [x] T044 Create evidence directory `specs/081-add-multi-feature-styling/evidence/`
+- [x] T045 Capture test summary with pass/fail counts `specs/081-add-multi-feature-styling/evidence/test-summary.md`
+- [x] T046 Record usage example demonstrating MultiPoint/MultiPolygon feature creation `specs/081-add-multi-feature-styling/evidence/usage-example.md`
+- [x] T047 [P] Copy sample valid MultiPoint fixture to evidence `specs/081-add-multi-feature-styling/evidence/sample-multipoint.json`
+- [x] T048 [P] Copy sample valid MultiPolygon fixture to evidence `specs/081-add-multi-feature-styling/evidence/sample-multipolygon.json`
 
 ### Quickstart Validation
 
-- [ ] T049 Run quickstart.md steps to verify implementation guide accuracy
+- [x] T049 Run quickstart.md steps to verify implementation guide accuracy
 
 ### Media Content
 
-- [ ] T050 Create shipped blog post `specs/081-add-multi-feature-styling/media/shipped-post.md`
-- [ ] T051 [P] Create LinkedIn shipped summary `specs/081-add-multi-feature-styling/media/linkedin-shipped.md`
+- [x] T050 Create shipped blog post `specs/081-add-multi-feature-styling/media/shipped-post.md`
+- [x] T051 [P] Create LinkedIn shipped summary `specs/081-add-multi-feature-styling/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T052 Create PR and publish blog: run /speckit.pr
+- [x] T052 Create PR and publish blog: run /speckit.pr
 
 **Task T052 must run last. It depends on all evidence and media tasks being complete.**
 

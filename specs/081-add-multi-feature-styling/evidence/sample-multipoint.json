@@ -1,0 +1,29 @@
+{
+  "type": "Feature",
+  "id": "mp-rendezvous-002",
+  "geometry": {
+    "type": "MultiPoint",
+    "coordinates": [
+      [-3.5000, 51.0000],
+      [-3.6000, 51.1000]
+    ]
+  },
+  "properties": {
+    "kind": "MULTI_POINT",
+    "label": "Rendezvous Candidates",
+    "style": {
+      "shape": "triangle",
+      "radius": 8,
+      "fill": true,
+      "fill_color": "#00FF00",
+      "fill_opacity": 0.6,
+      "stroke": true,
+      "color": "#009900",
+      "weight": 1,
+      "opacity": 0.9
+    },
+    "source_tool": "rendezvous-planner",
+    "source_features": ["track-alpha", "track-bravo"],
+    "description": "Candidate rendezvous positions computed from two track projections"
+  }
+}
