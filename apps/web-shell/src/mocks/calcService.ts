@@ -402,6 +402,17 @@ export function createMockCalcService(): MockCalcService {
           const item = response.content[0];
           const label = item?.annotations?.['debrief:label'] ?? `${toolId} applied`;
 
+          // Build provenance parameters from tool definition defaults + collected values
+          const toolDef = listTools().find(d => d.name === toolId);
+          const toolParamDefs = toolDef ? extractParameters(toolDef) : [];
+          const parameters: Record<string, ToolParameterMeta> = {};
+          for (const p of toolParamDefs) {
+            const value = params[p.name] ?? p.defaultValue;
+            if (value !== undefined) {
+              parameters[p.name] = { value, default: false, tunable: true };
+            }
+          }
+
           // For addition tools, parse result features and return as layers
           if (item?.resource?.text) {
             const fc = JSON.parse(item.resource.text);
@@ -410,11 +421,12 @@ export function createMockCalcService(): MockCalcService {
                 success: true,
                 message: String(label),
                 resultLayers: fc.features as Feature[],
+                parameters,
               };
             }
           }
 
-          return { success: true, message: String(label) };
+          return { success: true, message: String(label), parameters };
         } catch (err) {
           return { success: false, message: String(err) };
         }
