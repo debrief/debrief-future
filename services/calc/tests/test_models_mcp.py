@@ -156,3 +156,75 @@ class TestToMcpTool:
         assert params_schema["color"]["type"] == "string"
         assert "symbol" in params_schema
         assert params_schema["symbol"]["enum"] == ["circle", "square", "diamond"]
+
+    def test_param_type_included_in_schema(self):
+        """T019: x-debrief-param-type annotation is emitted when param_type is set."""
+        tool = Tool(
+            name="set-track-color",
+            description="Set color",
+            input_kinds=["TRACK"],
+            output_kind="mutation/track/styled",
+            context_type=ContextType.MULTI,
+            parameters=[
+                ToolParameter(
+                    name="color",
+                    type="enum",
+                    description="Track color",
+                    param_type="NamedColor",
+                ),
+            ],
+        )
+        mcp = tool.to_mcp_tool()
+        params_schema = mcp["inputSchema"]["properties"]["params"]["properties"]
+        assert "color" in params_schema
+        assert params_schema["color"]["x-debrief-param-type"] == "NamedColor"
+        # enum type with param_type but no choices should still have type: string
+        assert params_schema["color"]["type"] == "string"
+        # No enum key when choices are not provided
+        assert "enum" not in params_schema["color"]
+
+    def test_param_type_not_included_when_absent(self):
+        """T019: x-debrief-param-type is NOT emitted when param_type is None (backward compat)."""
+        tool = Tool(
+            name="set-track-color",
+            description="Set color",
+            input_kinds=["TRACK"],
+            output_kind="mutation/track/styled",
+            context_type=ContextType.MULTI,
+            parameters=[
+                ToolParameter(
+                    name="symbol",
+                    type="enum",
+                    description="Marker shape",
+                    choices=["circle", "square", "diamond"],
+                ),
+            ],
+        )
+        mcp = tool.to_mcp_tool()
+        params_schema = mcp["inputSchema"]["properties"]["params"]["properties"]
+        assert "symbol" in params_schema
+        assert "x-debrief-param-type" not in params_schema["symbol"]
+        assert params_schema["symbol"]["enum"] == ["circle", "square", "diamond"]
+
+    def test_param_type_with_choices_both_present(self):
+        """T019: Both enum values and x-debrief-param-type are emitted when both are set."""
+        tool = Tool(
+            name="set-track-color",
+            description="Set color",
+            input_kinds=["TRACK"],
+            output_kind="mutation/track/styled",
+            context_type=ContextType.MULTI,
+            parameters=[
+                ToolParameter(
+                    name="color",
+                    type="enum",
+                    description="Track color",
+                    choices=["red", "blue", "green"],
+                    param_type="NamedColor",
+                ),
+            ],
+        )
+        mcp = tool.to_mcp_tool()
+        params_schema = mcp["inputSchema"]["properties"]["params"]["properties"]
+        assert params_schema["color"]["enum"] == ["red", "blue", "green"]
+        assert params_schema["color"]["x-debrief-param-type"] == "NamedColor"

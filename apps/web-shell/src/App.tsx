@@ -435,8 +435,8 @@ export default function App() {
   }, [store]);
 
   // Handle tool execution — persist result to STAC assets and record a log entry
-  const handleRunTool = useCallback((toolId: string) => {
-    const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[]);
+  const handleRunTool = useCallback((toolId: string, params?: Record<string, unknown>) => {
+    const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[], params);
     setToolMessage(result.message);
 
     // Tools that transform features in-place (e.g. move-shape): replace in currentPlot
@@ -556,7 +556,7 @@ export default function App() {
         store.getState().setDisplayMode(toStoreMode(message.payload.mode));
         break;
       case 'tool:run':
-        handleRunTool(message.payload.toolId);
+        handleRunTool(message.payload.toolId, message.payload.params);
         break;
       case 'layer:select':
         store.getState().setSelection(message.payload.featureIds);
