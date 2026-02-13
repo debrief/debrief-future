@@ -200,6 +200,7 @@
         "TEXT",
         "VECTOR",
         "SYSTEM",
+        "POLY",
         "MULTI_POINT",
         "MULTI_POLYGON"
       ],
@@ -1060,6 +1061,92 @@
       ],
       "title": "PointShapeEnum",
       "type": "string"
+    },
+    "PolyAnnotation": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature for arbitrary polygon annotations. Geometry is a Polygon with user-defined vertices (freeform shape). Used for patrol zones, exclusion areas, search grids, etc.",
+      "properties": {
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONPolygon",
+          "description": "Polygon with user-defined vertices (closed ring)"
+        },
+        "id": {
+          "description": "Unique identifier",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/PolyAnnotationProperties",
+          "description": "Polygon metadata including vertex count and styling"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "PolyAnnotation",
+      "type": "object"
+    },
+    "PolyAnnotationProperties": {
+      "additionalProperties": false,
+      "description": "Properties for a PolyAnnotation",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "POLY",
+          "description": "Feature type discriminator"
+        },
+        "label": {
+          "description": "Annotation label text",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "line_number": {
+          "description": "Source line number for debugging",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_file": {
+          "description": "Original source file path",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "style": {
+          "$ref": "#/$defs/PolygonProperties",
+          "description": "Polygon styling properties for the polygon area"
+        },
+        "symbol": {
+          "description": "Display symbol code from REP file",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vertex_count": {
+          "description": "Number of unique vertices (excluding ring closure point)",
+          "minimum": 3,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "vertex_count",
+        "style"
+      ],
+      "title": "PolyAnnotationProperties",
+      "type": "object"
     },
     "PolygonProperties": {
       "additionalProperties": false,
