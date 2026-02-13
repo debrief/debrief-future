@@ -27,8 +27,8 @@ interface PointMetadataEntry {
 
 interface GeoJSONFeature {
   type: 'Feature';
-  id: string;
-  geometry: { type: string; coordinates: number[][] };
+  id?: string;
+  geometry: { type: string; coordinates: unknown };
   properties: Record<string, unknown>;
 }
 
