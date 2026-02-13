@@ -923,7 +923,7 @@ export class MapPanel {
         visible: true,
         selected: true,
       };
-      this.currentLocations.push(location);
+      this.currentLocations = [...this.currentLocations, location];
       console.log('[debrief] Added drawn point, locations count:', this.currentLocations.length);
       if (this.layersTreeProvider) {
         this.layersTreeProvider.setLocations(this.currentLocations);
@@ -944,7 +944,7 @@ export class MapPanel {
           id: feature.id,
         },
       };
-      this.otherFeatures.push(geoFeature);
+      this.otherFeatures = [...this.otherFeatures, geoFeature];
       console.log('[debrief] Added drawn shape, shapes count:', this.otherFeatures.length);
       if (this.layersTreeProvider) {
         this.layersTreeProvider.setShapes(this.otherFeatures);
