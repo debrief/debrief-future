@@ -176,6 +176,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Local filesystem STAC catalogs (no storage changes for this feature) (091-tool-parameter-context-menus)
 - Python 3.11 + pydantic >=2.0.0 (existing), stdlib `math` module only (080-buffer-zone-generator)
 - N/A (stateless tool — caller handles STAC persistence) (080-buffer-zone-generator)
+- TypeScript 5.x (shared components library) + Vega-Lite 5.x, Vega 5.x, vega-embed 6.x, React 18.x (peer) (085-chart-renderer)
+- N/A (stateless — consumes dataset JSON, produces rendered charts) (085-chart-renderer)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/schemas/dataset/range-bearing-series.schema.json",
+  "title": "RangeBearingSeriesDataset",
+  "description": "Line chart dataset for range and bearing time-series. Each series represents measurements between a pair of tracks.",
+  "type": "object",
+  "required": ["type", "title", "metadata", "series"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "range_bearing_series"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["xAxis", "yAxis"],
+      "properties": {
+        "xAxis": {
+          "type": "object",
+          "required": ["label", "type"],
+          "properties": {
+            "label": { "type": "string" },
+            "type": { "type": "string", "const": "temporal" },
+            "units": { "type": "string" }
+          }
+        },
+        "yAxis": {
+          "type": "object",
+          "required": ["label", "type"],
+          "properties": {
+            "label": { "type": "string" },
+            "type": { "type": "string", "const": "quantitative" },
+            "units": { "type": "string" }
+          }
+        }
+      }
+    },
+    "series": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "data"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Series name for the legend."
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["time", "value"],
+              "properties": {
+                "time": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "ISO 8601 timestamp."
+                },
+                "value": {
+                  "type": "number",
+                  "description": "Measurement value (range in nm, bearing in degrees, etc.)."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
