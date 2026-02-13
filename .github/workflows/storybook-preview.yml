@@ -20,12 +20,14 @@ on:
     paths:
       - 'shared/components/**'
       - 'apps/web-shell/**'
+      - 'services/calc/**'
       - '.github/workflows/storybook-preview.yml'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     paths:
       - 'shared/components/**'
       - 'apps/web-shell/**'
+      - 'services/calc/**'
       - '.github/workflows/storybook-preview.yml'
 
 permissions:
