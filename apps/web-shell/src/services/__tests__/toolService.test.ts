@@ -3,7 +3,7 @@
  * T045: Verify Python-only tools don't appear in web-shell.
  *
  * Validates that the web-shell toolService:
- * 1. Contains exactly the 4 styling tools implemented in TypeScript
+ * 1. Contains all TypeScript-implemented tools
  * 2. Does NOT include Python-only tools (track-stats, range-bearing, area-summary)
  * 3. Each tool has correct name, description, and requirements
  */
@@ -11,21 +11,23 @@
 import { describe, it, expect } from 'vitest';
 import { listTools, PYTHON_ONLY_TOOLS } from '../toolService';
 
-/** The 4 TypeScript-implemented styling tool IDs */
+/** All TypeScript-implemented tool IDs registered in the web-shell */
 const EXPECTED_TOOL_IDS = [
   'set-track-color',
   'apply-symbol-style',
   'label-interval',
   'symbol-interval',
+  'move-shape',
+  'buffer-zone-generator',
 ];
 
 describe('toolService.listTools (T041)', () => {
-  it('returns exactly 4 tools', () => {
+  it('returns all registered tools', () => {
     const tools = listTools();
-    expect(tools).toHaveLength(4);
+    expect(tools).toHaveLength(EXPECTED_TOOL_IDS.length);
   });
 
-  it('contains all 4 TypeScript styling tools', () => {
+  it('contains all expected TypeScript tools', () => {
     const tools = listTools();
     const toolIds = tools.map((t) => t.name);
 
@@ -40,7 +42,7 @@ describe('toolService.listTools (T041)', () => {
     expect(toolIds).toEqual([...EXPECTED_TOOL_IDS].sort());
   });
 
-  describe('each tool has correct structure', () => {
+  describe('styling tools have correct structure', () => {
     it('set-track-color has correct definition', () => {
       const tools = listTools();
       const tool = tools.find((t) => t.name === 'set-track-color');
@@ -111,24 +113,6 @@ describe('toolService.listTools (T041)', () => {
         expect(tool.annotations['debrief:category']).toBeDefined();
         expect(tool.annotations['debrief:version']).toBeDefined();
         expect(tool.annotations['debrief:outputKind']).toBeDefined();
-      }
-    });
-
-    it('all tools are in the track/styling category', () => {
-      const tools = listTools();
-      for (const tool of tools) {
-        expect(tool.annotations['debrief:category']).toBe('track/styling');
-      }
-    });
-
-    it('all tools require at least 1 TRACK feature', () => {
-      const tools = listTools();
-      for (const tool of tools) {
-        const trackReq = tool.annotations['debrief:selectionRequirements'].find(
-          (r) => r.kind === 'TRACK',
-        );
-        expect(trackReq).toBeDefined();
-        expect(trackReq!.min).toBeGreaterThanOrEqual(1);
       }
     });
   });

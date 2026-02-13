@@ -25,6 +25,8 @@ export interface ToolResult {
   message: string;
   /** Optional result layer (e.g., bounding box polygon) */
   resultLayer?: Feature;
+  /** Optional multiple result layers (e.g., buffer zone polygons) */
+  resultLayers?: Feature[];
   /** Optional tunable parameters recorded for provenance */
   parameters?: Record<string, ToolParameterMeta>;
 }
@@ -400,6 +402,19 @@ export function createMockCalcService(): MockCalcService {
           const response = executeTool(toolId, selectedFeatures as any, params);
           const item = response.content[0];
           const label = item?.annotations?.['debrief:label'] ?? `${toolId} applied`;
+
+          // For addition tools, parse result features and return as layers
+          if (item?.resource?.text) {
+            const fc = JSON.parse(item.resource.text);
+            if (fc.features && fc.features.length > 0) {
+              return {
+                success: true,
+                message: String(label),
+                resultLayers: fc.features as Feature[],
+              };
+            }
+          }
+
           return { success: true, message: String(label) };
         } catch (err) {
           return { success: false, message: String(err) };

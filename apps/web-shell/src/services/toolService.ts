@@ -71,6 +71,11 @@ import {
   execute as executeMoveShape,
 } from '../tools/shape/manipulation/moveShape';
 
+import {
+  toolDefinition as bufferZoneGeneratorDef,
+  execute as executeBufferZoneGenerator,
+} from '../tools/sensor/detection/bufferZoneGenerator';
+
 // Re-export types for consumers
 export type { MCPToolDefinition, MCPToolResponse, MCPContentItem, DebriefAnnotations };
 
@@ -143,6 +148,13 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
     {
       definition: moveShapeDef,
       execute: executeMoveShape,
+    },
+  ],
+  [
+    bufferZoneGeneratorDef.name,
+    {
+      definition: bufferZoneGeneratorDef,
+      execute: executeBufferZoneGenerator,
     },
   ],
 ]);
