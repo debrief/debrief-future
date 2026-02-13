@@ -186,7 +186,7 @@ Description formats:
 | 090 | Infrastructure | [E04 sample data workshop: identify realistic generators for all result types](docs/ideas/090-e04-sample-data-workshop.md) [E04] — collaborative workshop using E03 demo scenario; pseudocode + golden fixtures for all result categories (prerequisite for #085) | 5 | 3 | 2 | 10 | Low | approved |
 | 058 | Feature | [Add flip shape horizontal tool spec](docs/ideas/058-flip-shape-horizontal.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
 | 059 | Feature | [Add flip shape vertical tool spec](docs/ideas/059-flip-shape-vertical.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
-| 091 | Infrastructure | [[E05] Extend FeatureKindEnum for drawable shapes](docs/ideas/091-extend-featurekind-drawable-shapes.md) | - | - | - | - | Low | proposed |
+| 091 | Infrastructure | [[E05] Add POLY FeatureKind for arbitrary polygons](docs/ideas/091-extend-featurekind-drawable-shapes.md) | - | - | - | - | Low | proposed |
 | 092 | Infrastructure | [[E05] Integrate Geoman drawing library](docs/ideas/092-integrate-geoman-drawing-library.md) | - | - | - | - | Medium | proposed |
 | 093 | Feature | [[E05] Add drawing toolbar with shape palette](docs/ideas/093-drawing-toolbar-shape-palette.md) | - | - | - | - | Medium | proposed |
 | 094 | Feature | [[E05] Implement point and rectangle drawing](docs/ideas/094-point-rectangle-drawing.md) | - | - | - | - | Medium | proposed |
