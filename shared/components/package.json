@@ -34,7 +34,8 @@
     }
   },
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "**/leaflet-geoman*"
   ],
   "files": [
     "dist"
