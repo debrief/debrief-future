@@ -154,9 +154,9 @@
 
 **Purpose**: Automated Playwright tests against Storybook stories to verify drawing interactions across theme variants.
 
-- [ ] T026 Create Playwright e2e test for Drawing story `shared/components/e2e/Drawing.spec.ts`
-- [ ] T027 [P] Add theme variant tests (light, dark, vscode) `shared/components/e2e/Drawing.spec.ts`
-- [ ] T028 Run e2e tests: `pnpm --filter @debrief/components test:e2e Drawing`
+- [x] T026 Create Playwright e2e test for Drawing story `shared/components/e2e/Drawing.spec.ts`
+- [x] T027 [P] Add theme variant tests (light, dark, vscode) `shared/components/e2e/Drawing.spec.ts`
+- [x] T028 Run e2e tests: `pnpm --filter @debrief/components test:e2e Drawing`
 
 **Checkpoint**: E2E tests pass across all three theme variants.
 
