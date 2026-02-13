@@ -168,7 +168,7 @@ Description formats:
 | 080 | Feature | [Implement buffer-zone-generator tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — stub sensor model returning 3 detection-likelihood buffer polygons (requires #049, #079) | 4 | 4 | 4 | 12 | Medium | approved |
 | 081 | Feature | [Implement point-in-zone-classifier tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — classify and recolor reference points by buffer zone membership (requires #049, #078, #080) | 4 | 4 | 4 | 12 | Medium | approved |
 | 082 | Feature | [Implement zone-histogram-generator tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — outputs dataset/zone_histogram, point counts per buffer zone (requires #049, #081) | 4 | 4 | 4 | 12 | Medium | approved |
-| 061 | Feature | [Add generate courses and speeds for track tool spec](docs/ideas/061-generate-courses-speeds.md) (requires #049) | 4 | 3 | 5 | 12 | Low | approved |
+| 061 | Feature | [Add generate courses and speeds for track tool spec](specs/061-generate-courses-speeds/spec.md) (requires #049) | 4 | 3 | 5 | 12 | Low | specified |
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
 | 065 | Feature | [Implement Phase 2 tools: track/styling + dataset/export](docs/ideas/065-implement-tools-phase2-styling-export.md) [E01] — 15 styling and export tools (requires #064) | 4 | 3 | 4 | 11 | Medium | approved |
 | 060 | Feature | [Add resample track tool spec](docs/ideas/060-resample-track.md) (requires #049) | 4 | 3 | 4 | 11 | Medium | approved |
