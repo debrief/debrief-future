@@ -105,32 +105,40 @@ export function execute(features: GeoJSONFeature[]): GeoJSONFeature[] {
 
     // Phase 1: compute course and speed for each consecutive pair
     for (let i = 0; i < n - 1; i++) {
-      const [lon1, lat1] = coords[i];
-      const [lon2, lat2] = coords[i + 1];
+      const c1 = coords[i]!;
+      const c2 = coords[i + 1]!;
+      const lon1 = c1[0]!;
+      const lat1 = c1[1]!;
+      const lon2 = c2[0]!;
+      const lat2 = c2[1]!;
+      const pos = positions[i]!;
+      const posNext = positions[i + 1]!;
 
       const distanceNm = haversineDistance(lon1, lat1, lon2, lat2);
       const bearing = initialBearing(lon1, lat1, lon2, lat2);
 
-      const time1 = new Date(positions[i].time).getTime() / 1000;
-      const time2 = new Date(positions[i + 1].time).getTime() / 1000;
+      const time1 = new Date(pos.time).getTime() / 1000;
+      const time2 = new Date(posNext.time).getTime() / 1000;
       const elapsedSeconds = time2 - time1;
 
       if (distanceNm === 0) {
-        positions[i].course = 0;
-        positions[i].speed = 0;
+        pos.course = 0;
+        pos.speed = 0;
       } else if (elapsedSeconds <= 0) {
-        positions[i].course = round2(bearing);
-        positions[i].speed = 0;
+        pos.course = round2(bearing);
+        pos.speed = 0;
       } else {
         const elapsedHours = elapsedSeconds / 3600;
-        positions[i].course = round2(bearing);
-        positions[i].speed = round2(distanceNm / elapsedHours);
+        pos.course = round2(bearing);
+        pos.speed = round2(distanceNm / elapsedHours);
       }
     }
 
     // Phase 2: last position carries forward
-    positions[n - 1].course = positions[n - 2].course;
-    positions[n - 1].speed = positions[n - 2].speed;
+    const last = positions[n - 1]!;
+    const prev = positions[n - 2]!;
+    last.course = prev.course;
+    last.speed = prev.speed;
 
     modified.push(feature);
   }

@@ -3,7 +3,6 @@
 import copy
 
 import pytest
-
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.track.manipulation.generate_courses_speeds import (
     generate_courses_speeds,
