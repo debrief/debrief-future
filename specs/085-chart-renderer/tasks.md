@@ -50,12 +50,12 @@
 
 **Purpose**: Add Vega-Lite dependencies and scaffold the ChartRenderer module structure
 
-- [ ] T001 Install vega, vega-lite, vega-embed dependencies in shared/components `shared/components/package.json`
-- [ ] T002 Add ChartRenderer entry point to Vite build config `shared/components/vite.config.ts`
-- [ ] T003 Add ChartRenderer subpath export to package.json `shared/components/package.json`
-- [ ] T004 [P] Create ChartRenderer module directory structure `shared/components/src/ChartRenderer/index.ts`
-- [ ] T005 [P] Create transformer module directory structure `shared/components/src/ChartRenderer/transformer/index.ts`
-- [ ] T006 [P] Create fixtures directory with test datasets `shared/components/src/ChartRenderer/fixtures/`
+- [x] T001 Install vega, vega-lite, vega-embed dependencies in shared/components `shared/components/package.json`
+- [x] T002 Add ChartRenderer entry point to Vite build config `shared/components/vite.config.ts`
+- [x] T003 Add ChartRenderer subpath export to package.json `shared/components/package.json`
+- [x] T004 [P] Create ChartRenderer module directory structure `shared/components/src/ChartRenderer/index.ts`
+- [x] T005 [P] Create transformer module directory structure `shared/components/src/ChartRenderer/transformer/index.ts`
+- [x] T006 [P] Create fixtures directory with test datasets `shared/components/src/ChartRenderer/fixtures/`
 
 **Checkpoint**: Module scaffolding in place, dependencies installed, build config updated
 
@@ -67,16 +67,16 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Define DatasetEnvelope, AxisDefinition, DataSeries types `shared/components/src/ChartRenderer/types.ts`
-- [ ] T008 Define TransformerError, TransformResult, TransformFunction types `shared/components/src/ChartRenderer/transformer/types.ts`
-- [ ] T009 Implement TransformerRegistry class with register/transform/getSupportedTypes `shared/components/src/ChartRenderer/transformer/registry.ts`
-- [ ] T010 [test] Write unit tests for TransformerRegistry `shared/components/src/ChartRenderer/transformer/registry.test.ts`
-- [ ] T011 Implement theme config mapper (CSS custom properties → Vega-Lite config) `shared/components/src/ChartRenderer/transformer/theme.ts`
-- [ ] T012 Create transformDataset() entry point wiring registry + theme `shared/components/src/ChartRenderer/transformer/index.ts`
-- [ ] T013 [P] Create zone-histogram fixture JSON `shared/components/src/ChartRenderer/fixtures/zone-histogram.json`
-- [ ] T014 [P] Create range-bearing-series fixture JSON `shared/components/src/ChartRenderer/fixtures/range-bearing-series.json`
-- [ ] T015 [P] Create empty-dataset fixture JSON `shared/components/src/ChartRenderer/fixtures/empty-dataset.json`
-- [ ] T016 [P] Create malformed-dataset fixture JSON `shared/components/src/ChartRenderer/fixtures/malformed-dataset.json`
+- [x] T007 Define DatasetEnvelope, AxisDefinition, DataSeries types `shared/components/src/ChartRenderer/types.ts`
+- [x] T008 Define TransformerError, TransformResult, TransformFunction types `shared/components/src/ChartRenderer/transformer/types.ts`
+- [x] T009 Implement TransformerRegistry class with register/transform/getSupportedTypes `shared/components/src/ChartRenderer/transformer/registry.ts`
+- [x] T010 [test] Write unit tests for TransformerRegistry `shared/components/src/ChartRenderer/transformer/registry.test.ts`
+- [x] T011 Implement theme config mapper (CSS custom properties → Vega-Lite config) `shared/components/src/ChartRenderer/transformer/theme.ts`
+- [x] T012 Create transformDataset() entry point wiring registry + theme `shared/components/src/ChartRenderer/transformer/index.ts`
+- [x] T013 [P] Create zone-histogram fixture JSON `shared/components/src/ChartRenderer/fixtures/zone-histogram.json`
+- [x] T014 [P] Create range-bearing-series fixture JSON `shared/components/src/ChartRenderer/fixtures/range-bearing-series.json`
+- [x] T015 [P] Create empty-dataset fixture JSON `shared/components/src/ChartRenderer/fixtures/empty-dataset.json`
+- [x] T016 [P] Create malformed-dataset fixture JSON `shared/components/src/ChartRenderer/fixtures/malformed-dataset.json`
 
 **Checkpoint**: Foundation ready — transformer registry operational, types defined, fixtures in place
 
@@ -92,19 +92,19 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T017 [test] [US1] Write transformer unit test: zone_histogram → bar chart spec `shared/components/src/ChartRenderer/transformer/mappings.test.ts`
-- [ ] T018 [test] [US1] Write ChartRenderer unit test: renders bar chart from valid spec `shared/components/src/ChartRenderer/ChartRenderer.test.tsx`
-- [ ] T019 [test] [US1] Write ChartRenderer unit test: displays empty state for zero data points `shared/components/src/ChartRenderer/ChartRenderer.test.tsx`
-- [ ] T020 [test] [US1] Write ChartRenderer unit test: displays error state for null/malformed spec `shared/components/src/ChartRenderer/ChartRenderer.test.tsx`
+- [x] T017 [test] [US1] Write transformer unit test: zone_histogram → bar chart spec `shared/components/src/ChartRenderer/transformer/mappings.test.ts`
+- [x] T018 [test] [US1] Write ChartRenderer unit test: renders bar chart from valid spec `shared/components/src/ChartRenderer/ChartRenderer.test.tsx`
+- [x] T019 [test] [US1] Write ChartRenderer unit test: displays empty state for zero data points `shared/components/src/ChartRenderer/ChartRenderer.test.tsx`
+- [x] T020 [test] [US1] Write ChartRenderer unit test: displays error state for null/malformed spec `shared/components/src/ChartRenderer/ChartRenderer.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T021 [US1] Implement zoneHistogram mapping function (zone_histogram → bar chart Vega-Lite spec) `shared/components/src/ChartRenderer/transformer/mappings/zoneHistogram.ts`
-- [ ] T022 [US1] Register zoneHistogram in mappings index `shared/components/src/ChartRenderer/transformer/mappings/index.ts`
-- [ ] T023 [US1] Implement ChartRenderer React component with vega-embed lifecycle, error boundary, empty state, and loading state `shared/components/src/ChartRenderer/ChartRenderer.tsx`
-- [ ] T024 [US1] Export ChartRenderer and transformDataset from module index `shared/components/src/ChartRenderer/index.ts`
-- [ ] T025 [US1] Add ChartRenderer re-export to shared/components main index `shared/components/src/index.ts`
-- [ ] T026 [US1] Verify tests pass: run `pnpm --filter @debrief/components test`
+- [x] T021 [US1] Implement zoneHistogram mapping function (zone_histogram → bar chart Vega-Lite spec) `shared/components/src/ChartRenderer/transformer/mappings/zoneHistogram.ts`
+- [x] T022 [US1] Register zoneHistogram in mappings index `shared/components/src/ChartRenderer/transformer/mappings/index.ts`
+- [x] T023 [US1] Implement ChartRenderer React component with vega-embed lifecycle, error boundary, empty state, and loading state `shared/components/src/ChartRenderer/ChartRenderer.tsx`
+- [x] T024 [US1] Export ChartRenderer and transformDataset from module index `shared/components/src/ChartRenderer/index.ts`
+- [x] T025 [US1] Add ChartRenderer re-export to shared/components main index `shared/components/src/index.ts`
+- [x] T026 [US1] Verify tests pass: run `pnpm --filter @debrief/components test`
 
 **Checkpoint**: User Story 1 complete — zone_histogram datasets render as bar charts with labels, title, and error handling
 
@@ -120,17 +120,17 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T027 [test] [US2] Write transformer unit test: range_bearing_series → line chart spec `shared/components/src/ChartRenderer/transformer/mappings.test.ts`
-- [ ] T028 [test] [US2] Write transformer unit test: unsupported type → TransformerError `shared/components/src/ChartRenderer/transformer/mappings.test.ts`
-- [ ] T029 [test] [US2] Write transformer unit test: malformed dataset → TransformerError `shared/components/src/ChartRenderer/transformer/mappings.test.ts`
-- [ ] T030 [test] [US2] Write ChartRenderer unit test: renders line chart with temporal x-axis `shared/components/src/ChartRenderer/ChartRenderer.test.tsx`
+- [x] T027 [test] [US2] Write transformer unit test: range_bearing_series → line chart spec `shared/components/src/ChartRenderer/transformer/mappings.test.ts`
+- [x] T028 [test] [US2] Write transformer unit test: unsupported type → TransformerError `shared/components/src/ChartRenderer/transformer/mappings.test.ts`
+- [x] T029 [test] [US2] Write transformer unit test: malformed dataset → TransformerError `shared/components/src/ChartRenderer/transformer/mappings.test.ts`
+- [x] T030 [test] [US2] Write ChartRenderer unit test: renders line chart with temporal x-axis `shared/components/src/ChartRenderer/ChartRenderer.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T031 [US2] Implement rangeBearingSeries mapping function (range_bearing_series → line chart Vega-Lite spec with multi-series support) `shared/components/src/ChartRenderer/transformer/mappings/rangeBearingSeries.ts`
-- [ ] T032 [US2] Register rangeBearingSeries in mappings index `shared/components/src/ChartRenderer/transformer/mappings/index.ts`
-- [ ] T033 [US2] Add validation logic in transformDataset for unsupported types and malformed schemas `shared/components/src/ChartRenderer/transformer/index.ts`
-- [ ] T034 [US2] Verify tests pass: run `pnpm --filter @debrief/components test`
+- [x] T031 [US2] Implement rangeBearingSeries mapping function (range_bearing_series → line chart Vega-Lite spec with multi-series support) `shared/components/src/ChartRenderer/transformer/mappings/rangeBearingSeries.ts`
+- [x] T032 [US2] Register rangeBearingSeries in mappings index `shared/components/src/ChartRenderer/transformer/mappings/index.ts`
+- [x] T033 [US2] Add validation logic in transformDataset for unsupported types and malformed schemas `shared/components/src/ChartRenderer/transformer/index.ts`
+- [x] T034 [US2] Verify tests pass: run `pnpm --filter @debrief/components test`
 
 **Checkpoint**: User Stories 1 AND 2 work independently — two dataset types produce correct chart types, unsupported types return errors
 
@@ -144,12 +144,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T035 [US3] Create Storybook story: BarChart (zone_histogram fixture → chart) `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
-- [ ] T036 [US3] Create Storybook story: LineChart (range_bearing_series fixture → chart) `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
-- [ ] T037 [US3] Create Storybook story: EmptyState (empty dataset fixture) `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
-- [ ] T038 [US3] Create Storybook story: ErrorState (malformed dataset + null spec) `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
-- [ ] T039 [US3] Create Storybook story: LargeDataset (10,000 data point fixture for performance) `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
-- [ ] T040 [US3] Verify Storybook builds and all stories render: `pnpm --filter @debrief/components storybook`
+- [x] T035 [US3] Create Storybook story: BarChart (zone_histogram fixture → chart) `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
+- [x] T036 [US3] Create Storybook story: LineChart (range_bearing_series fixture → chart) `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
+- [x] T037 [US3] Create Storybook story: EmptyState (empty dataset fixture) `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
+- [x] T038 [US3] Create Storybook story: ErrorState (malformed dataset + null spec) `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
+- [x] T039 [US3] Create Storybook story: LargeDataset (10,000 data point fixture for performance) `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
+- [x] T040 [US3] Verify Storybook builds and all stories render: `pnpm --filter @debrief/components storybook`
 
 **Checkpoint**: Developers can view all chart types and edge cases in Storybook standalone environment
 
@@ -163,9 +163,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T041 [test] [US4] Write isolation check: automated grep for vega imports outside ChartRenderer module `shared/components/src/ChartRenderer/ChartRenderer.test.tsx`
-- [ ] T042 [US4] Review and verify transformer module structure ensures all Vega-Lite knowledge is contained within `shared/components/src/ChartRenderer/transformer/` and `shared/components/src/ChartRenderer/ChartRenderer.tsx`
-- [ ] T043 [US4] Verify isolation test passes: run `pnpm --filter @debrief/components test`
+- [x] T041 [test] [US4] Write isolation check: automated grep for vega imports outside ChartRenderer module `shared/components/src/ChartRenderer/ChartRenderer.test.tsx`
+- [x] T042 [US4] Review and verify transformer module structure ensures all Vega-Lite knowledge is contained within `shared/components/src/ChartRenderer/transformer/` and `shared/components/src/ChartRenderer/ChartRenderer.tsx`
+- [x] T043 [US4] Verify isolation test passes: run `pnpm --filter @debrief/components test`
 
 **Checkpoint**: Architectural isolation verified — Vega-Lite referenced only in ChartRenderer module
 
@@ -177,12 +177,12 @@
 
 ### E2E Tests
 
-- [ ] T044 [test] Create Playwright E2E test: BarChart renders in light/dark/vscode themes `shared/components/e2e/ChartRenderer.spec.ts`
-- [ ] T045 [test] Create Playwright E2E test: LineChart renders in light/dark/vscode themes `shared/components/e2e/ChartRenderer.spec.ts`
-- [ ] T046 [test] Create Playwright E2E test: EmptyState displays message across themes `shared/components/e2e/ChartRenderer.spec.ts`
-- [ ] T047 [test] Create Playwright E2E test: ErrorState displays message without crash `shared/components/e2e/ChartRenderer.spec.ts`
-- [ ] T048 [test] Create Playwright E2E test: hover interaction shows tooltip `shared/components/e2e/ChartRenderer.spec.ts`
-- [ ] T049 Run full E2E suite: `pnpm --filter @debrief/components test:e2e`
+- [x] T044 [test] Create Playwright E2E test: BarChart renders in light/dark/vscode themes `shared/components/e2e/ChartRenderer.spec.ts`
+- [x] T045 [test] Create Playwright E2E test: LineChart renders in light/dark/vscode themes `shared/components/e2e/ChartRenderer.spec.ts`
+- [x] T046 [test] Create Playwright E2E test: EmptyState displays message across themes `shared/components/e2e/ChartRenderer.spec.ts`
+- [x] T047 [test] Create Playwright E2E test: ErrorState displays message without crash `shared/components/e2e/ChartRenderer.spec.ts`
+- [x] T048 [test] Create Playwright E2E test: hover interaction shows tooltip `shared/components/e2e/ChartRenderer.spec.ts`
+- [x] T049 Run full E2E suite: `pnpm --filter @debrief/components test:e2e`
 
 **Checkpoint**: E2E tests pass across all theme variants with visual evidence captured
 
@@ -194,19 +194,19 @@
 
 ### Evidence Collection
 
-- [ ] T050 Create evidence directory `specs/085-chart-renderer/evidence/`
-- [ ] T051 Capture test summary with Vitest + Playwright pass/fail counts `specs/085-chart-renderer/evidence/test-summary.md`
-- [ ] T052 Create usage example demonstrating dataset → transformer → ChartRenderer flow `specs/085-chart-renderer/evidence/usage-example.md`
-- [ ] T053 [P] Capture Storybook screenshots for bar chart (light/dark/vscode) `specs/085-chart-renderer/evidence/screenshots/`
-- [ ] T054 [P] Capture Storybook screenshots for line chart (light theme) `specs/085-chart-renderer/evidence/screenshots/`
-- [ ] T055 [P] Capture Storybook screenshots for empty state and error state `specs/085-chart-renderer/evidence/screenshots/`
-- [ ] T056 Run Vega-Lite isolation check and capture results `specs/085-chart-renderer/evidence/isolation-check.md`
-- [ ] T057 Document E2E results `specs/085-chart-renderer/evidence/e2e-summary.md`
+- [x] T050 Create evidence directory `specs/085-chart-renderer/evidence/`
+- [x] T051 Capture test summary with Vitest + Playwright pass/fail counts `specs/085-chart-renderer/evidence/test-summary.md`
+- [x] T052 Create usage example demonstrating dataset → transformer → ChartRenderer flow `specs/085-chart-renderer/evidence/usage-example.md`
+- [x] T053 [P] Capture Storybook screenshots for bar chart (light/dark/vscode) `specs/085-chart-renderer/evidence/screenshots/`
+- [x] T054 [P] Capture Storybook screenshots for line chart (light theme) `specs/085-chart-renderer/evidence/screenshots/`
+- [x] T055 [P] Capture Storybook screenshots for empty state and error state `specs/085-chart-renderer/evidence/screenshots/`
+- [x] T056 Run Vega-Lite isolation check and capture results `specs/085-chart-renderer/evidence/isolation-check.md`
+- [x] T057 Document E2E results `specs/085-chart-renderer/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T058 Create shipped blog post `specs/085-chart-renderer/media/shipped-post.md`
-- [ ] T059 [P] Create LinkedIn shipped summary `specs/085-chart-renderer/media/linkedin-shipped.md`
+- [x] T058 Create shipped blog post `specs/085-chart-renderer/media/shipped-post.md`
+- [x] T059 [P] Create LinkedIn shipped summary `specs/085-chart-renderer/media/linkedin-shipped.md`
 
 ### PR Creation
 
