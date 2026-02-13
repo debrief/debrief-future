@@ -72,3 +72,26 @@
 .debrief-leaflet-toolbar__button--disabled:hover {
   background-color: var(--debrief-map-controls-bg);
 }
+
+/* TEMPORARY: 092-proof-of-concept — remove when #093 lands */
+/* Active state for draw rectangle button */
+.debrief-leaflet-toolbar__button--active {
+  background-color: var(--debrief-color-primary, #0066cc);
+  color: #fff;
+}
+
+.debrief-leaflet-toolbar__button--active:hover {
+  background-color: var(--debrief-color-primary, #0066cc);
+  opacity: 0.9;
+}
+
+/* Draw rectangle button with SVG icon */
+.debrief-leaflet-toolbar__draw-rect {
+  padding: 0;
+}
+
+.debrief-leaflet-toolbar__draw-rect svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
