@@ -10,8 +10,14 @@ import { extractTemporalData } from './temporal-utils';
 import { TemporalTrackLayer } from './TemporalTrackLayer';
 import { PositionSymbolsLayer } from './PositionSymbolsLayer';
 import { LeafletToolbar } from './LeafletToolbar';
+import '@geoman-io/leaflet-geoman-free';
 import 'leaflet/dist/leaflet.css';
+import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import './MapView.css';
+
+// Opt-in mode: Geoman only manages layers explicitly opted in, preventing
+// interference with existing GeoJSON track layers.
+L.PM.setOptIn(true);
 
 // Import marker icons as modules so Vite bundles them with correct paths
 // Icons bundled for offline support (CONSTITUTION.md)
