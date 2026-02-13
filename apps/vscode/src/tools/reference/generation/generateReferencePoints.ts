@@ -14,8 +14,6 @@ const LCG_MODULUS = 2 ** 32; // 4294967296
 
 export interface GenerateReferencePointsParams {
   pattern: 'grid' | 'scatter';
-  rows?: number;
-  cols?: number;
   count?: number;
   seed?: number;
 }
@@ -31,6 +29,9 @@ interface GeoJSONFeature {
   geometry: { type: string; coordinates: unknown };
   properties: Record<string, unknown>;
 }
+
+/** Preset count values shown in the ParameterCollector UI. */
+const COUNT_PRESETS = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000];
 
 export const toolDefinition: MCPToolDefinition = {
   name: 'generate-reference-points',
@@ -50,20 +51,12 @@ export const toolDefinition: MCPToolDefinition = {
               "Generation pattern: 'grid' for evenly spaced rows/columns, 'scatter' for random distribution",
             'x-debrief-param-type': 'ReferencePointPattern',
           },
-          rows: {
-            type: 'integer',
-            minimum: 1,
-            description: 'Number of rows (grid pattern only)',
-          },
-          cols: {
-            type: 'integer',
-            minimum: 1,
-            description: 'Number of columns (grid pattern only)',
-          },
           count: {
             type: 'integer',
+            enum: COUNT_PRESETS,
             minimum: 1,
-            description: 'Number of points to generate (scatter pattern only)',
+            default: 20,
+            description: 'Number of reference points to generate',
           },
           seed: {
             type: 'integer',
@@ -158,14 +151,24 @@ function buildMultiPointFeature(
   };
 }
 
+/**
+ * Compute grid dimensions (rows, cols) from a target count.
+ * Produces a near-square grid with rows * cols >= count.
+ */
+function gridDimensions(count: number): [number, number] {
+  const cols = Math.ceil(Math.sqrt(count));
+  const rows = Math.ceil(count / cols);
+  return [rows, cols];
+}
+
 function generateGrid(
   west: number,
   south: number,
   east: number,
   north: number,
-  rows: number,
-  cols: number,
+  count: number,
 ): GeoJSONFeature {
+  const [rows, cols] = gridDimensions(count);
   const effectiveEast = west > east ? east + 360 : east;
 
   const coordinates: number[][] = [];
@@ -178,13 +181,15 @@ function generateGrid(
         : south + (r * (north - south)) / (rows - 1);
 
     for (let c = 0; c < cols; c++) {
+      const idx = r * cols + c;
+      if (idx >= count) break;
+
       let lon =
         cols === 1
           ? (west + effectiveEast) / 2
           : west + (c * (effectiveEast - west)) / (cols - 1);
       lon = normaliseLon(lon);
 
-      const idx = r * cols + c;
       coordinates.push([lon, lat]);
       metadata.push({ index: idx, name: `Ref ${idx + 1}` });
     }
@@ -194,7 +199,7 @@ function generateGrid(
     'ref-grid',
     coordinates,
     metadata,
-    `Reference Points (grid ${rows}x${cols})`,
+    `Reference Points (grid ${count})`,
   );
 }
 
@@ -249,18 +254,15 @@ export function execute(
     throw new Error("Pattern must be 'grid' or 'scatter'");
   }
 
+  const count = Number(params.count ?? 20);
+  validatePositiveInt(count, 'count');
+
   const bounds = extractBoundsFromPolygon(features[0]!);
   const [west, south, east, north] = validateBounds(bounds);
 
   if (pattern === 'grid') {
-    const rows = params.rows ?? 5;
-    const cols = params.cols ?? 5;
-    validatePositiveInt(rows, 'rows');
-    validatePositiveInt(cols, 'cols');
-    return [generateGrid(west, south, east, north, rows, cols)];
+    return [generateGrid(west, south, east, north, count)];
   } else {
-    const count = params.count ?? 25;
-    validatePositiveInt(count, 'count');
     return [generateScatter(west, south, east, north, count, params.seed)];
   }
 }

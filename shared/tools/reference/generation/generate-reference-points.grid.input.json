@@ -17,7 +17,6 @@
   ],
   "params": {
     "pattern": "grid",
-    "rows": 3,
-    "cols": 4
+    "count": 12
   }
 }

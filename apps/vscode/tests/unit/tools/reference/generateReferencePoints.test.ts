@@ -36,11 +36,10 @@ const defaultPolygon = makePolygon(-5, 49, 1, 52);
 // ============================================================================
 
 describe('Grid Pattern', () => {
-  it('3x4 grid returns 12 coordinates', () => {
+  it('count=12 grid returns 12 coordinates in a 3x4 layout', () => {
     const result = execute([defaultPolygon], {
       pattern: 'grid',
-      rows: 3,
-      cols: 4,
+      count: 12,
     });
 
     expect(result).toHaveLength(1);
@@ -49,11 +48,10 @@ describe('Grid Pattern', () => {
     expect(feature.geometry.coordinates).toHaveLength(12);
   });
 
-  it('3x4 grid has correct positions', () => {
+  it('count=12 grid has correct positions (3x4 layout)', () => {
     const result = execute([defaultPolygon], {
       pattern: 'grid',
-      rows: 3,
-      cols: 4,
+      count: 12,
     });
 
     const coords = result[0].geometry.coordinates;
@@ -77,11 +75,10 @@ describe('Grid Pattern', () => {
     expect(coords[11]).toEqual([1.0, 52.0]);
   });
 
-  it('1x1 grid returns centre point', () => {
+  it('count=1 grid returns centre point', () => {
     const result = execute([defaultPolygon], {
       pattern: 'grid',
-      rows: 1,
-      cols: 1,
+      count: 1,
     });
 
     const coords = result[0].geometry.coordinates;
@@ -90,11 +87,10 @@ describe('Grid Pattern', () => {
     expect(coords[0][1]).toBeCloseTo(50.5);
   });
 
-  it('5x5 grid has 25 coordinates at even intervals', () => {
+  it('count=25 grid has 25 coordinates at even intervals (5x5)', () => {
     const result = execute([makePolygon(0, 0, 4, 4)], {
       pattern: 'grid',
-      rows: 5,
-      cols: 5,
+      count: 25,
     });
 
     const coords = result[0].geometry.coordinates;
@@ -114,8 +110,7 @@ describe('Grid Pattern', () => {
   it('feature has correct properties', () => {
     const result = execute([defaultPolygon], {
       pattern: 'grid',
-      rows: 3,
-      cols: 4,
+      count: 12,
     });
 
     const feature = result[0];
@@ -123,7 +118,7 @@ describe('Grid Pattern', () => {
     expect(feature.id).toBe('ref-grid');
     expect(feature.properties.kind).toBe('POINT');
     expect(feature.properties.locationType).toBe('REFERENCE');
-    expect((feature.properties.name as string)).toContain('grid 3x4');
+    expect((feature.properties.name as string)).toContain('grid 12');
     expect((feature.properties.style as any).shape).toBe('square');
     expect((feature.properties.style as any).color).toBe('#666666');
     expect((feature.properties.style as any).radius).toBe(5);
@@ -132,8 +127,7 @@ describe('Grid Pattern', () => {
   it('pointMetadata is parallel to coordinates', () => {
     const result = execute([defaultPolygon], {
       pattern: 'grid',
-      rows: 3,
-      cols: 4,
+      count: 12,
     });
 
     const coords = result[0].geometry.coordinates;
@@ -145,6 +139,17 @@ describe('Grid Pattern', () => {
       expect(entry.name).toBe(`Ref ${i + 1}`);
     });
   });
+
+  it('count=10 trims incomplete last row', () => {
+    // count=10 → cols=4, rows=3 → 12 slots, keep 10
+    const result = execute([makePolygon(0, 0, 3, 2)], {
+      pattern: 'grid',
+      count: 10,
+    });
+
+    const coords = result[0].geometry.coordinates;
+    expect(coords).toHaveLength(10);
+  });
 });
 
 // ============================================================================
@@ -154,33 +159,19 @@ describe('Grid Pattern', () => {
 describe('Grid Edge Cases', () => {
   it('zero-area bounds (west==east) throws', () => {
     expect(() =>
-      execute([makePolygon(0, 0, 0, 1)], { pattern: 'grid', rows: 2, cols: 2 }),
+      execute([makePolygon(0, 0, 0, 1)], { pattern: 'grid', count: 4 }),
     ).toThrow('positive area');
   });
 
   it('zero-area bounds (south==north) throws', () => {
     expect(() =>
-      execute([makePolygon(0, 0, 1, 0)], { pattern: 'grid', rows: 2, cols: 2 }),
+      execute([makePolygon(0, 0, 1, 0)], { pattern: 'grid', count: 4 }),
     ).toThrow('must be less than north');
   });
 
-  it('negative rows throws', () => {
+  it('count=0 throws', () => {
     expect(() =>
-      execute([defaultPolygon], {
-        pattern: 'grid',
-        rows: -1,
-        cols: 4,
-      }),
-    ).toThrow('positive integer');
-  });
-
-  it('zero cols throws', () => {
-    expect(() =>
-      execute([defaultPolygon], {
-        pattern: 'grid',
-        rows: 3,
-        cols: 0,
-      }),
+      execute([defaultPolygon], { pattern: 'grid', count: 0 }),
     ).toThrow('positive integer');
   });
 
@@ -192,7 +183,7 @@ describe('Grid Edge Cases', () => {
 
   it('no features throws', () => {
     expect(() =>
-      execute([], { pattern: 'grid', rows: 3, cols: 4 }),
+      execute([], { pattern: 'grid', count: 12 }),
     ).toThrow('polygon feature');
   });
 
@@ -212,8 +203,7 @@ describe('Grid Edge Cases', () => {
   it('antimeridian crossing normalises longitudes', () => {
     const result = execute([makePolygon(170, -10, -170, 10)], {
       pattern: 'grid',
-      rows: 3,
-      cols: 3,
+      count: 9,
     });
 
     const coords = result[0].geometry.coordinates;
@@ -337,13 +327,13 @@ describe('Scatter Edge Cases', () => {
     ).toThrow('positive integer');
   });
 
-  it('missing count uses default (25)', () => {
+  it('missing count uses default (20)', () => {
     const result = execute([defaultPolygon], {
       pattern: 'scatter',
       seed: 42,
     });
 
-    expect(result[0].geometry.coordinates).toHaveLength(25);
+    expect(result[0].geometry.coordinates).toHaveLength(20);
   });
 
   it('antimeridian crossing wraps longitudes', () => {

@@ -65,12 +65,12 @@ def _make_context(
 class TestGridBasic:
     """Basic grid generation tests (T015)."""
 
-    def test_grid_3x4_returns_12_coordinates(self):
-        """A 3x4 grid should produce exactly 12 coordinates."""
+    def test_grid_count12_returns_12_coordinates(self):
+        """count=12 grid should produce exactly 12 coordinates (3x4 layout)."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "rows": 3, "cols": 4}
+        params = {"pattern": "grid", "count": 12}
         result = generate_reference_points(context, params)
 
         assert isinstance(result, list)
@@ -81,12 +81,12 @@ class TestGridBasic:
         coords = feature["geometry"]["coordinates"]
         assert len(coords) == 12
 
-    def test_grid_3x4_correct_positions(self):
-        """Verify exact coordinate positions for 3x4 grid."""
+    def test_grid_count12_correct_positions(self):
+        """Verify exact coordinate positions for count=12 grid (3x4 layout)."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "rows": 3, "cols": 4}
+        params = {"pattern": "grid", "count": 12}
         result = generate_reference_points(context, params)
 
         coords = result[0]["geometry"]["coordinates"]
@@ -109,24 +109,24 @@ class TestGridBasic:
         assert coords[10] == [-1.0, 52.0]
         assert coords[11] == [1.0, 52.0]
 
-    def test_grid_1x1_centre_point(self):
-        """A 1x1 grid should produce a single point at the bounding box centre."""
+    def test_grid_count1_centre_point(self):
+        """count=1 grid should produce a single point at the bounding box centre."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "rows": 1, "cols": 1}
+        params = {"pattern": "grid", "count": 1}
         result = generate_reference_points(context, params)
 
         coords = result[0]["geometry"]["coordinates"]
         assert len(coords) == 1
         assert coords[0] == pytest.approx([-2.0, 50.5])
 
-    def test_grid_5x5_even_spacing(self):
-        """A 5x5 grid should have 25 coordinates at even intervals."""
+    def test_grid_count25_even_spacing(self):
+        """count=25 grid should have 25 coordinates at even intervals (5x5)."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context(0, 0, 4, 4)
-        params = {"pattern": "grid", "rows": 5, "cols": 5}
+        params = {"pattern": "grid", "count": 25}
         result = generate_reference_points(context, params)
 
         coords = result[0]["geometry"]["coordinates"]
@@ -147,7 +147,7 @@ class TestGridBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "rows": 3, "cols": 4}
+        params = {"pattern": "grid", "count": 12}
         result = generate_reference_points(context, params)
 
         feature = result[0]
@@ -156,7 +156,7 @@ class TestGridBasic:
         props = feature["properties"]
         assert props["kind"] == "POINT"
         assert props["locationType"] == "REFERENCE"
-        assert "grid 3x4" in props["name"]
+        assert "grid 12" in props["name"]
         assert props["style"]["shape"] == "square"
         assert props["style"]["color"] == "#666666"
         assert props["style"]["radius"] == 5
@@ -166,7 +166,7 @@ class TestGridBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "rows": 3, "cols": 4}
+        params = {"pattern": "grid", "count": 12}
         result = generate_reference_points(context, params)
 
         feature = result[0]
@@ -187,7 +187,7 @@ class TestGridEdgeCases:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context(0, 0, 0, 1)
-        params = {"pattern": "grid", "rows": 2, "cols": 2}
+        params = {"pattern": "grid", "count": 4}
         with pytest.raises(ValueError, match="positive area"):
             generate_reference_points(context, params)
 
@@ -196,37 +196,29 @@ class TestGridEdgeCases:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context(0, 0, 1, 0)
-        params = {"pattern": "grid", "rows": 2, "cols": 2}
+        params = {"pattern": "grid", "count": 4}
         with pytest.raises(ValueError, match="must be less than north"):
             generate_reference_points(context, params)
 
-    def test_degenerate_vertical_line(self):
-        """Polygon collapsed to a vertical line (all same longitude) should raise."""
-        from debrief_calc.tools.reference.generation import generate_reference_points
-
-        # All lons are 0, so west == east → positive area error
-        context = _make_context(0, 0, 0, 1)
-        params = {"pattern": "grid", "rows": 2, "cols": 2}
-        with pytest.raises(ValueError, match="positive area"):
-            generate_reference_points(context, params)
-
-    def test_negative_rows(self):
-        """Negative rows should raise ValueError."""
+    def test_count_zero(self):
+        """count=0 should raise ValueError."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "rows": -1, "cols": 4}
+        params = {"pattern": "grid", "count": 0}
         with pytest.raises(ValueError, match="positive integer"):
             generate_reference_points(context, params)
 
-    def test_zero_cols(self):
-        """Zero cols should raise ValueError."""
+    def test_count10_trims_incomplete_last_row(self):
+        """count=10 should trim incomplete last row (cols=4, rows=3 → 12 slots, keep 10)."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
-        context = _make_context()
-        params = {"pattern": "grid", "rows": 3, "cols": 0}
-        with pytest.raises(ValueError, match="positive integer"):
-            generate_reference_points(context, params)
+        context = _make_context(0, 0, 3, 2)
+        params = {"pattern": "grid", "count": 10}
+        result = generate_reference_points(context, params)
+
+        coords = result[0]["geometry"]["coordinates"]
+        assert len(coords) == 10
 
     def test_invalid_pattern(self):
         """Invalid pattern should raise ValueError."""
@@ -267,7 +259,7 @@ class TestGridEdgeCases:
         context = SelectionContext(type=ContextType.SINGLE, features=[_make_polygon(-5, 49, 1, 52)])
         # Manually clear features to test the guard
         context.features = []
-        params = {"pattern": "grid", "rows": 3, "cols": 4}
+        params = {"pattern": "grid", "count": 12}
         with pytest.raises(ValueError, match="polygon feature"):
             generate_reference_points(context, params)
 
@@ -380,7 +372,7 @@ class TestScatterEdgeCases:
             generate_reference_points(context, params)
 
     def test_scatter_missing_count(self):
-        """Missing count should use default (25)."""
+        """Missing count should use default (20)."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
@@ -388,7 +380,7 @@ class TestScatterEdgeCases:
         result = generate_reference_points(context, params)
 
         coords = result[0]["geometry"]["coordinates"]
-        assert len(coords) == 25
+        assert len(coords) == 20
 
     def test_scatter_antimeridian_crossing(self):
         """Antimeridian crossing (west > east) should wrap longitudes."""
@@ -444,7 +436,7 @@ class TestDownstreamCompatibility:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "rows": 3, "cols": 4}
+        params = {"pattern": "grid", "count": 12}
         result = generate_reference_points(context, params)
 
         feature = result[0]
@@ -460,7 +452,7 @@ class TestDownstreamCompatibility:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "rows": 2, "cols": 2}
+        params = {"pattern": "grid", "count": 4}
         result = generate_reference_points(context, params)
 
         feature = result[0]
@@ -483,7 +475,7 @@ class TestDownstreamCompatibility:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context(170, -10, -170, 10)
-        params = {"pattern": "grid", "rows": 3, "cols": 3}
+        params = {"pattern": "grid", "count": 9}
         result = generate_reference_points(context, params)
 
         coords = result[0]["geometry"]["coordinates"]

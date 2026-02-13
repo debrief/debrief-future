@@ -7,6 +7,7 @@ within a bounding box. First step of the E03 buffer zone analysis chain.
 
 from __future__ import annotations
 
+import math
 import time
 from typing import Any
 
@@ -94,10 +95,21 @@ def _build_multipoint_feature(
     }
 
 
+def _grid_dimensions(count: int) -> tuple[int, int]:
+    """Compute grid dimensions (rows, cols) from a target count.
+
+    Produces a near-square grid with rows * cols >= count.
+    """
+    cols = math.ceil(math.sqrt(count))
+    rows = math.ceil(count / cols)
+    return rows, cols
+
+
 def _generate_grid(
-    west: float, south: float, east: float, north: float, rows: int, cols: int
+    west: float, south: float, east: float, north: float, count: int
 ) -> dict[str, Any]:
     """Generate a grid of evenly spaced reference points."""
+    rows, cols = _grid_dimensions(count)
     effective_east = east + 360 if west > east else east
 
     coordinates: list[list[float]] = []
@@ -107,6 +119,10 @@ def _generate_grid(
         lat = (south + north) / 2 if rows == 1 else south + r * (north - south) / (rows - 1)
 
         for c in range(cols):
+            idx = r * cols + c
+            if idx >= count:
+                break
+
             lon = (
                 (west + effective_east) / 2
                 if cols == 1
@@ -114,12 +130,11 @@ def _generate_grid(
             )
             lon = _normalise_lon(lon)
 
-            idx = r * cols + c
             coordinates.append([lon, lat])
             metadata.append({"index": idx, "name": f"Ref {idx + 1}"})
 
     return _build_multipoint_feature(
-        "ref-grid", coordinates, metadata, f"Reference Points (grid {rows}x{cols})"
+        "ref-grid", coordinates, metadata, f"Reference Points (grid {count})"
     )
 
 
@@ -167,22 +182,10 @@ def _generate_scatter(
             param_type="ReferencePointPattern",
         ),
         ToolParameter(
-            name="rows",
-            type="number",
-            description="Number of rows (grid only)",
-            default=5,
-        ),
-        ToolParameter(
-            name="cols",
-            type="number",
-            description="Number of columns (grid only)",
-            default=5,
-        ),
-        ToolParameter(
             name="count",
             type="number",
-            description="Number of points (scatter only)",
-            default=25,
+            description="Number of reference points to generate",
+            default=20,
         ),
         ToolParameter(
             name="seed",
@@ -199,7 +202,7 @@ def generate_reference_points(
 
     Args:
         context: SelectionContext (SINGLE — one RECTANGLE or CIRCLE feature)
-        params: Tool parameters including pattern and pattern-specific options
+        params: Tool parameters including pattern, count, and optional seed
 
     Returns:
         List containing a single MultiPoint GeoJSON Feature
@@ -211,18 +214,15 @@ def generate_reference_points(
     if pattern not in ("grid", "scatter"):
         raise ValueError("Pattern must be 'grid' or 'scatter'")
 
+    count = int(params.get("count", 20))
+    _validate_positive_int(count, "count")
+
     bounds = _extract_bounds_from_polygon(context.features[0])
     west, south, east, north = _validate_bounds(bounds)
 
     if pattern == "grid":
-        rows = params.get("rows", 5)
-        cols = params.get("cols", 5)
-        _validate_positive_int(rows, "rows")
-        _validate_positive_int(cols, "cols")
-        feature = _generate_grid(west, south, east, north, rows, cols)
+        feature = _generate_grid(west, south, east, north, count)
     else:
-        count = params.get("count", 25)
-        _validate_positive_int(count, "count")
         seed = params.get("seed")
         feature = _generate_scatter(west, south, east, north, count, seed)
 

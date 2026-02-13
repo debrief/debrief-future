@@ -24,7 +24,7 @@
       "properties": {
         "kind": "POINT",
         "locationType": "REFERENCE",
-        "name": "Reference Points (grid 3x4)",
+        "name": "Reference Points (grid 12)",
         "style": {
           "shape": "square",
           "color": "#666666",
