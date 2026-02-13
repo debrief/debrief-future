@@ -307,6 +307,15 @@ export function MapView({
     };
   }, [onSelect]);
 
+  // Track a revision counter for the GeoJSON key — react-leaflet's GeoJSON
+  // component only renders on mount, so the key must change whenever data changes.
+  const geojsonRevision = useRef(0);
+  const prevGeojsonRef = useRef(geojsonData);
+  if (prevGeojsonRef.current !== geojsonData) {
+    geojsonRevision.current += 1;
+    prevGeojsonRef.current = geojsonData;
+  }
+
   const containerStyle: React.CSSProperties = {
     height: typeof height === 'number' ? `${height}px` : height,
     minHeight: 'var(--debrief-map-min-height)',
@@ -343,7 +352,7 @@ export function MapView({
 
         {staticFeatures.length > 0 && (
           <GeoJSON
-            key={JSON.stringify(selectedIds.size) + staticFeatures.length}
+            key={`geojson-${geojsonRevision.current}-${selectedIds.size}`}
             data={geojsonData}
             style={featureStyle}
             onEachFeature={onEachFeature}
