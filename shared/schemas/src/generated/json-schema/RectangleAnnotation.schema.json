@@ -93,6 +93,21 @@
       "title": "BranchRecord",
       "type": "object"
     },
+    "CardinalDirectionEnum": {
+      "description": "Eight-point compass directions",
+      "enum": [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW"
+      ],
+      "title": "CardinalDirectionEnum",
+      "type": "string"
+    },
     "CircleAnnotation": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for circle annotations. Geometry is a Polygon approximating the circle (vertices at regular intervals). Properties contain center and radius for precise reconstruction and smooth rendering.",
@@ -181,6 +196,22 @@
       ],
       "title": "CircleAnnotationProperties",
       "type": "object"
+    },
+    "DurationPresetEnum": {
+      "description": "Common ISO 8601 duration presets for interval parameters",
+      "enum": [
+        "PT1M",
+        "PT5M",
+        "PT15M",
+        "PT30M",
+        "PT1H",
+        "PT2H",
+        "PT6H",
+        "PT12H",
+        "PT24H"
+      ],
+      "title": "DurationPresetEnum",
+      "type": "string"
     },
     "FeatureKindEnum": {
       "description": "Discriminator for GeoJSON feature types",
@@ -338,10 +369,10 @@
     },
     "GeoJSONMultiPoint": {
       "additionalProperties": false,
-      "description": "GeoJSON MultiPoint geometry for multi-point tool results",
+      "description": "GeoJSON MultiPoint geometry for reference point sets",
       "properties": {
         "coordinates": {
-          "description": "Array of [longitude, latitude] positions",
+          "description": "Array of [longitude, latitude] pairs",
           "items": {
             "type": "number"
           },
@@ -661,6 +692,18 @@
       "title": "LogEntry",
       "type": "object"
     },
+    "MarkerSymbolEnum": {
+      "description": "Marker shapes for tool parameter choices (superset of PointShapeEnum)",
+      "enum": [
+        "circle",
+        "square",
+        "triangle",
+        "diamond",
+        "cross"
+      ],
+      "title": "MarkerSymbolEnum",
+      "type": "string"
+    },
     "MultiPointFeature": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for multi-point tool results",
@@ -847,6 +890,24 @@
       "title": "MultiPolygonFeatureProperties",
       "type": "object"
     },
+    "NamedColorEnum": {
+      "description": "Predefined named colours for styling tool parameters",
+      "enum": [
+        "red",
+        "green",
+        "blue",
+        "yellow",
+        "orange",
+        "purple",
+        "cyan",
+        "magenta",
+        "white",
+        "black",
+        "grey"
+      ],
+      "title": "NamedColorEnum",
+      "type": "string"
+    },
     "NarrativeEntry": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for timestamped narrative/log entries. Narratives are operator notes associated with a timestamp and optionally a track. Geometry is optional (Point for display position, or null).",
@@ -937,6 +998,33 @@
       "title": "NarrativeEntryProperties",
       "type": "object"
     },
+    "NumericPresetEnum": {
+      "description": "Common numeric presets for count and distance parameters",
+      "enum": [
+        "n_1",
+        "n_2",
+        "n_5",
+        "n_10",
+        "n_25",
+        "n_50",
+        "n_100"
+      ],
+      "title": "NumericPresetEnum",
+      "type": "string"
+    },
+    "ParameterTypeEnum": {
+      "description": "Names of available schema-defined parameter types. Referenced by ToolParameter.param_type to link tool parameters to their value enums defined in common.yaml.",
+      "enum": [
+        "NamedColor",
+        "MarkerSymbol",
+        "CardinalDirection",
+        "DurationPreset",
+        "NumericPreset",
+        "ReferencePointPattern"
+      ],
+      "title": "ParameterTypeEnum",
+      "type": "string"
+    },
     "ParameterValue": {
       "additionalProperties": false,
       "description": "A typed parameter value with replay metadata.",
@@ -964,6 +1052,26 @@
         "value"
       ],
       "title": "ParameterValue",
+      "type": "object"
+    },
+    "PointMetadataEntry": {
+      "additionalProperties": false,
+      "description": "Metadata for a single point within a MultiPoint reference set. Entries are parallel to the MultiPoint coordinates array. Downstream tools (#081 classifier) extend entries with zone/color fields.",
+      "properties": {
+        "index": {
+          "description": "0-based ordinal matching coordinates array position",
+          "type": "integer"
+        },
+        "name": {
+          "description": "Human-readable point label (e.g., \"Ref 1\")",
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
+        "name"
+      ],
+      "title": "PointMetadataEntry",
       "type": "object"
     },
     "PointProperties": {
@@ -1051,7 +1159,9 @@
       "enum": [
         "circle",
         "square",
-        "triangle"
+        "triangle",
+        "diamond",
+        "cross"
       ],
       "title": "PointShapeEnum",
       "type": "string"
@@ -1352,11 +1462,19 @@
     },
     "ReferenceLocation": {
       "additionalProperties": false,
-      "description": "GeoJSON Feature for fixed reference points",
+      "description": "GeoJSON Feature for fixed reference points or reference point sets",
       "properties": {
         "geometry": {
-          "$ref": "#/$defs/GeoJSONPoint",
-          "description": "Location (Point) or area (Polygon)"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GeoJSONPoint"
+            },
+            {
+              "$ref": "#/$defs/GeoJSONMultiPoint"
+            }
+          ],
+          "description": "Location (Point) or reference point set (MultiPoint)",
+          "type": "string"
         },
         "id": {
           "description": "Unique identifier",
@@ -1405,6 +1523,16 @@
           "description": "Reference location name",
           "type": "string"
         },
+        "point_metadata": {
+          "description": "Per-point metadata array, parallel to MultiPoint coordinates. Each entry contains at minimum an index and name. Downstream tools extend entries with zone/color fields.",
+          "items": {
+            "$ref": "#/$defs/PointMetadataEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "style": {
           "$ref": "#/$defs/PointProperties",
           "description": "Point styling properties for display"
@@ -1441,6 +1569,15 @@
       ],
       "title": "ReferenceLocationProperties",
       "type": "object"
+    },
+    "ReferencePointPatternEnum": {
+      "description": "Generation patterns for reference point placement",
+      "enum": [
+        "grid",
+        "scatter"
+      ],
+      "title": "ReferencePointPatternEnum",
+      "type": "string"
     },
     "SegmentMetadata": {
       "additionalProperties": false,
@@ -2222,6 +2359,49 @@
         "name"
       ],
       "title": "Tool",
+      "type": "object"
+    },
+    "ToolParameter": {
+      "additionalProperties": false,
+      "description": "A configurable parameter for a tool. Supports string, number, boolean, and enum types with optional default values, explicit choices, and schema-defined parameter type references.",
+      "properties": {
+        "default_value": {
+          "description": "Default value if not provided",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "description": "Human-readable parameter description",
+          "type": "string"
+        },
+        "name": {
+          "description": "Parameter identifier (kebab-case)",
+          "type": "string"
+        },
+        "param_type": {
+          "$ref": "#/$defs/ParameterTypeEnum",
+          "description": "References a schema-defined parameter-type enum by name. When set, the client resolves enum values from generated types rather than using inline choices."
+        },
+        "required": {
+          "description": "Whether parameter must be provided",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "type": {
+          "description": "Value type discriminator: string, number, boolean, enum",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "description"
+      ],
+      "title": "ToolParameter",
       "type": "object"
     },
     "TrackFeature": {

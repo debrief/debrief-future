@@ -200,6 +200,7 @@ VALID_PARAM_TYPES = {
     "CardinalDirection",
     "DurationPreset",
     "NumericPreset",
+    "ReferencePointPattern",
 }
 """Valid values for ToolParameter.param_type, referencing schema-defined parameter-type enums."""
 

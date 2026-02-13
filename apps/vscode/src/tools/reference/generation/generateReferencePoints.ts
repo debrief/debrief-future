@@ -44,6 +44,7 @@ export const toolDefinition: MCPToolDefinition = {
         enum: ['grid', 'scatter'],
         description:
           "Generation pattern: 'grid' for evenly spaced rows/columns, 'scatter' for random distribution",
+        'x-debrief-param-type': 'ReferencePointPattern',
       },
       rows: {
         type: 'integer',

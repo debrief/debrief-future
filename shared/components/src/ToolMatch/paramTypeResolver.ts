@@ -13,6 +13,7 @@ import {
   CardinalDirectionEnum,
   DurationPresetEnum,
   NumericPresetEnum,
+  ReferencePointPatternEnum,
 } from '@debrief/schemas';
 
 import type { ContextMenuItem } from '../ContextMenu';
@@ -72,6 +73,11 @@ export function resolveParamType(paramType: string): ContextMenuItem[] | null {
       return Object.values(NumericPresetEnum).map((v) => ({
         id: v,
         label: NUMERIC_DISPLAY_MAP[v] ?? v,
+      }));
+    case 'ReferencePointPattern':
+      return Object.values(ReferencePointPatternEnum).map((v) => ({
+        id: v,
+        label: v.charAt(0).toUpperCase() + v.slice(1),
       }));
     default:
       return null;

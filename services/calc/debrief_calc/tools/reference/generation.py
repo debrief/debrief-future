@@ -163,8 +163,8 @@ def _generate_scatter(
             name="pattern",
             type="enum",
             description="Generation pattern",
-            choices=["grid", "scatter"],
             required=True,
+            param_type="ReferencePointPattern",
         ),
         ToolParameter(
             name="rows",

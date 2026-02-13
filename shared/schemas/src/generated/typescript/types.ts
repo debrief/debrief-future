@@ -65,7 +65,7 @@ export enum LocationTypeEnum {
 * Valid shapes for point markers
 */
 export enum PointShapeEnum {
-
+    
     /** Filled/stroked circle (default marker) */
     circle = "circle",
     /** Filled/stroked square (reference points) */
@@ -76,6 +76,126 @@ export enum PointShapeEnum {
     diamond = "diamond",
     /** Cross/plus shape */
     cross = "cross",
+};
+/**
+* Predefined named colours for styling tool parameters
+*/
+export enum NamedColorEnum {
+    
+    /** Red */
+    red = "red",
+    /** Green */
+    green = "green",
+    /** Blue */
+    blue = "blue",
+    /** Yellow */
+    yellow = "yellow",
+    /** Orange */
+    orange = "orange",
+    /** Purple */
+    purple = "purple",
+    /** Cyan */
+    cyan = "cyan",
+    /** Magenta */
+    magenta = "magenta",
+    /** White */
+    white = "white",
+    /** Black */
+    black = "black",
+    /** Grey */
+    grey = "grey",
+};
+/**
+* Marker shapes for tool parameter choices (superset of PointShapeEnum)
+*/
+export enum MarkerSymbolEnum {
+    
+    /** Filled/stroked circle (default marker) */
+    circle = "circle",
+    /** Filled/stroked square (reference points) */
+    square = "square",
+    /** Filled/stroked triangle (directional indicators) */
+    triangle = "triangle",
+    /** Diamond shape */
+    diamond = "diamond",
+    /** Cross/plus shape */
+    cross = "cross",
+};
+/**
+* Eight-point compass directions
+*/
+export enum CardinalDirectionEnum {
+    
+    /** North */
+    N = "N",
+    /** North-East */
+    NE = "NE",
+    /** East */
+    E = "E",
+    /** South-East */
+    SE = "SE",
+    /** South */
+    S = "S",
+    /** South-West */
+    SW = "SW",
+    /** West */
+    W = "W",
+    /** North-West */
+    NW = "NW",
+};
+/**
+* Common ISO 8601 duration presets for interval parameters
+*/
+export enum DurationPresetEnum {
+    
+    /** 1 minute */
+    PT1M = "PT1M",
+    /** 5 minutes */
+    PT5M = "PT5M",
+    /** 15 minutes */
+    PT15M = "PT15M",
+    /** 30 minutes */
+    PT30M = "PT30M",
+    /** 1 hour */
+    PT1H = "PT1H",
+    /** 2 hours */
+    PT2H = "PT2H",
+    /** 6 hours */
+    PT6H = "PT6H",
+    /** 12 hours */
+    PT12H = "PT12H",
+    /** 24 hours */
+    PT24H = "PT24H",
+};
+/**
+* Common numeric presets for count and distance parameters
+*/
+export enum NumericPresetEnum {
+    
+    /** One */
+    n_1 = "n_1",
+    /** Two */
+    n_2 = "n_2",
+    /** Five */
+    n_5 = "n_5",
+    /** Ten */
+    n_10 = "n_10",
+    /** Twenty-five */
+    n_25 = "n_25",
+    /** Fifty */
+    n_50 = "n_50",
+    /** One hundred */
+    n_100 = "n_100",
+};
+/**
+* Generation patterns for reference point placement
+*/
+export enum ReferencePointPatternEnum {
+    
+    /** Evenly spaced grid of rows and columns */
+    grid = "grid",
+    /** Randomly distributed points */
+    scatter = "scatter",
 };
 /**
 * How line endpoints are rendered (SVG/CSS standard)
@@ -128,6 +248,24 @@ export enum SystemStateTypeEnum {
     selection = "selection",
 };
 /**
+* Names of available schema-defined parameter types. Referenced by ToolParameter.param_type to link tool parameters to their value enums defined in common.yaml.
+*/
+export enum ParameterTypeEnum {
+    
+    /** Predefined named colours (maps to NamedColorEnum) */
+    NamedColor = "NamedColor",
+    /** Marker shapes (maps to MarkerSymbolEnum) */
+    MarkerSymbol = "MarkerSymbol",
+    /** Eight-point compass directions (maps to CardinalDirectionEnum) */
+    CardinalDirection = "CardinalDirection",
+    /** Common ISO 8601 duration intervals (maps to DurationPresetEnum) */
+    DurationPreset = "DurationPreset",
+    /** Common numeric values (maps to NumericPresetEnum) */
+    NumericPreset = "NumericPreset",
+    /** Reference point generation patterns (maps to ReferencePointPatternEnum) */
+    ReferencePointPattern = "ReferencePointPattern",
+};
+/**
 * Type of file-level provenance event.
 */
 export enum FileProvEventTypeEnum {
@@ -141,137 +279,11 @@ export enum FileProvEventTypeEnum {
 * Direction of a branch event.
 */
 export enum FileProvDirectionEnum {
-
+    
     /** This file is the source of the branch */
     source = "source",
     /** This file is the target of the branch */
     target = "target",
-};
-/**
-* Predefined named colours for styling tool parameters
-*/
-export enum NamedColorEnum {
-
-    /** Red */
-    red = "red",
-    /** Green */
-    green = "green",
-    /** Blue */
-    blue = "blue",
-    /** Yellow */
-    yellow = "yellow",
-    /** Orange */
-    orange = "orange",
-    /** Purple */
-    purple = "purple",
-    /** Cyan */
-    cyan = "cyan",
-    /** Magenta */
-    magenta = "magenta",
-    /** White */
-    white = "white",
-    /** Black */
-    black = "black",
-    /** Grey */
-    grey = "grey",
-};
-/**
-* Marker shapes for tool parameter choices (superset of PointShapeEnum)
-*/
-export enum MarkerSymbolEnum {
-
-    /** Filled/stroked circle (default marker) */
-    circle = "circle",
-    /** Filled/stroked square (reference points) */
-    square = "square",
-    /** Filled/stroked triangle (directional indicators) */
-    triangle = "triangle",
-    /** Diamond shape */
-    diamond = "diamond",
-    /** Cross/plus shape */
-    cross = "cross",
-};
-/**
-* Eight-point compass directions
-*/
-export enum CardinalDirectionEnum {
-
-    /** North */
-    N = "N",
-    /** North-East */
-    NE = "NE",
-    /** East */
-    E = "E",
-    /** South-East */
-    SE = "SE",
-    /** South */
-    S = "S",
-    /** South-West */
-    SW = "SW",
-    /** West */
-    W = "W",
-    /** North-West */
-    NW = "NW",
-};
-/**
-* Common ISO 8601 duration presets for interval parameters
-*/
-export enum DurationPresetEnum {
-
-    /** 1 minute */
-    PT1M = "PT1M",
-    /** 5 minutes */
-    PT5M = "PT5M",
-    /** 15 minutes */
-    PT15M = "PT15M",
-    /** 30 minutes */
-    PT30M = "PT30M",
-    /** 1 hour */
-    PT1H = "PT1H",
-    /** 2 hours */
-    PT2H = "PT2H",
-    /** 6 hours */
-    PT6H = "PT6H",
-    /** 12 hours */
-    PT12H = "PT12H",
-    /** 24 hours */
-    PT24H = "PT24H",
-};
-/**
-* Common numeric presets for count and distance parameters
-*/
-export enum NumericPresetEnum {
-
-    /** One */
-    n_1 = "n_1",
-    /** Two */
-    n_2 = "n_2",
-    /** Five */
-    n_5 = "n_5",
-    /** Ten */
-    n_10 = "n_10",
-    /** Twenty-five */
-    n_25 = "n_25",
-    /** Fifty */
-    n_50 = "n_50",
-    /** One hundred */
-    n_100 = "n_100",
-};
-/**
-* Names of available schema-defined parameter types
-*/
-export enum ParameterTypeEnum {
-
-    /** Predefined named colours (maps to NamedColorEnum) */
-    NamedColor = "NamedColor",
-    /** Marker shapes (maps to MarkerSymbolEnum) */
-    MarkerSymbol = "MarkerSymbol",
-    /** Eight-point compass directions (maps to CardinalDirectionEnum) */
-    CardinalDirection = "CardinalDirection",
-    /** Common ISO 8601 duration intervals (maps to DurationPresetEnum) */
-    DurationPreset = "DurationPreset",
-    /** Common numeric values (maps to NumericPresetEnum) */
-    NumericPreset = "NumericPreset",
 };
 
 
@@ -449,23 +461,23 @@ export interface GeoJSONPolygon {
 
 
 /**
+ * GeoJSON MultiPoint geometry for reference point sets
+ */
+export interface GeoJSONMultiPoint {
+    /** Geometry type discriminator */
+    type: string,
+    /** Array of [longitude, latitude] pairs */
+    coordinates: number[],
+}
+
+
+/**
  * GeoJSON MultiLineString geometry for compound tracks
  */
 export interface GeoJSONMultiLineString {
     /** Geometry type discriminator */
     type: string,
     /** Array of LineString coordinate arrays */
-    coordinates: number[],
-}
-
-
-/**
- * GeoJSON MultiPoint geometry for multi-point tool results
- */
-export interface GeoJSONMultiPoint {
-    /** Geometry type discriminator */
-    type: string,
-    /** Array of [longitude, latitude] positions */
     coordinates: number[],
 }
 
@@ -657,6 +669,17 @@ export interface TrackFeature {
 
 
 /**
+ * Metadata for a single point within a MultiPoint reference set. Entries are parallel to the MultiPoint coordinates array. Downstream tools (#081 classifier) extend entries with zone/color fields.
+ */
+export interface PointMetadataEntry {
+    /** 0-based ordinal matching coordinates array position */
+    index: number,
+    /** Human-readable point label (e.g., "Ref 1") */
+    name: string,
+}
+
+
+/**
  * Properties for a ReferenceLocation
  */
 export interface ReferenceLocationProperties {
@@ -676,19 +699,21 @@ export interface ReferenceLocationProperties {
     valid_from?: string,
     /** End of validity period */
     valid_until?: string,
+    /** Per-point metadata array, parallel to MultiPoint coordinates. Each entry contains at minimum an index and name. Downstream tools extend entries with zone/color fields. */
+    point_metadata?: PointMetadataEntry[],
 }
 
 
 /**
- * GeoJSON Feature for fixed reference points
+ * GeoJSON Feature for fixed reference points or reference point sets
  */
 export interface ReferenceLocation {
     /** GeoJSON type discriminator */
     type: string,
     /** Unique identifier */
     id: string,
-    /** Location (Point) or area (Polygon) */
-    geometry: GeoJSONPoint,
+    /** Location (Point) or reference point set (MultiPoint) */
+    geometry: string,
     /** Reference metadata */
     properties: ReferenceLocationProperties,
 }
@@ -1075,6 +1100,25 @@ export interface Tool {
     version?: string,
     /** List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection. */
     requirements?: SelectionRequirement[],
+}
+
+
+/**
+ * A configurable parameter for a tool. Supports string, number, boolean, and enum types with optional default values, explicit choices, and schema-defined parameter type references.
+ */
+export interface ToolParameter {
+    /** Parameter identifier (kebab-case) */
+    name: string,
+    /** Value type discriminator: string, number, boolean, enum */
+    type: string,
+    /** Human-readable parameter description */
+    description: string,
+    /** Whether parameter must be provided */
+    required?: boolean,
+    /** Default value if not provided */
+    default_value?: string,
+    /** References a schema-defined parameter-type enum by name. When set, the client resolves enum values from generated types rather than using inline choices. */
+    param_type?: string,
 }
 
 

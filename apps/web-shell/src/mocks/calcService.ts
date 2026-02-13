@@ -256,15 +256,6 @@ function formatToolName(name: string): string {
     .join(' ');
 }
 
-/**
- * Check if any selected features are tracks (by kind property).
- */
-function hasTrackFeatures(features: Feature[]): boolean {
-  return features.some(f =>
-    (f.properties as Record<string, unknown> | null)?.kind === 'TRACK'
-  );
-}
-
 /** IDs of styling tools from toolService */
 const stylingToolIds = new Set(listTools().map(t => t.name));
 
@@ -373,22 +364,46 @@ export function createMockCalcService(): MockCalcService {
         };
       });
 
-      // Styling tools from toolService (with parameter metadata for context menus)
-      const hasTracks = hasTrackFeatures(selectedFeatures);
-      const stylingTools: ToolsPanelItem[] = listTools().map(def => {
-        // Only include parameters that can produce context menu items
+      // Registered tools from toolService (with parameter metadata for context menus)
+      const registeredTools: ToolsPanelItem[] = listTools().map(def => {
         const params = extractParameters(def).filter(p => p.paramType || p.choices);
+        const reqs = def.annotations['debrief:selectionRequirements'] as
+          | { kind: string; min?: number }[]
+          | undefined;
+
+        // Check applicability against selectionRequirements
+        let applicable = false;
+        let explanation: string | undefined;
+        if (!reqs || reqs.length === 0) {
+          applicable = selectedFeatures.length > 0;
+          explanation = applicable ? undefined : 'Requires at least 1 feature selected';
+        } else {
+          for (const req of reqs) {
+            const count = selectedFeatures.filter(
+              f => (f.properties as Record<string, unknown> | null)?.kind === req.kind
+            ).length;
+            if (count >= (req.min ?? 1)) {
+              applicable = true;
+              break;
+            }
+          }
+          if (!applicable) {
+            const kinds = reqs.map(r => r.kind).join(' or ');
+            explanation = `Requires ${kinds} feature selected`;
+          }
+        }
+
         return {
           id: def.name,
           name: formatToolName(def.name),
           description: def.description,
-          applicable: hasTracks,
-          explanation: hasTracks ? undefined : 'Requires at least 1 track selected',
+          applicable,
+          explanation,
           parameters: params.length > 0 ? params : undefined,
         };
       });
 
-      return [...builtinTools, ...stylingTools];
+      return [...builtinTools, ...registeredTools];
     },
 
     runTool(toolId: string, selectedFeatures: Feature[], collectedParams?: Record<string, unknown>): ToolResult {
