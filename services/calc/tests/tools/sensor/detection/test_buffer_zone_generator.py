@@ -93,6 +93,23 @@ NON_TRACK_FEATURE = {
 
 
 # ============================================================
+# Helpers
+# ============================================================
+
+
+def _run(track=None, params=None, **kwargs):
+    """Run the tool and return (feature, zones, rings) for convenience."""
+    if track is None:
+        track = copy.deepcopy(SIMPLE_TRACK)
+    context = SelectionContext(type=ContextType.SINGLE, features=[track])
+    result = buffer_zone_generator(context, params or {}, **kwargs)
+    feature = result[0]
+    zones = feature["properties"]["zones"]
+    rings = feature["geometry"]["coordinates"]
+    return feature, zones, rings
+
+
+# ============================================================
 # PHASE 2: Foundation — translate_point tests
 # ============================================================
 
@@ -200,84 +217,85 @@ class TestConvexHull:
 
 
 class TestBufferZoneGeneratorUS1:
-    """User Story 1: Generate 3 detection zones with default distances."""
+    """User Story 1: Generate 3 detection zones as a single MultiPolygon."""
 
-    def test_three_zones_generated(self):
-        """Tool returns exactly 3 zone features."""
+    def test_returns_single_feature(self):
+        """Tool returns a list with exactly 1 MultiPolygon feature."""
         track = copy.deepcopy(SIMPLE_TRACK)
         context = SelectionContext(type=ContextType.SINGLE, features=[track])
         result = buffer_zone_generator(context, {})
-        assert len(result) == 3
+        assert len(result) == 1
 
-    def test_zone_properties(self):
-        """Each zone has kind=ZONE, name, likelihood, distance."""
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
+    def test_multipolygon_geometry(self):
+        """The single feature has MultiPolygon geometry with 3 sub-polygons."""
+        feature, _, rings = _run()
+        assert feature["geometry"]["type"] == "MultiPolygon"
+        assert len(rings) == 3
 
-        for feature in result:
-            props = feature["properties"]
-            assert props["kind"] == "ZONE"
-            assert "name" in props
-            assert "detection_likelihood_pct" in props
-            assert "buffer_distance_nm" in props
+    def test_zones_metadata(self):
+        """The feature carries a zones array with per-ring metadata."""
+        feature, zones, _ = _run()
+        assert feature["properties"]["kind"] == "ZONE"
+        assert len(zones) == 3
+        for z in zones:
+            assert "name" in z
+            assert "detection_likelihood_pct" in z
+            assert "buffer_distance_nm" in z
+            assert "style" in z
 
     def test_zone_names_and_distances(self):
         """Zones have correct names matching default stub model."""
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
-
-        assert result[0]["properties"]["name"] == "75%"
-        assert result[0]["properties"]["buffer_distance_nm"] == 3.0
-        assert result[1]["properties"]["name"] == "50%"
-        assert result[1]["properties"]["buffer_distance_nm"] == 6.0
-        assert result[2]["properties"]["name"] == "25%"
-        assert result[2]["properties"]["buffer_distance_nm"] == 12.0
+        _, zones, _ = _run()
+        assert zones[0]["name"] == "75%"
+        assert zones[0]["buffer_distance_nm"] == 3.0
+        assert zones[1]["name"] == "50%"
+        assert zones[1]["buffer_distance_nm"] == 6.0
+        assert zones[2]["name"] == "25%"
+        assert zones[2]["buffer_distance_nm"] == 12.0
 
     def test_zones_ordered_innermost_to_outermost(self):
         """Zones ordered by ascending distance (innermost first)."""
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
-
-        distances = [f["properties"]["buffer_distance_nm"] for f in result]
+        _, zones, _ = _run()
+        distances = [z["buffer_distance_nm"] for z in zones]
         assert distances == sorted(distances)
         assert distances == [3.0, 6.0, 12.0]
+
+    def test_zone_styles_purple_red_orange(self):
+        """Zone styles are purple (inner), red (middle), orange (outer)."""
+        _, zones, _ = _run()
+        assert zones[0]["style"]["color"] == "#9C27B0"  # purple
+        assert zones[1]["style"]["color"] == "#F44336"  # red
+        assert zones[2]["style"]["color"] == "#FF9800"  # orange
 
     def test_zone_encloses_track(self):
         """Each zone polygon fully contains all track positions."""
         track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
+        feature, zones, rings = _run(track)
 
         track_coords = track["geometry"]["coordinates"]
-        for zone_feature in result:
-            ring = zone_feature["geometry"]["coordinates"][0]
+        for i, ring_wrapper in enumerate(rings):
+            ring = ring_wrapper[0]  # exterior ring
             for coord in track_coords:
                 lon, lat = coord[0], coord[1]
                 assert _point_in_polygon(lon, lat, ring), (
-                    f"Track point ({lon}, {lat}) not inside zone "
-                    f"{zone_feature['properties']['name']}"
+                    f"Track point ({lon}, {lat}) not inside zone {zones[i]['name']}"
                 )
 
     def test_concentric_containment(self):
         """Inner zone vertices are inside the outer zone polygon."""
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
+        _, _, rings = _run()
 
         # 75% zone (3nm) should be inside 50% zone (6nm)
-        inner_ring = result[0]["geometry"]["coordinates"][0]
-        outer_ring = result[1]["geometry"]["coordinates"][0]
+        inner_ring = rings[0][0]
+        outer_ring = rings[1][0]
         for point in inner_ring[:-1]:  # Skip closing point
             assert _point_in_polygon(point[0], point[1], outer_ring), (
                 f"Inner zone point ({point[0]}, {point[1]}) not inside middle zone"
             )
 
         # 50% zone (6nm) should be inside 25% zone (12nm)
-        mid_ring = result[1]["geometry"]["coordinates"][0]
-        outer_ring = result[2]["geometry"]["coordinates"][0]
+        mid_ring = rings[1][0]
+        outer_ring = rings[2][0]
         for point in mid_ring[:-1]:
             assert _point_in_polygon(point[0], point[1], outer_ring), (
                 f"Middle zone point ({point[0]}, {point[1]}) not inside outer zone"
@@ -303,47 +321,31 @@ class TestBufferZoneGeneratorUS1:
         non_track = copy.deepcopy(NON_TRACK_FEATURE)
         context = SelectionContext(type=ContextType.MULTI, features=[non_track, track])
         result = buffer_zone_generator(context, {})
-        assert len(result) == 3
-        # Source should reference the track, not the circle
+        assert len(result) == 1
         assert result[0]["properties"]["debrief:sourceFeatures"] == ["track-001"]
 
     def test_single_point_track_circular_zones(self):
         """Single-point track produces approximately circular zones."""
-        track = copy.deepcopy(SINGLE_POINT_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
-
-        assert len(result) == 3
-        # Each zone should be a valid polygon
-        for feature in result:
-            ring = feature["geometry"]["coordinates"][0]
+        feature, _, rings = _run(copy.deepcopy(SINGLE_POINT_TRACK))
+        assert feature["geometry"]["type"] == "MultiPolygon"
+        assert len(rings) == 3
+        for ring_wrapper in rings:
+            ring = ring_wrapper[0]
             assert len(ring) >= 4  # At least triangle + closing point
-            assert ring[0] == ring[-1]  # Ring is closed
+            assert ring[0] == ring[-1]
 
-    def test_zone_geometry_valid_polygon(self):
-        """Each zone has valid Polygon geometry with closed ring."""
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
-
-        for feature in result:
-            assert feature["type"] == "Feature"
-            assert feature["geometry"]["type"] == "Polygon"
-            ring = feature["geometry"]["coordinates"][0]
+    def test_valid_multipolygon_rings(self):
+        """Each sub-polygon has a valid closed ring."""
+        _, _, rings = _run()
+        for ring_wrapper in rings:
+            ring = ring_wrapper[0]
             assert len(ring) >= 4
             assert ring[0] == ring[-1]  # Closed ring
 
-    def test_zone_has_uuid_id(self):
-        """Each zone has a unique ID starting with 'zone-'."""
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
-
-        ids = set()
-        for feature in result:
-            assert feature["id"].startswith("zone-")
-            ids.add(feature["id"])
-        assert len(ids) == 3  # All unique
+    def test_feature_has_uuid_id(self):
+        """The feature has a unique ID starting with 'zone-'."""
+        feature, _, _ = _run()
+        assert feature["id"].startswith("zone-")
 
     def test_empty_track_coordinates_error(self):
         """Track with no coordinates raises ValueError."""
@@ -368,22 +370,18 @@ class TestBufferZoneGeneratorUS2:
 
     def test_custom_distances(self):
         """Custom distances produce zones at specified ranges."""
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        params = {"distance_1_nm": 2.0, "distance_2_nm": 8.0, "distance_3_nm": 15.0}
-        result = buffer_zone_generator(context, params)
-
-        distances = [f["properties"]["buffer_distance_nm"] for f in result]
+        _, zones, _ = _run(
+            params={"distance_1_nm": 2.0, "distance_2_nm": 8.0, "distance_3_nm": 15.0}
+        )
+        distances = [z["buffer_distance_nm"] for z in zones]
         assert distances == [2.0, 8.0, 15.0]
 
     def test_non_ascending_reordered(self):
         """Non-ascending distances are sorted ascending."""
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        params = {"distance_1_nm": 15.0, "distance_2_nm": 2.0, "distance_3_nm": 8.0}
-        result = buffer_zone_generator(context, params)
-
-        distances = [f["properties"]["buffer_distance_nm"] for f in result]
+        _, zones, _ = _run(
+            params={"distance_1_nm": 15.0, "distance_2_nm": 2.0, "distance_3_nm": 8.0}
+        )
+        distances = [z["buffer_distance_nm"] for z in zones]
         assert distances == [2.0, 8.0, 15.0]
 
     def test_error_zero_distance(self):
@@ -404,25 +402,18 @@ class TestBufferZoneGeneratorUS2:
 
     def test_partial_custom_distances(self):
         """Partial custom distances use defaults for unspecified."""
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        params = {"distance_1_nm": 1.0}  # Only override innermost
-        result = buffer_zone_generator(context, params)
-
-        distances = [f["properties"]["buffer_distance_nm"] for f in result]
+        _, zones, _ = _run(params={"distance_1_nm": 1.0})
+        distances = [z["buffer_distance_nm"] for z in zones]
         assert distances == [1.0, 6.0, 12.0]
 
     def test_custom_distances_preserve_likelihood_ordering(self):
         """Highest likelihood paired with smallest distance."""
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        params = {"distance_1_nm": 2.0, "distance_2_nm": 8.0, "distance_3_nm": 15.0}
-        result = buffer_zone_generator(context, params)
-
-        # Smallest distance should have highest likelihood
-        assert result[0]["properties"]["detection_likelihood_pct"] == 75
-        assert result[1]["properties"]["detection_likelihood_pct"] == 50
-        assert result[2]["properties"]["detection_likelihood_pct"] == 25
+        _, zones, _ = _run(
+            params={"distance_1_nm": 2.0, "distance_2_nm": 8.0, "distance_3_nm": 15.0}
+        )
+        assert zones[0]["detection_likelihood_pct"] == 75
+        assert zones[1]["detection_likelihood_pct"] == 50
+        assert zones[2]["detection_likelihood_pct"] == 25
 
 
 # ============================================================
@@ -443,38 +434,25 @@ class TestBufferZoneGeneratorUS3:
             [-1.9, 51.1, 0, 1705309200000],
         ]
 
-        context_a = SelectionContext(type=ContextType.SINGLE, features=[track_a])
-        context_b = SelectionContext(type=ContextType.SINGLE, features=[track_b])
+        _, _, rings_a = _run(track_a)
+        _, _, rings_b = _run(track_b)
 
-        result_a = buffer_zone_generator(context_a, {})
-        result_b = buffer_zone_generator(context_b, {})
-
-        # Results should have different geometries
-        ring_a = result_a[0]["geometry"]["coordinates"][0]
-        ring_b = result_b[0]["geometry"]["coordinates"][0]
-        assert ring_a != ring_b
+        # Innermost rings should differ
+        assert rings_a[0][0] != rings_b[0][0]
 
     def test_provenance_annotations(self):
-        """Each zone has correct provenance annotations."""
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
-
-        for feature in result:
-            props = feature["properties"]
-            assert props["debrief:resultType"] == "addition/feature"
-            assert props["debrief:sourceFeatures"] == ["track-001"]
-            assert "debrief:label" in props
-            assert "detection zones" in props["debrief:label"]
+        """The feature has correct provenance annotations."""
+        feature, _, _ = _run()
+        props = feature["properties"]
+        assert props["debrief:resultType"] == "addition/feature"
+        assert props["debrief:sourceFeatures"] == ["track-001"]
+        assert "detection zones" in props["debrief:label"]
 
     def test_provenance_label_format(self):
         """Provenance label follows expected format."""
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
-
+        feature, _, _ = _run()
         expected = "Generated 3 detection zones (75%, 50%, 25%) for track"
-        assert result[0]["properties"]["debrief:label"] == expected
+        assert feature["properties"]["debrief:label"] == expected
 
     def test_sensor_model_swappability(self):
         """Injecting a different sensor model changes the output."""
@@ -487,18 +465,11 @@ class TestBufferZoneGeneratorUS3:
                     SensorModelZone(distance_nm=4.0, likelihood_pct=30, name="30%"),
                 ]
 
-        track = copy.deepcopy(SIMPLE_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-
-        result_custom = buffer_zone_generator(context, {}, sensor_model=TestSensorModel())
-
-        # Custom model should produce different distances
-        assert result_custom[0]["properties"]["buffer_distance_nm"] == 1.0
-        assert result_custom[1]["properties"]["buffer_distance_nm"] == 2.0
-        assert result_custom[2]["properties"]["buffer_distance_nm"] == 4.0
-
-        # And different names
-        assert result_custom[0]["properties"]["name"] == "90%"
+        _, zones, _ = _run(sensor_model=TestSensorModel())
+        assert zones[0]["buffer_distance_nm"] == 1.0
+        assert zones[1]["buffer_distance_nm"] == 2.0
+        assert zones[2]["buffer_distance_nm"] == 4.0
+        assert zones[0]["name"] == "90%"
 
 
 # ============================================================
@@ -511,48 +482,39 @@ class TestBufferZoneGeneratorEdgeCases:
 
     def test_antimeridian_crossing_track(self):
         """Track crossing antimeridian produces valid polygons."""
-        track = copy.deepcopy(ANTIMERIDIAN_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
-
-        assert len(result) == 3
-        for feature in result:
-            ring = feature["geometry"]["coordinates"][0]
+        feature, _, rings = _run(copy.deepcopy(ANTIMERIDIAN_TRACK))
+        assert len(rings) == 3
+        for ring_wrapper in rings:
+            ring = ring_wrapper[0]
             assert len(ring) >= 4
             assert ring[0] == ring[-1]
-            # All longitudes should be in valid range
             for point in ring:
                 assert -180 <= point[0] <= 180
                 assert -90 <= point[1] <= 90
 
     def test_close_positions_track(self):
         """Track with sub-metre spacing produces valid zones."""
-        track = copy.deepcopy(CLOSE_POSITIONS_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
-
-        assert len(result) == 3
-        for feature in result:
-            ring = feature["geometry"]["coordinates"][0]
+        _, _, rings = _run(copy.deepcopy(CLOSE_POSITIONS_TRACK))
+        assert len(rings) == 3
+        for ring_wrapper in rings:
+            ring = ring_wrapper[0]
             assert len(ring) >= 4
             assert ring[0] == ring[-1]
 
     def test_two_point_track(self):
         """Two-point track (line segment) produces valid zones."""
         track = copy.deepcopy(TWO_POINT_TRACK)
-        context = SelectionContext(type=ContextType.SINGLE, features=[track])
-        result = buffer_zone_generator(context, {})
-
-        assert len(result) == 3
-        for feature in result:
-            ring = feature["geometry"]["coordinates"][0]
+        _, _, rings = _run(track)
+        assert len(rings) == 3
+        for ring_wrapper in rings:
+            ring = ring_wrapper[0]
             assert len(ring) >= 4
             assert ring[0] == ring[-1]
 
         # Track points should be inside zones
         track_coords = track["geometry"]["coordinates"]
-        for zone in result:
-            ring = zone["geometry"]["coordinates"][0]
+        for ring_wrapper in rings:
+            ring = ring_wrapper[0]
             for coord in track_coords:
                 assert _point_in_polygon(coord[0], coord[1], ring)
 

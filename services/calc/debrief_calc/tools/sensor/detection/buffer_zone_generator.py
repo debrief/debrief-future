@@ -207,61 +207,30 @@ def _validate_distances(distances: list[float]) -> list[float]:
     return sorted(distances)
 
 
-def _zone_style(likelihood_pct: int) -> dict[str, Any]:
-    """Return a display style for a detection zone based on likelihood.
-
-    Higher likelihood zones are green (good coverage), lower are red (weak).
-    """
-    if likelihood_pct >= 70:
-        return {
-            "color": "#4CAF50",
-            "fill_color": "#4CAF50",
-            "fill_opacity": 0.25,
-            "weight": 2,
-            "dash_array": "6, 4",
-        }
-    if likelihood_pct >= 40:
-        return {
-            "color": "#FF9800",
-            "fill_color": "#FF9800",
-            "fill_opacity": 0.18,
-            "weight": 2,
-            "dash_array": "6, 4",
-        }
-    return {
+# Per-ring styles: purple (inner), red (middle), orange (outer).
+ZONE_STYLES: list[dict[str, Any]] = [
+    {
+        "color": "#9C27B0",
+        "fill_color": "#9C27B0",
+        "fill_opacity": 0.25,
+        "weight": 2,
+        "dash_array": "6, 4",
+    },
+    {
         "color": "#F44336",
         "fill_color": "#F44336",
+        "fill_opacity": 0.18,
+        "weight": 2,
+        "dash_array": "6, 4",
+    },
+    {
+        "color": "#FF9800",
+        "fill_color": "#FF9800",
         "fill_opacity": 0.12,
         "weight": 2,
         "dash_array": "6, 4",
-    }
-
-
-def _build_zone_feature(ring: list[list[float]], zone: SensorModelZone) -> dict[str, Any]:
-    """Build a GeoJSON Feature for a detection zone.
-
-    Args:
-        ring: Closed polygon ring coordinates.
-        zone: SensorModelZone definition.
-
-    Returns:
-        GeoJSON Feature dict.
-    """
-    return {
-        "type": "Feature",
-        "id": f"zone-{uuid.uuid4()}",
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [ring],
-        },
-        "properties": {
-            "kind": "ZONE",
-            "name": zone.name,
-            "detection_likelihood_pct": zone.likelihood_pct,
-            "buffer_distance_nm": zone.distance_nm,
-            "style": _zone_style(zone.likelihood_pct),
-        },
-    }
+    },
+]
 
 
 # ============================================================
@@ -273,8 +242,8 @@ def _build_zone_feature(ring: list[list[float]], zone: SensorModelZone) -> dict[
     name="buffer-zone-generator",
     description=(
         "Generate detection likelihood buffer zones around a track using a sensor model. "
-        "Returns 3 concentric polygon features at increasing distances, each named with "
-        "its detection likelihood percentage."
+        "Returns a single MultiPolygon feature with 3 concentric zones at increasing "
+        "distances, each styled with its detection likelihood percentage."
     ),
     input_kinds=["TRACK"],
     output_kind="addition/feature",
@@ -316,7 +285,8 @@ def buffer_zone_generator(
         sensor_model: Optional sensor model override (default: StubSensorModel).
 
     Returns:
-        List of 3 GeoJSON Feature dicts (zone polygons), ordered innermost to outermost.
+        List containing a single GeoJSON Feature with MultiPolygon geometry
+        (3 concentric zone polygons, ordered innermost to outermost).
     """
     # Find the track
     track = _find_track_feature(context.features)
@@ -364,21 +334,41 @@ def buffer_zone_generator(
         # Validate default distances
         _validate_distances([z.distance_nm for z in zones])
 
-    # Generate zone polygons
-    zone_features = []
-    for zone in zones:
+    # Generate polygon rings and zone metadata
+    multi_coords: list[list[list[list[float]]]] = []
+    zone_defs: list[dict[str, Any]] = []
+    for i, zone in enumerate(zones):
         ring = generate_buffer_polygon(track_coords, zone.distance_nm)
-        feature = _build_zone_feature(ring, zone)
-        zone_features.append(feature)
+        multi_coords.append([ring])  # each polygon: [exterior_ring]
+        zone_defs.append(
+            {
+                "name": zone.name,
+                "detection_likelihood_pct": zone.likelihood_pct,
+                "buffer_distance_nm": zone.distance_nm,
+                "style": ZONE_STYLES[i] if i < len(ZONE_STYLES) else ZONE_STYLES[-1],
+            }
+        )
 
     # Build provenance label
     zone_names = ", ".join(z.name for z in zones)
     label = f"Generated 3 detection zones ({zone_names}) for track"
 
-    # Attach provenance annotations to each feature
-    for feature in zone_features:
-        feature["properties"]["debrief:resultType"] = "addition/feature"
-        feature["properties"]["debrief:sourceFeatures"] = [track_id]
-        feature["properties"]["debrief:label"] = label
+    # Build single MultiPolygon feature
+    feature: dict[str, Any] = {
+        "type": "Feature",
+        "id": f"zone-{uuid.uuid4()}",
+        "geometry": {
+            "type": "MultiPolygon",
+            "coordinates": multi_coords,
+        },
+        "properties": {
+            "kind": "ZONE",
+            "name": f"Detection Zones ({zone_names})",
+            "zones": zone_defs,
+            "debrief:resultType": "addition/feature",
+            "debrief:sourceFeatures": [track_id],
+            "debrief:label": label,
+        },
+    }
 
-    return zone_features
+    return [feature]

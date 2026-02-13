@@ -46,6 +46,23 @@ const NON_TRACK_FEATURE = {
 };
 
 // ============================================================
+// Helpers
+// ============================================================
+
+/** Run the tool and return convenient accessors. */
+function run(track = SIMPLE_TRACK, params = {}, sensorModel?: SensorModel) {
+  const result = execute(
+    [track as unknown as Parameters<typeof execute>[0][0]],
+    params,
+    sensorModel,
+  );
+  const feature = result[0];
+  const zones = feature.properties.zones as Array<Record<string, unknown>>;
+  const multiCoords = feature.geometry.coordinates as number[][][][];
+  return { result, feature, zones, multiCoords };
+}
+
+// ============================================================
 // Tool definition tests
 // ============================================================
 
@@ -67,49 +84,59 @@ describe('buffer-zone-generator toolDefinition', () => {
 });
 
 // ============================================================
-// Phase 1: Basic zone generation (US1)
+// Phase 1: Basic zone generation (US1) — now MultiPolygon
 // ============================================================
 
 describe('buffer-zone-generator basic generation (US1)', () => {
-  it('generates exactly 3 zone features', () => {
-    const result = execute([SIMPLE_TRACK], {});
-    expect(result).toHaveLength(3);
+  it('returns a single MultiPolygon feature', () => {
+    const { result, feature } = run();
+    expect(result).toHaveLength(1);
+    expect(feature.geometry.type).toBe('MultiPolygon');
   });
 
-  it('zones have correct properties', () => {
-    const result = execute([SIMPLE_TRACK], {});
-    for (const zone of result) {
-      expect(zone.type).toBe('Feature');
-      expect(zone.geometry.type).toBe('Polygon');
-      expect(zone.properties.kind).toBe('ZONE');
-      expect(zone.properties.name).toBeTruthy();
-      expect(zone.properties.detection_likelihood_pct).toBeDefined();
-      expect(zone.properties.buffer_distance_nm).toBeDefined();
-    }
+  it('MultiPolygon has 3 sub-polygons', () => {
+    const { multiCoords } = run();
+    expect(multiCoords).toHaveLength(3);
   });
 
-  it('zones have correct names and distances', () => {
-    const result = execute([SIMPLE_TRACK], {});
-    expect(result[0].properties.name).toBe('75%');
-    expect(result[0].properties.buffer_distance_nm).toBe(3.0);
-    expect(result[1].properties.name).toBe('50%');
-    expect(result[1].properties.buffer_distance_nm).toBe(6.0);
-    expect(result[2].properties.name).toBe('25%');
-    expect(result[2].properties.buffer_distance_nm).toBe(12.0);
+  it('feature has correct top-level properties', () => {
+    const { feature } = run();
+    expect(feature.type).toBe('Feature');
+    expect(feature.properties.kind).toBe('ZONE');
+    expect(feature.properties.name).toContain('Detection Zones');
+  });
+
+  it('zones metadata has correct names and distances', () => {
+    const { zones } = run();
+    expect(zones).toHaveLength(3);
+    expect(zones[0].name).toBe('75%');
+    expect(zones[0].buffer_distance_nm).toBe(3.0);
+    expect(zones[1].name).toBe('50%');
+    expect(zones[1].buffer_distance_nm).toBe(6.0);
+    expect(zones[2].name).toBe('25%');
+    expect(zones[2].buffer_distance_nm).toBe(12.0);
   });
 
   it('zones are ordered innermost to outermost', () => {
-    const result = execute([SIMPLE_TRACK], {});
-    const distances = result.map((z) => z.properties.buffer_distance_nm as number);
+    const { zones } = run();
+    const distances = zones.map((z) => z.buffer_distance_nm as number);
     for (let i = 1; i < distances.length; i++) {
       expect(distances[i]).toBeGreaterThan(distances[i - 1]);
     }
   });
 
-  it('zones have valid polygon geometry (closed ring)', () => {
-    const result = execute([SIMPLE_TRACK], {});
-    for (const zone of result) {
-      const ring = (zone.geometry.coordinates as number[][][])[0];
+  it('zones have purple/red/orange styles', () => {
+    const { zones } = run();
+    const styles = zones.map((z) => z.style as Record<string, unknown>);
+    expect(styles[0].color).toBe('#9C27B0'); // purple
+    expect(styles[1].color).toBe('#F44336'); // red
+    expect(styles[2].color).toBe('#FF9800'); // orange
+  });
+
+  it('each sub-polygon has valid closed ring', () => {
+    const { multiCoords } = run();
+    for (const polygon of multiCoords) {
+      const ring = polygon[0]; // exterior ring
       expect(ring.length).toBeGreaterThan(3);
       // Ring is closed
       expect(ring[0][0]).toBe(ring[ring.length - 1][0]);
@@ -117,20 +144,17 @@ describe('buffer-zone-generator basic generation (US1)', () => {
     }
   });
 
-  it('zones have UUID-based IDs', () => {
-    const result = execute([SIMPLE_TRACK], {});
-    for (const zone of result) {
-      expect(zone.id).toBeDefined();
-      expect(zone.id).toMatch(/^zone-/);
-    }
+  it('feature has UUID-based ID', () => {
+    const { feature } = run();
+    expect(feature.id).toBeDefined();
+    expect(feature.id).toMatch(/^zone-/);
   });
 
-  it('single-point track produces circular zones', () => {
-    const result = execute([SINGLE_POINT_TRACK], {});
-    expect(result).toHaveLength(3);
-    for (const zone of result) {
-      const ring = (zone.geometry.coordinates as number[][][])[0];
-      expect(ring.length).toBeGreaterThan(3);
+  it('single-point track produces valid MultiPolygon zones', () => {
+    const { multiCoords } = run(SINGLE_POINT_TRACK);
+    expect(multiCoords).toHaveLength(3);
+    for (const polygon of multiCoords) {
+      expect(polygon[0].length).toBeGreaterThan(3);
     }
   });
 });
@@ -141,23 +165,23 @@ describe('buffer-zone-generator basic generation (US1)', () => {
 
 describe('buffer-zone-generator custom distances (US2)', () => {
   it('accepts custom distances', () => {
-    const result = execute([SIMPLE_TRACK], {
+    const { zones } = run(SIMPLE_TRACK, {
       distance_1_nm: 5,
       distance_2_nm: 10,
       distance_3_nm: 15,
     });
-    expect(result[0].properties.buffer_distance_nm).toBe(5);
-    expect(result[1].properties.buffer_distance_nm).toBe(10);
-    expect(result[2].properties.buffer_distance_nm).toBe(15);
+    expect(zones[0].buffer_distance_nm).toBe(5);
+    expect(zones[1].buffer_distance_nm).toBe(10);
+    expect(zones[2].buffer_distance_nm).toBe(15);
   });
 
   it('reorders non-ascending custom distances', () => {
-    const result = execute([SIMPLE_TRACK], {
+    const { zones } = run(SIMPLE_TRACK, {
       distance_1_nm: 15,
       distance_2_nm: 5,
       distance_3_nm: 10,
     });
-    const distances = result.map((z) => z.properties.buffer_distance_nm as number);
+    const distances = zones.map((z) => z.buffer_distance_nm as number);
     expect(distances).toEqual([5, 10, 15]);
   });
 
@@ -174,23 +198,21 @@ describe('buffer-zone-generator custom distances (US2)', () => {
   });
 
   it('partial custom distances use sensor model defaults', () => {
-    const result = execute([SIMPLE_TRACK], { distance_1_nm: 5 });
-    expect(result).toHaveLength(3);
-    // distance_1_nm=5 overrides the innermost; others keep defaults (6, 12)
-    const distances = result.map((z) => z.properties.buffer_distance_nm as number);
+    const { zones } = run(SIMPLE_TRACK, { distance_1_nm: 5 });
+    expect(zones).toHaveLength(3);
+    const distances = zones.map((z) => z.buffer_distance_nm as number);
     expect(distances).toContain(5);
   });
 
   it('custom distances preserve likelihood ordering (highest pct -> smallest distance)', () => {
-    const result = execute([SIMPLE_TRACK], {
+    const { zones } = run(SIMPLE_TRACK, {
       distance_1_nm: 1,
       distance_2_nm: 2,
       distance_3_nm: 4,
     });
-    // Smallest distance should have highest likelihood
-    expect(result[0].properties.detection_likelihood_pct).toBe(75);
-    expect(result[1].properties.detection_likelihood_pct).toBe(50);
-    expect(result[2].properties.detection_likelihood_pct).toBe(25);
+    expect(zones[0].detection_likelihood_pct).toBe(75);
+    expect(zones[1].detection_likelihood_pct).toBe(50);
+    expect(zones[2].detection_likelihood_pct).toBe(25);
   });
 });
 
@@ -200,27 +222,25 @@ describe('buffer-zone-generator custom distances (US2)', () => {
 
 describe('buffer-zone-generator provenance and statelessness (US3)', () => {
   it('is stateless — repeated calls produce consistent structure', () => {
-    const r1 = execute([SIMPLE_TRACK], {});
-    const r2 = execute([SIMPLE_TRACK], {});
-    expect(r1.length).toBe(r2.length);
-    for (let i = 0; i < r1.length; i++) {
-      expect(r1[i].properties.name).toBe(r2[i].properties.name);
-      expect(r1[i].properties.buffer_distance_nm).toBe(r2[i].properties.buffer_distance_nm);
+    const r1 = run();
+    const r2 = run();
+    expect(r1.zones.length).toBe(r2.zones.length);
+    for (let i = 0; i < r1.zones.length; i++) {
+      expect(r1.zones[i].name).toBe(r2.zones[i].name);
+      expect(r1.zones[i].buffer_distance_nm).toBe(r2.zones[i].buffer_distance_nm);
     }
   });
 
   it('attaches provenance annotations', () => {
-    const result = execute([SIMPLE_TRACK], {});
-    for (const zone of result) {
-      expect(zone.properties['debrief:resultType']).toBe('addition/feature');
-      expect(zone.properties['debrief:sourceFeatures']).toEqual(['track-001']);
-      expect(zone.properties['debrief:label']).toBeDefined();
-    }
+    const { feature } = run();
+    expect(feature.properties['debrief:resultType']).toBe('addition/feature');
+    expect(feature.properties['debrief:sourceFeatures']).toEqual(['track-001']);
+    expect(feature.properties['debrief:label']).toBeDefined();
   });
 
   it('provenance label has correct format', () => {
-    const result = execute([SIMPLE_TRACK], {});
-    const label = result[0].properties['debrief:label'] as string;
+    const { feature } = run();
+    const label = feature.properties['debrief:label'] as string;
     expect(label).toBe('Generated 3 detection zones (75%, 50%, 25%) for track');
   });
 
@@ -235,11 +255,11 @@ describe('buffer-zone-generator provenance and statelessness (US3)', () => {
       }
     }
 
-    const result = execute([SIMPLE_TRACK], {}, new TestSensorModel());
-    expect(result[0].properties.buffer_distance_nm).toBe(1.0);
-    expect(result[1].properties.buffer_distance_nm).toBe(2.0);
-    expect(result[2].properties.buffer_distance_nm).toBe(4.0);
-    expect(result[0].properties.name).toBe('90%');
+    const { zones } = run(SIMPLE_TRACK, {}, new TestSensorModel());
+    expect(zones[0].buffer_distance_nm).toBe(1.0);
+    expect(zones[1].buffer_distance_nm).toBe(2.0);
+    expect(zones[2].buffer_distance_nm).toBe(4.0);
+    expect(zones[0].name).toBe('90%');
   });
 });
 
@@ -258,7 +278,7 @@ describe('buffer-zone-generator error handling', () => {
 
   it('skips non-TRACK features and uses first TRACK', () => {
     const result = execute([NON_TRACK_FEATURE, SIMPLE_TRACK], {});
-    expect(result).toHaveLength(3);
+    expect(result).toHaveLength(1);
     expect(result[0].properties['debrief:sourceFeatures']).toEqual(['track-001']);
   });
 
@@ -289,24 +309,38 @@ describe('buffer-zone-generator golden example', () => {
     const track = goldenInput.features[0];
     const result = execute([track as unknown as Parameters<typeof execute>[0][0]], {});
 
+    // Both return a list with 1 MultiPolygon feature
     expect(result).toHaveLength(goldenOutput.length);
 
     const TOLERANCE = 1e-8;
     let maxDiff = 0;
 
-    for (let z = 0; z < goldenOutput.length; z++) {
-      const goldenZone = goldenOutput[z];
-      const tsZone = result[z];
+    const goldenFeature = goldenOutput[0];
+    const tsFeature = result[0];
 
-      // Properties must match exactly
-      expect(tsZone.properties.kind).toBe(goldenZone.properties.kind);
-      expect(tsZone.properties.name).toBe(goldenZone.properties.name);
-      expect(tsZone.properties.detection_likelihood_pct).toBe(goldenZone.properties.detection_likelihood_pct);
-      expect(tsZone.properties.buffer_distance_nm).toBe(goldenZone.properties.buffer_distance_nm);
+    // Properties must match
+    expect(tsFeature.properties.kind).toBe(goldenFeature.properties.kind);
+    expect(tsFeature.properties.name).toBe(goldenFeature.properties.name);
+    expect(tsFeature.geometry.type).toBe('MultiPolygon');
 
-      // Coordinate ring must match point-by-point
-      const goldenRing = goldenZone.geometry.coordinates[0];
-      const tsRing = (tsZone.geometry.coordinates as number[][][])[0];
+    // Zones metadata must match
+    const goldenZones = goldenFeature.properties.zones;
+    const tsZones = tsFeature.properties.zones as Array<Record<string, unknown>>;
+    expect(tsZones).toHaveLength(goldenZones.length);
+    for (let z = 0; z < goldenZones.length; z++) {
+      expect(tsZones[z].name).toBe(goldenZones[z].name);
+      expect(tsZones[z].detection_likelihood_pct).toBe(goldenZones[z].detection_likelihood_pct);
+      expect(tsZones[z].buffer_distance_nm).toBe(goldenZones[z].buffer_distance_nm);
+    }
+
+    // Coordinate rings must match point-by-point
+    const goldenCoords = goldenFeature.geometry.coordinates as number[][][][];
+    const tsCoords = tsFeature.geometry.coordinates as number[][][][];
+    expect(tsCoords).toHaveLength(goldenCoords.length);
+
+    for (let p = 0; p < goldenCoords.length; p++) {
+      const goldenRing = goldenCoords[p][0]; // exterior ring
+      const tsRing = tsCoords[p][0];
       expect(tsRing).toHaveLength(goldenRing.length);
 
       for (let i = 0; i < goldenRing.length; i++) {
@@ -318,7 +352,6 @@ describe('buffer-zone-generator golden example', () => {
       }
     }
 
-    // Overall check
     expect(maxDiff).toBeLessThan(TOLERANCE);
   });
 
@@ -326,16 +359,17 @@ describe('buffer-zone-generator golden example', () => {
     const track = goldenInput.features[0];
     const result = execute([track as unknown as Parameters<typeof execute>[0][0]], {});
 
-    for (let z = 0; z < goldenOutput.length; z++) {
-      expect(result[z].properties['debrief:resultType']).toBe(
-        goldenOutput[z].properties['debrief:resultType'],
-      );
-      expect(result[z].properties['debrief:sourceFeatures']).toEqual(
-        goldenOutput[z].properties['debrief:sourceFeatures'],
-      );
-      expect(result[z].properties['debrief:label']).toBe(
-        goldenOutput[z].properties['debrief:label'],
-      );
-    }
+    const goldenFeature = goldenOutput[0];
+    const tsFeature = result[0];
+
+    expect(tsFeature.properties['debrief:resultType']).toBe(
+      goldenFeature.properties['debrief:resultType'],
+    );
+    expect(tsFeature.properties['debrief:sourceFeatures']).toEqual(
+      goldenFeature.properties['debrief:sourceFeatures'],
+    );
+    expect(tsFeature.properties['debrief:label']).toBe(
+      goldenFeature.properties['debrief:label'],
+    );
   });
 });

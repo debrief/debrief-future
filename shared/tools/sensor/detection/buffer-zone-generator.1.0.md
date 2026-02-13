@@ -20,8 +20,8 @@
 name: buffer-zone-generator
 description: >
   Generate detection likelihood buffer zones around a track using a sensor model.
-  Returns 3 concentric polygon features at increasing distances, each named with
-  its detection likelihood percentage. Default zones are at 3nm (75%), 6nm (50%),
+  Returns a single MultiPolygon feature with 3 concentric zones at increasing
+  distances, styled purple/red/orange. Default zones are at 3nm (75%), 6nm (50%),
   and 12nm (25%). Distances can be overridden via parameters.
 ```
 
@@ -54,25 +54,39 @@ description: >
 
 `addition/feature` — new features added to the plot.
 
-### Output Features
+### Output Feature
 
-Three GeoJSON Feature dicts, ordered innermost to outermost:
+A single GeoJSON Feature with `MultiPolygon` geometry containing 3 concentric zone polygons
+(ordered innermost to outermost). This enables downstream tools to treat the zones as one entity.
 
 | Property | Type | Description |
 |----------|------|-------------|
 | kind | "ZONE" | Feature kind identifier |
-| name | string | Zone label (e.g., "75%") |
-| detection_likelihood_pct | int | Detection probability (1-100) |
-| buffer_distance_nm | float | Distance from track in nm |
+| name | string | Composite label (e.g., "Detection Zones (75%, 50%, 25%)") |
+| zones | array | Per-ring metadata (see below) |
 | debrief:resultType | string | "addition/feature" |
 | debrief:sourceFeatures | string[] | Source track feature IDs |
 | debrief:label | string | Human-readable provenance label |
 
+Each entry in the `zones` array:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| name | string | Zone label (e.g., "75%") |
+| detection_likelihood_pct | int | Detection probability (1-100) |
+| buffer_distance_nm | float | Distance from track in nm |
+| style | object | Per-ring display style (color, fill_color, fill_opacity, weight, dash_array) |
+
+Default zone styles (by index):
+- **Inner (0)**: purple `#9C27B0`, fill opacity 0.25
+- **Middle (1)**: red `#F44336`, fill opacity 0.18
+- **Outer (2)**: orange `#FF9800`, fill opacity 0.12
+
 ### Geometry
 
-- Type: `Polygon`
-- Single exterior ring (no holes)
-- Ring is closed (first coordinate == last coordinate)
+- Type: `MultiPolygon`
+- 3 sub-polygons, each with a single exterior ring (no holes)
+- Rings are closed (first coordinate == last coordinate)
 - Coordinates: `[longitude, latitude]` pairs
 
 ## 5. Algorithm
@@ -96,10 +110,13 @@ FUNCTION buffer_zone_generator(context, params, sensor_model=StubSensorModel):
 
   5. FOR each zone definition (ordered by ascending distance):
      a. CALL generate_buffer_polygon(track_coords, zone.distance_nm)
-     b. BUILD GeoJSON Feature with zone properties
-     c. ATTACH provenance annotations
+     b. ADD polygon ring to MultiPolygon coordinates
+     c. BUILD zone metadata entry with per-ring style
 
-  6. RETURN list of 3 zone features
+  6. BUILD single GeoJSON Feature with MultiPolygon geometry
+     a. ATTACH zone metadata array and provenance annotations
+
+  7. RETURN list containing the single MultiPolygon feature
 
 FUNCTION generate_buffer_polygon(track_coords, distance_nm):
   1. CONVERT distance: distance_km = distance_nm × 1.852
@@ -172,8 +189,8 @@ track = {
 }
 
 context = SelectionContext(type=ContextType.SINGLE, features=[track])
-zones = buffer_zone_generator(context, {})
-# zones: 3 Polygon features at 3nm, 6nm, 12nm
+result = buffer_zone_generator(context, {})
+# result: [single MultiPolygon Feature with 3 concentric zones at 3nm, 6nm, 12nm]
 ```
 
 ## 8. Changelog

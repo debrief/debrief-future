@@ -64,8 +64,8 @@ export const toolDefinition: MCPToolDefinition = {
   name: 'buffer-zone-generator',
   description:
     'Generate detection likelihood buffer zones around a track using a sensor model. ' +
-    'Returns 3 concentric polygon features at increasing distances, each named with ' +
-    'its detection likelihood percentage.',
+    'Returns a single MultiPolygon feature with 3 concentric zones at increasing ' +
+    'distances, each styled with its detection likelihood percentage.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -250,19 +250,12 @@ function validateDistances(distances: number[]): number[] {
   return [...distances].sort((a, b) => a - b);
 }
 
-/**
- * Return a display style for a detection zone based on likelihood.
- * Green = high detection, amber = medium, red = low.
- */
-function zoneStyle(likelihoodPct: number): Record<string, unknown> {
-  if (likelihoodPct >= 70) {
-    return { color: '#4CAF50', fill_color: '#4CAF50', fill_opacity: 0.25, weight: 2, dash_array: '6, 4' };
-  }
-  if (likelihoodPct >= 40) {
-    return { color: '#FF9800', fill_color: '#FF9800', fill_opacity: 0.18, weight: 2, dash_array: '6, 4' };
-  }
-  return { color: '#F44336', fill_color: '#F44336', fill_opacity: 0.12, weight: 2, dash_array: '6, 4' };
-}
+// Per-ring styles: purple (inner), red (middle), orange (outer).
+const ZONE_STYLES: Record<string, unknown>[] = [
+  { color: '#9C27B0', fill_color: '#9C27B0', fill_opacity: 0.25, weight: 2, dash_array: '6, 4' },
+  { color: '#F44336', fill_color: '#F44336', fill_opacity: 0.18, weight: 2, dash_array: '6, 4' },
+  { color: '#FF9800', fill_color: '#FF9800', fill_opacity: 0.12, weight: 2, dash_array: '6, 4' },
+];
 
 function generateUUID(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -325,37 +318,41 @@ export function execute(
     validateDistances(zones.map((z) => z.distance_nm));
   }
 
-  // Generate zone polygons
-  const zoneFeatures: GeoJSONFeature[] = [];
-  for (const zone of zones) {
+  // Generate polygon rings and zone metadata
+  const multiCoords: number[][][][] = [];
+  const zoneDefs: Record<string, unknown>[] = [];
+  zones.forEach((zone, i) => {
     const ring = generateBufferPolygon(trackCoords, zone.distance_nm);
-    zoneFeatures.push({
-      type: 'Feature',
-      id: `zone-${generateUUID()}`,
-      geometry: {
-        type: 'Polygon',
-        coordinates: [ring],
-      },
-      properties: {
-        kind: 'ZONE',
-        name: zone.name,
-        detection_likelihood_pct: zone.likelihood_pct,
-        buffer_distance_nm: zone.distance_nm,
-        style: zoneStyle(zone.likelihood_pct),
-      },
+    multiCoords.push([ring]); // each polygon: [exterior_ring]
+    zoneDefs.push({
+      name: zone.name,
+      detection_likelihood_pct: zone.likelihood_pct,
+      buffer_distance_nm: zone.distance_nm,
+      style: ZONE_STYLES[i] ?? ZONE_STYLES[ZONE_STYLES.length - 1],
     });
-  }
+  });
 
   // Build provenance label
   const zoneNames = zones.map((z) => z.name).join(', ');
   const label = `Generated 3 detection zones (${zoneNames}) for track`;
 
-  // Attach provenance annotations
-  for (const feature of zoneFeatures) {
-    feature.properties['debrief:resultType'] = 'addition/feature';
-    feature.properties['debrief:sourceFeatures'] = [trackId];
-    feature.properties['debrief:label'] = label;
-  }
+  // Build single MultiPolygon feature
+  const feature: GeoJSONFeature = {
+    type: 'Feature',
+    id: `zone-${generateUUID()}`,
+    geometry: {
+      type: 'MultiPolygon',
+      coordinates: multiCoords,
+    },
+    properties: {
+      kind: 'ZONE',
+      name: `Detection Zones (${zoneNames})`,
+      zones: zoneDefs,
+      'debrief:resultType': 'addition/feature',
+      'debrief:sourceFeatures': [trackId],
+      'debrief:label': label,
+    },
+  };
 
-  return zoneFeatures;
+  return [feature];
 }
