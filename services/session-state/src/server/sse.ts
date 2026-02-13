@@ -187,6 +187,7 @@ export function createSSEHandler(store: SessionStoreApi) {
       spatial: {
         viewport: state.viewport,
         rotation: state.rotation,
+        drawingMode: state.drawingMode,
       },
       features: {
         featureCollectionUri: state.featureCollectionUri,

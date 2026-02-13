@@ -76,8 +76,8 @@ describe('Persistence', () => {
 
       const persistent = extractPersistentState(store);
 
-      // drawingMode should not be in persistent state
-      expect((persistent.spatial as Record<string, unknown>).drawingMode).toBeUndefined();
+      // drawingMode should always be null in persistent state (FR-010)
+      expect((persistent.spatial as Record<string, unknown>).drawingMode).toBeNull();
     });
 
     it('should include schema version', () => {
