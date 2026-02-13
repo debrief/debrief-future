@@ -165,6 +165,16 @@ export {
   type SnapshotService,
 } from './log/index.js';
 
+// Result ID Registry (Feature: 087)
+export {
+  createResultIdRegistry,
+  type ResultIdMapping,
+  type ResultIdChangeEvent,
+  type ResultIdChangeCallback,
+  type ResultIdRegistry,
+  type StacAssetForHydration,
+} from './registry/index.js';
+
 // Server (for standalone mode)
 export {
   createApp,
