@@ -250,11 +250,12 @@ function validateDistances(distances: number[]): number[] {
   return [...distances].sort((a, b) => a - b);
 }
 
-// Per-ring styles: purple (inner), red (middle), orange (outer).
+// Per-ring styles following PolygonProperties schema (#081):
+// purple (inner), red (middle), orange (outer).
 const ZONE_STYLES: Record<string, unknown>[] = [
-  { color: '#9C27B0', fill_color: '#9C27B0', fill_opacity: 0.25, weight: 2, dash_array: '6, 4' },
-  { color: '#F44336', fill_color: '#F44336', fill_opacity: 0.18, weight: 2, dash_array: '6, 4' },
-  { color: '#FF9800', fill_color: '#FF9800', fill_opacity: 0.12, weight: 2, dash_array: '6, 4' },
+  { fill: true, fill_color: '#9C27B0', fill_opacity: 0.25, stroke: true, color: '#9C27B0', weight: 2, opacity: 1.0, dash_array: '6, 4' },
+  { fill: true, fill_color: '#F44336', fill_opacity: 0.18, stroke: true, color: '#F44336', weight: 2, opacity: 1.0, dash_array: '6, 4' },
+  { fill: true, fill_color: '#FF9800', fill_opacity: 0.12, stroke: true, color: '#FF9800', weight: 2, opacity: 1.0, dash_array: '6, 4' },
 ];
 
 function generateUUID(): string {
@@ -347,6 +348,7 @@ export function execute(
     properties: {
       kind: 'ZONE',
       name: `Detection Zones (${zoneNames})`,
+      style: ZONE_STYLES[0],
       zones: zoneDefs,
       'debrief:resultType': 'addition/feature',
       'debrief:sourceFeatures': [trackId],

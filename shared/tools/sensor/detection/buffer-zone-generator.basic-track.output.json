@@ -1,7 +1,7 @@
 [
   {
     "type": "Feature",
-    "id": "zone-c36781a2-252d-4e12-9541-5db22a11a521",
+    "id": "zone-b9b00d04-da9e-45a5-9385-69cdcf5353ae",
     "geometry": {
       "type": "MultiPolygon",
       "coordinates": [
@@ -502,16 +502,29 @@
     "properties": {
       "kind": "ZONE",
       "name": "Detection Zones (75%, 50%, 25%)",
+      "style": {
+        "fill": true,
+        "fill_color": "#9C27B0",
+        "fill_opacity": 0.25,
+        "stroke": true,
+        "color": "#9C27B0",
+        "weight": 2,
+        "opacity": 1.0,
+        "dash_array": "6, 4"
+      },
       "zones": [
         {
           "name": "75%",
           "detection_likelihood_pct": 75,
           "buffer_distance_nm": 3.0,
           "style": {
-            "color": "#9C27B0",
+            "fill": true,
             "fill_color": "#9C27B0",
             "fill_opacity": 0.25,
+            "stroke": true,
+            "color": "#9C27B0",
             "weight": 2,
+            "opacity": 1.0,
             "dash_array": "6, 4"
           }
         },
@@ -520,10 +533,13 @@
           "detection_likelihood_pct": 50,
           "buffer_distance_nm": 6.0,
           "style": {
-            "color": "#F44336",
+            "fill": true,
             "fill_color": "#F44336",
             "fill_opacity": 0.18,
+            "stroke": true,
+            "color": "#F44336",
             "weight": 2,
+            "opacity": 1.0,
             "dash_array": "6, 4"
           }
         },
@@ -532,10 +548,13 @@
           "detection_likelihood_pct": 25,
           "buffer_distance_nm": 12.0,
           "style": {
-            "color": "#FF9800",
+            "fill": true,
             "fill_color": "#FF9800",
             "fill_opacity": 0.12,
+            "stroke": true,
+            "color": "#FF9800",
             "weight": 2,
+            "opacity": 1.0,
             "dash_array": "6, 4"
           }
         }

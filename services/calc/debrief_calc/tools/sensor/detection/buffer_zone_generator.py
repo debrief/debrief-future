@@ -207,27 +207,37 @@ def _validate_distances(distances: list[float]) -> list[float]:
     return sorted(distances)
 
 
-# Per-ring styles: purple (inner), red (middle), orange (outer).
+# Per-ring styles following PolygonProperties schema (#081):
+# purple (inner), red (middle), orange (outer).
 ZONE_STYLES: list[dict[str, Any]] = [
     {
-        "color": "#9C27B0",
+        "fill": True,
         "fill_color": "#9C27B0",
         "fill_opacity": 0.25,
+        "stroke": True,
+        "color": "#9C27B0",
         "weight": 2,
+        "opacity": 1.0,
         "dash_array": "6, 4",
     },
     {
-        "color": "#F44336",
+        "fill": True,
         "fill_color": "#F44336",
         "fill_opacity": 0.18,
+        "stroke": True,
+        "color": "#F44336",
         "weight": 2,
+        "opacity": 1.0,
         "dash_array": "6, 4",
     },
     {
-        "color": "#FF9800",
+        "fill": True,
         "fill_color": "#FF9800",
         "fill_opacity": 0.12,
+        "stroke": True,
+        "color": "#FF9800",
         "weight": 2,
+        "opacity": 1.0,
         "dash_array": "6, 4",
     },
 ]
@@ -364,6 +374,7 @@ def buffer_zone_generator(
         "properties": {
             "kind": "ZONE",
             "name": f"Detection Zones ({zone_names})",
+            "style": ZONE_STYLES[0],
             "zones": zone_defs,
             "debrief:resultType": "addition/feature",
             "debrief:sourceFeatures": [track_id],
