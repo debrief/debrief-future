@@ -26,8 +26,10 @@ interface ElectronThemeAPI {
 export function isElectronEnvironment(): boolean {
   if (typeof window === 'undefined') return false;
 
-  // Check for Electron's process object
-  if (typeof process !== 'undefined' && process.versions?.electron) {
+  // Check for Electron's process object via globalThis (avoids needing @types/node)
+  const g = globalThis as Record<string, unknown>;
+  const proc = g.process as { versions?: { electron?: string } } | undefined;
+  if (proc?.versions?.electron) {
     return true;
   }
 
