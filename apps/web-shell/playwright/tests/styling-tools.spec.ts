@@ -45,9 +45,9 @@ test.describe('Styling Tools Integration', () => {
     });
   });
 
-  test('tools panel lists all 8 tools (3 built-in + 4 styling + 1 shape)', async ({ page }) => {
+  test('tools panel lists all 9 tools (3 built-in + 4 styling + 1 shape + 1 sensor)', async ({ page }) => {
     const toolItems = page.locator('.debrief-tools-panel__item');
-    await expect(toolItems).toHaveCount(8);
+    await expect(toolItems).toHaveCount(9);
   });
 
   test('styling tools are listed by name', async ({ page }) => {
