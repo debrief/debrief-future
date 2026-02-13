@@ -7,21 +7,6 @@ from typing import Any
 from debrief_calc.models import ContextType, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 
-NAMED_COLORS = [
-    "red",
-    "blue",
-    "green",
-    "orange",
-    "purple",
-    "brown",
-    "pink",
-    "cyan",
-    "yellow",
-    "magenta",
-    "navy",
-    "olive",
-]
-
 
 @tool(
     name="set-track-color",
@@ -32,10 +17,9 @@ NAMED_COLORS = [
     parameters=[
         ToolParameter(
             name="color",
-            type="enum",
-            description="Display color to apply",
+            type="string",
+            description="CSS color value to apply",
             required=True,
-            choices=NAMED_COLORS,
         ),
     ],
 )

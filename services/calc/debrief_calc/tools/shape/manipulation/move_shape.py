@@ -12,17 +12,6 @@ EARTH_RADIUS_KM = 6371.0
 
 ANNOTATION_KINDS = {"CIRCLE", "RECTANGLE", "LINE", "TEXT", "VECTOR"}
 
-CARDINAL_BEARINGS = {
-    "N": 0,
-    "NE": 45,
-    "E": 90,
-    "SE": 135,
-    "S": 180,
-    "SW": 225,
-    "W": 270,
-    "NW": 315,
-}
-
 
 def translate_point(
     lat_deg: float, lon_deg: float, bearing_deg: float, distance_km: float
@@ -93,18 +82,16 @@ def _translate_coords_list(
     parameters=[
         ToolParameter(
             name="direction",
-            type="enum",
-            description="Compass direction for translation",
+            type="number",
+            description="Compass bearing in degrees (0=North, 90=East, 180=South, 270=West)",
             required=False,
-            choices=["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
-            default="E",
+            default=90,
         ),
         ToolParameter(
             name="distance_km",
             type="number",
             description="Translation distance in kilometres",
             required=False,
-            choices=[1, 2, 5, 10, 20, 50],
             default=5,
         ),
     ],
@@ -121,12 +108,11 @@ def move_shape(context: SelectionContext, params: dict[str, Any]) -> list[dict[s
     Returns:
         List of modified features with translated coordinates.
     """
-    direction_raw = params.get("direction", "E")
-    if isinstance(direction_raw, str) and direction_raw in CARDINAL_BEARINGS:
-        direction = float(CARDINAL_BEARINGS[direction_raw])
-    else:
-        direction = float(direction_raw) % 360
+    direction = float(params.get("direction", 90))
     distance_km = float(params.get("distance_km", 5))
+
+    # Normalise direction to [0, 360)
+    direction = direction % 360
 
     # Zero distance is a no-op — return features unchanged
     if distance_km == 0:

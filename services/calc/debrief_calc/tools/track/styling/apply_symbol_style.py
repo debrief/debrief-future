@@ -9,21 +9,6 @@ from debrief_calc.registry import tool
 
 VALID_SYMBOLS = ("circle", "square", "diamond", "triangle", "cross")
 
-NAMED_COLORS = [
-    "red",
-    "blue",
-    "green",
-    "orange",
-    "purple",
-    "brown",
-    "pink",
-    "cyan",
-    "yellow",
-    "magenta",
-    "navy",
-    "olive",
-]
-
 
 @tool(
     name="apply-symbol-style",
@@ -44,14 +29,12 @@ NAMED_COLORS = [
             name="radius",
             type="number",
             description="Marker radius in pixels",
-            choices=[1, 2, 3, 4, 5, 6],
             default=4,
         ),
         ToolParameter(
             name="fill_color",
-            type="enum",
-            description="Fill color for markers",
-            choices=NAMED_COLORS,
+            type="string",
+            description="Fill color for markers (CSS color string)",
         ),
     ],
 )

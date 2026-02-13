@@ -212,7 +212,7 @@ class ToolParameter(BaseModel):
     @field_validator("type")
     @classmethod
     def validate_type(cls, v: str) -> str:
-        valid_types = {"string", "number", "boolean", "enum", "duration"}
+        valid_types = {"string", "number", "boolean", "enum"}
         if v not in valid_types:
             raise ValueError(f"type must be one of {valid_types}")
         return v
@@ -475,14 +475,10 @@ class Tool(BaseModel):
             schema["type"] = "number"
         elif param.type == "boolean":
             schema["type"] = "boolean"
-        elif param.type == "duration":
-            schema["type"] = "string"
-            schema["format"] = "duration"
         elif param.type == "enum":
             schema["type"] = "string"
-
-        if param.choices:
-            schema["enum"] = param.choices
+            if param.choices:
+                schema["enum"] = param.choices
 
         if param.default is not None:
             schema["default"] = param.default

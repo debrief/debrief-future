@@ -71,8 +71,6 @@ def area_summary(context: SelectionContext, params: dict[str, Any]) -> list[dict
     Returns:
         List containing one Feature with area summary statistics
     """
-    include_centroid = params.get("include_centroid", True)
-
     bounds = context.bounds
     if not bounds or len(bounds) != 4:
         return []
@@ -93,19 +91,16 @@ def area_summary(context: SelectionContext, params: dict[str, Any]) -> list[dict
     width_nm = (maxx - minx) * 60 * math.cos(math.radians(avg_lat))
     height_nm = (maxy - miny) * 60
 
-    statistics: dict[str, Any] = {
-        "area_sq_nm": round(area_sq_nm, 2),
-        "width_nm": round(width_nm, 2),
-        "height_nm": round(height_nm, 2),
-    }
-    if include_centroid:
-        statistics["centroid"] = [round(centroid_lon, 4), round(centroid_lat, 4)]
-
     result_feature = {
         "type": "Feature",
         "id": f"area-{uuid.uuid4().hex[:8]}",
         "properties": {
-            "statistics": statistics,
+            "statistics": {
+                "area_sq_nm": round(area_sq_nm, 2),
+                "width_nm": round(width_nm, 2),
+                "height_nm": round(height_nm, 2),
+                "centroid": [round(centroid_lon, 4), round(centroid_lat, 4)],
+            },
             "bounds": bounds,
         },
         "geometry": {
