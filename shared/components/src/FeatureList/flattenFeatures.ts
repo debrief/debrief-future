@@ -222,7 +222,8 @@ function flattenMultiPointChildren(
   feature: import('@debrief/schemas').MultiPointFeature,
   featureId: string,
 ): void {
-  const coords = feature.geometry.coordinates;
+  // Schema types coordinates as number[] but runtime data is number[][] (Position[])
+  const coords = feature.geometry.coordinates as unknown as number[][];
   if (!coords || coords.length === 0) {
     items.push({
       type: 'point',
@@ -258,7 +259,8 @@ function flattenMultiPolygonChildren(
   feature: import('@debrief/schemas').MultiPolygonFeature,
   featureId: string,
 ): void {
-  const coords = feature.geometry.coordinates;
+  // Schema types coordinates as number[] but runtime data is number[][][][] (Position[][][])
+  const coords = feature.geometry.coordinates as unknown as number[][][][];
   if (!coords || coords.length === 0) {
     items.push({
       type: 'polygon',
