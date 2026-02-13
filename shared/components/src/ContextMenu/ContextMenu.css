@@ -6,7 +6,7 @@
  */
 
 .debrief-context-menu {
-  position: absolute;
+  position: fixed;
   z-index: 1000;
   min-width: 180px;
   max-width: 320px;

@@ -376,7 +376,8 @@ export function createMockCalcService(): MockCalcService {
       // Styling tools from toolService (with parameter metadata for context menus)
       const hasTracks = hasTrackFeatures(selectedFeatures);
       const stylingTools: ToolsPanelItem[] = listTools().map(def => {
-        const params = extractParameters(def);
+        // Only include parameters that can produce context menu items
+        const params = extractParameters(def).filter(p => p.paramType || p.choices);
         return {
           id: def.name,
           name: formatToolName(def.name),
