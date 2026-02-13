@@ -29,7 +29,7 @@ export { calculateBounds } from './utils/bounds';
 export { calculateTimeExtent, parseDuration, findIntervalPositions, resolvePositionStyle, computeAllPositionStyles, } from './utils/time';
 export type { ResolvedPositionStyle } from './utils/time';
 export { getFeatureLabel, getFeatureIcon } from './utils/labels';
-export { ToolMatchService, getInactiveReason, getAllInactiveReasons, createSelection, createSelectionFromCounts, } from './ToolMatch';
+export { ToolMatchService, getInactiveReason, getAllInactiveReasons, createSelection, createSelectionFromCounts, extractParameters, } from './ToolMatch';
 export type { Selection, MatchResult, Tool, SelectionRequirement } from './ToolMatch';
 export { ToolsPanel } from './ToolsPanel';
 export type { ToolsPanelProps, ToolsPanelItem, ActivityPanelProps, ActivityPanelCollapseState, ActivityPanelMessage, } from './ActivityPanel/types';
