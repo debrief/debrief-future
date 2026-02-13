@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { fromMCPTool, fromMCPTools, type MCPToolDefinition } from '../mcpAdapter';
+import { fromMCPTool, fromMCPTools, extractParameters, type MCPToolDefinition } from '../mcpAdapter';
 
 describe('mcpAdapter', () => {
   const sampleMCPTool: MCPToolDefinition = {
@@ -108,6 +108,132 @@ describe('mcpAdapter', () => {
     it('returns empty array for empty input', () => {
       const tools = fromMCPTools([]);
       expect(tools).toEqual([]);
+    });
+  });
+
+  describe('extractParameters', () => {
+    it('returns empty array when no params section exists', () => {
+      const mcpTool: MCPToolDefinition = {
+        ...sampleMCPTool,
+        inputSchema: {
+          type: 'object' as const,
+          properties: {
+            features: { type: 'array', items: { type: 'object' } },
+          },
+        },
+      };
+      const params = extractParameters(mcpTool);
+      expect(params).toEqual([]);
+    });
+
+    it('extracts enum parameter with x-debrief-param-type', () => {
+      const mcpTool: MCPToolDefinition = {
+        ...sampleMCPTool,
+        inputSchema: {
+          type: 'object' as const,
+          properties: {
+            features: { type: 'array', items: { type: 'object' } },
+            params: {
+              type: 'object',
+              properties: {
+                color: {
+                  type: 'string',
+                  description: 'Track color',
+                  'x-debrief-param-type': 'FeatureColor',
+                },
+              },
+            },
+          },
+        },
+      };
+      const params = extractParameters(mcpTool);
+      expect(params).toHaveLength(1);
+      expect(params[0]).toEqual({
+        name: 'color',
+        valueType: 'enum',
+        description: 'Track color',
+        paramType: 'FeatureColor',
+      });
+    });
+
+    it('extracts parameter with explicit choices but no param_type', () => {
+      const mcpTool: MCPToolDefinition = {
+        ...sampleMCPTool,
+        inputSchema: {
+          type: 'object' as const,
+          properties: {
+            features: { type: 'array', items: { type: 'object' } },
+            params: {
+              type: 'object',
+              properties: {
+                direction: {
+                  type: 'string',
+                  description: 'Bearing direction',
+                  enum: ['north', 'south', 'east', 'west'],
+                  default: 'north',
+                },
+              },
+            },
+          },
+        },
+      };
+      const params = extractParameters(mcpTool);
+      expect(params).toHaveLength(1);
+      expect(params[0]).toEqual({
+        name: 'direction',
+        valueType: 'enum',
+        description: 'Bearing direction',
+        choices: ['north', 'south', 'east', 'west'],
+        defaultValue: 'north',
+      });
+    });
+
+    it('handles multiple parameters with different types', () => {
+      const mcpTool: MCPToolDefinition = {
+        ...sampleMCPTool,
+        inputSchema: {
+          type: 'object' as const,
+          properties: {
+            features: { type: 'array', items: { type: 'object' } },
+            params: {
+              type: 'object',
+              properties: {
+                label: {
+                  type: 'string',
+                  description: 'Display label',
+                },
+                interval: {
+                  type: 'number',
+                  description: 'Interval in seconds',
+                  default: 60,
+                },
+                visible: {
+                  type: 'boolean',
+                  description: 'Whether labels are visible',
+                },
+              },
+            },
+          },
+        },
+      };
+      const params = extractParameters(mcpTool);
+      expect(params).toHaveLength(3);
+      expect(params[0]).toEqual({
+        name: 'label',
+        valueType: 'string',
+        description: 'Display label',
+      });
+      expect(params[1]).toEqual({
+        name: 'interval',
+        valueType: 'number',
+        description: 'Interval in seconds',
+        defaultValue: 60,
+      });
+      expect(params[2]).toEqual({
+        name: 'visible',
+        valueType: 'boolean',
+        description: 'Whether labels are visible',
+      });
     });
   });
 });

@@ -17,6 +17,28 @@ imports:
   - linkml:types
 
 # ============================================================================
+# Enums
+# ============================================================================
+
+enums:
+  ParameterTypeEnum:
+    description: >-
+      Names of available schema-defined parameter types.
+      Referenced by ToolParameter.param_type to link tool parameters
+      to their value enums defined in common.yaml.
+    permissible_values:
+      NamedColor:
+        description: Predefined named colours (maps to NamedColorEnum)
+      MarkerSymbol:
+        description: Marker shapes (maps to MarkerSymbolEnum)
+      CardinalDirection:
+        description: Eight-point compass directions (maps to CardinalDirectionEnum)
+      DurationPreset:
+        description: Common ISO 8601 duration intervals (maps to DurationPresetEnum)
+      NumericPreset:
+        description: Common numeric values (maps to NumericPresetEnum)
+
+# ============================================================================
 # Classes
 # ============================================================================
 
@@ -97,3 +119,37 @@ classes:
         required: false
         multivalued: true
         inlined_as_list: true
+
+  ToolParameter:
+    description: >-
+      A configurable parameter for a tool. Supports string, number,
+      boolean, and enum types with optional default values, explicit
+      choices, and schema-defined parameter type references.
+    attributes:
+      name:
+        description: Parameter identifier (kebab-case)
+        range: string
+        required: true
+      type:
+        description: "Value type discriminator: string, number, boolean, enum"
+        range: string
+        required: true
+      description:
+        description: Human-readable parameter description
+        range: string
+        required: true
+      required:
+        description: Whether parameter must be provided
+        range: boolean
+        required: false
+      default_value:
+        description: Default value if not provided
+        range: string
+        required: false
+      param_type:
+        description: >-
+          References a schema-defined parameter-type enum by name.
+          When set, the client resolves enum values from generated types
+          rather than using inline choices.
+        range: ParameterTypeEnum
+        required: false

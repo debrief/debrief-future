@@ -36,12 +36,21 @@ export function createExecuteToolCommand(
   stacService?: StacService,
   activityPanelProvider?: ActivityPanelViewProvider,
   logService?: LogService
-): (toolId: string) => Promise<void> {
-  return async (toolId: string) => {
-    // Handle both new format (toolId string) and legacy format (object with toolName)
-    const resolvedToolId = typeof toolId === 'object' && toolId !== null
-      ? ((toolId as Record<string, unknown>).toolName as string) || ((toolId as Record<string, unknown>).toolId as string)
-      : toolId;
+): (toolIdOrMessage: string | { toolId: string; params?: Record<string, unknown> }) => Promise<void> {
+  return async (toolIdOrMessage: string | { toolId: string; params?: Record<string, unknown> }) => {
+    // Handle string, { toolId, params } object, and legacy { toolName } format
+    let resolvedToolId: string;
+    let toolParams: Record<string, unknown> | undefined;
+
+    if (typeof toolIdOrMessage === 'string') {
+      resolvedToolId = toolIdOrMessage;
+    } else if (typeof toolIdOrMessage === 'object' && toolIdOrMessage !== null) {
+      resolvedToolId = (toolIdOrMessage as Record<string, unknown>).toolId as string
+        || (toolIdOrMessage as Record<string, unknown>).toolName as string;
+      toolParams = (toolIdOrMessage as Record<string, unknown>).params as Record<string, unknown> | undefined;
+    } else {
+      return;
+    }
 
     if (!resolvedToolId) {
       return;
@@ -99,6 +108,7 @@ export function createExecuteToolCommand(
         return calcService.executeTool({
           toolId: resolvedToolId,
           featureIds: selectedFeatureIds,
+          ...(toolParams ? { params: toolParams } : {}),
         });
       }
     );

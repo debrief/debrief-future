@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 from debrief_calc.models import (
+    VALID_PARAM_TYPES,
     BranchRecord,
     ContextType,
     CreatedAsset,
@@ -98,9 +99,58 @@ class TestToolParameter:
         )
         assert param.choices == ["json", "csv", "xml"]
 
-    def test_enum_parameter_requires_choices(self):
-        with pytest.raises(PydanticValidationError):
+    def test_enum_parameter_requires_choices_or_param_type(self):
+        with pytest.raises(PydanticValidationError, match="choices or param_type"):
             ToolParameter(name="format", type="enum", description="Output format")
+
+    def test_enum_parameter_valid_with_param_type_only(self):
+        """T018: enum type is valid when param_type is provided instead of choices."""
+        param = ToolParameter(
+            name="color",
+            type="enum",
+            description="Track color",
+            param_type="NamedColor",
+        )
+        assert param.param_type == "NamedColor"
+        assert param.choices is None
+
+    def test_enum_parameter_valid_with_both_choices_and_param_type(self):
+        """T018: enum type is valid when both choices and param_type are provided."""
+        param = ToolParameter(
+            name="color",
+            type="enum",
+            description="Track color",
+            choices=["red", "blue", "green"],
+            param_type="NamedColor",
+        )
+        assert param.choices == ["red", "blue", "green"]
+        assert param.param_type == "NamedColor"
+
+    def test_invalid_param_type_rejected(self):
+        """T018: Invalid param_type values are rejected."""
+        with pytest.raises(PydanticValidationError, match="param_type must be one of"):
+            ToolParameter(
+                name="color",
+                type="enum",
+                description="Track color",
+                param_type="InvalidType",
+            )
+
+    def test_param_type_none_by_default(self):
+        """T018: param_type defaults to None."""
+        param = ToolParameter(name="unit", type="string", description="Unit")
+        assert param.param_type is None
+
+    def test_all_valid_param_types_accepted(self):
+        """T018: All members of VALID_PARAM_TYPES are accepted."""
+        for pt in VALID_PARAM_TYPES:
+            param = ToolParameter(
+                name="test",
+                type="enum",
+                description="Test param",
+                param_type=pt,
+            )
+            assert param.param_type == pt
 
     def test_invalid_type_rejected(self):
         with pytest.raises(PydanticValidationError):
