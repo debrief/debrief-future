@@ -207,9 +207,7 @@ def _validate_distances(distances: list[float]) -> list[float]:
     return sorted(distances)
 
 
-def _build_zone_feature(
-    ring: list[list[float]], zone: SensorModelZone
-) -> dict[str, Any]:
+def _build_zone_feature(ring: list[list[float]], zone: SensorModelZone) -> dict[str, Any]:
     """Build a GeoJSON Feature for a detection zone.
 
     Args:

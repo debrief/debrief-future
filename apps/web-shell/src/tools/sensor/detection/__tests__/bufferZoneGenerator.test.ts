@@ -59,7 +59,7 @@ describe('buffer-zone-generator toolDefinition', () => {
 
   it('requires TRACK features', () => {
     const trackReq = toolDefinition.annotations['debrief:selectionRequirements'].find(
-      (r) => r.kind === 'TRACK',
+      (r: { kind: string; min: number }) => r.kind === 'TRACK',
     );
     expect(trackReq).toBeDefined();
     expect(trackReq!.min).toBe(1);

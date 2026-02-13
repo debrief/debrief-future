@@ -301,9 +301,7 @@ class TestBufferZoneGeneratorUS1:
         """Non-track features are silently skipped; first track is used."""
         track = copy.deepcopy(SIMPLE_TRACK)
         non_track = copy.deepcopy(NON_TRACK_FEATURE)
-        context = SelectionContext(
-            type=ContextType.MULTI, features=[non_track, track]
-        )
+        context = SelectionContext(type=ContextType.MULTI, features=[non_track, track])
         result = buffer_zone_generator(context, {})
         assert len(result) == 3
         # Source should reference the track, not the circle
@@ -564,9 +562,7 @@ class TestBufferZoneGeneratorEdgeCases:
 # ============================================================
 
 
-def _point_in_polygon(
-    x: float, y: float, polygon: list[list[float]]
-) -> bool:
+def _point_in_polygon(x: float, y: float, polygon: list[list[float]]) -> bool:
     """Ray-casting point-in-polygon test.
 
     Args:

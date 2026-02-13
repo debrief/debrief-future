@@ -4,7 +4,7 @@
  * Port of the Python implementation in debrief_calc/tools/sensor/detection/buffer_zone_generator.py.
  */
 
-import type { MCPToolDefinition } from '../../../../vscode/src/types/tool';
+import type { MCPToolDefinition } from '../../../services/toolService';
 
 // ============================================================
 // TYPES
