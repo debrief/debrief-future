@@ -169,7 +169,7 @@ Description formats:
 | 080 | Feature | [Implement buffer-zone-generator tool](specs/080-buffer-zone-generator/spec.md) [E03] — stub sensor model returning 3 detection-likelihood buffer polygons (requires #049, #079) | 4 | 4 | 4 | 12 | Medium | specified |
 | 081 | Feature | [Implement point-in-zone-classifier tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — classify and recolor reference points by buffer zone membership (requires #049, #078, #080) | 4 | 4 | 4 | 12 | Medium | approved |
 | 082 | Feature | [Implement zone-histogram-generator tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — outputs dataset/zone_histogram, point counts per buffer zone (requires #049, #081) | 4 | 4 | 4 | 12 | Medium | approved |
-| 061 | Feature | [Add generate courses and speeds for track tool spec](docs/ideas/061-generate-courses-speeds.md) (requires #049) | 4 | 3 | 5 | 12 | Low | approved |
+| 061 | Feature | [Add generate courses and speeds for track tool spec](specs/061-generate-courses-speeds/spec.md) (requires #049) | 4 | 3 | 5 | 12 | Low | implementing |
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
 | 091 | Feature | [Add tool parameter context menus for pre-execution configuration](specs/091-tool-parameter-context-menus/spec.md) — successive inline context menus in webview to collect parameter values before tool execution; presets defined in LinkML | 4 | 4 | 3 | 11 | High | specified |
 | 065 | Feature | [Implement Phase 2 tools: track/styling + dataset/export](docs/ideas/065-implement-tools-phase2-styling-export.md) [E01] — 15 styling and export tools (requires #064) | 4 | 3 | 4 | 11 | Medium | approved |
@@ -191,7 +191,7 @@ Description formats:
 | 093 | Feature | [[E05] Add drawing toolbar with shape palette](docs/ideas/093-drawing-toolbar-shape-palette.md) (requires #092) [E05] | 4 | 4 | 3 | 11 | Medium | approved |
 | 095 | Feature | [[E05] Implement polygon and polyline drawing](docs/ideas/095-polygon-polyline-drawing.md) (requires #091, #092, #093) [E05] | 4 | 4 | 3 | 11 | Medium | approved |
 | 029 | Tech Debt | [Add unit tests for VS Code extension providers](https://github.com/debrief/debrief-future/issues/104) | 4 | 2 | 5 | 11 | Low | proposed |
-| 092 | Infrastructure | [[E05] Integrate Geoman drawing library](docs/ideas/092-integrate-geoman-drawing-library.md) [E05] | 4 | 3 | 3 | 10 | Medium | approved |
+| 092 | Infrastructure | [[E05] Integrate Geoman drawing library](specs/092-integrate-geoman-drawing-library/spec.md) [E05] | 4 | 3 | 3 | 10 | Medium | specified |
 | 091 | Infrastructure | [[E05] Add POLY FeatureKind for arbitrary polygons](docs/ideas/091-extend-featurekind-drawable-shapes.md) [E05] | 3 | 2 | 5 | 10 | Low | approved |
 | 096 | Enhancement | [[E05] Drawing UX guidance and STAC persistence](docs/ideas/096-drawing-ux-persistence.md) (requires #094, #095) [E05] | 4 | 3 | 3 | 10 | Medium | approved |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
