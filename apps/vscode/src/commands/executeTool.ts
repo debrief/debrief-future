@@ -71,15 +71,15 @@ export function createExecuteToolCommand(
     const selectedIdSet = new Set(selectedFeatureIds);
     const otherFeatures = panel.getOtherFeatures();
     const preToolFeatures = otherFeatures.filter(
-      (f) => selectedIdSet.has(String(f.id ?? (f.properties as Record<string, unknown> | null)?.id))
+      (f) => selectedIdSet.has(String(f.id ?? f.properties?.id))
     );
     if (preToolFeatures.length > 0) {
       preToolInputState = preToolFeatures.map((f) => {
-        const { provenance: _p, ...restProps } = (f.properties ?? {}) as Record<string, unknown>;
+        const { provenance: _p, ...restProps } = f.properties ?? {};
         return {
-          featureId: String(f.id ?? (f.properties as Record<string, unknown> | null)?.id),
-          geometry: JSON.parse(JSON.stringify(f.geometry)),
-          properties: JSON.parse(JSON.stringify(restProps)),
+          featureId: String(f.id ?? f.properties?.id),
+          geometry: JSON.parse(JSON.stringify(f.geometry)) as unknown,
+          properties: JSON.parse(JSON.stringify(restProps)) as Record<string, unknown>,
         };
       });
     }
