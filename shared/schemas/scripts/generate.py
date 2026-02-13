@@ -109,6 +109,7 @@ def generate_jsonschema() -> bool:
             "LineAnnotation",
             "TextAnnotation",
             "VectorAnnotation",
+            "PolyAnnotation",
             # Tool metadata types
             "Tool",
             "SelectionRequirement",

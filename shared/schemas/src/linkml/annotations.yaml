@@ -330,3 +330,57 @@ classes:
         description: Vector metadata including origin, range, and bearing for reconstruction
         range: VectorAnnotationProperties
         required: true
+
+# ============================================================================
+# PolyAnnotation - Arbitrary user-defined polygons
+# ============================================================================
+
+  PolyAnnotationProperties:
+    description: Properties for a PolyAnnotation
+    attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "POLY"
+      vertex_count:
+        description: Number of unique vertices (excluding ring closure point)
+        range: integer
+        required: true
+        minimum_value: 3
+      label:
+        description: Annotation label text
+      symbol:
+        description: Display symbol code from REP file
+      style:
+        description: Polygon styling properties for the polygon area
+        range: PolygonProperties
+        required: true
+      source_file:
+        description: Original source file path
+      line_number:
+        description: Source line number for debugging
+        range: integer
+
+  PolyAnnotation:
+    description: >-
+      GeoJSON Feature for arbitrary polygon annotations.
+      Geometry is a Polygon with user-defined vertices (freeform shape).
+      Used for patrol zones, exclusion areas, search grids, etc.
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Unique identifier
+        required: true
+      geometry:
+        description: Polygon with user-defined vertices (closed ring)
+        range: GeoJSONPolygon
+        required: true
+      properties:
+        description: Polygon metadata including vertex count and styling
+        range: PolyAnnotationProperties
+        required: true
