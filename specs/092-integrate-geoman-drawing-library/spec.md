@@ -143,9 +143,14 @@ An analyst using the existing VS Code extension opens a plot, views tracks on th
 
 ## Assumptions
 
-- `@geoman-io/leaflet-geoman-free` version 2.x is compatible with Leaflet 1.9.x and works in a non-DOM (jsdom) test environment at least for initialization (drawing interactions require a real browser).
-- The esbuild `.css=text` loader used for VS Code webview bundling can handle Geoman's CSS — if not, a CSS extraction step will be needed.
+- `@geoman-io/leaflet-geoman-free` version 2.x (latest 2.19.2) is compatible with Leaflet 1.9.x — the package declares peer dependency `leaflet: "^1.2.0"`.
+- Geoman ships built-in TypeScript definitions (`dist/leaflet-geoman.d.ts`) — no `@types/` package needed.
+- Geoman auto-attaches to Leaflet on import, adding `map.pm` to every `L.Map` instance. The integration uses `L.PM.setOptIn(true)` to prevent Geoman from managing all layers by default.
+- Geoman CSS is at `dist/leaflet-geoman.css` and must be explicitly imported (no `"style"` field in package.json).
+- Geoman brings transitive dependencies: `@turf/boolean-contains`, `@turf/kinks`, `@turf/line-intersect`, `@turf/line-split`, `lodash`, `polygon-clipping`. These add bundle size but are required for snapping and geometry operations.
+- The esbuild `.css=text` loader used for VS Code webview bundling can handle Geoman's CSS — the CSS will be injected at runtime similar to `leaflet/dist/leaflet.css`.
 - Geoman's MIT-licensed free version provides sufficient functionality for the E05 epic's needs (polygon, rectangle, polyline, marker drawing). The paid Pro version is not needed.
+- The react-leaflet integration follows the `createControlComponent` pattern from `@react-leaflet/core`, wrapping Geoman's `L.Control.extend` API.
 - Later E05 features (#093, #094, #095, #096) will build on this integration to add the toolbar UI, specific shape drawing workflows, and STAC persistence. This feature only establishes the foundation.
 - The `useGeoman` hook or `GeomanControl` component created here defines the API contract that downstream E05 features will consume.
 
@@ -153,6 +158,6 @@ An analyst using the existing VS Code extension opens a plot, views tracks on th
 
 - TypeScript 5.x (shared components, VS Code extension webview)
 - React 18.x, react-leaflet 4.2, Leaflet 1.9.x (existing stack)
-- `@geoman-io/leaflet-geoman-free` ^2.x (new dependency)
+- `@geoman-io/leaflet-geoman-free` ^2.19.2 (new dependency — MIT, ships TypeScript defs)
 - Vite (Storybook dev/build), esbuild (VS Code webview bundling)
 - Storybook 8.x (story development and verification)
