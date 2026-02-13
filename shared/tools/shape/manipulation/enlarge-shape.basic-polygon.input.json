@@ -1,0 +1,35 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "rect-001",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.0, 51.0],
+          [-0.5, 51.0],
+          [-0.5, 51.5],
+          [-1.0, 51.5],
+          [-1.0, 51.0]
+        ]]
+      },
+      "properties": {
+        "kind": "RECTANGLE",
+        "label": "Exercise Area",
+        "style": {
+          "fill": true,
+          "fill_color": "#3388FF",
+          "fill_opacity": 0.2,
+          "stroke": true,
+          "color": "#3388FF",
+          "weight": 2,
+          "opacity": 1.0
+        }
+      }
+    }
+  ],
+  "parameters": {
+    "scale_factor": 3.0
+  }
+}

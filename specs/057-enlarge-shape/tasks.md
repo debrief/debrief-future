@@ -44,10 +44,10 @@
 
 **Purpose**: Establish the spec file with metadata and structural sections
 
-- [ ] T001 Create tool spec file with YAML frontmatter (Metadata section) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
-- [ ] T002 Write MCP section (description, when-to-use, parameters, returns) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
-- [ ] T003 Write Inputs section (schema reference, constraints, defaults) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
-- [ ] T004 Write Outputs section (ToolResponse schema, result type path, annotations) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T001 Create tool spec file with YAML frontmatter (Metadata section) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T002 Write MCP section (description, when-to-use, parameters, returns) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T003 Write Inputs section (schema reference, constraints, defaults) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T004 Write Outputs section (ToolResponse schema, result type path, annotations) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
 
 **Checkpoint**: Spec file exists with first 4 sections complete (Metadata, MCP, Inputs, Outputs)
 
@@ -57,9 +57,9 @@
 
 **Purpose**: Define the core scaling algorithm in pseudocode and document all edge cases. These sections are prerequisites for writing golden examples.
 
-- [ ] T005 Write Algorithm section with centroid computation pseudocode `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
-- [ ] T006 Write Algorithm section for coordinate scaling per annotation kind (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
-- [ ] T007 Write Edge Cases table (10+ scenarios from spec.md) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T005 Write Algorithm section with centroid computation pseudocode `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T006 Write Algorithm section for coordinate scaling per annotation kind (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T007 Write Edge Cases table (10+ scenarios from spec.md) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
 
 **Checkpoint**: Algorithm pseudocode complete — can now compute golden example values
 
@@ -73,10 +73,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Compute centroid and scaled coordinates for basic-polygon example (rectangle, factor 3.0)
-- [ ] T009 [US1] Create golden input file `shared/tools/shape/manipulation/enlarge-shape.basic-polygon.input.json`
-- [ ] T010 [US1] Create golden output file `shared/tools/shape/manipulation/enlarge-shape.basic-polygon.output.json`
-- [ ] T011 [US1] Write inline Examples section in spec with basic-polygon walkthrough `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T008 [US1] Compute centroid and scaled coordinates for basic-polygon example (rectangle, factor 3.0)
+- [x] T009 [US1] Create golden input file `shared/tools/shape/manipulation/enlarge-shape.basic-polygon.input.json`
+- [x] T010 [US1] Create golden output file `shared/tools/shape/manipulation/enlarge-shape.basic-polygon.output.json`
+- [x] T011 [US1] Write inline Examples section in spec with basic-polygon walkthrough `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
 
 **Checkpoint**: US1 complete — basic scaling from centroid validated with golden pair
 
@@ -90,10 +90,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T012 [US2] Compute scaled coordinates for custom-origin example (polygon, factor 2.0, explicit origin at vertex)
-- [ ] T013 [US2] Create golden input file `shared/tools/shape/manipulation/enlarge-shape.custom-origin.input.json`
-- [ ] T014 [US2] Create golden output file `shared/tools/shape/manipulation/enlarge-shape.custom-origin.output.json`
-- [ ] T015 [US2] Add golden file references to Examples section `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T012 [US2] Compute scaled coordinates for custom-origin example (polygon, factor 2.0, explicit origin at vertex)
+- [x] T013 [US2] Create golden input file `shared/tools/shape/manipulation/enlarge-shape.custom-origin.input.json`
+- [x] T014 [US2] Create golden output file `shared/tools/shape/manipulation/enlarge-shape.custom-origin.output.json`
+- [x] T015 [US2] Add golden file references to Examples section `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
 
 **Checkpoint**: US2 complete — custom origin scaling validated with golden pair
 
@@ -107,10 +107,10 @@
 
 ### Implementation for User Stories 3 & 4
 
-- [ ] T016 [P] [US3] Create golden input file `shared/tools/shape/manipulation/enlarge-shape.noop.input.json`
-- [ ] T017 [P] [US3] Create golden output file `shared/tools/shape/manipulation/enlarge-shape.noop.output.json`
-- [ ] T018 [US3] Add noop golden file references to Examples section `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
-- [ ] T019 [US4] Add error response example for negative scale factor to Examples section `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T016 [P] [US3] Create golden input file `shared/tools/shape/manipulation/enlarge-shape.noop.input.json`
+- [x] T017 [P] [US3] Create golden output file `shared/tools/shape/manipulation/enlarge-shape.noop.output.json`
+- [x] T018 [US3] Add noop golden file references to Examples section `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T019 [US4] Add error response example for negative scale factor to Examples section `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
 
 **Checkpoint**: All golden examples complete — 3 input/output pairs covering centroid, custom origin, and noop
 
@@ -120,11 +120,11 @@
 
 **Purpose**: Complete the remaining spec sections (Changelog, References) and validate the full spec
 
-- [ ] T020 Write Changelog section (1.0 initial release) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
-- [ ] T021 Write References section (move-shape, annotations.yaml, TEMPLATE.md, Wikipedia) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
-- [ ] T022 Validate all 9 sections are present and non-empty in the spec
-- [ ] T023 Validate all 6 golden JSON files parse correctly (well-formed JSON)
-- [ ] T024 Verify golden output coordinates match hand-computed values from scaling formula
+- [x] T020 Write Changelog section (1.0 initial release) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T021 Write References section (move-shape, annotations.yaml, TEMPLATE.md, Wikipedia) `shared/tools/shape/manipulation/enlarge-shape.1.0.md`
+- [x] T022 Validate all 9 sections are present and non-empty in the spec
+- [x] T023 Validate all 6 golden JSON files parse correctly (well-formed JSON)
+- [x] T024 Verify golden output coordinates match hand-computed values from scaling formula
 
 **Checkpoint**: Full spec complete and validated — all 9 sections, 3 golden pairs
 
@@ -136,15 +136,15 @@
 
 ### Evidence Collection
 
-- [ ] T025 Create evidence directory `specs/057-enlarge-shape/evidence/`
-- [ ] T026 Capture validation results in `specs/057-enlarge-shape/evidence/test-summary.md`
-- [ ] T027 Create usage example showing scaling formula walkthrough `specs/057-enlarge-shape/evidence/usage-example.md`
-- [ ] T028 [P] Create spec validation checklist confirming all 9 sections `specs/057-enlarge-shape/evidence/spec-validation.md`
+- [x] T025 Create evidence directory `specs/057-enlarge-shape/evidence/`
+- [x] T026 Capture validation results in `specs/057-enlarge-shape/evidence/test-summary.md`
+- [x] T027 Create usage example showing scaling formula walkthrough `specs/057-enlarge-shape/evidence/usage-example.md`
+- [x] T028 [P] Create spec validation checklist confirming all 9 sections `specs/057-enlarge-shape/evidence/spec-validation.md`
 
 ### Media Content
 
-- [ ] T029 Create shipped blog post `specs/057-enlarge-shape/media/shipped-post.md`
-- [ ] T030 [P] Create LinkedIn shipped summary `specs/057-enlarge-shape/media/linkedin-shipped.md`
+- [x] T029 Create shipped blog post `specs/057-enlarge-shape/media/shipped-post.md`
+- [x] T030 [P] Create LinkedIn shipped summary `specs/057-enlarge-shape/media/linkedin-shipped.md`
 
 ### PR Creation
 

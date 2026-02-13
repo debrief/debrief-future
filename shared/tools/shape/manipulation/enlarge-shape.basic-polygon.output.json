@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://rect-001",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"rect-001\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[-1.5,50.5],[0.0,50.5],[0.0,52.0],[-1.5,52.0],[-1.5,50.5]]]},\"properties\":{\"kind\":\"RECTANGLE\",\"label\":\"Exercise Area\",\"style\":{\"fill\":true,\"fill_color\":\"#3388FF\",\"fill_opacity\":0.2,\"stroke\":true,\"color\":\"#3388FF\",\"weight\":2,\"opacity\":1.0}}}",
+      "annotations": {
+        "debrief:resultType": "mutation/shape/scaled",
+        "debrief:sourceFeatures": ["rect-001"],
+        "debrief:label": "Scaled 1 shape(s) by factor 3.0 from centroid"
+      }
+    }
+  ]
+}
