@@ -1,4 +1,4 @@
-import { Tool } from './types';
+import { Tool, ToolParameter } from './types';
 
 /**
  * MCP tool definition with Debrief-specific annotations.
@@ -39,4 +39,12 @@ export declare function fromMCPTool(mcpTool: MCPToolDefinition): Tool;
  * @returns Array of Tool instances
  */
 export declare function fromMCPTools(mcpTools: MCPToolDefinition[]): Tool[];
+/**
+ * Extract tool parameters from MCP tool definition's inputSchema.
+ * Parses the params.properties section and extracts x-debrief-param-type annotations.
+ *
+ * @param mcpTool - MCP tool definition with inputSchema
+ * @returns Array of ToolParameter descriptors
+ */
+export declare function extractParameters(mcpTool: MCPToolDefinition): ToolParameter[];
 //# sourceMappingURL=mcpAdapter.d.ts.map
