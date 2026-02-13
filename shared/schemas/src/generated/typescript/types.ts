@@ -713,7 +713,7 @@ export interface ReferenceLocation {
     /** Unique identifier */
     id: string,
     /** Location (Point) or reference point set (MultiPoint) */
-    geometry: string,
+    geometry: GeoJSONPoint | GeoJSONMultiPoint,
     /** Reference metadata */
     properties: ReferenceLocationProperties,
 }

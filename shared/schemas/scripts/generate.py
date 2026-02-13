@@ -158,12 +158,18 @@ def generate_typescript() -> bool:
 
         # Post-process: gen-typescript doesn't support any_of unions,
         # so it falls back to 'string' for union geometry fields.
-        # Patch TrackFeature.geometry to use the proper union type.
+        # Patch geometry fields to use the proper union types.
         content = content.replace(
             "/** Track path as LineString (simple) or MultiLineString (compound) */\n"
             "    geometry: string,",
             "/** Track path as LineString (simple) or MultiLineString (compound) */\n"
             "    geometry: GeoJSONLineString | GeoJSONMultiLineString,",
+        )
+        content = content.replace(
+            "/** Location (Point) or reference point set (MultiPoint) */\n"
+            "    geometry: string,",
+            "/** Location (Point) or reference point set (MultiPoint) */\n"
+            "    geometry: GeoJSONPoint | GeoJSONMultiPoint,",
         )
 
         output_file.write_text(content)
