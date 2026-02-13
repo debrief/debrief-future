@@ -197,6 +197,50 @@ For testable examples, create sister files:
 }
 ```
 
+## Registration
+
+A new tool must be wired into **three** places to be available across all frontends:
+
+### 1. Python (debrief-calc MCP server)
+
+The `@tool` decorator auto-registers the tool when the module is imported.
+Ensure the import chain is unbroken:
+
+```
+services/calc/debrief_calc/tools/__init__.py          # imports track (or other top-level)
+  → tools/track/__init__.py                            # imports subcategory package
+    → tools/track/{category}/__init__.py               # imports tool module
+      → tools/track/{category}/tool_name.py            # @tool decorator registers on import
+```
+
+### 2. TypeScript (VS Code extension)
+
+Export `toolDefinition` and `execute` from the tool module and re-export
+via the barrel file:
+
+```
+apps/vscode/src/tools/track/{category}/toolName.ts     # toolDefinition + execute
+apps/vscode/src/tools/track/{category}/index.ts        # barrel re-export
+```
+
+### 3. Web-shell (browser-only registry)
+
+**This is the step most likely to be missed.** The web-shell cannot use the
+MCP server, so it maintains its own explicit registry in:
+
+```
+apps/web-shell/src/services/toolService.ts
+```
+
+Add an import and a `toolRegistry.set()` entry for the new tool. If the
+tool's `GeoJSONFeature` type differs from the web-shell's, use `as any`
+on the execute function.
+
+> **Why three?** Python tools run via MCP (server-side). TypeScript tools
+> run inside VS Code (extension host). The web-shell runs in a plain
+> browser with no MCP server and no VS Code API — it must bundle tool
+> implementations directly.
+
 ## Changelog
 
 ### 1.0 (YYYY-MM-DD)
