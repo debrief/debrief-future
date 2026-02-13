@@ -1,0 +1,251 @@
+/**
+ * Generate Reference Points tool implementation.
+ *
+ * Creates a grid or scatter pattern of GeoJSON MultiPoint reference points
+ * within a bounding box. First step of the E03 buffer zone analysis chain.
+ */
+
+import type { MCPToolDefinition } from '../../../types/tool';
+
+// LCG PRNG constants (Numerical Recipes) — identical in Python and TypeScript
+const LCG_MULTIPLIER = 1664525;
+const LCG_INCREMENT = 1013904223;
+const LCG_MODULUS = 2 ** 32; // 4294967296
+
+export interface GenerateReferencePointsParams {
+  pattern: 'grid' | 'scatter';
+  bounds: [number, number, number, number];
+  rows?: number;
+  cols?: number;
+  count?: number;
+  seed?: number;
+}
+
+interface PointMetadataEntry {
+  index: number;
+  name: string;
+}
+
+interface GeoJSONFeature {
+  type: 'Feature';
+  id: string;
+  geometry: { type: string; coordinates: number[][] };
+  properties: Record<string, unknown>;
+}
+
+export const toolDefinition: MCPToolDefinition = {
+  name: 'generate-reference-points',
+  description:
+    'Generates a grid or scatter pattern of reference points within a bounding box.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      pattern: {
+        type: 'string',
+        enum: ['grid', 'scatter'],
+        description:
+          "Generation pattern: 'grid' for evenly spaced rows/columns, 'scatter' for random distribution",
+      },
+      bounds: {
+        type: 'array',
+        items: { type: 'number' },
+        minItems: 4,
+        maxItems: 4,
+        description:
+          'Bounding box [west, south, east, north] in WGS84 decimal degrees',
+      },
+      rows: {
+        type: 'integer',
+        minimum: 1,
+        description: 'Number of rows (grid pattern only)',
+      },
+      cols: {
+        type: 'integer',
+        minimum: 1,
+        description: 'Number of columns (grid pattern only)',
+      },
+      count: {
+        type: 'integer',
+        minimum: 1,
+        description: 'Number of points to generate (scatter pattern only)',
+      },
+      seed: {
+        type: 'integer',
+        description:
+          'Random seed for reproducible scatter generation (scatter pattern only)',
+      },
+    },
+  },
+  annotations: {
+    'debrief:selectionRequirements': [],
+    'debrief:category': 'reference/generation',
+    'debrief:version': '1.0.0',
+    'debrief:outputKind': 'addition/reference/generated_points',
+  },
+};
+
+function lcgNext(state: number): number {
+  return ((LCG_MULTIPLIER * state + LCG_INCREMENT) % LCG_MODULUS) >>> 0;
+}
+
+function normaliseLon(lon: number): number {
+  if (lon > 180) return lon - 360;
+  if (lon < -180) return lon + 360;
+  return lon;
+}
+
+function validateBounds(
+  bounds: [number, number, number, number],
+): [number, number, number, number] {
+  if (!Array.isArray(bounds) || bounds.length !== 4) {
+    throw new Error('Bounds must be [west, south, east, north]');
+  }
+  const [west, south, east, north] = bounds;
+  if (south >= north) {
+    throw new Error(`South (${south}) must be less than north (${north})`);
+  }
+  if (west === east || south === north) {
+    throw new Error('Bounding box must have positive area');
+  }
+  return [west, south, east, north];
+}
+
+function validatePositiveInt(value: number, name: string): number {
+  if (!Number.isInteger(value) || value < 1) {
+    throw new Error(`${name.charAt(0).toUpperCase() + name.slice(1)} must be a positive integer`);
+  }
+  return value;
+}
+
+function buildMultiPointFeature(
+  featureId: string,
+  coordinates: number[][],
+  metadata: PointMetadataEntry[],
+  name: string,
+): GeoJSONFeature {
+  return {
+    type: 'Feature',
+    id: featureId,
+    geometry: {
+      type: 'MultiPoint',
+      coordinates,
+    },
+    properties: {
+      kind: 'POINT',
+      locationType: 'REFERENCE',
+      name,
+      style: {
+        shape: 'square',
+        color: '#666666',
+        radius: 5,
+      },
+      pointMetadata: metadata,
+    },
+  };
+}
+
+function generateGrid(
+  west: number,
+  south: number,
+  east: number,
+  north: number,
+  rows: number,
+  cols: number,
+): GeoJSONFeature {
+  const effectiveEast = west > east ? east + 360 : east;
+
+  const coordinates: number[][] = [];
+  const metadata: PointMetadataEntry[] = [];
+
+  for (let r = 0; r < rows; r++) {
+    const lat =
+      rows === 1
+        ? (south + north) / 2
+        : south + (r * (north - south)) / (rows - 1);
+
+    for (let c = 0; c < cols; c++) {
+      let lon =
+        cols === 1
+          ? (west + effectiveEast) / 2
+          : west + (c * (effectiveEast - west)) / (cols - 1);
+      lon = normaliseLon(lon);
+
+      const idx = r * cols + c;
+      coordinates.push([lon, lat]);
+      metadata.push({ index: idx, name: `Ref ${idx + 1}` });
+    }
+  }
+
+  return buildMultiPointFeature(
+    'ref-grid',
+    coordinates,
+    metadata,
+    `Reference Points (grid ${rows}x${cols})`,
+  );
+}
+
+function generateScatter(
+  west: number,
+  south: number,
+  east: number,
+  north: number,
+  count: number,
+  seed: number | undefined,
+): GeoJSONFeature {
+  const effectiveEast = west > east ? east + 360 : east;
+
+  let state = seed !== undefined ? seed : (Date.now() % LCG_MODULUS) >>> 0;
+
+  const coordinates: number[][] = [];
+  const metadata: PointMetadataEntry[] = [];
+
+  for (let i = 0; i < count; i++) {
+    state = lcgNext(state);
+    const lonFrac = state / LCG_MODULUS;
+    state = lcgNext(state);
+    const latFrac = state / LCG_MODULUS;
+
+    let lon = west + lonFrac * (effectiveEast - west);
+    const lat = south + latFrac * (north - south);
+    lon = normaliseLon(lon);
+
+    coordinates.push([lon, lat]);
+    metadata.push({ index: i, name: `Ref ${i + 1}` });
+  }
+
+  return buildMultiPointFeature(
+    'ref-scatter',
+    coordinates,
+    metadata,
+    `Reference Points (scatter ${count})`,
+  );
+}
+
+export function execute(
+  _features: GeoJSONFeature[],
+  params: GenerateReferencePointsParams,
+): GeoJSONFeature[] {
+  const { pattern, bounds } = params;
+
+  if (pattern !== 'grid' && pattern !== 'scatter') {
+    throw new Error("Pattern must be 'grid' or 'scatter'");
+  }
+
+  if (!bounds) {
+    throw new Error("Parameter 'bounds' is required");
+  }
+
+  const [west, south, east, north] = validateBounds(bounds);
+
+  if (pattern === 'grid') {
+    const rows = params.rows ?? 5;
+    const cols = params.cols ?? 5;
+    validatePositiveInt(rows, 'rows');
+    validatePositiveInt(cols, 'cols');
+    return [generateGrid(west, south, east, north, rows, cols)];
+  } else {
+    const count = params.count ?? 25;
+    validatePositiveInt(count, 'count');
+    return [generateScatter(west, south, east, north, count, params.seed)];
+  }
+}

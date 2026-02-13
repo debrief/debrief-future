@@ -94,19 +94,19 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T015 [test] [US1] Write Python grid unit tests: basic 3x4 grid, 1x1 centre point, 5x5 even spacing `services/calc/tests/tools/reference/test_generation.py`
-- [ ] T016 [test] [US1] Write Python grid edge case tests: zero-area bounds, negative rows/cols, south>north `services/calc/tests/tools/reference/test_generation.py`
-- [ ] T017 [P][test] [US1] Write TypeScript grid unit tests mirroring Python tests `apps/vscode/tests/unit/tools/reference/generateReferencePoints.test.ts`
+- [x] T015 [test] [US1] Write Python grid unit tests: basic 3x4 grid, 1x1 centre point, 5x5 even spacing `services/calc/tests/tools/reference/test_generation.py`
+- [x] T016 [test] [US1] Write Python grid edge case tests: zero-area bounds, negative rows/cols, south>north `services/calc/tests/tools/reference/test_generation.py`
+- [x] T017 [P][test] [US1] Write TypeScript grid unit tests mirroring Python tests `apps/vscode/tests/unit/tools/reference/generateReferencePoints.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T018 [US1] Implement Python grid generation: parameter validation, coordinate calculation, MultiPoint feature construction `services/calc/debrief_calc/tools/reference/generation.py`
-- [ ] T019 [US1] Register tool with @tool decorator (name, input_kinds=[], output_kind, context_type=NONE, parameters) `services/calc/debrief_calc/tools/reference/generation.py`
-- [ ] T020 [US1] Implement TypeScript grid generation: execute function + toolDefinition export `apps/vscode/src/tools/reference/generation/generateReferencePoints.ts`
-- [ ] T021 [US1] Create TypeScript barrel export `apps/vscode/src/tools/reference/generation/index.ts`
-- [ ] T022 [US1] Verify Python tests pass for grid pattern
-- [ ] T023 [US1] Verify TypeScript tests pass for grid pattern
-- [ ] T024 [test] [US1] Write cross-language grid parity test: Python and TypeScript produce identical output for grid golden example `services/calc/tests/tools/reference/test_generation.py`
+- [x] T018 [US1] Implement Python grid generation: parameter validation, coordinate calculation, MultiPoint feature construction `services/calc/debrief_calc/tools/reference/generation.py`
+- [x] T019 [US1] Register tool with @tool decorator (name, input_kinds=[], output_kind, context_type=NONE, parameters) `services/calc/debrief_calc/tools/reference/generation.py`
+- [x] T020 [US1] Implement TypeScript grid generation: execute function + toolDefinition export `apps/vscode/src/tools/reference/generation/generateReferencePoints.ts`
+- [x] T021 [US1] Create TypeScript barrel export `apps/vscode/src/tools/reference/generation/index.ts`
+- [x] T022 [US1] Verify Python tests pass for grid pattern
+- [x] T023 [US1] Verify TypeScript tests pass for grid pattern
+- [x] T024 [test] [US1] Write cross-language grid parity test: Python and TypeScript produce identical output for grid golden example `services/calc/tests/tools/reference/test_generation.py`
 
 **Checkpoint**: Grid pattern works in both Python and TypeScript with identical output
 
@@ -122,19 +122,19 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T025 [test] [US2] Write Python scatter unit tests: basic count, seed reproducibility, different-without-seed `services/calc/tests/tools/reference/test_generation.py`
-- [ ] T026 [test] [US2] Write Python scatter edge case tests: count=0, missing count, antimeridian crossing `services/calc/tests/tools/reference/test_generation.py`
-- [ ] T027 [P][test] [US2] Write TypeScript scatter unit tests mirroring Python tests `apps/vscode/tests/unit/tools/reference/generateReferencePoints.test.ts`
+- [x] T025 [test] [US2] Write Python scatter unit tests: basic count, seed reproducibility, different-without-seed `services/calc/tests/tools/reference/test_generation.py`
+- [x] T026 [test] [US2] Write Python scatter edge case tests: count=0, missing count, antimeridian crossing `services/calc/tests/tools/reference/test_generation.py`
+- [x] T027 [P][test] [US2] Write TypeScript scatter unit tests mirroring Python tests `apps/vscode/tests/unit/tools/reference/generateReferencePoints.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T028 [US2] Implement Python LCG PRNG helper function (Numerical Recipes constants) `services/calc/debrief_calc/tools/reference/generation.py`
-- [ ] T029 [US2] Implement Python scatter generation: validate count, generate coordinates via LCG, build MultiPoint `services/calc/debrief_calc/tools/reference/generation.py`
-- [ ] T030 [US2] Implement TypeScript LCG PRNG helper and scatter generation `apps/vscode/src/tools/reference/generation/generateReferencePoints.ts`
-- [ ] T031 [US2] Implement antimeridian handling for both grid and scatter (west > east → wrap) in both languages
-- [ ] T032 [US2] Verify Python tests pass for scatter pattern
-- [ ] T033 [US2] Verify TypeScript tests pass for scatter pattern
-- [ ] T034 [test] [US2] Write cross-language scatter parity test: Python and TypeScript produce identical output for scatter golden example with seed=42 `services/calc/tests/tools/reference/test_generation.py`
+- [x] T028 [US2] Implement Python LCG PRNG helper function (Numerical Recipes constants) `services/calc/debrief_calc/tools/reference/generation.py`
+- [x] T029 [US2] Implement Python scatter generation: validate count, generate coordinates via LCG, build MultiPoint `services/calc/debrief_calc/tools/reference/generation.py`
+- [x] T030 [US2] Implement TypeScript LCG PRNG helper and scatter generation `apps/vscode/src/tools/reference/generation/generateReferencePoints.ts`
+- [x] T031 [US2] Implement antimeridian handling for both grid and scatter (west > east → wrap) in both languages
+- [x] T032 [US2] Verify Python tests pass for scatter pattern
+- [x] T033 [US2] Verify TypeScript tests pass for scatter pattern
+- [x] T034 [test] [US2] Write cross-language scatter parity test: Python and TypeScript produce identical output for scatter golden example with seed=42 `services/calc/tests/tools/reference/test_generation.py`
 
 **Checkpoint**: Both grid and scatter work in both languages with cross-language parity
 
@@ -148,14 +148,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T035 [test] [US3] Write Python schema validation test: output validates against generated JSON Schema `services/calc/tests/tools/reference/test_generation.py`
-- [ ] T036 [test] [US3] Write Python downstream compatibility test: verify pointMetadata entries are extensible with zone/color fields `services/calc/tests/tools/reference/test_generation.py`
+- [x] T035 [test] [US3] Write Python schema validation test: output validates against generated JSON Schema `services/calc/tests/tools/reference/test_generation.py`
+- [x] T036 [test] [US3] Write Python downstream compatibility test: verify pointMetadata entries are extensible with zone/color fields `services/calc/tests/tools/reference/test_generation.py`
 
 ### Implementation for User Story 3
 
-- [ ] T037 [US3] Verify golden output examples validate against project JSON Schema
-- [ ] T038 [US3] Verify tool result type annotation is `addition/reference/generated_points`
-- [ ] T039 [US3] Verify provenance label includes pattern type, bounds, and point count
+- [x] T037 [US3] Verify golden output examples validate against project JSON Schema
+- [x] T038 [US3] Verify tool result type annotation is `addition/reference/generated_points`
+- [x] T039 [US3] Verify provenance label includes pattern type, bounds, and point count
 
 **Checkpoint**: All user stories complete, both languages, schema-validated output
 
