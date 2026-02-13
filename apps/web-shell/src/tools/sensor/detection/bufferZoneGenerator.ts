@@ -250,6 +250,20 @@ function validateDistances(distances: number[]): number[] {
   return [...distances].sort((a, b) => a - b);
 }
 
+/**
+ * Return a display style for a detection zone based on likelihood.
+ * Green = high detection, amber = medium, red = low.
+ */
+function zoneStyle(likelihoodPct: number): Record<string, unknown> {
+  if (likelihoodPct >= 70) {
+    return { color: '#4CAF50', fill_color: '#4CAF50', fill_opacity: 0.25, weight: 2, dash_array: '6, 4' };
+  }
+  if (likelihoodPct >= 40) {
+    return { color: '#FF9800', fill_color: '#FF9800', fill_opacity: 0.18, weight: 2, dash_array: '6, 4' };
+  }
+  return { color: '#F44336', fill_color: '#F44336', fill_opacity: 0.12, weight: 2, dash_array: '6, 4' };
+}
+
 function generateUUID(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();
@@ -327,6 +341,7 @@ export function execute(
         name: zone.name,
         detection_likelihood_pct: zone.likelihood_pct,
         buffer_distance_nm: zone.distance_nm,
+        style: zoneStyle(zone.likelihood_pct),
       },
     });
   }

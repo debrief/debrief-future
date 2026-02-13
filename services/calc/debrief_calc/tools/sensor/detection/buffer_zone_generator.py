@@ -207,6 +207,36 @@ def _validate_distances(distances: list[float]) -> list[float]:
     return sorted(distances)
 
 
+def _zone_style(likelihood_pct: int) -> dict[str, Any]:
+    """Return a display style for a detection zone based on likelihood.
+
+    Higher likelihood zones are green (good coverage), lower are red (weak).
+    """
+    if likelihood_pct >= 70:
+        return {
+            "color": "#4CAF50",
+            "fill_color": "#4CAF50",
+            "fill_opacity": 0.25,
+            "weight": 2,
+            "dash_array": "6, 4",
+        }
+    if likelihood_pct >= 40:
+        return {
+            "color": "#FF9800",
+            "fill_color": "#FF9800",
+            "fill_opacity": 0.18,
+            "weight": 2,
+            "dash_array": "6, 4",
+        }
+    return {
+        "color": "#F44336",
+        "fill_color": "#F44336",
+        "fill_opacity": 0.12,
+        "weight": 2,
+        "dash_array": "6, 4",
+    }
+
+
 def _build_zone_feature(ring: list[list[float]], zone: SensorModelZone) -> dict[str, Any]:
     """Build a GeoJSON Feature for a detection zone.
 
@@ -229,6 +259,7 @@ def _build_zone_feature(ring: list[list[float]], zone: SensorModelZone) -> dict[
             "name": zone.name,
             "detection_likelihood_pct": zone.likelihood_pct,
             "buffer_distance_nm": zone.distance_nm,
+            "style": _zone_style(zone.likelihood_pct),
         },
     }
 
