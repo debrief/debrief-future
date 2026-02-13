@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { useState, useCallback, useEffect } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import '@geoman-io/leaflet-geoman-free';
 import { ThemeProvider } from '../ThemeProvider';
 import { useGeoman } from './GeomanControl';
 import 'leaflet/dist/leaflet.css';
@@ -94,6 +95,7 @@ function DrawButton({
   }, [map]);
 
   const onClick = useCallback(() => {
+    if (!map.pm) return;
     if (active) {
       map.pm.disableDraw();
       setActive(false);
