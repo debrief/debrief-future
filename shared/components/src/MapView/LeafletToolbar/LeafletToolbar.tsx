@@ -28,37 +28,84 @@ const GEOMAN_SHAPE_MAP: Record<Exclude<DrawingMode, null>, string> = {
 interface ShapePaletteItem {
   id: Exclude<DrawingMode, null>;
   label: string;
-  icon: string;
   title: string;
+  /** Creates an SVG icon using createElementNS for correct namespace handling.
+   *  innerHTML on HTML elements doesn't give SVG children the proper namespace,
+   *  so icons must be built via the DOM API. */
+  createIcon: () => SVGSVGElement;
+}
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+/** Helper: create a 16x16 SVG root with standard stroke attributes */
+function createSvgRoot(fill = 'none'): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('width', '16');
+  svg.setAttribute('height', '16');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', fill);
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  return svg;
 }
 
 /** Static configuration for the four shape options (FR-002, FR-003) */
-// Icons use only <path> and <circle> — <rect>, <polygon>, <polyline> don't
-// render reliably when injected via innerHTML in Leaflet's DOM context.
 const SHAPE_PALETTE_ITEMS: ShapePaletteItem[] = [
   {
     id: 'point',
     label: 'Point',
     title: 'Draw a point',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle></svg>`,
+    createIcon: () => {
+      const svg = createSvgRoot('currentColor');
+      const circle = document.createElementNS(SVG_NS, 'circle');
+      circle.setAttribute('cx', '12');
+      circle.setAttribute('cy', '12');
+      circle.setAttribute('r', '5');
+      svg.appendChild(circle);
+      return svg;
+    },
   },
   {
     id: 'rectangle',
     label: 'Rectangle',
     title: 'Draw a rectangle',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18v14H3z"></path></svg>`,
+    createIcon: () => {
+      const svg = createSvgRoot();
+      const rect = document.createElementNS(SVG_NS, 'rect');
+      rect.setAttribute('x', '3');
+      rect.setAttribute('y', '5');
+      rect.setAttribute('width', '18');
+      rect.setAttribute('height', '14');
+      rect.setAttribute('rx', '1');
+      svg.appendChild(rect);
+      return svg;
+    },
   },
   {
     id: 'polygon',
     label: 'Polygon',
     title: 'Draw a polygon',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L22 20H2z"></path></svg>`,
+    createIcon: () => {
+      const svg = createSvgRoot();
+      const polygon = document.createElementNS(SVG_NS, 'polygon');
+      polygon.setAttribute('points', '12,2 22,20 2,20');
+      svg.appendChild(polygon);
+      return svg;
+    },
   },
   {
     id: 'polyline',
     label: 'Polyline',
     title: 'Draw a polyline',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20L10 8L16 16L22 4" fill="none"></path></svg>`,
+    createIcon: () => {
+      const svg = createSvgRoot();
+      const polyline = document.createElementNS(SVG_NS, 'polyline');
+      polyline.setAttribute('points', '4,20 10,8 16,16 22,4');
+      svg.appendChild(polyline);
+      return svg;
+    },
   },
 ];
 
@@ -283,7 +330,7 @@ class ToolbarControl extends L.Control {
       itemEl.title = item.title;
 
       const iconSpan = L.DomUtil.create('span', 'debrief-shape-palette__icon', itemEl);
-      iconSpan.innerHTML = item.icon;
+      iconSpan.appendChild(item.createIcon());
 
       const labelSpan = L.DomUtil.create('span', 'debrief-shape-palette__label', itemEl);
       labelSpan.textContent = item.label;
