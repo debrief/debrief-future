@@ -45,7 +45,7 @@
 
 **Purpose**: Create the drawing module directory and barrel export
 
-- [ ] T001 Create drawing module barrel export `shared/components/src/MapView/drawing/index.ts`
+- [x] T001 Create drawing module barrel export `shared/components/src/MapView/drawing/index.ts`
 
 ---
 
@@ -57,16 +57,16 @@
 
 ### Tests (write first, verify they fail)
 
-- [ ] T002 [P][test] Write isValidDrawnGeometry unit tests `shared/components/src/MapView/drawing/__tests__/isValidDrawnGeometry.test.ts`
-- [ ] T003 [P][test] Write createDrawnFeature unit tests `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
+- [x] T002 [P][test] Write isValidDrawnGeometry unit tests `shared/components/src/MapView/drawing/__tests__/isValidDrawnGeometry.test.ts`
+- [x] T003 [P][test] Write createDrawnFeature unit tests `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
 
 ### Implementation
 
-- [ ] T004 [P] Create default styling constants `shared/components/src/MapView/drawing/drawingDefaults.ts`
-- [ ] T005 Implement isValidDrawnGeometry guard `shared/components/src/MapView/drawing/isValidDrawnGeometry.ts`
-- [ ] T006 Implement createDrawnFeature factory `shared/components/src/MapView/drawing/createDrawnFeature.ts`
-- [ ] T007 Update barrel export with all public APIs `shared/components/src/MapView/drawing/index.ts`
-- [ ] T008 Run unit tests and verify all pass
+- [x] T004 [P] Create default styling constants `shared/components/src/MapView/drawing/drawingDefaults.ts`
+- [x] T005 Implement isValidDrawnGeometry guard `shared/components/src/MapView/drawing/isValidDrawnGeometry.ts`
+- [x] T006 Implement createDrawnFeature factory `shared/components/src/MapView/drawing/createDrawnFeature.ts`
+- [x] T007 Update barrel export with all public APIs `shared/components/src/MapView/drawing/index.ts`
+- [x] T008 Run unit tests and verify all pass
 
 **Checkpoint**: Pure logic complete — `createDrawnFeature()` converts raw GeoJSON to schema-compliant features with UUID, default styling, and validation. All unit tests green.
 
