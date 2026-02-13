@@ -168,22 +168,22 @@
 
 ### Evidence Collection
 
-- [ ] T029 Create evidence directory `specs/094-point-rectangle-drawing/evidence/`
-- [ ] T030 Capture test results in `specs/094-point-rectangle-drawing/evidence/test-summary.md`
-- [ ] T031 Create usage demonstration in `specs/094-point-rectangle-drawing/evidence/usage-example.md`
-- [ ] T032 [P] Capture Storybook screenshot of point drawing `specs/094-point-rectangle-drawing/evidence/storybook-screenshot-point.png`
-- [ ] T033 [P] Capture Storybook screenshot of rectangle drawing `specs/094-point-rectangle-drawing/evidence/storybook-screenshot-rectangle.png`
+- [x] T029 Create evidence directory `specs/094-point-rectangle-drawing/evidence/`
+- [x] T030 Capture test results in `specs/094-point-rectangle-drawing/evidence/test-summary.md`
+- [x] T031 Create usage demonstration in `specs/094-point-rectangle-drawing/evidence/usage-example.md`
+- [x] T032 [P] Capture Storybook screenshot of point drawing `specs/094-point-rectangle-drawing/evidence/storybook-screenshot-point.png`
+- [x] T033 [P] Capture Storybook screenshot of rectangle drawing `specs/094-point-rectangle-drawing/evidence/storybook-screenshot-rectangle.png`
 
 ### E2E Evidence Collection
 
-- [ ] T034 Run full e2e suite: `pnpm --filter @debrief/components test:e2e`
-- [ ] T035 [P] Capture theme variant screenshots to `specs/094-point-rectangle-drawing/evidence/screenshots/`
-- [ ] T036 Document e2e results in `specs/094-point-rectangle-drawing/evidence/e2e-summary.md`
+- [x] T034 Run full e2e suite: `pnpm --filter @debrief/components test:e2e`
+- [x] T035 [P] Capture theme variant screenshots to `specs/094-point-rectangle-drawing/evidence/screenshots/`
+- [x] T036 Document e2e results in `specs/094-point-rectangle-drawing/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T037 Create shipped blog post `specs/094-point-rectangle-drawing/media/shipped-post.md`
-- [ ] T038 [P] Create LinkedIn shipped summary `specs/094-point-rectangle-drawing/media/linkedin-shipped.md`
+- [x] T037 Create shipped blog post `specs/094-point-rectangle-drawing/media/shipped-post.md`
+- [x] T038 [P] Create LinkedIn shipped summary `specs/094-point-rectangle-drawing/media/linkedin-shipped.md`
 
 ### PR Creation
 
