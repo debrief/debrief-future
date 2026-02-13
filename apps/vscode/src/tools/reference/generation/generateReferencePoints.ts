@@ -39,32 +39,38 @@ export const toolDefinition: MCPToolDefinition = {
   inputSchema: {
     type: 'object',
     properties: {
-      pattern: {
-        type: 'string',
-        enum: ['grid', 'scatter'],
-        description:
-          "Generation pattern: 'grid' for evenly spaced rows/columns, 'scatter' for random distribution",
-        'x-debrief-param-type': 'ReferencePointPattern',
-      },
-      rows: {
-        type: 'integer',
-        minimum: 1,
-        description: 'Number of rows (grid pattern only)',
-      },
-      cols: {
-        type: 'integer',
-        minimum: 1,
-        description: 'Number of columns (grid pattern only)',
-      },
-      count: {
-        type: 'integer',
-        minimum: 1,
-        description: 'Number of points to generate (scatter pattern only)',
-      },
-      seed: {
-        type: 'integer',
-        description:
-          'Random seed for reproducible scatter generation (scatter pattern only)',
+      features: { type: 'array', items: { type: 'object' } },
+      params: {
+        type: 'object',
+        properties: {
+          pattern: {
+            type: 'string',
+            enum: ['grid', 'scatter'],
+            description:
+              "Generation pattern: 'grid' for evenly spaced rows/columns, 'scatter' for random distribution",
+            'x-debrief-param-type': 'ReferencePointPattern',
+          },
+          rows: {
+            type: 'integer',
+            minimum: 1,
+            description: 'Number of rows (grid pattern only)',
+          },
+          cols: {
+            type: 'integer',
+            minimum: 1,
+            description: 'Number of columns (grid pattern only)',
+          },
+          count: {
+            type: 'integer',
+            minimum: 1,
+            description: 'Number of points to generate (scatter pattern only)',
+          },
+          seed: {
+            type: 'integer',
+            description:
+              'Random seed for reproducible scatter generation (scatter pattern only)',
+          },
+        },
       },
     },
   },
