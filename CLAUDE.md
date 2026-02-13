@@ -176,6 +176,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Local filesystem STAC catalogs (no storage changes for this feature) (091-tool-parameter-context-menus)
 - Python 3.11 + pydantic >=2.0.0 (existing), stdlib `math` module only (080-buffer-zone-generator)
 - N/A (stateless tool — caller handles STAC persistence) (080-buffer-zone-generator)
+- TypeScript 5.x (session-state package, VS Code extension, web-shell) + `@debrief/session-state` (Zustand store, Log Service types — existing), no new external dependencies (087-logical-result-id-registry)
+- N/A — pure in-memory, not persisted. Reconstructed from STAC assets on plot load. (087-logical-result-id-registry)
 - TypeScript 5.x (shared components, session-state, VS Code extension webview) + React 18.x, react-leaflet 4.2, Leaflet 1.9.x, @geoman-io/leaflet-geoman-free ^2.19.2, Zustand ^5.0.0 (093-drawing-toolbar-shape-palette)
 - N/A — ephemeral in-memory state only (drawing mode is not persisted) (093-drawing-toolbar-shape-palette)
 - TypeScript 5.x (shared components, VS Code extension webview) + React 18.x, react-leaflet 4.2, Leaflet 1.9.x, @geoman-io/leaflet-geoman-free ^2.19.2, Zustand ^5.0.0 (@debrief/session-state) (094-point-rectangle-drawing)
