@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import {
   subscribeToDirty,
   subscribeToSelection,
+  createResultIdRegistry,
   type SessionStoreApi,
   type FeatureSelection,
 } from '@debrief/session-state';
@@ -65,6 +66,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const ioService = new IoService(context.extensionPath);
   const sessionManager = new SessionManager();
   context.subscriptions.push(sessionManager);
+
+  // Create Result ID Registry for tracking logical result IDs (Feature: 087)
+  const resultIdRegistry = createResultIdRegistry();
 
   // Wire output channel to services for cross-ecosystem diagnostics
   calcService.setOutputChannel(outputChannel);
@@ -184,6 +188,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     context,
     sessionManager
   );
+  logPanelProvider.setResultIdRegistry(resultIdRegistry);
 
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
@@ -266,7 +271,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     () => mapPanel,
     (panel) => {
       mapPanel = panel;
-    }
+    },
+    resultIdRegistry
   );
   context.subscriptions.push(...commands);
 
