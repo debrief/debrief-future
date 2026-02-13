@@ -80,10 +80,10 @@
 
 ### Implementation
 
-- [ ] T009 Extend LeafletToolbar to extract GeoJSON and call onShapeCreated callback on pm:create `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx`
-- [ ] T010 Add onShapeCreated prop to MapView and pass through to LeafletToolbar `shared/components/src/MapView/MapView.tsx`
-- [ ] T011 Create Drawing Storybook story with point mode demo (click to place point, show feature list) `shared/components/src/MapView/Drawing.stories.tsx`
-- [ ] T012 Verify point feature in Storybook: correct kind, geometry, styling, auto-selection
+- [x] T009 Extend LeafletToolbar to extract GeoJSON and call onShapeCreated callback on pm:create `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx`
+- [x] T010 Add onShapeCreated prop to MapView and pass through to LeafletToolbar `shared/components/src/MapView/MapView.tsx`
+- [x] T011 Create Drawing Storybook story with point mode demo (click to place point, show feature list) `shared/components/src/MapView/Drawing.stories.tsx`
+- [x] T012 Verify point feature in Storybook: correct kind, geometry, styling, auto-selection
 
 **Checkpoint**: Point drawing works end-to-end in Storybook. Clicking on map creates a POINT feature with correct schema properties.
 
@@ -97,9 +97,9 @@
 
 ### Implementation
 
-- [ ] T013 Extend Drawing Storybook story to include rectangle mode demo `shared/components/src/MapView/Drawing.stories.tsx`
-- [ ] T014 Verify rectangle feature in Storybook: correct kind, closed polygon geometry, styling, auto-selection
-- [ ] T015 Verify degenerate rectangle (click without drag) is silently discarded
+- [x] T013 Extend Drawing Storybook story to include rectangle mode demo `shared/components/src/MapView/Drawing.stories.tsx`
+- [x] T014 Verify rectangle feature in Storybook: correct kind, closed polygon geometry, styling, auto-selection
+- [x] T015 Verify degenerate rectangle (click without drag) is silently discarded
 
 **Checkpoint**: Both point and rectangle drawing work in Storybook. Degenerate rectangles are rejected.
 
@@ -113,10 +113,10 @@
 
 ### Implementation
 
-- [ ] T016 Add JSON inspector panel to Storybook story showing raw feature output `shared/components/src/MapView/Drawing.stories.tsx`
-- [ ] T017 Verify drawn point matches ReferenceLocation schema (type, id, geometry.type, properties.kind, properties.name, properties.location_type, properties.style)
-- [ ] T018 Verify drawn rectangle matches RectangleAnnotation schema (type, id, geometry.type with closed ring, properties.kind, properties.style)
-- [ ] T019 Verify multiple drawn features have unique UUIDs (no duplicates)
+- [x] T016 Add JSON inspector panel to Storybook story showing raw feature output `shared/components/src/MapView/Drawing.stories.tsx`
+- [x] T017 Verify drawn point matches ReferenceLocation schema (type, id, geometry.type, properties.kind, properties.name, properties.location_type, properties.style)
+- [x] T018 Verify drawn rectangle matches RectangleAnnotation schema (type, id, geometry.type with closed ring, properties.kind, properties.style)
+- [x] T019 Verify multiple drawn features have unique UUIDs (no duplicates)
 
 **Checkpoint**: Schema compliance verified for both feature types. All required fields present and correctly typed.
 
@@ -130,9 +130,9 @@
 
 ### Implementation
 
-- [ ] T020 Verify Geoman cursor changes in point mode (crosshair or marker cursor) in Storybook
-- [ ] T021 Verify Geoman rectangle preview appears during drag in Storybook
-- [ ] T022 Verify Escape key cancels drawing mode and removes preview in Storybook
+- [x] T020 Verify Geoman cursor changes in point mode (crosshair or marker cursor) in Storybook
+- [x] T021 Verify Geoman rectangle preview appears during drag in Storybook
+- [x] T022 Verify Escape key cancels drawing mode and removes preview in Storybook
 
 **Checkpoint**: Visual feedback works for both modes via Geoman's built-in capabilities. No custom feedback code needed.
 
@@ -142,9 +142,9 @@
 
 **Purpose**: Wire the drawing conversion into the VS Code extension webview so drawn features appear in the real application alongside loaded data.
 
-- [ ] T023 Handle onShapeCreated in VS Code webview mapView.tsx — convert and add to feature collection `apps/vscode/src/webview/web/mapView.tsx`
-- [ ] T024 Auto-select drawn feature via setSelection in VS Code webview `apps/vscode/src/webview/web/mapView.tsx`
-- [ ] T025 Verify drawn features coexist with loaded track data (no regressions)
+- [x] T023 Handle onShapeCreated in VS Code webview mapView.tsx — convert and add to feature collection `apps/vscode/src/webview/web/mapView.tsx`
+- [x] T024 Auto-select drawn feature via setSelection in VS Code webview `apps/vscode/src/webview/web/mapView.tsx`
+- [x] T025 Verify drawn features coexist with loaded track data (no regressions)
 
 **Checkpoint**: Point and rectangle drawing works in VS Code. Drawn features appear alongside loaded data and are auto-selected.
 
