@@ -178,6 +178,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - N/A (stateless tool — caller handles STAC persistence) (080-buffer-zone-generator)
 - TypeScript 5.x (shared components library) + Vega-Lite 5.x, Vega 5.x, vega-embed 6.x, React 18.x (peer) (085-chart-renderer)
 - N/A (stateless — consumes dataset JSON, produces rendered charts) (085-chart-renderer)
+- TypeScript 5.x (shared components, session-state, VS Code extension webview) + React 18.x, react-leaflet 4.2, Leaflet 1.9.x, @geoman-io/leaflet-geoman-free ^2.19.2, Zustand ^5.0.0 (093-drawing-toolbar-shape-palette)
+- N/A — ephemeral in-memory state only (drawing mode is not persisted) (093-drawing-toolbar-shape-palette)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)

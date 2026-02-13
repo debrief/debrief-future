@@ -5,8 +5,9 @@
 .debrief-leaflet-toolbar {
   border: 1px solid var(--debrief-border-color);
   border-radius: var(--debrief-radius-md);
-  overflow: hidden;
+  overflow: visible;
   box-shadow: var(--debrief-shadow-md);
+  position: relative;
 }
 
 .debrief-leaflet-toolbar__button {
@@ -73,8 +74,7 @@
   background-color: var(--debrief-map-controls-bg);
 }
 
-/* TEMPORARY: 092-proof-of-concept — remove when #093 lands */
-/* Active state for draw rectangle button */
+/* Active state for draw trigger button (FR-005) */
 .debrief-leaflet-toolbar__button--active {
   background-color: var(--debrief-color-primary, #0066cc);
   color: #fff;
@@ -85,12 +85,61 @@
   opacity: 0.9;
 }
 
-/* Draw rectangle button with SVG icon */
-.debrief-leaflet-toolbar__draw-rect {
+/* Draw trigger ('+') button with SVG icon */
+.debrief-leaflet-toolbar__draw-trigger {
   padding: 0;
 }
 
-.debrief-leaflet-toolbar__draw-rect svg {
+.debrief-leaflet-toolbar__draw-trigger svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+
+/* Shape palette — horizontal icon-only popup (FR-002, FR-014) */
+.debrief-shape-palette {
+  position: absolute;
+  z-index: 1000;
+  display: flex;
+  flex-direction: row;
+  background-color: var(--debrief-map-controls-bg, #fff);
+  border: 1px solid var(--debrief-border-color, #ccc);
+  border-radius: var(--debrief-radius-md, 4px);
+  box-shadow: var(--debrief-shadow-md, 0 2px 8px rgba(0, 0, 0, 0.15));
+  overflow: hidden;
+}
+
+.debrief-shape-palette__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: var(--debrief-text-primary, #333);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-right: 1px solid var(--debrief-border-color, #ccc);
+}
+
+.debrief-shape-palette__item:last-child {
+  border-right: none;
+}
+
+.debrief-shape-palette__item:hover {
+  background-color: var(--debrief-bg-tertiary, #f0f0f0);
+}
+
+.debrief-shape-palette__item:active {
+  background-color: var(--debrief-bg-secondary, #e0e0e0);
+}
+
+.debrief-shape-palette__item:focus {
+  outline: 2px solid var(--debrief-color-primary);
+  outline-offset: -2px;
+}
+
+.debrief-shape-palette__item svg {
   width: 16px;
   height: 16px;
   stroke: currentColor;
