@@ -55,8 +55,8 @@ export interface ToolsPanelProps {
   hasToolInventory?: boolean;
   /** Whether features are currently selected */
   hasSelection?: boolean;
-  /** Callback when a tool is run */
-  onRunTool?: (toolId: string) => void;
+  /** Callback when a tool is run, with optional collected parameters */
+  onRunTool?: (toolId: string, params?: Record<string, unknown>) => void;
   /** CSS class name */
   className?: string;
 }

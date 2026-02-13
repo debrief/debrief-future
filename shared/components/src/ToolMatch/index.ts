@@ -22,5 +22,8 @@ export { createSelection, createSelectionFromCounts } from './types';
 export { fromMCPTool, fromMCPTools, extractParameters } from './mcpAdapter';
 export type { MCPToolDefinition, MCPSelectionRequirement } from './mcpAdapter';
 
+// Parameter type resolution for context menus
+export { resolveParamType, isPresetType, getNumericValue } from './paramTypeResolver';
+
 // Re-export schema types for convenience
 export type { Tool, SelectionRequirement } from './types';

@@ -277,3 +277,49 @@ export const VSCodeTheme: Story = {
     },
   },
 };
+
+// =============================================================================
+// Parameterized Tools
+// =============================================================================
+
+/**
+ * Tool with parameters triggers a ParameterCollector on click.
+ * Click "Set Track Color" to see the colour picker context menu.
+ * "Calculate Range" has no parameters and executes immediately.
+ */
+export const WithParameterizedTool: Story = {
+  args: {
+    tools: [
+      {
+        id: 'set-track-color',
+        name: 'Set Track Color',
+        description: 'Sets the display color for track features',
+        applicable: true,
+        parameters: [
+          {
+            name: 'color',
+            valueType: 'enum',
+            description: 'Track colour',
+            paramType: 'NamedColor',
+          },
+        ],
+      },
+      {
+        id: 'calculate-range',
+        name: 'Calculate Range',
+        description: 'Calculate range between tracks',
+        applicable: true,
+      },
+    ],
+    hasToolInventory: true,
+    hasSelection: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'When a tool has parameters, clicking it opens a context menu to collect parameter values before execution. Tools without parameters execute immediately.',
+      },
+    },
+  },
+};

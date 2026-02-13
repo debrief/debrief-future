@@ -94,6 +94,10 @@ export type {
 export { ActivityPanel } from './ActivityPanel';
 export { DEFAULT_COLLAPSE_STATE } from './ActivityPanel/types';
 
+// ContextMenu (Feature: 091-tool-parameter-context-menus)
+export { ContextMenu } from './ContextMenu';
+export type { ContextMenuItem, ContextMenuProps } from './ContextMenu';
+
 // LogPanel (Feature: 072-log-panel)
 export { LogPanel } from './LogPanel';
 export type {
