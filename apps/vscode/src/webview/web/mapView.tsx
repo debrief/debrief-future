@@ -11,10 +11,8 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
-import { MapView } from '@debrief/components';
-import type { DebriefFeature, DisplayMode, Bounds } from '@debrief/components';
-import type { DrawingMode } from '@debrief/components/src/MapView/LeafletToolbar';
-import { createDrawnFeature } from '@debrief/components/src/MapView/drawing';
+import { MapView, createDrawnFeature } from '@debrief/components';
+import type { DebriefFeature, DisplayMode, Bounds, DrawingMode } from '@debrief/components';
 import type {
   ExtensionToWebviewMessage,
   WebviewToExtensionMessage,

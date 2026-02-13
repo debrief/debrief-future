@@ -99,6 +99,11 @@ export { DEFAULT_COLLAPSE_STATE } from './ActivityPanel/types';
 export { ContextMenu } from './ContextMenu';
 export type { ContextMenuItem, ContextMenuProps } from './ContextMenu';
 
+// Drawing (Feature: 094-point-rectangle-drawing)
+export { createDrawnFeature } from './MapView/drawing';
+export type { CreateDrawnFeatureOptions } from './MapView/drawing';
+export type { DrawingMode } from './MapView/LeafletToolbar';
+
 // LogPanel (Feature: 072-log-panel)
 export { LogPanel } from './LogPanel';
 export type {
