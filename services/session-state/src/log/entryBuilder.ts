@@ -7,6 +7,7 @@
 
 import type {
   LogEntry,
+  InputFeatureState,
   WasGeneratedBy,
   ToolResultForLog,
   ExpandedToolResultFields,
@@ -140,7 +141,8 @@ function resolveGeneratedOutputs(
 export function buildLogEntry(
   toolResult: ToolResultForLog,
   expanded: ExpandedToolResultFields | undefined,
-  activityId?: string
+  activityId?: string,
+  inputState?: InputFeatureState[]
 ): LogEntry {
   const resolvedActivityId = activityId ?? generateActivityId();
   const toolId = toolResult.toolId ?? 'unknown-tool';
@@ -153,6 +155,7 @@ export function buildLogEntry(
     generated: resolveGeneratedOutputs(toolResult, expanded),
     executionDuration: msToIsoDuration(toolResult.durationMs),
     generatedResultId: expanded?.createdAssets?.[0]?.resultId ?? null,
-    tune: null, // Always null in Phase 1
+    tune: null,
+    inputState: inputState ?? toolResult.inputState ?? null,
   };
 }

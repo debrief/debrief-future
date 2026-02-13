@@ -296,7 +296,7 @@ function translatePoint(lon: number, lat: number, distanceNm: number, bearingDeg
  * Move annotation features by distance and bearing.
  * Returns new features with translated coordinates.
  */
-function moveShapeFeatures(
+export function moveShapeFeatures(
   features: Feature[],
   distanceNm: number,
   directionDeg: number

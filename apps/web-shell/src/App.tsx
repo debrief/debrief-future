@@ -55,7 +55,7 @@ const toStoreMode = (m: string): StoreDisplayMode =>
   m === 'trail' ? 'snailTrail' : 'normal';
 import { useSessionStore } from './hooks/useSessionStore';
 import { stacService } from './mocks/stacService';
-import { calcService } from './mocks/calcService';
+import { calcService, moveShapeFeatures } from './mocks/calcService';
 import type { ToolResult } from './mocks/calcService';
 import { mockFsAdapter } from './mocks/fsAdapter';
 
@@ -320,6 +320,62 @@ export default function App() {
       // Coerce to number if the current value is numeric
       const newValue = typeof currentValue === 'number' ? Number(input) : input;
 
+      // Find the entry being tuned
+      const entry = logEntries.find((e: TimelineEntry) => e.activityId === activityId);
+
+      // Restore features from inputState and re-execute for mutation tools
+      if (entry?.inputState && entry.inputState.length > 0 && entry.toolName === 'move-shape') {
+        // Build restored features from inputState (pre-tool geometry)
+        setCurrentPlot(plot => {
+          if (!plot) return plot;
+          const restoredMap = new Map(
+            entry.inputState!.map(is => [is.featureId, is])
+          );
+          // Restore original geometry in the plot
+          const restoredFeatures = plot.features.features.map(f => {
+            const saved = restoredMap.get(String(f.id));
+            if (!saved) return f;
+            return {
+              ...f,
+              geometry: JSON.parse(JSON.stringify(saved.geometry)),
+              properties: {
+                ...(f.properties ?? {}),
+                ...JSON.parse(JSON.stringify(saved.properties ?? {})),
+              },
+            };
+          });
+
+          // Collect the restored features that the tool will operate on
+          const featuresToMove = restoredFeatures.filter(f =>
+            restoredMap.has(String(f.id))
+          ) as Feature[];
+
+          // Read the updated parameters (apply the new value)
+          const params = { ...entry.parameters };
+          if (params[parameter]) {
+            params[parameter] = { ...params[parameter], value: newValue };
+          }
+          const distNm = Number((params.distance_nm?.value) ?? 5);
+          const dirDeg = Number((params.direction_deg?.value) ?? 45);
+
+          // Re-execute the tool from original position
+          const moved = moveShapeFeatures(featuresToMove, distNm, dirDeg);
+          const movedMap = new Map(moved.map(m => [String(m.id), m]));
+
+          // Apply the re-executed result
+          const finalFeatures = restoredFeatures.map(f => {
+            const m = movedMap.get(String(f.id));
+            return m ?? f;
+          });
+
+          return {
+            ...plot,
+            features: { ...plot.features, features: finalFeatures },
+          };
+        });
+      }
+
+      // Update the log entry parameters and tune annotation
       setLogEntries((prev: TimelineEntry[]) =>
         prev.map((e: TimelineEntry) => {
           if (e.activityId !== activityId) return e;
@@ -340,7 +396,7 @@ export default function App() {
       setLogNotification(`Tuned "${parameter}" to ${String(newValue)}.`);
       setTimeout(() => setLogNotification(null), 3000);
     },
-    []
+    [logEntries]
   );
 
   // Phase 6: Handle restore request for deleted entries
@@ -427,6 +483,19 @@ export default function App() {
 
     const activityId = `act-${String(nextId).padStart(3, '0')}`;
 
+    // Capture pre-tool geometry for mutation tools (enables correct tune replay)
+    const inputState = replacesInPlace && selectedFeatures.length > 0
+      ? selectedFeatures.map(f => {
+          const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
+          const { provenance: _p, ...restProps } = props;
+          return {
+            featureId: String(f.id),
+            geometry: JSON.parse(JSON.stringify(f.geometry)),
+            properties: JSON.parse(JSON.stringify(restProps)),
+          };
+        })
+      : null;
+
     const entry: TimelineEntry = {
       activityId,
       timestamp: new Date().toISOString(),
@@ -438,6 +507,7 @@ export default function App() {
       executionDuration: 'PT0.1S',
       generatedResultId: generatedIds[0] ?? null,
       operationCategory: 'calculation',
+      inputState,
     };
 
     // Snapshot originals so revert can restore them
