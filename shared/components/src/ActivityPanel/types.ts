@@ -6,7 +6,7 @@
  */
 
 import type { DebriefFeature } from '../utils/types';
-import type { MatchResult } from '../ToolMatch/types';
+import type { MatchResult, ToolParameter } from '../ToolMatch/types';
 import type { AssociatedFile } from '../LayersToolbar/types';
 
 /**
@@ -41,6 +41,8 @@ export interface ToolsPanelItem {
   applicable: boolean;
   /** Explanation when tool is not applicable (optional) */
   explanation?: string;
+  /** Configurable parameters with type metadata */
+  parameters?: ToolParameter[];
 }
 
 /**
@@ -67,7 +69,7 @@ export type ActivityPanelMessage =
   | { type: 'temporal:play'; payload: { rate: number } }
   | { type: 'temporal:pause' }
   | { type: 'temporal:displayMode'; payload: { mode: 'full' | 'trail' } }
-  | { type: 'tool:run'; payload: { toolId: string } }
+  | { type: 'tool:run'; payload: { toolId: string; params?: Record<string, unknown> } }
   | { type: 'layer:toggleVisibility'; payload: { featureIds: string[] } }
   | { type: 'layer:delete'; payload: { featureIds: string[] } }
   | { type: 'layer:select'; payload: { featureIds: string[] } };

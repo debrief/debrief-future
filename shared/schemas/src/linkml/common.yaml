@@ -83,6 +83,117 @@ enums:
         description: Filled/stroked square (reference points)
       triangle:
         description: Filled/stroked triangle (directional indicators)
+      diamond:
+        description: Diamond shape
+      cross:
+        description: Cross/plus shape
+
+  NamedColorEnum:
+    description: Predefined named colours for styling tool parameters
+    permissible_values:
+      red:
+        description: Red
+      green:
+        description: Green
+      blue:
+        description: Blue
+      yellow:
+        description: Yellow
+      orange:
+        description: Orange
+      purple:
+        description: Purple
+      cyan:
+        description: Cyan
+      magenta:
+        description: Magenta
+      white:
+        description: White
+      black:
+        description: Black
+      grey:
+        description: Grey
+
+  MarkerSymbolEnum:
+    description: Marker shapes for tool parameter choices (superset of PointShapeEnum)
+    permissible_values:
+      circle:
+        description: Filled/stroked circle (default marker)
+      square:
+        description: Filled/stroked square (reference points)
+      triangle:
+        description: Filled/stroked triangle (directional indicators)
+      diamond:
+        description: Diamond shape
+      cross:
+        description: Cross/plus shape
+
+  CardinalDirectionEnum:
+    description: Eight-point compass directions
+    permissible_values:
+      N:
+        description: North
+      NE:
+        description: North-East
+      E:
+        description: East
+      SE:
+        description: South-East
+      S:
+        description: South
+      SW:
+        description: South-West
+      W:
+        description: West
+      NW:
+        description: North-West
+
+  DurationPresetEnum:
+    description: Common ISO 8601 duration presets for interval parameters
+    permissible_values:
+      PT1M:
+        description: 1 minute
+      PT5M:
+        description: 5 minutes
+      PT15M:
+        description: 15 minutes
+      PT30M:
+        description: 30 minutes
+      PT1H:
+        description: 1 hour
+      PT2H:
+        description: 2 hours
+      PT6H:
+        description: 6 hours
+      PT12H:
+        description: 12 hours
+      PT24H:
+        description: 24 hours
+
+  NumericPresetEnum:
+    description: Common numeric presets for count and distance parameters
+    permissible_values:
+      n_1:
+        description: One
+        meaning: debrief:1
+      n_2:
+        description: Two
+        meaning: debrief:2
+      n_5:
+        description: Five
+        meaning: debrief:5
+      n_10:
+        description: Ten
+        meaning: debrief:10
+      n_25:
+        description: Twenty-five
+        meaning: debrief:25
+      n_50:
+        description: Fifty
+        meaning: debrief:50
+      n_100:
+        description: One hundred
+        meaning: debrief:100
 
   LineCapEnum:
     description: How line endpoints are rendered (SVG/CSS standard)
