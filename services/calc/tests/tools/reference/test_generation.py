@@ -7,11 +7,16 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
 from debrief_calc.models import ContextType, SelectionContext
 
 # Golden example paths
-GOLDEN_DIR = Path(__file__).parent.parent.parent.parent.parent.parent / "shared" / "tools" / "reference" / "generation"
+GOLDEN_DIR = (
+    Path(__file__).parent.parent.parent.parent.parent.parent
+    / "shared"
+    / "tools"
+    / "reference"
+    / "generation"
+)
 
 
 def _load_golden(name: str) -> dict[str, Any]:
@@ -220,7 +225,10 @@ class TestGridEdgeCases:
 
         assert actual_feature["id"] == expected_feature["id"]
         assert actual_feature["geometry"] == expected_feature["geometry"]
-        assert actual_feature["properties"]["pointMetadata"] == expected_feature["properties"]["pointMetadata"]
+        assert (
+            actual_feature["properties"]["pointMetadata"]
+            == expected_feature["properties"]["pointMetadata"]
+        )
 
 
 # ============================================================================
@@ -374,7 +382,7 @@ class TestScatterEdgeCases:
         expected_coords = expected_feature["geometry"]["coordinates"]
         actual_coords = actual_feature["geometry"]["coordinates"]
         assert len(actual_coords) == len(expected_coords)
-        for i, (actual, expected) in enumerate(zip(actual_coords, expected_coords)):
+        for i, (actual, expected) in enumerate(zip(actual_coords, expected_coords, strict=True)):
             assert actual[0] == pytest.approx(expected[0], abs=1e-6), f"coord {i} lon mismatch"
             assert actual[1] == pytest.approx(expected[1], abs=1e-6), f"coord {i} lat mismatch"
 
@@ -479,6 +487,6 @@ class TestCrossLanguageParity:
         actual_coords = result[0]["geometry"]["coordinates"]
 
         assert len(actual_coords) == len(expected_coords)
-        for i, (actual, expected) in enumerate(zip(actual_coords, expected_coords)):
+        for i, (actual, expected) in enumerate(zip(actual_coords, expected_coords, strict=True)):
             assert actual[0] == pytest.approx(expected[0], abs=1e-6), f"coord {i} lon"
             assert actual[1] == pytest.approx(expected[1], abs=1e-6), f"coord {i} lat"

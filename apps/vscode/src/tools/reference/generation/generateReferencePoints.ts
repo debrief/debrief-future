@@ -89,8 +89,12 @@ function lcgNext(state: number): number {
 }
 
 function normaliseLon(lon: number): number {
-  if (lon > 180) return lon - 360;
-  if (lon < -180) return lon + 360;
+  if (lon > 180) {
+    return lon - 360;
+  }
+  if (lon < -180) {
+    return lon + 360;
+  }
   return lon;
 }
 

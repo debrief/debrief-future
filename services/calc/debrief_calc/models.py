@@ -365,7 +365,9 @@ class Tool(BaseModel):
     @model_validator(mode="after")
     def validate_input_kinds_for_context(self) -> Tool:
         if self.context_type != ContextType.NONE and not self.input_kinds:
-            raise ValueError("input_kinds must contain at least one value (unless context_type is NONE)")
+            raise ValueError(
+                "input_kinds must contain at least one value (unless context_type is NONE)"
+            )
         return self
 
     def accepts_kind(self, kind: str) -> bool:
