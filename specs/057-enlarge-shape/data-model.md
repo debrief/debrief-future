@@ -8,13 +8,14 @@
 
 Tool input parameters provided in the FeatureCollection's `parameters` field.
 
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `scale_factor` | number | No | 3.0 | Multiplicative scale factor. >1 enlarges, <1 shrinks, =1 no-op. Must be >= 0. |
-| `origin` | [number, number] | No | computed centroid | Scale origin point as [longitude, latitude]. Defaults to geometric centroid of each shape. |
+| Field | Type | Required | Default | Choices (presets) | Description |
+|-------|------|----------|---------|-------------------|-------------|
+| `scale_factor` | number | No | 3.0 | 0.25, 0.5, 1.5, 2.0, 3.0, 5.0 | Multiplicative scale factor. >1 enlarges, <1 shrinks, =1 no-op. Must be >= 0. Choices are presets; any non-negative number is accepted. |
+| `origin` | [number, number] | No | computed centroid | — | Scale origin point as [longitude, latitude]. Defaults to geometric centroid of each shape. |
 
 **Validation rules**:
 - `scale_factor` MUST be >= 0 (negative values return error)
+- `scale_factor` choices are **presets** for frontend context menus — the tool accepts any non-negative numeric value, not only the listed choices
 - `origin`, if provided, MUST be a valid [lon, lat] coordinate with lon in [-180, 180] and lat in [-90, 90]
 
 ### Input: FeatureCollection

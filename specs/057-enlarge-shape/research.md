@@ -61,7 +61,18 @@
 - **Return error**: Overly restrictive — 0 is a valid multiplier.
 - **Return empty collection**: Inconsistent — there IS a result, just a degenerate one.
 
-### R6: Latitude Clamping Strategy
+### R6: Scale Factor Parameter Presets
+
+**Decision**: Declare `scale_factor` as `type="number"` with `choices=[0.25, 0.5, 1.5, 2.0, 3.0, 5.0]` preset values
+
+**Rationale**: Following the pattern established by move-shape's `distance_km` parameter (which has `choices=[1, 2, 5, 10, 20, 50]`), the scale_factor should offer common presets so frontends can present a context menu for quick selection. The presets include both shrink values (0.25, 0.5) and enlarge values (1.5, 2.0, 3.0, 5.0) to cover common analyst needs. The default remains 3.0. Any non-negative numeric value is still accepted via custom input — presets are convenience, not constraints.
+
+**Alternatives considered**:
+- **Enum-only**: Restrict to preset values only. Too limiting — analysts may need precise factors like 1.8 or 4.5.
+- **No presets**: Require typed numeric input. Poor UX for the common case where standard scaling factors suffice.
+- **Schema-defined param_type**: Feature #091 will introduce `param_type` referencing LinkML enums. For now, inline `choices` is the correct approach per the current `ToolParameter` model.
+
+### R7: Latitude Clamping Strategy
 
 **Decision**: Clamp scaled latitude values to [-90, 90] range
 

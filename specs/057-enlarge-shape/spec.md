@@ -97,6 +97,7 @@ An analyst needs to reduce a shape's size. They invoke the tool with a scale fac
 - **FR-016**: Tool MUST include golden I/O example files (`.input.json` and `.output.json`) for validation
 - **FR-017**: Tool MUST record provenance including the origin point and scale factor used in the transformation
 - **FR-018**: Tool MUST use a default scale factor of 3.0 when none is provided
+- **FR-020**: Tool MUST declare `scale_factor` with preset choices (e.g., 0.25, 0.5, 1.5, 2.0, 3.0, 5.0) so frontends can present a selection menu before execution, while still accepting any non-negative numeric value via custom input
 - **FR-019**: Tool MUST work entirely offline with no network dependencies
 
 ### Key Entities

@@ -15,7 +15,7 @@ Create `shared/tools/shape/manipulation/enlarge-shape.1.0.md` following the 9-se
 **Sections to fill**:
 1. **Metadata** — YAML frontmatter: `name: enlarge-shape`, `version: 1.0`, `category: shape/manipulation`, `status: draft`
 2. **MCP** — LLM-optimized description, parameters, returns
-3. **Inputs** — Schema reference to `annotations.yaml`, constraints, defaults (`scale_factor: 3.0`, `origin: centroid`)
+3. **Inputs** — Schema reference to `annotations.yaml`, constraints, defaults (`scale_factor: 3.0` with preset choices `[0.25, 0.5, 1.5, 2.0, 3.0, 5.0]`, `origin: centroid`)
 4. **Outputs** — ToolResponse with `mutation/shape/scaled` result type
 5. **Algorithm** — Pseudocode for centroid computation, coordinate scaling, kind-specific handling
 6. **Edge Cases** — Table covering 10+ scenarios (see spec.md and research.md)
@@ -59,3 +59,4 @@ Create 3 pairs in `shared/tools/shape/manipulation/`:
 - **Scale factor 0 allowed** — collapses to origin, returns degenerate geometry with provenance
 - **Result type**: `mutation/shape/scaled`
 - **Vector handling**: Scale geometry + origin, preserve range + bearing
+- **Scale factor presets**: `[0.25, 0.5, 1.5, 2.0, 3.0, 5.0]` — preset choices for frontend context menus (matches move-shape `distance_km` pattern); any non-negative value still accepted
