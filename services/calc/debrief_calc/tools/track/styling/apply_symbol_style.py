@@ -10,8 +10,18 @@ from debrief_calc.registry import tool
 VALID_SYMBOLS = ("circle", "square", "diamond", "triangle", "cross")
 
 NAMED_COLORS = [
-    "red", "blue", "green", "orange", "purple", "brown",
-    "pink", "cyan", "yellow", "magenta", "navy", "olive",
+    "red",
+    "blue",
+    "green",
+    "orange",
+    "purple",
+    "brown",
+    "pink",
+    "cyan",
+    "yellow",
+    "magenta",
+    "navy",
+    "olive",
 ]
 
 

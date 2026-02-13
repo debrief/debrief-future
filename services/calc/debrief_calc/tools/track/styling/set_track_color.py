@@ -8,8 +8,18 @@ from debrief_calc.models import ContextType, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 
 NAMED_COLORS = [
-    "red", "blue", "green", "orange", "purple", "brown",
-    "pink", "cyan", "yellow", "magenta", "navy", "olive",
+    "red",
+    "blue",
+    "green",
+    "orange",
+    "purple",
+    "brown",
+    "pink",
+    "cyan",
+    "yellow",
+    "magenta",
+    "navy",
+    "olive",
 ]
 
 
