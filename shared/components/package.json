@@ -110,5 +110,6 @@
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "_ci_trigger": "061-generate-courses-speeds"
 }
