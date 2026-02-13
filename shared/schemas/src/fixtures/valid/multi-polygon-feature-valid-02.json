@@ -1,0 +1,43 @@
+{
+  "type": "Feature",
+  "id": "mpoly-exclusion-002",
+  "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+      [
+        [
+          [-5.0, 49.0],
+          [-5.0, 49.5],
+          [-4.5, 49.5],
+          [-4.5, 49.0],
+          [-5.0, 49.0]
+        ],
+        [
+          [-4.9, 49.1],
+          [-4.6, 49.1],
+          [-4.6, 49.4],
+          [-4.9, 49.4],
+          [-4.9, 49.1]
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "kind": "MULTI_POLYGON",
+    "label": "Exclusion Zones with Holes",
+    "style": {
+      "fill": true,
+      "fill_color": "#FF6600",
+      "fill_opacity": 0.4,
+      "stroke": true,
+      "color": "#CC4400",
+      "weight": 3,
+      "opacity": 1.0,
+      "line_cap": "round",
+      "line_join": "round"
+    },
+    "source_tool": "zone-generator",
+    "source_features": ["exercise-boundary-01"],
+    "description": "Exclusion zones with interior holes for safe passage"
+  }
+}

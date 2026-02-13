@@ -1,0 +1,31 @@
+{
+  "type": "Feature",
+  "id": "mpoly-invalid-wrong-kind",
+  "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+      [
+        [
+          [-4.0, 50.0],
+          [-4.0, 50.5],
+          [-3.5, 50.5],
+          [-3.5, 50.0],
+          [-4.0, 50.0]
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "kind": "CIRCLE",
+    "label": "Wrong Kind Value",
+    "style": {
+      "fill": true,
+      "fill_color": "#0000FF",
+      "fill_opacity": 0.3,
+      "stroke": true,
+      "color": "#0000CC",
+      "weight": 2,
+      "opacity": 0.8
+    }
+  }
+}

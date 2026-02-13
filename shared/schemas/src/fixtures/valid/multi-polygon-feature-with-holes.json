@@ -1,0 +1,50 @@
+{
+  "type": "Feature",
+  "id": "mpoly-holes-001",
+  "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+      [
+        [
+          [-5.0, 49.0],
+          [-5.0, 50.0],
+          [-4.0, 50.0],
+          [-4.0, 49.0],
+          [-5.0, 49.0]
+        ],
+        [
+          [-4.8, 49.2],
+          [-4.2, 49.2],
+          [-4.2, 49.8],
+          [-4.8, 49.8],
+          [-4.8, 49.2]
+        ]
+      ],
+      [
+        [
+          [-3.0, 51.0],
+          [-3.0, 51.5],
+          [-2.5, 51.5],
+          [-2.5, 51.0],
+          [-3.0, 51.0]
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "kind": "MULTI_POLYGON",
+    "label": "Mixed Polygons with Interior Ring",
+    "style": {
+      "fill": true,
+      "fill_color": "#00CCFF",
+      "fill_opacity": 0.25,
+      "stroke": true,
+      "color": "#0099CC",
+      "weight": 2,
+      "opacity": 0.9,
+      "dash_array": "5,10"
+    },
+    "source_tool": "area-coverage-analyser",
+    "source_features": ["track-alpha", "exercise-boundary-01"]
+  }
+}

@@ -22,6 +22,10 @@ export enum FeatureKindEnum {
     VECTOR = "VECTOR",
     /** Non-spatial system state (null geometry, reserved state.* IDs) */
     SYSTEM = "SYSTEM",
+    /** Multi-point tool result (MultiPoint geometry) */
+    MULTI_POINT = "MULTI_POINT",
+    /** Multi-polygon tool result (MultiPolygon geometry) */
+    MULTI_POLYGON = "MULTI_POLYGON",
 };
 /**
 * Type of track feature
@@ -116,6 +120,26 @@ export enum SystemStateTypeEnum {
     spatial = "spatial",
     /** Feature selection state (selected IDs) */
     selection = "selection",
+};
+/**
+* Type of file-level provenance event.
+*/
+export enum FileProvEventTypeEnum {
+    
+    /** Snapshot creation event */
+    snapshot = "snapshot",
+    /** Branch creation event */
+    branch = "branch",
+};
+/**
+* Direction of a branch event.
+*/
+export enum FileProvDirectionEnum {
+    
+    /** This file is the source of the branch */
+    source = "source",
+    /** This file is the target of the branch */
+    target = "target",
 };
 
 
@@ -299,6 +323,28 @@ export interface GeoJSONMultiLineString {
     /** Geometry type discriminator */
     type: string,
     /** Array of LineString coordinate arrays */
+    coordinates: number[],
+}
+
+
+/**
+ * GeoJSON MultiPoint geometry for multi-point tool results
+ */
+export interface GeoJSONMultiPoint {
+    /** Geometry type discriminator */
+    type: string,
+    /** Array of [longitude, latitude] positions */
+    coordinates: number[],
+}
+
+
+/**
+ * GeoJSON MultiPolygon geometry for multi-polygon tool results
+ */
+export interface GeoJSONMultiPolygon {
+    /** Geometry type discriminator */
+    type: string,
+    /** Array of polygon coordinate arrays (each an array of linear rings) */
     coordinates: number[],
 }
 
@@ -555,6 +601,78 @@ export interface SystemState {
 
 
 /**
+ * Properties for a MultiPointFeature (multi-point tool results)
+ */
+export interface MultiPointFeatureProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Human-readable result label */
+    label: string,
+    /** Point styling for all positions */
+    style: PointProperties,
+    /** Name of calculation tool that produced this result */
+    source_tool?: string,
+    /** IDs of input features used to generate this result */
+    source_features?: string[],
+    /** Additional description or notes */
+    description?: string,
+}
+
+
+/**
+ * GeoJSON Feature for multi-point tool results
+ */
+export interface MultiPointFeature {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Unique identifier (UUID recommended) */
+    id: string,
+    /** MultiPoint geometry */
+    geometry: GeoJSONMultiPoint,
+    /** Feature properties and styling */
+    properties: MultiPointFeatureProperties,
+    /** Bounding box [minLon, minLat, maxLon, maxLat] */
+    bbox?: number[],
+}
+
+
+/**
+ * Properties for a MultiPolygonFeature (multi-polygon tool results)
+ */
+export interface MultiPolygonFeatureProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Human-readable result label */
+    label: string,
+    /** Polygon styling for all regions */
+    style: PolygonProperties,
+    /** Name of calculation tool that produced this result */
+    source_tool?: string,
+    /** IDs of input features used to generate this result */
+    source_features?: string[],
+    /** Additional description or notes */
+    description?: string,
+}
+
+
+/**
+ * GeoJSON Feature for multi-polygon tool results
+ */
+export interface MultiPolygonFeature {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Unique identifier (UUID recommended) */
+    id: string,
+    /** MultiPolygon geometry */
+    geometry: GeoJSONMultiPolygon,
+    /** Feature properties and styling */
+    properties: MultiPolygonFeatureProperties,
+    /** Bounding box [minLon, minLat, maxLon, maxLat] */
+    bbox?: number[],
+}
+
+
+/**
  * Properties for a NarrativeEntry annotation
  */
 export interface NarrativeEntryProperties {
@@ -789,6 +907,158 @@ export interface Tool {
     version?: string,
     /** List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection. */
     requirements?: SelectionRequirement[],
+}
+
+
+/**
+ * A PROV-aligned provenance record stored on GeoJSON features. Contains activity identity, timestamp, generator information, input/output references, execution duration, and tuning annotations.
+ */
+export interface LogEntry {
+    /** Unique operation identifier (UUID v4). Shared across features in multi-feature operations. */
+    activity_id: string,
+    /** When the operation occurred (ISO 8601 with timezone). */
+    timestamp: string,
+    /** Tool identity and parameters for this invocation. */
+    was_generated_by: WasGeneratedBy,
+    /** Feature IDs of inputs. May be empty for operations with no explicit inputs. */
+    used: string[],
+    /** Feature IDs or versioned asset paths of outputs. May be empty for in-place modifications. */
+    generated: string[],
+    /** Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S). */
+    execution_duration: string,
+    /** Stable logical identity for artifact-producing tools. Null for non-artifact tools. */
+    generated_result_id?: string,
+    /** Parameter tuning record. Null until a tuning operation modifies this entry. */
+    tune?: TuneAnnotation,
+}
+
+
+/**
+ * Identifies the tool and its parameters for a specific invocation. Named after the W3C PROV vocabulary term.
+ */
+export interface WasGeneratedBy {
+    /** Tool identifier (kebab-case, e.g., calculate-range). */
+    tool: string,
+    /** Semantic version of the tool (e.g., 1.2.0). */
+    tool_version: string,
+    /** Full resolved parameter set. Keys are parameter names, values are ParameterValue objects. May be empty dict. */
+    parameters: ParameterValue[],
+}
+
+
+/**
+ * A typed parameter value with replay metadata.
+ */
+export interface ParameterValue {
+    /** The parameter value (any JSON type). */
+    value: string,
+    /** Whether this is the default value. */
+    default?: boolean,
+    /** Whether this parameter can be modified during replay. */
+    tunable?: boolean,
+}
+
+
+/**
+ * Records a parameter modification (appended, not replacing original).
+ */
+export interface TuneAnnotation {
+    /** When the tuning occurred (ISO 8601 with timezone). */
+    timestamp: string,
+    /** Name of the parameter that was changed. */
+    parameter: string,
+    /** Value before tuning. */
+    previous_value: string,
+    /** Value after tuning. */
+    new_value: string,
+}
+
+
+/**
+ * Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with featureType "system" and Point geometry with empty coordinates.
+ */
+export interface SystemRecordProperties {
+    /** Discriminator, always "system". */
+    feature_type: string,
+    /** Doubly-linked snapshot chain. Null when no snapshots exist. */
+    snapshot_links?: SnapshotLinks,
+    /** Branch records. Empty array when no branches exist. */
+    branches?: BranchRecord[],
+    /** Reverse link to source plot (set when this plot is a branch). */
+    branch_origin?: BranchOrigin,
+    /** File-level provenance events (snapshot and branch creation). */
+    provenance?: FileProvEntry[],
+}
+
+
+/**
+ * Doubly-linked references to adjacent snapshots.
+ */
+export interface SnapshotLinks {
+    /** Link to previous snapshot. Null if this is the first snapshot. */
+    prev?: SnapshotRef,
+    /** Link to next snapshot. Null if this is the current working file. */
+    next?: SnapshotRef,
+}
+
+
+/**
+ * Reference to a snapshot file.
+ */
+export interface SnapshotRef {
+    /** Relative path to snapshot GeoJSON file. */
+    asset: string,
+    /** Number of provenance entries in the snapshot. */
+    prov_entry_count: number,
+}
+
+
+/**
+ * Reference to a branched plot.
+ */
+export interface BranchRecord {
+    /** Unique branch identifier. */
+    branch_id: string,
+    /** Activity ID of the branch point. */
+    branched_from: string,
+    /** When the branch was created (ISO 8601 with timezone). */
+    branched_at: string,
+    /** Relative path to the branched plot file. */
+    target_asset: string,
+}
+
+
+/**
+ * Reverse link on a branch plot's system record, pointing to the source plot.
+ */
+export interface BranchOrigin {
+    /** Relative path to the source plot file. */
+    source_asset: string,
+    /** Activity ID of the branch point. */
+    branched_from: string,
+    /** When the branch was created (ISO 8601 with timezone). */
+    branched_at: string,
+    /** Branch identifier matching the source BranchRecord. */
+    branch_id: string,
+}
+
+
+/**
+ * File-level provenance event (snapshot or branch creation).
+ */
+export interface FileProvEntry {
+    /** Unique event identifier. */
+    activity_id: string,
+    /** Event type: snapshot or branch. */
+    type: string,
+    /** When the event occurred (ISO 8601 with timezone). */
+    timestamp: string,
+    /** Path to snapshot file (for snapshot events). */
+    asset?: string,
+    /** Branch identifier (for branch events). */
+    branch_id?: string,
+    /** 'source' or 'target' (for branch events). */
+    direction?: string,
 }
 
 

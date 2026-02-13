@@ -112,6 +112,9 @@ def generate_jsonschema() -> bool:
             # Tool metadata types
             "Tool",
             "SelectionRequirement",
+            # Multi-geometry tool result types
+            "MultiPointFeature",
+            "MultiPolygonFeature",
         ]
         for entity in entity_types:
             if entity in full_schema.get("$defs", {}):
