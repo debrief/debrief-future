@@ -10,6 +10,7 @@ import { extractTemporalData } from './temporal-utils';
 import { TemporalTrackLayer } from './TemporalTrackLayer';
 import { PositionSymbolsLayer } from './PositionSymbolsLayer';
 import { LeafletToolbar } from './LeafletToolbar';
+import type { DrawingMode } from './LeafletToolbar';
 import '@geoman-io/leaflet-geoman-free';
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
@@ -94,6 +95,12 @@ export interface MapViewProps {
 
   /** Position of the toolbar (default: 'topleft') */
   toolbarPosition?: 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
+
+  /** Current drawing mode (null = no drawing active) (FR-009) */
+  drawingMode?: DrawingMode;
+
+  /** Callback when drawing mode changes (FR-004, FR-006, FR-007, FR-008) */
+  onDrawingModeChange?: (mode: DrawingMode) => void;
 }
 
 // Component to handle map events, auto-fit, and programmatic viewport control
@@ -214,6 +221,8 @@ export function MapView({
   visibleIds,
   showToolbar = true,
   toolbarPosition = 'topleft',
+  drawingMode,
+  onDrawingModeChange,
 }: MapViewProps) {
   // Normalize features to array and filter out features that can't be rendered
   const featureArray = useMemo(() => {
@@ -391,6 +400,8 @@ export function MapView({
           <LeafletToolbar
             position={toolbarPosition}
             visibleBounds={visibleBounds}
+            drawingMode={drawingMode}
+            onDrawingModeChange={onDrawingModeChange}
           />
         )}
 
