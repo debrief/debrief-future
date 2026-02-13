@@ -44,6 +44,10 @@ export const createSpatialSlice: StateCreator<
     set({ rotation: normalizeRotation(rotation) });
   },
 
+  setDrawingMode: (mode) => {
+    set({ drawingMode: mode });
+  },
+
   getCenter: (): Coordinate | null => {
     const { viewport } = get();
     if (!viewport) return null;
