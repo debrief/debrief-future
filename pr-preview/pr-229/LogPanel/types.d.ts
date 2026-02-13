@@ -23,6 +23,12 @@ export interface ParameterValue {
     default: boolean;
     tunable: boolean;
 }
+/** Pre-tool feature state for mutation tools (mirrors session-state InputFeatureState). */
+export interface InputFeatureState {
+    featureId: string;
+    geometry: unknown;
+    properties: Record<string, unknown> | null;
+}
 /**
  * Display-oriented timeline entry derived from LogEntry.
  */
@@ -43,6 +49,8 @@ export interface TimelineEntry {
         previousValue: unknown;
         newValue: unknown;
     } | null;
+    /** Pre-tool geometry for mutation tools — enables correct tune replay. */
+    inputState?: InputFeatureState[] | null;
 }
 /**
  * Feature display info for resolving names.
@@ -177,6 +185,8 @@ export interface LogTimelineProps {
     presentationMode: PresentationMode;
     selectedEntryId: string | null;
     onEntryClick?: (entry: TimelineEntry) => void;
+    onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
+    onRestoreClick?: (entry: TimelineEntry) => void;
     className?: string;
 }
 /**
@@ -188,6 +198,8 @@ export interface LogByFeatureProps {
     presentationMode: PresentationMode;
     selectedEntryId: string | null;
     onEntryClick?: (entry: TimelineEntry) => void;
+    onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
+    onRestoreClick?: (entry: TimelineEntry) => void;
     className?: string;
 }
 /**
