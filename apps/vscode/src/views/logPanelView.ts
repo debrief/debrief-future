@@ -17,6 +17,7 @@ import {
   type LogService,
   type LogEntry,
   type ReplayResult,
+  type ResultIdRegistry,
 } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
 
@@ -175,6 +176,9 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   // Phase 6: active replay abort controller
   private _replayAbortController?: AbortController;
 
+  // Result ID Registry for tracking replay artifacts (Feature: 087)
+  private _resultIdRegistry?: ResultIdRegistry;
+
   constructor(
     extensionUri: vscode.Uri,
     private readonly _context: vscode.ExtensionContext,
@@ -193,6 +197,13 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
    */
   public setLogService(logService: LogService): void {
     this._logService = logService;
+  }
+
+  /**
+   * Set the Result ID Registry for tracking replay artifacts (Feature: 087).
+   */
+  public setResultIdRegistry(registry: ResultIdRegistry): void {
+    this._resultIdRegistry = registry;
   }
 
   /**
@@ -560,6 +571,11 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   private _sendReplayResult(result: ReplayResult): void {
+    // Update Result ID Registry from replay artifacts (Feature: 087)
+    if (this._resultIdRegistry && result.artifactsCreated.length > 0) {
+      this._resultIdRegistry.registerFromReplayResult(result.artifactsCreated);
+    }
+
     this._postMessage({
       type: 'replay:result',
       payload: result as unknown as Record<string, unknown>,
