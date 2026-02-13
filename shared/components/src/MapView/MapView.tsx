@@ -268,21 +268,25 @@ export function MapView({
     })),
   }), [staticFeatures]);
 
-  // Style function for features
+  // Style function for features — reads from properties.style when available
   const featureStyle = useMemo(() => {
     return (feature: GeoJSON.Feature | undefined): PathOptions => {
       if (!feature) return {};
 
       const debriefFeature = feature as unknown as DebriefFeature;
       const isSelected = selectedIds.has(debriefFeature.id);
+      const props = debriefFeature.properties as unknown as Record<string, unknown>;
+      const style = props.style as Record<string, unknown> | undefined;
       const color = getFeatureColor(debriefFeature);
+      const fillColor = (style?.fill_color as string) ?? color;
 
       return {
         color: isSelected ? 'var(--debrief-selection-border)' : color,
-        weight: isSelected ? 4 : isTrackFeature(debriefFeature) ? 3 : 2,
-        opacity: 1,
-        fillColor: color,
-        fillOpacity: isSelected ? 0.4 : 0.2,
+        weight: isSelected ? 4 : (style?.weight as number) ?? (isTrackFeature(debriefFeature) ? 3 : 2),
+        opacity: (style?.opacity as number) ?? 1,
+        fillColor: isSelected ? 'var(--debrief-selection-border)' : fillColor,
+        fillOpacity: isSelected ? 0.4 : (style?.fill_opacity as number) ?? 0.2,
+        dashArray: (style?.dash_array as string) ?? undefined,
       };
     };
   }, [selectedIds]);
