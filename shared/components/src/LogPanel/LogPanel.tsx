@@ -20,6 +20,7 @@ import { LogTimeline } from './LogTimeline';
 import { LogByFeature } from './LogByFeature';
 import { LogFilterRow } from './LogFilterRow';
 import { LogActionBar } from './LogActionBar';
+import { ReplayProgress } from './ReplayProgress';
 import { filterEntries, getAvailableToolTypes, getSelectableFeatureIds } from './utils';
 import { LOG_PANEL_STRINGS } from './strings';
 import './LogPanel.css';
@@ -33,11 +34,15 @@ export function LogPanel({
   filterState,
   hasActiveSession,
   actionResultMessage,
+  replayProgress,
   onMessage,
   onPresentationModeChange,
   onViewModeChange,
   onFilterStateChange,
   onSelectedEntryChange,
+  onTuneRequest,
+  onRestoreRequest,
+  onReplayCancel,
   className,
 }: LogPanelProps): React.ReactElement {
   // Apply filters to entries
@@ -81,6 +86,26 @@ export function LogPanel({
       });
     },
     [onMessage]
+  );
+
+  // Phase 6: Wrap onTuneRequest for LogEntry's onTuneClick signature
+  const handleTuneClick = useCallback(
+    (entry: TimelineEntry, parameterName: string) => {
+      if (onTuneRequest) {
+        // Pass current value for inline editing; caller provides new value
+        const paramVal = entry.parameters[parameterName];
+        onTuneRequest(entry.activityId, parameterName, paramVal?.value);
+      }
+    },
+    [onTuneRequest]
+  );
+
+  // Phase 6: Wrap onRestoreRequest for LogEntry's onRestoreClick signature
+  const handleRestoreClick = useCallback(
+    (entry: TimelineEntry) => {
+      onRestoreRequest?.(entry.activityId);
+    },
+    [onRestoreRequest]
   );
 
   // Empty state: no plot open
@@ -138,6 +163,17 @@ export function LogPanel({
         </div>
       )}
 
+      {/* Replay progress indicator (Phase 6) */}
+      {replayProgress && onReplayCancel && (
+        <ReplayProgress
+          current={replayProgress.current}
+          total={replayProgress.total}
+          currentToolId={replayProgress.currentToolId}
+          phase={replayProgress.phase as 'loading-snapshot' | 'replaying' | 'finalising'}
+          onCancel={onReplayCancel}
+        />
+      )}
+
       {/* Timeline or By-Feature view */}
       {viewMode === 'timeline' ? (
         <LogTimeline
@@ -146,6 +182,8 @@ export function LogPanel({
           presentationMode={presentationMode}
           selectedEntryId={selectedEntryId}
           onEntryClick={handleEntryClick}
+          onTuneClick={onTuneRequest ? handleTuneClick : undefined}
+          onRestoreClick={onRestoreRequest ? handleRestoreClick : undefined}
         />
       ) : (
         <LogByFeature
@@ -154,6 +192,8 @@ export function LogPanel({
           presentationMode={presentationMode}
           selectedEntryId={selectedEntryId}
           onEntryClick={handleEntryClick}
+          onTuneClick={onTuneRequest ? handleTuneClick : undefined}
+          onRestoreClick={onRestoreRequest ? handleRestoreClick : undefined}
         />
       )}
     </div>

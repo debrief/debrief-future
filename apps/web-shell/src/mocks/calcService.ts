@@ -25,6 +25,8 @@ export interface ToolResult {
   message: string;
   /** Optional result layer (e.g., bounding box polygon) */
   resultLayer?: Feature;
+  /** Optional tunable parameters recorded for provenance */
+  parameters?: Record<string, ToolParameterMeta>;
 }
 
 /**
@@ -125,6 +127,13 @@ function bboxToPolygon(bbox: [number, number, number, number]): Feature<Polygon>
   };
 }
 
+/** Tunable parameter metadata returned alongside tool results */
+export interface ToolParameterMeta {
+  value: unknown;
+  default: boolean;
+  tunable: boolean;
+}
+
 /** Tool definition */
 interface ToolDefinition {
   id: string;
@@ -136,7 +145,12 @@ interface ToolDefinition {
   maxTracks?: number;
   /** Minimum number of features required (any type) */
   minFeatures?: number;
+  /** Annotation kinds required (at least one feature must match) */
+  annotationKinds?: Set<string>;
 }
+
+/** Annotation kinds supported by the move-shape tool */
+const MOVE_SHAPE_KINDS = new Set(['CIRCLE', 'RECTANGLE', 'LINE', 'TEXT', 'VECTOR']);
 
 const TOOLS: ToolDefinition[] = [
   {
@@ -150,6 +164,13 @@ const TOOLS: ToolDefinition[] = [
     name: 'Bounding Box',
     description: 'Calculate bounding box of selected features',
     minFeatures: 1,
+  },
+  {
+    id: 'move-shape',
+    name: 'Move Shape',
+    description: 'Translate annotation shapes by distance and bearing',
+    minFeatures: 1,
+    annotationKinds: MOVE_SHAPE_KINDS,
   },
 ];
 
@@ -195,6 +216,19 @@ function getToolApplicability(
     };
   }
 
+  // Annotation kind check
+  if (tool.annotationKinds) {
+    const hasMatchingAnnotation = features.some(
+      (f) => f.properties?.kind && tool.annotationKinds!.has(f.properties.kind)
+    );
+    if (!hasMatchingAnnotation) {
+      return {
+        applicable: false,
+        explanation: 'Requires an annotation shape (Circle, Rectangle, Line, Text, or Vector)',
+      };
+    }
+  }
+
   return { applicable: true };
 }
 
@@ -232,6 +266,90 @@ function hasTrackFeatures(features: Feature[]): boolean {
 const stylingToolIds = new Set(listTools().map(t => t.name));
 
 /**
+ * Translate a [lon, lat] point by a given distance (nm) and bearing (degrees).
+ * Uses the Vincenty destination formula with Earth radius 6371 km.
+ */
+function translatePoint(lon: number, lat: number, distanceNm: number, bearingDeg: number): [number, number] {
+  const R = 6371; // Earth radius in km
+  const distKm = distanceNm * 1.852;
+  const d = distKm / R;
+  const brng = (bearingDeg * Math.PI) / 180;
+  const lat1 = (lat * Math.PI) / 180;
+  const lon1 = (lon * Math.PI) / 180;
+
+  const lat2 = Math.asin(
+    Math.sin(lat1) * Math.cos(d) + Math.cos(lat1) * Math.sin(d) * Math.cos(brng)
+  );
+  const lon2 =
+    lon1 +
+    Math.atan2(
+      Math.sin(brng) * Math.sin(d) * Math.cos(lat1),
+      Math.cos(d) - Math.sin(lat1) * Math.sin(lat2)
+    );
+
+  const lon2Deg = ((lon2 * 180) / Math.PI + 540) % 360 - 180;
+  const lat2Deg = (lat2 * 180) / Math.PI;
+  return [lon2Deg, lat2Deg];
+}
+
+/**
+ * Move annotation features by distance and bearing.
+ * Returns new features with translated coordinates.
+ */
+export function moveShapeFeatures(
+  features: Feature[],
+  distanceNm: number,
+  directionDeg: number
+): Feature[] {
+  const results: Feature[] = [];
+  for (const f of features) {
+    const kind = (f.properties as Record<string, unknown> | null)?.kind;
+    if (!kind || !MOVE_SHAPE_KINDS.has(kind as string)) continue;
+
+    const moved = JSON.parse(JSON.stringify(f)) as Feature;
+    const geom = moved.geometry;
+    if (!geom || !('coordinates' in geom)) continue;
+
+    // Recursively translate all coordinates
+    function translateCoords(coords: unknown): unknown {
+      if (!Array.isArray(coords)) return coords;
+      if (typeof coords[0] === 'number') {
+        // It's a single [lon, lat, ?alt] position
+        const [newLon, newLat] = translatePoint(
+          coords[0] as number,
+          coords[1] as number,
+          distanceNm,
+          directionDeg
+        );
+        return coords.length > 2 ? [newLon, newLat, coords[2]] : [newLon, newLat];
+      }
+      return coords.map(translateCoords);
+    }
+
+    (geom as { coordinates: unknown }).coordinates = translateCoords(
+      (geom as { coordinates: unknown }).coordinates
+    );
+
+    // Update center property if present (CIRCLE, etc.)
+    const props = moved.properties as Record<string, unknown> | null;
+    if (props?.center && Array.isArray(props.center)) {
+      const [cLon, cLat] = props.center as [number, number];
+      const [newLon, newLat] = translatePoint(cLon, cLat, distanceNm, directionDeg);
+      props.center = [newLon, newLat];
+    }
+    // Update origin property if present (VECTOR)
+    if (props?.origin && Array.isArray(props.origin)) {
+      const [oLon, oLat] = props.origin as [number, number];
+      const [newLon, newLat] = translatePoint(oLon, oLat, distanceNm, directionDeg);
+      props.origin = [newLon, newLat];
+    }
+
+    results.push(moved);
+  }
+  return results;
+}
+
+/**
  * Create a mock calc service instance.
  */
 export function createMockCalcService(): MockCalcService {
@@ -266,8 +384,11 @@ export function createMockCalcService(): MockCalcService {
     },
 
     runTool(toolId: string, selectedFeatures: Feature[]): ToolResult {
-      // Delegate styling tools to toolService
-      if (stylingToolIds.has(toolId)) {
+      // Check built-in tools first (they have richer result handling)
+      const builtinTool = TOOLS.find(t => t.id === toolId);
+
+      // Delegate non-built-in tools to toolService (styling tools, etc.)
+      if (!builtinTool && stylingToolIds.has(toolId)) {
         try {
           // Provide sensible default params for tools that require them
           const defaultParams: Record<string, Record<string, unknown>> = {
@@ -286,8 +407,7 @@ export function createMockCalcService(): MockCalcService {
       }
 
       // Built-in tools
-      const tool = TOOLS.find(t => t.id === toolId);
-      if (!tool) {
+      if (!builtinTool) {
         return { success: false, message: `Unknown tool: ${toolId}` };
       }
 
@@ -332,6 +452,27 @@ export function createMockCalcService(): MockCalcService {
             success: true,
             message: `Bounding box: ${(width / 1000).toFixed(2)} km × ${(height / 1000).toFixed(2)} km`,
             resultLayer: polygon,
+          };
+        }
+
+        case 'move-shape': {
+          const distanceNm = 5;
+          const directionDeg = 45;
+          const moved = moveShapeFeatures(selectedFeatures, distanceNm, directionDeg);
+          if (moved.length === 0) {
+            return { success: false, message: 'No annotation shapes found in selection' };
+          }
+          const names = moved
+            .map((f) => (f.properties as Record<string, unknown> | null)?.label ?? f.id ?? 'shape')
+            .join(', ');
+          return {
+            success: true,
+            message: `Moved ${moved.length} shape(s) by ${distanceNm} nm at ${directionDeg}°: ${names}`,
+            resultLayer: moved[0],
+            parameters: {
+              distance_nm: { value: distanceNm, default: false, tunable: true },
+              direction_deg: { value: directionDeg, default: false, tunable: true },
+            },
           };
         }
 

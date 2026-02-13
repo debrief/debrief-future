@@ -21,6 +21,7 @@ on:
       - 'shared/components/**'
       - 'apps/web-shell/**'
       - 'apps/vscode/test-data/**'
+      - 'services/calc/**'
       - '.github/workflows/storybook-preview.yml'
   pull_request:
     types: [opened, synchronize, reopened, closed]
@@ -28,6 +29,7 @@ on:
       - 'shared/components/**'
       - 'apps/web-shell/**'
       - 'apps/vscode/test-data/**'
+      - 'services/calc/**'
       - '.github/workflows/storybook-preview.yml'
 
 permissions:

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import type { PathOptions, LatLngBoundsExpression } from 'leaflet';
@@ -113,10 +113,24 @@ function MapController({
   onBackgroundClick?: () => void;
 }) {
   const map = useMap();
+  const prevBoundsRef = useRef<Bounds | null>(null);
 
   // Auto-fit bounds on initial load or when features change
   useEffect(() => {
     if (autoFitBounds && bounds) {
+      // Skip if bounds values haven't actually changed (avoids viewport
+      // jumping when features update without changing spatial extent)
+      const prev = prevBoundsRef.current;
+      if (
+        prev &&
+        prev[0] === bounds[0] &&
+        prev[1] === bounds[1] &&
+        prev[2] === bounds[2] &&
+        prev[3] === bounds[3]
+      ) {
+        return;
+      }
+      prevBoundsRef.current = bounds;
       const [minLon, minLat, maxLon, maxLat] = expandBounds(bounds, 0.1);
       map.fitBounds([[minLat, minLon], [maxLat, maxLon]] as LatLngBoundsExpression);
     }
@@ -293,6 +307,15 @@ export function MapView({
     };
   }, [onSelect]);
 
+  // Track a revision counter for the GeoJSON key — react-leaflet's GeoJSON
+  // component only renders on mount, so the key must change whenever data changes.
+  const geojsonRevision = useRef(0);
+  const prevGeojsonRef = useRef(geojsonData);
+  if (prevGeojsonRef.current !== geojsonData) {
+    geojsonRevision.current += 1;
+    prevGeojsonRef.current = geojsonData;
+  }
+
   const containerStyle: React.CSSProperties = {
     height: typeof height === 'number' ? `${height}px` : height,
     minHeight: 'var(--debrief-map-min-height)',
@@ -329,7 +352,7 @@ export function MapView({
 
         {staticFeatures.length > 0 && (
           <GeoJSON
-            key={JSON.stringify(selectedIds.size) + staticFeatures.length}
+            key={`geojson-${geojsonRevision.current}-${selectedIds.size}`}
             data={geojsonData}
             style={featureStyle}
             onEachFeature={onEachFeature}

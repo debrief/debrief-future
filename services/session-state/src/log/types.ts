@@ -23,6 +23,13 @@ export interface TuneAnnotation {
   newValue: unknown;
 }
 
+/** Pre-tool feature state for mutation (in-place transform) tools. */
+export interface InputFeatureState {
+  featureId: string;
+  geometry: unknown;
+  properties: Record<string, unknown> | null;
+}
+
 export interface LogEntry {
   activityId: string;
   timestamp: string;
@@ -33,6 +40,8 @@ export interface LogEntry {
   generatedResultId?: string | null;
   tune: TuneAnnotation | null;
   deleted?: boolean;
+  /** Pre-tool geometry for mutation tools — enables correct tune replay. */
+  inputState?: InputFeatureState[] | null;
 }
 
 // Expanded ToolResult fields (Phase 0 contract)
@@ -80,6 +89,8 @@ export interface ToolResultForLog {
   sourceFeatureIds?: string[];
   artifactHref?: string;
   toolId?: string;
+  /** Pre-tool geometry snapshot for mutation tools (passed through to LogEntry). */
+  inputState?: InputFeatureState[];
 }
 
 // Feature provenance entry for stacService

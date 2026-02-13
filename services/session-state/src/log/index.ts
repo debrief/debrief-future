@@ -15,6 +15,7 @@ export type {
   RecordResult,
   TimelineOptions,
   ToolResultForLog,
+  InputFeatureState,
   FeatureProvenance,
   LogService,
   // Replay Engine types (Feature: 076)

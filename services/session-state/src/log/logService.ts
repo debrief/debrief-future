@@ -263,6 +263,37 @@ export function createLogService(deps: LogServiceDeps): LogService {
         newValue,
       };
 
+      // Restore features to their pre-tool state using inputState
+      // so the replay engine re-executes from the correct geometry.
+      const inputState = targetEntry.inputState as
+        | Array<{ featureId: string; geometry: unknown; properties: Record<string, unknown> | null }>
+        | undefined;
+      if (inputState && inputState.length > 0) {
+        for (const saved of inputState) {
+          const feature = fc.features.find(
+            (f) => String(f.id ?? (f.properties as Record<string, unknown> | null)?.id) === saved.featureId
+          );
+          if (feature) {
+            feature.geometry = JSON.parse(JSON.stringify(saved.geometry));
+            // Restore mutation-affected properties (but preserve provenance)
+            if (saved.properties) {
+              const props = feature.properties as Record<string, unknown>;
+              for (const [key, val] of Object.entries(saved.properties)) {
+                if (key !== 'provenance') {
+                  props[key] = JSON.parse(JSON.stringify(val));
+                }
+              }
+            }
+          }
+        }
+        // Write the restored GeoJSON so executeTool reads correct state
+        await deps.writeGeoJson(
+          storePath,
+          itemPath,
+          fc as unknown as GeoJsonFeatureCollection
+        );
+      }
+
       const controller = new AbortController();
       const engine = makeReplayEngine(deps, controller.signal);
       const plan = engine.buildPlan(

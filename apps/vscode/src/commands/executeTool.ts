@@ -15,7 +15,7 @@ import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { MapPanel } from '../webview/mapPanel';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
-import type { LogService } from '@debrief/session-state';
+import type { LogService, InputFeatureState } from '@debrief/session-state';
 
 /**
  * Create the execute tool command
@@ -65,6 +65,24 @@ export function createExecuteToolCommand(
     const tools = toolMatchAdapter.getAllTools();
     const tool = tools.find((t) => t.id === resolvedToolId);
     const toolName = tool?.name ?? resolvedToolId;
+
+    // Capture pre-tool geometry for mutation tools (enables correct tune replay)
+    let preToolInputState: InputFeatureState[] | undefined;
+    const selectedIdSet = new Set(selectedFeatureIds);
+    const otherFeatures = panel.getOtherFeatures();
+    const preToolFeatures = otherFeatures.filter(
+      (f) => selectedIdSet.has(String(f.id ?? f.properties?.id))
+    );
+    if (preToolFeatures.length > 0) {
+      preToolInputState = preToolFeatures.map((f) => {
+        const { provenance: _p, ...restProps } = f.properties ?? {};
+        return {
+          featureId: String(f.id ?? f.properties?.id),
+          geometry: JSON.parse(JSON.stringify(f.geometry)) as unknown,
+          properties: JSON.parse(JSON.stringify(restProps)) as Record<string, unknown>,
+        };
+      });
+    }
 
     // Execute tool with progress (FR-015)
     const result = await vscode.window.withProgress(
@@ -165,6 +183,8 @@ export function createExecuteToolCommand(
           const store = panel.getCurrentStore?.();
           const plot = panel.getCurrentPlot?.();
           if (store?.path && plot?.itemPath) {
+            // Include pre-tool inputState for mutation tools
+            const isMutation = result.resultType?.startsWith('mutation/');
             await logService.recordToolResult(
               {
                 success: true,
@@ -174,6 +194,7 @@ export function createExecuteToolCommand(
                 sourceFeatureIds: result.sourceFeatureIds ?? selectedFeatureIds,
                 artifactHref: result.artifactHref,
                 toolId: resolvedToolId,
+                ...(isMutation && preToolInputState ? { inputState: preToolInputState } : {}),
               },
               result.toolVersion || result.parameters ? {
                 toolVersion: result.toolVersion,
