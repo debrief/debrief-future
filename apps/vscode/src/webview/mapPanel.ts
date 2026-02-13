@@ -823,6 +823,10 @@ export class MapPanel {
         this.handleTrackDetailsRequest(message.requestId, message.trackId);
         break;
 
+      case 'featureDrawn':
+        this.handleFeatureDrawn(message);
+        break;
+
       case 'repFileDrop':
         void this.handleRepFileDrop(message.uris);
         break;
@@ -886,6 +890,52 @@ export class MapPanel {
         contextType: message.selection.contextType,
         featureKinds,
       });
+    }
+  }
+
+  private handleFeatureDrawn(
+    message: Extract<WebviewToExtensionMessage, { type: 'featureDrawn' }>
+  ): void {
+    const { feature } = message;
+    if (feature.kind === 'POINT') {
+      // Add drawn point to locations list
+      const location: ReferenceLocation = {
+        id: feature.id,
+        name: feature.name ?? 'Drawn Point',
+        locationType: 'REFERENCE',
+        geometry: {
+          type: 'Point' as const,
+          coordinates: feature.geometry.coordinates as number[],
+        },
+        visible: true,
+        selected: true,
+      };
+      this.currentLocations.push(location);
+      if (this.layersTreeProvider) {
+        this.layersTreeProvider.setLocations(this.currentLocations);
+      }
+    } else {
+      // Add drawn rectangle (or other shapes) to otherFeatures
+      const geoFeature: GeoJSONFeature = {
+        type: 'Feature',
+        id: feature.id,
+        geometry: {
+          type: feature.geometry.type,
+          coordinates: feature.geometry.coordinates as number[][],
+        },
+        properties: {
+          ...feature.properties,
+          id: feature.id,
+        },
+      };
+      this.otherFeatures.push(geoFeature);
+      if (this.layersTreeProvider) {
+        this.layersTreeProvider.setShapes(this.otherFeatures);
+      }
+    }
+    // Update activity panel
+    if (this.activityPanelProvider) {
+      this.activityPanelProvider.setFeatures(this.currentTracks, this.currentLocations);
     }
   }
 

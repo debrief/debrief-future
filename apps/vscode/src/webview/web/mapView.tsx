@@ -253,13 +253,26 @@ function MapViewApp(): React.ReactElement {
     if (feature) {
       setDrawnFeatures(prev => [...prev, feature as DebriefFeature]);
       setSelectedIds(new Set([feature.id]));
+      // Notify extension of the new drawn feature
+      const props = feature.properties as Record<string, unknown>;
+      vscode.postMessage({
+        type: 'featureDrawn',
+        feature: {
+          id: feature.id,
+          kind: String(props.kind),
+          name: props.name != null ? String(props.name) : undefined,
+          label: props.label != null ? String(props.label) : undefined,
+          geometry: feature.geometry,
+          properties: props,
+        },
+      });
       // Notify extension of new selection
       vscode.postMessage({
         type: 'selectionChanged',
         selection: {
           trackIds: [],
-          locationIds: feature.properties.kind === 'POINT' ? [feature.id] : [],
-          contextType: feature.properties.kind === 'POINT' ? 'location' : 'none',
+          locationIds: props.kind === 'POINT' ? [feature.id] : [],
+          contextType: props.kind === 'POINT' ? 'location' : 'none',
         },
       });
     }
