@@ -7,9 +7,6 @@ from typing import Any
 from debrief_calc.models import ContextType, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 
-VALID_SYMBOLS = ("circle", "square", "diamond", "triangle", "cross")
-
-
 @tool(
     name="apply-symbol-style",
     description="Applies a symbol style to position markers on track features.",
@@ -22,8 +19,8 @@ VALID_SYMBOLS = ("circle", "square", "diamond", "triangle", "cross")
             type="enum",
             description="Marker shape (default: square)",
             required=False,
-            choices=list(VALID_SYMBOLS),
             default="square",
+            param_type="MarkerSymbol",
         ),
         ToolParameter(
             name="radius",
@@ -50,8 +47,10 @@ def apply_symbol_style(context: SelectionContext, params: dict[str, Any]) -> lis
         List of modified track features with updated symbol style
     """
     symbol = params.get("symbol") or "square"
-    if symbol not in VALID_SYMBOLS:
-        raise ValueError(f"symbol must be one of: {', '.join(VALID_SYMBOLS)}")
+    # Validation uses MarkerSymbol enum values from schema (param_type="MarkerSymbol")
+    valid_symbols = {"circle", "square", "triangle", "diamond", "cross"}
+    if symbol not in valid_symbols:
+        raise ValueError(f"symbol must be one of: {', '.join(sorted(valid_symbols))}")
 
     radius = params.get("radius", 4)
     if radius is not None and radius <= 0:

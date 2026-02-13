@@ -121,6 +121,28 @@ export function ContextMenu({
   }, [onDismiss]);
 
   // -------------------------------------------------------------------------
+  // Custom input handling
+  // -------------------------------------------------------------------------
+  const handleCustomSubmit = useCallback(() => {
+    const trimmed = customValue.trim();
+    if (!trimmed) {
+      setCustomError('Value cannot be empty.');
+      return;
+    }
+
+    if (validateCustom) {
+      const error = validateCustom(trimmed);
+      if (error) {
+        setCustomError(error);
+        return;
+      }
+    }
+
+    setCustomError(null);
+    onCustomValue?.(trimmed);
+  }, [customValue, validateCustom, onCustomValue]);
+
+  // -------------------------------------------------------------------------
   // Keyboard navigation
   // -------------------------------------------------------------------------
   const handleKeyDown = useCallback(
@@ -182,28 +204,6 @@ export function ContextMenu({
     },
     [isCustomMode, highlightedIndex, totalCount, items, showCustomOption, onSelect, onDismiss, handleCustomSubmit]
   );
-
-  // -------------------------------------------------------------------------
-  // Custom input handling
-  // -------------------------------------------------------------------------
-  const handleCustomSubmit = useCallback(() => {
-    const trimmed = customValue.trim();
-    if (!trimmed) {
-      setCustomError('Value cannot be empty.');
-      return;
-    }
-
-    if (validateCustom) {
-      const error = validateCustom(trimmed);
-      if (error) {
-        setCustomError(error);
-        return;
-      }
-    }
-
-    setCustomError(null);
-    onCustomValue?.(trimmed);
-  }, [customValue, validateCustom, onCustomValue]);
 
   const handleCustomInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

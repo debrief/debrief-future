@@ -129,12 +129,13 @@ class TestParameterDocumentation:
                 assert param.description is not None
                 assert len(param.description) > 0
 
-    def test_enum_parameters_have_choices(self):
+    def test_enum_parameters_have_choices_or_param_type(self):
         for tool in registry.list_all():
             for param in tool.parameters:
                 if param.type == "enum":
-                    assert param.choices is not None
-                    assert len(param.choices) >= 2
+                    assert param.choices is not None or param.param_type is not None, (
+                        f"enum param '{param.name}' on tool '{tool.name}' needs choices or param_type"
+                    )
 
 
 class TestLLMSupervisorMetadata:

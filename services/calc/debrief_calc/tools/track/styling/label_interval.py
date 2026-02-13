@@ -20,6 +20,7 @@ from debrief_calc.registry import tool
             type="string",
             description="ISO 8601 duration (e.g., 'PT15M' for 15 minutes). Defaults to PT15M.",
             required=False,
+            param_type="DurationPreset",
         ),
     ],
 )

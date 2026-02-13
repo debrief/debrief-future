@@ -323,3 +323,78 @@ export const WithParameterizedTool: Story = {
     },
   },
 };
+
+/**
+ * Tool with multiple parameters collects all values before execution.
+ * Click "Style Track" to see the multi-parameter context menu.
+ */
+export const WithMultiParameterTool: Story = {
+  args: {
+    tools: [
+      {
+        id: 'style-track',
+        name: 'Style Track',
+        description: 'Sets display style for track features',
+        applicable: true,
+        parameters: [
+          {
+            name: 'color',
+            valueType: 'enum',
+            description: 'Track colour',
+            paramType: 'NamedColor',
+          },
+          {
+            name: 'symbol',
+            valueType: 'enum',
+            description: 'Marker shape',
+            paramType: 'MarkerSymbol',
+          },
+        ],
+      },
+    ],
+    hasToolInventory: true,
+    hasSelection: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'When a tool has multiple parameters, the context menu presents each parameter for collection before executing the tool.',
+      },
+    },
+  },
+};
+
+/**
+ * Tool with a boolean parameter shows a toggle control.
+ * Click "Toggle Labels" to see the boolean parameter context menu.
+ */
+export const WithBooleanParameterTool: Story = {
+  args: {
+    tools: [
+      {
+        id: 'toggle-labels',
+        name: 'Toggle Labels',
+        description: 'Toggle position label visibility on tracks',
+        applicable: true,
+        parameters: [
+          {
+            name: 'show_labels',
+            valueType: 'boolean',
+            description: 'Show position labels',
+          },
+        ],
+      },
+    ],
+    hasToolInventory: true,
+    hasSelection: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'When a tool has a boolean parameter, the context menu presents a toggle control for the true/false value.',
+      },
+    },
+  },
+};
