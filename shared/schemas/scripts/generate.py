@@ -75,6 +75,24 @@ def generate_pydantic() -> bool:
         return False
 
 
+def _strip_type_from_anyof(obj: object) -> None:
+    """Remove spurious ``"type": "string"`` from properties that have ``"anyOf"``.
+
+    LinkML gen-json-schema emits both ``anyOf`` (with the correct union refs) and
+    a fallback ``"type": "string"`` for ``any_of`` slots. AJV enforces both,
+    causing valid objects to fail with "must be string". Walk the schema tree and
+    delete the ``type`` key from any mapping that already carries ``anyOf``.
+    """
+    if isinstance(obj, dict):
+        if "anyOf" in obj and "type" in obj:
+            del obj["type"]
+        for v in obj.values():
+            _strip_type_from_anyof(v)
+    elif isinstance(obj, list):
+        for item in obj:
+            _strip_type_from_anyof(item)
+
+
 def generate_jsonschema() -> bool:
     """Generate JSON Schema from LinkML schema."""
     import json
@@ -93,11 +111,15 @@ def generate_jsonschema() -> bool:
 
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        output_file.write_text(result.stdout)
-        print(f"  [OK] Generated: {output_file}")
 
-        # Generate per-entity schemas
+        # Post-process: gen-json-schema emits "type": "string" alongside "anyOf"
+        # for any_of union fields (e.g., geometry unions). The spurious "type" must
+        # be removed so AJV validates against the anyOf alternatives instead.
         full_schema = json.loads(result.stdout)
+        _strip_type_from_anyof(full_schema)
+
+        output_file.write_text(json.dumps(full_schema, indent=2))
+        print(f"  [OK] Generated: {output_file}")
         entity_types = [
             # Core types
             "TrackFeature",
@@ -116,6 +138,12 @@ def generate_jsonschema() -> bool:
             # Multi-geometry tool result types
             "MultiPointFeature",
             "MultiPolygonFeature",
+            # Sub-schema types (styling, state)
+            "LineProperties",
+            "PointProperties",
+            "PolygonProperties",
+            "TrackStyle",
+            "SystemState",
         ]
         for entity in entity_types:
             if entity in full_schema.get("$defs", {}):

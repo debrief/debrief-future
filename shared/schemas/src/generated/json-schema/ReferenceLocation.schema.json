@@ -13,8 +13,7 @@
           "$ref": "#/$defs/GeoJSONMultiPoint"
         }
       ],
-      "description": "Location (Point) or reference point set (MultiPoint)",
-      "type": "string"
+      "description": "Location (Point) or reference point set (MultiPoint)"
     },
     "id": {
       "description": "Unique identifier",
@@ -1481,8 +1480,7 @@
               "$ref": "#/$defs/GeoJSONMultiPoint"
             }
           ],
-          "description": "Location (Point) or reference point set (MultiPoint)",
-          "type": "string"
+          "description": "Location (Point) or reference point set (MultiPoint)"
         },
         "id": {
           "description": "Unique identifier",
@@ -2437,8 +2435,7 @@
               "$ref": "#/$defs/GeoJSONMultiLineString"
             }
           ],
-          "description": "Track path as LineString (simple) or MultiLineString (compound)",
-          "type": "string"
+          "description": "Track path as LineString (simple) or MultiLineString (compound)"
         },
         "id": {
           "description": "Unique identifier (UUID recommended)",

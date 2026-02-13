@@ -1,20 +1,21 @@
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://debrief.info/schemas/CircleAnnotation",
+  "$id": "https://debrief.info/schemas/SystemState",
   "additionalProperties": false,
-  "description": "GeoJSON Feature for circle annotations. Geometry is a Polygon approximating the circle (vertices at regular intervals). Properties contain center and radius for precise reconstruction and smooth rendering.",
+  "description": "GeoJSON Feature for storing non-spatial system state",
   "properties": {
     "geometry": {
-      "$ref": "#/$defs/GeoJSONPolygon",
-      "description": "Circle as Polygon (approximated with vertices, e.g., every 45 degrees)"
+      "$ref": "#/$defs/GeoJSONEmptyPoint",
+      "description": "Point geometry with empty coordinates for SYSTEM features"
     },
     "id": {
-      "description": "Unique identifier",
+      "description": "State identifier (must start with 'state.')",
+      "pattern": "^state\\.[a-z]+$",
       "type": "string"
     },
     "properties": {
-      "$ref": "#/$defs/CircleAnnotationProperties",
-      "description": "Circle metadata including center and radius for reconstruction"
+      "$ref": "#/$defs/SystemStateProperties",
+      "description": "State-specific properties"
     },
     "type": {
       "const": "Feature",
@@ -28,7 +29,7 @@
     "geometry",
     "properties"
   ],
-  "title": "CircleAnnotation",
+  "title": "SystemState",
   "type": "object",
   "$defs": {
     "BranchOrigin": {

@@ -1,34 +1,83 @@
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://debrief.info/schemas/CircleAnnotation",
+  "$id": "https://debrief.info/schemas/PointProperties",
   "additionalProperties": false,
-  "description": "GeoJSON Feature for circle annotations. Geometry is a Polygon approximating the circle (vertices at regular intervals). Properties contain center and radius for precise reconstruction and smooth rendering.",
+  "description": "Styling schema for Point and MultiPoint geometries. Follows Leaflet CircleMarker options naming conventions.",
   "properties": {
-    "geometry": {
-      "$ref": "#/$defs/GeoJSONPolygon",
-      "description": "Circle as Polygon (approximated with vertices, e.g., every 45 degrees)"
-    },
-    "id": {
-      "description": "Unique identifier",
+    "color": {
+      "description": "Stroke color (CSS color string)",
+      "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
       "type": "string"
     },
-    "properties": {
-      "$ref": "#/$defs/CircleAnnotationProperties",
-      "description": "Circle metadata including center and radius for reconstruction"
+    "fill": {
+      "description": "Whether to fill the shape",
+      "type": [
+        "boolean",
+        "null"
+      ]
     },
-    "type": {
-      "const": "Feature",
-      "description": "GeoJSON type discriminator",
+    "fill_color": {
+      "description": "Fill color (CSS color string)",
+      "pattern": "^(#[0-9A-Fa-f]{3,8}|[a-zA-Z]+|rgb\\(.+\\)|rgba\\(.+\\)|hsl\\(.+\\)|hsla\\(.+\\))$",
       "type": "string"
+    },
+    "fill_opacity": {
+      "description": "Fill transparency (0-1)",
+      "maximum": 1,
+      "minimum": 0,
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "legacy_style": {
+      "description": "Legacy symbol name from Debrief symbology (e.g., 'Aircraft', 'torpedo'). Preserved for future icon rendering support.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "opacity": {
+      "description": "Stroke transparency (0-1)",
+      "maximum": 1,
+      "minimum": 0,
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "radius": {
+      "description": "Marker radius in pixels",
+      "minimum": 0,
+      "type": "number"
+    },
+    "shape": {
+      "$ref": "#/$defs/PointShapeEnum",
+      "description": "Marker shape"
+    },
+    "stroke": {
+      "description": "Whether to draw outline",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "weight": {
+      "description": "Stroke width in pixels",
+      "minimum": 0,
+      "type": [
+        "number",
+        "null"
+      ]
     }
   },
   "required": [
-    "type",
-    "id",
-    "geometry",
-    "properties"
+    "shape",
+    "radius",
+    "fill_color",
+    "color"
   ],
-  "title": "CircleAnnotation",
+  "title": "PointProperties",
   "type": "object",
   "$defs": {
     "BranchOrigin": {

@@ -1,34 +1,23 @@
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://debrief.info/schemas/CircleAnnotation",
+  "$id": "https://debrief.info/schemas/TrackStyle",
   "additionalProperties": false,
-  "description": "GeoJSON Feature for circle annotations. Geometry is a Polygon approximating the circle (vertices at regular intervals). Properties contain center and radius for precise reconstruction and smooth rendering.",
+  "description": "Composite styling for TrackFeature, supporting both line path and position markers.",
   "properties": {
-    "geometry": {
-      "$ref": "#/$defs/GeoJSONPolygon",
-      "description": "Circle as Polygon (approximated with vertices, e.g., every 45 degrees)"
+    "line": {
+      "$ref": "#/$defs/LineProperties",
+      "description": "Styling for the track line path"
     },
-    "id": {
-      "description": "Unique identifier",
-      "type": "string"
-    },
-    "properties": {
-      "$ref": "#/$defs/CircleAnnotationProperties",
-      "description": "Circle metadata including center and radius for reconstruction"
-    },
-    "type": {
-      "const": "Feature",
-      "description": "GeoJSON type discriminator",
-      "type": "string"
+    "point": {
+      "$ref": "#/$defs/PointProperties",
+      "description": "Styling for position markers"
     }
   },
   "required": [
-    "type",
-    "id",
-    "geometry",
-    "properties"
+    "line",
+    "point"
   ],
-  "title": "CircleAnnotation",
+  "title": "TrackStyle",
   "type": "object",
   "$defs": {
     "BranchOrigin": {
