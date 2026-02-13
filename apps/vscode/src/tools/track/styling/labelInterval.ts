@@ -16,7 +16,7 @@ export const toolDefinition: MCPToolDefinition = {
     type: 'object',
     properties: {
       features: { type: 'array', items: { type: 'object' } },
-      params: { type: 'object', properties: { interval: { type: 'string', description: 'ISO 8601 duration' } } },
+      params: { type: 'object', properties: { interval: { type: 'string', description: 'ISO 8601 duration', 'x-debrief-param-type': 'DurationPreset' } } },
     },
   },
   annotations: {

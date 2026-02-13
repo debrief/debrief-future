@@ -77,6 +77,7 @@ export {
   getAllInactiveReasons,
   createSelection,
   createSelectionFromCounts,
+  extractParameters,
 } from './ToolMatch';
 export type { Selection, MatchResult, Tool, SelectionRequirement } from './ToolMatch';
 

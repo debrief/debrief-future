@@ -7,6 +7,7 @@
 
 import type { Feature, LineString, Position, Polygon } from 'geojson';
 import type { ToolsPanelItem } from '@debrief/components';
+import { extractParameters } from '@debrief/components';
 import { listTools, executeTool } from '../services/toolService';
 
 /** Feature with properties containing an id */
@@ -241,8 +242,8 @@ export interface MockCalcService {
   /** Get tools with applicability based on selection */
   getTools(selectedFeatures: Feature[]): ToolsPanelItem[];
 
-  /** Run a tool on selected features */
-  runTool(toolId: string, selectedFeatures: Feature[]): ToolResult;
+  /** Run a tool on selected features with optional collected parameters */
+  runTool(toolId: string, selectedFeatures: Feature[], params?: Record<string, unknown>): ToolResult;
 }
 
 /**
@@ -372,32 +373,36 @@ export function createMockCalcService(): MockCalcService {
         };
       });
 
-      // Styling tools from toolService
+      // Styling tools from toolService (with parameter metadata for context menus)
       const hasTracks = hasTrackFeatures(selectedFeatures);
-      const stylingTools: ToolsPanelItem[] = listTools().map(def => ({
-        id: def.name,
-        name: formatToolName(def.name),
-        description: def.description,
-        applicable: hasTracks,
-        explanation: hasTracks ? undefined : 'Requires at least 1 track selected',
-      }));
+      const stylingTools: ToolsPanelItem[] = listTools().map(def => {
+        const params = extractParameters(def);
+        return {
+          id: def.name,
+          name: formatToolName(def.name),
+          description: def.description,
+          applicable: hasTracks,
+          explanation: hasTracks ? undefined : 'Requires at least 1 track selected',
+          parameters: params.length > 0 ? params : undefined,
+        };
+      });
 
       return [...builtinTools, ...stylingTools];
     },
 
-    runTool(toolId: string, selectedFeatures: Feature[]): ToolResult {
+    runTool(toolId: string, selectedFeatures: Feature[], collectedParams?: Record<string, unknown>): ToolResult {
       // Check built-in tools first (they have richer result handling)
       const builtinTool = TOOLS.find(t => t.id === toolId);
 
       // Delegate non-built-in tools to toolService (styling tools, etc.)
       if (!builtinTool && stylingToolIds.has(toolId)) {
         try {
-          // Provide sensible default params for tools that require them
+          // Use collected parameters from ParameterCollector, fall back to defaults
           const defaultParams: Record<string, Record<string, unknown>> = {
             'set-track-color': { color: '#ff0000' },
             'apply-symbol-style': { symbol: 'circle' },
           };
-          const params = defaultParams[toolId] ?? {};
+          const params = collectedParams ?? defaultParams[toolId] ?? {};
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const response = executeTool(toolId, selectedFeatures as any, params);
           const item = response.content[0];
