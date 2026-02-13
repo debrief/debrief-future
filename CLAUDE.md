@@ -176,6 +176,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Local filesystem STAC catalogs (no storage changes for this feature) (091-tool-parameter-context-menus)
 - Python 3.11 + pydantic >=2.0.0 (existing), stdlib `math` module only (080-buffer-zone-generator)
 - N/A (stateless tool — caller handles STAC persistence) (080-buffer-zone-generator)
+- TypeScript 5.x (session-state package, VS Code extension, web-shell) + `@debrief/session-state` (Zustand store, Log Service types — existing), no new external dependencies (087-logical-result-id-registry)
+- N/A — pure in-memory, not persisted. Reconstructed from STAC assets on plot load. (087-logical-result-id-registry)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
