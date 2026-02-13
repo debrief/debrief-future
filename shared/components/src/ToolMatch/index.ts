@@ -15,12 +15,15 @@
 
 export { ToolMatchService } from './ToolMatchService';
 export { getInactiveReason, getAllInactiveReasons } from './explanations';
-export type { Selection, MatchResult } from './types';
+export type { Selection, MatchResult, ToolParameter } from './types';
 export { createSelection, createSelectionFromCounts } from './types';
 
 // MCP adapter for converting MCP tool definitions to ToolMatchService format
-export { fromMCPTool, fromMCPTools } from './mcpAdapter';
+export { fromMCPTool, fromMCPTools, extractParameters } from './mcpAdapter';
 export type { MCPToolDefinition, MCPSelectionRequirement } from './mcpAdapter';
+
+// Parameter type resolution for context menus
+export { resolveParamType, isPresetType, getNumericValue } from './paramTypeResolver';
 
 // Re-export schema types for convenience
 export type { Tool, SelectionRequirement } from './types';

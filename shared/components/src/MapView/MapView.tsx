@@ -10,7 +10,9 @@ import { extractTemporalData } from './temporal-utils';
 import { TemporalTrackLayer } from './TemporalTrackLayer';
 import { PositionSymbolsLayer } from './PositionSymbolsLayer';
 import { LeafletToolbar } from './LeafletToolbar';
+import '@geoman-io/leaflet-geoman-free';
 import 'leaflet/dist/leaflet.css';
+import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import './MapView.css';
 
 // Import marker icons as modules so Vite bundles them with correct paths
@@ -308,6 +310,33 @@ export function MapView({
         e.originalEvent.stopPropagation();
         onSelect?.(debriefFeature.id, e.originalEvent as unknown as React.MouseEvent);
       });
+
+      // Apply per-ring styles for ZONE MultiPolygon features
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const featureProps = feature.properties as any;
+      const zoneRingStyles: Array<{ style?: Record<string, unknown> }> | undefined =
+        featureProps?.kind === 'ZONE' &&
+        feature.geometry?.type === 'MultiPolygon' &&
+        Array.isArray(featureProps?.zones)
+          ? featureProps.zones
+          : undefined;
+
+      if (zoneRingStyles && 'getLayers' in layer) {
+        const subLayers = (layer as unknown as { getLayers(): L.Layer[] }).getLayers();
+        subLayers.forEach((subLayer, i) => {
+          const s = zoneRingStyles[i]?.style;
+          if (s && 'setStyle' in subLayer) {
+            (subLayer as unknown as { setStyle(opts: PathOptions): void }).setStyle({
+              color: (s.color as string) ?? '#999',
+              fillColor: (s.fill_color as string) ?? (s.color as string),
+              fillOpacity: (s.fill_opacity as number) ?? 0.2,
+              weight: (s.weight as number) ?? 2,
+              opacity: 1,
+              dashArray: (s.dash_array as string) ?? undefined,
+            });
+          }
+        });
+      }
     };
   }, [onSelect]);
 

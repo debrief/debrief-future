@@ -16,7 +16,7 @@ export const toolDefinition: MCPToolDefinition = {
     type: 'object',
     properties: {
       features: { type: 'array', items: { type: 'object' } },
-      params: { type: 'object', properties: { color: { type: 'string', description: 'CSS color value' } } },
+      params: { type: 'object', properties: { color: { type: 'string', description: 'CSS color value', 'x-debrief-param-type': 'NamedColor' } } },
     },
   },
   annotations: {

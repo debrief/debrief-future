@@ -143,6 +143,10 @@ class FeatureKindEnum(str, Enum):
     """
     Non-spatial system state (null geometry, reserved state.* IDs)
     """
+    POLY = "POLY"
+    """
+    Arbitrary polygon annotation (Polygon geometry)
+    """
     MULTI_POINT = "MULTI_POINT"
     """
     Multi-point tool result (MultiPoint geometry)
@@ -419,7 +423,8 @@ class PositionStyle(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     show_label: bool = Field(default=..., description="""Whether to display labels at positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride']} })
 
 
@@ -438,7 +443,8 @@ class PositionStyleOverride(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     show_label: Optional[bool] = Field(default=None, description="""Override whether to show label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle', 'PositionStyleOverride']} })
     label: Optional[str] = Field(default=None, description="""Custom label text (null = use timestamp)""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
                        'SensorContact',
@@ -448,7 +454,8 @@ class PositionStyleOverride(ConfiguredBaseModel):
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
 
 
 class GeoJSONPoint(ConfiguredBaseModel):
@@ -475,6 +482,7 @@ class GeoJSONPoint(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Point'} })
     coordinates: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
@@ -510,6 +518,7 @@ class GeoJSONEmptyPoint(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Point'} })
     coordinates: list[float] = Field(default=..., description="""Empty array for non-spatial features""", max_length=0, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
@@ -545,6 +554,7 @@ class GeoJSONLineString(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'LineString'} })
     coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
@@ -580,6 +590,7 @@ class GeoJSONPolygon(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Polygon'} })
     coordinates: list[float] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
@@ -615,6 +626,7 @@ class GeoJSONMultiLineString(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'MultiLineString'} })
     coordinates: list[float] = Field(default=..., description="""Array of LineString coordinate arrays""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
@@ -650,6 +662,7 @@ class GeoJSONMultiPoint(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'MultiPoint'} })
     coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
@@ -685,6 +698,7 @@ class GeoJSONMultiPolygon(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'MultiPolygon'} })
     coordinates: list[float] = Field(default=..., description="""Array of polygon coordinate arrays (each an array of linear rings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
@@ -721,7 +735,8 @@ class SegmentMetadata(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     course: Optional[float] = Field(default=None, description="""Estimated course in degrees (TMA segments)""", ge=0, le=360, json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition', 'SegmentMetadata', 'TUASolution']} })
     speed: Optional[float] = Field(default=None, description="""Estimated speed in knots (TMA segments)""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition', 'SegmentMetadata', 'TUASolution']} })
     base_frequency: Optional[float] = Field(default=None, description="""Base frequency in Hz (TMA segments)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'SensorData']} })
@@ -755,7 +770,8 @@ class SensorContact(ConfiguredBaseModel):
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     comment: Optional[str] = Field(default=None, description="""Operator note""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact']} })
 
 
@@ -794,7 +810,8 @@ class TUASolution(ConfiguredBaseModel):
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     centre_lat: Optional[float] = Field(default=None, description="""Absolute latitude (mutual exclusive with bearing/range)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TUASolution']} })
     centre_lon: Optional[float] = Field(default=None, description="""Absolute longitude (mutual exclusive with bearing/range)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TUASolution']} })
     bearing: Optional[float] = Field(default=None, description="""Relative bearing from host track in degrees""", ge=0, le=360, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'TUASolution', 'VectorAnnotationProperties']} })
@@ -839,6 +856,7 @@ class TrackProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'TRACK'} })
     platform_id: str = Field(default=..., description="""Platform/vessel identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
@@ -853,7 +871,8 @@ class TrackProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     style: TrackStyle = Field(default=..., description="""Composite styling for track line and position markers""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -864,7 +883,8 @@ class TrackProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     default_position_style: PositionStyle = Field(default=..., description="""Default styling applied to all positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     symbol_interval: Optional[str] = Field(default=None, description="""ISO 8601 duration for interval-based symbol display. E.g., \"PT5M\" = every 5 minutes, \"PT1H\" = every hour. Null means no interval-based symbols.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     label_interval: Optional[str] = Field(default=None, description="""ISO 8601 duration for interval-based label display. Null means no interval-based labels.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
@@ -924,6 +944,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier (UUID recommended)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -937,6 +958,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'Tool']} })
     geometry: Union[GeoJSONLineString, GeoJSONMultiLineString] = Field(default=..., description="""Track path as LineString (simple) or MultiLineString (compound)""", json_schema_extra = { "linkml_meta": {'any_of': [{'range': 'GeoJSONLineString'},
                     {'range': 'GeoJSONMultiLineString'}],
@@ -950,7 +972,8 @@ class TrackFeature(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     properties: TrackProperties = Field(default=..., description="""Track metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -961,7 +984,8 @@ class TrackFeature(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
@@ -985,6 +1009,7 @@ class ReferenceLocationProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'POINT'} })
     name: str = Field(default=..., description="""Reference location name""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
@@ -1005,7 +1030,8 @@ class ReferenceLocationProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     style: PointProperties = Field(default=..., description="""Point styling properties for display""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -1016,7 +1042,8 @@ class ReferenceLocationProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     valid_from: Optional[datetime ] = Field(default=None, description="""Start of validity period""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
     valid_until: Optional[datetime ] = Field(default=None, description="""End of validity period""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
 
@@ -1045,6 +1072,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1058,6 +1086,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'Tool']} })
     geometry: GeoJSONPoint = Field(default=..., description="""Location (Point) or area (Polygon)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -1069,7 +1098,8 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     properties: ReferenceLocationProperties = Field(default=..., description="""Reference metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -1080,7 +1110,8 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
 
 
 class SystemStateProperties(ConfiguredBaseModel):
@@ -1100,6 +1131,7 @@ class SystemStateProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'SYSTEM'} })
     state_type: SystemStateTypeEnum = Field(default=..., description="""Discriminator for state variant (temporal, spatial, selection)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
@@ -1138,6 +1170,7 @@ class SystemState(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""State identifier (must start with 'state.')""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1151,6 +1184,7 @@ class SystemState(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'Tool']} })
     geometry: GeoJSONEmptyPoint = Field(default=..., description="""Point geometry with empty coordinates for SYSTEM features""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -1162,7 +1196,8 @@ class SystemState(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     properties: SystemStateProperties = Field(default=..., description="""State-specific properties""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -1173,7 +1208,8 @@ class SystemState(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
 
     @field_validator('id')
     def pattern_id(cls, v):
@@ -1206,6 +1242,7 @@ class MultiPointFeatureProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'MULTI_POINT'} })
     label: str = Field(default=..., description="""Human-readable result label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
@@ -1216,7 +1253,8 @@ class MultiPointFeatureProperties(ConfiguredBaseModel):
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     style: PointProperties = Field(default=..., description="""Point styling for all positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -1227,7 +1265,8 @@ class MultiPointFeatureProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     source_tool: Optional[str] = Field(default=None, description="""Name of calculation tool that produced this result""", json_schema_extra = { "linkml_meta": {'domain_of': ['MultiPointFeatureProperties', 'MultiPolygonFeatureProperties']} })
     source_features: Optional[list[str]] = Field(default=[], description="""IDs of input features used to generate this result""", json_schema_extra = { "linkml_meta": {'domain_of': ['MultiPointFeatureProperties', 'MultiPolygonFeatureProperties']} })
     description: Optional[str] = Field(default=None, description="""Additional description or notes""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
@@ -1260,6 +1299,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier (UUID recommended)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1273,6 +1313,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'Tool']} })
     geometry: GeoJSONMultiPoint = Field(default=..., description="""MultiPoint geometry""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -1284,7 +1325,8 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     properties: MultiPointFeatureProperties = Field(default=..., description="""Feature properties and styling""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -1295,7 +1337,8 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
@@ -1319,6 +1362,7 @@ class MultiPolygonFeatureProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'MULTI_POLYGON'} })
     label: str = Field(default=..., description="""Human-readable result label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
@@ -1329,7 +1373,8 @@ class MultiPolygonFeatureProperties(ConfiguredBaseModel):
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     style: PolygonProperties = Field(default=..., description="""Polygon styling for all regions""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -1340,7 +1385,8 @@ class MultiPolygonFeatureProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     source_tool: Optional[str] = Field(default=None, description="""Name of calculation tool that produced this result""", json_schema_extra = { "linkml_meta": {'domain_of': ['MultiPointFeatureProperties', 'MultiPolygonFeatureProperties']} })
     source_features: Optional[list[str]] = Field(default=[], description="""IDs of input features used to generate this result""", json_schema_extra = { "linkml_meta": {'domain_of': ['MultiPointFeatureProperties', 'MultiPolygonFeatureProperties']} })
     description: Optional[str] = Field(default=None, description="""Additional description or notes""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
@@ -1373,6 +1419,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier (UUID recommended)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1386,6 +1433,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'Tool']} })
     geometry: GeoJSONMultiPolygon = Field(default=..., description="""MultiPolygon geometry""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -1397,7 +1445,8 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     properties: MultiPolygonFeatureProperties = Field(default=..., description="""Feature properties and styling""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -1408,7 +1457,8 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
@@ -1432,6 +1482,7 @@ class NarrativeEntryProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'NARRATIVE'} })
     time: datetime  = Field(default=..., description="""Narrative timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
@@ -1448,7 +1499,8 @@ class NarrativeEntryProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     style: PointProperties = Field(default=..., description="""Point styling properties for display position""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -1459,14 +1511,16 @@ class NarrativeEntryProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
 
 
 class NarrativeEntry(ConfiguredBaseModel):
@@ -1493,6 +1547,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1506,6 +1561,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'Tool']} })
     geometry: Optional[GeoJSONPoint] = Field(default=None, description="""Optional display position (Point) or null""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -1517,7 +1573,8 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     properties: NarrativeEntryProperties = Field(default=..., description="""Narrative metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -1528,7 +1585,8 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
 
 
 class CircleAnnotationProperties(ConfiguredBaseModel):
@@ -1548,6 +1606,7 @@ class CircleAnnotationProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'CIRCLE'} })
     center: list[float] = Field(default=..., description="""Circle center as [longitude, latitude] for precise reconstruction""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'CircleAnnotationProperties']} })
@@ -1560,7 +1619,8 @@ class CircleAnnotationProperties(ConfiguredBaseModel):
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
                        'PositionStyleOverride',
                        'ReferenceLocationProperties',
@@ -1569,7 +1629,8 @@ class CircleAnnotationProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     style: PolygonProperties = Field(default=..., description="""Polygon styling properties for the circle area""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -1580,14 +1641,16 @@ class CircleAnnotationProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
 
 
 class CircleAnnotation(ConfiguredBaseModel):
@@ -1614,6 +1677,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1627,6 +1691,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'Tool']} })
     geometry: GeoJSONPolygon = Field(default=..., description="""Circle as Polygon (approximated with vertices, e.g., every 45 degrees)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -1638,7 +1703,8 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     properties: CircleAnnotationProperties = Field(default=..., description="""Circle metadata including center and radius for reconstruction""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -1649,7 +1715,8 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
 
 
 class RectangleAnnotationProperties(ConfiguredBaseModel):
@@ -1669,6 +1736,7 @@ class RectangleAnnotationProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'RECTANGLE'} })
     label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
@@ -1679,7 +1747,8 @@ class RectangleAnnotationProperties(ConfiguredBaseModel):
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
                        'PositionStyleOverride',
                        'ReferenceLocationProperties',
@@ -1688,7 +1757,8 @@ class RectangleAnnotationProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     style: PolygonProperties = Field(default=..., description="""Polygon styling properties for the rectangle area""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -1699,14 +1769,16 @@ class RectangleAnnotationProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
 
 
 class RectangleAnnotation(ConfiguredBaseModel):
@@ -1733,6 +1805,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1746,6 +1819,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'Tool']} })
     geometry: GeoJSONPolygon = Field(default=..., description="""Rectangle as Polygon (4 corners + close)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -1757,7 +1831,8 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     properties: RectangleAnnotationProperties = Field(default=..., description="""Rectangle metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -1768,7 +1843,8 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
 
 
 class LineAnnotationProperties(ConfiguredBaseModel):
@@ -1788,6 +1864,7 @@ class LineAnnotationProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'LINE'} })
     label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
@@ -1798,7 +1875,8 @@ class LineAnnotationProperties(ConfiguredBaseModel):
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
                        'PositionStyleOverride',
                        'ReferenceLocationProperties',
@@ -1807,7 +1885,8 @@ class LineAnnotationProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     style: LineProperties = Field(default=..., description="""Line styling properties for the line segment""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -1818,14 +1897,16 @@ class LineAnnotationProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
 
 
 class LineAnnotation(ConfiguredBaseModel):
@@ -1852,6 +1933,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1865,6 +1947,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'Tool']} })
     geometry: GeoJSONLineString = Field(default=..., description="""Line as LineString (2 points)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -1876,7 +1959,8 @@ class LineAnnotation(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     properties: LineAnnotationProperties = Field(default=..., description="""Line metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -1887,7 +1971,8 @@ class LineAnnotation(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
 
 
 class TextAnnotationProperties(ConfiguredBaseModel):
@@ -1907,6 +1992,7 @@ class TextAnnotationProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'TEXT'} })
     text: str = Field(default=..., description="""Text content to display""", json_schema_extra = { "linkml_meta": {'domain_of': ['NarrativeEntryProperties', 'TextAnnotationProperties']} })
@@ -1918,7 +2004,8 @@ class TextAnnotationProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     style: PointProperties = Field(default=..., description="""Point styling properties for the text position marker""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -1929,14 +2016,16 @@ class TextAnnotationProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
 
 
 class TextAnnotation(ConfiguredBaseModel):
@@ -1963,6 +2052,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1976,6 +2066,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'Tool']} })
     geometry: GeoJSONPoint = Field(default=..., description="""Text display position""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -1987,7 +2078,8 @@ class TextAnnotation(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     properties: TextAnnotationProperties = Field(default=..., description="""Text metadata""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -1998,7 +2090,8 @@ class TextAnnotation(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
 
 
 class VectorAnnotationProperties(ConfiguredBaseModel):
@@ -2018,6 +2111,7 @@ class VectorAnnotationProperties(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
                        'SelectionRequirement'],
          'equals_string': 'VECTOR'} })
     origin: list[float] = Field(default=..., description="""Vector origin as [longitude, latitude] for precise reconstruction""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['VectorAnnotationProperties']} })
@@ -2031,7 +2125,8 @@ class VectorAnnotationProperties(ConfiguredBaseModel):
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
                        'PositionStyleOverride',
                        'ReferenceLocationProperties',
@@ -2040,7 +2135,8 @@ class VectorAnnotationProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     style: LineProperties = Field(default=..., description="""Line styling properties for the vector""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -2051,14 +2147,16 @@ class VectorAnnotationProperties(ConfiguredBaseModel):
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
     source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
-                       'VectorAnnotationProperties']} })
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
 
 
 class VectorAnnotation(ConfiguredBaseModel):
@@ -2085,6 +2183,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2098,6 +2197,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'Tool']} })
     geometry: GeoJSONLineString = Field(default=..., description="""Vector as LineString (origin to computed endpoint)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
@@ -2109,7 +2209,8 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
     properties: VectorAnnotationProperties = Field(default=..., description="""Vector metadata including origin, range, and bearing for reconstruction""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
@@ -2120,7 +2221,138 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'RectangleAnnotation',
                        'LineAnnotation',
                        'TextAnnotation',
-                       'VectorAnnotation']} })
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
+
+
+class PolyAnnotationProperties(ConfiguredBaseModel):
+    """
+    Properties for a PolyAnnotation
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
+
+    kind: Literal["POLY"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+                       'ReferenceLocationProperties',
+                       'SystemStateProperties',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'NarrativeEntryProperties',
+                       'CircleAnnotationProperties',
+                       'RectangleAnnotationProperties',
+                       'LineAnnotationProperties',
+                       'TextAnnotationProperties',
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
+                       'SelectionRequirement'],
+         'equals_string': 'POLY'} })
+    vertex_count: int = Field(default=..., description="""Number of unique vertices (excluding ring closure point)""", ge=3, json_schema_extra = { "linkml_meta": {'domain_of': ['PolyAnnotationProperties']} })
+    label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
+                       'SensorContact',
+                       'TUASolution',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'CircleAnnotationProperties',
+                       'RectangleAnnotationProperties',
+                       'LineAnnotationProperties',
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
+    symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
+                       'PositionStyleOverride',
+                       'ReferenceLocationProperties',
+                       'NarrativeEntryProperties',
+                       'CircleAnnotationProperties',
+                       'RectangleAnnotationProperties',
+                       'LineAnnotationProperties',
+                       'TextAnnotationProperties',
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
+    style: PolygonProperties = Field(default=..., description="""Polygon styling properties for the polygon area""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'TrackProperties',
+                       'ReferenceLocationProperties',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'NarrativeEntryProperties',
+                       'CircleAnnotationProperties',
+                       'RectangleAnnotationProperties',
+                       'LineAnnotationProperties',
+                       'TextAnnotationProperties',
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
+    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+                       'NarrativeEntryProperties',
+                       'CircleAnnotationProperties',
+                       'RectangleAnnotationProperties',
+                       'LineAnnotationProperties',
+                       'TextAnnotationProperties',
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties']} })
+    line_number: Optional[int] = Field(default=None, description="""Source line number for debugging""", json_schema_extra = { "linkml_meta": {'domain_of': ['PolyAnnotationProperties']} })
+
+
+class PolyAnnotation(ConfiguredBaseModel):
+    """
+    GeoJSON Feature for arbitrary polygon annotations. Geometry is a Polygon with user-defined vertices (freeform shape). Used for patrol zones, exclusion areas, search grids, etc.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
+
+    type: Literal["Feature"] = Field(default=..., description="""GeoJSON type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'FileProvEntry'],
+         'equals_string': 'Feature'} })
+    id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'Tool']} })
+    geometry: GeoJSONPolygon = Field(default=..., description="""Polygon with user-defined vertices (closed ring)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
+    properties: PolyAnnotationProperties = Field(default=..., description="""Polygon metadata including vertex count and styling""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation']} })
 
 
 class SelectionRequirement(ConfiguredBaseModel):
@@ -2140,6 +2372,7 @@ class SelectionRequirement(ConfiguredBaseModel):
                        'LineAnnotationProperties',
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
                        'SelectionRequirement']} })
     segment_type: Optional[SegmentTypeEnum] = Field(default=None, description="""Optional filter for segment type when kind targets TRACK.SEGMENT. Must be a valid SegmentTypeEnum value (e.g., \"ABSOLUTE_TMA\"). Only meaningful when kind is \"TRACK.SEGMENT\".""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'SelectionRequirement']} })
     min: Optional[int] = Field(default=None, description="""Minimum number of features of this kind required. Must be >= 0. Defaults to 0 if not specified.""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SelectionRequirement']} })
@@ -2163,6 +2396,7 @@ class Tool(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'Tool']} })
     name: str = Field(default=..., description="""Human-readable name displayed in menus and panels. Should be concise (2-4 words).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
@@ -2322,6 +2556,7 @@ class FileProvEntry(ConfiguredBaseModel):
                        'LineAnnotation',
                        'TextAnnotation',
                        'VectorAnnotation',
+                       'PolyAnnotation',
                        'FileProvEntry']} })
     timestamp: datetime  = Field(default=..., description="""When the event occurred (ISO 8601 with timezone).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry', 'TuneAnnotation', 'FileProvEntry']} })
     asset: Optional[str] = Field(default=None, description="""Path to snapshot file (for snapshot events).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SnapshotRef', 'FileProvEntry']} })
@@ -2372,6 +2607,8 @@ TextAnnotationProperties.model_rebuild()
 TextAnnotation.model_rebuild()
 VectorAnnotationProperties.model_rebuild()
 VectorAnnotation.model_rebuild()
+PolyAnnotationProperties.model_rebuild()
+PolyAnnotation.model_rebuild()
 SelectionRequirement.model_rebuild()
 Tool.model_rebuild()
 LogEntry.model_rebuild()
