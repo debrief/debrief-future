@@ -135,6 +135,7 @@ Large features broken down into multiple backlog items.
 | E02 | PROV Logging Implementation | [Implement PROV logging system per SRD priorities P1-P6](docs/architecture/prov-transition-plan.md) | approved | #070, #071, #072, #073, #074, #075, #076 |
 | E03 | Buffer Zone Analysis Demo | [Reactive PROV cascade with 5-tool chain for stakeholder demo](docs/ideas/E03-buffer-zone-analysis-demo.md) | approved | #078, #079, #080, #081, #082, #084 |
 | E04 | Results Visualization | [Vega-Lite based results viewing infrastructure](docs/ideas/E04-results-visualization.md) | approved | #085, #086, #087, #088, #089, #090 |
+| E05 | Shape Drawing Tools | Add shape drawing tools to map via Geoman (point, rectangle, polygon, polyline) with '+' toolbar dropdown | proposed | #091, #092, #093, #094, #095, #096 |
 
 ## Items
 
@@ -185,6 +186,12 @@ Description formats:
 | 090 | Infrastructure | [E04 sample data workshop: identify realistic generators for all result types](docs/ideas/090-e04-sample-data-workshop.md) [E04] — collaborative workshop using E03 demo scenario; pseudocode + golden fixtures for all result categories (prerequisite for #085) | 5 | 3 | 2 | 10 | Low | approved |
 | 058 | Feature | [Add flip shape horizontal tool spec](docs/ideas/058-flip-shape-horizontal.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
 | 059 | Feature | [Add flip shape vertical tool spec](docs/ideas/059-flip-shape-vertical.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
+| 091 | Infrastructure | [[E05] Extend FeatureKindEnum for drawable shapes](docs/ideas/091-extend-featurekind-drawable-shapes.md) | - | - | - | - | Low | proposed |
+| 092 | Infrastructure | [[E05] Integrate Geoman drawing library](docs/ideas/092-integrate-geoman-drawing-library.md) | - | - | - | - | Medium | proposed |
+| 093 | Feature | [[E05] Add drawing toolbar with shape palette](docs/ideas/093-drawing-toolbar-shape-palette.md) | - | - | - | - | Medium | proposed |
+| 094 | Feature | [[E05] Implement point and rectangle drawing](docs/ideas/094-point-rectangle-drawing.md) | - | - | - | - | Medium | proposed |
+| 095 | Feature | [[E05] Implement polygon and polyline drawing](docs/ideas/095-polygon-polyline-drawing.md) | - | - | - | - | Medium | proposed |
+| 096 | Enhancement | [[E05] Drawing UX guidance and STAC persistence](docs/ideas/096-drawing-ux-persistence.md) | - | - | - | - | Medium | proposed |
 | 029 | Tech Debt | [Add unit tests for VS Code extension providers](https://github.com/debrief/debrief-future/issues/104) | 4 | 2 | 5 | 11 | Low | proposed |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
 | 033 | Tech Debt | [Re-enable debrief-stac tests in pytest](docs/ideas/033-reenable-stac-tests.md) | 4 | 2 | 4 | 10 | Low | proposed |
