@@ -1,32 +1,20 @@
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://debrief.info/schemas/MultiPolygonFeature",
+  "$id": "https://debrief.info/schemas/PolyAnnotation",
   "additionalProperties": false,
-  "description": "GeoJSON Feature for multi-polygon tool results",
+  "description": "GeoJSON Feature for arbitrary polygon annotations. Geometry is a Polygon with user-defined vertices (freeform shape). Used for patrol zones, exclusion areas, search grids, etc.",
   "properties": {
-    "bbox": {
-      "description": "Bounding box [minLon, minLat, maxLon, maxLat]",
-      "items": {
-        "type": "number"
-      },
-      "maxItems": 4,
-      "minItems": 4,
-      "type": [
-        "array",
-        "null"
-      ]
-    },
     "geometry": {
-      "$ref": "#/$defs/GeoJSONMultiPolygon",
-      "description": "MultiPolygon geometry"
+      "$ref": "#/$defs/GeoJSONPolygon",
+      "description": "Polygon with user-defined vertices (closed ring)"
     },
     "id": {
-      "description": "Unique identifier (UUID recommended)",
+      "description": "Unique identifier",
       "type": "string"
     },
     "properties": {
-      "$ref": "#/$defs/MultiPolygonFeatureProperties",
-      "description": "Feature properties and styling"
+      "$ref": "#/$defs/PolyAnnotationProperties",
+      "description": "Polygon metadata including vertex count and styling"
     },
     "type": {
       "const": "Feature",
@@ -40,7 +28,7 @@
     "geometry",
     "properties"
   ],
-  "title": "MultiPolygonFeature",
+  "title": "PolyAnnotation",
   "type": "object",
   "$defs": {
     "BranchOrigin": {

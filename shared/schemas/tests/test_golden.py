@@ -31,6 +31,7 @@ from debrief_schemas import (
     MultiPolygonFeature,
     NarrativeEntry,
     PointProperties,
+    PolyAnnotation,
     PolygonProperties,
     RectangleAnnotation,
     ReferenceLocation,
@@ -59,6 +60,7 @@ ENTITY_MAP = {
     "line-annotation": LineAnnotation,
     "text-annotation": TextAnnotation,
     "vector-annotation": VectorAnnotation,
+    "poly-annotation": PolyAnnotation,
     # Styling types
     "point-properties": PointProperties,
     "line-properties": LineProperties,
@@ -109,6 +111,7 @@ def is_known_geometry_limitation(entity_type: str, error: ValidationError) -> bo
         "line-annotation",
         "circle-annotation",
         "vector-annotation",
+        "poly-annotation",
         "multi-point-feature",
         "multi-polygon-feature",
     }

@@ -22,6 +22,8 @@ export enum FeatureKindEnum {
     VECTOR = "VECTOR",
     /** Non-spatial system state (null geometry, reserved state.* IDs) */
     SYSTEM = "SYSTEM",
+    /** Arbitrary polygon annotation (Polygon geometry) */
+    POLY = "POLY",
     /** Multi-point tool result (MultiPoint geometry) */
     MULTI_POINT = "MULTI_POINT",
     /** Multi-polygon tool result (MultiPolygon geometry) */
@@ -1005,6 +1007,42 @@ export interface VectorAnnotation {
     geometry: GeoJSONLineString,
     /** Vector metadata including origin, range, and bearing for reconstruction */
     properties: VectorAnnotationProperties,
+}
+
+
+/**
+ * Properties for a PolyAnnotation
+ */
+export interface PolyAnnotationProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Number of unique vertices (excluding ring closure point) */
+    vertex_count: number,
+    /** Annotation label text */
+    label?: string,
+    /** Display symbol code from REP file */
+    symbol?: string,
+    /** Polygon styling properties for the polygon area */
+    style: PolygonProperties,
+    /** Original source file path */
+    source_file?: string,
+    /** Source line number for debugging */
+    line_number?: number,
+}
+
+
+/**
+ * GeoJSON Feature for arbitrary polygon annotations. Geometry is a Polygon with user-defined vertices (freeform shape). Used for patrol zones, exclusion areas, search grids, etc.
+ */
+export interface PolyAnnotation {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Unique identifier */
+    id: string,
+    /** Polygon with user-defined vertices (closed ring) */
+    geometry: GeoJSONPolygon,
+    /** Polygon metadata including vertex count and styling */
+    properties: PolyAnnotationProperties,
 }
 
 

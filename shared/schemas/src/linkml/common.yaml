@@ -41,6 +41,8 @@ enums:
         description: Vector annotation (LineString geometry, origin+range+bearing in properties)
       SYSTEM:
         description: Non-spatial system state (null geometry, reserved state.* IDs)
+      POLY:
+        description: Arbitrary polygon annotation (Polygon geometry)
       MULTI_POINT:
         description: Multi-point tool result (MultiPoint geometry)
       MULTI_POLYGON:
