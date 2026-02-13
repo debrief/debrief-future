@@ -455,21 +455,33 @@ export default function App() {
           features: { ...plot.features, features: updatedFeatures },
         };
       });
-    } else if (result.resultLayer) {
-      // Additive tools (e.g. analysis): add result as a new layer
-      setResultLayers(prev => [...prev, result.resultLayer!]);
+    }
 
-      // Persist result as a STAC asset in the current item's assets/ directory
+    // Collect all result layers (singular or plural) for additive tools
+    const allResultLayers: Feature[] = replacesInPlace
+      ? []
+      : [
+          ...(result.resultLayer ? [result.resultLayer] : []),
+          ...(result.resultLayers ?? []),
+        ];
+
+    if (allResultLayers.length > 0) {
+      setResultLayers(prev => [...prev, ...allResultLayers]);
+
+      // Persist results as STAC assets in the current item's assets/ directory
       if (currentPlot) {
         const itemDir = `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`;
         const sourceNames = selectedFeatures
           .map(f => (f.properties as unknown as Record<string, unknown>)?.name ?? f.id ?? 'unknown')
           .map(n => String(n).toLowerCase().replace(/\s+/g, '-'))
           .join('-');
-        const fileName = `${toolId}-${sourceNames}.json`;
-        const assetPath = `${itemDir}/assets/${fileName}`;
 
-        mockFsAdapter.writeFile(assetPath, JSON.stringify(result.resultLayer, null, 2));
+        for (let i = 0; i < allResultLayers.length; i++) {
+          const suffix = allResultLayers.length > 1 ? `-${i + 1}` : '';
+          const fileName = `${toolId}-${sourceNames}${suffix}.json`;
+          const assetPath = `${itemDir}/assets/${fileName}`;
+          mockFsAdapter.writeFile(assetPath, JSON.stringify(allResultLayers[i], null, 2));
+        }
         setTreeRefreshKey(k => k + 1);
       }
     }
@@ -480,8 +492,9 @@ export default function App() {
 
     const usedIds = selectedFeatures.map(f => f.id).filter(Boolean);
 
-    const generatedIds = result.resultLayer
-      ? [String((result.resultLayer.properties as Record<string, unknown> | null)?.id ?? `result-${nextId}`)]
+    const generatedIds = allResultLayers.length > 0
+      ? allResultLayers.map((layer, i) =>
+          String((layer.properties as Record<string, unknown> | null)?.id ?? `result-${nextId}-${i}`))
       : [];
 
     const activityId = `act-${String(nextId).padStart(3, '0')}`;
