@@ -66,31 +66,27 @@ export function ParameterCollector({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [collectedValues, setCollectedValues] = useState<Record<string, unknown>>({});
 
-  const currentParam = parameters[currentIndex];
-  if (!currentParam) return null;
-
-  // Resolve menu items for the current parameter
-  const items = getItemsForParameter(currentParam);
-
   const handleSelect = useCallback(
     (itemId: string) => {
-      const newValues = { ...collectedValues, [currentParam.name]: itemId };
+      const param = parameters[currentIndex];
+      if (!param) return;
+      const newValues = { ...collectedValues, [param.name]: itemId };
 
       if (currentIndex + 1 < parameters.length) {
-        // More parameters to collect
         setCollectedValues(newValues);
         setCurrentIndex(currentIndex + 1);
       } else {
-        // All collected, execute
         onComplete(newValues);
       }
     },
-    [collectedValues, currentParam, currentIndex, parameters.length, onComplete],
+    [collectedValues, currentIndex, parameters, onComplete],
   );
 
   const handleCustomValue = useCallback(
     (value: string) => {
-      const newValues = { ...collectedValues, [currentParam.name]: value };
+      const param = parameters[currentIndex];
+      if (!param) return;
+      const newValues = { ...collectedValues, [param.name]: value };
 
       if (currentIndex + 1 < parameters.length) {
         setCollectedValues(newValues);
@@ -99,9 +95,13 @@ export function ParameterCollector({
         onComplete(newValues);
       }
     },
-    [collectedValues, currentParam, currentIndex, parameters.length, onComplete],
+    [collectedValues, currentIndex, parameters, onComplete],
   );
 
+  const currentParam = parameters[currentIndex];
+  if (!currentParam) return null;
+
+  const items = getItemsForParameter(currentParam);
   const showCustom = currentParam.paramType ? isPresetType(currentParam.paramType) : false;
 
   return (

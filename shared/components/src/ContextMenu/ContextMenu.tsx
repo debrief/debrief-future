@@ -180,7 +180,7 @@ export function ContextMenu({
         }
       }
     },
-    [isCustomMode, highlightedIndex, totalCount, items, showCustomOption, onSelect, onDismiss]
+    [isCustomMode, highlightedIndex, totalCount, items, showCustomOption, onSelect, onDismiss, handleCustomSubmit]
   );
 
   // -------------------------------------------------------------------------
