@@ -73,9 +73,11 @@ function createFilesystemDeps(): SnapshotServiceDeps & { dirtyCount: number } {
         return null;
       }
 
-      const geoJsonAsset = Object.values(item.assets).find(
-        (a) => a.type === 'application/geo+json' || a.href.endsWith('.geojson')
-      );
+      // Prefer the 'plot' asset (working file) over snapshot assets
+      const geoJsonAsset = item.assets['plot'] ??
+        Object.values(item.assets).find(
+          (a) => a.type === 'application/geo+json' || a.href.endsWith('.geojson')
+        );
       if (!geoJsonAsset) {
         return null;
       }
@@ -161,9 +163,11 @@ function createFilesystemDeps(): SnapshotServiceDeps & { dirtyCount: number } {
         throw new Error(`Item not found: ${itemPath}`);
       }
 
-      const geoJsonAsset = Object.values(item.assets).find(
-        (a) => a.type === 'application/geo+json' || a.href.endsWith('.geojson')
-      );
+      // Prefer the 'plot' asset (working file) over snapshot assets
+      const geoJsonAsset = item.assets['plot'] ??
+        Object.values(item.assets).find(
+          (a) => a.type === 'application/geo+json' || a.href.endsWith('.geojson')
+        );
       if (!geoJsonAsset) {
         throw new Error(`No GeoJSON asset for item: ${itemPath}`);
       }

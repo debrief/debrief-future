@@ -5,6 +5,18 @@
  * Only includes tools that run entirely in the browser (no Python backend required).
  * Python-only tools (track-stats, range-bearing, area-summary) are excluded.
  *
+ * ## ADDING A NEW TOOL
+ *
+ * When you create a new TypeScript tool, you MUST register it here for it to
+ * appear in the web-shell. The web-shell has no MCP server — it bundles tool
+ * implementations directly. Steps:
+ *
+ * 1. Import `toolDefinition` and `execute` from the tool module
+ * 2. Add a `[toolDefinition.name, { definition, execute }]` entry to `toolRegistry`
+ * 3. If the tool's GeoJSONFeature type differs, cast execute with `as any`
+ *
+ * See also: `shared/tools/TEMPLATE.md` § Registration for the full checklist.
+ *
  * ## Layers Toolbar Integration (T044)
  *
  * The Layers Toolbar component (from @debrief/components) can consume this service
@@ -70,6 +82,11 @@ import {
   toolDefinition as moveShapeDef,
   execute as executeMoveShape,
 } from '../tools/shape/manipulation/moveShape';
+
+import {
+  toolDefinition as generateCoursesSpeedsDef,
+  execute as executeGenerateCourseSpeeds,
+} from '../../../vscode/src/tools/track/manipulation/generateCoursesSpeeds';
 
 import {
   toolDefinition as bufferZoneGeneratorDef,
@@ -148,6 +165,14 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
     {
       definition: moveShapeDef,
       execute: executeMoveShape,
+    },
+  ],
+  [
+    generateCoursesSpeedsDef.name,
+    {
+      definition: generateCoursesSpeedsDef,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      execute: executeGenerateCourseSpeeds as any,
     },
   ],
   [
