@@ -1,4 +1,5 @@
 import { DebriefFeature, DebriefFeatureCollection, Bounds, DisplayMode } from '../utils/types';
+import { DrawingMode } from './LeafletToolbar';
 
 export interface MapViewProps {
     /** GeoJSON features to display */
@@ -47,6 +48,10 @@ export interface MapViewProps {
     showToolbar?: boolean;
     /** Position of the toolbar (default: 'topleft') */
     toolbarPosition?: 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
+    /** Current drawing mode (null = no drawing active) (FR-009) */
+    drawingMode?: DrawingMode;
+    /** Callback when drawing mode changes (FR-004, FR-006, FR-007, FR-008) */
+    onDrawingModeChange?: (mode: DrawingMode) => void;
 }
 /**
  * MapView component for displaying GeoJSON features on an interactive map.
@@ -62,5 +67,5 @@ export interface MapViewProps {
  * />
  * ```
  */
-export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, viewport, autoFitBounds, fitBoundsTrigger, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, visibleIds, showToolbar, toolbarPosition, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
+export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, viewport, autoFitBounds, fitBoundsTrigger, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, visibleIds, showToolbar, toolbarPosition, drawingMode, onDrawingModeChange, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=MapView.d.ts.map
