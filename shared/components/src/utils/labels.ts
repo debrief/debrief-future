@@ -90,6 +90,17 @@ export function getFeatureColor(feature: DebriefFeature): string {
     return feature.properties.style.line.color;
   }
 
+  // Check for explicit color in properties.style.color (annotations, multi-geometry)
+  const props = feature.properties as unknown as Record<string, unknown>;
+  const style = props.style as Record<string, unknown> | undefined;
+  if (style?.color && typeof style.color === 'string') {
+    return style.color;
+  }
+  // Check for top-level color property (legacy data)
+  if (props.color && typeof props.color === 'string') {
+    return props.color;
+  }
+
   // Fall back to type-based defaults
   if (isTrackFeature(feature)) {
     switch (feature.properties.track_type) {

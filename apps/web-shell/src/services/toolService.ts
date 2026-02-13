@@ -76,6 +76,11 @@ import {
   execute as executeGenerateReferencePoints,
 } from '../../../vscode/src/tools/reference/generation/generateReferencePoints';
 
+import {
+  toolDefinition as bufferZoneGeneratorDef,
+  execute as executeBufferZoneGenerator,
+} from '../tools/sensor/detection/bufferZoneGenerator';
+
 // Re-export types for consumers
 export type { MCPToolDefinition, MCPToolResponse, MCPContentItem, DebriefAnnotations };
 
@@ -155,6 +160,13 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
     {
       definition: generateReferencePointsDef,
       execute: executeGenerateReferencePoints,
+    },
+  ],
+  [
+    bufferZoneGeneratorDef.name,
+    {
+      definition: bufferZoneGeneratorDef,
+      execute: executeBufferZoneGenerator,
     },
   ],
 ]);

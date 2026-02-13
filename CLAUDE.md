@@ -174,6 +174,10 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - N/A — pure transformation tool, no persistence (caller handles STAC writes) (056-move-shape)
 - Python 3.11 (debrief-calc service), TypeScript 5.x (VS Code extension, web-shell) + None beyond existing project dependencies — standard library `math` (Python), no new npm packages (TypeScript) (078-generate-reference-points)
 - N/A — pure transformation tool; caller handles STAC persistence (078-generate-reference-points)
+- Python 3.11 (LinkML schemas, Pydantic models, calc service), TypeScript 5.x (VS Code extension, shared components, generated types) + LinkML >= 1.7.0 (schema source), Pydantic v2 (Python validation), React 18.x (shared components), VS Code Extension API ^1.85.0, Zustand ^5.0.0 (session-state) (091-tool-parameter-context-menus)
+- Local filesystem STAC catalogs (no storage changes for this feature) (091-tool-parameter-context-menus)
+- Python 3.11 + pydantic >=2.0.0 (existing), stdlib `math` module only (080-buffer-zone-generator)
+- N/A (stateless tool — caller handles STAC persistence) (080-buffer-zone-generator)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)

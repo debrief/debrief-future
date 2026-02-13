@@ -135,6 +135,7 @@ Large features broken down into multiple backlog items.
 | E02 | PROV Logging Implementation | [Implement PROV logging system per SRD priorities P1-P6](docs/architecture/prov-transition-plan.md) | approved | #070, #071, #072, #073, #074, #075, #076 |
 | E03 | Buffer Zone Analysis Demo | [Reactive PROV cascade with 5-tool chain for stakeholder demo](docs/ideas/E03-buffer-zone-analysis-demo.md) | approved | #078, #079, #080, #081, #082, #084 |
 | E04 | Results Visualization | [Vega-Lite based results viewing infrastructure](docs/ideas/E04-results-visualization.md) | approved | #085, #086, #087, #088, #089, #090 |
+| E05 | Shape Drawing Tools | Add shape drawing tools to map via Geoman (point, rectangle, polygon, polyline) with '+' toolbar dropdown | approved | #091, #092, #093, #094, #095, #096 |
 
 ## Items
 
@@ -165,11 +166,12 @@ Description formats:
 | 063 | Infrastructure | [Analyse tool specs for phased implementation sequence](docs/ideas/063-tool-implementation-sequence.md) [E01] — dependency graph, phase groupings, and per-phase backlog items for 63 documented tools | 5 | 3 | 4 | 12 | Medium | approved |
 | 085 | Feature | [Chart renderer + dataset-to-spec transformer](docs/ideas/E04-results-visualization.md) [E04] — React component with Vega-Lite (swappable); transformer converts standard result datasets to render specs | 4 | 4 | 4 | 12 | Medium | approved |
 | 079 | Feature | [Implement move-track tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — offset track by range/bearing with map drag support (requires #049, #062) | 4 | 4 | 4 | 12 | Medium | approved |
-| 080 | Feature | [Implement buffer-zone-generator tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — stub sensor model returning 3 detection-likelihood buffer polygons (requires #049, #079) | 4 | 4 | 4 | 12 | Medium | approved |
+| 080 | Feature | [Implement buffer-zone-generator tool](specs/080-buffer-zone-generator/spec.md) [E03] — stub sensor model returning 3 detection-likelihood buffer polygons (requires #049, #079) | 4 | 4 | 4 | 12 | Medium | specified |
 | 081 | Feature | [Implement point-in-zone-classifier tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — classify and recolor reference points by buffer zone membership (requires #049, #078, #080) | 4 | 4 | 4 | 12 | Medium | approved |
 | 082 | Feature | [Implement zone-histogram-generator tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — outputs dataset/zone_histogram, point counts per buffer zone (requires #049, #081) | 4 | 4 | 4 | 12 | Medium | approved |
 | 061 | Feature | [Add generate courses and speeds for track tool spec](docs/ideas/061-generate-courses-speeds.md) (requires #049) | 4 | 3 | 5 | 12 | Low | approved |
 | 011 | Documentation | Create Jupyter notebook example demonstrating debrief-calc Python API | 4 | 4 | 4 | 12 | Low | approved |
+| 091 | Feature | [Add tool parameter context menus for pre-execution configuration](specs/091-tool-parameter-context-menus/spec.md) — successive inline context menus in webview to collect parameter values before tool execution; presets defined in LinkML | 4 | 4 | 3 | 11 | High | specified |
 | 065 | Feature | [Implement Phase 2 tools: track/styling + dataset/export](docs/ideas/065-implement-tools-phase2-styling-export.md) [E01] — 15 styling and export tools (requires #064) | 4 | 3 | 4 | 11 | Medium | approved |
 | 060 | Feature | [Add resample track tool spec](docs/ideas/060-resample-track.md) (requires #049) | 4 | 3 | 4 | 11 | Medium | approved |
 | 002 | Feature | Add MCP wrapper for debrief-io service | 4 | 3 | 4 | 11 | Medium | approved |
@@ -185,7 +187,13 @@ Description formats:
 | 090 | Infrastructure | [E04 sample data workshop: identify realistic generators for all result types](docs/ideas/090-e04-sample-data-workshop.md) [E04] — collaborative workshop using E03 demo scenario; pseudocode + golden fixtures for all result categories (prerequisite for #085) | 5 | 3 | 2 | 10 | Low | approved |
 | 058 | Feature | [Add flip shape horizontal tool spec](docs/ideas/058-flip-shape-horizontal.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
 | 059 | Feature | [Add flip shape vertical tool spec](docs/ideas/059-flip-shape-vertical.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
+| 094 | Feature | [[E05] Implement point and rectangle drawing](docs/ideas/094-point-rectangle-drawing.md) (requires #091, #092, #093) [E05] | 4 | 4 | 4 | 12 | Medium | approved |
+| 093 | Feature | [[E05] Add drawing toolbar with shape palette](docs/ideas/093-drawing-toolbar-shape-palette.md) (requires #092) [E05] | 4 | 4 | 3 | 11 | Medium | approved |
+| 095 | Feature | [[E05] Implement polygon and polyline drawing](docs/ideas/095-polygon-polyline-drawing.md) (requires #091, #092, #093) [E05] | 4 | 4 | 3 | 11 | Medium | approved |
 | 029 | Tech Debt | [Add unit tests for VS Code extension providers](https://github.com/debrief/debrief-future/issues/104) | 4 | 2 | 5 | 11 | Low | proposed |
+| 092 | Infrastructure | [[E05] Integrate Geoman drawing library](docs/ideas/092-integrate-geoman-drawing-library.md) [E05] | 4 | 3 | 3 | 10 | Medium | approved |
+| 091 | Infrastructure | [[E05] Add POLY FeatureKind for arbitrary polygons](docs/ideas/091-extend-featurekind-drawable-shapes.md) [E05] | 3 | 2 | 5 | 10 | Low | approved |
+| 096 | Enhancement | [[E05] Drawing UX guidance and STAC persistence](docs/ideas/096-drawing-ux-persistence.md) (requires #094, #095) [E05] | 4 | 3 | 3 | 10 | Medium | approved |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
 | 033 | Tech Debt | [Re-enable debrief-stac tests in pytest](docs/ideas/033-reenable-stac-tests.md) | 4 | 2 | 4 | 10 | Low | proposed |
 | 034 | Tech Debt | [Remove synchronous fs calls from VS Code stacService](docs/ideas/034-async-stac-service-fs.md) | 3 | 2 | 5 | 10 | Low | proposed |

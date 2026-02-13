@@ -13,11 +13,13 @@ Built-in tools:
 - label-interval: Set time interval for label display
 - symbol-interval: Set time interval for symbol display
 - generate-reference-points: Generate grid/scatter reference points in a bounding box
+- buffer-zone-generator: Generate detection likelihood buffer zones around a track
 """
 
 # Import tools to trigger registration via @tool decorator
 from debrief_calc.tools import area_summary, range_bearing, track_stats
 from debrief_calc.tools.reference import generation
+from debrief_calc.tools.sensor import detection
 from debrief_calc.tools.shape import manipulation
 from debrief_calc.tools.track import styling
 
@@ -28,4 +30,5 @@ __all__ = [
     "styling",
     "manipulation",
     "generation",
+    "detection",
 ]

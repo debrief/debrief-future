@@ -1,0 +1,90 @@
+# Tool Parameter Schema Contract
+# Defines the extended ToolParameter model with param_type field
+# Used by: debrief-calc Python service, MCP tool definitions, TypeScript ToolMatch adapter
+
+# === Python Model (services/calc/debrief_calc/models.py) ===
+# Extends existing ToolParameter BaseModel
+
+ToolParameter:
+  description: "A configurable parameter for a tool"
+  fields:
+    name:
+      type: string
+      required: true
+      description: "Parameter identifier (kebab-case)"
+    type:
+      type: string
+      required: true
+      enum: [string, number, boolean, enum]
+      description: "Value type discriminator"
+    description:
+      type: string
+      required: true
+      description: "Human-readable parameter description"
+    required:
+      type: boolean
+      default: false
+      description: "Whether parameter must be provided"
+    default:
+      type: any
+      default: null
+      description: "Default value if not provided"
+    choices:
+      type: array
+      items: any
+      default: null
+      description: "Valid values for enum type (redundant when param_type set)"
+    param_type:
+      type: string
+      default: null
+      description: "References a schema-defined parameter-type enum by name"
+      enum: [NamedColor, MarkerSymbol, CardinalDirection, DurationPreset, NumericPreset]
+
+  validation:
+    - rule: "type must be one of: string, number, boolean, enum"
+    - rule: "if type=enum, at least one of choices or param_type must be set"
+    - rule: "if param_type is set, value must be a valid ParameterTypeEnum member"
+
+# === MCP JSON Schema Output ===
+# When a tool has param_type set, the MCP inputSchema includes
+# the annotation instead of flattening values
+
+MCPInputSchemaProperty:
+  description: "How a parameter with param_type appears in MCP tool definition inputSchema"
+  example:
+    color:
+      type: string
+      description: "Track colour"
+      x-debrief-param-type: NamedColor
+      # Note: no "enum: [red, green, blue, ...]" — the type name is the contract
+
+MCPInputSchemaPropertyFallback:
+  description: "When param_type is NOT set, existing behavior is preserved"
+  example:
+    symbol:
+      type: string
+      description: "Marker shape"
+      enum: [circle, square, diamond, triangle, cross]
+      # Flat enum array when no param_type reference
+
+# === TypeScript Type (shared/components/src/ToolMatch/types.ts) ===
+
+ToolParameterTS:
+  description: "TypeScript representation after MCP adapter extraction"
+  fields:
+    name:
+      type: string
+    valueType:
+      type: "'string' | 'number' | 'boolean' | 'enum' | 'duration'"
+    description:
+      type: string
+    required:
+      type: boolean
+    defaultValue:
+      type: "unknown | undefined"
+    choices:
+      type: "string[] | undefined"
+      description: "Explicit choices (from enum array, or empty when paramType set)"
+    paramType:
+      type: "string | undefined"
+      description: "Schema-defined type name (from x-debrief-param-type)"

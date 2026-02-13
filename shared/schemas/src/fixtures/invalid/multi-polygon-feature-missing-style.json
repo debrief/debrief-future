@@ -1,0 +1,22 @@
+{
+  "type": "Feature",
+  "id": "mpoly-invalid-no-style",
+  "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+      [
+        [
+          [-4.0, 50.0],
+          [-4.0, 50.5],
+          [-3.5, 50.5],
+          [-3.5, 50.0],
+          [-4.0, 50.0]
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "kind": "MULTI_POLYGON",
+    "label": "Missing Style"
+  }
+}

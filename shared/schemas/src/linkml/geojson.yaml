@@ -110,6 +110,34 @@ classes:
         multivalued: true
         required: true
 
+  GeoJSONMultiPoint:
+    description: GeoJSON MultiPoint geometry for multi-point tool results
+    attributes:
+      type:
+        description: Geometry type discriminator
+        range: string
+        required: true
+        equals_string: "MultiPoint"
+      coordinates:
+        description: Array of [longitude, latitude] positions
+        range: float
+        multivalued: true
+        required: true
+
+  GeoJSONMultiPolygon:
+    description: GeoJSON MultiPolygon geometry for multi-polygon tool results
+    attributes:
+      type:
+        description: Geometry type discriminator
+        range: string
+        required: true
+        equals_string: "MultiPolygon"
+      coordinates:
+        description: Array of polygon coordinate arrays (each an array of linear rings)
+        range: float
+        multivalued: true
+        required: true
+
 # ============================================================================
 # Compound Track Embedded Types
 # ============================================================================
@@ -556,3 +584,111 @@ classes:
         description: State-specific properties
         range: SystemStateProperties
         required: true
+
+# ============================================================================
+# MultiPointFeature (tool result with MultiPoint geometry)
+# ============================================================================
+
+  MultiPointFeatureProperties:
+    description: Properties for a MultiPointFeature (multi-point tool results)
+    attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "MULTI_POINT"
+      label:
+        description: Human-readable result label
+        required: true
+      style:
+        description: Point styling for all positions
+        range: PointProperties
+        required: true
+      source_tool:
+        description: Name of calculation tool that produced this result
+      source_features:
+        description: IDs of input features used to generate this result
+        range: string
+        multivalued: true
+      description:
+        description: Additional description or notes
+
+  MultiPointFeature:
+    description: GeoJSON Feature for multi-point tool results
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Unique identifier (UUID recommended)
+        required: true
+      geometry:
+        description: MultiPoint geometry
+        range: GeoJSONMultiPoint
+        required: true
+      properties:
+        description: Feature properties and styling
+        range: MultiPointFeatureProperties
+        required: true
+      bbox:
+        description: Bounding box [minLon, minLat, maxLon, maxLat]
+        range: float
+        multivalued: true
+        minimum_cardinality: 4
+        maximum_cardinality: 4
+
+# ============================================================================
+# MultiPolygonFeature (tool result with MultiPolygon geometry)
+# ============================================================================
+
+  MultiPolygonFeatureProperties:
+    description: Properties for a MultiPolygonFeature (multi-polygon tool results)
+    attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+        equals_string: "MULTI_POLYGON"
+      label:
+        description: Human-readable result label
+        required: true
+      style:
+        description: Polygon styling for all regions
+        range: PolygonProperties
+        required: true
+      source_tool:
+        description: Name of calculation tool that produced this result
+      source_features:
+        description: IDs of input features used to generate this result
+        range: string
+        multivalued: true
+      description:
+        description: Additional description or notes
+
+  MultiPolygonFeature:
+    description: GeoJSON Feature for multi-polygon tool results
+    attributes:
+      type:
+        description: GeoJSON type discriminator
+        range: string
+        required: true
+        equals_string: "Feature"
+      id:
+        description: Unique identifier (UUID recommended)
+        required: true
+      geometry:
+        description: MultiPolygon geometry
+        range: GeoJSONMultiPolygon
+        required: true
+      properties:
+        description: Feature properties and styling
+        range: MultiPolygonFeatureProperties
+        required: true
+      bbox:
+        description: Bounding box [minLon, minLat, maxLon, maxLat]
+        range: float
+        multivalued: true
+        minimum_cardinality: 4
+        maximum_cardinality: 4
