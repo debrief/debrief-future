@@ -1,0 +1,133 @@
+# Context Menu Messages Contract
+# Defines the webview ↔ extension message protocol for tool parameter collection
+# Used by: ActivityPanel (webview), VS Code extension host
+
+# === Extended tool:run Message ===
+# The existing tool:run message gains an optional params field
+
+ToolRunMessage:
+  description: "Message sent from webview to extension when a tool is executed"
+  direction: "webview → extension"
+  type_field: "tool:run"
+  payload:
+    toolId:
+      type: string
+      required: true
+      description: "The tool identifier to execute"
+    params:
+      type: "Record<string, unknown>"
+      required: false
+      default: undefined
+      description: "Collected parameter values keyed by parameter name"
+  examples:
+    no_params:
+      description: "Tool with no parameters (backward compatible)"
+      value:
+        type: "tool:run"
+        payload:
+          toolId: "calculate-range"
+    with_enum_param:
+      description: "Tool with a single enum parameter"
+      value:
+        type: "tool:run"
+        payload:
+          toolId: "set-track-color"
+          params:
+            color: "red"
+    with_multiple_params:
+      description: "Tool with multiple parameters"
+      value:
+        type: "tool:run"
+        payload:
+          toolId: "apply-symbol-style"
+          params:
+            symbol: "triangle"
+            color: "blue"
+    with_custom_duration:
+      description: "Tool with custom duration value"
+      value:
+        type: "tool:run"
+        payload:
+          toolId: "symbol-interval"
+          params:
+            interval: "PT37M"
+    with_boolean_param:
+      description: "Tool with boolean parameter"
+      value:
+        type: "tool:run"
+        payload:
+          toolId: "area-summary"
+          params:
+            include_centroid: true
+
+# === Tools Update Message (extended) ===
+# The existing tools:update message now includes parameter metadata
+
+ToolsUpdateMessage:
+  description: "Message sent from extension to webview with tool definitions"
+  direction: "extension → webview"
+  type_field: "tools:update"
+  payload:
+    tools:
+      type: "ToolsPanelItem[]"
+      description: "Tool definitions with parameter metadata"
+    hasToolInventory:
+      type: boolean
+      description: "Whether tools have been loaded"
+    hasSelection:
+      type: boolean
+      description: "Whether features are selected"
+
+ToolsPanelItem:
+  description: "Extended tool item with parameter information"
+  fields:
+    id:
+      type: string
+      description: "Tool identifier"
+    name:
+      type: string
+      description: "Display name"
+    description:
+      type: string
+      description: "Brief description"
+    applicable:
+      type: boolean
+      description: "Whether tool is active for current selection"
+    explanation:
+      type: "string | undefined"
+      description: "Why tool is inactive"
+    parameters:
+      type: "ToolParameterTS[] | undefined"
+      description: "NEW: Configurable parameters with type metadata"
+  examples:
+    no_params:
+      description: "Tool without parameters"
+      value:
+        id: "calculate-range"
+        name: "Calculate Range"
+        description: "Calculate range and bearing between tracks"
+        applicable: true
+    with_params:
+      description: "Tool with parameters"
+      value:
+        id: "set-track-color"
+        name: "Set Track Color"
+        description: "Change track display colour"
+        applicable: true
+        parameters:
+          - name: "color"
+            valueType: "enum"
+            description: "Track colour"
+            required: false
+            defaultValue: "red"
+            paramType: "NamedColor"
+
+# === Backward Compatibility ===
+
+BackwardCompatibility:
+  description: "Existing tool:run messages without params continue to work"
+  guarantees:
+    - "Tools with no parameters work identically to current behavior"
+    - "tool:run messages without params field are treated as params={}"
+    - "executeTool handler passes empty params to calcService when not provided"
+    - "No changes to ToolExecutionResult format"
