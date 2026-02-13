@@ -96,30 +96,34 @@
   stroke: currentColor;
 }
 
-/* Shape palette dropdown (FR-002, FR-014) */
+/* Shape palette — horizontal icon-only popup (FR-002, FR-014) */
 .debrief-shape-palette {
   position: absolute;
   z-index: 1000;
+  display: flex;
+  flex-direction: row;
   background-color: var(--debrief-map-controls-bg, #fff);
   border: 1px solid var(--debrief-border-color, #ccc);
   border-radius: var(--debrief-radius-md, 4px);
   box-shadow: var(--debrief-shadow-md, 0 2px 8px rgba(0, 0, 0, 0.15));
-  min-width: 120px;
   overflow: hidden;
 }
 
 .debrief-shape-palette__item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
   color: var(--debrief-text-primary, #333);
   text-decoration: none;
   cursor: pointer;
   transition: background-color 0.15s ease;
-  white-space: nowrap;
-  font-size: 13px;
-  line-height: 20px;
+  border-right: 1px solid var(--debrief-border-color, #ccc);
+}
+
+.debrief-shape-palette__item:last-child {
+  border-right: none;
 }
 
 .debrief-shape-palette__item:hover {
@@ -135,21 +139,8 @@
   outline-offset: -2px;
 }
 
-.debrief-shape-palette__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-}
-
-.debrief-shape-palette__icon svg {
+.debrief-shape-palette__item svg {
   width: 16px;
   height: 16px;
   stroke: currentColor;
-}
-
-.debrief-shape-palette__label {
-  flex: 1;
 }

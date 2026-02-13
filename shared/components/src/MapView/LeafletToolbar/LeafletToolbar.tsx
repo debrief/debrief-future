@@ -327,13 +327,9 @@ class ToolbarControl extends L.Control {
       itemEl.setAttribute('role', 'menuitem');
       itemEl.setAttribute('data-testid', `shape-${item.id}`);
       itemEl.setAttribute('data-shape', item.id);
-      itemEl.title = item.title;
+      itemEl.title = item.label;
 
-      const iconSpan = L.DomUtil.create('span', 'debrief-shape-palette__icon', itemEl);
-      iconSpan.appendChild(item.createIcon());
-
-      const labelSpan = L.DomUtil.create('span', 'debrief-shape-palette__label', itemEl);
-      labelSpan.textContent = item.label;
+      itemEl.appendChild(item.createIcon());
 
       L.DomEvent.on(itemEl, 'click', (e: Event) => {
         L.DomEvent.preventDefault(e);
@@ -426,23 +422,12 @@ class ToolbarControl extends L.Control {
   private positionDropdown(): void {
     if (!this.dropdownContainer || !this.drawTriggerButton) return;
 
-    const buttonRect = this.drawTriggerButton.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-
-    // Default: position to the right of the button
-    const spaceRight = viewportWidth - buttonRect.right;
-
-    if (spaceRight > 140) {
-      // Enough room to the right
-      this.dropdownContainer.style.left = '100%';
-      this.dropdownContainer.style.right = '';
-      this.dropdownContainer.style.top = '0';
-    } else {
-      // Not enough room — position below the button
-      this.dropdownContainer.style.left = '0';
-      this.dropdownContainer.style.right = '';
-      this.dropdownContainer.style.top = '100%';
-    }
+    // Position the horizontal bar to the right of the '+' button,
+    // aligned with the button's vertical position.
+    const triggerOffset = this.drawTriggerButton.offsetTop;
+    this.dropdownContainer.style.left = '100%';
+    this.dropdownContainer.style.marginLeft = '4px';
+    this.dropdownContainer.style.top = `${triggerOffset}px`;
   }
 
   private updateDrawTriggerAppearance(): void {
