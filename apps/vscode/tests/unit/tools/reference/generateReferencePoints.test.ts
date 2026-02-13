@@ -15,15 +15,30 @@ function loadGolden(name: string): any {
   return JSON.parse(readFileSync(resolve(GOLDEN_DIR, name), 'utf-8'));
 }
 
+/** Create a RECTANGLE polygon feature for the given bounds. */
+function makePolygon(west: number, south: number, east: number, north: number): any {
+  return {
+    type: 'Feature',
+    id: 'test-rect',
+    geometry: {
+      type: 'Polygon',
+      coordinates: [[[west, south], [east, south], [east, north], [west, north], [west, south]]],
+    },
+    properties: { kind: 'RECTANGLE' },
+  };
+}
+
+/** Default polygon with bounds [-5, 49, 1, 52]. */
+const defaultPolygon = makePolygon(-5, 49, 1, 52);
+
 // ============================================================================
 // User Story 1: Grid Pattern
 // ============================================================================
 
 describe('Grid Pattern', () => {
   it('3x4 grid returns 12 coordinates', () => {
-    const result = execute([], {
+    const result = execute([defaultPolygon], {
       pattern: 'grid',
-      bounds: [-5, 49, 1, 52],
       rows: 3,
       cols: 4,
     });
@@ -35,9 +50,8 @@ describe('Grid Pattern', () => {
   });
 
   it('3x4 grid has correct positions', () => {
-    const result = execute([], {
+    const result = execute([defaultPolygon], {
       pattern: 'grid',
-      bounds: [-5, 49, 1, 52],
       rows: 3,
       cols: 4,
     });
@@ -64,9 +78,8 @@ describe('Grid Pattern', () => {
   });
 
   it('1x1 grid returns centre point', () => {
-    const result = execute([], {
+    const result = execute([defaultPolygon], {
       pattern: 'grid',
-      bounds: [-5, 49, 1, 52],
       rows: 1,
       cols: 1,
     });
@@ -78,9 +91,8 @@ describe('Grid Pattern', () => {
   });
 
   it('5x5 grid has 25 coordinates at even intervals', () => {
-    const result = execute([], {
+    const result = execute([makePolygon(0, 0, 4, 4)], {
       pattern: 'grid',
-      bounds: [0, 0, 4, 4],
       rows: 5,
       cols: 5,
     });
@@ -100,9 +112,8 @@ describe('Grid Pattern', () => {
   });
 
   it('feature has correct properties', () => {
-    const result = execute([], {
+    const result = execute([defaultPolygon], {
       pattern: 'grid',
-      bounds: [-5, 49, 1, 52],
       rows: 3,
       cols: 4,
     });
@@ -119,9 +130,8 @@ describe('Grid Pattern', () => {
   });
 
   it('pointMetadata is parallel to coordinates', () => {
-    const result = execute([], {
+    const result = execute([defaultPolygon], {
       pattern: 'grid',
-      bounds: [-5, 49, 1, 52],
       rows: 3,
       cols: 4,
     });
@@ -144,21 +154,20 @@ describe('Grid Pattern', () => {
 describe('Grid Edge Cases', () => {
   it('zero-area bounds (west==east) throws', () => {
     expect(() =>
-      execute([], { pattern: 'grid', bounds: [0, 0, 0, 1], rows: 2, cols: 2 }),
+      execute([makePolygon(0, 0, 0, 1)], { pattern: 'grid', rows: 2, cols: 2 }),
     ).toThrow('positive area');
   });
 
-  it('south >= north throws', () => {
+  it('zero-area bounds (south==north) throws', () => {
     expect(() =>
-      execute([], { pattern: 'grid', bounds: [0, 52, 1, 49], rows: 2, cols: 2 }),
+      execute([makePolygon(0, 0, 1, 0)], { pattern: 'grid', rows: 2, cols: 2 }),
     ).toThrow('must be less than north');
   });
 
   it('negative rows throws', () => {
     expect(() =>
-      execute([], {
+      execute([defaultPolygon], {
         pattern: 'grid',
-        bounds: [-5, 49, 1, 52],
         rows: -1,
         cols: 4,
       }),
@@ -167,9 +176,8 @@ describe('Grid Edge Cases', () => {
 
   it('zero cols throws', () => {
     expect(() =>
-      execute([], {
+      execute([defaultPolygon], {
         pattern: 'grid',
-        bounds: [-5, 49, 1, 52],
         rows: 3,
         cols: 0,
       }),
@@ -178,15 +186,21 @@ describe('Grid Edge Cases', () => {
 
   it('invalid pattern throws', () => {
     expect(() =>
-      execute([], { pattern: 'hexagonal' as any, bounds: [-5, 49, 1, 52] }),
+      execute([defaultPolygon], { pattern: 'hexagonal' as any }),
     ).toThrow("'grid' or 'scatter'");
+  });
+
+  it('no features throws', () => {
+    expect(() =>
+      execute([], { pattern: 'grid', rows: 3, cols: 4 }),
+    ).toThrow('polygon feature');
   });
 
   it('matches golden example', () => {
     const goldenInput = loadGolden('generate-reference-points.grid.input.json');
     const goldenOutput = loadGolden('generate-reference-points.grid.output.json');
 
-    const result = execute([], goldenInput);
+    const result = execute(goldenInput.features, goldenInput.params);
     const expected = goldenOutput.features[0];
     const actual = result[0];
 
@@ -196,9 +210,8 @@ describe('Grid Edge Cases', () => {
   });
 
   it('antimeridian crossing normalises longitudes', () => {
-    const result = execute([], {
+    const result = execute([makePolygon(170, -10, -170, 10)], {
       pattern: 'grid',
-      bounds: [170, -10, -170, 10],
       rows: 3,
       cols: 3,
     });
@@ -220,9 +233,8 @@ describe('Grid Edge Cases', () => {
 
 describe('Scatter Pattern', () => {
   it('scatter with count=20 returns 20 coordinates', () => {
-    const result = execute([], {
+    const result = execute([defaultPolygon], {
       pattern: 'scatter',
-      bounds: [-5, 49, 1, 52],
       count: 20,
       seed: 42,
     });
@@ -235,12 +247,11 @@ describe('Scatter Pattern', () => {
   it('same seed produces identical output', () => {
     const params = {
       pattern: 'scatter' as const,
-      bounds: [-5, 49, 1, 52] as [number, number, number, number],
       count: 20,
       seed: 42,
     };
-    const result1 = execute([], params);
-    const result2 = execute([], params);
+    const result1 = execute([defaultPolygon], params);
+    const result2 = execute([defaultPolygon], params);
 
     expect(result1[0].geometry.coordinates).toEqual(
       result2[0].geometry.coordinates,
@@ -248,15 +259,13 @@ describe('Scatter Pattern', () => {
   });
 
   it('different seeds produce different output', () => {
-    const result1 = execute([], {
+    const result1 = execute([defaultPolygon], {
       pattern: 'scatter',
-      bounds: [-5, 49, 1, 52],
       count: 20,
       seed: 1,
     });
-    const result2 = execute([], {
+    const result2 = execute([defaultPolygon], {
       pattern: 'scatter',
-      bounds: [-5, 49, 1, 52],
       count: 20,
       seed: 2,
     });
@@ -267,9 +276,8 @@ describe('Scatter Pattern', () => {
   });
 
   it('all points within bounds', () => {
-    const result = execute([], {
+    const result = execute([defaultPolygon], {
       pattern: 'scatter',
-      bounds: [-5, 49, 1, 52],
       count: 100,
       seed: 99,
     });
@@ -283,9 +291,8 @@ describe('Scatter Pattern', () => {
   });
 
   it('feature has correct properties', () => {
-    const result = execute([], {
+    const result = execute([defaultPolygon], {
       pattern: 'scatter',
-      bounds: [-5, 49, 1, 52],
       count: 20,
       seed: 42,
     });
@@ -298,9 +305,8 @@ describe('Scatter Pattern', () => {
   });
 
   it('pointMetadata is parallel to coordinates', () => {
-    const result = execute([], {
+    const result = execute([defaultPolygon], {
       pattern: 'scatter',
-      bounds: [-5, 49, 1, 52],
       count: 10,
       seed: 42,
     });
@@ -323,9 +329,8 @@ describe('Scatter Pattern', () => {
 describe('Scatter Edge Cases', () => {
   it('count=0 throws', () => {
     expect(() =>
-      execute([], {
+      execute([defaultPolygon], {
         pattern: 'scatter',
-        bounds: [-5, 49, 1, 52],
         count: 0,
         seed: 42,
       }),
@@ -333,9 +338,8 @@ describe('Scatter Edge Cases', () => {
   });
 
   it('missing count uses default (25)', () => {
-    const result = execute([], {
+    const result = execute([defaultPolygon], {
       pattern: 'scatter',
-      bounds: [-5, 49, 1, 52],
       seed: 42,
     });
 
@@ -343,9 +347,8 @@ describe('Scatter Edge Cases', () => {
   });
 
   it('antimeridian crossing wraps longitudes', () => {
-    const result = execute([], {
+    const result = execute([makePolygon(170, -10, -170, 10)], {
       pattern: 'scatter',
-      bounds: [170, -10, -170, 10],
       count: 50,
       seed: 42,
     });
@@ -368,7 +371,7 @@ describe('Scatter Edge Cases', () => {
       'generate-reference-points.scatter.output.json',
     );
 
-    const result = execute([], goldenInput);
+    const result = execute(goldenInput.features, goldenInput.params);
     const expected = goldenOutput.features[0];
     const actual = result[0];
 
@@ -394,7 +397,7 @@ describe('Cross-Language Parity', () => {
     const goldenInput = loadGolden('generate-reference-points.grid.input.json');
     const goldenOutput = loadGolden('generate-reference-points.grid.output.json');
 
-    const result = execute([], goldenInput);
+    const result = execute(goldenInput.features, goldenInput.params);
     const expected = goldenOutput.features[0];
 
     expect(result[0].geometry.coordinates).toEqual(
@@ -413,7 +416,7 @@ describe('Cross-Language Parity', () => {
       'generate-reference-points.scatter.output.json',
     );
 
-    const result = execute([], goldenInput);
+    const result = execute(goldenInput.features, goldenInput.params);
     const expectedCoords = goldenOutput.features[0].geometry.coordinates;
     const actualCoords = result[0].geometry.coordinates;
 

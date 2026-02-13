@@ -14,7 +14,6 @@ const LCG_MODULUS = 2 ** 32; // 4294967296
 
 export interface GenerateReferencePointsParams {
   pattern: 'grid' | 'scatter';
-  bounds: [number, number, number, number];
   rows?: number;
   cols?: number;
   count?: number;
@@ -36,7 +35,7 @@ interface GeoJSONFeature {
 export const toolDefinition: MCPToolDefinition = {
   name: 'generate-reference-points',
   description:
-    'Generates a grid or scatter pattern of reference points within a bounding box.',
+    'Generates a grid or scatter pattern of reference points within a selected polygon.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -45,14 +44,6 @@ export const toolDefinition: MCPToolDefinition = {
         enum: ['grid', 'scatter'],
         description:
           "Generation pattern: 'grid' for evenly spaced rows/columns, 'scatter' for random distribution",
-      },
-      bounds: {
-        type: 'array',
-        items: { type: 'number' },
-        minItems: 4,
-        maxItems: 4,
-        description:
-          'Bounding box [west, south, east, north] in WGS84 decimal degrees',
       },
       rows: {
         type: 'integer',
@@ -77,7 +68,10 @@ export const toolDefinition: MCPToolDefinition = {
     },
   },
   annotations: {
-    'debrief:selectionRequirements': [],
+    'debrief:selectionRequirements': [
+      { kind: 'RECTANGLE', min: 1, max: 1 },
+      { kind: 'CIRCLE', min: 1, max: 1 },
+    ],
     'debrief:category': 'reference/generation',
     'debrief:version': '1.0.0',
     'debrief:outputKind': 'addition/reference/generated_points',
@@ -98,12 +92,21 @@ function normaliseLon(lon: number): number {
   return lon;
 }
 
+function extractBoundsFromPolygon(
+  feature: GeoJSONFeature,
+): [number, number, number, number] {
+  const coords = (feature.geometry.coordinates as number[][][])[0];
+  if (!coords || coords.length === 0) {
+    throw new Error('Polygon feature has no coordinates');
+  }
+  const lons = coords.map((c) => c[0]);
+  const lats = coords.map((c) => c[1]);
+  return [Math.min(...lons), Math.min(...lats), Math.max(...lons), Math.max(...lats)];
+}
+
 function validateBounds(
   bounds: [number, number, number, number],
 ): [number, number, number, number] {
-  if (!Array.isArray(bounds) || bounds.length !== 4) {
-    throw new Error('Bounds must be [west, south, east, north]');
-  }
   const [west, south, east, north] = bounds;
   if (south >= north) {
     throw new Error(`South (${south}) must be less than north (${north})`);
@@ -226,19 +229,20 @@ function generateScatter(
 }
 
 export function execute(
-  _features: GeoJSONFeature[],
+  features: GeoJSONFeature[],
   params: GenerateReferencePointsParams,
 ): GeoJSONFeature[] {
-  const { pattern, bounds } = params;
+  if (!features || features.length === 0) {
+    throw new Error('Requires exactly one polygon feature');
+  }
+
+  const { pattern } = params;
 
   if (pattern !== 'grid' && pattern !== 'scatter') {
     throw new Error("Pattern must be 'grid' or 'scatter'");
   }
 
-  if (!bounds) {
-    throw new Error("Parameter 'bounds' is required");
-  }
-
+  const bounds = extractBoundsFromPolygon(features[0]);
   const [west, south, east, north] = validateBounds(bounds);
 
   if (pattern === 'grid') {

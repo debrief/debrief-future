@@ -11,13 +11,12 @@ status: draft
 
 ## MCP
 
-**Description**: Generates a grid or scatter pattern of reference points within a bounding box. Creates a single GeoJSON MultiPoint feature with evenly spaced (grid) or randomly distributed (scatter) coordinates. Used as the first step of buffer zone analysis.
+**Description**: Generates a grid or scatter pattern of reference points within the bounds of a selected polygon. Creates a single GeoJSON MultiPoint feature with evenly spaced (grid) or randomly distributed (scatter) coordinates. Used as the first step of buffer zone analysis.
 
-**When to use**: When an analyst needs a set of reference points covering an area of interest for spatial analysis, such as buffer zone classification or coverage assessment.
+**When to use**: When an analyst has selected a zone polygon (RECTANGLE or CIRCLE) and needs a set of reference points filling that area for spatial analysis, such as buffer zone classification or coverage assessment.
 
 **Parameters**:
 - `pattern`: Generation pattern — "grid" for evenly spaced rows/columns, "scatter" for random distribution
-- `bounds`: Bounding box [west, south, east, north] in WGS84 decimal degrees
 - `rows`: Number of rows (grid pattern only, default: 5)
 - `cols`: Number of columns (grid pattern only, default: 5)
 - `count`: Number of points to generate (scatter pattern only, default: 25)
@@ -27,12 +26,12 @@ status: draft
 
 ## Inputs
 
-**Schema**: No input features required — `ContextType.NONE`. All parameters are explicit tool arguments.
+**Schema**: Requires exactly one polygon feature — `ContextType.SINGLE` with `input_kinds: ["RECTANGLE", "CIRCLE"]`. The bounding box [west, south, east, north] is derived from the polygon geometry coordinates by computing min/max of longitude and latitude across the outer ring.
 
 **Constraints**:
-- `bounds` must be a 4-element numeric array [west, south, east, north]
+- Input feature must have Polygon geometry with at least one coordinate ring
+- Derived bounding box must have positive area (west != east, south != north)
 - `south < north` (latitude ordering)
-- Bounding box must have positive area (west != east, south != north)
 - `rows` and `cols` must be positive integers (grid pattern)
 - `count` must be a positive integer (scatter pattern)
 - When `west > east`, the bounding box crosses the antimeridian
@@ -56,7 +55,7 @@ The `result_subtype` is `reference/generated_points`.
 ### Annotations
 
 - `debrief:resultType`: `addition/reference/generated_points`
-- `debrief:sourceFeatures`: `[]` (no input features)
+- `debrief:sourceFeatures`: `[<polygon feature id>]`
 - `debrief:label`: `"Generated {N} reference points ({pattern}) in [{W},{S},{E},{N}]"`
 
 ## Algorithm
@@ -190,14 +189,28 @@ FUNCTION build_multipoint_feature(id: string, coordinates: list, metadata: list,
 END FUNCTION
 ```
 
+### Bounds Extraction
+
+```pseudocode
+FUNCTION extract_bounds_from_polygon(feature: Feature) -> BoundingBox:
+    // Extract outer ring coordinates from Polygon geometry
+    coordinates = feature.geometry.coordinates[0]
+    lons = [c[0] FOR c IN coordinates]
+    lats = [c[1] FOR c IN coordinates]
+    RETURN [min(lons), min(lats), max(lons), max(lats)]
+END FUNCTION
+```
+
 ### Entry Point
 
 ```pseudocode
 FUNCTION generate_reference_points(context: SelectionContext, params: dict) -> list[Feature]:
-    // Validate common parameters
-    pattern = params["pattern"]
-    bounds = params["bounds"]
+    // Extract bounds from the selected polygon feature
+    polygon = context.features[0]
+    bounds = extract_bounds_from_polygon(polygon)
     validate_bounds(bounds)
+
+    pattern = params["pattern"]
 
     IF pattern = "grid":
         rows = params.get("rows", 5)
@@ -222,14 +235,13 @@ END FUNCTION
 
 | Scenario | Expected Behavior |
 |----------|------------------|
-| Zero-area bounds (west=east or south=north) | Return error: "Bounding box must have positive area" |
-| south >= north | Return error: "South ({s}) must be less than north ({n})" |
+| No polygon feature provided | Return error: "Requires exactly one polygon feature" |
+| Zero-area polygon (degenerate line/point) | Return error: "Bounding box must have positive area" |
+| south >= north in derived bounds | Return error: "South ({s}) must be less than north ({n})" |
 | Negative or zero rows/cols | Return error: "Grid dimensions must be positive integers" |
 | count = 0 or negative | Return error: "Count must be a positive integer" |
 | Antimeridian crossing (west > east) | Generate points across date line, normalise longitudes to [-180, 180] |
 | 1x1 grid | Single coordinate at bounding box centre |
-| Missing rows/cols for grid | Return error: "Grid pattern requires 'rows' and 'cols' parameters" |
-| Missing count for scatter | Return error: "Scatter pattern requires 'count' parameter" |
 | No seed for scatter | Use system time as seed (non-reproducible) |
 | Very large grid (1000x1000) | Generate all points; no artificial limit |
 
@@ -244,7 +256,7 @@ END FUNCTION
 
 ### Grid Example (3x4)
 
-**Input**: `pattern="grid"`, `bounds=[-5, 49, 1, 52]`, `rows=3`, `cols=4`
+**Input**: A RECTANGLE polygon with bounds [-5, 49, 1, 52], `pattern="grid"`, `rows=3`, `cols=4`
 
 **Output**: MultiPoint feature with 12 coordinates at evenly spaced intervals:
 - Row 0 (lat=49.0): [-5, 49], [-3, 49], [-1, 49], [1, 49]
@@ -253,7 +265,7 @@ END FUNCTION
 
 ### Scatter Example (20 points, seed=42)
 
-**Input**: `pattern="scatter"`, `bounds=[-5, 49, 1, 52]`, `count=20`, `seed=42`
+**Input**: A RECTANGLE polygon with bounds [-5, 49, 1, 52], `pattern="scatter"`, `count=20`, `seed=42`
 
 **Output**: MultiPoint feature with 20 coordinates uniformly distributed within bounds, deterministic for seed=42.
 
@@ -261,6 +273,7 @@ END FUNCTION
 
 ### 1.0 (2026-02-13)
 - Initial release with grid and scatter patterns
+- Requires a polygon feature (RECTANGLE or CIRCLE) — bounds derived from geometry
 - Cross-language LCG PRNG for deterministic scatter
 - MultiPoint geometry with parallel pointMetadata array
 

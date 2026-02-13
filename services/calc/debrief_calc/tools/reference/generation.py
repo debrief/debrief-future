@@ -24,11 +24,21 @@ def _lcg_next(state: int) -> int:
     return (_LCG_MULTIPLIER * state + _LCG_INCREMENT) % _LCG_MODULUS
 
 
-def _validate_bounds(bounds: list) -> tuple[float, float, float, float]:
-    """Validate and unpack bounding box."""
-    if not isinstance(bounds, list) or len(bounds) != 4:
-        raise ValueError("Bounds must be [west, south, east, north]")
+def _extract_bounds_from_polygon(feature: dict[str, Any]) -> tuple[float, float, float, float]:
+    """Extract bounding box [west, south, east, north] from a polygon feature."""
+    geom = feature.get("geometry", {})
+    coords = geom.get("coordinates", [[]])[0]  # outer ring
+    if not coords:
+        raise ValueError("Polygon feature has no coordinates")
+    lons = [c[0] for c in coords]
+    lats = [c[1] for c in coords]
+    return min(lons), min(lats), max(lons), max(lats)
 
+
+def _validate_bounds(
+    bounds: tuple[float, float, float, float],
+) -> tuple[float, float, float, float]:
+    """Validate bounding box."""
     west, south, east, north = bounds
 
     if south >= north:
@@ -144,22 +154,16 @@ def _generate_scatter(
 
 @tool(
     name="generate-reference-points",
-    description="Generates a grid or scatter pattern of reference points within a bounding box.",
-    input_kinds=[],
+    description="Generates a grid or scatter pattern of reference points within a selected polygon.",
+    input_kinds=["RECTANGLE", "CIRCLE"],
     output_kind="reference/generated_points",
-    context_type=ContextType.NONE,
+    context_type=ContextType.SINGLE,
     parameters=[
         ToolParameter(
             name="pattern",
             type="enum",
             description="Generation pattern",
             choices=["grid", "scatter"],
-            required=True,
-        ),
-        ToolParameter(
-            name="bounds",
-            type="string",
-            description="Bounding box [west, south, east, north]",
             required=True,
         ),
         ToolParameter(
@@ -191,23 +195,23 @@ def generate_reference_points(
     context: SelectionContext, params: dict[str, Any]
 ) -> list[dict[str, Any]]:
     """
-    Generate a grid or scatter of reference points within a bounding box.
+    Generate a grid or scatter of reference points within a polygon's bounding box.
 
     Args:
-        context: SelectionContext (NONE — no input features needed)
-        params: Tool parameters including pattern, bounds, and pattern-specific options
+        context: SelectionContext (SINGLE — one RECTANGLE or CIRCLE feature)
+        params: Tool parameters including pattern and pattern-specific options
 
     Returns:
         List containing a single MultiPoint GeoJSON Feature
     """
+    if not context.features:
+        raise ValueError("Requires exactly one polygon feature")
+
     pattern = params.get("pattern")
     if pattern not in ("grid", "scatter"):
         raise ValueError("Pattern must be 'grid' or 'scatter'")
 
-    bounds = params.get("bounds")
-    if bounds is None:
-        raise ValueError("Parameter 'bounds' is required")
-
+    bounds = _extract_bounds_from_polygon(context.features[0])
     west, south, east, north = _validate_bounds(bounds)
 
     if pattern == "grid":

@@ -6,12 +6,21 @@
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.reference.generation import generate_reference_points
 
-context = SelectionContext(type=ContextType.NONE, features=[])
+# Create a polygon feature representing the zone
+polygon = {
+    "type": "Feature",
+    "id": "zone-charlie",
+    "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-5, 49], [1, 49], [1, 52], [-5, 52], [-5, 49]]],
+    },
+    "properties": {"kind": "RECTANGLE"},
+}
+context = SelectionContext(type=ContextType.SINGLE, features=[polygon])
 
 # Grid pattern: 3 rows x 4 columns
 grid_result = generate_reference_points(context, {
     "pattern": "grid",
-    "bounds": [-5, 49, 1, 52],
     "rows": 3,
     "cols": 4,
 })
@@ -23,7 +32,6 @@ feature = grid_result[0]
 # Scatter pattern: 20 points with seed for reproducibility
 scatter_result = generate_reference_points(context, {
     "pattern": "scatter",
-    "bounds": [-5, 49, 1, 52],
     "count": 20,
     "seed": 42,
 })
@@ -38,19 +46,27 @@ feature = scatter_result[0]
 ```typescript
 import { execute } from './tools/reference/generation/generateReferencePoints';
 
+const polygon = {
+  type: 'Feature' as const,
+  id: 'zone-charlie',
+  geometry: {
+    type: 'Polygon',
+    coordinates: [[[-5, 49], [1, 49], [1, 52], [-5, 52], [-5, 49]]],
+  },
+  properties: { kind: 'RECTANGLE' },
+};
+
 // Grid pattern
-const gridResult = execute([], {
+const gridResult = execute([polygon], {
   pattern: 'grid',
-  bounds: [-5, 49, 1, 52],
   rows: 3,
   cols: 4,
 });
 // gridResult[0].geometry.coordinates.length === 12
 
 // Scatter pattern with seed
-const scatterResult = execute([], {
+const scatterResult = execute([polygon], {
   pattern: 'scatter',
-  bounds: [-5, 49, 1, 52],
   count: 20,
   seed: 42,
 });
@@ -88,6 +104,6 @@ Both languages produce a single MultiPoint feature:
 
 The generated MultiPoint feature feeds directly into the E03 buffer zone analysis chain:
 
-1. **generate-reference-points** (#078) -- produces MultiPoint with pointMetadata
+1. **generate-reference-points** (#078) -- requires a RECTANGLE/CIRCLE polygon, produces MultiPoint with pointMetadata
 2. **point-in-zone-classifier** (#081) -- reads pointMetadata, adds zone/color fields
 3. **zone-histogram-generator** (#082) -- counts entries per zone

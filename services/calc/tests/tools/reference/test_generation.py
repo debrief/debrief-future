@@ -26,9 +26,35 @@ def _load_golden(name: str) -> dict[str, Any]:
         return json.load(f)
 
 
-def _make_context() -> SelectionContext:
-    """Create a NONE context for the tool."""
-    return SelectionContext(type=ContextType.NONE, features=[])
+def _make_polygon(west: float, south: float, east: float, north: float) -> dict[str, Any]:
+    """Create a RECTANGLE polygon feature with the given bounds."""
+    return {
+        "type": "Feature",
+        "id": "test-rect",
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [west, south],
+                    [east, south],
+                    [east, north],
+                    [west, north],
+                    [west, south],
+                ]
+            ],
+        },
+        "properties": {"kind": "RECTANGLE"},
+    }
+
+
+def _make_context(
+    west: float = -5, south: float = 49, east: float = 1, north: float = 52
+) -> SelectionContext:
+    """Create a SINGLE context with a RECTANGLE polygon."""
+    return SelectionContext(
+        type=ContextType.SINGLE,
+        features=[_make_polygon(west, south, east, north)],
+    )
 
 
 # ============================================================================
@@ -44,7 +70,7 @@ class TestGridBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "bounds": [-5, 49, 1, 52], "rows": 3, "cols": 4}
+        params = {"pattern": "grid", "rows": 3, "cols": 4}
         result = generate_reference_points(context, params)
 
         assert isinstance(result, list)
@@ -60,7 +86,7 @@ class TestGridBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "bounds": [-5, 49, 1, 52], "rows": 3, "cols": 4}
+        params = {"pattern": "grid", "rows": 3, "cols": 4}
         result = generate_reference_points(context, params)
 
         coords = result[0]["geometry"]["coordinates"]
@@ -88,7 +114,7 @@ class TestGridBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "bounds": [-5, 49, 1, 52], "rows": 1, "cols": 1}
+        params = {"pattern": "grid", "rows": 1, "cols": 1}
         result = generate_reference_points(context, params)
 
         coords = result[0]["geometry"]["coordinates"]
@@ -99,8 +125,8 @@ class TestGridBasic:
         """A 5x5 grid should have 25 coordinates at even intervals."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
-        context = _make_context()
-        params = {"pattern": "grid", "bounds": [0, 0, 4, 4], "rows": 5, "cols": 5}
+        context = _make_context(0, 0, 4, 4)
+        params = {"pattern": "grid", "rows": 5, "cols": 5}
         result = generate_reference_points(context, params)
 
         coords = result[0]["geometry"]["coordinates"]
@@ -121,7 +147,7 @@ class TestGridBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "bounds": [-5, 49, 1, 52], "rows": 3, "cols": 4}
+        params = {"pattern": "grid", "rows": 3, "cols": 4}
         result = generate_reference_points(context, params)
 
         feature = result[0]
@@ -140,7 +166,7 @@ class TestGridBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "bounds": [-5, 49, 1, 52], "rows": 3, "cols": 4}
+        params = {"pattern": "grid", "rows": 3, "cols": 4}
         result = generate_reference_points(context, params)
 
         feature = result[0]
@@ -160,8 +186,8 @@ class TestGridEdgeCases:
         """Zero-area bounds (west==east) should raise ValueError."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
-        context = _make_context()
-        params = {"pattern": "grid", "bounds": [0, 0, 0, 1], "rows": 2, "cols": 2}
+        context = _make_context(0, 0, 0, 1)
+        params = {"pattern": "grid", "rows": 2, "cols": 2}
         with pytest.raises(ValueError, match="positive area"):
             generate_reference_points(context, params)
 
@@ -169,18 +195,19 @@ class TestGridEdgeCases:
         """Zero-area bounds (south==north) should raise ValueError."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
-        context = _make_context()
-        params = {"pattern": "grid", "bounds": [0, 0, 1, 0], "rows": 2, "cols": 2}
+        context = _make_context(0, 0, 1, 0)
+        params = {"pattern": "grid", "rows": 2, "cols": 2}
         with pytest.raises(ValueError, match="must be less than north"):
             generate_reference_points(context, params)
 
-    def test_south_greater_than_north(self):
-        """south > north should raise ValueError."""
+    def test_degenerate_vertical_line(self):
+        """Polygon collapsed to a vertical line (all same longitude) should raise."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
-        context = _make_context()
-        params = {"pattern": "grid", "bounds": [0, 52, 1, 49], "rows": 2, "cols": 2}
-        with pytest.raises(ValueError, match="must be less than north"):
+        # All lons are 0, so west == east → positive area error
+        context = _make_context(0, 0, 0, 1)
+        params = {"pattern": "grid", "rows": 2, "cols": 2}
+        with pytest.raises(ValueError, match="positive area"):
             generate_reference_points(context, params)
 
     def test_negative_rows(self):
@@ -188,7 +215,7 @@ class TestGridEdgeCases:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "bounds": [-5, 49, 1, 52], "rows": -1, "cols": 4}
+        params = {"pattern": "grid", "rows": -1, "cols": 4}
         with pytest.raises(ValueError, match="positive integer"):
             generate_reference_points(context, params)
 
@@ -197,7 +224,7 @@ class TestGridEdgeCases:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "bounds": [-5, 49, 1, 52], "rows": 3, "cols": 0}
+        params = {"pattern": "grid", "rows": 3, "cols": 0}
         with pytest.raises(ValueError, match="positive integer"):
             generate_reference_points(context, params)
 
@@ -206,7 +233,7 @@ class TestGridEdgeCases:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "hexagonal", "bounds": [-5, 49, 1, 52]}
+        params = {"pattern": "hexagonal"}
         with pytest.raises(ValueError, match="'grid' or 'scatter'"):
             generate_reference_points(context, params)
 
@@ -217,8 +244,11 @@ class TestGridEdgeCases:
         golden_input = _load_golden("generate-reference-points.grid.input.json")
         golden_output = _load_golden("generate-reference-points.grid.output.json")
 
-        context = _make_context()
-        result = generate_reference_points(context, golden_input)
+        context = SelectionContext(
+            type=ContextType.SINGLE,
+            features=golden_input["features"],
+        )
+        result = generate_reference_points(context, golden_input["params"])
 
         expected_feature = golden_output["features"][0]
         actual_feature = result[0]
@@ -229,6 +259,17 @@ class TestGridEdgeCases:
             actual_feature["properties"]["pointMetadata"]
             == expected_feature["properties"]["pointMetadata"]
         )
+
+    def test_no_features_raises(self):
+        """Missing polygon feature should raise ValueError."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = SelectionContext(type=ContextType.SINGLE, features=[_make_polygon(-5, 49, 1, 52)])
+        # Manually clear features to test the guard
+        context.features = []
+        params = {"pattern": "grid", "rows": 3, "cols": 4}
+        with pytest.raises(ValueError, match="polygon feature"):
+            generate_reference_points(context, params)
 
 
 # ============================================================================
@@ -244,7 +285,7 @@ class TestScatterBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "scatter", "bounds": [-5, 49, 1, 52], "count": 20, "seed": 42}
+        params = {"pattern": "scatter", "count": 20, "seed": 42}
         result = generate_reference_points(context, params)
 
         assert len(result) == 1
@@ -258,7 +299,7 @@ class TestScatterBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "scatter", "bounds": [-5, 49, 1, 52], "count": 20, "seed": 42}
+        params = {"pattern": "scatter", "count": 20, "seed": 42}
         result1 = generate_reference_points(context, params)
         result2 = generate_reference_points(context, params)
 
@@ -271,8 +312,8 @@ class TestScatterBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params1 = {"pattern": "scatter", "bounds": [-5, 49, 1, 52], "count": 20, "seed": 1}
-        params2 = {"pattern": "scatter", "bounds": [-5, 49, 1, 52], "count": 20, "seed": 2}
+        params1 = {"pattern": "scatter", "count": 20, "seed": 1}
+        params2 = {"pattern": "scatter", "count": 20, "seed": 2}
         result1 = generate_reference_points(context, params1)
         result2 = generate_reference_points(context, params2)
 
@@ -285,7 +326,7 @@ class TestScatterBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "scatter", "bounds": [-5, 49, 1, 52], "count": 100, "seed": 99}
+        params = {"pattern": "scatter", "count": 100, "seed": 99}
         result = generate_reference_points(context, params)
 
         coords = result[0]["geometry"]["coordinates"]
@@ -298,7 +339,7 @@ class TestScatterBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "scatter", "bounds": [-5, 49, 1, 52], "count": 20, "seed": 42}
+        params = {"pattern": "scatter", "count": 20, "seed": 42}
         result = generate_reference_points(context, params)
 
         feature = result[0]
@@ -313,7 +354,7 @@ class TestScatterBasic:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "scatter", "bounds": [-5, 49, 1, 52], "count": 10, "seed": 42}
+        params = {"pattern": "scatter", "count": 10, "seed": 42}
         result = generate_reference_points(context, params)
 
         feature = result[0]
@@ -334,7 +375,7 @@ class TestScatterEdgeCases:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "scatter", "bounds": [-5, 49, 1, 52], "count": 0, "seed": 42}
+        params = {"pattern": "scatter", "count": 0, "seed": 42}
         with pytest.raises(ValueError, match="positive integer"):
             generate_reference_points(context, params)
 
@@ -343,7 +384,7 @@ class TestScatterEdgeCases:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "scatter", "bounds": [-5, 49, 1, 52], "seed": 42}
+        params = {"pattern": "scatter", "seed": 42}
         result = generate_reference_points(context, params)
 
         coords = result[0]["geometry"]["coordinates"]
@@ -353,8 +394,8 @@ class TestScatterEdgeCases:
         """Antimeridian crossing (west > east) should wrap longitudes."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
-        context = _make_context()
-        params = {"pattern": "scatter", "bounds": [170, -10, -170, 10], "count": 50, "seed": 42}
+        context = _make_context(170, -10, -170, 10)
+        params = {"pattern": "scatter", "count": 50, "seed": 42}
         result = generate_reference_points(context, params)
 
         coords = result[0]["geometry"]["coordinates"]
@@ -370,8 +411,11 @@ class TestScatterEdgeCases:
         golden_input = _load_golden("generate-reference-points.scatter.input.json")
         golden_output = _load_golden("generate-reference-points.scatter.output.json")
 
-        context = _make_context()
-        result = generate_reference_points(context, golden_input)
+        context = SelectionContext(
+            type=ContextType.SINGLE,
+            features=golden_input["features"],
+        )
+        result = generate_reference_points(context, golden_input["params"])
 
         expected_feature = golden_output["features"][0]
         actual_feature = result[0]
@@ -400,7 +444,7 @@ class TestDownstreamCompatibility:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "bounds": [-5, 49, 1, 52], "rows": 3, "cols": 4}
+        params = {"pattern": "grid", "rows": 3, "cols": 4}
         result = generate_reference_points(context, params)
 
         feature = result[0]
@@ -416,7 +460,7 @@ class TestDownstreamCompatibility:
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
-        params = {"pattern": "grid", "bounds": [-5, 49, 1, 52], "rows": 2, "cols": 2}
+        params = {"pattern": "grid", "rows": 2, "cols": 2}
         result = generate_reference_points(context, params)
 
         feature = result[0]
@@ -438,8 +482,8 @@ class TestDownstreamCompatibility:
         """Grid with antimeridian crossing should normalise longitudes."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
-        context = _make_context()
-        params = {"pattern": "grid", "bounds": [170, -10, -170, 10], "rows": 3, "cols": 3}
+        context = _make_context(170, -10, -170, 10)
+        params = {"pattern": "grid", "rows": 3, "cols": 3}
         result = generate_reference_points(context, params)
 
         coords = result[0]["geometry"]["coordinates"]
@@ -464,8 +508,11 @@ class TestCrossLanguageParity:
         golden_input = _load_golden("generate-reference-points.grid.input.json")
         golden_output = _load_golden("generate-reference-points.grid.output.json")
 
-        context = _make_context()
-        result = generate_reference_points(context, golden_input)
+        context = SelectionContext(
+            type=ContextType.SINGLE,
+            features=golden_input["features"],
+        )
+        result = generate_reference_points(context, golden_input["params"])
 
         expected = golden_output["features"][0]
         actual = result[0]
@@ -480,8 +527,11 @@ class TestCrossLanguageParity:
         golden_input = _load_golden("generate-reference-points.scatter.input.json")
         golden_output = _load_golden("generate-reference-points.scatter.output.json")
 
-        context = _make_context()
-        result = generate_reference_points(context, golden_input)
+        context = SelectionContext(
+            type=ContextType.SINGLE,
+            features=golden_input["features"],
+        )
+        result = generate_reference_points(context, golden_input["params"])
 
         expected_coords = golden_output["features"][0]["geometry"]["coordinates"]
         actual_coords = result[0]["geometry"]["coordinates"]
