@@ -46,11 +46,11 @@
 
 **Purpose**: Create the registry module structure and type definitions
 
-- [ ] T001 Create registry module directory and barrel export `services/session-state/src/registry/index.ts`
-- [ ] T002 [P] Define ResultIdMapping and ResultIdChangeEvent types `services/session-state/src/registry/types.ts`
-- [ ] T003 [P] Define StacAssetForHydration type `services/session-state/src/registry/types.ts`
-- [ ] T004 [P] Define ResultIdChangeCallback type and ResultIdRegistry interface `services/session-state/src/registry/types.ts`
-- [ ] T005 Re-export registry types and factory from session-state package index `services/session-state/src/index.ts`
+- [x] T001 Create registry module directory and barrel export `services/session-state/src/registry/index.ts`
+- [x] T002 [P] Define ResultIdMapping and ResultIdChangeEvent types `services/session-state/src/registry/types.ts`
+- [x] T003 [P] Define StacAssetForHydration type `services/session-state/src/registry/types.ts`
+- [x] T004 [P] Define ResultIdChangeCallback type and ResultIdRegistry interface `services/session-state/src/registry/types.ts`
+- [x] T005 Re-export registry types and factory from session-state package index `services/session-state/src/index.ts`
 
 **Checkpoint**: Type definitions compile, barrel exports resolve, no runtime code yet
 
@@ -66,16 +66,16 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T006 [test] Write tests for createResultIdRegistry factory and initial state `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T007 [P][test] Write tests for resolve() returning undefined for unknown IDs `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T008 [P][test] Write tests for clear() removing all mappings `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T009 [P][test] Write tests for size property `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T006 [test] Write tests for createResultIdRegistry factory and initial state `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T007 [P][test] Write tests for resolve() returning undefined for unknown IDs `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T008 [P][test] Write tests for clear() removing all mappings `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T009 [P][test] Write tests for size property `services/session-state/tests/registry/resultIdRegistry.test.ts`
 
 ### Implementation for Foundation
 
-- [ ] T010 Implement createResultIdRegistry factory with internal Map, resolve, listAll, size, clear `services/session-state/src/registry/resultIdRegistry.ts`
-- [ ] T011 Implement internal _register method that updates Map and emits change events to subscribers `services/session-state/src/registry/resultIdRegistry.ts`
-- [ ] T012 Verify foundation tests pass
+- [x] T010 Implement createResultIdRegistry factory with internal Map, resolve, listAll, size, clear `services/session-state/src/registry/resultIdRegistry.ts`
+- [x] T011 Implement internal _register method that updates Map and emits change events to subscribers `services/session-state/src/registry/resultIdRegistry.ts`
+- [x] T012 Verify foundation tests pass
 
 **Checkpoint**: Factory creates registry, resolve/listAll/size/clear work, change events emitted internally
 
@@ -91,17 +91,17 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T013 [test] Write tests for registerFromLogEntry with valid generatedResultId `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T014 [P][test] Write tests for registerFromLogEntry with null/undefined generatedResultId (no-op) `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T015 [P][test] Write tests for registerFromRecordResult delegating to registerFromLogEntry `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T016 [P][test] Write tests for registerFromReplayResult processing ArtifactVersion array `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T013 [test] Write tests for registerFromLogEntry with valid generatedResultId `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T014 [P][test] Write tests for registerFromLogEntry with null/undefined generatedResultId (no-op) `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T015 [P][test] Write tests for registerFromRecordResult delegating to registerFromLogEntry `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T016 [P][test] Write tests for registerFromReplayResult processing ArtifactVersion array `services/session-state/tests/registry/resultIdRegistry.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T017 Implement registerFromLogEntry: extract generatedResultId and generated[0] path from LogEntry, call _register `services/session-state/src/registry/resultIdRegistry.ts`
-- [ ] T018 Implement registerFromRecordResult: iterate entries, delegate to registerFromLogEntry `services/session-state/src/registry/resultIdRegistry.ts`
-- [ ] T019 Implement registerFromReplayResult: iterate ArtifactVersion[], call _register for each `services/session-state/src/registry/resultIdRegistry.ts`
-- [ ] T020 Verify User Story 1 tests pass
+- [x] T017 Implement registerFromLogEntry: extract generatedResultId and generated[0] path from LogEntry, call _register `services/session-state/src/registry/resultIdRegistry.ts`
+- [x] T018 Implement registerFromRecordResult: iterate entries, delegate to registerFromLogEntry `services/session-state/src/registry/resultIdRegistry.ts`
+- [x] T019 Implement registerFromReplayResult: iterate ArtifactVersion[], call _register for each `services/session-state/src/registry/resultIdRegistry.ts`
+- [x] T020 Verify User Story 1 tests pass
 
 **Checkpoint**: LogEntry and RecordResult registration works. resolve() returns correct paths. No-op for entries without generatedResultId.
 
@@ -117,20 +117,20 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T021 [test] Write tests for subscribe() receiving change events on update `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T022 [P][test] Write tests for subscribeAll() receiving all change events `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T023 [P][test] Write tests for unsubscribe preventing further callbacks `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T024 [P][test] Write tests for change event containing resultId, previousPath, newPath `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T025 [P][test] Write tests for multiple subscribers receiving independent notifications `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T026 [P][test] Write tests for per-ID subscriber NOT receiving events for other IDs `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T021 [test] Write tests for subscribe() receiving change events on update `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T022 [P][test] Write tests for subscribeAll() receiving all change events `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T023 [P][test] Write tests for unsubscribe preventing further callbacks `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T024 [P][test] Write tests for change event containing resultId, previousPath, newPath `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T025 [P][test] Write tests for multiple subscribers receiving independent notifications `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T026 [P][test] Write tests for per-ID subscriber NOT receiving events for other IDs `services/session-state/tests/registry/resultIdRegistry.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T027 Implement subscribe(): add per-ID callback to internal Set, return unsubscribe function `services/session-state/src/registry/resultIdRegistry.ts`
-- [ ] T028 Implement subscribeAll(): add global callback to internal Set, return unsubscribe function `services/session-state/src/registry/resultIdRegistry.ts`
-- [ ] T029 Wire _register to emit ResultIdChangeEvent to per-ID and global subscribers `services/session-state/src/registry/resultIdRegistry.ts`
-- [ ] T030 Ensure clear() removes all subscriptions in addition to mappings `services/session-state/src/registry/resultIdRegistry.ts`
-- [ ] T031 Verify User Story 2 tests pass
+- [x] T027 Implement subscribe(): add per-ID callback to internal Set, return unsubscribe function `services/session-state/src/registry/resultIdRegistry.ts`
+- [x] T028 Implement subscribeAll(): add global callback to internal Set, return unsubscribe function `services/session-state/src/registry/resultIdRegistry.ts`
+- [x] T029 Wire _register to emit ResultIdChangeEvent to per-ID and global subscribers `services/session-state/src/registry/resultIdRegistry.ts`
+- [x] T030 Ensure clear() removes all subscriptions in addition to mappings `services/session-state/src/registry/resultIdRegistry.ts`
+- [x] T031 Verify User Story 2 tests pass
 
 **Checkpoint**: Subscriptions work. Change events emitted on first registration and on update. Unsubscribe stops callbacks. Per-ID filtering correct.
 
@@ -146,17 +146,17 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T032 [test] Write tests for hydrateFromAssets with single result ID, single version `services/session-state/tests/registry/hydration.test.ts`
-- [ ] T033 [P][test] Write tests for hydrateFromAssets selecting highest version from multiple versions `services/session-state/tests/registry/hydration.test.ts`
-- [ ] T034 [P][test] Write tests for hydrateFromAssets with multiple distinct result IDs `services/session-state/tests/registry/hydration.test.ts`
-- [ ] T035 [P][test] Write tests for hydrateFromAssets ignoring assets without debrief:resultId `services/session-state/tests/registry/hydration.test.ts`
-- [ ] T036 [P][test] Write tests for hydrateFromAssets with empty asset map (no error) `services/session-state/tests/registry/hydration.test.ts`
-- [ ] T037 [P][test] Write tests that hydrateFromAssets does NOT emit change events `services/session-state/tests/registry/hydration.test.ts`
+- [x] T032 [test] Write tests for hydrateFromAssets with single result ID, single version `services/session-state/tests/registry/hydration.test.ts`
+- [x] T033 [P][test] Write tests for hydrateFromAssets selecting highest version from multiple versions `services/session-state/tests/registry/hydration.test.ts`
+- [x] T034 [P][test] Write tests for hydrateFromAssets with multiple distinct result IDs `services/session-state/tests/registry/hydration.test.ts`
+- [x] T035 [P][test] Write tests for hydrateFromAssets ignoring assets without debrief:resultId `services/session-state/tests/registry/hydration.test.ts`
+- [x] T036 [P][test] Write tests for hydrateFromAssets with empty asset map (no error) `services/session-state/tests/registry/hydration.test.ts`
+- [x] T037 [P][test] Write tests that hydrateFromAssets does NOT emit change events `services/session-state/tests/registry/hydration.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T038 Implement hydrateFromAssets: scan assets, group by debrief:resultId, select highest debrief:version, populate Map without emitting events `services/session-state/src/registry/resultIdRegistry.ts`
-- [ ] T039 Verify User Story 3 tests pass
+- [x] T038 Implement hydrateFromAssets: scan assets, group by debrief:resultId, select highest debrief:version, populate Map without emitting events `services/session-state/src/registry/resultIdRegistry.ts`
+- [x] T039 Verify User Story 3 tests pass
 
 **Checkpoint**: Hydration works. Highest version selected. Legacy assets ignored. No change events during hydration.
 
@@ -172,15 +172,15 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T040 [test] Write tests for rapid successive updates producing correctly ordered events `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T041 [P][test] Write tests for registering after hydration (hydrate then register new version) `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T042 [P][test] Write tests for clear() during active subscriptions (no callbacks after clear) `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T040 [test] Write tests for rapid successive updates producing correctly ordered events `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T041 [P][test] Write tests for registering after hydration (hydrate then register new version) `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T042 [P][test] Write tests for clear() during active subscriptions (no callbacks after clear) `services/session-state/tests/registry/resultIdRegistry.test.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T043 Handle edge case: rapid successive updates emit sequential change events `services/session-state/src/registry/resultIdRegistry.ts`
-- [ ] T044 Handle edge case: registering after hydration triggers change event (old path from hydration, new from LogEntry) `services/session-state/src/registry/resultIdRegistry.ts`
-- [ ] T045 Verify User Story 4 tests pass
+- [x] T043 Handle edge case: rapid successive updates emit sequential change events `services/session-state/src/registry/resultIdRegistry.ts`
+- [x] T044 Handle edge case: registering after hydration triggers change event (old path from hydration, new from LogEntry) `services/session-state/src/registry/resultIdRegistry.ts`
+- [x] T045 Verify User Story 4 tests pass
 
 **Checkpoint**: All edge cases handled. Subscriptions work correctly across hydration + live updates. Clear during active subscriptions is safe.
 
@@ -192,17 +192,17 @@
 
 ### Tests for Integration
 
-- [ ] T046 [test] Write integration test: mock LogService RecordResult → registry populated `services/session-state/tests/registry/resultIdRegistry.test.ts`
-- [ ] T047 [P][test] Write integration test: mock STAC assets → hydrate → registry populated `services/session-state/tests/registry/hydration.test.ts`
+- [x] T046 [test] Write integration test: mock LogService RecordResult → registry populated `services/session-state/tests/registry/resultIdRegistry.test.ts`
+- [x] T047 [P][test] Write integration test: mock STAC assets → hydrate → registry populated `services/session-state/tests/registry/hydration.test.ts`
 
 ### Implementation for Integration
 
-- [ ] T048 Add registerFromRecordResult call after logService.recordToolResult in executeTool command `apps/vscode/src/commands/executeTool.ts`
-- [ ] T049 Add registerFromReplayResult call after replay/tune operations in executeTool command `apps/vscode/src/commands/executeTool.ts`
-- [ ] T050 Add hydrateFromAssets call after stacService.loadItem in openPlot command `apps/vscode/src/commands/openPlot.ts`
-- [ ] T051 Create registry instance in extension activation and wire clear() to plot close `apps/vscode/src/extension.ts`
-- [ ] T052 Export createResultIdRegistry from session-state barrel if not already done `services/session-state/src/index.ts`
-- [ ] T053 Verify existing tests still pass (no regression)
+- [x] T048 Add registerFromRecordResult call after logService.recordToolResult in executeTool command `apps/vscode/src/commands/executeTool.ts`
+- [x] T049 Add registerFromReplayResult call after replay/tune operations in logPanelView `apps/vscode/src/views/logPanelView.ts`
+- [x] T050 Add hydrateFromAssets call in openPlot command (reads STAC item JSON directly) `apps/vscode/src/commands/openPlot.ts`
+- [x] T051 Create registry instance in extension activation and wire to commands and log panel `apps/vscode/src/extension.ts`
+- [x] T052 Export createResultIdRegistry from session-state barrel if not already done `services/session-state/src/index.ts`
+- [x] T053 Verify existing tests still pass (no regression) — 521 tests pass, 0 failures
 
 **Checkpoint**: Registry is wired end-to-end in VS Code extension. Tool executions populate registry. Plot load hydrates registry. Plot close clears registry.
 
