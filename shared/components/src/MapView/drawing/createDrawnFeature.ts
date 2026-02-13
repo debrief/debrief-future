@@ -67,7 +67,7 @@ export function createDrawnFeature(
       id,
       geometry: {
         type: 'Polygon',
-        coordinates: polygonGeometry.coordinates,
+        coordinates: polygonGeometry.coordinates as unknown as number[],
       },
       properties: {
         kind: 'RECTANGLE',

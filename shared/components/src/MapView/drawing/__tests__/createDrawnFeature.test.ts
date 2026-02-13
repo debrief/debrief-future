@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { ReferenceLocation, RectangleAnnotation } from '@debrief/schemas';
 import { createDrawnFeature } from '../createDrawnFeature';
 import { DEFAULT_DRAWN_POINT_STYLE, DEFAULT_DRAWN_RECTANGLE_STYLE } from '../drawingDefaults';
 
@@ -37,7 +38,7 @@ describe('createDrawnFeature', () => {
     it('preserves the clicked coordinates', () => {
       const result = createDrawnFeature(validPointGeojson, 'point');
       expect(result!.geometry.type).toBe('Point');
-      expect((result!.geometry as GeoJSON.Point).coordinates).toEqual([-4.1189, 50.3912]);
+      expect((result!.geometry as unknown as GeoJSON.Point).coordinates).toEqual([-4.1189, 50.3912]);
     });
 
     it('applies default point styling', () => {
@@ -46,22 +47,22 @@ describe('createDrawnFeature', () => {
     });
 
     it('sets default name and location_type', () => {
-      const result = createDrawnFeature(validPointGeojson, 'point');
-      expect(result!.properties.name).toBe('Drawn Point');
-      expect(result!.properties.location_type).toBe('REFERENCE');
+      const result = createDrawnFeature(validPointGeojson, 'point') as ReferenceLocation;
+      expect(result.properties.name).toBe('Drawn Point');
+      expect(result.properties.location_type).toBe('REFERENCE');
     });
 
     it('allows custom name via options', () => {
-      const result = createDrawnFeature(validPointGeojson, 'point', { name: 'Sighting A' });
-      expect(result!.properties.name).toBe('Sighting A');
+      const result = createDrawnFeature(validPointGeojson, 'point', { name: 'Sighting A' }) as ReferenceLocation;
+      expect(result.properties.name).toBe('Sighting A');
     });
 
     it('allows partial style overrides via options', () => {
       const result = createDrawnFeature(validPointGeojson, 'point', {
         pointStyle: { fill_color: '#FF0000' },
-      });
-      expect(result!.properties.style.fill_color).toBe('#FF0000');
-      expect(result!.properties.style.shape).toBe('circle'); // Preserved default
+      }) as ReferenceLocation;
+      expect(result.properties.style.fill_color).toBe('#FF0000');
+      expect(result.properties.style.shape).toBe('circle'); // Preserved default
     });
   });
 
@@ -93,9 +94,9 @@ describe('createDrawnFeature', () => {
     it('preserves the polygon geometry with closed ring', () => {
       const result = createDrawnFeature(validRectGeojson, 'rectangle');
       expect(result!.geometry.type).toBe('Polygon');
-      const coords = (result!.geometry as GeoJSON.Polygon).coordinates[0];
-      expect(coords.length).toBe(5);
-      expect(coords[0]).toEqual(coords[4]); // Closed ring
+      const coords = (result!.geometry as unknown as GeoJSON.Polygon).coordinates[0];
+      expect(coords!.length).toBe(5);
+      expect(coords![0]).toEqual(coords![coords!.length - 1]); // Closed ring
     });
 
     it('applies default rectangle styling', () => {
@@ -104,13 +105,13 @@ describe('createDrawnFeature', () => {
     });
 
     it('sets default label', () => {
-      const result = createDrawnFeature(validRectGeojson, 'rectangle');
-      expect(result!.properties.label).toBe('Drawn Rectangle');
+      const result = createDrawnFeature(validRectGeojson, 'rectangle') as RectangleAnnotation;
+      expect(result.properties.label).toBe('Drawn Rectangle');
     });
 
     it('allows custom label via options', () => {
-      const result = createDrawnFeature(validRectGeojson, 'rectangle', { label: 'Patrol Zone' });
-      expect(result!.properties.label).toBe('Patrol Zone');
+      const result = createDrawnFeature(validRectGeojson, 'rectangle', { label: 'Patrol Zone' }) as RectangleAnnotation;
+      expect(result.properties.label).toBe('Patrol Zone');
     });
 
     it('allows partial style overrides via options', () => {
