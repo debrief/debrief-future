@@ -15,5 +15,5 @@ import { StacFileTreeProps } from './types';
  * />
  * ```
  */
-export declare function StacFileTree({ fs, rootPath, highlightedPaths, currentItemPath, onItemSelect, refreshKey, className, }: StacFileTreeProps): import("react/jsx-runtime").JSX.Element;
+export declare function StacFileTree({ fs, rootPath, highlightedPaths, currentItemPath, onItemSelect, onFileSelect, refreshKey, className, }: StacFileTreeProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=StacFileTree.d.ts.map
