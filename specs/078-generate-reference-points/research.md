@@ -49,17 +49,29 @@ This produces identical sequences in Python and TypeScript given the same seed.
 - External PRNG library — rejected; violates Art. IX.1 (minimal dependencies).
 - Precomputed lookup table — rejected; doesn't scale to arbitrary counts.
 
-### RQ-5: Should the tool accept input features?
+### RQ-5: Should the output be individual Point features or a single MultiPoint feature?
+
+**Decision**: A single MultiPoint feature containing all generated coordinates.
+
+**Rationale**: Individual Point features would flood the FeatureCollection with hundreds of features. A single MultiPoint keeps the FeatureCollection compact and is the standard GeoJSON approach for point sets. Crucially, when the downstream classifier (#081) needs to recolor individual points by zone, a `pointMetadata` array parallel to the MultiPoint coordinates provides a natural extension point — each entry can have zone and color fields added without changing geometry or creating per-point features.
+
+**Schema implications**: The `ReferenceLocation` class in `geojson.yaml` currently constrains geometry to `GeoJSONPoint`. This feature extends it to also accept `GeoJSONMultiPoint` and adds an optional `pointMetadata` attribute to `ReferenceLocationProperties`. Both are non-breaking additions under Article XIV (Pre-Release Freedom).
+
+**Alternatives considered**:
+- Individual Point features — rejected; creates excessive features for large grids, makes per-point styling harder.
+- FeatureCollection of Points — rejected; same problem but nested, and loses the single-feature provenance tracking.
+
+### RQ-5a: Should the tool accept input features?
 
 **Decision**: No. The tool's `input_kinds` is empty (no selection requirements). Bounds, pattern, and dimensions are all passed as tool parameters.
 
 **Rationale**: This tool creates features from parameters alone. It doesn't transform existing data. The MCP `selectionRequirements` annotation will be an empty array.
 
-### RQ-6: How should feature IDs be generated?
+### RQ-6: How should the feature ID be generated?
 
-**Decision**: Deterministic IDs based on pattern, bounds, and point index: `ref-{pattern}-{index}` (e.g., `ref-grid-0`, `ref-grid-1`, ..., `ref-scatter-19`).
+**Decision**: Deterministic ID based on pattern: `ref-{pattern}` (e.g., `ref-grid`, `ref-scatter`). Since there is a single MultiPoint feature per invocation, the index suffix is no longer needed.
 
-**Rationale**: Deterministic IDs enable reproducible output (Art I.4). UUIDs would make scatter output with the same seed produce different IDs each time, which violates the reproducibility requirement.
+**Rationale**: Deterministic IDs enable reproducible output (Art I.4). UUIDs would make output non-reproducible. Individual point identity is handled by the `pointMetadata[i].index` field instead.
 
 ### RQ-7: What result subtype should be used?
 
@@ -81,6 +93,7 @@ This produces identical sequences in Python and TypeScript given the same seed.
 | Python path | `tools/reference/generation.py` | Matches tool spec category |
 | TypeScript path | `tools/reference/generation/generateReferencePoints.ts` | Mirrors Python structure |
 | PRNG | Cross-language LCG | Deterministic, no dependencies |
-| Feature IDs | Deterministic `ref-{pattern}-{index}` | Reproducibility (Art I.4) |
+| Output geometry | Single MultiPoint feature | Compact, per-point metadata extensible |
+| Feature ID | Deterministic `ref-{pattern}` | Reproducibility (Art I.4) |
 | Result subtype | `reference/generated_points` | Addition type, standard naming |
 | Dependencies | None (stdlib only) | Art IX.1 compliance |

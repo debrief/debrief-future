@@ -4,7 +4,7 @@
 
 ## Overview
 
-The generate-reference-points tool creates Point features in a grid or scatter pattern within a bounding box. It is the first step in the E03 buffer zone analysis chain.
+The generate-reference-points tool creates a single MultiPoint feature containing a grid or scatter pattern of reference coordinates within a bounding box. It is the first step in the E03 buffer zone analysis chain. The MultiPoint approach keeps the FeatureCollection compact and provides a `pointMetadata` array for per-point information that downstream tools can extend.
 
 ## Usage
 
@@ -22,10 +22,14 @@ result = run("generate-reference-points", context, params={
     "cols": 4,
 })
 
-# result.features contains 12 Point features
-assert len(result.features) == 12
-assert result.features[0]["properties"]["kind"] == "POINT"
-assert result.features[0]["properties"]["locationType"] == "REFERENCE"
+# result.features contains 1 MultiPoint feature with 12 coordinates
+feature = result.features[0]
+assert feature["geometry"]["type"] == "MultiPoint"
+assert len(feature["geometry"]["coordinates"]) == 12
+assert feature["properties"]["kind"] == "POINT"
+assert feature["properties"]["locationType"] == "REFERENCE"
+assert len(feature["properties"]["pointMetadata"]) == 12
+assert feature["properties"]["pointMetadata"][0] == {"index": 0, "name": "Ref 1"}
 ```
 
 ### Scatter Pattern (Python)
@@ -38,8 +42,10 @@ result = run("generate-reference-points", context, params={
     "seed": 42,
 })
 
-# result.features contains 20 randomly placed points
-assert len(result.features) == 20
+# result.features contains 1 MultiPoint feature with 20 coordinates
+feature = result.features[0]
+assert len(feature["geometry"]["coordinates"]) == 20
+assert len(feature["properties"]["pointMetadata"]) == 20
 ```
 
 ### TypeScript (VS Code / Web-Shell)
@@ -54,31 +60,35 @@ const features = execute([], {
   cols: 4,
 });
 
-// features contains 12 Point features
-console.log(features.length); // 12
-console.log(features[0].properties.kind); // "POINT"
+// features contains 1 MultiPoint feature with 12 coordinates
+const feature = features[0];
+console.log(feature.geometry.type);                  // "MultiPoint"
+console.log(feature.geometry.coordinates.length);    // 12
+console.log(feature.properties.pointMetadata.length); // 12
 ```
 
 ## Key Behaviours
 
-1. **Grid**: Points placed at regular latitude/longitude intervals, including boundary edges
-2. **Scatter**: Uniform random distribution using a cross-language deterministic PRNG (LCG)
-3. **Seed reproducibility**: Same seed always produces same coordinates in both Python and TypeScript
-4. **Antimeridian**: Bounds with west > east correctly generate points across the date line
-5. **Provenance**: Executor automatically attaches PROV log entries to all generated features
+1. **Single MultiPoint feature**: All coordinates in one feature, not individual Point features
+2. **pointMetadata**: Parallel array to coordinates — each entry has `index` and `name`; downstream tools (#081) add `zone` and `color` for per-point styling
+3. **Grid**: Coordinates placed at regular latitude/longitude intervals, including boundary edges
+4. **Scatter**: Uniform random distribution using a cross-language deterministic PRNG (LCG)
+5. **Seed reproducibility**: Same seed always produces same coordinates in both Python and TypeScript
+6. **Antimeridian**: Bounds with west > east correctly generate points across the date line
+7. **Provenance**: Executor automatically attaches PROV log entries
 
 ## Integration with E03 Chain
 
 ```
 generate-reference-points (#078)
-        │ FeatureCollection of POINT/REFERENCE features
-        ▼
+        | MultiPoint feature with pointMetadata
+        v
 point-in-zone-classifier (#081)
-        │ Recolored features with zone membership
-        ▼
+        | Same feature, pointMetadata extended with zone + color
+        v
 zone-histogram-generator (#082)
-        │ Dataset artifact with counts per zone
-        ▼
+        | Dataset artifact with counts per zone
+        v
 Results panel (E04)
 ```
 

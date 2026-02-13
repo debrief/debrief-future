@@ -81,7 +81,7 @@ def generate_reference_points(context: SelectionContext, params: dict[str, Any])
 
 ### Return Value
 
-Returns `list[dict]` — a list of GeoJSON Point Feature dicts. The executor wraps these in a ToolResponse with `addition/reference/generated_points` result type.
+Returns `list[dict]` — a list containing a single GeoJSON MultiPoint Feature dict. The feature's geometry contains all generated coordinates, and `properties.pointMetadata` holds a parallel array of per-point metadata entries. The executor wraps this in a ToolResponse with `addition/reference/generated_points` result type.
 
 ### Error Responses
 
@@ -134,4 +134,4 @@ export function execute(
 ): GeoJSONFeature[];
 ```
 
-Returns an array of GeoJSON Point Features. The caller (toolService or calcService) wraps them in an MCPToolResponse envelope.
+Returns an array containing a single GeoJSON MultiPoint Feature. The feature's geometry holds all generated coordinates, and `properties.pointMetadata` contains a parallel array of per-point metadata. The caller (toolService or calcService) wraps this in an MCPToolResponse envelope.

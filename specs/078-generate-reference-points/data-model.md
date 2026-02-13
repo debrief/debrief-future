@@ -5,25 +5,60 @@
 
 ## Entities
 
-### ReferencePoint (Output Feature)
+### ReferencePointSet (Output Feature)
 
-A GeoJSON Point Feature representing a generated reference location.
+A single GeoJSON MultiPoint Feature containing all generated reference coordinates, with a parallel `pointMetadata` array for per-point information.
 
 ```
 Feature {
   type: "Feature"
-  id: string                    // Deterministic: "ref-{pattern}-{index}"
+  id: string                    // Deterministic: "ref-{pattern}"
   geometry: {
-    type: "Point"
-    coordinates: [lon, lat]     // WGS84 decimal degrees
+    type: "MultiPoint"
+    coordinates: [              // Array of [lon, lat] pairs
+      [lon0, lat0],
+      [lon1, lat1],
+      ...
+    ]
   }
   properties: {
     kind: "POINT"               // FeatureKind enum
     locationType: "REFERENCE"   // LocationTypeEnum
-    name: string                // Human-readable label, e.g., "Reference Point 1"
-    pointShape: "square"        // PointShapeEnum default for reference points
-    index: integer              // 0-based ordinal position in generation sequence
+    name: string                // Set name, e.g., "Reference Points (grid 3x4)"
+    style: {                    // PointProperties — default style for all points
+      shape: "square"           // PointShapeEnum
+      color: "#666666"          // Default fill color
+      radius: 5                 // Marker radius
+    }
+    pointMetadata: [            // Parallel to coordinates array
+      {
+        index: 0                // 0-based ordinal
+        name: "Ref 1"           // Human-readable label
+        // Downstream tools (#081) extend with:
+        // zone: "inner" | "mid" | "outer" | null
+        // color: "#ff0000"     // Per-point color override
+      },
+      {
+        index: 1
+        name: "Ref 2"
+      },
+      ...
+    ]
   }
+}
+```
+
+### PointMetadataEntry
+
+A single entry in the `pointMetadata` array, indexed parallel to the MultiPoint coordinates.
+
+```
+PointMetadataEntry {
+  index: integer              // 0-based, matches coordinates[index]
+  name: string                // Human-readable label, e.g., "Ref 1"
+  // Extension fields (added by downstream tools, not by this tool):
+  // zone: string | null      // Buffer zone classification (#081)
+  // color: string | null     // Per-point color override (#081)
 }
 ```
 
@@ -59,10 +94,43 @@ Constraints:
   west > east is valid          (antimeridian crossing)
 ```
 
+## Schema Changes
+
+The `ReferenceLocation` class in `geojson.yaml` requires two updates:
+
+1. **Geometry**: Allow `MultiPoint` in addition to `Point` (via `any_of` or union type)
+2. **Properties**: Add optional `pointMetadata` attribute to `ReferenceLocationProperties`
+
+```yaml
+# geojson.yaml additions
+ReferenceLocationProperties:
+  attributes:
+    # ... existing attributes ...
+    point_metadata:
+      description: Per-point metadata array, parallel to MultiPoint coordinates
+      multivalued: true
+      range: PointMetadataEntry
+      required: false
+
+PointMetadataEntry:
+  description: Metadata for a single point within a MultiPoint reference set
+  attributes:
+    index:
+      description: 0-based ordinal matching coordinates array position
+      range: integer
+      required: true
+    name:
+      description: Human-readable point label
+      range: string
+      required: true
+```
+
+This is a non-breaking schema extension under Article XIV (Pre-Release Freedom).
+
 ## Relationships
 
 ```
-ToolParameters ──[produces]──> FeatureCollection of ReferencePoint
+ToolParameters ──[produces]──> FeatureCollection with single MultiPoint Feature
                                     │
                               [persisted as]
                                     │
@@ -73,11 +141,14 @@ ToolParameters ──[produces]──> FeatureCollection of ReferencePoint
                                     │
                                     v
                         Point-in-Zone Classifier (#081)
+                        (mutates pointMetadata entries
+                         to add zone + color fields)
                                     │
                               [consumed by]
                                     │
                                     v
                         Zone Histogram Generator (#082)
+                        (counts entries per zone)
 ```
 
 ## Validation Rules
@@ -92,6 +163,8 @@ ToolParameters ──[produces]──> FeatureCollection of ReferencePoint
 | V-006 | cols | Required when pattern="grid", must be >= 1 |
 | V-007 | count | Required when pattern="scatter", must be >= 1 |
 | V-008 | seed | Optional; when present, must be integer |
+| V-009 | pointMetadata | Length must equal coordinates array length |
+| V-010 | pointMetadata[i].index | Must equal i (parallel indexing) |
 
 ## Result Type
 
