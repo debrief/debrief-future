@@ -1,0 +1,39 @@
+{
+  "type": "Feature",
+  "id": "poly-002",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [[
+      [-10.0, 55.0],
+      [-9.5, 55.2],
+      [-9.0, 55.5],
+      [-8.5, 55.8],
+      [-8.0, 56.0],
+      [-8.5, 56.2],
+      [-9.0, 56.0],
+      [-9.5, 55.8],
+      [-10.0, 55.5],
+      [-10.0, 55.0]
+    ]]
+  },
+  "properties": {
+    "kind": "POLY",
+    "vertex_count": 9,
+    "label": "Exclusion Area Bravo",
+    "symbol": "@B",
+    "style": {
+      "fill": true,
+      "fill_color": "#0000FF",
+      "fill_opacity": 0.15,
+      "stroke": true,
+      "color": "#0000CC",
+      "weight": 3,
+      "opacity": 0.8,
+      "line_cap": "butt",
+      "line_join": "bevel",
+      "dash_array": "5, 10"
+    },
+    "source_file": "exercise.rep",
+    "line_number": 108
+  }
+}
