@@ -361,6 +361,9 @@ export function MapView({
         className="debrief-mapview__container"
         style={{ height: '100%', width: '100%' }}
         zoomControl={!showToolbar}
+        // Opt the map into Geoman (L.PM.setOptIn(true) requires this).
+        // Individual GeoJSON layers still default to pmIgnore=true.
+        pmIgnore={false}
       >
         <TileLayer url={tileLayerUrl} attribution={tileLayerAttribution} />
 
