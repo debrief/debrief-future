@@ -13,10 +13,12 @@ Built-in tools:
 - label-interval: Set time interval for label display
 - symbol-interval: Set time interval for symbol display
 - generate-courses-speeds: Derive course and speed from consecutive positions
+- buffer-zone-generator: Generate detection likelihood buffer zones around a track
 """
 
 # Import tools to trigger registration via @tool decorator
 from debrief_calc.tools import area_summary, range_bearing, track_stats
+from debrief_calc.tools.sensor import detection
 from debrief_calc.tools.shape import manipulation
 from debrief_calc.tools.track import styling
 
@@ -26,4 +28,5 @@ __all__ = [
     "area_summary",
     "styling",
     "manipulation",
+    "detection",
 ]

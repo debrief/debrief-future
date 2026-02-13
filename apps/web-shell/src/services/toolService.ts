@@ -88,6 +88,11 @@ import {
   execute as executeGenerateCourseSpeeds,
 } from '../../../vscode/src/tools/track/manipulation/generateCoursesSpeeds';
 
+import {
+  toolDefinition as bufferZoneGeneratorDef,
+  execute as executeBufferZoneGenerator,
+} from '../tools/sensor/detection/bufferZoneGenerator';
+
 // Re-export types for consumers
 export type { MCPToolDefinition, MCPToolResponse, MCPContentItem, DebriefAnnotations };
 
@@ -168,6 +173,13 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
       definition: generateCoursesSpeedsDef,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       execute: executeGenerateCourseSpeeds as any,
+    },
+  ],
+  [
+    bufferZoneGeneratorDef.name,
+    {
+      definition: bufferZoneGeneratorDef,
+      execute: executeBufferZoneGenerator,
     },
   ],
 ]);
