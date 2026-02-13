@@ -57,6 +57,7 @@ export const selectors = {
   spatial: (state: ReturnType<SessionStoreApi['getState']>): SpatialSlice => ({
     viewport: state.viewport,
     rotation: state.rotation,
+    drawingMode: state.drawingMode,
   }),
 
   features: (state: ReturnType<SessionStoreApi['getState']>): FeaturesSlice => ({

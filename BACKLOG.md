@@ -154,10 +154,10 @@ Description formats:
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
 | 061 | Feature | [Add generate courses and speeds for track tool spec](specs/061-generate-courses-speeds/spec.md) (requires #049) | 4 | 3 | 5 | 12 | Low | implementing |
-| 028 | Tech Debt | [Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md) | 4 | 2 | 5 | 11 | Low | implementing |
+| ~~028~~ | ~~Tech Debt~~ | ~~[Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md)~~ | ~~4~~ | ~~2~~ | ~~5~~ | ~~11~~ | ~~Low~~ | ~~complete~~ |
 | 076 | Feature | [Implement replay and parameter tuning](specs/076-replay-tune/spec.md) [E02] — parameter editing, positional replay, revert operations (requires #071, #074) | 5 | 4 | 2 | 11 | High | implementing |
 | 056 | Feature | [Add move shape tool spec](specs/056-move-shape/spec.md) (requires #049) | 3 | 3 | 5 | 11 | Low | implementing |
-| 016 | Infrastructure | [Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md) | 3 | 5 | 4 | 12 | Medium | specified |
+| ~~016~~ | ~~Infrastructure~~ | ~~[Add dynamic component bundling for blog posts](specs/016-dynamic-blog-components/spec.md)~~ | ~~3~~ | ~~5~~ | ~~4~~ | ~~12~~ | ~~Medium~~ | ~~complete~~ |
 | 080 | Feature | [Implement buffer-zone-generator tool](specs/080-buffer-zone-generator/spec.md) [E03] — stub sensor model returning 3 detection-likelihood buffer polygons (requires #049, #079) | 4 | 4 | 4 | 12 | Medium | specified |
 | 091 | Feature | [Add tool parameter context menus for pre-execution configuration](specs/091-tool-parameter-context-menus/spec.md) — successive inline context menus in webview to collect parameter values before tool execution; presets defined in LinkML | 4 | 4 | 3 | 11 | High | specified |
 | 092 | Infrastructure | [[E05] Integrate Geoman drawing library](specs/092-integrate-geoman-drawing-library/spec.md) [E05] | 4 | 3 | 3 | 10 | Medium | specified |
@@ -193,6 +193,9 @@ Description formats:
 | 096 | Enhancement | [[E05] Drawing UX guidance and STAC persistence](docs/ideas/096-drawing-ux-persistence.md) (requires #094, #095) [E05] | 4 | 3 | 3 | 10 | Medium | approved |
 | 058 | Feature | [Add flip shape horizontal tool spec](docs/ideas/058-flip-shape-horizontal.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
 | 059 | Feature | [Add flip shape vertical tool spec](docs/ideas/059-flip-shape-vertical.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
+| 094 | Feature | [[E05] Implement point and rectangle drawing](docs/ideas/094-point-rectangle-drawing.md) (requires #091, #092, #093) [E05] | 4 | 4 | 4 | 12 | Medium | approved |
+| 093 | Feature | [[E05] Add drawing toolbar with shape palette](specs/093-drawing-toolbar-shape-palette/spec.md) (requires #092) [E05] | 4 | 4 | 3 | 11 | Medium | specified |
+| 095 | Feature | [[E05] Implement polygon and polyline drawing](docs/ideas/095-polygon-polyline-drawing.md) (requires #091, #092, #093) [E05] | 4 | 4 | 3 | 11 | Medium | approved |
 | 029 | Tech Debt | [Add unit tests for VS Code extension providers](https://github.com/debrief/debrief-future/issues/104) | 4 | 2 | 5 | 11 | Low | proposed |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
 | 033 | Tech Debt | [Re-enable debrief-stac tests in pytest](docs/ideas/033-reenable-stac-tests.md) | 4 | 2 | 4 | 10 | Low | proposed |
