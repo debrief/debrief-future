@@ -98,6 +98,9 @@ export default function App() {
   // Sidebar tab
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('activity');
 
+  // STAC Catalog section collapsed state (collapsed by default to reduce sidebar clutter)
+  const [fileTreeCollapsed, setFileTreeCollapsed] = useState(true);
+
   // Log panel state
   const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
   const [logPresentationMode, setLogPresentationMode] = useState<PresentationMode>('normal');
@@ -415,13 +418,28 @@ export default function App() {
 
       <main className="web-shell__main web-shell__main--split">
         <aside className="web-shell__sidebar">
-          <StacFileTree
-            fs={mockFsAdapter}
-            rootPath="/local-store"
-            currentItemPath={currentPlot ? `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}` : undefined}
-            refreshKey={treeRefreshKey}
-            className="web-shell__file-tree"
-          />
+          <button
+            type="button"
+            className="web-shell__section-header"
+            onClick={() => setFileTreeCollapsed(prev => !prev)}
+            aria-expanded={!fileTreeCollapsed}
+            aria-controls="sidebar-file-tree"
+            data-testid="file-tree-toggle"
+          >
+            <span className={`web-shell__section-chevron ${fileTreeCollapsed ? '' : 'web-shell__section-chevron--expanded'}`}>&#9654;</span>
+            STAC Catalog
+          </button>
+          {!fileTreeCollapsed && (
+            <div id="sidebar-file-tree">
+              <StacFileTree
+                fs={mockFsAdapter}
+                rootPath="/local-store"
+                currentItemPath={currentPlot ? `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}` : undefined}
+                refreshKey={treeRefreshKey}
+                className="web-shell__file-tree"
+              />
+            </div>
+          )}
           <div className="web-shell__tab-bar" role="tablist">
             <button
               type="button"
