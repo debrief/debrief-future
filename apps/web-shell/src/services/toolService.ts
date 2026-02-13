@@ -71,6 +71,11 @@ import {
   execute as executeMoveShape,
 } from '../tools/shape/manipulation/moveShape';
 
+import {
+  toolDefinition as generateReferencePointsDef,
+  execute as executeGenerateReferencePoints,
+} from '../../../vscode/src/tools/reference/generation/generateReferencePoints';
+
 // Re-export types for consumers
 export type { MCPToolDefinition, MCPToolResponse, MCPContentItem, DebriefAnnotations };
 
@@ -143,6 +148,13 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
     {
       definition: moveShapeDef,
       execute: executeMoveShape,
+    },
+  ],
+  [
+    generateReferencePointsDef.name,
+    {
+      definition: generateReferencePointsDef,
+      execute: executeGenerateReferencePoints,
     },
   ],
 ]);
