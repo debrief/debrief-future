@@ -104,6 +104,19 @@ export { createDrawnFeature } from './MapView/drawing';
 export type { CreateDrawnFeatureOptions } from './MapView/drawing';
 export type { DrawingMode } from './MapView/LeafletToolbar';
 
+// ChartRenderer (Feature: 085-chart-renderer)
+export { ChartRenderer } from './ChartRenderer';
+export type { ChartRendererProps } from './ChartRenderer';
+export { transformDataset, registerTransformer, getSupportedTypes } from './ChartRenderer';
+export type {
+  DatasetEnvelope,
+  DatasetMetadata,
+  AxisDefinition,
+  DataSeries,
+  TransformerError,
+  TransformResult,
+} from './ChartRenderer';
+
 // LogPanel (Feature: 072-log-panel)
 export { LogPanel } from './LogPanel';
 export type {

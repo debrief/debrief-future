@@ -13,11 +13,51 @@ import exerciseAlphaData from '@test-data/local-store/exercise-alpha/exercise-al
 import trainingRun1Item from '@test-data/local-store/training-run-1/item.json';
 import trainingRun1Data from '@test-data/local-store/training-run-1/training-run-1.geojson';
 
+/** Sample dataset files for chart rendering demonstration */
+const sampleZoneHistogram = JSON.stringify({
+  type: 'zone_histogram',
+  title: 'Buffer Zone Point Distribution',
+  metadata: {
+    xAxis: { label: 'Zone', type: 'nominal' },
+    yAxis: { label: 'Count', type: 'quantitative', units: 'points' },
+  },
+  data: [
+    { zone: 'Zone A (0-5 nm)', count: 42 },
+    { zone: 'Zone B (5-10 nm)', count: 17 },
+    { zone: 'Zone C (10-15 nm)', count: 8 },
+    { zone: 'Zone D (15-20 nm)', count: 3 },
+  ],
+});
+
+const sampleRangeBearingSeries = JSON.stringify({
+  type: 'range_bearing_series',
+  title: 'Range over Time — HMS Defender vs USS Freedom',
+  metadata: {
+    xAxis: { label: 'Time', type: 'temporal' },
+    yAxis: { label: 'Range', type: 'quantitative', units: 'nm' },
+  },
+  series: [
+    {
+      name: 'HMS Defender → USS Freedom',
+      data: [
+        { time: '2024-01-15T10:00:00Z', value: 12.5 },
+        { time: '2024-01-15T10:05:00Z', value: 11.8 },
+        { time: '2024-01-15T10:10:00Z', value: 10.2 },
+        { time: '2024-01-15T10:15:00Z', value: 9.7 },
+        { time: '2024-01-15T10:20:00Z', value: 8.3 },
+        { time: '2024-01-15T10:25:00Z', value: 7.1 },
+      ],
+    },
+  ],
+});
+
 /** Build a flat path→content map from imported test data */
 const files: Record<string, string> = {
   '/local-store/catalog.json': JSON.stringify(catalogData),
   '/local-store/exercise-alpha/item.json': JSON.stringify(exerciseAlphaItem),
   '/local-store/exercise-alpha/exercise-alpha.geojson': JSON.stringify(exerciseAlphaData),
+  '/local-store/exercise-alpha/assets/zone-histogram.dataset.json': sampleZoneHistogram,
+  '/local-store/exercise-alpha/assets/range-bearing-series.dataset.json': sampleRangeBearingSeries,
   '/local-store/training-run-1/item.json': JSON.stringify(trainingRun1Item),
   '/local-store/training-run-1/training-run-1.geojson': JSON.stringify(trainingRun1Data),
 };

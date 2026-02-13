@@ -31,6 +31,10 @@
     "./ToolMatch": {
       "types": "./dist/ToolMatch/index.d.ts",
       "import": "./dist/ToolMatch/index.js"
+    },
+    "./ChartRenderer": {
+      "types": "./dist/ChartRenderer/index.d.ts",
+      "import": "./dist/ChartRenderer/index.js"
     }
   },
   "sideEffects": [
@@ -65,6 +69,9 @@
     "@tanstack/react-virtual": "^3.0.0",
     "leaflet": "^1.9.0",
     "react-leaflet": "^4.2.1",
+    "vega": "^5.30.0",
+    "vega-embed": "^6.26.0",
+    "vega-lite": "^5.21.0",
     "vscrui": "^0.1.0"
   },
   "devDependencies": {

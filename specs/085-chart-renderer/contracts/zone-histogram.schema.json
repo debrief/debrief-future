@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/schemas/dataset/zone-histogram.schema.json",
+  "title": "ZoneHistogramDataset",
+  "description": "Bar chart dataset for buffer zone point distribution. Each record represents one zone with a count.",
+  "type": "object",
+  "required": ["type", "title", "metadata", "data"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "zone_histogram"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["xAxis", "yAxis"],
+      "properties": {
+        "xAxis": {
+          "type": "object",
+          "required": ["label", "type"],
+          "properties": {
+            "label": { "type": "string" },
+            "type": { "type": "string", "const": "nominal" },
+            "units": { "type": "string" }
+          }
+        },
+        "yAxis": {
+          "type": "object",
+          "required": ["label", "type"],
+          "properties": {
+            "label": { "type": "string" },
+            "type": { "type": "string", "const": "quantitative" },
+            "units": { "type": "string" }
+          }
+        }
+      }
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["zone", "count"],
+        "properties": {
+          "zone": {
+            "type": "string",
+            "description": "Categorical zone label."
+          },
+          "count": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Number of points in this zone."
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
