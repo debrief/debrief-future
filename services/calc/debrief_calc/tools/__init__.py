@@ -12,6 +12,7 @@ Built-in tools:
 - apply-symbol-style: Apply symbol style to position markers
 - label-interval: Set time interval for label display
 - symbol-interval: Set time interval for symbol display
+- generate-courses-speeds: Derive course and speed from consecutive positions
 """
 
 # Import tools to trigger registration via @tool decorator
