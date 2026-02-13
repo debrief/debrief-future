@@ -92,6 +92,7 @@ Items that don't fit current strategy but may return later:
 | VS Code map PNG export (BACKLOG #009) | Nice demo but not tracer bullet critical | After core workflow validated |
 | i18n infrastructure (BACKLOG #006) | Premature for NATO pilot | NATO pilot planning begins |
 | Storyboarding briefings (BACKLOG #017) | Requires VS Code extension; not tracer bullet critical | VS Code extension core validated (tracer bullet step 6 complete) |
+| Tool-provided undo via inverse slug (BACKLOG #091, ADR-006) | #076 replay-tune implementing now; scaling problem not acute at demo scale; ADR-006 preserves the design. Scored V4/M2/A3=9 | E03 demo complete and E01 tool phases (#064-#068) begin landing |
 
 ## Rejected Items Log
 
@@ -118,6 +119,7 @@ Record significant prioritisation decisions here for future reference.
 | 2026-02-10 | Approved #077 STAC File Tree Component | Natural companion to E02 PROV logging; fills visibility gap (users cannot see what STAC store contains); strong Theme 3 fit (demo-able provenance story via change highlighting); memfs dependency justified for browser/Storybook compatibility; depends on #074 and #071 (both in pipeline) |
 | 2026-02-11 | Approved E03 Buffer Zone Analysis Demo (#078-#084) | 6 items (after #083 absorbed by E04): 5 demo tools + end-to-end integration; reactive PROV cascade where moving a track updates buffer zones, recolors points, and refreshes a histogram; serves all three themes; depends on E02 PROV infra (#076) and E04 results visualization (#085, #086, #089) for histogram display |
 | 2026-02-11 | Approved E04 Results Visualization (#085-#089) | 5 items implementing Vega-Lite results viewing infrastructure; absorbs E03 #083 as #089; Vega-Lite chosen for schema-first philosophy (JSON specs, not code); bottom panel with tabs + editor tab for drag-to-float; logical result ID registry for stable view binding; critical enabler for E03 demo and all future tool output visualization |
+| 2026-02-12 | Parked #091 Tool-provided undo via inverse slug | Well-designed (ADR-006 exists) but wrong timing: #076 replay-tune is mid-implementation, changing revert mechanism now is disruptive; scaling concern (10k-position deep-copies) is real but not acute at demo/tracer bullet scale; revisit when E01 tool volume makes generic undo infra urgent |
 
 ---
 

@@ -13,6 +13,7 @@ export type {
   LogActionBarProps,
   SnapshotBoundaryProps,
   TimelineEntry,
+  InputFeatureState,
   OperationCategory,
   PresentationMode,
   ViewMode,

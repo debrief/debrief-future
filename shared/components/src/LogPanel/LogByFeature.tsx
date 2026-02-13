@@ -18,6 +18,8 @@ export function LogByFeature({
   presentationMode,
   selectedEntryId,
   onEntryClick,
+  onTuneClick,
+  onRestoreClick,
   className,
 }: LogByFeatureProps): React.ReactElement {
   const groups = useMemo(
@@ -44,6 +46,8 @@ export function LogByFeature({
               presentationMode={presentationMode}
               isSelected={entry.activityId === selectedEntryId}
               onClick={onEntryClick}
+              onTuneClick={onTuneClick}
+              onRestoreClick={onRestoreClick}
             />
           ))}
         </div>

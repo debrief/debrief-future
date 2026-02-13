@@ -55,7 +55,7 @@ const toStoreMode = (m: string): StoreDisplayMode =>
   m === 'trail' ? 'snailTrail' : 'normal';
 import { useSessionStore } from './hooks/useSessionStore';
 import { stacService } from './mocks/stacService';
-import { calcService } from './mocks/calcService';
+import { calcService, moveShapeFeatures } from './mocks/calcService';
 import type { ToolResult } from './mocks/calcService';
 import { mockFsAdapter } from './mocks/fsAdapter';
 
@@ -92,6 +92,10 @@ export default function App() {
   const [view, setView] = useState<View>('welcome');
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
   const [resultLayers, setResultLayers] = useState<Feature[]>([]);
+  /** Maps activityId → original feature snapshots so revert can restore them */
+  const [, setActivitySnapshots] = useState<
+    Record<string, Feature[]>
+  >({});
   const [toolMessage, setToolMessage] = useState<string | null>(null);
   const [treeRefreshKey, setTreeRefreshKey] = useState(0);
 
@@ -241,6 +245,28 @@ export default function App() {
     store.getState().clearSelection();
   }, [store]);
 
+  // Restore original features for a reverted activity
+  const restoreSnapshots = useCallback((aid: string) => {
+    setActivitySnapshots(prev => {
+      const originals = prev[aid];
+      if (!originals || originals.length === 0) return prev;
+      // Swap moved features back to originals in currentPlot
+      const idMap = new Map(originals.map(f => [String(f.id), f]));
+      setCurrentPlot(plot => {
+        if (!plot) return plot;
+        const updatedFeatures = plot.features.features.map(f =>
+          idMap.has(String(f.id)) ? idMap.get(String(f.id))! : f
+        );
+        return {
+          ...plot,
+          features: { ...plot.features, features: updatedFeatures },
+        };
+      });
+      const { [aid]: _, ...rest } = prev;
+      return rest;
+    });
+  }, []);
+
   // Handle LogPanel messages
   const handleLogMessage = useCallback((message: LogPanelMessage) => {
     if (message.type === 'entry:select') {
@@ -248,10 +274,144 @@ export default function App() {
     } else if (message.type === 'entry:deselect') {
       store.getState().clearSelection();
     } else if (message.type === 'action:invoke') {
-      setLogNotification(`Action "${message.payload.actionType}" is not yet available.`);
-      setTimeout(() => setLogNotification(null), 3000);
+      const { actionType, activityId } = message.payload;
+      if (actionType === 'tune') {
+        // Tune is handled inline via onTuneRequest — prompt user
+        setLogNotification('Click a tunable parameter value to edit it.');
+        setTimeout(() => setLogNotification(null), 3000);
+      } else if (actionType === 'revertTo') {
+        // Remove all entries after the target and restore their original features
+        setLogEntries((prev: TimelineEntry[]) => {
+          const idx = prev.findIndex((e: TimelineEntry) => e.activityId === activityId);
+          if (idx < 0) return prev;
+          // Entries before idx (most-recent-first) are the ones being removed
+          const removed = prev.slice(0, idx);
+          for (const r of removed) {
+            restoreSnapshots(r.activityId);
+          }
+          return prev.slice(idx);
+        });
+        setLogNotification('Reverted. Operations after the selected point removed.');
+        setTimeout(() => setLogNotification(null), 3000);
+      } else if (actionType === 'revertThis') {
+        // Mark entry as deleted and restore original features
+        restoreSnapshots(activityId);
+        setLogEntries((prev: TimelineEntry[]) =>
+          prev.map((e: TimelineEntry) =>
+            e.activityId === activityId ? { ...e, deleted: true } : e
+          )
+        );
+        setLogNotification('Operation removed.');
+        setTimeout(() => setLogNotification(null), 3000);
+      } else {
+        setLogNotification(`Action "${actionType}" is not yet available.`);
+        setTimeout(() => setLogNotification(null), 3000);
+      }
     }
-  }, [store]);
+  }, [store, restoreSnapshots]);
+
+  // Phase 6: Handle tune request from inline parameter click
+  const handleTuneRequest = useCallback(
+    (activityId: string, parameter: string, currentValue: unknown) => {
+      // Prompt for new value (simple approach for web-shell demo)
+      const input = window.prompt(
+        `Tune "${parameter}" (current: ${String(currentValue)}):`,
+        String(currentValue)
+      );
+      if (input === null) return; // cancelled
+
+      // Coerce to number if the current value is numeric
+      const newValue = typeof currentValue === 'number' ? Number(input) : input;
+
+      // Find the entry being tuned
+      const entry = logEntries.find((e: TimelineEntry) => e.activityId === activityId);
+
+      // Restore features from inputState and re-execute for mutation tools
+      if (entry?.inputState && entry.inputState.length > 0 && entry.toolName === 'move-shape') {
+        // Build restored features from inputState (pre-tool geometry)
+        setCurrentPlot(plot => {
+          if (!plot) return plot;
+          const restoredMap = new Map(
+            entry.inputState!.map(is => [is.featureId, is])
+          );
+          // Restore original geometry in the plot
+          const restoredFeatures = plot.features.features.map(f => {
+            const saved = restoredMap.get(String(f.id));
+            if (!saved) return f;
+            return {
+              ...f,
+              geometry: JSON.parse(JSON.stringify(saved.geometry)),
+              properties: {
+                ...(f.properties ?? {}),
+                ...JSON.parse(JSON.stringify(saved.properties ?? {})),
+              },
+            };
+          });
+
+          // Collect the restored features that the tool will operate on
+          const featuresToMove = restoredFeatures.filter(f =>
+            restoredMap.has(String(f.id))
+          ) as Feature[];
+
+          // Read the updated parameters (apply the new value)
+          const params = { ...entry.parameters };
+          if (params[parameter]) {
+            params[parameter] = { ...params[parameter], value: newValue };
+          }
+          const distNm = Number((params.distance_nm?.value) ?? 5);
+          const dirDeg = Number((params.direction_deg?.value) ?? 45);
+
+          // Re-execute the tool from original position
+          const moved = moveShapeFeatures(featuresToMove, distNm, dirDeg);
+          const movedMap = new Map(moved.map(m => [String(m.id), m]));
+
+          // Apply the re-executed result
+          const finalFeatures = restoredFeatures.map(f => {
+            const m = movedMap.get(String(f.id));
+            return m ?? f;
+          });
+
+          return {
+            ...plot,
+            features: { ...plot.features, features: finalFeatures },
+          };
+        });
+      }
+
+      // Update the log entry parameters and tune annotation
+      setLogEntries((prev: TimelineEntry[]) =>
+        prev.map((e: TimelineEntry) => {
+          if (e.activityId !== activityId) return e;
+          const updatedParams = { ...e.parameters };
+          if (updatedParams[parameter]) {
+            updatedParams[parameter] = {
+              ...updatedParams[parameter],
+              value: newValue,
+            };
+          }
+          return {
+            ...e,
+            parameters: updatedParams,
+            tuneAnnotation: { parameter, previousValue: currentValue, newValue },
+          };
+        })
+      );
+      setLogNotification(`Tuned "${parameter}" to ${String(newValue)}.`);
+      setTimeout(() => setLogNotification(null), 3000);
+    },
+    [logEntries]
+  );
+
+  // Phase 6: Handle restore request for deleted entries
+  const handleRestoreRequest = useCallback((activityId: string) => {
+    setLogEntries((prev: TimelineEntry[]) =>
+      prev.map((e: TimelineEntry) =>
+        e.activityId === activityId ? { ...e, deleted: false } : e
+      )
+    );
+    setLogNotification('Operation restored.');
+    setTimeout(() => setLogNotification(null), 3000);
+  }, []);
 
   // Handle map feature selection (goes through session-state)
   const handleMapSelect = useCallback((featureId: string, event: React.MouseEvent) => {
@@ -279,7 +439,24 @@ export default function App() {
     const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[]);
     setToolMessage(result.message);
 
-    if (result.resultLayer) {
+    // Tools that transform features in-place (e.g. move-shape): replace in currentPlot
+    const replacesInPlace = toolId === 'move-shape';
+
+    if (result.resultLayer && replacesInPlace) {
+      // Replace the original feature in the plot with the moved version
+      const movedId = String(result.resultLayer.id);
+      setCurrentPlot(plot => {
+        if (!plot) return plot;
+        const updatedFeatures = plot.features.features.map(f =>
+          String(f.id) === movedId ? result.resultLayer! : f
+        );
+        return {
+          ...plot,
+          features: { ...plot.features, features: updatedFeatures },
+        };
+      });
+    } else if (result.resultLayer) {
+      // Additive tools (e.g. analysis): add result as a new layer
       setResultLayers(prev => [...prev, result.resultLayer!]);
 
       // Persist result as a STAC asset in the current item's assets/ directory
@@ -307,18 +484,45 @@ export default function App() {
       ? [String((result.resultLayer.properties as Record<string, unknown> | null)?.id ?? `result-${nextId}`)]
       : [];
 
+    const activityId = `act-${String(nextId).padStart(3, '0')}`;
+
+    // Capture pre-tool geometry for mutation tools (enables correct tune replay)
+    const inputState = replacesInPlace && selectedFeatures.length > 0
+      ? selectedFeatures.map(f => {
+          const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
+          const { provenance: _p, ...restProps } = props;
+          return {
+            featureId: String(f.id),
+            geometry: JSON.parse(JSON.stringify(f.geometry)),
+            properties: JSON.parse(JSON.stringify(restProps)),
+          };
+        })
+      : null;
+
     const entry: TimelineEntry = {
-      activityId: `act-${String(nextId).padStart(3, '0')}`,
+      activityId,
       timestamp: new Date().toISOString(),
       toolName: toolId,
       toolVersion: '1.0.0',
-      parameters: {},
+      parameters: result.parameters ?? {},
       usedFeatureIds: usedIds,
       generatedFeatureIds: generatedIds,
       executionDuration: 'PT0.1S',
       generatedResultId: generatedIds[0] ?? null,
       operationCategory: 'calculation',
+      inputState,
     };
+
+    // Snapshot originals so revert can restore them
+    if (replacesInPlace && selectedFeatures.length > 0) {
+      const originals = selectedFeatures.map(f =>
+        JSON.parse(JSON.stringify(f)) as Feature
+      );
+      setActivitySnapshots(prev => ({
+        ...prev,
+        [activityId]: originals,
+      }));
+    }
 
     setLogEntries(prev => [entry, ...prev]);
   }, [selectedFeatures, activityCounter, currentPlot]);
@@ -495,6 +699,8 @@ export default function App() {
                 onViewModeChange={setLogViewMode}
                 onFilterStateChange={setLogFilterState}
                 onSelectedEntryChange={setLogSelectedEntryId}
+                onTuneRequest={handleTuneRequest}
+                onRestoreRequest={handleRestoreRequest}
               />
             )}
           </div>

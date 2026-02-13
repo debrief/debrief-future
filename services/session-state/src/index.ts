@@ -115,6 +115,7 @@ export {
   type RecordResult,
   type TimelineOptions,
   type ToolResultForLog,
+  type InputFeatureState,
   type FeatureProvenance,
   type LogService,
   type LogServiceDeps,
