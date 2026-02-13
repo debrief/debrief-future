@@ -187,7 +187,7 @@ test.describe('Styling Tools Integration', () => {
 
     // The title attribute should contain the explanation
     const title = await inactiveTool.getAttribute('title');
-    expect(title).toContain('track');
+    expect(title?.toLowerCase()).toContain('track');
   });
 
   test('selecting via feature list activates styling tools', async ({
