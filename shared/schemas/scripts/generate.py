@@ -166,8 +166,7 @@ def generate_typescript() -> bool:
             "    geometry: GeoJSONLineString | GeoJSONMultiLineString,",
         )
         content = content.replace(
-            "/** Location (Point) or reference point set (MultiPoint) */\n"
-            "    geometry: string,",
+            "/** Location (Point) or reference point set (MultiPoint) */\n    geometry: string,",
             "/** Location (Point) or reference point set (MultiPoint) */\n"
             "    geometry: GeoJSONPoint | GeoJSONMultiPoint,",
         )

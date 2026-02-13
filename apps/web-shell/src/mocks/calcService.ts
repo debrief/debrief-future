@@ -148,12 +148,7 @@ interface ToolDefinition {
   maxTracks?: number;
   /** Minimum number of features required (any type) */
   minFeatures?: number;
-  /** Annotation kinds required (at least one feature must match) */
-  annotationKinds?: Set<string>;
 }
-
-/** Annotation kinds supported by the move-shape tool */
-const MOVE_SHAPE_KINDS = new Set(['CIRCLE', 'RECTANGLE', 'LINE', 'TEXT', 'VECTOR']);
 
 const TOOLS: ToolDefinition[] = [
   {
@@ -167,13 +162,6 @@ const TOOLS: ToolDefinition[] = [
     name: 'Bounding Box',
     description: 'Calculate bounding box of selected features',
     minFeatures: 1,
-  },
-  {
-    id: 'move-shape',
-    name: 'Move Shape',
-    description: 'Translate annotation shapes by distance and bearing',
-    minFeatures: 1,
-    annotationKinds: MOVE_SHAPE_KINDS,
   },
 ];
 
@@ -219,19 +207,6 @@ function getToolApplicability(
     };
   }
 
-  // Annotation kind check
-  if (tool.annotationKinds) {
-    const hasMatchingAnnotation = features.some(
-      (f) => f.properties?.kind && tool.annotationKinds!.has(f.properties.kind)
-    );
-    if (!hasMatchingAnnotation) {
-      return {
-        applicable: false,
-        explanation: 'Requires an annotation shape (Circle, Rectangle, Line, Text, or Vector)',
-      };
-    }
-  }
-
   return { applicable: true };
 }
 
@@ -258,6 +233,9 @@ function formatToolName(name: string): string {
 
 /** IDs of styling tools from toolService */
 const stylingToolIds = new Set(listTools().map(t => t.name));
+
+/** Annotation kinds supported by the move-shape tool */
+const MOVE_SHAPE_KINDS = new Set(['CIRCLE', 'RECTANGLE', 'LINE', 'TEXT', 'VECTOR']);
 
 /**
  * Translate a [lon, lat] point by a given distance (nm) and bearing (degrees).
@@ -488,27 +466,6 @@ export function createMockCalcService(): MockCalcService {
             success: true,
             message: `Bounding box: ${(width / 1000).toFixed(2)} km × ${(height / 1000).toFixed(2)} km`,
             resultLayer: polygon,
-          };
-        }
-
-        case 'move-shape': {
-          const distanceNm = 5;
-          const directionDeg = 45;
-          const moved = moveShapeFeatures(selectedFeatures, distanceNm, directionDeg);
-          if (moved.length === 0) {
-            return { success: false, message: 'No annotation shapes found in selection' };
-          }
-          const names = moved
-            .map((f) => (f.properties as Record<string, unknown> | null)?.label ?? f.id ?? 'shape')
-            .join(', ');
-          return {
-            success: true,
-            message: `Moved ${moved.length} shape(s) by ${distanceNm} nm at ${directionDeg}°: ${names}`,
-            resultLayer: moved[0],
-            parameters: {
-              distance_nm: { value: distanceNm, default: false, tunable: true },
-              direction_deg: { value: directionDeg, default: false, tunable: true },
-            },
           };
         }
 
