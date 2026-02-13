@@ -72,6 +72,19 @@ def _calculate_track_stats(coordinates: list[list[float]]) -> dict[str, Any]:
     }
 
 
+DISTANCE_CONVERSIONS = {
+    "nm": 1.0,
+    "km": 1.852,
+    "mi": 1.15078,
+}
+
+SPEED_LABELS = {
+    "nm": "kts",
+    "km": "km/h",
+    "mi": "mph",
+}
+
+
 @tool(
     name="track-stats",
     description="Calculate statistics for a single track including point count, duration, distance, and average speed",
@@ -99,11 +112,27 @@ def track_stats(context: SelectionContext, params: dict[str, Any]) -> list[dict[
     Returns:
         List containing one Feature with track statistics
     """
+    distance_unit = params.get("distance_unit", "nm")
+    if distance_unit not in DISTANCE_CONVERSIONS:
+        raise ValueError(f"distance_unit must be one of: {', '.join(DISTANCE_CONVERSIONS)}")
+
     feature = context.features[0]
     geometry = feature.get("geometry", {})
     coordinates = geometry.get("coordinates", [])
 
     stats = _calculate_track_stats(coordinates)
+
+    # Convert distances from nm to requested unit
+    factor = DISTANCE_CONVERSIONS[distance_unit]
+    distance = round(stats["distance_nm"] * factor, 2)
+    speed = round(stats["average_speed_kts"] * factor, 2)
+
+    converted_stats = {
+        "point_count": stats["point_count"],
+        "duration_hours": stats["duration_hours"],
+        f"distance_{distance_unit}": distance,
+        f"average_speed_{SPEED_LABELS[distance_unit]}": speed,
+    }
 
     # Get the track's bounding box for the result geometry
     if coordinates:
@@ -119,7 +148,7 @@ def track_stats(context: SelectionContext, params: dict[str, Any]) -> list[dict[
         "properties": {
             "source_track": feature.get("id", "unknown"),
             "source_name": feature.get("properties", {}).get("name", "unknown"),
-            "statistics": stats,
+            "statistics": converted_stats,
         },
         "geometry": {"type": "Point", "coordinates": centroid},
     }

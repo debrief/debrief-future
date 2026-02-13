@@ -17,9 +17,10 @@ from debrief_calc.registry import tool
     parameters=[
         ToolParameter(
             name="interval",
-            type="string",
-            description="ISO 8601 duration (e.g., 'PT15M' for 15 minutes). Defaults to PT15M.",
+            type="duration",
+            description="ISO 8601 duration for symbol spacing (e.g., 'PT15M' for 15 minutes)",
             required=False,
+            default="PT15M",
         ),
     ],
 )
