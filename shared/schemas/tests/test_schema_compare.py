@@ -98,6 +98,30 @@ class TestEnumConsistency:
             f"SegmentTypeEnum values mismatch: {enum_values} vs {expected}"
         )
 
+    def test_feature_kind_enum_values(self):
+        """FeatureKindEnum should include all feature type discriminators."""
+        main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
+
+        feature_kind_def = main_schema.get("$defs", {}).get("FeatureKindEnum", {})
+        enum_values = feature_kind_def.get("enum", [])
+
+        expected = [
+            "TRACK",
+            "POINT",
+            "NARRATIVE",
+            "CIRCLE",
+            "RECTANGLE",
+            "LINE",
+            "TEXT",
+            "VECTOR",
+            "SYSTEM",
+            "MULTI_POINT",
+            "MULTI_POLYGON",
+        ]
+        assert set(enum_values) == set(expected), (
+            f"FeatureKindEnum values mismatch: {enum_values} vs {expected}"
+        )
+
 
 class TestRequiredFields:
     """Test that required fields are properly defined."""

@@ -41,6 +41,10 @@ enums:
         description: Vector annotation (LineString geometry, origin+range+bearing in properties)
       SYSTEM:
         description: Non-spatial system state (null geometry, reserved state.* IDs)
+      MULTI_POINT:
+        description: Multi-point tool result (MultiPoint geometry)
+      MULTI_POLYGON:
+        description: Multi-polygon tool result (MultiPolygon geometry)
 
   TrackTypeEnum:
     description: Type of track feature

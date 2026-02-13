@@ -44,6 +44,68 @@
   "title": "Tool",
   "type": "object",
   "$defs": {
+    "BranchOrigin": {
+      "additionalProperties": false,
+      "description": "Reverse link on a branch plot's system record, pointing to the source plot.",
+      "properties": {
+        "branch_id": {
+          "description": "Branch identifier matching the source BranchRecord.",
+          "type": "string"
+        },
+        "branched_at": {
+          "description": "When the branch was created (ISO 8601 with timezone).",
+          "format": "date-time",
+          "type": "string"
+        },
+        "branched_from": {
+          "description": "Activity ID of the branch point.",
+          "type": "string"
+        },
+        "source_asset": {
+          "description": "Relative path to the source plot file.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_asset",
+        "branched_from",
+        "branched_at",
+        "branch_id"
+      ],
+      "title": "BranchOrigin",
+      "type": "object"
+    },
+    "BranchRecord": {
+      "additionalProperties": false,
+      "description": "Reference to a branched plot.",
+      "properties": {
+        "branch_id": {
+          "description": "Unique branch identifier.",
+          "type": "string"
+        },
+        "branched_at": {
+          "description": "When the branch was created (ISO 8601 with timezone).",
+          "format": "date-time",
+          "type": "string"
+        },
+        "branched_from": {
+          "description": "Activity ID of the branch point.",
+          "type": "string"
+        },
+        "target_asset": {
+          "description": "Relative path to the branched plot file.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "branch_id",
+        "branched_from",
+        "branched_at",
+        "target_asset"
+      ],
+      "title": "BranchRecord",
+      "type": "object"
+    },
     "CircleAnnotation": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for circle annotations. Geometry is a Polygon approximating the circle (vertices at regular intervals). Properties contain center and radius for precise reconstruction and smooth rendering.",
@@ -144,9 +206,73 @@
         "LINE",
         "TEXT",
         "VECTOR",
-        "SYSTEM"
+        "SYSTEM",
+        "MULTI_POINT",
+        "MULTI_POLYGON"
       ],
       "title": "FeatureKindEnum",
+      "type": "string"
+    },
+    "FileProvDirectionEnum": {
+      "description": "Direction of a branch event.",
+      "enum": [
+        "source",
+        "target"
+      ],
+      "title": "FileProvDirectionEnum",
+      "type": "string"
+    },
+    "FileProvEntry": {
+      "additionalProperties": false,
+      "description": "File-level provenance event (snapshot or branch creation).",
+      "properties": {
+        "activity_id": {
+          "description": "Unique event identifier.",
+          "type": "string"
+        },
+        "asset": {
+          "description": "Path to snapshot file (for snapshot events).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "branch_id": {
+          "description": "Branch identifier (for branch events).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "direction": {
+          "$ref": "#/$defs/FileProvDirectionEnum",
+          "description": "'source' or 'target' (for branch events)."
+        },
+        "timestamp": {
+          "description": "When the event occurred (ISO 8601 with timezone).",
+          "format": "date-time",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/FileProvEventTypeEnum",
+          "description": "Event type: snapshot or branch."
+        }
+      },
+      "required": [
+        "activity_id",
+        "type",
+        "timestamp"
+      ],
+      "title": "FileProvEntry",
+      "type": "object"
+    },
+    "FileProvEventTypeEnum": {
+      "description": "Type of file-level provenance event.",
+      "enum": [
+        "snapshot",
+        "branch"
+      ],
+      "title": "FileProvEventTypeEnum",
       "type": "string"
     },
     "GeoJSONEmptyPoint": {
@@ -220,6 +346,54 @@
         "coordinates"
       ],
       "title": "GeoJSONMultiLineString",
+      "type": "object"
+    },
+    "GeoJSONMultiPoint": {
+      "additionalProperties": false,
+      "description": "GeoJSON MultiPoint geometry for multi-point tool results",
+      "properties": {
+        "coordinates": {
+          "description": "Array of [longitude, latitude] positions",
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "type": {
+          "const": "MultiPoint",
+          "description": "Geometry type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "GeoJSONMultiPoint",
+      "type": "object"
+    },
+    "GeoJSONMultiPolygon": {
+      "additionalProperties": false,
+      "description": "GeoJSON MultiPolygon geometry for multi-polygon tool results",
+      "properties": {
+        "coordinates": {
+          "description": "Array of polygon coordinate arrays (each an array of linear rings)",
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "type": {
+          "const": "MultiPolygon",
+          "description": "Geometry type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "GeoJSONMultiPolygon",
       "type": "object"
     },
     "GeoJSONPoint": {
@@ -433,6 +607,258 @@
       "title": "LocationTypeEnum",
       "type": "string"
     },
+    "LogEntry": {
+      "additionalProperties": false,
+      "description": "A PROV-aligned provenance record stored on GeoJSON features. Contains activity identity, timestamp, generator information, input/output references, execution duration, and tuning annotations.",
+      "properties": {
+        "activity_id": {
+          "description": "Unique operation identifier (UUID v4). Shared across features in multi-feature operations.",
+          "type": "string"
+        },
+        "execution_duration": {
+          "description": "Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S).",
+          "pattern": "^PT[0-9]+(\\.[0-9]+)?S$",
+          "type": "string"
+        },
+        "generated": {
+          "description": "Feature IDs or versioned asset paths of outputs. May be empty for in-place modifications.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "generated_result_id": {
+          "description": "Stable logical identity for artifact-producing tools. Null for non-artifact tools.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "timestamp": {
+          "description": "When the operation occurred (ISO 8601 with timezone).",
+          "format": "date-time",
+          "type": "string"
+        },
+        "tune": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TuneAnnotation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Parameter tuning record. Null until a tuning operation modifies this entry."
+        },
+        "used": {
+          "description": "Feature IDs of inputs. May be empty for operations with no explicit inputs.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "was_generated_by": {
+          "$ref": "#/$defs/WasGeneratedBy",
+          "description": "Tool identity and parameters for this invocation."
+        }
+      },
+      "required": [
+        "activity_id",
+        "timestamp",
+        "was_generated_by",
+        "used",
+        "generated",
+        "execution_duration"
+      ],
+      "title": "LogEntry",
+      "type": "object"
+    },
+    "MultiPointFeature": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature for multi-point tool results",
+      "properties": {
+        "bbox": {
+          "description": "Bounding box [minLon, minLat, maxLon, maxLat]",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONMultiPoint",
+          "description": "MultiPoint geometry"
+        },
+        "id": {
+          "description": "Unique identifier (UUID recommended)",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/MultiPointFeatureProperties",
+          "description": "Feature properties and styling"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "MultiPointFeature",
+      "type": "object"
+    },
+    "MultiPointFeatureProperties": {
+      "additionalProperties": false,
+      "description": "Properties for a MultiPointFeature (multi-point tool results)",
+      "properties": {
+        "description": {
+          "description": "Additional description or notes",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "MULTI_POINT",
+          "description": "Feature type discriminator"
+        },
+        "label": {
+          "description": "Human-readable result label",
+          "type": "string"
+        },
+        "source_features": {
+          "description": "IDs of input features used to generate this result",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "source_tool": {
+          "description": "Name of calculation tool that produced this result",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "style": {
+          "$ref": "#/$defs/PointProperties",
+          "description": "Point styling for all positions"
+        }
+      },
+      "required": [
+        "kind",
+        "label",
+        "style"
+      ],
+      "title": "MultiPointFeatureProperties",
+      "type": "object"
+    },
+    "MultiPolygonFeature": {
+      "additionalProperties": false,
+      "description": "GeoJSON Feature for multi-polygon tool results",
+      "properties": {
+        "bbox": {
+          "description": "Bounding box [minLon, minLat, maxLon, maxLat]",
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "geometry": {
+          "$ref": "#/$defs/GeoJSONMultiPolygon",
+          "description": "MultiPolygon geometry"
+        },
+        "id": {
+          "description": "Unique identifier (UUID recommended)",
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/$defs/MultiPolygonFeatureProperties",
+          "description": "Feature properties and styling"
+        },
+        "type": {
+          "const": "Feature",
+          "description": "GeoJSON type discriminator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "geometry",
+        "properties"
+      ],
+      "title": "MultiPolygonFeature",
+      "type": "object"
+    },
+    "MultiPolygonFeatureProperties": {
+      "additionalProperties": false,
+      "description": "Properties for a MultiPolygonFeature (multi-polygon tool results)",
+      "properties": {
+        "description": {
+          "description": "Additional description or notes",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "MULTI_POLYGON",
+          "description": "Feature type discriminator"
+        },
+        "label": {
+          "description": "Human-readable result label",
+          "type": "string"
+        },
+        "source_features": {
+          "description": "IDs of input features used to generate this result",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "source_tool": {
+          "description": "Name of calculation tool that produced this result",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "style": {
+          "$ref": "#/$defs/PolygonProperties",
+          "description": "Polygon styling for all regions"
+        }
+      },
+      "required": [
+        "kind",
+        "label",
+        "style"
+      ],
+      "title": "MultiPolygonFeatureProperties",
+      "type": "object"
+    },
     "NarrativeEntry": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for timestamped narrative/log entries. Narratives are operator notes associated with a timestamp and optionally a track. Geometry is optional (Point for display position, or null).",
@@ -521,6 +947,35 @@
         "style"
       ],
       "title": "NarrativeEntryProperties",
+      "type": "object"
+    },
+    "ParameterValue": {
+      "additionalProperties": false,
+      "description": "A typed parameter value with replay metadata.",
+      "properties": {
+        "default": {
+          "description": "Whether this is the default value.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "tunable": {
+          "description": "Whether this parameter can be modified during replay.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "value": {
+          "description": "The parameter value (any JSON type).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "ParameterValue",
       "type": "object"
     },
     "PointProperties": {
@@ -1186,6 +1641,115 @@
       "title": "SensorData",
       "type": "object"
     },
+    "SnapshotLinks": {
+      "additionalProperties": false,
+      "description": "Doubly-linked references to adjacent snapshots.",
+      "properties": {
+        "next": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SnapshotRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Link to next snapshot. Null if this is the current working file."
+        },
+        "prev": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SnapshotRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Link to previous snapshot. Null if this is the first snapshot."
+        }
+      },
+      "title": "SnapshotLinks",
+      "type": "object"
+    },
+    "SnapshotRef": {
+      "additionalProperties": false,
+      "description": "Reference to a snapshot file.",
+      "properties": {
+        "asset": {
+          "description": "Relative path to snapshot GeoJSON file.",
+          "type": "string"
+        },
+        "prov_entry_count": {
+          "description": "Number of provenance entries in the snapshot.",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "asset",
+        "prov_entry_count"
+      ],
+      "title": "SnapshotRef",
+      "type": "object"
+    },
+    "SystemRecordProperties": {
+      "additionalProperties": false,
+      "description": "Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with featureType \"system\" and Point geometry with empty coordinates.",
+      "properties": {
+        "branch_origin": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BranchOrigin"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Reverse link to source plot (set when this plot is a branch)."
+        },
+        "branches": {
+          "description": "Branch records. Empty array when no branches exist.",
+          "items": {
+            "$ref": "#/$defs/BranchRecord"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "feature_type": {
+          "const": "system",
+          "description": "Discriminator, always \"system\".",
+          "type": "string"
+        },
+        "provenance": {
+          "description": "File-level provenance events (snapshot and branch creation).",
+          "items": {
+            "$ref": "#/$defs/FileProvEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "snapshot_links": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SnapshotLinks"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Doubly-linked snapshot chain. Null when no snapshots exist."
+        }
+      },
+      "required": [
+        "feature_type"
+      ],
+      "title": "SystemRecordProperties",
+      "type": "object"
+    },
     "SystemState": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for storing non-spatial system state",
@@ -1795,6 +2359,37 @@
       "title": "TrackTypeEnum",
       "type": "string"
     },
+    "TuneAnnotation": {
+      "additionalProperties": false,
+      "description": "Records a parameter modification (appended, not replacing original).",
+      "properties": {
+        "new_value": {
+          "description": "Value after tuning.",
+          "type": "string"
+        },
+        "parameter": {
+          "description": "Name of the parameter that was changed.",
+          "type": "string"
+        },
+        "previous_value": {
+          "description": "Value before tuning.",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "When the tuning occurred (ISO 8601 with timezone).",
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "timestamp",
+        "parameter",
+        "previous_value",
+        "new_value"
+      ],
+      "title": "TuneAnnotation",
+      "type": "object"
+    },
     "VectorAnnotation": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for vector annotations. Geometry is a LineString from origin to endpoint (computed from range/bearing). Properties contain origin, range, and bearing for precise reconstruction.",
@@ -1889,6 +2484,34 @@
         "style"
       ],
       "title": "VectorAnnotationProperties",
+      "type": "object"
+    },
+    "WasGeneratedBy": {
+      "additionalProperties": false,
+      "description": "Identifies the tool and its parameters for a specific invocation. Named after the W3C PROV vocabulary term.",
+      "properties": {
+        "parameters": {
+          "description": "Full resolved parameter set. Keys are parameter names, values are ParameterValue objects. May be empty dict.",
+          "items": {
+            "$ref": "#/$defs/ParameterValue"
+          },
+          "type": "array"
+        },
+        "tool": {
+          "description": "Tool identifier (kebab-case, e.g., calculate-range).",
+          "type": "string"
+        },
+        "tool_version": {
+          "description": "Semantic version of the tool (e.g., 1.2.0).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tool",
+        "tool_version",
+        "parameters"
+      ],
+      "title": "WasGeneratedBy",
       "type": "object"
     }
   }

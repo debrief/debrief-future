@@ -1,0 +1,26 @@
+{
+  "type": "Feature",
+  "id": "mp-single-001",
+  "geometry": {
+    "type": "MultiPoint",
+    "coordinates": [
+      [-4.5, 50.8]
+    ]
+  },
+  "properties": {
+    "kind": "MULTI_POINT",
+    "label": "Single Point in MultiPoint",
+    "style": {
+      "shape": "square",
+      "radius": 5,
+      "fill": true,
+      "fill_color": "#9900FF",
+      "fill_opacity": 0.7,
+      "stroke": true,
+      "color": "#6600CC",
+      "weight": 1,
+      "opacity": 1.0
+    },
+    "source_tool": "intersection-finder"
+  }
+}

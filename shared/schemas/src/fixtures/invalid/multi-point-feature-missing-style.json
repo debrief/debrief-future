@@ -1,0 +1,15 @@
+{
+  "type": "Feature",
+  "id": "mp-invalid-no-style",
+  "geometry": {
+    "type": "MultiPoint",
+    "coordinates": [
+      [-4.1234, 50.3456],
+      [-4.2345, 50.4567]
+    ]
+  },
+  "properties": {
+    "kind": "MULTI_POINT",
+    "label": "Missing Style"
+  }
+}

@@ -18,6 +18,7 @@ import type {
   WebviewToExtensionMessage,
   Track,
   ReferenceLocation,
+  GeoJSONFeature,
 } from '../messages';
 
 // VS Code API type
@@ -81,6 +82,7 @@ function MapViewApp(): React.ReactElement {
   // Feature state
   const [tracks, setTracks] = useState<Track[]>([]);
   const [locations, setLocations] = useState<ReferenceLocation[]>([]);
+  const [otherFeatures, setOtherFeatures] = useState<GeoJSONFeature[]>([]);
   const [resultFeatures, setResultFeatures] = useState<DebriefFeature[]>([]);
   const [trackColors, setTrackColors] = useState<Record<string, string>>({});
 
@@ -117,11 +119,18 @@ function MapViewApp(): React.ReactElement {
   const features = useMemo((): DebriefFeature[] => {
     const trackFeatures = tracks.map(t => trackToFeature(t, trackColors[t.id]));
     const locationFeatures = locations.map(locationToFeature);
-    const allFeatures = [...trackFeatures, ...locationFeatures, ...resultFeatures];
+    // otherFeatures (annotations, multi-geometry) already have properties.style
+    const otherDebriefFeatures = otherFeatures.map(f => ({
+      type: 'Feature' as const,
+      id: f.id ?? '',
+      geometry: f.geometry,
+      properties: f.properties ?? {},
+    })) as DebriefFeature[];
+    const allFeatures = [...trackFeatures, ...locationFeatures, ...otherDebriefFeatures, ...resultFeatures];
     // Filter out hidden features
     if (hiddenIds.size === 0) return allFeatures;
     return allFeatures.filter(f => !hiddenIds.has(String(f.id)));
-  }, [tracks, locations, resultFeatures, trackColors, hiddenIds]);
+  }, [tracks, locations, otherFeatures, resultFeatures, trackColors, hiddenIds]);
 
   // Message handler
   useEffect(() => {
@@ -131,6 +140,7 @@ function MapViewApp(): React.ReactElement {
         case 'loadPlot':
           setTracks(msg.plot.tracks);
           setLocations(msg.plot.locations);
+          setOtherFeatures(msg.plot.otherFeatures ?? []);
           setResultFeatures([]);
           setFitBoundsTrigger(prev => prev + 1);
           break;
