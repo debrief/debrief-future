@@ -88,15 +88,31 @@
 
 ---
 
-## Phase 5: Polish & Evidence Collection
+## Phase 5: Proof-of-Concept — "Add Rectangle" Button (Temporary)
+
+**Goal**: Prove Geoman works end-to-end by adding a temporary "Add Rectangle" button to the LeafletToolbar. This button enables Geoman rectangle drawing mode when clicked. The rectangle is drawn on the map but NOT persisted. This is deliberately temporary — will be superseded by #093 (drawing toolbar).
+
+- [ ] T017 [US1] Add a temporary "Add Rectangle" button to `LeafletToolbar` in `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx`:
+  - Add a rectangle icon button (use a simple SVG or Unicode character) to the toolbar
+  - On click: call `map.pm.enableDraw('Rectangle')` to enter rectangle drawing mode
+  - On `pm:create`: exit drawing mode (single-draw behavior)
+  - Mark the button/code with `// TEMPORARY: 092-proof-of-concept — remove when #093 lands`
+- [ ] T018 [US1] Verify in Storybook: open any MapView story with the toolbar visible, click "Add Rectangle", draw a rectangle on the map, confirm the rectangle renders
+- [ ] T019 [US2] Verify in VS Code webview build: run `pnpm --filter debrief-vscode compile`, confirm the rectangle button appears in the map toolbar when running the extension
+
+**Checkpoint**: User can click "Add Rectangle" in the toolbar, draw a rectangle on the map — proves Geoman integration works end-to-end
+
+---
+
+## Phase 6: Polish & Evidence Collection
 
 **Purpose**: Capture evidence and finalize
 
-- [ ] T017 Run full test suite: `pnpm --filter @debrief/components test` — capture output
-- [ ] T018 Create evidence directory: `mkdir -p specs/092-integrate-geoman-drawing-library/evidence/screenshots`
-- [ ] T019 Capture test summary in `specs/092-integrate-geoman-drawing-library/evidence/test-summary.md`
-- [ ] T020 Write usage example in `specs/092-integrate-geoman-drawing-library/evidence/usage-example.md` showing how to use `useGeoman` hook
-- [ ] T021 Update `specs/092-integrate-geoman-drawing-library/spec.md` status from "Draft" to "Implemented"
+- [ ] T020 Run full test suite: `pnpm --filter @debrief/components test` — capture output
+- [ ] T021 Create evidence directory: `mkdir -p specs/092-integrate-geoman-drawing-library/evidence/screenshots`
+- [ ] T022 Capture test summary in `specs/092-integrate-geoman-drawing-library/evidence/test-summary.md`
+- [ ] T023 Write usage example in `specs/092-integrate-geoman-drawing-library/evidence/usage-example.md` showing how to use `useGeoman` hook
+- [ ] T024 Update `specs/092-integrate-geoman-drawing-library/spec.md` status from "Draft" to "Implemented"
 
 **Checkpoint**: Evidence collected, ready for PR creation
 
@@ -110,7 +126,8 @@
 - **Phase 2 (Core)**: Depends on Phase 1 — T004-T008 are sequential; T009-T010 run after T008
 - **Phase 3 (Build)**: Depends on Phase 2 — verify build only after code changes
 - **Phase 4 (Story)**: Depends on Phase 2 — needs `useGeoman` hook to exist
-- **Phase 5 (Polish)**: Depends on Phases 2-4
+- **Phase 5 (Proof-of-Concept)**: Depends on Phase 2 — needs Geoman initialized on map
+- **Phase 6 (Polish)**: Depends on Phases 2-5
 
 ### Parallel Opportunities
 
