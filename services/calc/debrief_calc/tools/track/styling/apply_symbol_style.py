@@ -7,6 +7,7 @@ from typing import Any
 from debrief_calc.models import ContextType, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 
+
 @tool(
     name="apply-symbol-style",
     description="Applies a symbol style to position markers on track features.",
