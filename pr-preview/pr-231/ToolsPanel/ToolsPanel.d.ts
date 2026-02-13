@@ -10,7 +10,7 @@ import { ToolsPanelProps } from '../ActivityPanel/types';
  *     { id: 'range', name: 'Range', description: 'Calculate range', applicable: true },
  *     { id: 'bearing', name: 'Bearing', description: 'Calculate bearing', applicable: false, explanation: 'Requires 2 tracks' }
  *   ]}
- *   onRunTool={(id) => console.log('Run tool:', id)}
+ *   onRunTool={(id, params) => console.log('Run tool:', id, params)}
  * />
  * ```
  */

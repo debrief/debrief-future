@@ -1,5 +1,5 @@
 import { DebriefFeature } from '../utils/types';
-import { MatchResult } from '../ToolMatch/types';
+import { MatchResult, ToolParameter } from '../ToolMatch/types';
 import { AssociatedFile } from '../LayersToolbar/types';
 
 /**
@@ -28,6 +28,8 @@ export interface ToolsPanelItem {
     applicable: boolean;
     /** Explanation when tool is not applicable (optional) */
     explanation?: string;
+    /** Configurable parameters with type metadata */
+    parameters?: ToolParameter[];
 }
 /**
  * Props for the ToolsPanel component.
@@ -39,8 +41,8 @@ export interface ToolsPanelProps {
     hasToolInventory?: boolean;
     /** Whether features are currently selected */
     hasSelection?: boolean;
-    /** Callback when a tool is run */
-    onRunTool?: (toolId: string) => void;
+    /** Callback when a tool is run, with optional collected parameters */
+    onRunTool?: (toolId: string, params?: Record<string, unknown>) => void;
     /** CSS class name */
     className?: string;
 }
@@ -68,6 +70,7 @@ export type ActivityPanelMessage = {
     type: 'tool:run';
     payload: {
         toolId: string;
+        params?: Record<string, unknown>;
     };
 } | {
     type: 'layer:toggleVisibility';

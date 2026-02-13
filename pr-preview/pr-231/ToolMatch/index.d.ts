@@ -14,9 +14,10 @@
  */
 export { ToolMatchService } from './ToolMatchService';
 export { getInactiveReason, getAllInactiveReasons } from './explanations';
-export type { Selection, MatchResult } from './types';
+export type { Selection, MatchResult, ToolParameter } from './types';
 export { createSelection, createSelectionFromCounts } from './types';
-export { fromMCPTool, fromMCPTools } from './mcpAdapter';
+export { fromMCPTool, fromMCPTools, extractParameters } from './mcpAdapter';
 export type { MCPToolDefinition, MCPSelectionRequirement } from './mcpAdapter';
+export { resolveParamType, isPresetType, getNumericValue } from './paramTypeResolver';
 export type { Tool, SelectionRequirement } from './types';
 //# sourceMappingURL=index.d.ts.map
