@@ -4,7 +4,7 @@
 
 import * as vscode from 'vscode';
 import { access, readFile } from 'fs/promises';
-import { loadSession, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
+import { loadSession, createLogService, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { IoService } from '../services/ioService';
@@ -235,6 +235,22 @@ export function createOpenPlotCommand(
 
     // Set up import services for drag-drop functionality
     panel.setImportServices(ioService, stacService, store, layersTreeProvider, activityPanelProvider);
+
+    // Create and wire LogService for provenance recording (Feature: 094)
+    const logService = createLogService({
+      appendProvenance: stacService.appendProvenance.bind(stacService),
+      loadGeoJson: async (sp: string, ip: string) => {
+        const fc = await stacService.loadGeoJsonForItem(sp, ip);
+        return fc as { features: Array<Record<string, unknown>> } | null;
+      },
+      markDirty: () => {
+        const activeSession = sessionManager.getActiveSession();
+        if (activeSession) {
+          activeSession.getState().markDirty();
+        }
+      },
+    });
+    panel.setLogService(logService);
 
     // Load plot into panel
     panel.loadPlot(plot, plotData.tracks, plotData.locations, plotData.otherFeatures);
