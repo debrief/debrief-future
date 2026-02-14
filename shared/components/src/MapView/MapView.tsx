@@ -16,19 +16,6 @@ import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import './MapView.css';
 
-/**
- * Check if a feature is involved in the current selection — either directly
- * selected or has a child (position/point/polygon) selected.
- */
-function isFeatureInSelection(featureId: string, selectedIds: Set<string>): boolean {
-  if (selectedIds.has(featureId)) return true;
-  const prefix = featureId + '/';
-  for (const id of selectedIds) {
-    if (id.startsWith(prefix)) return true;
-  }
-  return false;
-}
-
 // Import marker icons as modules so Vite bundles them with correct paths
 // Icons bundled for offline support (CONSTITUTION.md)
 import markerIcon from '../assets/marker-icon.png';
@@ -298,7 +285,7 @@ export function MapView({
       if (!feature) return {};
 
       const debriefFeature = feature as unknown as DebriefFeature;
-      const isSelected = isFeatureInSelection(debriefFeature.id, selectedIds);
+      const isSelected = selectedIds.has(debriefFeature.id);
       const props = debriefFeature.properties as unknown as Record<string, unknown>;
       const style = props.style as Record<string, unknown> | undefined;
       const color = getFeatureColor(debriefFeature);
@@ -366,7 +353,7 @@ export function MapView({
   const pointToLayer = useMemo(() => {
     return (feature: GeoJSON.Feature, latlng: L.LatLng): L.Layer => {
       const debriefFeature = feature as unknown as DebriefFeature;
-      const isSelected = isFeatureInSelection(debriefFeature.id, selectedIds);
+      const isSelected = selectedIds.has(debriefFeature.id);
       const props = debriefFeature.properties as unknown as Record<string, unknown>;
       const featureStyle = props.style as Record<string, unknown> | undefined;
       const color = (featureStyle?.color as string) ?? getFeatureColor(debriefFeature);
@@ -450,7 +437,7 @@ export function MapView({
           <PositionSymbolsLayer
             key={`pos-${String(f.id)}-sel-${selectionRevision.current}`}
             feature={f}
-            isSelected={isFeatureInSelection(f.id, selectedIds)}
+            isSelected={selectedIds.has(f.id)}
             selectedIds={selectedIds}
           />
         ))}
@@ -461,7 +448,7 @@ export function MapView({
             feature={f}
             currentTime={currentTime}
             displayMode={displayMode}
-            isSelected={isFeatureInSelection(f.id, selectedIds)}
+            isSelected={selectedIds.has(f.id)}
             onClick={onSelect}
           />
         ))}
