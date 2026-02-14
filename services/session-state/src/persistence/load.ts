@@ -152,6 +152,7 @@ function applySessionState(
       viewport: state.viewport,
       rotation: state.rotation,
       drawingMode: state.drawingMode,
+      drawingPaletteIndex: state.drawingPaletteIndex ?? 0,
     },
     features: {
       featureCollectionUri: state.featureCollectionUri,
