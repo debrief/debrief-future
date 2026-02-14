@@ -16,6 +16,19 @@ import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import './MapView.css';
 
+/**
+ * Check if a feature is involved in the current selection — either directly
+ * selected or has a child (position/point/polygon) selected.
+ */
+function isFeatureInSelection(featureId: string, selectedIds: Set<string>): boolean {
+  if (selectedIds.has(featureId)) return true;
+  const prefix = featureId + '/';
+  for (const id of selectedIds) {
+    if (id.startsWith(prefix)) return true;
+  }
+  return false;
+}
+
 // Import marker icons as modules so Vite bundles them with correct paths
 // Icons bundled for offline support (CONSTITUTION.md)
 import markerIcon from '../assets/marker-icon.png';
@@ -285,7 +298,7 @@ export function MapView({
       if (!feature) return {};
 
       const debriefFeature = feature as unknown as DebriefFeature;
-      const isSelected = selectedIds.has(debriefFeature.id);
+      const isSelected = isFeatureInSelection(debriefFeature.id, selectedIds);
       const props = debriefFeature.properties as unknown as Record<string, unknown>;
       const style = props.style as Record<string, unknown> | undefined;
       const color = getFeatureColor(debriefFeature);
@@ -353,7 +366,7 @@ export function MapView({
   const pointToLayer = useMemo(() => {
     return (feature: GeoJSON.Feature, latlng: L.LatLng): L.Layer => {
       const debriefFeature = feature as unknown as DebriefFeature;
-      const isSelected = selectedIds.has(debriefFeature.id);
+      const isSelected = isFeatureInSelection(debriefFeature.id, selectedIds);
       const props = debriefFeature.properties as unknown as Record<string, unknown>;
       const featureStyle = props.style as Record<string, unknown> | undefined;
       const color = (featureStyle?.color as string) ?? getFeatureColor(debriefFeature);
@@ -370,13 +383,21 @@ export function MapView({
     };
   }, [selectedIds]);
 
-  // Track a revision counter for the GeoJSON key — react-leaflet's GeoJSON
-  // component only renders on mount, so the key must change whenever data changes.
+  // Track revision counters for the GeoJSON key — react-leaflet's GeoJSON
+  // component only renders on mount, so the key must change whenever data
+  // or selection changes to force re-mount with updated styles.
   const geojsonRevision = useRef(0);
   const prevGeojsonRef = useRef(geojsonData);
   if (prevGeojsonRef.current !== geojsonData) {
     geojsonRevision.current += 1;
     prevGeojsonRef.current = geojsonData;
+  }
+
+  const selectionRevision = useRef(0);
+  const prevSelectedRef = useRef(selectedIds);
+  if (prevSelectedRef.current !== selectedIds) {
+    selectionRevision.current += 1;
+    prevSelectedRef.current = selectedIds;
   }
 
   const containerStyle: React.CSSProperties = {
@@ -417,7 +438,7 @@ export function MapView({
 
         {staticFeatures.length > 0 && (
           <GeoJSON
-            key={`geojson-${geojsonRevision.current}-${selectedIds.size}`}
+            key={`geojson-${geojsonRevision.current}-sel-${selectionRevision.current}`}
             data={geojsonData}
             style={featureStyle}
             pointToLayer={pointToLayer}
@@ -427,9 +448,10 @@ export function MapView({
 
         {staticFeatures.filter(isTrackFeature).map((f) => (
           <PositionSymbolsLayer
-            key={`pos-${String(f.id)}`}
+            key={`pos-${String(f.id)}-sel-${selectionRevision.current}`}
             feature={f}
-            isSelected={selectedIds.has(f.id)}
+            isSelected={isFeatureInSelection(f.id, selectedIds)}
+            selectedIds={selectedIds}
           />
         ))}
 
@@ -439,7 +461,7 @@ export function MapView({
             feature={f}
             currentTime={currentTime}
             displayMode={displayMode}
-            isSelected={selectedIds.has(f.id)}
+            isSelected={isFeatureInSelection(f.id, selectedIds)}
             onClick={onSelect}
           />
         ))}
