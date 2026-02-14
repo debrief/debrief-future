@@ -181,7 +181,7 @@ Description formats:
 | 089 | Feature | [Result view auto-refresh on logical ID change](docs/ideas/E04-results-visualization.md) [E04] — watches logical result IDs, re-renders preserving viewport; absorbs E03 #083 (requires #086, #087, #088) | 4 | 4 | 3 | 11 | Medium | approved |
 | 086 | Feature | [Results bottom panel with tabbed layout](docs/ideas/E04-results-visualization.md) [E04] — VS Code panel hosting Vega-Lite renderer tabs (requires #085) | 4 | 4 | 3 | 11 | Medium | approved |
 | 093 | Feature | [[E05] Add drawing toolbar with shape palette](docs/ideas/093-drawing-toolbar-shape-palette.md) (requires #092) [E05] | 4 | 4 | 3 | 11 | Medium | approved |
-| 095 | Feature | [[E05] Implement polygon and polyline drawing](docs/ideas/095-polygon-polyline-drawing.md) (requires #091, #092, #093) [E05] | 4 | 4 | 3 | 11 | Medium | approved |
+| 095 | Feature | [[E05] Implement polygon and polyline drawing](specs/095-polygon-polyline-drawing/spec.md) (requires #091, #092, #093) [E05] | 4 | 4 | 3 | 11 | Medium | specified |
 | 087 | Infrastructure | [Logical result ID registry](docs/ideas/E04-results-visualization.md) [E04] — maps stable logical IDs to current result files, emits change events (requires #071) | 4 | 3 | 4 | 11 | Medium | approved |
 | 027 | Infrastructure | [Add automated screenshot capture for Storybook stories](docs/ideas/027-automated-screenshots.md) | 3 | 4 | 4 | 11 | Medium | approved |
 | 088 | Feature | [Custom editor provider for result datasets](docs/ideas/E04-results-visualization.md) [E04] — opens results as editor tabs, supports drag-to-float via auxiliary windows (requires #085) | 3 | 4 | 4 | 11 | Medium | approved |
@@ -195,7 +195,7 @@ Description formats:
 | 059 | Feature | [Add flip shape vertical tool spec](docs/ideas/059-flip-shape-vertical.md) (requires #049) | 2 | 2 | 5 | 9 | Low | approved |
 | 094 | Feature | [[E05] Implement point and rectangle drawing](docs/ideas/094-point-rectangle-drawing.md) (requires #091, #092, #093) [E05] | 4 | 4 | 4 | 12 | Medium | approved |
 | 093 | Feature | [[E05] Add drawing toolbar with shape palette](specs/093-drawing-toolbar-shape-palette/spec.md) (requires #092) [E05] | 4 | 4 | 3 | 11 | Medium | specified |
-| 095 | Feature | [[E05] Implement polygon and polyline drawing](docs/ideas/095-polygon-polyline-drawing.md) (requires #091, #092, #093) [E05] | 4 | 4 | 3 | 11 | Medium | approved |
+| 095 | Feature | [[E05] Implement polygon and polyline drawing](specs/095-polygon-polyline-drawing/spec.md) (requires #091, #092, #093) [E05] | 4 | 4 | 3 | 11 | Medium | specified |
 | 029 | Tech Debt | [Add unit tests for VS Code extension providers](https://github.com/debrief/debrief-future/issues/104) | 4 | 2 | 5 | 11 | Low | proposed |
 | 004 | Infrastructure | Add contrib folder scaffolding with example extension (requires #008) | 3 | 3 | 4 | 10 | Low | proposed |
 | 033 | Tech Debt | [Re-enable debrief-stac tests in pytest](docs/ideas/033-reenable-stac-tests.md) | 4 | 2 | 4 | 10 | Low | proposed |

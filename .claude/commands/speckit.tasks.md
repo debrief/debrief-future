@@ -35,7 +35,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Clear file paths for each task
    - Dependencies section showing story completion order
    - Parallel execution examples per story
-   - Implementation strategy section (MVP first, incremental delivery)
+   - Implementation strategy section (incremental delivery)
 
 5. **Plan evidence artifacts**: Determine what evidence should be captured to demonstrate the feature works:
    - **Test evidence**: What test output/summary will prove correctness?
@@ -55,7 +55,6 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Independent test criteria for each story
    - **Evidence artifacts planned** (list what will be captured)
    - **PR task included**: Confirm final task triggers /speckit.pr
-   - Suggested MVP scope (typically just User Story 1)
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
 
 Context for task generation: $ARGUMENTS

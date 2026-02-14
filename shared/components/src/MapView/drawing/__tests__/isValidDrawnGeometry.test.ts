@@ -132,28 +132,128 @@ describe('isValidDrawnGeometry', () => {
     });
   });
 
-  describe('unsupported modes', () => {
-    it('returns false for polygon mode', () => {
+  describe('polygon mode', () => {
+    it('returns true for valid polygon with 3 unique vertices + closure', () => {
       const geojson: GeoJSON.Feature = {
         type: 'Feature',
         geometry: {
           type: 'Polygon',
-          coordinates: [[[-4, 50], [-3, 50], [-3, 51], [-4, 51], [-4, 50]]],
+          coordinates: [[[-4, 50], [-3, 50], [-3, 51], [-4, 50]]],
+        },
+        properties: {},
+      };
+      expect(isValidDrawnGeometry(geojson, 'polygon')).toBe(true);
+    });
+
+    it('returns true for polygon with many vertices', () => {
+      const geojson: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[[-4, 50], [-3, 50], [-3, 51], [-4, 51], [-4.5, 50.5], [-4, 50]]],
+        },
+        properties: {},
+      };
+      expect(isValidDrawnGeometry(geojson, 'polygon')).toBe(true);
+    });
+
+    it('returns false for polygon with fewer than 3 unique vertices', () => {
+      const geojson: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[[-4, 50], [-3, 50], [-4, 50]]],
         },
         properties: {},
       };
       expect(isValidDrawnGeometry(geojson, 'polygon')).toBe(false);
     });
 
-    it('returns false for polyline mode', () => {
+    it('returns false for non-Polygon geometry type', () => {
+      const geojson: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [-4, 50] },
+        properties: {},
+      };
+      expect(isValidDrawnGeometry(geojson, 'polygon')).toBe(false);
+    });
+
+    it('returns false for empty rings', () => {
+      const geojson: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: { type: 'Polygon', coordinates: [] } as unknown as GeoJSON.Polygon,
+        properties: {},
+      };
+      expect(isValidDrawnGeometry(geojson, 'polygon')).toBe(false);
+    });
+
+    it('returns false for non-finite coordinates', () => {
+      const geojson: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[[NaN, 50], [-3, 50], [-3, 51], [NaN, 50]]],
+        },
+        properties: {},
+      };
+      expect(isValidDrawnGeometry(geojson, 'polygon')).toBe(false);
+    });
+  });
+
+  describe('polyline mode', () => {
+    it('returns true for valid polyline with 2 vertices', () => {
       const geojson: GeoJSON.Feature = {
         type: 'Feature',
         geometry: { type: 'LineString', coordinates: [[-4, 50], [-3, 51]] },
         properties: {},
       };
+      expect(isValidDrawnGeometry(geojson, 'polyline')).toBe(true);
+    });
+
+    it('returns true for polyline with many vertices', () => {
+      const geojson: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: [[-4, 50], [-3, 50], [-3, 51], [-2, 51], [-1, 50]],
+        },
+        properties: {},
+      };
+      expect(isValidDrawnGeometry(geojson, 'polyline')).toBe(true);
+    });
+
+    it('returns false for polyline with only 1 vertex', () => {
+      const geojson: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: { type: 'LineString', coordinates: [[-4, 50]] } as unknown as GeoJSON.LineString,
+        properties: {},
+      };
       expect(isValidDrawnGeometry(geojson, 'polyline')).toBe(false);
     });
 
+    it('returns false for non-LineString geometry type', () => {
+      const geojson: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[[-4, 50], [-3, 50], [-3, 51], [-4, 50]]],
+        },
+        properties: {},
+      };
+      expect(isValidDrawnGeometry(geojson, 'polyline')).toBe(false);
+    });
+
+    it('returns false for non-finite coordinates', () => {
+      const geojson: GeoJSON.Feature = {
+        type: 'Feature',
+        geometry: { type: 'LineString', coordinates: [[-4, 50], [Infinity, 51]] },
+        properties: {},
+      };
+      expect(isValidDrawnGeometry(geojson, 'polyline')).toBe(false);
+    });
+  });
+
+  describe('null mode', () => {
     it('returns false for null mode', () => {
       const geojson: GeoJSON.Feature = {
         type: 'Feature',
