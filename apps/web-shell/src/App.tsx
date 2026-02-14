@@ -15,7 +15,7 @@
  * Feature: 073-undo-redo-split (runtime verification)
  */
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, createElement } from 'react';
 import type { Feature, FeatureCollection } from 'geojson';
 import {
   CatalogOverview,
@@ -29,6 +29,9 @@ import {
   ChartRenderer,
   transformDataset,
   createDrawnFeature,
+  PanelWorkspace,
+  PanelContextProvider,
+  createDefaultRegistry,
 } from '@debrief/components';
 import type { DatasetEnvelope, DrawingMode } from '@debrief/components';
 import type {
@@ -40,6 +43,9 @@ import type {
   PresentationMode,
   ViewMode,
   LogPanelMessage,
+  PanelContextValue,
+  PanelComponents,
+  ChartContextProps,
 } from '@debrief/components';
 import type { LogFilterState } from '@debrief/components';
 import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
@@ -74,9 +80,6 @@ window.__sessionStore = getSessionStore();
 /** Current view state */
 type View = 'welcome' | 'analysis';
 
-/** Sidebar tab */
-type SidebarTab = 'activity' | 'log';
-
 /** State for the currently loaded plot */
 interface PlotState {
   itemPath: string;
@@ -110,12 +113,6 @@ export default function App() {
   >({});
   const [toolMessage, setToolMessage] = useState<string | null>(null);
   const [treeRefreshKey, setTreeRefreshKey] = useState(0);
-
-  // Sidebar tab
-  const [sidebarTab, setSidebarTab] = useState<SidebarTab>('activity');
-
-  // STAC Catalog section collapsed state (collapsed by default to reduce sidebar clutter)
-  const [fileTreeCollapsed, setFileTreeCollapsed] = useState(true);
 
   // Log panel state
   const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
@@ -249,7 +246,6 @@ export default function App() {
       setDrawingMode(null);
       setToolMessage(null);
       setLogEntries([]);
-      setSidebarTab('activity');
       setView('analysis');
     } catch (error) {
       console.error('Failed to load plot:', error);
@@ -263,7 +259,6 @@ export default function App() {
     setResultLayers([]);
     setToolMessage(null);
     setLogEntries([]);
-    setSidebarTab('activity');
     store.getState().clearSelection();
   }, [store]);
 
@@ -660,6 +655,106 @@ export default function App() {
     }
   }, [playback, store, handleRunTool]);
 
+  // --- Panel workspace infrastructure ---
+  // Create panel registry once (stable reference)
+  const panelRegistry = useMemo(() => createDefaultRegistry(), []);
+
+  // Panel component references (stable across renders)
+  const panelComponents = useMemo<PanelComponents>(() => ({
+    ActivityPanel,
+    MapView,
+    LogPanel,
+    StacFileTree,
+    ChartRenderer,
+  }), []);
+
+  // Chart context for the Chart panel wrapper
+  const chartContextProps = useMemo<ChartContextProps | null>(() => {
+    if (chartTabs.length === 0 && !activeChartSpec) return null;
+    return {
+      chartSpec: activeChartSpec,
+      chartTabs: chartTabs.map(t => ({ id: t.id, title: t.title })),
+      activeChartTabId,
+      onChartTabSelect: setActiveChartTabId,
+      onChartTabClose: handleCloseChartTab,
+    };
+  }, [chartTabs, activeChartSpec, activeChartTabId, handleCloseChartTab]);
+
+  // Full context value for all panel wrappers
+  const panelContextValue = useMemo<PanelContextValue>(() => ({
+    components: panelComponents,
+    activityPanelProps: currentPlot ? {
+      timeExtent,
+      currentTime: playback.currentTime,
+      playbackState: playback.playbackState,
+      playbackSpeed: playback.speed,
+      displayMode: toComponentMode(state.displayMode),
+      timeUiState: timeExtent ? 'ready' : 'empty',
+      tools,
+      features: allFeatures,
+      selectedFeatureIds: state.selection.featureIds,
+      onMessage: handleActivityMessage,
+    } : null,
+    mapViewProps: currentPlot ? {
+      features: allFeatures,
+      selectedIds: selectedIds,
+      onSelect: handleMapSelect,
+      onBackgroundClick: handleBackgroundClick,
+      currentTime: playback.currentTime,
+      displayMode: toComponentMode(state.displayMode),
+      drawingMode,
+      onDrawingModeChange: setDrawingMode,
+      onShapeCreated: handleShapeCreated,
+      height: '100%',
+      className: 'web-shell__map',
+    } : null,
+    logPanelProps: currentPlot ? {
+      entries: logEntries,
+      featureNames,
+      presentationMode: logPresentationMode,
+      viewMode: logViewMode,
+      selectedEntryId: logSelectedEntryId,
+      filterState: logFilterState,
+      hasActiveSession: true,
+      plotName: currentPlot?.title ?? null,
+      actionResultMessage: logNotification,
+      onMessage: handleLogMessage,
+      onPresentationModeChange: setLogPresentationMode,
+      onViewModeChange: setLogViewMode,
+      onFilterStateChange: setLogFilterState,
+      onSelectedEntryChange: setLogSelectedEntryId,
+      onTuneRequest: handleTuneRequest,
+      onRestoreRequest: handleRestoreRequest,
+    } : null,
+    stacFileTreeProps: currentPlot ? {
+      fs: mockFsAdapter,
+      rootPath: '/local-store',
+      currentItemPath: currentPlot
+        ? `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`
+        : undefined,
+      onFileSelect: handleFileSelect,
+      refreshKey: treeRefreshKey,
+      className: 'web-shell__file-tree',
+    } : null,
+    chartProps: chartContextProps,
+  }), [
+    panelComponents, currentPlot, timeExtent, playback.currentTime,
+    playback.playbackState, playback.speed, state.displayMode,
+    tools, allFeatures, state.selection.featureIds, handleActivityMessage,
+    selectedIds, handleMapSelect, handleBackgroundClick, drawingMode,
+    handleShapeCreated, logEntries, featureNames, logPresentationMode,
+    logViewMode, logSelectedEntryId, logFilterState, logNotification,
+    handleLogMessage, handleTuneRequest, handleRestoreRequest,
+    handleFileSelect, treeRefreshKey, chartContextProps,
+  ]);
+
+  // Context wrapper for the GoldenLayout bridge — wraps each panel in PanelContextProvider
+  const contextWrapper = useCallback(
+    (element: React.ReactElement) =>
+      createElement(PanelContextProvider, { value: panelContextValue }, element),
+    [panelContextValue]
+  );
+
   // Render welcome view
   if (view === 'welcome') {
     return (
@@ -727,144 +822,12 @@ export default function App() {
         </div>
       )}
 
-      <main className="web-shell__main web-shell__main--split">
-        <aside className="web-shell__sidebar">
-          <button
-            type="button"
-            className="web-shell__section-header"
-            onClick={() => setFileTreeCollapsed(prev => !prev)}
-            aria-expanded={!fileTreeCollapsed}
-            aria-controls="sidebar-file-tree"
-            data-testid="file-tree-toggle"
-          >
-            <span className={`web-shell__section-chevron ${fileTreeCollapsed ? '' : 'web-shell__section-chevron--expanded'}`}>&#9654;</span>
-            STAC Catalog
-          </button>
-          {!fileTreeCollapsed && (
-            <div id="sidebar-file-tree">
-              <StacFileTree
-                fs={mockFsAdapter}
-                rootPath="/local-store"
-                currentItemPath={currentPlot ? `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}` : undefined}
-                onFileSelect={handleFileSelect}
-                refreshKey={treeRefreshKey}
-                className="web-shell__file-tree"
-              />
-            </div>
-          )}
-          <div className="web-shell__tab-bar" role="tablist">
-            <button
-              type="button"
-              className={`web-shell__tab ${sidebarTab === 'activity' ? 'web-shell__tab--active' : ''}`}
-              role="tab"
-              aria-selected={sidebarTab === 'activity'}
-              aria-controls="sidebar-activity"
-              data-testid="sidebar-tab-activity"
-              onClick={() => setSidebarTab('activity')}
-            >
-              Activity
-            </button>
-            <button
-              type="button"
-              className={`web-shell__tab ${sidebarTab === 'log' ? 'web-shell__tab--active' : ''}`}
-              role="tab"
-              aria-selected={sidebarTab === 'log'}
-              aria-controls="sidebar-log"
-              data-testid="sidebar-tab-log"
-              onClick={() => setSidebarTab('log')}
-            >
-              Log
-            </button>
-          </div>
-
-          <div className="web-shell__tab-content">
-            {sidebarTab === 'activity' ? (
-              <ActivityPanel
-                timeExtent={timeExtent}
-                currentTime={playback.currentTime}
-                playbackState={playback.playbackState}
-                playbackSpeed={playback.speed}
-                displayMode={toComponentMode(state.displayMode)}
-                timeUiState={timeExtent ? 'ready' : 'empty'}
-                tools={tools}
-                features={allFeatures}
-                selectedFeatureIds={state.selection.featureIds}
-                onMessage={handleActivityMessage}
-              />
-            ) : (
-              <LogPanel
-                entries={logEntries}
-                featureNames={featureNames}
-                presentationMode={logPresentationMode}
-                viewMode={logViewMode}
-                selectedEntryId={logSelectedEntryId}
-                filterState={logFilterState}
-                hasActiveSession={true}
-                plotName={currentPlot?.title ?? null}
-                actionResultMessage={logNotification}
-                onMessage={handleLogMessage}
-                onPresentationModeChange={setLogPresentationMode}
-                onViewModeChange={setLogViewMode}
-                onFilterStateChange={setLogFilterState}
-                onSelectedEntryChange={setLogSelectedEntryId}
-                onTuneRequest={handleTuneRequest}
-                onRestoreRequest={handleRestoreRequest}
-              />
-            )}
-          </div>
-        </aside>
-        <section className="web-shell__right-panel">
-          <div className={`web-shell__map-container ${chartTabs.length > 0 ? 'web-shell__map-container--with-panel' : ''}`}>
-            <MapView
-              features={allFeatures}
-              selectedIds={selectedIds}
-              onSelect={handleMapSelect}
-              onBackgroundClick={handleBackgroundClick}
-              currentTime={playback.currentTime}
-              displayMode={toComponentMode(state.displayMode)}
-              drawingMode={drawingMode}
-              onDrawingModeChange={setDrawingMode}
-              onShapeCreated={handleShapeCreated}
-              height="100%"
-              className="web-shell__map"
-            />
-          </div>
-          {chartTabs.length > 0 && (
-            <div className="web-shell__chart-panel" data-testid="chart-panel">
-              <div className="web-shell__chart-tabs" role="tablist">
-                {chartTabs.map(tab => (
-                  <div
-                    key={tab.id}
-                    className={`web-shell__chart-tab ${tab.id === activeChartTabId ? 'web-shell__chart-tab--active' : ''}`}
-                    role="tab"
-                    aria-selected={tab.id === activeChartTabId}
-                    onClick={() => setActiveChartTabId(tab.id)}
-                  >
-                    <span className="web-shell__chart-tab-label">{tab.title}</span>
-                    <button
-                      type="button"
-                      className="web-shell__chart-tab-close"
-                      onClick={(e) => { e.stopPropagation(); handleCloseChartTab(tab.id); }}
-                      aria-label={`Close ${tab.title}`}
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <div className="web-shell__chart-content">
-                {activeChartSpec && (
-                  <ChartRenderer spec={activeChartSpec} className="web-shell__chart" />
-                )}
-                {activeChartTab && !activeChartSpec && (
-                  <div className="web-shell__chart-error">
-                    Unable to render dataset: {activeChartTab.dataset.type}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </section>
+      <main className="web-shell__main">
+        <PanelWorkspace
+          registry={panelRegistry}
+          contextWrapper={contextWrapper}
+          className="web-shell__panel-workspace"
+        />
       </main>
     </div>
   );

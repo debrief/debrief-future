@@ -15,7 +15,7 @@ import {
 import type { PanelRegistry } from './panelRegistry';
 import { DEFAULT_LAYOUT_CONFIG } from './defaultLayout';
 import { saveLayout, loadLayout, clearLayout } from './layoutPersistence';
-import { createBindHandler, createUnbindHandler, unmountAll } from './goldenLayoutBridge';
+import { createBindHandler, createUnbindHandler, unmountAll, updateContextWrapper } from './goldenLayoutBridge';
 import './PanelWorkspace.css';
 
 export interface PanelWorkspaceProps {
@@ -119,6 +119,11 @@ export function PanelWorkspace({
       glRef.current = null;
     };
   }, []); // Only initialize once on mount
+
+  // Re-render all mounted panels when context wrapper changes
+  useEffect(() => {
+    updateContextWrapper(contextWrapper);
+  }, [contextWrapper]);
 
   // Reset layout handler
   const handleResetLayout = useCallback(() => {
