@@ -52,6 +52,8 @@ export interface MapViewProps {
     drawingMode?: DrawingMode;
     /** Callback when drawing mode changes (FR-004, FR-006, FR-007, FR-008) */
     onDrawingModeChange?: (mode: DrawingMode) => void;
+    /** Callback when a shape is drawn via Geoman. Called with raw GeoJSON and the active drawing mode. */
+    onShapeCreated?: (geojson: GeoJSON.Feature, mode: DrawingMode) => void;
 }
 /**
  * MapView component for displaying GeoJSON features on an interactive map.
@@ -67,5 +69,5 @@ export interface MapViewProps {
  * />
  * ```
  */
-export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, viewport, autoFitBounds, fitBoundsTrigger, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, visibleIds, showToolbar, toolbarPosition, drawingMode, onDrawingModeChange, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
+export declare function MapView({ features, selectedIds, onSelect, onBackgroundClick, onZoomChange, onBoundsChange, initialZoom, initialCenter, viewport, autoFitBounds, fitBoundsTrigger, tileLayerUrl, tileLayerAttribution, className, style, height, currentTime, displayMode, visibleIds, showToolbar, toolbarPosition, drawingMode, onDrawingModeChange, onShapeCreated, }: MapViewProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=MapView.d.ts.map
