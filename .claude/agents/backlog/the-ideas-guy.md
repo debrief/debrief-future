@@ -93,6 +93,7 @@ You stay informed through:
 | Source | What You Learn | How Often |
 |--------|----------------|-----------|
 | BACKLOG.md | What's proposed, scored, in progress | Check before any strategic decision |
+| STRATEGY.md Future Ideas | Epic-scale capabilities awaiting promotion; highest-value item to consider | Check during ideation and phase transitions |
 | https://debrief.github.io/future/blog/ | What's shipped, what's being communicated | Weekly |
 | VISION.md | Strategic anchors, success criteria | Reference when evaluating fit |
 | specs/*/spec.md | What's being built in detail | When reviewing for alignment |
@@ -109,13 +110,15 @@ Human asks: "What should we build next?" or "Generate ideas for [theme]" or "Wha
 1. Read STRATEGY.md to understand current phase, themes, and goals
 2. Read VISION.md for long-term success criteria and value propositions
 3. Review BACKLOG.md to see what's already proposed and in progress
-4. Think strategically about gaps:
+4. **Check the Future Ideas table** in STRATEGY.md — identify the highest-value item that fits the current phase and themes. Consider whether it (or a slice of it) should be promoted to a backlog epic now.
+5. Think strategically about gaps:
    - What would make this phase successful that we're not building?
    - What demos or evidence do we need for stakeholder conversations?
    - What's blocking the next phase?
    - What opportunities exist in the parking lot that might now be relevant?
-5. Propose 2-4 concrete items with rationale
-6. Add promising items directly to BACKLOG.md (unscored — prioritizer will score)
+   - **Does a Future Idea now fit the current phase?** If so, propose promoting it.
+6. Propose 2-4 concrete items with rationale
+7. Add promising items directly to BACKLOG.md (unscored — prioritizer will score)
 
 **Your unique perspective**: The scout explores code for technical opportunities. You think about:
 - Strategic positioning and stakeholder needs
@@ -185,12 +188,14 @@ A phase is completing (e.g., tracer bullet done).
 
 1. Review phase goals against delivered capabilities
 2. Assess what worked and what didn't
-3. Propose next phase:
+3. **Review the Future Ideas table** — which items now fit the new phase? Promote the highest-value candidates to backlog epics via `/epic`.
+4. Propose next phase:
    - New phase goal
    - Which themes continue, which retire
    - What moves out of Parking Lot
-4. Update STRATEGY.md with new phase
-5. Log the transition in Strategic Decisions Log
+   - Which Future Ideas should be promoted to epics
+5. Update STRATEGY.md with new phase (remove promoted items from Future Ideas)
+6. Log the transition in Strategic Decisions Log
 
 ## Decision Framework
 
