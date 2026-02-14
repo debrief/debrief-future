@@ -1,1 +1,1 @@
-{"version":3,"file":"LogPanelWrapper.d.ts","sourceRoot":"","sources":["../../src/panels/LogPanelWrapper.tsx"],"names":[],"mappings":"AAAA;;GAEG;AAEH,OAAO,KAAK,EAAE,UAAU,EAAE,MAAM,iCAAiC,CAAC;AAGlE,wBAAgB,eAAe,CAAC,MAAM,EAAE,UAAU,2CAcjD"}
+{"version":3,"file":"LogPanelWrapper.d.ts","sourceRoot":"","sources":["../../src/panels/LogPanelWrapper.tsx"],"names":[],"mappings":"AAAA;;GAEG;AAIH,wBAAgB,eAAe,4CAc9B"}
