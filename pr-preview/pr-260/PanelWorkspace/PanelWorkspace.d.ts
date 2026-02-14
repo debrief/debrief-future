@@ -16,9 +16,11 @@ export interface PanelWorkspaceProps {
     /** Additional CSS class name */
     className?: string;
 }
-/** Ref handle exposed via useImperativeHandle (if needed) */
-export interface PanelWorkspaceHandle {
-    resetLayout: () => void;
+/** Methods exposed on the workspace DOM element for external control */
+export interface PanelWorkspaceElement extends HTMLElement {
+    __resetLayout?: () => void;
+    __addPanel?: (componentType: string, title: string) => void;
+    __hasPanel?: (componentType: string) => boolean;
 }
 export declare function PanelWorkspace({ registry, contextWrapper, onLayoutReset, onSaveError, className, }: PanelWorkspaceProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=PanelWorkspace.d.ts.map

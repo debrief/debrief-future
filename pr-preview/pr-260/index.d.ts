@@ -45,7 +45,7 @@ export type { ChartRendererProps } from './ChartRenderer';
 export { transformDataset, registerTransformer, getSupportedTypes } from './ChartRenderer';
 export type { DatasetEnvelope, DatasetMetadata, AxisDefinition, DataSeries, TransformerError, TransformResult, } from './ChartRenderer';
 export { PanelWorkspace } from './PanelWorkspace';
-export type { PanelWorkspaceProps } from './PanelWorkspace';
+export type { PanelWorkspaceProps, PanelWorkspaceElement } from './PanelWorkspace';
 export { createPanelRegistry } from './PanelWorkspace';
 export type { PanelDefinition, PanelProps, PanelRegistry } from './PanelWorkspace';
 export { DEFAULT_LAYOUT_CONFIG, PANEL_NAVIGATION, PANEL_ACTIVITY, PANEL_LOG, PANEL_MAP, PANEL_CHART } from './PanelWorkspace/defaultLayout';

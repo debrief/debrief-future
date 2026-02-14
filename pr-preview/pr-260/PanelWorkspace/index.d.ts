@@ -1,5 +1,5 @@
 export { PanelWorkspace } from './PanelWorkspace';
-export type { PanelWorkspaceProps } from './PanelWorkspace';
+export type { PanelWorkspaceProps, PanelWorkspaceElement } from './PanelWorkspace';
 export { createPanelRegistry } from './panelRegistry';
 export type { PanelDefinition, PanelProps, PanelRegistry } from './panelRegistry';
 export { DEFAULT_LAYOUT_CONFIG, PANEL_NAVIGATION, PANEL_ACTIVITY, PANEL_LOG, PANEL_MAP, PANEL_CHART } from './defaultLayout';
