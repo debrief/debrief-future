@@ -183,6 +183,70 @@
   color: var(--debrief-text-secondary, #666666);
 }
 
+/* Expand/collapse button */
+.debrief-feature-row__expand-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--debrief-text-secondary, #666666);
+  border-radius: 3px;
+}
+
+.debrief-feature-row__expand-btn:hover {
+  background-color: var(--debrief-hover-bg, rgba(0, 0, 0, 0.08));
+}
+
+/* Chevron icon with rotation animation */
+.debrief-feature-row__chevron {
+  transition: transform 0.15s ease;
+}
+
+.debrief-feature-row__chevron--expanded {
+  transform: rotate(90deg);
+}
+
+/* Child-selected indicator dot */
+.debrief-feature-row__child-selected-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--debrief-selection-bg, #0066cc);
+}
+
+/* Spacer to align child rows with parent content when no expand button */
+.debrief-feature-row__expand-spacer {
+  flex-shrink: 0;
+  width: 20px;
+}
+
+/* Child row variant */
+.debrief-feature-row--child {
+  font-size: var(--debrief-font-size-xs, 12px);
+  font-weight: 400;
+}
+
+.debrief-feature-row--child .debrief-feature-row__name {
+  font-weight: 400;
+}
+
+/* Sublabel (secondary info for child rows) */
+.debrief-feature-row__sublabel {
+  flex-shrink: 0;
+  color: var(--debrief-text-secondary, #666666);
+  font-size: var(--debrief-font-size-xs, 11px);
+}
+
 /* Dark theme support */
 [data-theme='dark'] .debrief-feature-list {
   border-color: var(--debrief-border-color, #3a3a3a);
@@ -215,5 +279,17 @@
 }
 
 [data-theme='dark'] .debrief-feature-list__empty {
+  color: var(--debrief-text-secondary, #888888);
+}
+
+[data-theme='dark'] .debrief-feature-row__expand-btn {
+  color: var(--debrief-text-secondary, #888888);
+}
+
+[data-theme='dark'] .debrief-feature-row__expand-btn:hover {
+  background-color: var(--debrief-hover-bg, rgba(255, 255, 255, 0.1));
+}
+
+[data-theme='dark'] .debrief-feature-row__sublabel {
   color: var(--debrief-text-secondary, #888888);
 }

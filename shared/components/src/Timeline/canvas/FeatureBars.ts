@@ -1,5 +1,5 @@
 import type { DebriefFeature, TimeExtent } from '../../utils/types';
-import { isTrackFeature } from '../../utils/types';
+import { isTrackFeature, isReferenceLocation } from '../../utils/types';
 import { getFeatureColor, getFeatureLabel } from '../../utils/labels';
 import { parseTime } from '../../utils/time';
 
@@ -77,7 +77,7 @@ export function calculateFeatureBars(
     if (isTrackFeature(feature)) {
       featureStart = parseTime(feature.properties.start_time);
       featureEnd = parseTime(feature.properties.end_time);
-    } else {
+    } else if (isReferenceLocation(feature)) {
       featureStart = parseTime(feature.properties.valid_from);
       featureEnd = parseTime(feature.properties.valid_until);
     }

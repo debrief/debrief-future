@@ -22,11 +22,23 @@ import {
 // ─── getLevelRegistry (T016) ────────────────────────────────────────
 
 describe('getLevelRegistry', () => {
-  it('should return a map with positions and segments', () => {
+  it('should return a map with positions, segments, points, and polygons', () => {
     const registry = getLevelRegistry();
-    expect(registry.size).toBe(2);
+    expect(registry.size).toBe(4);
     expect(registry.has('positions')).toBe(true);
     expect(registry.has('segments')).toBe(true);
+    expect(registry.has('points')).toBe(true);
+    expect(registry.has('polygons')).toBe(true);
+  });
+
+  it('should define points as index-based', () => {
+    const registry = getLevelRegistry();
+    expect(registry.get('points')?.addressingMode).toBe('index');
+  });
+
+  it('should define polygons as index-based', () => {
+    const registry = getLevelRegistry();
+    expect(registry.get('polygons')?.addressingMode).toBe('index');
   });
 
   it('should define positions as index-based', () => {
