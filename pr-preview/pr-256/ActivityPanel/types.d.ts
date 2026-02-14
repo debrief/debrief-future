@@ -93,6 +93,9 @@ export type ActivityPanelMessage = {
         featureIds: string[];
         property: string;
         value: string | number | boolean;
+        isPointOverride?: boolean;
+        positionIndex?: number;
+        childType?: string;
     };
 };
 /**
