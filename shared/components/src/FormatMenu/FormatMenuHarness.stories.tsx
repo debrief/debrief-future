@@ -10,21 +10,22 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { FeatureList } from '../FeatureList';
 import { FormatMenu } from './FormatMenu';
 import { ThemeProvider } from '../ThemeProvider';
-import type { TrackFeature, ReferenceLocation } from '@debrief/schemas';
 import type { DebriefFeature } from '../utils/types';
 
 // ---------------------------------------------------------------------------
-// Mock data — matches schema types used by getFeatureColor()
+// Mock data — uses Record<string,unknown> to keep extra fields (style, color)
+// that getFeatureColor() reads. We deliberately use untyped records so the
+// story avoids fighting with the strict schema types.
 // ---------------------------------------------------------------------------
 
-function makeTracks(): TrackFeature[] {
+function makeFeatures(): DebriefFeature[] {
   return [
     {
       type: 'Feature',
       id: 'track-alpha',
       geometry: {
         type: 'LineString',
-        coordinates: [[-5, 50], [-4, 51]] as unknown as number[],
+        coordinates: [[-5, 50], [-4, 51]],
       },
       properties: {
         kind: 'TRACK',
@@ -33,8 +34,9 @@ function makeTracks(): TrackFeature[] {
         track_type: 'OWNSHIP',
         start_time: '2024-01-15T08:00:00Z',
         end_time: '2024-01-15T16:00:00Z',
-        color: '#0066cc',
         positions: [],
+        // getFeatureColor() reads style.line.color for tracks
+        style: { line: { color: '#0066cc' }, point: { shape: 'circle', radius: 5, fill_color: '#0066cc', color: '#0066cc' } },
       },
     },
     {
@@ -42,7 +44,7 @@ function makeTracks(): TrackFeature[] {
       id: 'track-bravo',
       geometry: {
         type: 'LineString',
-        coordinates: [[-3, 52], [-2, 53]] as unknown as number[],
+        coordinates: [[-3, 52], [-2, 53]],
       },
       properties: {
         kind: 'TRACK',
@@ -51,8 +53,8 @@ function makeTracks(): TrackFeature[] {
         track_type: 'CONTACT',
         start_time: '2024-01-15T08:00:00Z',
         end_time: '2024-01-15T16:00:00Z',
-        color: '#cc0000',
         positions: [],
+        style: { line: { color: '#cc0000' }, point: { shape: 'circle', radius: 5, fill_color: '#cc0000', color: '#cc0000' } },
       },
     },
     {
@@ -60,7 +62,7 @@ function makeTracks(): TrackFeature[] {
       id: 'track-charlie',
       geometry: {
         type: 'LineString',
-        coordinates: [[-1, 54], [0, 55]] as unknown as number[],
+        coordinates: [[-1, 54], [0, 55]],
       },
       properties: {
         kind: 'TRACK',
@@ -69,21 +71,16 @@ function makeTracks(): TrackFeature[] {
         track_type: 'SOLUTION',
         start_time: '2024-01-15T08:00:00Z',
         end_time: '2024-01-15T16:00:00Z',
-        color: '#00cc66',
         positions: [],
+        style: { line: { color: '#00cc66' }, point: { shape: 'circle', radius: 5, fill_color: '#00cc66', color: '#00cc66' } },
       },
     },
-  ];
-}
-
-function makeLocations(): ReferenceLocation[] {
-  return [
     {
       type: 'Feature',
       id: 'ref-delta',
       geometry: {
         type: 'Point',
-        coordinates: [-2.5, 51.5] as unknown as number[],
+        coordinates: [-2.5, 51.5],
       },
       properties: {
         kind: 'POINT',
@@ -91,10 +88,44 @@ function makeLocations(): ReferenceLocation[] {
         location_type: 'WAYPOINT',
         valid_from: '2024-01-15T00:00:00Z',
         valid_until: '2024-01-15T23:59:59Z',
-        color: '#ff9900',
+        // getFeatureColor() reads style.color for non-tracks, or props.color
+        style: { color: '#ff9900' },
       },
     },
-  ];
+  ] as unknown as DebriefFeature[];
+}
+
+// ---------------------------------------------------------------------------
+// Style update helper — sets a dot-path value inside properties.style
+// e.g. property="line.color" → style.line.color = value
+// e.g. property="color"      → style.color = value
+// ---------------------------------------------------------------------------
+
+function applyStyleChange(
+  feature: DebriefFeature,
+  property: string,
+  value: string | number,
+): DebriefFeature {
+  const props = feature.properties as unknown as Record<string, unknown>;
+  const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+  const newStyle = { ...oldStyle };
+
+  const dotIndex = property.indexOf('.');
+  if (dotIndex > 0) {
+    // Compound path like "line.color" or "point.fill_color"
+    const category = property.slice(0, dotIndex);
+    const field = property.slice(dotIndex + 1);
+    const oldCategory = (newStyle[category] ?? {}) as Record<string, unknown>;
+    newStyle[category] = { ...oldCategory, [field]: value };
+  } else {
+    // Flat path like "color", "weight"
+    newStyle[property] = value;
+  }
+
+  return {
+    ...feature,
+    properties: { ...props, style: newStyle },
+  } as unknown as DebriefFeature;
 }
 
 // ---------------------------------------------------------------------------
@@ -108,10 +139,7 @@ interface FormatMenuState {
 }
 
 function FormatMenuHarness() {
-  const [features, setFeatures] = useState<DebriefFeature[]>(() => [
-    ...makeTracks(),
-    ...makeLocations(),
-  ]);
+  const [features, setFeatures] = useState<DebriefFeature[]>(makeFeatures);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
     () => new Set(['track-alpha']),
   );
@@ -132,22 +160,12 @@ function FormatMenuHarness() {
 
   const handleFormatChange = useCallback(
     (featureIds: readonly string[], property: string, value: string | number) => {
-      // Apply the format change by updating features
       setFeatures(prev =>
         prev.map(f => {
           if (!featureIds.includes(f.id)) return f;
-
-          // For any colour-type property, update properties.color so
-          // getFeatureColor() picks it up via the legacy path
-          if (property.includes('color') || property.includes('fill_color')) {
-            const props = { ...(f.properties as Record<string, unknown>), color: value };
-            return { ...f, properties: props } as DebriefFeature;
-          }
-
-          return f;
+          return applyStyleChange(f, property, value);
         }),
       );
-
       setLastChange(`${featureIds.join(',')}|${property}=${String(value)}`);
       setFormatMenuState(null);
     },

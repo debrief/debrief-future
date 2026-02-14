@@ -655,6 +655,68 @@ export default function App() {
       case 'layer:select':
         store.getState().setSelection(message.payload.featureIds);
         break;
+      case 'layer:format': {
+        const { featureIds, property, value } = message.payload;
+        const targetIds = new Set(featureIds);
+
+        // Update features in the current plot
+        setCurrentPlot(plot => {
+          if (!plot) return plot;
+          const updatedFeatures = plot.features.features.map(f => {
+            if (!targetIds.has(String(f.id))) return f;
+
+            const props = (f.properties ?? {}) as Record<string, unknown>;
+            const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+            const newStyle = { ...oldStyle };
+
+            const dotIndex = property.indexOf('.');
+            if (dotIndex > 0) {
+              // Compound path: "line.color" → style.line.color
+              const category = property.slice(0, dotIndex);
+              const field = property.slice(dotIndex + 1);
+              const oldCategory = (newStyle[category] ?? {}) as Record<string, unknown>;
+              newStyle[category] = { ...oldCategory, [field]: value };
+            } else {
+              // Flat path: "color" → style.color
+              newStyle[property] = value;
+            }
+
+            return { ...f, properties: { ...props, style: newStyle } };
+          });
+
+          return {
+            ...plot,
+            features: { ...plot.features, features: updatedFeatures },
+          };
+        });
+
+        // Also update drawn features if targeted
+        setDrawnFeatures(prev =>
+          prev.map(f => {
+            if (!targetIds.has(f.id)) return f;
+
+            const props = f.properties as unknown as Record<string, unknown>;
+            const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+            const newStyle = { ...oldStyle };
+
+            const dotIndex = property.indexOf('.');
+            if (dotIndex > 0) {
+              const category = property.slice(0, dotIndex);
+              const field = property.slice(dotIndex + 1);
+              const oldCategory = (newStyle[category] ?? {}) as Record<string, unknown>;
+              newStyle[category] = { ...oldCategory, [field]: value };
+            } else {
+              newStyle[property] = value;
+            }
+
+            return {
+              ...f,
+              properties: { ...props, style: newStyle },
+            } as unknown as DebriefFeature;
+          }),
+        );
+        break;
+      }
       default:
         break;
     }
