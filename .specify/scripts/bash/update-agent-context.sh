@@ -230,6 +230,87 @@ format_technology_stack() {
 }
 
 #==============================================================================
+# Technology Novelty Detection Functions
+#==============================================================================
+
+# Extract canonical technology names from a raw plan field string.
+# Strips parenthetical context, splits on commas, and normalises whitespace.
+# Returns one technology name per line.
+extract_technology_names() {
+    local input="$1"
+    [[ -z "$input" ]] && return
+
+    echo "$input" | \
+        sed 's/([^)]*)//g' | \
+        sed 's/`//g' | \
+        tr ',' '\n' | \
+        sed 's/^[ \t]*//;s/[ \t]*$//' | \
+        grep -v '^$' | \
+        grep -vi '^None' | \
+        grep -vi '^N/A' | \
+        grep -vi '^NEEDS CLARIFICATION' | \
+        grep -vi '^existing ' | \
+        grep -vi '^no new ' | \
+        grep -vi '^standard library'
+}
+
+# Check whether ALL canonical technology names from the plan are already
+# mentioned somewhere in the Active Technologies section of the target file.
+# Returns 0 (true) if at least one technology is genuinely new.
+# Returns 1 (false) if every technology is already listed.
+has_new_technology() {
+    local target_file="$1"
+    local lang="$2"
+    local framework="$3"
+
+    # Grab the existing Active Technologies section (case-insensitive search)
+    local existing_tech=""
+    if [[ -f "$target_file" ]]; then
+        existing_tech=$(sed -n '/^## Active Technologies/,/^## /p' "$target_file" 2>/dev/null | head -200)
+        # Also include Tech Stack Summary for broader dedup
+        existing_tech+=$'\n'$(sed -n '/^## Tech Stack Summary/,/^## /p' "$target_file" 2>/dev/null | head -20)
+    fi
+
+    # If no existing tech section, everything is new
+    if [[ -z "$existing_tech" ]]; then
+        return 0
+    fi
+
+    # Collect all technology names from both fields
+    local all_names=""
+    all_names=$(extract_technology_names "$lang")
+    all_names+=$'\n'$(extract_technology_names "$framework")
+
+    # Check each name – return 0 as soon as we find one that's genuinely new
+    while IFS= read -r tech_name; do
+        [[ -z "$tech_name" ]] && continue
+
+        # Extract the core identifier (first two words, e.g. "Python 3.11", "React 18.x")
+        # For scoped packages like @foo/bar, keep the whole package name
+        local core_id
+        if [[ "$tech_name" == @* ]]; then
+            # Scoped npm package – use package name (up to first space)
+            core_id=$(echo "$tech_name" | awk '{print $1}')
+        else
+            # Use first word as the core identifier (e.g. "Python", "React", "Leaflet")
+            core_id=$(echo "$tech_name" | awk '{print $1}')
+        fi
+
+        # Skip very short or generic identifiers
+        [[ ${#core_id} -lt 2 ]] && continue
+
+        # Case-insensitive check: does this core identifier already appear?
+        if ! echo "$existing_tech" | grep -qi "$core_id"; then
+            log_info "New technology detected: $tech_name (core: $core_id)"
+            return 0
+        fi
+    done <<< "$all_names"
+
+    log_info "No new technologies detected – skipping Active Technologies update"
+    return 1
+}
+
+#==============================================================================
 # Template and Content Generation Functions
 #==============================================================================
 
@@ -377,21 +458,25 @@ update_existing_agent_file() {
     local tech_stack=$(format_technology_stack "$NEW_LANG" "$NEW_FRAMEWORK")
     local new_tech_entries=()
     local new_change_entry=""
-    
-    # Prepare new technology entries
-    if [[ -n "$tech_stack" ]] && ! grep -q "$tech_stack" "$target_file"; then
+
+    # Only add technology entries when genuinely new technologies are introduced.
+    # This prevents the same core technologies (Python 3.11, TypeScript 5.x, React, etc.)
+    # from being re-added with every feature, which causes merge conflicts and bloat.
+    if [[ -n "$tech_stack" ]] && has_new_technology "$target_file" "$NEW_LANG" "$NEW_FRAMEWORK"; then
         new_tech_entries+=("- $tech_stack ($CURRENT_BRANCH)")
     fi
-    
-    if [[ -n "$NEW_DB" ]] && [[ "$NEW_DB" != "N/A" ]] && [[ "$NEW_DB" != "NEEDS CLARIFICATION" ]] && ! grep -q "$NEW_DB" "$target_file"; then
-        new_tech_entries+=("- $NEW_DB ($CURRENT_BRANCH)")
+
+    if [[ -n "$NEW_DB" ]] && [[ "$NEW_DB" != "N/A" ]] && [[ "$NEW_DB" != "NEEDS CLARIFICATION" ]]; then
+        # Check DB/storage novelty: extract core name and check existing section
+        local db_core=$(echo "$NEW_DB" | sed 's/([^)]*)//g' | awk '{print $1}')
+        if [[ ${#db_core} -ge 2 ]] && ! sed -n '/^## Active Technologies/,/^## /p' "$target_file" 2>/dev/null | grep -qi "$db_core"; then
+            new_tech_entries+=("- $NEW_DB ($CURRENT_BRANCH)")
+        fi
     fi
-    
-    # Prepare new change entry
-    if [[ -n "$tech_stack" ]]; then
+
+    # Only add a "Recent Changes" entry if we're actually adding new technologies
+    if [[ ${#new_tech_entries[@]} -gt 0 ]]; then
         new_change_entry="- $CURRENT_BRANCH: Added $tech_stack"
-    elif [[ -n "$NEW_DB" ]] && [[ "$NEW_DB" != "N/A" ]] && [[ "$NEW_DB" != "NEEDS CLARIFICATION" ]]; then
-        new_change_entry="- $CURRENT_BRANCH: Added $NEW_DB"
     fi
     
     # Check if sections exist in the file
