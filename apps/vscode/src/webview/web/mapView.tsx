@@ -11,8 +11,8 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
-import { MapView } from '@debrief/components';
-import type { DebriefFeature, DisplayMode, Bounds } from '@debrief/components';
+import { MapView, createDrawnFeature } from '@debrief/components';
+import type { DebriefFeature, DisplayMode, Bounds, DrawingMode } from '@debrief/components';
 import type {
   ExtensionToWebviewMessage,
   WebviewToExtensionMessage,
@@ -96,6 +96,10 @@ function MapViewApp(): React.ReactElement {
   const [viewport, setViewport] = useState<{ center: [number, number]; zoom: number } | undefined>();
   const [fitBoundsTrigger, setFitBoundsTrigger] = useState(0);
 
+  // Drawing state
+  const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
+  const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
+
   // Temporal state
   const [currentTime, setCurrentTime] = useState<number | undefined>();
   const [displayMode, setDisplayMode] = useState<DisplayMode>('full');
@@ -126,11 +130,11 @@ function MapViewApp(): React.ReactElement {
       geometry: f.geometry,
       properties: f.properties ?? {},
     })) as DebriefFeature[];
-    const allFeatures = [...trackFeatures, ...locationFeatures, ...otherDebriefFeatures, ...resultFeatures];
+    const allFeatures = [...trackFeatures, ...locationFeatures, ...otherDebriefFeatures, ...resultFeatures, ...drawnFeatures];
     // Filter out hidden features
     if (hiddenIds.size === 0) return allFeatures;
     return allFeatures.filter(f => !hiddenIds.has(String(f.id)));
-  }, [tracks, locations, otherFeatures, resultFeatures, trackColors, hiddenIds]);
+  }, [tracks, locations, otherFeatures, resultFeatures, drawnFeatures, trackColors, hiddenIds]);
 
   // Message handler
   useEffect(() => {
@@ -243,6 +247,43 @@ function MapViewApp(): React.ReactElement {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Shape drawing callback — prompt for name, then convert Geoman output to schema-compliant features
+  const handleShapeCreated = useCallback((geojson: GeoJSON.Feature, mode: DrawingMode) => {
+    const defaultName = mode === 'point' ? 'Drawn Point' : 'Drawn Rectangle';
+    const promptLabel = mode === 'point' ? 'Name this point:' : 'Name this shape:';
+    const name = window.prompt(promptLabel, defaultName);
+    if (name === null) return; // user cancelled — discard the shape
+
+    const opts = mode === 'point' ? { name } : { label: name };
+    const feature = createDrawnFeature(geojson, mode, opts);
+    if (feature) {
+      setDrawnFeatures(prev => [...prev, feature as DebriefFeature]);
+      setSelectedIds(new Set([feature.id]));
+      // Notify extension of the new drawn feature
+      const props = feature.properties as Record<string, unknown>;
+      vscode.postMessage({
+        type: 'featureDrawn',
+        feature: {
+          id: feature.id,
+          kind: String(props.kind),
+          name: props.name != null ? String(props.name) : undefined,
+          label: props.label != null ? String(props.label) : undefined,
+          geometry: feature.geometry,
+          properties: props,
+        },
+      });
+      // Notify extension of new selection
+      vscode.postMessage({
+        type: 'selectionChanged',
+        selection: {
+          trackIds: [],
+          locationIds: props.kind === 'POINT' ? [feature.id] : [],
+          contextType: props.kind === 'POINT' ? 'location' : 'none',
+        },
+      });
+    }
+  }, []);
+
   // Drag-and-drop for REP files
   useEffect(() => {
     const container = document.getElementById('root');
@@ -286,6 +327,9 @@ function MapViewApp(): React.ReactElement {
       onBackgroundClick={handleBackgroundClick}
       onBoundsChange={handleBoundsChange}
       onZoomChange={handleZoomChange}
+      drawingMode={drawingMode}
+      onDrawingModeChange={setDrawingMode}
+      onShapeCreated={handleShapeCreated}
       height="100vh"
     />
   );
