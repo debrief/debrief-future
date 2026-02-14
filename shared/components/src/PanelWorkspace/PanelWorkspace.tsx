@@ -146,16 +146,14 @@ export function PanelWorkspace({
     const gl = glRef.current;
     if (!gl || !gl.rootItem) return false;
     // Recursively search content items for the component type
-    const search = (items: readonly { contentItems: readonly unknown[]; type: string; [k: string]: unknown }[]): boolean => {
-      for (const item of items) {
-        if (item.type === 'component' && (item as { componentType?: unknown }).componentType === componentType) return true;
-        if ((item as { contentItems?: unknown[] }).contentItems) {
-          if (search((item as { contentItems: typeof items }).contentItems)) return true;
-        }
+    const search = (items: unknown[]): boolean => {
+      for (const item of items as Array<{ type?: string; componentType?: string; contentItems?: unknown[] }>) {
+        if (item.type === 'component' && item.componentType === componentType) return true;
+        if (item.contentItems && search(item.contentItems)) return true;
       }
       return false;
     };
-    return search(gl.rootItem.contentItems as never[]);
+    return search(gl.rootItem.contentItems as unknown[]);
   }, []);
 
   // Add a panel dynamically (e.g., Chart panel when results arrive)
