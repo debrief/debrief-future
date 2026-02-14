@@ -77,7 +77,7 @@ export function ChartPanelWrapper() {
   if (!ctx.chartProps) {
     return (
       <div style={{ padding: 16, color: '#969696', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }} data-testid="panel-chart">
-        No chart data. Open a .dataset.json file from the Navigation panel.
+        No results to display. Run a tool or open a file from the Navigation panel.
       </div>
     );
   }
