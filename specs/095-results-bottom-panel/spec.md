@@ -11,6 +11,7 @@
 
 - Q: Which entry points should trigger opening a result in the panel? → A: All three — auto-open on tool completion, STAC browser, and attachments context menu in the activity panel.
 - Q: Should the panel only display chart-renderable datasets, or also handle non-chart artifacts (images, reports)? → A: All artifacts — the panel handles datasets as charts and also embeds image/report previews in tabs.
+- Q: Are tabs scoped per-plot or is the panel a global flat view across all plots? → A: Per-plot — tab identity is plot + file path; same filename in different plots produces separate tabs.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -104,6 +105,7 @@ An analyst wants to access the results panel directly. They open it using a VS C
 - What happens when the VS Code window is resized to a very narrow width? Charts within tabs resize responsively to fit the available space.
 - What happens when the analyst opens the same result file from different entry points (e.g., first via tool completion, then via STAC browser)? The existing tab is activated rather than creating a duplicate.
 - What happens when a result artifact is a file type the panel cannot preview (e.g., a binary report format)? The tab displays a summary (filename, type, size) and offers a link to open the file in VS Code's native viewer or the system default application.
+- What happens when two different plots each have a result file with the same name (e.g., both have `results/zone_histogram.json`)? Each produces a separate tab. The tab title includes the plot name to disambiguate (e.g., "Zone Histogram — Plot Alpha" vs "Zone Histogram — Plot Bravo").
 
 ## Requirements *(mandatory)*
 
@@ -115,13 +117,14 @@ An analyst wants to access the results panel directly. They open it using a VS C
 - **FR-017**: For image-type results (e.g., PNG, JPEG), each tab MUST render the image inline within the tab area, scaled to fit the available space.
 - **FR-018**: For other result file types that are neither datasets nor images, each tab MUST display a summary or fallback view (e.g., filename, file type, and file size) with an option to open the file in VS Code's native viewer.
 - **FR-004**: Each tab MUST display a title derived from the result's metadata (title field from dataset metadata, or filename for non-dataset artifacts). If no title is available, the tab MUST display a fallback title based on the result type.
+- **FR-019**: When result tabs from multiple plots are open simultaneously, each tab title MUST include the source plot name to disambiguate (e.g., "Zone Histogram — Plot Alpha").
 - **FR-005**: Tabs MUST be individually closable via a close button on each tab.
 - **FR-006**: When a tab is closed, the nearest remaining tab MUST become active. When the last tab is closed, the panel MUST show the empty state.
 - **FR-007**: The results panel MUST be openable via a VS Code command ("Show Results Panel") accessible from the command palette.
 - **FR-008**: When a tool completes and persists a result to the plot's `results/` sub-folder, the panel MUST open automatically (if hidden) and create a new tab for the result.
 - **FR-014**: The panel MUST accept result open requests from the STAC browser (file tree or catalog overview) and open the selected result file as a new tab.
 - **FR-015**: The panel MUST accept result open requests from the attachments context menu in the activity panel and open the selected result file as a new tab.
-- **FR-016**: If a result file that is already open in an existing tab is requested again (from any entry point), the panel MUST activate the existing tab rather than creating a duplicate.
+- **FR-016**: If a result file that is already open in an existing tab is requested again (from any entry point), the panel MUST activate the existing tab rather than creating a duplicate. Tab identity is the combination of the source plot (STAC item) and the result file path — the same filename in different plots produces separate tabs.
 - **FR-009**: Switching between tabs MUST restore the previously rendered chart without re-processing the dataset from scratch.
 - **FR-010**: Tab titles that exceed available space MUST be truncated with an ellipsis, with the full title shown as a tooltip on hover.
 - **FR-011**: Charts within tabs MUST resize responsively when the panel or VS Code window is resized.
@@ -131,7 +134,7 @@ An analyst wants to access the results panel directly. They open it using a VS C
 ### Key Entities
 
 - **Results Panel**: A VS Code panel view that lives in the bottom panel area. It hosts multiple result tabs and manages tab lifecycle (creation, activation, closure). It is the container for all result visualisations and previews.
-- **Result Tab**: An individual tab within the results panel. Each tab represents one tool result artifact. The tab's content depends on the artifact type: datasets are rendered as charts via the chart renderer (#085), images are displayed inline, and other file types show a summary with a link to open natively. Tabs can be activated, deactivated, and closed.
+- **Result Tab**: An individual tab within the results panel. Each tab represents one tool result artifact, uniquely identified by the combination of its source plot (STAC item) and file path. The tab's content depends on the artifact type: datasets are rendered as charts via the chart renderer (#085), images are displayed inline, and other file types show a summary with a link to open natively. Tabs can be activated, deactivated, and closed.
 - **Result Artifact**: Any file persisted to the `results/` sub-folder of a STAC item (plot). Artifacts fall into three display categories: (1) datasets — rendered as charts, (2) images — displayed inline, (3) other files — shown as a summary/fallback view. The artifact's STAC asset entry (in `item.json`) provides metadata including type, title, and file path.
 
 ## User Interface Flow
