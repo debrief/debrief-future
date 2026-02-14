@@ -87,6 +87,13 @@ export type ActivityPanelMessage = {
     payload: {
         featureIds: string[];
     };
+} | {
+    type: 'layer:format';
+    payload: {
+        featureIds: string[];
+        property: string;
+        value: string | number | boolean;
+    };
 };
 /**
  * Props for the ActivityPanel component.

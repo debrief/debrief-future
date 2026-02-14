@@ -4,7 +4,8 @@ import { StylePropertyDescriptor } from './formatMenuItems';
 export interface FormatMenuProps {
     readonly featureIds: readonly string[];
     readonly featureKinds: readonly string[];
-    readonly properties: readonly StylePropertyDescriptor[];
+    /** Style property descriptors. If omitted, resolved automatically from featureKinds. */
+    readonly properties?: readonly StylePropertyDescriptor[];
     readonly currentValues?: Record<string, unknown>;
     readonly disabledProperties?: Map<string, string>;
     readonly anchorPosition: {
