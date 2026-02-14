@@ -25,39 +25,49 @@ export function getInactiveReason(tool: Tool, selection: Selection): string {
     return '';
   }
 
-  const reasons: string[] = [];
-
+  // OR semantics: if ANY requirement is satisfied, the tool is active
   for (const req of requirements) {
     const count = selection.get(req.kind) ?? 0;
     const min = req.min ?? 0;
-    const max = req.max;
-    const kindLabel = formatKindLabel(req.kind);
+    if (count < min) continue;
+    if (req.max !== undefined && req.max !== null && count > req.max) continue;
+    // This requirement is satisfied — tool is active
+    return '';
+  }
 
-    // Check under-selection (needs more)
-    if (count < min) {
-      if (min === 1 && count === 0) {
-        reasons.push(`Requires at least 1 ${kindLabel}`);
-      } else if (min === max) {
-        reasons.push(`Requires exactly ${min} ${pluralize(kindLabel, min)} (${count} selected)`);
-      } else {
-        reasons.push(`Requires at least ${min} ${pluralize(kindLabel, min)} (${count} selected)`);
-      }
-    }
+  // No requirement satisfied — build explanation
+  if (requirements.length > 1) {
+    const kinds = requirements.map(r => formatKindLabel(r.kind)).join(' or ');
+    return `Requires ${kinds} feature selected`;
+  }
 
-    // Check over-selection (too many)
-    if (max !== undefined && max !== null && count > max) {
-      if (max === 0) {
-        reasons.push(`Does not accept ${kindLabel} features (${count} in selection)`);
-      } else if (min === max) {
-        reasons.push(`Requires exactly ${max} ${pluralize(kindLabel, max)} (${count} selected)`);
-      } else {
-        reasons.push(`Maximum ${max} ${pluralize(kindLabel, max)} allowed (${count} selected)`);
-      }
+  const req = requirements[0]!;
+  const count = selection.get(req.kind) ?? 0;
+  const min = req.min ?? 0;
+  const max = req.max;
+  const kindLabel = formatKindLabel(req.kind);
+
+  if (count < min) {
+    if (min === 1 && count === 0) {
+      return `Requires at least 1 ${kindLabel}`;
+    } else if (min === max) {
+      return `Requires exactly ${min} ${pluralize(kindLabel, min)} (${count} selected)`;
+    } else {
+      return `Requires at least ${min} ${pluralize(kindLabel, min)} (${count} selected)`;
     }
   }
 
-  // Return first reason (most relevant)
-  return reasons[0] ?? '';
+  if (max !== undefined && max !== null && count > max) {
+    if (max === 0) {
+      return `Does not accept ${kindLabel} features (${count} in selection)`;
+    } else if (min === max) {
+      return `Requires exactly ${max} ${pluralize(kindLabel, max)} (${count} selected)`;
+    } else {
+      return `Maximum ${max} ${pluralize(kindLabel, max)} allowed (${count} selected)`;
+    }
+  }
+
+  return '';
 }
 
 /**
@@ -68,46 +78,8 @@ export function getInactiveReason(tool: Tool, selection: Selection): string {
  * @returns Array of all reasons, or empty array if tool is active
  */
 export function getAllInactiveReasons(tool: Tool, selection: Selection): string[] {
-  const requirements = tool.requirements ?? [];
-
-  if (requirements.length === 0) {
-    return [];
-  }
-
-  const reasons: string[] = [];
-
-  for (const req of requirements) {
-    const count = selection.get(req.kind) ?? 0;
-    const min = req.min ?? 0;
-    const max = req.max;
-    const kindLabel = formatKindLabel(req.kind);
-
-    if (count < min) {
-      if (min === 1 && count === 0) {
-        reasons.push(`Requires at least 1 ${kindLabel}`);
-      } else if (min === max) {
-        reasons.push(`Requires exactly ${min} ${pluralize(kindLabel, min)} (${count} selected)`);
-      } else {
-        reasons.push(`Requires at least ${min} ${pluralize(kindLabel, min)} (${count} selected)`);
-      }
-    }
-
-    if (max !== undefined && max !== null && count > max) {
-      if (max === 0) {
-        reasons.push(`Does not accept ${kindLabel} features (${count} in selection)`);
-      } else if (min === max) {
-        // Avoid duplicate if already added for under-selection
-        const exactMsg = `Requires exactly ${max} ${pluralize(kindLabel, max)} (${count} selected)`;
-        if (!reasons.includes(exactMsg)) {
-          reasons.push(exactMsg);
-        }
-      } else {
-        reasons.push(`Maximum ${max} ${pluralize(kindLabel, max)} allowed (${count} selected)`);
-      }
-    }
-  }
-
-  return reasons;
+  const reason = getInactiveReason(tool, selection);
+  return reason ? [reason] : [];
 }
 
 /**

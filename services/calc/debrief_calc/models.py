@@ -200,6 +200,7 @@ VALID_PARAM_TYPES = {
     "CardinalDirection",
     "DurationPreset",
     "NumericPreset",
+    "ReferencePointPattern",
 }
 """Valid values for ToolParameter.param_type, referencing schema-defined parameter-type enums."""
 
@@ -382,12 +383,13 @@ class Tool(BaseModel):
             raise ValueError("name must be kebab-case starting with a letter")
         return v
 
-    @field_validator("input_kinds")
-    @classmethod
-    def validate_input_kinds_not_empty(cls, v: list) -> list:
-        if not v:
-            raise ValueError("input_kinds must contain at least one value")
-        return v
+    @model_validator(mode="after")
+    def validate_input_kinds_for_context(self) -> Tool:
+        if self.context_type != ContextType.NONE and not self.input_kinds:
+            raise ValueError(
+                "input_kinds must contain at least one value (unless context_type is NONE)"
+            )
+        return self
 
     def accepts_kind(self, kind: str) -> bool:
         """Check if this tool accepts features of the given kind."""
@@ -464,7 +466,7 @@ class Tool(BaseModel):
     def _build_selection_requirements(self) -> list[dict[str, Any]]:
         """Build selection requirements from context_type and input_kinds."""
         if self.context_type == ContextType.SINGLE:
-            return [{"kind": self.input_kinds[0], "min": 1, "max": 1}]
+            return [{"kind": k, "min": 1, "max": 1} for k in self.input_kinds]
         elif self.context_type == ContextType.MULTI:
             return [{"kind": k, "min": 1} for k in self.input_kinds]
         elif self.context_type == ContextType.REGION:

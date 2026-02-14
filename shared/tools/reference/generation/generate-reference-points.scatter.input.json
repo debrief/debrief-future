@@ -1,0 +1,23 @@
+{
+  "features": [
+    {
+      "type": "Feature",
+      "id": "zone-charlie",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[-5, 49], [1, 49], [1, 52], [-5, 52], [-5, 49]]
+        ]
+      },
+      "properties": {
+        "kind": "RECTANGLE",
+        "label": "Weapons-Hold Zone Charlie"
+      }
+    }
+  ],
+  "params": {
+    "pattern": "scatter",
+    "count": 20,
+    "seed": 42
+  }
+}

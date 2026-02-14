@@ -24,6 +24,9 @@ export const sampleFeatures: SimpleFeature[] = [
   { id: 'ref-1', kind: 'POINT', name: 'Waypoint Alpha' },
   { id: 'ref-2', kind: 'POINT', name: 'Waypoint Bravo' },
 
+  // Zones (RECTANGLE kind)
+  { id: 'rect-1', kind: 'RECTANGLE', name: 'Weapons-Hold Zone Charlie' },
+
   // Narrative entries
   { id: 'narrative-1', kind: 'NARRATIVE', name: 'Log Entry 1' },
   { id: 'narrative-2', kind: 'NARRATIVE', name: 'Log Entry 2' },
@@ -55,6 +58,7 @@ export function getKindLabel(kind: string): string {
   const labels: Record<string, string> = {
     TRACK: 'Tracks',
     POINT: 'Reference Points',
+    RECTANGLE: 'Zones',
     NARRATIVE: 'Narratives',
   };
   return labels[kind] ?? kind;

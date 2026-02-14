@@ -23,13 +23,14 @@ describe('ToolMatchService', () => {
     requirements: [{ kind: 'TRACK', min: 1 }],
   };
 
-  const bearingToPoint: Tool = {
-    id: 'bearing-to-point',
-    name: 'Bearing to Point',
-    description: 'Calculate bearing from track to point',
+  const generateRefPoints: Tool = {
+    id: 'generate-reference-points',
+    name: 'Generate Reference Points',
+    description: 'Generate reference points in a polygon',
     requirements: [
-      { kind: 'TRACK', min: 1, max: 1 },
-      { kind: 'POINT', min: 1, max: 1 },
+      { kind: 'RECTANGLE', min: 1, max: 1 },
+      { kind: 'POLY', min: 1, max: 1 },
+      { kind: 'CIRCLE', min: 1, max: 1 },
     ],
   };
 
@@ -58,7 +59,7 @@ describe('ToolMatchService', () => {
     service = new ToolMatchService([
       rangeCalculation,
       trackSummary,
-      bearingToPoint,
+      generateRefPoints,
       globalStats,
       noRequirements,
       maxOnlyTool,
@@ -91,14 +92,29 @@ describe('ToolMatchService', () => {
       expect(service.isToolActive(trackSummary, selection)).toBe(false);
     });
 
-    it('should return true for tool with multiple requirements when all satisfied', () => {
-      const selection = createSelectionFromCounts({ TRACK: 1, POINT: 1 });
-      expect(service.isToolActive(bearingToPoint, selection)).toBe(true);
+    it('should return true for multi-requirement tool when any requirement satisfied (RECTANGLE)', () => {
+      const selection = createSelectionFromCounts({ RECTANGLE: 1 });
+      expect(service.isToolActive(generateRefPoints, selection)).toBe(true);
     });
 
-    it('should return false for tool with multiple requirements when one is not satisfied', () => {
+    it('should return true for multi-requirement tool when any requirement satisfied (POLY)', () => {
+      const selection = createSelectionFromCounts({ POLY: 1 });
+      expect(service.isToolActive(generateRefPoints, selection)).toBe(true);
+    });
+
+    it('should return true for multi-requirement tool when any requirement satisfied (CIRCLE)', () => {
+      const selection = createSelectionFromCounts({ CIRCLE: 1 });
+      expect(service.isToolActive(generateRefPoints, selection)).toBe(true);
+    });
+
+    it('should return false for multi-requirement tool when no requirement satisfied', () => {
       const selection = createSelectionFromCounts({ TRACK: 1 });
-      expect(service.isToolActive(bearingToPoint, selection)).toBe(false);
+      expect(service.isToolActive(generateRefPoints, selection)).toBe(false);
+    });
+
+    it('should return false for multi-requirement tool when over max', () => {
+      const selection = createSelectionFromCounts({ RECTANGLE: 2 });
+      expect(service.isToolActive(generateRefPoints, selection)).toBe(false);
     });
 
     it('should return true for tool with no requirements (empty array)', () => {
@@ -145,7 +161,7 @@ describe('ToolMatchService', () => {
       expect(activeIds).toContain('track-summary');
       expect(activeIds).toContain('global-stats');
       expect(activeIds).toContain('no-requirements');
-      expect(activeIds).not.toContain('bearing-to-point'); // needs POINT
+      expect(activeIds).not.toContain('generate-reference-points'); // needs polygon-like
     });
 
     it('should return tools sorted alphabetically by name', () => {
@@ -176,7 +192,7 @@ describe('ToolMatchService', () => {
       const inactive = service.getInactiveTools(selection);
       const inactiveIds = inactive.map((t) => t.id);
 
-      expect(inactiveIds).toContain('bearing-to-point'); // needs POINT
+      expect(inactiveIds).toContain('generate-reference-points'); // needs polygon-like
       expect(inactiveIds).toContain('max-only'); // max is 1
       expect(inactiveIds).not.toContain('range-calculation');
     });
