@@ -146,6 +146,24 @@ export const ComplexSelection: Story = {
 };
 
 /**
+ * Rectangle selected - Generate Reference Points becomes active.
+ */
+export const RectangleSelected: Story = {
+  args: {
+    initialSelection: ['rect-1'],
+    initialShowInactive: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'With one rectangle selected, "Generate Reference Points" becomes active.',
+      },
+    },
+  },
+};
+
+/**
  * Dark theme variant.
  */
 export const DarkTheme: Story = {

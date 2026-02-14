@@ -172,6 +172,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - TypeScript 5.x (session-state package, VS Code extension, shared components) + Zustand ^5.0.0 (session-state store), React 18.x (shared components), VS Code Extension API ^1.85.0, existing `@debrief/session-state` (Log Service, Snapshot Service), existing `calcService` (MCP tool invocation), existing `stacService` (file I/O) (076-replay-tune)
 - Python 3.11 (debrief-calc service), TypeScript 5.x (VS Code extension, web-shell) + `debrief_calc` registry + `@tool` decorator (Python), `MCPToolDefinition` types (TypeScript). Standard library `math` module for trig functions — no external geo libraries. (056-move-shape)
 - N/A — pure transformation tool, no persistence (caller handles STAC writes) (056-move-shape)
+- Python 3.11 (debrief-calc service), TypeScript 5.x (VS Code extension, web-shell) + None beyond existing project dependencies — standard library `math` (Python), no new npm packages (TypeScript) (078-generate-reference-points)
+- N/A — pure transformation tool; caller handles STAC persistence (078-generate-reference-points)
 - Python 3.11 (LinkML schemas, Pydantic models, calc service), TypeScript 5.x (VS Code extension, shared components, generated types) + LinkML >= 1.7.0 (schema source), Pydantic v2 (Python validation), React 18.x (shared components), VS Code Extension API ^1.85.0, Zustand ^5.0.0 (session-state) (091-tool-parameter-context-menus)
 - Local filesystem STAC catalogs (no storage changes for this feature) (091-tool-parameter-context-menus)
 - Python 3.11 + pydantic >=2.0.0 (existing), stdlib `math` module only (080-buffer-zone-generator)

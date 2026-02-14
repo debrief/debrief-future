@@ -1,0 +1,50 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "ref-grid",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [-5.0, 49.0],
+          [-3.0, 49.0],
+          [-1.0, 49.0],
+          [1.0, 49.0],
+          [-5.0, 50.5],
+          [-3.0, 50.5],
+          [-1.0, 50.5],
+          [1.0, 50.5],
+          [-5.0, 52.0],
+          [-3.0, 52.0],
+          [-1.0, 52.0],
+          [1.0, 52.0]
+        ]
+      },
+      "properties": {
+        "kind": "POINT",
+        "locationType": "REFERENCE",
+        "name": "Reference Points (grid 12)",
+        "style": {
+          "shape": "square",
+          "color": "#666666",
+          "radius": 5
+        },
+        "pointMetadata": [
+          {"index": 0, "name": "Ref 1"},
+          {"index": 1, "name": "Ref 2"},
+          {"index": 2, "name": "Ref 3"},
+          {"index": 3, "name": "Ref 4"},
+          {"index": 4, "name": "Ref 5"},
+          {"index": 5, "name": "Ref 6"},
+          {"index": 6, "name": "Ref 7"},
+          {"index": 7, "name": "Ref 8"},
+          {"index": 8, "name": "Ref 9"},
+          {"index": 9, "name": "Ref 10"},
+          {"index": 10, "name": "Ref 11"},
+          {"index": 11, "name": "Ref 12"}
+        ]
+      }
+    }
+  ]
+}
