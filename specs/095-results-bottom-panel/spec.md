@@ -12,6 +12,7 @@
 - Q: Which entry points should trigger opening a result in the panel? → A: All three — auto-open on tool completion, STAC browser, and attachments context menu in the activity panel.
 - Q: Should the panel only display chart-renderable datasets, or also handle non-chart artifacts (images, reports)? → A: All artifacts — the panel handles datasets as charts and also embeds image/report previews in tabs.
 - Q: Are tabs scoped per-plot or is the panel a global flat view across all plots? → A: Per-plot — tab identity is plot + file path; same filename in different plots produces separate tabs.
+- Q: Should a tab update live when its underlying result file is overwritten (e.g., tool re-run), or remain a static snapshot? → A: Live update — the analyst may use displayed results to optimise the operation they are tuning (e.g., minimising bearing errors during a plot-lock), so the tab must reflect the latest file content.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -32,24 +33,40 @@ An analyst runs a tool (e.g., buffer zone analysis) that produces a result artif
 
 ---
 
-### User Story 2 - Manage Multiple Result Tabs (Priority: P2)
+### User Story 2 - Live Update During Iterative Tuning (Priority: P2)
+
+An analyst is tuning a plot-lock operation to minimise bearing errors. They run a bearing analysis tool and see the result chart in the results panel. They adjust parameters and re-run the tool, which overwrites the same result file. The open tab detects the change and automatically re-renders with the updated data — the analyst sees the improvement (or regression) immediately without needing to close and reopen the tab. This tight feedback loop allows the analyst to iteratively optimise their work.
+
+**Why this priority**: Iterative tuning is a core analyst workflow. Without live update, the analyst would need to manually close and reopen tabs after each tool re-run, breaking their flow. This is essential for practical productivity.
+
+**Independent Test**: Can be tested by opening a result tab, then overwriting the underlying result file with new content, and confirming the tab automatically re-renders with the updated data within a short delay.
+
+**Acceptance Scenarios**:
+
+1. **Given** a result tab is open displaying a chart, **When** the underlying result file is overwritten by a tool re-run, **Then** the tab re-renders with the updated content automatically.
+2. **Given** a result tab is open displaying an image, **When** the underlying image file is overwritten, **Then** the tab displays the updated image.
+3. **Given** a result tab updates live, **When** the re-render completes, **Then** the tab remains in the same position in the tab bar (it is not closed and reopened).
+
+---
+
+### User Story 3 - Manage Multiple Result Tabs (Priority: P2)
 
 An analyst runs multiple tools during an analysis session, each producing a result. Each result appears as a separate tab in the results panel. The analyst switches between tabs to compare results — for example, switching between a zone histogram and a range-bearing plot. Tabs can be closed individually when the analyst no longer needs a particular result.
 
 **Why this priority**: Analysts frequently run multiple tools in sequence and need to review several results. Without tab management, each new result would replace the previous one, losing context. This is essential for practical use.
 
-**Independent Test**: Can be tested by opening three or more result tabs, switching between them to verify charts render correctly on each switch, and closing individual tabs to verify the remaining tabs are unaffected.
+**Independent Test**: Can be tested by opening three or more result tabs, switching between them to verify content displays correctly on each switch, and closing individual tabs to verify the remaining tabs are unaffected.
 
 **Acceptance Scenarios**:
 
-1. **Given** the results panel has three open tabs, **When** the analyst clicks the second tab, **Then** the second tab's chart is displayed and the other tabs remain available.
+1. **Given** the results panel has three open tabs, **When** the analyst clicks the second tab, **Then** the second tab's content is displayed and the other tabs remain available.
 2. **Given** a results tab is active, **When** the analyst clicks the tab's close button, **Then** the tab is removed and the nearest remaining tab becomes active.
 3. **Given** the last remaining tab is closed, **When** the analyst closes it, **Then** the results panel displays the empty state.
-4. **Given** multiple tabs are open, **When** the analyst switches between tabs, **Then** the previously rendered chart is restored without re-processing the dataset.
+4. **Given** multiple tabs are open, **When** the analyst switches between tabs, **Then** the previously rendered content is restored without unnecessary delay.
 
 ---
 
-### User Story 3 - Identify Result Tabs by Title (Priority: P3)
+### User Story 4 - Identify Result Tabs by Title (Priority: P3)
 
 Each tab in the results panel displays a meaningful title derived from the result's metadata — for example, "Zone Histogram — Track Alpha" or "Range-Bearing — Alpha vs Bravo". The analyst can distinguish between multiple results at a glance without needing to click into each tab. If a title is too long, it is truncated with an ellipsis, and the full title is shown on hover.
 
@@ -65,7 +82,7 @@ Each tab in the results panel displays a meaningful title derived from the resul
 
 ---
 
-### User Story 4 - Open a Result from the STAC Browser or Attachments Menu (Priority: P2)
+### User Story 5 - Open a Result from the STAC Browser or Attachments Menu (Priority: P2)
 
 An analyst wants to review a previously computed result. They can open it in two ways: by selecting a result file in the STAC browser (catalog overview or file tree), or by choosing a result from the attachments context menu in the activity panel. Either action opens the result as a new tab in the results panel, using the same chart rendering as the auto-open flow.
 
@@ -81,7 +98,7 @@ An analyst wants to review a previously computed result. They can open it in two
 
 ---
 
-### User Story 5 - Open Results Panel via Command (Priority: P4)
+### User Story 6 - Open Results Panel via Command (Priority: P4)
 
 An analyst wants to access the results panel directly. They open it using a VS Code command (via the command palette or a keyboard shortcut). The panel opens in the bottom panel area, showing any previously opened result tabs or the empty state if no results have been opened in the current session.
 
@@ -106,6 +123,7 @@ An analyst wants to access the results panel directly. They open it using a VS C
 - What happens when the analyst opens the same result file from different entry points (e.g., first via tool completion, then via STAC browser)? The existing tab is activated rather than creating a duplicate.
 - What happens when a result artifact is a file type the panel cannot preview (e.g., a binary report format)? The tab displays a summary (filename, type, size) and offers a link to open the file in VS Code's native viewer or the system default application.
 - What happens when two different plots each have a result file with the same name (e.g., both have `results/zone_histogram.json`)? Each produces a separate tab. The tab title includes the plot name to disambiguate (e.g., "Zone Histogram — Plot Alpha" vs "Zone Histogram — Plot Bravo").
+- What happens when a result file is being written (mid-write) when the file watcher triggers? The panel waits for the write to complete (file size stabilises or write lock releases) before re-rendering, to avoid displaying partial or corrupt data.
 
 ## Requirements *(mandatory)*
 
@@ -125,7 +143,9 @@ An analyst wants to access the results panel directly. They open it using a VS C
 - **FR-014**: The panel MUST accept result open requests from the STAC browser (file tree or catalog overview) and open the selected result file as a new tab.
 - **FR-015**: The panel MUST accept result open requests from the attachments context menu in the activity panel and open the selected result file as a new tab.
 - **FR-016**: If a result file that is already open in an existing tab is requested again (from any entry point), the panel MUST activate the existing tab rather than creating a duplicate. Tab identity is the combination of the source plot (STAC item) and the result file path — the same filename in different plots produces separate tabs.
-- **FR-009**: Switching between tabs MUST restore the previously rendered chart without re-processing the dataset from scratch.
+- **FR-009**: Switching between tabs MUST restore the previously rendered content without unnecessary delay.
+- **FR-020**: When the underlying result file for an open tab is overwritten (e.g., by a tool re-run), the tab MUST detect the change and re-render with the updated content automatically.
+- **FR-021**: Live updates MUST preserve the tab's position in the tab bar — the tab is not closed and reopened, it refreshes in place.
 - **FR-010**: Tab titles that exceed available space MUST be truncated with an ellipsis, with the full title shown as a tooltip on hover.
 - **FR-011**: Charts within tabs MUST resize responsively when the panel or VS Code window is resized.
 - **FR-012**: The results panel MUST function correctly regardless of where VS Code allows it to be placed (bottom, side, etc.).
@@ -176,6 +196,7 @@ An analyst wants to access the results panel directly. They open it using a VS C
 - **SC-004**: The results panel handles at least 20 simultaneous tabs without degradation in tab switching or chart display.
 - **SC-005**: Charts in tabs resize correctly when the panel is resized, maintaining readability at any panel width above 300 pixels.
 - **SC-006**: The panel functions fully offline with no network requests during any operation.
+- **SC-007**: When a result file is overwritten by a tool re-run, the open tab re-renders with updated content within 2 seconds of the write completing.
 
 ## Assumptions
 
@@ -203,11 +224,12 @@ An analyst wants to access the results panel directly. They open it using a VS C
 - VS Code command to show the panel
 - Three entry points: auto-open on tool completion, STAC browser, attachments context menu
 - De-duplication — re-opening an already-open result activates the existing tab
+- Live update — open tabs re-render when their underlying result file is overwritten (supporting iterative tuning workflows)
 
 ### Out of Scope
 
 - Logical result ID registry (#087) — this feature receives results directly, not via ID lookup
-- Auto-refresh when results update (#089) — tabs display static snapshots of results
+- Logical-result-ID-based auto-refresh (#089) — this feature watches the underlying file directly; #089 adds the abstraction layer of logical result IDs and cross-tab refresh coordination
 - Custom editor provider for opening results as editor tabs (#088)
 - Drag-and-drop reordering of tabs
 - Tab persistence across VS Code restarts
