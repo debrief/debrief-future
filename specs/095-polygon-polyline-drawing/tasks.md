@@ -182,16 +182,16 @@ No tasks needed — visual feedback is provided by the Geoman library out of the
 
 ### Evidence Collection
 
-- [ ] T021 Create evidence directory `specs/095-polygon-polyline-drawing/evidence/`
-- [ ] T022 Capture test summary with pass/fail counts `specs/095-polygon-polyline-drawing/evidence/test-summary.md`
-- [ ] T023 Create usage demonstration showing createDrawnFeature for polygon and polyline inputs with output `specs/095-polygon-polyline-drawing/evidence/usage-example.md`
-- [ ] T024 [P] Capture example schema-compliant JSON output for both feature types `specs/095-polygon-polyline-drawing/evidence/schema-output.json`
-- [ ] T025 [P] Capture Storybook screenshot showing drawn polygon and polyline features `specs/095-polygon-polyline-drawing/evidence/storybook-screenshot.png`
+- [x] T021 Create evidence directory `specs/095-polygon-polyline-drawing/evidence/`
+- [x] T022 Capture test summary with pass/fail counts `specs/095-polygon-polyline-drawing/evidence/test-summary.md`
+- [x] T023 Create usage demonstration showing createDrawnFeature for polygon and polyline inputs with output `specs/095-polygon-polyline-drawing/evidence/usage-example.md`
+- [x] T024 [P] Capture example schema-compliant JSON output for both feature types `specs/095-polygon-polyline-drawing/evidence/schema-output.json`
+- [x] T025 [P] Capture Storybook screenshot showing drawn polygon and polyline features `specs/095-polygon-polyline-drawing/evidence/storybook-screenshot.png`
 
 ### Media Content
 
-- [ ] T026 Create shipped blog post `specs/095-polygon-polyline-drawing/media/shipped-post.md`
-- [ ] T027 [P] Create LinkedIn shipped summary `specs/095-polygon-polyline-drawing/media/linkedin-shipped.md`
+- [x] T026 Create shipped blog post `specs/095-polygon-polyline-drawing/media/shipped-post.md`
+- [x] T027 [P] Create LinkedIn shipped summary `specs/095-polygon-polyline-drawing/media/linkedin-shipped.md`
 
 ### PR Creation
 
