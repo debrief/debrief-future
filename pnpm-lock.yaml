@@ -202,6 +202,9 @@ importers:
       '@debrief/session-state':
         specifier: workspace:*
         version: link:../../services/session-state
+      golden-layout:
+        specifier: ^2.6.0
+        version: 2.6.0
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
@@ -214,6 +217,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
+      shared-zustand:
+        specifier: ^2.1.0
+        version: 2.1.0(zustand@5.0.10(@types/react@18.3.27)(react@18.3.1))
       vscrui:
         specifier: ^0.1.0
         version: 0.1.0(@types/react@18.3.27)(react@18.3.1)
@@ -3607,6 +3613,9 @@ packages:
     resolution: {integrity: sha512-oB4vkQGqlMl682wL1IlWd02tXCbquGWM4voPEI85QmNKCaw8zGTm1f1rubFgkg3Eli2PtKlFgrnmUqasbQWlkw==}
     engines: {node: '>=20'}
 
+  golden-layout@2.6.0:
+    resolution: {integrity: sha512-sIVQCiRWOymHbVD1Aw/T9/ijbPYAVGBlgGYd1N9MRKfcyBNSpjr87Vg9nSHm+RCT8ELrvK8IJYJV0QRJuVUkCQ==}
+
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
@@ -5072,6 +5081,11 @@ packages:
 
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
+
+  shared-zustand@2.1.0:
+    resolution: {integrity: sha512-AoWNZ9g15HKUOJWR/IfF+SZVaJHE6fe9G7wicVLgOd6HCbRaBl4EURBdw6vGry7Z3ILWLGF7tXzxmIkTI1fnNQ==}
+    peerDependencies:
+      zustand: '>= 4.0.0'
 
   shebang-command@2.0.0:
     resolution: {integrity: sha512-kHxr2zZpYtdmrN1qDjrrX/Z1rR1kG8Dx+gkpK1G4eXmvXswmcE1hTWBWYUzlraYw1/yZp6YuDY77YtvbN0dmDA==}
@@ -9758,6 +9772,8 @@ snapshots:
       slash: 5.1.0
       unicorn-magic: 0.3.0
 
+  golden-layout@2.6.0: {}
+
   gopd@1.2.0: {}
 
   got@11.8.6:
@@ -11299,6 +11315,10 @@ snapshots:
   setimmediate@1.0.5: {}
 
   setprototypeof@1.2.0: {}
+
+  shared-zustand@2.1.0(zustand@5.0.10(@types/react@18.3.27)(react@18.3.1)):
+    dependencies:
+      zustand: 5.0.10(@types/react@18.3.27)(react@18.3.1)
 
   shebang-command@2.0.0:
     dependencies:

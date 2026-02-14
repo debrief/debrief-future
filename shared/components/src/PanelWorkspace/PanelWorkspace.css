@@ -1,0 +1,174 @@
+/**
+ * GoldenLayout Debrief Dark Theme
+ *
+ * Overrides GoldenLayout's default styles to match the VS Code dark theme
+ * using existing CSS custom properties.
+ */
+
+/* Workspace container fills its parent */
+.panel-workspace {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* GoldenLayout root */
+.lm_goldenlayout {
+  background: var(--vscode-editor-background, #1e1e1e);
+}
+
+/* Panel content area */
+.lm_content {
+  background: var(--vscode-editor-background, #1e1e1e);
+  border: none;
+  overflow: hidden;
+}
+
+/* Tab bar header */
+.lm_header {
+  height: 28px !important;
+  background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
+  border-bottom: 1px solid var(--vscode-panel-border, #454545);
+}
+
+/* Individual tab */
+.lm_header .lm_tab {
+  height: 26px !important;
+  line-height: 26px;
+  padding: 0 12px;
+  margin: 0;
+  background: transparent;
+  color: var(--vscode-tab-inactiveForeground, #969696);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+/* Active tab */
+.lm_header .lm_tab.lm_active {
+  background: var(--vscode-tab-activeBackground, #1e1e1e);
+  color: var(--vscode-tab-activeForeground, #ffffff);
+  border-bottom-color: var(--vscode-focusBorder, #007fd4);
+}
+
+/* Tab hover */
+.lm_header .lm_tab:hover {
+  color: var(--vscode-foreground, #cccccc);
+}
+
+/* Tab close button */
+.lm_header .lm_tab .lm_close_tab {
+  width: 14px;
+  height: 14px;
+  top: 6px;
+  right: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.lm_header .lm_tab:hover .lm_close_tab,
+.lm_header .lm_tab.lm_active .lm_close_tab {
+  opacity: 0.6;
+}
+
+.lm_header .lm_tab .lm_close_tab:hover {
+  opacity: 1;
+}
+
+/* Splitter (resize handle between panels) */
+.lm_splitter {
+  background: var(--vscode-panel-border, #454545);
+  opacity: 1;
+}
+
+.lm_splitter:hover {
+  background: var(--vscode-focusBorder, #007fd4);
+}
+
+/* Drag proxy (shown while dragging a panel) */
+.lm_dragProxy {
+  border: 2px solid var(--vscode-focusBorder, #007fd4);
+  background: var(--vscode-editor-background, #1e1e1e);
+  opacity: 0.9;
+  border-radius: 2px;
+}
+
+.lm_dragProxy .lm_header {
+  background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
+}
+
+/* Drop indicator */
+.lm_dropTargetIndicator {
+  outline: 2px dashed var(--vscode-focusBorder, #007fd4);
+  background: rgba(0, 127, 212, 0.15);
+  transition: all 0.15s ease;
+}
+
+/* Maximise/popout/close buttons in header */
+.lm_header .lm_controls > li {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.lm_header .lm_controls > li:hover {
+  opacity: 1;
+}
+
+/* Popin button for popout windows */
+.lm_popin {
+  cursor: pointer;
+}
+
+.lm_popin > * {
+  background: var(--vscode-button-background, #0e639c);
+  color: var(--vscode-button-foreground, #ffffff);
+  border-radius: 2px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+/* Empty workspace message */
+.panel-workspace__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  color: var(--vscode-descriptionForeground, #969696);
+  font-size: 14px;
+}
+
+.panel-workspace__empty button {
+  padding: 6px 16px;
+  background: var(--vscode-button-background, #0e639c);
+  color: var(--vscode-button-foreground, #ffffff);
+  border: none;
+  border-radius: 2px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.panel-workspace__empty button:hover {
+  background: var(--vscode-button-hoverBackground, #1177bb);
+}
+
+/* Stack maximised state */
+.lm_maximised .lm_header {
+  background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
+}
+
+.lm_maximised .lm_content {
+  border: 1px solid var(--vscode-panel-border, #454545);
+}
+
+/* Ensure items fill their containers */
+.lm_item_container {
+  overflow: hidden;
+}

@@ -117,6 +117,15 @@ export type {
   TransformResult,
 } from './ChartRenderer';
 
+// PanelWorkspace (Feature: 096-add-goldenlayout-panels)
+export { PanelWorkspace } from './PanelWorkspace';
+export type { PanelWorkspaceProps } from './PanelWorkspace';
+export { createPanelRegistry } from './PanelWorkspace';
+export type { PanelDefinition, PanelProps, PanelRegistry } from './PanelWorkspace';
+export { DEFAULT_LAYOUT_CONFIG, PANEL_NAVIGATION, PANEL_ACTIVITY, PANEL_LOG, PANEL_MAP, PANEL_CHART } from './PanelWorkspace/defaultLayout';
+export { saveLayout, loadLayout, clearLayout, LAYOUT_STORAGE_KEY, LAYOUT_VERSION } from './PanelWorkspace/layoutPersistence';
+export { PanelErrorBoundary } from './PanelWorkspace/PanelErrorBoundary';
+
 // LogPanel (Feature: 072-log-panel)
 export { LogPanel } from './LogPanel';
 export type {
