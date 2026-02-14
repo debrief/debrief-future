@@ -466,7 +466,7 @@ class Tool(BaseModel):
     def _build_selection_requirements(self) -> list[dict[str, Any]]:
         """Build selection requirements from context_type and input_kinds."""
         if self.context_type == ContextType.SINGLE:
-            return [{"kind": self.input_kinds[0], "min": 1, "max": 1}]
+            return [{"kind": k, "min": 1, "max": 1} for k in self.input_kinds]
         elif self.context_type == ContextType.MULTI:
             return [{"kind": k, "min": 1} for k in self.input_kinds]
         elif self.context_type == ContextType.REGION:

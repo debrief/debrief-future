@@ -70,6 +70,7 @@ export const toolDefinition: MCPToolDefinition = {
   annotations: {
     'debrief:selectionRequirements': [
       { kind: 'RECTANGLE', min: 1, max: 1 },
+      { kind: 'POLY', min: 1, max: 1 },
       { kind: 'CIRCLE', min: 1, max: 1 },
     ],
     'debrief:category': 'reference/generation',

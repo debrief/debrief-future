@@ -170,7 +170,7 @@ def _generate_scatter(
 @tool(
     name="generate-reference-points",
     description="Generates a grid or scatter pattern of reference points within a selected polygon.",
-    input_kinds=["RECTANGLE", "CIRCLE"],
+    input_kinds=["RECTANGLE", "POLY", "CIRCLE"],
     output_kind="reference/generated_points",
     context_type=ContextType.SINGLE,
     parameters=[
