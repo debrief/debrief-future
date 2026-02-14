@@ -2,12 +2,14 @@ import React, { useMemo, useCallback } from 'react';
 import { CascadingMenu } from '../CascadingMenu/CascadingMenu';
 import { buildFormatMenuItems, parseMenuItemId, resolvePresetValue } from './formatMenuItems';
 import type { StylePropertyDescriptor } from './formatMenuItems';
+import { resolvePropertiesForKinds } from './stylePropertyMap';
 import './FormatMenu.css';
 
 export interface FormatMenuProps {
   readonly featureIds: readonly string[];
   readonly featureKinds: readonly string[];
-  readonly properties: readonly StylePropertyDescriptor[];
+  /** Style property descriptors. If omitted, resolved automatically from featureKinds. */
+  readonly properties?: readonly StylePropertyDescriptor[];
   readonly currentValues?: Record<string, unknown>;
   readonly disabledProperties?: Map<string, string>;
   readonly anchorPosition: { x: number; y: number };
@@ -26,13 +28,20 @@ export interface FormatMenuProps {
 export function FormatMenu(props: FormatMenuProps): React.ReactElement {
   const {
     featureIds,
-    properties,
+    featureKinds,
+    properties: externalProperties,
     currentValues,
     disabledProperties,
     anchorPosition,
     onFormatChange,
     onDismiss,
   } = props;
+
+  // Resolve properties from featureKinds when not explicitly provided
+  const properties = useMemo(() => {
+    if (externalProperties && externalProperties.length > 0) return externalProperties;
+    return resolvePropertiesForKinds(featureKinds);
+  }, [externalProperties, featureKinds]);
 
   // Build menu items from property descriptors
   const menuItems = useMemo(() => {

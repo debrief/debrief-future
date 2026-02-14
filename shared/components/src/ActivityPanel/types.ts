@@ -72,7 +72,8 @@ export type ActivityPanelMessage =
   | { type: 'tool:run'; payload: { toolId: string; params?: Record<string, unknown> } }
   | { type: 'layer:toggleVisibility'; payload: { featureIds: string[] } }
   | { type: 'layer:delete'; payload: { featureIds: string[] } }
-  | { type: 'layer:select'; payload: { featureIds: string[] } };
+  | { type: 'layer:select'; payload: { featureIds: string[] } }
+  | { type: 'layer:format'; payload: { featureIds: string[]; property: string; value: string | number | boolean } };
 
 /**
  * Props for the ActivityPanel component.
