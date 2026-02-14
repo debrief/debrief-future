@@ -17,9 +17,11 @@ export interface LeafletToolbarProps {
     drawingMode?: DrawingMode;
     /** Callback when drawing mode changes */
     onDrawingModeChange?: (mode: DrawingMode) => void;
+    /** Callback when a shape is drawn via Geoman. Called with raw GeoJSON and the active drawing mode. */
+    onShapeCreated?: (geojson: GeoJSON.Feature, mode: DrawingMode) => void;
 }
 /**
  * React wrapper component for the LeafletToolbar control.
  */
-export declare function LeafletToolbar({ position, visibleBounds, fitPadding, showZoomControls, showFitButton, drawingMode, onDrawingModeChange, }: LeafletToolbarProps): null;
+export declare function LeafletToolbar({ position, visibleBounds, fitPadding, showZoomControls, showFitButton, drawingMode, onDrawingModeChange, onShapeCreated, }: LeafletToolbarProps): null;
 //# sourceMappingURL=LeafletToolbar.d.ts.map
