@@ -96,7 +96,7 @@ export function createDrawnFeature(
 
   if (mode === 'polygon') {
     const polygonGeometry = geojson.geometry as GeoJSON.Polygon;
-    const ring = polygonGeometry.coordinates[0];
+    const ring = polygonGeometry.coordinates[0]!;
     // vertex_count = unique vertices, excluding the closure point
     const vertexCount = ring.length - 1;
     return {
