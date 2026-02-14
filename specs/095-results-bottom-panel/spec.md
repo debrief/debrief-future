@@ -5,20 +5,26 @@
 **Status**: Draft
 **Input**: User description: "Results bottom panel with tabbed layout — VS Code panel hosting Vega-Lite renderer tabs (requires #085)"
 
+## Clarifications
+
+### Session 2026-02-14
+
+- Q: Which entry points should trigger opening a result in the panel? → A: All three — auto-open on tool completion, STAC browser, and attachments context menu in the activity panel.
+
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - View a Tool Result in the Bottom Panel (Priority: P1)
+### User Story 1 - View a Tool Result After Tool Completion (Priority: P1)
 
-An analyst runs a tool (e.g., buffer zone analysis) that produces a result dataset. The system opens a results panel in the VS Code bottom panel area — in the same region as the terminal and output panels. The result is displayed as a chart within a tab in this panel. The analyst can see the chart without leaving their current editor layout, as the bottom panel is a non-intrusive location familiar from the terminal experience.
+An analyst runs a tool (e.g., buffer zone analysis) that produces a result dataset. The tool's output is persisted to the `results/` sub-folder of the current plot (STAC item). Once stored, the system automatically opens the result in the results panel — a VS Code bottom panel in the same region as the terminal and output panels. The result is displayed as a chart within a tab. The analyst sees the chart without leaving their current editor layout.
 
-**Why this priority**: This is the core value — providing a dedicated, non-intrusive location for viewing tool results. Without a panel to host the charts, the chart renderer component (#085) has nowhere to appear. This is the minimum viable feature.
+**Why this priority**: This is the primary flow — the analyst runs a tool and immediately sees the result. Without a panel to host the charts, the chart renderer component (#085) has nowhere to appear. This is the minimum viable feature.
 
-**Independent Test**: Can be fully tested by triggering a result display action with a valid dataset and confirming the bottom panel opens with a tab containing a rendered chart. Delivers immediate value by giving analysts a place to see their results.
+**Independent Test**: Can be fully tested by triggering a tool that persists a result dataset to the plot's `results/` sub-folder and confirming the bottom panel opens with a tab containing the rendered chart.
 
 **Acceptance Scenarios**:
 
-1. **Given** a tool has produced a result dataset, **When** the result is sent to the results panel, **Then** the bottom panel opens (if not already visible) and displays a tab containing the rendered chart.
-2. **Given** the results panel is already open, **When** a new result is sent to the panel, **Then** a new tab is created for the result without affecting existing tabs.
+1. **Given** a tool has completed and persisted a result dataset to the plot's `results/` sub-folder, **When** the persistence completes, **Then** the bottom panel opens (if not already visible) and displays a tab containing the rendered chart.
+2. **Given** the results panel is already open, **When** a new tool result is persisted, **Then** a new tab is created for the result without affecting existing tabs.
 3. **Given** the results panel is open with a chart tab, **When** the analyst clicks on the tab title, **Then** the tab becomes active and its chart is displayed.
 
 ---
@@ -56,11 +62,27 @@ Each tab in the results panel displays a meaningful title derived from the resul
 
 ---
 
-### User Story 4 - Open Results Panel via Command (Priority: P4)
+### User Story 4 - Open a Result from the STAC Browser or Attachments Menu (Priority: P2)
 
-An analyst wants to view results from previously completed tools. They open the results panel using a VS Code command (via the command palette or a keyboard shortcut). The panel opens in the bottom panel area, showing any previously opened result tabs or the empty state if no results have been opened in the current session.
+An analyst wants to review a previously computed result. They can open it in two ways: by selecting a result file in the STAC browser (catalog overview or file tree), or by choosing a result from the attachments context menu in the activity panel. Either action opens the result as a new tab in the results panel, using the same chart rendering as the auto-open flow.
 
-**Why this priority**: The panel is primarily opened automatically when results arrive, but users need a manual way to re-access it if they closed it. This is a secondary access path.
+**Why this priority**: Analysts frequently need to revisit results from earlier in a session or from a previous session. The STAC browser and attachments menu provide natural navigation paths to persisted results — without these, analysts can only see results at the moment they are first computed.
+
+**Independent Test**: Can be tested by persisting a result file to a plot's `results/` sub-folder, then opening it via the STAC browser file tree and confirming a chart tab appears. Separately, opening the same result via the attachments dropdown and confirming the same behaviour.
+
+**Acceptance Scenarios**:
+
+1. **Given** a result dataset file exists in a plot's `results/` sub-folder, **When** the analyst selects it in the STAC browser (file tree or catalog overview), **Then** the results panel opens with a tab displaying the chart for that result.
+2. **Given** a result dataset file exists in the current plot, **When** the analyst clicks "Open" on the result in the attachments context menu of the activity panel, **Then** the results panel opens with a tab displaying the chart for that result.
+3. **Given** the analyst opens the same result file that is already displayed in an existing tab, **When** the open action is triggered, **Then** the existing tab is activated rather than creating a duplicate tab.
+
+---
+
+### User Story 5 - Open Results Panel via Command (Priority: P4)
+
+An analyst wants to access the results panel directly. They open it using a VS Code command (via the command palette or a keyboard shortcut). The panel opens in the bottom panel area, showing any previously opened result tabs or the empty state if no results have been opened in the current session.
+
+**Why this priority**: The panel is primarily opened automatically when results arrive or navigated to via the STAC browser / attachments menu. A manual command provides a fallback access path.
 
 **Independent Test**: Can be tested by executing the "Show Results Panel" command from the command palette and confirming the panel appears in the bottom area.
 
@@ -78,6 +100,7 @@ An analyst wants to view results from previously completed tools. They open the 
 - What happens when a result's chart fails to render (e.g., due to a malformed dataset)? The tab still opens, but displays the chart renderer's error state within the tab area, showing what went wrong.
 - What happens when the analyst drags the results panel to a different location in VS Code (e.g., side panel)? The panel functions correctly in any location VS Code allows it to be placed.
 - What happens when the VS Code window is resized to a very narrow width? Charts within tabs resize responsively to fit the available space.
+- What happens when the analyst opens the same result file from different entry points (e.g., first via tool completion, then via STAC browser)? The existing tab is activated rather than creating a duplicate.
 
 ## Requirements *(mandatory)*
 
@@ -90,7 +113,10 @@ An analyst wants to view results from previously completed tools. They open the 
 - **FR-005**: Tabs MUST be individually closable via a close button on each tab.
 - **FR-006**: When a tab is closed, the nearest remaining tab MUST become active. When the last tab is closed, the panel MUST show the empty state.
 - **FR-007**: The results panel MUST be openable via a VS Code command ("Show Results Panel") accessible from the command palette.
-- **FR-008**: When a new result is sent to the panel, the panel MUST open automatically (if hidden) and create a new tab for the result.
+- **FR-008**: When a tool completes and persists a result to the plot's `results/` sub-folder, the panel MUST open automatically (if hidden) and create a new tab for the result.
+- **FR-014**: The panel MUST accept result open requests from the STAC browser (file tree or catalog overview) and open the selected result file as a new tab.
+- **FR-015**: The panel MUST accept result open requests from the attachments context menu in the activity panel and open the selected result file as a new tab.
+- **FR-016**: If a result file that is already open in an existing tab is requested again (from any entry point), the panel MUST activate the existing tab rather than creating a duplicate.
 - **FR-009**: Switching between tabs MUST restore the previously rendered chart without re-processing the dataset from scratch.
 - **FR-010**: Tab titles that exceed available space MUST be truncated with an ellipsis, with the full title shown as a tooltip on hover.
 - **FR-011**: Charts within tabs MUST resize responsively when the panel or VS Code window is resized.
@@ -115,13 +141,15 @@ An analyst wants to view results from previously completed tools. They open the 
 
 ### Screen Progression
 
-| Step | Screen/State       | User Action                              | Result                                                    |
-|------|--------------------|------------------------------------------|-----------------------------------------------------------|
-| 1    | No results yet     | Analyst runs a tool that produces output  | Results panel opens in bottom area with a chart in a tab   |
-| 2    | One tab open       | Analyst runs another tool                 | Second tab appears, becomes active, shows new chart        |
-| 3    | Multiple tabs open | Analyst clicks a tab title               | That tab becomes active, its chart is displayed            |
-| 4    | Reviewing results  | Analyst clicks close button on a tab     | Tab is removed, nearest tab becomes active                 |
-| 5    | Panel closed       | Analyst runs "Show Results Panel" command | Panel reopens showing any previously opened tabs           |
+| Step | Screen/State       | User Action                                          | Result                                                    |
+|------|--------------------|------------------------------------------------------|-----------------------------------------------------------|
+| 1    | No results yet     | Analyst runs a tool that produces output              | Result persisted to `results/`; panel opens with chart tab |
+| 2    | One tab open       | Analyst runs another tool                             | Second tab appears, becomes active, shows new chart        |
+| 3    | Multiple tabs open | Analyst clicks a tab title                            | That tab becomes active, its chart is displayed            |
+| 4    | Browsing STAC      | Analyst selects a result file in STAC browser         | Result opens as new tab (or existing tab activated)        |
+| 5    | Activity panel     | Analyst clicks "Open" on attachments context menu     | Result opens as new tab (or existing tab activated)        |
+| 6    | Reviewing results  | Analyst clicks close button on a tab                  | Tab is removed, nearest tab becomes active                 |
+| 7    | Panel closed       | Analyst runs "Show Results Panel" command              | Panel reopens showing any previously opened tabs           |
 
 ### UI States
 
@@ -145,7 +173,7 @@ An analyst wants to view results from previously completed tools. They open the 
 
 - The chart renderer component (#085) is available as a shared React component that accepts a render spec and produces a chart. This feature consumes that component — it does not build its own rendering logic.
 - VS Code's webview panel API supports the tabbed layout pattern described here. The implementation will use VS Code's native panel contribution mechanisms.
-- Result datasets arrive via an internal messaging mechanism (e.g., a service event or command) that this feature's planning phase will define. The spec does not prescribe the delivery mechanism.
+- Result datasets are persisted files in the `results/` sub-folder of a STAC item (plot). The panel reads result data from these files. Three entry points trigger the panel to open a result: (1) automatic on tool completion, (2) STAC browser selection, (3) attachments context menu in the activity panel.
 - Tab state (which tabs are open, their content) is session-scoped — tabs are not persisted across VS Code restarts. Persistence is a potential future enhancement.
 - The panel does not manage result lifecycle — it displays what it receives. Clearing old results or managing result storage is handled by other features (e.g., #087 Logical Result ID Registry).
 
@@ -165,7 +193,8 @@ An analyst wants to view results from previously completed tools. They open the 
 - Responsive chart sizing within the panel
 - Empty, loading, and error states
 - VS Code command to show the panel
-- Automatic panel opening when a result arrives
+- Three entry points: auto-open on tool completion, STAC browser, attachments context menu
+- De-duplication — re-opening an already-open result activates the existing tab
 
 ### Out of Scope
 
