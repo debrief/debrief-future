@@ -39,6 +39,15 @@ describe('resolveParamType', () => {
     expect(items![0]).toEqual({ id: 'n_1', label: '1' });
   });
 
+  it('resolves ReferencePointPattern to grid and scatter items', () => {
+    const items = resolveParamType('ReferencePointPattern');
+    expect(items).not.toBeNull();
+    expect(items!.length).toBe(2);
+    expect(items!.map(i => i.id)).toEqual(['grid', 'scatter']);
+    expect(items![0]).toEqual({ id: 'grid', label: 'Grid' });
+    expect(items![1]).toEqual({ id: 'scatter', label: 'Scatter' });
+  });
+
   it('returns null for unknown type', () => {
     expect(resolveParamType('UnknownType')).toBeNull();
   });

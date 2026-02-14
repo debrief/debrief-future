@@ -172,6 +172,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - TypeScript 5.x (session-state package, VS Code extension, shared components) + Zustand ^5.0.0 (session-state store), React 18.x (shared components), VS Code Extension API ^1.85.0, existing `@debrief/session-state` (Log Service, Snapshot Service), existing `calcService` (MCP tool invocation), existing `stacService` (file I/O) (076-replay-tune)
 - Python 3.11 (debrief-calc service), TypeScript 5.x (VS Code extension, web-shell) + `debrief_calc` registry + `@tool` decorator (Python), `MCPToolDefinition` types (TypeScript). Standard library `math` module for trig functions — no external geo libraries. (056-move-shape)
 - N/A — pure transformation tool, no persistence (caller handles STAC writes) (056-move-shape)
+- Python 3.11 (debrief-calc service), TypeScript 5.x (VS Code extension, web-shell) + None beyond existing project dependencies — standard library `math` (Python), no new npm packages (TypeScript) (078-generate-reference-points)
+- N/A — pure transformation tool; caller handles STAC persistence (078-generate-reference-points)
 - Python 3.11 (LinkML schemas, Pydantic models, calc service), TypeScript 5.x (VS Code extension, shared components, generated types) + LinkML >= 1.7.0 (schema source), Pydantic v2 (Python validation), React 18.x (shared components), VS Code Extension API ^1.85.0, Zustand ^5.0.0 (session-state) (091-tool-parameter-context-menus)
 - Local filesystem STAC catalogs (no storage changes for this feature) (091-tool-parameter-context-menus)
 - Python 3.11 + pydantic >=2.0.0 (existing), stdlib `math` module only (080-buffer-zone-generator)
@@ -185,6 +187,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - TypeScript 5.x (shared components, VS Code extension webview) + React 18.x, react-leaflet 4.2, Leaflet 1.9.x, @geoman-io/leaflet-geoman-free ^2.19.2, Zustand ^5.0.0 (@debrief/session-state) (094-point-rectangle-drawing)
 - N/A — drawn features are held in-memory in the webview's React state; persistence is out of scope (future feature 096) (094-point-rectangle-drawing)
 - TypeScript 5.x (shared components, session-state, VS Code extension webview) + React 18.x (shared components), Zustand ^5.0.0 (session-state store), Leaflet 1.9.x (map rendering), VS Code Extension API ^1.85.0, existing `@debrief/session-state` (Log Service), existing `stacService` (file I/O) (097-feature-format-menu)
+- TypeScript 5.x (shared components, session-state, VS Code extension) + React 18.x, @tanstack/react-virtual (existing), Zustand ^5.0.0 (session-state, existing), @debrief/schemas (existing) (094-show-points-in-layers)
+- N/A — expansion state is ephemeral UI state (not persisted) (094-show-points-in-layers)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)

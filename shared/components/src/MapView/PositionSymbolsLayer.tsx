@@ -19,6 +19,8 @@ export interface PositionSymbolsLayerProps {
   currentTime?: number;
   displayMode?: 'full' | 'trail';
   isSelected?: boolean;
+  /** Full set of selected IDs — enables per-position highlighting via paths like 'track-001/positions/4' */
+  selectedIds?: Set<string>;
 }
 
 /**
@@ -35,6 +37,7 @@ export function PositionSymbolsLayer({
   currentTime,
   displayMode = 'full',
   isSelected = false,
+  selectedIds,
 }: PositionSymbolsLayerProps) {
   const props = feature.properties;
   const color = getFeatureColor(feature);
@@ -86,6 +89,7 @@ export function PositionSymbolsLayer({
   }, [currentTime, displayMode, positions]);
 
   // Generate symbol/label elements
+  const featureId = feature.id;
   const elements = useMemo(() => {
     const items: JSX.Element[] = [];
 
@@ -93,8 +97,15 @@ export function PositionSymbolsLayer({
       const style = resolvedStyles[i];
       if (!style) continue;
 
+      // Check if this specific position is selected via its selection path
+      const isPositionSelected = isSelected ||
+        (selectedIds?.has(`${featureId}/positions/${i}`) ?? false);
+
+      // Show symbol if it should be shown OR if this position is individually selected
+      const shouldShowSymbol = style.showSymbol || isPositionSelected;
+
       // Skip if neither symbol nor label should be shown
-      if (!style.showSymbol && !style.showLabel) continue;
+      if (!shouldShowSymbol && !style.showLabel) continue;
 
       // Get coordinate (GeoJSON is [lon, lat], Leaflet needs [lat, lon])
       const coord = coordinates[i];
@@ -102,10 +113,11 @@ export function PositionSymbolsLayer({
       const position: LatLngExpression = [coord[1], coord[0]];
 
       // Determine marker appearance
-      const markerColor = isSelected ? 'var(--debrief-selection-border)' : color;
-      const radius = getRadiusForShape(style.symbol);
+      const markerColor = isPositionSelected ? 'var(--debrief-selection-border, #0066cc)' : color;
+      const baseRadius = getRadiusForShape(style.symbol);
+      const radius = isPositionSelected ? baseRadius + 3 : baseRadius;
 
-      if (style.showSymbol) {
+      if (shouldShowSymbol) {
         items.push(
           <CircleMarker
             key={`symbol-${i}`}
@@ -114,8 +126,8 @@ export function PositionSymbolsLayer({
             pathOptions={{
               color: markerColor,
               fillColor: markerColor,
-              fillOpacity: 0.7,
-              weight: 2,
+              fillOpacity: isPositionSelected ? 0.9 : 0.7,
+              weight: isPositionSelected ? 3 : 2,
             }}
           >
             {style.showLabel && style.labelText && (
@@ -143,7 +155,7 @@ export function PositionSymbolsLayer({
     }
 
     return items;
-  }, [visibleRange, resolvedStyles, coordinates, color, isSelected]);
+  }, [visibleRange, resolvedStyles, coordinates, color, isSelected, selectedIds, featureId]);
 
   if (elements.length === 0) return null;
 

@@ -23,11 +23,33 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const SCHEMAS_DIR = join(__dirname, "..", "src", "generated", "json-schema");
 const FIXTURES_DIR = join(__dirname, "..", "src", "fixtures");
 
-// Entity type mapping from fixture prefix to schema name
+// Entity type mapping from fixture prefix to schema name.
+// Prefixes are matched against fixture filenames using startsWith.
+// Order matters: longer prefixes must come first to avoid ambiguity
+// (e.g., "track-feature" before "track-style").
 const ENTITY_MAP = {
+  // Core feature types
   "track-feature": "TrackFeature",
   "reference-location": "ReferenceLocation",
+  // Annotation types
+  "narrative-entry": "NarrativeEntry",
+  "circle-annotation": "CircleAnnotation",
+  "rectangle-annotation": "RectangleAnnotation",
+  "line-annotation": "LineAnnotation",
+  "text-annotation": "TextAnnotation",
+  "vector-annotation": "VectorAnnotation",
+  "poly-annotation": "PolyAnnotation",
+  // Tool metadata
   "tool": "Tool",
+  // Multi-geometry tool results
+  "multi-point-feature": "MultiPointFeature",
+  "multi-polygon-feature": "MultiPolygonFeature",
+  // Sub-schema types (styling, state)
+  "line-properties": "LineProperties",
+  "point-properties": "PointProperties",
+  "polygon-properties": "PolygonProperties",
+  "track-style": "TrackStyle",
+  "system-state": "SystemState",
 };
 
 /**
@@ -99,12 +121,23 @@ function validateFixtures(validators, fixturesPath, expectValid) {
     const fixture = JSON.parse(readFileSync(filePath, "utf-8"));
     const valid = validator(fixture);
 
-    // Check if this is a known limitation (GeoJSON nested array coordinates)
+    // Check if this is a known limitation of LinkML's JSON Schema generator.
+    // Two known issues:
+    // 1. GeoJSON nested arrays: LinkML generates "items": {"type": "number"}
+    //    for coordinate arrays but GeoJSON uses nested arrays ([[lon, lat], ...])
+    // 2. Nullable array items: LinkML doesn't support nullable items in arrays
+    //    (e.g., position_style_overrides can contain null entries)
+    // For anyOf geometries (e.g., TrackFeature), AJV also emits rollup errors
+    // for const mismatches and the anyOf itself.
     const isKnownLimitation = !valid &&
-      entityType === "track-feature" &&
-      validator.errors?.some(e =>
-        e.instancePath?.includes("/geometry/coordinates") &&
-        e.keyword === "type"
+      validator.errors?.length > 0 &&
+      validator.errors?.every(e =>
+        // Coordinate array type errors (nested arrays flattened)
+        (e.instancePath?.includes("/geometry/coordinates") && e.keyword === "type") ||
+        // anyOf/const rollup errors from geometry union validation
+        (e.instancePath?.includes("/geometry") && (e.keyword === "anyOf" || e.keyword === "const")) ||
+        // Nullable array item errors (null in arrays of objects)
+        (e.keyword === "type" && e.params?.type === "object" && /\/\d+$/.test(e.instancePath ?? ""))
       );
 
     if (expectValid && valid) {

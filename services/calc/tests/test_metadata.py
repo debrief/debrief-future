@@ -2,6 +2,7 @@
 
 import pytest
 from debrief_calc import registry
+from debrief_calc.models import ContextType
 
 
 class TestToolMetadataCompleteness:
@@ -28,7 +29,9 @@ class TestToolMetadataCompleteness:
     def test_all_tools_have_input_kinds(self):
         for tool in registry.list_all():
             assert tool.input_kinds is not None
-            assert len(tool.input_kinds) >= 1
+            # ContextType.NONE tools may have empty input_kinds
+            if tool.context_type != ContextType.NONE:
+                assert len(tool.input_kinds) >= 1
 
     def test_all_tools_have_output_kind(self):
         for tool in registry.list_all():
