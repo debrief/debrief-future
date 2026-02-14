@@ -28,8 +28,9 @@ import {
   getFeatureLabel,
   ChartRenderer,
   transformDataset,
+  createDrawnFeature,
 } from '@debrief/components';
-import type { DatasetEnvelope } from '@debrief/components';
+import type { DatasetEnvelope, DrawingMode } from '@debrief/components';
 import type {
   CatalogOverviewItem,
   ToolsPanelItem,
@@ -131,6 +132,10 @@ export default function App() {
   const [chartTabs, setChartTabs] = useState<ChartTab[]>([]);
   const [activeChartTabId, setActiveChartTabId] = useState<string | null>(null);
 
+  // Drawing state (Feature: 094)
+  const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
+  const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
+
   // Catalog items
   const catalogItems = useMemo<CatalogOverviewItem[]>(() => {
     return stacService.getItems();
@@ -142,10 +147,10 @@ export default function App() {
     return currentPlot.features.features as DebriefFeature[];
   }, [currentPlot]);
 
-  // All features including result layers
+  // All features including result layers and drawn features
   const allFeatures = useMemo<DebriefFeature[]>(() => {
-    return [...plotFeatures, ...resultLayers as DebriefFeature[]];
-  }, [plotFeatures, resultLayers]);
+    return [...plotFeatures, ...resultLayers as DebriefFeature[], ...drawnFeatures];
+  }, [plotFeatures, resultLayers, drawnFeatures]);
 
   // Feature names map for LogPanel
   const featureNames = useMemo<Record<string, string>>(() => {
@@ -240,6 +245,8 @@ export default function App() {
         features: plotData,
       });
       setResultLayers([]);
+      setDrawnFeatures([]);
+      setDrawingMode(null);
       setToolMessage(null);
       setLogEntries([]);
       setSidebarTab('activity');
@@ -447,6 +454,15 @@ export default function App() {
   // Handle background click (clear selection via session-state)
   const handleBackgroundClick = useCallback(() => {
     store.getState().clearSelection();
+  }, [store]);
+
+  // Handle shape drawn on map (Feature: 094)
+  const handleShapeCreated = useCallback((geojson: GeoJSON.Feature, mode: DrawingMode) => {
+    const feature = createDrawnFeature(geojson, mode);
+    if (feature) {
+      setDrawnFeatures(prev => [...prev, feature as DebriefFeature]);
+      store.getState().setSelection([feature.id]);
+    }
   }, [store]);
 
   // Handle file selection from STAC tree — open dataset files as chart tabs
@@ -800,6 +816,9 @@ export default function App() {
               onBackgroundClick={handleBackgroundClick}
               currentTime={playback.currentTime}
               displayMode={toComponentMode(state.displayMode)}
+              drawingMode={drawingMode}
+              onDrawingModeChange={setDrawingMode}
+              onShapeCreated={handleShapeCreated}
               height="100%"
               className="web-shell__map"
             />
