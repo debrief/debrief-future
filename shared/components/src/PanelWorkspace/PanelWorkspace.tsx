@@ -5,7 +5,7 @@
  * handles layout persistence, and exposes a reset action.
  */
 
-import { useRef, useEffect, useCallback, type ReactElement } from 'react';
+import { useRef, useEffect, useCallback, useState, type ReactElement } from 'react';
 import {
   GoldenLayout,
   LayoutConfig,
@@ -48,6 +48,7 @@ export function PanelWorkspace({
   const containerRef = useRef<HTMLDivElement>(null);
   const glRef = useRef<GoldenLayout | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isEmpty, setIsEmpty] = useState(false);
 
   // Debounced save handler
   const debouncedSave = useCallback(() => {
@@ -96,8 +97,11 @@ export function PanelWorkspace({
 
     gl.loadLayout(layoutConfig);
 
-    // Listen for state changes to save layout (debounced)
-    gl.on('stateChanged', debouncedSave);
+    // Listen for state changes to save layout (debounced) and detect empty state
+    gl.on('stateChanged', () => {
+      debouncedSave();
+      setIsEmpty(!gl.rootItem || gl.rootItem.contentItems.length === 0);
+    });
 
     return () => {
       // Save layout before destroying
@@ -149,6 +153,15 @@ export function PanelWorkspace({
       ref={containerRef}
       className={`panel-workspace ${className ?? ''}`}
       data-testid="panel-workspace"
-    />
+    >
+      {isEmpty && (
+        <div className="panel-workspace__empty">
+          <p>All panels have been closed.</p>
+          <button type="button" onClick={handleResetLayout}>
+            Reset Layout
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

@@ -807,6 +807,18 @@ export default function App() {
           {state.canUndo() ? 'Undo available' : ''}
           {state.canRedo() ? ' | Redo available' : ''}
         </span>
+        <button
+          type="button"
+          className="web-shell__back-button"
+          onClick={() => {
+            const el = document.querySelector('[data-testid="panel-workspace"]') as HTMLElement & { __resetLayout?: () => void };
+            el?.__resetLayout?.();
+          }}
+          data-testid="reset-layout"
+          aria-label="Reset panel layout"
+        >
+          Reset Layout
+        </button>
       </header>
 
       {toolMessage && (

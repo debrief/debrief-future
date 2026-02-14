@@ -32,6 +32,16 @@ export const PANEL_CHART = 'chart';
  * and content area (map, chart).
  */
 export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
+  settings: {
+    // Enable pop-out for panels (US3)
+    popoutWholeStack: false,
+  },
+  header: {
+    // Show pop-out button on panel headers
+    popout: 'pop out',
+    // Show close button on panel headers
+    close: 'close',
+  },
   root: {
     type: 'row',
     content: [
@@ -49,6 +59,8 @@ export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
                 type: 'component',
                 componentType: PANEL_NAVIGATION,
                 title: 'Navigation',
+                minWidth: 200,
+                minHeight: 100,
               },
             ],
           },
@@ -61,6 +73,8 @@ export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
                 type: 'component',
                 componentType: PANEL_ACTIVITY,
                 title: 'Activity',
+                minWidth: 240,
+                minHeight: 200,
               },
             ],
           },
@@ -73,6 +87,8 @@ export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
                 type: 'component',
                 componentType: PANEL_LOG,
                 title: 'Log',
+                minWidth: 200,
+                minHeight: 100,
               },
             ],
           },
@@ -92,6 +108,8 @@ export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
                 type: 'component',
                 componentType: PANEL_MAP,
                 title: 'Map',
+                minWidth: 300,
+                minHeight: 200,
               },
             ],
           },
@@ -104,6 +122,8 @@ export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
                 type: 'component',
                 componentType: PANEL_CHART,
                 title: 'Chart',
+                minWidth: 200,
+                minHeight: 150,
               },
             ],
           },
