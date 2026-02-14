@@ -32,6 +32,7 @@ import {
   selectors,
   type SessionStoreApi,
   type SessionStoreWithUndo,
+  type LogService,
 } from '@debrief/session-state';
 import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
 import { calculateBounds, mergeBounds } from '../utils/bounds';
@@ -59,6 +60,9 @@ export class MapPanel {
   private currentStore: StacStore | null = null;
   private layersTreeProvider: LayersTreeProvider | null = null;
   private activityPanelProvider: ActivityPanelViewProvider | null = null;
+
+  // Provenance recording (Feature: 094)
+  private logService: LogService | null = null;
 
   // Event handlers
   private onSelectionChangedCallback:
@@ -517,6 +521,13 @@ export class MapPanel {
   }
 
   /**
+   * Set LogService for provenance recording (Feature: 094)
+   */
+  public setLogService(logService: LogService): void {
+    this.logService = logService;
+  }
+
+  /**
    * Get current plot info
    */
   public getCurrentPlot(): Plot | null {
@@ -823,6 +834,10 @@ export class MapPanel {
         this.handleTrackDetailsRequest(message.requestId, message.trackId);
         break;
 
+      case 'featureDrawn':
+        void this.handleFeatureDrawn(message);
+        break;
+
       case 'repFileDrop':
         void this.handleRepFileDrop(message.uris);
         break;
@@ -886,6 +901,101 @@ export class MapPanel {
         contextType: message.selection.contextType,
         featureKinds,
       });
+    }
+  }
+
+  private async handleFeatureDrawn(
+    message: Extract<WebviewToExtensionMessage, { type: 'featureDrawn' }>
+  ): Promise<void> {
+    const { feature } = message;
+    console.log('[debrief] featureDrawn received:', feature.kind, feature.id);
+
+    if (feature.kind === 'POINT') {
+      // Add drawn point to locations list
+      const location: ReferenceLocation = {
+        id: feature.id,
+        name: feature.name ?? 'Drawn Point',
+        locationType: 'REFERENCE',
+        geometry: {
+          type: 'Point' as const,
+          coordinates: feature.geometry.coordinates as number[],
+        },
+        visible: true,
+        selected: true,
+      };
+      this.currentLocations = [...this.currentLocations, location];
+      console.log('[debrief] Added drawn point, locations count:', this.currentLocations.length);
+      if (this.layersTreeProvider) {
+        this.layersTreeProvider.setLocations(this.currentLocations);
+      } else {
+        console.warn('[debrief] layersTreeProvider is null — drawn point not added to Layers');
+      }
+    } else {
+      // Add drawn rectangle (or other shapes) to otherFeatures
+      const geoFeature: GeoJSONFeature = {
+        type: 'Feature',
+        id: feature.id,
+        geometry: {
+          type: feature.geometry.type,
+          coordinates: feature.geometry.coordinates as number[][],
+        },
+        properties: {
+          ...feature.properties,
+          id: feature.id,
+        },
+      };
+      this.otherFeatures = [...this.otherFeatures, geoFeature];
+      console.log('[debrief] Added drawn shape, shapes count:', this.otherFeatures.length);
+      if (this.layersTreeProvider) {
+        this.layersTreeProvider.setShapes(this.otherFeatures);
+      } else {
+        console.warn('[debrief] layersTreeProvider is null — drawn shape not added to Layers');
+      }
+    }
+
+    // Update activity panel
+    if (this.activityPanelProvider) {
+      this.activityPanelProvider.setFeatures(this.currentTracks, this.currentLocations);
+    }
+
+    // Record provenance (Feature: 094)
+    if (this.logService && this.stacService) {
+      try {
+        const store = this.getCurrentStore();
+        const plot = this.getCurrentPlot();
+        if (store?.path && plot?.itemPath) {
+          const toolId = feature.kind === 'POINT' ? 'draw-point' : 'draw-rectangle';
+          await this.logService.recordToolResult(
+            {
+              success: true,
+              features: {
+                type: 'FeatureCollection',
+                features: [{
+                  type: 'Feature',
+                  id: feature.id,
+                  geometry: feature.geometry as { type: string; coordinates: unknown },
+                  properties: feature.properties,
+                }],
+              },
+              durationMs: 0,
+              resultType: 'addition/drawn-feature',
+              sourceFeatureIds: [],
+              toolId,
+            },
+            {
+              createdFeatures: [feature.id],
+              parameters: {
+                featureKind: { value: feature.kind, default: false, tunable: false },
+              },
+            },
+            store.path,
+            plot.itemPath
+          );
+          console.log('[debrief] Provenance recorded for drawn feature:', feature.id);
+        }
+      } catch (err) {
+        console.warn('[debrief] Failed to record drawn feature provenance:', err);
+      }
     }
   }
 

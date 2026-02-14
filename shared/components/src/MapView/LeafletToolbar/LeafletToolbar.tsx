@@ -136,6 +136,9 @@ export interface LeafletToolbarProps {
 
   /** Callback when drawing mode changes */
   onDrawingModeChange?: (mode: DrawingMode) => void;
+
+  /** Callback when a shape is drawn via Geoman. Called with raw GeoJSON and the active drawing mode. */
+  onShapeCreated?: (geojson: GeoJSON.Feature, mode: DrawingMode) => void;
 }
 
 /**
@@ -154,6 +157,7 @@ class ToolbarControl extends L.Control {
   private dropdownContainer: HTMLDivElement | null = null;
   private isDropdownOpen: boolean = false;
   private outsideClickHandler: ((e: MouseEvent) => void) | null = null;
+  private onShapeCreated: ((geojson: GeoJSON.Feature, mode: DrawingMode) => void) | null = null;
 
   constructor(options: L.ControlOptions & {
     visibleBounds: Bounds | null;
@@ -162,6 +166,7 @@ class ToolbarControl extends L.Control {
     showFitButton: boolean;
     drawingMode?: DrawingMode;
     onDrawingModeChange?: (mode: DrawingMode) => void;
+    onShapeCreated?: (geojson: GeoJSON.Feature, mode: DrawingMode) => void;
   }) {
     super(options);
     this.visibleBounds = options.visibleBounds;
@@ -170,6 +175,7 @@ class ToolbarControl extends L.Control {
     this.showFitButton = options.showFitButton;
     this.drawingMode = options.drawingMode ?? null;
     this.onDrawingModeChange = options.onDrawingModeChange ?? null;
+    this.onShapeCreated = options.onShapeCreated ?? null;
   }
 
   onAdd(map: L.Map): HTMLElement {
@@ -211,6 +217,7 @@ class ToolbarControl extends L.Control {
     showFitButton: boolean;
     drawingMode?: DrawingMode;
     onDrawingModeChange?: (mode: DrawingMode) => void;
+    onShapeCreated?: (geojson: GeoJSON.Feature, mode: DrawingMode) => void;
   }): void {
     const drawingModeChanged = this.drawingMode !== (props.drawingMode ?? null);
     this.visibleBounds = props.visibleBounds;
@@ -219,6 +226,7 @@ class ToolbarControl extends L.Control {
     this.showFitButton = props.showFitButton;
     this.drawingMode = props.drawingMode ?? null;
     this.onDrawingModeChange = props.onDrawingModeChange ?? null;
+    this.onShapeCreated = props.onShapeCreated ?? null;
 
     // Only update the draw trigger button appearance if drawing mode changed
     // to avoid full re-render disrupting active drawing (US3)
@@ -441,8 +449,20 @@ class ToolbarControl extends L.Control {
     }
   }
 
-  // FR-008: Reset after shape completion
-  private handleShapeCreated = (): void => {
+  // FR-008: Reset after shape completion and emit drawn GeoJSON
+  private handleShapeCreated = (e: { layer: L.Layer }): void => {
+    const currentMode = this.drawingMode;
+
+    // Extract GeoJSON from the Geoman-created layer before resetting state
+    if (this.onShapeCreated && currentMode && 'toGeoJSON' in e.layer && typeof e.layer.toGeoJSON === 'function') {
+      const geojson = e.layer.toGeoJSON() as GeoJSON.Feature;
+      // Remove the temporary Geoman layer to avoid duplicates —
+      // the consumer will add the feature to the collection and it will
+      // be rendered by MapView's GeoJSON component instead.
+      e.layer.remove();
+      this.onShapeCreated(geojson, currentMode);
+    }
+
     this.drawingMode = null;
     this.onDrawingModeChange?.(null);
     this.updateDrawTriggerAppearance();
@@ -487,6 +507,7 @@ export function LeafletToolbar({
   showFitButton = true,
   drawingMode,
   onDrawingModeChange,
+  onShapeCreated,
 }: LeafletToolbarProps) {
   const map = useMap();
   const controlRef = useRef<ToolbarControl | null>(null);
@@ -508,6 +529,7 @@ export function LeafletToolbar({
       showFitButton,
       drawingMode,
       onDrawingModeChange,
+      onShapeCreated,
     });
     control.addTo(map);
     controlRef.current = control;
@@ -528,9 +550,10 @@ export function LeafletToolbar({
         showFitButton,
         drawingMode,
         onDrawingModeChange,
+        onShapeCreated,
       });
     }
-  }, [visibleBounds, fitPadding, showZoomControls, showFitButton, drawingMode, onDrawingModeChange]);
+  }, [visibleBounds, fitPadding, showZoomControls, showFitButton, drawingMode, onDrawingModeChange, onShapeCreated]);
 
   return null;
 }
