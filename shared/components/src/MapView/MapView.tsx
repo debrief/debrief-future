@@ -101,6 +101,9 @@ export interface MapViewProps {
 
   /** Callback when drawing mode changes (FR-004, FR-006, FR-007, FR-008) */
   onDrawingModeChange?: (mode: DrawingMode) => void;
+
+  /** Callback when a shape is drawn via Geoman. Called with raw GeoJSON and the active drawing mode. */
+  onShapeCreated?: (geojson: GeoJSON.Feature, mode: DrawingMode) => void;
 }
 
 // Component to handle map events, auto-fit, and programmatic viewport control
@@ -223,6 +226,7 @@ export function MapView({
   toolbarPosition = 'topleft',
   drawingMode,
   onDrawingModeChange,
+  onShapeCreated,
 }: MapViewProps) {
   // Normalize features to array and filter out features that can't be rendered
   const featureArray = useMemo(() => {
@@ -402,6 +406,7 @@ export function MapView({
             visibleBounds={visibleBounds}
             drawingMode={drawingMode}
             onDrawingModeChange={onDrawingModeChange}
+            onShapeCreated={onShapeCreated}
           />
         )}
 
