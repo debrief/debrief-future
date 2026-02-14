@@ -22,6 +22,8 @@ export interface TemporalTrackLayerProps {
   currentTime: number;
   displayMode: DisplayMode;
   isSelected?: boolean;
+  /** Full set of selected IDs — forwarded to PositionSymbolsLayer for per-position highlighting */
+  selectedIds?: Set<string>;
   markerStyle?: Partial<HighlightMarkerStyle>;
   onClick?: (featureId: string, event: React.MouseEvent) => void;
 }
@@ -31,6 +33,7 @@ export function TemporalTrackLayer({
   currentTime,
   displayMode,
   isSelected = false,
+  selectedIds,
   markerStyle,
   onClick,
 }: TemporalTrackLayerProps) {
@@ -100,6 +103,7 @@ export function TemporalTrackLayer({
           currentTime={currentTime}
           displayMode={displayMode}
           isSelected={isSelected}
+          selectedIds={selectedIds}
         />
       )}
     </>

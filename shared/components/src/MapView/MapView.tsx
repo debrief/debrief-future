@@ -449,6 +449,7 @@ export function MapView({
             currentTime={currentTime}
             displayMode={displayMode}
             isSelected={selectedIds.has(f.id)}
+            selectedIds={selectedIds}
             onClick={onSelect}
           />
         ))}
