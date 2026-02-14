@@ -14,6 +14,7 @@ import { OutlineProvider } from './providers/outlineProvider';
 import { TimeRangeViewProvider } from './views/timeRangeView';
 import { ActivityPanelViewProvider } from './views/activityPanelView';
 import { LogPanelViewProvider } from './views/logPanelView';
+import { ResultsPanelViewProvider } from './views/resultsPanelView';
 import { MapPanel } from './webview/mapPanel';
 import { StacService } from './services/stacService';
 import { ConfigService } from './services/configService';
@@ -190,10 +191,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   );
   logPanelProvider.setResultIdRegistry(resultIdRegistry);
 
+  // Register Results Panel (Feature: 095-results-bottom-panel)
+  const resultsPanelProvider = new ResultsPanelViewProvider(context.extensionUri);
+
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
     vscode.window.registerWebviewViewProvider('debrief.activityPanel', activityPanelProvider),
-    vscode.window.registerWebviewViewProvider('debrief.logPanel', logPanelProvider)
+    vscode.window.registerWebviewViewProvider('debrief.logPanel', logPanelProvider),
+    vscode.window.registerWebviewViewProvider('debrief.resultsPanel', resultsPanelProvider)
   );
 
   // Register outline provider for selection
@@ -272,7 +277,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     (panel) => {
       mapPanel = panel;
     },
-    resultIdRegistry
+    resultIdRegistry,
+    resultsPanelProvider
   );
   context.subscriptions.push(...commands);
 

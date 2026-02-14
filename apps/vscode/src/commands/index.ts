@@ -19,6 +19,7 @@ import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import type { MapPanel } from '../webview/mapPanel';
+import type { ResultsPanelViewProvider } from '../views/resultsPanelView';
 
 import { createOpenPlotCommand } from './openPlot';
 import { createAddStoreCommand, createRemoveStoreCommand, createUpdateStorePathCommand } from './addStore';
@@ -54,7 +55,8 @@ export function registerCommands(
   toolMatchAdapter: ToolMatchAdapter,
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void,
-  resultIdRegistry?: ResultIdRegistry
+  resultIdRegistry?: ResultIdRegistry,
+  resultsPanelProvider?: ResultsPanelViewProvider
 ): vscode.Disposable[] {
   const disposables: vscode.Disposable[] = [];
 
@@ -226,7 +228,7 @@ export function registerCommands(
     );
   }
 
-  // Open result artifact in editor
+  // Open result artifact in results panel (Feature: 095-results-bottom-panel)
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.openResultArtifact',
@@ -245,14 +247,39 @@ export function registerCommands(
           path.join(store.path, plot.itemPath)
         );
         const filePath = path.join(itemDir, 'assets', layer.artifactHref);
-        try {
-          const doc = await vscode.workspace.openTextDocument(filePath);
-          await vscode.window.showTextDocument(doc);
-        } catch {
-          void vscode.window.showErrorMessage(`Could not open artifact: ${layer.artifactHref}`);
+
+        // Route to results panel if available, otherwise fall back to text editor
+        if (resultsPanelProvider) {
+          try {
+            const plotTitle = plot.title ?? path.basename(path.dirname(plot.itemPath));
+            await resultsPanelProvider.openResult(
+              plot.itemPath,
+              plotTitle,
+              layer.artifactHref,
+              filePath
+            );
+          } catch {
+            void vscode.window.showErrorMessage(`Could not open artifact: ${layer.artifactHref}`);
+          }
+        } else {
+          try {
+            const doc = await vscode.workspace.openTextDocument(filePath);
+            await vscode.window.showTextDocument(doc);
+          } catch {
+            void vscode.window.showErrorMessage(`Could not open artifact: ${layer.artifactHref}`);
+          }
         }
       }
     )
+  );
+
+  // Show Results Panel command (Feature: 095-results-bottom-panel)
+  disposables.push(
+    vscode.commands.registerCommand('debrief.showResultsPanel', () => {
+      if (resultsPanelProvider) {
+        resultsPanelProvider.reveal();
+      }
+    })
   );
 
   // Layer commands

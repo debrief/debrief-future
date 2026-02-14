@@ -168,3 +168,19 @@ export {
 export type {
   FilterState as LogFilterState,
 } from './LogPanel';
+
+// ResultsPanel (Feature: 095-results-bottom-panel)
+export { ResultsPanel } from './ResultsPanel';
+export { ResultTabBar, ResultTabContent, ImageViewer, FallbackViewer } from './ResultsPanel';
+export type {
+  ResultsPanelProps,
+  ResultTabBarProps,
+  ResultTabContentProps,
+  ImageViewerProps,
+  FallbackViewerProps,
+  ResultTab,
+  TabContentPayload,
+  ResultArtifactType,
+  ResultsExtensionToWebviewMessage,
+  ResultsWebviewToExtensionMessage,
+} from './ResultsPanel';
