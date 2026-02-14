@@ -99,9 +99,12 @@ export { DEFAULT_COLLAPSE_STATE } from './ActivityPanel/types';
 export { ContextMenu } from './ContextMenu';
 export type { ContextMenuItem, ContextMenuProps } from './ContextMenu';
 
-// Drawing (Feature: 094-point-rectangle-drawing)
+// Drawing (Feature: 094-point-rectangle-drawing, 096-drawing-ux-persistence)
 export { createDrawnFeature } from './MapView/drawing';
-export type { CreateDrawnFeatureOptions } from './MapView/drawing';
+export type { CreateDrawnFeatureOptions, DrawnFeatureProvenance } from './MapView/drawing';
+export { DRAWING_GUIDANCE, CANCEL_HINT } from './MapView/drawing';
+export type { GuidanceText } from './MapView/drawing';
+export { DRAWING_PALETTE, getPaletteColour, getPaletteStyleOverrides } from './MapView/drawing';
 export type { DrawingMode } from './MapView/LeafletToolbar';
 
 // ChartRenderer (Feature: 085-chart-renderer)

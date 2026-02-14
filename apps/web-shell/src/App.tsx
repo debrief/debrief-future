@@ -29,8 +29,9 @@ import {
   ChartRenderer,
   transformDataset,
   createDrawnFeature,
+  getPaletteStyleOverrides,
 } from '@debrief/components';
-import type { DatasetEnvelope, DrawingMode } from '@debrief/components';
+import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance } from '@debrief/components';
 import type {
   CatalogOverviewItem,
   ToolsPanelItem,
@@ -456,18 +457,33 @@ export default function App() {
     store.getState().clearSelection();
   }, [store]);
 
-  // Handle shape drawn on map (Feature: 094)
+  // Handle shape drawn on map (Feature: 094, 096)
   const handleShapeCreated = useCallback((geojson: GeoJSON.Feature, mode: DrawingMode) => {
     const defaultName = mode === 'point' ? 'Drawn Point' : 'Drawn Rectangle';
     const promptLabel = mode === 'point' ? 'Name this point:' : 'Name this shape:';
     const name = window.prompt(promptLabel, defaultName);
     if (name === null) return; // user cancelled — discard the shape
 
-    const opts = mode === 'point' ? { name } : { label: name };
+    // FR-096: Get palette style overrides for sequential colour assignment
+    const paletteIndex = store.getState().drawingPaletteIndex;
+    const paletteOverrides = getPaletteStyleOverrides(mode, paletteIndex);
+
+    // FR-012: Build provenance metadata
+    const provenance: DrawnFeatureProvenance = {
+      source: 'user-drawn',
+      timestamp: new Date().toISOString(),
+      operator: 'unknown',
+      action: 'created',
+    };
+
+    const opts = mode === 'point'
+      ? { name, ...paletteOverrides, provenance }
+      : { label: name, ...paletteOverrides, provenance };
     const feature = createDrawnFeature(geojson, mode, opts);
     if (feature) {
       setDrawnFeatures(prev => [...prev, feature as DebriefFeature]);
       store.getState().setSelection([feature.id]);
+      store.getState().incrementDrawingPaletteIndex();
     }
   }, [store]);
 
