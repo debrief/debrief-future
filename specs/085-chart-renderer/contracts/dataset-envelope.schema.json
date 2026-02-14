@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/schemas/dataset-envelope.schema.json",
+  "title": "DatasetEnvelope",
+  "description": "Standard envelope for tool result datasets. Every dataset artifact conforms to this structure.",
+  "type": "object",
+  "required": ["type", "title", "metadata"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "pattern": "^[a-z_]+$",
+      "description": "Dataset subtype identifier matching the third segment of debrief:resultType annotation path."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable chart title."
+    },
+    "metadata": {
+      "$ref": "#/$defs/DatasetMetadata"
+    },
+    "data": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Flat array of data records (used for histograms, single-series charts)."
+    },
+    "series": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/DataSeries" },
+      "description": "Array of named data series (used for multi-line/multi-series charts)."
+    }
+  },
+  "oneOf": [
+    { "required": ["data"], "not": { "required": ["series"] } },
+    { "required": ["series"], "not": { "required": ["data"] } }
+  ],
+  "$defs": {
+    "DatasetMetadata": {
+      "type": "object",
+      "required": ["xAxis", "yAxis"],
+      "properties": {
+        "xAxis": { "$ref": "#/$defs/AxisDefinition" },
+        "yAxis": { "$ref": "#/$defs/AxisDefinition" }
+      },
+      "additionalProperties": false
+    },
+    "AxisDefinition": {
+      "type": "object",
+      "required": ["label", "type"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable axis label."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["nominal", "ordinal", "quantitative", "temporal"],
+          "description": "Data type for the axis. Maps to Vega-Lite encoding type."
+        },
+        "units": {
+          "type": "string",
+          "description": "Display units appended to axis label."
+        }
+      },
+      "additionalProperties": false
+    },
+    "DataSeries": {
+      "type": "object",
+      "required": ["name", "data"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Series name for the legend."
+        },
+        "data": {
+          "type": "array",
+          "items": { "type": "object" },
+          "description": "Array of data records for this series."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
