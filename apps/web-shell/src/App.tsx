@@ -656,7 +656,10 @@ export default function App() {
         store.getState().setSelection(message.payload.featureIds);
         break;
       case 'layer:format': {
-        const { featureIds, property, value, isPointOverride, positionIndex } = message.payload;
+        const { featureIds, property, isPointOverride, positionIndex } = message.payload;
+        // Coerce boolean string values ('true'/'false') to actual booleans
+        const rawValue = message.payload.value;
+        const value = rawValue === 'true' ? true : rawValue === 'false' ? false : rawValue;
         const targetIds = new Set(featureIds);
 
         // Helper: apply a style property to a feature-level style object

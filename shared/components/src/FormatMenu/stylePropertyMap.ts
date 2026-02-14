@@ -88,6 +88,8 @@ const PROPERTY_MAP: ReadonlyMap<string, readonly StylePropertyDescriptor[]> = ne
 
   // POSITION: per-point overrides when formatting individual track positions
   ['POSITION', [
+    { id: 'show_symbol', label: 'format.point.showSymbol', category: 'visibility', valueType: 'boolean' },
+    { id: 'show_label', label: 'format.point.showLabel', category: 'visibility', valueType: 'boolean' },
     { id: 'shape', label: 'format.point.shape', category: 'point', valueType: 'shape' },
     { id: 'fill_color', label: 'format.point.fillColor', category: 'point', valueType: 'color' },
     { id: 'fill_opacity', label: 'format.fill.opacity', category: 'point', valueType: 'number' },

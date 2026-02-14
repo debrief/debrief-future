@@ -6,13 +6,14 @@ import {
   RADIUS_PRESETS,
   DASH_PATTERN_PRESETS,
   SHAPE_PRESETS,
+  BOOLEAN_PRESETS,
 } from './presetPalette';
 
 export interface StylePropertyDescriptor {
   readonly id: string;
   readonly label: string;
   readonly category: string;
-  readonly valueType: 'color' | 'number' | 'shape' | 'dashPattern';
+  readonly valueType: 'color' | 'number' | 'shape' | 'dashPattern' | 'boolean';
 }
 
 /**
@@ -45,6 +46,11 @@ function getPresetsForValueType(valueType: string, propertyId: string): Cascadin
         label: p.label,
       }));
     }
+    case 'boolean':
+      return BOOLEAN_PRESETS.map(p => ({
+        id: `${propertyId}::${p.id}`,
+        label: p.label,
+      }));
     default:
       return [];
   }
@@ -152,6 +158,10 @@ export function resolvePresetValue(presetId: string, valueType: string): string 
         ...RADIUS_PRESETS,
       ];
       const preset = allNumericPresets.find(p => p.id === presetId);
+      return preset?.value;
+    }
+    case 'boolean': {
+      const preset = BOOLEAN_PRESETS.find(p => p.id === presetId);
       return preset?.value;
     }
     default:

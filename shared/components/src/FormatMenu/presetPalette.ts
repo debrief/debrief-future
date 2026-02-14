@@ -94,3 +94,11 @@ export const SHAPE_PRESETS: readonly PresetValue[] = [
   { id: 'diamond', label: 'Diamond', value: 'diamond' },
   { id: 'cross', label: 'Cross', value: 'cross' },
 ] as const;
+
+/**
+ * Boolean toggle presets for show/hide properties.
+ */
+export const BOOLEAN_PRESETS: readonly PresetValue[] = [
+  { id: 'true', label: 'Show', value: 'true' },
+  { id: 'false', label: 'Hide', value: 'false' },
+] as const;
