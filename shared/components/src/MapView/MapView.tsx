@@ -374,13 +374,21 @@ export function MapView({
     };
   }, [selectedIds]);
 
-  // Track a revision counter for the GeoJSON key — react-leaflet's GeoJSON
-  // component only renders on mount, so the key must change whenever data changes.
+  // Track revision counters for the GeoJSON key — react-leaflet's GeoJSON
+  // component only renders on mount, so the key must change whenever data
+  // or selection changes to force re-mount with updated styles.
   const geojsonRevision = useRef(0);
   const prevGeojsonRef = useRef(geojsonData);
   if (prevGeojsonRef.current !== geojsonData) {
     geojsonRevision.current += 1;
     prevGeojsonRef.current = geojsonData;
+  }
+
+  const selectionRevision = useRef(0);
+  const prevSelectedRef = useRef(selectedIds);
+  if (prevSelectedRef.current !== selectedIds) {
+    selectionRevision.current += 1;
+    prevSelectedRef.current = selectedIds;
   }
 
   const containerStyle: React.CSSProperties = {
@@ -422,7 +430,7 @@ export function MapView({
 
         {staticFeatures.length > 0 && (
           <GeoJSON
-            key={`geojson-${geojsonRevision.current}-${selectedIds.size}`}
+            key={`geojson-${geojsonRevision.current}-sel-${selectionRevision.current}`}
             data={geojsonData}
             style={featureStyle}
             pointToLayer={pointToLayer}
@@ -432,9 +440,10 @@ export function MapView({
 
         {staticFeatures.filter(isTrackFeature).map((f) => (
           <PositionSymbolsLayer
-            key={`pos-${String(f.id)}`}
+            key={`pos-${String(f.id)}-sel-${selectionRevision.current}`}
             feature={f}
             isSelected={selectedIds.has(f.id)}
+            selectedIds={selectedIds}
           />
         ))}
 
@@ -445,6 +454,7 @@ export function MapView({
             currentTime={currentTime}
             displayMode={displayMode}
             isSelected={selectedIds.has(f.id)}
+            selectedIds={selectedIds}
             onClick={onSelect}
           />
         ))}

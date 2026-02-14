@@ -186,6 +186,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - N/A — ephemeral in-memory state only (drawing mode is not persisted) (093-drawing-toolbar-shape-palette)
 - TypeScript 5.x (shared components, VS Code extension webview) + React 18.x, react-leaflet 4.2, Leaflet 1.9.x, @geoman-io/leaflet-geoman-free ^2.19.2, Zustand ^5.0.0 (@debrief/session-state) (094-point-rectangle-drawing)
 - N/A — drawn features are held in-memory in the webview's React state; persistence is out of scope (future feature 096) (094-point-rectangle-drawing)
+- TypeScript 5.x (shared components, session-state, VS Code extension) + React 18.x, @tanstack/react-virtual (existing), Zustand ^5.0.0 (session-state, existing), @debrief/schemas (existing) (094-show-points-in-layers)
+- N/A — expansion state is ephemeral UI state (not persisted) (094-show-points-in-layers)
 
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)

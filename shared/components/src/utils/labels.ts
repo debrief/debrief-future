@@ -1,5 +1,5 @@
 import type { DebriefFeature } from './types';
-import { isTrackFeature } from './types';
+import { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygonFeature } from './types';
 
 /**
  * Get a human-readable label for a feature.
@@ -22,8 +22,10 @@ export function getFeatureLabel(feature: DebriefFeature): string {
       feature.id ||
       'Unnamed Track'
     );
+  } else if (isMultiPointFeature(feature) || isMultiPolygonFeature(feature)) {
+    return feature.properties.label || feature.id || 'Unnamed Feature';
   } else {
-    // Schema: name; Legacy: label (used by shapes like CIRCLE, RECTANGLE, etc.)
+    // ReferenceLocation: name; Legacy: label
     return (
       feature.properties.name ||
       (props.label as string) ||
@@ -56,8 +58,12 @@ export function getFeatureIcon(feature: DebriefFeature): string {
       default:
         return 'vessel-unknown';
     }
+  } else if (isMultiPointFeature(feature)) {
+    return 'multi-point';
+  } else if (isMultiPolygonFeature(feature)) {
+    return 'multi-polygon';
   } else {
-    // Use location_type to determine icon
+    // ReferenceLocation: use location_type to determine icon
     switch (feature.properties.location_type) {
       case 'WAYPOINT':
         return 'location-waypoint';
@@ -115,7 +121,7 @@ export function getFeatureColor(feature: DebriefFeature): string {
       default:
         return '#999999';
     }
-  } else {
+  } else if (isReferenceLocation(feature)) {
     switch (feature.properties.location_type) {
       case 'DANGER_AREA':
         return '#cc0000'; // Red for danger
@@ -124,6 +130,8 @@ export function getFeatureColor(feature: DebriefFeature): string {
       default:
         return '#0066cc'; // Blue for other locations
     }
+  } else {
+    return '#0066cc'; // Default for multi-point/multi-polygon
   }
 }
 
@@ -138,6 +146,10 @@ export function getFeatureDescription(feature: DebriefFeature): string {
   if (isTrackFeature(feature)) {
     const trackType = feature.properties.track_type.toLowerCase().replace('_', ' ');
     return `${trackType} track`;
+  } else if (isMultiPointFeature(feature)) {
+    return feature.properties.description || 'multi-point';
+  } else if (isMultiPolygonFeature(feature)) {
+    return feature.properties.description || 'multi-polygon';
   } else {
     const locType = feature.properties.location_type.toLowerCase().replace('_', ' ');
     return feature.properties.description || locType;

@@ -12,6 +12,12 @@ import type {
   TrackTypeEnum,
   LocationTypeEnum,
   TimestampedPosition,
+  MultiPointFeature,
+  MultiPointFeatureProperties,
+  MultiPolygonFeature,
+  MultiPolygonFeatureProperties,
+  SegmentMetadata,
+  PositionStyleOverride,
 } from '@debrief/schemas';
 
 // Re-export all schema types for convenience
@@ -24,6 +30,12 @@ export type {
   TrackTypeEnum,
   LocationTypeEnum,
   TimestampedPosition,
+  MultiPointFeature,
+  MultiPointFeatureProperties,
+  MultiPolygonFeature,
+  MultiPolygonFeatureProperties,
+  SegmentMetadata,
+  PositionStyleOverride,
 };
 
 // Re-export DisplayMode from TimeController for use by MapView temporal rendering
@@ -33,7 +45,7 @@ export type { DisplayMode } from '../TimeController/types';
  * Union type for all Debrief feature types.
  * Components should accept either type interchangeably.
  */
-export type DebriefFeature = TrackFeature | ReferenceLocation;
+export type DebriefFeature = TrackFeature | ReferenceLocation | MultiPointFeature | MultiPolygonFeature;
 
 /**
  * GeoJSON FeatureCollection containing Debrief features.
@@ -76,4 +88,28 @@ export function isTrackFeature(feature: DebriefFeature): feature is TrackFeature
  */
 export function isReferenceLocation(feature: DebriefFeature): feature is ReferenceLocation {
   return feature.properties.kind === 'POINT';
+}
+
+/**
+ * Type guard to check if a feature is a MultiPointFeature
+ */
+export function isMultiPointFeature(feature: DebriefFeature): feature is MultiPointFeature {
+  return feature.properties.kind === 'MULTI_POINT';
+}
+
+/**
+ * Type guard to check if a feature is a MultiPolygonFeature
+ */
+export function isMultiPolygonFeature(feature: DebriefFeature): feature is MultiPolygonFeature {
+  return feature.properties.kind === 'MULTI_POLYGON';
+}
+
+/**
+ * Check if a feature is expandable (has child elements that can be shown).
+ */
+export function isExpandableFeature(feature: DebriefFeature): boolean {
+  if (isTrackFeature(feature)) return true;
+  if (isMultiPointFeature(feature)) return feature.geometry.coordinates.length > 0;
+  if (isMultiPolygonFeature(feature)) return feature.geometry.coordinates.length > 0;
+  return false;
 }
