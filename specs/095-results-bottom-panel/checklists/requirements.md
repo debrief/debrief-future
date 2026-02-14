@@ -2,6 +2,7 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-02-14
+**Updated**: 2026-02-14 (post-clarification)
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -38,6 +39,10 @@
 
 ## Notes
 
-- All items pass validation. Spec is ready for `/speckit.clarify` or `/speckit.plan`.
-- No [NEEDS CLARIFICATION] markers were needed — the feature description and epic context provided sufficient detail to make informed decisions.
-- Assumptions are documented for areas where reasonable defaults were applied (e.g., session-scoped tab state, delivery mechanism deferred to planning).
+- All items pass validation. Spec is ready for `/speckit.plan`.
+- 4 clarifications resolved during `/speckit.clarify` session:
+  1. Three entry points (auto-open, STAC browser, attachments menu) — all in scope
+  2. All artifact types (datasets, images, reports) displayed in panel — not chart-only
+  3. Per-plot tab scoping with disambiguation in titles
+  4. Live update when result files are overwritten — supports iterative tuning workflows
+- Assumptions updated to reflect STAC-based result persistence and file-watching.
