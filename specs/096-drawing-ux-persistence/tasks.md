@@ -47,9 +47,9 @@
 
 **Purpose**: Create new files and directories needed by all user stories
 
-- [ ] T001 Create guidance text constants module `shared/components/src/MapView/drawing/drawingGuidance.ts`
-- [ ] T002 [P] Create drawing palette module with 8-colour array and helpers `shared/components/src/MapView/drawing/drawingPalette.ts`
-- [ ] T003 [P] Create DrawingGuidanceOverlay directory `shared/components/src/MapView/DrawingGuidanceOverlay/`
+- [x] T001 Create guidance text constants module `shared/components/src/MapView/drawing/drawingGuidance.ts`
+- [x] T002 [P] Create drawing palette module with 8-colour array and helpers `shared/components/src/MapView/drawing/drawingPalette.ts`
+- [x] T003 [P] Create DrawingGuidanceOverlay directory `shared/components/src/MapView/DrawingGuidanceOverlay/`
 
 **Checkpoint**: New files exist, ready for implementation content.
 
@@ -61,10 +61,10 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Add `drawingPaletteIndex` field and `incrementDrawingPaletteIndex` action to spatial slice types `services/session-state/src/types/spatial.ts`
-- [ ] T005 Implement `drawingPaletteIndex` in spatial slice creator with default value 0 `services/session-state/src/store/slices/spatial.ts`
-- [ ] T006 [P] Extend `CreateDrawnFeatureOptions` interface with optional `provenance` field `shared/components/src/MapView/drawing/createDrawnFeature.ts`
-- [ ] T007 [P] Implement provenance embedding in `createDrawnFeature()` — when `options.provenance` is provided, add `properties.provenance: [options.provenance]` to the returned feature `shared/components/src/MapView/drawing/createDrawnFeature.ts`
+- [x] T004 Add `drawingPaletteIndex` field and `incrementDrawingPaletteIndex` action to spatial slice types `services/session-state/src/types/spatial.ts`
+- [x] T005 Implement `drawingPaletteIndex` in spatial slice creator with default value 0 `services/session-state/src/store/slices/spatial.ts`
+- [x] T006 [P] Extend `CreateDrawnFeatureOptions` interface with optional `provenance` field `shared/components/src/MapView/drawing/createDrawnFeature.ts`
+- [x] T007 [P] Implement provenance embedding in `createDrawnFeature()` — when `options.provenance` is provided, add `properties.provenance: [options.provenance]` to the returned feature `shared/components/src/MapView/drawing/createDrawnFeature.ts`
 
 **Checkpoint**: Foundation ready — session store has palette index, createDrawnFeature supports provenance, guidance/palette modules exist.
 
@@ -80,17 +80,17 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T008 [test] [US1] Unit test: `DRAWING_GUIDANCE` record returns correct text for each mode `shared/components/src/MapView/drawing/__tests__/drawingGuidance.test.ts`
-- [ ] T009 [P][test] [US1] Unit test: `DrawingGuidanceOverlay` renders nothing when `drawingMode` is null `shared/components/src/MapView/DrawingGuidanceOverlay/__tests__/DrawingGuidanceOverlay.test.tsx`
-- [ ] T010 [P][test] [US1] Unit test: `DrawingGuidanceOverlay` renders correct text for each mode and includes `data-testid` `shared/components/src/MapView/DrawingGuidanceOverlay/__tests__/DrawingGuidanceOverlay.test.tsx`
+- [x] T008 [test] [US1] Unit test: `DRAWING_GUIDANCE` record returns correct text for each mode `shared/components/src/MapView/drawing/__tests__/drawingGuidance.test.ts`
+- [x] T009 [P][test] [US1] Unit test: `DrawingGuidanceOverlay` renders nothing when `drawingMode` is null `shared/components/src/MapView/DrawingGuidanceOverlay/__tests__/DrawingGuidanceOverlay.test.tsx`
+- [x] T010 [P][test] [US1] Unit test: `DrawingGuidanceOverlay` renders correct text for each mode and includes `data-testid` `shared/components/src/MapView/DrawingGuidanceOverlay/__tests__/DrawingGuidanceOverlay.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Populate `drawingGuidance.ts` with `DRAWING_GUIDANCE` record and `CANCEL_HINT` constant per contract `shared/components/src/MapView/drawing/drawingGuidance.ts`
-- [ ] T012 [US1] Implement `DrawingGuidanceOverlay.tsx` — React component that renders guidance text when `drawingMode` is non-null, with `role="status"`, `aria-live="polite"`, and `data-testid="drawing-guidance-overlay"` `shared/components/src/MapView/DrawingGuidanceOverlay/DrawingGuidanceOverlay.tsx`
-- [ ] T013 [P] [US1] Create `DrawingGuidanceOverlay.css` — position fixed bottom-centre of parent, semi-transparent background, theme-aware using CSS custom properties `shared/components/src/MapView/DrawingGuidanceOverlay/DrawingGuidanceOverlay.css`
-- [ ] T014 [US1] Integrate `DrawingGuidanceOverlay` into `MapView.tsx` — pass `drawingMode` prop, render inside map container `shared/components/src/MapView/MapView.tsx`
-- [ ] T015 [US1] Export `DrawingGuidanceOverlay` from MapView barrel export (if applicable) `shared/components/src/MapView/index.ts`
+- [x] T011 [US1] Populate `drawingGuidance.ts` with `DRAWING_GUIDANCE` record and `CANCEL_HINT` constant per contract `shared/components/src/MapView/drawing/drawingGuidance.ts`
+- [x] T012 [US1] Implement `DrawingGuidanceOverlay.tsx` — React component that renders guidance text when `drawingMode` is non-null, with `role="status"`, `aria-live="polite"`, and `data-testid="drawing-guidance-overlay"` `shared/components/src/MapView/DrawingGuidanceOverlay/DrawingGuidanceOverlay.tsx`
+- [x] T013 [P] [US1] Create `DrawingGuidanceOverlay.css` — position fixed bottom-centre of parent, semi-transparent background, theme-aware using CSS custom properties `shared/components/src/MapView/DrawingGuidanceOverlay/DrawingGuidanceOverlay.css`
+- [x] T014 [US1] Integrate `DrawingGuidanceOverlay` into `MapView.tsx` — pass `drawingMode` prop, render inside map container `shared/components/src/MapView/MapView.tsx`
+- [x] T015 [US1] Export `DrawingGuidanceOverlay` from MapView barrel export (if applicable) `shared/components/src/MapView/index.ts`
 
 ### E2E Tests for User Story 1
 
@@ -112,15 +112,15 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T019 [test] [US2] Unit test: `createDrawnFeature()` with provenance option embeds `properties.provenance` array `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
+- [x] T019 [test] [US2] Unit test: `createDrawnFeature()` with provenance option embeds `properties.provenance` array `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
 - [ ] T020 [P][test] [US2] Unit test: `addDrawnFeature()` calls `addFeatures()` then `appendProvenance()` with correct arguments `apps/vscode/src/services/__tests__/stacService.addDrawnFeature.test.ts`
 - [ ] T021 [P][test] [US2] Unit test: `addDrawnFeature()` propagates errors when `addFeatures()` fails `apps/vscode/src/services/__tests__/stacService.addDrawnFeature.test.ts`
 
 ### Implementation for User Story 2
 
 - [ ] T022 [US2] Add `addDrawnFeature()` convenience method to `StacService` class — calls `addFeatures()` then `appendProvenance()` `apps/vscode/src/services/stacService.ts`
-- [ ] T023 [US2] Update `handleShapeCreated` in VS Code webview `mapView.tsx` — build provenance metadata, call `createDrawnFeature()` with provenance, persist via message passing to extension host `apps/vscode/src/webview/web/mapView.tsx`
-- [ ] T024 [P] [US2] Update `handleShapeCreated` in web-shell `App.tsx` — build provenance metadata, call `createDrawnFeature()` with provenance, add error handling with `setLogNotification()` `apps/web-shell/src/App.tsx`
+- [x] T023 [US2] Update `handleShapeCreated` in VS Code webview `mapView.tsx` — build provenance metadata, call `createDrawnFeature()` with provenance, persist via message passing to extension host `apps/vscode/src/webview/web/mapView.tsx`
+- [x] T024 [P] [US2] Update `handleShapeCreated` in web-shell `App.tsx` — build provenance metadata, call `createDrawnFeature()` with provenance, add error handling with `setLogNotification()` `apps/web-shell/src/App.tsx`
 - [ ] T025 [US2] Add failure notification: catch persistence errors and display non-blocking notification (5-second auto-clear) `apps/web-shell/src/App.tsx`
 
 **Checkpoint**: Drawn shapes persist to STAC with provenance. Failure shows notification. US2 acceptance scenarios 1-5 verified.
@@ -137,15 +137,15 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T026 [test] [US3] Unit test: `getPaletteColour()` returns expected colour for indices 0-7 and wraps at 8 `shared/components/src/MapView/drawing/__tests__/drawingPalette.test.ts`
-- [ ] T027 [P][test] [US3] Unit test: `getPaletteStyleOverrides()` returns correct style key per mode with palette colour `shared/components/src/MapView/drawing/__tests__/drawingPalette.test.ts`
-- [ ] T028 [P][test] [US3] Unit test: `DRAWING_PALETTE` contains exactly 8 distinct colour strings `shared/components/src/MapView/drawing/__tests__/drawingPalette.test.ts`
+- [x] T026 [test] [US3] Unit test: `getPaletteColour()` returns expected colour for indices 0-7 and wraps at 8 `shared/components/src/MapView/drawing/__tests__/drawingPalette.test.ts`
+- [x] T027 [P][test] [US3] Unit test: `getPaletteStyleOverrides()` returns correct style key per mode with palette colour `shared/components/src/MapView/drawing/__tests__/drawingPalette.test.ts`
+- [x] T028 [P][test] [US3] Unit test: `DRAWING_PALETTE` contains exactly 8 distinct colour strings `shared/components/src/MapView/drawing/__tests__/drawingPalette.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] Populate `drawingPalette.ts` with `DRAWING_PALETTE` array (8 colours), `getPaletteColour()`, and `getPaletteStyleOverrides()` `shared/components/src/MapView/drawing/drawingPalette.ts`
-- [ ] T030 [US3] Update `handleShapeCreated` in `App.tsx` — get palette style overrides from store index, pass to `createDrawnFeature()`, increment index after creation `apps/web-shell/src/App.tsx`
-- [ ] T031 [P] [US3] Update `handleShapeCreated` in `mapView.tsx` — same palette integration as App.tsx `apps/vscode/src/webview/web/mapView.tsx`
+- [x] T029 [US3] Populate `drawingPalette.ts` with `DRAWING_PALETTE` array (8 colours), `getPaletteColour()`, and `getPaletteStyleOverrides()` `shared/components/src/MapView/drawing/drawingPalette.ts`
+- [x] T030 [US3] Update `handleShapeCreated` in `App.tsx` — get palette style overrides from store index, pass to `createDrawnFeature()`, increment index after creation `apps/web-shell/src/App.tsx`
+- [x] T031 [P] [US3] Update `handleShapeCreated` in `mapView.tsx` — same palette integration as App.tsx `apps/vscode/src/webview/web/mapView.tsx`
 
 **Checkpoint**: Each drawn shape gets a sequentially assigned colour. Palette cycles at 8. Colours persist in feature styling. US3 acceptance scenarios 1-4 verified.
 
@@ -164,8 +164,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T034 [US4] Add CSS rule `.leaflet-container.debrief-drawing-active { cursor: crosshair; }` `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.css`
-- [ ] T035 [US4] Extend `ToolbarControl` in `LeafletToolbar.tsx` — toggle `debrief-drawing-active` class on the map container element when drawing mode changes `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx`
+- [x] T034 [US4] Add CSS rule `.leaflet-container.debrief-drawing-active { cursor: crosshair; }` `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.css`
+- [x] T035 [US4] Extend `ToolbarControl` in `LeafletToolbar.tsx` — toggle `debrief-drawing-active` class on the map container element when drawing mode changes `shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx`
 
 **Checkpoint**: Cursor changes to crosshair on drawing activation and reverts on completion/cancel. US4 acceptance scenarios 1-3 verified.
 
@@ -179,13 +179,13 @@
 
 ### Tests for User Story 5
 
-- [ ] T036 [test] [US5] Run existing stacService test suite and verify all pass `apps/vscode/src/services/__tests__/`
+- [x] T036 [test] [US5] Run existing stacService test suite and verify all pass `apps/vscode/src/services/__tests__/`
 - [ ] T037 [P][test] [US5] Unit test: `addDrawnFeature()` does not modify existing features when adding a drawn feature alongside imported data `apps/vscode/src/services/__tests__/stacService.addDrawnFeature.test.ts`
 
 ### Implementation for User Story 5
 
-- [ ] T038 [US5] Review `addDrawnFeature()` implementation for any side effects on existing features (code review task — no file changes expected)
-- [ ] T039 [US5] Verify STAC Item loading still handles items with zero drawn features (no-op path) `apps/vscode/src/services/stacService.ts`
+- [x] T038 [US5] Review `addDrawnFeature()` implementation for any side effects on existing features (code review task — no file changes expected)
+- [x] T039 [US5] Verify STAC Item loading still handles items with zero drawn features (no-op path) `apps/vscode/src/services/stacService.ts`
 
 **Checkpoint**: All existing STAC tests pass. No regressions. US5 acceptance scenarios 1-3 verified.
 
@@ -195,9 +195,9 @@
 
 **Purpose**: Add Storybook stories for the new components and visual states
 
-- [ ] T040 [P] Add "Guidance Overlay" story variant to `Drawing.stories.tsx` — shows overlay for each drawing mode with mode switching controls `shared/components/src/MapView/Drawing.stories.tsx`
-- [ ] T041 [P] Add "Palette Cycling" story variant to `Drawing.stories.tsx` — draws multiple shapes showing sequential colour assignment `shared/components/src/MapView/Drawing.stories.tsx`
-- [ ] T042 Verify stories render correctly in light, dark, and vscode themes
+- [x] T040 [P] Add "Guidance Overlay" story variant to `Drawing.stories.tsx` — shows overlay for each drawing mode with mode switching controls `shared/components/src/MapView/Drawing.stories.tsx`
+- [x] T041 [P] Add "Palette Cycling" story variant to `Drawing.stories.tsx` — draws multiple shapes showing sequential colour assignment `shared/components/src/MapView/Drawing.stories.tsx`
+- [x] T042 Verify stories render correctly in light, dark, and vscode themes
 
 **Checkpoint**: All new visual components have Storybook stories with theme variant coverage.
 
@@ -209,9 +209,9 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T043 Create evidence directory `specs/096-drawing-ux-persistence/evidence/`
-- [ ] T044 Capture test summary with pass/fail counts and key scenarios `specs/096-drawing-ux-persistence/evidence/test-summary.md`
-- [ ] T045 Record usage example: step-by-step drawing workflow demonstrating guidance, palette, and persistence `specs/096-drawing-ux-persistence/evidence/usage-example.md`
+- [x] T043 Create evidence directory `specs/096-drawing-ux-persistence/evidence/`
+- [x] T044 Capture test summary with pass/fail counts and key scenarios `specs/096-drawing-ux-persistence/evidence/test-summary.md`
+- [x] T045 Record usage example: step-by-step drawing workflow demonstrating guidance, palette, and persistence `specs/096-drawing-ux-persistence/evidence/usage-example.md`
 
 ### E2E Evidence Collection (REQUIRED for UI components)
 
@@ -223,8 +223,8 @@
 
 ### Media Content
 
-- [ ] T051 Create shipped blog post `specs/096-drawing-ux-persistence/media/shipped-post.md`
-- [ ] T052 [P] Create LinkedIn shipped summary `specs/096-drawing-ux-persistence/media/linkedin-shipped.md`
+- [x] T051 Create shipped blog post `specs/096-drawing-ux-persistence/media/shipped-post.md`
+- [x] T052 [P] Create LinkedIn shipped summary `specs/096-drawing-ux-persistence/media/linkedin-shipped.md`
 
 ### PR Creation
 
