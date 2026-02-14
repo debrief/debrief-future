@@ -247,9 +247,15 @@ function MapViewApp(): React.ReactElement {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Shape drawing callback — converts Geoman output to schema-compliant features
+  // Shape drawing callback — prompt for name, then convert Geoman output to schema-compliant features
   const handleShapeCreated = useCallback((geojson: GeoJSON.Feature, mode: DrawingMode) => {
-    const feature = createDrawnFeature(geojson, mode);
+    const defaultName = mode === 'point' ? 'Drawn Point' : 'Drawn Rectangle';
+    const promptLabel = mode === 'point' ? 'Name this point:' : 'Name this shape:';
+    const name = window.prompt(promptLabel, defaultName);
+    if (name === null) return; // user cancelled — discard the shape
+
+    const opts = mode === 'point' ? { name } : { label: name };
+    const feature = createDrawnFeature(geojson, mode, opts);
     if (feature) {
       setDrawnFeatures(prev => [...prev, feature as DebriefFeature]);
       setSelectedIds(new Set([feature.id]));

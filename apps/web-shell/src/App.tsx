@@ -458,7 +458,13 @@ export default function App() {
 
   // Handle shape drawn on map (Feature: 094)
   const handleShapeCreated = useCallback((geojson: GeoJSON.Feature, mode: DrawingMode) => {
-    const feature = createDrawnFeature(geojson, mode);
+    const defaultName = mode === 'point' ? 'Drawn Point' : 'Drawn Rectangle';
+    const promptLabel = mode === 'point' ? 'Name this point:' : 'Name this shape:';
+    const name = window.prompt(promptLabel, defaultName);
+    if (name === null) return; // user cancelled — discard the shape
+
+    const opts = mode === 'point' ? { name } : { label: name };
+    const feature = createDrawnFeature(geojson, mode, opts);
     if (feature) {
       setDrawnFeatures(prev => [...prev, feature as DebriefFeature]);
       store.getState().setSelection([feature.id]);
