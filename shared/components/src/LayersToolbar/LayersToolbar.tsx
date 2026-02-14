@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Button, Icon } from 'vscrui';
 import type { LayersToolbarProps } from './types';
 import { DEFAULT_FILTER_STATE, DEFAULT_LABELS, isFilterActive } from './types';
@@ -11,8 +11,8 @@ import './YellowHalo.css';
 type OpenDropdown = 'filter' | 'run' | 'associated' | null;
 
 /**
- * LayersToolbar renders 5 buttons in two groups:
- * - Selection-scoped (left): Delete, Visibility, Run
+ * LayersToolbar renders buttons in two groups:
+ * - Selection-scoped (left): Delete, Visibility, Format (097), Run
  * - Plot-scoped (right): Filter, Associated Files
  *
  * Only one dropdown is open at a time. Click-outside or Escape closes it.
@@ -30,6 +30,7 @@ export function LayersToolbar({
   showHidden = true,
   onDelete,
   onToggleVisibility,
+  onFormat,
   onRunTool,
   onRunAction,
   onFilterChange,
@@ -138,6 +139,23 @@ export function LayersToolbar({
             <Icon name="eye" />
           )}
         </Button>
+
+        {/* Format (Feature 097) */}
+        {onFormat && (
+          <Button
+            appearance="icon"
+            disabled={!hasSelection}
+            onClick={(e: React.MouseEvent) => {
+              if (!hasSelection) return;
+              const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+              onFormat(selectedFeatureIds, { x: rect.left, y: rect.bottom + 2 });
+            }}
+            title={labels.format}
+            aria-label={labels.format}
+          >
+            <Icon name="symbol-color" />
+          </Button>
+        )}
 
         {/* Run */}
         <div className="debrief-layers-toolbar__btn-wrapper">
