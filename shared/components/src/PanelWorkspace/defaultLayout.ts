@@ -6,8 +6,7 @@
  * Root (row)
  * ├── Sidebar Column (column, width: 25%)
  * │   ├── Navigation Panel (STAC File Tree) — 25% height
- * │   ├── Activity Panel (Time, Tools, Layers) — 50% height
- * │   └── Log Panel — 25% height
+ * │   └── Activity / Log (tabbed stack) — 75% height
  * └── Content Column (column, width: 75%)
  *     ├── Map Panel — 65% height
  *     └── Chart Panel — 35% height
@@ -64,10 +63,11 @@ export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
               },
             ],
           },
-          // Activity Panel (50% height)
+          // Activity + Log (tabbed stack, 75% height — Activity tab active by default)
           {
             type: 'stack',
-            height: 50,
+            height: 75,
+            activeItemIndex: 0,
             content: [
               {
                 type: 'component',
@@ -76,13 +76,6 @@ export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
                 minWidth: 240,
                 minHeight: 200,
               },
-            ],
-          },
-          // Log Panel (25% height)
-          {
-            type: 'stack',
-            height: 25,
-            content: [
               {
                 type: 'component',
                 componentType: PANEL_LOG,
