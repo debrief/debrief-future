@@ -2,10 +2,9 @@
  * Chart Panel wrapper — renders ChartRenderer in a GoldenLayout panel.
  */
 
-import type { PanelProps } from '../PanelWorkspace/panelRegistry';
 import { usePanelContext } from './PanelContext';
 
-export function ChartPanelWrapper(_props: PanelProps) {
+export function ChartPanelWrapper() {
   const ctx = usePanelContext();
 
   if (!ctx.chartProps) {

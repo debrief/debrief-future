@@ -2,10 +2,9 @@
  * Navigation Panel wrapper — renders StacFileTree in a GoldenLayout panel.
  */
 
-import type { PanelProps } from '../PanelWorkspace/panelRegistry';
 import { usePanelContext } from './PanelContext';
 
-export function NavigationPanel(_props: PanelProps) {
+export function NavigationPanel() {
   const ctx = usePanelContext();
 
   if (!ctx.stacFileTreeProps) {

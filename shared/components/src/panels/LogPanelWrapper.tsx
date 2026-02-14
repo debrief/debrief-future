@@ -2,10 +2,9 @@
  * Log Panel wrapper — renders LogPanel in a GoldenLayout panel.
  */
 
-import type { PanelProps } from '../PanelWorkspace/panelRegistry';
 import { usePanelContext } from './PanelContext';
 
-export function LogPanelWrapper(_props: PanelProps) {
+export function LogPanelWrapper() {
   const ctx = usePanelContext();
 
   if (!ctx.logPanelProps) {

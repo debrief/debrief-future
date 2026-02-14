@@ -2,10 +2,9 @@
  * Activity Panel wrapper — renders ActivityPanel in a GoldenLayout panel.
  */
 
-import type { PanelProps } from '../PanelWorkspace/panelRegistry';
 import { usePanelContext } from './PanelContext';
 
-export function ActivityPanelWrapper(_props: PanelProps) {
+export function ActivityPanelWrapper() {
   const ctx = usePanelContext();
 
   if (!ctx.activityPanelProps) {
