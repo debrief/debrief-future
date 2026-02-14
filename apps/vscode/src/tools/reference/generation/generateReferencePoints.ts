@@ -183,7 +183,9 @@ function generateGrid(
 
     for (let c = 0; c < cols; c++) {
       const idx = r * cols + c;
-      if (idx >= count) break;
+      if (idx >= count) {
+        break;
+      }
 
       let lon =
         cols === 1
