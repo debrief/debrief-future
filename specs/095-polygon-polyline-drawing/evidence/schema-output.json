@@ -1,0 +1,55 @@
+{
+  "polygon_example": {
+    "type": "Feature",
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [-4.15, 50.40],
+          [-4.08, 50.42],
+          [-4.05, 50.38],
+          [-4.10, 50.35],
+          [-4.15, 50.40]
+        ]
+      ]
+    },
+    "properties": {
+      "kind": "POLY",
+      "vertex_count": 4,
+      "label": "Drawn Polygon",
+      "style": {
+        "fill": true,
+        "fill_color": "#FF9800",
+        "fill_opacity": 0.15,
+        "stroke": true,
+        "color": "#E65100",
+        "weight": 2,
+        "opacity": 0.8
+      }
+    }
+  },
+  "polyline_example": {
+    "type": "Feature",
+    "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+    "geometry": {
+      "type": "LineString",
+      "coordinates": [
+        [-4.20, 50.35],
+        [-4.10, 50.38],
+        [-4.00, 50.36],
+        [-3.90, 50.40]
+      ]
+    },
+    "properties": {
+      "kind": "LINE",
+      "label": "Drawn Path",
+      "style": {
+        "stroke": true,
+        "color": "#00BCD4",
+        "weight": 3,
+        "opacity": 0.9
+      }
+    }
+  }
+}
