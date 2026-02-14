@@ -4,8 +4,8 @@
  * Part of Feature 097 (Feature Format Menu).
  */
 
-export type ValueType = 'color' | 'number' | 'shape' | 'dashPattern';
-export type PropertyCategory = 'line' | 'fill' | 'point' | 'stroke';
+export type ValueType = 'color' | 'number' | 'shape' | 'dashPattern' | 'boolean';
+export type PropertyCategory = 'line' | 'fill' | 'point' | 'stroke' | 'visibility';
 
 export interface StylePropertyDescriptor {
   readonly id: string;      // Dot-path to property within properties.style (e.g., "line.color")
@@ -98,11 +98,50 @@ const PROPERTY_MAP: ReadonlyMap<string, readonly StylePropertyDescriptor[]> = ne
     { id: 'weight', label: 'format.line.weight', category: 'line', valueType: 'number' },
   ]],
 
+  // POSITION: per-point overrides when formatting individual track positions
+  ['POSITION', [
+    { id: 'show_symbol', label: 'format.point.showSymbol', category: 'visibility', valueType: 'boolean' },
+    { id: 'show_label', label: 'format.point.showLabel', category: 'visibility', valueType: 'boolean' },
+    { id: 'shape', label: 'format.point.shape', category: 'point', valueType: 'shape' },
+    { id: 'fill_color', label: 'format.point.fillColor', category: 'point', valueType: 'color' },
+    { id: 'fill_opacity', label: 'format.fill.opacity', category: 'point', valueType: 'number' },
+    { id: 'stroke_color', label: 'format.stroke.color', category: 'stroke', valueType: 'color' },
+    { id: 'radius', label: 'format.point.radius', category: 'point', valueType: 'number' },
+  ]],
+
   // NARRATIVE, TEXT, SYSTEM: No editable properties
   ['NARRATIVE', []],
   ['TEXT', []],
+  ['TIMETEXT', []],
+  ['PERIODTEXT', []],
   ['SYSTEM', []],
 ]);
+
+/**
+ * Maps extended/dynamic kinds to their base kind for style property lookup.
+ */
+const KIND_FALLBACK: ReadonlyMap<string, string> = new Map([
+  ['DYNAMIC_RECT', 'RECTANGLE'],
+  ['DYNAMIC_CIRCLE', 'CIRCLE'],
+  ['DYNAMIC_POLY', 'POLY'],
+  ['ELLIPSE', 'CIRCLE'],
+  ['WHEEL', 'CIRCLE'],
+  ['POLYLINE', 'LINE'],
+  ['SENSOR', 'LINE'],
+  ['TMA_POS', 'POINT'],
+]);
+
+/**
+ * Default properties for polygon-like features not explicitly mapped.
+ */
+const POLYGON_DEFAULTS: readonly StylePropertyDescriptor[] = [
+  { id: 'fill_color', label: 'format.fill.color', category: 'fill', valueType: 'color' },
+  { id: 'fill_opacity', label: 'format.fill.opacity', category: 'fill', valueType: 'number' },
+  { id: 'color', label: 'format.stroke.color', category: 'stroke', valueType: 'color' },
+  { id: 'weight', label: 'format.stroke.weight', category: 'stroke', valueType: 'number' },
+  { id: 'opacity', label: 'format.stroke.opacity', category: 'stroke', valueType: 'number' },
+  { id: 'dash_array', label: 'format.stroke.dashArray', category: 'stroke', valueType: 'dashPattern' },
+];
 
 /**
  * Export the full map for testing purposes.
@@ -111,11 +150,16 @@ export const STYLE_PROPERTY_MAP = PROPERTY_MAP;
 
 /**
  * Returns the editable style properties for a given feature kind.
- * @param featureKind - FeatureKindEnum value (e.g., "TRACK", "POINT")
- * @returns Array of style property descriptors (empty if none)
+ * Falls back to KIND_FALLBACK mapping, then POLYGON_DEFAULTS for unknown kinds.
  */
 export function getEditableProperties(featureKind: string): readonly StylePropertyDescriptor[] {
-  return PROPERTY_MAP.get(featureKind) ?? [];
+  const direct = PROPERTY_MAP.get(featureKind);
+  if (direct !== undefined) return direct;
+
+  const fallbackKind = KIND_FALLBACK.get(featureKind);
+  if (fallbackKind) return PROPERTY_MAP.get(fallbackKind) ?? POLYGON_DEFAULTS;
+
+  return POLYGON_DEFAULTS;
 }
 
 /**
@@ -124,6 +168,6 @@ export function getEditableProperties(featureKind: string): readonly StyleProper
  * @returns true if the kind has at least one editable property
  */
 export function hasEditableProperties(featureKind: string): boolean {
-  const properties = PROPERTY_MAP.get(featureKind);
-  return properties !== undefined && properties.length > 0;
+  const properties = getEditableProperties(featureKind);
+  return properties.length > 0;
 }

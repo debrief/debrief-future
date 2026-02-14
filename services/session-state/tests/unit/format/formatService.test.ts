@@ -345,7 +345,9 @@ describe('formatService', () => {
 
       const properties = service.getEditableProperties('UNKNOWN_KIND');
 
-      expect(properties).toEqual([]);
+      // Unknown kinds fall back to polygon defaults
+      expect(properties.length).toBeGreaterThan(0);
+      expect(properties.map(p => p.property)).toContain('fill_color');
     });
   });
 });

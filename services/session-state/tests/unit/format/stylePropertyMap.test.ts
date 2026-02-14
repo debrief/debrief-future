@@ -14,7 +14,8 @@ import {
 const ALL_KINDS = [
   'TRACK', 'POINT', 'NARRATIVE', 'CIRCLE', 'RECTANGLE',
   'LINE', 'TEXT', 'VECTOR', 'SYSTEM', 'POLY',
-  'MULTI_POINT', 'MULTI_POLYGON',
+  'MULTI_POINT', 'MULTI_POLYGON', 'POSITION',
+  'TIMETEXT', 'PERIODTEXT',
 ] as const;
 
 describe('stylePropertyMap', () => {
@@ -148,9 +149,22 @@ describe('stylePropertyMap', () => {
   });
 
   describe('Unknown kind', () => {
-    it('returns empty array for unknown kind', () => {
+    it('returns polygon defaults for unknown kind', () => {
       const properties = getEditableProperties('UNKNOWN_KIND');
-      expect(properties).toEqual([]);
+      expect(properties.length).toBeGreaterThan(0);
+      const ids = properties.map(p => p.id);
+      expect(ids).toContain('fill_color');
+      expect(ids).toContain('color');
+    });
+
+    it('returns mapped base kind properties for dynamic kinds', () => {
+      const dynamicRect = getEditableProperties('DYNAMIC_RECT');
+      const rectangle = getEditableProperties('RECTANGLE');
+      expect(dynamicRect).toEqual(rectangle);
+
+      const dynamicCircle = getEditableProperties('DYNAMIC_CIRCLE');
+      const circle = getEditableProperties('CIRCLE');
+      expect(dynamicCircle).toEqual(circle);
     });
 
     it('does not throw for unknown kind', () => {
@@ -209,7 +223,7 @@ describe('stylePropertyMap', () => {
     });
 
     it('all categories are valid', () => {
-      const validCategories = new Set(['line', 'fill', 'point', 'stroke']);
+      const validCategories = new Set(['line', 'fill', 'point', 'stroke', 'visibility']);
 
       for (const [, properties] of STYLE_PROPERTY_MAP) {
         for (const property of properties) {
@@ -219,7 +233,7 @@ describe('stylePropertyMap', () => {
     });
 
     it('all valueTypes are valid', () => {
-      const validValueTypes = new Set(['color', 'number', 'shape', 'dashPattern']);
+      const validValueTypes = new Set(['color', 'number', 'shape', 'dashPattern', 'boolean']);
 
       for (const [, properties] of STYLE_PROPERTY_MAP) {
         for (const property of properties) {
