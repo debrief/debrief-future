@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://debrief.info/schemas/transformer-error.schema.json",
+  "title": "TransformerError",
+  "description": "Structured error returned when the transformer cannot convert a dataset to a render spec.",
+  "type": "object",
+  "required": ["type", "message"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["unsupported_type", "invalid_schema", "empty_data"],
+      "description": "Error category."
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable error description."
+    },
+    "datasetType": {
+      "type": "string",
+      "description": "The dataset type that caused the error (for unsupported_type errors)."
+    },
+    "details": {
+      "type": "object",
+      "description": "Additional context (e.g., validation errors)."
+    }
+  },
+  "additionalProperties": false
+}

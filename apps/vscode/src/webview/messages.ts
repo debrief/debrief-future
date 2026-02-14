@@ -250,6 +250,22 @@ export interface RequestRedoMessage {
   type: 'requestRedo';
 }
 
+/** Notify extension that a feature was drawn on the map (Webview → Host) */
+export interface FeatureDrawnMessage {
+  type: 'featureDrawn';
+  feature: {
+    id: string;
+    kind: string;
+    name?: string;
+    label?: string;
+    geometry: {
+      type: string;
+      coordinates: unknown;
+    };
+    properties: Record<string, unknown>;
+  };
+}
+
 /** Notify extension of viewport change for session state (Feature: 029) */
 export interface ViewportChangedMessage {
   type: 'viewportChanged';
@@ -323,7 +339,8 @@ export type WebviewToExtensionMessage =
   | WebviewReadyMessage
   | RepFileDropMessage
   | RequestUndoMessage
-  | RequestRedoMessage;
+  | RequestRedoMessage
+  | FeatureDrawnMessage;
 
 // ============================================================================
 // Re-exports for webview
