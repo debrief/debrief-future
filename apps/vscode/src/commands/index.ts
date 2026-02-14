@@ -232,7 +232,7 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.openResultArtifact',
-      async (layer: { artifactHref?: string }) => {
+      (layer: { artifactHref?: string }) => {
         if (!layer?.artifactHref) {
           return;
         }
@@ -252,7 +252,7 @@ export function registerCommands(
         if (resultsPanelProvider) {
           try {
             const plotTitle = plot.title ?? path.basename(path.dirname(plot.itemPath));
-            await resultsPanelProvider.openResult(
+            resultsPanelProvider.openResult(
               plot.itemPath,
               plotTitle,
               layer.artifactHref,
@@ -262,12 +262,10 @@ export function registerCommands(
             void vscode.window.showErrorMessage(`Could not open artifact: ${layer.artifactHref}`);
           }
         } else {
-          try {
-            const doc = await vscode.workspace.openTextDocument(filePath);
-            await vscode.window.showTextDocument(doc);
-          } catch {
-            void vscode.window.showErrorMessage(`Could not open artifact: ${layer.artifactHref}`);
-          }
+          void vscode.workspace.openTextDocument(filePath).then(
+            (doc) => void vscode.window.showTextDocument(doc),
+            () => void vscode.window.showErrorMessage(`Could not open artifact: ${layer.artifactHref}`)
+          );
         }
       }
     )

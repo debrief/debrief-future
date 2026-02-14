@@ -16,6 +16,23 @@ import type {
   TabContentPayload,
   ResultsWebviewToExtensionMessage,
 } from '../webview/messages';
+// Locally-defined types matching @debrief/components transformer types.
+// Defined here to avoid ESM-from-CJS import issues with @debrief/components.
+interface DatasetMetadata {
+  xAxis?: { field: string; label?: string };
+  yAxis?: { field: string; label?: string };
+  [key: string]: unknown;
+}
+interface DatasetEnvelope {
+  type: string;
+  title: string;
+  metadata: DatasetMetadata;
+  data?: Record<string, unknown>[];
+  series?: Array<{ name: string; data: Record<string, unknown>[] }>;
+}
+type TransformResult =
+  | { ok: true; spec: Record<string, unknown> }
+  | { ok: false; error: { type: string; message: string } };
 
 /** In-memory tab record maintained by the provider. */
 interface ResultTabRecord {
@@ -53,12 +70,12 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
    * Open a result artifact in the panel.
    * If the tab already exists, activates it (de-duplication).
    */
-  public async openResult(
+  public openResult(
     plotItemPath: string,
     plotTitle: string,
     resultFilePath: string,
     absolutePath: string
-  ): Promise<void> {
+  ): void {
     const tabId = `${plotItemPath}::${resultFilePath}`;
 
     // De-duplication: activate existing tab
@@ -70,7 +87,7 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
 
     // Determine artifact type and prepare content
     const artifactType = this._determineArtifactType(absolutePath);
-    const content = await this._prepareContent(absolutePath, artifactType);
+    const content = this._prepareContent(absolutePath, artifactType);
     const title = this._deriveTitle(absolutePath, artifactType, content);
 
     // Create tab record
@@ -247,16 +264,16 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
     return 'other';
   }
 
-  private async _prepareContent(
+  private _prepareContent(
     filePath: string,
     artifactType: ResultArtifactType
-  ): Promise<TabContentPayload> {
+  ): TabContentPayload {
     try {
       switch (artifactType) {
         case 'dataset':
-          return await this._prepareDatasetContent(filePath);
+          return this._prepareDatasetContent(filePath);
         case 'image':
-          return await this._prepareImageContent(filePath);
+          return this._prepareImageContent(filePath);
         case 'other':
           return this._prepareOtherContent(filePath);
       }
@@ -271,25 +288,22 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private async _prepareDatasetContent(filePath: string): Promise<TabContentPayload> {
+  private _prepareDatasetContent(filePath: string): TabContentPayload {
     try {
       const raw = fs.readFileSync(filePath, 'utf-8');
-      const data = JSON.parse(raw);
+      const data = JSON.parse(raw) as DatasetEnvelope;
 
-      // Attempt to use the transformer to create a Vega-Lite spec
-      // We import dynamically to avoid bundling issues
-      try {
-        const { transformDataset } = await import('@debrief/components');
-        const result = transformDataset(data);
-        if (result.success) {
-          return { artifactType: 'dataset', spec: result.spec };
-        }
-        return { artifactType: 'dataset', spec: null, error: result.error?.message ?? 'Transform failed' };
-      } catch {
-        // If transformDataset is not available, pass the raw data as spec
-        // The ChartRenderer can handle DatasetEnvelope directly in some cases
-        return { artifactType: 'dataset', spec: null, error: 'Chart transformer unavailable' };
+      // Use require() for @debrief/components since it's ESM and this file is CJS.
+      // esbuild bundles this correctly at build time.
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { transformDataset } = require('@debrief/components') as {
+        transformDataset: (d: DatasetEnvelope) => TransformResult;
+      };
+      const result = transformDataset(data);
+      if (result.ok) {
+        return { artifactType: 'dataset', spec: result.spec };
       }
+      return { artifactType: 'dataset', spec: null, error: result.error.message };
     } catch (err) {
       return {
         artifactType: 'dataset',
@@ -299,7 +313,7 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private async _prepareImageContent(filePath: string): Promise<TabContentPayload> {
+  private _prepareImageContent(filePath: string): TabContentPayload {
     const buffer = fs.readFileSync(filePath);
     const base64 = buffer.toString('base64');
     const mimeType = this._getMimeType(filePath);
@@ -333,7 +347,7 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
         return spec.title;
       }
       // Try nested title object
-      if (spec.title && typeof spec.title === 'object') {
+      if (spec.title !== null && spec.title !== undefined && typeof spec.title === 'object') {
         const titleObj = spec.title as Record<string, unknown>;
         if (typeof titleObj.text === 'string') {
           return titleObj.text;
@@ -345,9 +359,10 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
     if (artifactType === 'dataset') {
       try {
         const raw = fs.readFileSync(filePath, 'utf-8');
-        const data = JSON.parse(raw);
-        if (typeof data.title === 'string' && data.title) {
-          return data.title;
+        const data: unknown = JSON.parse(raw);
+        const envelope = data as Record<string, unknown>;
+        if (typeof envelope.title === 'string' && envelope.title !== '') {
+          return envelope.title;
         }
       } catch {
         // Fall through to filename
@@ -365,7 +380,6 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
     filePath: string,
     artifactType: ResultArtifactType
   ): void {
-    const uri = vscode.Uri.file(filePath);
     const pattern = new vscode.RelativePattern(
       vscode.Uri.file(path.dirname(filePath)),
       path.basename(filePath)
@@ -374,12 +388,12 @@ export class ResultsPanelViewProvider implements vscode.WebviewViewProvider {
 
     let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const handleChange = () => {
+    const handleChange = (): void => {
       if (debounceTimer) {
         clearTimeout(debounceTimer);
       }
-      debounceTimer = setTimeout(async () => {
-        const content = await this._prepareContent(filePath, artifactType);
+      debounceTimer = setTimeout(() => {
+        const content = this._prepareContent(filePath, artifactType);
         this._postMessage({
           type: 'results:updateContent',
           tabId,
