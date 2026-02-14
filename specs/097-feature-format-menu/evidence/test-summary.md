@@ -53,3 +53,32 @@ No regressions introduced.
 | FR-010: Mixed-kind union menu | `should return union with disabled items` | PASS |
 | FR-013: Single batch provenance | `should create single provenance entry for batch` | PASS |
 | FR-015: No properties for NARRATIVE/TEXT/SYSTEM | `Non-editable kinds` | PASS |
+
+### Shared Components — Diagnostic Tests
+
+| Test File | Tests | Passed | Failed | Duration |
+|-----------|-------|--------|--------|----------|
+| `format-diagnostic.test.ts` | 6 | 6 | 0 | 7ms |
+
+- `isTrackFeature` works on cast mocks
+- `getFeatureColor` reads `style.line.color` from tracks
+- `applyStyleChange` updates nested `style.line.color` path
+- `getFeatureColor` returns UPDATED colour after `applyStyleChange`
+- `isTrackFeature` still works on updated feature
+- Updated feature has different identity from original (immutable update)
+
+### Shared Components — Full Regression
+
+| Scope | Tests | Passed | Failed |
+|-------|-------|--------|--------|
+| shared/components unit tests | 540 | 540 | 0 |
+
+### Playwright E2E Tests
+
+| Suite | Passed | Failed | Duration |
+|-------|--------|--------|----------|
+| FormatMenu | 8 | 0 | ~12s |
+| FormatMenu Screenshots | 3 | 0 | ~5s |
+| **Total** | **11** | **0** | **20.0s** |
+
+See `e2e-summary.md` for full details. Key: Test 6 ("selecting a colour updates the indicator bar") confirms the CascadingMenu click-outside fix works correctly.
