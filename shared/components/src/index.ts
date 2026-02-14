@@ -129,7 +129,7 @@ export { createDefaultRegistry } from './PanelWorkspace/createDefaultRegistry';
 
 // Panel wrappers and context (Feature: 096-add-goldenlayout-panels)
 export { PanelContextProvider, usePanelContext } from './panels/PanelContext';
-export type { PanelContextValue, PanelComponents, ChartContextProps, ChartTabData } from './panels/PanelContext';
+export type { PanelContextValue, PanelComponents, ChartContextProps, ChartTabData, ResultArtifactType } from './panels/PanelContext';
 export { NavigationPanel } from './panels/NavigationPanel';
 export { ActivityPanelWrapper } from './panels/ActivityPanelWrapper';
 export { LogPanelWrapper } from './panels/LogPanelWrapper';
@@ -168,19 +168,3 @@ export {
 export type {
   FilterState as LogFilterState,
 } from './LogPanel';
-
-// ResultsPanel (Feature: 095-results-bottom-panel)
-export { ResultsPanel } from './ResultsPanel';
-export { ResultTabBar, ResultTabContent, ImageViewer, FallbackViewer } from './ResultsPanel';
-export type {
-  ResultsPanelProps,
-  ResultTabBarProps,
-  ResultTabContentProps,
-  ImageViewerProps,
-  FallbackViewerProps,
-  ResultTab,
-  TabContentPayload,
-  ResultArtifactType,
-  ResultsExtensionToWebviewMessage,
-  ResultsWebviewToExtensionMessage,
-} from './ResultsPanel';

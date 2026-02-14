@@ -26,7 +26,6 @@
   "activationEvents": [
     "onFileSystem:stac",
     "onView:debrief.stacExplorer",
-    "onView:debrief.resultsPanel",
     "onCommand:debrief.openPlot"
   ],
   "main": "./dist/extension.js",
@@ -232,12 +231,6 @@
         "title": "Open Catalog Overview",
         "category": "Debrief",
         "icon": "$(map)"
-      },
-      {
-        "command": "debrief.showResultsPanel",
-        "title": "Show Results Panel",
-        "category": "Debrief",
-        "icon": "$(graph)"
       }
     ],
     "keybindings": [
@@ -323,13 +316,6 @@
           "title": "Debrief Log",
           "icon": "resources/log-icon.svg"
         }
-      ],
-      "panel": [
-        {
-          "id": "debrief-results",
-          "title": "Debrief Results",
-          "icon": "resources/debrief-icon.svg"
-        }
       ]
     },
     "views": {
@@ -351,13 +337,6 @@
         {
           "id": "debrief.stacExplorer",
           "name": "STAC Stores"
-        }
-      ],
-      "debrief-results": [
-        {
-          "id": "debrief.resultsPanel",
-          "name": "Results",
-          "type": "webview"
         }
       ]
     },
@@ -550,7 +529,7 @@
     "build": "pnpm --filter @debrief/components build && npm run compile",
     "compile": "npm run compile:extension && npm run compile:webview",
     "compile:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
-    "compile:webview": "esbuild src/webview/web/mapView.tsx --bundle --outfile=dist/webview/mapView.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/catalogOverview.tsx --bundle --outfile=dist/webview/catalogOverview.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/logPanel.tsx --bundle --outfile=dist/webview/logPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/resultsPanel.tsx --bundle --outfile=dist/webview/resultsPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && cpy src/webview/web/styles.css dist/webview/",
+    "compile:webview": "esbuild src/webview/web/mapView.tsx --bundle --outfile=dist/webview/mapView.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/catalogOverview.tsx --bundle --outfile=dist/webview/catalogOverview.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && esbuild src/webview/web/logPanel.tsx --bundle --outfile=dist/webview/logPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text && cpy src/webview/web/styles.css dist/webview/",
     "watch": "npm run watch:extension & npm run watch:webview",
     "watch:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
     "watch:webview": "esbuild src/webview/web/mapView.tsx --bundle --outfile=dist/webview/mapView.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/timeController.tsx --bundle --outfile=dist/webview/timeController.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch & esbuild src/webview/web/activityPanel.tsx --bundle --outfile=dist/webview/activityPanel.js --format=iife --loader:.tsx=tsx --loader:.css=text --watch",
