@@ -4,7 +4,8 @@ import type { DebriefFeature } from '../utils/types';
 import type { DrawingMode } from './LeafletToolbar';
 import { MapView } from './MapView';
 import { ThemeProvider } from '../ThemeProvider';
-import { createDrawnFeature } from './drawing';
+import { createDrawnFeature, getPaletteStyleOverrides } from './drawing';
+import type { DrawnFeatureProvenance } from './drawing';
 
 const meta: Meta = {
   title: 'Components/MapView/Drawing',
@@ -150,6 +151,130 @@ export const AllShapes: Story = {
             </pre>
           </details>
         )}
+      </div>
+    );
+  },
+};
+
+/**
+ * Guidance Overlay story — demonstrates the DrawingGuidanceOverlay component.
+ *
+ * Use the toolbar buttons to switch between drawing modes.
+ * The guidance overlay appears at the bottom-centre of the map
+ * with mode-specific instruction text and "Press Esc to cancel".
+ *
+ * Feature: 096-drawing-ux-persistence (FR-001 through FR-006)
+ */
+export const GuidanceOverlay: Story = {
+  render: function GuidanceOverlayStory() {
+    const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ height: 500, position: 'relative' }}>
+          <MapView
+            features={[]}
+            drawingMode={drawingMode}
+            onDrawingModeChange={setDrawingMode}
+            autoFitBounds={false}
+            initialCenter={[50.4, -4.1]}
+            initialZoom={12}
+            height={500}
+          />
+        </div>
+        <p style={{ fontSize: 13, color: '#666' }}>
+          Current mode: <strong>{drawingMode ?? 'none'}</strong>
+          {drawingMode && ' — Look for the guidance text at the bottom of the map'}
+        </p>
+      </div>
+    );
+  },
+};
+
+/**
+ * Palette Cycling story — demonstrates sequential colour assignment.
+ *
+ * Draw multiple shapes to see each receive a different colour from
+ * the 8-colour palette. Colours cycle after 8 shapes.
+ *
+ * Feature: 096-drawing-ux-persistence (FR-007 through FR-010)
+ */
+export const PaletteCycling: Story = {
+  render: function PaletteCyclingStory() {
+    const [features, setFeatures] = useState<DebriefFeature[]>([]);
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
+    const [paletteIndex, setPaletteIndex] = useState(0);
+
+    const handleShapeCreated = useCallback(
+      (geojson: GeoJSON.Feature, mode: DrawingMode) => {
+        const paletteOverrides = getPaletteStyleOverrides(mode, paletteIndex);
+        const provenance: DrawnFeatureProvenance = {
+          source: 'user-drawn',
+          timestamp: new Date().toISOString(),
+          operator: 'storybook-user',
+          action: 'created',
+        };
+        const feature = createDrawnFeature(geojson, mode, {
+          ...paletteOverrides,
+          provenance,
+        });
+        if (feature) {
+          setFeatures((prev) => [...prev, feature as DebriefFeature]);
+          setSelectedIds(new Set([feature.id]));
+          setPaletteIndex((prev) => prev + 1);
+        }
+      },
+      [paletteIndex],
+    );
+
+    const handleSelect = useCallback((featureId: string) => {
+      setSelectedIds(new Set([featureId]));
+    }, []);
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ height: 500, position: 'relative' }}>
+          <MapView
+            features={features}
+            selectedIds={selectedIds}
+            onSelect={handleSelect}
+            drawingMode={drawingMode}
+            onDrawingModeChange={setDrawingMode}
+            onShapeCreated={handleShapeCreated}
+            autoFitBounds={false}
+            initialCenter={[50.4, -4.1]}
+            initialZoom={12}
+            height={500}
+          />
+        </div>
+        <div data-testid="palette-features-list">
+          <h4 style={{ margin: '0 0 8px' }}>
+            Drawn Features ({features.length}) — Palette index: {paletteIndex}
+          </h4>
+          {features.map((f) => {
+            const style = (f.properties as Record<string, unknown>).style as Record<string, unknown> | undefined;
+            const colour = (style?.color as string) ?? (style?.fill_color as string) ?? '#999';
+            return (
+              <div
+                key={f.id}
+                data-testid={`palette-feature-${f.id}`}
+                style={{
+                  padding: '6px 12px',
+                  marginBottom: 4,
+                  borderLeft: `4px solid ${colour}`,
+                  background: '#f5f5f5',
+                  borderRadius: 4,
+                  fontSize: 13,
+                }}
+              >
+                <span style={{ color: colour, fontWeight: 700 }}>{colour}</span>
+                {' — '}
+                {(f.properties as Record<string, unknown>).kind as string}
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   },
