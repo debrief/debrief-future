@@ -8,8 +8,8 @@
  * │   ├── Navigation Panel (STAC File Tree) — 25% height
  * │   └── Activity / Log (tabbed stack) — 75% height
  * └── Content Column (column, width: 75%)
- *     ├── Map Panel — 65% height
- *     └── Chart Panel — 35% height
+ *     └── Map Panel — 100% height
+ * (Chart panel added dynamically when result datasets are plotted)
  * ```
  */
 
@@ -87,15 +87,13 @@ export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
           },
         ],
       },
-      // Content Column (75% width)
+      // Content Column (75% width) — Map only; Chart added dynamically
       {
         type: 'column',
         width: 75,
         content: [
-          // Map Panel (65% height)
           {
             type: 'stack',
-            height: 65,
             content: [
               {
                 type: 'component',
@@ -103,20 +101,6 @@ export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
                 title: 'Map',
                 minWidth: 300,
                 minHeight: 200,
-              },
-            ],
-          },
-          // Chart Panel (35% height)
-          {
-            type: 'stack',
-            height: 35,
-            content: [
-              {
-                type: 'component',
-                componentType: PANEL_CHART,
-                title: 'Chart',
-                minWidth: 200,
-                minHeight: 150,
               },
             ],
           },

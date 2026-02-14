@@ -119,7 +119,7 @@ export type {
 
 // PanelWorkspace (Feature: 096-add-goldenlayout-panels)
 export { PanelWorkspace } from './PanelWorkspace';
-export type { PanelWorkspaceProps } from './PanelWorkspace';
+export type { PanelWorkspaceProps, PanelWorkspaceElement } from './PanelWorkspace';
 export { createPanelRegistry } from './PanelWorkspace';
 export type { PanelDefinition, PanelProps, PanelRegistry } from './PanelWorkspace';
 export { DEFAULT_LAYOUT_CONFIG, PANEL_NAVIGATION, PANEL_ACTIVITY, PANEL_LOG, PANEL_MAP, PANEL_CHART } from './PanelWorkspace/defaultLayout';

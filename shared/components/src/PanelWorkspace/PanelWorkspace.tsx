@@ -33,9 +33,11 @@ export interface PanelWorkspaceProps {
   className?: string;
 }
 
-/** Ref handle exposed via useImperativeHandle (if needed) */
-export interface PanelWorkspaceHandle {
-  resetLayout: () => void;
+/** Methods exposed on the workspace DOM element for external control */
+export interface PanelWorkspaceElement extends HTMLElement {
+  __resetLayout?: () => void;
+  __addPanel?: (componentType: string, title: string) => void;
+  __hasPanel?: (componentType: string) => boolean;
 }
 
 export function PanelWorkspace({
@@ -139,14 +141,40 @@ export function PanelWorkspace({
     onLayoutReset?.();
   }, [onLayoutReset]);
 
-  // Expose reset via a data attribute for external triggering
-  // (PanelWorkspace is controlled by the app, which can call resetLayout)
+  // Check if a component type is currently present in the layout
+  const hasPanel = useCallback((componentType: string): boolean => {
+    const gl = glRef.current;
+    if (!gl || !gl.rootItem) return false;
+    // Recursively search content items for the component type
+    const search = (items: readonly { contentItems: readonly unknown[]; type: string; [k: string]: unknown }[]): boolean => {
+      for (const item of items) {
+        if (item.type === 'component' && (item as { componentType?: unknown }).componentType === componentType) return true;
+        if ((item as { contentItems?: unknown[] }).contentItems) {
+          if (search((item as { contentItems: typeof items }).contentItems)) return true;
+        }
+      }
+      return false;
+    };
+    return search(gl.rootItem.contentItems as never[]);
+  }, []);
+
+  // Add a panel dynamically (e.g., Chart panel when results arrive)
+  const addPanel = useCallback((componentType: string, title: string) => {
+    const gl = glRef.current;
+    if (!gl || !gl.isInitialised) return;
+    if (hasPanel(componentType)) return; // already present
+    gl.addComponent(componentType, undefined, title);
+  }, [hasPanel]);
+
+  // Expose control methods on the DOM element for external triggering
   useEffect(() => {
-    const container = containerRef.current;
+    const container = containerRef.current as PanelWorkspaceElement | null;
     if (container) {
-      (container as HTMLElement & { __resetLayout?: () => void }).__resetLayout = handleResetLayout;
+      container.__resetLayout = handleResetLayout;
+      container.__addPanel = addPanel;
+      container.__hasPanel = hasPanel;
     }
-  }, [handleResetLayout]);
+  }, [handleResetLayout, addPanel, hasPanel]);
 
   return (
     <div

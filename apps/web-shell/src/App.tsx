@@ -32,6 +32,7 @@ import {
   PanelWorkspace,
   PanelContextProvider,
   createDefaultRegistry,
+  PANEL_CHART,
 } from '@debrief/components';
 import type { DatasetEnvelope, DrawingMode } from '@debrief/components';
 import type {
@@ -46,6 +47,7 @@ import type {
   PanelContextValue,
   PanelComponents,
   ChartContextProps,
+  PanelWorkspaceElement,
 } from '@debrief/components';
 import type { LogFilterState } from '@debrief/components';
 import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
@@ -754,6 +756,15 @@ export default function App() {
       createElement(PanelContextProvider, { value: panelContextValue }, element),
     [panelContextValue]
   );
+
+  // Dynamically add chart panel when chart data arrives
+  useEffect(() => {
+    if (chartTabs.length === 0) return;
+    const el = document.querySelector('[data-testid="panel-workspace"]') as PanelWorkspaceElement | null;
+    if (el?.__addPanel) {
+      el.__addPanel(PANEL_CHART, 'Chart');
+    }
+  }, [chartTabs.length > 0]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Render welcome view
   if (view === 'welcome') {
