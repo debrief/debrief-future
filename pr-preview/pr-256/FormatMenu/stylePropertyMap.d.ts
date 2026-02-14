@@ -2,6 +2,7 @@ import { StylePropertyDescriptor } from './formatMenuItems';
 
 /**
  * Returns the editable style properties for a given feature kind.
+ * Falls back to KIND_FALLBACK mapping, then POLYGON_DEFAULTS for unknown kinds.
  */
 export declare function getPropertiesForKind(featureKind: string): readonly StylePropertyDescriptor[];
 /**

@@ -4,7 +4,7 @@ export interface StylePropertyDescriptor {
     readonly id: string;
     readonly label: string;
     readonly category: string;
-    readonly valueType: 'color' | 'number' | 'shape' | 'dashPattern';
+    readonly valueType: 'color' | 'number' | 'shape' | 'dashPattern' | 'boolean';
 }
 /**
  * Build cascading menu items from style property descriptors.

@@ -40,4 +40,8 @@ export declare const DASH_PATTERN_PRESETS: readonly PresetValue[];
  * Matches PointShapeEnum values from schema.
  */
 export declare const SHAPE_PRESETS: readonly PresetValue[];
+/**
+ * Boolean toggle presets for show/hide properties.
+ */
+export declare const BOOLEAN_PRESETS: readonly PresetValue[];
 //# sourceMappingURL=presetPalette.d.ts.map
