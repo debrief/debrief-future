@@ -10,22 +10,24 @@
 ### Session 2026-02-14
 
 - Q: Which entry points should trigger opening a result in the panel? → A: All three — auto-open on tool completion, STAC browser, and attachments context menu in the activity panel.
+- Q: Should the panel only display chart-renderable datasets, or also handle non-chart artifacts (images, reports)? → A: All artifacts — the panel handles datasets as charts and also embeds image/report previews in tabs.
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - View a Tool Result After Tool Completion (Priority: P1)
 
-An analyst runs a tool (e.g., buffer zone analysis) that produces a result dataset. The tool's output is persisted to the `results/` sub-folder of the current plot (STAC item). Once stored, the system automatically opens the result in the results panel — a VS Code bottom panel in the same region as the terminal and output panels. The result is displayed as a chart within a tab. The analyst sees the chart without leaving their current editor layout.
+An analyst runs a tool (e.g., buffer zone analysis) that produces a result artifact. The tool's output is persisted to the `results/` sub-folder of the current plot (STAC item). Once stored, the system automatically opens the result in the results panel — a VS Code bottom panel in the same region as the terminal and output panels. The result is displayed in a tab: dataset results appear as charts (via the chart renderer #085), image results (e.g., PNG bearing-time plots) are displayed inline, and other file types show a preview or summary. The analyst sees the result without leaving their current editor layout.
 
-**Why this priority**: This is the primary flow — the analyst runs a tool and immediately sees the result. Without a panel to host the charts, the chart renderer component (#085) has nowhere to appear. This is the minimum viable feature.
+**Why this priority**: This is the primary flow — the analyst runs a tool and immediately sees the result. Without a panel to host result views, there is no integrated viewing experience. This is the minimum viable feature.
 
-**Independent Test**: Can be fully tested by triggering a tool that persists a result dataset to the plot's `results/` sub-folder and confirming the bottom panel opens with a tab containing the rendered chart.
+**Independent Test**: Can be fully tested by triggering a tool that persists a result artifact to the plot's `results/` sub-folder and confirming the bottom panel opens with a tab displaying the appropriate content (chart for datasets, inline preview for images).
 
 **Acceptance Scenarios**:
 
-1. **Given** a tool has completed and persisted a result dataset to the plot's `results/` sub-folder, **When** the persistence completes, **Then** the bottom panel opens (if not already visible) and displays a tab containing the rendered chart.
-2. **Given** the results panel is already open, **When** a new tool result is persisted, **Then** a new tab is created for the result without affecting existing tabs.
-3. **Given** the results panel is open with a chart tab, **When** the analyst clicks on the tab title, **Then** the tab becomes active and its chart is displayed.
+1. **Given** a tool has completed and persisted a dataset result to the plot's `results/` sub-folder, **When** the persistence completes, **Then** the bottom panel opens (if not already visible) and displays a tab containing the rendered chart.
+2. **Given** a tool has completed and persisted an image result (e.g., PNG) to the plot's `results/` sub-folder, **When** the persistence completes, **Then** the bottom panel opens and displays a tab with the image rendered inline.
+3. **Given** the results panel is already open, **When** a new tool result is persisted, **Then** a new tab is created for the result without affecting existing tabs.
+4. **Given** the results panel is open with a result tab, **When** the analyst clicks on the tab title, **Then** the tab becomes active and its content is displayed.
 
 ---
 
@@ -101,6 +103,7 @@ An analyst wants to access the results panel directly. They open it using a VS C
 - What happens when the analyst drags the results panel to a different location in VS Code (e.g., side panel)? The panel functions correctly in any location VS Code allows it to be placed.
 - What happens when the VS Code window is resized to a very narrow width? Charts within tabs resize responsively to fit the available space.
 - What happens when the analyst opens the same result file from different entry points (e.g., first via tool completion, then via STAC browser)? The existing tab is activated rather than creating a duplicate.
+- What happens when a result artifact is a file type the panel cannot preview (e.g., a binary report format)? The tab displays a summary (filename, type, size) and offers a link to open the file in VS Code's native viewer or the system default application.
 
 ## Requirements *(mandatory)*
 
@@ -108,8 +111,10 @@ An analyst wants to access the results panel directly. They open it using a VS C
 
 - **FR-001**: The system MUST provide a results panel that appears in the VS Code bottom panel area (alongside terminal, output, and problems panels).
 - **FR-002**: The results panel MUST support a tabbed layout where each tool result occupies its own tab.
-- **FR-003**: Each tab MUST host the chart renderer component (#085) to display the result's chart.
-- **FR-004**: Each tab MUST display a title derived from the result dataset's metadata (title field). If no title is available, the tab MUST display a fallback title based on the dataset type.
+- **FR-003**: For dataset-type results, each tab MUST host the chart renderer component (#085) to display the result as a chart.
+- **FR-017**: For image-type results (e.g., PNG, JPEG), each tab MUST render the image inline within the tab area, scaled to fit the available space.
+- **FR-018**: For other result file types that are neither datasets nor images, each tab MUST display a summary or fallback view (e.g., filename, file type, and file size) with an option to open the file in VS Code's native viewer.
+- **FR-004**: Each tab MUST display a title derived from the result's metadata (title field from dataset metadata, or filename for non-dataset artifacts). If no title is available, the tab MUST display a fallback title based on the result type.
 - **FR-005**: Tabs MUST be individually closable via a close button on each tab.
 - **FR-006**: When a tab is closed, the nearest remaining tab MUST become active. When the last tab is closed, the panel MUST show the empty state.
 - **FR-007**: The results panel MUST be openable via a VS Code command ("Show Results Panel") accessible from the command palette.
@@ -125,15 +130,15 @@ An analyst wants to access the results panel directly. They open it using a VS C
 
 ### Key Entities
 
-- **Results Panel**: A VS Code panel view that lives in the bottom panel area. It hosts multiple result tabs and manages tab lifecycle (creation, activation, closure). It is the container for all result visualisations.
-- **Result Tab**: An individual tab within the results panel. Each tab represents one tool result, has a title derived from the result metadata, and contains a chart renderer instance displaying the result's chart. Tabs can be activated, deactivated, and closed.
-- **Result Dataset**: The standard result dataset JSON (from #085's schema) that is passed to the panel for display. The panel delegates rendering to the chart renderer component — it does not interpret the dataset itself.
+- **Results Panel**: A VS Code panel view that lives in the bottom panel area. It hosts multiple result tabs and manages tab lifecycle (creation, activation, closure). It is the container for all result visualisations and previews.
+- **Result Tab**: An individual tab within the results panel. Each tab represents one tool result artifact. The tab's content depends on the artifact type: datasets are rendered as charts via the chart renderer (#085), images are displayed inline, and other file types show a summary with a link to open natively. Tabs can be activated, deactivated, and closed.
+- **Result Artifact**: Any file persisted to the `results/` sub-folder of a STAC item (plot). Artifacts fall into three display categories: (1) datasets — rendered as charts, (2) images — displayed inline, (3) other files — shown as a summary/fallback view. The artifact's STAC asset entry (in `item.json`) provides metadata including type, title, and file path.
 
 ## User Interface Flow
 
 ### Decision Analysis
 
-- **Primary Goal**: View and compare tool results as charts in a non-intrusive panel that does not disrupt the editor layout.
+- **Primary Goal**: View and compare tool result artifacts (charts, images, reports) in a non-intrusive panel that does not disrupt the editor layout.
 - **Key Decision(s)**:
   1. Which result tab to view (when multiple results are open)
   2. Whether to close a result tab that is no longer needed
@@ -156,7 +161,7 @@ An analyst wants to access the results panel directly. They open it using a VS C
 - **Empty State**: A centred message reading "No results to display. Run a tool to see results here." displayed when the panel is open but has no tabs.
 - **Loading State**: When a new result is being prepared, the tab is created immediately with a loading indicator (skeleton or spinner) while the chart renderer processes the dataset.
 - **Error State**: If a result's chart fails to render, the tab displays the chart renderer's error message within the tab area. Other tabs are unaffected.
-- **Success State**: The active tab displays a fully rendered chart with title, axes, labels, and data. Inactive tabs retain their rendered content for instant switching.
+- **Success State**: The active tab displays the result content appropriate to its type — a rendered chart for datasets, an inline image for image artifacts, or a summary view for other file types. Inactive tabs retain their rendered content for instant switching. The bottom panel placement ensures the current plot remains visible in the editor above while results are reviewed below.
 
 ## Success Criteria *(mandatory)*
 
@@ -189,7 +194,7 @@ An analyst wants to access the results panel directly. They open it using a VS C
 - VS Code bottom panel registration and display
 - Tabbed layout with tab creation, activation, and closure
 - Tab titles derived from result dataset metadata
-- Hosting the chart renderer component within tabs
+- Hosting result content within tabs: charts (via #085), inline images, and summary/fallback views for other types
 - Responsive chart sizing within the panel
 - Empty, loading, and error states
 - VS Code command to show the panel
