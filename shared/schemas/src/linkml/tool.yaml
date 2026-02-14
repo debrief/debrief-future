@@ -37,6 +37,8 @@ enums:
         description: Common ISO 8601 duration intervals (maps to DurationPresetEnum)
       NumericPreset:
         description: Common numeric values (maps to NumericPresetEnum)
+      ReferencePointPattern:
+        description: Reference point generation patterns (maps to ReferencePointPatternEnum)
 
 # ============================================================================
 # Classes

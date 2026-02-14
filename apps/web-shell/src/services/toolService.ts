@@ -84,6 +84,11 @@ import {
 } from '../tools/shape/manipulation/moveShape';
 
 import {
+  toolDefinition as generateReferencePointsDef,
+  execute as executeGenerateReferencePoints,
+} from '../../../vscode/src/tools/reference/generation/generateReferencePoints';
+
+import {
   toolDefinition as generateCoursesSpeedsDef,
   execute as executeGenerateCourseSpeeds,
 } from '../../../vscode/src/tools/track/manipulation/generateCoursesSpeeds';
@@ -165,6 +170,13 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
     {
       definition: moveShapeDef,
       execute: executeMoveShape,
+    },
+  ],
+  [
+    generateReferencePointsDef.name,
+    {
+      definition: generateReferencePointsDef,
+      execute: executeGenerateReferencePoints,
     },
   ],
   [

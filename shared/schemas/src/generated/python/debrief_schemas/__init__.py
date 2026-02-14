@@ -225,6 +225,218 @@ class PointShapeEnum(str, Enum):
     """
     Filled/stroked triangle (directional indicators)
     """
+    diamond = "diamond"
+    """
+    Diamond shape
+    """
+    cross = "cross"
+    """
+    Cross/plus shape
+    """
+
+
+class NamedColorEnum(str, Enum):
+    """
+    Predefined named colours for styling tool parameters
+    """
+    red = "red"
+    """
+    Red
+    """
+    green = "green"
+    """
+    Green
+    """
+    blue = "blue"
+    """
+    Blue
+    """
+    yellow = "yellow"
+    """
+    Yellow
+    """
+    orange = "orange"
+    """
+    Orange
+    """
+    purple = "purple"
+    """
+    Purple
+    """
+    cyan = "cyan"
+    """
+    Cyan
+    """
+    magenta = "magenta"
+    """
+    Magenta
+    """
+    white = "white"
+    """
+    White
+    """
+    black = "black"
+    """
+    Black
+    """
+    grey = "grey"
+    """
+    Grey
+    """
+
+
+class MarkerSymbolEnum(str, Enum):
+    """
+    Marker shapes for tool parameter choices (superset of PointShapeEnum)
+    """
+    circle = "circle"
+    """
+    Filled/stroked circle (default marker)
+    """
+    square = "square"
+    """
+    Filled/stroked square (reference points)
+    """
+    triangle = "triangle"
+    """
+    Filled/stroked triangle (directional indicators)
+    """
+    diamond = "diamond"
+    """
+    Diamond shape
+    """
+    cross = "cross"
+    """
+    Cross/plus shape
+    """
+
+
+class CardinalDirectionEnum(str, Enum):
+    """
+    Eight-point compass directions
+    """
+    N = "N"
+    """
+    North
+    """
+    NE = "NE"
+    """
+    North-East
+    """
+    E = "E"
+    """
+    East
+    """
+    SE = "SE"
+    """
+    South-East
+    """
+    S = "S"
+    """
+    South
+    """
+    SW = "SW"
+    """
+    South-West
+    """
+    W = "W"
+    """
+    West
+    """
+    NW = "NW"
+    """
+    North-West
+    """
+
+
+class DurationPresetEnum(str, Enum):
+    """
+    Common ISO 8601 duration presets for interval parameters
+    """
+    PT1M = "PT1M"
+    """
+    1 minute
+    """
+    PT5M = "PT5M"
+    """
+    5 minutes
+    """
+    PT15M = "PT15M"
+    """
+    15 minutes
+    """
+    PT30M = "PT30M"
+    """
+    30 minutes
+    """
+    PT1H = "PT1H"
+    """
+    1 hour
+    """
+    PT2H = "PT2H"
+    """
+    2 hours
+    """
+    PT6H = "PT6H"
+    """
+    6 hours
+    """
+    PT12H = "PT12H"
+    """
+    12 hours
+    """
+    PT24H = "PT24H"
+    """
+    24 hours
+    """
+
+
+class NumericPresetEnum(str, Enum):
+    """
+    Common numeric presets for count and distance parameters
+    """
+    n_1 = "n_1"
+    """
+    One
+    """
+    n_2 = "n_2"
+    """
+    Two
+    """
+    n_5 = "n_5"
+    """
+    Five
+    """
+    n_10 = "n_10"
+    """
+    Ten
+    """
+    n_25 = "n_25"
+    """
+    Twenty-five
+    """
+    n_50 = "n_50"
+    """
+    Fifty
+    """
+    n_100 = "n_100"
+    """
+    One hundred
+    """
+
+
+class ReferencePointPatternEnum(str, Enum):
+    """
+    Generation patterns for reference point placement
+    """
+    grid = "grid"
+    """
+    Evenly spaced grid of rows and columns
+    """
+    scatter = "scatter"
+    """
+    Randomly distributed points
+    """
 
 
 class LineCapEnum(str, Enum):
@@ -300,6 +512,36 @@ class SystemStateTypeEnum(str, Enum):
     selection = "selection"
     """
     Feature selection state (selected IDs)
+    """
+
+
+class ParameterTypeEnum(str, Enum):
+    """
+    Names of available schema-defined parameter types. Referenced by ToolParameter.param_type to link tool parameters to their value enums defined in common.yaml.
+    """
+    NamedColor = "NamedColor"
+    """
+    Predefined named colours (maps to NamedColorEnum)
+    """
+    MarkerSymbol = "MarkerSymbol"
+    """
+    Marker shapes (maps to MarkerSymbolEnum)
+    """
+    CardinalDirection = "CardinalDirection"
+    """
+    Eight-point compass directions (maps to CardinalDirectionEnum)
+    """
+    DurationPreset = "DurationPreset"
+    """
+    Common ISO 8601 duration intervals (maps to DurationPresetEnum)
+    """
+    NumericPreset = "NumericPreset"
+    """
+    Common numeric values (maps to NumericPresetEnum)
+    """
+    ReferencePointPattern = "ReferencePointPattern"
+    """
+    Reference point generation patterns (maps to ReferencePointPatternEnum)
     """
 
 
@@ -468,8 +710,8 @@ class GeoJSONPoint(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -483,14 +725,15 @@ class GeoJSONPoint(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Point'} })
     coordinates: list[float] = Field(default=..., description="""[longitude, latitude] in degrees""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon']} })
 
 
@@ -504,8 +747,8 @@ class GeoJSONEmptyPoint(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -519,14 +762,15 @@ class GeoJSONEmptyPoint(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Point'} })
     coordinates: list[float] = Field(default=..., description="""Empty array for non-spatial features""", max_length=0, json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon']} })
 
 
@@ -540,8 +784,8 @@ class GeoJSONLineString(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -555,14 +799,15 @@ class GeoJSONLineString(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'LineString'} })
     coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon']} })
 
 
@@ -576,8 +821,8 @@ class GeoJSONPolygon(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -591,14 +836,52 @@ class GeoJSONPolygon(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Polygon'} })
     coordinates: list[float] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon']} })
+
+
+class GeoJSONMultiPoint(ConfiguredBaseModel):
+    """
+    GeoJSON MultiPoint geometry for reference point sets
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
+
+    type: Literal["MultiPoint"] = Field(default=..., description="""Geometry type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'ToolParameter',
+                       'FileProvEntry'],
+         'equals_string': 'MultiPoint'} })
+    coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon']} })
 
 
@@ -612,8 +895,8 @@ class GeoJSONMultiLineString(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -627,50 +910,15 @@ class GeoJSONMultiLineString(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'MultiLineString'} })
     coordinates: list[float] = Field(default=..., description="""Array of LineString coordinate arrays""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
-                       'GeoJSONMultiPolygon']} })
-
-
-class GeoJSONMultiPoint(ConfiguredBaseModel):
-    """
-    GeoJSON MultiPoint geometry for multi-point tool results
-    """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
-
-    type: Literal["MultiPoint"] = Field(default=..., description="""Geometry type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
-                       'GeoJSONEmptyPoint',
-                       'GeoJSONLineString',
-                       'GeoJSONPolygon',
                        'GeoJSONMultiLineString',
-                       'GeoJSONMultiPoint',
-                       'GeoJSONMultiPolygon',
-                       'TrackFeature',
-                       'ReferenceLocation',
-                       'SystemState',
-                       'MultiPointFeature',
-                       'MultiPolygonFeature',
-                       'NarrativeEntry',
-                       'CircleAnnotation',
-                       'RectangleAnnotation',
-                       'LineAnnotation',
-                       'TextAnnotation',
-                       'VectorAnnotation',
-                       'PolyAnnotation',
-                       'FileProvEntry'],
-         'equals_string': 'MultiPoint'} })
-    coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
-                       'GeoJSONEmptyPoint',
-                       'GeoJSONLineString',
-                       'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
-                       'GeoJSONMultiPoint',
                        'GeoJSONMultiPolygon']} })
 
 
@@ -684,8 +932,8 @@ class GeoJSONMultiPolygon(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -699,14 +947,15 @@ class GeoJSONMultiPolygon(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'MultiPolygon'} })
     coordinates: list[float] = Field(default=..., description="""Array of polygon coordinate arrays (each an array of linear rings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon']} })
 
 
@@ -723,8 +972,10 @@ class SegmentMetadata(ConfiguredBaseModel):
     name: Optional[str] = Field(default=None, description="""Human-readable segment name""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'PointMetadataEntry',
                        'ReferenceLocationProperties',
-                       'Tool']} })
+                       'Tool',
+                       'ToolParameter']} })
     style: Optional[LineProperties] = Field(default=None, description="""Per-segment line styling override""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -784,8 +1035,10 @@ class SensorData(ConfiguredBaseModel):
     name: str = Field(default=..., description="""Sensor identifier (e.g., \"TOWED_ARRAY\")""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'PointMetadataEntry',
                        'ReferenceLocationProperties',
-                       'Tool']} })
+                       'Tool',
+                       'ToolParameter']} })
     base_frequency: Optional[float] = Field(default=None, description="""Reference frequency in Hz""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'SensorData']} })
     offset: Optional[float] = Field(default=None, description="""Sensor offset from host platform in metres""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorData']} })
     worm_in_hole: Optional[bool] = Field(default=None, description="""Display mode flag""", json_schema_extra = { "linkml_meta": {'domain_of': ['SensorData']} })
@@ -833,8 +1086,10 @@ class TUAData(ConfiguredBaseModel):
     name: str = Field(default=..., description="""TUA collection name""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'PointMetadataEntry',
                        'ReferenceLocationProperties',
-                       'Tool']} })
+                       'Tool',
+                       'ToolParameter']} })
     host_track_name: str = Field(default=..., description="""Name of track this TUA set relates to""", json_schema_extra = { "linkml_meta": {'domain_of': ['TUAData']} })
     solutions: list[TUASolution] = Field(default=..., description="""Array of TUA estimates""", json_schema_extra = { "linkml_meta": {'domain_of': ['TUAData']} })
 
@@ -930,8 +1185,8 @@ class TrackFeature(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -945,6 +1200,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier (UUID recommended)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -992,6 +1248,22 @@ class TrackFeature(ConfiguredBaseModel):
                        'MultiPolygonFeature']} })
 
 
+class PointMetadataEntry(ConfiguredBaseModel):
+    """
+    Metadata for a single point within a MultiPoint reference set. Entries are parallel to the MultiPoint coordinates array. Downstream tools (#081 classifier) extend entries with zone/color fields.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
+
+    index: int = Field(default=..., description="""0-based ordinal matching coordinates array position""", json_schema_extra = { "linkml_meta": {'domain_of': ['PointMetadataEntry']} })
+    name: str = Field(default=..., description="""Human-readable point label (e.g., \"Ref 1\")""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'SensorData',
+                       'TUAData',
+                       'PointMetadataEntry',
+                       'ReferenceLocationProperties',
+                       'Tool',
+                       'ToolParameter']} })
+
+
 class ReferenceLocationProperties(ConfiguredBaseModel):
     """
     Properties for a ReferenceLocation
@@ -1015,13 +1287,16 @@ class ReferenceLocationProperties(ConfiguredBaseModel):
     name: str = Field(default=..., description="""Reference location name""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'PointMetadataEntry',
                        'ReferenceLocationProperties',
-                       'Tool']} })
+                       'Tool',
+                       'ToolParameter']} })
     location_type: LocationTypeEnum = Field(default=..., description="""Type of reference""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
     description: Optional[str] = Field(default=None, description="""Additional description""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'Tool']} })
+                       'Tool',
+                       'ToolParameter']} })
     symbol: Optional[str] = Field(default=None, description="""Map symbol identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
                        'PositionStyleOverride',
                        'ReferenceLocationProperties',
@@ -1046,11 +1321,12 @@ class ReferenceLocationProperties(ConfiguredBaseModel):
                        'PolyAnnotationProperties']} })
     valid_from: Optional[datetime ] = Field(default=None, description="""Start of validity period""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
     valid_until: Optional[datetime ] = Field(default=None, description="""End of validity period""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
+    point_metadata: Optional[list[PointMetadataEntry]] = Field(default=[], description="""Per-point metadata array, parallel to MultiPoint coordinates. Each entry contains at minimum an index and name. Downstream tools extend entries with zone/color fields.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
 
 
 class ReferenceLocation(ConfiguredBaseModel):
     """
-    GeoJSON Feature for fixed reference points
+    GeoJSON Feature for fixed reference points or reference point sets
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
@@ -1058,8 +1334,8 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -1073,6 +1349,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1088,7 +1365,8 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'VectorAnnotation',
                        'PolyAnnotation',
                        'Tool']} })
-    geometry: GeoJSONPoint = Field(default=..., description="""Location (Point) or area (Polygon)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+    geometry: Union[GeoJSONMultiPoint, GeoJSONPoint] = Field(default=..., description="""Location (Point) or reference point set (MultiPoint)""", json_schema_extra = { "linkml_meta": {'any_of': [{'range': 'GeoJSONPoint'}, {'range': 'GeoJSONMultiPoint'}],
+         'domain_of': ['TrackFeature',
                        'ReferenceLocation',
                        'SystemState',
                        'MultiPointFeature',
@@ -1156,8 +1434,8 @@ class SystemState(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -1171,6 +1449,7 @@ class SystemState(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""State identifier (must start with 'state.')""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1272,7 +1551,8 @@ class MultiPointFeatureProperties(ConfiguredBaseModel):
     description: Optional[str] = Field(default=None, description="""Additional description or notes""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'Tool']} })
+                       'Tool',
+                       'ToolParameter']} })
 
 
 class MultiPointFeature(ConfiguredBaseModel):
@@ -1285,8 +1565,8 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -1300,6 +1580,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier (UUID recommended)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1392,7 +1673,8 @@ class MultiPolygonFeatureProperties(ConfiguredBaseModel):
     description: Optional[str] = Field(default=None, description="""Additional description or notes""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'Tool']} })
+                       'Tool',
+                       'ToolParameter']} })
 
 
 class MultiPolygonFeature(ConfiguredBaseModel):
@@ -1405,8 +1687,8 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -1420,6 +1702,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier (UUID recommended)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1533,8 +1816,8 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -1548,6 +1831,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1663,8 +1947,8 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -1678,6 +1962,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1791,8 +2076,8 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -1806,6 +2091,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -1919,8 +2205,8 @@ class LineAnnotation(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -1934,6 +2220,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2038,8 +2325,8 @@ class TextAnnotation(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -2053,6 +2340,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2169,8 +2457,8 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -2184,6 +2472,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2299,8 +2588,8 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -2314,6 +2603,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Feature'} })
     id: str = Field(default=..., description="""Unique identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
@@ -2401,14 +2691,61 @@ class Tool(ConfiguredBaseModel):
     name: str = Field(default=..., description="""Human-readable name displayed in menus and panels. Should be concise (2-4 words).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
                        'TUAData',
+                       'PointMetadataEntry',
                        'ReferenceLocationProperties',
-                       'Tool']} })
+                       'Tool',
+                       'ToolParameter']} })
     description: Optional[str] = Field(default=None, description="""Brief description of what the tool does. Displayed in tooltips and help text. Should be one sentence.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'Tool']} })
+                       'Tool',
+                       'ToolParameter']} })
     version: Optional[str] = Field(default=None, description="""Tool version string for provenance tracking. Follows semantic versioning (e.g., \"1.0.0\").""", json_schema_extra = { "linkml_meta": {'domain_of': ['Tool']} })
     requirements: Optional[list[SelectionRequirement]] = Field(default=[], description="""List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Tool']} })
+
+
+class ToolParameter(ConfiguredBaseModel):
+    """
+    A configurable parameter for a tool. Supports string, number, boolean, and enum types with optional default values, explicit choices, and schema-defined parameter type references.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/tool'})
+
+    name: str = Field(default=..., description="""Parameter identifier (kebab-case)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
+                       'SensorData',
+                       'TUAData',
+                       'PointMetadataEntry',
+                       'ReferenceLocationProperties',
+                       'Tool',
+                       'ToolParameter']} })
+    type: str = Field(default=..., description="""Value type discriminator: string, number, boolean, enum""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+                       'GeoJSONEmptyPoint',
+                       'GeoJSONLineString',
+                       'GeoJSONPolygon',
+                       'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
+                       'GeoJSONMultiPolygon',
+                       'TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation',
+                       'ToolParameter',
+                       'FileProvEntry']} })
+    description: str = Field(default=..., description="""Human-readable parameter description""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'Tool',
+                       'ToolParameter']} })
+    required: Optional[bool] = Field(default=None, description="""Whether parameter must be provided""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolParameter']} })
+    default_value: Optional[str] = Field(default=None, description="""Default value if not provided""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolParameter']} })
+    param_type: Optional[ParameterTypeEnum] = Field(default=None, description="""References a schema-defined parameter-type enum by name. When set, the client resolves enum values from generated types rather than using inline choices.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ToolParameter']} })
 
 
 class LogEntry(ConfiguredBaseModel):
@@ -2542,8 +2879,8 @@ class FileProvEntry(ConfiguredBaseModel):
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
-                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPoint',
+                       'GeoJSONMultiLineString',
                        'GeoJSONMultiPolygon',
                        'TrackFeature',
                        'ReferenceLocation',
@@ -2557,6 +2894,7 @@ class FileProvEntry(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation',
+                       'ToolParameter',
                        'FileProvEntry']} })
     timestamp: datetime  = Field(default=..., description="""When the event occurred (ISO 8601 with timezone).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry', 'TuneAnnotation', 'FileProvEntry']} })
     asset: Optional[str] = Field(default=None, description="""Path to snapshot file (for snapshot events).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SnapshotRef', 'FileProvEntry']} })
@@ -2577,8 +2915,8 @@ GeoJSONPoint.model_rebuild()
 GeoJSONEmptyPoint.model_rebuild()
 GeoJSONLineString.model_rebuild()
 GeoJSONPolygon.model_rebuild()
-GeoJSONMultiLineString.model_rebuild()
 GeoJSONMultiPoint.model_rebuild()
+GeoJSONMultiLineString.model_rebuild()
 GeoJSONMultiPolygon.model_rebuild()
 SegmentMetadata.model_rebuild()
 SensorContact.model_rebuild()
@@ -2587,6 +2925,7 @@ TUASolution.model_rebuild()
 TUAData.model_rebuild()
 TrackProperties.model_rebuild()
 TrackFeature.model_rebuild()
+PointMetadataEntry.model_rebuild()
 ReferenceLocationProperties.model_rebuild()
 ReferenceLocation.model_rebuild()
 SystemStateProperties.model_rebuild()
@@ -2611,6 +2950,7 @@ PolyAnnotationProperties.model_rebuild()
 PolyAnnotation.model_rebuild()
 SelectionRequirement.model_rebuild()
 Tool.model_rebuild()
+ToolParameter.model_rebuild()
 LogEntry.model_rebuild()
 WasGeneratedBy.model_rebuild()
 ParameterValue.model_rebuild()

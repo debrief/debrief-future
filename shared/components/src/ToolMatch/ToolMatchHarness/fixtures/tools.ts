@@ -52,6 +52,17 @@ export const sampleTools: Tool[] = [
     version: '1.0.0',
     requirements: [],
   },
+  {
+    id: 'generate-reference-points',
+    name: 'Generate Reference Points',
+    description: 'Generates a grid or scatter pattern of reference points within a selected polygon',
+    version: '1.0.0',
+    requirements: [
+      { kind: 'RECTANGLE', min: 1, max: 1 },
+      { kind: 'POLY', min: 1, max: 1 },
+      { kind: 'CIRCLE', min: 1, max: 1 },
+    ],
+  },
 ];
 
 /**

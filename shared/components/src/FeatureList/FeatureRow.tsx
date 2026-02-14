@@ -1,12 +1,16 @@
 import type { CSSProperties } from 'react';
 import type { DebriefFeature } from '../utils/types';
-import { isTrackFeature } from '../utils/types';
+import { isTrackFeature, isMultiPointFeature, isMultiPolygonFeature } from '../utils/types';
 import { getFeatureLabel, getFeatureColor } from '../utils/labels';
+import type { DisplayItem } from './flattenFeatures';
 import './FeatureList.css';
 
 export interface FeatureRowProps {
-  /** The feature to display */
-  feature: DebriefFeature;
+  /** The feature to display (for top-level rows) */
+  feature?: DebriefFeature;
+
+  /** Display item for child rows (positions, points, etc.) */
+  displayItem?: DisplayItem;
 
   /** Whether this row is selected */
   isSelected: boolean;
@@ -14,11 +18,44 @@ export interface FeatureRowProps {
   /** Whether this feature is hidden (shows eye-slash indicator) */
   isHidden?: boolean;
 
+  /** Nesting depth (0 = top-level) */
+  depth?: number;
+
+  /** Whether this item can be expanded */
+  isExpandable?: boolean;
+
+  /** Whether this item is currently expanded */
+  isExpanded?: boolean;
+
+  /** Whether a child of this item is selected (shows indicator dot) */
+  hasChildSelected?: boolean;
+
   /** Click handler */
   onClick: (event: React.MouseEvent) => void;
 
+  /** Toggle expand/collapse handler */
+  onToggleExpand?: (event: React.MouseEvent) => void;
+
   /** Optional inline style */
   style?: CSSProperties;
+}
+
+function ChevronIcon({ expanded }: { expanded: boolean }) {
+  return (
+    <svg
+      className={`debrief-feature-row__chevron${expanded ? ' debrief-feature-row__chevron--expanded' : ''}`}
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4.5 2.5L8 6L4.5 9.5" />
+    </svg>
+  );
 }
 
 /**
@@ -28,10 +65,14 @@ function getFeatureType(feature: DebriefFeature): string {
   const props = feature.properties as unknown as Record<string, unknown>;
 
   if (isTrackFeature(feature)) {
-    // Schema: track_type; Legacy: platformType
     return (feature.properties.track_type || props.platformType as string) ?? 'TRACK';
   }
-  // Schema: location_type; Legacy: locationType
+  if (isMultiPointFeature(feature)) {
+    return 'MULTI_POINT';
+  }
+  if (isMultiPolygonFeature(feature)) {
+    return 'MULTI_POLYGON';
+  }
   return (feature.properties.location_type || props.locationType as string) ?? 'POINT';
 }
 
@@ -40,11 +81,9 @@ function getFeatureType(feature: DebriefFeature): string {
  */
 function getFeatureInfo(feature: DebriefFeature): string | null {
   if (isTrackFeature(feature)) {
-    // Try start_time/end_time first (schema properties)
     let start: string | undefined = feature.properties.start_time;
     let end: string | undefined = feature.properties.end_time;
 
-    // Fallback: derive from times array if start_time/end_time not present
     if (!start || !end) {
       const props = feature.properties as unknown as Record<string, unknown>;
       const times = props.times as unknown[] | undefined;
@@ -70,27 +109,54 @@ function getFeatureInfo(feature: DebriefFeature): string | null {
 }
 
 /**
- * FeatureRow displays a single feature in the list.
+ * FeatureRow displays a single feature or child item in the list.
  */
 export function FeatureRow({
   feature,
+  displayItem,
   isSelected,
   isHidden = false,
+  depth = 0,
+  isExpandable = false,
+  isExpanded = false,
+  hasChildSelected: childSelected = false,
   onClick,
+  onToggleExpand,
   style,
 }: FeatureRowProps) {
-  const label = getFeatureLabel(feature);
-  const type = getFeatureType(feature);
-  const color = getFeatureColor(feature);
-  const info = getFeatureInfo(feature);
+  // Determine label, type, color based on whether this is a feature row or child row
+  const isChildRow = !feature && displayItem;
+  const label = feature ? getFeatureLabel(feature) : (displayItem?.label ?? '');
+  const type = feature ? getFeatureType(feature) : null;
+  const color = feature ? getFeatureColor(feature) : null;
+  const info = feature ? getFeatureInfo(feature) : null;
+  const sublabel = displayItem?.sublabel ?? null;
 
   const className = [
     'debrief-feature-row',
     isSelected && 'debrief-feature-row--selected',
     isHidden && 'debrief-feature-row--hidden',
+    isChildRow && 'debrief-feature-row--child',
   ]
     .filter(Boolean)
     .join(' ');
+
+  const paddingLeft = 12 + depth * 20;
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick(e as unknown as React.MouseEvent);
+    }
+    if (e.key === 'ArrowRight' && isExpandable && !isExpanded && onToggleExpand) {
+      e.preventDefault();
+      onToggleExpand(e as unknown as React.MouseEvent);
+    }
+    if (e.key === 'ArrowLeft' && isExpandable && isExpanded && onToggleExpand) {
+      e.preventDefault();
+      onToggleExpand(e as unknown as React.MouseEvent);
+    }
+  };
 
   return (
     <div
@@ -98,21 +164,39 @@ export function FeatureRow({
       onClick={onClick}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick(e as unknown as React.MouseEvent);
-        }
-      }}
-      style={style}
+      onKeyDown={handleKeyDown}
+      style={{ ...style, paddingLeft: `${paddingLeft}px`, paddingRight: '12px' }}
+      data-testid={`feature-row-${feature?.id ?? displayItem?.id ?? ''}`}
     >
-      <span
-        className="debrief-feature-row__indicator"
-        style={{ backgroundColor: color }}
-      />
+      {isExpandable ? (
+        <button
+          className="debrief-feature-row__expand-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleExpand?.(e);
+          }}
+          aria-label={isExpanded ? 'Collapse' : 'Expand'}
+          tabIndex={-1}
+        >
+          <ChevronIcon expanded={isExpanded} />
+          {childSelected && !isExpanded && (
+            <span className="debrief-feature-row__child-selected-dot" />
+          )}
+        </button>
+      ) : depth > 0 ? (
+        <span className="debrief-feature-row__expand-spacer" />
+      ) : null}
+
+      {color && (
+        <span
+          className="debrief-feature-row__indicator"
+          style={{ backgroundColor: color }}
+        />
+      )}
       <div className="debrief-feature-row__content">
         <span className="debrief-feature-row__name">{label}</span>
-        <span className="debrief-feature-row__type">{type}</span>
+        {sublabel && <span className="debrief-feature-row__sublabel">{sublabel}</span>}
+        {type && <span className="debrief-feature-row__type">{type}</span>}
       </div>
       {isHidden && (
         <span className="debrief-feature-row__hidden-icon" title="Hidden">

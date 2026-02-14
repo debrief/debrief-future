@@ -45,7 +45,7 @@ test.describe('Styling Tools Integration', () => {
     });
   });
 
-  test('tools panel lists all 10 tools (3 built-in + 4 styling + 1 shape + 1 sensor + 1 track-manipulation)', async ({ page }) => {
+  test('tools panel lists all 10 tools (2 built-in + 4 styling + 1 shape + 1 reference + 1 sensor + 1 track-manipulation)', async ({ page }) => {
     const toolItems = page.locator('.debrief-tools-panel__item');
     await expect(toolItems).toHaveCount(10);
   });
@@ -187,7 +187,7 @@ test.describe('Styling Tools Integration', () => {
 
     // The title attribute should contain the explanation
     const title = await inactiveTool.getAttribute('title');
-    expect(title).toContain('track');
+    expect(title?.toLowerCase()).toContain('track');
   });
 
   test('selecting via feature list activates styling tools', async ({

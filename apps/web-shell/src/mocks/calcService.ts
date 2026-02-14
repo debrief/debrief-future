@@ -148,12 +148,7 @@ interface ToolDefinition {
   maxTracks?: number;
   /** Minimum number of features required (any type) */
   minFeatures?: number;
-  /** Annotation kinds required (at least one feature must match) */
-  annotationKinds?: Set<string>;
 }
-
-/** Annotation kinds supported by the move-shape tool */
-const MOVE_SHAPE_KINDS = new Set(['CIRCLE', 'RECTANGLE', 'LINE', 'TEXT', 'VECTOR']);
 
 const TOOLS: ToolDefinition[] = [
   {
@@ -167,13 +162,6 @@ const TOOLS: ToolDefinition[] = [
     name: 'Bounding Box',
     description: 'Calculate bounding box of selected features',
     minFeatures: 1,
-  },
-  {
-    id: 'move-shape',
-    name: 'Move Shape',
-    description: 'Translate annotation shapes by distance and bearing',
-    minFeatures: 1,
-    annotationKinds: MOVE_SHAPE_KINDS,
   },
 ];
 
@@ -219,19 +207,6 @@ function getToolApplicability(
     };
   }
 
-  // Annotation kind check
-  if (tool.annotationKinds) {
-    const hasMatchingAnnotation = features.some(
-      (f) => f.properties?.kind && tool.annotationKinds!.has(f.properties.kind)
-    );
-    if (!hasMatchingAnnotation) {
-      return {
-        applicable: false,
-        explanation: 'Requires an annotation shape (Circle, Rectangle, Line, Text, or Vector)',
-      };
-    }
-  }
-
   return { applicable: true };
 }
 
@@ -256,17 +231,11 @@ function formatToolName(name: string): string {
     .join(' ');
 }
 
-/**
- * Check if any selected features are tracks (by kind property).
- */
-function hasTrackFeatures(features: Feature[]): boolean {
-  return features.some(f =>
-    (f.properties as Record<string, unknown> | null)?.kind === 'TRACK'
-  );
-}
-
 /** IDs of styling tools from toolService */
 const stylingToolIds = new Set(listTools().map(t => t.name));
+
+/** Annotation kinds supported by the move-shape tool */
+const MOVE_SHAPE_KINDS = new Set(['CIRCLE', 'RECTANGLE', 'LINE', 'TEXT', 'VECTOR']);
 
 /**
  * Translate a [lon, lat] point by a given distance (nm) and bearing (degrees).
@@ -373,22 +342,46 @@ export function createMockCalcService(): MockCalcService {
         };
       });
 
-      // Styling tools from toolService (with parameter metadata for context menus)
-      const hasTracks = hasTrackFeatures(selectedFeatures);
-      const stylingTools: ToolsPanelItem[] = listTools().map(def => {
-        // Only include parameters that can produce context menu items
+      // Registered tools from toolService (with parameter metadata for context menus)
+      const registeredTools: ToolsPanelItem[] = listTools().map(def => {
         const params = extractParameters(def).filter(p => p.paramType || p.choices);
+        const reqs = def.annotations['debrief:selectionRequirements'] as
+          | { kind: string; min?: number }[]
+          | undefined;
+
+        // Check applicability against selectionRequirements
+        let applicable = false;
+        let explanation: string | undefined;
+        if (!reqs || reqs.length === 0) {
+          applicable = selectedFeatures.length > 0;
+          explanation = applicable ? undefined : 'Requires at least 1 feature selected';
+        } else {
+          for (const req of reqs) {
+            const count = selectedFeatures.filter(
+              f => (f.properties as Record<string, unknown> | null)?.kind === req.kind
+            ).length;
+            if (count >= (req.min ?? 1)) {
+              applicable = true;
+              break;
+            }
+          }
+          if (!applicable) {
+            const kinds = reqs.map(r => r.kind).join(' or ');
+            explanation = `Requires ${kinds} feature selected`;
+          }
+        }
+
         return {
           id: def.name,
           name: formatToolName(def.name),
           description: def.description,
-          applicable: hasTracks,
-          explanation: hasTracks ? undefined : 'Requires at least 1 track selected',
+          applicable,
+          explanation,
           parameters: params.length > 0 ? params : undefined,
         };
       });
 
-      return [...builtinTools, ...stylingTools];
+      return [...builtinTools, ...registeredTools];
     },
 
     runTool(toolId: string, selectedFeatures: Feature[], collectedParams?: Record<string, unknown>): ToolResult {
@@ -409,6 +402,17 @@ export function createMockCalcService(): MockCalcService {
           const item = response.content[0];
           const label = item?.annotations?.['debrief:label'] ?? `${toolId} applied`;
 
+          // Build provenance parameters from tool definition defaults + collected values
+          const toolDef = listTools().find(d => d.name === toolId);
+          const toolParamDefs = toolDef ? extractParameters(toolDef) : [];
+          const parameters: Record<string, ToolParameterMeta> = {};
+          for (const p of toolParamDefs) {
+            const value = params[p.name] ?? p.defaultValue;
+            if (value !== undefined) {
+              parameters[p.name] = { value, default: false, tunable: true };
+            }
+          }
+
           // For addition tools, parse result features and return as layers
           if (item?.resource?.text) {
             const fc = JSON.parse(item.resource.text);
@@ -417,11 +421,12 @@ export function createMockCalcService(): MockCalcService {
                 success: true,
                 message: String(label),
                 resultLayers: fc.features as Feature[],
+                parameters,
               };
             }
           }
 
-          return { success: true, message: String(label) };
+          return { success: true, message: String(label), parameters };
         } catch (err) {
           return { success: false, message: String(err) };
         }
@@ -473,27 +478,6 @@ export function createMockCalcService(): MockCalcService {
             success: true,
             message: `Bounding box: ${(width / 1000).toFixed(2)} km × ${(height / 1000).toFixed(2)} km`,
             resultLayer: polygon,
-          };
-        }
-
-        case 'move-shape': {
-          const distanceNm = 5;
-          const directionDeg = 45;
-          const moved = moveShapeFeatures(selectedFeatures, distanceNm, directionDeg);
-          if (moved.length === 0) {
-            return { success: false, message: 'No annotation shapes found in selection' };
-          }
-          const names = moved
-            .map((f) => (f.properties as Record<string, unknown> | null)?.label ?? f.id ?? 'shape')
-            .join(', ');
-          return {
-            success: true,
-            message: `Moved ${moved.length} shape(s) by ${distanceNm} nm at ${directionDeg}°: ${names}`,
-            resultLayer: moved[0],
-            parameters: {
-              distance_nm: { value: distanceNm, default: false, tunable: true },
-              direction_deg: { value: directionDeg, default: false, tunable: true },
-            },
           };
         }
 

@@ -44,6 +44,8 @@ export interface PathValidationResult {
 const LEVEL_REGISTRY: ReadonlyMap<string, LevelDefinition> = new Map([
   ['positions', { name: 'positions', addressingMode: 'index', description: 'Individual position within a track or segment' }],
   ['segments', { name: 'segments', addressingMode: 'id', description: 'Named track segment' }],
+  ['points', { name: 'points', addressingMode: 'index', description: 'Individual point within a MultiPoint geometry' }],
+  ['polygons', { name: 'polygons', addressingMode: 'index', description: 'Individual polygon within a MultiPolygon geometry' }],
 ]);
 
 /**

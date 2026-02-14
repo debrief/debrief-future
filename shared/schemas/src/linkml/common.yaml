@@ -197,6 +197,14 @@ enums:
         description: One hundred
         meaning: debrief:100
 
+  ReferencePointPatternEnum:
+    description: Generation patterns for reference point placement
+    permissible_values:
+      grid:
+        description: Evenly spaced grid of rows and columns
+      scatter:
+        description: Randomly distributed points
+
   LineCapEnum:
     description: How line endpoints are rendered (SVG/CSS standard)
     permissible_values:

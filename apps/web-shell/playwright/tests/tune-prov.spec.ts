@@ -3,7 +3,7 @@
  *
  * Tests the end-to-end flow of:
  * 1. Loading a plot and selecting an annotation shape
- * 2. Running move-shape tool (defaults: 5 nm at 45°)
+ * 2. Running move-shape tool (defaults: 5 km at 90°)
  * 3. Switching to the Log tab to view the entry
  * 4. Tuning the distance parameter via inline parameter editor
  * 5. Tuning the direction parameter
@@ -84,12 +84,12 @@ test.describe('PROV Tuning (move-shape)', () => {
     const entry = analysisPage.logEntries.first();
     await expect(entry.locator('.log-panel__entry-tool')).toHaveText('move-shape');
 
-    // Should show tunable parameters (distance_nm and direction_deg)
+    // Should show tunable parameters (distance_km and direction)
     const paramKeys = entry.locator('.log-panel__entry-param-key');
     await expect(paramKeys.first()).toBeVisible();
     const paramTexts = await paramKeys.allTextContents();
-    expect(paramTexts).toContain('distance_nm:');
-    expect(paramTexts).toContain('direction_deg:');
+    expect(paramTexts).toContain('distance_km:');
+    expect(paramTexts).toContain('direction:');
 
     // Parameter values should be clickable (tunable class applied)
     const tunableValues = entry.locator(
@@ -97,7 +97,7 @@ test.describe('PROV Tuning (move-shape)', () => {
     );
     await expect(tunableValues.first()).toBeVisible();
     const tunableCount = await tunableValues.count();
-    expect(tunableCount).toBe(2); // distance_nm and direction_deg
+    expect(tunableCount).toBe(2); // distance_km and direction
   });
 
   test('tuning distance parameter updates entry and shows annotation', async ({ page }) => {
@@ -109,15 +109,15 @@ test.describe('PROV Tuning (move-shape)', () => {
 
     const entry = analysisPage.logEntries.first();
 
-    // Click the distance_nm tunable parameter value to trigger tune
-    const distanceParam = entry.locator('[data-testid="tune-param-distance_nm"]');
+    // Click the distance_km tunable parameter value to trigger tune
+    const distanceParam = entry.locator('[data-testid="tune-param-distance_km"]');
     await expect(distanceParam).toBeVisible();
     await expect(distanceParam).toHaveText('5');
 
     // Set up dialog handler BEFORE clicking — supply new value
     page.once('dialog', async (dialog) => {
       expect(dialog.type()).toBe('prompt');
-      expect(dialog.message()).toContain('distance_nm');
+      expect(dialog.message()).toContain('distance_km');
       await dialog.accept('10');
     });
 
@@ -130,7 +130,7 @@ test.describe('PROV Tuning (move-shape)', () => {
     const notification = page.getByTestId('log-panel-notification');
     await expect(notification).toBeVisible({ timeout: 3000 });
     await expect(notification).toContainText('Tuned');
-    await expect(notification).toContainText('distance_nm');
+    await expect(notification).toContainText('distance_km');
 
     // The entry should now have a tuned badge
     const tunedBadge = entry.locator('[data-testid="badge-tuned"]');
@@ -144,10 +144,10 @@ test.describe('PROV Tuning (move-shape)', () => {
 
     const entry = analysisPage.logEntries.first();
 
-    // Click the direction_deg tunable parameter
-    const directionParam = entry.locator('[data-testid="tune-param-direction_deg"]');
+    // Click the direction tunable parameter
+    const directionParam = entry.locator('[data-testid="tune-param-direction"]');
     await expect(directionParam).toBeVisible();
-    await expect(directionParam).toHaveText('45');
+    await expect(directionParam).toHaveText('90');
 
     // Supply new value via dialog
     page.once('dialog', async (dialog) => {
@@ -172,7 +172,7 @@ test.describe('PROV Tuning (move-shape)', () => {
     const entry = analysisPage.logEntries.first();
 
     // First tune: change distance to 10
-    const distanceParam = entry.locator('[data-testid="tune-param-distance_nm"]');
+    const distanceParam = entry.locator('[data-testid="tune-param-distance_km"]');
     page.once('dialog', async (dialog) => {
       await dialog.accept('10');
     });
@@ -183,7 +183,7 @@ test.describe('PROV Tuning (move-shape)', () => {
     await expect(entry.locator('[data-testid="badge-tuned"]')).toBeVisible();
 
     // Second tune: change direction to 270
-    const directionParam = entry.locator('[data-testid="tune-param-direction_deg"]');
+    const directionParam = entry.locator('[data-testid="tune-param-direction"]');
     page.once('dialog', async (dialog) => {
       await dialog.accept('270');
     });
@@ -200,7 +200,7 @@ test.describe('PROV Tuning (move-shape)', () => {
     await analysisPage.switchToLogTab();
 
     const entry = analysisPage.logEntries.first();
-    const distanceParam = entry.locator('[data-testid="tune-param-distance_nm"]');
+    const distanceParam = entry.locator('[data-testid="tune-param-distance_km"]');
     await expect(distanceParam).toHaveText('5');
 
     // Dismiss the dialog (cancel)
