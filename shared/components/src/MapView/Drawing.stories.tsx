@@ -13,9 +13,10 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Point and rectangle drawing on the map via the custom toolbar shape palette. ' +
-          'Demonstrates createDrawnFeature() converting Geoman output to schema-compliant GeoJSON. ' +
-          'Part of E05: Shape Drawing Tools (Feature 094).',
+          'Shape drawing on the map via the custom toolbar shape palette. ' +
+          'Demonstrates createDrawnFeature() converting Geoman output to schema-compliant GeoJSON ' +
+          'for all four shape types: Point, Rectangle, Polygon, and Polyline. ' +
+          'Part of E05: Shape Drawing Tools (Features 094, 095).',
       },
     },
   },
@@ -32,17 +33,19 @@ export default meta;
 type Story = StoryObj;
 
 /**
- * Interactive point and rectangle drawing demo.
+ * Interactive drawing demo for all four shape types.
  *
  * 1. Click the '+' button in the toolbar to open the shape palette
  * 2. Select "Point" — click on the map to place a point marker
  * 3. Select "Rectangle" — click and drag on the map to draw a rectangle
+ * 4. Select "Polygon" — click to place vertices, double-click to close
+ * 5. Select "Polyline" — click to place vertices, double-click to finish
  *
  * Drawn features appear in the list below the map with full schema details.
  * The most recently drawn feature is auto-selected (highlighted on map).
  */
-export const PointAndRectangle: Story = {
-  render: function PointAndRectangleStory() {
+export const AllShapes: Story = {
+  render: function AllShapesStory() {
     const [features, setFeatures] = useState<DebriefFeature[]>([]);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
@@ -93,7 +96,7 @@ export const PointAndRectangle: Story = {
           </h4>
           {features.length === 0 && (
             <p style={{ color: '#888', fontSize: 13 }}>
-              Click '+' in the toolbar, then select Point or Rectangle to start drawing.
+              Click '+' in the toolbar, then select a shape type to start drawing.
             </p>
           )}
           {features.map((f) => (

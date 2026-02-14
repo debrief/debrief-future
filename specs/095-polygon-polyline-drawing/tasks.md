@@ -59,16 +59,16 @@
 
 ### Tests
 
-- [ ] T001 [P][test] Write polygon validation tests `shared/components/src/MapView/drawing/__tests__/isValidDrawnGeometry.test.ts`
-- [ ] T002 [P][test] Write polyline validation tests `shared/components/src/MapView/drawing/__tests__/isValidDrawnGeometry.test.ts`
+- [x] T001 [P][test] Write polygon validation tests `shared/components/src/MapView/drawing/__tests__/isValidDrawnGeometry.test.ts`
+- [x] T002 [P][test] Write polyline validation tests `shared/components/src/MapView/drawing/__tests__/isValidDrawnGeometry.test.ts`
 
 ### Implementation
 
-- [ ] T003 [P] Add DEFAULT_DRAWN_POLYGON_STYLE constant (PolygonProperties: orange fill, dark orange stroke) `shared/components/src/MapView/drawing/drawingDefaults.ts`
-- [ ] T004 [P] Add DEFAULT_DRAWN_POLYLINE_STYLE constant (LineProperties: teal stroke, weight 3) `shared/components/src/MapView/drawing/drawingDefaults.ts`
-- [ ] T005 Export new style constants from barrel `shared/components/src/MapView/drawing/index.ts`
-- [ ] T006 Add polygon validation case to isValidDrawnGeometry (Polygon type, >=4 coords in ring, finite numbers) `shared/components/src/MapView/drawing/isValidDrawnGeometry.ts`
-- [ ] T007 Add polyline validation case to isValidDrawnGeometry (LineString type, >=2 coords, finite numbers) `shared/components/src/MapView/drawing/isValidDrawnGeometry.ts`
+- [x] T003 [P] Add DEFAULT_DRAWN_POLYGON_STYLE constant (PolygonProperties: orange fill, dark orange stroke) `shared/components/src/MapView/drawing/drawingDefaults.ts`
+- [x] T004 [P] Add DEFAULT_DRAWN_POLYLINE_STYLE constant (LineProperties: teal stroke, weight 3) `shared/components/src/MapView/drawing/drawingDefaults.ts`
+- [x] T005 Export new style constants from barrel `shared/components/src/MapView/drawing/index.ts`
+- [x] T006 Add polygon validation case to isValidDrawnGeometry (Polygon type, >=4 coords in ring, finite numbers) `shared/components/src/MapView/drawing/isValidDrawnGeometry.ts`
+- [x] T007 Add polyline validation case to isValidDrawnGeometry (LineString type, >=2 coords, finite numbers) `shared/components/src/MapView/drawing/isValidDrawnGeometry.ts`
 
 **Checkpoint**: Style constants and validation logic ready. All validation tests pass.
 
@@ -82,13 +82,13 @@
 
 ### Tests
 
-- [ ] T008 [test] Write createDrawnFeature polygon tests (kind=POLY, vertex_count calculation, default styling, label override, invalid geometry returns null) `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
+- [x] T008 [test] Write createDrawnFeature polygon tests (kind=POLY, vertex_count calculation, default styling, label override, invalid geometry returns null) `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
 
 ### Implementation
 
-- [ ] T009 Add polygon case to createDrawnFeature — import PolyAnnotation type, create feature with kind=POLY, calculate vertex_count from ring length, apply DEFAULT_DRAWN_POLYGON_STYLE, support label and polygonStyle options `shared/components/src/MapView/drawing/createDrawnFeature.ts`
-- [ ] T010 Update CreateDrawnFeatureOptions interface — add polygonStyle field (Partial<PolygonProperties>) `shared/components/src/MapView/drawing/createDrawnFeature.ts`
-- [ ] T011 Update return type union to include PolyAnnotation `shared/components/src/MapView/drawing/createDrawnFeature.ts`
+- [x] T009 Add polygon case to createDrawnFeature — import PolyAnnotation type, create feature with kind=POLY, calculate vertex_count from ring length, apply DEFAULT_DRAWN_POLYGON_STYLE, support label and polygonStyle options `shared/components/src/MapView/drawing/createDrawnFeature.ts`
+- [x] T010 Update CreateDrawnFeatureOptions interface — add polygonStyle field (Partial<PolygonProperties>) `shared/components/src/MapView/drawing/createDrawnFeature.ts`
+- [x] T011 Update return type union to include PolyAnnotation `shared/components/src/MapView/drawing/createDrawnFeature.ts`
 
 **Checkpoint**: Polygon creation logic complete. Unit tests pass for polygon mode. Geoman polygon events produce schema-compliant PolyAnnotation features.
 
@@ -102,13 +102,13 @@
 
 ### Tests
 
-- [ ] T012 [test] Write createDrawnFeature polyline tests (kind=LINE, default styling, label override, invalid geometry returns null) `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
+- [x] T012 [test] Write createDrawnFeature polyline tests (kind=LINE, default styling, label override, invalid geometry returns null) `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
 
 ### Implementation
 
-- [ ] T013 Add polyline case to createDrawnFeature — import LineAnnotation type, create feature with kind=LINE, apply DEFAULT_DRAWN_POLYLINE_STYLE, support label and polylineStyle options `shared/components/src/MapView/drawing/createDrawnFeature.ts`
-- [ ] T014 Update CreateDrawnFeatureOptions interface — add polylineStyle field (Partial<LineProperties>) `shared/components/src/MapView/drawing/createDrawnFeature.ts`
-- [ ] T015 Update return type union to include LineAnnotation `shared/components/src/MapView/drawing/createDrawnFeature.ts`
+- [x] T013 Add polyline case to createDrawnFeature — import LineAnnotation type, create feature with kind=LINE, apply DEFAULT_DRAWN_POLYLINE_STYLE, support label and polylineStyle options `shared/components/src/MapView/drawing/createDrawnFeature.ts`
+- [x] T014 Update CreateDrawnFeatureOptions interface — add polylineStyle field (Partial<LineProperties>) `shared/components/src/MapView/drawing/createDrawnFeature.ts`
+- [x] T015 Update return type union to include LineAnnotation `shared/components/src/MapView/drawing/createDrawnFeature.ts`
 
 **Checkpoint**: Polyline creation logic complete. Unit tests pass for polyline mode. Both polygon and polyline creation produce correct schema-compliant output.
 
@@ -122,9 +122,9 @@
 
 ### Tests
 
-- [ ] T016 [test] Write schema compliance tests — verify polygon output matches PolyAnnotation schema (all required fields, correct types, valid vertex_count, closed ring) `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
-- [ ] T017 [P][test] Write schema compliance tests — verify polyline output matches LineAnnotation schema (all required fields, correct types, valid LineString) `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
-- [ ] T018 [P][test] Write uniqueness test — verify multiple created features have unique IDs `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
+- [x] T016 [test] Write schema compliance tests — verify polygon output matches PolyAnnotation schema (all required fields, correct types, valid vertex_count, closed ring) `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
+- [x] T017 [P][test] Write schema compliance tests — verify polyline output matches LineAnnotation schema (all required fields, correct types, valid LineString) `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
+- [x] T018 [P][test] Write uniqueness test — verify multiple created features have unique IDs `shared/components/src/MapView/drawing/__tests__/createDrawnFeature.test.ts`
 
 ### Implementation
 
@@ -156,7 +156,7 @@ No tasks needed — visual feedback is provided by the Geoman library out of the
 
 ### Implementation
 
-- [ ] T019 Update Drawing.stories.tsx — rename PointAndRectangle story to AllShapes, update description to cover all 4 shape types, update empty-state prompt text `shared/components/src/MapView/Drawing.stories.tsx`
+- [x] T019 Update Drawing.stories.tsx — rename PointAndRectangle story to AllShapes, update description to cover all 4 shape types, update empty-state prompt text `shared/components/src/MapView/Drawing.stories.tsx`
 
 **Checkpoint**: Storybook story demonstrates all 4 drawing modes (point, rectangle, polygon, polyline) with feature list and JSON inspector.
 
@@ -170,7 +170,7 @@ No tasks needed — visual feedback is provided by the Geoman library out of the
 
 ### Implementation
 
-- [ ] T020 Extend handleShapeCreated in mapView.tsx — add polygon and polyline prompt/default mappings, update selection context `apps/vscode/src/webview/web/mapView.tsx`
+- [x] T020 Extend handleShapeCreated in mapView.tsx — add polygon and polyline prompt/default mappings, update selection context `apps/vscode/src/webview/web/mapView.tsx`
 
 **Checkpoint**: VS Code webview correctly handles polygon and polyline drawing with appropriate name prompts and extension messaging.
 

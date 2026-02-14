@@ -6,7 +6,9 @@ import type { DrawingMode } from '../LeafletToolbar';
  * - Point mode: geometry must be type "Point" with valid [lon, lat] coordinates
  * - Rectangle mode: geometry must be type "Polygon" with >= 5 coordinates in a closed ring
  *   and non-zero bounding area (rejects degenerate click-without-drag rectangles)
- * - All other modes: returns false (not handled by this feature)
+ * - Polygon mode: geometry must be type "Polygon" with >= 4 coordinates in a closed ring
+ *   (3 unique vertices + closure point), all finite numbers
+ * - Polyline mode: geometry must be type "LineString" with >= 2 coordinate pairs, all finite
  */
 export function isValidDrawnGeometry(
   geojson: GeoJSON.Feature,
@@ -50,6 +52,34 @@ export function isValidDrawnGeometry(
     return (maxLon - minLon) > 0 && (maxLat - minLat) > 0;
   }
 
-  // Other modes not handled by this feature
+  if (mode === 'polygon') {
+    if (geojson.geometry.type !== 'Polygon') return false;
+    const rings = (geojson.geometry as GeoJSON.Polygon).coordinates;
+    if (!Array.isArray(rings) || rings.length === 0) return false;
+    const ring = rings[0];
+    // Need at least 4 coords: 3 unique vertices + closure point
+    if (!Array.isArray(ring) || ring.length < 4) return false;
+
+    for (const coord of ring) {
+      if (!Array.isArray(coord) || coord.length < 2) return false;
+      if (typeof coord[0] !== 'number' || typeof coord[1] !== 'number') return false;
+      if (!isFinite(coord[0]) || !isFinite(coord[1])) return false;
+    }
+    return true;
+  }
+
+  if (mode === 'polyline') {
+    if (geojson.geometry.type !== 'LineString') return false;
+    const coords = (geojson.geometry as GeoJSON.LineString).coordinates;
+    if (!Array.isArray(coords) || coords.length < 2) return false;
+
+    for (const coord of coords) {
+      if (!Array.isArray(coord) || coord.length < 2) return false;
+      if (typeof coord[0] !== 'number' || typeof coord[1] !== 'number') return false;
+      if (!isFinite(coord[0]) || !isFinite(coord[1])) return false;
+    }
+    return true;
+  }
+
   return false;
 }
