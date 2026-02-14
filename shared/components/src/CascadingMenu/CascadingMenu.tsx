@@ -80,7 +80,8 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
     return enabledItems.findIndex((ei) => items[itemIndex] === ei);
   };
   const getItemIndex = (enabledIndex: number): number => {
-    return items.indexOf(enabledItems[enabledIndex]);
+    const item = enabledItems[enabledIndex];
+    return item ? items.indexOf(item) : 0;
   };
 
   // Keyboard navigation
@@ -179,7 +180,7 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
         const itemElement = menuRef.current?.querySelector(
           `[data-item-index="${index}"]`
         ) as HTMLElement;
-        if (itemElement) {
+        if (itemElement && item.submenu) {
           const rect = itemElement.getBoundingClientRect();
           setSubmenu({
             itemId: item.id,
@@ -323,7 +324,8 @@ const SubmenuPanel: React.FC<SubmenuPanelProps> = ({ items, anchorRect, onSelect
     return enabledItems.findIndex((ei) => items[itemIndex] === ei);
   };
   const getItemIndex = (enabledIndex: number): number => {
-    return items.indexOf(enabledItems[enabledIndex]);
+    const item = enabledItems[enabledIndex];
+    return item ? items.indexOf(item) : 0;
   };
 
   // Keyboard navigation
@@ -421,7 +423,7 @@ const SubmenuPanel: React.FC<SubmenuPanelProps> = ({ items, anchorRect, onSelect
         const itemElement = submenuRef.current?.querySelector(
           `[data-item-index="${index}"]`
         ) as HTMLElement;
-        if (itemElement) {
+        if (itemElement && item.submenu) {
           const rect = itemElement.getBoundingClientRect();
           setNestedSubmenu({
             itemId: item.id,

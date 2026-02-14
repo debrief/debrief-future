@@ -118,9 +118,12 @@ export function buildFormatMenuItems(
  * Parse menu item ID like "line.color::red" into components.
  */
 export function parseMenuItemId(itemId: string): { property: string; presetId: string } | null {
-  const parts = itemId.split('::');
-  if (parts.length !== 2) return null;
-  return { property: parts[0], presetId: parts[1] };
+  const separatorIndex = itemId.indexOf('::');
+  if (separatorIndex < 0) return null;
+  return {
+    property: itemId.slice(0, separatorIndex),
+    presetId: itemId.slice(separatorIndex + 2),
+  };
 }
 
 /**

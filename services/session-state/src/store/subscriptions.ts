@@ -64,6 +64,7 @@ export const selectors = {
     featureCollectionUri: state.featureCollectionUri,
     selection: state.selection,
     hiddenFeatureIds: state.hiddenFeatureIds,
+    styleVersion: state.styleVersion,
   }),
 
   document: (state: ReturnType<SessionStoreApi['getState']>): DocumentSlice => ({

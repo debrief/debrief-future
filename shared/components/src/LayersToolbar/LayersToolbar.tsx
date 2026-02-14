@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Button, Icon } from 'vscrui';
 import type { LayersToolbarProps } from './types';
 import { DEFAULT_FILTER_STATE, DEFAULT_LABELS, isFilterActive } from './types';
@@ -45,6 +45,7 @@ export function LayersToolbar({
   const filterState = externalFilterState ?? DEFAULT_FILTER_STATE;
   const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const formatBtnRef = useRef<HTMLSpanElement>(null);
 
   const hasSelection = selectedFeatureIds.length > 0;
   const filterActive = isFilterActive(filterState);
@@ -142,19 +143,22 @@ export function LayersToolbar({
 
         {/* Format (Feature 097) */}
         {onFormat && (
-          <Button
-            appearance="icon"
-            disabled={!hasSelection}
-            onClick={(e: React.MouseEvent) => {
-              if (!hasSelection) return;
-              const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-              onFormat(selectedFeatureIds, { x: rect.left, y: rect.bottom + 2 });
-            }}
-            title={labels.format}
-            aria-label={labels.format}
-          >
-            <Icon name="symbol-color" />
-          </Button>
+          <span ref={formatBtnRef} style={{ display: 'inline-flex' }}>
+            <Button
+              appearance="icon"
+              disabled={!hasSelection}
+              onClick={() => {
+                if (!hasSelection) return;
+                const el = formatBtnRef.current;
+                const rect = el ? el.getBoundingClientRect() : { left: 0, bottom: 0 };
+                onFormat(selectedFeatureIds, { x: rect.left, y: rect.bottom + 2 });
+              }}
+              title={labels.format}
+              aria-label={labels.format}
+            >
+              <Icon name="symbol-color" />
+            </Button>
+          </span>
         )}
 
         {/* Run */}
