@@ -62,10 +62,15 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
     setPosition({ left: newLeft, top: newTop });
   }, [anchorPosition]);
 
-  // Click outside handler
+  // Click outside handler — must also ignore clicks on sibling submenus
+  // which are rendered outside menuRef via React Fragment.
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      const target = e.target as HTMLElement;
+      // Ignore clicks inside any part of the cascading menu system
+      // (submenus are siblings of menuRef, not children)
+      if (target.closest && target.closest('.debrief-cascading-menu')) return;
+      if (menuRef.current && !menuRef.current.contains(target)) {
         onDismiss();
       }
     };
