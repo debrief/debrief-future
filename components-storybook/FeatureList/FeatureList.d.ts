@@ -18,6 +18,8 @@ export interface FeatureListProps {
      * Simple callback when a feature is clicked (id only).
      */
     onSelect?: (id: string) => void;
+    /** Called when a feature is expanded or collapsed */
+    onToggleExpand?: (featureId: string, isExpanded: boolean) => void;
     /** Set of hidden feature IDs (shown with eye-slash icon) */
     hiddenIds?: Set<string>;
     /** Optional filter function */
@@ -32,19 +34,8 @@ export interface FeatureListProps {
     style?: CSSProperties;
 }
 /**
- * FeatureList displays a virtualized list of features.
- *
- * Uses @tanstack/react-virtual for efficient rendering of large lists.
- *
- * @example
- * ```tsx
- * <FeatureList
- *   features={featureCollection}
- *   selectedIds={selectedIds}
- *   onSelect={(id) => toggleSelection(id)}
- *   height={400}
- * />
- * ```
+ * FeatureList displays a virtualized list of features with expand/collapse
+ * support for viewing child elements (positions, points, polygons).
  */
-export declare function FeatureList({ features, selectedIds, hiddenIds, onSelectionChange, onSelect, filter, height, rowHeight, className, style, }: FeatureListProps): import("react/jsx-runtime").JSX.Element;
+export declare function FeatureList({ features, selectedIds, hiddenIds, onSelectionChange, onSelect, onToggleExpand, filter, height, rowHeight, className, style, }: FeatureListProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=FeatureList.d.ts.map

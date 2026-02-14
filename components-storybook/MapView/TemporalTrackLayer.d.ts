@@ -6,8 +6,10 @@ export interface TemporalTrackLayerProps {
     currentTime: number;
     displayMode: DisplayMode;
     isSelected?: boolean;
+    /** Full set of selected IDs — forwarded to PositionSymbolsLayer for per-position highlighting */
+    selectedIds?: Set<string>;
     markerStyle?: Partial<HighlightMarkerStyle>;
     onClick?: (featureId: string, event: React.MouseEvent) => void;
 }
-export declare function TemporalTrackLayer({ feature, currentTime, displayMode, isSelected, markerStyle, onClick, }: TemporalTrackLayerProps): import("react/jsx-runtime").JSX.Element | null;
+export declare function TemporalTrackLayer({ feature, currentTime, displayMode, isSelected, selectedIds, markerStyle, onClick, }: TemporalTrackLayerProps): import("react/jsx-runtime").JSX.Element | null;
 //# sourceMappingURL=TemporalTrackLayer.d.ts.map

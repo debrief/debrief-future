@@ -1,12 +1,12 @@
-import { TrackFeature, ReferenceLocation, TrackProperties, ReferenceLocationProperties, FeatureKindEnum, TrackTypeEnum, LocationTypeEnum, TimestampedPosition } from '@debrief/schemas';
+import { TrackFeature, ReferenceLocation, TrackProperties, ReferenceLocationProperties, FeatureKindEnum, TrackTypeEnum, LocationTypeEnum, TimestampedPosition, MultiPointFeature, MultiPointFeatureProperties, MultiPolygonFeature, MultiPolygonFeatureProperties, SegmentMetadata, PositionStyleOverride } from '@debrief/schemas';
 
-export type { TrackFeature, ReferenceLocation, TrackProperties, ReferenceLocationProperties, FeatureKindEnum, TrackTypeEnum, LocationTypeEnum, TimestampedPosition, };
+export type { TrackFeature, ReferenceLocation, TrackProperties, ReferenceLocationProperties, FeatureKindEnum, TrackTypeEnum, LocationTypeEnum, TimestampedPosition, MultiPointFeature, MultiPointFeatureProperties, MultiPolygonFeature, MultiPolygonFeatureProperties, SegmentMetadata, PositionStyleOverride, };
 export type { DisplayMode } from '../TimeController/types';
 /**
  * Union type for all Debrief feature types.
  * Components should accept either type interchangeably.
  */
-export type DebriefFeature = TrackFeature | ReferenceLocation;
+export type DebriefFeature = TrackFeature | ReferenceLocation | MultiPointFeature | MultiPolygonFeature;
 /**
  * GeoJSON FeatureCollection containing Debrief features.
  * This is the primary data input for all visualization components.
@@ -40,4 +40,16 @@ export declare function isTrackFeature(feature: DebriefFeature): feature is Trac
  * Type guard to check if a feature is a ReferenceLocation
  */
 export declare function isReferenceLocation(feature: DebriefFeature): feature is ReferenceLocation;
+/**
+ * Type guard to check if a feature is a MultiPointFeature
+ */
+export declare function isMultiPointFeature(feature: DebriefFeature): feature is MultiPointFeature;
+/**
+ * Type guard to check if a feature is a MultiPolygonFeature
+ */
+export declare function isMultiPolygonFeature(feature: DebriefFeature): feature is MultiPolygonFeature;
+/**
+ * Check if a feature is expandable (has child elements that can be shown).
+ */
+export declare function isExpandableFeature(feature: DebriefFeature): boolean;
 //# sourceMappingURL=types.d.ts.map
