@@ -85,19 +85,20 @@ export function buildFormatMenuItems(
   disabledProperties?: Map<string, string>,  // propertyId -> disabled reason
 ): readonly CascadingMenuItem[] {
   return properties.map(property => {
-    const submenu = getPresetsForValueType(property.valueType, property.id);
+    let submenu = getPresetsForValueType(property.valueType, property.id);
 
     // Mark current preset if currentValues provided
     if (currentValues && property.id in currentValues) {
       const currentValue = currentValues[property.id];
-      submenu.forEach(item => {
+      submenu = submenu.map(item => {
         const parsed = parseMenuItemId(item.id);
         if (parsed) {
           const presetValue = resolvePresetValue(parsed.presetId, property.valueType);
           if (presetValue === currentValue) {
-            (item as any).current = true;
+            return { ...item, current: true };
           }
         }
+        return item;
       });
     }
 
