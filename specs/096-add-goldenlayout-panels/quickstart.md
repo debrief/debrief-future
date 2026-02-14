@@ -79,8 +79,8 @@ Replace the analysis view's flexbox layout with `<PanelWorkspace>`:
 
 ### Step 8: Theme GoldenLayout
 
-Create `goldenlayout-debrief-theme.css`:
-- Override GoldenLayout's `.lm_*` classes with VS Code CSS variables from `tokens.css`
+See `shared/components/src/PanelWorkspace/PanelWorkspace.css`:
+- Override GoldenLayout's `.lm_*` classes with VS Code CSS variables
 - Match existing web-shell dark theme appearance
 
 ### Step 9: Add Layout Persistence
