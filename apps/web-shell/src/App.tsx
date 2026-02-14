@@ -656,8 +656,23 @@ export default function App() {
         store.getState().setSelection(message.payload.featureIds);
         break;
       case 'layer:format': {
-        const { featureIds, property, value } = message.payload;
+        const { featureIds, property, value, isPointOverride, positionIndex } = message.payload;
         const targetIds = new Set(featureIds);
+
+        // Helper: apply a style property to a feature-level style object
+        const applyStyleProperty = (style: Record<string, unknown>, prop: string, val: unknown): Record<string, unknown> => {
+          const result = { ...style };
+          const dotIndex = prop.indexOf('.');
+          if (dotIndex > 0) {
+            const category = prop.slice(0, dotIndex);
+            const field = prop.slice(dotIndex + 1);
+            const oldCategory = (result[category] ?? {}) as Record<string, unknown>;
+            result[category] = { ...oldCategory, [field]: val };
+          } else {
+            result[prop] = val;
+          }
+          return result;
+        };
 
         // Update features in the current plot
         setCurrentPlot(plot => {
@@ -666,21 +681,18 @@ export default function App() {
             if (!targetIds.has(String(f.id))) return f;
 
             const props = (f.properties ?? {}) as Record<string, unknown>;
-            const oldStyle = (props.style ?? {}) as Record<string, unknown>;
-            const newStyle = { ...oldStyle };
 
-            const dotIndex = property.indexOf('.');
-            if (dotIndex > 0) {
-              // Compound path: "line.color" → style.line.color
-              const category = property.slice(0, dotIndex);
-              const field = property.slice(dotIndex + 1);
-              const oldCategory = (newStyle[category] ?? {}) as Record<string, unknown>;
-              newStyle[category] = { ...oldCategory, [field]: value };
-            } else {
-              // Flat path: "color" → style.color
-              newStyle[property] = value;
+            // Per-position override: write to position_style_overrides[index]
+            if (isPointOverride && positionIndex !== undefined) {
+              const overrides = { ...(props.position_style_overrides ?? {}) as Record<string, Record<string, unknown>> };
+              const key = String(positionIndex);
+              overrides[key] = { ...(overrides[key] ?? {}), [property]: value };
+              return { ...f, properties: { ...props, position_style_overrides: overrides } };
             }
 
+            // Feature-level style change
+            const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+            const newStyle = applyStyleProperty(oldStyle, property, value);
             return { ...f, properties: { ...props, style: newStyle } };
           });
 
@@ -690,31 +702,23 @@ export default function App() {
           };
         });
 
-        // Also update drawn features if targeted
-        setDrawnFeatures(prev =>
-          prev.map(f => {
-            if (!targetIds.has(f.id)) return f;
+        // Also update drawn features if targeted (drawn features don't have positions)
+        if (!isPointOverride) {
+          setDrawnFeatures(prev =>
+            prev.map(f => {
+              if (!targetIds.has(f.id)) return f;
 
-            const props = f.properties as unknown as Record<string, unknown>;
-            const oldStyle = (props.style ?? {}) as Record<string, unknown>;
-            const newStyle = { ...oldStyle };
+              const props = f.properties as unknown as Record<string, unknown>;
+              const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+              const newStyle = applyStyleProperty(oldStyle, property, value);
 
-            const dotIndex = property.indexOf('.');
-            if (dotIndex > 0) {
-              const category = property.slice(0, dotIndex);
-              const field = property.slice(dotIndex + 1);
-              const oldCategory = (newStyle[category] ?? {}) as Record<string, unknown>;
-              newStyle[category] = { ...oldCategory, [field]: value };
-            } else {
-              newStyle[property] = value;
-            }
-
-            return {
-              ...f,
-              properties: { ...props, style: newStyle },
-            } as unknown as DebriefFeature;
-          }),
-        );
+              return {
+                ...f,
+                properties: { ...props, style: newStyle },
+              } as unknown as DebriefFeature;
+            }),
+          );
+        }
         break;
       }
       default:

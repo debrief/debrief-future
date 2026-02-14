@@ -15,6 +15,7 @@ import { LayersToolbar } from '../LayersToolbar';
 import { FeatureList } from '../FeatureList';
 import { FormatMenu } from '../FormatMenu';
 import type { DebriefFeature } from '../utils/types';
+import type { DisplayItem } from '../FeatureList/flattenFeatures';
 import type { ActivityPanelProps } from './types';
 import { DEFAULT_COLLAPSE_STATE } from './types';
 import './ActivityPanel.css';
@@ -275,6 +276,8 @@ export function ActivityPanel({
     featureIds: string[];
     featureKinds: string[];
     position: { x: number; y: number };
+    /** For child overrides (e.g., individual track point formatting) */
+    childOverride?: { parentFeatureId: string; childIndex: number; childType: string };
   } | null>(null);
 
   const handleFormatClick = useCallback(
@@ -285,6 +288,33 @@ export function ActivityPanel({
         featureIds: [feature.id],
         featureKinds: kind ? [kind] : ['TRACK'],
         position: { x: rect.right + 4, y: rect.top },
+      });
+    },
+    []
+  );
+
+  const handleChildFormatClick = useCallback(
+    (event: React.MouseEvent, displayItem: DisplayItem) => {
+      if (!displayItem.parentId || displayItem.index === null) return;
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+
+      // Map child type to the menu kind
+      const childKindMap: Record<string, string> = {
+        position: 'POSITION',
+        point: 'POINT',
+        polygon: 'POLY',
+      };
+      const menuKind = childKindMap[displayItem.type] ?? 'POINT';
+
+      setFormatMenuState({
+        featureIds: [displayItem.parentId],
+        featureKinds: [menuKind],
+        position: { x: rect.right + 4, y: rect.top },
+        childOverride: {
+          parentFeatureId: displayItem.parentId,
+          childIndex: displayItem.index,
+          childType: displayItem.type,
+        },
       });
     },
     []
@@ -306,10 +336,23 @@ export function ActivityPanel({
 
   const handleFormatChange = useCallback(
     (featureIds: readonly string[], property: string, value: string | number) => {
-      onMessage?.({ type: 'layer:format', payload: { featureIds: [...featureIds], property, value } });
+      const override = formatMenuState?.childOverride;
+      onMessage?.({
+        type: 'layer:format',
+        payload: {
+          featureIds: [...featureIds],
+          property,
+          value,
+          ...(override && {
+            isPointOverride: true,
+            positionIndex: override.childIndex,
+            childType: override.childType,
+          }),
+        },
+      });
       setFormatMenuState(null);
     },
-    [onMessage]
+    [onMessage, formatMenuState]
   );
 
   // Determine how many flexible sections are expanded (for split calc)
@@ -398,6 +441,7 @@ export function ActivityPanel({
             onSelectionChange={handleSelectionChange}
             showFormatIcon
             onFormatClick={handleFormatClick}
+            onChildFormatClick={handleChildFormatClick}
           />
           {formatMenuState && (
             <FormatMenu

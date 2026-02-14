@@ -86,6 +86,15 @@ const PROPERTY_MAP: ReadonlyMap<string, readonly StylePropertyDescriptor[]> = ne
     { id: 'weight', label: 'format.line.weight', category: 'line', valueType: 'number' },
   ]],
 
+  // POSITION: per-point overrides when formatting individual track positions
+  ['POSITION', [
+    { id: 'shape', label: 'format.point.shape', category: 'point', valueType: 'shape' },
+    { id: 'fill_color', label: 'format.point.fillColor', category: 'point', valueType: 'color' },
+    { id: 'fill_opacity', label: 'format.fill.opacity', category: 'point', valueType: 'number' },
+    { id: 'stroke_color', label: 'format.stroke.color', category: 'stroke', valueType: 'color' },
+    { id: 'radius', label: 'format.point.radius', category: 'point', valueType: 'number' },
+  ]],
+
   ['NARRATIVE', []],
   ['TEXT', []],
   ['SYSTEM', []],

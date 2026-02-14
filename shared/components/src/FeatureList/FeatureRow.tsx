@@ -42,6 +42,9 @@ export interface FeatureRowProps {
   /** Format icon click handler (Feature 097) */
   onFormatClick?: (event: React.MouseEvent, feature: DebriefFeature) => void;
 
+  /** Format icon click handler for child rows (positions, points, polygons) */
+  onChildFormatClick?: (event: React.MouseEvent, displayItem: DisplayItem) => void;
+
   /** Optional inline style */
   style?: CSSProperties;
 }
@@ -130,6 +133,7 @@ export function FeatureRow({
   onClick,
   onToggleExpand,
   onFormatClick,
+  onChildFormatClick,
   style,
 }: FeatureRowProps) {
   // Determine label, type, color based on whether this is a feature row or child row
@@ -221,6 +225,32 @@ export function FeatureRow({
             if (e.key === 'Enter') {
               e.stopPropagation();
               onFormatClick(e as unknown as React.MouseEvent, feature);
+            }
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2.5l1.5 1.5-9 9H3v-1.5l9-9z" />
+            <path d="M10.5 4l1.5 1.5" />
+            <path d="M2 13.5h12" />
+          </svg>
+        </span>
+      )}
+      {showFormatIcon && !feature && displayItem && onChildFormatClick &&
+        (displayItem.type === 'position' || displayItem.type === 'point' || displayItem.type === 'polygon') && (
+        <span
+          className="debrief-feature-row__format-icon"
+          title="Format"
+          role="button"
+          tabIndex={-1}
+          data-testid={`format-icon-${displayItem.id}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onChildFormatClick(e, displayItem);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.stopPropagation();
+              onChildFormatClick(e as unknown as React.MouseEvent, displayItem);
             }
           }}
         >

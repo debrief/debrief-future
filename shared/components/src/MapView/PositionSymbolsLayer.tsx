@@ -112,21 +112,31 @@ export function PositionSymbolsLayer({
       if (!coord) continue;
       const position: LatLngExpression = [coord[1], coord[0]];
 
-      // Determine marker appearance
-      const markerColor = isPositionSelected ? 'var(--debrief-selection-border, #0066cc)' : color;
-      const baseRadius = getRadiusForShape(style.symbol);
-      const radius = isPositionSelected ? baseRadius + 3 : baseRadius;
+      // Determine marker appearance — per-position overrides take priority
+      const hasOverrideColor = !!style.fillColor || !!style.strokeColor;
+      const defaultColor = isPositionSelected ? 'var(--debrief-selection-border, #0066cc)' : color;
+      const markerFillColor = style.fillColor ?? defaultColor;
+      const markerStrokeColor = style.strokeColor ?? defaultColor;
+      const baseRadius = style.radius ?? getRadiusForShape(style.symbol);
+      const markerRadius = isPositionSelected ? baseRadius + 3 : baseRadius;
+      const markerFillOpacity = style.fillOpacity ?? (isPositionSelected ? 0.9 : 0.7);
 
-      if (shouldShowSymbol) {
+      // Show symbol if it has a per-position colour override (even if normally hidden)
+      const showForOverride = hasOverrideColor && !shouldShowSymbol;
+      if (showForOverride) {
+        // Override colour forces the position to be visible
+      }
+
+      if (shouldShowSymbol || showForOverride) {
         items.push(
           <CircleMarker
             key={`symbol-${i}`}
             center={position}
-            radius={radius}
+            radius={markerRadius}
             pathOptions={{
-              color: markerColor,
-              fillColor: markerColor,
-              fillOpacity: isPositionSelected ? 0.9 : 0.7,
+              color: markerStrokeColor,
+              fillColor: markerFillColor,
+              fillOpacity: markerFillOpacity,
               weight: isPositionSelected ? 3 : 2,
             }}
           >

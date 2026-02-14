@@ -73,7 +73,7 @@ export type ActivityPanelMessage =
   | { type: 'layer:toggleVisibility'; payload: { featureIds: string[] } }
   | { type: 'layer:delete'; payload: { featureIds: string[] } }
   | { type: 'layer:select'; payload: { featureIds: string[] } }
-  | { type: 'layer:format'; payload: { featureIds: string[]; property: string; value: string | number | boolean } };
+  | { type: 'layer:format'; payload: { featureIds: string[]; property: string; value: string | number | boolean; isPointOverride?: boolean; positionIndex?: number; childType?: string } };
 
 /**
  * Props for the ActivityPanel component.
