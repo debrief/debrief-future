@@ -47,13 +47,13 @@
 
 **Purpose**: Project scaffolding — type definitions, component skeleton, extension registration
 
-- [ ] T001 [P] Create ResultsPanel type definitions `shared/components/src/ResultsPanel/types.ts`
-- [ ] T002 [P] Create ResultsPanel component barrel export `shared/components/src/ResultsPanel/index.ts`
-- [ ] T003 [P] Create results panel message types in extension `apps/vscode/src/webview/messages.ts`
-- [ ] T004 Register panel view container and view in package.json `apps/vscode/package.json`
-- [ ] T005 Register "Show Results Panel" command in package.json `apps/vscode/package.json`
-- [ ] T006 Add resultsPanel webview entry point to esbuild config `apps/vscode/esbuild.config.js`
-- [ ] T007 Export ResultsPanel from shared components barrel `shared/components/src/index.ts`
+- [x] T001 [P] Create ResultsPanel type definitions `shared/components/src/ResultsPanel/types.ts`
+- [x] T002 [P] Create ResultsPanel component barrel export `shared/components/src/ResultsPanel/index.ts`
+- [x] T003 [P] Create results panel message types in extension `apps/vscode/src/webview/messages.ts`
+- [x] T004 Register panel view container and view in package.json `apps/vscode/package.json`
+- [x] T005 Register "Show Results Panel" command in package.json `apps/vscode/package.json`
+- [x] T006 Add resultsPanel webview entry point to esbuild config `apps/vscode/esbuild.config.js`
+- [x] T007 Export ResultsPanel from shared components barrel `shared/components/src/index.ts`
 
 ---
 
@@ -63,10 +63,10 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 Create ResultsPanelViewProvider shell with resolveWebviewView, message queueing, and disposal `apps/vscode/src/views/resultsPanelView.ts`
-- [ ] T009 Create resultsPanel.tsx webview entry point — mount React root, send webviewReady, listen for messages `apps/vscode/src/webview/web/resultsPanel.tsx`
-- [ ] T010 Register ResultsPanelViewProvider in extension activation `apps/vscode/src/extension.ts`
-- [ ] T011 Create empty-state ResultsPanel React component (renders "No results to display" when no tabs) `shared/components/src/ResultsPanel/ResultsPanel.tsx`
+- [x] T008 Create ResultsPanelViewProvider shell with resolveWebviewView, message queueing, and disposal `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T009 Create resultsPanel.tsx webview entry point — mount React root, send webviewReady, listen for messages `apps/vscode/src/webview/web/resultsPanel.tsx`
+- [x] T010 Register ResultsPanelViewProvider in extension activation `apps/vscode/src/extension.ts`
+- [x] T011 Create empty-state ResultsPanel React component (renders "No results to display" when no tabs) `shared/components/src/ResultsPanel/ResultsPanel.tsx`
 
 **Checkpoint**: Foundation ready — panel appears in VS Code bottom area with empty state. User story implementation can begin.
 
@@ -80,19 +80,19 @@
 
 ### Tests for User Story 1
 
-- [ ] T012 [test] Unit tests for ResultsPanel rendering (empty state, single tab, loading state, error state) `shared/components/src/ResultsPanel/ResultsPanel.test.tsx`
-- [ ] T013 [P][test] Unit tests for ResultTabContent content routing (dataset → chart, image → img, other → fallback) `shared/components/src/ResultsPanel/ResultTabContent.test.tsx`
+- [x] T012 [test] Unit tests for ResultsPanel rendering (empty state, single tab, loading state, error state) `shared/components/src/ResultsPanel/ResultsPanel.test.tsx`
+- [x] T013 [P][test] Unit tests for ResultTabContent content routing (dataset → chart, image → img, other → fallback) `shared/components/src/ResultsPanel/ResultTabContent.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T014 Implement ResultTabContent — content router dispatching to ChartRenderer, ImageViewer, or FallbackViewer based on artifactType `shared/components/src/ResultsPanel/ResultTabContent.tsx`
-- [ ] T015 [P] Implement ImageViewer — inline image display from data URI, scaled to fit `shared/components/src/ResultsPanel/ImageViewer.tsx`
-- [ ] T016 [P] Implement FallbackViewer — file summary (name, type, size) with "Open in VS Code" button `shared/components/src/ResultsPanel/FallbackViewer.tsx`
-- [ ] T017 Implement single-tab rendering in ResultsPanel — receives addTab messages, displays active tab content, shows loading/error states `shared/components/src/ResultsPanel/ResultsPanel.tsx`
-- [ ] T018 Add openResult() method to ResultsPanelViewProvider — reads file, determines artifact type, creates ResultTab, creates content payload, sends results:addTab message `apps/vscode/src/views/resultsPanelView.ts`
-- [ ] T019 Implement content preparation logic — parse JSON as DatasetEnvelope + transformDataset(), read images as base64 data URI, read file metadata for fallback `apps/vscode/src/views/resultsPanelView.ts`
-- [ ] T020 Wire auto-open: after tool result persistence in executeTool, call resultsPanelView.openResult() `apps/vscode/src/commands/index.ts`
-- [ ] T021 Handle webviewReady message — flush queued messages when webview mounts `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T014 Implement ResultTabContent — content router dispatching to ChartRenderer, ImageViewer, or FallbackViewer based on artifactType `shared/components/src/ResultsPanel/ResultTabContent.tsx`
+- [x] T015 [P] Implement ImageViewer — inline image display from data URI, scaled to fit `shared/components/src/ResultsPanel/ImageViewer.tsx`
+- [x] T016 [P] Implement FallbackViewer — file summary (name, type, size) with "Open in VS Code" button `shared/components/src/ResultsPanel/FallbackViewer.tsx`
+- [x] T017 Implement single-tab rendering in ResultsPanel — receives addTab messages, displays active tab content, shows loading/error states `shared/components/src/ResultsPanel/ResultsPanel.tsx`
+- [x] T018 Add openResult() method to ResultsPanelViewProvider — reads file, determines artifact type, creates ResultTab, creates content payload, sends results:addTab message `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T019 Implement content preparation logic — parse JSON as DatasetEnvelope + transformDataset(), read images as base64 data URI, read file metadata for fallback `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T020 Wire auto-open: after tool result persistence in executeTool, call resultsPanelView.openResult() `apps/vscode/src/commands/index.ts`
+- [x] T021 Handle webviewReady message — flush queued messages when webview mounts `apps/vscode/src/views/resultsPanelView.ts`
 
 **Checkpoint**: Tool completion auto-opens the panel with a single result tab. Chart, image, and fallback content types all render correctly.
 
@@ -106,10 +106,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T022 Add FileSystemWatcher creation per tab in ResultsPanelViewProvider — watch the result file's absolute path, dispose on tab close `apps/vscode/src/views/resultsPanelView.ts`
-- [ ] T023 Implement debounced file change handler — 200ms debounce after onDidChange, re-read file, re-prepare content, send results:updateContent message `apps/vscode/src/views/resultsPanelView.ts`
-- [ ] T024 Handle results:updateContent in ResultsPanel React component — update content for matching tab ID without changing tab position `shared/components/src/ResultsPanel/ResultsPanel.tsx`
-- [ ] T025 [test] Unit test for live update — verify updateContent replaces tab content without affecting tab order or active state `shared/components/src/ResultsPanel/ResultsPanel.test.tsx`
+- [x] T022 Add FileSystemWatcher creation per tab in ResultsPanelViewProvider — watch the result file's absolute path, dispose on tab close `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T023 Implement debounced file change handler — 200ms debounce after onDidChange, re-read file, re-prepare content, send results:updateContent message `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T024 Handle results:updateContent in ResultsPanel React component — update content for matching tab ID without changing tab position `shared/components/src/ResultsPanel/ResultsPanel.tsx`
+- [x] T025 [test] Unit test for live update — verify updateContent replaces tab content without affecting tab order or active state `shared/components/src/ResultsPanel/ResultsPanel.test.tsx`
 
 **Checkpoint**: Re-running a tool that overwrites the same result file causes the open tab to re-render automatically. Tab position is preserved.
 
@@ -123,15 +123,15 @@
 
 ### Tests for User Story 3
 
-- [ ] T026 [test] Unit tests for ResultTabBar — renders tab titles, handles click to switch, handles close button, shows empty state after last close `shared/components/src/ResultsPanel/ResultTabBar.test.tsx`
+- [x] T026 [test] Unit tests for ResultTabBar — renders tab titles, handles click to switch, handles close button, shows empty state after last close `shared/components/src/ResultsPanel/ResultTabBar.test.tsx`
 
 ### Implementation for User Story 3
 
-- [ ] T027 Implement ResultTabBar — horizontal tab strip with tab titles, close buttons, active indicator, overflow scroll `shared/components/src/ResultsPanel/ResultTabBar.tsx`
-- [ ] T028 Implement multi-tab state in ResultsPanel — tab ordering, active tab tracking, switching between tabs (restoring cached content) `shared/components/src/ResultsPanel/ResultsPanel.tsx`
-- [ ] T029 Handle results:selectTab in webview — send to extension host; handle results:closeTab — send to extension host `shared/components/src/ResultsPanel/ResultsPanel.tsx`
-- [ ] T030 Handle closeTab and selectTab in ResultsPanelViewProvider — remove tab + dispose watcher on close, determine next active tab, send results:removeTab `apps/vscode/src/views/resultsPanelView.ts`
-- [ ] T031 Implement de-duplication in openResult() — if tab ID already exists, send results:activateTab instead of creating a new tab `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T027 Implement ResultTabBar — horizontal tab strip with tab titles, close buttons, active indicator, overflow scroll `shared/components/src/ResultsPanel/ResultTabBar.tsx`
+- [x] T028 Implement multi-tab state in ResultsPanel — tab ordering, active tab tracking, switching between tabs (restoring cached content) `shared/components/src/ResultsPanel/ResultsPanel.tsx`
+- [x] T029 Handle results:selectTab in webview — send to extension host; handle results:closeTab — send to extension host `shared/components/src/ResultsPanel/ResultsPanel.tsx`
+- [x] T030 Handle closeTab and selectTab in ResultsPanelViewProvider — remove tab + dispose watcher on close, determine next active tab, send results:removeTab `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T031 Implement de-duplication in openResult() — if tab ID already exists, send results:activateTab instead of creating a new tab `apps/vscode/src/views/resultsPanelView.ts`
 
 **Checkpoint**: Multiple tabs open, switch, and close correctly. Duplicate opens activate existing tabs. Closing the last tab shows empty state.
 
@@ -145,10 +145,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T032 Implement title derivation in openResult() — extract DatasetEnvelope.title for datasets, use filename for images/other, apply plot prefix when multiple plots have tabs `apps/vscode/src/views/resultsPanelView.ts`
-- [ ] T033 Add title truncation and tooltip to ResultTabBar — CSS text-overflow ellipsis, HTML title attribute for full text on hover `shared/components/src/ResultsPanel/ResultTabBar.tsx`
-- [ ] T034 Handle results:updatePlotPrefixes — when the set of plots with open tabs changes, toggle plot name prefix in all tab titles `apps/vscode/src/views/resultsPanelView.ts`
-- [ ] T035 [test] Unit test for title derivation — dataset with title, dataset without title, image filename, fallback, multi-plot prefix `shared/components/src/ResultsPanel/ResultsPanel.test.tsx`
+- [x] T032 Implement title derivation in openResult() — extract DatasetEnvelope.title for datasets, use filename for images/other, apply plot prefix when multiple plots have tabs `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T033 Add title truncation and tooltip to ResultTabBar — CSS text-overflow ellipsis, HTML title attribute for full text on hover `shared/components/src/ResultsPanel/ResultTabBar.tsx`
+- [x] T034 Handle results:updatePlotPrefixes — when the set of plots with open tabs changes, toggle plot name prefix in all tab titles `apps/vscode/src/views/resultsPanelView.ts`
+- [x] T035 [test] Unit test for title derivation — dataset with title, dataset without title, image filename, fallback, multi-plot prefix `shared/components/src/ResultsPanel/ResultsPanel.test.tsx`
 
 **Checkpoint**: Tab titles reflect result metadata. Truncated titles show full text on hover. Multi-plot tabs include plot names.
 
@@ -162,8 +162,8 @@
 
 ### Implementation for User Story 5
 
-- [ ] T036 Redirect openResultArtifact command to call resultsPanelView.openResult() instead of opening raw JSON in text editor `apps/vscode/src/commands/index.ts`
-- [ ] T037 Add STAC browser context menu action for result assets — register menu item with `viewItem == stacResultAsset` calling openResultArtifact `apps/vscode/package.json`
+- [x] T036 Redirect openResultArtifact command to call resultsPanelView.openResult() instead of opening raw JSON in text editor `apps/vscode/src/commands/index.ts`
+- [x] T037 Add STAC browser context menu action for result assets — register menu item with `viewItem == stacResultAsset` calling openResultArtifact `apps/vscode/package.json`
 
 **Checkpoint**: All three entry points (auto-open, STAC browser, attachments menu) open results in the same panel with consistent rendering.
 
@@ -177,7 +177,7 @@
 
 ### Implementation for User Story 6
 
-- [ ] T038 Register debrief.showResultsPanel command handler — reveal the results panel view `apps/vscode/src/commands/index.ts`
+- [x] T038 Register debrief.showResultsPanel command handler — reveal the results panel view `apps/vscode/src/commands/index.ts`
 
 **Checkpoint**: The "Show Results Panel" command opens the panel, showing previously opened tabs or the empty state.
 
@@ -189,13 +189,13 @@
 
 ### Storybook Stories
 
-- [ ] T039 Create Storybook stories — EmptyState, SingleDatasetTab, MultipleTabTypes, ImageTab, ErrorTab, FallbackTab `shared/components/src/ResultsPanel/ResultsPanel.stories.tsx`
+- [x] T039 Create Storybook stories — EmptyState, SingleDatasetTab, MultipleTabTypes, ImageTab, ErrorTab, FallbackTab `shared/components/src/ResultsPanel/ResultsPanel.stories.tsx`
 
 ### E2E Tests
 
-- [ ] T040 Create Playwright E2E test for MultipleTabs story — tab rendering, click to switch, click to close, hover tooltip `shared/components/e2e/ResultsPanel.spec.ts`
-- [ ] T041 [P] Add theme variant E2E tests — light, dark, vscode variants for MultipleTabs and EmptyState `shared/components/e2e/ResultsPanel.spec.ts`
-- [ ] T042 Run full E2E suite: `pnpm --filter @debrief/components test:e2e ResultsPanel`
+- [x] T040 Create Playwright E2E test for MultipleTabs story — tab rendering, click to switch, click to close, hover tooltip `shared/components/e2e/ResultsPanel.spec.ts`
+- [x] T041 [P] Add theme variant E2E tests — light, dark, vscode variants for MultipleTabs and EmptyState `shared/components/e2e/ResultsPanel.spec.ts`
+- [x] T042 Run full E2E suite: `pnpm --filter @debrief/components test:e2e ResultsPanel`
 
 **Checkpoint**: All Storybook stories render correctly. Playwright tests pass across all theme variants.
 
@@ -207,24 +207,24 @@
 
 ### Polish
 
-- [ ] T043 Add responsive chart resizing — listen for panel resize events, propagate dimensions to ChartRenderer `shared/components/src/ResultsPanel/ResultTabContent.tsx`
-- [ ] T044 [P] Add accessibility attributes — data-testid on tab buttons, aria-label on close buttons, aria-selected on active tab `shared/components/src/ResultsPanel/ResultTabBar.tsx`
-- [ ] T045 Run unit tests: `pnpm --filter @debrief/components test -- ResultsPanel`
-- [ ] T046 Run linting: `pnpm --filter @debrief/components lint && pnpm --filter debrief-vscode lint`
-- [ ] T047 Build extension and verify no errors: `cd apps/vscode && npm run compile`
+- [x] T043 Add responsive chart resizing — listen for panel resize events, propagate dimensions to ChartRenderer `shared/components/src/ResultsPanel/ResultTabContent.tsx`
+- [x] T044 [P] Add accessibility attributes — data-testid on tab buttons, aria-label on close buttons, aria-selected on active tab `shared/components/src/ResultsPanel/ResultTabBar.tsx`
+- [x] T045 Run unit tests: `pnpm --filter @debrief/components test -- ResultsPanel`
+- [x] T046 Run linting: `pnpm --filter @debrief/components lint && pnpm --filter debrief-vscode lint`
+- [x] T047 Build extension and verify no errors: `cd apps/vscode && npm run compile`
 
 ### Evidence Collection
 
-- [ ] T048 Create evidence directory `specs/095-results-bottom-panel/evidence/`
-- [ ] T049 Capture test summary with pass/fail counts `specs/095-results-bottom-panel/evidence/test-summary.md`
-- [ ] T050 Record usage example demonstrating feature workflow `specs/095-results-bottom-panel/evidence/usage-example.md`
-- [ ] T051 [P] Capture Storybook screenshots across theme variants `specs/095-results-bottom-panel/evidence/screenshots/`
-- [ ] T052 Document E2E results `specs/095-results-bottom-panel/evidence/e2e-summary.md`
+- [x] T048 Create evidence directory `specs/095-results-bottom-panel/evidence/`
+- [x] T049 Capture test summary with pass/fail counts `specs/095-results-bottom-panel/evidence/test-summary.md`
+- [x] T050 Record usage example demonstrating feature workflow `specs/095-results-bottom-panel/evidence/usage-example.md`
+- [x] T051 [P] Capture Storybook screenshots across theme variants `specs/095-results-bottom-panel/evidence/screenshots/`
+- [x] T052 Document E2E results `specs/095-results-bottom-panel/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T053 Create shipped blog post `specs/095-results-bottom-panel/media/shipped-post.md`
-- [ ] T054 [P] Create LinkedIn shipped summary `specs/095-results-bottom-panel/media/linkedin-shipped.md`
+- [x] T053 Create shipped blog post `specs/095-results-bottom-panel/media/shipped-post.md`
+- [x] T054 [P] Create LinkedIn shipped summary `specs/095-results-bottom-panel/media/linkedin-shipped.md`
 
 ### PR Creation
 
