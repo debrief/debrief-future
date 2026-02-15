@@ -263,6 +263,50 @@ test.describe('FormatMenu — Child polygon formatting (3-tier)', () => {
     const formatIcon = page.locator('[data-testid="format-icon-track-alpha\\/positions\\/0"]');
     await expect(formatIcon).toBeVisible();
   });
+
+  test('selecting fill colour on track position records change', async ({ page }) => {
+    // Expand track-alpha to show positions
+    const trackRow = page.locator('[data-testid="feature-row-track-alpha"]');
+    await trackRow.locator('.debrief-feature-row__expand-btn').click();
+
+    // Hover position 0 and click its format icon
+    const posRow = page.locator('[data-testid="feature-row-track-alpha\\/positions\\/0"]');
+    await posRow.hover();
+    const formatIcon = page.locator('[data-testid="format-icon-track-alpha\\/positions\\/0"]');
+    await formatIcon.click();
+
+    // Menu should open with POSITION properties
+    const menu = page.locator('[data-testid="cascading-menu"]');
+    await expect(menu).toBeVisible();
+
+    // POSITION kind should show fill_color and show_symbol
+    await expect(page.locator('[data-testid="menu-item-fill_color"]')).toBeVisible();
+    await expect(page.locator('[data-testid="menu-item-show_symbol"]')).toBeVisible();
+
+    // Hover Fill Colour to open submenu
+    const fillColourItem = page.locator('[data-testid="menu-item-fill_color"]');
+    await fillColourItem.hover();
+
+    const submenu = page.locator('[data-testid="cascading-submenu"]');
+    await expect(submenu).toBeVisible({ timeout: 2000 });
+
+    // Click "Green" (#00CC00)
+    const greenItem = page.locator('[data-testid="submenu-item-fill_color\\:\\:green"]');
+    await greenItem.click();
+
+    // Menu should be dismissed
+    await expect(menu).not.toBeVisible();
+
+    // Verify the change was recorded with child override path
+    const lastChange = page.locator('[data-testid="last-format-change"]');
+    await expect(lastChange).toHaveText('track-alpha/child/0|fill_color=#00CC00');
+
+    // Verify the child colour map was updated
+    const colourMap = page.locator('[data-testid="child-colour-map"]');
+    const mapJson = await colourMap.textContent();
+    const parsed = JSON.parse(mapJson!);
+    expect(parsed['track-alpha/positions/0']).toBe('#00CC00');
+  });
 });
 
 test.describe('FormatMenu Screenshots', () => {
