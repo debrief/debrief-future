@@ -630,6 +630,18 @@ export default function App() {
       }
     }
 
+    // Write dataset results to STAC assets and auto-open in Results panel
+    if (result.datasets && result.datasets.length > 0 && currentPlot) {
+      const itemDir = `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`;
+      for (const ds of result.datasets) {
+        const assetPath = `${itemDir}/assets/${ds.filename}`;
+        mockFsAdapter.writeFile(assetPath, JSON.stringify(ds.envelope, null, 2));
+        // Auto-open the dataset as a result tab
+        handleFileSelect(assetPath);
+      }
+      setTreeRefreshKey(k => k + 1);
+    }
+
     // Record a log entry
     const nextId = activityCounter + 1;
     setActivityCounter(nextId);
@@ -682,7 +694,7 @@ export default function App() {
     }
 
     setLogEntries(prev => [entry, ...prev]);
-  }, [selectedFeatures, activityCounter, currentPlot]);
+  }, [selectedFeatures, activityCounter, currentPlot, handleFileSelect]);
 
   // Handle ActivityPanel messages
   const handleActivityMessage = useCallback((message: ActivityPanelMessage) => {
