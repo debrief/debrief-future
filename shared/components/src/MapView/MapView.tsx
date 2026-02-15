@@ -350,6 +350,31 @@ export function MapView({
           }
         });
       }
+
+      // Apply per-polygon child overrides from position_style_overrides
+      // (used when formatting individual polygons within a MultiPolygon)
+      if (
+        feature.geometry?.type === 'MultiPolygon' &&
+        !zoneRingStyles &&
+        featureProps?.position_style_overrides &&
+        'getLayers' in layer
+      ) {
+        const childOverrides = featureProps.position_style_overrides as Record<string, Record<string, unknown>>;
+        const subLayers = (layer as unknown as { getLayers(): L.Layer[] }).getLayers();
+        subLayers.forEach((subLayer, i) => {
+          const s = childOverrides[String(i)];
+          if (s && 'setStyle' in subLayer) {
+            const overrideStyle: PathOptions = {};
+            if (s.fill_color !== undefined) overrideStyle.fillColor = s.fill_color as string;
+            if (s.color !== undefined) overrideStyle.color = s.color as string;
+            if (s.fill_opacity !== undefined) overrideStyle.fillOpacity = s.fill_opacity as number;
+            if (s.weight !== undefined) overrideStyle.weight = s.weight as number;
+            if (s.opacity !== undefined) overrideStyle.opacity = s.opacity as number;
+            if (s.dash_array !== undefined) overrideStyle.dashArray = s.dash_array as string;
+            (subLayer as unknown as { setStyle(opts: PathOptions): void }).setStyle(overrideStyle);
+          }
+        });
+      }
     };
   }, [onSelect]);
 
