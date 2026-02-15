@@ -5,12 +5,11 @@
  * when a plot with temporal features is loaded.
  */
 
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { CatalogPage, AnalysisPage } from '../pages';
 
-// STATUS: Skipped — requires web-shell app with TimeController and STAC data.
-// See docs/web-shell-test-restoration-requirements.md for restoration plan.
-test.describe.skip('Time Controller', () => {
+// Time Controller integration tests — verifies playback, layer selection, and navigation.
+test.describe('Time Controller', () => {
   let catalogPage: CatalogPage;
 
   test.beforeEach(async ({ page }) => {

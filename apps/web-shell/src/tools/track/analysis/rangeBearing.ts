@@ -88,8 +88,8 @@ export function execute(
 
   // Build time-series by zipping coordinates by index
   const len = Math.min(coords1.length, coords2.length);
-  const rangeData: Record<string, unknown>[] = [];
-  const bearingData: Record<string, unknown>[] = [];
+  const rangePoints: Record<string, unknown>[] = [];
+  const bearingPoints: Record<string, unknown>[] = [];
 
   for (let i = 0; i < len; i++) {
     const time = times1?.[i] ?? times2?.[i] ?? i * 1000;
@@ -102,17 +102,13 @@ export function execute(
       coords1[i][0], coords1[i][1], coords2[i][0], coords2[i][1],
     );
 
-    rangeData.push({
-      Time: isoTime,
-      Range: Math.round(rangeNm * 100) / 100,
-    });
-    bearingData.push({
-      Time: isoTime,
-      Bearing: Math.round(bearingDeg * 10) / 10,
-    });
+    rangePoints.push({ time: isoTime, value: Math.round(rangeNm * 100) / 100 });
+    bearingPoints.push({ time: isoTime, value: Math.round(bearingDeg * 10) / 10 });
   }
 
-  // DatasetEnvelope for range chart
+  const seriesName = `${name1} \u2192 ${name2}`;
+
+  // DatasetEnvelope for range chart (uses series format for rangeBearingSeries mapping)
   const rangeDataset = {
     type: 'range_bearing_series',
     title: `Range: ${name1} \u2192 ${name2}`,
@@ -120,7 +116,7 @@ export function execute(
       xAxis: { label: 'Time', type: 'temporal' },
       yAxis: { label: 'Range', type: 'quantitative', units: 'nm' },
     },
-    data: rangeData,
+    series: [{ name: seriesName, data: rangePoints }],
   };
 
   // DatasetEnvelope for bearing chart
@@ -131,7 +127,7 @@ export function execute(
       xAxis: { label: 'Time', type: 'temporal' },
       yAxis: { label: 'Bearing', type: 'quantitative', units: '\u00b0' },
     },
-    data: bearingData,
+    series: [{ name: seriesName, data: bearingPoints }],
   };
 
   // Return as a Feature carrying the datasets in __datasets

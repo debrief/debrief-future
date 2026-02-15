@@ -1,8 +1,7 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
-// STATUS: Skipped — requires web-shell app with STAC catalog data.
-// See docs/web-shell-test-restoration-requirements.md for restoration plan.
-test.describe.skip('Catalog Browse', () => {
+// Catalog browse tests — verifies welcome view and STAC catalog timeline.
+test.describe('Catalog Browse', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
   });
