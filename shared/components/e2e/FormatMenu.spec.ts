@@ -157,6 +157,114 @@ test.describe('FormatMenu', () => {
   });
 });
 
+test.describe('FormatMenu — Child polygon formatting (3-tier)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(STORY_URL);
+    await page.waitForSelector('[data-testid="format-menu-harness"]');
+  });
+
+  test('MULTI_POLYGON feature is expandable and shows child polygons', async ({ page }) => {
+    // mpg-echo should have an expand chevron
+    const row = page.locator('[data-testid="feature-row-mpg-echo"]');
+    await expect(row).toBeVisible();
+
+    // Click the expand button
+    const expandBtn = row.locator('.debrief-feature-row__expand-btn');
+    await expandBtn.click();
+
+    // Child polygon rows should appear
+    await expect(page.locator('[data-testid="feature-row-mpg-echo\\/polygons\\/0"]')).toBeVisible();
+    await expect(page.locator('[data-testid="feature-row-mpg-echo\\/polygons\\/1"]')).toBeVisible();
+    await expect(page.locator('[data-testid="feature-row-mpg-echo\\/polygons\\/2"]')).toBeVisible();
+  });
+
+  test('format icon appears on child polygon row when hovered', async ({ page }) => {
+    // Expand the MULTI_POLYGON
+    const row = page.locator('[data-testid="feature-row-mpg-echo"]');
+    await row.locator('.debrief-feature-row__expand-btn').click();
+
+    // Hover Polygon 1 row
+    const childRow = page.locator('[data-testid="feature-row-mpg-echo\\/polygons\\/0"]');
+    await expect(childRow).toBeVisible();
+    await childRow.hover();
+
+    // Format icon should be present
+    const formatIcon = page.locator('[data-testid="format-icon-mpg-echo\\/polygons\\/0"]');
+    await expect(formatIcon).toBeVisible();
+  });
+
+  test('clicking child polygon format icon opens menu with POLY properties', async ({ page }) => {
+    // Expand the MULTI_POLYGON
+    const row = page.locator('[data-testid="feature-row-mpg-echo"]');
+    await row.locator('.debrief-feature-row__expand-btn').click();
+
+    // Hover then click format icon on Polygon 1
+    const childRow = page.locator('[data-testid="feature-row-mpg-echo\\/polygons\\/0"]');
+    await childRow.hover();
+    const formatIcon = page.locator('[data-testid="format-icon-mpg-echo\\/polygons\\/0"]');
+    await formatIcon.click();
+
+    // Cascading menu should open with POLY properties
+    const menu = page.locator('[data-testid="cascading-menu"]');
+    await expect(menu).toBeVisible();
+
+    // POLY kind should show fill_color
+    await expect(page.locator('[data-testid="menu-item-fill_color"]')).toBeVisible();
+  });
+
+  test('selecting fill colour on child polygon records change', async ({ page }) => {
+    // Expand the MULTI_POLYGON
+    const mpgRow = page.locator('[data-testid="feature-row-mpg-echo"]');
+    await mpgRow.locator('.debrief-feature-row__expand-btn').click();
+
+    // Hover Polygon 1 and click its format icon
+    const childRow = page.locator('[data-testid="feature-row-mpg-echo\\/polygons\\/0"]');
+    await childRow.hover();
+    const formatIcon = page.locator('[data-testid="format-icon-mpg-echo\\/polygons\\/0"]');
+    await formatIcon.click();
+
+    // Hover Fill Colour to open submenu
+    const fillColourItem = page.locator('[data-testid="menu-item-fill_color"]');
+    await fillColourItem.hover();
+
+    // Wait for submenu
+    const submenu = page.locator('[data-testid="cascading-submenu"]');
+    await expect(submenu).toBeVisible({ timeout: 2000 });
+
+    // Click "Red" (#CC0000)
+    const redItem = page.locator('[data-testid="submenu-item-fill_color\\:\\:red"]');
+    await redItem.click();
+
+    // Menu should be dismissed
+    await expect(page.locator('[data-testid="cascading-menu"]')).not.toBeVisible();
+
+    // Verify the change was recorded with child override path
+    const lastChange = page.locator('[data-testid="last-format-change"]');
+    await expect(lastChange).toHaveText('mpg-echo/child/0|fill_color=#CC0000');
+
+    // Verify the child colour map was updated
+    const colourMap = page.locator('[data-testid="child-colour-map"]');
+    const mapJson = await colourMap.textContent();
+    const parsed = JSON.parse(mapJson!);
+    expect(parsed['mpg-echo/polygons/0']).toBe('#CC0000');
+  });
+
+  test('track positions are expandable and show format icons', async ({ page }) => {
+    // Expand track-alpha (has 3 positions)
+    const row = page.locator('[data-testid="feature-row-track-alpha"]');
+    await row.locator('.debrief-feature-row__expand-btn').click();
+
+    // Position rows should appear
+    const posRow = page.locator('[data-testid="feature-row-track-alpha\\/positions\\/0"]');
+    await expect(posRow).toBeVisible();
+
+    // Hover to see format icon
+    await posRow.hover();
+    const formatIcon = page.locator('[data-testid="format-icon-track-alpha\\/positions\\/0"]');
+    await expect(formatIcon).toBeVisible();
+  });
+});
+
 test.describe('FormatMenu Screenshots', () => {
   test('capture format menu open state', async ({ page }) => {
     await page.goto(STORY_URL);
