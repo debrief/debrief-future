@@ -310,6 +310,7 @@ export function MapView({
   const onEachFeature = useMemo(() => {
     return (feature: GeoJSON.Feature, layer: L.Layer) => {
       const debriefFeature = feature as unknown as DebriefFeature;
+      const featureId = debriefFeature.id;
       const label = getFeatureLabel(debriefFeature);
 
       // Add tooltip
@@ -318,21 +319,27 @@ export function MapView({
         direction: 'top',
       });
 
-      // Add click handler
-      layer.on('click', (e) => {
-        e.originalEvent.stopPropagation();
-        onSelect?.(debriefFeature.id, e.originalEvent as unknown as React.MouseEvent);
-      });
-
-      // Apply per-ring styles for ZONE MultiPolygon features
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const featureProps = feature.properties as any;
-      const zoneRingStyles: Array<{ style?: Record<string, unknown> }> | undefined =
+      const isZone =
         featureProps?.kind === 'ZONE' &&
         feature.geometry?.type === 'MultiPolygon' &&
-        Array.isArray(featureProps?.zones)
-          ? featureProps.zones
-          : undefined;
+        Array.isArray(featureProps?.zones);
+      const isMultiPoly = feature.geometry?.type === 'MultiPolygon' && !isZone;
+
+      // For non-MultiPolygon features (or ZONE features), attach a click
+      // handler on the parent layer. MultiPolygon sub-layers get individual
+      // click handlers below so we skip the parent to avoid double-firing.
+      if (!isMultiPoly) {
+        layer.on('click', (e) => {
+          e.originalEvent.stopPropagation();
+          onSelect?.(featureId, e.originalEvent as unknown as React.MouseEvent);
+        });
+      }
+
+      // Apply per-ring styles for ZONE MultiPolygon features
+      const zoneRingStyles: Array<{ style?: Record<string, unknown> }> | undefined =
+        isZone ? featureProps.zones : undefined;
 
       if (zoneRingStyles && 'getLayers' in layer) {
         const subLayers = (layer as unknown as { getLayers(): L.Layer[] }).getLayers();
@@ -351,18 +358,22 @@ export function MapView({
         });
       }
 
-      // Apply per-polygon child overrides from position_style_overrides
-      // (used when formatting individual polygons within a MultiPolygon)
-      if (
-        feature.geometry?.type === 'MultiPolygon' &&
-        !zoneRingStyles &&
-        featureProps?.position_style_overrides &&
-        'getLayers' in layer
-      ) {
-        const childOverrides = featureProps.position_style_overrides as Record<string, Record<string, unknown>>;
+      // MultiPolygon sub-layer handling: per-polygon click, overrides, and
+      // selection highlighting for individual polygons
+      if (isMultiPoly && 'getLayers' in layer) {
+        const childOverrides = featureProps?.position_style_overrides as Record<string, Record<string, unknown>> | undefined;
         const subLayers = (layer as unknown as { getLayers(): L.Layer[] }).getLayers();
         subLayers.forEach((subLayer, i) => {
-          const s = childOverrides[String(i)];
+          const childPath = `${featureId}/polygons/${i}`;
+
+          // Per-polygon click: select the child path
+          subLayer.on('click', (e) => {
+            (e as unknown as { originalEvent: Event }).originalEvent.stopPropagation();
+            onSelect?.(childPath, (e as unknown as { originalEvent: Event }).originalEvent as unknown as React.MouseEvent);
+          });
+
+          // Per-polygon style overrides (from format menu)
+          const s = childOverrides?.[String(i)];
           if (s && 'setStyle' in subLayer) {
             const overrideStyle: PathOptions = {};
             if (s.fill_color !== undefined) overrideStyle.fillColor = s.fill_color as string;
@@ -373,10 +384,20 @@ export function MapView({
             if (s.dash_array !== undefined) overrideStyle.dashArray = s.dash_array as string;
             (subLayer as unknown as { setStyle(opts: PathOptions): void }).setStyle(overrideStyle);
           }
+
+          // Per-polygon selection highlight
+          if (selectedIds.has(childPath) && 'setStyle' in subLayer) {
+            (subLayer as unknown as { setStyle(opts: PathOptions): void }).setStyle({
+              color: 'var(--debrief-selection-border)',
+              fillColor: 'var(--debrief-selection-border)',
+              fillOpacity: 0.4,
+              weight: 4,
+            });
+          }
         });
       }
     };
-  }, [onSelect]);
+  }, [onSelect, selectedIds]);
 
   // pointToLayer callback — renders Point and MultiPoint geometries as circle markers
   const pointToLayer = useMemo(() => {
