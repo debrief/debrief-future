@@ -97,7 +97,8 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Add `data-testid` attributes to components for reliable selection
      - Capture screenshots for evidence: `await page.screenshot({ path: 'specs/[feature]/evidence/screenshots/...' })`
      - Run tests: `pnpm --filter @debrief/components test:e2e [testfile]`
-     - For Claude Code sessions: Tests run with `@sparticuz/chromium` (see key_facts.md)
+
+> **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip Playwright tests because you think browsers can't be installed. Standard browser CDN downloads are blocked (403), but `@sparticuz/chromium` bundles a Linux Chromium binary via npm and works fully. The project's `playwright.config.ts` auto-detects the environment and uses the bundled binary when `CLAUDE_CODE=1` is set. Run via `node apps/web-shell/run-playwright.mjs` to extract and configure the bundled browser. Full details: `docs/project_notes/playwright-installation-research.md`
 
 8. Progress tracking and error handling:
    - Report progress after each completed task
