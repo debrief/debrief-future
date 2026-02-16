@@ -45,6 +45,7 @@ export function extractPersistentState(store: SessionStoreApi): PersistentSessio
       featureCollectionUri: state.featureCollectionUri,
       selection: state.selection,
       hiddenFeatureIds: state.hiddenFeatureIds,
+      styleVersion: 0, // Ephemeral — always reset to 0 on load
     },
   };
 }

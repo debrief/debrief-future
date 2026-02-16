@@ -95,6 +95,25 @@ export type {
 export { ActivityPanel } from './ActivityPanel';
 export { DEFAULT_COLLAPSE_STATE } from './ActivityPanel/types';
 
+// CascadingMenu (Feature: 097-feature-format-menu)
+export { CascadingMenu } from './CascadingMenu';
+export type { CascadingMenuProps, CascadingMenuItem } from './CascadingMenu';
+
+// FormatMenu (Feature: 097-feature-format-menu)
+export { FormatMenu } from './FormatMenu';
+export type { FormatMenuProps } from './FormatMenu';
+export { buildFormatMenuItems, parseMenuItemId, resolvePresetValue } from './FormatMenu';
+export type { StylePropertyDescriptor as FormatStylePropertyDescriptor } from './FormatMenu';
+export {
+  COLOUR_PALETTE,
+  LINE_WEIGHT_PRESETS,
+  OPACITY_PRESETS,
+  RADIUS_PRESETS,
+  DASH_PATTERN_PRESETS,
+  SHAPE_PRESETS,
+} from './FormatMenu';
+export type { PresetValue } from './FormatMenu';
+
 // ContextMenu (Feature: 091-tool-parameter-context-menus)
 export { ContextMenu } from './ContextMenu';
 export type { ContextMenuItem, ContextMenuProps } from './ContextMenu';

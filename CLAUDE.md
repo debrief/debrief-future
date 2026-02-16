@@ -144,6 +144,5 @@ Only updated when a feature introduces a technology not already listed here.
 - pytest / pytest-cov (Python tests)
 - Local filesystem STAC catalogs (JSON + GeoJSON storage)
 
-
 ## Recent Changes
 - 094-show-points-in-layers: Added @tanstack/react-virtual

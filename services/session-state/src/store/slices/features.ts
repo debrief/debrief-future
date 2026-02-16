@@ -119,4 +119,9 @@ export const createFeaturesSlice: StateCreator<
       set({ hiddenFeatureIds: [...hiddenFeatureIds, featureId] });
     }
   },
+
+  notifyStyleChange: () => {
+    const { styleVersion } = get();
+    set({ styleVersion: styleVersion + 1 });
+  },
 });
