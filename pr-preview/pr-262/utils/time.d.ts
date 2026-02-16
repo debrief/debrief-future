@@ -52,6 +52,14 @@ export interface ResolvedPositionStyle {
     symbol: 'circle' | 'square' | 'triangle';
     showLabel: boolean;
     labelText: string | null;
+    /** Per-position colour override from position_style_overrides (format menu) */
+    fillColor?: string;
+    /** Per-position stroke colour override */
+    strokeColor?: string;
+    /** Per-position radius override */
+    radius?: number;
+    /** Per-position fill opacity override */
+    fillOpacity?: number;
 }
 /**
  * Resolve the final styling for a position by applying the cascade:
@@ -78,5 +86,5 @@ export declare function resolvePositionStyle(index: number, defaultStyle: Positi
  */
 export declare function computeAllPositionStyles(positions: Array<{
     time: string;
-}>, defaultStyle: PositionStyle, symbolInterval: string | null | undefined, labelInterval: string | null | undefined, overrides: Array<PositionStyleOverride | null> | undefined): ResolvedPositionStyle[];
+}>, defaultStyle: PositionStyle, symbolInterval: string | null | undefined, labelInterval: string | null | undefined, overrides: Array<PositionStyleOverride | null> | Record<string, PositionStyleOverride> | undefined): ResolvedPositionStyle[];
 //# sourceMappingURL=time.d.ts.map
