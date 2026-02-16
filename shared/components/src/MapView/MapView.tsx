@@ -277,14 +277,15 @@ export function MapView({
   const geojsonData = useMemo(() => {
     const expanded: GeoJSON.Feature[] = [];
     for (const f of staticFeatures) {
-      const props = f.properties as unknown as Record<string, unknown>;
-      const isZone = props?.kind === 'ZONE' && f.geometry?.type === 'MultiPolygon';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const fProps = f.properties as any;
+      const isZone = fProps?.kind === 'ZONE' && f.geometry?.type === 'MultiPolygon';
       if (f.geometry?.type === 'MultiPolygon' && !isZone) {
         // Decompose MultiPolygon into individual Polygons
         const coords = f.geometry.coordinates as number[][][][];
-        const overrides = props?.position_style_overrides as Record<string, Record<string, unknown>> | undefined;
+        const overrides = fProps?.position_style_overrides as Record<string, Record<string, unknown>> | undefined;
         for (let i = 0; i < coords.length; i++) {
-          const childStyle = { ...(props.style as Record<string, unknown> ?? {}) };
+          const childStyle = { ...(fProps?.style ?? {}) };
           // Merge per-polygon overrides into the child style
           const ov = overrides?.[String(i)];
           if (ov) {
@@ -297,7 +298,7 @@ export function MapView({
             id: `${f.id}/polygons/${i}`,
             geometry: { type: 'Polygon', coordinates: coords[i] },
             properties: {
-              ...props,
+              ...fProps,
               style: childStyle,
               _parentId: f.id,
               _childIndex: i,
