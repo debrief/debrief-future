@@ -270,18 +270,49 @@ export function MapView({
     return calculateBounds(visibleFeatures);
   }, [featureArray, visibleIds, bounds]);
 
-  // Create GeoJSON data structure for static (non-temporal) features
-  const geojsonData = useMemo(() => ({
-    type: 'FeatureCollection' as const,
-    features: staticFeatures.map((f) => ({
-      ...f,
-      geometry: {
-        ...f.geometry,
-        // Ensure coordinates are proper arrays for GeoJSON
-        coordinates: f.geometry.coordinates,
-      },
-    })),
-  }), [staticFeatures]);
+  // Create GeoJSON data structure for static (non-temporal) features.
+  // MultiPolygon features are decomposed into individual Polygon features
+  // because Leaflet renders MultiPolygon as a single L.Polygon (not a
+  // FeatureGroup), making per-sub-polygon selection/styling impossible.
+  const geojsonData = useMemo(() => {
+    const expanded: GeoJSON.Feature[] = [];
+    for (const f of staticFeatures) {
+      const props = f.properties as unknown as Record<string, unknown>;
+      const isZone = props?.kind === 'ZONE' && f.geometry?.type === 'MultiPolygon';
+      if (f.geometry?.type === 'MultiPolygon' && !isZone) {
+        // Decompose MultiPolygon into individual Polygons
+        const coords = f.geometry.coordinates as number[][][][];
+        const overrides = props?.position_style_overrides as Record<string, Record<string, unknown>> | undefined;
+        for (let i = 0; i < coords.length; i++) {
+          const childStyle = { ...(props.style as Record<string, unknown> ?? {}) };
+          // Merge per-polygon overrides into the child style
+          const ov = overrides?.[String(i)];
+          if (ov) {
+            for (const [k, v] of Object.entries(ov)) {
+              childStyle[k] = v;
+            }
+          }
+          expanded.push({
+            type: 'Feature',
+            id: `${f.id}/polygons/${i}`,
+            geometry: { type: 'Polygon', coordinates: coords[i] },
+            properties: {
+              ...props,
+              style: childStyle,
+              _parentId: f.id,
+              _childIndex: i,
+            },
+          } as GeoJSON.Feature);
+        }
+      } else {
+        expanded.push({
+          ...f,
+          geometry: { ...f.geometry, coordinates: f.geometry.coordinates },
+        } as GeoJSON.Feature);
+      }
+    }
+    return { type: 'FeatureCollection' as const, features: expanded };
+  }, [staticFeatures]);
 
   // Style function for features — reads from properties.style when available
   const featureStyle = useMemo(() => {
@@ -319,32 +350,26 @@ export function MapView({
         direction: 'top',
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const featureProps = feature.properties as any;
-      const isZone =
-        featureProps?.kind === 'ZONE' &&
-        feature.geometry?.type === 'MultiPolygon' &&
-        Array.isArray(featureProps?.zones);
-      const isMultiPoly = feature.geometry?.type === 'MultiPolygon' && !isZone;
-
-      // For non-MultiPolygon features (or ZONE features), attach a click
-      // handler on the parent layer. MultiPolygon sub-layers get individual
-      // click handlers below so we skip the parent to avoid double-firing.
-      if (!isMultiPoly) {
-        layer.on('click', (e) => {
-          e.originalEvent.stopPropagation();
-          onSelect?.(featureId, e.originalEvent as unknown as React.MouseEvent);
-        });
-      }
+      // Click handler — works for all features including decomposed
+      // MultiPolygon child polygons (which now have IDs like "parent/polygons/0")
+      layer.on('click', (e) => {
+        e.originalEvent.stopPropagation();
+        onSelect?.(featureId, e.originalEvent as unknown as React.MouseEvent);
+      });
 
       // Apply per-ring styles for ZONE MultiPolygon features
-      const zoneRingStyles: Array<{ style?: Record<string, unknown> }> | undefined =
-        isZone ? featureProps.zones : undefined;
-
-      if (zoneRingStyles && 'getLayers' in layer) {
+      // (ZONEs are kept as MultiPolygon since they use a dedicated zones array)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const featureProps = feature.properties as any;
+      if (
+        featureProps?.kind === 'ZONE' &&
+        feature.geometry?.type === 'MultiPolygon' &&
+        Array.isArray(featureProps?.zones) &&
+        'getLayers' in layer
+      ) {
         const subLayers = (layer as unknown as { getLayers(): L.Layer[] }).getLayers();
         subLayers.forEach((subLayer, i) => {
-          const s = zoneRingStyles[i]?.style;
+          const s = featureProps.zones[i]?.style;
           if (s && 'setStyle' in subLayer) {
             (subLayer as unknown as { setStyle(opts: PathOptions): void }).setStyle({
               color: (s.color as string) ?? '#999',
@@ -357,47 +382,8 @@ export function MapView({
           }
         });
       }
-
-      // MultiPolygon sub-layer handling: per-polygon click, overrides, and
-      // selection highlighting for individual polygons
-      if (isMultiPoly && 'getLayers' in layer) {
-        const childOverrides = featureProps?.position_style_overrides as Record<string, Record<string, unknown>> | undefined;
-        const subLayers = (layer as unknown as { getLayers(): L.Layer[] }).getLayers();
-        subLayers.forEach((subLayer, i) => {
-          const childPath = `${featureId}/polygons/${i}`;
-
-          // Per-polygon click: select the child path
-          subLayer.on('click', (e) => {
-            (e as unknown as { originalEvent: Event }).originalEvent.stopPropagation();
-            onSelect?.(childPath, (e as unknown as { originalEvent: Event }).originalEvent as unknown as React.MouseEvent);
-          });
-
-          // Per-polygon style overrides (from format menu)
-          const s = childOverrides?.[String(i)];
-          if (s && 'setStyle' in subLayer) {
-            const overrideStyle: PathOptions = {};
-            if (s.fill_color !== undefined) overrideStyle.fillColor = s.fill_color as string;
-            if (s.color !== undefined) overrideStyle.color = s.color as string;
-            if (s.fill_opacity !== undefined) overrideStyle.fillOpacity = s.fill_opacity as number;
-            if (s.weight !== undefined) overrideStyle.weight = s.weight as number;
-            if (s.opacity !== undefined) overrideStyle.opacity = s.opacity as number;
-            if (s.dash_array !== undefined) overrideStyle.dashArray = s.dash_array as string;
-            (subLayer as unknown as { setStyle(opts: PathOptions): void }).setStyle(overrideStyle);
-          }
-
-          // Per-polygon selection highlight
-          if (selectedIds.has(childPath) && 'setStyle' in subLayer) {
-            (subLayer as unknown as { setStyle(opts: PathOptions): void }).setStyle({
-              color: 'var(--debrief-selection-border)',
-              fillColor: 'var(--debrief-selection-border)',
-              fillOpacity: 0.4,
-              weight: 4,
-            });
-          }
-        });
-      }
     };
-  }, [onSelect, selectedIds]);
+  }, [onSelect]);
 
   // pointToLayer callback — renders Point and MultiPoint geometries as circle markers
   const pointToLayer = useMemo(() => {
