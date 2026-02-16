@@ -11,8 +11,8 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
-import { MapView, createDrawnFeature } from '@debrief/components';
-import type { DebriefFeature, DisplayMode, Bounds, DrawingMode } from '@debrief/components';
+import { MapView, createDrawnFeature, getPaletteStyleOverrides } from '@debrief/components';
+import type { DebriefFeature, DisplayMode, Bounds, DrawingMode, DrawnFeatureProvenance } from '@debrief/components';
 import type {
   ExtensionToWebviewMessage,
   WebviewToExtensionMessage,
@@ -99,6 +99,7 @@ function MapViewApp(): React.ReactElement {
   // Drawing state
   const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
+  const [paletteIndex, setPaletteIndex] = useState(0);
 
   // Temporal state
   const [currentTime, setCurrentTime] = useState<number | undefined>();
@@ -266,11 +267,25 @@ function MapViewApp(): React.ReactElement {
     const name = window.prompt(promptLabel, defaultName);
     if (name === null) return; // user cancelled — discard the shape
 
-    const opts = mode === 'point' ? { name } : { label: name };
+    // FR-096: Get palette style overrides for sequential colour assignment
+    const paletteOverrides = getPaletteStyleOverrides(mode, paletteIndex);
+
+    // FR-012: Build provenance metadata
+    const provenance: DrawnFeatureProvenance = {
+      source: 'user-drawn',
+      timestamp: new Date().toISOString(),
+      operator: 'unknown',
+      action: 'created',
+    };
+
+    const opts = mode === 'point'
+      ? { name, ...paletteOverrides, provenance }
+      : { label: name, ...paletteOverrides, provenance };
     const feature = createDrawnFeature(geojson, mode, opts);
     if (feature) {
       setDrawnFeatures(prev => [...prev, feature as DebriefFeature]);
       setSelectedIds(new Set([feature.id]));
+      setPaletteIndex(prev => prev + 1);
       // Notify extension of the new drawn feature
       const props = feature.properties as Record<string, unknown>;
       vscode.postMessage({
@@ -294,7 +309,7 @@ function MapViewApp(): React.ReactElement {
         },
       });
     }
-  }, []);
+  }, [paletteIndex]);
 
   // Drag-and-drop for REP files
   useEffect(() => {

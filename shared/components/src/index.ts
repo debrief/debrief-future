@@ -95,13 +95,35 @@ export type {
 export { ActivityPanel } from './ActivityPanel';
 export { DEFAULT_COLLAPSE_STATE } from './ActivityPanel/types';
 
+// CascadingMenu (Feature: 097-feature-format-menu)
+export { CascadingMenu } from './CascadingMenu';
+export type { CascadingMenuProps, CascadingMenuItem } from './CascadingMenu';
+
+// FormatMenu (Feature: 097-feature-format-menu)
+export { FormatMenu } from './FormatMenu';
+export type { FormatMenuProps } from './FormatMenu';
+export { buildFormatMenuItems, parseMenuItemId, resolvePresetValue } from './FormatMenu';
+export type { StylePropertyDescriptor as FormatStylePropertyDescriptor } from './FormatMenu';
+export {
+  COLOUR_PALETTE,
+  LINE_WEIGHT_PRESETS,
+  OPACITY_PRESETS,
+  RADIUS_PRESETS,
+  DASH_PATTERN_PRESETS,
+  SHAPE_PRESETS,
+} from './FormatMenu';
+export type { PresetValue } from './FormatMenu';
+
 // ContextMenu (Feature: 091-tool-parameter-context-menus)
 export { ContextMenu } from './ContextMenu';
 export type { ContextMenuItem, ContextMenuProps } from './ContextMenu';
 
-// Drawing (Feature: 094-point-rectangle-drawing)
+// Drawing (Feature: 094-point-rectangle-drawing, 096-drawing-ux-persistence)
 export { createDrawnFeature } from './MapView/drawing';
-export type { CreateDrawnFeatureOptions } from './MapView/drawing';
+export type { CreateDrawnFeatureOptions, DrawnFeatureProvenance } from './MapView/drawing';
+export { DRAWING_GUIDANCE, CANCEL_HINT } from './MapView/drawing';
+export type { GuidanceText } from './MapView/drawing';
+export { DRAWING_PALETTE, getPaletteColour, getPaletteStyleOverrides } from './MapView/drawing';
 export type { DrawingMode } from './MapView/LeafletToolbar';
 
 // ChartRenderer (Feature: 085-chart-renderer)
@@ -129,7 +151,7 @@ export { createDefaultRegistry } from './PanelWorkspace/createDefaultRegistry';
 
 // Panel wrappers and context (Feature: 096-add-goldenlayout-panels)
 export { PanelContextProvider, usePanelContext } from './panels/PanelContext';
-export type { PanelContextValue, PanelComponents, ChartContextProps, ChartTabData } from './panels/PanelContext';
+export type { PanelContextValue, PanelComponents, ChartContextProps, ChartTabData, ResultArtifactType } from './panels/PanelContext';
 export { NavigationPanel } from './panels/NavigationPanel';
 export { ActivityPanelWrapper } from './panels/ActivityPanelWrapper';
 export { LogPanelWrapper } from './panels/LogPanelWrapper';

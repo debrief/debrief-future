@@ -58,6 +58,8 @@ export interface FeaturesSlice {
   selection: FeatureSelection;
   /** Features hidden from display (FR-018) */
   hiddenFeatureIds: string[];
+  /** Monotonic counter incremented on style changes to trigger re-renders (Feature 097) */
+  styleVersion: number;
 }
 
 /**
@@ -67,6 +69,7 @@ export const DEFAULT_FEATURES_SLICE: FeaturesSlice = {
   featureCollectionUri: null,
   selection: createEmptySelection(),
   hiddenFeatureIds: [],
+  styleVersion: 0,
 };
 
 /**
@@ -82,4 +85,6 @@ export interface FeaturesActions {
   hideFeatures: (featureIds: string[]) => void;
   showFeatures: (featureIds: string[]) => void;
   toggleFeatureVisibility: (featureId: string) => void;
+  /** Increment style version to trigger re-renders after format changes (Feature 097) */
+  notifyStyleChange: () => void;
 }

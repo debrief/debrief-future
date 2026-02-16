@@ -13,6 +13,9 @@ import { TimeController } from '../TimeController';
 import { ToolsPanel } from '../ToolsPanel';
 import { LayersToolbar } from '../LayersToolbar';
 import { FeatureList } from '../FeatureList';
+import { FormatMenu } from '../FormatMenu';
+import type { DebriefFeature } from '../utils/types';
+import type { DisplayItem } from '../FeatureList/flattenFeatures';
 import type { ActivityPanelProps } from './types';
 import { DEFAULT_COLLAPSE_STATE } from './types';
 import './ActivityPanel.css';
@@ -268,6 +271,90 @@ export function ActivityPanel({
     [onMessage]
   );
 
+  // Format menu state (Feature 097)
+  const [formatMenuState, setFormatMenuState] = useState<{
+    featureIds: string[];
+    featureKinds: string[];
+    position: { x: number; y: number };
+    /** For child overrides (e.g., individual track point formatting) */
+    childOverride?: { parentFeatureId: string; childIndex: number; childType: string };
+  } | null>(null);
+
+  const handleFormatClick = useCallback(
+    (event: React.MouseEvent, feature: DebriefFeature) => {
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      const kind = feature.properties.kind as string | undefined;
+      setFormatMenuState({
+        featureIds: [feature.id],
+        featureKinds: kind ? [kind] : ['TRACK'],
+        position: { x: rect.right + 4, y: rect.top },
+      });
+    },
+    []
+  );
+
+  const handleChildFormatClick = useCallback(
+    (event: React.MouseEvent, displayItem: DisplayItem) => {
+      if (!displayItem.parentId || displayItem.index === null) return;
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+
+      // Map child type to the menu kind
+      const childKindMap: Record<string, string> = {
+        position: 'POSITION',
+        point: 'POINT',
+        polygon: 'POLY',
+      };
+      const menuKind = childKindMap[displayItem.type] ?? 'POINT';
+
+      setFormatMenuState({
+        featureIds: [displayItem.parentId],
+        featureKinds: [menuKind],
+        position: { x: rect.right + 4, y: rect.top },
+        childOverride: {
+          parentFeatureId: displayItem.parentId,
+          childIndex: displayItem.index,
+          childType: displayItem.type,
+        },
+      });
+    },
+    []
+  );
+
+  const handleToolbarFormat = useCallback(
+    (featureIds: string[], anchorPosition: { x: number; y: number }) => {
+      const kinds = featureIds.map((id) => {
+        const f = features.find((feat) => feat.id === id);
+        const kind = f ? (f.properties.kind as string | undefined) : undefined;
+        return kind ?? 'TRACK';
+      });
+      // Deduplicate kinds
+      const uniqueKinds = [...new Set(kinds)];
+      setFormatMenuState({ featureIds, featureKinds: uniqueKinds, position: anchorPosition });
+    },
+    [features]
+  );
+
+  const handleFormatChange = useCallback(
+    (featureIds: readonly string[], property: string, value: string | number) => {
+      const override = formatMenuState?.childOverride;
+      onMessage?.({
+        type: 'layer:format',
+        payload: {
+          featureIds: [...featureIds],
+          property,
+          value,
+          ...(override && {
+            isPointOverride: true,
+            positionIndex: override.childIndex,
+            childType: override.childType,
+          }),
+        },
+      });
+      setFormatMenuState(null);
+    },
+    [onMessage, formatMenuState]
+  );
+
   // Determine how many flexible sections are expanded (for split calc)
   const toolsExpanded = !collapseState.toolsCollapsed;
   const layersExpanded = !collapseState.layersCollapsed;
@@ -344,6 +431,7 @@ export function ActivityPanel({
             resultsChanged={resultsChanged}
             onDelete={handleDelete}
             onToggleVisibility={handleToggleVisibility}
+            onFormat={handleToolbarFormat}
             onRunTool={(toolId) => onMessage?.({ type: 'tool:run', payload: { toolId } })}
           />
           <FeatureList
@@ -351,7 +439,19 @@ export function ActivityPanel({
             selectedIds={new Set(selectedFeatureIds)}
             hiddenIds={hiddenIds}
             onSelectionChange={handleSelectionChange}
+            showFormatIcon
+            onFormatClick={handleFormatClick}
+            onChildFormatClick={handleChildFormatClick}
           />
+          {formatMenuState && (
+            <FormatMenu
+              featureIds={formatMenuState.featureIds}
+              featureKinds={formatMenuState.featureKinds}
+              anchorPosition={formatMenuState.position}
+              onFormatChange={handleFormatChange}
+              onDismiss={() => setFormatMenuState(null)}
+            />
+          )}
         </SectionErrorBoundary>
       </PaneSection>
     </div>

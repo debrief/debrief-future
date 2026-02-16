@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     concurrency:
-      group: storybook-main
+      group: pages
       cancel-in-progress: false
     steps:
       - name: Checkout
@@ -96,8 +96,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     concurrency:
-      group: storybook-preview-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
+      group: pages
+      cancel-in-progress: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4

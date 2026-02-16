@@ -2,8 +2,7 @@
  * Web-shell tool service (T043).
  *
  * Provides access to TypeScript-implemented analysis tools for the web-shell.
- * Only includes tools that run entirely in the browser (no Python backend required).
- * Python-only tools (track-stats, range-bearing, area-summary) are excluded.
+ * All tools run entirely in the browser (no Python backend required).
  *
  * ## ADDING A NEW TOOL
  *
@@ -98,6 +97,21 @@ import {
   execute as executeBufferZoneGenerator,
 } from '../tools/sensor/detection/bufferZoneGenerator';
 
+import {
+  toolDefinition as trackStatsDef,
+  execute as executeTrackStats,
+} from '../tools/track/analysis/trackStats';
+
+import {
+  toolDefinition as rangeBearingDef,
+  execute as executeRangeBearing,
+} from '../tools/track/analysis/rangeBearing';
+
+import {
+  toolDefinition as areaSummaryDef,
+  execute as executeAreaSummary,
+} from '../tools/region/analysis/areaSummary';
+
 // Re-export types for consumers
 export type { MCPToolDefinition, MCPToolResponse, MCPContentItem, DebriefAnnotations };
 
@@ -121,16 +135,6 @@ interface ToolRegistryEntry {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   execute: (features: GeoJSONFeature[], params: any) => GeoJSONFeature[];
 }
-
-/**
- * Known Python-only tool IDs that must NOT be included in the web-shell.
- * These require the Python MCP backend (debrief-calc) to execute.
- */
-export const PYTHON_ONLY_TOOLS = [
-  'track-stats',
-  'range-bearing',
-  'area-summary',
-] as const;
 
 /**
  * Registry of TypeScript-implemented tools available in the web-shell.
@@ -194,11 +198,31 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
       execute: executeBufferZoneGenerator,
     },
   ],
+  [
+    trackStatsDef.name,
+    {
+      definition: trackStatsDef,
+      execute: executeTrackStats,
+    },
+  ],
+  [
+    rangeBearingDef.name,
+    {
+      definition: rangeBearingDef,
+      execute: executeRangeBearing,
+    },
+  ],
+  [
+    areaSummaryDef.name,
+    {
+      definition: areaSummaryDef,
+      execute: executeAreaSummary,
+    },
+  ],
 ]);
 
 /**
  * Returns all TypeScript-implemented tool definitions available in the web-shell.
- * Only styling tools are included; Python-only tools are excluded.
  */
 export function listTools(): MCPToolDefinition[] {
   return Array.from(toolRegistry.values()).map((entry) => entry.definition);

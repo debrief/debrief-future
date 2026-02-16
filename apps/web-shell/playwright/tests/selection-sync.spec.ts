@@ -1,8 +1,7 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
-// STATUS: Skipped — requires web-shell app with selection sync between map and panel.
-// See docs/web-shell-test-restoration-requirements.md for restoration plan.
-test.describe.skip('Selection Sync', () => {
+// Selection sync tests — verifies map/panel selection synchronization.
+test.describe('Selection Sync', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // Navigate to analysis view via timeline bar/point

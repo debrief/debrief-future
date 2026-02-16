@@ -11,8 +11,8 @@ import './YellowHalo.css';
 type OpenDropdown = 'filter' | 'run' | 'associated' | null;
 
 /**
- * LayersToolbar renders 5 buttons in two groups:
- * - Selection-scoped (left): Delete, Visibility, Run
+ * LayersToolbar renders buttons in two groups:
+ * - Selection-scoped (left): Delete, Visibility, Format (097), Run
  * - Plot-scoped (right): Filter, Associated Files
  *
  * Only one dropdown is open at a time. Click-outside or Escape closes it.
@@ -30,6 +30,7 @@ export function LayersToolbar({
   showHidden = true,
   onDelete,
   onToggleVisibility,
+  onFormat,
   onRunTool,
   onRunAction,
   onFilterChange,
@@ -44,6 +45,7 @@ export function LayersToolbar({
   const filterState = externalFilterState ?? DEFAULT_FILTER_STATE;
   const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const formatBtnRef = useRef<HTMLSpanElement>(null);
 
   const hasSelection = selectedFeatureIds.length > 0;
   const filterActive = isFilterActive(filterState);
@@ -138,6 +140,26 @@ export function LayersToolbar({
             <Icon name="eye" />
           )}
         </Button>
+
+        {/* Format (Feature 097) */}
+        {onFormat && (
+          <span ref={formatBtnRef} style={{ display: 'inline-flex' }}>
+            <Button
+              appearance="icon"
+              disabled={!hasSelection}
+              onClick={() => {
+                if (!hasSelection) return;
+                const el = formatBtnRef.current;
+                const rect = el ? el.getBoundingClientRect() : { left: 0, bottom: 0 };
+                onFormat(selectedFeatureIds, { x: rect.left, y: rect.bottom + 2 });
+              }}
+              title={labels.format}
+              aria-label={labels.format}
+            >
+              <Icon name="symbol-color" />
+            </Button>
+          </span>
+        )}
 
         {/* Run */}
         <div className="debrief-layers-toolbar__btn-wrapper">

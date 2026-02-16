@@ -16,6 +16,14 @@ import {
 } from './drawingDefaults';
 import { isValidDrawnGeometry } from './isValidDrawnGeometry';
 
+/** Provenance metadata for a user-drawn feature (FR-012) */
+export interface DrawnFeatureProvenance {
+  source: string;
+  timestamp: string;
+  operator: string;
+  action: string;
+}
+
 export interface CreateDrawnFeatureOptions {
   /** Override default point style */
   pointStyle?: Partial<PointProperties>;
@@ -29,6 +37,8 @@ export interface CreateDrawnFeatureOptions {
   name?: string;
   /** Custom label for the feature (rectangle, polygon, polyline) */
   label?: string;
+  /** Provenance metadata to embed in the feature (FR-012) */
+  provenance?: DrawnFeatureProvenance;
 }
 
 /**
@@ -70,6 +80,7 @@ export function createDrawnFeature(
           ...DEFAULT_DRAWN_POINT_STYLE,
           ...options?.pointStyle,
         },
+        ...(options?.provenance ? { provenance: [options.provenance] } : {}),
       },
     } as ReferenceLocation;
   }
@@ -90,6 +101,7 @@ export function createDrawnFeature(
           ...DEFAULT_DRAWN_RECTANGLE_STYLE,
           ...options?.rectangleStyle,
         },
+        ...(options?.provenance ? { provenance: [options.provenance] } : {}),
       },
     } as RectangleAnnotation;
   }
@@ -114,6 +126,7 @@ export function createDrawnFeature(
           ...DEFAULT_DRAWN_POLYGON_STYLE,
           ...options?.polygonStyle,
         },
+        ...(options?.provenance ? { provenance: [options.provenance] } : {}),
       },
     } as PolyAnnotation;
   }
@@ -134,6 +147,7 @@ export function createDrawnFeature(
           ...DEFAULT_DRAWN_POLYLINE_STYLE,
           ...options?.polylineStyle,
         },
+        ...(options?.provenance ? { provenance: [options.provenance] } : {}),
       },
     } as LineAnnotation;
   }
