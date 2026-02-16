@@ -68,6 +68,11 @@ interface LayerSelectMessage {
   payload: { featureIds: string[] };
 }
 
+interface LayerFormatMessage {
+  type: 'layer:format';
+  payload: { featureIds: string[]; property: string; value: string | number | boolean };
+}
+
 interface WebviewReadyMessage {
   type: 'webviewReady';
 }
@@ -81,6 +86,7 @@ type WebviewMessage =
   | LayerToggleVisibilityMessage
   | LayerDeleteMessage
   | LayerSelectMessage
+  | LayerFormatMessage
   | WebviewReadyMessage;
 
 export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
@@ -493,6 +499,16 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
             const state: SessionStoreWithUndo = this._activeSession.getState();
             state.setSelection(message.payload.featureIds);
           }
+          break;
+
+        case 'layer:format':
+          // Apply style change to features via formatService
+          // For now, delegate to a command that the extension host can handle
+          void vscode.commands.executeCommand('debrief.applyFormat', {
+            featureIds: message.payload.featureIds,
+            property: message.payload.property,
+            value: message.payload.value,
+          });
           break;
       }
     });

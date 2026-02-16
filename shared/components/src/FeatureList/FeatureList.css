@@ -293,3 +293,33 @@
 [data-theme='dark'] .debrief-feature-row__sublabel {
   color: var(--debrief-text-secondary, #888888);
 }
+
+/* Format icon (Feature 097) */
+.debrief-feature-row__format-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0;
+  color: var(--debrief-text-muted, #888888);
+  transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.debrief-feature-row:hover .debrief-feature-row__format-icon,
+.debrief-feature-row--selected .debrief-feature-row__format-icon {
+  opacity: 1;
+}
+
+.debrief-feature-row__format-icon:hover {
+  color: var(--debrief-text-primary, #e0e0e0);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='light'] .debrief-feature-row__format-icon:hover {
+  color: var(--debrief-text-primary, #333333);
+  background-color: rgba(0, 0, 0, 0.08);
+}

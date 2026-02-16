@@ -1,4 +1,4 @@
-import { useRef, useMemo, useCallback, useState, CSSProperties } from 'react';
+import React, { useRef, useMemo, useCallback, useState, CSSProperties } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { DebriefFeature, DebriefFeatureCollection } from '../utils/types';
 import { FeatureRow } from './FeatureRow';
@@ -46,6 +46,15 @@ export interface FeatureListProps {
 
   /** Additional inline styles */
   style?: CSSProperties;
+
+  /** Show format icon on rows for features with editable properties (Feature 097) */
+  showFormatIcon?: boolean;
+
+  /** Called when the format icon is clicked on a feature row (Feature 097) */
+  onFormatClick?: (event: React.MouseEvent, feature: DebriefFeature) => void;
+
+  /** Called when the format icon is clicked on a child row (position, point, polygon) */
+  onChildFormatClick?: (event: React.MouseEvent, displayItem: import('./flattenFeatures').DisplayItem) => void;
 }
 
 /**
@@ -76,6 +85,9 @@ export function FeatureList({
   rowHeight = 40,
   className,
   style,
+  showFormatIcon,
+  onFormatClick,
+  onChildFormatClick,
 }: FeatureListProps) {
   const parentRef = useRef<HTMLDivElement>(null);
   const lastClickedIndex = useRef<number | null>(null);
@@ -233,6 +245,9 @@ export function FeatureList({
                   isExpandable={item.isExpandable}
                   isExpanded={isExpanded}
                   hasChildSelected={childSel}
+                  showFormatIcon={showFormatIcon}
+                  onFormatClick={onFormatClick}
+                  onChildFormatClick={onChildFormatClick}
                   onClick={(e) => handleRowClick(virtualItem.index, e)}
                   onToggleExpand={() => handleToggleExpand(item.id)}
                   style={{ height: '100%' }}

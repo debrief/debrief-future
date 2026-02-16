@@ -718,6 +718,75 @@ export default function App() {
       case 'layer:select':
         store.getState().setSelection(message.payload.featureIds);
         break;
+      case 'layer:format': {
+        const { featureIds, property, isPointOverride, positionIndex } = message.payload;
+        // Coerce boolean string values ('true'/'false') to actual booleans
+        const rawValue = message.payload.value;
+        const value = rawValue === 'true' ? true : rawValue === 'false' ? false : rawValue;
+        const targetIds = new Set(featureIds);
+
+        // Helper: apply a style property to a feature-level style object
+        const applyStyleProperty = (style: Record<string, unknown>, prop: string, val: unknown): Record<string, unknown> => {
+          const result = { ...style };
+          const dotIndex = prop.indexOf('.');
+          if (dotIndex > 0) {
+            const category = prop.slice(0, dotIndex);
+            const field = prop.slice(dotIndex + 1);
+            const oldCategory = (result[category] ?? {}) as Record<string, unknown>;
+            result[category] = { ...oldCategory, [field]: val };
+          } else {
+            result[prop] = val;
+          }
+          return result;
+        };
+
+        // Update features in the current plot
+        setCurrentPlot(plot => {
+          if (!plot) return plot;
+          const updatedFeatures = plot.features.features.map(f => {
+            if (!targetIds.has(String(f.id))) return f;
+
+            const props = (f.properties ?? {}) as Record<string, unknown>;
+
+            // Per-position override: write to position_style_overrides[index]
+            if (isPointOverride && positionIndex !== undefined) {
+              const overrides = { ...(props.position_style_overrides ?? {}) as Record<string, Record<string, unknown>> };
+              const key = String(positionIndex);
+              overrides[key] = { ...(overrides[key] ?? {}), [property]: value };
+              return { ...f, properties: { ...props, position_style_overrides: overrides } };
+            }
+
+            // Feature-level style change
+            const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+            const newStyle = applyStyleProperty(oldStyle, property, value);
+            return { ...f, properties: { ...props, style: newStyle } };
+          });
+
+          return {
+            ...plot,
+            features: { ...plot.features, features: updatedFeatures },
+          };
+        });
+
+        // Also update drawn features if targeted (drawn features don't have positions)
+        if (!isPointOverride) {
+          setDrawnFeatures(prev =>
+            prev.map(f => {
+              if (!targetIds.has(f.id)) return f;
+
+              const props = f.properties as unknown as Record<string, unknown>;
+              const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+              const newStyle = applyStyleProperty(oldStyle, property, value);
+
+              return {
+                ...f,
+                properties: { ...props, style: newStyle },
+              } as unknown as DebriefFeature;
+            }),
+          );
+        }
+        break;
+      }
       default:
         break;
     }

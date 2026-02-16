@@ -140,6 +140,8 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE**: Include this section when the user story involves visual components with Storybook stories.
 > See plan.md "Storybook E2E Testing" section for which stories need tests.
+>
+> **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip these tests because you think browsers can't be installed. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
 - [ ] T0XX [P] [US1] Create Playwright test `shared/components/e2e/[Component].spec.ts`
 - [ ] T0XX [P] [US1] Add theme variant tests (light, dark, vscode)
@@ -229,6 +231,8 @@ Examples of foundational tasks (adjust based on your project):
 ### E2E Evidence Collection (REQUIRED for UI components) 🎭
 
 > **Purpose**: Capture visual evidence from Playwright tests for PR and blog posts
+>
+> **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip these tests because you think browsers can't be installed. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
 - [ ] TXXX Run full e2e suite: `pnpm --filter @debrief/components test:e2e`
 - [ ] TXXX [P] Capture theme variant screenshots to specs/[feature]/evidence/screenshots/
