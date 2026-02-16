@@ -1,4 +1,4 @@
-import { CSSProperties } from '../../../../node_modules/.pnpm/react@18.3.1/node_modules/react';
+import { default as React, CSSProperties } from '../../../../node_modules/.pnpm/react@18.3.1/node_modules/react';
 import { DebriefFeature, DebriefFeatureCollection } from '../utils/types';
 
 export interface FeatureListProps {
@@ -32,10 +32,16 @@ export interface FeatureListProps {
     className?: string;
     /** Additional inline styles */
     style?: CSSProperties;
+    /** Show format icon on rows for features with editable properties (Feature 097) */
+    showFormatIcon?: boolean;
+    /** Called when the format icon is clicked on a feature row (Feature 097) */
+    onFormatClick?: (event: React.MouseEvent, feature: DebriefFeature) => void;
+    /** Called when the format icon is clicked on a child row (position, point, polygon) */
+    onChildFormatClick?: (event: React.MouseEvent, displayItem: import('./flattenFeatures').DisplayItem) => void;
 }
 /**
  * FeatureList displays a virtualized list of features with expand/collapse
  * support for viewing child elements (positions, points, polygons).
  */
-export declare function FeatureList({ features, selectedIds, hiddenIds, onSelectionChange, onSelect, onToggleExpand, filter, height, rowHeight, className, style, }: FeatureListProps): import("react/jsx-runtime").JSX.Element;
+export declare function FeatureList({ features, selectedIds, hiddenIds, onSelectionChange, onSelect, onToggleExpand, filter, height, rowHeight, className, style, showFormatIcon, onFormatClick, onChildFormatClick, }: FeatureListProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=FeatureList.d.ts.map
