@@ -64,7 +64,7 @@ export { saveLayout, loadLayout, clearLayout, LAYOUT_STORAGE_KEY, LAYOUT_VERSION
 export { PanelErrorBoundary } from './PanelWorkspace/PanelErrorBoundary';
 export { createDefaultRegistry } from './PanelWorkspace/createDefaultRegistry';
 export { PanelContextProvider, usePanelContext } from './panels/PanelContext';
-export type { PanelContextValue, PanelComponents, ChartContextProps, ChartTabData } from './panels/PanelContext';
+export type { PanelContextValue, PanelComponents, ChartContextProps, ChartTabData, ResultArtifactType } from './panels/PanelContext';
 export { NavigationPanel } from './panels/NavigationPanel';
 export { ActivityPanelWrapper } from './panels/ActivityPanelWrapper';
 export { LogPanelWrapper } from './panels/LogPanelWrapper';

@@ -5,10 +5,22 @@ import { LogPanelProps } from '../LogPanel';
 import { StacFileTreeProps } from '../StacFileTree';
 import { ChartRendererProps } from '../ChartRenderer';
 
-/** Chart tab data passed to the Chart panel wrapper */
+/** Content type for result tabs — dataset (chart), image, or fallback */
+export type ResultArtifactType = 'dataset' | 'image' | 'other';
+/** Chart/result tab data passed to the Chart panel wrapper */
 export interface ChartTabData {
     id: string;
     title: string;
+    /** Type of content in this tab. Defaults to 'dataset' for backwards compat. */
+    artifactType?: ResultArtifactType;
+    /** Base64 data URI for image tabs */
+    imageDataUri?: string;
+    /** File metadata for fallback ('other') tabs */
+    fileMeta?: {
+        filename: string;
+        mimeType: string;
+        sizeBytes: number;
+    };
 }
 /** Chart-related props passed via context */
 export interface ChartContextProps {
