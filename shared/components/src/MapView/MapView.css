@@ -96,7 +96,16 @@
   cursor: pointer;
 }
 
-/* Selected feature styling - handled via style prop */
+/* Selected feature styling — glow + pulse, preserves original color */
+@keyframes debrief-selection-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px currentColor); }
+  50% { filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 2px currentColor); }
+}
+
+.debrief-mapview .debrief-map-feature--selected {
+  filter: drop-shadow(0 0 4px currentColor);
+  animation: debrief-selection-pulse 2s ease-in-out infinite;
+}
 
 /* Loading state */
 .debrief-mapview--loading {

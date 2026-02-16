@@ -114,9 +114,8 @@ export function PositionSymbolsLayer({
 
       // Determine marker appearance — per-position overrides take priority
       const hasOverrideColor = !!style.fillColor || !!style.strokeColor;
-      const defaultColor = isPositionSelected ? 'var(--debrief-selection-border, #0066cc)' : color;
-      const markerFillColor = style.fillColor ?? defaultColor;
-      const markerStrokeColor = style.strokeColor ?? defaultColor;
+      const markerFillColor = style.fillColor ?? color;
+      const markerStrokeColor = style.strokeColor ?? color;
       const baseRadius = style.radius ?? getRadiusForShape(style.symbol);
       const markerRadius = isPositionSelected ? baseRadius + 3 : baseRadius;
       const markerFillOpacity = style.fillOpacity ?? (isPositionSelected ? 0.9 : 0.7);
@@ -138,6 +137,7 @@ export function PositionSymbolsLayer({
               fillColor: markerFillColor,
               fillOpacity: markerFillOpacity,
               weight: isPositionSelected ? 3 : 2,
+              className: isPositionSelected ? 'debrief-map-feature--selected' : undefined,
             }}
           >
             {style.showLabel && style.labelText && (

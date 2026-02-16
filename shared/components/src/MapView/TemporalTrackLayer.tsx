@@ -59,9 +59,10 @@ export function TemporalTrackLayer({
   }, [feature.id, feature.properties, renderState.visibleCoordinates, hasTemporalData]);
 
   const style = useMemo((): PathOptions => ({
-    color: isSelected ? 'var(--debrief-selection-border)' : color,
+    color,
     weight: isSelected ? 4 : 3,
     opacity: 1,
+    className: isSelected ? 'debrief-map-feature--selected' : undefined,
   }), [isSelected, color]);
 
   const onEachFeature = useMemo(() => {
