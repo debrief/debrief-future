@@ -19,15 +19,21 @@ export interface FeatureRowProps {
     isExpanded?: boolean;
     /** Whether a child of this item is selected (shows indicator dot) */
     hasChildSelected?: boolean;
+    /** Whether to show the format icon (Feature 097) */
+    showFormatIcon?: boolean;
     /** Click handler */
     onClick: (event: React.MouseEvent) => void;
     /** Toggle expand/collapse handler */
     onToggleExpand?: (event: React.MouseEvent) => void;
+    /** Format icon click handler (Feature 097) */
+    onFormatClick?: (event: React.MouseEvent, feature: DebriefFeature) => void;
+    /** Format icon click handler for child rows (positions, points, polygons) */
+    onChildFormatClick?: (event: React.MouseEvent, displayItem: DisplayItem) => void;
     /** Optional inline style */
     style?: CSSProperties;
 }
 /**
  * FeatureRow displays a single feature or child item in the list.
  */
-export declare function FeatureRow({ feature, displayItem, isSelected, isHidden, depth, isExpandable, isExpanded, hasChildSelected: childSelected, onClick, onToggleExpand, style, }: FeatureRowProps): import("react/jsx-runtime").JSX.Element;
+export declare function FeatureRow({ feature, displayItem, isSelected, isHidden, depth, isExpandable, isExpanded, hasChildSelected: childSelected, showFormatIcon, onClick, onToggleExpand, onFormatClick, onChildFormatClick, style, }: FeatureRowProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=FeatureRow.d.ts.map

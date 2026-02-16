@@ -60,6 +60,7 @@ export interface AssociatedFile {
 export interface ToolbarLabels {
     delete: string;
     toggleVisibility: string;
+    format: string;
     run: string;
     filter: string;
     associatedFiles: string;
@@ -186,6 +187,11 @@ export interface LayersToolbarProps {
     showHidden?: boolean;
     onDelete?: (featureIds: string[]) => void;
     onToggleVisibility?: (featureIds: string[]) => void;
+    /** Called when the format button is clicked with the selected feature IDs (Feature 097) */
+    onFormat?: (featureIds: string[], anchorPosition: {
+        x: number;
+        y: number;
+    }) => void;
     onRunTool?: (toolId: string, featureIds: string[]) => void;
     onRunAction?: (actionId: string, featureIds: string[]) => void;
     onFilterChange?: (filterState: FilterState) => void;
