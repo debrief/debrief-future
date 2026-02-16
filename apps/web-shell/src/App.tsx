@@ -161,6 +161,7 @@ export default function App() {
   // Results panel state — tabs opened by clicking files in the STAC tree
   const [resultTabs, setResultTabs] = useState<ResultTab[]>([]);
   const [activeResultTabId, setActiveResultTabId] = useState<string | null>(null);
+  const [layoutResetCount, setLayoutResetCount] = useState(0);
 
   // Drawing state (Feature: 094)
   const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
@@ -829,14 +830,14 @@ export default function App() {
     [panelContextValue]
   );
 
-  // Dynamically add results panel when result data arrives
+  // Dynamically add results panel when result data arrives (or after layout reset)
   useEffect(() => {
     if (resultTabs.length === 0) return;
     const el = document.querySelector('[data-testid="panel-workspace"]') as PanelWorkspaceElement | null;
     if (el?.__addPanel) {
       el.__addPanel(PANEL_CHART, 'Results');
     }
-  }, [resultTabs.length > 0]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [resultTabs.length > 0, layoutResetCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Render welcome view
   if (view === 'welcome') {
@@ -922,6 +923,7 @@ export default function App() {
           registry={panelRegistry}
           contextWrapper={contextWrapper}
           className="web-shell__panel-workspace"
+          onLayoutReset={() => setLayoutResetCount(c => c + 1)}
         />
       </main>
     </div>
