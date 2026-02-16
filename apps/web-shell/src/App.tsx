@@ -481,8 +481,25 @@ export default function App() {
       setDrawnFeatures(prev => [...prev, feature as DebriefFeature]);
       store.getState().setSelection([feature.id]);
       store.getState().incrementDrawingPaletteIndex();
+
+      // Record a log entry for the drawing action
+      const nextId = activityCounter + 1;
+      setActivityCounter(nextId);
+      const entry: TimelineEntry = {
+        activityId: `act-${String(nextId).padStart(3, '0')}`,
+        timestamp: new Date().toISOString(),
+        toolName: `draw-${mode ?? 'shape'}`,
+        toolVersion: '1.0.0',
+        parameters: {},
+        usedFeatureIds: [],
+        generatedFeatureIds: [feature.id],
+        executionDuration: 'PT0S',
+        generatedResultId: feature.id,
+        operationCategory: 'property-edit',
+      };
+      setLogEntries(prev => [entry, ...prev]);
     }
-  }, [store]);
+  }, [store, activityCounter]);
 
   // Handle file selection from STAC tree — open dataset files as chart tabs
   const handleFileSelect = useCallback(async (filePath: string) => {

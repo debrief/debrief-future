@@ -138,6 +138,36 @@ test.describe('Drawing — Feature 094', () => {
     expect(countAfter).toBe(countBefore);
   });
 
+  test('drawing a shape creates a log entry', async ({ page }) => {
+    // Accept the naming dialog
+    page.on('dialog', async dialog => {
+      await dialog.accept('Logged Point');
+    });
+
+    // Draw a point
+    await page.locator('[data-testid="draw-trigger"]').click();
+    await page.locator('[data-testid="shape-point"]').click();
+    await page.waitForTimeout(500);
+
+    const mapContainer = page.locator('.leaflet-container').first();
+    const box = await mapContainer.boundingBox();
+    expect(box).not.toBeNull();
+
+    await page.mouse.click(box!.x + box!.width * 0.5, box!.y + box!.height * 0.5);
+    await page.waitForTimeout(2000);
+
+    // Switch to the Log tab
+    await page.getByTestId('sidebar-tab-log').click();
+    await expect(page.getByTestId('log-panel')).toBeVisible({ timeout: 5000 });
+
+    // Should show exactly 1 log entry for the drawing action
+    const entries = page.locator('.log-panel__entry');
+    await expect(entries).toHaveCount(1, { timeout: 3000 });
+
+    // The entry should reference the draw tool
+    await expect(entries.first()).toContainText('draw-point');
+  });
+
   test('drawn feature is selectable via FeatureList', async ({ page }) => {
     // Accept naming dialog
     page.on('dialog', async dialog => {
