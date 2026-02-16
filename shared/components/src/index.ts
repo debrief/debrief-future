@@ -136,6 +136,25 @@ export type {
   TransformResult,
 } from './ChartRenderer';
 
+// PanelWorkspace (Feature: 096-add-goldenlayout-panels)
+export { PanelWorkspace } from './PanelWorkspace';
+export type { PanelWorkspaceProps, PanelWorkspaceElement } from './PanelWorkspace';
+export { createPanelRegistry } from './PanelWorkspace';
+export type { PanelDefinition, PanelProps, PanelRegistry } from './PanelWorkspace';
+export { DEFAULT_LAYOUT_CONFIG, PANEL_NAVIGATION, PANEL_ACTIVITY, PANEL_LOG, PANEL_MAP, PANEL_CHART } from './PanelWorkspace/defaultLayout';
+export { saveLayout, loadLayout, clearLayout, LAYOUT_STORAGE_KEY, LAYOUT_VERSION } from './PanelWorkspace/layoutPersistence';
+export { PanelErrorBoundary } from './PanelWorkspace/PanelErrorBoundary';
+export { createDefaultRegistry } from './PanelWorkspace/createDefaultRegistry';
+
+// Panel wrappers and context (Feature: 096-add-goldenlayout-panels)
+export { PanelContextProvider, usePanelContext } from './panels/PanelContext';
+export type { PanelContextValue, PanelComponents, ChartContextProps, ChartTabData } from './panels/PanelContext';
+export { NavigationPanel } from './panels/NavigationPanel';
+export { ActivityPanelWrapper } from './panels/ActivityPanelWrapper';
+export { LogPanelWrapper } from './panels/LogPanelWrapper';
+export { MapPanel } from './panels/MapPanel';
+export { ChartPanelWrapper } from './panels/ChartPanelWrapper';
+
 // LogPanel (Feature: 072-log-panel)
 export { LogPanel } from './LogPanel';
 export type {

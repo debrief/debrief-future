@@ -121,6 +121,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 - Log in `docs/project_notes/issues.md` with ticket ID and URL
 
 ## Active Technologies
+- TypeScript 5.x (React 18.x) + `golden-layout` v2.x (panel management), `shared-zustand` (cross-window state sync via BroadcastChannel), existing `@debrief/components`, `@debrief/session-state` (Zustand ^5.0.0) (096-add-goldenlayout-panels)
+- Browser localStorage for layout persistence (~2-5 KB per saved layout) (096-add-goldenlayout-panels)
 
 Only updated when a feature introduces a technology not already listed here.
 

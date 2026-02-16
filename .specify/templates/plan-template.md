@@ -120,6 +120,8 @@ directories captured above]
 
 *Identify which Storybook stories require automated Playwright tests. Skip if feature has no visual components.*
 
+> **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT omit E2E tests because you think browsers can't be installed. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Full details: `docs/project_notes/playwright-installation-research.md`
+
 | Story | Test Coverage | Theme Variants | Interactions |
 |-------|--------------|----------------|--------------|
 | `ComponentName.stories.tsx` | Rendering, accessibility | light, dark, vscode | [click, fill, hover, etc.] |

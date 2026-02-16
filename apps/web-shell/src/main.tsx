@@ -14,6 +14,9 @@ import 'leaflet/dist/leaflet.css';
 // Import vscrui codicon CSS for icon rendering
 import 'vscrui/dist/codicon.css';
 
+// Import GoldenLayout base CSS for panel management
+import 'golden-layout/dist/css/goldenlayout-base.css';
+
 const container = document.getElementById('root');
 if (!container) {
   throw new Error('Root element not found');
