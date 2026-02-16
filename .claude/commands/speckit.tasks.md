@@ -171,7 +171,10 @@ For the Polish phase, ALWAYS generate these tasks:
    ```
    150-200 words, hook opening, link to full post
 
-6. **Runtime Verification Task** (REQUIRED for Electron/Desktop apps):
+6. **Playwright E2E Reminder** (include when generating E2E test tasks):
+   > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip or omit Playwright E2E tasks because you think browsers can't be installed. The project uses `@sparticuz/chromium` which bundles a Linux Chromium binary via npm. Standard browser CDN downloads are blocked (403), but this bundled binary works fully. Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
+
+7. **Runtime Verification Task** (REQUIRED for Electron/Desktop apps):
    ```markdown
    - [ ] TXXX Run app in dev mode and verify startup
    - [ ] TXXX [P] Capture runtime screenshot of actual app window
@@ -182,7 +185,7 @@ For the Polish phase, ALWAYS generate these tasks:
    - UI renders correctly in real Electron window
    - Error handling works when dependencies are unavailable
 
-7. **PR Creation Task** (REQUIRED - must be final task):
+8. **PR Creation Task** (REQUIRED - must be final task):
    ```markdown
    - [ ] TXXX Create PR and publish blog: run /speckit.pr
    ```
