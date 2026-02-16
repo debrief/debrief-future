@@ -1,6 +1,13 @@
 import { LineProperties, PointProperties, PolygonProperties, ReferenceLocation, RectangleAnnotation, PolyAnnotation, LineAnnotation } from '@debrief/schemas';
 import { DrawingMode } from '../LeafletToolbar';
 
+/** Provenance metadata for a user-drawn feature (FR-012) */
+export interface DrawnFeatureProvenance {
+    source: string;
+    timestamp: string;
+    operator: string;
+    action: string;
+}
 export interface CreateDrawnFeatureOptions {
     /** Override default point style */
     pointStyle?: Partial<PointProperties>;
@@ -14,6 +21,8 @@ export interface CreateDrawnFeatureOptions {
     name?: string;
     /** Custom label for the feature (rectangle, polygon, polyline) */
     label?: string;
+    /** Provenance metadata to embed in the feature (FR-012) */
+    provenance?: DrawnFeatureProvenance;
 }
 /**
  * Converts raw GeoJSON output from Geoman into a schema-compliant Debrief feature.
