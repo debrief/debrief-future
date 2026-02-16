@@ -282,7 +282,7 @@ export function MapView({
       const isZone = fProps?.kind === 'ZONE' && f.geometry?.type === 'MultiPolygon';
       if (f.geometry?.type === 'MultiPolygon' && !isZone) {
         // Decompose MultiPolygon into individual Polygons
-        const coords = f.geometry.coordinates as number[][][][];
+        const coords = f.geometry.coordinates as unknown as number[][][][];
         const overrides = fProps?.position_style_overrides as Record<string, Record<string, unknown>> | undefined;
         for (let i = 0; i < coords.length; i++) {
           const childStyle = { ...(fProps?.style ?? {}) };
