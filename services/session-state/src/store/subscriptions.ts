@@ -58,6 +58,7 @@ export const selectors = {
     viewport: state.viewport,
     rotation: state.rotation,
     drawingMode: state.drawingMode,
+    drawingPaletteIndex: state.drawingPaletteIndex,
   }),
 
   features: (state: ReturnType<SessionStoreApi['getState']>): FeaturesSlice => ({

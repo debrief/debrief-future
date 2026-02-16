@@ -11,6 +11,7 @@ import { TemporalTrackLayer } from './TemporalTrackLayer';
 import { PositionSymbolsLayer } from './PositionSymbolsLayer';
 import { LeafletToolbar } from './LeafletToolbar';
 import type { DrawingMode } from './LeafletToolbar';
+import { DrawingGuidanceOverlay } from './DrawingGuidanceOverlay/DrawingGuidanceOverlay';
 import '@geoman-io/leaflet-geoman-free';
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
@@ -492,6 +493,7 @@ export function MapView({
           />
         ))}
       </MapContainer>
+      <DrawingGuidanceOverlay drawingMode={drawingMode ?? null} />
     </div>
   );
 }

@@ -447,6 +447,16 @@ class ToolbarControl extends L.Control {
     } else {
       this.drawTriggerButton.classList.remove('debrief-leaflet-toolbar__button--active');
     }
+
+    // FR-006 / FR-096: Toggle crosshair cursor on map container
+    const container = this.map?.getContainer();
+    if (container) {
+      if (this.drawingMode !== null) {
+        container.classList.add('debrief-drawing-active');
+      } else {
+        container.classList.remove('debrief-drawing-active');
+      }
+    }
   }
 
   // FR-008: Reset after shape completion and emit drawn GeoJSON

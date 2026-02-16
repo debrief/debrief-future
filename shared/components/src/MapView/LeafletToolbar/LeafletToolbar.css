@@ -144,3 +144,8 @@
   height: 16px;
   stroke: currentColor;
 }
+
+/* Crosshair cursor during active drawing mode (FR-006, FR-096) */
+.leaflet-container.debrief-drawing-active {
+  cursor: crosshair;
+}

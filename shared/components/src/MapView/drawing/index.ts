@@ -7,4 +7,7 @@ export {
 } from './drawingDefaults';
 export { isValidDrawnGeometry } from './isValidDrawnGeometry';
 export { createDrawnFeature } from './createDrawnFeature';
-export type { CreateDrawnFeatureOptions } from './createDrawnFeature';
+export type { CreateDrawnFeatureOptions, DrawnFeatureProvenance } from './createDrawnFeature';
+export { DRAWING_GUIDANCE, CANCEL_HINT } from './drawingGuidance';
+export type { GuidanceText } from './drawingGuidance';
+export { DRAWING_PALETTE, getPaletteColour, getPaletteStyleOverrides } from './drawingPalette';
