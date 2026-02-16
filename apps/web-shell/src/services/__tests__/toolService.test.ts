@@ -1,24 +1,27 @@
 /**
- * T041: Test web-shell tool-list contains only TypeScript-implemented tools.
- * T045: Verify Python-only tools don't appear in web-shell.
+ * T041: Test web-shell tool-list contains all registered tools.
  *
  * Validates that the web-shell toolService:
- * 1. Contains all TypeScript-implemented tools
- * 2. Does NOT include Python-only tools (track-stats, range-bearing, area-summary)
- * 3. Each tool has correct name, description, and requirements
+ * 1. Contains all TypeScript-implemented tools (styling, analysis, shape, sensor)
+ * 2. Each tool has correct name, description, and requirements
  */
 
 import { describe, it, expect } from 'vitest';
-import { listTools, PYTHON_ONLY_TOOLS } from '../toolService';
+import { listTools } from '../toolService';
 
-/** All TypeScript-implemented tool IDs registered in the web-shell */
+/** All tool IDs registered in the web-shell */
 const EXPECTED_TOOL_IDS = [
   'set-track-color',
   'apply-symbol-style',
   'label-interval',
   'symbol-interval',
   'move-shape',
+  'generate-reference-points',
+  'generate-courses-speeds',
   'buffer-zone-generator',
+  'track-stats',
+  'range-bearing',
+  'area-summary',
 ];
 
 describe('toolService.listTools (T041)', () => {
@@ -27,7 +30,7 @@ describe('toolService.listTools (T041)', () => {
     expect(tools).toHaveLength(EXPECTED_TOOL_IDS.length);
   });
 
-  it('contains all expected TypeScript tools', () => {
+  it('contains all expected tools', () => {
     const tools = listTools();
     const toolIds = tools.map((t) => t.name);
 
@@ -100,6 +103,41 @@ describe('toolService.listTools (T041)', () => {
     });
   });
 
+  describe('analysis tools have correct structure', () => {
+    it('track-stats has correct definition', () => {
+      const tools = listTools();
+      const tool = tools.find((t) => t.name === 'track-stats');
+      expect(tool).toBeDefined();
+      expect(tool!.description.toLowerCase()).toContain('statistic');
+      expect(tool!.annotations['debrief:category']).toBe('track/analysis');
+      expect(tool!.annotations['debrief:outputKind']).toBe('track/statistics');
+      expect(tool!.annotations['debrief:selectionRequirements']).toEqual(
+        expect.arrayContaining([expect.objectContaining({ kind: 'TRACK', min: 1 })]),
+      );
+    });
+
+    it('range-bearing has correct definition', () => {
+      const tools = listTools();
+      const tool = tools.find((t) => t.name === 'range-bearing');
+      expect(tool).toBeDefined();
+      expect(tool!.description.toLowerCase()).toContain('range');
+      expect(tool!.annotations['debrief:category']).toBe('track/analysis');
+      expect(tool!.annotations['debrief:outputKind']).toBe('dataset/range_bearing_series');
+      expect(tool!.annotations['debrief:selectionRequirements']).toEqual(
+        expect.arrayContaining([expect.objectContaining({ kind: 'TRACK', min: 2 })]),
+      );
+    });
+
+    it('area-summary has correct definition', () => {
+      const tools = listTools();
+      const tool = tools.find((t) => t.name === 'area-summary');
+      expect(tool).toBeDefined();
+      expect(tool!.description.toLowerCase()).toContain('area');
+      expect(tool!.annotations['debrief:category']).toBe('region/analysis');
+      expect(tool!.annotations['debrief:outputKind']).toBe('region/statistics');
+    });
+  });
+
   describe('all tools have required MCP fields', () => {
     it('every tool has name, description, inputSchema, and annotations', () => {
       const tools = listTools();
@@ -115,40 +153,5 @@ describe('toolService.listTools (T041)', () => {
         expect(tool.annotations['debrief:outputKind']).toBeDefined();
       }
     });
-  });
-});
-
-describe('Python-only tool exclusion (T045)', () => {
-  it('does not contain track-stats', () => {
-    const tools = listTools();
-    const toolIds = tools.map((t) => t.name);
-    expect(toolIds).not.toContain('track-stats');
-  });
-
-  it('does not contain range-bearing', () => {
-    const tools = listTools();
-    const toolIds = tools.map((t) => t.name);
-    expect(toolIds).not.toContain('range-bearing');
-  });
-
-  it('does not contain area-summary', () => {
-    const tools = listTools();
-    const toolIds = tools.map((t) => t.name);
-    expect(toolIds).not.toContain('area-summary');
-  });
-
-  it('none of the known Python-only tools appear in the tool list', () => {
-    const tools = listTools();
-    const toolIds = new Set(tools.map((t) => t.name));
-    for (const pythonTool of PYTHON_ONLY_TOOLS) {
-      expect(toolIds.has(pythonTool)).toBe(false);
-    }
-  });
-
-  it('PYTHON_ONLY_TOOLS constant lists all known Python-only tools', () => {
-    expect(PYTHON_ONLY_TOOLS).toContain('track-stats');
-    expect(PYTHON_ONLY_TOOLS).toContain('range-bearing');
-    expect(PYTHON_ONLY_TOOLS).toContain('area-summary');
-    expect(PYTHON_ONLY_TOOLS).toHaveLength(3);
   });
 });

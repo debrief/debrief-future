@@ -10,10 +10,12 @@ import {
   GoldenLayout,
   LayoutConfig,
   ResolvedLayoutConfig,
+  RowOrColumn,
+  ContentItem,
   type ComponentContainer,
 } from 'golden-layout';
 import type { PanelRegistry } from './panelRegistry';
-import { DEFAULT_LAYOUT_CONFIG } from './defaultLayout';
+import { DEFAULT_LAYOUT_CONFIG, PANEL_MAP } from './defaultLayout';
 import { saveLayout, loadLayout, clearLayout } from './layoutPersistence';
 import { createBindHandler, createUnbindHandler, unmountAll, updateContextWrapper } from './goldenLayoutBridge';
 import './PanelWorkspace.css';
@@ -156,12 +158,37 @@ export function PanelWorkspace({
     return search(gl.rootItem.contentItems as unknown[]);
   }, []);
 
-  // Add a panel dynamically (e.g., Chart panel when results arrive)
+  // Add a panel dynamically (e.g., Results panel when results arrive).
+  // Places it below the map by finding the map's parent column.
   const addPanel = useCallback((componentType: string, title: string) => {
     const gl = glRef.current;
     if (!gl || !gl.isInitialised) return;
     if (hasPanel(componentType)) return; // already present
-    gl.addComponent(componentType, undefined, title);
+
+    // Find the column containing the map so we can add below it
+    const findMapColumn = (item: ContentItem): RowOrColumn | null => {
+      if (ContentItem.isComponentItem(item) && item.componentType === PANEL_MAP) {
+        // Walk up to find the parent column
+        let parent = item.parent;
+        while (parent) {
+          if (parent.isColumn && parent instanceof RowOrColumn) return parent;
+          parent = parent.parent;
+        }
+      }
+      for (const child of item.contentItems) {
+        const found = findMapColumn(child);
+        if (found) return found;
+      }
+      return null;
+    };
+
+    const mapColumn = gl.rootItem ? findMapColumn(gl.rootItem) : null;
+    if (mapColumn) {
+      mapColumn.addComponent(componentType, undefined, title);
+    } else {
+      // Fallback: use default placement
+      gl.addComponent(componentType, undefined, title);
+    }
   }, [hasPanel]);
 
   // Expose control methods on the DOM element for external triggering

@@ -1,8 +1,75 @@
 /**
- * Chart Panel wrapper — renders ChartRenderer in a GoldenLayout panel.
+ * Chart Panel wrapper — renders result artifacts (charts, images, fallback)
+ * in a GoldenLayout panel.
+ *
+ * Features: 096-add-goldenlayout-panels, 095-results-bottom-panel
  */
 
 import { usePanelContext } from './PanelContext';
+import type { ChartTabData } from './PanelContext';
+import type { ChartRendererProps } from '../ChartRenderer';
+
+/** Format bytes into a human-readable string */
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/** Render content for the active tab based on its artifact type */
+function TabContent({
+  tab,
+  chartSpec,
+  ChartRenderer,
+}: {
+  tab: ChartTabData;
+  chartSpec: ChartRendererProps['spec'];
+  ChartRenderer: React.ComponentType<ChartRendererProps>;
+}) {
+  const type = tab.artifactType ?? 'dataset';
+
+  if (type === 'image' && tab.imageDataUri) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', padding: 8 }}>
+        <img
+          src={tab.imageDataUri}
+          alt={tab.title}
+          style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+        />
+      </div>
+    );
+  }
+
+  if (type === 'other' && tab.fileMeta) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        gap: 8,
+        color: 'var(--vscode-foreground, #cccccc)',
+      }}>
+        <div style={{ fontSize: 14, fontWeight: 500 }}>{tab.fileMeta.filename}</div>
+        <div style={{ fontSize: 12, color: 'var(--vscode-descriptionForeground, #969696)' }}>
+          {tab.fileMeta.mimeType} &middot; {formatFileSize(tab.fileMeta.sizeBytes)}
+        </div>
+      </div>
+    );
+  }
+
+  // Default: dataset (chart)
+  if (chartSpec) {
+    return <ChartRenderer spec={chartSpec} className="web-shell__chart" />;
+  }
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--vscode-errorForeground, #d32f2f)' }}>
+      Unable to render chart
+    </div>
+  );
+}
 
 export function ChartPanelWrapper() {
   const ctx = usePanelContext();
@@ -10,13 +77,14 @@ export function ChartPanelWrapper() {
   if (!ctx.chartProps) {
     return (
       <div style={{ padding: 16, color: '#969696', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }} data-testid="panel-chart">
-        No chart data. Open a .dataset.json file from the Navigation panel.
+        No results to display. Run a tool or open a file from the Navigation panel.
       </div>
     );
   }
 
   const { chartSpec, chartTabs, activeChartTabId, onChartTabSelect, onChartTabClose } = ctx.chartProps;
   const { ChartRenderer } = ctx.components;
+  const activeTab = chartTabs.find(t => t.id === activeChartTabId);
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }} data-testid="panel-chart">
@@ -73,12 +141,13 @@ export function ChartPanelWrapper() {
         </div>
       )}
       <div style={{ flex: 1, minHeight: 0, overflow: 'auto', padding: 8 }}>
-        {chartSpec && <ChartRenderer spec={chartSpec} className="web-shell__chart" />}
-        {!chartSpec && chartTabs.length > 0 && (
+        {activeTab ? (
+          <TabContent tab={activeTab} chartSpec={chartSpec} ChartRenderer={ChartRenderer} />
+        ) : chartTabs.length > 0 ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--vscode-errorForeground, #d32f2f)' }}>
             Unable to render chart
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

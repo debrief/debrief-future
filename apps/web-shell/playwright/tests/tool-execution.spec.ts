@@ -1,8 +1,20 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
-// STATUS: Skipped — requires web-shell app with tool execution and map rendering.
-// See docs/web-shell-test-restoration-requirements.md for restoration plan.
-test.describe.skip('Tool Execution', () => {
+/**
+ * Helper: select a track feature via the feature list (more reliable than map clicks
+ * since .leaflet-interactive.first() may be a polygon, not a track).
+ */
+async function selectTrackViaFeatureList(page: import('@playwright/test').Page) {
+  const featureRow = page.locator('.debrief-feature-row:has-text("HMS Defender")');
+  const target = (await featureRow.count()) > 0
+    ? featureRow
+    : page.locator('.debrief-feature-row').first();
+  await target.click();
+  await page.waitForTimeout(200);
+}
+
+// Tool execution tests — verifies tool activation, execution, and result display.
+test.describe('Tool Execution', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // Navigate to analysis view via timeline bar/point
@@ -13,39 +25,32 @@ test.describe.skip('Tool Execution', () => {
   });
 
   test('tools panel shows available tools', async ({ page }) => {
-    // Tools panel should be visible in activity panel
     const toolsPanel = page.locator('.debrief-tools-panel');
     await expect(toolsPanel).toBeVisible();
   });
 
   test('tools are inactive without selection', async ({ page }) => {
-    // With no selection, tools should show as inactive
     const inactiveTools = page.locator('.debrief-tools-panel__item--inactive');
     await expect(inactiveTools.first()).toBeVisible();
   });
 
   test('track length tool activates when track selected', async ({ page }) => {
-    // Select a track on the map (force: true bypasses SVG overlap check)
-    const track = page.locator('.leaflet-interactive').first();
-    await track.click({ force: true });
+    // Select a track via feature list (reliable targeting)
+    await selectTrackViaFeatureList(page);
 
-    // Wait for tools to update
-    await page.waitForTimeout(100);
-
-    // At least one tool should now be active (Track Length and/or Bounding Box)
+    // At least one tool should now be active
     const activeTools = page.locator('.debrief-tools-panel__item--active');
     await expect(activeTools.first()).toBeVisible({ timeout: 2000 });
   });
 
   test('running track length shows result message', async ({ page }) => {
-    // Select a track (force: true bypasses SVG overlap check)
-    const track = page.locator('.leaflet-interactive').first();
-    await track.click({ force: true });
+    // Select a track via feature list
+    await selectTrackViaFeatureList(page);
 
     // Wait for tool to become active
     await expect(page.locator('.debrief-tools-panel__item--active').first()).toBeVisible({ timeout: 2000 });
 
-    // Click the run button on first active tool
+    // Click the run button on the Track Length tool (first active built-in)
     const runButton = page.locator('.debrief-tools-panel__item--active button').first();
     await runButton.click();
 
@@ -59,19 +64,17 @@ test.describe.skip('Tool Execution', () => {
     // Select any feature (click on feature row)
     const featureRow = page.locator('.debrief-feature-row').first();
     await featureRow.click();
+    await page.waitForTimeout(200);
 
-    // Wait for tools to update - bounding box should be active
-    await page.waitForTimeout(100);
-
-    // Both tools should potentially be available now
+    // At least one tool should be available
     const activeTools = page.locator('.debrief-tools-panel__item--active');
     const count = await activeTools.count();
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
   test('tool message can be dismissed', async ({ page }) => {
-    // Select a track and run tool (force: true bypasses SVG overlap check)
-    await page.locator('.leaflet-interactive').first().click({ force: true });
+    // Select a track and run tool via feature list
+    await selectTrackViaFeatureList(page);
     await expect(page.locator('.debrief-tools-panel__item--active').first()).toBeVisible({ timeout: 2000 });
     await page.locator('.debrief-tools-panel__item--active button').first().click();
 

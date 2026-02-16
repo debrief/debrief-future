@@ -69,7 +69,7 @@ export class AnalysisPage {
    * The back button.
    */
   get backButton(): Locator {
-    return this.page.locator('.web-shell__back-button');
+    return this.page.locator('.web-shell__back-button[aria-label="Back to catalog"]');
   }
 
   /**

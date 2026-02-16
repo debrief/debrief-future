@@ -47,7 +47,9 @@ import type {
   PanelContextValue,
   PanelComponents,
   ChartContextProps,
+  ChartTabData,
   PanelWorkspaceElement,
+  ResultArtifactType,
 } from '@debrief/components';
 import type { LogFilterState } from '@debrief/components';
 import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
@@ -89,12 +91,41 @@ interface PlotState {
   features: FeatureCollection;
 }
 
-/** An open chart tab in the bottom panel */
-interface ChartTab {
+/** An open result tab in the results panel */
+interface ResultTab {
   id: string;
   title: string;
   path: string;
-  dataset: DatasetEnvelope;
+  artifactType: ResultArtifactType;
+  /** Dataset envelope for chart rendering (artifactType === 'dataset') */
+  dataset?: DatasetEnvelope;
+  /** Base64 data URI for image display (artifactType === 'image') */
+  imageDataUri?: string;
+  /** File metadata for fallback display (artifactType === 'other') */
+  fileMeta?: { filename: string; mimeType: string; sizeBytes: number };
+}
+
+/** Image file extensions that should render inline */
+const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.svg', '.bmp', '.webp']);
+
+/** Determine artifact type from file path */
+function getArtifactType(filePath: string): ResultArtifactType {
+  const ext = filePath.toLowerCase().replace(/^.*(\.[^.]+)$/, '$1');
+  if (filePath.endsWith('.dataset.json') || ext === '.json') return 'dataset';
+  if (IMAGE_EXTENSIONS.has(ext)) return 'image';
+  return 'other';
+}
+
+/** MIME type lookup by extension */
+function getMimeType(filePath: string): string {
+  const ext = filePath.toLowerCase().replace(/^.*(\.[^.]+)$/, '$1');
+  const mimeMap: Record<string, string> = {
+    '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.svg': 'image/svg+xml',
+    '.bmp': 'image/bmp', '.webp': 'image/webp', '.pdf': 'application/pdf',
+    '.csv': 'text/csv', '.txt': 'text/plain',
+  };
+  return mimeMap[ext] ?? 'application/octet-stream';
 }
 
 /**
@@ -127,9 +158,10 @@ export default function App() {
   // Counter for generating unique activity IDs
   const [activityCounter, setActivityCounter] = useState(0);
 
-  // Chart panel state — tabs opened by clicking dataset files in the STAC tree
-  const [chartTabs, setChartTabs] = useState<ChartTab[]>([]);
-  const [activeChartTabId, setActiveChartTabId] = useState<string | null>(null);
+  // Results panel state — tabs opened by clicking files in the STAC tree
+  const [resultTabs, setResultTabs] = useState<ResultTab[]>([]);
+  const [activeResultTabId, setActiveResultTabId] = useState<string | null>(null);
+  const [layoutResetCount, setLayoutResetCount] = useState(0);
 
   // Drawing state (Feature: 094)
   const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
@@ -468,62 +500,84 @@ export default function App() {
     }
   }, [store]);
 
-  // Handle file selection from STAC tree — open dataset files as chart tabs
+  // Handle file selection from STAC tree — open result files as tabs
   const handleFileSelect = useCallback(async (filePath: string) => {
-    // Only handle .dataset.json files
-    if (!filePath.endsWith('.dataset.json')) return;
+    const artifactType = getArtifactType(filePath);
+    const filename = filePath.replace(/^.*\//, '');
+
+    // Skip item.json (STAC metadata, not a result)
+    if (filename === 'item.json' || filename === 'catalog.json') return;
 
     // Already open? Just activate the tab
-    const existing = chartTabs.find(t => t.path === filePath);
+    const existing = resultTabs.find(t => t.path === filePath);
     if (existing) {
-      setActiveChartTabId(existing.id);
+      setActiveResultTabId(existing.id);
       return;
     }
 
     try {
-      const content = await mockFsAdapter.readFile(filePath);
-      const parsed = JSON.parse(content) as DatasetEnvelope;
-
-      // Quick sanity check — must have type + title
-      if (!parsed.type || !parsed.title) return;
-
-      const tab: ChartTab = {
-        id: filePath,
-        title: parsed.title,
-        path: filePath,
-        dataset: parsed,
-      };
-      setChartTabs(prev => [...prev, tab]);
-      setActiveChartTabId(tab.id);
+      if (artifactType === 'dataset') {
+        const content = await mockFsAdapter.readFile(filePath);
+        const parsed = JSON.parse(content) as DatasetEnvelope;
+        if (!parsed.type || !parsed.title) return;
+        const tab: ResultTab = {
+          id: filePath, title: parsed.title, path: filePath,
+          artifactType: 'dataset', dataset: parsed,
+        };
+        setResultTabs(prev => [...prev, tab]);
+        setActiveResultTabId(tab.id);
+      } else if (artifactType === 'image') {
+        // Read image content — in the mock FS it's stored as text (SVG etc.)
+        const content = await mockFsAdapter.readFile(filePath);
+        const mime = getMimeType(filePath);
+        const dataUri = mime === 'image/svg+xml'
+          ? `data:${mime};base64,${btoa(content)}`
+          : `data:${mime};base64,${content}`;
+        const tab: ResultTab = {
+          id: filePath, title: filename, path: filePath,
+          artifactType: 'image', imageDataUri: dataUri,
+        };
+        setResultTabs(prev => [...prev, tab]);
+        setActiveResultTabId(tab.id);
+      } else {
+        // Fallback: show file metadata
+        const stats = await mockFsAdapter.stat(filePath);
+        const tab: ResultTab = {
+          id: filePath, title: filename, path: filePath,
+          artifactType: 'other',
+          fileMeta: { filename, mimeType: getMimeType(filePath), sizeBytes: stats.size },
+        };
+        setResultTabs(prev => [...prev, tab]);
+        setActiveResultTabId(tab.id);
+      }
     } catch {
-      // Not a valid dataset file — ignore silently
+      // Cannot read file — ignore silently
     }
-  }, [chartTabs]);
+  }, [resultTabs]);
 
-  // Close a chart tab
-  const handleCloseChartTab = useCallback((tabId: string) => {
-    setChartTabs(prev => {
+  // Close a result tab
+  const handleCloseResultTab = useCallback((tabId: string) => {
+    setResultTabs(prev => {
       const next = prev.filter(t => t.id !== tabId);
-      // If closing the active tab, switch to the last remaining or null
-      if (tabId === activeChartTabId) {
-        setActiveChartTabId(next.length > 0 ? next[next.length - 1].id : null);
+      if (tabId === activeResultTabId) {
+        setActiveResultTabId(next.length > 0 ? next[next.length - 1].id : null);
       }
       return next;
     });
-  }, [activeChartTabId]);
+  }, [activeResultTabId]);
 
-  // Active chart tab data
-  const activeChartTab = useMemo(
-    () => chartTabs.find(t => t.id === activeChartTabId) ?? null,
-    [chartTabs, activeChartTabId]
+  // Active result tab
+  const activeResultTab = useMemo(
+    () => resultTabs.find(t => t.id === activeResultTabId) ?? null,
+    [resultTabs, activeResultTabId]
   );
 
-  // Transform active chart dataset to Vega-Lite spec
+  // Transform active dataset to Vega-Lite spec (only for dataset tabs)
   const activeChartSpec = useMemo(() => {
-    if (!activeChartTab) return null;
-    const result = transformDataset(activeChartTab.dataset);
+    if (!activeResultTab || activeResultTab.artifactType !== 'dataset' || !activeResultTab.dataset) return null;
+    const result = transformDataset(activeResultTab.dataset);
     return result.ok ? result.spec : null;
-  }, [activeChartTab]);
+  }, [activeResultTab]);
 
   // Handle tool execution — persist result to STAC assets and record a log entry
   const handleRunTool = useCallback((toolId: string, params?: Record<string, unknown>) => {
@@ -575,6 +629,18 @@ export default function App() {
         }
         setTreeRefreshKey(k => k + 1);
       }
+    }
+
+    // Write dataset results to STAC assets and auto-open in Results panel
+    if (result.datasets && result.datasets.length > 0 && currentPlot) {
+      const itemDir = `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`;
+      for (const ds of result.datasets) {
+        const assetPath = `${itemDir}/assets/${ds.filename}`;
+        mockFsAdapter.writeFile(assetPath, JSON.stringify(ds.envelope, null, 2));
+        // Auto-open the dataset as a result tab
+        handleFileSelect(assetPath);
+      }
+      setTreeRefreshKey(k => k + 1);
     }
 
     // Record a log entry
@@ -629,7 +695,7 @@ export default function App() {
     }
 
     setLogEntries(prev => [entry, ...prev]);
-  }, [selectedFeatures, activityCounter, currentPlot]);
+  }, [selectedFeatures, activityCounter, currentPlot, handleFileSelect]);
 
   // Handle ActivityPanel messages
   const handleActivityMessage = useCallback((message: ActivityPanelMessage) => {
@@ -739,17 +805,24 @@ export default function App() {
     ChartRenderer,
   }), []);
 
-  // Chart context for the Chart panel wrapper
+  // Results context for the Chart/Results panel wrapper
   const chartContextProps = useMemo<ChartContextProps | null>(() => {
-    if (chartTabs.length === 0 && !activeChartSpec) return null;
+    if (resultTabs.length === 0 && !activeChartSpec) return null;
+    const tabData: ChartTabData[] = resultTabs.map(t => ({
+      id: t.id,
+      title: t.title,
+      artifactType: t.artifactType,
+      imageDataUri: t.imageDataUri,
+      fileMeta: t.fileMeta,
+    }));
     return {
       chartSpec: activeChartSpec,
-      chartTabs: chartTabs.map(t => ({ id: t.id, title: t.title })),
-      activeChartTabId,
-      onChartTabSelect: setActiveChartTabId,
-      onChartTabClose: handleCloseChartTab,
+      chartTabs: tabData,
+      activeChartTabId: activeResultTabId,
+      onChartTabSelect: setActiveResultTabId,
+      onChartTabClose: handleCloseResultTab,
     };
-  }, [chartTabs, activeChartSpec, activeChartTabId, handleCloseChartTab]);
+  }, [resultTabs, activeChartSpec, activeResultTabId, handleCloseResultTab]);
 
   // Full context value for all panel wrappers
   const panelContextValue = useMemo<PanelContextValue>(() => ({
@@ -826,14 +899,14 @@ export default function App() {
     [panelContextValue]
   );
 
-  // Dynamically add chart panel when chart data arrives
+  // Dynamically add results panel when result data arrives (or after layout reset)
   useEffect(() => {
-    if (chartTabs.length === 0) return;
+    if (resultTabs.length === 0) return;
     const el = document.querySelector('[data-testid="panel-workspace"]') as PanelWorkspaceElement | null;
     if (el?.__addPanel) {
-      el.__addPanel(PANEL_CHART, 'Chart');
+      el.__addPanel(PANEL_CHART, 'Results');
     }
-  }, [chartTabs.length > 0]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [resultTabs.length > 0, layoutResetCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Render welcome view
   if (view === 'welcome') {
@@ -919,6 +992,7 @@ export default function App() {
           registry={panelRegistry}
           contextWrapper={contextWrapper}
           className="web-shell__panel-workspace"
+          onLayoutReset={() => setLayoutResetCount(c => c + 1)}
         />
       </main>
     </div>

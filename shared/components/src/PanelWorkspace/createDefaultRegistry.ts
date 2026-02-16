@@ -57,7 +57,7 @@ export function createDefaultRegistry(): PanelRegistry {
 
   registry.register({
     type: PANEL_CHART,
-    title: 'Chart',
+    title: 'Results',
     component: ChartPanelWrapper,
     icon: 'graph',
     minWidth: 200,
