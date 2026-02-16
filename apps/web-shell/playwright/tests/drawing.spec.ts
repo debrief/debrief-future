@@ -156,8 +156,8 @@ test.describe('Drawing — Feature 094', () => {
     await page.mouse.click(box!.x + box!.width * 0.5, box!.y + box!.height * 0.5);
     await page.waitForTimeout(2000);
 
-    // Switch to the Log tab
-    await page.getByTestId('sidebar-tab-log').click();
+    // Switch to the Log tab (GoldenLayout tab)
+    await page.locator('.lm_tab:has-text("Log")').click();
     await expect(page.getByTestId('log-panel')).toBeVisible({ timeout: 5000 });
 
     // Should show exactly 1 log entry for the drawing action
