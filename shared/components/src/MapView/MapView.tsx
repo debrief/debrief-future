@@ -271,18 +271,50 @@ export function MapView({
     return calculateBounds(visibleFeatures);
   }, [featureArray, visibleIds, bounds]);
 
-  // Create GeoJSON data structure for static (non-temporal) features
-  const geojsonData = useMemo(() => ({
-    type: 'FeatureCollection' as const,
-    features: staticFeatures.map((f) => ({
-      ...f,
-      geometry: {
-        ...f.geometry,
-        // Ensure coordinates are proper arrays for GeoJSON
-        coordinates: f.geometry.coordinates,
-      },
-    })),
-  }), [staticFeatures]);
+  // Create GeoJSON data structure for static (non-temporal) features.
+  // MultiPolygon features are decomposed into individual Polygon features
+  // because Leaflet renders MultiPolygon as a single L.Polygon (not a
+  // FeatureGroup), making per-sub-polygon selection/styling impossible.
+  const geojsonData = useMemo(() => {
+    const expanded: GeoJSON.Feature[] = [];
+    for (const f of staticFeatures) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const fProps = f.properties as any;
+      const isZone = fProps?.kind === 'ZONE' && f.geometry?.type === 'MultiPolygon';
+      if (f.geometry?.type === 'MultiPolygon' && !isZone) {
+        // Decompose MultiPolygon into individual Polygons
+        const coords = f.geometry.coordinates as unknown as number[][][][];
+        const overrides = fProps?.position_style_overrides as Record<string, Record<string, unknown>> | undefined;
+        for (let i = 0; i < coords.length; i++) {
+          const childStyle = { ...(fProps?.style ?? {}) };
+          // Merge per-polygon overrides into the child style
+          const ov = overrides?.[String(i)];
+          if (ov) {
+            for (const [k, v] of Object.entries(ov)) {
+              childStyle[k] = v;
+            }
+          }
+          expanded.push({
+            type: 'Feature',
+            id: `${f.id}/polygons/${i}`,
+            geometry: { type: 'Polygon', coordinates: coords[i] },
+            properties: {
+              ...fProps,
+              style: childStyle,
+              _parentId: f.id,
+              _childIndex: i,
+            },
+          } as GeoJSON.Feature);
+        }
+      } else {
+        expanded.push({
+          ...f,
+          geometry: { ...f.geometry, coordinates: f.geometry.coordinates },
+        } as GeoJSON.Feature);
+      }
+    }
+    return { type: 'FeatureCollection' as const, features: expanded };
+  }, [staticFeatures]);
 
   // Style function for features — reads from properties.style when available
   const featureStyle = useMemo(() => {
@@ -311,6 +343,7 @@ export function MapView({
   const onEachFeature = useMemo(() => {
     return (feature: GeoJSON.Feature, layer: L.Layer) => {
       const debriefFeature = feature as unknown as DebriefFeature;
+      const featureId = debriefFeature.id;
       const label = getFeatureLabel(debriefFeature);
 
       // Add tooltip
@@ -319,26 +352,26 @@ export function MapView({
         direction: 'top',
       });
 
-      // Add click handler
+      // Click handler — works for all features including decomposed
+      // MultiPolygon child polygons (which now have IDs like "parent/polygons/0")
       layer.on('click', (e) => {
         e.originalEvent.stopPropagation();
-        onSelect?.(debriefFeature.id, e.originalEvent as unknown as React.MouseEvent);
+        onSelect?.(featureId, e.originalEvent as unknown as React.MouseEvent);
       });
 
       // Apply per-ring styles for ZONE MultiPolygon features
+      // (ZONEs are kept as MultiPolygon since they use a dedicated zones array)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const featureProps = feature.properties as any;
-      const zoneRingStyles: Array<{ style?: Record<string, unknown> }> | undefined =
+      if (
         featureProps?.kind === 'ZONE' &&
         feature.geometry?.type === 'MultiPolygon' &&
-        Array.isArray(featureProps?.zones)
-          ? featureProps.zones
-          : undefined;
-
-      if (zoneRingStyles && 'getLayers' in layer) {
+        Array.isArray(featureProps?.zones) &&
+        'getLayers' in layer
+      ) {
         const subLayers = (layer as unknown as { getLayers(): L.Layer[] }).getLayers();
         subLayers.forEach((subLayer, i) => {
-          const s = zoneRingStyles[i]?.style;
+          const s = featureProps.zones[i]?.style;
           if (s && 'setStyle' in subLayer) {
             (subLayer as unknown as { setStyle(opts: PathOptions): void }).setStyle({
               color: (s.color as string) ?? '#999',

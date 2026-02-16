@@ -158,6 +158,7 @@ function applySessionState(
       featureCollectionUri: state.featureCollectionUri,
       selection: state.selection,
       hiddenFeatureIds: state.hiddenFeatureIds,
+      styleVersion: state.styleVersion ?? 0,
     },
     document: {
       dirty: state.dirty,

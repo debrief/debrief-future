@@ -30,6 +30,8 @@ export interface ToolResult {
   resultLayers?: Feature[];
   /** Optional tunable parameters recorded for provenance */
   parameters?: Record<string, ToolParameterMeta>;
+  /** Optional dataset results for the Results panel (range-bearing charts, etc.) */
+  datasets?: Array<{ filename: string; envelope: Record<string, unknown> }>;
 }
 
 /**
@@ -413,15 +415,51 @@ export function createMockCalcService(): MockCalcService {
             }
           }
 
-          // For addition tools, parse result features and return as layers
+          // Parse result features — separate map layers from dataset results
           if (item?.resource?.text) {
             const fc = JSON.parse(item.resource.text);
             if (fc.features && fc.features.length > 0) {
+              const mapFeatures: Feature[] = [];
+              const datasets: Array<{ filename: string; envelope: Record<string, unknown> }> = [];
+              let displayMessage = String(label);
+
+              for (const f of fc.features as Feature[]) {
+                const props = f.properties as Record<string, unknown> | null;
+
+                // Extract dataset envelopes from __datasets property
+                if (props?.__datasets && Array.isArray(props.__datasets)) {
+                  const srcNames = (selectedFeatures
+                    .map(sf => ((sf.properties as Record<string, unknown>)?.name ?? sf.id ?? 'feature') as string)
+                    .map(n => n.toLowerCase().replace(/\s+/g, '-'))
+                    .join('-'));
+                  for (let i = 0; i < (props.__datasets as unknown[]).length; i++) {
+                    const ds = (props.__datasets as Record<string, unknown>[])[i];
+                    datasets.push({
+                      filename: `${toolId}-${srcNames}-${i + 1}.dataset.json`,
+                      envelope: ds,
+                    });
+                  }
+                  continue; // Don't add dataset carriers to map layers
+                }
+
+                // Build rich message for statistics features
+                if (props?.statistics) {
+                  const stats = props.statistics as Record<string, unknown>;
+                  const lines = Object.entries(stats)
+                    .map(([k, v]) => `  ${k.replace(/_/g, ' ')}: ${String(v)}`)
+                    .join('\n');
+                  displayMessage = `${String(props.name ?? label)}\n${lines}`;
+                }
+
+                mapFeatures.push(f);
+              }
+
               return {
                 success: true,
-                message: String(label),
-                resultLayers: fc.features as Feature[],
+                message: displayMessage,
+                resultLayers: mapFeatures.length > 0 ? mapFeatures : undefined,
                 parameters,
+                datasets: datasets.length > 0 ? datasets : undefined,
               };
             }
           }
