@@ -47,5 +47,5 @@
 ## Phase 6: Completion
 
 - [x] T601 Update BACKLOG.md status to `specified`
-- [ ] T602 Commit and push all changes
-- [ ] T603 Create PR and publish blog: run /speckit.pr
+- [x] T602 Commit and push all changes
+- [ ] T603 Create PR and publish blog: run /speckit.pr (gh CLI not available — create PR manually)
