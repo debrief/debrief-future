@@ -64,7 +64,20 @@ def generate_pydantic() -> bool:
 
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        output_file.write_text(result.stdout)
+        content = result.stdout
+
+        # Post-process: gen-pydantic emits dict[str, Any] in boilerplate classes
+        # (ConfiguredBaseModel, LinkMLMeta). Replace with dict[str, object] to
+        # eliminate Any from generated code. These are infrastructure classes,
+        # not domain models — object is sufficient for their serialisation needs.
+        content = content.replace("dict[str, Any]", "dict[str, object]")
+        # Remove the Any import if it's no longer used
+        content = content.replace(
+            "from typing import (\n    Any,\n",
+            "from typing import (\n",
+        )
+
+        output_file.write_text(content)
         print(f"  [OK] Generated: {output_file}")
         return True
     except subprocess.CalledProcessError as e:
