@@ -399,8 +399,9 @@ export function ActivityPanel({
         geometryType = 'Point';
         coordinates = coords[displayItem.index] ?? [];
       } else if (isMultiPointFeature(parentFeature) && displayItem.type === 'point') {
+        const coords = parentFeature.geometry.coordinates as unknown as number[][];
         geometryType = 'Point';
-        coordinates = parentFeature.geometry.coordinates[displayItem.index] ?? [];
+        coordinates = coords[displayItem.index] ?? [];
       } else if (isMultiPolygonFeature(parentFeature) && displayItem.type === 'polygon') {
         geometryType = 'Polygon';
         coordinates = (parentFeature.geometry.coordinates[displayItem.index] ?? []) as number[][][];
