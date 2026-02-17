@@ -48,4 +48,4 @@
 
 - [x] T601 Update BACKLOG.md status to `specified`
 - [x] T602 Commit and push all changes
-- [ ] T603 Create PR and publish blog: run /speckit.pr (gh CLI not available — create PR manually)
+- [ ] T603 Create PR and publish blog: gh CLI lacks GitHub API token in this environment — PR body prepared, create manually
