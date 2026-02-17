@@ -70,7 +70,8 @@ const toStoreMode = (m: string): StoreDisplayMode =>
   m === 'trail' ? 'snailTrail' : 'normal';
 import { useSessionStore } from './hooks/useSessionStore';
 import { stacService } from './mocks/stacService';
-import { calcService, moveShapeFeatures } from './mocks/calcService';
+import { calcService } from './mocks/calcService';
+import { executeTool } from './services/toolService';
 import type { ToolResult } from './mocks/calcService';
 import { mockFsAdapter } from './mocks/fsAdapter';
 
@@ -410,11 +411,17 @@ export default function App() {
           if (params[parameter]) {
             params[parameter] = { ...params[parameter], value: newValue };
           }
-          const distNm = Number((params.distance_nm?.value) ?? 5);
-          const dirDeg = Number((params.direction_deg?.value) ?? 45);
+          const distKm = Number((params.distance_km?.value) ?? 5);
+          const dirDeg = Number((params.direction?.value) ?? 90);
 
-          // Re-execute the tool from original position
-          const moved = moveShapeFeatures(featuresToMove, distNm, dirDeg);
+          // Re-execute the tool from original position using the proper tool
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const response = executeTool('move-shape', featuresToMove as any, {
+            distance_km: distKm,
+            direction: dirDeg,
+          });
+          const fc = JSON.parse(response.content[0]?.resource?.text ?? '{"features":[]}');
+          const moved = (fc.features ?? []) as Feature[];
           const movedMap = new Map(moved.map(m => [String(m.id), m]));
 
           // Apply the re-executed result
@@ -620,19 +627,23 @@ export default function App() {
     // Tools that transform features in-place (e.g. move-shape): replace in currentPlot
     const replacesInPlace = toolId === 'move-shape';
 
-    if (result.resultLayer && replacesInPlace) {
-      // Replace the original feature in the plot with the moved version
-      const movedId = String(result.resultLayer.id);
-      setCurrentPlot(plot => {
-        if (!plot) return plot;
-        const updatedFeatures = plot.features.features.map(f =>
-          String(f.id) === movedId ? result.resultLayer! : f
-        );
-        return {
-          ...plot,
-          features: { ...plot.features, features: updatedFeatures },
-        };
-      });
+    if (replacesInPlace) {
+      // Replace the original features in the plot with the moved versions
+      const movedFeatures = result.resultLayers ?? (result.resultLayer ? [result.resultLayer] : []);
+      if (movedFeatures.length > 0) {
+        const movedMap = new Map(movedFeatures.map(m => [String(m.id), m]));
+        setCurrentPlot(plot => {
+          if (!plot) return plot;
+          const updatedFeatures = plot.features.features.map(f => {
+            const moved = movedMap.get(String(f.id));
+            return moved ?? f;
+          });
+          return {
+            ...plot,
+            features: { ...plot.features, features: updatedFeatures },
+          };
+        });
+      }
     }
 
     // Collect all result layers (singular or plural) for additive tools
