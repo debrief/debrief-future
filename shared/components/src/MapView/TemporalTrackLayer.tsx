@@ -92,7 +92,7 @@ export function TemporalTrackLayer({
   return (
     <>
       <GeoJSON
-        key={renderKey}
+        key={`${renderKey}-sel-${isSelected ? 1 : 0}`}
         data={geojsonData as unknown as GeoJSON.GeoJsonObject}
         style={() => style}
         onEachFeature={onEachFeature}
