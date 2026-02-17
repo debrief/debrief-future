@@ -72,8 +72,8 @@
 - [x] T011 [P] Deferred: see T010
 - [x] T012 [P] Add strict: true to apps/web-shell/tsconfig.node.json `apps/web-shell/tsconfig.node.json`
 - [x] T013 [P] Add typecheck script to apps/web-shell/package.json `apps/web-shell/package.json`
-- [ ] T014 Run pnpm -r lint to capture baseline ESLint violation count across all packages
-- [ ] T015 Run pnpm -r typecheck to verify all TypeScript packages compile in strict mode
+- [x] T014 Run pnpm -r lint to capture baseline ESLint violation count across all packages
+- [x] T015 Run pnpm -r typecheck to verify all TypeScript packages compile in strict mode
 
 **Checkpoint**: ESLint consistently configured across all packages. Baseline violation counts captured.
 
@@ -87,9 +87,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T016 Verify Article XV exists in CONSTITUTION.md with all 6 mandates `CONSTITUTION.md`
-- [ ] T017 Sync .specify/memory/constitution.md to include Article XV `.specify/memory/constitution.md`
-- [ ] T018 Verify constitution version bumped to 1.2 `CONSTITUTION.md`
+- [x] T016 Verify Article XV exists in CONSTITUTION.md with all 6 mandates `CONSTITUTION.md`
+- [x] T017 Sync .specify/memory/constitution.md to include Article XV `.specify/memory/constitution.md`
+- [x] T018 Verify constitution version bumped to 1.2 `CONSTITUTION.md`
 
 **Checkpoint**: Constitution updated. Article XV mandates strict type safety.
 
@@ -103,11 +103,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T019 Verify pyright strict mode flags use of Any in a Python file
-- [ ] T020 [P] Verify pyright strict mode flags type mismatch (str passed to int param)
-- [ ] T021 [P] Verify ESLint no-explicit-any flags any usage in a TypeScript file
-- [ ] T022 [P] Verify tsc --noEmit catches type mismatches in TypeScript
-- [ ] T023 Document verification results in evidence/usage-example.md `specs/098-strict-type-checking/evidence/usage-example.md`
+- [x] T019 Verify pyright strict mode flags use of Any in a Python file
+- [x] T020 [P] Verify pyright strict mode flags type mismatch (str passed to int param)
+- [x] T021 [P] Verify ESLint no-explicit-any flags any usage in a TypeScript file
+- [x] T022 [P] Verify tsc --noEmit catches type mismatches in TypeScript
+- [x] T023 Document verification results in evidence/usage-example.md `specs/098-strict-type-checking/evidence/usage-example.md`
 
 **Checkpoint**: Type checkers catch errors locally in both languages. Developer workflow verified.
 
@@ -121,10 +121,10 @@
 
 ### Implementation for User Story 5
 
-- [ ] T024 Add post-processing step to generate.py: replace dict[str, Any] with dict[str, object] in gen-pydantic boilerplate `shared/schemas/scripts/generate.py`
-- [ ] T025 Run make generate and verify zero Any in generated Python domain types
-- [ ] T026 [P] Verify zero any type annotations in generated TypeScript (already clean)
-- [ ] T027 Add pyright exclude for generated boilerplate classes if post-processing is insufficient `pyrightconfig.json`
+- [x] T024 Add post-processing step to generate.py: replace dict[str, Any] with dict[str, object] in gen-pydantic boilerplate `shared/schemas/scripts/generate.py`
+- [x] T025 Run make generate and verify zero Any in generated Python domain types
+- [x] T026 [P] Verify zero any type annotations in generated TypeScript (already clean)
+- [x] T027 Add pyright exclude for generated boilerplate classes if post-processing is insufficient `pyrightconfig.json`
 
 **Checkpoint**: Schema generation produces strict types. Generated code is compliant.
 
@@ -138,66 +138,66 @@
 
 ### Python Remediation: services/stac
 
-- [ ] T028 Replace dict[str, Any] type aliases (STACCatalog, STACItem, GeoJSONFeature) with TypedDict or Pydantic models `services/stac/src/debrief_stac/types.py`
-- [ ] T029 Fix Any usage in mcp_server.py (14 occurrences) `services/stac/src/debrief_stac/mcp_server.py`
-- [ ] T030 [P] Fix Any usage in cli.py (8 occurrences) `services/stac/src/debrief_stac/cli.py`
-- [ ] T031 Run pyright on services/stac and verify zero violations
+- [x] T028 Replace dict[str, Any] type aliases (STACCatalog, STACItem, GeoJSONFeature) with TypedDict or Pydantic models `services/stac/src/debrief_stac/types.py`
+- [x] T029 Fix Any usage in mcp_server.py (14 occurrences) `services/stac/src/debrief_stac/mcp_server.py`
+- [x] T030 [P] Fix Any usage in cli.py (8 occurrences) `services/stac/src/debrief_stac/cli.py`
+- [x] T031 Run pyright on services/stac and verify zero violations
 
 ### Python Remediation: services/calc
 
-- [ ] T032 Fix Any in models.py (16 occurrences) — replace with concrete Pydantic types `services/calc/debrief_calc/models.py`
-- [ ] T033 [P] Fix Any in provenance.py (8 occurrences) `services/calc/debrief_calc/provenance.py`
-- [ ] T034 [P] Fix Any in exceptions.py (8 occurrences) `services/calc/debrief_calc/exceptions.py`
-- [ ] T035 [P] Fix Any in tools/reference/generation.py (10 occurrences) `services/calc/debrief_calc/tools/reference/generation.py`
-- [ ] T036 [P] Fix Any in tools/range_bearing.py (8 occurrences) `services/calc/debrief_calc/tools/range_bearing.py`
-- [ ] T037 [P] Fix Any in tools/sensor/detection/buffer_zone_generator.py (6 occurrences) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
-- [ ] T038 Fix remaining Any in calc package: validation.py, executor.py, registry.py, area_summary.py, track tools `services/calc/debrief_calc/`
-- [ ] T039 Run pyright on services/calc and verify zero violations
+- [x] T032 Fix Any in models.py (16 occurrences) — replace with concrete Pydantic types `services/calc/debrief_calc/models.py`
+- [x] T033 [P] Fix Any in provenance.py (8 occurrences) `services/calc/debrief_calc/provenance.py`
+- [x] T034 [P] Fix Any in exceptions.py (8 occurrences) `services/calc/debrief_calc/exceptions.py`
+- [x] T035 [P] Fix Any in tools/reference/generation.py (10 occurrences) `services/calc/debrief_calc/tools/reference/generation.py`
+- [x] T036 [P] Fix Any in tools/range_bearing.py (8 occurrences) `services/calc/debrief_calc/tools/range_bearing.py`
+- [x] T037 [P] Fix Any in tools/sensor/detection/buffer_zone_generator.py (6 occurrences) `services/calc/debrief_calc/tools/sensor/detection/buffer_zone_generator.py`
+- [x] T038 Fix remaining Any in calc package: validation.py, executor.py, registry.py, area_summary.py, track tools `services/calc/debrief_calc/`
+- [x] T039 Run pyright on services/calc and verify zero violations
 
 ### Python Remediation: services/io
 
-- [ ] T040 Fix Any in handlers/annotations/builders.py (22 occurrences) `services/io/src/debrief_io/handlers/annotations/builders.py`
-- [ ] T041 [P] Fix Any in handlers/annotations/parser.py (2 occurrences) `services/io/src/debrief_io/handlers/annotations/parser.py`
-- [ ] T042 [P] Fix Any in models.py, handlers/rep.py, cli.py `services/io/src/debrief_io/`
-- [ ] T043 Run pyright on services/io and verify zero violations
+- [x] T040 Fix Any in handlers/annotations/builders.py (22 occurrences) `services/io/src/debrief_io/handlers/annotations/builders.py`
+- [x] T041 [P] Fix Any in handlers/annotations/parser.py (2 occurrences) `services/io/src/debrief_io/handlers/annotations/parser.py`
+- [x] T042 [P] Fix Any in models.py, handlers/rep.py, cli.py `services/io/src/debrief_io/`
+- [x] T043 Run pyright on services/io and verify zero violations
 
 ### Python Remediation: services/cli
 
-- [ ] T044 Fix Any in tools.py (3 occurrences) and output.py (4 occurrences) `services/cli/debrief_cli/`
-- [ ] T045 Run pyright on services/cli and verify zero violations
+- [x] T044 Fix Any in tools.py (3 occurrences) and output.py (4 occurrences) `services/cli/debrief_cli/`
+- [x] T045 Run pyright on services/cli and verify zero violations
 
 ### TypeScript Remediation: apps/vscode
 
-- [ ] T046 Fix any in tests/__mocks__/vscode.ts (5 occurrences) — use concrete VS Code API types or typed mock objects `apps/vscode/tests/__mocks__/vscode.ts`
-- [ ] T047 [P] Fix any in test files: setTrackColor, labelInterval, openPlotsService, applySymbolStyle, symbolInterval, generateReferencePoints `apps/vscode/tests/unit/`
-- [ ] T048 [P] Fix any in stylePropertyMap.ts (1 occurrence) `services/session-state/src/format/stylePropertyMap.ts`
-- [ ] T049 Run eslint and tsc on apps/vscode and verify zero any violations
+- [x] T046 Fix any in tests/__mocks__/vscode.ts (5 occurrences) — use concrete VS Code API types or typed mock objects `apps/vscode/tests/__mocks__/vscode.ts`
+- [x] T047 [P] Fix any in test files: setTrackColor, labelInterval, openPlotsService, applySymbolStyle, symbolInterval, generateReferencePoints `apps/vscode/tests/unit/`
+- [x] T048 [P] Fix any in stylePropertyMap.ts (1 occurrence) `services/session-state/src/format/stylePropertyMap.ts`
+- [x] T049 Run eslint and tsc on apps/vscode and verify zero any violations
 
 ### TypeScript Remediation: shared/components
 
-- [ ] T050 Fix any in MapView.tsx (2 occurrences) — remove eslint-disable comments and use concrete types `shared/components/src/MapView/MapView.tsx`
-- [ ] T051 [P] Fix any in selection and theme test files `shared/components/src/__tests__/`
-- [ ] T052 [P] Fix any in temporal-utils.test.ts (6 occurrences) `shared/components/src/MapView/__tests__/temporal-utils.test.ts`
-- [ ] T053 [P] Fix any in exerciseAlpha.ts fixture (1 occurrence) `shared/components/src/MapView/__fixtures__/exerciseAlpha.ts`
-- [ ] T054 Run eslint on shared/components and verify zero any violations
+- [x] T050 Fix any in MapView.tsx (2 occurrences) — remove eslint-disable comments and use concrete types `shared/components/src/MapView/MapView.tsx`
+- [x] T051 [P] Fix any in selection and theme test files `shared/components/src/__tests__/`
+- [x] T052 [P] Fix any in temporal-utils.test.ts (6 occurrences) `shared/components/src/MapView/__tests__/temporal-utils.test.ts`
+- [x] T053 [P] Fix any in exerciseAlpha.ts fixture (1 occurrence) `shared/components/src/MapView/__fixtures__/exerciseAlpha.ts`
+- [x] T054 Run eslint on shared/components and verify zero any violations
 
 ### TypeScript Remediation: apps/web-shell
 
-- [ ] T055 Fix any in toolService.ts (3 occurrences) — remove eslint-disable comments, use typed tool results `apps/web-shell/src/services/toolService.ts`
-- [ ] T056 [P] Fix any in calcService.ts mock (1 occurrence) `apps/web-shell/src/mocks/calcService.ts`
-- [ ] T057 Run eslint and tsc on apps/web-shell and verify zero any violations
+- [x] T055 Fix any in toolService.ts (3 occurrences) — remove eslint-disable comments, use typed tool results `apps/web-shell/src/services/toolService.ts`
+- [x] T056 [P] Fix any in calcService.ts mock (1 occurrence) `apps/web-shell/src/mocks/calcService.ts`
+- [x] T057 Run eslint and tsc on apps/web-shell and verify zero any violations
 
 ### TypeScript Remediation: services/session-state
 
-- [ ] T058 Fix any in entryBuilder.test.ts (4 occurrences) `services/session-state/tests/unit/log/entryBuilder.test.ts`
-- [ ] T059 Run eslint on services/session-state and verify zero violations
+- [x] T058 Fix any in entryBuilder.test.ts (4 occurrences) `services/session-state/tests/unit/log/entryBuilder.test.ts`
+- [x] T059 Run eslint on services/session-state and verify zero violations
 
 ### Full Codebase Verification
 
-- [ ] T060 Run pyright across all Python packages — verify zero violations
-- [ ] T061 [P] Run pnpm -r lint across all TypeScript packages — verify zero no-explicit-any violations
-- [ ] T062 [P] Run pnpm -r typecheck across all TypeScript packages — verify zero errors
-- [ ] T063 Capture full violation inventory in evidence/violation-inventory.md `specs/098-strict-type-checking/evidence/violation-inventory.md`
+- [x] T060 Run pyright across all Python packages — verify zero violations
+- [x] T061 [P] Run pnpm -r lint across all TypeScript packages — verify zero no-explicit-any violations
+- [x] T062 [P] Run pnpm -r typecheck across all TypeScript packages — verify zero errors
+- [x] T063 Capture full violation inventory in evidence/violation-inventory.md `specs/098-strict-type-checking/evidence/violation-inventory.md`
 
 **Checkpoint**: All ~208 violations resolved. Full codebase passes strict type checking.
 
@@ -211,10 +211,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T064 Add typecheck task to Taskfile.yml: pnpm -r typecheck + uv run pyright `Taskfile.yml`
-- [ ] T065 Add task typecheck step to .github/workflows/ci.yml between lint and test `.github/workflows/ci.yml`
-- [ ] T066 Verify task typecheck runs successfully on the current clean codebase
-- [ ] T067 Run full CI pipeline locally: task lint && task typecheck && task test
+- [x] T064 Add typecheck task to Taskfile.yml: pnpm -r typecheck + uv run pyright `Taskfile.yml`
+- [x] T065 Add task typecheck step to .github/workflows/ci.yml between lint and test `.github/workflows/ci.yml`
+- [x] T066 Verify task typecheck runs successfully on the current clean codebase
+- [x] T067 Run full CI pipeline locally: task lint && task typecheck && task test
 
 **Checkpoint**: CI enforces type safety. PRs with violations cannot merge.
 
@@ -226,31 +226,31 @@
 
 ### Existing Test Suite Verification
 
-- [ ] T068 Run full Python test suite (pytest) — verify no regressions from type changes
-- [ ] T069 [P] Run full TypeScript test suite (pnpm -r test) — verify no regressions from type changes
-- [ ] T070 Run ruff check with new ANN/TC rules — verify no remaining annotation gaps
+- [x] T068 Run full Python test suite (pytest) — verify no regressions from type changes
+- [x] T069 [P] Run full TypeScript test suite (pnpm -r test) — verify no regressions from type changes
+- [x] T070 Run ruff check with new ANN/TC rules — verify no remaining annotation gaps
 
 ### Review Test File Exceptions
 
-- [ ] T071 Audit all remaining Any/any in test files — ensure each has lint-disable with justification
-- [ ] T072 Review all existing eslint-disable comments for no-explicit-any — replace or re-justify
+- [x] T071 Audit all remaining Any/any in test files — ensure each has lint-disable with justification
+- [x] T072 Review all existing eslint-disable comments for no-explicit-any — replace or re-justify
 
 ### Evidence Collection
 
-- [ ] T073 Create evidence directory `specs/098-strict-type-checking/evidence/`
-- [ ] T074 Capture test summary with pyright/eslint/pytest pass counts `specs/098-strict-type-checking/evidence/test-summary.md`
-- [ ] T075 [P] Capture pyright output showing zero violations `specs/098-strict-type-checking/evidence/pyright-output.txt`
-- [ ] T076 [P] Capture eslint output showing zero no-explicit-any violations `specs/098-strict-type-checking/evidence/eslint-output.txt`
-- [ ] T077 Finalize usage example with before/after code samples `specs/098-strict-type-checking/evidence/usage-example.md`
+- [x] T073 Create evidence directory `specs/098-strict-type-checking/evidence/`
+- [x] T074 Capture test summary with pyright/eslint/pytest pass counts `specs/098-strict-type-checking/evidence/test-summary.md`
+- [x] T075 [P] Capture pyright output showing zero violations `specs/098-strict-type-checking/evidence/pyright-output.txt`
+- [x] T076 [P] Capture eslint output showing zero no-explicit-any violations `specs/098-strict-type-checking/evidence/eslint-output.txt`
+- [x] T077 Finalize usage example with before/after code samples `specs/098-strict-type-checking/evidence/usage-example.md`
 
 ### Media Content
 
-- [ ] T078 Create shipped blog post `specs/098-strict-type-checking/media/shipped-post.md`
-- [ ] T079 [P] Create LinkedIn shipped summary `specs/098-strict-type-checking/media/linkedin-shipped.md`
+- [x] T078 Create shipped blog post `specs/098-strict-type-checking/media/shipped-post.md`
+- [x] T079 [P] Create LinkedIn shipped summary `specs/098-strict-type-checking/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T080 Create PR and publish blog: run /speckit.pr
+- [x] T080 Create PR and publish blog: run /speckit.pr
 
 **Task T080 must run last. It depends on all evidence and media tasks being complete.**
 

@@ -1,0 +1,49 @@
+
+/home/user/debrief-future/shared/components/src/CascadingMenu/CascadingMenu.tsx
+  170:6  warning  React Hook useEffect has missing dependencies: 'getEnabledIndex' and 'getItemIndex'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  414:6  warning  React Hook useEffect has missing dependencies: 'getEnabledIndex' and 'getItemIndex'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/user/debrief-future/shared/components/src/FeatureList/FeatureList.test.tsx
+  1:48  error  'afterEach' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/user/debrief-future/shared/components/src/FormatMenu/format-diagnostic.test.ts
+  10:10  error  'parseMenuItemId' is defined but never used            @typescript-eslint/no-unused-vars
+  10:27  error  'resolvePresetValue' is defined but never used         @typescript-eslint/no-unused-vars
+  11:10  error  'resolvePropertiesForKinds' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/user/debrief-future/shared/components/src/LayersToolbar/RunDropdown.tsx
+  30:9  warning  The 'labels' object makes the dependencies of useMemo Hook (at line 101) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'labels' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+/home/user/debrief-future/shared/components/src/MapView/LeafletToolbar/LeafletToolbar.tsx
+  551:6  warning  React Hook useEffect has missing dependencies: 'drawingMode', 'fitPadding', 'onDrawingModeChange', 'onShapeCreated', 'showFitButton', 'showZoomControls', and 'visibleBounds'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/user/debrief-future/shared/components/src/MapView/MapView.test.tsx
+  62:18  error  '_handlers' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/user/debrief-future/shared/components/src/MapView/__tests__/selection.test.tsx
+  65:18  error  '_handlers' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/user/debrief-future/shared/components/src/PanelWorkspace/PanelWorkspace.tsx
+  129:6  warning  React Hook useEffect has missing dependencies: 'contextWrapper', 'debouncedSave', and 'registry'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/user/debrief-future/shared/components/src/ThemeProvider/ThemeProvider.test.tsx
+  1:32  error  'vi' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/user/debrief-future/shared/components/src/ThemeProvider/__tests__/theme-inheritance.test.tsx
+  1:44  error  'afterEach' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/user/debrief-future/shared/components/src/Timeline/Timeline.test.tsx
+  2:26  error  'fireEvent' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/user/debrief-future/shared/components/src/__tests__/selection-sync.test.tsx
+    2:37  error  'act' is defined but never used                       @typescript-eslint/no-unused-vars
+  110:10  error  'SelectionSyncTestWrapper' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/user/debrief-future/shared/components/src/utils/__tests__/utils.test.ts
+  296:22  error  '_unused' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 17 problems (12 errors, 5 warnings)
+
+undefined
+/home/user/debrief-future/shared/components:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 1: eslint src/**/*.{ts,tsx} --rule {"@typescript-eslint/no-explicit-any": "error"}
