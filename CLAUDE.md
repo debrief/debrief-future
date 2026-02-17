@@ -141,5 +141,11 @@ Only updated when a feature introduces a technology not already listed here.
 - pytest / pytest-cov (Python tests)
 - Local filesystem STAC catalogs (JSON + GeoJSON storage)
 
+## Before Pushing
+
+**Always run `task verify` before pushing any commits.** This mirrors CI locally: it builds all packages (components, web-shell, vscode), runs linting, and runs all tests. Do not push if `task verify` fails.
+
+Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during `pnpm build`) does. The `verify` task ensures type checking is performed across all three entry points: `@debrief/components`, `@debrief/web-shell`, and `apps/vscode`.
+
 ## Recent Changes
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)

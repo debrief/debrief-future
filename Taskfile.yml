@@ -13,6 +13,7 @@
 #   task dev          Start development watch mode
 #   task lint         Check code style
 #   task lint:fix     Auto-fix code style issues
+#   task verify       Run full CI checks locally before pushing
 #   task clean        Remove build artifacts
 
 version: '3'
@@ -84,6 +85,13 @@ tasks:
       - uv run ruff check --fix .
       - uv run ruff format .
       - pnpm lint -- --fix
+
+  verify:
+    desc: "Run full CI checks locally (build + lint + test) before pushing"
+    deps: [install]
+    cmds:
+      - task: lint
+      - task: test
 
   clean:
     desc: "Remove build artifacts and caches"
