@@ -124,6 +124,8 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 Only updated when a feature introduces a technology not already listed here.
 - TypeScript 5.x (VS Code extension + shared components) + `@debrief/schemas` (generated types), `@debrief/components` (MapView), VS Code Extension API ^1.85.0 (100-unify-feature-pipeline)
 - CSS3 (within TypeScript 5.x React component library) + React 18.x, @tanstack/react-virtual (FeatureList virtualisation) (101-layers-panel-vertical-space)
+- Python 3.11, TypeScript 5.x + pyright (new), ruff (existing — add ANN/TC rules), ESLint + @typescript-eslint (existing — tighten config) (098-strict-type-checking)
+- N/A — configuration and code quality feature (098-strict-type-checking)
 
 - Python 3.11 (services, schemas, calc tools)
 - TypeScript 5.x (VS Code extension, webview, shared components, session-state)
