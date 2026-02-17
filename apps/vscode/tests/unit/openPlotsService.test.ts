@@ -9,13 +9,24 @@ import { OpenPlotsService } from '../../src/services/openPlotsService';
 import type { OpenPlotsState } from '../../src/types/openPlots';
 import { commands } from 'vscode';
 
+/** Minimal mock of VS Code ExtensionContext.workspaceState */
+interface MockWorkspaceState {
+  get: <T>(key: string) => T | undefined;
+  update: (key: string, value: unknown) => Promise<void>;
+}
+
+/** Minimal mock of VS Code ExtensionContext */
+interface MockExtensionContext {
+  workspaceState: MockWorkspaceState;
+}
+
 /**
  * Create a mock ExtensionContext with an in-memory workspaceState.
  */
-function createMockContext(): { context: any; store: Map<string, unknown> } {
+function createMockContext(): { context: MockExtensionContext; store: Map<string, unknown> } {
   const store = new Map<string, unknown>();
 
-  const context = {
+  const context: MockExtensionContext = {
     workspaceState: {
       get: vi.fn(<T>(key: string): T | undefined => {
         return store.get(key) as T | undefined;
@@ -334,8 +345,8 @@ describe('OpenPlotsService', () => {
       await service.addPlot('stac://s/charlie', 'Charlie', 's', 'charlie');
 
       const callOrder: string[] = [];
-      vi.mocked(commands.executeCommand).mockImplementation(async (_cmd: string, args: any) => {
-        callOrder.push(args.uri);
+      vi.mocked(commands.executeCommand).mockImplementation(async (_cmd: string, args: unknown) => {
+        callOrder.push((args as { uri: string }).uri);
         return undefined;
       });
 

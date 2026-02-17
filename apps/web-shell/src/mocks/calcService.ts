@@ -399,8 +399,11 @@ export function createMockCalcService(): MockCalcService {
             'apply-symbol-style': { symbol: 'circle' },
           };
           const params = collectedParams ?? defaultParams[toolId] ?? {};
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const response = executeTool(toolId, selectedFeatures as any, params);
+          const response = executeTool(
+            toolId,
+            selectedFeatures as unknown as Parameters<typeof executeTool>[1],
+            params,
+          );
           const item = response.content[0];
           const label = item?.annotations?.['debrief:label'] ?? `${toolId} applied`;
 

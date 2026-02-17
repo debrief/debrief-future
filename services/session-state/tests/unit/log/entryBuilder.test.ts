@@ -48,7 +48,7 @@ describe('generateActivityId', () => {
 
 describe('extractActivityIdFromOutputFeatures', () => {
   it('returns activityId from last provenance entry', () => {
-    const features = [
+    const features: Array<Record<string, unknown>> = [
       {
         type: 'Feature',
         properties: {
@@ -59,22 +59,22 @@ describe('extractActivityIdFromOutputFeatures', () => {
         },
       },
     ];
-    expect(extractActivityIdFromOutputFeatures(features as any)).toBe('new-id');
+    expect(extractActivityIdFromOutputFeatures(features)).toBe('new-id');
   });
 
   it('returns undefined when no provenance exists', () => {
-    const features = [{ type: 'Feature', properties: {} }];
-    expect(extractActivityIdFromOutputFeatures(features as any)).toBeUndefined();
+    const features: Array<Record<string, unknown>> = [{ type: 'Feature', properties: {} }];
+    expect(extractActivityIdFromOutputFeatures(features)).toBeUndefined();
   });
 
   it('returns undefined when properties is null', () => {
-    const features = [{ type: 'Feature', properties: null }];
-    expect(extractActivityIdFromOutputFeatures(features as any)).toBeUndefined();
+    const features: Array<Record<string, unknown>> = [{ type: 'Feature', properties: null }];
+    expect(extractActivityIdFromOutputFeatures(features)).toBeUndefined();
   });
 
   it('returns undefined when provenance is empty array', () => {
-    const features = [{ type: 'Feature', properties: { provenance: [] } }];
-    expect(extractActivityIdFromOutputFeatures(features as any)).toBeUndefined();
+    const features: Array<Record<string, unknown>> = [{ type: 'Feature', properties: { provenance: [] } }];
+    expect(extractActivityIdFromOutputFeatures(features)).toBeUndefined();
   });
 });
 

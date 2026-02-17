@@ -8,8 +8,16 @@
 
 import { describe, it, expect } from 'vitest';
 import { execute } from '../../src/tools/track/styling/applySymbolStyle';
+import type { ApplySymbolStyleParams } from '../../src/tools/track/styling/applySymbolStyle';
 
-function makeTrackFeature(): any {
+interface TestTrackFeature {
+  type: 'Feature';
+  id: string;
+  geometry: { type: string; coordinates: number[][] };
+  properties: Record<string, unknown>;
+}
+
+function makeTrackFeature(): TestTrackFeature {
   return {
     type: 'Feature' as const,
     id: 'track-001',
@@ -97,7 +105,7 @@ describe('applySymbolStyle (T032)', () => {
   it('error for invalid symbol: throws Error for unrecognized symbol name', () => {
     const feature = makeTrackFeature();
 
-    expect(() => execute([feature], { symbol: 'hexagon' as any })).toThrow(
+    expect(() => execute([feature], { symbol: 'hexagon' as unknown as ApplySymbolStyleParams['symbol'] })).toThrow(
       'symbol must be one of: circle, square, diamond, triangle, cross',
     );
   });
@@ -107,7 +115,7 @@ describe('applySymbolStyle (T032)', () => {
     // Remove existing point style so we can verify the default shape
     delete feature.properties.style.point;
 
-    const result = execute([feature], {} as any);
+    const result = execute([feature], {} as ApplySymbolStyleParams);
 
     expect(result).toHaveLength(1);
     const point = result[0].properties.style.point;

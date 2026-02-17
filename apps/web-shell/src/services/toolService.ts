@@ -12,7 +12,7 @@
  *
  * 1. Import `toolDefinition` and `execute` from the tool module
  * 2. Add a `[toolDefinition.name, { definition, execute }]` entry to `toolRegistry`
- * 3. If the tool's GeoJSONFeature type differs, cast execute with `as any`
+ * 3. If the tool's GeoJSONFeature type differs, cast execute with `as unknown as ToolExecuteFn`
  *
  * See also: `shared/tools/TEMPLATE.md` § Registration for the full checklist.
  *
@@ -126,14 +126,28 @@ interface GeoJSONFeature {
 }
 
 /**
+ * Tool execute function type. Params are typed as Record<string, unknown>
+ * because each tool has its own specific parameter interface; validation
+ * occurs inside the tool implementation.
+ */
+type ToolExecuteFn = (features: GeoJSONFeature[], params: Record<string, unknown>) => GeoJSONFeature[];
+
+/**
  * Internal registry entry mapping a tool definition to its execute function.
- * The params type uses `any` because each tool has its own specific parameter
- * interface; validation occurs inside the tool implementation.
  */
 interface ToolRegistryEntry {
   definition: MCPToolDefinition;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  execute: (features: GeoJSONFeature[], params: any) => GeoJSONFeature[];
+  execute: ToolExecuteFn;
+}
+
+/**
+ * Cast a typed execute function to ToolExecuteFn.
+ * Each tool validates its own params internally, so casting to the generic
+ * signature is safe — the registry passes through params without inspection.
+ */
+function asToolFn(fn: (features: GeoJSONFeature[], params: Record<string, unknown>) => GeoJSONFeature[]): ToolExecuteFn;
+function asToolFn<P>(fn: (features: GeoJSONFeature[], params: P) => GeoJSONFeature[]): ToolExecuteFn {
+  return fn as unknown as ToolExecuteFn;
 }
 
 /**
@@ -145,78 +159,78 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
     setTrackColorDef.name,
     {
       definition: setTrackColorDef,
-      execute: executeSetTrackColor,
+      execute: asToolFn(executeSetTrackColor),
     },
   ],
   [
     applySymbolStyleDef.name,
     {
       definition: applySymbolStyleDef,
-      execute: executeApplySymbolStyle,
+      execute: asToolFn(executeApplySymbolStyle),
     },
   ],
   [
     labelIntervalDef.name,
     {
       definition: labelIntervalDef,
-      execute: executeLabelInterval,
+      execute: asToolFn(executeLabelInterval),
     },
   ],
   [
     symbolIntervalDef.name,
     {
       definition: symbolIntervalDef,
-      execute: executeSymbolInterval,
+      execute: asToolFn(executeSymbolInterval),
     },
   ],
   [
     moveShapeDef.name,
     {
       definition: moveShapeDef,
-      execute: executeMoveShape,
+      execute: asToolFn(executeMoveShape),
     },
   ],
   [
     generateReferencePointsDef.name,
     {
       definition: generateReferencePointsDef,
-      execute: executeGenerateReferencePoints,
+      execute: asToolFn(executeGenerateReferencePoints),
     },
   ],
   [
     generateCoursesSpeedsDef.name,
     {
       definition: generateCoursesSpeedsDef,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      execute: executeGenerateCourseSpeeds as any,
+      // generate-courses-speeds ignores params; wrapper drops the second argument
+      execute: (features: GeoJSONFeature[], _params: Record<string, unknown>) => executeGenerateCourseSpeeds(features),
     },
   ],
   [
     bufferZoneGeneratorDef.name,
     {
       definition: bufferZoneGeneratorDef,
-      execute: executeBufferZoneGenerator,
+      execute: asToolFn(executeBufferZoneGenerator),
     },
   ],
   [
     trackStatsDef.name,
     {
       definition: trackStatsDef,
-      execute: executeTrackStats,
+      execute: asToolFn(executeTrackStats),
     },
   ],
   [
     rangeBearingDef.name,
     {
       definition: rangeBearingDef,
-      execute: executeRangeBearing,
+      execute: asToolFn(executeRangeBearing),
     },
   ],
   [
     areaSummaryDef.name,
     {
       definition: areaSummaryDef,
-      execute: executeAreaSummary,
+      execute: asToolFn(executeAreaSummary),
     },
   ],
 ]);

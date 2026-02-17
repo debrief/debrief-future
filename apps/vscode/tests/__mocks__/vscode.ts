@@ -55,17 +55,37 @@ export class EventEmitter<T> {
   };
 }
 
+/** Minimal VS Code Uri shape for mocking purposes */
+interface MockUri {
+  fsPath: string;
+  scheme: string;
+  path: string;
+}
+
+/** Minimal VS Code command shape for mocking purposes */
+interface MockCommand {
+  command: string;
+  title: string;
+  arguments?: unknown[];
+}
+
+/** Minimal VS Code ThemeIcon shape for mocking purposes */
+interface MockThemeIcon {
+  id: string;
+  color?: unknown;
+}
+
 export class TreeItem {
   label?: string;
   description?: string;
   tooltip?: string;
   contextValue?: string;
   collapsibleState?: number;
-  iconPath?: any;
-  command?: any;
-  resourceUri?: any;
+  iconPath?: MockThemeIcon | MockUri | string;
+  command?: MockCommand;
+  resourceUri?: MockUri;
 
-  constructor(labelOrUri: string | any, collapsibleState?: number) {
+  constructor(labelOrUri: string | MockUri, collapsibleState?: number) {
     if (typeof labelOrUri === 'string') {
       this.label = labelOrUri;
     } else {
@@ -83,9 +103,9 @@ export const TreeItemCollapsibleState = {
 
 export class ThemeIcon {
   id: string;
-  color?: any;
+  color?: unknown;
 
-  constructor(id: string, color?: any) {
+  constructor(id: string, color?: unknown) {
     this.id = id;
     this.color = color;
   }

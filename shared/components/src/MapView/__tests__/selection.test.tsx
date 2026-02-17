@@ -6,16 +6,20 @@ import type { TrackFeature } from '@debrief/schemas';
 
 // Mock react-leaflet components
 vi.mock('react-leaflet', () => ({
-  MapContainer: ({ children, className }: any) => (
+  MapContainer: ({ children, className }: { children: React.ReactNode; className?: string }) => (
     <div data-testid="map-container" className={className}>
       {children}
     </div>
   ),
   TileLayer: () => <div data-testid="tile-layer" />,
-  GeoJSON: ({ data, onEachFeature, style: styleFn }: any) => {
+  GeoJSON: ({ data, onEachFeature, style: styleFn }: {
+    data: { features: Array<{ id?: string | number; properties: Record<string, unknown> }> };
+    onEachFeature?: (feature: Record<string, unknown>, layer: { on: ReturnType<typeof vi.fn>; bindTooltip: ReturnType<typeof vi.fn>; setStyle: ReturnType<typeof vi.fn> }) => void;
+    style?: (feature: Record<string, unknown>) => Record<string, unknown>;
+  }) => {
     return (
       <div data-testid="geojson-layer">
-        {data.features.map((feature: any, index: number) => {
+        {data.features.map((feature, index: number) => {
           const computedStyle = styleFn?.(feature) ?? {};
           const layer = {
             on: vi.fn(),
@@ -26,17 +30,17 @@ vi.mock('react-leaflet', () => ({
 
           return (
             <div
-              key={feature.id || index}
+              key={String(feature.id) || String(index)}
               data-testid={`feature-${feature.id}`}
               data-selected={computedStyle.weight === 4 ? 'true' : 'false'}
               style={{
-                color: computedStyle.color,
-                opacity: computedStyle.fillOpacity,
+                color: computedStyle.color as string | undefined,
+                opacity: computedStyle.fillOpacity as number | undefined,
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                const clickHandler = layer.on.mock.calls.find(
-                  (c: any[]) => c[0] === 'click'
+                const clickHandler = (layer.on.mock.calls as Array<[string, (e: Record<string, unknown>) => void]>).find(
+                  (c) => c[0] === 'click'
                 );
                 if (clickHandler) {
                   clickHandler[1]({ originalEvent: e.nativeEvent });
@@ -58,7 +62,7 @@ vi.mock('react-leaflet', () => ({
       getNorth: () => 52,
     }),
   }),
-  useMapEvents: (handlers: any) => {
+  useMapEvents: (_handlers: Record<string, unknown>) => {
     // Store handlers for potential use
     return null;
   },

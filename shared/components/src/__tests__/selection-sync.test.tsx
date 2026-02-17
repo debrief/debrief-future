@@ -11,16 +11,20 @@ import type { TrackFeature } from '@debrief/schemas';
 
 // Mock react-leaflet
 vi.mock('react-leaflet', () => ({
-  MapContainer: ({ children, className }: any) => (
+  MapContainer: ({ children, className }: { children: React.ReactNode; className?: string }) => (
     <div data-testid="map-container" className={className}>
       {children}
     </div>
   ),
   TileLayer: () => <div data-testid="tile-layer" />,
-  GeoJSON: ({ data, onEachFeature, style: styleFn }: any) => {
+  GeoJSON: ({ data, onEachFeature, style: styleFn }: {
+    data: { features: Array<{ id?: string; properties: Record<string, unknown> }> };
+    onEachFeature?: (feature: Record<string, unknown>, layer: { on: ReturnType<typeof vi.fn>; bindTooltip: ReturnType<typeof vi.fn> }) => void;
+    style?: (feature: Record<string, unknown>) => Record<string, unknown>;
+  }) => {
     return (
       <div data-testid="geojson-layer">
-        {data.features.map((feature: any, index: number) => {
+        {data.features.map((feature, index: number) => {
           const computedStyle = styleFn?.(feature) ?? {};
           const layer = {
             on: vi.fn(),
@@ -34,8 +38,8 @@ vi.mock('react-leaflet', () => ({
               data-testid={`map-feature-${feature.id}`}
               data-selected={computedStyle.weight === 4 ? 'true' : 'false'}
               onClick={(e) => {
-                const clickHandler = layer.on.mock.calls.find(
-                  (c: any[]) => c[0] === 'click'
+                const clickHandler = (layer.on.mock.calls as Array<[string, (e: Record<string, unknown>) => void]>).find(
+                  (c) => c[0] === 'click'
                 );
                 if (clickHandler) {
                   clickHandler[1]({ originalEvent: e.nativeEvent });
@@ -62,7 +66,7 @@ vi.mock('react-leaflet', () => ({
 
 // Mock @tanstack/react-virtual
 vi.mock('@tanstack/react-virtual', () => ({
-  useVirtualizer: ({ count, estimateSize }: any) => ({
+  useVirtualizer: ({ count, estimateSize }: { count: number; estimateSize: () => number }) => ({
     getVirtualItems: () =>
       Array.from({ length: Math.min(count, 20) }, (_, i) => ({
         index: i,

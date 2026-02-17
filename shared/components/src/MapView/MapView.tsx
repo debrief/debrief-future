@@ -278,15 +278,14 @@ export function MapView({
   const geojsonData = useMemo(() => {
     const expanded: GeoJSON.Feature[] = [];
     for (const f of staticFeatures) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const fProps = f.properties as any;
+      const fProps = f.properties as unknown as Record<string, unknown>;
       const isZone = fProps?.kind === 'ZONE' && f.geometry?.type === 'MultiPolygon';
       if (f.geometry?.type === 'MultiPolygon' && !isZone) {
         // Decompose MultiPolygon into individual Polygons
         const coords = f.geometry.coordinates as unknown as number[][][][];
         const overrides = fProps?.position_style_overrides as Record<string, Record<string, unknown>> | undefined;
         for (let i = 0; i < coords.length; i++) {
-          const childStyle = { ...(fProps?.style ?? {}) };
+          const childStyle: Record<string, unknown> = { ...(fProps?.style as Record<string, unknown> ?? {}) };
           // Merge per-polygon overrides into the child style
           const ov = overrides?.[String(i)];
           if (ov) {
@@ -369,8 +368,7 @@ export function MapView({
 
       // Apply per-ring styles for ZONE MultiPolygon features
       // (ZONEs are kept as MultiPolygon since they use a dedicated zones array)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const featureProps = feature.properties as any;
+      const featureProps = feature.properties as unknown as Record<string, unknown>;
       if (
         featureProps?.kind === 'ZONE' &&
         feature.geometry?.type === 'MultiPolygon' &&
@@ -378,8 +376,9 @@ export function MapView({
         'getLayers' in layer
       ) {
         const subLayers = (layer as unknown as { getLayers(): L.Layer[] }).getLayers();
+        const zones = featureProps.zones as Array<{ style?: Record<string, unknown> }>;
         subLayers.forEach((subLayer, i) => {
-          const s = featureProps.zones[i]?.style;
+          const s = zones[i]?.style;
           if (s && 'setStyle' in subLayer) {
             (subLayer as unknown as { setStyle(opts: PathOptions): void }).setStyle({
               color: (s.color as string) ?? '#999',
