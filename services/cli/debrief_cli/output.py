@@ -20,11 +20,11 @@ class OutputFormatter:
     - JSON: Machine-readable output for scripting
     """
 
-    def __init__(self, json_mode: bool = False):
+    def __init__(self, json_mode: bool = False) -> None:
         self.json_mode = json_mode
-        self._data = {}
+        self._data: dict[str, Any] = {}
 
-    def set(self, key: str, value: Any) -> None:
+    def set(self, key: str, value: object) -> None:
         """Set a value in the output data."""
         self._data[key] = value
 
@@ -74,7 +74,7 @@ class OutputFormatter:
             for row in rows:
                 print(" | ".join(str(cell).ljust(widths[i]) for i, cell in enumerate(row)))
 
-    def json_output(self, data: Any) -> None:
+    def json_output(self, data: object) -> None:
         """Output raw JSON data."""
         if self.json_mode:
             self._data = data if isinstance(data, dict) else {"data": data}

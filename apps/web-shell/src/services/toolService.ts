@@ -142,10 +142,10 @@ interface ToolRegistryEntry {
 
 /**
  * Cast a typed execute function to ToolExecuteFn.
- * Each tool validates its own params internally, so casting to the generic
- * signature is safe — the registry passes through params without inspection.
+ * Each tool validates its own params internally, so widening the params type
+ * to Record<string, unknown> is safe — the registry passes through params
+ * without inspection, and each tool's implementation validates what it needs.
  */
-function asToolFn(fn: (features: GeoJSONFeature[], params: Record<string, unknown>) => GeoJSONFeature[]): ToolExecuteFn;
 function asToolFn<P>(fn: (features: GeoJSONFeature[], params: P) => GeoJSONFeature[]): ToolExecuteFn {
   return fn as unknown as ToolExecuteFn;
 }
@@ -201,8 +201,12 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
     generateCoursesSpeedsDef.name,
     {
       definition: generateCoursesSpeedsDef,
-      // generate-courses-speeds ignores params; wrapper drops the second argument
-      execute: (features: GeoJSONFeature[], _params: Record<string, unknown>) => executeGenerateCourseSpeeds(features),
+      // generate-courses-speeds ignores params; the wrapper drops the second
+      // argument, and the cast bridges the structural difference between this
+      // module's GeoJSONFeature (coordinates: unknown) and the tool's internal
+      // GeoJSONFeature (coordinates: number[][]).
+      execute: asToolFn((features: GeoJSONFeature[], _params: Record<string, unknown>) =>
+        executeGenerateCourseSpeeds(features as unknown as Parameters<typeof executeGenerateCourseSpeeds>[0])),
     },
   ],
   [

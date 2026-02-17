@@ -17,7 +17,7 @@ from debrief_cli.output import format_tool_metadata
 
 
 @click.group()
-def tools():
+def tools() -> None:
     """Discover and run analysis tools."""
     pass
 
@@ -27,7 +27,7 @@ def tools():
     "--input", "input_file", type=click.Path(exists=True), help="Filter by input file kind"
 )
 @pass_context
-def list_tools(ctx: Context, input_file: str | None):
+def list_tools(ctx: Context, input_file: str | None) -> None:
     """
     List available analysis tools.
 
@@ -82,7 +82,7 @@ def list_tools(ctx: Context, input_file: str | None):
 @tools.command("describe")
 @click.argument("tool_name")
 @pass_context
-def describe_tool(ctx: Context, tool_name: str):
+def describe_tool(ctx: Context, tool_name: str) -> None:
     """
     Show detailed information about a tool.
 
@@ -122,7 +122,7 @@ def describe_tool(ctx: Context, tool_name: str):
     help="Tool parameter as key value pair",
 )
 @pass_context
-def run_tool(ctx: Context, tool_name: str, input_file: str, params: tuple):
+def run_tool(ctx: Context, tool_name: str, input_file: str, params: tuple) -> None:
     """
     Execute an analysis tool on input data.
 
@@ -240,7 +240,7 @@ def _extract_bounds(features: list[dict[str, Any]]) -> list[float]:
     return [min_x, min_y, max_x, max_y]
 
 
-def _flatten_coordinates(coords: Any) -> list[list[float]]:
+def _flatten_coordinates(coords: Any) -> list[list[float]]:  # complex nested GeoJSON coords
     """Recursively flatten nested coordinate arrays."""
     if not coords:
         return []
