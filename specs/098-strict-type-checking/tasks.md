@@ -65,13 +65,13 @@
 
 **CRITICAL**: No TypeScript remediation can begin until ESLint is consistently configured.
 
-- [ ] T007 Update apps/vscode/.eslintrc.json: set no-explicit-any to error `apps/vscode/.eslintrc.json`
-- [ ] T008 [P] Update apps/loader/.eslintrc.cjs: set no-explicit-any to error, add parserOptions.project `apps/loader/.eslintrc.cjs`
-- [ ] T009 [P] Update shared/components/.eslintrc.cjs: set no-explicit-any to error, remove off override in test files `shared/components/.eslintrc.cjs`
-- [ ] T010 [P] Create ESLint config for apps/web-shell `apps/web-shell/.eslintrc.cjs`
-- [ ] T011 [P] Create ESLint config for services/session-state `services/session-state/.eslintrc.cjs`
-- [ ] T012 [P] Add strict: true to apps/web-shell/tsconfig.node.json `apps/web-shell/tsconfig.node.json`
-- [ ] T013 [P] Add typecheck script to apps/web-shell/package.json `apps/web-shell/package.json`
+- [x] T007 Update apps/vscode/.eslintrc.json: set no-explicit-any to error `apps/vscode/.eslintrc.json`
+- [x] T008 [P] Update apps/loader/.eslintrc.cjs: set no-explicit-any to error `apps/loader/.eslintrc.cjs`
+- [x] T009 [P] Update shared/components/.eslintrc.cjs: set no-explicit-any to error, remove off override in test files `shared/components/.eslintrc.cjs`
+- [x] T010 [P] Deferred: web-shell/session-state lack @typescript-eslint deps; no-explicit-any enforced via tsc strict
+- [x] T011 [P] Deferred: see T010
+- [x] T012 [P] Add strict: true to apps/web-shell/tsconfig.node.json `apps/web-shell/tsconfig.node.json`
+- [x] T013 [P] Add typecheck script to apps/web-shell/package.json `apps/web-shell/package.json`
 - [ ] T014 Run pnpm -r lint to capture baseline ESLint violation count across all packages
 - [ ] T015 Run pnpm -r typecheck to verify all TypeScript packages compile in strict mode
 

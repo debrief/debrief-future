@@ -11,7 +11,8 @@
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:ui": "playwright test --config=playwright/playwright.config.ts --ui",
-    "test:cloud": "node run-playwright.mjs"
+    "test:cloud": "node run-playwright.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@debrief/components": "workspace:*",
