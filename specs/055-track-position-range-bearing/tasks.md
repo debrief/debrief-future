@@ -124,7 +124,7 @@
 
 ### PR Creation
 
-- [x] T023 Create PR and publish blog: run /speckit.pr
+- [ ] T023 Create PR and publish blog: run /speckit.pr (gh CLI not available — manual PR needed)
 
 **Task T023 must run last. It depends on all evidence and media tasks being complete.**
 
