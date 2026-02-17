@@ -94,7 +94,7 @@ A data structure defined in the LinkML schema is used in both a Python service a
 - What happens with JSON parsing, which inherently produces untyped data? Parsed JSON must be validated through a typed model (Pydantic in Python, schema-validated types in TypeScript) before use.
 - What happens with catch blocks, which receive `unknown` (TypeScript) or `Exception` (Python)? These must use type narrowing — `instanceof` checks in TypeScript, specific exception types in Python — not `any`/`Any` casts.
 - What happens with existing `eslint-disable` comments for `no-explicit-any`? Each must be reviewed: either replaced with a concrete type or re-justified with a specific technical reason.
-- What happens with generic parameter dictionaries like `Record<string, unknown>` used to pass tool parameters? These must be replaced with strongly-typed per-tool parameter interfaces. A generic dictionary is `any` by another name — it defers type checking to runtime and loses the compiler's ability to verify correctness at call sites.
+- What happens with generic parameter dictionaries like `Record<string, unknown>` used to pass tool parameters? These must be replaced with references to existing concrete type declarations from the schema/type system. A generic dictionary is `any` by another name — it defers type checking to runtime and loses the compiler's ability to verify correctness at call sites. The fix is not per-tool bespoke interfaces, but expressing parameters in terms of the types that already exist in the project.
 
 ## Requirements *(mandatory)*
 
@@ -112,7 +112,7 @@ A data structure defined in the LinkML schema is used in both a Python service a
 - **FR-010**: Test files MAY use `Any`/`any` only when technically necessary for mocking, and each use MUST be accompanied by a lint-disable comment with a specific justification.
 - **FR-011**: External library boundaries MUST be wrapped with typed functions that narrow `Any`/`any` returns to concrete types before use in application code.
 - **FR-012**: JSON deserialization MUST pass through typed validation (Pydantic models in Python, schema-validated types in TypeScript) before data is used.
-- **FR-013**: Generic parameter dictionaries (e.g., `Record<string, unknown>` for tool parameters) MUST be replaced with strongly-typed per-entity interfaces. Passing data through untyped dictionaries defeats static analysis and is treated as equivalent to using `any`.
+- **FR-013**: Generic parameter dictionaries (e.g., `Record<string, unknown>` for tool parameters) MUST be replaced with references to existing concrete type declarations from the project's type system. Passing data through untyped dictionaries defeats static analysis and is treated as equivalent to using `any`.
 
 ### Key Entities
 
