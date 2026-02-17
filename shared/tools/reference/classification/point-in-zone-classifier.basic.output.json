@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://ref-grid",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"ref-grid\",\"geometry\":{\"type\":\"MultiPoint\",\"coordinates\":[[-4.5,50.2],[-4.45,50.22],[-4.35,50.28],[-4.3,50.32],[-3.8,50.5],[-5.5,49.0]]},\"properties\":{\"kind\":\"POINT\",\"locationType\":\"REFERENCE\",\"name\":\"Reference Points (grid 6)\",\"style\":{\"shape\":\"square\",\"color\":\"#666666\",\"radius\":5},\"pointMetadata\":[{\"index\":0,\"name\":\"Ref 1\",\"zone\":\"75%\",\"color\":\"#9C27B0\"},{\"index\":1,\"name\":\"Ref 2\",\"zone\":\"75%\",\"color\":\"#9C27B0\"},{\"index\":2,\"name\":\"Ref 3\",\"zone\":\"50%\",\"color\":\"#F44336\"},{\"index\":3,\"name\":\"Ref 4\",\"zone\":\"25%\",\"color\":\"#FF9800\"},{\"index\":4,\"name\":\"Ref 5\",\"zone\":\"none\",\"color\":\"#666666\"},{\"index\":5,\"name\":\"Ref 6\",\"zone\":\"none\",\"color\":\"#666666\"}],\"pointColors\":[\"#9C27B0\",\"#9C27B0\",\"#F44336\",\"#FF9800\",\"#666666\",\"#666666\"]}}",
+      "annotations": {
+        "debrief:resultType": "mutation/reference/classified_points",
+        "debrief:sourceFeatures": ["ref-grid", "zone-001"],
+        "debrief:label": "Classified 6 points: 2 in 75%, 1 in 50%, 1 in 25%, 2 outside"
+      }
+    }
+  ]
+}
