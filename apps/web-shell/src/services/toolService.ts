@@ -112,6 +112,11 @@ import {
   execute as executeAreaSummary,
 } from '../tools/region/analysis/areaSummary';
 
+import {
+  toolDefinition as pointInZoneClassifierDef,
+  execute as executePointInZoneClassifier,
+} from '../../../vscode/src/tools/reference/classification/pointInZoneClassifier';
+
 // Re-export types for consumers
 export type { MCPToolDefinition, MCPToolResponse, MCPContentItem, DebriefAnnotations };
 
@@ -217,6 +222,13 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
     {
       definition: areaSummaryDef,
       execute: executeAreaSummary,
+    },
+  ],
+  [
+    pointInZoneClassifierDef.name,
+    {
+      definition: pointInZoneClassifierDef,
+      execute: executePointInZoneClassifier,
     },
   ],
 ]);
