@@ -19,10 +19,14 @@ select = [
     "UP",   # pyupgrade (Python version upgrades)
     "B",    # flake8-bugbear (common bugs)
     "SIM",  # flake8-simplify (simplifications)
+    "ANN",  # flake8-annotations (type annotation presence)
+    "TC",   # flake8-type-checking (TYPE_CHECKING import hygiene)
 ]
 
 ignore = [
-    "E501",  # line too long - handled by formatter
+    "E501",    # line too long - handled by formatter
+    "ANN101",  # deprecated: missing type annotation for self (Python 3.11+)
+    "ANN102",  # deprecated: missing type annotation for cls (Python 3.11+)
 ]
 
 [lint.isort]

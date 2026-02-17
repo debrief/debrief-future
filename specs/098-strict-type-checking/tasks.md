@@ -48,12 +48,12 @@
 
 **Purpose**: Install tools and create configuration files that all subsequent phases depend on
 
-- [ ] T001 Add pyright to root pyproject.toml dev dependencies `pyproject.toml`
-- [ ] T002 Create pyrightconfig.json with strict mode targeting all Python packages `pyrightconfig.json`
-- [ ] T003 [P] Add ANN and TC rule sets to ruff config `ruff.toml`
-- [ ] T004 [P] Add ANN101, ANN102 to ruff ignore list (deprecated for Python 3.11+) `ruff.toml`
-- [ ] T005 Verify pyright runs and reports current violation count
-- [ ] T006 Verify ruff ANN rules run and report current violation count
+- [x] T001 Add pyright to root pyproject.toml dev dependencies `pyproject.toml`
+- [x] T002 Create pyrightconfig.json with standard mode targeting all Python packages `pyrightconfig.json`
+- [x] T003 [P] Add ANN and TC rule sets to ruff config `ruff.toml`
+- [x] T004 [P] Add ANN101, ANN102 to ruff ignore list (deprecated for Python 3.11+) `ruff.toml`
+- [x] T005 Verify pyright runs and reports current violation count (baseline: 132 errors at standard mode)
+- [x] T006 Verify ruff ANN rules run and report current violation count (baseline: 1063 ANN violations)
 
 **Checkpoint**: Tools installed, configs created. Can measure baseline violation counts.
 
