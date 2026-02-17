@@ -98,12 +98,12 @@
 
 /* Selected feature styling — glow + pulse, preserves original color */
 @keyframes debrief-selection-pulse {
-  0%, 100% { filter: drop-shadow(0 0 4px currentColor); }
-  50% { filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 2px currentColor); }
+  0%, 100% { filter: drop-shadow(0 0 3px white) drop-shadow(0 0 6px rgba(0, 0, 0, 0.4)); }
+  50% { filter: drop-shadow(0 0 6px white) drop-shadow(0 0 10px rgba(0, 0, 0, 0.6)); }
 }
 
 .debrief-mapview .debrief-map-feature--selected {
-  filter: drop-shadow(0 0 4px currentColor);
+  filter: drop-shadow(0 0 3px white) drop-shadow(0 0 6px rgba(0, 0, 0, 0.4));
   animation: debrief-selection-pulse 2s ease-in-out infinite;
 }
 

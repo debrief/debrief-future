@@ -334,7 +334,6 @@ export function MapView({
         fillColor,
         fillOpacity: isSelected ? 0.4 : (style?.fill_opacity as number) ?? 0.2,
         dashArray: (style?.dash_array as string) ?? undefined,
-        className: isSelected ? 'debrief-map-feature--selected' : undefined,
       };
     };
   }, [selectedIds]);
@@ -345,6 +344,14 @@ export function MapView({
       const debriefFeature = feature as unknown as DebriefFeature;
       const featureId = debriefFeature.id;
       const label = getFeatureLabel(debriefFeature);
+
+      // Apply selected CSS class on layer options before it's added to the DOM.
+      // Leaflet's setStyle() ignores className, so we set it here in
+      // onEachFeature (called before addLayer → _initPath reads options.className).
+      if (selectedIds.has(featureId) && 'options' in layer) {
+        const path = layer as L.Path;
+        path.options.className = ((path.options.className ?? '') + ' debrief-map-feature--selected').trim();
+      }
 
       // Add tooltip
       layer.bindTooltip(label, {
@@ -385,7 +392,7 @@ export function MapView({
         });
       }
     };
-  }, [onSelect]);
+  }, [onSelect, selectedIds]);
 
   // pointToLayer callback — renders Point and MultiPoint geometries as circle markers
   const pointToLayer = useMemo(() => {
