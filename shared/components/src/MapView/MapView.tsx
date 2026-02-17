@@ -329,10 +329,10 @@ export function MapView({
       const fillColor = (style?.fill_color as string) ?? color;
 
       return {
-        color: isSelected ? 'var(--debrief-selection-border)' : color,
+        color,
         weight: isSelected ? 4 : (style?.weight as number) ?? (isTrackFeature(debriefFeature) ? 3 : 2),
         opacity: (style?.opacity as number) ?? 1,
-        fillColor: isSelected ? 'var(--debrief-selection-border)' : fillColor,
+        fillColor,
         fillOpacity: isSelected ? 0.4 : (style?.fill_opacity as number) ?? 0.2,
         dashArray: (style?.dash_array as string) ?? undefined,
       };
@@ -345,6 +345,14 @@ export function MapView({
       const debriefFeature = feature as unknown as DebriefFeature;
       const featureId = debriefFeature.id;
       const label = getFeatureLabel(debriefFeature);
+
+      // Apply selected CSS class on layer options before it's added to the DOM.
+      // Leaflet's setStyle() ignores className, so we set it here in
+      // onEachFeature (called before addLayer → _initPath reads options.className).
+      if (selectedIds.has(featureId) && 'options' in layer) {
+        const path = layer as L.Path;
+        path.options.className = ((path.options.className ?? '') + ' debrief-map-feature--selected').trim();
+      }
 
       // Add tooltip
       layer.bindTooltip(label, {
@@ -385,7 +393,7 @@ export function MapView({
         });
       }
     };
-  }, [onSelect]);
+  }, [onSelect, selectedIds]);
 
   // pointToLayer callback — renders Point and MultiPoint geometries as circle markers
   const pointToLayer = useMemo(() => {
@@ -397,13 +405,15 @@ export function MapView({
       const color = (featureStyle?.color as string) ?? getFeatureColor(debriefFeature);
       const fillColor = (featureStyle?.fill_color as string) ?? color;
 
+      const baseRadius = (featureStyle?.radius as number) ?? 6;
       return L.circleMarker(latlng, {
-        radius: (featureStyle?.radius as number) ?? 6,
-        fillColor: isSelected ? 'var(--debrief-selection-border)' : fillColor,
+        radius: isSelected ? baseRadius + 2 : baseRadius,
+        fillColor,
         fillOpacity: isSelected ? 0.6 : (featureStyle?.fill_opacity as number) ?? 0.7,
-        color: isSelected ? 'var(--debrief-selection-border)' : color,
+        color,
         weight: isSelected ? 3 : (featureStyle?.weight as number) ?? 2,
         opacity: (featureStyle?.opacity as number) ?? 1,
+        className: isSelected ? 'debrief-map-feature--selected' : undefined,
       });
     };
   }, [selectedIds]);

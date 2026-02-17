@@ -59,21 +59,28 @@ export function TemporalTrackLayer({
   }, [feature.id, feature.properties, renderState.visibleCoordinates, hasTemporalData]);
 
   const style = useMemo((): PathOptions => ({
-    color: isSelected ? 'var(--debrief-selection-border)' : color,
+    color,
     weight: isSelected ? 4 : 3,
     opacity: 1,
   }), [isSelected, color]);
 
   const onEachFeature = useMemo(() => {
-    if (!onClick) return undefined;
     return (_feat: GeoJSON.Feature, layer: L.Layer) => {
-      layer.on('click', (e) => {
-        const leafletEvent = e as L.LeafletMouseEvent;
-        leafletEvent.originalEvent?.stopPropagation();
-        onClick(String(feature.id), leafletEvent.originalEvent as unknown as React.MouseEvent);
-      });
+      // Apply selected CSS class on layer options before DOM insertion
+      if (isSelected && 'options' in layer) {
+        const path = layer as L.Path;
+        path.options.className = ((path.options.className ?? '') + ' debrief-map-feature--selected').trim();
+      }
+
+      if (onClick) {
+        layer.on('click', (e) => {
+          const leafletEvent = e as L.LeafletMouseEvent;
+          leafletEvent.originalEvent?.stopPropagation();
+          onClick(String(feature.id), leafletEvent.originalEvent as unknown as React.MouseEvent);
+        });
+      }
     };
-  }, [onClick, feature.id]);
+  }, [onClick, feature.id, isSelected]);
 
   if (!geojsonData) return null;
 
@@ -85,7 +92,7 @@ export function TemporalTrackLayer({
   return (
     <>
       <GeoJSON
-        key={renderKey}
+        key={`${renderKey}-sel-${isSelected ? 1 : 0}`}
         data={geojsonData as unknown as GeoJSON.GeoJsonObject}
         style={() => style}
         onEachFeature={onEachFeature}
