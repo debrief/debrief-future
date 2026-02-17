@@ -403,8 +403,9 @@ export function ActivityPanel({
         geometryType = 'Point';
         coordinates = coords[displayItem.index] ?? [];
       } else if (isMultiPolygonFeature(parentFeature) && displayItem.type === 'polygon') {
+        const coords = parentFeature.geometry.coordinates as unknown as number[][][][];
         geometryType = 'Polygon';
-        coordinates = (parentFeature.geometry.coordinates[displayItem.index] ?? []) as number[][][];
+        coordinates = coords[displayItem.index] ?? [];
       } else {
         return;
       }
