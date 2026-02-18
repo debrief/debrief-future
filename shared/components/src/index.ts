@@ -29,6 +29,9 @@ export type {
 export { FeatureList } from './FeatureList';
 export type { FeatureListProps } from './FeatureList';
 
+export { GeometryDialog } from './GeometryDialog';
+export type { GeometryDialogProps } from './GeometryDialog';
+
 export { LayersToolbar, FilterDropdown } from './LayersToolbar';
 export type {
   LayersToolbarProps,
