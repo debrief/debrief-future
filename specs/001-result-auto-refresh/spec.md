@@ -10,6 +10,7 @@
 ### Session 2026-02-18
 
 - Q: Where does the pause/resume toggle appear in the UI? → A: Small icon button in the tab header, next to the close button (per-tab action).
+- Q: When the same logical result ID is open in two views (e.g., bottom panel and editor tab), how do they refresh? → A: Both views refresh independently, each with its own auto-refresh state (pause, stale, visible tracked per view instance).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -84,6 +85,7 @@ An analyst is examining a result view in detail and does not want it to change w
 - What happens when a view is open but the tab/panel is not visible (e.g., behind another tab)? The refresh should be deferred until the view becomes visible to avoid wasting resources.
 - What happens when the viewport state cannot be fully preserved (e.g., the data range changed drastically)? The system should preserve what it can (zoom level, center point) and fall back gracefully rather than resetting entirely.
 - What happens when the system is offline? Auto-refresh must function fully offline since all result data is local. No network dependency is permitted.
+- What happens when the same logical result ID is open in multiple views (e.g., bottom panel and editor tab simultaneously)? Each view refreshes independently with its own auto-refresh state. Pausing one view does not affect the other.
 
 ## Requirements *(mandatory)*
 
@@ -92,7 +94,7 @@ An analyst is examining a result view in detail and does not want it to change w
 - **FR-001**: System MUST watch for changes to result files associated with logical result IDs and automatically trigger a re-render of any open views bound to those IDs.
 - **FR-002**: System MUST preserve viewport state (zoom level, pan position) across auto-refresh re-renders.
 - **FR-003**: System MUST support auto-refresh for result views displayed in both the results bottom panel and custom editor tabs.
-- **FR-004**: System MUST refresh only the specific view(s) affected by a data change; views bound to unaffected logical IDs MUST NOT re-render.
+- **FR-004**: System MUST refresh only the specific view(s) affected by a data change; views bound to unaffected logical IDs MUST NOT re-render. When multiple views are bound to the same logical result ID, each MUST refresh independently with its own auto-refresh state.
 - **FR-005**: System MUST debounce rapid successive updates to avoid excessive re-renders, ensuring only the final state is displayed after a burst of changes.
 - **FR-006**: System MUST defer re-renders for views that are not currently visible (e.g., background tabs), refreshing them when they become visible.
 - **FR-007**: System MUST provide a pause/resume mechanism that allows users to temporarily disable auto-refresh for individual views.
