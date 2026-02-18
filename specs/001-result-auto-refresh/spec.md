@@ -5,6 +5,12 @@
 **Status**: Draft
 **Input**: User description: "Result view auto-refresh on logical ID change — watches logical result IDs, re-renders preserving viewport; absorbs E03 #083"
 
+## Clarifications
+
+### Session 2026-02-18
+
+- Q: Where does the pause/resume toggle appear in the UI? → A: Small icon button in the tab header, next to the close button (per-tab action).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Auto-Refresh on Tool Re-Run (Priority: P1)
@@ -112,7 +118,7 @@ An analyst is examining a result view in detail and does not want it to change w
 - **Key Decision(s)**:
   1. Whether to pause auto-refresh when studying a result in detail
   2. Whether to manually trigger a refresh if auto-refresh is paused
-- **Decision Inputs**: A visual indicator showing auto-refresh status (active/paused) and whether pending updates exist. The indicator helps the analyst decide whether to pause, resume, or manually refresh.
+- **Decision Inputs**: A small icon button in each tab header (next to the close button) shows auto-refresh status (active/paused) and toggles pause/resume. When paused with pending updates, a badge on the tab indicates new data is available. The per-tab placement ensures the control is co-located with the view it affects.
 
 ### Screen Progression
 
