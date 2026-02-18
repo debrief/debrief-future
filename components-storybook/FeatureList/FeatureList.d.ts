@@ -38,10 +38,16 @@ export interface FeatureListProps {
     onFormatClick?: (event: React.MouseEvent, feature: DebriefFeature) => void;
     /** Called when the format icon is clicked on a child row (position, point, polygon) */
     onChildFormatClick?: (event: React.MouseEvent, displayItem: import('./flattenFeatures').DisplayItem) => void;
+    /** Show info icon on rows to display geometry data (Feature 098) */
+    showInfoIcon?: boolean;
+    /** Called when the info icon is clicked on a feature row (Feature 098) */
+    onInfoClick?: (event: React.MouseEvent, feature: DebriefFeature) => void;
+    /** Called when the info icon is clicked on a child row (Feature 098) */
+    onChildInfoClick?: (event: React.MouseEvent, displayItem: import('./flattenFeatures').DisplayItem) => void;
 }
 /**
  * FeatureList displays a virtualized list of features with expand/collapse
  * support for viewing child elements (positions, points, polygons).
  */
-export declare function FeatureList({ features, selectedIds, hiddenIds, onSelectionChange, onSelect, onToggleExpand, filter, height, rowHeight, className, style, showFormatIcon, onFormatClick, onChildFormatClick, }: FeatureListProps): import("react/jsx-runtime").JSX.Element;
+export declare function FeatureList({ features, selectedIds, hiddenIds, onSelectionChange, onSelect, onToggleExpand, filter, height, rowHeight, className, style, showFormatIcon, onFormatClick, onChildFormatClick, showInfoIcon, onInfoClick, onChildInfoClick, }: FeatureListProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=FeatureList.d.ts.map

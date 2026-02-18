@@ -10,6 +10,8 @@ export { TimeController, useTimePlayback } from './TimeController';
 export type { TimeControllerProps, PlaybackSpeed, PlaybackState, DisplayMode, } from './TimeController';
 export { FeatureList } from './FeatureList';
 export type { FeatureListProps } from './FeatureList';
+export { GeometryDialog } from './GeometryDialog';
+export type { GeometryDialogProps } from './GeometryDialog';
 export { LayersToolbar, FilterDropdown } from './LayersToolbar';
 export type { LayersToolbarProps, FilterDropdownProps, FilterState, AssociatedFile, ToolbarLabels, } from './LayersToolbar';
 export { DEFAULT_FILTER_STATE, isFilterActive } from './LayersToolbar';
