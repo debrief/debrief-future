@@ -10,7 +10,7 @@ from __future__ import annotations
 import copy
 from typing import Any
 
-from debrief_calc.models import ContextType, SelectionContext, ToolParameter
+from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.registry import tool
 
 # Default color for points outside all zones

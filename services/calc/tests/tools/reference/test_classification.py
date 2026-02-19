@@ -471,7 +471,7 @@ class TestGoldenExamples:
         actual_md = actual["properties"]["pointMetadata"]
         expected_md = expected_feature["properties"]["pointMetadata"]
         assert len(actual_md) == len(expected_md)
-        for i, (a, e) in enumerate(zip(actual_md, expected_md)):
+        for i, (a, e) in enumerate(zip(actual_md, expected_md, strict=True)):
             assert a["zone"] == e["zone"], f"Point {i} zone mismatch: {a['zone']} != {e['zone']}"
             assert a["color"] == e["color"], f"Point {i} color mismatch"
 
@@ -497,7 +497,7 @@ class TestGoldenExamples:
         actual = result[0]
         actual_md = actual["properties"]["pointMetadata"]
         expected_md = expected_feature["properties"]["pointMetadata"]
-        for i, (a, e) in enumerate(zip(actual_md, expected_md)):
+        for i, (a, _e) in enumerate(zip(actual_md, expected_md, strict=True)):
             assert a["zone"] == "none", f"Point {i} should be 'none'"
             assert a["color"] == "#666666", f"Point {i} should be grey"
 
