@@ -89,6 +89,14 @@ function getFeatureType(feature: DebriefFeature): string {
  * Get additional info for a feature.
  */
 function getFeatureInfo(feature: DebriefFeature): string | null {
+  const parts: string[] = [];
+
+  if (feature.id != null) {
+    const idStr = String(feature.id);
+    const shortId = idStr.length > 8 ? idStr.slice(0, 8) + '…' : idStr;
+    parts.push(shortId);
+  }
+
   if (isTrackFeature(feature)) {
     let start: string | undefined = feature.properties.start_time;
     let end: string | undefined = feature.properties.end_time;
@@ -111,10 +119,11 @@ function getFeatureInfo(feature: DebriefFeature): string | null {
     if (start && end) {
       const startDate = new Date(start);
       const endDate = new Date(end);
-      return `${startDate.toLocaleTimeString()} - ${endDate.toLocaleTimeString()}`;
+      parts.push(`${startDate.toLocaleTimeString()} - ${endDate.toLocaleTimeString()}`);
     }
   }
-  return null;
+
+  return parts.length > 0 ? parts.join(' · ') : null;
 }
 
 /**
