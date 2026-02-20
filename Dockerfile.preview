@@ -6,6 +6,45 @@
 #
 # Heroku Review Apps: heroku.yml points here. Heroku sets $PORT automatically.
 
+# ---------------------------------------------------------------------------
+# Stage 1: Build the VS Code extension .vsix from source
+# ---------------------------------------------------------------------------
+FROM node:18-slim AS vsix-builder
+
+RUN npm install -g pnpm@9
+
+WORKDIR /build
+
+# Copy workspace root config
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Copy package.json for every workspace package (needed for pnpm resolution)
+COPY shared/schemas/package.json ./shared/schemas/
+COPY shared/components/package.json ./shared/components/
+COPY shared/utils/package.json ./shared/utils/
+COPY shared/config-ts/package.json ./shared/config-ts/
+COPY services/session-state/package.json ./services/session-state/
+COPY apps/vscode/package.json ./apps/vscode/
+COPY apps/loader/package.json ./apps/loader/
+COPY apps/web-shell/package.json ./apps/web-shell/
+
+# Install only deps needed for the vscode extension build
+RUN pnpm install --filter debrief-vscode... --no-frozen-lockfile
+
+# Copy source for the extension and its workspace dependencies
+COPY shared/schemas/ ./shared/schemas/
+COPY shared/components/ ./shared/components/
+COPY shared/utils/ ./shared/utils/
+COPY services/session-state/ ./services/session-state/
+COPY apps/vscode/ ./apps/vscode/
+
+# Build workspace deps then the extension, then package as .vsix
+RUN pnpm --filter debrief-vscode... build
+RUN cd apps/vscode && npx @vscode/vsce package --no-dependencies
+
+# ---------------------------------------------------------------------------
+# Stage 2: Final image with code-server + Python services + extension
+# ---------------------------------------------------------------------------
 FROM codercom/code-server:latest
 
 USER root
@@ -38,9 +77,8 @@ RUN uv venv /opt/debrief-venv && \
     ./services/calc
 ENV PATH="/opt/debrief-venv/bin:$PATH"
 
-# Install the Debrief VS Code extension
-# The .vsix must be built before Docker build: pnpm --filter debrief-vscode run package
-COPY apps/vscode/*.vsix /tmp/debrief.vsix
+# Install the VS Code extension from Stage 1
+COPY --from=vsix-builder /build/apps/vscode/*.vsix /tmp/debrief.vsix
 RUN code-server --install-extension /tmp/debrief.vsix && rm /tmp/debrief.vsix
 
 # Copy preview workspace with sample data

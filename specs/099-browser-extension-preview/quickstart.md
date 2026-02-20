@@ -6,30 +6,17 @@
 ## Prerequisites
 
 - Docker installed and running
-- Node.js 20+ and pnpm (for building the `.vsix`)
 - A web browser
 
 ## Phase 1: Local Testing (Before Heroku Config)
 
-### Step 1: Build the VS Code Extension
-
-From the repository root:
-
-```bash
-pnpm install
-pnpm --filter debrief-vscode run build
-pnpm --filter debrief-vscode run package
-```
-
-This produces `apps/vscode/debrief-vscode-*.vsix`.
-
-### Step 2: Build the Preview Container
+### Step 1: Build the Preview Container
 
 ```bash
 docker build -t debrief-preview -f Dockerfile.preview .
 ```
 
-The Dockerfile copies the `.vsix` from the build context and installs it into code-server.
+The multi-stage Dockerfile builds the `.vsix` extension from source (Stage 1) and installs it into code-server (Stage 2). No pre-build step required.
 
 ### Step 3: Run the Preview Container
 

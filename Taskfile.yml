@@ -95,12 +95,9 @@ tasks:
 
   preview:build:
     desc: "Build the preview container (code-server + Debrief extension)"
-    deps: [build]
     preconditions:
       - sh: command -v docker
         msg: "Docker not found. Install Docker to build the preview container."
-      - sh: ls apps/vscode/*.vsix 2>/dev/null
-        msg: "No .vsix found. Run 'task build' then 'cd apps/vscode && npx vsce package --no-dependencies' first."
     cmds:
       - docker build -t debrief-preview -f Dockerfile.preview .
 
