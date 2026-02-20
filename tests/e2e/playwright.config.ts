@@ -38,9 +38,11 @@ const useSandboxedChromium = !!chromiumPath || process.env.CLAUDE_CODE === '1';
 const CODE_SERVER_URL = process.env.CODE_SERVER_URL ?? 'http://localhost:8080';
 
 // Launch options for sandboxed/cloud environments.
-// --single-process and --no-zygote are required to avoid renderer crashes
-// in containerized environments (the VS Code workbench is too complex for
-// multi-process chromium in constrained sandboxes).
+// NOTE: --single-process is intentionally omitted — it causes the browser to
+// crash after each test in constrained sandboxes (see web-shell config and
+// docs/project_notes/playwright-installation-research.md). Instead we use
+// --disable-features=IsolateOrigins,site-per-process which achieves sandbox
+// compatibility without crashing.
 const launchOptions = useSandboxedChromium
   ? {
       executablePath: chromiumPath,
@@ -51,8 +53,9 @@ const launchOptions = useSandboxedChromium
         '--disable-gpu',
         '--disable-dev-shm-usage',
         '--disable-software-rasterizer',
-        '--single-process',
         '--no-zygote',
+        '--disable-features=IsolateOrigins,site-per-process',
+        '--disable-site-isolation-trials',
         '--disable-background-networking',
         '--disable-default-apps',
         '--disable-extensions',
