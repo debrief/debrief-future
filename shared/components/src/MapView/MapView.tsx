@@ -352,6 +352,18 @@ export function MapView({
         direction: 'top',
       });
 
+      // Add popup with feature details including ID
+      const props = (feature.properties ?? {}) as Record<string, unknown>;
+      const popupLines = [`<b>id:</b> ${String(featureId)}`];
+      for (const [k, v] of Object.entries(props)) {
+        if (k === 'style' || k === 'position_style_overrides' || k === 'times' || k === 'positions' || k === 'pointMetadata' || k === 'pointColors' || k === 'zones') continue;
+        if (v !== null && v !== undefined && typeof v !== 'object') {
+          popupLines.push(`<b>${k}:</b> ${String(v)}`);
+        }
+      }
+      popupLines.push(`<b>geometry.type:</b> ${feature.geometry?.type ?? 'null'}`);
+      layer.bindPopup(popupLines.join('<br/>'), { maxWidth: 400 });
+
       // Click handler — works for all features including decomposed
       // MultiPolygon child polygons (which now have IDs like "parent/polygons/0")
       layer.on('click', (e) => {
