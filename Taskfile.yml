@@ -93,6 +93,31 @@ tasks:
       - task: lint
       - task: test
 
+  preview:build:
+    desc: "Build the preview container (code-server + Debrief extension)"
+    deps: [build]
+    preconditions:
+      - sh: command -v docker
+        msg: "Docker not found. Install Docker to build the preview container."
+      - sh: ls apps/vscode/*.vsix 2>/dev/null
+        msg: "No .vsix found. Run 'task build' then 'cd apps/vscode && npx vsce package --no-dependencies' first."
+    cmds:
+      - docker build -t debrief-preview -f preview/Dockerfile .
+
+  preview:run:
+    desc: "Run the preview container locally (http://localhost:8080)"
+    preconditions:
+      - sh: docker image inspect debrief-preview >/dev/null 2>&1
+        msg: "Preview image not built. Run 'task preview:build' first."
+    cmds:
+      - docker run --rm -p 8080:8080 -e PORT=8080 debrief-preview
+
+  preview:package:
+    desc: "Package the VS Code extension as .vsix"
+    deps: [build]
+    cmds:
+      - cd apps/vscode && npx vsce package --no-dependencies
+
   clean:
     desc: "Remove build artifacts and caches"
     cmds:

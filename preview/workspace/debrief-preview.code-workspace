@@ -1,0 +1,15 @@
+{
+  "folders": [
+    {
+      "path": "samples",
+      "name": "Sample Data"
+    }
+  ],
+  "settings": {
+    "debrief.stacCatalogPath": "samples/local-store",
+    "workbench.startupEditor": "readme",
+    "workbench.welcome.enabled": false,
+    "debrief.mcp.autoStart": false,
+    "terminal.integrated.defaultProfile.linux": "bash"
+  }
+}

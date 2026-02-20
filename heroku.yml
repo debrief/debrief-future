@@ -1,0 +1,6 @@
+build:
+  docker:
+    web: preview/Dockerfile
+
+# No explicit run section needed — the Dockerfile CMD handles startup.
+# code-server binds to 0.0.0.0:$PORT as required by Heroku.
