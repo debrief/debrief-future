@@ -219,37 +219,6 @@ export function FeatureRow({
         {sublabel && <span className="debrief-feature-row__sublabel">{sublabel}</span>}
         {type && <span className="debrief-feature-row__type">{type}</span>}
       </div>
-      {feature && (
-        <span
-          className="debrief-feature-row__info-icon"
-          title="Feature info"
-          role="button"
-          tabIndex={-1}
-          data-testid={`info-icon-${feature.id}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            const props = feature.properties as unknown as Record<string, unknown>;
-            const lines = [`id: ${String(feature.id)}`];
-            for (const [k, v] of Object.entries(props)) {
-              if (k === 'style' || k === 'position_style_overrides' || k === 'times' || k === 'pointMetadata' || k === 'pointColors' || k === 'zones') {
-                lines.push(`${k}: [${Array.isArray(v) ? v.length + ' items' : 'object'}]`);
-              } else if (v !== null && v !== undefined && typeof v !== 'object') {
-                lines.push(`${k}: ${String(v)}`);
-              } else if (v !== null && v !== undefined) {
-                lines.push(`${k}: ${JSON.stringify(v)}`);
-              }
-            }
-            lines.push(`geometry.type: ${feature.geometry?.type ?? 'null'}`);
-            window.alert(lines.join('\n'));
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="8" cy="8" r="6.5" />
-            <path d="M8 7v4" />
-            <circle cx="8" cy="5" r="0.5" fill="currentColor" stroke="none" />
-          </svg>
-        </span>
-      )}
       {showFormatIcon && feature && onFormatClick && (
         <span
           className="debrief-feature-row__format-icon"
@@ -311,7 +280,33 @@ export function FeatureRow({
           </svg>
         </span>
       )}
-      {!isHidden && info && <span className="debrief-feature-row__info">{info}</span>}
+      {!isHidden && info && feature && (
+        <span
+          className="debrief-feature-row__info"
+          role="button"
+          tabIndex={-1}
+          title="Click for feature details"
+          onClick={(e) => {
+            e.stopPropagation();
+            const props = feature.properties as unknown as Record<string, unknown>;
+            const lines = [`id: ${String(feature.id)}`];
+            for (const [k, v] of Object.entries(props)) {
+              if (k === 'style' || k === 'position_style_overrides' || k === 'times' || k === 'pointMetadata' || k === 'pointColors' || k === 'zones') {
+                lines.push(`${k}: [${Array.isArray(v) ? v.length + ' items' : 'object'}]`);
+              } else if (v !== null && v !== undefined && typeof v !== 'object') {
+                lines.push(`${k}: ${String(v)}`);
+              } else if (v !== null && v !== undefined) {
+                lines.push(`${k}: ${JSON.stringify(v)}`);
+              }
+            }
+            lines.push(`geometry.type: ${feature.geometry?.type ?? 'null'}`);
+            window.alert(lines.join('\n'));
+          }}
+        >
+          {info}
+        </span>
+      )}
+      {!isHidden && info && !feature && <span className="debrief-feature-row__info">{info}</span>}
     </div>
   );
 }
