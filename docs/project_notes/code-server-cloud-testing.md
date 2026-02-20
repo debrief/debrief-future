@@ -83,40 +83,45 @@ which code-server         # not found
 
 ## What's Needed
 
-One of these solutions would unblock the tests:
+The end goal is running `preview/Dockerfile` on Heroku as a Review App. Local Docker testing in the cloud session is a stepping stone — it validates the same container image that Heroku will build and run. Solutions must exercise this Docker path; bypassing Docker doesn't prove the Heroku deployment works.
 
-### Option A: Install openvscode-server in the cloud image
+### Fix Docker networking in the sandbox
 
-`openvscode-server` is a single binary (~80MB) with no iptables dependency. Adding it to the cloud session base image would let `global-setup.ts` start it directly.
+Docker fails because the sandbox kernel (4.4.0) doesn't support nftables. Two sub-options:
+
+**A. Kernel/nftables support**: Upgrade the sandbox kernel or enable the `nf_tables` module so Docker's default bridge networking works.
+
+**B. Disable Docker networking, use host mode**: Start dockerd without iptables and run containers on the host network:
 
 ```bash
-# Example install (version may vary)
-curl -fsSL https://github.com/nicolo-ribaudo/openvscode-releases/releases/download/v1.96.2/openvscode-server-v1.96.2-linux-x64.tar.gz \
-  | tar xz -C /usr/local
-ln -s /usr/local/openvscode-server-*/bin/openvscode-server /usr/local/bin/
+# Start daemon without bridge networking
+nohup sudo dockerd --iptables=false --bridge=none > /tmp/dockerd.log 2>&1 &
+sleep 5
+
+# Build the image (no networking needed for build)
+docker build -t debrief-preview -f preview/Dockerfile .
+
+# Run with host networking (no NAT/bridge needed)
+docker run --rm --network=host -e PORT=8080 debrief-preview
 ```
 
-Then the test would run as:
+This is the preferred approach because:
+- It validates the exact Dockerfile and entrypoint that Heroku will use
+- It tests the full build chain: Python services, .vsix install, workspace copy
+- The smoke test (`test-preview-smoke.spec.ts`) runs against `localhost:8080` — identical to the Heroku flow except for the URL
+- Any build or runtime failures caught here will also fail on Heroku
+
+Once the container is running, the smoke test runs as:
 
 ```bash
-# global-setup.ts detects openvscode-server and starts it automatically
+# Extract chromium for cloud environment
+cd apps/web-shell && node -e "import('@sparticuz/chromium').then(c=>c.default.executablePath()).then(p=>{console.log(p);require('fs').writeFileSync('/tmp/chromium-path',p)})"
+
+# Run the smoke test against the local container
 cd /home/user/debrief-future
-CHROMIUM_PATH=/tmp/chromium pnpm exec playwright test \
-  --config=tests/e2e/playwright.config.ts test-preview-smoke
-```
-
-### Option B: Fix Docker networking in the sandbox
-
-Either:
-- Upgrade the kernel to support nftables, or
-- Start dockerd with `--iptables=false --bridge=none` and use host networking (`docker run --network=host`)
-
-### Option C: npm-installable code-server
-
-`code-server` is available on npm but it's a large install (~200MB). Less ideal than a pre-installed binary.
-
-```bash
-npx code-server --auth none --bind-addr 0.0.0.0:8080 tests/e2e/test-workspace
+CODE_SERVER_URL=http://localhost:8080 \
+CHROMIUM_PATH=$(cat /tmp/chromium-path) \
+pnpm exec playwright test --config=tests/e2e/playwright.config.ts test-preview-smoke
 ```
 
 ## Related Files
