@@ -1,0 +1,17 @@
+{
+  "name": "debrief-preview",
+  "description": "Browser-based VS Code extension preview for Debrief PRs",
+  "stack": "container",
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "environments": {
+    "review": {
+      "scripts": {},
+      "addons": []
+    }
+  }
+}
