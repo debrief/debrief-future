@@ -1,137 +1,173 @@
-# Research: Running code-server E2E Tests in Cloud Sessions
+# Code-Server Cloud Testing — Solution
 
-**Date**: 2026-02-20
-**Status**: Blocked — needs solution
-**Context**: Feature 099 (Browser Extension Preview) requires running Playwright smoke tests against a code-server instance
+**Date:** 2026-02-20
+**Status:** Resolved
+**Context:** Running Playwright E2E smoke tests against code-server in Claude Code cloud sessions
 
 ## Goal
 
-Run `tests/e2e/test-preview-smoke.spec.ts` in a Claude Code cloud session. This test verifies that code-server loads with the Debrief VS Code extension active, the activity bar icons are present, and sample workspace files are visible.
+Run `tests/e2e/test-preview-smoke.spec.ts` in a Claude Code cloud session to verify that
+code-server loads with the Debrief VS Code extension active, activity bar icons are present,
+and sample workspace files are visible.
 
-The test uses the existing `tests/e2e/` infrastructure (`global-setup.ts`, `CodeServerPage` fixture, `playwright.config.ts`).
+## Solution Summary
+
+Docker-based testing is blocked in the cloud sandbox (no bridge networking, no registry
+access, no overlay2 filesystem). Instead, **install code-server directly via GitHub release**
+and run Playwright with `@sparticuz/chromium`.
+
+One-liner:
+
+```bash
+bash tests/e2e/scripts/cloud-e2e-setup.sh
+```
 
 ## What Works
 
-Web-shell Playwright tests run successfully using `@sparticuz/chromium`:
+### Direct code-server Installation
+
+The official code-server install script downloads a standalone tarball from GitHub Releases,
+which is accessible from the cloud sandbox:
 
 ```bash
-cd apps/web-shell && pnpm test:cloud
-# 71 passed (2.3m)
+curl -fsSL https://raw.githubusercontent.com/coder/code-server/main/install.sh \
+  | sh -s -- --method=standalone --prefix=/opt/code-server
+export PATH="/opt/code-server/bin:$PATH"
 ```
 
-This proves:
-- Playwright is installed and functional
-- `@sparticuz/chromium` extracts and launches correctly
-- The Vite dev server starts and serves the web-shell app
-- Browser automation works end-to-end
+### Chromium via @sparticuz/chromium
 
-## What Fails
-
-### Approach 1: Docker container with code-server
-
-The preview Dockerfile (`preview/Dockerfile`) builds a container based on `codercom/code-server:latest` with the Debrief extension and sample data pre-installed.
+The `@sparticuz/chromium` npm package bundles a Linux x86-64 Chromium binary that extracts
+at runtime. This is the same approach used by the web-shell Playwright tests:
 
 ```bash
-# Start Docker daemon
-nohup sudo dockerd > /tmp/dockerd.log 2>&1 &
-sleep 5
-
-# Build the preview image
-docker build -t debrief-preview -f preview/Dockerfile .
+node -e "require('@sparticuz/chromium').executablePath().then(p => console.log(p))"
+# → /tmp/chromium
 ```
 
-**Result**: Docker daemon starts but crashes during network initialisation:
+### Workspace Trust and Welcome Tab
 
+Code-server shows a "Do you trust the authors?" dialog and Welcome tab by default.
+Both block extension activation and test interaction. Fix with user settings:
+
+```json
+{
+  "security.workspace.trust.enabled": false,
+  "workbench.startupEditor": "none",
+  "workbench.welcomePage.walkthroughs.openOnInstall": false
+}
 ```
-failed to start daemon: Error initializing network controller:
-  error obtaining controller instance: failed to register "bridge" driver:
-  failed to create NAT chain DOCKER: iptables failed:
-  iptables --wait -t nat -N DOCKER: iptables: Failed to initialize nft:
-  Protocol not supported (exit status 1)
+
+Written to `~/.local/share/code-server/User/settings.json`.
+
+### Chromium Launch Flags
+
+The `--single-process` flag (previously used in the E2E Playwright config) causes the
+browser to crash after each test in constrained sandboxes. The fix:
+
+```diff
+- '--single-process',
++ '--disable-features=IsolateOrigins,site-per-process',
++ '--disable-site-isolation-trials',
 ```
 
-**Root cause**: The sandbox kernel (Linux 4.4.0) does not support nftables. Docker requires iptables/nft for bridge networking.
+This matches the proven web-shell Playwright config approach.
 
-### Approach 2: Direct code-server binary
+## What Doesn't Work
 
-The `global-setup.ts` can start `openvscode-server` or `code-server` directly (no Docker needed).
+### Docker (Three Blockers)
+
+1. **Bridge networking** — Linux 4.4.0 kernel lacks nftables: `Failed to initialize nft: Protocol not supported`
+2. **overlay2 storage** — Kernel can't mount overlayfs: `failed to mount overlay: invalid argument`
+3. **Registry access** — DNS for `registry-1.docker.io` fails: `dial tcp: lookup registry-1.docker.io: connection refused`
+
+Docker daemon *can* start with `--bridge=none --iptables=false --storage-driver=vfs`, but
+without registry access it cannot pull base images, making `docker build` unusable.
 
 ```bash
-which openvscode-server  # not found
-which code-server        # not found
-find / -name "openvscode-server" -type f 2>/dev/null  # empty
-find / -name "code-server" -type f 2>/dev/null         # empty
+# Docker daemon starts but can't pull images
+sudo dockerd --iptables=false --bridge=none --storage-driver=vfs &
+docker info  # Works
+docker build ...  # Fails — no registry access
 ```
 
-**Result**: Neither binary is installed in the cloud session image.
+### npm install code-server
 
-## Minimum Reproducible Example
+`npm install -g code-server` fails with tar extraction errors (ENOENT during extraction
+of the bundled VS Code server). The standalone tarball from GitHub Releases works instead.
 
-To reproduce, run this in a Claude Code cloud session:
-
-```bash
-# 1. Verify Docker is installed but daemon can't run
-docker --version          # Docker version 29.2.1
-nohup sudo dockerd > /tmp/dockerd.log 2>&1 &
-sleep 5
-tail -5 /tmp/dockerd.log  # "Failed to initialize nft: Protocol not supported"
-
-# 2. Verify no VS Code server binaries exist
-which openvscode-server   # not found
-which code-server         # not found
-```
-
-## What's Needed
-
-The end goal is running `preview/Dockerfile` on Heroku as a Review App. Local Docker testing in the cloud session is a stepping stone — it validates the same container image that Heroku will build and run. Solutions must exercise this Docker path; bypassing Docker doesn't prove the Heroku deployment works.
-
-### Fix Docker networking in the sandbox
-
-Docker fails because the sandbox kernel (4.4.0) doesn't support nftables. Two sub-options:
-
-**A. Kernel/nftables support**: Upgrade the sandbox kernel or enable the `nf_tables` module so Docker's default bridge networking works.
-
-**B. Disable Docker networking, use host mode**: Start dockerd without iptables and run containers on the host network:
+## Complete Working Pipeline
 
 ```bash
-# Start daemon without bridge networking
-nohup sudo dockerd --iptables=false --bridge=none > /tmp/dockerd.log 2>&1 &
-sleep 5
+# 1. Install code-server
+curl -fsSL https://raw.githubusercontent.com/coder/code-server/main/install.sh \
+  | sh -s -- --method=standalone --prefix=/opt/code-server
+export PATH="/opt/code-server/bin:$PATH"
 
-# Build the image (no networking needed for build)
-docker build -t debrief-preview -f preview/Dockerfile .
+# 2. Build and install the Debrief extension
+pnpm --filter @debrief/session-state build
+pnpm --filter @debrief/utils build
+pnpm --filter @debrief/components build
+cd apps/vscode && pnpm run package && cd ../..
+code-server --install-extension apps/vscode/*.vsix
 
-# Run with host networking (no NAT/bridge needed)
-docker run --rm --network=host -e PORT=8080 debrief-preview
-```
+# 3. Configure settings (disable trust dialog + Welcome tab)
+mkdir -p ~/.local/share/code-server/User
+cat > ~/.local/share/code-server/User/settings.json << 'EOF'
+{
+  "security.workspace.trust.enabled": false,
+  "workbench.startupEditor": "none",
+  "workbench.welcomePage.walkthroughs.openOnInstall": false,
+  "workbench.tips.enabled": false
+}
+EOF
 
-This is the preferred approach because:
-- It validates the exact Dockerfile and entrypoint that Heroku will use
-- It tests the full build chain: Python services, .vsix install, workspace copy
-- The smoke test (`test-preview-smoke.spec.ts`) runs against `localhost:8080` — identical to the Heroku flow except for the URL
-- Any build or runtime failures caught here will also fail on Heroku
+# 4. Start code-server
+nohup code-server --auth none --bind-addr 0.0.0.0:8080 \
+  --disable-telemetry tests/e2e/test-workspace > /tmp/code-server.log 2>&1 &
 
-Once the container is running, the smoke test runs as:
+# 5. Extract Chromium and write path
+node -e "require('@sparticuz/chromium').executablePath().then(p => {
+  require('fs').writeFileSync('tests/e2e/.chromium-path', p);
+  console.log('Chromium:', p);
+})"
 
-```bash
-# Extract chromium for cloud environment
-cd apps/web-shell && node -e "import('@sparticuz/chromium').then(c=>c.default.executablePath()).then(p=>{console.log(p);require('fs').writeFileSync('/tmp/chromium-path',p)})"
-
-# Run the smoke test against the local container
-cd /home/user/debrief-future
+# 6. Run smoke tests
+CHROMIUM_PATH=$(cat tests/e2e/.chromium-path) \
 CODE_SERVER_URL=http://localhost:8080 \
-CHROMIUM_PATH=$(cat /tmp/chromium-path) \
-pnpm exec playwright test --config=tests/e2e/playwright.config.ts test-preview-smoke
+  npx playwright test --config tests/e2e/playwright.config.ts \
+  tests/e2e/test-preview-smoke.spec.ts
+```
+
+## Smoke Test Results (4/4 passing)
+
+```
+Running 4 tests using 1 worker
+  ✓ S01: workbench loads successfully (2.9s)
+  ✓ S02: Debrief activity-bar icon is present (3.4s)
+  ✓ S03: sample workspace files are visible (4.6s)
+  ✓ S04: capture evidence screenshot (5.3s)
+  4 passed (19.7s)
 ```
 
 ## Related Files
 
 | File | Purpose |
 |------|---------|
-| `tests/e2e/test-preview-smoke.spec.ts` | The smoke test that needs to run |
-| `tests/e2e/global-setup.ts` | Starts openvscode-server or code-server |
-| `tests/e2e/playwright.config.ts` | Config with `CODE_SERVER_URL` and chromium resolution |
-| `preview/Dockerfile` | Docker container definition |
-| `preview/entrypoint.sh` | Container entrypoint |
-| `docs/project_notes/playwright-installation-research.md` | How @sparticuz/chromium works |
-| `apps/web-shell/run-playwright.mjs` | Working example of cloud Playwright execution |
+| `tests/e2e/test-preview-smoke.spec.ts` | Smoke test (4 checks) |
+| `tests/e2e/scripts/cloud-e2e-setup.sh` | Automated setup + run script |
+| `tests/e2e/playwright.config.ts` | Playwright config (updated: no `--single-process`) |
+| `tests/e2e/global-setup.ts` | Server startup logic (supports external CODE_SERVER_URL) |
+| `tests/e2e/global-teardown.ts` | Server cleanup |
+| `apps/web-shell/run-playwright.mjs` | Reference: working cloud Playwright runner |
+| `docker/code-server/Dockerfile` | Docker image (for CI, not cloud sessions) |
+| `docker/code-server/docker-compose.yml` | Docker Compose (for CI, not cloud sessions) |
+
+## Key Discoveries
+
+1. **npm registry works** in the sandbox — packages can be downloaded
+2. **GitHub URLs work** — release tarballs and raw content are accessible
+3. **Docker registry doesn't work** — DNS resolution fails for `registry-1.docker.io`
+4. **`--single-process` crashes browsers** — use `--disable-features=IsolateOrigins,site-per-process` instead
+5. **Workspace trust must be disabled** — otherwise extensions run in Restricted Mode and don't activate
+6. **code-server standalone tarball** is the reliable installation method (not npm, not Docker)

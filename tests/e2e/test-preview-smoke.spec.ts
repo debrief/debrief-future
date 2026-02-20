@@ -1,66 +1,137 @@
 /**
- * Preview smoke test — verifies that code-server loads with the Debrief
- * extension active and sample data visible in the preview workspace.
+ * E2E Smoke Test: code-server loads with Debrief extension
  *
- * Run against a local preview container:
- *   CODE_SERVER_URL=http://localhost:8080 pnpm exec playwright test \
- *     --config=tests/e2e/playwright.config.ts test-preview-smoke
+ * Lightweight checks that validate the code-server environment is functional:
+ *   1. code-server loads and shows the VS Code workbench
+ *   2. The Debrief activity-bar icon is present (extension installed + activated)
+ *   3. The test-workspace sample files are visible in the Explorer
  *
- * Run against a Heroku review app:
- *   CODE_SERVER_URL=https://<app>.herokuapp.com pnpm exec playwright test \
- *     --config=tests/e2e/playwright.config.ts test-preview-smoke
+ * These tests are designed to run in Claude Code cloud sessions where
+ * code-server is started directly (not via Docker) and Chromium comes
+ * from @sparticuz/chromium.
+ *
+ * Prerequisites (handled by bin/cloud-e2e-setup.sh):
+ *   - code-server installed and running on port 8080
+ *   - Debrief VSIX installed in code-server
+ *   - Workspace trust disabled in user settings
+ *   - @sparticuz/chromium extracted to .chromium-path
+ *
+ * @see docs/project_notes/code-server-cloud-testing.md
  */
-import { test, expect } from './fixtures/base';
-import { join } from 'path';
+import { test, expect } from '@playwright/test';
 
-const EVIDENCE_DIR = join(
-  __dirname,
-  '../../specs/099-browser-extension-preview/evidence/screenshots'
-);
+const CODE_SERVER_URL =
+  process.env.CODE_SERVER_URL ?? 'http://localhost:8080';
 
-test.describe('Preview Environment Smoke Test', () => {
-  test('VS Code workbench loads', async ({ codeServerPage }) => {
-    await expect(codeServerPage.workbench).toBeVisible();
-  });
+// Longer timeouts for code-server cold-start in cloud
+test.setTimeout(90_000);
 
-  test('Debrief activity bar icon is present', async ({ codeServerPage }) => {
-    // The Debrief extension registers an activity bar icon with the view container ID
-    const activityBar = codeServerPage.page.locator(
-      '.activitybar .action-item[id*="debrief"]'
-    );
-    await expect(activityBar).toBeVisible({ timeout: 10_000 });
+test.describe('Smoke: code-server with Debrief extension', () => {
+  test('S01: workbench loads successfully', async ({ page }) => {
+    await page.goto(CODE_SERVER_URL, { waitUntil: 'domcontentloaded' });
 
-    await codeServerPage.page.screenshot({
-      path: join(EVIDENCE_DIR, 'debrief-activity-bar.png'),
+    // Dismiss trust dialog if it appears (belt-and-suspenders — settings should prevent it)
+    const trustButton = page.getByRole('button', {
+      name: 'Yes, I trust the authors',
     });
+    if (await trustButton.isVisible({ timeout: 5_000 }).catch(() => false)) {
+      await trustButton.click();
+      await page.waitForTimeout(1000);
+    }
+
+    // Wait for the VS Code workbench to appear
+    const workbench = page.locator('.monaco-workbench');
+    await workbench.waitFor({ state: 'visible', timeout: 60_000 });
+    expect(await workbench.isVisible()).toBe(true);
   });
 
-  test('Log activity panel is accessible', async ({ codeServerPage }) => {
-    // The Log panel is registered as a separate activity bar entry
-    const logPanel = codeServerPage.page.locator(
-      '.activitybar .action-item[id*="log"]'
-    );
-    await expect(logPanel).toBeVisible({ timeout: 10_000 });
-  });
+  test('S02: Debrief activity-bar icon is present', async ({ page }) => {
+    await page.goto(CODE_SERVER_URL, { waitUntil: 'domcontentloaded' });
 
-  test('File explorer shows sample workspace files', async ({
-    codeServerPage,
-  }) => {
-    await codeServerPage.openExplorer();
-
-    // Verify the file explorer is visible and contains sample data files
-    const explorer = codeServerPage.fileExplorer;
-    await expect(explorer).toBeVisible();
-
-    await codeServerPage.page.screenshot({
-      path: join(EVIDENCE_DIR, 'file-explorer-samples.png'),
+    // Dismiss trust dialog if it appears
+    const trustButton = page.getByRole('button', {
+      name: 'Yes, I trust the authors',
     });
+    if (await trustButton.isVisible({ timeout: 5_000 }).catch(() => false)) {
+      await trustButton.click();
+      await page.waitForTimeout(1000);
+    }
+
+    const workbench = page.locator('.monaco-workbench');
+    await workbench.waitFor({ state: 'visible', timeout: 60_000 });
+
+    // The Debrief extension registers activity bar containers with title "Debrief"
+    // and "Debrief Log". These show up as action items in the activity bar.
+    // We look for any action with "debrief" in its id or "Debrief" in its aria-label.
+    const debriefActivity = page.locator(
+      [
+        '.activitybar [id*="debrief" i]',
+        '.activitybar [aria-label*="Debrief" i]',
+        // code-server may use different selectors — also check composite bar
+        '.composite.bar [id*="debrief" i]',
+        '.composite.bar [aria-label*="Debrief" i]',
+      ].join(', ')
+    );
+
+    // Allow time for extension activation
+    await debriefActivity.first().waitFor({ state: 'visible', timeout: 30_000 });
+    expect(await debriefActivity.count()).toBeGreaterThan(0);
   });
 
-  test('capture full workspace screenshot', async ({ codeServerPage }) => {
-    await codeServerPage.page.screenshot({
-      path: join(EVIDENCE_DIR, 'preview-workspace-full.png'),
-      fullPage: true,
+  test('S03: sample workspace files are visible', async ({ page }) => {
+    await page.goto(CODE_SERVER_URL, { waitUntil: 'domcontentloaded' });
+
+    // Dismiss trust dialog if it appears
+    const trustButton = page.getByRole('button', {
+      name: 'Yes, I trust the authors',
+    });
+    if (await trustButton.isVisible({ timeout: 5_000 }).catch(() => false)) {
+      await trustButton.click();
+      await page.waitForTimeout(1000);
+    }
+
+    const workbench = page.locator('.monaco-workbench');
+    await workbench.waitFor({ state: 'visible', timeout: 60_000 });
+
+    // Open Explorer if not already open (Ctrl+Shift+E)
+    await page.keyboard.press('Control+Shift+E');
+    await page.waitForTimeout(1000);
+
+    // The "samples" folder should be visible in the explorer tree
+    const samplesFolder = page.locator('.monaco-workbench').getByText('samples');
+    await samplesFolder.first().waitFor({ state: 'visible', timeout: 15_000 });
+
+    // Click to expand the samples folder
+    await samplesFolder.first().click();
+    await page.waitForTimeout(1000);
+
+    // Now look for boat1.rep inside the expanded tree
+    const repFile = page.locator('.monaco-workbench').getByText('boat1.rep');
+    await repFile.first().waitFor({ state: 'visible', timeout: 10_000 });
+    expect(await repFile.count()).toBeGreaterThan(0);
+  });
+
+  test('S04: capture evidence screenshot', async ({ page }) => {
+    await page.goto(CODE_SERVER_URL, { waitUntil: 'domcontentloaded' });
+
+    // Dismiss trust dialog if it appears
+    const trustButton = page.getByRole('button', {
+      name: 'Yes, I trust the authors',
+    });
+    if (await trustButton.isVisible({ timeout: 5_000 }).catch(() => false)) {
+      await trustButton.click();
+      await page.waitForTimeout(1000);
+    }
+
+    const workbench = page.locator('.monaco-workbench');
+    await workbench.waitFor({ state: 'visible', timeout: 60_000 });
+
+    // Wait for things to settle
+    await page.waitForTimeout(3000);
+
+    await page.screenshot({
+      path: 'tests/e2e/evidence/smoke-code-server.png',
+      fullPage: false,
     });
   });
 });

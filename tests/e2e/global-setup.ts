@@ -62,8 +62,9 @@ function whichSync(cmd: string): string | null {
 }
 
 /**
- * Write machine-level settings to disable the Welcome tab.
+ * Write machine-level settings to disable the Welcome tab and workspace trust.
  * The Welcome tab captures keyboard focus into an iframe, breaking shortcuts.
+ * Workspace trust must be disabled so extensions activate without user interaction.
  */
 function writeVSCodeSettings(dataDir: string): void {
   const settingsDir = join(dataDir, 'User');
@@ -72,6 +73,7 @@ function writeVSCodeSettings(dataDir: string): void {
     join(settingsDir, 'settings.json'),
     JSON.stringify(
       {
+        'security.workspace.trust.enabled': false,
         'workbench.startupEditor': 'none',
         'workbench.welcomePage.walkthroughs.openOnInstall': false,
         'workbench.tips.enabled': false,
@@ -119,12 +121,14 @@ async function globalSetup(): Promise<void> {
       { stdio: 'pipe', detached: true }
     );
   } else {
-    // Fall back to code-server
-    const csPath = whichSync('code-server');
+    // Fall back to code-server (check PATH, then standalone install location)
+    const csPath =
+      whichSync('code-server') ?? whichSync('/opt/code-server/bin/code-server');
     if (!csPath) {
       throw new Error(
         'Neither openvscode-server nor code-server found.\n' +
           'Install openvscode-server or code-server, or set CODE_SERVER_URL to an external instance.\n' +
+          'In cloud sessions: bash tests/e2e/scripts/cloud-e2e-setup.sh\n' +
           'Or use Docker: docker compose -f docker/code-server/docker-compose.yml up -d'
       );
     }
