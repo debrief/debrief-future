@@ -12,7 +12,7 @@ Enable browser-based review of the Debrief VS Code extension via Heroku Review A
 **Language/Version**: Dockerfile (container definition), Bash (entry scripts), YAML (Heroku config, CI workflow)
 **Primary Dependencies**: code-server (latest stable), existing `@vscode/vsce` for `.vsix` packaging
 **Storage**: Ephemeral container filesystem (no persistence needed — preview environments are disposable)
-**Testing**: Local Docker build + run, manual browser verification, CI smoke test
+**Testing**: Local Docker build + run, Playwright smoke test (extension activation + activity panels), CI smoke test
 **Target Platform**: Heroku container stack (Linux, `$PORT` binding, single dyno)
 **Project Type**: Infrastructure / DevOps (no application code changes)
 **Performance Goals**: Container startup to interactive VS Code in under 2 minutes
@@ -79,6 +79,8 @@ preview/
 │       └── example-track.rep
 heroku.yml                      # Heroku container stack definition (repo root)
 app.json                        # Heroku Review Apps descriptor (repo root)
+tests/e2e/
+└── test-preview-smoke.spec.ts  # Playwright smoke test for preview container
 .github/
 └── PULL_REQUEST_TEMPLATE.md    # Updated with preview section (Phase 2)
 ```
@@ -91,7 +93,35 @@ None — backend/infrastructure feature. No visual components, no Storybook stor
 
 ## Storybook E2E Testing
 
-None — no interactive UI components. This feature creates infrastructure for reviewing existing components.
+No new Storybook stories — this feature creates infrastructure, not UI components.
+
+However, the preview container **is** a browser-accessible environment that can be verified with Playwright. The project already has code-server E2E infrastructure in `tests/e2e/` with:
+
+- `global-setup.ts` — starts code-server (or connects to `CODE_SERVER_URL`)
+- `global-teardown.ts` — cleans up server process
+- `fixtures/base.ts` — provides `CodeServerPage` fixture
+- `models/code-server-page.ts` — page object for VS Code chrome interactions
+
+### Preview Smoke Test
+
+A Playwright test against the running preview container verifies:
+
+1. code-server loads and the VS Code workbench renders
+2. The **Debrief** activity bar icon is present (extension activated)
+3. The **Log** activity panel is accessible
+4. The file explorer shows the sample workspace
+
+This test serves two purposes:
+- **Feature verification**: Proves this feature (099) works end-to-end
+- **Ongoing regression**: Runs against every future preview deployment to catch extension breakage
+
+| Test | File | What It Checks |
+|------|------|----------------|
+| Preview smoke | `tests/e2e/test-preview-smoke.spec.ts` | Workbench loads, Debrief + Log panels present, sample data visible |
+
+**Test runs against**: `CODE_SERVER_URL` (the preview container on `localhost:8080` or Heroku URL)
+
+> **Playwright in cloud sessions**: The project uses `@sparticuz/chromium` for bundled Chromium in environments where browser CDN downloads are blocked. See `docs/project_notes/playwright-installation-research.md` for full details. Do NOT skip Playwright tests — they work in cloud sessions.
 
 ## Complexity Tracking
 

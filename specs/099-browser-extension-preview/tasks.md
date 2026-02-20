@@ -3,7 +3,9 @@
 **Input**: Design documents from `/specs/099-browser-extension-preview/`
 **Prerequisites**: plan.md (required), spec.md (required), research.md, data-model.md, contracts/
 
-**Tests**: No automated tests requested in the spec. Verification is manual (Docker build + browser check).
+**Tests**: Playwright smoke test verifies code-server loads with the Debrief and Log activity panels. Uses existing `tests/e2e/` infrastructure (`CodeServerPage` fixture, `global-setup.ts`).
+
+> **Playwright in cloud sessions**: The project uses `@sparticuz/chromium` for bundled Chromium in environments where browser CDN downloads are blocked. See `docs/project_notes/playwright-installation-research.md` for full details. Do NOT skip Playwright tests — they work in cloud sessions.
 
 **Organization**: Tasks follow the two-phase delivery model from the spec. Phases 1-3 are "Before Heroku Config" (US1). Phases 4-5 are "After Heroku Config" (US2, US3). A MANUAL STOP separates them.
 
@@ -24,6 +26,8 @@
 | usage-example.md | Step-by-step walkthrough of opening preview in browser | After container serves code-server |
 | docker-build.txt | Docker build output showing successful image creation | After Dockerfile works |
 | container-startup.txt | Container logs showing code-server + extension loading | After entrypoint runs |
+| e2e-summary.md | Playwright smoke test results (workbench, Debrief panel, Log panel) | After smoke test passes |
+| screenshots/ | Screenshots of code-server with Debrief extension active | Captured by Playwright |
 
 ### Media Content
 
@@ -74,15 +78,32 @@
 
 **Independent Test**: Build the container locally, run it, navigate to the code-server URL in a browser, and confirm the Debrief extension is loaded with sample data.
 
+### Playwright Smoke Test
+
+> **Purpose**: Automated verification that code-server loads with the Debrief extension active. This test validates this feature AND serves as ongoing regression for future preview deployments.
+>
+> **Existing infrastructure**: `tests/e2e/` already provides `CodeServerPage` fixture, `global-setup.ts` (starts/connects to code-server), and `playwright.config.ts` (reads `CODE_SERVER_URL`). The smoke test slots into this structure.
+>
+> **Playwright in cloud sessions**: Use `@sparticuz/chromium` — see `docs/project_notes/playwright-installation-research.md`.
+
+- [ ] T008 [test] [US1] Create preview smoke test `tests/e2e/test-preview-smoke.spec.ts`
+- [ ] T009 [test] [US1] Run smoke test against local container: `CODE_SERVER_URL=http://localhost:8080 pnpm exec playwright test --config=tests/e2e/playwright.config.ts test-preview-smoke`
+
+**Smoke test checks**:
+1. VS Code workbench renders (`.monaco-workbench` visible)
+2. Debrief activity bar icon present (extension activated)
+3. Log activity panel accessible
+4. File explorer shows sample workspace files
+5. Capture screenshot to `specs/099-browser-extension-preview/evidence/screenshots/`
+
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Create WELCOME.md onboarding document for the preview workspace `preview/workspace/WELCOME.md`
-- [ ] T009 [US1] Create Heroku app.json descriptor at repo root `app.json`
-- [ ] T010 [US1] Create heroku.yml container stack definition at repo root `heroku.yml`
-- [ ] T011 [US1] Verify container runs locally and code-server is accessible in browser
-- [ ] T012 [US1] Verify Debrief extension is active in code-server (STAC explorer visible in sidebar)
-- [ ] T013 [US1] Verify sample data loads in the preview workspace (REP files openable, STAC catalog browsable)
-- [ ] T014 [US1] Add Taskfile entry for local preview build and run `Taskfile.yml`
+- [ ] T010 [US1] Create WELCOME.md onboarding document for the preview workspace `preview/workspace/WELCOME.md`
+- [ ] T011 [P] [US1] Create Heroku app.json descriptor at repo root `app.json`
+- [ ] T012 [P] [US1] Create heroku.yml container stack definition at repo root `heroku.yml`
+- [ ] T013 [US1] Verify container runs locally and code-server is accessible in browser
+- [ ] T014 [US1] Verify sample data loads in the preview workspace (REP files openable, STAC catalog browsable)
+- [ ] T015 [US1] Add Taskfile entry for local preview build and run `Taskfile.yml`
 
 **Checkpoint**: Phase 1 of the spec is complete. Container builds locally, extension loads, sample data works, Heroku descriptors are committed. Ready for manual Heroku configuration.
 
@@ -109,11 +130,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Open a test PR with a trivial extension change and confirm Heroku builds the review app
-- [ ] T016 [US2] Verify preview URL is accessible and code-server loads with the Debrief extension
-- [ ] T017 [US2] Verify the extension is built from the PR branch, not from main
-- [ ] T018 [US2] Verify map view, STAC explorer, and sample data work in the browser preview
-- [ ] T019 [US2] Close the test PR and verify the review app is automatically destroyed
+- [ ] T016 [US2] Open a test PR with a trivial extension change and confirm Heroku builds the review app
+- [ ] T017 [US2] Verify preview URL is accessible and code-server loads with the Debrief extension
+- [ ] T018 [US2] Verify the extension is built from the PR branch, not from main
+- [ ] T019 [US2] Verify map view, STAC explorer, and sample data work in the browser preview
+- [ ] T020 [test] [US2] Run Playwright smoke test against Heroku preview: `CODE_SERVER_URL=https://<heroku-app>.herokuapp.com pnpm exec playwright test --config=tests/e2e/playwright.config.ts test-preview-smoke`
+- [ ] T021 [US2] Close the test PR and verify the review app is automatically destroyed
 
 **Checkpoint**: End-to-end PR preview workflow validated. Reviewers can click a link and interact with the extension in the browser.
 
@@ -127,9 +149,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Update or create PR template with preview section `.github/PULL_REQUEST_TEMPLATE.md`
-- [ ] T021 [US3] Verify WELCOME.md opens by default when code-server loads in the preview environment
-- [ ] T022 [US3] Open a test PR and confirm the PR description includes the preview URL placeholder and review instructions
+- [ ] T022 [US3] Update or create PR template with preview section `.github/PULL_REQUEST_TEMPLATE.md`
+- [ ] T023 [US3] Verify WELCOME.md opens by default when code-server loads in the preview environment
+- [ ] T024 [US3] Open a test PR and confirm the PR description includes the preview URL placeholder and review instructions
 
 **Checkpoint**: All three user stories are complete. The preview workflow is fully operational with reviewer guidance.
 
@@ -139,27 +161,29 @@
 
 **Purpose**: Evidence collection, media content, and PR creation
 
-- [ ] T023 Run quickstart.md validation (follow steps and confirm they work) `specs/099-browser-extension-preview/quickstart.md`
-- [ ] T024 [P] Review all edge cases from spec.md (build failure, missing data, early access)
+- [ ] T025 Run quickstart.md validation (follow steps and confirm they work) `specs/099-browser-extension-preview/quickstart.md`
+- [ ] T026 [P] Review all edge cases from spec.md (build failure, missing data, early access)
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T025 Create evidence directory `specs/099-browser-extension-preview/evidence/`
-- [ ] T026 Capture Docker build output in `specs/099-browser-extension-preview/evidence/docker-build.txt`
-- [ ] T027 [P] Capture container startup logs in `specs/099-browser-extension-preview/evidence/container-startup.txt`
-- [ ] T028 Capture test summary in `specs/099-browser-extension-preview/evidence/test-summary.md`
-- [ ] T029 Create usage demonstration in `specs/099-browser-extension-preview/evidence/usage-example.md`
+- [ ] T027 Create evidence directory `specs/099-browser-extension-preview/evidence/`
+- [ ] T028 Capture Docker build output in `specs/099-browser-extension-preview/evidence/docker-build.txt`
+- [ ] T029 [P] Capture container startup logs in `specs/099-browser-extension-preview/evidence/container-startup.txt`
+- [ ] T030 Capture Playwright smoke test results in `specs/099-browser-extension-preview/evidence/e2e-summary.md`
+- [ ] T031 [P] Capture screenshots from Playwright in `specs/099-browser-extension-preview/evidence/screenshots/`
+- [ ] T032 Capture test summary in `specs/099-browser-extension-preview/evidence/test-summary.md`
+- [ ] T033 Create usage demonstration in `specs/099-browser-extension-preview/evidence/usage-example.md`
 
 ### Media Content
 
-- [ ] T030 Create shipped blog post in `specs/099-browser-extension-preview/media/shipped-post.md`
-- [ ] T031 [P] Create LinkedIn shipped summary in `specs/099-browser-extension-preview/media/linkedin-shipped.md`
+- [ ] T034 Create shipped blog post in `specs/099-browser-extension-preview/media/shipped-post.md`
+- [ ] T035 [P] Create LinkedIn shipped summary in `specs/099-browser-extension-preview/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T032 Create PR and publish blog: run /speckit.pr
+- [ ] T036 Create PR and publish blog: run /speckit.pr
 
-**Task T032 must run last. It depends on all evidence and media tasks being complete.**
+**Task T036 must run last. It depends on all evidence and media tasks being complete.**
 
 ---
 
@@ -232,7 +256,8 @@ The spec explicitly requires splitting work around a manual Heroku configuration
 - [P] tasks = different files, no dependencies
 - [US#] label maps task to specific user story for traceability
 - Each user story is independently testable (per spec)
-- Verification is manual (Docker build + browser) — no automated test suite for this infrastructure feature
+- Playwright smoke test provides automated verification (Debrief + Log panels present, workbench loads)
+- Test runs against local container in Phase 3 AND against Heroku deployment in Phase 4
 - **Evidence is required** — capture artifacts that prove the feature works
 - Run `/speckit.pr` after all tasks complete to create PR with evidence
 - The ⛔ MANUAL STOP is a first-class workflow element, not a blocker to work around
