@@ -105,9 +105,7 @@ _OUTER_RING = [[-3, -3], [3, -3], [3, 3], [-3, 3], [-3, -3]]
 _SIMPLE_ZONES = [[_INNER_RING], [_MIDDLE_RING], [_OUTER_RING]]
 
 
-def _make_context(
-    ref_feature: dict[str, Any], zone_feature: dict[str, Any]
-) -> SelectionContext:
+def _make_context(ref_feature: dict[str, Any], zone_feature: dict[str, Any]) -> SelectionContext:
     """Create a MULTI context with ref and zone features."""
     return SelectionContext(
         type=ContextType.MULTI,
@@ -182,10 +180,10 @@ class TestClassifyBasic:
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
         coords = [
-            [0, 0],       # inner
-            [1.5, 0],     # middle
-            [2.5, 0],     # outer
-            [10, 10],     # outside
+            [0, 0],  # inner
+            [1.5, 0],  # middle
+            [2.5, 0],  # outer
+            [10, 10],  # outside
         ]
         ref = _make_ref_feature(coords)
         zone = _make_zone_feature(_SIMPLE_ZONES)
@@ -284,12 +282,17 @@ class TestMetadataPreservation:
         # Re-classify with a zone that doesn't contain the origin
         far_ring = [[5, 5], [6, 5], [6, 6], [5, 6], [5, 5]]
         far_zones = [[far_ring]]
-        far_zone = _make_zone_feature(far_zones, zones=[{
-            "name": "remote",
-            "detection_likelihood_pct": 90,
-            "buffer_distance_nm": 1.0,
-            "style": {"fill_color": "#00FF00"},
-        }])
+        far_zone = _make_zone_feature(
+            far_zones,
+            zones=[
+                {
+                    "name": "remote",
+                    "detection_likelihood_pct": 90,
+                    "buffer_distance_nm": 1.0,
+                    "style": {"fill_color": "#00FF00"},
+                }
+            ],
+        )
         ctx2 = _make_context(result1[0], far_zone)
         result2 = point_in_zone_classifier(ctx2, {})
 
