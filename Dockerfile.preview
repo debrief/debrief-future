@@ -1,7 +1,7 @@
 # Browser-based VS Code Extension Preview
 # Runs code-server with the Debrief extension and sample data pre-installed.
 #
-# Build: docker build -t debrief-preview -f preview/Dockerfile .
+# Build: docker build -t debrief-preview -f Dockerfile.preview .
 # Run:   docker run -p 8080:8080 -e PORT=8080 debrief-preview
 #
 # Heroku Review Apps: heroku.yml points here. Heroku sets $PORT automatically.

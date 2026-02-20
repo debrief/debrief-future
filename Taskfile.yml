@@ -102,7 +102,7 @@ tasks:
       - sh: ls apps/vscode/*.vsix 2>/dev/null
         msg: "No .vsix found. Run 'task build' then 'cd apps/vscode && npx vsce package --no-dependencies' first."
     cmds:
-      - docker build -t debrief-preview -f preview/Dockerfile .
+      - docker build -t debrief-preview -f Dockerfile.preview .
 
   preview:run:
     desc: "Run the preview container locally (http://localhost:8080)"

@@ -26,7 +26,7 @@ This produces `apps/vscode/debrief-vscode-*.vsix`.
 ### Step 2: Build the Preview Container
 
 ```bash
-docker build -t debrief-preview -f preview/Dockerfile .
+docker build -t debrief-preview -f Dockerfile.preview .
 ```
 
 The Dockerfile copies the `.vsix` from the build context and installs it into code-server.
@@ -80,4 +80,4 @@ You should see:
 | Extension not visible in sidebar | `.vsix` not installed | Check Docker build logs for install step |
 | Sample data missing | Dockerfile COPY path wrong | Verify `preview/workspace/samples/` exists in build context |
 | Map view blank | Webview CSP issue | Check browser console for blocked resources |
-| Heroku build fails | Dockerfile not found | Ensure `heroku.yml` points to `preview/Dockerfile` |
+| Heroku build fails | Dockerfile not found | Ensure `heroku.yml` points to `Dockerfile.preview` |
