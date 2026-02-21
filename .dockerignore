@@ -19,6 +19,7 @@ node_modules
 # Build artifacts (rebuilt inside Docker)
 **/dist
 **/*.vsix
+!apps/vscode/*.vsix
 
 # Documentation not needed at runtime
 docs
