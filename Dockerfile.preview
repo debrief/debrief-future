@@ -87,11 +87,9 @@ USER coder
 COPY --from=vsix-builder /build/apps/vscode/*.vsix /tmp/debrief.vsix
 RUN code-server --install-extension /tmp/debrief.vsix --force && rm /tmp/debrief.vsix
 
-# Verify extension was installed
-RUN code-server --list-extensions && \
-    ls -la ~/.local/share/code-server/extensions/ 2>/dev/null || \
-    ls -la ~/.config/code-server/extensions/ 2>/dev/null || \
-    echo "WARN: could not find extensions directory"
+# Verify extension was installed (lightweight check, no server startup)
+RUN ls ~/.local/share/code-server/extensions/ | grep -i debrief || \
+    (echo "ERROR: Debrief extension not found in extensions directory" && exit 1)
 
 # Default port — Heroku overrides via $PORT env var
 ENV PORT=8080

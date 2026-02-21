@@ -8,14 +8,8 @@ PORT="${PORT:-8080}"
 
 echo "=== Debrief Preview Environment ==="
 echo "Starting code-server on port ${PORT}"
-
-# Diagnostic: verify extension is installed
-echo "--- Installed extensions ---"
-code-server --list-extensions 2>&1 || true
-echo "--- Extensions directory ---"
-ls -la ~/.local/share/code-server/extensions/ 2>/dev/null || \
-  ls -la ~/.config/code-server/extensions/ 2>/dev/null || \
-  echo "WARN: extensions directory not found"
+echo "--- Extensions ---"
+ls ~/.local/share/code-server/extensions/ 2>/dev/null || echo "No extensions found"
 echo "==================================="
 
 exec code-server \
