@@ -25,11 +25,32 @@ fi
 
 echo "--- Installed extensions ---"
 code-server --list-extensions --show-versions 2>&1 || echo "Failed to list extensions"
-echo "--- Extension files ---"
-ls -la ~/.local/share/code-server/extensions/ 2>&1 || echo "No extensions directory"
-ls ~/.local/share/code-server/extensions/*/dist/extension.js 2>&1 || echo "No extension.js found"
-echo "--- Workspace ---"
-cat /workspace/preview/debrief-preview.code-workspace 2>/dev/null || echo "No workspace file"
+
+# Pre-seed Debrief config with sample STAC store
+# ConfigService reads from ~/.config/debrief/config.json (XDG_CONFIG_HOME)
+echo "--- Seeding config ---"
+DEBRIEF_CONFIG_DIR="${HOME}/.config/debrief"
+DEBRIEF_CONFIG_FILE="${DEBRIEF_CONFIG_DIR}/config.json"
+if [ ! -f "${DEBRIEF_CONFIG_FILE}" ]; then
+  mkdir -p "${DEBRIEF_CONFIG_DIR}"
+  cat > "${DEBRIEF_CONFIG_FILE}" <<'SEED'
+{
+  "stores": [
+    {
+      "id": "store-preview-sample",
+      "path": "/workspace/preview/samples/local-store",
+      "displayName": "Sample Maritime Data",
+      "status": "available"
+    }
+  ],
+  "preferences": {}
+}
+SEED
+  echo "Created ${DEBRIEF_CONFIG_FILE}"
+else
+  echo "Config already exists at ${DEBRIEF_CONFIG_FILE}"
+fi
+
 echo "==================================="
 
 exec code-server \
