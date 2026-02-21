@@ -62,14 +62,19 @@ test.describe('Smoke: code-server with Debrief extension', () => {
 
     // The Debrief extension registers activity bar containers with title "Debrief"
     // and "Debrief Log". These show up as action items in the activity bar.
-    // We look for any action with "debrief" in its id or "Debrief" in its aria-label.
+    // VS Code ≥1.93 moved activity-bar items into the sidebar header, so we
+    // cast a wide net across class names and use role="tab" as a fallback.
     const debriefActivity = page.locator(
       [
         '.activitybar [id*="debrief" i]',
         '.activitybar [aria-label*="Debrief" i]',
-        // code-server may use different selectors — also check composite bar
+        // code-server may use different class names for the composite bar
         '.composite.bar [id*="debrief" i]',
         '.composite.bar [aria-label*="Debrief" i]',
+        // VS Code ≥1.93 sidebar-integrated activity bar
+        '.action-item[id*="debrief" i]',
+        // Broadest: any tab with Debrief label (works across all layouts)
+        '[role="tab"][aria-label*="Debrief"]',
       ].join(', ')
     );
 

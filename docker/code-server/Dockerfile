@@ -36,11 +36,6 @@ RUN uv venv /opt/debrief-venv && \
     ./services/calc
 ENV PATH="/opt/debrief-venv/bin:$PATH"
 
-# Install the Debrief VS Code extension
-# The .vsix must be built before Docker build: pnpm run package --filter @debrief/vscode
-COPY apps/vscode/*.vsix /tmp/debrief.vsix
-RUN code-server --install-extension /tmp/debrief.vsix && rm /tmp/debrief.vsix
-
 # Copy test workspace
 COPY tests/e2e/test-workspace /workspace/test-workspace
 
@@ -48,7 +43,13 @@ COPY tests/e2e/test-workspace /workspace/test-workspace
 ENV PASSWORD=""
 EXPOSE 8080
 
+# Install the Debrief VS Code extension as the coder user.
+# code-server stores extensions under ~/.local/share/code-server/extensions.
+# Installing as root would place them in /root/... which coder can't see.
+# (See Dockerfile.preview and coder/code-server#7326 for background.)
 USER coder
+COPY --chown=coder:coder apps/vscode/*.vsix /tmp/debrief.vsix
+RUN code-server --install-extension /tmp/debrief.vsix && rm /tmp/debrief.vsix
 
 ENTRYPOINT ["code-server", \
     "--auth", "none", \

@@ -69,13 +69,16 @@ test.describe('Heroku Review App: Debrief Extension', () => {
     const workbench = page.locator('.monaco-workbench');
     await workbench.waitFor({ state: 'visible', timeout: 60_000 });
 
-    // Look for Debrief activity bar entry
+    // Look for Debrief activity bar entry — broad selectors to handle
+    // both traditional and sidebar-integrated layouts (VS Code ≥1.93)
     const debriefActivity = page.locator(
       [
         '.activitybar [id*="debrief" i]',
         '.activitybar [aria-label*="Debrief" i]',
         '.composite.bar [id*="debrief" i]',
         '.composite.bar [aria-label*="Debrief" i]',
+        '.action-item[id*="debrief" i]',
+        '[role="tab"][aria-label*="Debrief"]',
       ].join(', ')
     );
 
