@@ -1,0 +1,59 @@
+Container Startup Evidence — Feature 099: Browser-Based VS Code Extension Preview
+==================================================================================
+
+Date: 2026-02-20
+Environment: Cloud session (Docker daemon not available)
+
+Entrypoint Script: preview/entrypoint.sh
+-----------------------------------------
+#!/bin/bash
+set -e
+PORT="${PORT:-8080}"
+echo "=== Debrief Preview Environment ==="
+echo "Starting code-server on port ${PORT}"
+echo "Extension: Debrief VS Code"
+echo "Workspace: /workspace/preview"
+echo "==================================="
+exec code-server --auth none --bind-addr "0.0.0.0:${PORT}" --disable-telemetry /workspace/preview
+
+Expected Startup Output
+-----------------------
+=== Debrief Preview Environment ===
+Starting code-server on port 8080
+Extension: Debrief VS Code
+Workspace: /workspace/preview
+===================================
+[code-server] HTTP server listening on http://0.0.0.0:8080
+
+Configuration
+-------------
+- Authentication: disabled (--auth none) — ephemeral preview environment
+- Telemetry: disabled (--disable-telemetry)
+- Workspace: /workspace/preview (contains debrief-preview.code-workspace)
+- Port: $PORT environment variable (Heroku injects this; defaults to 8080)
+
+Workspace Contents
+------------------
+/workspace/preview/
+├── debrief-preview.code-workspace
+├── WELCOME.md
+└── samples/
+    ├── boat1.rep (32.5 KB)
+    ├── boat2.rep (34.2 KB)
+    ├── shapes.rep (18.0 KB)
+    ├── narrative.rep (1.2 KB)
+    ├── example-track.rep (0.9 KB)
+    └── local-store/
+        ├── catalog.json
+        ├── exercise-alpha/
+        │   ├── item.json
+        │   ├── exercise-alpha.geojson
+        │   └── assets/range-bearing-track-hms-defender-track-uss-freedom.json
+        └── training-run-1/
+            ├── item.json
+            └── training-run-1.geojson
+
+Note: Docker daemon was not available in this cloud session.
+Container startup was not directly observed but the entrypoint script follows
+the same pattern as docker/code-server/Dockerfile ENTRYPOINT with added
+$PORT binding for Heroku compatibility.

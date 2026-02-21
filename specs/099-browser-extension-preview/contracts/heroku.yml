@@ -1,14 +1,14 @@
 # Heroku Container Stack Definition
 # Reference: https://devcenter.heroku.com/articles/build-docker-images-heroku-yml
 #
-# This file tells Heroku to build the preview container from preview/Dockerfile
+# This file tells Heroku to build the preview container from Dockerfile.preview
 # and run code-server as the web process.
 #
 # Heroku Review Apps will use this to build a fresh container for each PR.
 
 build:
   docker:
-    web: preview/Dockerfile
+    web: Dockerfile.preview
 
 # No explicit run section needed — the Dockerfile CMD handles startup.
 # code-server binds to 0.0.0.0:$PORT as required by Heroku.

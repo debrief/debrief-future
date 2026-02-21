@@ -24,6 +24,7 @@
     "directory": "apps/vscode"
   },
   "activationEvents": [
+    "onStartupFinished",
     "onFileSystem:stac",
     "onView:debrief.stacExplorer",
     "onCommand:debrief.openPlot"

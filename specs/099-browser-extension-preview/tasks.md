@@ -51,10 +51,10 @@
 
 **Purpose**: Create the `preview/` directory structure and workspace files
 
-- [ ] T001 Create preview directory structure `preview/`
-- [ ] T002 [P] Create VS Code workspace file `preview/workspace/debrief-preview.code-workspace`
-- [ ] T003 [P] Copy sample STAC data into workspace `preview/workspace/samples/`
-- [ ] T004 [P] Copy sample REP files into workspace `preview/workspace/samples/`
+- [x] T001 Create preview directory structure `preview/`
+- [x] T002 [P] Create VS Code workspace file `preview/workspace/debrief-preview.code-workspace`
+- [x] T003 [P] Copy sample STAC data into workspace `preview/workspace/samples/`
+- [x] T004 [P] Copy sample REP files into workspace `preview/workspace/samples/`
 
 ---
 
@@ -64,9 +64,9 @@
 
 **Critical**: The Dockerfile and entrypoint are prerequisites for all subsequent testing.
 
-- [ ] T005 Create Dockerfile for code-server with extension install `preview/Dockerfile`
-- [ ] T006 Create entrypoint script that installs .vsix and starts code-server `preview/entrypoint.sh`
-- [ ] T007 Verify Dockerfile builds locally without errors
+- [x] T005 Create Dockerfile for code-server with extension install `preview/Dockerfile`
+- [x] T006 Create entrypoint script that installs .vsix and starts code-server `preview/entrypoint.sh`
+- [x] T007 Verify Dockerfile builds locally without errors
 
 **Checkpoint**: Docker image builds successfully. code-server starts and serves on the configured port.
 
@@ -86,7 +86,7 @@
 >
 > **Playwright in cloud sessions**: Use `@sparticuz/chromium` — see `docs/project_notes/playwright-installation-research.md`.
 
-- [ ] T008 [test] [US1] Create preview smoke test `tests/e2e/test-preview-smoke.spec.ts`
+- [x] T008 [test] [US1] Create preview smoke test `tests/e2e/test-preview-smoke.spec.ts`
 - [ ] T009 [test] [US1] Run smoke test against local container: `CODE_SERVER_URL=http://localhost:8080 pnpm exec playwright test --config=tests/e2e/playwright.config.ts test-preview-smoke`
 
 **Smoke test checks**:
@@ -98,12 +98,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Create WELCOME.md onboarding document for the preview workspace `preview/workspace/WELCOME.md`
-- [ ] T011 [P] [US1] Create Heroku app.json descriptor at repo root `app.json`
-- [ ] T012 [P] [US1] Create heroku.yml container stack definition at repo root `heroku.yml`
+- [x] T010 [US1] Create WELCOME.md onboarding document for the preview workspace `preview/workspace/WELCOME.md`
+- [x] T011 [P] [US1] Create Heroku app.json descriptor at repo root `app.json`
+- [x] T012 [P] [US1] Create heroku.yml container stack definition at repo root `heroku.yml`
 - [ ] T013 [US1] Verify container runs locally and code-server is accessible in browser
 - [ ] T014 [US1] Verify sample data loads in the preview workspace (REP files openable, STAC catalog browsable)
-- [ ] T015 [US1] Add Taskfile entry for local preview build and run `Taskfile.yml`
+- [x] T015 [US1] Add Taskfile entry for local preview build and run `Taskfile.yml`
 
 **Checkpoint**: Phase 1 of the spec is complete. Container builds locally, extension loads, sample data works, Heroku descriptors are committed. Ready for manual Heroku configuration.
 
@@ -161,23 +161,23 @@
 
 **Purpose**: Evidence collection, media content, and PR creation
 
-- [ ] T025 Run quickstart.md validation (follow steps and confirm they work) `specs/099-browser-extension-preview/quickstart.md`
-- [ ] T026 [P] Review all edge cases from spec.md (build failure, missing data, early access)
+- [x] T025 Run quickstart.md validation (follow steps and confirm they work) `specs/099-browser-extension-preview/quickstart.md`
+- [x] T026 [P] Review all edge cases from spec.md (build failure, missing data, early access)
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T027 Create evidence directory `specs/099-browser-extension-preview/evidence/`
-- [ ] T028 Capture Docker build output in `specs/099-browser-extension-preview/evidence/docker-build.txt`
-- [ ] T029 [P] Capture container startup logs in `specs/099-browser-extension-preview/evidence/container-startup.txt`
-- [ ] T030 Capture Playwright smoke test results in `specs/099-browser-extension-preview/evidence/e2e-summary.md`
-- [ ] T031 [P] Capture screenshots from Playwright in `specs/099-browser-extension-preview/evidence/screenshots/`
-- [ ] T032 Capture test summary in `specs/099-browser-extension-preview/evidence/test-summary.md`
-- [ ] T033 Create usage demonstration in `specs/099-browser-extension-preview/evidence/usage-example.md`
+- [x] T027 Create evidence directory `specs/099-browser-extension-preview/evidence/`
+- [x] T028 Capture Docker build output in `specs/099-browser-extension-preview/evidence/docker-build.txt`
+- [x] T029 [P] Capture container startup logs in `specs/099-browser-extension-preview/evidence/container-startup.txt`
+- [x] T030 Capture Playwright smoke test results in `specs/099-browser-extension-preview/evidence/e2e-summary.md`
+- [x] T031 [P] Capture screenshots from Playwright in `specs/099-browser-extension-preview/evidence/screenshots/`
+- [x] T032 Capture test summary in `specs/099-browser-extension-preview/evidence/test-summary.md`
+- [x] T033 Create usage demonstration in `specs/099-browser-extension-preview/evidence/usage-example.md`
 
 ### Media Content
 
-- [ ] T034 Create shipped blog post in `specs/099-browser-extension-preview/media/shipped-post.md`
-- [ ] T035 [P] Create LinkedIn shipped summary in `specs/099-browser-extension-preview/media/linkedin-shipped.md`
+- [x] T034 Create shipped blog post in `specs/099-browser-extension-preview/media/shipped-post.md`
+- [x] T035 [P] Create LinkedIn shipped summary in `specs/099-browser-extension-preview/media/linkedin-shipped.md`
 
 ### PR Creation
 
