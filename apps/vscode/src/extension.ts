@@ -30,7 +30,8 @@ import { createRestoreActivitiesCommand } from './commands/restoreActivities';
 let mapPanel: MapPanel | undefined;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  // Extension activation begins
+  // Diagnostic: log to console so it's visible in browser Developer Tools (F12)
+  console.log('[Debrief] activate() called');
 
   // Create shared output channel for cross-ecosystem diagnostics (ARCHITECTURE.md)
   const outputChannel = vscode.window.createOutputChannel('Debrief');
@@ -52,13 +53,31 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     })
   );
 
-  // Initialize activity bar service early (before tree providers)
-  // This hides non-essential activities on first activation
-  const activityBarService = new ActivityBarService(context);
-  await activityBarService.applyDefaults();
+  // ── Phase 1: Initialize services (with resilience) ─────────────────────
+  // Services are wrapped in try-catch so a failure in one doesn't prevent
+  // view providers from registering (Phase 2). This is critical for
+  // code-server where the filesystem environment may differ from desktop.
 
-  // Initialize services
-  const configService = new ConfigService();
+  let configService: ConfigService;
+  try {
+    configService = new ConfigService();
+  } catch (err) {
+    console.error('[Debrief] ConfigService failed to initialize:', err);
+    outputChannel.appendLine(`[startup] ConfigService init failed: ${err instanceof Error ? err.message : String(err)}`);
+    // Create a minimal fallback so extension can still show views
+    configService = Object.create(ConfigService.prototype) as ConfigService;
+    Object.assign(configService, {
+      config: { stores: [], preferences: {} },
+      configWatcher: null,
+      changeListeners: [],
+      getStores: () => [],
+      getStore: () => undefined,
+      getRecentPlots: () => [],
+      onConfigChange: () => () => {},
+      dispose: () => {},
+    });
+  }
+
   const stacService = new StacService();
   const calcService = new CalcService(context, () => mapPanel);
   const recentPlotsService = new RecentPlotsService(context);
@@ -73,6 +92,75 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // Wire output channel to services for cross-ecosystem diagnostics
   calcService.setOutputChannel(outputChannel);
   ioService.setOutputChannel(outputChannel);
+
+  console.log('[Debrief] services initialized');
+  outputChannel.appendLine('[startup] services initialized');
+
+  // ── Phase 2: Register view providers EARLY ─────────────────────────────
+  // This must happen before any async work that could fail, so the Debrief
+  // activity bar icons and views always appear in the UI.
+
+  // Initialize ToolMatchAdapter with feature kind lookup (Feature: 038)
+  const getFeatureKind = (featureId: string): string | undefined => {
+    const panel = mapPanel;
+    if (!panel) {
+      return undefined;
+    }
+    return panel.getFeatureKind(featureId);
+  };
+  const toolMatchAdapter = new ToolMatchAdapter([], getFeatureKind);
+
+  const stacTreeProvider = new StacTreeProvider(configService, stacService);
+  const toolsTreeProvider = new ToolsTreeProvider(calcService, toolMatchAdapter);
+  const layersTreeProvider = new LayersTreeProvider(sessionManager);
+  const outlineProvider = new OutlineProvider();
+  const timeRangeProvider = new TimeRangeViewProvider(context.extensionUri, sessionManager);
+
+  const activityPanelProvider = new ActivityPanelViewProvider(
+    context.extensionUri,
+    sessionManager,
+    toolMatchAdapter,
+    calcService
+  );
+
+  const logPanelProvider = new LogPanelViewProvider(
+    context.extensionUri,
+    context,
+    sessionManager
+  );
+  logPanelProvider.setResultIdRegistry(resultIdRegistry);
+
+  // Register all view providers — this is what makes views appear in the UI
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
+    vscode.window.registerWebviewViewProvider('debrief.activityPanel', activityPanelProvider),
+    vscode.window.registerWebviewViewProvider('debrief.logPanel', logPanelProvider)
+  );
+
+  // Register outline provider for selection
+  context.subscriptions.push(
+    vscode.languages.registerDocumentSymbolProvider(
+      { scheme: 'stac' },
+      outlineProvider
+    )
+  );
+
+  console.log('[Debrief] view providers registered');
+  outputChannel.appendLine('[startup] view providers registered');
+
+  // ── Phase 3: Activity bar, context, filesystem, commands ───────────────
+
+  // Initialize activity bar service (shows one-time prompt)
+  try {
+    const activityBarService = new ActivityBarService(context);
+    await activityBarService.applyDefaults();
+
+    // Register activity bar restore command
+    context.subscriptions.push(createRestoreActivitiesCommand(activityBarService));
+  } catch (err) {
+    console.error('[Debrief] ActivityBarService failed:', err);
+    outputChannel.appendLine(`[startup] ActivityBarService failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
 
   // Configure MCP server port from settings (Feature: 029 - Phase 5)
   const mcpConfig = vscode.workspace.getConfiguration('debrief');
@@ -137,19 +225,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     })
   );
 
-  // Initialize ToolMatchAdapter with feature kind lookup (Feature: 038)
-  // This function looks up the 'kind' property of features from the map panel
-  const getFeatureKind = (featureId: string): string | undefined => {
-    const panel = mapPanel;
-    if (!panel) {
-      return undefined;
-    }
-    return panel.getFeatureKind(featureId);
-  };
-
-  // Create ToolMatchAdapter - tools will be loaded when calcService connects
-  const toolMatchAdapter = new ToolMatchAdapter([], getFeatureKind);
-
   // Set noStores context — positive flag so welcome is hidden before activation
   // (undefined = falsy = welcome hidden; true = no stores, show welcome)
   const updateNoStores = (): void => {
@@ -166,43 +241,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   );
   await vscode.commands.executeCommand('setContext', 'debrief.storesReady', true);
   configService.onConfigChange(() => updateNoStores());
-
-  // Register tree providers
-  const stacTreeProvider = new StacTreeProvider(configService, stacService);
-  const toolsTreeProvider = new ToolsTreeProvider(calcService, toolMatchAdapter);
-  const layersTreeProvider = new LayersTreeProvider(sessionManager);
-  const outlineProvider = new OutlineProvider();
-  const timeRangeProvider = new TimeRangeViewProvider(context.extensionUri, sessionManager);
-
-  // Register unified activity panel (Feature: 047)
-  const activityPanelProvider = new ActivityPanelViewProvider(
-    context.extensionUri,
-    sessionManager,
-    toolMatchAdapter,
-    calcService
-  );
-
-  // Register Log Panel (Feature: 072-log-panel)
-  const logPanelProvider = new LogPanelViewProvider(
-    context.extensionUri,
-    context,
-    sessionManager
-  );
-  logPanelProvider.setResultIdRegistry(resultIdRegistry);
-
-  context.subscriptions.push(
-    vscode.window.registerTreeDataProvider('debrief.stacExplorer', stacTreeProvider),
-    vscode.window.registerWebviewViewProvider('debrief.activityPanel', activityPanelProvider),
-    vscode.window.registerWebviewViewProvider('debrief.logPanel', logPanelProvider)
-  );
-
-  // Register outline provider for selection
-  context.subscriptions.push(
-    vscode.languages.registerDocumentSymbolProvider(
-      { scheme: 'stac' },
-      outlineProvider
-    )
-  );
 
   // Track selection subscription for cleanup when session changes (Feature: 038)
   let selectionUnsubscribe: (() => void) | undefined;
@@ -276,9 +314,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   );
   context.subscriptions.push(...commands);
 
-  // Register activity bar restore command
-  context.subscriptions.push(createRestoreActivitiesCommand(activityBarService));
-
   // Set initial context
   await vscode.commands.executeCommand('setContext', 'debrief.plotOpen', false);
   await vscode.commands.executeCommand('setContext', 'debrief.mapFocused', false);
@@ -288,6 +323,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   // Restore previously-open plots (Feature: 052)
   void openPlotsService.restoreOpenPlots();
+
+  // ── Phase 4: Background Python service checks ──────────────────────────
 
   // Check Python service availability and update status indicator
   pythonStatus.text = '$(sync~spin) Python';
@@ -345,7 +382,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     outputChannel.appendLine(`[startup] debrief-calc: check failed — ${err instanceof Error ? err.message : String(err)}`);
   });
 
-  // Extension activation complete
+  console.log('[Debrief] activation complete');
+  outputChannel.appendLine('[startup] activation complete');
 }
 
 /**

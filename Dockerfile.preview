@@ -77,26 +77,18 @@ COPY preview/workspace /workspace/preview
 COPY preview/entrypoint.sh /opt/entrypoint.sh
 RUN chmod +x /opt/entrypoint.sh
 
-# Install the VS Code extension as coder so it lands in coder's extensions dir
+# Keep the .vsix in the image — the entrypoint installs it at runtime.
+# code-server's --install-extension at build time writes to extensions.json,
+# but this manifest can be lost at runtime (known issue: coder/code-server#7326).
+# Installing at container startup guarantees the extensions.json is fresh.
 USER coder
-COPY --chown=coder:coder --from=vsix-builder /build/apps/vscode/*.vsix /tmp/debrief.vsix
-RUN code-server --install-extension /tmp/debrief.vsix --force && rm /tmp/debrief.vsix
+COPY --chown=coder:coder --from=vsix-builder /build/apps/vscode/*.vsix /opt/debrief.vsix
 
-# Diagnostic: show code-server version and verify extension installation
+# Diagnostic: verify the .vsix was copied successfully
 RUN echo "=== code-server version ===" && \
     code-server --version && \
-    echo "=== Installed extensions ===" && \
-    code-server --list-extensions --show-versions 2>&1 && \
-    echo "=== Extension directory ===" && \
-    ls -la ~/.local/share/code-server/extensions/ && \
-    echo "=== Extension entry point ===" && \
-    ls ~/.local/share/code-server/extensions/*/dist/extension.js 2>&1 && \
-    echo "=== Extension engine check ===" && \
-    cat ~/.local/share/code-server/extensions/*/package.json 2>/dev/null | \
-    grep -A1 '"engines"' || true && \
-    echo "=== Verification ===" && \
-    (ls ~/.local/share/code-server/extensions/ | grep -i debrief || \
-    (echo "ERROR: Debrief extension not found in extensions directory" && exit 1))
+    echo "=== .vsix file ===" && \
+    ls -la /opt/debrief.vsix
 
 # Default port — Heroku overrides via $PORT env var
 ENV PORT=8080

@@ -215,8 +215,12 @@ export class ConfigService {
   // ============================================================================
 
   private ensureConfigDir(): void {
-    if (!fs.existsSync(DEBRIEF_CONFIG_DIR)) {
-      fs.mkdirSync(DEBRIEF_CONFIG_DIR, { recursive: true });
+    try {
+      if (!fs.existsSync(DEBRIEF_CONFIG_DIR)) {
+        fs.mkdirSync(DEBRIEF_CONFIG_DIR, { recursive: true });
+      }
+    } catch (err) {
+      console.error('[ConfigService] Failed to create config directory:', err);
     }
   }
 
