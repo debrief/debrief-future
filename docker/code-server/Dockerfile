@@ -51,6 +51,14 @@ USER coder
 COPY --chown=coder:coder apps/vscode/*.vsix /tmp/debrief.vsix
 RUN code-server --install-extension /tmp/debrief.vsix && rm /tmp/debrief.vsix
 
+# Pre-seed VS Code settings so extensions activate without user interaction.
+# - Workspace trust disabled → extensions activate immediately (no trust dialog)
+# - Welcome tab disabled → no iframe stealing keyboard focus
+# These mirror what global-setup.ts writes for locally-started code-server.
+RUN mkdir -p /home/coder/.local/share/code-server/User && \
+    echo '{"security.workspace.trust.enabled":false,"workbench.startupEditor":"none","workbench.welcomePage.walkthroughs.openOnInstall":false,"workbench.tips.enabled":false}' \
+    > /home/coder/.local/share/code-server/User/settings.json
+
 ENTRYPOINT ["code-server", \
     "--auth", "none", \
     "--bind-addr", "0.0.0.0:8080", \

@@ -79,7 +79,37 @@ test.describe('Smoke: code-server with Debrief extension', () => {
     );
 
     // Allow time for extension activation
-    await debriefActivity.first().waitFor({ state: 'visible', timeout: 30_000 });
+    try {
+      await debriefActivity.first().waitFor({ state: 'visible', timeout: 30_000 });
+    } catch {
+      // Dump diagnostic info on failure so we can fix selectors
+      const screenshot = 'test-results/s02-debug-activity-bar.png';
+      await page.screenshot({ path: screenshot, fullPage: false });
+
+      // Dump the activity bar outer HTML and all role="tab" elements
+      const activityBarHtml = await page
+        .locator('.activitybar, .part.activitybar, [class*="activitybar"]')
+        .first()
+        .innerHTML()
+        .catch(() => '<not found>');
+      const allTabs = await page
+        .locator('[role="tab"]')
+        .evaluateAll((els) =>
+          els.map((e) => ({ id: e.id, ariaLabel: e.getAttribute('aria-label'), classes: e.className }))
+        )
+        .catch(() => []);
+
+      console.log('=== S02 DEBUG: Activity bar HTML (first 2000 chars) ===');
+      console.log(activityBarHtml.slice(0, 2000));
+      console.log('=== S02 DEBUG: All role="tab" elements ===');
+      console.log(JSON.stringify(allTabs, null, 2));
+
+      throw new Error(
+        `Debrief activity-bar icon not found. ` +
+        `Tabs found: ${JSON.stringify(allTabs.map((t: { ariaLabel: string | null }) => t.ariaLabel))}. ` +
+        `Screenshot: ${screenshot}`
+      );
+    }
     expect(await debriefActivity.count()).toBeGreaterThan(0);
   });
 
