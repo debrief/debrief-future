@@ -79,7 +79,7 @@ RUN chmod +x /opt/entrypoint.sh
 
 # Install the VS Code extension as coder so it lands in coder's extensions dir
 USER coder
-COPY --from=vsix-builder /build/apps/vscode/*.vsix /tmp/debrief.vsix
+COPY --chown=coder:coder --from=vsix-builder /build/apps/vscode/*.vsix /tmp/debrief.vsix
 RUN code-server --install-extension /tmp/debrief.vsix --force && rm /tmp/debrief.vsix
 
 # Verify extension was installed (lightweight check, no server startup)
