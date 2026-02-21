@@ -62,19 +62,54 @@ test.describe('Smoke: code-server with Debrief extension', () => {
 
     // The Debrief extension registers activity bar containers with title "Debrief"
     // and "Debrief Log". These show up as action items in the activity bar.
-    // We look for any action with "debrief" in its id or "Debrief" in its aria-label.
+    // VS Code ≥1.93 moved activity-bar items into the sidebar header, so we
+    // cast a wide net across class names and use role="tab" as a fallback.
     const debriefActivity = page.locator(
       [
         '.activitybar [id*="debrief" i]',
         '.activitybar [aria-label*="Debrief" i]',
-        // code-server may use different selectors — also check composite bar
+        // code-server may use different class names for the composite bar
         '.composite.bar [id*="debrief" i]',
         '.composite.bar [aria-label*="Debrief" i]',
+        // VS Code ≥1.93 sidebar-integrated activity bar
+        '.action-item[id*="debrief" i]',
+        // Broadest: any tab with Debrief label (works across all layouts)
+        '[role="tab"][aria-label*="Debrief"]',
       ].join(', ')
     );
 
     // Allow time for extension activation
-    await debriefActivity.first().waitFor({ state: 'visible', timeout: 30_000 });
+    try {
+      await debriefActivity.first().waitFor({ state: 'visible', timeout: 30_000 });
+    } catch {
+      // Dump diagnostic info on failure so we can fix selectors
+      const screenshot = 'test-results/s02-debug-activity-bar.png';
+      await page.screenshot({ path: screenshot, fullPage: false });
+
+      // Dump the activity bar outer HTML and all role="tab" elements
+      const activityBarHtml = await page
+        .locator('.activitybar, .part.activitybar, [class*="activitybar"]')
+        .first()
+        .innerHTML()
+        .catch(() => '<not found>');
+      const allTabs = await page
+        .locator('[role="tab"]')
+        .evaluateAll((els) =>
+          els.map((e) => ({ id: e.id, ariaLabel: e.getAttribute('aria-label'), classes: e.className }))
+        )
+        .catch(() => []);
+
+      console.log('=== S02 DEBUG: Activity bar HTML (first 2000 chars) ===');
+      console.log(activityBarHtml.slice(0, 2000));
+      console.log('=== S02 DEBUG: All role="tab" elements ===');
+      console.log(JSON.stringify(allTabs, null, 2));
+
+      throw new Error(
+        `Debrief activity-bar icon not found. ` +
+        `Tabs found: ${JSON.stringify(allTabs.map((t: { ariaLabel: string | null }) => t.ariaLabel))}. ` +
+        `Screenshot: ${screenshot}`
+      );
+    }
     expect(await debriefActivity.count()).toBeGreaterThan(0);
   });
 

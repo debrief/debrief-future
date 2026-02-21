@@ -16,8 +16,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv for Python package management
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/root/.local/bin:$PATH"
+# Use UV_INSTALL_DIR so uv lands in a fixed location regardless of $HOME
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
 
 # Copy Python service sources
 COPY services/io /workspace/services/io
@@ -36,11 +36,6 @@ RUN uv venv /opt/debrief-venv && \
     ./services/calc
 ENV PATH="/opt/debrief-venv/bin:$PATH"
 
-# Install the Debrief VS Code extension
-# The .vsix must be built before Docker build: pnpm run package --filter @debrief/vscode
-COPY apps/vscode/*.vsix /tmp/debrief.vsix
-RUN code-server --install-extension /tmp/debrief.vsix && rm /tmp/debrief.vsix
-
 # Copy test workspace
 COPY tests/e2e/test-workspace /workspace/test-workspace
 
@@ -48,7 +43,21 @@ COPY tests/e2e/test-workspace /workspace/test-workspace
 ENV PASSWORD=""
 EXPOSE 8080
 
+# Install the Debrief VS Code extension as the coder user.
+# code-server stores extensions under ~/.local/share/code-server/extensions.
+# Installing as root would place them in /root/... which coder can't see.
+# (See Dockerfile.preview and coder/code-server#7326 for background.)
 USER coder
+COPY --chown=coder:coder apps/vscode/*.vsix /tmp/debrief.vsix
+RUN code-server --install-extension /tmp/debrief.vsix && rm /tmp/debrief.vsix
+
+# Pre-seed VS Code settings so extensions activate without user interaction.
+# - Workspace trust disabled → extensions activate immediately (no trust dialog)
+# - Welcome tab disabled → no iframe stealing keyboard focus
+# These mirror what global-setup.ts writes for locally-started code-server.
+RUN mkdir -p /home/coder/.local/share/code-server/User && \
+    echo '{"security.workspace.trust.enabled":false,"workbench.startupEditor":"none","workbench.welcomePage.walkthroughs.openOnInstall":false,"workbench.tips.enabled":false}' \
+    > /home/coder/.local/share/code-server/User/settings.json
 
 ENTRYPOINT ["code-server", \
     "--auth", "none", \

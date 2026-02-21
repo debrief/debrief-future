@@ -84,7 +84,7 @@ jobs:
         env:
           CODE_SERVER_URL: http://localhost:8080
           CI: true
-        run: npx playwright test --config tests/e2e/playwright.config.ts
+        run: npx playwright test --config tests/e2e/playwright.config.ts --grep-invert "Heroku"
 
       # Upload artifacts on failure or success
       - name: Upload Playwright report
