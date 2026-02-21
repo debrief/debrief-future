@@ -15,32 +15,27 @@ RUN npm install -g pnpm@9
 
 WORKDIR /build
 
-# Copy workspace root config
+# Copy workspace config and all source upfront
+# (Heroku has no Docker layer cache, so separate COPY-for-cache is pointless)
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-# Copy package.json for every workspace package (needed for pnpm resolution)
-COPY shared/schemas/package.json ./shared/schemas/
-COPY shared/components/package.json ./shared/components/
-COPY shared/utils/package.json ./shared/utils/
-COPY shared/config-ts/package.json ./shared/config-ts/
-COPY services/session-state/package.json ./services/session-state/
-COPY apps/vscode/package.json ./apps/vscode/
-COPY apps/loader/package.json ./apps/loader/
-COPY apps/web-shell/package.json ./apps/web-shell/
-
-# Install only deps needed for the vscode extension build
-RUN pnpm install --filter debrief-vscode... --no-frozen-lockfile
-
-# Copy source for the extension and its workspace dependencies
 COPY shared/schemas/ ./shared/schemas/
 COPY shared/components/ ./shared/components/
 COPY shared/utils/ ./shared/utils/
+COPY shared/config-ts/package.json ./shared/config-ts/
 COPY services/session-state/ ./services/session-state/
 COPY apps/vscode/ ./apps/vscode/
+COPY apps/loader/package.json ./apps/loader/
+COPY apps/web-shell/package.json ./apps/web-shell/
 
-# Build workspace deps then the extension, then package as .vsix
-RUN pnpm --filter debrief-vscode... build
-RUN cd apps/vscode && npx @vscode/vsce package --no-dependencies
+# Install, build, package, then delete node_modules — all in ONE layer.
+# Docker commits layer diffs: creating + deleting node_modules in the same
+# RUN means Docker never snapshots the ~500MB node_modules directory.
+# This prevents OOM on Heroku's constrained build dynos.
+RUN pnpm install --filter debrief-vscode... --no-frozen-lockfile && \
+    pnpm --filter debrief-vscode... build && \
+    cd apps/vscode && npx @vscode/vsce package --no-dependencies && \
+    cd /build && \
+    rm -rf node_modules
 
 # ---------------------------------------------------------------------------
 # Stage 2: Final image with code-server + Python services + extension
