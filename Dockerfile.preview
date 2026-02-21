@@ -84,13 +84,6 @@ RUN chmod +x /opt/entrypoint.sh
 USER coder
 COPY --chown=coder:coder --from=vsix-builder /build/apps/vscode/*.vsix /opt/debrief.vsix
 
-# Diagnostic: verify the .vsix was copied successfully
-RUN echo "=== code-server version ===" && \
-    code-server --version && \
-    echo "=== .vsix file ===" && \
-    ls -la /opt/debrief.vsix
-
-# Default port — Heroku overrides via $PORT env var
 ENV PORT=8080
 EXPOSE 8080
 
