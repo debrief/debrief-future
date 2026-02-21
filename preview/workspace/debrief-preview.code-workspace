@@ -9,6 +9,7 @@
     "debrief.stacCatalogPath": "samples/local-store",
     "workbench.startupEditor": "readme",
     "workbench.welcome.enabled": false,
+    "workbench.welcomePage.walkthroughs.openOnInstall": false,
     "debrief.mcp.autoStart": false,
     "terminal.integrated.defaultProfile.linux": "bash"
   }
