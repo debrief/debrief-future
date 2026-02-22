@@ -29,13 +29,33 @@ Key source files in microsoft/vscode:
 - `src/vs/workbench/contrib/webview/browser/pre/main.js` — runs inside the outer iframe, creates `#active-frame`, manages the handshake
 - `src/vs/workbench/contrib/webview/browser/pre/service-worker.js` — proxies resource loading from the inner iframe back to VS Code
 
-### The Handshake Sequence
+### The Handshake Sequence (from VS Code source: `pre/index.html`)
 
 1. **VS Code creates** the outer `iframe.webview.ready` element with `src` pointing to a webview host page
-2. **The host page** (`main.js`) loads, registers a service worker, and creates the `#active-frame` inner iframe
-3. **Service worker** intercepts resource requests from `#active-frame` and proxies them via `postMessage` to the host page, which forwards them to VS Code's main process
-4. **The inner iframe** loads the extension's HTML, which calls `acquireVsCodeApi()` — this returns a proxy that uses `postMessage` to communicate through the iframe chain
-5. **Extension code** sends `webviewReady` message back through the chain, completing the handshake
+2. **Origin validation**: The outer iframe computes a SHA-256 hash of the `parentOrigin` URL parameter and validates it against the iframe's hostname. If validation fails, the handshake never starts.
+3. **Port transfer**: The outer iframe creates a `MessageChannel` and sends `port2` to the parent via:
+   ```javascript
+   window.parent.postMessage(
+     { target: ID, channel: 'webview-ready', data: {} },
+     parentOrigin,
+     [this.channel.port2]
+   );
+   ```
+4. **Service worker** registers and intercepts fetch requests for `vscode-resource://` URIs, proxying them via `postMessage` back to VS Code's main process (with a 30-second timeout returning HTTP 408 on failure)
+5. **The `#active-frame`** inner iframe loads, the extension's HTML mounts, and calls `acquireVsCodeApi()` — this returns a proxy that sends messages through `port1` of the `MessageChannel`
+6. **All subsequent messages** flow through the `MessageChannel` ports (not `window.postMessage`), using named channels: `onmessage`, `content`, `styles`, `focus`, `load-resource`, etc.
+7. **Extension code** sends `webviewReady` message back through the chain, completing the handshake
+
+**Key message channels:**
+
+| Channel | Direction | Purpose |
+|---------|-----------|---------|
+| `webview-ready` | iframe → host | Initial handshake, transfers MessagePort |
+| `onmessage` | iframe ↔ host | Extension messages via `vscode.postMessage()` |
+| `content` | host → iframe | HTML content updates |
+| `styles` | host → iframe | Theme variable injection |
+| `load-resource` | service-worker → host | Resource loading requests |
+| `do-update-state` | iframe → host | State persistence |
 
 ### Where It Breaks in Headless Mode
 
@@ -165,7 +185,43 @@ const launchOptions = useSandboxedChromium
 
 **Verdict:** Fragile workaround. Even if the handshake message is injected, the service worker still needs to proxy resource requests (JS bundles, CSS). Without a functioning service worker, the React app in `#active-frame` won't load its bundle.
 
-### Strategy F: CSP/CORS Configuration
+### Strategy F: Jupyter-Style Test Middleware (ALTERNATIVE WORTH CONSIDERING)
+
+**How it works:** Inject a test middleware layer into the webview host that exposes webview state to the extension host, allowing tests to verify rendered content without needing browser automation of the iframe at all.
+
+**Assessment:**
+- This is how Microsoft's own Jupyter extension tests its complex webview notebooks
+- Set an environment variable (e.g., `DEBRIEF_WEBVIEW_TEST_MIDDLEWARE=true`) that creates a test host exposing rendered HTML and component state
+- Tests run inside the extension host via `@vscode/test-electron`, querying the middleware for webview state
+- **Completely avoids** the iframe/headless/service-worker problem by testing from the inside out
+- Requires changes to the extension code to support the middleware injection point
+
+**What we'd need to build:**
+1. A `TestWebViewHost` class that wraps `MapPanel` and exposes:
+   - Current rendered feature list (tracks, locations, result layers)
+   - Selection state
+   - Time controller state
+   - Log panel entries
+2. Extension activation checks for `DEBRIEF_WEBVIEW_TEST_MIDDLEWARE` env var
+3. Mocha test suite using `@vscode/test-electron` that queries the middleware
+
+**Pros:**
+- Proven pattern (Jupyter extension uses it at scale)
+- No iframe navigation, no service worker dependency
+- Works in any CI environment (headless, no xvfb needed)
+- Tests the real extension activation → service calls → state management path
+- Fast — no browser rendering overhead
+
+**Cons:**
+- Does NOT test actual UI rendering (Leaflet map visual correctness, CSS layout)
+- Requires invasive changes to extension code to inject test hooks
+- Tests are coupled to internal state rather than observable UI outcomes
+- Cannot verify "user sees X" — only "state contains X"
+- A new test runner (Mocha in extension host) alongside existing Playwright
+
+**Verdict:** A strong complementary strategy for testing business logic flows (load file → tracks appear in state → tool produces results → provenance recorded). But it does NOT replace visual E2E testing — it cannot verify that the Leaflet map renders correctly or that CSS transitions work. Best used alongside Strategy A.
+
+### Strategy G: CSP/CORS Configuration
 
 **How it works:** Modify code-server's Content Security Policy or webview settings to allow the handshake.
 
@@ -181,15 +237,31 @@ const launchOptions = useSandboxedChromium
 
 ## 3. How Other Extensions Test Webviews
 
-### Jupyter Extension
-- Tests notebook rendering using `@vscode/test-electron` for integration tests
-- Webview content is tested via the VS Code API (checking that cells execute, outputs appear) rather than direct DOM interaction
-- Does NOT use Playwright/WebdriverIO for webview DOM testing in CI
+### Jupyter Extension (most relevant precedent)
+- Does **NOT** use Playwright/WebdriverIO for webview DOM testing
+- Instead uses a **custom test middleware** injected via environment variable: `VSC_JUPYTER_WEBVIEW_TEST_MIDDLEWARE=true`
+- This creates an `ITestWebViewHost` — a custom webview that allows pulling back the rendered HTML, enabling testing of webview content changes from the extension host
+- Integration tests use Mocha running inside VS Code's Extension Development Host
+- Tests verify content through the extension host API, not through browser DOM interaction
+- **Key insight:** This completely avoids the iframe/headless problem by testing from the inside out
+
+Source: [vscode-jupyter Integration Tests Wiki](https://github.com/microsoft/vscode-jupyter/wiki/Integration-Tests)
 
 ### GitLens
 - Uses a combination of unit tests and VS Code API integration tests
 - Webview-specific UI is tested in isolation (component tests)
 - No public evidence of Playwright-based webview DOM testing
+
+### vscode-extension-tester (Red Hat)
+- Uses Selenium WebDriver with a built-in `WebView` page object that handles iframe context switching automatically:
+  ```typescript
+  const webview = new WebviewView();
+  await webview.switchToFrame();  // handles nested iframe navigation
+  const element = await webview.findWebElement(By.css('.my-element'));
+  await webview.switchBack();
+  ```
+- Requires xvfb for CI
+- Source: [vscode-extension-tester GitHub](https://github.com/redhat-developer/vscode-extension-tester)
 
 ### Industry Pattern
 The dominant pattern among VS Code extensions with complex webviews is:
@@ -264,6 +336,13 @@ xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' \
   env:
     E2E_HEADED: '1'
 ```
+
+### Complementary: Jupyter-Style Test Middleware (Strategy F)
+
+For business-logic validation (load → state → tool → provenance), consider adding a test middleware that exposes webview state to the extension host. This tests the full stack without any iframe/browser dependency and runs in any CI environment. Use this alongside Strategy A:
+
+- **Strategy A** validates: "user sees tracks on the map, clicks a feature, sees results"
+- **Strategy F** validates: "loading a file produces correct state, tool execution produces correct results, provenance is recorded"
 
 ### Fallback: WebdriverIO (Strategy D)
 
