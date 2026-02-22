@@ -137,15 +137,83 @@ test.describe('Real Webview Screenshot', () => {
     await stacHeader.click();
     await page.waitForTimeout(2_000);
 
-    // Wait for the tree to populate with a store row
+    // Wait for the tree to populate with a store row.
+    // If the tree is empty (config missing), seed config via terminal + reload.
     const storeRow = page.locator('.monaco-list-row:has-text("STAC:")').first();
-    await storeRow.waitFor({ state: 'visible', timeout: 15_000 }).catch(async () => {
-      // Diagnostic: capture sidebar state
+    let storeRowVisible = await storeRow.waitFor({ state: 'visible', timeout: 15_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!storeRowVisible) {
+      console.log('  ✗ STAC tree empty — seeding config via terminal + reloading');
       const listRows = await page.locator('.monaco-list-row').allTextContents();
-      console.log(`  ✗ No STAC store row found. Tree rows: ${JSON.stringify(listRows.slice(0, 10))}`);
+      console.log(`  Tree rows: ${JSON.stringify(listRows.slice(0, 10))}`);
       await page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-row.png' });
-      throw new Error('STAC store tree row not visible after 15s');
-    });
+
+      // Write config via terminal (ConfigService only watches existing files,
+      // so we must reload the window for the extension to pick it up)
+      await page.keyboard.press('Control+Backquote');
+      await page.waitForTimeout(2_000);
+      const configCmd =
+        'mkdir -p ~/.config/debrief && ' +
+        'echo \'{"stores":[{"id":"local-store","path":"/workspace/test-workspace/local-store",' +
+        '"displayName":"Test Maritime Data","status":"available"}],"preferences":{}}\' ' +
+        '> ~/.config/debrief/config.json';
+      await page.keyboard.type(configCmd, { delay: 5 });
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(2_000);
+      await page.keyboard.press('Control+Backquote'); // close terminal
+
+      // Reload window so ConfigService re-reads config from disk
+      await page.keyboard.press('Control+Shift+P');
+      await page.waitForTimeout(500);
+      await page.keyboard.type('Developer: Reload Window', { delay: 20 });
+      await page.waitForTimeout(1_000);
+      await page.keyboard.press('Enter');
+
+      // Wait for reload
+      await page.waitForTimeout(10_000);
+
+      // Re-setup route interception (lost after reload)
+      await page.route('**/*.vscode-resource.vscode-cdn.net/**', async (route) => {
+        const url = route.request().url();
+        const pathMatch = url.match(/vscode-cdn\.net(\/.*)/);
+        const filePath = pathMatch ? decodeURIComponent(pathMatch[1]) : null;
+        if (filePath && existsSync(filePath)) {
+          const body = readFileSync(filePath);
+          const ext = filePath.split('.').pop() || '';
+          const ct: Record<string, string> = {
+            js: 'application/javascript', css: 'text/css',
+            png: 'image/png', svg: 'image/svg+xml',
+          };
+          await route.fulfill({ body, contentType: ct[ext] || 'application/octet-stream' });
+        } else {
+          await route.continue();
+        }
+      });
+      await page.route('**/*.tile.openstreetmap.org/**', async (route) => {
+        await route.fulfill({ body: greyPng, contentType: 'image/png' });
+      });
+
+      // Re-navigate to Explorer and find the tree
+      await page.keyboard.press('Control+Shift+E');
+      await page.waitForTimeout(3_000);
+      await stacHeader.waitFor({ state: 'visible', timeout: 30_000 });
+      await stacHeader.click();
+      await page.waitForTimeout(2_000);
+
+      storeRowVisible = await storeRow.waitFor({ state: 'visible', timeout: 15_000 })
+        .then(() => true)
+        .catch(() => false);
+      if (!storeRowVisible) {
+        const rows2 = await page.locator('.monaco-list-row').allTextContents();
+        console.log(`  ✗ Still empty after reload. Tree rows: ${JSON.stringify(rows2.slice(0, 10))}`);
+        await page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-row-after-fix.png' });
+        throw new Error('STAC store tree row not visible even after seeding config + reload');
+      }
+      console.log('  ✓ STAC tree populated after config seed + reload');
+    }
+
     await storeRow.click();
     await page.waitForTimeout(1_000);
 
