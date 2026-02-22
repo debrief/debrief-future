@@ -180,23 +180,53 @@ test.describe('Real Webview Screenshot', () => {
     await debriefIcon.click();
     console.log('  ✓ Clicked Debrief sidebar icon');
 
-    // Wait for the activity panel's #active-frame
-    const sidebarFrame = await waitForActiveFrame(page, 20_000);
-    if (sidebarFrame) {
-      console.log('  ✓ Activity panel #active-frame created');
+    // Wait for the activity panel's #active-frame (second webview, not the map)
+    await page.waitForTimeout(5_000); // Give sidebar webview time to create
 
-      // Check if the React app rendered
-      await page.waitForTimeout(3_000);
-      const rootContent = await sidebarFrame.evaluate(() => {
-        const root = document.getElementById('root');
-        return root ? root.innerHTML.substring(0, 200) : '(no root)';
-      }).catch(() => '(error)');
-      console.log(`  Activity panel #root: ${rootContent.substring(0, 100)}`);
-    } else {
-      console.log('  ✗ Activity panel #active-frame not created');
+    // Find the sidebar frame by looking for activity-panel content
+    let sidebarFrame: import('@playwright/test').Frame | null = null;
+    const hostFrames = page.frames().filter(f =>
+      f.url().includes('workbench/contrib/webview/browser/pre')
+    );
+    console.log(`  Found ${hostFrames.length} webview host frames`);
+
+    for (const host of hostFrames) {
+      const hasActive = await host.evaluate(
+        () => !!document.getElementById('active-frame')
+      ).catch(() => false);
+      if (hasActive && host.childFrames().length > 0) {
+        const child = host.childFrames()[0];
+        const hasActivityPanel = await child.evaluate(
+          () => !!document.querySelector('.debrief-activity-panel')
+        ).catch(() => false);
+        if (hasActivityPanel) {
+          sidebarFrame = child;
+          console.log('  ✓ Found activity panel sidebar frame');
+          break;
+        }
+      }
     }
 
-    // Wait a moment for everything to settle
+    if (!sidebarFrame) {
+      console.log('  ✗ Activity panel sidebar frame not found, trying last host frame...');
+      // Fallback: use the last host frame with an active-frame
+      for (const host of [...hostFrames].reverse()) {
+        const hasActive = await host.evaluate(
+          () => !!document.getElementById('active-frame')
+        ).catch(() => false);
+        if (hasActive && host.childFrames().length > 0) {
+          sidebarFrame = host.childFrames()[0];
+          const rootHTML = await sidebarFrame.evaluate(() => {
+            const root = document.getElementById('root');
+            return root ? root.innerHTML.substring(0, 200) : '(no root)';
+          }).catch(() => '(error)');
+          console.log(`  Fallback frame #root: ${rootHTML.substring(0, 120)}`);
+          break;
+        }
+      }
+    }
+
+    // Wait for React to render
     await page.waitForTimeout(2_000);
 
     // Dismiss any remaining notifications
@@ -206,9 +236,45 @@ test.describe('Real Webview Screenshot', () => {
     }
     await page.waitForTimeout(500);
 
-    // ─── Screenshot ───
+    // ─── Screenshot 1: all sections expanded ───
     await page.screenshot({ path: 'tests/e2e/evidence/real-webview-combined.png' });
-    console.log('  ✓ Combined screenshot saved');
+    console.log('  ✓ Combined screenshot saved (all expanded)');
+
+    // ─── Step 3: Collapse Time Controller and Tools to show Layers ───
+    if (sidebarFrame) {
+      // Click the "Time Controller" section header to collapse it
+      const collapsedTC = await sidebarFrame.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('.debrief-activity-panel__section-header'));
+        const tcBtn = buttons.find(b => b.textContent?.includes('Time Controller'));
+        if (tcBtn) { (tcBtn as HTMLElement).click(); return true; }
+        return false;
+      }).catch(() => false);
+      console.log(`  ${collapsedTC ? '✓' : '✗'} Collapsed Time Controller`);
+
+      await page.waitForTimeout(500);
+
+      // Click the "Tools" section header to collapse it
+      const collapsedTools = await sidebarFrame.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('.debrief-activity-panel__section-header'));
+        const toolsBtn = buttons.find(b => b.textContent?.includes('Tools'));
+        if (toolsBtn) { (toolsBtn as HTMLElement).click(); return true; }
+        return false;
+      }).catch(() => false);
+      console.log(`  ${collapsedTools ? '✓' : '✗'} Collapsed Tools`);
+
+      await page.waitForTimeout(1_000);
+    }
+
+    // Dismiss any remaining notifications
+    const toasts = page.locator('.notification-toast-container .codicon-close');
+    for (let i = 0; i < await toasts.count(); i++) {
+      await toasts.nth(i).click().catch(() => {});
+    }
+    await page.waitForTimeout(500);
+
+    // ─── Screenshot 2: Layers expanded, TC+Tools collapsed ───
+    await page.screenshot({ path: 'tests/e2e/evidence/real-webview-layers-focus.png' });
+    console.log('  ✓ Layers-focus screenshot saved (TC+Tools collapsed)');
 
     // Report frame inventory
     const frames = page.frames();
