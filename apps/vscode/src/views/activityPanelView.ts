@@ -26,6 +26,7 @@ import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { CalcService } from '../services/calcService';
 import type { MatchResult } from '../types/tool';
 import type { Track, ReferenceLocation } from '../types/plot';
+import type { GeoJSONFeature } from '../types/import';
 import type { AssociatedFile } from '../services/stacService';
 
 // Message types from webview
@@ -106,6 +107,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   // Feature data from MapPanel
   private _tracks: Track[] = [];
   private _locations: ReferenceLocation[] = [];
+  private _otherFeatures: GeoJSONFeature[] = [];
 
   // Result files for Associated Files dropdown
   private _resultFiles: AssociatedFile[] = [];
@@ -268,7 +270,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     const hiddenIds: string[] = this._activeSession?.getState().hiddenFeatureIds ?? [];
     const toolMatches: MatchResult[] = this._toolMatchAdapter.getMatchResults();
 
-    // Transform tracks and locations to DebriefFeature format
+    // Transform tracks, locations, and other features to DebriefFeature format
     const features = [
       ...this._tracks.map((track) => ({
         type: 'Feature' as const,
@@ -294,6 +296,12 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
           name: loc.name,
           location_type: loc.locationType ?? 'REFERENCE',
         },
+      })),
+      ...this._otherFeatures.map((f) => ({
+        type: 'Feature' as const,
+        id: (f.properties?.id as string) ?? f.id,
+        geometry: f.geometry,
+        properties: f.properties ?? {},
       })),
     ];
 
@@ -334,9 +342,10 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
    * Set features to display in the layers panel.
    * Called by MapPanel when plot data is loaded/updated.
    */
-  public setFeatures(tracks: Track[], locations: ReferenceLocation[]): void {
+  public setFeatures(tracks: Track[], locations: ReferenceLocation[], otherFeatures: GeoJSONFeature[] = []): void {
     this._tracks = tracks;
     this._locations = locations;
+    this._otherFeatures = otherFeatures;
     this._sendLayersUpdate();
   }
 
