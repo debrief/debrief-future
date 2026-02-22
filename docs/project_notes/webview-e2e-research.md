@@ -137,22 +137,80 @@ test('webview interaction', async ({ codeServerPage }) => {
 
 ### Business Flows That Can Now Be Tested
 
-| Flow | How |
-|------|-----|
-| **Open files** | Inject HTML with Leaflet container, verify map renders |
-| **Change time** | Inject TimeController UI, interact with slider/buttons |
-| **Run tools** | Inject ToolsPanel, click run button, verify results |
-| **Inspect PROV LOG** | Inject LogPanel HTML, verify entries |
+| Flow | How | Status |
+|------|-----|--------|
+| **Open files** | Click STAC tree → map panel with real Leaflet map | **Validated** |
+| **View layers** | Activity panel shows tracks, locations, with collapse/expand | **Validated** |
+| **View tools** | ToolsPanel shows 11 tools with selection requirements | **Validated** (requires debrief-calc installed) |
+| **Change time** | TimeController slider/buttons inside sidebar iframe | Ready to test |
+| **Run tools** | Select features → tools become active → click run | Ready to test |
+| **Inspect PROV LOG** | Execute tool → verify provenance entry recorded | Ready to test |
 
-### For testing with REAL extension content:
+### Real Extension Content (Validated)
 
-The interceptor sends any HTML you provide. To test with the actual extension bundle:
+Both the **map panel** (editor webview) and **activity panel** (sidebar webview) have been validated
+running with real extension bundles in E2E tests. The approach:
 
-1. Read the extension's built `activityPanel.js` from `apps/vscode/dist/webview/`
-2. Construct the HTML that `_getHtmlContent()` would produce
-3. Use `webview.asWebviewUri()` equivalent paths for script sources
+#### Map Panel (Editor Webview)
+- Opens automatically when a STAC plot is clicked in the tree view
+- Uses **route interception** for `vscode-resource.vscode-cdn.net` URLs (DNS unreachable in sandbox)
+- Playwright `page.route()` serves files from the local extension installation
+- Real Leaflet map renders with track symbols, time labels, shapes, reference areas
 
-Alternatively, test the React components in isolation (Storybook/Vitest) for rendering correctness, and use this E2E approach for integration verification.
+#### Activity Panel (Sidebar Webview)
+- Uses **MessagePort injection** with the real `activityPanel.js` bundle inlined
+- `buildActivityPanelHtml()` reads the bundle from the installed extension and inlines it (avoids cross-origin issues in blob iframe)
+- Real React components render: TimeController, ToolsPanel, LayersToolbar + FeatureList
+- Collapsible sections work (click section headers via `frame.evaluate()`)
+
+#### debrief-calc Connection
+- **Architecture:** subprocess CLI, NOT an MCP server
+- Extension spawns `python -m debrief_calc.cli` with JSON on stdin, reads stdout
+- **Validation:** `calcService.checkAvailability()` checks: (1) Python interpreter accessible, (2) `import debrief_calc` succeeds
+- **Python path resolution:** Setting `debrief.calc.pythonPath` > workspace `.venv/bin/python` (walks up 5 dirs) > system `python`
+- **Circuit breaker:** 3 failures = skip for 30s
+- **In E2E env:** `pip install -e services/calc` + set `debrief.calc.pythonPath` in code-server User settings
+- When connected: 11 tools appear with selection requirements (e.g., "Need 1 TRACK, have 0")
+
+#### Route Interceptor Pattern
+```typescript
+await page.route('**/*.vscode-resource.vscode-cdn.net/**', async (route) => {
+  const url = route.request().url();
+  const pathMatch = url.match(/vscode-cdn\.net(\/.*)/);
+  const filePath = pathMatch ? decodeURIComponent(pathMatch[1]) : null;
+  if (filePath && existsSync(filePath)) {
+    const body = readFileSync(filePath);
+    await route.fulfill({ body, contentType: inferContentType(filePath) });
+  } else {
+    await route.continue();
+  }
+});
+```
+
+#### Finding the Correct Sidebar Frame
+The page may contain multiple webview host frames (map + sidebar). To find the sidebar:
+```typescript
+const hostFrames = page.frames().filter(f =>
+  f.url().includes('workbench/contrib/webview/browser/pre')
+);
+for (const host of hostFrames) {
+  const child = host.childFrames()[0];
+  const isActivityPanel = await child.evaluate(
+    () => !!document.querySelector('.debrief-activity-panel')
+  ).catch(() => false);
+  if (isActivityPanel) { sidebarFrame = child; break; }
+}
+```
+
+#### Interacting with React Components Inside Webview
+```typescript
+// Collapse a section by clicking its header button
+await sidebarFrame.evaluate(() => {
+  const buttons = document.querySelectorAll('.debrief-activity-panel__section-header');
+  const tcBtn = Array.from(buttons).find(b => b.textContent?.includes('Time Controller'));
+  if (tcBtn) (tcBtn as HTMLElement).click();
+});
+```
 
 ---
 
@@ -193,10 +251,19 @@ Alternatively, test the React components in isolation (Storybook/Vitest) for ren
 ### New files:
 - `tests/e2e/scripts/patch-webview.sh` — Automated patching script
 - `tests/e2e/helpers/webview-injector.ts` — Test helper for content injection
-- `tests/e2e/test-webview-probe.spec.ts` — Proof-of-concept tests
+- `tests/e2e/test-webview-probe.spec.ts` — Proof-of-concept tests (injected HTML)
+- `tests/e2e/test-real-webview.spec.ts` — Real extension bundle tests (map + activity panel)
+
+### Evidence screenshots:
+- `tests/e2e/evidence/real-webview-combined.png` — Map + activity panel, tools connected
+- `tests/e2e/evidence/real-webview-layers-focus.png` — TC+Tools collapsed, Layers expanded
 
 ### Modified files:
 - `tests/e2e/playwright.config.ts` — Added `E2E_HEADED` env var support
+
+### Environment setup for debrief-calc:
+- `pip install -e services/calc` — Install debrief-calc in system Python
+- code-server User settings: `"debrief.calc.pythonPath": "/usr/local/bin/python"`
 
 ### Runtime patches (NOT in repo, applied by patch-webview.sh):
 - `<code-server>/lib/vscode/out/vs/workbench/contrib/webview/browser/pre/index.html`
