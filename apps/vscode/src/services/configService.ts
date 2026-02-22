@@ -29,6 +29,8 @@ export class ConfigService {
   private config: DebriefConfig | null = null;
   private configWatcher: fs.FSWatcher | null = null;
   private changeListeners: Array<() => void> = [];
+  /** Timestamp of last self-write — used to ignore watcher events from our own saves. */
+  private lastSaveTime = 0;
 
   constructor() {
     this.ensureConfigDir();
@@ -136,6 +138,12 @@ export class ConfigService {
 
     const store = this.config.stores.find((s) => s.id === storeId);
     if (!store) {
+      return;
+    }
+
+    // Skip save when nothing actually changed — avoids triggering the
+    // file watcher → loadConfig → notifyListeners → tree refresh loop.
+    if (store.status === status && store.errorMessage === errorMessage) {
       return;
     }
 
@@ -289,6 +297,7 @@ export class ConfigService {
   private saveConfig(): Promise<void> {
     try {
       this.ensureConfigDir();
+      this.lastSaveTime = Date.now();
       fs.writeFileSync(CONFIG_FILE, JSON.stringify(this.config, null, 2));
       return Promise.resolve();
     } catch (err) {
@@ -303,6 +312,11 @@ export class ConfigService {
       if (fs.existsSync(CONFIG_FILE)) {
         this.configWatcher = fs.watch(CONFIG_FILE, (eventType) => {
           if (eventType === 'change') {
+            // Ignore watcher events triggered by our own saves — prevents
+            // an infinite loadConfig → notifyListeners → tree refresh loop.
+            if (Date.now() - this.lastSaveTime < 500) {
+              return;
+            }
             this.loadConfig();
             this.notifyListeners();
           }

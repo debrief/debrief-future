@@ -267,27 +267,39 @@ test.describe('Real Webview Screenshot', () => {
     }
     await page.waitForTimeout(2_000);
 
-    // Wait for catalog child row ("2 plots") to appear after expansion
+    // Wait for tree children to appear.  Two possible layouts after expansion:
+    //   A) Store → Catalog ("2 plots") → [collapsed]  — need to expand catalog
+    //   B) Store → Catalog → Exercise Alpha            — VS Code auto-expanded catalog
+    // Race for whichever appears first.
     const catalogNode = page.locator('.monaco-list-row:has-text("2 plots")').first();
-    await catalogNode.waitFor({ state: 'visible', timeout: 15_000 }).catch(async () => {
-      // Diagnostics: dump all visible tree rows
+    const plotNode = page.locator('.monaco-list-row:has-text("Exercise Alpha")').first();
+
+    const firstVisible = await Promise.race([
+      catalogNode.waitFor({ state: 'visible', timeout: 20_000 }).then(() => 'catalog' as const),
+      plotNode.waitFor({ state: 'visible', timeout: 20_000 }).then(() => 'plot' as const),
+    ]).catch(async () => {
       const allRows = await page.locator('.monaco-list-row').allTextContents();
-      console.log(`  ✗ Catalog "2 plots" not found. Tree rows: ${JSON.stringify(allRows.slice(0, 10))}`);
+      console.log(`  ✗ Neither catalog nor plot rows found. Tree rows: ${JSON.stringify(allRows.slice(0, 15))}`);
       await page.screenshot({ path: 'tests/e2e/evidence/debug-no-catalog-row.png' });
-      throw new Error('Catalog row with "2 plots" not visible after expanding store');
+      throw new Error('Neither catalog ("2 plots") nor plot ("Exercise Alpha") visible after expanding store');
     });
 
-    // Expand the catalog to show individual plot items
-    const catalogTwistie = catalogNode.locator('.monaco-tl-twistie');
-    const catalogCollapsed = await catalogTwistie.evaluate(
-      (el) => el.classList.contains('collapsed')
-    ).catch(() => true);
-    if (catalogCollapsed) {
-      await catalogTwistie.click();
-    }
-    await page.waitForTimeout(2_000);
+    console.log(`  ✓ Found ${firstVisible} row after expanding store`);
 
-    await page.locator('.monaco-list-row:has-text("Exercise Alpha")').first().click();
+    if (firstVisible === 'catalog') {
+      // Expand the catalog to show individual plot items
+      const catalogTwistie = catalogNode.locator('.monaco-tl-twistie');
+      const catalogCollapsed = await catalogTwistie.evaluate(
+        (el) => el.classList.contains('collapsed')
+      ).catch(() => true);
+      if (catalogCollapsed) {
+        await catalogTwistie.click();
+      }
+      await page.waitForTimeout(2_000);
+    }
+
+    await plotNode.waitFor({ state: 'visible', timeout: 10_000 });
+    await plotNode.click();
     console.log('  ✓ Opened Exercise Alpha (map panel)');
 
     // Wait for map webview to render
