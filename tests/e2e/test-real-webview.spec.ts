@@ -121,11 +121,32 @@ test.describe('Real Webview Screenshot', () => {
 
     // ─── Step 1: Open the plot via STAC tree (map in editor) ───
 
+    // Navigate to Explorer view first (ensure sidebar is showing the tree views)
+    await page.keyboard.press('Control+Shift+E');
+    await page.waitForTimeout(2_000);
+
+    // Wait for the STAC STORES pane header to appear (extension must be activated)
     const stacHeader = page.locator('.pane-header:has-text("STAC STORES")');
+    await stacHeader.waitFor({ state: 'visible', timeout: 30_000 }).catch(async () => {
+      // Diagnostic: capture what's visible in the sidebar
+      const paneHeaders = await page.locator('.pane-header').allTextContents();
+      console.log(`  ✗ STAC STORES pane not found. Visible panes: ${JSON.stringify(paneHeaders)}`);
+      await page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-pane.png' });
+      throw new Error('STAC STORES pane header not visible after 30s');
+    });
     await stacHeader.click();
     await page.waitForTimeout(2_000);
 
-    await page.locator('.monaco-list-row:has-text("STAC:")').first().click();
+    // Wait for the tree to populate with a store row
+    const storeRow = page.locator('.monaco-list-row:has-text("STAC:")').first();
+    await storeRow.waitFor({ state: 'visible', timeout: 15_000 }).catch(async () => {
+      // Diagnostic: capture sidebar state
+      const listRows = await page.locator('.monaco-list-row').allTextContents();
+      console.log(`  ✗ No STAC store row found. Tree rows: ${JSON.stringify(listRows.slice(0, 10))}`);
+      await page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-row.png' });
+      throw new Error('STAC store tree row not visible after 15s');
+    });
+    await storeRow.click();
     await page.waitForTimeout(1_000);
 
     const catalogNode = page.locator('.monaco-list-row:has-text("2 plots")').first();
