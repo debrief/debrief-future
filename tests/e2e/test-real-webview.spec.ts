@@ -255,15 +255,35 @@ test.describe('Real Webview Screenshot', () => {
       console.log('  ✓ STAC tree populated after config seed + reload');
     }
 
-    await storeRow.click();
-    await page.waitForTimeout(1_000);
+    // Expand the store row if it isn't already expanded.
+    // VS Code may auto-expand single-root tree nodes, so blindly clicking
+    // could COLLAPSE the store. Check the twistie state first.
+    const storeTwistie = storeRow.locator('.monaco-tl-twistie');
+    const storeCollapsed = await storeTwistie.evaluate(
+      (el) => el.classList.contains('collapsed')
+    ).catch(() => true);
+    if (storeCollapsed) {
+      await storeTwistie.click();
+    }
+    await page.waitForTimeout(2_000);
 
+    // Wait for catalog child row ("2 plots") to appear after expansion
     const catalogNode = page.locator('.monaco-list-row:has-text("2 plots")').first();
-    const twistie = catalogNode.locator('.monaco-tl-twistie');
-    if (await twistie.isVisible().catch(() => false)) {
-      await twistie.click();
-    } else {
-      await catalogNode.click();
+    await catalogNode.waitFor({ state: 'visible', timeout: 15_000 }).catch(async () => {
+      // Diagnostics: dump all visible tree rows
+      const allRows = await page.locator('.monaco-list-row').allTextContents();
+      console.log(`  ✗ Catalog "2 plots" not found. Tree rows: ${JSON.stringify(allRows.slice(0, 10))}`);
+      await page.screenshot({ path: 'tests/e2e/evidence/debug-no-catalog-row.png' });
+      throw new Error('Catalog row with "2 plots" not visible after expanding store');
+    });
+
+    // Expand the catalog to show individual plot items
+    const catalogTwistie = catalogNode.locator('.monaco-tl-twistie');
+    const catalogCollapsed = await catalogTwistie.evaluate(
+      (el) => el.classList.contains('collapsed')
+    ).catch(() => true);
+    if (catalogCollapsed) {
+      await catalogTwistie.click();
     }
     await page.waitForTimeout(2_000);
 
