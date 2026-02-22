@@ -1,25 +1,89 @@
 /**
- * Screenshot: real VS Code extension webview with Leaflet map.
+ * Screenshot: real VS Code extension webview with Leaflet map + activity panel.
  *
- * Opens a STAC plot via the tree view, intercepts vscode-resource URLs
- * (which fail in sandboxed envs), and captures the real Leaflet map
- * rendering tracks from Exercise Alpha.
+ * Opens a STAC plot via the tree view, then opens the Debrief sidebar
+ * activity panel. Uses two workarounds:
  *
- * Two workarounds needed:
- * 1. vscode-resource.vscode-cdn.net URLs → serve files from local filesystem
- * 2. OSM tile URLs → serve placeholder tiles (no internet in sandbox)
+ * 1. Route interception for vscode-resource.vscode-cdn.net URLs
+ *    (DNS fails in sandboxed envs, serve from local filesystem)
+ * 2. MessagePort injection for the sidebar webview
+ *    (resolveWebviewView never sends content in code-server)
+ *
+ * The activity panel HTML is constructed to match what the extension
+ * would generate, loading the real activityPanel.js bundle.
  */
 import { test, expect } from './fixtures/base';
 import { readFileSync, existsSync } from 'fs';
+import {
+  installWebviewInterceptor,
+  removeCodeServerServiceWorker,
+  waitForActiveFrame,
+} from './helpers/webview-injector';
+
+// The extension URI root in the code-server installation
+const EXT_ROOT = '/root/.local/share/code-server/extensions/debrief.debrief-vscode-0.1.0';
+
+/**
+ * Build the activity panel HTML matching what _getHtmlContent() generates,
+ * but with the script loaded via a file:// URL that our route interceptor
+ * can serve. We strip the CSP to allow loading.
+ */
+function buildActivityPanelHtml(): string {
+  // Read the real bundle and inline it (avoids cross-origin issues in blob iframe)
+  const bundlePath = `${EXT_ROOT}/dist/webview/activityPanel.js`;
+  const bundleJs = existsSync(bundlePath) ? readFileSync(bundlePath, 'utf-8') : '';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activity Panel</title>
+  <style>
+    :root {
+      --debrief-bg-primary: var(--vscode-sideBar-background);
+      --debrief-bg-secondary: var(--vscode-input-background);
+      --debrief-bg-tertiary: var(--vscode-list-hoverBackground);
+      --debrief-text-primary: var(--vscode-foreground);
+      --debrief-text-secondary: var(--vscode-descriptionForeground);
+      --debrief-border-color: var(--vscode-panel-border);
+      --debrief-border-color-focus: var(--vscode-focusBorder);
+      --debrief-accent: var(--vscode-focusBorder);
+      --debrief-accent-hover: var(--vscode-focusBorder);
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--vscode-sideBar-background);
+      font-family: var(--vscode-font-family);
+      font-size: var(--vscode-font-size);
+      color: var(--vscode-foreground);
+      overflow: hidden;
+    }
+    #root {
+      width: 100%;
+      height: 100vh;
+    }
+    .activity-panel-webview {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>${bundleJs}</script>
+</body>
+</html>`;
+}
 
 test.describe('Real Webview Screenshot', () => {
   test.setTimeout(120_000);
 
-  test('open plot via STAC tree and capture Leaflet map', async ({ codeServerPage }) => {
+  test('map panel + activity panel combined', async ({ codeServerPage }) => {
     const page = codeServerPage.page;
 
-    // ─── Set up route interception BEFORE opening the plot ───
-    // Intercept vscode-resource URLs and serve from local filesystem
+    // ─── Set up route interception for vscode-resource URLs ───
     await page.route('**/*.vscode-resource.vscode-cdn.net/**', async (route) => {
       const url = route.request().url();
       const pathMatch = url.match(/vscode-cdn\.net(\/.*)/);
@@ -27,30 +91,23 @@ test.describe('Real Webview Screenshot', () => {
       if (filePath && existsSync(filePath)) {
         const body = readFileSync(filePath);
         const ext = filePath.split('.').pop() || '';
-        const contentType: Record<string, string> = {
-          js: 'application/javascript',
-          css: 'text/css',
-          png: 'image/png',
-          svg: 'image/svg+xml',
-          json: 'application/json',
+        const ct: Record<string, string> = {
+          js: 'application/javascript', css: 'text/css',
+          png: 'image/png', svg: 'image/svg+xml',
         };
-        await route.fulfill({
-          body,
-          contentType: contentType[ext] || 'application/octet-stream',
-        });
+        await route.fulfill({ body, contentType: ct[ext] || 'application/octet-stream' });
       } else {
         await route.continue();
       }
     });
 
-    // Intercept OSM tile requests → serve a light grey tile
-    // Creates a 1x1 pixel PNG as placeholder (no internet in sandbox)
-    const greyPixelPng = Buffer.from(
+    // Placeholder for OSM tiles
+    const greyPng = Buffer.from(
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12NgwAcAAB0AAe3d7qkAAAAASUVORK5CYII=',
       'base64'
     );
     await page.route('**/*.tile.openstreetmap.org/**', async (route) => {
-      await route.fulfill({ body: greyPixelPng, contentType: 'image/png' });
+      await route.fulfill({ body: greyPng, contentType: 'image/png' });
     });
 
     // Wait for extension
@@ -61,18 +118,16 @@ test.describe('Real Webview Screenshot', () => {
     for (let i = 0; i < await closeButtons.count(); i++) {
       await closeButtons.nth(i).click().catch(() => {});
     }
-    await page.waitForTimeout(500);
 
-    // ─── Navigate STAC tree: Store → Catalog → Plot ───
+    // ─── Step 1: Open the plot via STAC tree (map in editor) ───
+
     const stacHeader = page.locator('.pane-header:has-text("STAC STORES")');
     await stacHeader.click();
     await page.waitForTimeout(2_000);
 
-    // Expand store
     await page.locator('.monaco-list-row:has-text("STAC:")').first().click();
     await page.waitForTimeout(1_000);
 
-    // Expand catalog
     const catalogNode = page.locator('.monaco-list-row:has-text("2 plots")').first();
     const twistie = catalogNode.locator('.monaco-tl-twistie');
     if (await twistie.isVisible().catch(() => false)) {
@@ -82,17 +137,14 @@ test.describe('Real Webview Screenshot', () => {
     }
     await page.waitForTimeout(2_000);
 
-    // Click Exercise Alpha
     await page.locator('.monaco-list-row:has-text("Exercise Alpha")').first().click();
-    console.log('  ✓ Clicked Exercise Alpha');
+    console.log('  ✓ Opened Exercise Alpha (map panel)');
 
-    // Wait for webview
+    // Wait for map webview to render
     await page.locator('iframe.webview').first().waitFor({ state: 'attached', timeout: 30_000 });
-    console.log('  ✓ Webview attached');
 
-    // Wait for #active-frame and Leaflet
-    let hasLeaflet = false;
-    for (let i = 0; i < 20; i++) {
+    // Poll for Leaflet
+    for (let i = 0; i < 15; i++) {
       const hostFrame = page.frames().find(f =>
         f.url().includes('webview/browser/pre/index.html')
       );
@@ -101,12 +153,11 @@ test.describe('Real Webview Screenshot', () => {
           () => !!document.getElementById('active-frame')
         ).catch(() => false);
         if (hasActive && hostFrame.childFrames().length > 0) {
-          const inner = hostFrame.childFrames()[0];
-          hasLeaflet = await inner.evaluate(
+          const hasLeaflet = await hostFrame.childFrames()[0].evaluate(
             () => !!document.querySelector('.leaflet-container')
           ).catch(() => false);
           if (hasLeaflet) {
-            console.log(`  ✓ Leaflet map rendered after ~${i}s`);
+            console.log(`  ✓ Leaflet map rendered`);
             break;
           }
         }
@@ -114,43 +165,62 @@ test.describe('Real Webview Screenshot', () => {
       await page.waitForTimeout(1_000);
     }
 
-    if (!hasLeaflet) {
-      console.log('  ✗ Leaflet did not render');
+    // ─── Step 2: Open the Debrief sidebar with activity panel ───
+
+    // Build the real activity panel HTML with inlined JS bundle
+    const activityHtml = buildActivityPanelHtml();
+    console.log(`  Activity panel HTML size: ${activityHtml.length} bytes`);
+
+    // Install the MessagePort interceptor before clicking the sidebar icon
+    await installWebviewInterceptor(page, { html: activityHtml });
+    await removeCodeServerServiceWorker(page);
+
+    // Click the Debrief activity bar icon to open the sidebar
+    const debriefIcon = page.locator('.action-item a[aria-label="Debrief"]').first();
+    await debriefIcon.click();
+    console.log('  ✓ Clicked Debrief sidebar icon');
+
+    // Wait for the activity panel's #active-frame
+    const sidebarFrame = await waitForActiveFrame(page, 20_000);
+    if (sidebarFrame) {
+      console.log('  ✓ Activity panel #active-frame created');
+
+      // Check if the React app rendered
+      await page.waitForTimeout(3_000);
+      const rootContent = await sidebarFrame.evaluate(() => {
+        const root = document.getElementById('root');
+        return root ? root.innerHTML.substring(0, 200) : '(no root)';
+      }).catch(() => '(error)');
+      console.log(`  Activity panel #root: ${rootContent.substring(0, 100)}`);
+    } else {
+      console.log('  ✗ Activity panel #active-frame not created');
     }
 
-    // Wait for tracks to render
-    await page.waitForTimeout(3_000);
+    // Wait a moment for everything to settle
+    await page.waitForTimeout(2_000);
 
-    // Dismiss the "Session changes were discarded" warning if present
-    const warnClose = page.locator('.notification-toast-container .codicon-close');
-    for (let i = 0; i < await warnClose.count(); i++) {
-      await warnClose.nth(i).click().catch(() => {});
+    // Dismiss any remaining notifications
+    const warnings = page.locator('.notification-toast-container .codicon-close');
+    for (let i = 0; i < await warnings.count(); i++) {
+      await warnings.nth(i).click().catch(() => {});
     }
     await page.waitForTimeout(500);
 
-    // Screenshot
-    await page.screenshot({ path: 'tests/e2e/evidence/real-webview-map.png' });
-    console.log('  ✓ Screenshot saved: real-webview-map.png');
+    // ─── Screenshot ───
+    await page.screenshot({ path: 'tests/e2e/evidence/real-webview-combined.png' });
+    console.log('  ✓ Combined screenshot saved');
 
-    // Verify map content from Playwright
-    const hostFrame = page.frames().find(f =>
-      f.url().includes('webview/browser/pre/index.html')
-    );
-    if (hostFrame && hostFrame.childFrames().length > 0) {
-      const inner = hostFrame.childFrames()[0];
-      const mapStats = await inner.evaluate(() => {
-        const container = document.querySelector('.leaflet-container');
-        const paths = document.querySelectorAll('.leaflet-overlay-pane path');
-        const markers = document.querySelectorAll('.leaflet-marker-pane *');
-        const tiles = document.querySelectorAll('.leaflet-tile');
-        return {
-          containerSize: container ? `${container.clientWidth}x${container.clientHeight}` : 'none',
-          pathCount: paths.length,
-          markerCount: markers.length,
-          tileCount: tiles.length,
-        };
-      }).catch(() => null);
-      console.log(`  Map stats: ${JSON.stringify(mapStats)}`);
+    // Report frame inventory
+    const frames = page.frames();
+    console.log(`\n  Total frames: ${frames.length}`);
+    for (const frame of frames) {
+      const url = frame.url();
+      if (url.includes('webview/browser/pre')) {
+        const hasActive = await frame.evaluate(
+          () => !!document.getElementById('active-frame')
+        ).catch(() => false);
+        console.log(`    webview: ${url.substring(0, 80)}... active-frame: ${hasActive}`);
+      }
     }
   });
 });
