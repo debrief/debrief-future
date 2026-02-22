@@ -19,6 +19,7 @@ import { fileURLToPath } from 'url';
  * - CODE_SERVER_URL: Base URL for code-server (default: http://localhost:8080)
  * - CHROMIUM_PATH: Path to chromium binary (overrides all other resolution)
  * - CLAUDE_CODE: Set to '1' to enable sandboxed chromium flags
+ * - E2E_HEADED: Set to '1' to run in headed mode (use with xvfb-run in CI)
  *
  * @see tests/e2e/scripts/ensure-chromium.sh
  * @see docs/project_notes/playwright-installation-research.md
@@ -34,6 +35,7 @@ if (!chromiumPath && existsSync(chromiumPathFile)) {
   chromiumPath = readFileSync(chromiumPathFile, 'utf8').trim();
 }
 const useSandboxedChromium = !!chromiumPath || process.env.CLAUDE_CODE === '1';
+const useHeadedMode = process.env.E2E_HEADED === '1';
 
 const CODE_SERVER_URL = process.env.CODE_SERVER_URL ?? 'http://localhost:8080';
 
@@ -43,10 +45,13 @@ const CODE_SERVER_URL = process.env.CODE_SERVER_URL ?? 'http://localhost:8080';
 // docs/project_notes/playwright-installation-research.md). Instead we use
 // --disable-features=IsolateOrigins,site-per-process which achieves sandbox
 // compatibility without crashing.
+//
+// E2E_HEADED=1 switches to headed mode for webview testing.
+// Use with xvfb-run in CI: xvfb-run --auto-servernum npx playwright test ...
 const launchOptions = useSandboxedChromium
   ? {
       executablePath: chromiumPath,
-      headless: true,
+      headless: !useHeadedMode,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
