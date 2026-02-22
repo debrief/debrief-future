@@ -121,21 +121,61 @@ test.describe('Real Webview Screenshot', () => {
 
     // ─── Step 1: Open the plot via STAC tree (map in editor) ───
 
+    // Helper: ensure the STAC STORES pane is expanded (not collapsed).
+    // Clicking the pane header TOGGLES expand/collapse, so we must check
+    // the aria-expanded attribute first to avoid collapsing an already-open pane.
+    const stacHeader = page.locator('.pane-header:has-text("STAC STORES")');
+    const ensureStacPaneExpanded = async (): Promise<void> => {
+      await stacHeader.waitFor({ state: 'visible', timeout: 30_000 }).catch(async () => {
+        const paneHeaders = await page.locator('.pane-header').allTextContents();
+        console.log(`  ✗ STAC STORES pane not found. Visible panes: ${JSON.stringify(paneHeaders)}`);
+        await page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-pane.png' });
+        throw new Error('STAC STORES pane header not visible after 30s');
+      });
+
+      // Check expansion state — only click if collapsed
+      const expanded = await stacHeader.getAttribute('aria-expanded');
+      console.log(`  STAC STORES pane aria-expanded: ${expanded}`);
+      if (expanded === 'false') {
+        console.log('  Clicking to expand STAC STORES pane');
+        await stacHeader.click();
+        await page.waitForTimeout(1_500);
+      } else if (expanded === null) {
+        // aria-expanded not present — pane may use different DOM; try scrolling into view
+        console.log('  No aria-expanded attribute; clicking header to toggle');
+        await stacHeader.click();
+        await page.waitForTimeout(1_500);
+        // Verify we didn't collapse it — check if any list rows appeared
+        const hasRows = await page.locator('.monaco-list-row').count();
+        if (hasRows === 0) {
+          // We collapsed it; click again to re-expand
+          console.log('  No rows visible after click — re-clicking to expand');
+          await stacHeader.click();
+          await page.waitForTimeout(1_500);
+        }
+      }
+    };
+
+    // Helper: capture diagnostic info about the STAC pane state
+    const captureStacDiagnostics = async (label: string): Promise<void> => {
+      const listRows = await page.locator('.monaco-list-row').allTextContents();
+      console.log(`  [${label}] Tree rows: ${JSON.stringify(listRows.slice(0, 10))}`);
+      // Check for welcome view text (indicates config is empty vs pane collapsed)
+      const noStoresWelcome = await page.getByText('No STAC stores configured').isVisible().catch(() => false);
+      const loadingWelcome = await page.getByText('Loading stores').isVisible().catch(() => false);
+      if (noStoresWelcome) console.log(`  [${label}] Welcome view: "No STAC stores configured" — config is empty`);
+      if (loadingWelcome) console.log(`  [${label}] Welcome view: "Loading stores…" — extension still initializing`);
+      if (!noStoresWelcome && !loadingWelcome && listRows.length === 0) {
+        console.log(`  [${label}] No tree rows and no welcome view — pane may be collapsed or not rendered`);
+      }
+    };
+
     // Navigate to Explorer view first (ensure sidebar is showing the tree views)
     await page.keyboard.press('Control+Shift+E');
     await page.waitForTimeout(2_000);
 
-    // Wait for the STAC STORES pane header to appear (extension must be activated)
-    const stacHeader = page.locator('.pane-header:has-text("STAC STORES")');
-    await stacHeader.waitFor({ state: 'visible', timeout: 30_000 }).catch(async () => {
-      // Diagnostic: capture what's visible in the sidebar
-      const paneHeaders = await page.locator('.pane-header').allTextContents();
-      console.log(`  ✗ STAC STORES pane not found. Visible panes: ${JSON.stringify(paneHeaders)}`);
-      await page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-pane.png' });
-      throw new Error('STAC STORES pane header not visible after 30s');
-    });
-    await stacHeader.click();
-    await page.waitForTimeout(2_000);
+    // Ensure the STAC STORES pane is expanded
+    await ensureStacPaneExpanded();
 
     // Wait for the tree to populate with a store row.
     // If the tree is empty (config missing), seed config via terminal + reload.
@@ -145,10 +185,10 @@ test.describe('Real Webview Screenshot', () => {
       .catch(() => false);
 
     if (!storeRowVisible) {
-      console.log('  ✗ STAC tree empty — seeding config via terminal + reloading');
-      const listRows = await page.locator('.monaco-list-row').allTextContents();
-      console.log(`  Tree rows: ${JSON.stringify(listRows.slice(0, 10))}`);
+      await captureStacDiagnostics('initial');
       await page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-row.png' });
+
+      console.log('  ✗ STAC tree empty — seeding config via terminal + reloading');
 
       // Write config via terminal (ConfigService only watches existing files,
       // so we must reload the window for the extension to pick it up)
@@ -171,8 +211,12 @@ test.describe('Real Webview Screenshot', () => {
       await page.waitForTimeout(1_000);
       await page.keyboard.press('Enter');
 
-      // Wait for reload
-      await page.waitForTimeout(10_000);
+      // Wait for reload — poll for the page to stabilize rather than fixed timeout.
+      // After reload, the workbench re-renders from scratch.
+      await page.waitForTimeout(5_000);
+      // Wait for the workbench shell to be ready (sidebar visible)
+      await page.locator('.monaco-workbench').waitFor({ state: 'visible', timeout: 30_000 });
+      await page.waitForTimeout(3_000);
 
       // Re-setup route interception (lost after reload)
       await page.route('**/*.vscode-resource.vscode-cdn.net/**', async (route) => {
@@ -195,19 +239,16 @@ test.describe('Real Webview Screenshot', () => {
         await route.fulfill({ body: greyPng, contentType: 'image/png' });
       });
 
-      // Re-navigate to Explorer and find the tree
+      // Re-navigate to Explorer and ensure STAC pane is expanded
       await page.keyboard.press('Control+Shift+E');
       await page.waitForTimeout(3_000);
-      await stacHeader.waitFor({ state: 'visible', timeout: 30_000 });
-      await stacHeader.click();
-      await page.waitForTimeout(2_000);
+      await ensureStacPaneExpanded();
 
       storeRowVisible = await storeRow.waitFor({ state: 'visible', timeout: 15_000 })
         .then(() => true)
         .catch(() => false);
       if (!storeRowVisible) {
-        const rows2 = await page.locator('.monaco-list-row').allTextContents();
-        console.log(`  ✗ Still empty after reload. Tree rows: ${JSON.stringify(rows2.slice(0, 10))}`);
+        await captureStacDiagnostics('after-reload');
         await page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-row-after-fix.png' });
         throw new Error('STAC store tree row not visible even after seeding config + reload');
       }

@@ -226,15 +226,18 @@ export class ConfigService {
 
   private loadConfig(): void {
     try {
+      console.log(`[ConfigService] config path: ${CONFIG_FILE}`);
       if (fs.existsSync(CONFIG_FILE)) {
         const content = fs.readFileSync(CONFIG_FILE, 'utf-8');
         const rawConfig = JSON.parse(content) as DebriefConfig;
         this.config = this.migrateConfig(rawConfig);
+        console.log(`[ConfigService] loaded ${this.config.stores.length} store(s)`);
       } else {
+        console.log('[ConfigService] config file not found, using defaults');
         this.config = { stores: [], preferences: {} };
       }
     } catch (err) {
-      console.error('Failed to load config:', err);
+      console.error('[ConfigService] failed to load config:', err);
       this.config = { stores: [], preferences: {} };
     }
   }
