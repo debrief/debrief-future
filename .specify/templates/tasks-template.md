@@ -148,6 +148,16 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T0XX [P] [US1] Add interaction tests for user flows
 - [ ] T0XX [US1] Run e2e tests: `pnpm --filter @debrief/components test:e2e [Component]`
 
+### VS Code Webview E2E Tests for User Story 1 (REQUIRED for extension workflows) 🖥️
+
+> **NOTE**: Include this section when the user story involves VS Code extension workflows (opening files, running commands, interacting with webview panels).
+> See plan.md "VS Code Webview E2E Testing" section for which workflows need tests.
+> Full architecture guide: `docs/e2e-testing-guide.md`
+
+- [ ] T0XX [P] [US1] Update page objects in `tests/e2e/models/` with new selectors
+- [ ] T0XX [P] [US1] Create Playwright test `tests/e2e/test-[workflow].spec.ts`
+- [ ] T0XX [US1] Run webview e2e tests: `xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts test-[workflow]`
+
 ### Implementation for User Story 1
 
 - [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
@@ -253,6 +263,15 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] Dark theme: `screenshots/component-dark.png`
 - [ ] VS Code theme: `screenshots/component-vscode.png`
 ```
+
+### VS Code Webview E2E Evidence Collection (REQUIRED for extension workflows) 🖥️
+
+> **Purpose**: Capture workflow evidence from VS Code webview tests
+> Full guide: `docs/e2e-testing-guide.md`
+
+- [ ] TXXX Run webview e2e suite: `xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts`
+- [ ] TXXX [P] Capture workflow screenshots to tests/e2e/evidence/
+- [ ] TXXX Document webview e2e results in evidence/webview-e2e-summary.md
 
 **Checkpoint**: Evidence collected - ready for PR creation via `/speckit.pr`
 

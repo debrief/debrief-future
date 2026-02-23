@@ -29,6 +29,8 @@ export class ConfigService {
   private config: DebriefConfig | null = null;
   private configWatcher: fs.FSWatcher | null = null;
   private changeListeners: Array<() => void> = [];
+  /** Timestamp of last self-write — used to ignore watcher events from our own saves. */
+  private lastSaveTime = 0;
 
   constructor() {
     this.ensureConfigDir();
@@ -139,6 +141,12 @@ export class ConfigService {
       return;
     }
 
+    // Skip save when nothing actually changed — avoids triggering the
+    // file watcher → loadConfig → notifyListeners → tree refresh loop.
+    if (store.status === status && store.errorMessage === errorMessage) {
+      return;
+    }
+
     store.status = status;
     store.errorMessage = errorMessage;
 
@@ -226,15 +234,18 @@ export class ConfigService {
 
   private loadConfig(): void {
     try {
+      console.log(`[ConfigService] config path: ${CONFIG_FILE}`);
       if (fs.existsSync(CONFIG_FILE)) {
         const content = fs.readFileSync(CONFIG_FILE, 'utf-8');
         const rawConfig = JSON.parse(content) as DebriefConfig;
         this.config = this.migrateConfig(rawConfig);
+        console.log(`[ConfigService] loaded ${this.config.stores.length} store(s)`);
       } else {
+        console.log('[ConfigService] config file not found, using defaults');
         this.config = { stores: [], preferences: {} };
       }
     } catch (err) {
-      console.error('Failed to load config:', err);
+      console.error('[ConfigService] failed to load config:', err);
       this.config = { stores: [], preferences: {} };
     }
   }
@@ -286,6 +297,7 @@ export class ConfigService {
   private saveConfig(): Promise<void> {
     try {
       this.ensureConfigDir();
+      this.lastSaveTime = Date.now();
       fs.writeFileSync(CONFIG_FILE, JSON.stringify(this.config, null, 2));
       return Promise.resolve();
     } catch (err) {
@@ -300,6 +312,11 @@ export class ConfigService {
       if (fs.existsSync(CONFIG_FILE)) {
         this.configWatcher = fs.watch(CONFIG_FILE, (eventType) => {
           if (eventType === 'change') {
+            // Ignore watcher events triggered by our own saves — prevents
+            // an infinite loadConfig → notifyListeners → tree refresh loop.
+            if (Date.now() - this.lastSaveTime < 500) {
+              return;
+            }
             this.loadConfig();
             this.notifyListeners();
           }

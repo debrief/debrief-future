@@ -59,6 +59,13 @@ RUN mkdir -p /home/coder/.local/share/code-server/User && \
     echo '{"security.workspace.trust.enabled":false,"workbench.startupEditor":"none","workbench.welcomePage.walkthroughs.openOnInstall":false,"workbench.tips.enabled":false}' \
     > /home/coder/.local/share/code-server/User/settings.json
 
+# Pre-seed Debrief config with the test STAC store so the tree view
+# is populated when the extension activates (XDG_CONFIG_HOME defaults
+# to ~/.config inside the container).
+RUN mkdir -p /home/coder/.config/debrief && \
+    echo '{"stores":[{"id":"local-store","path":"/workspace/test-workspace/local-store","displayName":"Test Maritime Data","status":"available"}],"preferences":{}}' \
+    > /home/coder/.config/debrief/config.json
+
 ENTRYPOINT ["code-server", \
     "--auth", "none", \
     "--bind-addr", "0.0.0.0:8080", \

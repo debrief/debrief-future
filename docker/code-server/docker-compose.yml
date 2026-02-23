@@ -26,3 +26,7 @@ services:
     volumes:
       # Mount test workspace for live updates during development
       - ../../tests/e2e/test-workspace:/workspace/test-workspace
+      # Mount Debrief config so the STAC tree is populated at startup.
+      # Belt-and-suspenders: Dockerfile also writes this, but volume mount
+      # guarantees it regardless of Docker layer caching.
+      - ../../tests/e2e/fixtures/debrief-config.json:/home/coder/.config/debrief/config.json

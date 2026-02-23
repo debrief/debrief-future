@@ -261,8 +261,8 @@ export function createOpenPlotCommand(
     layersTreeProvider.setShapes(plotData.otherFeatures);
     layersTreeProvider.setResultLayers([]);
 
-    // Update activity panel webview with features
-    activityPanelProvider.setFeatures(plotData.tracks, plotData.locations);
+    // Update activity panel webview with all features
+    activityPanelProvider.setFeatures(plotData.tracks, plotData.locations, plotData.otherFeatures);
 
     // Load existing result files from STAC item (Feature: 051-load-result-attachments)
     const resultFiles = await stacService.loadResultFiles(store, itemPath);

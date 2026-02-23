@@ -165,3 +165,37 @@ Each decision should include:
 - ✅ Additive tools need no new code — existing `generatedFeatureIds` already sufficient
 - ❌ Each transform tool must implement an `undo` method
 - ❌ Not all transformations are cleanly invertible (e.g. lossy operations like snapping to grid)
+
+### ADR-007: VS Code Webview E2E via code-server + Playwright (2026-02-23)
+
+**Context:**
+- Need end-to-end tests that exercise full extension workflows (open file → view tracks → run tool)
+- VS Code webviews use a three-layer iframe architecture that is not directly accessible to test frameworks
+- code-server (openvscode-server) provides a browser-accessible VS Code, but webview content never renders due to three distinct blockers
+- Existing `@vscode/test-web` has no webview DOM access; WebdriverIO is viable but untested
+
+**Decision:**
+- Use code-server as the VS Code host for E2E tests, driven by Playwright
+- Apply three automated patches via `tests/e2e/scripts/patch-webview.sh`:
+  1. Disable service worker in `pre/index.html` (SW conflict blocks `workerReady`)
+  2. Comment out CSP meta tag in `pre/index.html` (hash mismatch blocks modified script)
+  3. Remove origin hash guard in `workbench.js` (silently drops `webview-ready` message)
+- Work around code-server's missing `resolveWebviewView` call via MessagePort interception (`tests/e2e/helpers/webview-injector.ts`)
+- Run in headed mode with `xvfb-run` for CI (required for webview iframe creation)
+- Use `@sparticuz/chromium` for sandboxed environments where Playwright CDN is blocked
+
+**Alternatives Considered:**
+- `@vscode/test-web` → Rejected: no webview DOM access, designed for unit-level extension testing
+- WebdriverIO → Viable fallback but not tested; Playwright already in project
+- Jupyter test middleware → Good complement for state-only testing, not sufficient for UI flows
+- openvscode-server without patches → Rejected: same VS Code webview architecture, same blockers
+- Headless Chromium → Rejected: webview iframes not created without headed rendering
+
+**Consequences:**
+- ✅ Full DOM access to webview content (Leaflet map, React panels, tools)
+- ✅ Real extension bundles tested end-to-end, not mocks
+- ✅ Patches are automated and version-pinned to code-server release
+- ✅ Two testing tiers: Storybook (component) + code-server (integration)
+- ❌ Patches are fragile — tied to code-server internals, may break on upgrades
+- ❌ Requires headed Chromium + xvfb-run in CI (heavier than headless)
+- ❌ MessagePort injection is a workaround for a code-server bug, not a stable API
