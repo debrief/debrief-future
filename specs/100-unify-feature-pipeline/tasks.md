@@ -194,7 +194,7 @@
 
 ### PR Creation
 
-- [ ] T054 Create PR and publish blog: run /speckit.pr
+- [ ] T054 Create PR and publish blog: run /speckit.pr (blocked — no GH_TOKEN in environment)
 
 **Task T054 must run last. It depends on all evidence and media tasks being complete.**
 
