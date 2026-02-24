@@ -59,7 +59,8 @@ export { useTheme } from './hooks/useTheme';
 export { useTemporalTrack } from './MapView/useTemporalTrack';
 
 // Types
-export type { DebriefFeature, DebriefFeatureCollection } from './utils/types';
+export type { DebriefFeature, DebriefFeatureCollection, AnnotationFeature } from './utils/types';
+export { isAnnotationFeature } from './utils/types';
 
 // Utilities
 export { calculateBounds } from './utils/bounds';

@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { DebriefFeature } from '../utils/types';
-import { isTrackFeature, isMultiPointFeature, isMultiPolygonFeature } from '../utils/types';
+import { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygonFeature } from '../utils/types';
 import { getFeatureLabel, getFeatureColor } from '../utils/labels';
 import type { DisplayItem } from './flattenFeatures';
 import './FeatureList.css';
@@ -91,7 +91,10 @@ function getFeatureType(feature: DebriefFeature): string {
   if (isMultiPolygonFeature(feature)) {
     return 'MULTI_POLYGON';
   }
-  return (feature.properties.location_type || props.locationType as string) ?? 'POINT';
+  if (isReferenceLocation(feature)) {
+    return (feature.properties.location_type || props.locationType as string) ?? 'POINT';
+  }
+  return (props.kind as string) ?? 'ANNOTATION';
 }
 
 /**

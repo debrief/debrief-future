@@ -42,10 +42,30 @@ export type {
 export type { DisplayMode } from '../TimeController/types';
 
 /**
+ * GeoJSON Feature for annotation/shape types (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR, POLY)
+ * that don't have dedicated schema types yet. Preserves all original GeoJSON properties.
+ */
+export interface AnnotationFeature {
+  type: 'Feature';
+  id: string;
+  geometry: {
+    type: string;
+    coordinates: unknown;
+  };
+  properties: {
+    kind: string;
+    name?: string;
+    label?: string;
+    style?: Record<string, unknown>;
+    [key: string]: unknown;
+  };
+}
+
+/**
  * Union type for all Debrief feature types.
  * Components should accept either type interchangeably.
  */
-export type DebriefFeature = TrackFeature | ReferenceLocation | MultiPointFeature | MultiPolygonFeature;
+export type DebriefFeature = TrackFeature | ReferenceLocation | MultiPointFeature | MultiPolygonFeature | AnnotationFeature;
 
 /**
  * GeoJSON FeatureCollection containing Debrief features.
@@ -102,6 +122,13 @@ export function isMultiPointFeature(feature: DebriefFeature): feature is MultiPo
  */
 export function isMultiPolygonFeature(feature: DebriefFeature): feature is MultiPolygonFeature {
   return feature.properties.kind === 'MULTI_POLYGON';
+}
+
+/**
+ * Type guard to check if a feature is an AnnotationFeature (shapes, annotations)
+ */
+export function isAnnotationFeature(feature: DebriefFeature): feature is AnnotationFeature {
+  return !isTrackFeature(feature) && !isReferenceLocation(feature) && !isMultiPointFeature(feature) && !isMultiPolygonFeature(feature);
 }
 
 /**
