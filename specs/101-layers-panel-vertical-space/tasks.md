@@ -46,8 +46,8 @@
 
 **Purpose**: Verify baseline and prepare for CSS fix
 
-- [ ] T001 Create evidence directory `specs/101-layers-panel-vertical-space/evidence/`
-- [ ] T002 Run `task verify` to confirm clean baseline before changes
+- [x] T001 Create evidence directory `specs/101-layers-panel-vertical-space/evidence/`
+- [x] T002 Run `task verify` to confirm clean baseline before changes
 
 **Checkpoint**: Baseline confirmed clean — ready to apply CSS fix
 
@@ -61,9 +61,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Modify `.debrief-activity-panel__section--flexible .debrief-activity-panel__section-content` to become a flex column container `shared/components/src/ActivityPanel/ActivityPanel.css`
-- [ ] T004 [US1] Add rule for `.debrief-activity-panel__section--flexible .debrief-feature-list` to grow via `flex: 1 1 0%` `shared/components/src/ActivityPanel/ActivityPanel.css`
-- [ ] T005 [US1] Run `task verify` to confirm build passes and no regressions
+- [x] T003 [US1] Modify `.debrief-activity-panel__section--flexible .debrief-activity-panel__section-content` to become a flex column container `shared/components/src/ActivityPanel/ActivityPanel.css`
+- [x] T004 [US1] Add rule for `.debrief-activity-panel__section--flexible .debrief-feature-list` to grow via `flex: 1 1 0%` `shared/components/src/ActivityPanel/ActivityPanel.css`
+- [x] T005 [US1] Run `task verify` to confirm build passes and no regressions
 
 **Checkpoint**: Core CSS fix applied — Layers fills vertical space when both siblings collapsed
 
@@ -77,8 +77,8 @@
 
 ### Verification for User Story 2
 
-- [ ] T006 [US2] Verify Storybook `TimeControllerCollapsed` story renders correctly (Tools/Layers share space with resize handle)
-- [ ] T007 [US2] Verify Storybook `ToolsCollapsed` story renders correctly (Layers fills remaining space)
+- [x] T006 [US2] Verify Storybook `TimeControllerCollapsed` story renders correctly (Tools/Layers share space with resize handle)
+- [x] T007 [US2] Verify Storybook `ToolsCollapsed` story renders correctly (Layers fills remaining space)
 
 **Checkpoint**: Partial-collapse states verified
 
@@ -92,9 +92,9 @@
 
 ### Verification for User Story 3
 
-- [ ] T008 [US3] Verify Storybook `Default` story renders correctly (50/50 split with resize handle)
-- [ ] T009 [US3] Verify Storybook `AllCollapsed` story renders correctly (headers only, remaining space empty)
-- [ ] T010 [US3] Verify Storybook `OnlyTimeExpanded` story renders correctly (two collapsed flex sections)
+- [x] T008 [US3] Verify Storybook `Default` story renders correctly (50/50 split with resize handle)
+- [x] T009 [US3] Verify Storybook `AllCollapsed` story renders correctly (headers only, remaining space empty)
+- [x] T010 [US3] Verify Storybook `OnlyTimeExpanded` story renders correctly (two collapsed flex sections)
 
 **Checkpoint**: All 8 collapse-state combinations produce correct layouts
 
@@ -108,9 +108,9 @@
 
 ### Storybook E2E Tests
 
-- [ ] T011 [P] Create Playwright test for ActivityPanel collapse states `shared/components/e2e/ActivityPanel.spec.ts`
-- [ ] T012 [P] Add theme variant tests (dark, vscode) for ToolsCollapsed story `shared/components/e2e/ActivityPanel.spec.ts`
-- [ ] T013 Run Storybook E2E suite: `pnpm --filter @debrief/components test:e2e ActivityPanel`
+- [x] T011 [P] Create Playwright test for ActivityPanel collapse states `shared/components/e2e/ActivityPanel.spec.ts`
+- [x] T012 [P] Add theme variant tests (dark, vscode) for ToolsCollapsed story `shared/components/e2e/ActivityPanel.spec.ts`
+- [x] T013 Run Storybook E2E suite: `pnpm --filter @debrief/components test:e2e ActivityPanel`
 
 **Checkpoint**: E2E tests pass — automated evidence of correct collapse-state layouts
 
@@ -122,15 +122,15 @@
 
 ### Evidence Collection
 
-- [ ] T014 Capture test results in `specs/101-layers-panel-vertical-space/evidence/test-summary.md`
-- [ ] T015 Create usage demonstration in `specs/101-layers-panel-vertical-space/evidence/usage-example.md`
-- [ ] T016 [P] Capture Storybook screenshots of key collapse states in `specs/101-layers-panel-vertical-space/evidence/screenshots/`
-- [ ] T017 [P] Document E2E results in `specs/101-layers-panel-vertical-space/evidence/e2e-summary.md`
+- [x] T014 Capture test results in `specs/101-layers-panel-vertical-space/evidence/test-summary.md`
+- [x] T015 Create usage demonstration in `specs/101-layers-panel-vertical-space/evidence/usage-example.md`
+- [x] T016 [P] Capture Storybook screenshots of key collapse states in `specs/101-layers-panel-vertical-space/evidence/screenshots/`
+- [x] T017 [P] Document E2E results in `specs/101-layers-panel-vertical-space/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T018 Create shipped blog post in `specs/101-layers-panel-vertical-space/media/shipped-post.md`
-- [ ] T019 [P] Create LinkedIn shipped summary in `specs/101-layers-panel-vertical-space/media/linkedin-shipped.md`
+- [x] T018 Create shipped blog post in `specs/101-layers-panel-vertical-space/media/shipped-post.md`
+- [x] T019 [P] Create LinkedIn shipped summary in `specs/101-layers-panel-vertical-space/media/linkedin-shipped.md`
 
 ### PR Creation
 
