@@ -34,8 +34,11 @@ export interface AssociatedFile {
   /** File modification time (epoch ms) for chronological ordering */
   mtime?: number;
 }
-import type { Plot, Track, ReferenceLocation } from '../types/plot';
-import type { GeoJSONFeature } from '../types/import';
+import type { Plot } from '../types/plot';
+import type {
+  DebriefFeature,
+  DebriefFeatureCollection,
+} from '@debrief/components';
 
 // Type-safe properties to avoid any from geojson
 type SafeProperties = Record<string, unknown>;
@@ -296,12 +299,13 @@ export class StacService {
   }
 
   /**
-   * Load tracks and locations from a plot
+   * Load all features from a plot as a unified FeatureCollection.
+   * Each feature is classified by properties.kind (TRACK, POINT, CIRCLE, etc.)
    */
   async loadPlotData(
     store: StacStore,
     itemPath: string
-  ): Promise<{ tracks: Track[]; locations: ReferenceLocation[]; otherFeatures: GeoJSONFeature[] } | null> {
+  ): Promise<DebriefFeatureCollection | null> {
     try {
       const fullPath = path.join(store.path, itemPath);
       const item = await this.loadItem(fullPath);
@@ -318,7 +322,7 @@ export class StacService {
       );
 
       if (!geoJsonAsset) {
-        return { tracks: [], locations: [], otherFeatures: [] };
+        return { type: 'FeatureCollection', features: [] };
       }
 
       const geoJsonPath = path.resolve(
@@ -328,12 +332,12 @@ export class StacService {
       const featureCollection = await this.loadGeoJson(geoJsonPath);
 
       if (featureCollection === null) {
-        return { tracks: [], locations: [], otherFeatures: [] };
+        return { type: 'FeatureCollection', features: [] };
       }
 
-      const tracks: Track[] = [];
-      const locations: ReferenceLocation[] = [];
-      const otherFeatures: GeoJSONFeature[] = [];
+      const features: DebriefFeature[] = [];
+      let trackCount = 0;
+      let locationCount = 0;
 
       for (const feature of featureCollection.features) {
         const props = feature.properties ?? {};
@@ -348,47 +352,61 @@ export class StacService {
           // Track: LineString with times array (epoch ms)
           const times = (props.times as number[]) ?? [];
           const lineCoords = geom.coordinates as number[][];
+          const id = (props.id as string) ?? `track-${trackCount}`;
+          const positions = (props.positions as Array<{ time: string }>) ??
+            times.map(t => ({ time: new Date(t).toISOString() }));
 
-          tracks.push({
-            id: (props.id as string) ?? `track-${tracks.length}`,
-            name: (props.platform_name as string) ?? (props.name as string) ?? `Track ${tracks.length + 1}`,
-            platformType: (props.track_type as string) ?? (props.platformType as string) ?? undefined,
+          features.push({
+            type: 'Feature',
+            id,
             geometry: { type: 'LineString' as const, coordinates: lineCoords },
-            times,
-            positions: (props.positions as Track['positions']) ?? times.map(t => ({ time: new Date(t).toISOString() })),
-            startTime: times[0] ? new Date(times[0]).toISOString() : '',
-            endTime: times[times.length - 1] ? new Date(times[times.length - 1]!).toISOString() : '',
-            color: props.color as string | undefined,
-            visible: true,
-            selected: false,
-            defaultPositionStyle: props.default_position_style as Track['defaultPositionStyle'],
-            symbolInterval: props.symbol_interval as string | undefined,
-            labelInterval: props.label_interval as string | undefined,
-            positionStyleOverrides: props.position_style_overrides as Track['positionStyleOverrides'],
-          });
+            properties: {
+              kind: 'TRACK',
+              platform_id: id,
+              platform_name: (props.platform_name as string) ?? (props.name as string) ?? `Track ${trackCount + 1}`,
+              track_type: (props.track_type as string) ?? (props.platformType as string) ?? 'CONTACT',
+              start_time: times[0] ? new Date(times[0]).toISOString() : '',
+              end_time: times[times.length - 1] ? new Date(times[times.length - 1]!).toISOString() : '',
+              positions,
+              times,
+              style: { line: { color: (props.color as string) ?? '#0066cc' } },
+              default_position_style: props.default_position_style ?? { show_symbol: true, symbol: 'circle', show_label: false },
+              symbol_interval: props.symbol_interval as string | undefined,
+              label_interval: props.label_interval as string | undefined,
+              position_style_overrides: props.position_style_overrides,
+            },
+          } as DebriefFeature);
+          trackCount++;
         } else if (geom.type === 'Point' && (props.kind === 'POINT' || props.kind === 'LOCATION')) {
           // Reference location: Point with kind=POINT or LOCATION
           const pointCoords = geom.coordinates as number[];
+          const id = (props.id as string) ?? `location-${locationCount}`;
 
-          locations.push({
-            id: (props.id as string) ?? `location-${locations.length}`,
-            name: (props.name as string) ?? `Location ${locations.length + 1}`,
-            locationType: props.locationType as string | undefined,
-            geometry: { type: 'Point' as const, coordinates: pointCoords },
-            visible: true,
-            selected: false,
-          });
-        } else {
-          // Other features: render with standard GeoJSON layer
-          otherFeatures.push({
+          features.push({
             type: 'Feature',
-            geometry: geom as GeoJSONFeature['geometry'],
-            properties: props,
-          });
+            id,
+            geometry: { type: 'Point' as const, coordinates: pointCoords },
+            properties: {
+              kind: 'POINT',
+              name: (props.name as string) ?? `Location ${locationCount + 1}`,
+              location_type: (props.locationType as string) ?? (props.location_type as string) ?? 'REFERENCE',
+              style: { shape: 'circle', radius: 5, fill_color: '#ff0000', color: '#000000' },
+            },
+          } as DebriefFeature);
+          locationCount++;
+        } else {
+          // Annotation/shape feature (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR, POLY)
+          const id = (props.id as string) ?? `annotation-${features.length}`;
+          features.push({
+            type: 'Feature',
+            id,
+            geometry: geom,
+            properties: { ...props, kind: (props.kind as string) ?? geom.type },
+          } as DebriefFeature);
         }
       }
 
-      return { tracks, locations, otherFeatures };
+      return { type: 'FeatureCollection', features };
     } catch (err) {
       console.error('Failed to load plot data:', err);
       return null;

@@ -1,13 +1,17 @@
 /**
  * Layers Tree Provider - Sidebar tree view for layer management
  *
- * Displays source tracks, reference locations, and result layers
+ * Displays source features (tracks, reference locations, annotations) and result layers
  * with visibility controls.
  *
  * Feature: 029-session-state-vscode
  * - Subscribes to session manager for active session changes
  * - Uses session hiddenFeatureIds for visibility state
  * - Updates selection state in session
+ *
+ * Feature: 100-unify-feature-pipeline
+ * - Single setFeatures() method replaces setTracks/setLocations/setShapes
+ * - Classifies features by properties.kind for tree grouping
  */
 
 import * as vscode from 'vscode';
@@ -17,15 +21,13 @@ import {
   type SessionStoreWithUndo,
 } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
-import type { Track, ReferenceLocation } from '../types/plot';
 import type { ResultLayer } from '../types/tool';
-import type { GeoJSONFeature } from '../types/import';
+import type { DebriefFeature } from '@debrief/components';
+import { isTrackFeature, isReferenceLocation } from '@debrief/components';
 
 export type LayerItem =
   | { type: 'header'; label: string; id: string }
-  | { type: 'track'; track: Track }
-  | { type: 'location'; location: ReferenceLocation }
-  | { type: 'shape'; feature: GeoJSONFeature }
+  | { type: 'feature'; feature: DebriefFeature }
   | { type: 'result'; layer: ResultLayer };
 
 /**
@@ -33,12 +35,8 @@ export type LayerItem =
  */
 export function getFeatureId(item: LayerItem): string | undefined {
   switch (item.type) {
-    case 'track':
-      return item.track.id;
-    case 'location':
-      return item.location.id;
-    case 'shape':
-      return (item.feature.properties?.id as string) ?? undefined;
+    case 'feature':
+      return String(item.feature.id);
     case 'result':
       return item.layer.id;
     default:
@@ -52,9 +50,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
   >();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-  private tracks: Track[] = [];
-  private locations: ReferenceLocation[] = [];
-  private shapes: GeoJSONFeature[] = [];
+  private features: DebriefFeature[] = [];
   private resultLayers: ResultLayer[] = [];
 
   // Session manager integration
@@ -153,26 +149,10 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
   }
 
   /**
-   * Update tracks
+   * Update all source features (unified)
    */
-  setTracks(tracks: Track[]): void {
-    this.tracks = tracks;
-    this.refresh();
-  }
-
-  /**
-   * Update locations
-   */
-  setLocations(locations: ReferenceLocation[]): void {
-    this.locations = locations;
-    this.refresh();
-  }
-
-  /**
-   * Update shapes (other features)
-   */
-  setShapes(shapes: GeoJSONFeature[]): void {
-    this.shapes = shapes;
+  setFeatures(features: DebriefFeature[]): void {
+    this.features = features;
     this.refresh();
   }
 
@@ -207,9 +187,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
    * Clear all data
    */
   clear(): void {
-    this.tracks = [];
-    this.locations = [];
-    this.shapes = [];
+    this.features = [];
     this.resultLayers = [];
     this.refresh();
   }
@@ -240,12 +218,8 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
     switch (element.type) {
       case 'header':
         return this.createHeaderItem(element);
-      case 'track':
-        return this.createTrackItem(element.track);
-      case 'location':
-        return this.createLocationItem(element.location);
-      case 'shape':
-        return this.createShapeItem(element.feature);
+      case 'feature':
+        return this.createFeatureItem(element.feature);
       case 'result':
         return this.createResultItem(element.layer);
     }
@@ -259,7 +233,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       // Root level: return headers
       const items: LayerItem[] = [];
 
-      if (this.tracks.length > 0 || this.locations.length > 0 || this.shapes.length > 0) {
+      if (this.features.length > 0) {
         items.push({ type: 'header', label: 'Source Data', id: 'source' });
       }
 
@@ -272,17 +246,11 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
 
     if (element.type === 'header') {
       if (element.id === 'source') {
-        return Promise.resolve([
-          ...this.tracks.map(
-            (track): LayerItem => ({ type: 'track', track })
-          ),
-          ...this.locations.map(
-            (location): LayerItem => ({ type: 'location', location })
-          ),
-          ...this.shapes.map(
-            (feature): LayerItem => ({ type: 'shape', feature })
-          ),
-        ]);
+        return Promise.resolve(
+          this.features.map(
+            (feature): LayerItem => ({ type: 'feature', feature })
+          )
+        );
       }
 
       if (element.id === 'results') {
@@ -303,7 +271,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       return undefined;
     }
 
-    if (element.type === 'track' || element.type === 'location' || element.type === 'shape') {
+    if (element.type === 'feature') {
       return { type: 'header', label: 'Source Data', id: 'source' };
     }
 
@@ -328,72 +296,51 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
     return item;
   }
 
-  private createTrackItem(track: Track): vscode.TreeItem {
-    const item = new vscode.TreeItem(
-      track.name,
-      vscode.TreeItemCollapsibleState.None
-    );
+  private createFeatureItem(feature: DebriefFeature): vscode.TreeItem {
+    const props = feature.properties as Record<string, unknown>;
+    const kind = (props.kind as string) ?? 'UNKNOWN';
+    const featureId = String(feature.id);
+    const isSelected = this._isFeatureSelected(featureId);
 
-    item.contextValue = 'track';
-    item.description = track.platformType ?? '';
-    const geom = track.geometry as { coordinates: number[][] };
-    item.tooltip = `${track.name}\nPlatform: ${track.platformType ?? 'Unknown'}\nPoints: ${geom.coordinates.length}`;
+    if (isTrackFeature(feature)) {
+      const name = feature.properties.platform_name ?? feature.properties.platform_id;
+      const trackType = feature.properties.track_type ?? '';
+      const item = new vscode.TreeItem(name, vscode.TreeItemCollapsibleState.None);
+      item.contextValue = 'track';
+      item.description = trackType;
+      const geom = feature.geometry as { coordinates: number[][] };
+      item.tooltip = `${name}\nPlatform: ${trackType || 'Unknown'}\nPoints: ${geom.coordinates.length}`;
+      item.iconPath = new vscode.ThemeIcon(isSelected ? 'check' : 'circle-outline');
 
-    // Selection state
-    const isSelected = this._isFeatureSelected(track.id);
+      // Color indicator
+      const style = feature.properties.style as { line?: { color?: string } } | undefined;
+      const color = style?.line?.color;
+      if (color) {
+        item.resourceUri = vscode.Uri.parse(`color:${color}`);
+      }
 
-    item.iconPath = new vscode.ThemeIcon(
-      isSelected ? 'check' : 'circle-outline'
-    );
-
-    // Color indicator
-    if (track.color) {
-      item.resourceUri = vscode.Uri.parse(`color:${track.color}`);
+      return item;
     }
 
-    return item;
-  }
+    if (isReferenceLocation(feature)) {
+      const name = feature.properties.name;
+      const locType = feature.properties.location_type ?? '';
+      const item = new vscode.TreeItem(name, vscode.TreeItemCollapsibleState.None);
+      item.contextValue = 'location';
+      item.description = locType;
+      item.tooltip = `${name}\nType: ${locType || 'Unknown'}`;
+      item.iconPath = new vscode.ThemeIcon(isSelected ? 'check' : 'circle-outline');
+      return item;
+    }
 
-  private createLocationItem(location: ReferenceLocation): vscode.TreeItem {
-    const item = new vscode.TreeItem(
-      location.name,
-      vscode.TreeItemCollapsibleState.None
-    );
-
-    item.contextValue = 'location';
-    item.description = location.locationType ?? '';
-    item.tooltip = `${location.name}\nType: ${location.locationType ?? 'Unknown'}`;
-
-    // Selection state
-    const isSelected = this._isFeatureSelected(location.id);
-
-    item.iconPath = new vscode.ThemeIcon(
-      isSelected ? 'check' : 'circle-outline'
-    );
-
-    return item;
-  }
-
-  private createShapeItem(feature: GeoJSONFeature): vscode.TreeItem {
-    const props = feature.properties ?? {};
-    const kind = (props.kind as string) ?? feature.geometry.type;
+    // Annotation/shape feature
     const label = (props.label as string) ?? (props.name as string) ?? kind;
-
-    const item = new vscode.TreeItem(
-      label,
-      vscode.TreeItemCollapsibleState.None
-    );
-
+    const item = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.None);
     item.contextValue = 'shape';
     item.description = kind.toLowerCase();
-    item.tooltip = `${label}\nType: ${kind}\nGeometry: ${feature.geometry.type}`;
-
-    const featureId = (props.id as string) ?? '';
-    const isSelected = featureId ? this._isFeatureSelected(featureId) : false;
-    item.iconPath = new vscode.ThemeIcon(
-      isSelected ? 'check' : 'circle-outline'
-    );
-
+    const geomType = (feature.geometry as { type: string }).type;
+    item.tooltip = `${label}\nType: ${kind}\nGeometry: ${geomType}`;
+    item.iconPath = new vscode.ThemeIcon(isSelected ? 'check' : 'circle-outline');
     return item;
   }
 

@@ -16,9 +16,6 @@ import type { DebriefFeature, DisplayMode, Bounds, DrawingMode, DrawnFeatureProv
 import type {
   ExtensionToWebviewMessage,
   WebviewToExtensionMessage,
-  Track,
-  ReferenceLocation,
-  GeoJSONFeature,
 } from '../messages';
 
 // VS Code API type
@@ -38,51 +35,12 @@ interface PersistedState {
 // VS Code API instance
 const vscode = acquireVsCodeApi();
 
-// Transform Track to DebriefFeature
-function trackToFeature(track: Track, customColor?: string): DebriefFeature {
-  return {
-    type: 'Feature',
-    id: track.id,
-    geometry: track.geometry,
-    properties: {
-      kind: 'TRACK',
-      platform_name: track.name,
-      platform_type: track.platformType,
-      start_time: track.startTime,
-      end_time: track.endTime,
-      times: track.times,
-      positions: track.positions ?? track.times.map(t => ({ time: t })),
-      default_position_style: track.defaultPositionStyle,
-      symbol_interval: track.symbolInterval,
-      label_interval: track.labelInterval,
-      position_style_overrides: track.positionStyleOverrides,
-      style: { color: customColor ?? track.color },
-    },
-  };
-}
-
-// Transform ReferenceLocation to DebriefFeature
-function locationToFeature(location: ReferenceLocation): DebriefFeature {
-  return {
-    type: 'Feature',
-    id: location.id,
-    geometry: location.geometry,
-    properties: {
-      kind: 'POINT',
-      name: location.name,
-      location_type: location.locationType ?? 'REFERENCE',
-    },
-  };
-}
-
 /**
  * MapView Webview App
  */
 function MapViewApp(): React.ReactElement {
   // Feature state
-  const [tracks, setTracks] = useState<Track[]>([]);
-  const [locations, setLocations] = useState<ReferenceLocation[]>([]);
-  const [otherFeatures, setOtherFeatures] = useState<GeoJSONFeature[]>([]);
+  const [plotFeatures, setPlotFeatures] = useState<DebriefFeature[]>([]);
   const [resultFeatures, setResultFeatures] = useState<DebriefFeature[]>([]);
   const [trackColors, setTrackColors] = useState<Record<string, string>>({});
 
@@ -122,20 +80,11 @@ function MapViewApp(): React.ReactElement {
 
   // Merge all features, filtering out hidden ones
   const features = useMemo((): DebriefFeature[] => {
-    const trackFeatures = tracks.map(t => trackToFeature(t, trackColors[t.id]));
-    const locationFeatures = locations.map(locationToFeature);
-    // otherFeatures (annotations, multi-geometry) already have properties.style
-    const otherDebriefFeatures = otherFeatures.map(f => ({
-      type: 'Feature' as const,
-      id: f.id ?? '',
-      geometry: f.geometry,
-      properties: f.properties ?? {},
-    })) as DebriefFeature[];
-    const allFeatures = [...trackFeatures, ...locationFeatures, ...otherDebriefFeatures, ...resultFeatures, ...drawnFeatures];
+    const allFeatures = [...plotFeatures, ...resultFeatures, ...drawnFeatures];
     // Filter out hidden features
     if (hiddenIds.size === 0) return allFeatures;
     return allFeatures.filter(f => !hiddenIds.has(String(f.id)));
-  }, [tracks, locations, otherFeatures, resultFeatures, drawnFeatures, trackColors, hiddenIds]);
+  }, [plotFeatures, resultFeatures, drawnFeatures, hiddenIds]);
 
   // Message handler
   useEffect(() => {
@@ -143,14 +92,9 @@ function MapViewApp(): React.ReactElement {
       const msg = event.data;
       switch (msg.type) {
         case 'loadPlot':
-          setTracks(msg.plot.tracks);
-          setLocations(msg.plot.locations);
-          setOtherFeatures(msg.plot.otherFeatures ?? []);
+          setPlotFeatures(msg.plot.features);
           setResultFeatures([]);
           setFitBoundsTrigger(prev => prev + 1);
-          break;
-        case 'updateTracks':
-          setTracks(msg.tracks);
           break;
         case 'setSelection':
           setSelectedIds(new Set(msg.featureIds));
@@ -196,23 +140,20 @@ function MapViewApp(): React.ReactElement {
 
   // Selection callback
   const handleSelect = useCallback((featureId: string) => {
-    const isTrack = tracks.some(t => t.id === featureId);
-    const isLocation = locations.some(l => l.id === featureId);
     vscode.postMessage({
       type: 'selectionChanged',
       selection: {
-        trackIds: isTrack ? [featureId] : [],
-        locationIds: isLocation ? [featureId] : [],
-        contextType: isTrack ? 'single-track' : isLocation ? 'location' : 'none',
+        featureIds: [featureId],
+        contextType: 'single-track',
       },
     });
-  }, [tracks, locations]);
+  }, []);
 
   // Background click callback
   const handleBackgroundClick = useCallback(() => {
     vscode.postMessage({
       type: 'selectionChanged',
-      selection: { trackIds: [], locationIds: [], contextType: 'none' },
+      selection: { featureIds: [], contextType: 'none' },
     });
   }, []);
 
@@ -303,8 +244,7 @@ function MapViewApp(): React.ReactElement {
       vscode.postMessage({
         type: 'selectionChanged',
         selection: {
-          trackIds: [],
-          locationIds: props.kind === 'POINT' ? [feature.id] : [],
+          featureIds: [feature.id],
           contextType: props.kind === 'POINT' ? 'location' : 'none',
         },
       });

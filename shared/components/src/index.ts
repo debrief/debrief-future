@@ -60,7 +60,14 @@ export { useTemporalTrack } from './MapView/useTemporalTrack';
 
 // Types
 export type { DebriefFeature, DebriefFeatureCollection, AnnotationFeature } from './utils/types';
-export { isAnnotationFeature } from './utils/types';
+export {
+  isTrackFeature,
+  isReferenceLocation,
+  isMultiPointFeature,
+  isMultiPolygonFeature,
+  isAnnotationFeature,
+  isExpandableFeature,
+} from './utils/types';
 
 // Utilities
 export { calculateBounds } from './utils/bounds';

@@ -130,12 +130,17 @@ export function createOpenPlotCommand(
       return;
     }
 
+    // Derive track/location counts from unified features
+    const { isTrackFeature, isReferenceLocation } = await import('@debrief/components');
+    const tracks = plotData.features.filter(isTrackFeature);
+    const locations = plotData.features.filter(isReferenceLocation);
+
     // Create session for this document
     const plotUri = buildStacUri(storeId, itemPath);
     const session = sessionManager.createSession(plotUri, {
       plot,
-      tracks: plotData.tracks,
-      locations: plotData.locations,
+      tracks,
+      locations,
       featureCollectionUri: plotUri,
     });
 
@@ -202,9 +207,7 @@ export function createOpenPlotCommand(
         void openPlotsService.clearAll();
 
         setMapPanel(undefined);
-        layersTreeProvider.setTracks([]);
-        layersTreeProvider.setLocations([]);
-        layersTreeProvider.setShapes([]);
+        layersTreeProvider.setFeatures([]);
         layersTreeProvider.setResultLayers([]);
         // Dispose all sessions since they're no longer visible (T028)
         sessionManager.disposeAllSessions();
@@ -214,7 +217,7 @@ export function createOpenPlotCommand(
     // Register selection change handler (runs for both new and reused panels)
     // Fix: 077 — previously only registered inside if(!panel), missing on reuse
     panel.onSelectionChanged((selection) => {
-      const featureIds = [...selection.trackIds, ...selection.locationIds];
+      const { featureIds } = selection;
 
       // Update session state - this will trigger subscriptions in ActivityPanelView
       // which will update toolMatchAdapter and refresh the UI
@@ -227,7 +230,7 @@ export function createOpenPlotCommand(
       // Also update toolMatchAdapter directly for tools tree provider
       toolMatchAdapter.updateSelection({
         featureIds,
-        primary: selection.trackIds[0] ?? selection.locationIds[0] ?? null,
+        primary: featureIds[0] ?? null,
         timestamp: createTimeInstant(Date.now()),
       });
       toolsTreeProvider.refresh();
@@ -253,16 +256,14 @@ export function createOpenPlotCommand(
     panel.setLogService(logService);
 
     // Load plot into panel
-    panel.loadPlot(plot, plotData.tracks, plotData.locations, plotData.otherFeatures);
+    panel.loadPlot(plot, plotData.features);
 
     // Update layers panel
-    layersTreeProvider.setTracks(plotData.tracks);
-    layersTreeProvider.setLocations(plotData.locations);
-    layersTreeProvider.setShapes(plotData.otherFeatures);
+    layersTreeProvider.setFeatures(plotData.features);
     layersTreeProvider.setResultLayers([]);
 
     // Update activity panel webview with all features
-    activityPanelProvider.setFeatures(plotData.tracks, plotData.locations, plotData.otherFeatures);
+    activityPanelProvider.setFeatures(plotData.features);
 
     // Load existing result files from STAC item (Feature: 051-load-result-attachments)
     const resultFiles = await stacService.loadResultFiles(store, itemPath);
