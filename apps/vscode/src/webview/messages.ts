@@ -5,7 +5,6 @@
  * and the map webview panel.
  */
 
-import type { SelectionContextType } from '../types/plot';
 import type { LayerStyle } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
 
@@ -193,7 +192,6 @@ export interface SelectionChangedMessage {
     featureIds: string[];
     /** Full selection paths for all selected elements (Feature 053) */
     paths?: string[];
-    contextType: SelectionContextType;
   };
 }
 
@@ -337,8 +335,5 @@ export type WebviewToExtensionMessage =
 // Re-exports for webview
 // ============================================================================
 
-export type {
-  SelectionContextType,
-} from '../types/plot';
 export type { LayerStyle, ResultLayer } from '../types/tool';
 export type { DebriefFeature } from '@debrief/components';

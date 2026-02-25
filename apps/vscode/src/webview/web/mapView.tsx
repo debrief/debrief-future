@@ -144,7 +144,6 @@ function MapViewApp(): React.ReactElement {
       type: 'selectionChanged',
       selection: {
         featureIds: [featureId],
-        contextType: 'single-track',
       },
     });
   }, []);
@@ -153,7 +152,7 @@ function MapViewApp(): React.ReactElement {
   const handleBackgroundClick = useCallback(() => {
     vscode.postMessage({
       type: 'selectionChanged',
-      selection: { featureIds: [], contextType: 'none' },
+      selection: { featureIds: [] },
     });
   }, []);
 
@@ -245,7 +244,6 @@ function MapViewApp(): React.ReactElement {
         type: 'selectionChanged',
         selection: {
           featureIds: [feature.id],
-          contextType: props.kind === 'POINT' ? 'location' : 'none',
         },
       });
     }
