@@ -536,30 +536,7 @@ export class CalcService {
     const script = `
 import json
 from debrief_calc.registry import registry
-from debrief_calc.models import ContextType
-tools = []
-for t in registry.list_all():
-    ctx = t.context_type
-    if ctx == ContextType.REGION:
-        reqs = [{"kind": "REGION", "min": 1, "max": 1}]
-    elif ctx == ContextType.NONE:
-        reqs = []
-    elif ctx == ContextType.SINGLE:
-        reqs = [{"kind": k.upper(), "min": 1, "max": 1} for k in t.input_kinds]
-    else:
-        reqs = [{"kind": k.upper(), "min": 1} for k in t.input_kinds]
-    entry = {
-        "name": t.name,
-        "description": t.description,
-        "inputSchema": {"type": "object", "properties": {}},
-        "annotations": {
-            "debrief:selectionRequirements": reqs,
-            "debrief:category": getattr(t, "category", "general"),
-            "debrief:version": t.version,
-            "debrief:outputKind": getattr(t, "output_kind", "unknown")
-        }
-    }
-    tools.append(entry)
+tools = [t.to_mcp_tool() for t in registry.list_all()]
 print(json.dumps(tools))
 `;
     const { stdout } = await execFileAsync(pythonPath, ['-c', script], {
