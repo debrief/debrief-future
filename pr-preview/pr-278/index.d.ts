@@ -26,7 +26,7 @@ export type { PositionSymbolsLayerProps } from './MapView/PositionSymbolsLayer';
 export { useSelection } from './hooks/useSelection';
 export { useTheme } from './hooks/useTheme';
 export { useTemporalTrack } from './MapView/useTemporalTrack';
-export type { DebriefFeature, DebriefFeatureCollection, AnnotationFeature } from './utils/types';
+export type { DebriefFeature, DebriefFeatureCollection, AnnotationFeature, TrackFeature, ReferenceLocation } from './utils/types';
 export { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygonFeature, isAnnotationFeature, isExpandableFeature, } from './utils/types';
 export { calculateBounds } from './utils/bounds';
 export { calculateTimeExtent, parseDuration, findIntervalPositions, resolvePositionStyle, computeAllPositionStyles, } from './utils/time';
