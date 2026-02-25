@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import type { StacService } from '../services/stacService';
 import type { ConfigService } from '../services/configService';
 import type { MapPanel } from '../webview/mapPanel';
+import { isTrackFeature } from '@debrief/components';
 
 interface ChangeColorArgs {
   trackId: string;
@@ -29,12 +30,16 @@ export function createChangeTrackColorCommand(
       return;
     }
 
-    const tracks = panel.getTracks();
-    const track = tracks.find((t) => t.id === args.trackId);
+    const features = panel.getFeatures();
+    const track = features.filter(isTrackFeature).find((t) => t.id === args.trackId);
 
     if (!track) {
       return;
     }
+
+    const trackName = track.properties.platform_name ?? track.properties.platform_id;
+    const style = track.properties.style as { line?: { color?: string } } | undefined;
+    const currentColor = style?.line?.color ?? '#377eb8';
 
     // Get default colors from configuration
     const config = vscode.workspace.getConfiguration('debrief');
@@ -66,7 +71,7 @@ export function createChangeTrackColorCommand(
 
     // Show quick pick
     const selection = await vscode.window.showQuickPick(colorItems, {
-      placeHolder: `Select color for ${track.name}`,
+      placeHolder: `Select color for ${trackName}`,
     });
 
     if (!selection) {
@@ -80,7 +85,7 @@ export function createChangeTrackColorCommand(
       const input = await vscode.window.showInputBox({
         prompt: 'Enter hex color code',
         placeHolder: '#FF0000',
-        value: track.color ?? '#377eb8',
+        value: currentColor,
         validateInput: (value) => {
           if (!/^#[0-9A-Fa-f]{6}$/.test(value)) {
             return 'Enter a valid hex color (e.g., #FF0000)';

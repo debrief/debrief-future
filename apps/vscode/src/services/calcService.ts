@@ -613,55 +613,20 @@ print(json.dumps(tools))
       throw new Error('No map panel available');
     }
 
-    const tracks = panel.getTracks();
-    const locations = panel.getLocations();
-    const otherFeatures = panel.getOtherFeatures();
+    const allFeatures = panel.getFeatures();
     const resultLayers = panel.getResultLayers();
-    const features: Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> = [];
+    const resolved: Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> = [];
 
     for (const id of featureIds) {
-      const track = tracks.find((t) => t.id === id);
-      if (track) {
-        features.push({
+      const feature = allFeatures.find((f) => String(f.id) === id);
+      if (feature) {
+        const props = feature.properties as Record<string, unknown>;
+        resolved.push({
           type: 'Feature',
-          geometry: track.geometry,
-          properties: {
-            id: track.id,
-            name: track.name,
-            kind: 'TRACK',
-            platformType: track.platformType,
-            times: track.times,
-            startTime: track.startTime,
-            endTime: track.endTime,
-          },
-        });
-        continue;
-      }
-
-      const location = locations.find((l) => l.id === id);
-      if (location) {
-        features.push({
-          type: 'Feature',
-          geometry: location.geometry,
-          properties: {
-            id: location.id,
-            name: location.name,
-            kind: 'LOCATION',
-            locationType: location.locationType,
-          },
-        });
-        continue;
-      }
-
-      const shape = otherFeatures.find((f) => (f.properties as Record<string, unknown>)?.id === id);
-      if (shape) {
-        const props = shape.properties ?? {};
-        features.push({
-          type: 'Feature',
-          geometry: shape.geometry,
+          geometry: feature.geometry,
           properties: {
             ...props,
-            kind: (props.kind as string) ?? 'SHAPE',
+            id: feature.id,
           },
         });
         continue;
@@ -669,12 +634,12 @@ print(json.dumps(tools))
 
       const resultLayer = resultLayers.find((l) => l.id === id);
       if (resultLayer) {
-        for (const feature of resultLayer.features.features) {
-          features.push({
+        for (const rlFeature of resultLayer.features.features) {
+          resolved.push({
             type: 'Feature',
-            geometry: feature.geometry,
+            geometry: rlFeature.geometry,
             properties: {
-              ...feature.properties,
+              ...rlFeature.properties,
               kind: 'result',
               sourceToolId: resultLayer.toolId,
               sourceToolName: resultLayer.toolName,
@@ -688,7 +653,7 @@ print(json.dumps(tools))
       throw new Error(`Feature not found: ${id}`);
     }
 
-    return features;
+    return resolved;
   }
 
   private async executeToolOnMcp(

@@ -37,7 +37,7 @@ import {
 import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
 import { calculateBounds, mergeBounds } from '../utils/bounds';
 import type { DebriefFeature } from '@debrief/components';
-import { isTrackFeature, isReferenceLocation } from '@debrief/components';
+import { isTrackFeature } from '@debrief/components';
 
 export class MapPanel {
   public static currentPanel: MapPanel | undefined;
@@ -1180,7 +1180,7 @@ export class MapPanel {
       details: {
         name: props.platform_name ?? props.platform_id,
         platformType: props.track_type ?? 'Unknown',
-        pointCount: (feature.geometry as { coordinates: number[][] }).coordinates.length,
+        pointCount: (feature.geometry as unknown as { coordinates: number[][] }).coordinates.length,
         startTime: props.start_time,
         endTime: props.end_time,
         duration,

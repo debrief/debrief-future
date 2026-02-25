@@ -80,15 +80,16 @@ export function createExecuteToolCommand(
     // Capture pre-tool geometry for mutation tools (enables correct tune replay)
     let preToolInputState: InputFeatureState[] | undefined;
     const selectedIdSet = new Set(selectedFeatureIds);
-    const otherFeatures = panel.getOtherFeatures();
-    const preToolFeatures = otherFeatures.filter(
-      (f) => selectedIdSet.has(String(f.id ?? f.properties?.id))
+    const allFeatures = panel.getFeatures();
+    const preToolFeatures = allFeatures.filter(
+      (f) => selectedIdSet.has(String(f.id))
     );
     if (preToolFeatures.length > 0) {
       preToolInputState = preToolFeatures.map((f) => {
-        const { provenance: _p, ...restProps } = f.properties ?? {};
+        const props = (f.properties ?? {}) as Record<string, unknown>;
+        const { provenance: _p, ...restProps } = props;
         return {
-          featureId: String(f.id ?? f.properties?.id),
+          featureId: String(f.id),
           geometry: JSON.parse(JSON.stringify(f.geometry)) as unknown,
           properties: JSON.parse(JSON.stringify(restProps)) as Record<string, unknown>,
         };

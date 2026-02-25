@@ -308,7 +308,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       const item = new vscode.TreeItem(name, vscode.TreeItemCollapsibleState.None);
       item.contextValue = 'track';
       item.description = trackType;
-      const geom = feature.geometry as { coordinates: number[][] };
+      const geom = feature.geometry as unknown as { coordinates: number[][] };
       item.tooltip = `${name}\nPlatform: ${trackType || 'Unknown'}\nPoints: ${geom.coordinates.length}`;
       item.iconPath = new vscode.ThemeIcon(isSelected ? 'check' : 'circle-outline');
 
