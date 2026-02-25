@@ -40,7 +40,16 @@
 
 .debrief-activity-panel__section--flexible .debrief-activity-panel__section-content {
   flex: 1 1 0%;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* FeatureList fills remaining space inside flexible section content */
+.debrief-activity-panel__section--flexible .debrief-feature-list {
+  flex: 1 1 0%;
+  min-height: 0;
 }
 
 /* Collapsed — header only, no flex growth */
