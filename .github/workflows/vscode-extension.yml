@@ -41,6 +41,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build shared packages
+        run: pnpm --filter @debrief/components build
+        working-directory: .
+
       - name: Lint
         run: pnpm run lint
 

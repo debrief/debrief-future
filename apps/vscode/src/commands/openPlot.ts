@@ -18,6 +18,7 @@ import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import { MapPanel } from '../webview/mapPanel';
+import { isTrackFeature, isReferenceLocation } from '@debrief/components';
 import { parseStacUri, buildStacUri } from '../types/stac';
 
 interface OpenPlotArgs {
@@ -131,7 +132,6 @@ export function createOpenPlotCommand(
     }
 
     // Derive track/location counts from unified features
-    const { isTrackFeature, isReferenceLocation } = await import('@debrief/components');
     const tracks = plotData.features.filter(isTrackFeature);
     const locations = plotData.features.filter(isReferenceLocation);
 
