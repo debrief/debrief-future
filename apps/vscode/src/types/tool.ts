@@ -22,6 +22,26 @@ export interface SelectionRequirement {
  * Tool definition (from @debrief/schemas).
  * Describes an analysis tool and its requirements.
  */
+/**
+ * A configurable parameter for a tool, extracted from MCP annotations.
+ */
+export interface ToolParameter {
+  /** Parameter identifier */
+  name: string;
+  /** Value type */
+  valueType: 'string' | 'number' | 'boolean' | 'enum';
+  /** Human-readable description */
+  description: string;
+  /** Whether parameter is required */
+  required?: boolean;
+  /** Default value */
+  defaultValue?: unknown;
+  /** Explicit choices (for enum type) */
+  choices?: string[];
+  /** Schema-defined parameter type name (from x-debrief-param-type) */
+  paramType?: string;
+}
+
 export interface Tool {
   /** Unique tool identifier */
   id: string;
@@ -35,6 +55,8 @@ export interface Tool {
   requirements?: SelectionRequirement[];
   /** Minimum total features across all kinds (for multi-kind tools) */
   minFeatures?: number;
+  /** Configurable parameters (only those with paramType or choices) */
+  parameters?: ToolParameter[];
 }
 
 /**

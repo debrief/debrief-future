@@ -592,7 +592,22 @@ for t in registry.list_all():
             reqs = [{"kind": k.upper(), "min": 1, "max": 1} for k in t.input_kinds]
         else:
             reqs = [{"kind": k.upper(), "min": 1} for k in t.input_kinds]
+    params = []
+    for p in t.parameters:
+        pd = {"name": p.name, "valueType": "enum" if p.type == "enum" else p.type, "description": p.description}
+        if p.required:
+            pd["required"] = True
+        if p.default is not None:
+            pd["defaultValue"] = p.default
+        if p.choices:
+            pd["choices"] = p.choices
+        if p.param_type:
+            pd["paramType"] = p.param_type
+        if p.param_type or p.choices:
+            params.append(pd)
     entry = {"id": t.name, "name": t.name, "description": t.description, "version": t.version, "requirements": reqs}
+    if params:
+        entry["parameters"] = params
     tools.append(entry)
 print(json.dumps(tools))
 `;
