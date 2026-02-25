@@ -395,13 +395,20 @@ export class StacService {
           } as DebriefFeature);
           locationCount++;
         } else {
-          // Annotation/shape feature (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR, POLY)
+          // Annotation/shape feature (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR, POLY, etc.)
+          const kind = props.kind as string | undefined;
+          if (!kind) {
+            const featureId = (props.id as string) ?? `annotation-${features.length}`;
+            throw new Error(
+              `Feature "${featureId}" is missing required "kind" property`,
+            );
+          }
           const id = (props.id as string) ?? `annotation-${features.length}`;
           features.push({
             type: 'Feature',
             id,
             geometry: geom,
-            properties: { ...props, kind: (props.kind as string) ?? geom.type },
+            properties: { ...props, kind },
           } as DebriefFeature);
         }
       }
