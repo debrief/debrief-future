@@ -153,7 +153,7 @@ jobs:
             const baseUrl = `https://debrief.github.io/debrief-future`;
             const previewUrl = `${baseUrl}/pr-preview/pr-${prNumber}/`;
             const webShellPreviewUrl = `${baseUrl}/pr-preview/pr-${prNumber}/web-shell/`;
-            const codeServerUrl = `https://debrief-preview-pr-${prNumber}.herokuapp.com`;
+            const codeServerUrl = `https://preview--pr-${prNumber}.herokuapp.com`;
             const persistentUrl = `${baseUrl}/components-storybook/`;
             const webShellUrl = `${baseUrl}/web-shell/`;
 

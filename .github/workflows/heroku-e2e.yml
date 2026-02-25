@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       heroku_url:
-        description: 'Heroku review app URL (e.g. https://debrief-preview-pr-123.herokuapp.com)'
+        description: 'Heroku review app URL (e.g. https://preview--pr-123.herokuapp.com)'
         required: true
         type: string
 
