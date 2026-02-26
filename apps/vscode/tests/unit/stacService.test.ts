@@ -267,7 +267,7 @@ describe('StacService', () => {
   // ===========================================================================
 
   describe('loadPlotData', () => {
-    it('should return tracks, locations, and otherFeatures for valid data', async () => {
+    it('should return a FeatureCollection with tracks, locations, and annotations', async () => {
       const store = createMockStore();
       const item = createMockItem({
         assets: {
@@ -295,9 +295,13 @@ describe('StacService', () => {
       const result = await service.loadPlotData(store, 'items/test.json');
 
       expect(result).not.toBeNull();
-      expect(result!.tracks).toHaveLength(1);
-      expect(result!.locations).toHaveLength(1);
-      expect(result!.otherFeatures).toHaveLength(1);
+      expect(result!.type).toBe('FeatureCollection');
+      const tracks = result!.features.filter((f: { properties: Record<string, unknown> }) => f.properties.kind === 'TRACK');
+      const locations = result!.features.filter((f: { properties: Record<string, unknown> }) => f.properties.kind === 'POINT');
+      const annotations = result!.features.filter((f: { properties: Record<string, unknown> }) => f.properties.kind !== 'TRACK' && f.properties.kind !== 'POINT');
+      expect(tracks).toHaveLength(1);
+      expect(locations).toHaveLength(1);
+      expect(annotations).toHaveLength(1);
     });
 
     it('should categorize LineString with times as Track', async () => {
@@ -322,8 +326,9 @@ describe('StacService', () => {
 
       const result = await service.loadPlotData(store, 'items/test.json');
 
-      expect(result!.tracks).toHaveLength(1);
-      expect(result!.tracks[0].name).toBe('Vessel Alpha');
+      const tracks = result!.features.filter((f: { properties: Record<string, unknown> }) => f.properties.kind === 'TRACK');
+      expect(tracks).toHaveLength(1);
+      expect((tracks[0].properties as Record<string, unknown>).platform_name).toBe('Vessel Alpha');
     });
 
     it('should categorize Point with kind=LOCATION as Location', async () => {
@@ -348,11 +353,12 @@ describe('StacService', () => {
 
       const result = await service.loadPlotData(store, 'items/test.json');
 
-      expect(result!.locations).toHaveLength(1);
-      expect(result!.locations[0].name).toBe('Waypoint A');
+      const locations = result!.features.filter((f: { properties: Record<string, unknown> }) => f.properties.kind === 'POINT');
+      expect(locations).toHaveLength(1);
+      expect((locations[0].properties as Record<string, unknown>).name).toBe('Waypoint A');
     });
 
-    it('should categorize other geometries as otherFeatures', async () => {
+    it('should categorize other geometries as annotation features', async () => {
       const store = createMockStore();
       const item = createMockItem({
         assets: {
@@ -374,10 +380,11 @@ describe('StacService', () => {
 
       const result = await service.loadPlotData(store, 'items/test.json');
 
-      expect(result!.otherFeatures).toHaveLength(1);
+      const annotations = result!.features.filter((f: { properties: Record<string, unknown> }) => f.properties.kind !== 'TRACK' && f.properties.kind !== 'POINT');
+      expect(annotations).toHaveLength(1);
     });
 
-    it('should return empty arrays when no GeoJSON asset (BUG FIX)', async () => {
+    it('should return empty features when no GeoJSON asset (BUG FIX)', async () => {
       const store = createMockStore();
       const item = createMockItem({
         assets: {}, // No GeoJSON asset
@@ -389,12 +396,11 @@ describe('StacService', () => {
       const result = await service.loadPlotData(store, 'items/test.json');
 
       expect(result).not.toBeNull();
-      expect(result!.tracks).toEqual([]);
-      expect(result!.locations).toEqual([]);
-      expect(result!.otherFeatures).toEqual([]);
+      expect(result!.type).toBe('FeatureCollection');
+      expect(result!.features).toEqual([]);
     });
 
-    it('should return empty arrays when GeoJSON file missing', async () => {
+    it('should return empty features when GeoJSON file missing', async () => {
       const store = createMockStore();
       const item = createMockItem({
         assets: {
@@ -411,9 +417,8 @@ describe('StacService', () => {
       const result = await service.loadPlotData(store, 'items/test.json');
 
       expect(result).not.toBeNull();
-      expect(result!.tracks).toEqual([]);
-      expect(result!.locations).toEqual([]);
-      expect(result!.otherFeatures).toEqual([]);
+      expect(result!.type).toBe('FeatureCollection');
+      expect(result!.features).toEqual([]);
     });
 
     it('should return null when item not found', async () => {
@@ -448,12 +453,12 @@ describe('StacService', () => {
 
       const result = await service.loadPlotData(store, 'items/test.json');
 
-      expect(result!.tracks).toHaveLength(1);
-      expect(result!.locations).toHaveLength(0);
-      expect(result!.otherFeatures).toHaveLength(0);
+      // Only the track should survive (null geometry skipped)
+      expect(result!.features).toHaveLength(1);
+      expect((result!.features[0].properties as Record<string, unknown>).kind).toBe('TRACK');
     });
 
-    it('should handle LineString without times as otherFeature', async () => {
+    it('should handle LineString without times as annotation feature', async () => {
       const store = createMockStore();
       const item = createMockItem({
         assets: {
@@ -484,11 +489,14 @@ describe('StacService', () => {
 
       const result = await service.loadPlotData(store, 'items/test.json');
 
-      expect(result!.tracks).toHaveLength(0);
-      expect(result!.otherFeatures).toHaveLength(1);
+      const tracks = result!.features.filter((f: { properties: Record<string, unknown> }) => f.properties.kind === 'TRACK');
+      expect(tracks).toHaveLength(0);
+      // LINE without times is an annotation
+      expect(result!.features).toHaveLength(1);
+      expect((result!.features[0].properties as Record<string, unknown>).kind).toBe('LINE');
     });
 
-    it('should handle Point without kind=LOCATION as otherFeature', async () => {
+    it('should handle Point without kind=LOCATION as annotation feature', async () => {
       const store = createMockStore();
       const item = createMockItem({
         assets: {
@@ -519,11 +527,14 @@ describe('StacService', () => {
 
       const result = await service.loadPlotData(store, 'items/test.json');
 
-      expect(result!.locations).toHaveLength(0);
-      expect(result!.otherFeatures).toHaveLength(1);
+      const locations = result!.features.filter((f: { properties: Record<string, unknown> }) => f.properties.kind === 'POINT');
+      expect(locations).toHaveLength(0);
+      // TEXT annotation
+      expect(result!.features).toHaveLength(1);
+      expect((result!.features[0].properties as Record<string, unknown>).kind).toBe('TEXT');
     });
 
-    it('should always return consistent object structure or null', async () => {
+    it('should always return consistent FeatureCollection structure or null', async () => {
       const store = createMockStore();
 
       // Test various edge cases all return the same structure
@@ -550,12 +561,9 @@ describe('StacService', () => {
         const result = await service.loadPlotData(store, 'items/test.json');
 
         expect(result).not.toBeNull();
-        expect(result).toHaveProperty('tracks');
-        expect(result).toHaveProperty('locations');
-        expect(result).toHaveProperty('otherFeatures');
-        expect(Array.isArray(result!.tracks)).toBe(true);
-        expect(Array.isArray(result!.locations)).toBe(true);
-        expect(Array.isArray(result!.otherFeatures)).toBe(true);
+        expect(result).toHaveProperty('type', 'FeatureCollection');
+        expect(result).toHaveProperty('features');
+        expect(Array.isArray(result!.features)).toBe(true);
       }
     });
   });

@@ -121,6 +121,35 @@ test.describe('Real Webview Screenshot', () => {
 
     // ─── Step 1: Open the plot via STAC tree (map in editor) ───
 
+    // Helper: focus the STAC Stores view via command palette.
+    // This ensures the view is scrolled into view and has sufficient render height,
+    // which is critical in CI where the Explorer sidebar may allocate minimal
+    // space to the STAC STORES pane by default.
+    const focusStacView = async (): Promise<void> => {
+      await page.keyboard.press('Control+Shift+P');
+      await page.waitForTimeout(500);
+      await page.keyboard.type('View: Focus on STAC Stores View', { delay: 20 });
+      await page.waitForTimeout(1_000);
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(2_000);
+    };
+
+    // Helper: wait for extension activation by polling for context indicators.
+    // Returns true if stores are ready, false if still loading after timeout.
+    const waitForExtensionReady = async (timeoutMs: number): Promise<boolean> => {
+      const start = Date.now();
+      while (Date.now() - start < timeoutMs) {
+        const loadingVisible = await page.getByText('Loading stores').isVisible().catch(() => false);
+        if (!loadingVisible) {
+          // Extension has activated (either has stores or shows "No STAC stores configured")
+          return true;
+        }
+        console.log('  Extension still loading stores, waiting...');
+        await page.waitForTimeout(2_000);
+      }
+      return false;
+    };
+
     // Helper: ensure the STAC STORES pane is expanded (not collapsed).
     // Clicking the pane header TOGGLES expand/collapse, so we must check
     // the aria-expanded attribute first to avoid collapsing an already-open pane.
@@ -170,9 +199,13 @@ test.describe('Real Webview Screenshot', () => {
       }
     };
 
-    // Navigate to Explorer view first (ensure sidebar is showing the tree views)
-    await page.keyboard.press('Control+Shift+E');
-    await page.waitForTimeout(2_000);
+    // Focus the STAC Stores view directly — this gives it screen space and scrolls
+    // it into view, avoiding issues where the pane has zero height in the Explorer.
+    await focusStacView();
+
+    // Wait for the extension to finish activating (Loading stores... disappears)
+    const extensionReady = await waitForExtensionReady(20_000);
+    console.log(`  Extension ready: ${extensionReady}`);
 
     // Ensure the STAC STORES pane is expanded
     await ensureStacPaneExpanded();
@@ -239,9 +272,10 @@ test.describe('Real Webview Screenshot', () => {
         await route.fulfill({ body: greyPng, contentType: 'image/png' });
       });
 
-      // Re-navigate to Explorer and ensure STAC pane is expanded
-      await page.keyboard.press('Control+Shift+E');
-      await page.waitForTimeout(3_000);
+      // Focus STAC view directly (gives it screen space) and wait for activation
+      await focusStacView();
+      const readyAfterReload = await waitForExtensionReady(20_000);
+      console.log(`  Extension ready after reload: ${readyAfterReload}`);
       await ensureStacPaneExpanded();
 
       storeRowVisible = await storeRow.waitFor({ state: 'visible', timeout: 15_000 })

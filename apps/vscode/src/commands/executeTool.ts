@@ -16,6 +16,59 @@ import type { MapPanel } from '../webview/mapPanel';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import type { LogService, InputFeatureState, ResultIdRegistry } from '@debrief/session-state';
+import type { ToolParameter } from '../types/tool';
+
+/**
+ * Known parameter type → values map.
+ * Mirrors @debrief/components paramTypeResolver for use in VS Code QuickPick.
+ */
+const PARAM_TYPE_VALUES: Record<string, string[]> = {
+  ReferencePointPattern: ['grid', 'scatter'],
+  NamedColor: ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'brown', 'grey', 'black', 'white'],
+  MarkerSymbol: ['circle', 'square', 'triangle', 'diamond', 'cross', 'star'],
+  CardinalDirection: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'],
+};
+
+/**
+ * Collect tool parameters via VS Code QuickPick.
+ * Returns collected params or undefined if the user cancelled.
+ */
+async function collectParameters(
+  parameters: ToolParameter[],
+  toolName: string,
+): Promise<Record<string, unknown> | undefined> {
+  const collected: Record<string, unknown> = {};
+
+  for (const param of parameters) {
+    // Resolve choices: explicit choices, or from known paramType
+    const choices: string[] =
+      param.choices?.map(String) ??
+      (param.paramType ? PARAM_TYPE_VALUES[param.paramType] ?? [] : []);
+
+    if (choices.length === 0) { continue; }
+
+    const items: vscode.QuickPickItem[] = choices.map((c) => ({
+      label: c.charAt(0).toUpperCase() + c.slice(1),
+      description: param.defaultValue !== undefined && String(param.defaultValue) === c ? '(default)' : undefined,
+      detail: undefined,
+      picked: false,
+    }));
+
+    const picked = await vscode.window.showQuickPick(items, {
+      placeHolder: `${toolName}: ${param.description || param.name}`,
+      title: param.description || param.name,
+    });
+
+    if (!picked) { return undefined; } // user cancelled
+
+    // Store the raw value (lowercase original)
+    const rawValue = choices[items.indexOf(picked)];
+    // Convert numeric strings to numbers for numeric params
+    collected[param.name] = param.valueType === 'number' ? Number(rawValue) : rawValue;
+  }
+
+  return collected;
+}
 
 /**
  * Create the execute tool command
@@ -77,18 +130,28 @@ export function createExecuteToolCommand(
     const tool = tools.find((t) => t.id === resolvedToolId);
     const toolName = tool?.name ?? resolvedToolId;
 
+    // Collect parameters if needed (Feature: 091)
+    if (!toolParams && tool?.parameters && tool.parameters.length > 0) {
+      const collected = await collectParameters(tool.parameters, toolName);
+      if (!collected) {
+        return; // user cancelled parameter collection
+      }
+      toolParams = collected;
+    }
+
     // Capture pre-tool geometry for mutation tools (enables correct tune replay)
     let preToolInputState: InputFeatureState[] | undefined;
     const selectedIdSet = new Set(selectedFeatureIds);
-    const otherFeatures = panel.getOtherFeatures();
-    const preToolFeatures = otherFeatures.filter(
-      (f) => selectedIdSet.has(String(f.id ?? f.properties?.id))
+    const allFeatures = panel.getFeatures();
+    const preToolFeatures = allFeatures.filter(
+      (f) => selectedIdSet.has(String(f.id))
     );
     if (preToolFeatures.length > 0) {
       preToolInputState = preToolFeatures.map((f) => {
-        const { provenance: _p, ...restProps } = f.properties ?? {};
+        const props = (f.properties ?? {}) as Record<string, unknown>;
+        const { provenance: _p, ...restProps } = props;
         return {
-          featureId: String(f.id ?? f.properties?.id),
+          featureId: String(f.id),
           geometry: JSON.parse(JSON.stringify(f.geometry)) as unknown,
           properties: JSON.parse(JSON.stringify(restProps)) as Record<string, unknown>,
         };

@@ -186,6 +186,7 @@ def _generate_scatter(
             type="number",
             description="Number of reference points to generate",
             default=20,
+            choices=[1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000],
         ),
         ToolParameter(
             name="seed",

@@ -32,6 +32,16 @@ export const toolDefinition: MCPToolDefinition = {
     type: 'object',
     properties: {
       features: { type: 'array', items: { type: 'object' } },
+      params: {
+        type: 'object',
+        properties: {
+          include_centroid: {
+            type: 'boolean',
+            default: true,
+            description: 'Include centroid point in output',
+          },
+        },
+      },
     },
   },
   annotations: {
@@ -56,8 +66,10 @@ function flattenCoords(coords: unknown): Position[] {
 
 export function execute(
   features: GeoJSONFeature[],
-  _params: Record<string, unknown>,
+  params: Record<string, unknown>,
 ): GeoJSONFeature[] {
+  const includeCentroid = params?.include_centroid !== false;
+
   if (features.length === 0) throw new Error('No features selected');
 
   let minLon = Infinity, minLat = Infinity;
@@ -83,7 +95,15 @@ export function execute(
   const heightNm = heightDeg * 60;
   const areaSqNm = widthNm * heightNm;
 
-  const centroid = [(minLon + maxLon) / 2, (minLat + maxLat) / 2];
+  const statistics: Record<string, unknown> = {
+    area_sq_nm: Math.round(areaSqNm * 100) / 100,
+    width_nm: Math.round(widthNm * 100) / 100,
+    height_nm: Math.round(heightNm * 100) / 100,
+  };
+
+  if (includeCentroid) {
+    statistics.centroid = [(minLon + maxLon) / 2, (minLat + maxLat) / 2];
+  }
 
   const featureNames = features
     .map(f => (f.properties?.name ?? f.id ?? 'feature') as string)
@@ -106,12 +126,7 @@ export function execute(
       kind: 'RECTANGLE',
       name: `Area Summary`,
       label: `Area Summary`,
-      statistics: {
-        area_sq_nm: Math.round(areaSqNm * 100) / 100,
-        width_nm: Math.round(widthNm * 100) / 100,
-        height_nm: Math.round(heightNm * 100) / 100,
-        centroid,
-      },
+      statistics,
       bounds: [minLon, minLat, maxLon, maxLat],
       style: {
         fill: true,

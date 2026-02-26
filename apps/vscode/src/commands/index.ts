@@ -279,35 +279,9 @@ export function registerCommands(
           const isVisible = !hiddenIds.includes(featureId);
           panel.setLayerVisibility(args.layerId, isVisible);
         } else {
-          // Fallback to legacy behavior for backward compatibility
-          const tracks = panel.getTracks();
-          const locations = panel.getLocations();
-          const results = panel.getResultLayers();
-
-          if (args.layerId.startsWith('track-')) {
-            const trackId = args.layerId.replace('track-', '');
-            const track = tracks.find((t) => t.id === trackId);
-            if (track) {
-              track.visible = !track.visible;
-              panel.setLayerVisibility(args.layerId, track.visible);
-              layersTreeProvider.setTracks(tracks);
-            }
-          } else if (args.layerId.startsWith('location-')) {
-            const locationId = args.layerId.replace('location-', '');
-            const location = locations.find((l) => l.id === locationId);
-            if (location) {
-              location.visible = !location.visible;
-              panel.setLayerVisibility(args.layerId, location.visible);
-              layersTreeProvider.setLocations(locations);
-            }
-          } else {
-            const layer = results.find((l) => l.id === args.layerId);
-            if (layer) {
-              layer.visible = !layer.visible;
-              panel.setLayerVisibility(args.layerId, layer.visible);
-              layersTreeProvider.setResultLayers(results);
-            }
-          }
+          // Fallback: toggle visibility directly when no session is active
+          panel.setLayerVisibility(args.layerId, true);
+          layersTreeProvider.setFeatures(panel.getFeatures());
         }
       }
     )

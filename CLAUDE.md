@@ -122,6 +122,7 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 
 ## Active Technologies
 Only updated when a feature introduces a technology not already listed here.
+- TypeScript 5.x (VS Code extension + shared components) + `@debrief/schemas` (generated types), `@debrief/components` (MapView), VS Code Extension API ^1.85.0 (100-unify-feature-pipeline)
 - CSS3 (within TypeScript 5.x React component library) + React 18.x, @tanstack/react-virtual (FeatureList virtualisation) (101-layers-panel-vertical-space)
 
 - Python 3.11 (services, schemas, calc tools)
@@ -149,5 +150,6 @@ Only updated when a feature introduces a technology not already listed here.
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during `pnpm build`) does. The `verify` task ensures type checking is performed across all three entry points: `@debrief/components`, `@debrief/web-shell`, and `apps/vscode`.
 
 ## Recent Changes
+- 100-unify-feature-pipeline: Added TypeScript 5.x (VS Code extension + shared components) + `@debrief/schemas` (generated types), `@debrief/components` (MapView), VS Code Extension API ^1.85.0
 - 101-layers-panel-vertical-space: Added CSS3 (within TypeScript 5.x React component library) + React 18.x, @tanstack/react-virtual (FeatureList virtualisation)
 - 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)

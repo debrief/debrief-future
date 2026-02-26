@@ -536,30 +536,7 @@ export class CalcService {
     const script = `
 import json
 from debrief_calc.registry import registry
-from debrief_calc.models import ContextType
-tools = []
-for t in registry.list_all():
-    ctx = t.context_type
-    if ctx == ContextType.REGION:
-        reqs = [{"kind": "REGION", "min": 1, "max": 1}]
-    elif ctx == ContextType.NONE:
-        reqs = []
-    elif ctx == ContextType.SINGLE:
-        reqs = [{"kind": k.upper(), "min": 1, "max": 1} for k in t.input_kinds]
-    else:
-        reqs = [{"kind": k.upper(), "min": 1} for k in t.input_kinds]
-    entry = {
-        "name": t.name,
-        "description": t.description,
-        "inputSchema": {"type": "object", "properties": {}},
-        "annotations": {
-            "debrief:selectionRequirements": reqs,
-            "debrief:category": getattr(t, "category", "general"),
-            "debrief:version": t.version,
-            "debrief:outputKind": getattr(t, "output_kind", "unknown")
-        }
-    }
-    tools.append(entry)
+tools = [t.to_mcp_tool() for t in registry.list_all()]
 print(json.dumps(tools))
 `;
     const { stdout } = await execFileAsync(pythonPath, ['-c', script], {
@@ -592,7 +569,22 @@ for t in registry.list_all():
             reqs = [{"kind": k.upper(), "min": 1, "max": 1} for k in t.input_kinds]
         else:
             reqs = [{"kind": k.upper(), "min": 1} for k in t.input_kinds]
+    params = []
+    for p in t.parameters:
+        pd = {"name": p.name, "valueType": "enum" if p.type == "enum" else p.type, "description": p.description}
+        if p.required:
+            pd["required"] = True
+        if p.default is not None:
+            pd["defaultValue"] = p.default
+        if p.choices:
+            pd["choices"] = p.choices
+        if p.param_type:
+            pd["paramType"] = p.param_type
+        if p.param_type or p.choices:
+            params.append(pd)
     entry = {"id": t.name, "name": t.name, "description": t.description, "version": t.version, "requirements": reqs}
+    if params:
+        entry["parameters"] = params
     tools.append(entry)
 print(json.dumps(tools))
 `;
@@ -613,55 +605,20 @@ print(json.dumps(tools))
       throw new Error('No map panel available');
     }
 
-    const tracks = panel.getTracks();
-    const locations = panel.getLocations();
-    const otherFeatures = panel.getOtherFeatures();
+    const allFeatures = panel.getFeatures();
     const resultLayers = panel.getResultLayers();
-    const features: Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> = [];
+    const resolved: Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> = [];
 
     for (const id of featureIds) {
-      const track = tracks.find((t) => t.id === id);
-      if (track) {
-        features.push({
+      const feature = allFeatures.find((f) => String(f.id) === id);
+      if (feature) {
+        const props = feature.properties as Record<string, unknown>;
+        resolved.push({
           type: 'Feature',
-          geometry: track.geometry,
-          properties: {
-            id: track.id,
-            name: track.name,
-            kind: 'TRACK',
-            platformType: track.platformType,
-            times: track.times,
-            startTime: track.startTime,
-            endTime: track.endTime,
-          },
-        });
-        continue;
-      }
-
-      const location = locations.find((l) => l.id === id);
-      if (location) {
-        features.push({
-          type: 'Feature',
-          geometry: location.geometry,
-          properties: {
-            id: location.id,
-            name: location.name,
-            kind: 'LOCATION',
-            locationType: location.locationType,
-          },
-        });
-        continue;
-      }
-
-      const shape = otherFeatures.find((f) => (f.properties as Record<string, unknown>)?.id === id);
-      if (shape) {
-        const props = shape.properties ?? {};
-        features.push({
-          type: 'Feature',
-          geometry: shape.geometry,
+          geometry: feature.geometry,
           properties: {
             ...props,
-            kind: (props.kind as string) ?? 'SHAPE',
+            id: feature.id,
           },
         });
         continue;
@@ -669,12 +626,12 @@ print(json.dumps(tools))
 
       const resultLayer = resultLayers.find((l) => l.id === id);
       if (resultLayer) {
-        for (const feature of resultLayer.features.features) {
-          features.push({
+        for (const rlFeature of resultLayer.features.features) {
+          resolved.push({
             type: 'Feature',
-            geometry: feature.geometry,
+            geometry: rlFeature.geometry,
             properties: {
-              ...feature.properties,
+              ...rlFeature.properties,
               kind: 'result',
               sourceToolId: resultLayer.toolId,
               sourceToolName: resultLayer.toolName,
@@ -688,7 +645,7 @@ print(json.dumps(tools))
       throw new Error(`Feature not found: ${id}`);
     }
 
-    return features;
+    return resolved;
   }
 
   private async executeToolOnMcp(

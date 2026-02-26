@@ -22,6 +22,26 @@ export interface SelectionRequirement {
  * Tool definition (from @debrief/schemas).
  * Describes an analysis tool and its requirements.
  */
+/**
+ * A configurable parameter for a tool, extracted from MCP annotations.
+ */
+export interface ToolParameter {
+  /** Parameter identifier */
+  name: string;
+  /** Value type */
+  valueType: 'string' | 'number' | 'boolean' | 'enum';
+  /** Human-readable description */
+  description: string;
+  /** Whether parameter is required */
+  required?: boolean;
+  /** Default value */
+  defaultValue?: unknown;
+  /** Explicit choices (for enum type) */
+  choices?: string[];
+  /** Schema-defined parameter type name (from x-debrief-param-type) */
+  paramType?: string;
+}
+
 export interface Tool {
   /** Unique tool identifier */
   id: string;
@@ -35,6 +55,8 @@ export interface Tool {
   requirements?: SelectionRequirement[];
   /** Minimum total features across all kinds (for multi-kind tools) */
   minFeatures?: number;
+  /** Configurable parameters (only those with paramType or choices) */
+  parameters?: ToolParameter[];
 }
 
 /**
@@ -69,31 +91,25 @@ export function createSelectionFromCounts(counts: Record<string, number>): ToolS
 }
 
 /**
- * Check if a tool's requirements are satisfied by a selection.
+ * Check if ANY of a tool's requirements are satisfied by a selection (OR semantics).
+ *
+ * Each requirement entry is an alternative — selecting 1 POLY or 1 RECTANGLE
+ * or 1 CIRCLE each independently satisfies a tool that lists all three.
  */
 function checkRequirements(requirements: SelectionRequirement[], selection: ToolSelection): boolean {
-  const acceptedKinds = new Set(requirements.map((r) => r.kind));
-
-  // Reject if selection contains kinds the tool doesn't accept
-  for (const kind of selection.keys()) {
-    if (!acceptedKinds.has(kind) && (selection.get(kind) ?? 0) > 0) {
-      return false;
-    }
-  }
-
   for (const req of requirements) {
     const count = selection.get(req.kind) ?? 0;
     const min = req.min ?? 1;
-    const max = req.max;
 
     if (count < min) {
-      return false;
+      continue;
     }
-    if (max !== undefined && count > max) {
-      return false;
+    if (req.max !== undefined && count > req.max) {
+      continue;
     }
+    return true;
   }
-  return true;
+  return false;
 }
 
 /**
@@ -104,38 +120,17 @@ export function getInactiveReason(tool: Tool, selection: ToolSelection): string 
     return '';
   }
 
-  const reasons: string[] = [];
-  const acceptedKinds = new Set(tool.requirements.map((r) => r.kind));
+  // OR semantics — show what kinds would satisfy the tool
+  const accepted = tool.requirements.map((r) => r.kind);
+  const selectedKinds = [...selection.entries()]
+    .filter(([, count]) => count > 0)
+    .map(([kind]) => kind);
 
-  for (const [kind, count] of selection) {
-    if (!acceptedKinds.has(kind) && count > 0) {
-      reasons.push(`Unexpected ${kind} in selection`);
-    }
+  if (selectedKinds.length === 0) {
+    return `Select ${accepted.join(' or ')}`;
   }
 
-  for (const req of tool.requirements) {
-    const count = selection.get(req.kind) ?? 0;
-    const min = req.min ?? 1;
-    const max = req.max;
-
-    if (count < min) {
-      reasons.push(`Need ${min} ${req.kind}, have ${count}`);
-    } else if (max !== undefined && count > max) {
-      reasons.push(`Need at most ${max} ${req.kind}, have ${count}`);
-    }
-  }
-
-  if (tool.minFeatures !== undefined) {
-    let total = 0;
-    for (const count of selection.values()) {
-      total += count;
-    }
-    if (total < tool.minFeatures) {
-      reasons.push(`Need ${tool.minFeatures} features total, have ${total}`);
-    }
-  }
-
-  return reasons.join('; ');
+  return `Need ${accepted.join(' or ')}, have ${selectedKinds.join(', ')}`;
 }
 
 /**

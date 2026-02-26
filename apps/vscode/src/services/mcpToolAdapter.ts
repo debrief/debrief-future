@@ -17,7 +17,7 @@
  * ---
  */
 
-import type { MCPToolDefinition, Tool, SelectionRequirement } from '../types/tool';
+import type { MCPToolDefinition, Tool, ToolParameter, SelectionRequirement } from '../types/tool';
 
 /**
  * Convert kebab-case tool name to display name.
@@ -28,6 +28,55 @@ function formatToolName(name: string): string {
     .split('-')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+}
+
+/** JSON Schema property shape inside inputSchema.properties.params.properties */
+interface MCPParamSchema {
+  type?: string;
+  description?: string;
+  enum?: unknown[];
+  default?: unknown;
+  'x-debrief-param-type'?: string;
+}
+
+function mapParamType(schema: MCPParamSchema): ToolParameter['valueType'] {
+  if (schema.enum) { return 'enum'; }
+  switch (schema.type) {
+    case 'integer':
+    case 'number':
+      return 'number';
+    case 'boolean':
+      return 'boolean';
+    default:
+      return 'string';
+  }
+}
+
+/**
+ * Extract collectible parameters from MCP inputSchema.
+ * Only returns parameters that have a paramType or explicit choices,
+ * matching the web-shell's ParameterCollector filter.
+ */
+function extractParameters(mcpTool: MCPToolDefinition): ToolParameter[] {
+  const paramsSchema = mcpTool.inputSchema?.properties?.params as
+    | { type: 'object'; properties: Record<string, MCPParamSchema> }
+    | undefined;
+  if (!paramsSchema?.properties) { return []; }
+
+  const all = Object.entries(paramsSchema.properties).map(([name, schema]) => {
+    const param: ToolParameter = {
+      name,
+      valueType: mapParamType(schema),
+      description: schema.description ?? '',
+    };
+    if (schema.enum) { param.choices = schema.enum as string[]; }
+    if (schema.default !== undefined) { param.defaultValue = schema.default; }
+    if (schema['x-debrief-param-type']) { param.paramType = schema['x-debrief-param-type']; }
+    return param;
+  });
+
+  // Only keep parameters that can be presented in a picker
+  return all.filter(p => p.paramType || p.choices);
 }
 
 /**
@@ -41,12 +90,15 @@ function fromMCPTool(mcpTool: MCPToolDefinition): Tool {
       ...(req.max !== undefined ? { max: req.max } : {}),
     }));
 
+  const parameters = extractParameters(mcpTool);
+
   return {
     id: mcpTool.name,
     name: formatToolName(mcpTool.name),
     description: mcpTool.description,
     version: mcpTool.annotations['debrief:version'],
     requirements,
+    ...(parameters.length > 0 ? { parameters } : {}),
   };
 }
 

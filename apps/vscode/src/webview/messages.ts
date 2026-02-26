@@ -5,8 +5,8 @@
  * and the map webview panel.
  */
 
-import type { Track, ReferenceLocation, SelectionContextType } from '../types/plot';
 import type { LayerStyle } from '../types/tool';
+import type { DebriefFeature } from '@debrief/components';
 
 // Type-safe properties to avoid any from geojson
 type SafeProperties = Record<string, unknown> | null;
@@ -72,18 +72,10 @@ export interface LoadPlotMessage {
   plot: {
     id: string;
     title: string;
-    tracks: Track[];
-    locations: ReferenceLocation[];
-    otherFeatures?: GeoJSONFeature[];
+    features: DebriefFeature[];
     bbox: [number, number, number, number];
     timeExtent: [string, string];
   };
-}
-
-/** Update track data (after time filter change) */
-export interface UpdateTracksMessage {
-  type: 'updateTracks';
-  tracks: Track[];
 }
 
 /** Set the current selection (from external source like Outline click) */
@@ -197,11 +189,9 @@ export interface RequestTrackDetailsResponse extends ResponseMessage {
 export interface SelectionChangedMessage {
   type: 'selectionChanged';
   selection: {
-    trackIds: string[];
-    locationIds: string[];
+    featureIds: string[];
     /** Full selection paths for all selected elements (Feature 053) */
     paths?: string[];
-    contextType: SelectionContextType;
   };
 }
 
@@ -310,7 +300,6 @@ export interface ImportCompleteMessage {
 /** All messages from extension to webview */
 export type ExtensionToWebviewMessage =
   | LoadPlotMessage
-  | UpdateTracksMessage
   | SetSelectionMessage
   | ClearSelectionMessage
   | AddResultLayerMessage
@@ -346,12 +335,5 @@ export type WebviewToExtensionMessage =
 // Re-exports for webview
 // ============================================================================
 
-export type {
-  Track,
-  ReferenceLocation,
-  SelectionContextType,
-  PositionStyle,
-  PositionStyleOverride,
-  TimestampedPosition,
-} from '../types/plot';
 export type { LayerStyle, ResultLayer } from '../types/tool';
+export type { DebriefFeature } from '@debrief/components';
