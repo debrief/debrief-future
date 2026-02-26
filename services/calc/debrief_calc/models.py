@@ -499,8 +499,9 @@ class Tool(BaseModel):
             schema["type"] = "boolean"
         elif param.type == "enum":
             schema["type"] = "string"
-            if param.choices:
-                schema["enum"] = param.choices
+
+        if param.choices:
+            schema["enum"] = param.choices
 
         if param.default is not None:
             schema["default"] = param.default
