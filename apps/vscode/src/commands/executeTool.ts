@@ -45,7 +45,7 @@ async function collectParameters(
       param.choices?.map(String) ??
       (param.paramType ? PARAM_TYPE_VALUES[param.paramType] ?? [] : []);
 
-    if (choices.length === 0) continue;
+    if (choices.length === 0) { continue; }
 
     const items: vscode.QuickPickItem[] = choices.map((c) => ({
       label: c.charAt(0).toUpperCase() + c.slice(1),
@@ -59,7 +59,7 @@ async function collectParameters(
       title: param.description || param.name,
     });
 
-    if (!picked) return undefined; // user cancelled
+    if (!picked) { return undefined; } // user cancelled
 
     // Store the raw value (lowercase original)
     const rawValue = choices[items.indexOf(picked)];

@@ -50,7 +50,7 @@ interface TemporalDisplayModeMessage {
 
 interface ToolRunMessage {
   type: 'tool:run';
-  payload: { toolId: string };
+  payload: { toolId: string; params?: Record<string, unknown> };
 }
 
 interface LayerToggleVisibilityMessage {

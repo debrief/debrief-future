@@ -40,7 +40,7 @@ interface MCPParamSchema {
 }
 
 function mapParamType(schema: MCPParamSchema): ToolParameter['valueType'] {
-  if (schema.enum) return 'enum';
+  if (schema.enum) { return 'enum'; }
   switch (schema.type) {
     case 'integer':
     case 'number':
@@ -61,7 +61,7 @@ function extractParameters(mcpTool: MCPToolDefinition): ToolParameter[] {
   const paramsSchema = mcpTool.inputSchema?.properties?.params as
     | { type: 'object'; properties: Record<string, MCPParamSchema> }
     | undefined;
-  if (!paramsSchema?.properties) return [];
+  if (!paramsSchema?.properties) { return []; }
 
   const all = Object.entries(paramsSchema.properties).map(([name, schema]) => {
     const param: ToolParameter = {
@@ -69,9 +69,9 @@ function extractParameters(mcpTool: MCPToolDefinition): ToolParameter[] {
       valueType: mapParamType(schema),
       description: schema.description ?? '',
     };
-    if (schema.enum) param.choices = schema.enum as string[];
-    if (schema.default !== undefined) param.defaultValue = schema.default;
-    if (schema['x-debrief-param-type']) param.paramType = schema['x-debrief-param-type'];
+    if (schema.enum) { param.choices = schema.enum as string[]; }
+    if (schema.default !== undefined) { param.defaultValue = schema.default; }
+    if (schema['x-debrief-param-type']) { param.paramType = schema['x-debrief-param-type']; }
     return param;
   });
 
