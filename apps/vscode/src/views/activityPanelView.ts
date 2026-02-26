@@ -242,6 +242,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
       description: match.tool.description,
       applicable: match.isActive,
       explanation: match.isActive ? undefined : match.explanation,
+      ...(match.tool.parameters ? { parameters: match.tool.parameters } : {}),
     }));
 
     // hasToolInventory: undefined = still checking (show loading),
@@ -430,8 +431,8 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
           break;
 
         case 'tool:run':
-          // Delegate to CalcService
-          void this._handleToolRun(message.payload.toolId);
+          // Delegate to CalcService (pass params collected by webview ParameterCollector)
+          void this._handleToolRun(message.payload.toolId, message.payload.params);
           break;
 
         case 'layer:toggleVisibility':
@@ -486,10 +487,11 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   /**
    * Handle tool execution request - delegates to registered command
    */
-  private async _handleToolRun(toolId: string): Promise<void> {
+  private async _handleToolRun(toolId: string, params?: Record<string, unknown>): Promise<void> {
     // Delegate to the registered executeTool command which handles
     // result layer creation, map updates, STAC persistence, and notifications
-    await vscode.commands.executeCommand('debrief.executeTool', toolId);
+    await vscode.commands.executeCommand('debrief.executeTool',
+      params ? { toolId, params } : toolId);
   }
 
   /**
