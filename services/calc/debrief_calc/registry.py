@@ -240,7 +240,7 @@ def tool(
             return func(*args, **kwargs)
 
         # Attach tool metadata to the wrapper
-        wrapper.tool = tool_instance
+        setattr(wrapper, "tool", tool_instance)  # noqa: B010
 
         return wrapper
 

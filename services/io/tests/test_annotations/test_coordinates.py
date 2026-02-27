@@ -96,6 +96,7 @@ class TestParseLatLon:
     def test_geojson_order(self) -> None:
         """Result is in GeoJSON order [lon, lat]."""
         result = parse_lat_lon("21 0 0 N 45 0 0 W")
+        assert result is not None
         lon, lat = result
         assert lon == -45.0  # Longitude first
         assert lat == 21.0  # Latitude second

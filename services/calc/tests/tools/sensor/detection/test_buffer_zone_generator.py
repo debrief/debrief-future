@@ -11,6 +11,7 @@ from debrief_calc.tools.sensor.detection.buffer_zone_generator import (
     translate_point,
 )
 from debrief_calc.tools.sensor.detection.sensor_model import (
+    SensorModel,
     SensorModelZone,
 )
 
@@ -101,13 +102,13 @@ NON_TRACK_FEATURE = {
 def _run(
     track: dict[str, Any] | None = None,
     params: dict[str, Any] | None = None,
-    **kwargs: object,
-) -> tuple[dict[str, Any], list[dict[str, Any]], list[object]]:
+    sensor_model: SensorModel | None = None,
+) -> tuple[dict[str, Any], list[dict[str, Any]], list[Any]]:
     """Run the tool and return (feature, zones, rings) for convenience."""
     if track is None:
         track = copy.deepcopy(SIMPLE_TRACK)
     context = SelectionContext(type=ContextType.SINGLE, features=[track])
-    result = buffer_zone_generator(context, params or {}, **kwargs)
+    result = buffer_zone_generator(context, params or {}, sensor_model=sensor_model)
     feature = result[0]
     zones = feature["properties"]["zones"]
     rings = feature["geometry"]["coordinates"]
@@ -169,49 +170,57 @@ class TestConvexHull:
 
     def test_triangle(self) -> None:
         """Three points forming a triangle."""
-        points = [(0, 0), (4, 0), (2, 3)]
+        points = [(0.0, 0.0), (4.0, 0.0), (2.0, 3.0)]
         hull = convex_hull(points)
         assert len(hull) == 3
-        assert set(hull) == {(0, 0), (4, 0), (2, 3)}
+        assert set(hull) == {(0.0, 0.0), (4.0, 0.0), (2.0, 3.0)}
 
     def test_square(self) -> None:
         """Four corner points of a square."""
-        points = [(0, 0), (4, 0), (4, 4), (0, 4)]
+        points = [(0.0, 0.0), (4.0, 0.0), (4.0, 4.0), (0.0, 4.0)]
         hull = convex_hull(points)
         assert len(hull) == 4
 
     def test_collinear(self) -> None:
         """Collinear points: hull should be just the endpoints."""
-        points = [(0, 0), (1, 1), (2, 2), (3, 3)]
+        points = [(0.0, 0.0), (1.0, 1.0), (2.0, 2.0), (3.0, 3.0)]
         hull = convex_hull(points)
         assert len(hull) == 2
-        assert (0, 0) in hull
-        assert (3, 3) in hull
+        assert (0.0, 0.0) in hull
+        assert (3.0, 3.0) in hull
 
     def test_single_point(self) -> None:
         """Single point returns that point."""
-        points = [(5, 5)]
+        points = [(5.0, 5.0)]
         hull = convex_hull(points)
-        assert hull == [(5, 5)]
+        assert hull == [(5.0, 5.0)]
 
     def test_two_points(self) -> None:
         """Two points returns both."""
-        points = [(0, 0), (5, 5)]
+        points = [(0.0, 0.0), (5.0, 5.0)]
         hull = convex_hull(points)
         assert len(hull) == 2
 
     def test_interior_points_excluded(self) -> None:
         """Interior points not in hull."""
-        points = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2), (1, 1), (3, 3)]
+        points = [
+            (0.0, 0.0),
+            (4.0, 0.0),
+            (4.0, 4.0),
+            (0.0, 4.0),
+            (2.0, 2.0),
+            (1.0, 1.0),
+            (3.0, 3.0),
+        ]
         hull = convex_hull(points)
         assert len(hull) == 4
-        assert (2, 2) not in hull
-        assert (1, 1) not in hull
-        assert (3, 3) not in hull
+        assert (2.0, 2.0) not in hull
+        assert (1.0, 1.0) not in hull
+        assert (3.0, 3.0) not in hull
 
     def test_duplicate_points(self) -> None:
         """Duplicate points handled correctly."""
-        points = [(0, 0), (0, 0), (4, 0), (4, 0), (2, 3)]
+        points = [(0.0, 0.0), (0.0, 0.0), (4.0, 0.0), (4.0, 0.0), (2.0, 3.0)]
         hull = convex_hull(points)
         assert len(hull) == 3
 

@@ -1,7 +1,5 @@
 """Unit tests for debrief-calc exceptions."""
 
-from typing import Never
-
 import pytest
 from debrief_calc.exceptions import (
     DebriefCalcError,
@@ -147,7 +145,7 @@ class TestExecutionError:
         assert d["details"]["error_type"] == "TypeError"
         assert "wrong type" in d["details"]["original_error"]
 
-    def test_error_can_be_caught_as_base(self) -> Never:
+    def test_error_can_be_caught_as_base(self) -> None:
         original = ValueError("test")
         error = ExecutionError("tool", original)
 

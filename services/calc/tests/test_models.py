@@ -3,6 +3,7 @@
 import json
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import pytest
 from debrief_calc.models import (
@@ -56,11 +57,11 @@ class TestSourceRef:
 
     def test_source_ref_requires_id(self) -> None:
         with pytest.raises(PydanticValidationError):
-            SourceRef(kind="TRACK")
+            SourceRef(kind="TRACK")  # type: ignore[reportCallIssue]
 
     def test_source_ref_requires_kind(self) -> None:
         with pytest.raises(PydanticValidationError):
-            SourceRef(id="track-001")
+            SourceRef(id="track-001")  # type: ignore[reportCallIssue]
 
 
 class TestProvenance:
@@ -158,7 +159,7 @@ class TestToolParameter:
 
     def test_valid_types_accepted(self) -> None:
         for param_type in ["string", "number", "boolean", "enum"]:
-            kwargs = {"name": "test", "type": param_type, "description": "Test"}
+            kwargs: dict[str, Any] = {"name": "test", "type": param_type, "description": "Test"}
             if param_type == "enum":
                 kwargs["choices"] = ["a", "b"]
             param = ToolParameter(**kwargs)
@@ -194,6 +195,7 @@ class TestToolResult:
             duration_ms=42.5,
         )
         assert result.success is True
+        assert result.features is not None
         assert len(result.features) == 1
         assert result.error is None
 
@@ -254,6 +256,10 @@ class TestToolResult:
             },
         )
         assert result.tool_version == "1.2.0"
+        assert result.modified_features is not None
+        assert result.created_features is not None
+        assert result.created_assets is not None
+        assert result.parameters is not None
         assert len(result.modified_features) == 1
         assert result.modified_features[0].feature_id == "track-001"
         assert len(result.created_features) == 1
@@ -274,6 +280,7 @@ class TestToolResult:
         data = result.model_dump()
         restored = ToolResult.model_validate(data)
         assert restored.tool_version == "2.0.0"
+        assert restored.parameters is not None
         assert restored.parameters["interval"].value == 60
         assert restored.parameters["interval"].default is True
 
@@ -454,7 +461,7 @@ class TestParameterValue:
 
     def test_parameter_value_requires_value(self) -> None:
         with pytest.raises(PydanticValidationError):
-            ParameterValue()
+            ParameterValue()  # type: ignore[reportCallIssue]
 
     def test_parameter_value_accepts_any_type(self) -> None:
         assert ParameterValue(value=42).value == 42
@@ -479,9 +486,9 @@ class TestPropertyDelta:
 
     def test_property_delta_requires_both_values(self) -> None:
         with pytest.raises(PydanticValidationError):
-            PropertyDelta(previous_value="old")
+            PropertyDelta(previous_value="old")  # type: ignore[reportCallIssue]
         with pytest.raises(PydanticValidationError):
-            PropertyDelta(new_value="new")
+            PropertyDelta(new_value="new")  # type: ignore[reportCallIssue]
 
 
 class TestModifiedFeature:
@@ -510,11 +517,11 @@ class TestModifiedFeature:
 
     def test_modified_feature_requires_feature_id(self) -> None:
         with pytest.raises(PydanticValidationError):
-            ModifiedFeature(changed_properties={})
+            ModifiedFeature(changed_properties={})  # type: ignore[reportCallIssue]
 
     def test_modified_feature_requires_changed_properties(self) -> None:
         with pytest.raises(PydanticValidationError):
-            ModifiedFeature(feature_id="track-001")
+            ModifiedFeature(feature_id="track-001")  # type: ignore[reportCallIssue]
 
 
 class TestCreatedAsset:
@@ -536,11 +543,11 @@ class TestCreatedAsset:
 
     def test_create_asset_requires_result_id(self) -> None:
         with pytest.raises(PydanticValidationError):
-            CreatedAsset(path="./results/output.png")
+            CreatedAsset(path="./results/output.png")  # type: ignore[reportCallIssue]
 
     def test_create_asset_requires_path(self) -> None:
         with pytest.raises(PydanticValidationError):
-            CreatedAsset(result_id="bt_plot_001")
+            CreatedAsset(result_id="bt_plot_001")  # type: ignore[reportCallIssue]
 
 
 class TestLogEntry:
@@ -548,16 +555,16 @@ class TestLogEntry:
 
     def test_create_log_entry(self) -> None:
         entry = LogEntry(
-            activity_id="550e8400-e29b-41d4-a716-446655440000",
+            activityId="550e8400-e29b-41d4-a716-446655440000",
             timestamp=datetime(2026, 1, 15, 10, 30, 0, tzinfo=UTC),
-            was_generated_by=WasGeneratedBy(
+            wasGeneratedBy=WasGeneratedBy(
                 tool="calculate-range",
-                tool_version="1.0.0",
+                toolVersion="1.0.0",
                 parameters={"interval": ParameterValue(value=60, default=True, tunable=True)},
             ),
             used=["track-alpha"],
             generated=["range-001"],
-            execution_duration="PT0.3S",
+            executionDuration="PT0.3S",
         )
         assert entry.activity_id == "550e8400-e29b-41d4-a716-446655440000"
         assert entry.was_generated_by.tool == "calculate-range"
@@ -568,22 +575,22 @@ class TestLogEntry:
     def test_log_entry_invalid_duration(self) -> None:
         with pytest.raises(PydanticValidationError):
             LogEntry(
-                activity_id="test",
+                activityId="test",
                 timestamp=datetime.now(UTC),
-                was_generated_by=WasGeneratedBy(tool="t", tool_version="1.0", parameters={}),
+                wasGeneratedBy=WasGeneratedBy(tool="t", toolVersion="1.0", parameters={}),
                 used=[],
                 generated=[],
-                execution_duration="300ms",  # Invalid format
+                executionDuration="300ms",  # Invalid format
             )
 
     def test_log_entry_serialization_camelcase(self) -> None:
         entry = LogEntry(
-            activity_id="test-id",
+            activityId="test-id",
             timestamp=datetime(2026, 1, 15, 10, 0, 0, tzinfo=UTC),
-            was_generated_by=WasGeneratedBy(tool="t", tool_version="1.0", parameters={}),
+            wasGeneratedBy=WasGeneratedBy(tool="t", toolVersion="1.0", parameters={}),
             used=[],
             generated=[],
-            execution_duration="PT1S",
+            executionDuration="PT1S",
         )
         data = entry.model_dump(mode="json", by_alias=True)
         assert "activityId" in data
@@ -636,11 +643,13 @@ class TestSystemRecordProperties:
 
     def test_system_record_with_snapshot_links(self) -> None:
         sr = SystemRecordProperties(
-            snapshot_links=SnapshotLinks(
-                prev=SnapshotRef(asset="./snapshots/v1.geojson", prov_entry_count=3),
+            snapshotLinks=SnapshotLinks(
+                prev=SnapshotRef(asset="./snapshots/v1.geojson", provEntryCount=3),
                 next=None,
             ),
         )
+        assert sr.snapshot_links is not None
+        assert sr.snapshot_links.prev is not None
         assert sr.snapshot_links.prev.asset == "./snapshots/v1.geojson"
         assert sr.snapshot_links.prev.prov_entry_count == 3
         assert sr.snapshot_links.next is None
@@ -649,10 +658,10 @@ class TestSystemRecordProperties:
         sr = SystemRecordProperties(
             branches=[
                 BranchRecord(
-                    branch_id="branch-001",
-                    branched_from="act-123",
-                    branched_at=datetime(2026, 1, 16, 9, 0, 0, tzinfo=UTC),
-                    target_asset="./branches/branch-001/plot.geojson",
+                    branchId="branch-001",
+                    branchedFrom="act-123",
+                    branchedAt=datetime(2026, 1, 16, 9, 0, 0, tzinfo=UTC),
+                    targetAsset="./branches/branch-001/plot.geojson",
                 ),
             ],
         )
@@ -672,6 +681,7 @@ class TestSystemRecordProperties:
         data = json.loads(fixture.read_text())
         sr = SystemRecordProperties.model_validate(data)
         assert sr.feature_type == "system"
+        assert sr.snapshot_links is not None
         assert sr.snapshot_links.prev is not None
         assert sr.snapshot_links.prev.prov_entry_count == 5
         assert len(sr.branches) == 1
@@ -683,12 +693,12 @@ class TestSystemRecordProperties:
 
     def test_system_record_invalid_feature_type(self) -> None:
         with pytest.raises(PydanticValidationError):
-            SystemRecordProperties(feature_type="not-system")
+            SystemRecordProperties(featureType="not-system")
 
     def test_file_prov_entry_invalid_type(self) -> None:
         with pytest.raises(PydanticValidationError):
             FileProvEntry(
-                activity_id="test",
+                activityId="test",
                 type="invalid",
                 timestamp=datetime.now(UTC),
             )
@@ -696,7 +706,7 @@ class TestSystemRecordProperties:
     def test_file_prov_entry_invalid_direction(self) -> None:
         with pytest.raises(PydanticValidationError):
             FileProvEntry(
-                activity_id="test",
+                activityId="test",
                 type="branch",
                 timestamp=datetime.now(UTC),
                 direction="invalid",

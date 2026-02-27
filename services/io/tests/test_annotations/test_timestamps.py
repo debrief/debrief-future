@@ -36,33 +36,41 @@ class TestParseTimestamp:
     def test_year_conversion_90s(self) -> None:
         """Years 50-99 map to 1950-1999."""
         result = parse_timestamp("951212 050200")
+        assert result is not None
         assert result.datetime.year == 1995
 
         result = parse_timestamp("500101 000000")
+        assert result is not None
         assert result.datetime.year == 1950
 
         result = parse_timestamp("991231 235959")
+        assert result is not None
         assert result.datetime.year == 1999
 
     def test_year_conversion_2000s(self) -> None:
         """Years 00-49 map to 2000-2049."""
         result = parse_timestamp("000101 000000")
+        assert result is not None
         assert result.datetime.year == 2000
 
         result = parse_timestamp("261212 050200")
+        assert result is not None
         assert result.datetime.year == 2026
 
         result = parse_timestamp("491231 235959")
+        assert result is not None
         assert result.datetime.year == 2049
 
     def test_iso_string_format(self) -> None:
         """ISO string is properly formatted."""
         result = parse_timestamp("951212 050200")
+        assert result is not None
         assert result.iso_string == "1995-12-12T05:02:00+00:00"
 
     def test_utc_timezone(self) -> None:
         """Timestamps are in UTC."""
         result = parse_timestamp("951212 050200")
+        assert result is not None
         assert result.datetime.tzinfo == UTC
 
     def test_from_text_with_context(self) -> None:

@@ -10,19 +10,22 @@ Per Constitution IV.3: Services have zero MCP dependency for domain logic.
 from __future__ import annotations
 
 import json
+from typing import TYPE_CHECKING
 
-# MCP SDK import is optional
-try:
+if TYPE_CHECKING:
     from mcp.server import Server
     from mcp.server.stdio import stdio_server
     from mcp.types import TextContent, Tool
 
+# MCP SDK import is optional
+try:
+    from mcp.server import Server  # type: ignore[no-redef]
+    from mcp.server.stdio import stdio_server  # type: ignore[no-redef]
+    from mcp.types import TextContent, Tool  # type: ignore[no-redef]
+
     HAS_MCP = True
 except ImportError:
     HAS_MCP = False
-    Server = None
-    Tool = None
-    TextContent = None
 
 
 # Error codes per contracts/mcp-tools.md

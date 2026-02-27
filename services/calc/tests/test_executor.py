@@ -81,6 +81,7 @@ class TestRunSuccess:
         assert result.tool == "track-stats"
         assert result.error is None
         assert result.duration_ms > 0
+        assert result.features is not None
         assert len(result.features) == 1
 
         feature = result.features[0]
@@ -93,6 +94,7 @@ class TestRunSuccess:
 
         assert result.success is True
         assert result.tool == "range-bearing"
+        assert result.features is not None
         assert len(result.features) == 1  # single wrapper
 
         wrapper = result.features[0]
@@ -108,6 +110,7 @@ class TestRunSuccess:
 
         assert result.success is True
         assert result.tool == "area-summary"
+        assert result.features is not None
         assert len(result.features) == 1
 
         feature = result.features[0]
@@ -119,12 +122,14 @@ class TestRunSuccess:
         result = run("range-bearing", multi_track_context, params={})
 
         assert result.success is True
+        assert result.features is not None
         assert len(result.features) == 1  # single wrapper with time-series
 
     def test_provenance_attached(self, single_track_context: SelectionContext) -> None:
         result = run("track-stats", single_track_context)
 
         assert result.success is True
+        assert result.features is not None
         provenance = result.features[0]["properties"]["provenance"]
 
         # Provenance is now an array of PROV-aligned entries
@@ -158,6 +163,7 @@ class TestRunErrors:
         result = run("track-stats", multi_track_context)
 
         assert result.success is False
+        assert result.error is not None
         assert result.error.code == "INVALID_CONTEXT"
         assert "single" in result.error.message.lower()
         assert "multi" in result.error.message.lower()
@@ -175,6 +181,7 @@ class TestRunErrors:
         result = run("track-stats", context)
 
         assert result.success is False
+        assert result.error is not None
         assert result.error.code == "KIND_MISMATCH"
 
 

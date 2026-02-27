@@ -14,7 +14,7 @@ import pytest
 try:
     import urllib.request
 
-    from stac_validator import stac_validator
+    from stac_validator import stac_validator  # type: ignore[reportMissingImports]
 
     urllib.request.urlopen("https://schemas.stacspec.org", timeout=2)
     NETWORK_AVAILABLE = True
@@ -45,6 +45,7 @@ class TestSTACCatalogValidation:
         assert catalog_json_path.exists()
 
         # Validate against STAC spec
+        assert stac_validator is not None
         stac = stac_validator.StacValidate(str(catalog_json_path))
         stac.run()
 
@@ -65,6 +66,7 @@ class TestSTACCatalogValidation:
             create_plot(catalog_path, metadata)
 
         catalog_json_path = catalog_path / "catalog.json"
+        assert stac_validator is not None
         stac = stac_validator.StacValidate(str(catalog_json_path))
         stac.run()
 
@@ -92,6 +94,7 @@ class TestSTACItemValidation:
         assert item_json_path.exists()
 
         # Validate against STAC spec
+        assert stac_validator is not None
         stac = stac_validator.StacValidate(str(item_json_path))
         stac.run()
 
@@ -130,6 +133,7 @@ class TestSTACItemValidation:
         item_json_path = catalog_path / plot_id / "item.json"
 
         # Validate against STAC spec
+        assert stac_validator is not None
         stac = stac_validator.StacValidate(str(item_json_path))
         stac.run()
 
@@ -155,6 +159,7 @@ class TestSTACItemValidation:
         item_json_path = catalog_path / plot_id / "item.json"
 
         # Validate against STAC spec
+        assert stac_validator is not None
         stac = stac_validator.StacValidate(str(item_json_path))
         stac.run()
 
@@ -204,6 +209,7 @@ class TestSTACFullWorkflowValidation:
             add_asset(catalog_path, plot_id, asset_file)
 
         # Validate catalog
+        assert stac_validator is not None
         catalog_stac = stac_validator.StacValidate(str(catalog_path / "catalog.json"))
         catalog_stac.run()
         assert catalog_stac.valid, f"Catalog validation failed: {catalog_stac.message}"

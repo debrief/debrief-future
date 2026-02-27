@@ -190,6 +190,7 @@ def run_tool(ctx: Context, tool_name: str, input_file: str, params: tuple) -> No
             output = {"type": "FeatureCollection", "features": result.features}
             print(json.dumps(output, indent=2))
         else:
+            assert result.error is not None
             formatter.error(result.error.message, result.error.code)
             formatter.finish()
             sys.exit(4)
@@ -248,9 +249,9 @@ def _flatten_coordinates(
         return []
 
     if isinstance(coords[0], (int, float)):
-        return [coords]
+        return [coords]  # type: ignore[reportReturnType]
 
     result = []
     for item in coords:
-        result.extend(_flatten_coordinates(item))
+        result.extend(_flatten_coordinates(item))  # type: ignore[reportArgumentType]
     return result
