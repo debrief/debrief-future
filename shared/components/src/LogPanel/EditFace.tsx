@@ -199,6 +199,11 @@ export function EditFace({
       onKeyDown={handleKeyDown}
       onClick={(e) => e.stopPropagation()}
     >
+      {/* Title */}
+      <div className="log-panel__edit-face-title" data-testid="edit-face-title">
+        {entry.toolName}
+      </div>
+
       {/* Replay progress indicator */}
       {replayStatus === 'in-progress' && (
         <div className="log-panel__edit-face-replay-indicator" data-testid="edit-face-replay">

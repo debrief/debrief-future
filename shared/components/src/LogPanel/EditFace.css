@@ -8,12 +8,20 @@
   padding: 8px;
   background: var(--vscode-sideBar-background, #252526);
   border: 1px solid var(--vscode-panel-border, #454545);
-  border-radius: 2px;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   max-height: 400px;
   overflow-y: auto;
+}
+
+.log-panel__edit-face-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--vscode-foreground, #cccccc);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--vscode-panel-border, #454545);
 }
 
 .log-panel__edit-face-section {

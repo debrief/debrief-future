@@ -166,12 +166,19 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  padding: 4px 6px;
+  background: var(--vscode-editor-background, #1e1e1e);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 /* Single log entry */
 .log-panel__entry {
   padding: 6px 8px;
-  border-bottom: 1px solid var(--vscode-list-inactiveSelectionBackground, rgba(128, 128, 128, 0.1));
+  border: 1px solid var(--vscode-panel-border, #454545);
+  border-radius: 6px;
+  background: var(--vscode-sideBar-background, #252526);
   cursor: pointer;
   transition: background 0.1s;
 }

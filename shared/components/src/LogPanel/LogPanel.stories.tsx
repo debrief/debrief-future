@@ -77,7 +77,7 @@ const sampleEntries: TimelineEntry[] = [
     toolName: 'change-track-color',
     toolVersion: '1.0.0',
     parameters: {
-      color: { value: '#ff0000', default: false, tunable: false },
+      color: { value: 'red', default: false, tunable: true },
     },
     usedFeatureIds: ['track-bravo'],
     generatedFeatureIds: [],
@@ -418,6 +418,7 @@ function FlipCardInteractive(props: {
       if (entry) {
         for (const [name, param] of Object.entries(entry.parameters)) {
           const isNum = typeof param.value === 'number';
+          const isColor = name === 'color';
           schema.push({
             name,
             type: isNum ? 'number' : 'string',
@@ -427,8 +428,8 @@ function FlipCardInteractive(props: {
             minimum: isNum ? 0 : null,
             maximum: isNum ? Number(param.value) * 3 : null,
             step: isNum ? 1 : null,
-            choices: null,
-            paramType: null,
+            choices: isColor ? ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'cyan', 'magenta', 'white', 'pink', 'navy', 'teal'] : null,
+            paramType: isColor ? 'NamedColor' : null,
           });
         }
       }
