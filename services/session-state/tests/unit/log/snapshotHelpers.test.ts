@@ -183,15 +183,25 @@ describe('countLogEntries', () => {
 });
 
 describe('generateSnapshotFilename', () => {
-  it('generates filename with hyphens replacing colons', () => {
+  it('generates filename with hyphens replacing colons and a random suffix', () => {
     const timestamp = new Date('2026-02-09T14:30:00.000Z');
     const filename = generateSnapshotFilename(timestamp);
-    expect(filename).toBe('plot-snap-2026-02-09T14-30-00-000.geojson');
+    expect(filename).toMatch(/^plot-snap-2026-02-09T14-30-00-000-[a-z0-9]{4}\.geojson$/);
   });
 
   it('uses current time when no timestamp provided', () => {
     const filename = generateSnapshotFilename();
-    expect(filename).toMatch(/^plot-snap-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}\.geojson$/);
+    expect(filename).toMatch(/^plot-snap-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}-[a-z0-9]{4}\.geojson$/);
+  });
+
+  it('generates unique filenames for the same timestamp', () => {
+    const timestamp = new Date('2026-02-09T14:30:00.000Z');
+    const filenames = new Set<string>();
+    for (let i = 0; i < 20; i++) {
+      filenames.add(generateSnapshotFilename(timestamp));
+    }
+    // With 4-char base36 suffix (~1.7M combinations), 20 calls should all be unique
+    expect(filenames.size).toBe(20);
   });
 });
 

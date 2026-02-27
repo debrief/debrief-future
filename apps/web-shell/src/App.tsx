@@ -959,14 +959,24 @@ export default function App() {
         <header className="web-shell__header">
           <h1 className="web-shell__title">Debrief Web Shell</h1>
           <p className="web-shell__subtitle">STAC Catalog Browser</p>
-          <a
-            className="web-shell__storybook-link"
-            href="https://debrief.github.io/debrief-future/components-storybook/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Component Storybook &rarr;
-          </a>
+          <div className="web-shell__header-links">
+            <a
+              className="web-shell__header-link"
+              href="https://debrief.github.io/debrief-future/components-storybook/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Component Storybook &rarr;
+            </a>
+            <a
+              className="web-shell__header-link"
+              href="https://debrief-future-main-c900643d7496.herokuapp.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              VS Code Preview &rarr;
+            </a>
+          </div>
         </header>
         <main className="web-shell__main">
           <CatalogOverview
