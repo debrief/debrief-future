@@ -1,11 +1,11 @@
-What if adjusting a past analysis step was as simple as flipping a card?
+Every parameter tweak in our maritime analysis tool currently opens a separate dialog. You leave the provenance timeline, adjust a value in isolation, confirm, and reconnect with where you were. It works, but the context switch adds up.
 
-In maritime tactical analysis, parameters matter. A range calculation at 60-second intervals tells a different story than one at 30 seconds. Today in Debrief's Log Panel, tweaking that means opening a separate dialog and losing your place in the timeline.
+We're replacing that with a flip-card interaction on the Log Panel. Each provenance entry card gets a pencil icon. Click it, the card flips via CSS 3D transform to reveal type-aware controls on the back face — sliders for bounded numerics, dropdowns for enums, toggles for booleans, colour pickers. Change a value and the tool re-executes live. The map updates. No dialog.
 
-We're planning a flip-card interaction model: click the pencil icon on any provenance entry, and the card flips to reveal type-aware controls — sliders for bounded values, dropdowns for enums, toggles for booleans. Drag a slider and the tool re-executes live, updating the map as you explore. No dialog, no context switch.
+The edit face also exposes disable (skip this step during replay, keep it in the timeline) and delete (soft-remove behind a confirmation prompt), plus a rationale field for analyst notes. Schema-driven controls load lazily on first flip and cache for the session. No new dependencies — pure CSS animation, existing component extensions.
 
-The same edit face surfaces disable/delete controls and analyst rationale notes. All built with CSS-only 3D transforms, lazy-loaded tool schemas, and the existing replay engine.
+The question we're sitting with: is a pencil icon discoverable enough as the sole flip trigger, or does it need a secondary affordance?
 
-Details and feedback questions in the full planning post: [link]
+Full planning post: [LINK]
 
-#FutureDebrief #MaritimeAnalysis #OpenSource
+#FutureDebrief #MaritimeAnalysis #ProvenanceLogging
