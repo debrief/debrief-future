@@ -676,9 +676,9 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private async _handleSchemaRequest(payload: {
+  private _handleSchemaRequest(payload: {
     toolId: string;
-  }): Promise<void> {
+  }): void {
     // TODO: Wire to actual tool schema registry when available.
     // For now, return an empty schema array (no type-aware controls, fallback only).
     this._postMessage({

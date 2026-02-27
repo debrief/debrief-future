@@ -94,10 +94,11 @@ tasks:
       - pnpm lint -- --fix
 
   verify:
-    desc: "Run full CI checks locally (build + lint + test) before pushing"
+    desc: "Run full CI checks locally (lint + typecheck + test) before pushing"
     deps: [install]
     cmds:
       - task: lint
+      - task: typecheck
       - task: test
 
   preview:build:
