@@ -69,13 +69,15 @@ LinkML master schemas in `shared/schemas/src/linkml/` generate all TypeScript an
 ### F-1.5 Web-shell provenance on tool results (Art. III.1)
 
 **Category:** Constitutional violation
-**Severity:** Significant
+**Severity:** Blocking
 
 Art. III.1 requires "every transformation must record lineage." The web-shell's `toolService.ts:283-287` attaches `debrief:resultType`, `debrief:sourceFeatures`, and `debrief:label` as MCP response annotations — but does NOT attach a W3C PROV `LogEntry` to `feature.properties.provenance`. Once features leave the MCP response envelope, lineage is lost.
 
 Python's executor (`executor.py:77-96`) correctly creates a `LogEntry` and appends it to each output feature's `properties.provenance[]`.
 
 **Impact:** Web-shell tool outputs have no persistent provenance chain. Tool replay, parameter tuning audit, and downstream lineage queries all break.
+
+**Disposition:** Must fix. Add LogEntry creation and attachment in TS executor, mirroring Python.
 
 **Files:** `apps/web-shell/src/services/toolService.ts:258-303`, `services/calc/debrief_calc/executor.py:77-96`, `services/calc/debrief_calc/provenance.py:117-127`
 
@@ -97,7 +99,7 @@ All three shared tools (`track-stats`, `range-bearing`, `area-summary`) use iden
 ### F-2.2 `kind` attribute values diverge
 
 **Category:** Implementation drift
-**Severity:** Significant
+**Severity:** Blocking
 
 Python sets `feature.properties.kind` to the tool's `output_kind` (e.g., `"track/statistics"`, `"region/statistics"`). TypeScript tools set kind to feature-type tokens (e.g., `"STATISTICS"`, `"DATASET"`, `"RECTANGLE"`).
 
@@ -109,6 +111,8 @@ Python sets `feature.properties.kind` to the tool's `output_kind` (e.g., `"track
 
 Consumers filtering by `kind` will get different results depending on which backend produced the feature.
 
+**Disposition:** Must fix. Define canonical `kind` values in a central schema (LinkML) and propagate to both Python and TypeScript generated code. No hand-authored kind strings.
+
 **Files:** `services/calc/debrief_calc/provenance.py:183-198` (Python setter), `apps/web-shell/src/tools/track/analysis/trackStats.ts:147`, `apps/web-shell/src/tools/track/analysis/rangeBearing.ts:139`, `apps/web-shell/src/tools/region/analysis/areaSummary.ts:126`
 
 ### F-2.3 TypeScript has no output validation
@@ -118,14 +122,18 @@ Consumers filtering by `kind` will get different results depending on which back
 
 Python's `executor.py:96` calls `validate_tool_output()` which checks GeoJSON structure, kind presence, and provenance existence (`validation.py:88-178`). TypeScript has zero post-execution validation — invalid features pass through silently.
 
+**Disposition:** Resolve. Add post-execution validation in TS toolService mirroring Python's `validate_tool_output()`.
+
 **Files:** `services/calc/debrief_calc/executor.py:96`, `services/calc/debrief_calc/validation.py:88-178`
 
 ### F-2.4 `range-bearing` selection requirements diverge
 
 **Category:** Implementation drift
-**Severity:** Minor
+**Severity:** Significant
 
 Python accepts `["TRACK", "SHAPE"]` inputs with mixed-type handling (Track+Point, Track+Polygon via `_closest_point_on_polygon`). TypeScript requires exactly 2 TRACK features — no mixed-type support, no polygon projection.
+
+**Disposition:** Resolve. Align both implementations to identical selection requirements and input handling.
 
 **Files:** `services/calc/debrief_calc/tools/range_bearing.py`, `apps/web-shell/src/tools/track/analysis/rangeBearing.ts`
 
@@ -136,14 +144,18 @@ Python accepts `["TRACK", "SHAPE"]` inputs with mixed-type handling (Track+Point
 
 Python returns `{"type": "range-bearing-series", "entries": [...]}` — not a valid GeoJSON Feature. TypeScript wraps the same data in a proper GeoJSON Feature with `__datasets` in properties. The Python output violates the project's GeoJSON-everywhere convention.
 
+**Disposition:** Resolve. Align both implementations to return valid GeoJSON.
+
 **Files:** `services/calc/debrief_calc/tools/range_bearing.py`, `apps/web-shell/src/tools/track/analysis/rangeBearing.ts`
 
 ### F-2.6 `area-summary` input semantics diverge
 
 **Category:** Implementation drift
-**Severity:** Minor
+**Severity:** Significant
 
 Python expects `context.bounds [minx, miny, maxx, maxy]` (REGION context with zone/region/polygon inputs). TypeScript extracts bbox from feature coordinates (accepts TRACK, POINT, RECTANGLE, CIRCLE). Same algorithm, different input contract.
+
+**Disposition:** Resolve. Align both implementations to identical input semantics.
 
 **Files:** `services/calc/debrief_calc/tools/area_summary.py`, `apps/web-shell/src/tools/region/analysis/areaSummary.ts`
 
@@ -169,6 +181,8 @@ Both frontends manage `drawingMode` as local React state:
 
 But session-state already provides `setDrawingMode()` in `spatial.ts:47-49`. Neither frontend uses it. This means drawing mode resets on webview re-render (VS Code) and isn't available to external consumers.
 
+**Disposition:** Resolve. Wire both frontends to `session-state.setDrawingMode()`.
+
 **Files:** `apps/web-shell/src/App.tsx:169`, `apps/vscode/src/webview/web/mapView.tsx:58`, `services/session-state/src/store/slices/spatial.ts:47-49`
 
 ### F-3.2 VS Code palette index bypasses store
@@ -178,16 +192,20 @@ But session-state already provides `setDrawingMode()` in `spatial.ts:47-49`. Nei
 
 Web-shell correctly uses `session-state.drawingPaletteIndex` (`App.tsx:504,522`). VS Code uses local `useState(0)` (`mapView.tsx:60,228`). Palette resets when VS Code webview is recreated.
 
+**Disposition:** Resolve. Use `session-state.drawingPaletteIndex` in VS Code mapView.
+
 **Files:** `apps/web-shell/src/App.tsx:504,522`, `apps/vscode/src/webview/web/mapView.tsx:60,228`
 
 ### F-3.3 Result layers have different lifecycles
 
-**Category:** Intentional divergence
-**Severity:** Minor
+**Category:** Implementation drift
+**Severity:** Significant
 
 Web-shell accumulates result layers in persistent app state (`App.tsx:144,658`). VS Code holds them in ephemeral webview state (`mapView.tsx:44,123-134`), driven by extension messages. Neither persists to STAC.
 
-This is intentional (web-shell is a persistent SPA; VS Code webview is transient) but undocumented. SessionManager has no result-layer API to support persistence.
+Previously considered intentional, but undocumented and inconsistent. SessionManager has no result-layer API to support persistence.
+
+**Disposition:** Resolve. Unify result layer lifecycle management across both frontends.
 
 **Files:** `apps/web-shell/src/App.tsx:144,658`, `apps/vscode/src/webview/web/mapView.tsx:44,123-134`
 
@@ -206,6 +224,8 @@ Web-shell reads `session-state.features.selection` directly (`App.tsx:214-216`).
 Web-shell implements full tool undo via Log Service (`App.tsx:335-346`): revert to a prior log entry, restore pre-tool feature snapshots. VS Code only has UI-state undo (viewport, selection, etc.) via session-state's `UNDO_TRACKED_FIELDS`.
 
 The Log Service exists in `session-state/src/log/index.ts` but VS Code never invokes it. This means VS Code users cannot undo tool executions.
+
+**Disposition:** Investigate further to confirm VS Code is at fault, then resolve if confirmed. May require Log Service integration in VS Code extension.
 
 **Files:** `apps/web-shell/src/App.tsx:335-346`, `services/session-state/src/store/index.ts:26-37`, `services/session-state/src/log/index.ts`
 
@@ -230,7 +250,7 @@ Both frontends track dirty state via `session-state/store/middleware/dirty.ts`. 
 ### F-4.1 Persistence flow is documented-but-unbuilt
 
 **Category:** Documentation staleness
-**Severity:** Blocking
+**Severity:** Significant
 
 TOOL-RESULTS.md specifies: "Frontend iterates content array, interprets `debrief:resultType`, calls appropriate atomic STAC operation (`update_features`, `add_features`, `delete_features`, `store_artifact`)."
 
@@ -241,6 +261,8 @@ Neither frontend does this:
 
 **Impact:** Tool results exist only in frontend memory. No durable persistence, no STAC catalog update, no audit trail via STAC operations.
 
+**Disposition:** Deferred. The calculated results handling strategy is still maturing. Revisit once the persistence approach is settled.
+
 **Files:** `apps/vscode/src/services/calcService.ts:342-416`, `apps/web-shell/src/App.tsx:672,683`, `apps/loader/src/main/ipc/stac.ts:127-150`
 
 ### F-4.2 Web-shell resultType annotation uses wrong format
@@ -250,16 +272,20 @@ Neither frontend does this:
 
 TOOL-RESULTS.md requires `debrief:resultType` to be a hierarchical path like `addition/track/reconstructed` or `mutation/track/smoothed`. Web-shell copies `debrief:outputKind` from tool definitions (e.g., `track/statistics`) — missing the top-level type prefix (`addition/`, `mutation/`, etc.).
 
+**Disposition:** Resolve. Align annotation format with TOOL-RESULTS.md spec.
+
 **Files:** `apps/web-shell/src/services/toolService.ts:284`, `apps/web-shell/src/tools/track/analysis/trackStats.ts:64`
 
-### F-4.3 Provenance field naming is consistent
+### F-4.3 Provenance field naming inconsistency flagged in plan
 
-**Category:** N/A — Compliant
-**Severity:** Informational
+**Category:** Implementation drift
+**Severity:** Minor
 
-Python uses `feature.properties.provenance` (array) with camelCase JSON aliases (`activityId`, `wasGeneratedBy`). This matches the doc's intent. The doc mentions `properties.prov` nowhere in the actual implementation — `provenance` is canonical.
+Python uses `feature.properties.provenance` (array) with camelCase JSON aliases (`activityId`, `wasGeneratedBy`). The original plan flagged `properties.prov` vs `properties.provenance` as a potential conflict. Implementation uses `provenance` consistently, but the naming should be validated against TOOL-RESULTS.md to ensure doc and code agree.
 
-**Files:** `services/calc/debrief_calc/provenance.py:117-127`
+**Disposition:** Resolve. Confirm canonical field name in TOOL-RESULTS.md and ensure all references align.
+
+**Files:** `services/calc/debrief_calc/provenance.py:117-127`, `docs/TOOL-RESULTS.md`
 
 ### F-4.4 Python result_builder emits all required annotations
 
@@ -291,7 +317,7 @@ Implemented at `shared/components/diff/src/diffFeatureCollections.ts:43-81`. Ret
 ### F-5.1 VS Code `types/tool.ts` extends schema types
 
 **Category:** Implementation drift
-**Severity:** Minor
+**Severity:** Significant
 
 VS Code's hand-authored `types/tool.ts` extends the schema-generated `Tool` interface:
 - Adds `minFeatures`, `parameters` to `Tool` (not in LinkML)
@@ -299,18 +325,22 @@ VS Code's hand-authored `types/tool.ts` extends the schema-generated `Tool` inte
 - Adds `choices` to `ToolParameter`
 - Omits `segment_type` from `SelectionRequirement`
 
-These are adapter-layer transformations for UI convenience. The bidirectional mapping is handled in `mcpAdapter.ts` and tested in `mcpAdapter.test.ts`. Acceptable as long as round-trip integrity holds.
-
 **Risk:** If someone imports VS Code types as canonical (instead of `@debrief/schemas`), they get a superset. No safeguard prevents this.
+
+**Disposition:** Resolve. No legacy code to support pre-release — refactor tool type definitions to be consistent across all layers. VS Code should use schema-generated types, extending via TypeScript `extends`/intersection if additional fields are needed, not shadowing.
 
 **Files:** `apps/vscode/src/types/tool.ts:12-60`, `shared/schemas/src/generated/typescript/types.ts:1077-1122`
 
 ### F-5.2 Two `mcpAdapter` files serve different roles
 
-**Category:** N/A — Compliant
-**Severity:** Informational
+**Category:** Implementation drift
+**Severity:** Significant
 
-`shared/components/src/ToolMatch/mcpAdapter.ts` converts MCP tool definitions to ToolMatchService format (shared). `apps/vscode/src/services/mcpToolAdapter.ts` converts MCP definitions to VS Code's extended tool types. Different consumers, different output shapes — not duplicates.
+`shared/components/src/ToolMatch/mcpAdapter.ts` converts MCP tool definitions to ToolMatchService format (shared). `apps/vscode/src/services/mcpToolAdapter.ts` converts MCP definitions to VS Code's extended tool types. Different consumers, different output shapes.
+
+**Disposition:** Resolve. Aim for a single consistent adapter implementation rather than supporting divergent implementations. Once F-5.1 unifies the type definitions, the VS Code adapter should be eliminated or consolidated with the shared one.
+
+**Files:** `shared/components/src/ToolMatch/mcpAdapter.ts`, `apps/vscode/src/services/mcpToolAdapter.ts`
 
 ---
 
@@ -359,80 +389,95 @@ ARCHITECTURE.md requires: "re-validate availability periodically rather than ass
 
 ## Summary: All Findings by Severity
 
-### Blocking (1)
+### Blocking (2)
 
-| ID | Finding | Category |
-|----|---------|----------|
-| F-4.1 | Persistence flow documented but unbuilt — tool results never reach STAC | Documentation staleness |
+| ID | Finding | Category | Disposition |
+|----|---------|----------|-------------|
+| F-1.5 | Web-shell tool results lack feature-level provenance (Art. III.1) | Constitutional violation | **Must fix** |
+| F-2.2 | `kind` attribute values diverge between Python and TypeScript | Implementation drift | **Must fix** — define in LinkML, propagate |
 
-### Significant (7)
+### Significant (11)
 
-| ID | Finding | Category |
-|----|---------|----------|
-| F-1.5 | Web-shell tool results lack feature-level provenance (Art. III.1) | Constitutional violation |
-| F-2.2 | `kind` attribute values diverge between Python and TypeScript | Implementation drift |
-| F-2.3 | TypeScript has no output validation | Implementation drift |
-| F-2.5 | Python `range-bearing` output is non-GeoJSON | Implementation drift |
-| F-3.1 | Drawing mode not using session-state store in either frontend | Implementation drift |
-| F-3.5 | Tool-level undo only in web-shell; VS Code has no tool replay | Implementation drift |
-| F-6.5 | Periodic heartbeats missing for cross-ecosystem dependencies | Implementation drift |
+| ID | Finding | Category | Disposition |
+|----|---------|----------|-------------|
+| F-2.3 | TypeScript has no output validation | Implementation drift | Resolve |
+| F-2.4 | `range-bearing` selection requirements diverge | Implementation drift | Resolve — align implementations |
+| F-2.5 | Python `range-bearing` output is non-GeoJSON | Implementation drift | Resolve |
+| F-2.6 | `area-summary` input semantics diverge | Implementation drift | Resolve — align implementations |
+| F-3.1 | Drawing mode not using session-state store in either frontend | Implementation drift | Resolve |
+| F-3.3 | Result layers have different lifecycles | Implementation drift | Resolve — unify |
+| F-3.5 | Tool-level undo only in web-shell; VS Code has no tool replay | Implementation drift | Investigate, then resolve if confirmed |
+| F-4.1 | Persistence flow documented but unbuilt — tool results never reach STAC | Documentation staleness | **Deferred** — revisit when results strategy matures |
+| F-5.1 | VS Code `types/tool.ts` extends schema types — no legacy to support | Implementation drift | Resolve — refactor for cross-layer consistency |
+| F-5.2 | Two `mcpAdapter` files diverge | Implementation drift | Resolve — consolidate after F-5.1 |
+| F-6.5 | Periodic heartbeats missing for cross-ecosystem dependencies | Implementation drift | Resolve |
 
-### Minor (7)
+### Minor (5)
 
-| ID | Finding | Category |
-|----|---------|----------|
-| F-1.2 | Web-shell frontend persists via mock FS (Art. IV.2, demo only) | Intentional divergence |
-| F-2.4 | `range-bearing` selection requirements diverge | Implementation drift |
-| F-2.6 | `area-summary` input semantics diverge | Implementation drift |
-| F-3.2 | VS Code palette index bypasses session-state store | Implementation drift |
-| F-3.7 | Web-shell dirty tracking has no save UI | Implementation drift |
-| F-4.2 | Web-shell resultType annotation missing type prefix | Implementation drift |
-| F-5.1 | VS Code `types/tool.ts` extends schema types without safeguard | Implementation drift |
+| ID | Finding | Category | Disposition |
+|----|---------|----------|-------------|
+| F-1.2 | Web-shell frontend persists via mock FS (Art. IV.2, demo only) | Intentional divergence | No action |
+| F-3.2 | VS Code palette index bypasses session-state store | Implementation drift | Resolve |
+| F-3.7 | Web-shell dirty tracking has no save UI | Implementation drift | No action for now |
+| F-4.2 | Web-shell resultType annotation missing type prefix | Implementation drift | Resolve |
+| F-4.3 | Provenance field naming needs doc/code alignment check | Implementation drift | Resolve |
 
-### Informational (11)
+### Informational (8)
 
-| ID | Finding | Category |
-|----|---------|----------|
-| F-1.1 | Web-shell in-process tool execution (demo, Art. XIV) | Intentional divergence |
-| F-1.3 | MCP isolation properly maintained | Compliant |
-| F-1.4 | Schema single source of truth upheld | Compliant |
-| F-2.1 | Algorithm fidelity is strong | Compliant |
-| F-2.7 | Nine TS-only tools are intentionally frontend-only | Intentional divergence |
-| F-3.3 | Result layer lifecycles differ (intentional, undocumented) | Intentional divergence |
-| F-3.4 | Selection state architecture differs by platform (correct) | Intentional divergence |
-| F-3.6 | MCP server in VS Code only (correct) | Intentional divergence |
-| F-4.3-4.6 | Python result_builder, diffFeatureCollections, error structure all compliant | Compliant |
-| F-5.2 | Two mcpAdapter files serve different consumers (not duplicates) | Compliant |
-| F-6.1-6.4 | Health checks, logging, status, error messages all implemented | Compliant |
+| ID | Finding | Category | Disposition |
+|----|---------|----------|-------------|
+| F-1.1 | Web-shell in-process tool execution (demo, Art. XIV) | Intentional divergence | No action |
+| F-1.3 | MCP isolation properly maintained | Compliant | No action |
+| F-1.4 | Schema single source of truth upheld | Compliant | No action |
+| F-2.1 | Algorithm fidelity is strong | Compliant | No action |
+| F-2.7 | Nine TS-only tools are intentionally frontend-only | Intentional divergence | No action |
+| F-3.4 | Selection state architecture differs by platform (correct) | Intentional divergence | No action |
+| F-3.6 | MCP server in VS Code only (correct) | Intentional divergence | No action |
+| F-4.4-4.6 | Python result_builder, diffFeatureCollections, error structure all compliant | Compliant | No action |
+| F-6.1-6.4 | Health checks, logging, status, error messages all implemented | Compliant | No action |
 
 ---
 
-## Recommended Resolution Directions
+## Resolution Plan
 
-### Tier 1: Address before next milestone
+### Tier 1: Must fix (blocking)
 
-1. **F-4.1 (Persistence flow)** — Decide: implement STAC persistence orchestration in frontends, or update TOOL-RESULTS.md to reflect current in-memory-only reality. Either way, close the gap between doc and code.
+1. **F-1.5 (TS provenance)** — Add LogEntry creation and attachment in `toolService.ts` executor, mirroring Python's `create_log_entry()` + `attach_log_entry()`.
 
-2. **F-1.5 (TS provenance)** — Add LogEntry creation and attachment in `toolService.ts` executor, mirroring Python's `create_log_entry()` + `attach_log_entry()`.
+2. **F-2.2 (kind values)** — Define canonical `kind` attribute values in LinkML schema. Propagate generated constants to both Python and TypeScript. Remove all hand-authored kind strings.
 
-### Tier 2: Fix in current quarter
+### Tier 2: Resolve (significant)
 
-3. **F-2.2 (kind values)** — Standardize on output_kind format (`track/statistics`, not `STATISTICS`). Update TS tool implementations.
+3. **F-2.3 (TS validation)** — Add post-execution validation in TS toolService mirroring Python's `validate_tool_output()`.
 
-4. **F-2.5 (range-bearing output)** — Wrap Python's range-bearing output in a valid GeoJSON Feature with `__datasets` in properties (adopt TS pattern).
+4. **F-2.4 (range-bearing selection)** — Align both implementations to identical selection requirements and mixed-type input handling.
 
-5. **F-2.3 (TS validation)** — Add post-execution validation in TS toolService mirroring Python's `validate_tool_output()`.
+5. **F-2.5 (range-bearing output)** — Align both implementations to return valid GeoJSON.
 
-6. **F-3.1 (drawing mode)** — Wire both frontends to `session-state.setDrawingMode()`.
+6. **F-2.6 (area-summary input)** — Align both implementations to identical input semantics.
 
-7. **F-3.5 (tool undo)** — Either implement Log Service integration in VS Code, or document this as a known web-shell-only capability.
+7. **F-3.1 (drawing mode)** — Wire both frontends to `session-state.setDrawingMode()`.
 
-8. **F-6.5 (heartbeats)** — Add periodic re-validation timer (e.g., every 5 minutes) in calcService.
+8. **F-3.3 (result layers)** — Unify result layer lifecycle management across both frontends.
 
-### Tier 3: Cleanup
+9. **F-3.5 (tool undo)** — Investigate VS Code gap further. Resolve if confirmed at fault.
 
-9. **F-3.2, F-3.7, F-4.2, F-5.1** — Minor alignment fixes that reduce confusion but have no functional impact today.
+10. **F-5.1 + F-5.2 (type consistency)** — Refactor VS Code tool types to use schema-generated types. Consolidate mcpAdapter implementations.
+
+11. **F-6.5 (heartbeats)** — Add periodic re-validation timer (e.g., every 5 minutes) in calcService.
+
+### Tier 3: Minor fixes
+
+12. **F-3.2** — Use `session-state.drawingPaletteIndex` in VS Code mapView.
+
+13. **F-4.2** — Align resultType annotation format with TOOL-RESULTS.md spec.
+
+14. **F-4.3** — Confirm canonical provenance field name in TOOL-RESULTS.md and align all references.
+
+### Deferred
+
+15. **F-4.1 (STAC persistence)** — Revisit once calculated results handling strategy matures.
 
 ### Document
 
-10. **F-3.3, F-3.4, F-3.6** — Add notes to ARCHITECTURE.md explaining intentional state management asymmetries between VS Code and web-shell.
+16. **F-3.4, F-3.6** — Add notes to ARCHITECTURE.md explaining intentional state management asymmetries between VS Code and web-shell.
