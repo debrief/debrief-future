@@ -58,6 +58,15 @@ classes:
         description: Parameter tuning record. Null until a tuning operation modifies this entry.
         range: TuneAnnotation
         required: false
+      disabled:
+        description: Whether this entry is skipped during replay. Toggled via the flip-card edit face.
+        range: boolean
+        required: false
+        ifabsent: "false"
+      rationale:
+        description: Free-text analyst annotation explaining the reasoning for this operation.
+        range: string
+        required: false
 
   WasGeneratedBy:
     description: >-

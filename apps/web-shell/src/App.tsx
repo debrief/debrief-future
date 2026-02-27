@@ -338,11 +338,7 @@ export default function App() {
       store.getState().clearSelection();
     } else if (message.type === 'action:invoke') {
       const { actionType, activityId } = message.payload;
-      if (actionType === 'tune') {
-        // Tune is handled inline via onTuneRequest — prompt user
-        setLogNotification('Click a tunable parameter value to edit it.');
-        setTimeout(() => setLogNotification(null), 3000);
-      } else if (actionType === 'revertTo') {
+      if (actionType === 'revertTo') {
         // Remove all entries after the target and restore their original features
         setLogEntries((prev: TimelineEntry[]) => {
           const idx = prev.findIndex((e: TimelineEntry) => e.activityId === activityId);

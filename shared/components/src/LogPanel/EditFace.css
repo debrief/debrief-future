@@ -1,0 +1,365 @@
+/**
+ * EditFace CSS — styles for the flip-card edit face.
+ * Feature: 113-prov-card-flip
+ */
+
+.log-panel__edit-face {
+  padding: 8px;
+  background: var(--vscode-sideBar-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.log-panel__edit-face-section {
+  border-bottom: 1px solid var(--vscode-panel-border);
+  padding-bottom: 8px;
+}
+
+.log-panel__edit-face-section:last-of-type {
+  border-bottom: none;
+}
+
+.log-panel__edit-face-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--vscode-descriptionForeground);
+  margin-bottom: 6px;
+}
+
+/* Parameter controls */
+.log-panel__edit-face-params {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.log-panel__edit-face-param {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.log-panel__edit-face-param-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--vscode-foreground);
+}
+
+.log-panel__edit-face-param-desc {
+  color: var(--vscode-descriptionForeground);
+  cursor: help;
+  font-size: 10px;
+}
+
+.log-panel__edit-face-input,
+.log-panel__edit-face-select {
+  width: 100%;
+  padding: 3px 6px;
+  font-size: 12px;
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+  border-radius: 2px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.log-panel__edit-face-input:focus,
+.log-panel__edit-face-select:focus {
+  border-color: var(--vscode-focusBorder);
+}
+
+.log-panel__edit-face-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.log-panel__edit-face-no-params {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+  padding: 4px 0;
+}
+
+/* Schema error / retry */
+.log-panel__edit-face-schema-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--vscode-errorForeground, #f44747);
+  padding: 4px 0;
+}
+
+.log-panel__edit-face-retry-btn {
+  padding: 2px 6px;
+  font-size: 11px;
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.log-panel__edit-face-retry-btn:hover {
+  background: var(--vscode-button-secondaryHoverBackground);
+}
+
+/* Metadata */
+.log-panel__edit-face-metadata {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+}
+
+.log-panel__edit-face-meta-row {
+  display: flex;
+  gap: 6px;
+}
+
+.log-panel__edit-face-meta-label {
+  color: var(--vscode-descriptionForeground);
+  min-width: 80px;
+}
+
+/* Rationale field */
+.log-panel__rationale-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.log-panel__rationale-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--vscode-foreground);
+}
+
+.log-panel__rationale-textarea {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 12px;
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+  border-radius: 2px;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.log-panel__rationale-textarea:focus {
+  border-color: var(--vscode-focusBorder);
+}
+
+/* Disable toggle */
+.log-panel__disable-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.log-panel__disable-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.log-panel__disable-toggle-warning {
+  font-size: 11px;
+  color: var(--vscode-editorWarning-foreground, #ff8c00);
+  padding-left: 22px;
+}
+
+/* Delete section */
+.log-panel__edit-face-delete-section {
+  padding-top: 4px;
+}
+
+.log-panel__edit-face-delete-btn {
+  padding: 3px 8px;
+  font-size: 11px;
+  background: var(--vscode-inputValidation-errorBackground, rgba(255, 0, 0, 0.1));
+  color: var(--vscode-errorForeground, #f44747);
+  border: 1px solid var(--vscode-inputValidation-errorBorder, #f44747);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.log-panel__edit-face-delete-btn:hover {
+  opacity: 0.9;
+}
+
+/* Delete confirmation */
+.log-panel__delete-confirm {
+  padding: 8px;
+  background: var(--vscode-inputValidation-errorBackground, rgba(255, 0, 0, 0.05));
+  border: 1px solid var(--vscode-inputValidation-errorBorder, #f44747);
+  border-radius: 2px;
+}
+
+.log-panel__delete-confirm-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--vscode-errorForeground, #f44747);
+  margin-bottom: 4px;
+}
+
+.log-panel__delete-confirm-message {
+  font-size: 11px;
+  color: var(--vscode-foreground);
+  margin-bottom: 8px;
+}
+
+.log-panel__delete-confirm-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.log-panel__delete-confirm-btn {
+  padding: 3px 8px;
+  font-size: 11px;
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.log-panel__delete-confirm-btn--danger {
+  background: var(--vscode-inputValidation-errorBackground, rgba(255, 0, 0, 0.2));
+  color: var(--vscode-errorForeground, #f44747);
+  border-color: var(--vscode-inputValidation-errorBorder, #f44747);
+}
+
+.log-panel__delete-confirm-btn:hover {
+  opacity: 0.9;
+}
+
+/* Done button */
+.log-panel__edit-face-done-btn {
+  width: 100%;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.log-panel__edit-face-done-btn:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+
+/* Replay progress indicator on card */
+.log-panel__edit-face-replay-indicator {
+  height: 2px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.log-panel__edit-face-replay-bar {
+  height: 100%;
+  width: 40%;
+  background: var(--vscode-progressBar-background, #0078d4);
+  animation: edit-face-replay-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes edit-face-replay-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+/* Slider control */
+.log-panel__slider-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.log-panel__slider-input {
+  flex: 1;
+  height: 4px;
+  accent-color: var(--vscode-focusBorder);
+}
+
+.log-panel__slider-readout {
+  font-size: 11px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Color picker */
+.log-panel__color-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.log-panel__color-swatch {
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.log-panel__color-swatch--selected {
+  border-color: var(--vscode-focusBorder);
+  box-shadow: 0 0 0 1px var(--vscode-focusBorder);
+}
+
+.log-panel__color-swatch:hover:not(.log-panel__color-swatch--selected) {
+  border-color: var(--vscode-foreground);
+}
+
+.log-panel__color-swatch:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* JSON editor */
+.log-panel__json-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.log-panel__json-editor-textarea {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 11px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+  border-radius: 2px;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.log-panel__json-editor-textarea:focus {
+  border-color: var(--vscode-focusBorder);
+}
+
+.log-panel__json-editor-error {
+  font-size: 11px;
+  color: var(--vscode-errorForeground, #f44747);
+}

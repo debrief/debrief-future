@@ -4,7 +4,7 @@
  * Feature: 072-log-panel
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { LogPanel } from './LogPanel';
 import type {
@@ -15,6 +15,8 @@ import type {
   LogPanelMessage,
 } from './types';
 import { DEFAULT_FILTER_STATE } from './types';
+import { CardFlip } from './CardFlip';
+import { EditFace } from './EditFace';
 
 // --- Sample data ---
 
@@ -363,6 +365,147 @@ export const ActionsDisabled: Story = {
             plotName="Exercise Alpha"
             actionResultMessage={null}
             onFilterStateChange={setFilterState}
+          />
+        </div>
+      );
+    };
+    return <Wrapper />;
+  },
+};
+
+// --- Feature 113: Flip-Card Interaction ---
+
+// Sample disabled entry
+const disabledEntry: TimelineEntry = {
+  ...sampleEntries[0],
+  activityId: 'act-disabled-001',
+  disabled: true,
+};
+
+// Sample entry with rationale
+const entryWithRationale: TimelineEntry = {
+  ...sampleEntries[0],
+  activityId: 'act-rationale-001',
+  rationale: 'Increased range to capture distant contacts from the latest exercise data.',
+};
+
+/**
+ * Interactive flip-card wrapper that wires edit callbacks.
+ */
+function FlipCardInteractive(props: {
+  entries: TimelineEntry[];
+  featureNames: Record<string, string>;
+}) {
+  const [presentationMode, setPresentationMode] = useState<PresentationMode>('normal');
+  const [viewMode, setViewMode] = useState<ViewMode>('timeline');
+  const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
+  const [filterState, setFilterState] = useState<FilterState>(DEFAULT_FILTER_STATE);
+  const [notification, setNotification] = useState<string | null>(null);
+  const [localEntries, setLocalEntries] = useState(props.entries);
+
+  const handleMessage = useCallback((message: LogPanelMessage) => {
+    if (message.type === 'action:invoke') {
+      setNotification(`Action "${message.payload.actionType}" invoked.`);
+      setTimeout(() => setNotification(null), 3000);
+    }
+  }, []);
+
+  const handleSchemaRequest = useCallback((_toolId: string) => {
+    // Simulate schema loading — no-op in stories
+  }, []);
+
+  const handleDisableToggle = useCallback((activityId: string, disabled: boolean) => {
+    setLocalEntries((prev) =>
+      prev.map((e) => (e.activityId === activityId ? { ...e, disabled } : e))
+    );
+  }, []);
+
+  const handleRationaleUpdate = useCallback((activityId: string, rationale: string) => {
+    setLocalEntries((prev) =>
+      prev.map((e) => (e.activityId === activityId ? { ...e, rationale } : e))
+    );
+  }, []);
+
+  return (
+    <div style={{ width: 320, height: 600, border: '1px solid #333' }}>
+      <LogPanel
+        entries={localEntries}
+        featureNames={props.featureNames}
+        presentationMode={presentationMode}
+        viewMode={viewMode}
+        selectedEntryId={selectedEntryId}
+        filterState={filterState}
+        hasActiveSession={true}
+        plotName="Exercise Alpha"
+        actionResultMessage={notification}
+        onMessage={handleMessage}
+        onPresentationModeChange={setPresentationMode}
+        onViewModeChange={setViewMode}
+        onFilterStateChange={setFilterState}
+        onSelectedEntryChange={setSelectedEntryId}
+        onSchemaRequest={handleSchemaRequest}
+        onDisableToggle={handleDisableToggle}
+        onRationaleUpdate={handleRationaleUpdate}
+      />
+    </div>
+  );
+}
+
+export const FlipCardDefault: Story = {
+  name: 'Flip Card — Edit Icon',
+  render: () => (
+    <FlipCardInteractive
+      entries={sampleEntries}
+      featureNames={sampleFeatureNames}
+    />
+  ),
+};
+
+export const FlipCardDisabled: Story = {
+  name: 'Flip Card — Disabled Entry',
+  render: () => (
+    <FlipCardInteractive
+      entries={[disabledEntry, ...sampleEntries.slice(1)]}
+      featureNames={sampleFeatureNames}
+    />
+  ),
+};
+
+export const FlipCardRationale: Story = {
+  name: 'Flip Card — With Rationale',
+  render: () => (
+    <FlipCardInteractive
+      entries={[entryWithRationale, ...sampleEntries.slice(1)]}
+      featureNames={sampleFeatureNames}
+    />
+  ),
+};
+
+// --- CardFlip primitive story ---
+export const CardFlipPrimitive: Story = {
+  name: 'CardFlip Primitive',
+  render: () => {
+    const Wrapper = () => {
+      const [isFlipped, setIsFlipped] = useState(false);
+      return (
+        <div style={{ width: 320, padding: 16 }}>
+          <button onClick={() => setIsFlipped(!isFlipped)} style={{ marginBottom: 8 }}>
+            {isFlipped ? 'Show Front' : 'Show Back'}
+          </button>
+          <CardFlip
+            isFlipped={isFlipped}
+            front={
+              <div style={{ padding: 16, background: '#1e1e1e', border: '1px solid #333' }}>
+                <strong>Front Face</strong>
+                <p>Tool name, features, parameters</p>
+              </div>
+            }
+            back={
+              <div style={{ padding: 16, background: '#252526', border: '1px solid #333' }}>
+                <strong>Back Face (Edit)</strong>
+                <p>Parameter controls, rationale, disable</p>
+              </div>
+            }
           />
         </div>
       );

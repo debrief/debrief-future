@@ -383,3 +383,38 @@
 .log-panel__entry-restore-btn:hover {
   background: var(--vscode-button-secondaryHoverBackground);
 }
+
+/* Disabled entry styling (Feature: 113-prov-card-flip) */
+.log-panel__entry--disabled {
+  opacity: 0.6;
+}
+
+.log-panel__entry--disabled .log-panel__entry-tool {
+  font-style: italic;
+}
+
+/* Disabled badge (Feature: 113) */
+.log-panel__entry-badge--disabled {
+  background: var(--vscode-descriptionForeground, rgba(128, 128, 128, 0.15));
+  color: var(--vscode-descriptionForeground);
+}
+
+/* Edit icon (pencil) — visible on hover (Feature: 113) */
+.log-panel__entry-edit-icon {
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+  color: var(--vscode-descriptionForeground);
+  padding: 0 2px;
+}
+
+.log-panel__entry:hover .log-panel__entry-edit-icon,
+.log-panel__entry-edit-icon:focus {
+  opacity: 1;
+}
+
+.log-panel__entry-edit-icon:hover {
+  color: var(--vscode-textLink-foreground);
+}

@@ -1,0 +1,56 @@
+/**
+ * CardFlip CSS — 3D perspective flip animation.
+ * Feature: 113-prov-card-flip
+ */
+
+.card-flip {
+  perspective: 1000px;
+}
+
+.card-flip__inner {
+  position: relative;
+  transition: transform 400ms ease-in-out;
+  transform-style: preserve-3d;
+}
+
+.card-flip__inner--flipped {
+  transform: rotateY(180deg);
+}
+
+.card-flip__face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.card-flip__face--front {
+  position: relative;
+}
+
+.card-flip__face--back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: rotateY(180deg);
+}
+
+/* When flipped, front face is hidden and back face is shown.
+   Use display toggling for accessible content. */
+.card-flip__inner--flipped .card-flip__face--front {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+
+.card-flip__inner:not(.card-flip__inner--flipped) .card-flip__face--back {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+  position: static;
+}
+
+.card-flip__inner--flipped .card-flip__face--back {
+  position: static;
+  visibility: visible;
+  height: auto;
+}

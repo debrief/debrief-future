@@ -530,6 +530,88 @@ export function createLogService(deps: LogServiceDeps): LogService {
       return result;
     },
 
+    // Feature 113: Flip-card edit operations
+
+    async disableEntry(
+      storePath: string,
+      itemPath: string,
+      activityId: string,
+      disabled: boolean
+    ): Promise<{ disabledActivityIds: string[] }> {
+      if (!deps.writeGeoJson) {
+        throw new Error('disableEntry requires writeGeoJson dependency');
+      }
+
+      const fc = await deps.loadGeoJson(storePath, itemPath);
+      if (!fc) {
+        throw new Error(`Cannot load GeoJSON for ${storePath}/${itemPath}`);
+      }
+
+      const disabledIds: string[] = [activityId];
+
+      // Set or clear disabled flag on matching provenance entries
+      for (const feature of fc.features) {
+        const props = feature.properties as Record<string, unknown> | null;
+        if (!props) continue;
+        const prov = normaliseProvenanceArray(props.provenance);
+        for (const raw of prov) {
+          const entry = raw as Record<string, unknown>;
+          if (entry.activityId === activityId) {
+            if (disabled) {
+              entry.disabled = true;
+            } else {
+              delete entry.disabled;
+            }
+          }
+        }
+      }
+
+      await deps.writeGeoJson(
+        storePath,
+        itemPath,
+        fc as unknown as GeoJsonFeatureCollection
+      );
+      deps.markDirty();
+
+      return { disabledActivityIds: disabledIds };
+    },
+
+    async setRationale(
+      storePath: string,
+      itemPath: string,
+      activityId: string,
+      rationale: string
+    ): Promise<void> {
+      if (!deps.writeGeoJson) {
+        throw new Error('setRationale requires writeGeoJson dependency');
+      }
+
+      const fc = await deps.loadGeoJson(storePath, itemPath);
+      if (!fc) {
+        throw new Error(`Cannot load GeoJSON for ${storePath}/${itemPath}`);
+      }
+
+      // Set rationale on matching provenance entries
+      for (const feature of fc.features) {
+        const props = feature.properties as Record<string, unknown> | null;
+        if (!props) continue;
+        const prov = normaliseProvenanceArray(props.provenance);
+        for (const raw of prov) {
+          const entry = raw as Record<string, unknown>;
+          if (entry.activityId === activityId) {
+            entry.rationale = rationale || null;
+          }
+        }
+      }
+
+      await deps.writeGeoJson(
+        storePath,
+        itemPath,
+        fc as unknown as GeoJsonFeatureCollection
+      );
+      deps.markDirty();
+    },
+
     // Delegated stubs (moved to dedicated services)
     async createSnapshot(): Promise<void> {
       throw new Error(

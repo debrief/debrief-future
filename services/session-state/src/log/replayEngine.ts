@@ -80,11 +80,12 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
         }
       }
 
-      // Collect entries from startIndex onward, skipping deleted
+      // Collect entries from startIndex onward, skipping deleted and disabled
       const entries: ReplayEntry[] = [];
       for (let i = startIndex; i < timeline.length; i++) {
         const entry = timeline[i];
         if (deletedSet.has(entry.activityId)) continue;
+        if (entry.disabled === true) continue;
 
         const rawParams = unwrapParameters(
           entry.wasGeneratedBy.parameters as Record<string, unknown>

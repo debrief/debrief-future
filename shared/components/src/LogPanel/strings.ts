@@ -82,4 +82,27 @@ export const LOG_PANEL_STRINGS = {
   tunedEntryBadge: 'Tuned',
   versionMismatch: (tool: string, expected: string, installed: string) =>
     `"${tool}" version mismatch: expected ${expected}, found ${installed}.`,
+
+  // Flip-card interaction (Feature: 113-prov-card-flip)
+  editIconTooltip: 'Edit parameters',
+  editFaceDone: 'Done',
+  editFaceMetadataTitle: 'Metadata',
+  editFaceParametersTitle: 'Parameters',
+  editFaceNoParameters: 'This tool has no tunable parameters.',
+  editFaceSchemaLoading: 'Loading parameter schema\u2026',
+  editFaceSchemaError: 'Failed to load parameter schema.',
+  editFaceSchemaRetry: 'Retry',
+  editFaceRationaleLabel: 'Rationale',
+  editFaceRationalePlaceholder: 'Why was this operation performed?',
+  editFaceDisableLabel: 'Disable this entry',
+  editFaceDisableWarning: (causeId: string) => `Auto-disabled due to dependency on ${causeId}`,
+  editFaceDeleteButton: 'Delete',
+  editFaceDeleteConfirmTitle: 'Delete this entry?',
+  editFaceDeleteConfirmMessage: 'All subsequent operations will replay without this entry.',
+  editFaceDeleteConfirm: 'Delete',
+  editFaceDeleteCancel: 'Cancel',
+  disabledEntryBadge: 'Disabled',
+  sliderValueLabel: (value: number) => String(value),
+  jsonEditorParseError: 'Invalid JSON',
+  colorPickerLabel: 'Select colour',
 } as const;

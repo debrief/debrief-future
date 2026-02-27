@@ -3,6 +3,7 @@
  * Entries are expected to be pre-sorted most-recent-first.
  *
  * Feature: 072-log-panel
+ * Updated: 113-prov-card-flip (flip-card pass-through)
  */
 
 import React from 'react';
@@ -17,6 +18,18 @@ export function LogTimeline({
   onEntryClick,
   onTuneClick,
   onRestoreClick,
+  editingActivityId,
+  editingSchema,
+  schemaLoading,
+  schemaError,
+  rationaleRef,
+  onEditClick,
+  onDoneClick,
+  onParameterChange,
+  onDisableToggle,
+  onDeleteClick,
+  onRationaleChange,
+  onRetrySchema,
   className,
 }: LogTimelineProps): React.ReactElement {
   return (
@@ -35,6 +48,18 @@ export function LogTimeline({
           onClick={onEntryClick}
           onTuneClick={onTuneClick}
           onRestoreClick={onRestoreClick}
+          isEditing={editingActivityId === entry.activityId}
+          schema={editingActivityId === entry.activityId ? editingSchema : undefined}
+          schemaLoading={editingActivityId === entry.activityId ? schemaLoading : false}
+          schemaError={editingActivityId === entry.activityId ? schemaError : null}
+          rationaleRef={editingActivityId === entry.activityId ? rationaleRef : undefined}
+          onEditClick={onEditClick}
+          onDoneClick={onDoneClick}
+          onParameterChange={onParameterChange}
+          onDisableToggle={onDisableToggle}
+          onDeleteClick={onDeleteClick}
+          onRationaleChange={onRationaleChange}
+          onRetrySchema={onRetrySchema}
         />
       ))}
     </div>

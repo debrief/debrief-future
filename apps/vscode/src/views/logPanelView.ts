@@ -42,6 +42,8 @@ interface TimelineEntry {
   generatedResultId: string | null;
   operationCategory: OperationCategory;
   deleted?: boolean;
+  disabled?: boolean;
+  rationale?: string | null;
   tuneAnnotation?: { parameter: string; previousValue: unknown; newValue: unknown } | null;
 }
 
@@ -94,6 +96,22 @@ interface ReplayCancelMessage {
   type: 'replay:cancel';
 }
 
+// Feature 113: flip-card edit messages
+interface DisableToggleMessage {
+  type: 'disable:toggle';
+  payload: { activityId: string; disabled: boolean };
+}
+
+interface RationaleUpdateMessage {
+  type: 'rationale:update';
+  payload: { activityId: string; rationale: string };
+}
+
+interface SchemaRequestMessage {
+  type: 'schema:request';
+  payload: { toolId: string };
+}
+
 type WebviewMessage =
   | EntrySelectMessage
   | EntryDeselectMessage
@@ -104,7 +122,10 @@ type WebviewMessage =
   | RevertToRequestMessage
   | RevertThisRequestMessage
   | RestoreRequestMessage
-  | ReplayCancelMessage;
+  | ReplayCancelMessage
+  | DisableToggleMessage
+  | RationaleUpdateMessage
+  | SchemaRequestMessage;
 
 // Tool category mapping for operation classification
 const TOOL_CATEGORY_MAP: Record<string, OperationCategory> = {
@@ -140,6 +161,8 @@ function toTimelineEntry(entry: LogEntry): TimelineEntry {
     generatedResultId: entry.generatedResultId ?? null,
     operationCategory: classifyOperation(entry.wasGeneratedBy.tool),
     deleted: entry.deleted === true,
+    disabled: entry.disabled === true,
+    rationale: entry.rationale ?? null,
     tuneAnnotation: entry.tune !== null
       ? { parameter: entry.tune.parameter, previousValue: entry.tune.previousValue, newValue: entry.tune.newValue }
       : null,
@@ -441,6 +464,19 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
             message.payload.presentationMode
           );
           break;
+
+        // Feature 113: flip-card edit messages
+        case 'disable:toggle':
+          void this._handleDisableToggle(message.payload);
+          break;
+
+        case 'rationale:update':
+          void this._handleRationaleUpdate(message.payload);
+          break;
+
+        case 'schema:request':
+          void this._handleSchemaRequest(message.payload);
+          break;
       }
     });
   }
@@ -583,6 +619,79 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   }
 
   // ─── End Phase 6 handlers ────────────────────────────────────────
+
+  // ─── Feature 113: Flip-card edit handlers ──────────────────────────
+
+  private async _handleDisableToggle(payload: {
+    activityId: string;
+    disabled: boolean;
+  }): Promise<void> {
+    if (!this._logService || !this._getStorePath || !this._getItemPath) {
+      return;
+    }
+    const storePath = this._getStorePath();
+    const itemPath = this._getItemPath();
+    if (!storePath || !itemPath) {
+      return;
+    }
+
+    try {
+      await this._logService.disableEntry(
+        storePath, itemPath,
+        payload.activityId, payload.disabled
+      );
+      await this._sendTimelineUpdate();
+    } catch (err) {
+      this._postMessage({
+        type: 'replay:error',
+        payload: { message: err instanceof Error ? err.message : String(err) },
+      });
+    }
+  }
+
+  private async _handleRationaleUpdate(payload: {
+    activityId: string;
+    rationale: string;
+  }): Promise<void> {
+    if (!this._logService || !this._getStorePath || !this._getItemPath) {
+      return;
+    }
+    const storePath = this._getStorePath();
+    const itemPath = this._getItemPath();
+    if (!storePath || !itemPath) {
+      return;
+    }
+
+    try {
+      await this._logService.setRationale(
+        storePath, itemPath,
+        payload.activityId, payload.rationale
+      );
+      // No timeline update needed — rationale is metadata only
+    } catch (err) {
+      this._postMessage({
+        type: 'replay:error',
+        payload: { message: err instanceof Error ? err.message : String(err) },
+      });
+    }
+  }
+
+  private async _handleSchemaRequest(payload: {
+    toolId: string;
+  }): Promise<void> {
+    // TODO: Wire to actual tool schema registry when available.
+    // For now, return an empty schema array (no type-aware controls, fallback only).
+    this._postMessage({
+      type: 'schema:response',
+      payload: {
+        toolId: payload.toolId,
+        schema: [],
+        error: null,
+      },
+    });
+  }
+
+  // ─── End Feature 113 handlers ──────────────────────────────────────
 
   /**
    * Dispose resources.
