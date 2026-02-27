@@ -270,6 +270,18 @@ export class MapPanel {
   }
 
   /**
+   * Update plot features in-place (for mutation tool results).
+   * Sends the modified features to the webview which replaces matching
+   * features in plotFeatures by ID.
+   */
+  public updatePlotFeatures(layer: ResultLayer): void {
+    this.postMessage({
+      type: 'updatePlotFeatures',
+      features: layer.features,
+    });
+  }
+
+  /**
    * Add a result layer
    */
   public addResultLayer(layer: ResultLayer): void {

@@ -135,6 +135,16 @@ function MapViewApp(): React.ReactElement {
           })) as DebriefFeature[];
           setResultFeatures(prev => [...prev, ...newFeatures]);
           break;
+        case 'updatePlotFeatures': {
+          // Mutation tools: replace matching features in plotFeatures by ID
+          const updatedMap = new Map(
+            msg.features.features.map(f => [String(f.id), f as DebriefFeature])
+          );
+          setPlotFeatures(prev =>
+            prev.map(f => updatedMap.get(String(f.id)) ?? f)
+          );
+          break;
+        }
         case 'removeResultLayer':
           setResultFeatures(prev => prev.filter(f => !String(f.id).startsWith(msg.layerId)));
           break;
