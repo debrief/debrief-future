@@ -80,7 +80,9 @@ class TestPythonRoundTrip:
         assert instance == instance2, "Round-trip should preserve data"
 
     @pytest.mark.parametrize("entity_type,fixture_path", get_roundtrip_fixtures())
-    def test_roundtrip_preserves_required_fields(self, entity_type: str, fixture_path: Path) -> None:
+    def test_roundtrip_preserves_required_fields(
+        self, entity_type: str, fixture_path: Path
+    ) -> None:
         """Required fields should be present after round-trip."""
         model_class = ROUNDTRIP_ENTITY_MAP[entity_type]
         original_data = json.loads(fixture_path.read_text())

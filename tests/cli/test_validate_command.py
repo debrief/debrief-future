@@ -80,13 +80,17 @@ class TestValidateCommand:
 
         assert result.exit_code == 3
 
-    def test_validate_strict_mode_fails_without_kind(self, runner: CliRunner, feature_without_kind: Path) -> None:
+    def test_validate_strict_mode_fails_without_kind(
+        self, runner: CliRunner, feature_without_kind: Path
+    ) -> None:
         result = runner.invoke(cli, ["validate", "--strict", str(feature_without_kind)])
 
         assert result.exit_code == 3
         assert "kind" in result.output.lower()
 
-    def test_validate_non_strict_passes_without_kind(self, runner: CliRunner, feature_without_kind: Path) -> None:
+    def test_validate_non_strict_passes_without_kind(
+        self, runner: CliRunner, feature_without_kind: Path
+    ) -> None:
         result = runner.invoke(cli, ["validate", str(feature_without_kind)])
 
         # Should pass without --strict flag

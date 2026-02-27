@@ -87,7 +87,9 @@ class TestTrackRegressionBoat1:
 class TestTrackRegressionShapesRep:
     """Regression tests for tracks in shapes.rep (mixed tracks and annotations)."""
 
-    def test_track_parsing_with_annotations(self, rep_handler: REPHandler, shapes_content: str) -> None:
+    def test_track_parsing_with_annotations(
+        self, rep_handler: REPHandler, shapes_content: str
+    ) -> None:
         """Verify tracks are parsed correctly alongside annotations."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
         tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
@@ -103,7 +105,9 @@ class TestTrackRegressionShapesRep:
         # NEL_STYLE4 uses standard @GA20 format and should be parsed
         assert "NEL_STYLE4" in track_names
 
-    def test_track_positions_not_affected_by_annotations(self, rep_handler: REPHandler, shapes_content: str) -> None:
+    def test_track_positions_not_affected_by_annotations(
+        self, rep_handler: REPHandler, shapes_content: str
+    ) -> None:
         """Verify annotation lines don't corrupt track position data."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
         tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
@@ -139,7 +143,9 @@ class TestAnnotationCountInShapesRep:
         # shapes.rep has 8 CIRCLE entries
         assert len(circles) == 8
 
-    def test_rectangle_annotations_parsed(self, rep_handler: REPHandler, shapes_content: str) -> None:
+    def test_rectangle_annotations_parsed(
+        self, rep_handler: REPHandler, shapes_content: str
+    ) -> None:
         """Verify RECT annotations are parsed."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
         rects = [f for f in result.features if f["properties"].get("kind") == "RECTANGLE"]
@@ -164,7 +170,9 @@ class TestAnnotationCountInShapesRep:
         # shapes.rep has many TEXT entries with various symbols and layers
         assert len(texts) >= 40  # At least 40 TEXT entries
 
-    def test_narrative_annotations_parsed(self, rep_handler: REPHandler, shapes_content: str) -> None:
+    def test_narrative_annotations_parsed(
+        self, rep_handler: REPHandler, shapes_content: str
+    ) -> None:
         """Verify NARRATIVE annotations are parsed."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
         narratives = [f for f in result.features if f["properties"].get("kind") == "NARRATIVE"]

@@ -86,7 +86,9 @@ class ParameterValue(BaseModel):
 class PropertyDelta(BaseModel):
     """Captures the previous and new value of a single property change."""
 
-    previous_value: Any = Field(..., description="Value before the change")  # JSON-serializable value
+    previous_value: Any = Field(
+        ..., description="Value before the change"
+    )  # JSON-serializable value
     new_value: Any = Field(..., description="Value after the change")  # JSON-serializable value
 
 
@@ -217,8 +219,12 @@ class ToolParameter(BaseModel):
     type: str = Field(..., description="Data type: string, number, boolean, enum")
     description: str = Field(..., description="Human-readable description")
     required: bool = Field(default=False, description="Whether parameter is required")
-    default: Any | None = Field(default=None, description="Default value if not provided")  # JSON-serializable value
-    choices: list[Any] | None = Field(default=None, description="Valid values for enum type")  # JSON-serializable value
+    default: Any | None = Field(
+        default=None, description="Default value if not provided"
+    )  # JSON-serializable value
+    choices: list[Any] | None = Field(
+        default=None, description="Valid values for enum type"
+    )  # JSON-serializable value
     param_type: str | None = Field(
         default=None, description="References a schema-defined parameter-type enum by name"
     )

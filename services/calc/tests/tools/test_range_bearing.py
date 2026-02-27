@@ -29,9 +29,7 @@ def multi_track_context(tracks_pair_fixture: dict[str, Any]) -> SelectionContext
     return SelectionContext(type=ContextType.MULTI, features=tracks_pair_fixture["features"])
 
 
-def _make_track(
-    name: str, coords: list[list[float]], times: list[int]
-) -> dict[str, Any]:
+def _make_track(name: str, coords: list[list[float]], times: list[int]) -> dict[str, Any]:
     return {
         "type": "Feature",
         "id": name,

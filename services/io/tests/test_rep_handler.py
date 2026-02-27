@@ -272,7 +272,9 @@ class TestREPHandlerRealFiles:
         # boat2.rep has COLLINGWOOD track
         assert result.features[0]["properties"]["platform_id"] == "COLLINGWOOD"
 
-    def test_all_coordinates_in_geometry_are_valid(self, boat2_content: str, boat2_rep: Path) -> None:
+    def test_all_coordinates_in_geometry_are_valid(
+        self, boat2_content: str, boat2_rep: Path
+    ) -> None:
         """All coordinates in geometry should be valid (not in positions)."""
         handler = REPHandler()
         result = handler.parse(boat2_content, str(boat2_rep))
@@ -318,7 +320,9 @@ class TestREPHandlerRealFiles:
             for i in range(1, len(positions)):
                 assert positions[i]["time"] >= positions[i - 1]["time"]
 
-    def test_smart_intervals_set_for_6_hour_track(self, boat2_content: str, boat2_rep: Path) -> None:
+    def test_smart_intervals_set_for_6_hour_track(
+        self, boat2_content: str, boat2_rep: Path
+    ) -> None:
         """Track spanning ~6.7 hours should get 6-12 hour tier intervals."""
         handler = REPHandler()
         result = handler.parse(boat2_content, str(boat2_rep))

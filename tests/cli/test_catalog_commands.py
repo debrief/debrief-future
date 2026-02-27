@@ -38,7 +38,9 @@ def config_with_stores(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 class TestCatalogStores:
     """Tests for 'catalog stores' command."""
 
-    def test_stores_no_config(self, runner: CliRunner, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_stores_no_config(
+        self, runner: CliRunner, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         # Use empty config dir
         monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / ".config"))
 
@@ -72,7 +74,9 @@ class TestCatalogList:
         # Should fail without --store
         assert result.exit_code != 0
 
-    def test_list_unknown_store(self, runner: CliRunner, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_list_unknown_store(
+        self, runner: CliRunner, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / ".config"))
 
         result = runner.invoke(cli, ["catalog", "list", "--store", "unknown"])
@@ -98,7 +102,9 @@ class TestCatalogGet:
         result = runner.invoke(cli, ["catalog", "get", "--store", "test"])
         assert result.exit_code != 0
 
-    def test_get_unknown_store(self, runner: CliRunner, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_get_unknown_store(
+        self, runner: CliRunner, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / ".config"))
 
         result = runner.invoke(cli, ["catalog", "get", "--store", "unknown", "--item", "test"])

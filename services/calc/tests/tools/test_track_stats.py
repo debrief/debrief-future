@@ -124,7 +124,9 @@ class TestTrackStatsTool:
         assert geom["type"] == "Point"
         assert len(geom["coordinates"]) == 2
 
-    def test_with_fixture_data(self, single_track_context: SelectionContext, single_track_fixture: dict[str, Any]) -> None:
+    def test_with_fixture_data(
+        self, single_track_context: SelectionContext, single_track_fixture: dict[str, Any]
+    ) -> None:
         results = track_stats(single_track_context, {})
         stats = results[0]["properties"]["statistics"]
 

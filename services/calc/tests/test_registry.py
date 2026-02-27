@@ -59,7 +59,9 @@ class TestToolRegistry:
         assert len(fresh_registry) == 1
         assert "test-tool" in fresh_registry
 
-    def test_register_duplicate_raises(self, fresh_registry: ToolRegistry, sample_tool: Tool) -> None:
+    def test_register_duplicate_raises(
+        self, fresh_registry: ToolRegistry, sample_tool: Tool
+    ) -> None:
         fresh_registry.register(sample_tool)
         with pytest.raises(ValueError, match="already registered"):
             fresh_registry.register(sample_tool)
@@ -78,7 +80,9 @@ class TestToolRegistry:
         tools = fresh_registry.list_all()
         assert tools == []
 
-    def test_list_all_sorted(self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool, zone_tool: Tool) -> None:
+    def test_list_all_sorted(
+        self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool, zone_tool: Tool
+    ) -> None:
         fresh_registry.register(zone_tool)
         fresh_registry.register(sample_tool)
         fresh_registry.register(multi_tool)
@@ -87,7 +91,9 @@ class TestToolRegistry:
         names = [t.name for t in tools]
         assert names == ["multi-tool", "test-tool", "zone-tool"]
 
-    def test_find_tools_by_context_type(self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool) -> None:
+    def test_find_tools_by_context_type(
+        self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool
+    ) -> None:
         fresh_registry.register(sample_tool)
         fresh_registry.register(multi_tool)
 
@@ -99,7 +105,9 @@ class TestToolRegistry:
         assert len(multi_tools) == 1
         assert multi_tools[0].name == "multi-tool"
 
-    def test_find_tools_by_kinds(self, fresh_registry: ToolRegistry, sample_tool: Tool, zone_tool: Tool) -> None:
+    def test_find_tools_by_kinds(
+        self, fresh_registry: ToolRegistry, sample_tool: Tool, zone_tool: Tool
+    ) -> None:
         fresh_registry.register(sample_tool)
         fresh_registry.register(zone_tool)
 
@@ -139,7 +147,9 @@ class TestToolRegistry:
         tools = fresh_registry.find_tools(kinds={"POINT"})
         assert tools == []
 
-    def test_find_tools_for_context(self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool) -> None:
+    def test_find_tools_for_context(
+        self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool
+    ) -> None:
         fresh_registry.register(sample_tool)
         fresh_registry.register(multi_tool)
 
@@ -151,7 +161,9 @@ class TestToolRegistry:
         assert len(tools) == 1
         assert tools[0].name == "test-tool"
 
-    def test_describe_returns_metadata(self, fresh_registry: ToolRegistry, sample_tool: Tool) -> None:
+    def test_describe_returns_metadata(
+        self, fresh_registry: ToolRegistry, sample_tool: Tool
+    ) -> None:
         fresh_registry.register(sample_tool)
 
         metadata = fresh_registry.describe("test-tool")
@@ -256,7 +268,9 @@ class TestFindToolsEdgeCases:
         tools = fresh_registry.find_tools(kinds={"TRACK", "ZONE"})
         assert len(tools) == 1
 
-    def test_empty_kinds_filter_returns_all(self, fresh_registry: ToolRegistry, sample_tool: Tool, zone_tool: Tool) -> None:
+    def test_empty_kinds_filter_returns_all(
+        self, fresh_registry: ToolRegistry, sample_tool: Tool, zone_tool: Tool
+    ) -> None:
         """Empty kinds set should not filter (return all)."""
         fresh_registry.register(sample_tool)
         fresh_registry.register(zone_tool)
@@ -269,7 +283,9 @@ class TestFindToolsEdgeCases:
         tools = fresh_registry.find_tools(kinds=set())
         assert len(tools) == 0
 
-    def test_find_tools_returns_sorted_copy(self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool) -> None:
+    def test_find_tools_returns_sorted_copy(
+        self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool
+    ) -> None:
         """Returned list should be a new list, sorted alphabetically."""
         fresh_registry.register(multi_tool)
         fresh_registry.register(sample_tool)
