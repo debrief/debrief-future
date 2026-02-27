@@ -114,8 +114,6 @@ Note: Rationale in the action bar flips the card and auto-focuses the rationale 
 3. **Schema loading** — lazy-load on flip, show spinner/skeleton while loading, cache after first access per session.
 4. **Rationale sync** — rationale is editable on the flip face. The action bar Rationale button is a shortcut that flips the selected card and focuses the rationale field. Single source of truth — no duplication.
 
-## Open Questions
-
-1. **Compound parameters** — some tools may have parameters that are arrays or objects. How deep do rich controls go? Suggest: top-level primitives get rich controls, complex nested structures fall back to JSON editor.
-2. **Undo during tuning** — if the analyst is mid-tune and clicks Done, is the previous parameter value recoverable? Or does Done commit the change as a new PROV entry? (Live replay means changes apply continuously — Done simply exits edit mode.)
-3. **Disabled entry cascading** — if entry B depends on the output of entry A, and A is disabled, should B auto-disable with a warning?
+5. **Compound parameters** — top-level primitives get rich controls (sliders, dropdowns, toggles, color pickers). Complex nested structures (arrays, objects) fall back to a JSON editor.
+6. **Undo during tuning** — Done commits the current parameter values by updating the existing PROV entry in place. The previous values are not separately recoverable (live replay means changes apply continuously; Done simply exits edit mode and persists).
+7. **Disabled entry cascading** — if entry B depends on the output of entry A, and A is disabled, B is auto-disabled with a visual warning indicating the dependency.
