@@ -193,6 +193,64 @@ const meta: Meta = {
 
 export default meta;
 
+// ------------- Per-track default symbol shapes (simulates apply-symbol-style tool output) -------
+
+const SHAPES: Array<{ shape: string; name: string; color: string }> = [
+  { shape: 'circle', name: 'Circle (default)', color: '#2196F3' },
+  { shape: 'square', name: 'Square', color: '#4CAF50' },
+  { shape: 'triangle', name: 'Triangle', color: '#FF9800' },
+  { shape: 'diamond', name: 'Diamond', color: '#E91E63' },
+  { shape: 'cross', name: 'Cross', color: '#9C27B0' },
+];
+
+const shapeTracks: DebriefFeature[] = SHAPES.map((s, idx) => {
+  const data = generatePositions(BASE_TIME, 15, -4.0 + idx * 0.04, 50.3 - idx * 0.02);
+  return createStyledTrack(
+    `track-shape-${s.shape}`,
+    s.name,
+    s.color,
+    data.coordinates,
+    data.positions,
+    data.times,
+    { show_symbol: true, symbol: s.shape, show_label: false },
+  );
+});
+
+const shapeTimeExtent: TimeExtent = [BASE_TIME, BASE_TIME + 60 * MINUTE];
+
+function SymbolShapesDemo() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', gap: 0 }}>
+      <div style={{ padding: '8px', background: '#2d2d2d', color: '#fff', fontSize: '14px' }}>
+        <strong>Symbol Shapes Demo</strong> — each track uses a different default symbol shape
+        <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+          {SHAPES.map((s) => (
+            <li key={s.shape} style={{ color: s.color }}>{s.name}</li>
+          ))}
+        </ul>
+      </div>
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <MapView features={shapeTracks} height="100%" autoFitBounds />
+      </div>
+    </div>
+  );
+}
+
+export const SymbolShapes: StoryObj = {
+  render: () => <SymbolShapesDemo />,
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Demonstrates all five symbol shapes as default track symbols.
+Each track has \`default_position_style.show_symbol: true\` with a different symbol.
+This matches the output of the **apply-symbol-style** tool.
+        `,
+      },
+    },
+  },
+};
+
 export const IntervalBasedStyling: StoryObj = {
   render: () => <PositionStylingDemo />,
   parameters: {

@@ -93,6 +93,12 @@ def apply_symbol_style(context: SelectionContext, params: dict[str, Any]) -> lis
             if line.get("color"):
                 point["fill_color"] = line["color"]
 
+        # Update default_position_style so the PositionSymbolsLayer renderer
+        # shows the chosen symbol shape on the map.
+        dps = props.setdefault("default_position_style", {})
+        dps["symbol"] = symbol
+        dps["show_symbol"] = True
+
         modified.append(feature)
 
     if not modified:

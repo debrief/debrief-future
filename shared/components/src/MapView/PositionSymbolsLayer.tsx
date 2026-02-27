@@ -113,8 +113,18 @@ export function PositionSymbolsLayer({
     [feature.geometry.coordinates]
   );
 
-  // Get position styling configuration
-  const defaultStyle = props.default_position_style ?? DEFAULT_POSITION_STYLE;
+  // Get position styling configuration.
+  // Fall back to style.point (set by apply-symbol-style tool) when
+  // default_position_style is absent.
+  const explicitDps = props.default_position_style;
+  const pointStyle = (props.style as unknown as Record<string, unknown> | undefined)?.point as
+    | Record<string, unknown>
+    | undefined;
+  const defaultStyle: PositionStyle = explicitDps ?? (
+    pointStyle?.shape
+      ? { show_symbol: true, symbol: pointStyle.shape as string, show_label: false }
+      : DEFAULT_POSITION_STYLE
+  );
   const symbolInterval = props.symbol_interval;
   const labelInterval = props.label_interval;
   const overrides = props.position_style_overrides;
