@@ -44,6 +44,8 @@ jobs:
 
       - name: Install dependencies
         run: task install
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install chromium
