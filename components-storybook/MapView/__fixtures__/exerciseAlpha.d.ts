@@ -1,7 +1,7 @@
 import { TimeExtent } from '../../utils/types';
 
 export declare const exerciseAlphaTimeExtent: TimeExtent;
-export declare const exerciseAlphaFeatures: any[];
+export declare const exerciseAlphaFeatures: GeoJSON.Feature[];
 export declare const exerciseAlphaNarratives: {
     time: string;
     text: string;
