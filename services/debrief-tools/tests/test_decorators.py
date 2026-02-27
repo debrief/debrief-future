@@ -74,7 +74,7 @@ class TestToolSpecDecorator:
         def my_tool() -> None:
             pass
 
-        assert getattr(my_tool, "__tool_spec__")  # noqa: B009 == "track/styling/set-track-color.1.0"
+        assert getattr(my_tool, "__tool_spec__") == "track/styling/set-track-color.1.0"  # noqa: B009
 
     def test_missing_spec_raises_error(self) -> None:
         """Should raise ToolSpecError when spec doesn't exist."""
@@ -92,7 +92,7 @@ class TestToolSpecDecorator:
             return "works"
 
         assert my_tool() == "works"
-        assert getattr(my_tool, "__tool_spec__")  # noqa: B009 == "nonexistent/tool.1.0"
+        assert getattr(my_tool, "__tool_spec__") == "nonexistent/tool.1.0"  # noqa: B009
 
     def test_preserves_function_name(self) -> None:
         """Should preserve function __name__."""
@@ -147,7 +147,7 @@ class TestToolSpecDecorator:
             def placeholder() -> None:
                 pass
 
-            assert getattr(placeholder, "__tool_spec__")  # noqa: B009 == tool_path
+            assert getattr(placeholder, "__tool_spec__") == tool_path  # noqa: B009
 
 
 class TestToolSpecIntrospection:
@@ -171,7 +171,7 @@ class TestToolSpecIntrospection:
         def my_tool() -> None:
             pass
 
-        assert getattr(my_tool, "__tool_spec__")  # noqa: B009 == "track/styling/set-track-color.1.0"
+        assert getattr(my_tool, "__tool_spec__") == "track/styling/set-track-color.1.0"  # noqa: B009
 
 
 class TestToolSpecErrorMessages:

@@ -49,11 +49,13 @@ export function getState(
           viewport: state.viewport,
           rotation: state.rotation,
           drawingMode: state.drawingMode,
+          drawingPaletteIndex: state.drawingPaletteIndex,
         },
         features: {
           featureCollectionUri: state.featureCollectionUri,
           selection: state.selection,
           hiddenFeatureIds: state.hiddenFeatureIds,
+          styleVersion: state.styleVersion,
         },
         document: {
           dirty: state.dirty,
@@ -84,6 +86,7 @@ export function getState(
           viewport: state.viewport,
           rotation: state.rotation,
           drawingMode: state.drawingMode,
+          drawingPaletteIndex: state.drawingPaletteIndex,
         },
       };
     case 'features':
@@ -93,6 +96,7 @@ export function getState(
           featureCollectionUri: state.featureCollectionUri,
           selection: state.selection,
           hiddenFeatureIds: state.hiddenFeatureIds,
+          styleVersion: state.styleVersion,
         },
       };
     case 'document':
