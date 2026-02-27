@@ -205,6 +205,38 @@ Entry D uses: [feature-X, feature-Z]  → D partially depends on A → auto-disa
 
 **Algorithm**: For each subsequent entry after the disabled one, check if any element of `entry.used[]` appears in the disabled entry's `generated[]`. If so, the entry is auto-disabled. Then recursively check entries that depend on the auto-disabled entry's `generated[]`.
 
+**REVIEW DECISION (F1): Visited guard required.** The algorithm MUST maintain a `visited: Set<string>` of already-processed activityIds to prevent infinite loops when the `used`/`generated` dependency graph contains cycles. Before processing each entry in the cascade, check `visited.has(entry.activityId)` and skip if already visited.
+
+```
+function cascadeDisable(entryId: string, timeline: TimelineEntry[]): string[] {
+  const visited = new Set<string>();
+  const disabled: string[] = [];
+  const queue = [entryId];
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+    if (visited.has(currentId)) continue;  // ← prevents infinite loop
+    visited.add(currentId);
+
+    const entry = timeline.find(e => e.activityId === currentId);
+    if (!entry) continue;
+
+    const generatedFeatures = new Set(entry.generated);
+
+    for (const subsequent of timeline.filter(e => /* after entry */)) {
+      if (visited.has(subsequent.activityId)) continue;
+      const dependsOnDisabled = subsequent.used.some(f => generatedFeatures.has(f));
+      if (dependsOnDisabled) {
+        disabled.push(subsequent.activityId);
+        queue.push(subsequent.activityId);
+      }
+    }
+  }
+
+  return disabled;
+}
+```
+
 ## Validation Rules
 
 | Rule | Scope | Description |

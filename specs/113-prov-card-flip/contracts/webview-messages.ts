@@ -3,6 +3,13 @@
  *
  * These extend the existing Log Panel message protocol defined in
  * apps/vscode/src/views/logPanelView.ts and apps/vscode/src/webview/web/logPanel.tsx.
+ *
+ * REVIEW DECISION (113-review):
+ * - live-replay:request/result REMOVED — reuse existing tune:request message
+ *   (routes to logService.tuneEntry() which already handles parameter change + replay)
+ * - delete:request REMOVED — reuse existing revert-this:request message
+ *   (routes to logService.revertThis() which already handles soft-delete + replay)
+ * - SchemaResponseMessage gains status discriminator (8A)
  */
 
 // ---------------------------------------------------------------------------
@@ -17,18 +24,32 @@ export interface SchemaRequestMessage {
   };
 }
 
-/** Extension returns tool parameter schema. */
+/**
+ * Extension returns tool parameter schema.
+ *
+ * Uses explicit `status` discriminator (matching ReplayResult pattern)
+ * rather than structural narrowing on optional fields.
+ */
 export interface SchemaResponseMessage {
   readonly type: 'schema:response';
   readonly payload: {
     readonly toolId: string;
-    readonly parameters: ReadonlyArray<ParameterSchemaEntry>;
-  } | {
-    readonly toolId: string;
-    readonly error: string;
+    readonly status: 'success' | 'error';
+    readonly parameters?: ReadonlyArray<ParameterSchemaEntry>;
+    readonly error?: string;
   };
 }
 
+/**
+ * Describes a single tool parameter's type and constraints for rendering
+ * the appropriate edit control.
+ *
+ * REVIEW DECISION (113-review, 2A): This type extends the existing
+ * ToolParameter interface (apps/vscode/src/types/tool.ts, shared/components/
+ * src/ToolMatch/types.ts) with flip-card-specific fields: tunable, minimum,
+ * maximum, step. During implementation, consolidate with the existing
+ * ToolParameter type rather than maintaining two parallel definitions.
+ */
 export interface ParameterSchemaEntry {
   readonly name: string;
   readonly type: 'number' | 'string' | 'boolean' | 'enum' | 'object' | 'array';
@@ -40,30 +61,6 @@ export interface ParameterSchemaEntry {
   readonly step: number | null;
   readonly choices: ReadonlyArray<unknown> | null;
   readonly paramType: string | null;
-}
-
-// ---------------------------------------------------------------------------
-// Live replay (webview → extension)
-// ---------------------------------------------------------------------------
-
-/** Webview requests live replay after parameter change. */
-export interface LiveReplayRequestMessage {
-  readonly type: 'live-replay:request';
-  readonly payload: {
-    readonly activityId: string;
-    readonly parameter: string;
-    readonly newValue: unknown;
-  };
-}
-
-/** Extension reports live replay result. */
-export interface LiveReplayResultMessage {
-  readonly type: 'live-replay:result';
-  readonly payload: {
-    readonly activityId: string;
-    readonly status: 'completed' | 'halted' | 'error';
-    readonly errorMessage: string | null;
-  };
 }
 
 // ---------------------------------------------------------------------------
@@ -89,18 +86,6 @@ export interface DisableCascadeMessage {
 }
 
 // ---------------------------------------------------------------------------
-// Delete entry (webview → extension)
-// ---------------------------------------------------------------------------
-
-/** Webview requests soft-delete of an entry (after user confirmation). */
-export interface DeleteEntryMessage {
-  readonly type: 'delete:request';
-  readonly payload: {
-    readonly activityId: string;
-  };
-}
-
-// ---------------------------------------------------------------------------
 // Rationale update (webview → extension)
 // ---------------------------------------------------------------------------
 
@@ -117,16 +102,18 @@ export interface RationaleUpdateMessage {
 // Union types
 // ---------------------------------------------------------------------------
 
-/** All messages sent from webview to extension (new for this feature). */
+/**
+ * New messages sent from webview to extension for flip-card interaction.
+ *
+ * Note: Parameter changes reuse existing tune:request message.
+ * Entry deletion reuses existing revert-this:request message.
+ */
 export type FlipCardWebviewMessage =
   | SchemaRequestMessage
-  | LiveReplayRequestMessage
   | DisableToggleMessage
-  | DeleteEntryMessage
   | RationaleUpdateMessage;
 
 /** All messages sent from extension to webview (new for this feature). */
 export type FlipCardExtensionMessage =
   | SchemaResponseMessage
-  | LiveReplayResultMessage
   | DisableCascadeMessage;

@@ -5,7 +5,24 @@
 
 ## Summary
 
-Replace the Log Panel's separate Tune dialog with an in-place flip-card interaction model. Each Log entry card gains a pencil icon that triggers a CSS 3D flip animation to reveal an edit face with type-aware parameter controls (sliders, dropdowns, toggles, colour pickers), metadata display, analyst rationale field, disable toggle, and delete button. Parameter changes trigger debounced live tool re-execution via the existing replay engine. Only one card may be in edit mode at a time. The action bar removes the Tune button and adds Rationale as a shortcut to flip-and-focus.
+Replace the Log Panel's separate Tune dialog with an in-place flip-card interaction model. Each Log entry card gains a pencil icon that triggers a CSS 3D flip animation to reveal an edit face with type-aware parameter controls (sliders, dropdowns, toggles, colour pickers), metadata display, analyst rationale field, disable toggle, and delete button. Parameter changes trigger debounced live tool re-execution via the existing replay engine (reusing existing `tune:request` messages). Only one card may be in edit mode at a time. The action bar removes the Tune button and adds Rationale as a shortcut to flip-and-focus.
+
+## Review Decisions (113-review)
+
+The following decisions were made during `/speckit.review` and are normative for implementation:
+
+| # | Decision | Choice | Rationale |
+|---|----------|--------|-----------|
+| 1A | Reuse existing messages | Reuse `tune:request` and `revert-this:request` instead of creating `live-replay:request` and `delete:request` | DRY — existing messages route to the same service methods |
+| 2A | Extend ToolParameter type | Extend existing `ToolParameter` (at `apps/vscode/src/types/tool.ts`, `shared/components/src/ToolMatch/types.ts`) with `tunable`, `minimum`, `maximum`, `step` fields instead of creating a parallel `ParameterSchemaEntry` | Article II — single source of truth |
+| 3A | Plain Map for schema cache | Use `Map<string, ReadonlyArray<ParameterSchemaEntry>>` in a `useRef` instead of a custom SchemaCache interface/factory | Avoid premature abstraction |
+| 4A | activityId matching after timeline:update | When `timeline:update` arrives during editing, find the matching entry by `activityId` in the new array and update the edit face's entry reference | Article I.3 — no silent failures |
+| 6A | Pure animation CardFlip | CardFlip takes `isFlipped`, `front`, `back` children — no knowledge of entries or schemas | Reusable animation primitive |
+| 7C | Accept disabled mutation | `disabled` field toggles on provenance entries under Article XIV pre-release freedom; document as known deviation from III.3 | Pre-release freedom |
+| 8A | Status discriminator on SchemaResponse | `status: 'success' \| 'error'` field matches existing `ReplayResult` pattern | Article XV — explicit types |
+| 9B | Keep linear cascade scan | O(n²) worst case on 500 entries is microseconds; optimise later if needed | Avoid premature optimisation |
+| 10A | 5-second schema timeout | `setTimeout` on schema:request; show error + retry after 5s | Article I.3 — no silent failures |
+| F1 | Visited guard in cascade | Add `visited: Set<string>` to prevent infinite loops in circular dependency graphs | Prevent crash |
 
 ## Technical Context
 
@@ -41,7 +58,10 @@ Replace the Log Panel's separate Tune dialog with an in-place flip-card interact
 | XV.1 Explicit types everywhere | All types annotated | PASS | All new interfaces, props, and state fully typed |
 | XV.2 No Any/any | Forbidden in production code | PASS | Parameter values typed as `unknown` (not `any`) at schema boundary, narrowed via type guards |
 
-**Post-design re-check**: PASS — III.3 audit trail concern resolved: rationale is a user annotation field on the entry, not a modification of provenance lineage data. The `TuneAnnotation` precedent already establishes that entries can carry mutable annotations alongside immutable provenance fields.
+**Post-design re-check**: PASS with documented deviation:
+- **III.3 rationale**: PASS — rationale is a user annotation field, not provenance lineage. `TuneAnnotation` precedent establishes mutable annotations.
+- **III.3 disabled**: KNOWN DEVIATION — `disabled` is a bidirectional toggle that modifies the same entry repeatedly. Unlike `TuneAnnotation` (append-once), disable/re-enable mutates the same field back and forth. Accepted under Article XIV (pre-release freedom). Must be revisited before v4.0.0 — options: (a) separate disable state from provenance entries, (b) append-only `DisableAnnotation[]` array.
+- **II.3 schema versioning**: Additive changes (`disabled`, `rationale` fields) are non-breaking but should note the schema version for discipline.
 
 ## Project Structure
 
@@ -54,9 +74,9 @@ specs/113-prov-card-flip/
 ├── data-model.md        # Entity definitions and state transitions
 ├── quickstart.md        # Implementation starting point
 ├── contracts/           # API contracts
-│   ├── webview-messages.ts   # New message types
-│   ├── card-flip-props.ts    # Component prop interfaces
-│   └── schema-cache.ts       # Schema cache interface
+│   ├── webview-messages.ts   # New message types (schema:request, disable:toggle, rationale:update)
+│   ├── card-flip-props.ts    # CardFlip pure animation container props (6A)
+│   └── schema-cache.ts       # Documentation only — use plain Map (3A)
 └── tasks.md             # Phase 2 output (NOT created by /speckit.plan)
 ```
 
@@ -64,12 +84,12 @@ specs/113-prov-card-flip/
 
 ```text
 shared/components/src/LogPanel/
-├── LogPanel.tsx              # (modify) Add editingActivityId state, schema cache
-├── LogEntry.tsx              # (modify) Refactor to support front/back face
+├── LogPanel.tsx              # (modify) Add editingActivityId state, schema cache (plain Map via useRef, 3A)
+├── LogEntry.tsx              # (modify) Refactor to support front/back face via CardFlip
 ├── LogActionBar.tsx          # (modify) Remove Tune button, add Rationale shortcut
 ├── ParameterEditor.tsx       # (modify) Add slider, colour picker, live-replay mode
 ├── ReplayProgress.tsx        # (reuse) In-card progress indicator
-├── CardFlip.tsx              # (new) CSS 3D flip container
+├── CardFlip.tsx              # (new) Pure CSS 3D flip animation container (6A: isFlipped + front/back children)
 ├── CardFlip.css              # (new) Flip animation styles
 ├── EditFace.tsx              # (new) Edit face layout
 ├── EditFace.css              # (new) Edit face styles
@@ -83,16 +103,20 @@ shared/components/src/LogPanel/
 ├── RationaleField.tsx        # (new) Rationale text area
 ├── LogPanel.stories.tsx      # (modify) Add flip-card stories
 ├── types.ts                  # (modify) Add disabled, rationale, schema types
-├── utils.ts                  # (modify) Add dependency graph utilities
+├── utils.ts                  # (modify) Add dependency graph utilities (with visited guard, F1)
 └── strings.ts                # (modify) Add new user-facing strings
 
 apps/vscode/src/
 ├── views/logPanelView.ts     # (modify) Add schema:request/response, disable:toggle messages
-└── webview/web/logPanel.tsx  # (modify) Add schema cache, edit state management
+│                             #          Reuse existing tune:request handler for parameter changes (1A)
+│                             #          Reuse existing revert-this:request handler for delete (1A)
+│                             #          Add 5s timeout on schema request (10A)
+└── webview/web/logPanel.tsx  # (modify) Add schema cache (plain Map in useRef), edit state management
+│                             #          Add activityId matching on timeline:update (4A)
 
 services/session-state/src/log/
 ├── logService.ts             # (modify) Add disableEntry(), setRationale() methods
-├── types.ts                  # (modify) Add disabled, rationale fields
+├── types.ts                  # (modify) Add disabled, rationale fields; extend ToolParameter (2A)
 └── replayEngine.ts           # (modify) Skip disabled entries during replay
 
 shared/schemas/src/linkml/
@@ -100,6 +124,10 @@ shared/schemas/src/linkml/
 ```
 
 **Structure Decision**: This feature extends the existing multi-package architecture. Components live in `shared/components/src/LogPanel/` (pure React, no VS Code dependencies). VS Code integration lives in `apps/vscode/src/`. Service logic lives in `services/session-state/src/log/`. Schema changes in `shared/schemas/src/linkml/`.
+
+**Message Reuse (1A)**: Parameter changes from the edit face send the existing `tune:request` message (handled by `_handleTuneRequest()` → `logService.tuneEntry()`). Entry deletion sends the existing `revert-this:request` message (handled by `_handleRevertThisRequest()` → `logService.revertThis()`). Only genuinely new messages are added: `schema:request/response`, `disable:toggle/cascade`, `rationale:update`.
+
+**Type Consolidation (2A)**: The `ParameterSchemaEntry` type in the contract spec must be implemented by extending the existing `ToolParameter` interface (at `apps/vscode/src/types/tool.ts:28` and `shared/components/src/ToolMatch/types.ts:34`) with the fields `tunable`, `minimum`, `maximum`, and `step`. Do not create a parallel type definition.
 
 ## Media Components
 
@@ -170,4 +198,34 @@ shared/schemas/src/linkml/
 
 ## Complexity Tracking
 
-No constitution violations requiring justification. All gates pass.
+### Constitution Deviations
+
+| Article | Field | Deviation | Justification | Resolution Deadline |
+|---------|-------|-----------|---------------|---------------------|
+| III.3 | `disabled` | Bidirectional toggle modifies provenance entry repeatedly | Article XIV pre-release freedom; TuneAnnotation precedent for mutable annotations | Before v4.0.0 — migrate to separate disable state (7A) or append-only annotations (7B) |
+
+### Test Gaps (all to be addressed in tasks.md)
+
+| Gap | Description | Severity |
+|-----|-------------|----------|
+| G1 | Unit test for schema:request → MCP registry lookup in extension | Medium |
+| G2 | Unit test for `logService.disableEntry()` | High |
+| G3 | Unit test for `logService.setRationale()` | Medium |
+| G4 | Golden fixture for `disabled: true` log entry | High |
+| G5 | Round-trip test for `disabled` + `rationale` fields | High |
+| G6 | Unit test for slider value clamping to min/max/step | Medium |
+| G7 | Unit test for JSON editor parse validation | Low |
+| G8 | Unit test for schema load timeout handling (5s, 10A) | Medium |
+| G9 | Unit test for soft-deleted card flip prevention | Low |
+| G10 | Unit test for activityId matching after timeline:update (4A) | Medium |
+
+### Failure Mode: Circular Dependency (F1)
+
+The disable cascade algorithm must include a `visited: Set<string>` guard to prevent infinite loops when the `used`/`generated` graph contains cycles. Without this, a circular dependency (A→B→C→A) would cause the cascade to loop infinitely. This is a **must-fix** before implementation.
+
+### Performance Notes
+
+- Schema cache: unbounded `Map` growth is acceptable (worst case ~30KB for ~30 tools)
+- Disable cascade: O(n²) worst case for 500 entries is microseconds; optimise later if needed (9B)
+- CSS flip animation: GPU-composited, no JS animation overhead
+- Schema load timeout: 5 seconds (10A) prevents indefinite skeleton display

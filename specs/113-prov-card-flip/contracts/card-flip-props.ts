@@ -5,38 +5,38 @@
  * in the LogPanel component tree.
  */
 
-import type { TimelineEntry, ParameterValue } from './types-extended';
 import type { ParameterSchemaEntry } from './webview-messages';
 
 // ---------------------------------------------------------------------------
-// CardFlip — container managing 3D flip animation
+// CardFlip — pure animation container (review decision 6A)
 // ---------------------------------------------------------------------------
 
+/**
+ * CardFlip is a reusable CSS 3D flip animation container.
+ * It has no knowledge of entries, schemas, or parameters — it only
+ * manages the flip transform between two children (front and back slots).
+ *
+ * REVIEW DECISION (113-review, 6A): Simplified from smart component to
+ * pure animation primitive. The parent (LogEntry) renders both faces and
+ * wraps them in CardFlip. This follows the existing pattern where
+ * LogTimeline and LogByFeature are thin layout components delegating
+ * to LogEntry.
+ */
 export interface CardFlipProps {
-  /** The timeline entry this card represents. */
-  readonly entry: TimelineEntry;
+  /** Whether the card is currently flipped to show the back face. */
+  readonly isFlipped: boolean;
 
-  /** Whether this card is currently showing its edit face. */
-  readonly isEditing: boolean;
+  /** Content for the front face. */
+  readonly front: React.ReactNode;
 
-  /** Callback when the pencil icon is clicked to flip to edit mode. */
-  readonly onFlipToEdit: (activityId: string) => void;
+  /** Content for the back face. */
+  readonly back: React.ReactNode;
 
-  /** Callback when Done is clicked or edit is auto-closed. */
-  readonly onFlipToRead: (activityId: string) => void;
+  /** Optional CSS class name for the container. */
+  readonly className?: string;
 
-  /** Whether this card is currently selected in the timeline. */
-  readonly isSelected: boolean;
-
-  /** Current presentation mode for the front face. */
-  readonly presentationMode: 'compact' | 'normal' | 'detailed';
-
-  /** Feature name lookup for display. */
-  readonly featureNames: Readonly<Record<string, string>>;
-
-  /** Children rendered inside the card faces. */
-  readonly frontFace: React.ReactNode;
-  readonly backFace: React.ReactNode;
+  /** Optional data-testid for testing. */
+  readonly 'data-testid'?: string;
 }
 
 // ---------------------------------------------------------------------------
