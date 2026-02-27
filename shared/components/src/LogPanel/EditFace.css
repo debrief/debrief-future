@@ -12,6 +12,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .log-panel__edit-face-section {
@@ -112,24 +114,6 @@
 
 .log-panel__edit-face-retry-btn:hover {
   background: var(--vscode-button-secondaryHoverBackground, #45494e);
-}
-
-/* Metadata */
-.log-panel__edit-face-metadata {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 12px;
-}
-
-.log-panel__edit-face-meta-row {
-  display: flex;
-  gap: 6px;
-}
-
-.log-panel__edit-face-meta-label {
-  color: var(--vscode-descriptionForeground, #969696);
-  min-width: 80px;
 }
 
 /* Rationale field */
@@ -260,6 +244,9 @@
   border: none;
   border-radius: 2px;
   cursor: pointer;
+  position: sticky;
+  bottom: 0;
+  flex-shrink: 0;
 }
 
 .log-panel__edit-face-done-btn:hover {

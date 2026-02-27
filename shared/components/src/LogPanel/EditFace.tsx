@@ -17,7 +17,7 @@ import { DisableToggle } from './DisableToggle';
 import { DeleteConfirmation } from './DeleteConfirmation';
 import { RationaleField } from './RationaleField';
 import { LOG_PANEL_STRINGS } from './strings';
-import { formatDuration, formatTimestamp } from './utils';
+
 import './EditFace.css';
 
 export interface EditFaceProps {
@@ -256,27 +256,6 @@ export function EditFace({
             })}
           </div>
         )}
-      </div>
-
-      {/* Metadata section */}
-      <div className="log-panel__edit-face-section">
-        <div className="log-panel__edit-face-section-title">
-          {LOG_PANEL_STRINGS.editFaceMetadataTitle}
-        </div>
-        <div className="log-panel__edit-face-metadata">
-          <div className="log-panel__edit-face-meta-row">
-            <span className="log-panel__edit-face-meta-label">{LOG_PANEL_STRINGS.timestampLabel}:</span>
-            <span>{formatTimestamp(entry.timestamp)}</span>
-          </div>
-          <div className="log-panel__edit-face-meta-row">
-            <span className="log-panel__edit-face-meta-label">{LOG_PANEL_STRINGS.durationLabel}:</span>
-            <span>{formatDuration(entry.executionDuration)}</span>
-          </div>
-          <div className="log-panel__edit-face-meta-row">
-            <span className="log-panel__edit-face-meta-label">Tool version:</span>
-            <span>{entry.toolVersion}</span>
-          </div>
-        </div>
       </div>
 
       {/* Rationale field */}

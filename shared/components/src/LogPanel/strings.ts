@@ -86,7 +86,6 @@ export const LOG_PANEL_STRINGS = {
   // Flip-card interaction (Feature: 113-prov-card-flip)
   editIconTooltip: 'Edit parameters',
   editFaceDone: 'Done',
-  editFaceMetadataTitle: 'Metadata',
   editFaceParametersTitle: 'Parameters',
   editFaceNoParameters: 'This tool has no tunable parameters.',
   editFaceSchemaLoading: 'Loading parameter schema\u2026',
