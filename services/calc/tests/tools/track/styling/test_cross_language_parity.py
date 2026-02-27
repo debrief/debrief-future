@@ -10,6 +10,7 @@ If both test suites pass, cross-language parity is proven:
 """
 
 import copy
+from typing import Any
 
 from debrief_calc.models import ContextType, SelectionContext
 
@@ -105,7 +106,7 @@ TRACK_FEATURE_B = {
 }
 
 
-def _make_context(*features):
+def _make_context(*features: dict[str, Any]) -> SelectionContext:
     """Create a selection context from features.
 
     MULTI accepts 1+ features. Uses SINGLE for exactly 1 feature,
@@ -122,7 +123,7 @@ def _make_context(*features):
 class TestCrossLanguageParity:
     """Verify Python outputs match the golden expectations shared with TypeScript."""
 
-    def test_set_track_color_parity(self):
+    def test_set_track_color_parity(self) -> None:
         """set-track-color: Python output matches cross-language golden example."""
         from debrief_calc.tools.track.styling.set_track_color import set_track_color
 
@@ -139,7 +140,7 @@ class TestCrossLanguageParity:
             assert line["weight"] == 3
             assert abs(line["opacity"] - 1.0) < 1e-9
 
-    def test_apply_symbol_style_parity(self):
+    def test_apply_symbol_style_parity(self) -> None:
         """apply-symbol-style: Python output matches cross-language golden example."""
         from debrief_calc.tools.track.styling.apply_symbol_style import (
             apply_symbol_style,
@@ -163,7 +164,7 @@ class TestCrossLanguageParity:
         assert point["fill"] is True
         assert abs(point["fill_opacity"] - 0.8) < 1e-9
 
-    def test_label_interval_parity(self):
+    def test_label_interval_parity(self) -> None:
         """label-interval: Python output matches cross-language golden example."""
         from debrief_calc.tools.track.styling.label_interval import label_interval
 
@@ -180,7 +181,7 @@ class TestCrossLanguageParity:
         assert dps["show_symbol"] is True
         assert dps["symbol"] == "circle"
 
-    def test_symbol_interval_parity(self):
+    def test_symbol_interval_parity(self) -> None:
         """symbol-interval: Python output matches cross-language golden example."""
         from debrief_calc.tools.track.styling.symbol_interval import symbol_interval
 
@@ -196,7 +197,7 @@ class TestCrossLanguageParity:
         # Original properties preserved
         assert dps["symbol"] == "circle"
 
-    def test_all_tools_preserve_feature_id(self):
+    def test_all_tools_preserve_feature_id(self) -> None:
         """All tools must preserve feature IDs across both languages."""
         from debrief_calc.tools.track.styling.apply_symbol_style import (
             apply_symbol_style,
@@ -218,7 +219,7 @@ class TestCrossLanguageParity:
             result = tool_fn(context, params)
             assert result[0]["id"] == "track-001", f"{tool_fn.__name__} did not preserve feature ID"
 
-    def test_all_tools_preserve_geometry(self):
+    def test_all_tools_preserve_geometry(self) -> None:
         """All tools must preserve geometry across both languages."""
         from debrief_calc.tools.track.styling.apply_symbol_style import (
             apply_symbol_style,
@@ -244,7 +245,7 @@ class TestCrossLanguageParity:
                 f"{tool_fn.__name__} modified geometry"
             )
 
-    def test_all_tools_preserve_kind(self):
+    def test_all_tools_preserve_kind(self) -> None:
         """All tools must preserve properties.kind across both languages."""
         from debrief_calc.tools.track.styling.apply_symbol_style import (
             apply_symbol_style,

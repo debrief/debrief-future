@@ -9,7 +9,14 @@
 import { describe, it, expect } from 'vitest';
 import { execute } from '../../src/tools/track/styling/setTrackColor';
 
-function makeTrackFeature(): any {
+interface TestTrackFeature {
+  type: 'Feature';
+  id: string;
+  geometry: { type: string; coordinates: number[][] };
+  properties: Record<string, unknown>;
+}
+
+function makeTrackFeature(): TestTrackFeature {
   return {
     type: 'Feature' as const,
     id: 'track-001',
@@ -106,7 +113,7 @@ describe('setTrackColor (T031)', () => {
       'color parameter is required',
     );
 
-    expect(() => execute([feature], {} as any)).toThrow(
+    expect(() => execute([feature], {} as Record<string, unknown>)).toThrow(
       'color parameter is required',
     );
   });

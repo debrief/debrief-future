@@ -293,7 +293,8 @@ describe('labels', () => {
 
     it('returns red for contact tracks without explicit style', () => {
       // Create contact track without style to test type-based default color
-      const { style: _unused, ...propsWithoutStyle } = mockTrackFeature.properties;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { style: _omitted, ...propsWithoutStyle } = mockTrackFeature.properties;
       const contactTrack: TrackFeature = {
         ...mockTrackFeature,
         properties: {

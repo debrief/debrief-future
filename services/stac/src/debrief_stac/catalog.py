@@ -205,7 +205,7 @@ def list_plots(path: CatalogPath) -> list[PlotSummary]:
         summary = PlotSummary(
             id=item_data.get("id", ""),
             title=properties.get("title", "Untitled"),
-            timestamp=dt,
+            datetime=dt,
             feature_count=feature_count,
         )
         summaries.append(summary)

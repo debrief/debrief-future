@@ -56,7 +56,7 @@ def register_store(
         registration = StoreRegistration(
             path=path_str,
             name=name.strip(),
-            last_accessed=datetime.now(UTC),
+            lastAccessed=datetime.now(UTC),
             notes=notes,
         )
 

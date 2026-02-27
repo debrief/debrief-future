@@ -14,20 +14,20 @@ from debrief_io.symbology import (
 class TestColorMapping:
     """Test color code to CSS mapping."""
 
-    def test_all_codes_have_mapping(self):
+    def test_all_codes_have_mapping(self) -> None:
         """All valid codes A-Q have CSS color mappings."""
         for code in "ABCDEFGHIJKLMNOPQ":
             assert code in COLOR_MAP
             assert COLOR_MAP[code].startswith("#")
 
-    def test_get_color_valid_codes(self):
+    def test_get_color_valid_codes(self) -> None:
         """get_color returns CSS colors for valid codes."""
         assert get_color("A") == "#0000FF"  # Blue
         assert get_color("B") == "#00FF00"  # Green
         assert get_color("C") == "#FF0000"  # Red
         assert get_color("Q") == "#000000"  # Black
 
-    def test_get_color_invalid_code_raises(self):
+    def test_get_color_invalid_code_raises(self) -> None:
         """get_color raises ValueError for invalid codes."""
         with pytest.raises(ValueError, match="Invalid color code 'Z'"):
             get_color("Z")
@@ -35,13 +35,13 @@ class TestColorMapping:
         with pytest.raises(ValueError, match="Invalid color code 'a'"):
             get_color("a")  # Lowercase not valid
 
-    def test_get_color_name(self):
+    def test_get_color_name(self) -> None:
         """get_color_name returns human-readable names."""
         assert get_color_name("A") == "Blue"
         assert get_color_name("C") == "Red"
         assert get_color_name("D") == "Yellow"
 
-    def test_is_valid_color_code(self):
+    def test_is_valid_color_code(self) -> None:
         """is_valid_color_code checks code validity."""
         assert is_valid_color_code("A") is True
         assert is_valid_color_code("Q") is True
@@ -53,32 +53,32 @@ class TestColorMapping:
 class TestParseColorCode:
     """Test color code extraction from symbol strings."""
 
-    def test_simple_symbol(self):
+    def test_simple_symbol(self) -> None:
         """Parse @X format."""
         assert parse_color_code("@A") == "A"
         assert parse_color_code("@Q") == "Q"
 
-    def test_extended_symbol(self):
+    def test_extended_symbol(self) -> None:
         """Parse @X@00 format."""
         assert parse_color_code("@A@00") == "A"
         assert parse_color_code("@B@11") == "B"
 
-    def test_symbol_with_attributes(self):
+    def test_symbol_with_attributes(self) -> None:
         """Parse @X[LAYER=y] format."""
         # Note: parse_color_code extracts the color but doesn't parse attributes
         assert parse_color_code("@A[LAYER=test]") == "A"
 
-    def test_svg_style_symbol(self):
+    def test_svg_style_symbol(self) -> None:
         """Parse aB format (SVG symbol + color)."""
         assert parse_color_code("aB") == "B"
         assert parse_color_code("xC") == "C"
 
-    def test_single_letter(self):
+    def test_single_letter(self) -> None:
         """Parse single color code."""
         assert parse_color_code("A") == "A"
         assert parse_color_code("Q") == "Q"
 
-    def test_invalid_returns_none(self):
+    def test_invalid_returns_none(self) -> None:
         """Invalid formats return None."""
         assert parse_color_code("") is None
         assert parse_color_code("@") is None
@@ -110,6 +110,6 @@ class TestColorValues:
             ("Q", "#000000"),  # Black
         ],
     )
-    def test_color_mapping_matches_reference(self, code, expected_css):
+    def test_color_mapping_matches_reference(self, code: str, expected_css: str) -> None:
         """Color mappings match Debrief symbology reference."""
         assert get_color(code) == expected_css

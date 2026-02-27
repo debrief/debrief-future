@@ -4,7 +4,8 @@ Pytest configuration and shared fixtures for debrief-stac tests.
 
 import tempfile
 from collections.abc import Generator
-from datetime import UTC, datetime
+from datetime import UTC
+from datetime import datetime as dt
 from pathlib import Path
 
 import pytest
@@ -31,7 +32,7 @@ def sample_plot_metadata() -> PlotMetadata:
     return PlotMetadata(
         title="Test Plot",
         description="A test plot for unit testing",
-        timestamp=datetime.now(UTC),
+        datetime=dt.now(UTC),
     )
 
 

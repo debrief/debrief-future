@@ -51,7 +51,7 @@ def _validate_bounds(
     return west, south, east, north
 
 
-def _validate_positive_int(value: Any, name: str) -> int:
+def _validate_positive_int(value: object, name: str) -> int:
     """Validate that a value is a positive integer."""
     if not isinstance(value, int) or value < 1:
         raise ValueError(f"{name.capitalize()} must be a positive integer")

@@ -6,7 +6,7 @@ from debrief_calc.models import ContextType, Tool, ToolParameter
 class TestToMcpTool:
     """Tests for the to_mcp_tool() method."""
 
-    def test_single_context_type(self):
+    def test_single_context_type(self) -> None:
         tool = Tool(
             name="track-stats",
             description="Calculate track statistics",
@@ -19,7 +19,7 @@ class TestToMcpTool:
         assert len(reqs) == 1
         assert reqs[0] == {"kind": "TRACK", "min": 1, "max": 1}
 
-    def test_multi_context_type(self):
+    def test_multi_context_type(self) -> None:
         tool = Tool(
             name="range-bearing",
             description="Calculate range and bearing",
@@ -32,7 +32,7 @@ class TestToMcpTool:
         assert len(reqs) == 1
         assert reqs[0] == {"kind": "TRACK", "min": 1}
 
-    def test_multi_context_multiple_kinds(self):
+    def test_multi_context_multiple_kinds(self) -> None:
         tool = Tool(
             name="mixed-analysis",
             description="Analyze mixed features",
@@ -46,7 +46,7 @@ class TestToMcpTool:
         assert {"kind": "TRACK", "min": 1} in reqs
         assert {"kind": "POINT", "min": 1} in reqs
 
-    def test_region_context_type(self):
+    def test_region_context_type(self) -> None:
         tool = Tool(
             name="area-summary",
             description="Summarize area",
@@ -59,7 +59,7 @@ class TestToMcpTool:
         assert len(reqs) == 1
         assert reqs[0] == {"kind": "REGION", "min": 1, "max": 1}
 
-    def test_none_context_type(self):
+    def test_none_context_type(self) -> None:
         tool = Tool(
             name="global-stats",
             description="Show global statistics",
@@ -71,7 +71,7 @@ class TestToMcpTool:
         reqs = mcp["annotations"]["debrief:selectionRequirements"]
         assert reqs == []
 
-    def test_top_level_structure(self):
+    def test_top_level_structure(self) -> None:
         tool = Tool(
             name="set-track-color",
             description="Set display color for tracks",
@@ -87,7 +87,7 @@ class TestToMcpTool:
         assert mcp["inputSchema"]["type"] == "object"
         assert "annotations" in mcp
 
-    def test_annotations_structure(self):
+    def test_annotations_structure(self) -> None:
         tool = Tool(
             name="set-track-color",
             description="Set display color for tracks",
@@ -105,7 +105,7 @@ class TestToMcpTool:
         assert annotations["debrief:outputKind"] == "mutation/track/styled"
         assert "debrief:category" in annotations
 
-    def test_category_from_mutation_output_kind(self):
+    def test_category_from_mutation_output_kind(self) -> None:
         tool = Tool(
             name="set-track-color",
             description="Set color",
@@ -116,7 +116,7 @@ class TestToMcpTool:
         mcp = tool.to_mcp_tool()
         assert mcp["annotations"]["debrief:category"] == "track"
 
-    def test_category_from_dataset_output_kind(self):
+    def test_category_from_dataset_output_kind(self) -> None:
         tool = Tool(
             name="range-bearing",
             description="Range and bearing",
@@ -127,7 +127,7 @@ class TestToMcpTool:
         mcp = tool.to_mcp_tool()
         assert mcp["annotations"]["debrief:category"] == "analysis"
 
-    def test_parameters_in_input_schema(self):
+    def test_parameters_in_input_schema(self) -> None:
         tool = Tool(
             name="set-track-color",
             description="Set color",
@@ -157,7 +157,7 @@ class TestToMcpTool:
         assert "symbol" in params_schema
         assert params_schema["symbol"]["enum"] == ["circle", "square", "diamond"]
 
-    def test_param_type_included_in_schema(self):
+    def test_param_type_included_in_schema(self) -> None:
         """T019: x-debrief-param-type annotation is emitted when param_type is set."""
         tool = Tool(
             name="set-track-color",
@@ -183,7 +183,7 @@ class TestToMcpTool:
         # No enum key when choices are not provided
         assert "enum" not in params_schema["color"]
 
-    def test_param_type_not_included_when_absent(self):
+    def test_param_type_not_included_when_absent(self) -> None:
         """T019: x-debrief-param-type is NOT emitted when param_type is None (backward compat)."""
         tool = Tool(
             name="set-track-color",
@@ -206,7 +206,7 @@ class TestToMcpTool:
         assert "x-debrief-param-type" not in params_schema["symbol"]
         assert params_schema["symbol"]["enum"] == ["circle", "square", "diamond"]
 
-    def test_param_type_with_choices_both_present(self):
+    def test_param_type_with_choices_both_present(self) -> None:
         """T019: Both enum values and x-debrief-param-type are emitted when both are set."""
         tool = Tool(
             name="set-track-color",

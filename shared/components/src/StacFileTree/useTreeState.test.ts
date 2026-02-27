@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useTreeState } from './useTreeState';
-import type { FilesystemAdapter } from './types';
+import type { DirectoryEntry, FilesystemAdapter } from './types';
 
 describe('useTreeState', () => {
   let mockFs: FilesystemAdapter;
@@ -222,7 +222,7 @@ describe('useTreeState', () => {
   });
 
   it('cancels load when unmounted', async () => {
-    let resolveReadDir: (value: any) => void;
+    let resolveReadDir: (value: unknown) => void;
     const readDirPromise = new Promise((resolve) => {
       resolveReadDir = resolve;
     });
@@ -233,7 +233,7 @@ describe('useTreeState', () => {
       modifiedTime: Date.now(),
     });
 
-    vi.mocked(mockFs.readDirectory).mockReturnValue(readDirPromise as any);
+    vi.mocked(mockFs.readDirectory).mockReturnValue(readDirPromise as Promise<DirectoryEntry[]>);
 
     const { unmount } = renderHook(() => useTreeState(mockFs, '/root'));
 

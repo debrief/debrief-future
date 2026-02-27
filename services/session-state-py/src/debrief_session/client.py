@@ -28,7 +28,7 @@ class SessionClient:
         client.set_current_time(epoch=1706097600000)
     """
 
-    def __init__(self, base_url: str = "http://localhost:3001/mcp"):
+    def __init__(self, base_url: str = "http://localhost:3001/mcp") -> None:
         """
         Initialize the client.
 
@@ -45,7 +45,7 @@ class SessionClient:
     def __enter__(self) -> "SessionClient":
         return self
 
-    def __exit__(self, *args) -> None:
+    def __exit__(self, *args: object) -> None:
         self.close()
 
     def _call_tool(self, tool: str, input_data: dict | None = None) -> dict:

@@ -11,7 +11,7 @@ from debrief_io.handlers.rep import REPHandler
 
 
 @pytest.fixture
-def rep_handler():
+def rep_handler() -> REPHandler:
     """Create REP handler instance."""
     return REPHandler()
 
@@ -19,7 +19,7 @@ def rep_handler():
 class TestTracksAndAnnotations:
     """Test parsing files with both tracks and annotations."""
 
-    def test_parse_tracks_and_narratives(self, rep_handler):
+    def test_parse_tracks_and_narratives(self, rep_handler: REPHandler) -> None:
         """Parse a file containing both tracks and NARRATIVE comments."""
         content = """;NARRATIVE: 951212 050200 NELSON POSSUB TRACK 14
 951212 050200.000 NELSON @C 22 0 0 N 21 0 0 W 045.0 12.0 0
@@ -47,7 +47,7 @@ class TestTracksAndAnnotations:
         assert narratives[0]["properties"]["track_id"] == "NELSON"
         assert narratives[1]["properties"]["text"] == "Contact confirmed"
 
-    def test_parse_tracks_and_shapes(self, rep_handler):
+    def test_parse_tracks_and_shapes(self, rep_handler: REPHandler) -> None:
         """Parse a file containing both tracks and shape annotations."""
         content = """;CIRCLE: @D 21.8 0 0 N 21.0 0 0 W 2000 search area
 951212 050200.000 BOAT1 @A 22 0 0 N 21 0 0 W 045.0 12.0 0
@@ -76,7 +76,7 @@ class TestTracksAndAnnotations:
         assert rect["properties"]["label"] == "boundary"
         assert rect["geometry"]["type"] == "Polygon"
 
-    def test_parse_tracks_and_lines(self, rep_handler):
+    def test_parse_tracks_and_lines(self, rep_handler: REPHandler) -> None:
         """Parse a file containing both tracks and LINE annotations."""
         content = """;LINE: @B 20 50 0 N 21 10 0 W 22 0 0 N 21 10 0 W reference line
 951212 050200.000 SHIP1 @C 22 0 0 N 21 0 0 W 045.0 12.0 0
@@ -94,7 +94,7 @@ class TestTracksAndAnnotations:
         assert line["properties"]["label"] == "reference line"
         assert line["geometry"]["type"] == "LineString"
 
-    def test_multiple_tracks_and_annotations(self, rep_handler):
+    def test_multiple_tracks_and_annotations(self, rep_handler: REPHandler) -> None:
         """Parse file with multiple tracks and multiple annotation types."""
         content = """;NARRATIVE: 951212 050000 BOAT1 Exercise start
 ;CIRCLE: @D 22 0 0 N 21 0 0 W 5000 op area
@@ -117,7 +117,7 @@ class TestTracksAndAnnotations:
         assert len(circles) == 1
         assert len(texts) == 1
 
-    def test_annotations_without_tracks(self, rep_handler):
+    def test_annotations_without_tracks(self, rep_handler: REPHandler) -> None:
         """Parse file with only annotations (no track data)."""
         content = """;CIRCLE: @A 21 0 0 N 20 0 0 W 1000 circle1
 ;RECT: @B 22 0 0 N 21 0 0 W 23 0 0 N 22 0 0 W rectangle1
@@ -129,7 +129,7 @@ class TestTracksAndAnnotations:
         assert len(tracks) == 0
         assert len(result.features) == 3  # 3 annotations
 
-    def test_regular_comments_ignored(self, rep_handler):
+    def test_regular_comments_ignored(self, rep_handler: REPHandler) -> None:
         """Verify regular comments (not annotations) are ignored."""
         content = """; This is a regular comment
 ; Another comment line
@@ -147,7 +147,7 @@ class TestTracksAndAnnotations:
 class TestAnnotationProvenance:
     """Test that annotations have correct provenance information."""
 
-    def test_annotation_source_file(self, rep_handler):
+    def test_annotation_source_file(self, rep_handler: REPHandler) -> None:
         """Verify annotations include source file in properties."""
         content = ";CIRCLE: @A 21 0 0 N 20 0 0 W 1000 test"
 
@@ -156,7 +156,7 @@ class TestAnnotationProvenance:
         assert len(result.features) == 1
         assert result.features[0]["properties"]["source_file"] == "data/shapes.rep"
 
-    def test_annotation_line_number(self, rep_handler):
+    def test_annotation_line_number(self, rep_handler: REPHandler) -> None:
         """Verify annotations include correct line number."""
         content = """; Header comment
 ; Another comment
@@ -171,7 +171,7 @@ class TestAnnotationProvenance:
 class TestTrackRegressionWithAnnotations:
     """Test that track parsing is unchanged when annotations are present."""
 
-    def test_track_positions_unchanged(self, rep_handler):
+    def test_track_positions_unchanged(self, rep_handler: REPHandler) -> None:
         """Verify track positions are identical with or without annotations."""
         track_only = """951212 050200.000 BOAT1 @A 22 0 0 N 21 0 0 W 045.0 12.0 0
 951212 050300.000 BOAT1 @A 22 1 0 N 21 1 0 W 046.0 12.5 0"""
@@ -200,7 +200,7 @@ class TestTrackRegressionWithAnnotations:
         # Platform info should be identical
         assert track1["properties"]["platform_id"] == track2["properties"]["platform_id"]
 
-    def test_track_times_unchanged(self, rep_handler):
+    def test_track_times_unchanged(self, rep_handler: REPHandler) -> None:
         """Verify track timing is identical with or without annotations."""
         track_only = """951212 050200.000 BOAT1 @A 22 0 0 N 21 0 0 W 045.0 12.0 0
 951212 050300.000 BOAT1 @A 22 1 0 N 21 1 0 W 046.0 12.5 0"""

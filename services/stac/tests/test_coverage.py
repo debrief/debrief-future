@@ -452,4 +452,4 @@ class TestFeatureValidation:
         plot_id = create_plot(catalog_path, metadata)
 
         with pytest.raises(ValueError, match="must be a dictionary"):
-            add_features(catalog_path, plot_id, ["not a dict"])
+            add_features(catalog_path, plot_id, ["not a dict"])  # type: ignore[reportArgumentType]

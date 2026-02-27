@@ -178,6 +178,19 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 
 ---
 
+## Article XV: Strict Type Safety
+
+**Every value has a concrete type. `Any` is not a type — it is the absence of one.**
+
+1. **Explicit types everywhere** — all function parameters, return types, and variable declarations must have explicit type annotations in both Python and TypeScript. Implicit or inferred types are acceptable only where the type checker can verify them unambiguously.
+2. **`Any`/`any` prohibited** — the use of `Any` (Python) and `any` (TypeScript) is forbidden in production code. These erase type information and defeat the purpose of static analysis. When external libraries return untyped data, narrow to a concrete type at the boundary immediately.
+3. **Strict mode mandatory** — all TypeScript projects must enable `strict: true`. All Python projects must pass strict static type checking. There are no "relaxed" configurations.
+4. **Schema types are canonical** — types generated from LinkML schemas must be fully typed with no `Any`/`any` in the output. Generated types are production code and meet the same standards.
+5. **Type boundaries are explicit** — every point where untyped data enters the system (JSON parsing, external API responses, user input) must validate through a typed model before the data is used in application code.
+6. **CI enforces compliance** — type checking for all languages must run as a required CI step. PRs with type violations cannot be merged.
+
+---
+
 ## Governance
 
 - This constitution supersedes all other project documentation in case of conflict.
@@ -187,4 +200,4 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 
 ---
 
-*Document version: 1.1 — January 2026*
+*Document version: 1.2 — February 2026*

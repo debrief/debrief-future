@@ -70,37 +70,48 @@ describe('sliceTrackToTime', () => {
   });
 });
 
+/** Minimal feature shape accepted by extractTemporalData for testing */
+interface TestFeatureInput {
+  id?: string;
+  type?: string;
+  geometry: { type: string; coordinates: number[][] } | null;
+  properties: Record<string, unknown> | null;
+}
+
 describe('extractTemporalData', () => {
   it('returns null for feature without geometry', () => {
-    expect(extractTemporalData({ geometry: null, properties: {} } as any)).toBeNull();
+    expect(extractTemporalData({ geometry: null, properties: {} } as unknown as Parameters<typeof extractTemporalData>[0])).toBeNull();
   });
 
   it('returns null for non-LineString geometry', () => {
-    expect(extractTemporalData({
+    const feature: TestFeatureInput = {
       id: '1',
-      geometry: { type: 'Point', coordinates: [0, 0] },
+      geometry: { type: 'Point', coordinates: [[0, 0]] },
       properties: { times: [1000] },
-    } as any)).toBeNull();
+    };
+    expect(extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0])).toBeNull();
   });
 
   it('returns null when times array is missing', () => {
-    expect(extractTemporalData({
+    const feature: TestFeatureInput = {
       id: '1',
       geometry: { type: 'LineString', coordinates: [[-4, 50]] },
       properties: { name: 'test' },
-    } as any)).toBeNull();
+    };
+    expect(extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0])).toBeNull();
   });
 
   it('throws when times length does not match coordinates', () => {
-    expect(() => extractTemporalData({
+    const feature: TestFeatureInput = {
       id: 'mismatched',
       geometry: { type: 'LineString', coordinates: [[-4, 50], [-4.1, 50.1]] },
       properties: { times: [1000] },
-    } as any)).toThrow('mismatched arrays');
+    };
+    expect(() => extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0])).toThrow('mismatched arrays');
   });
 
   it('extracts valid temporal data', () => {
-    const result = extractTemporalData({
+    const feature: TestFeatureInput = {
       id: 'track-1',
       type: 'Feature',
       geometry: {
@@ -112,7 +123,8 @@ describe('extractTemporalData', () => {
         name: 'OWNSHIP',
         times: [1000, 2000, 3000],
       },
-    } as any);
+    };
+    const result = extractTemporalData(feature as unknown as Parameters<typeof extractTemporalData>[0]);
 
     expect(result).toEqual({
       trackId: 'track-1',
@@ -123,7 +135,7 @@ describe('extractTemporalData', () => {
   });
 
   it('throws on non-numeric times (ISO strings)', () => {
-    expect(() => extractTemporalData({
+    const featureWithStringTimes: TestFeatureInput = {
       id: 'string-times',
       type: 'Feature',
       geometry: {
@@ -134,6 +146,7 @@ describe('extractTemporalData', () => {
         kind: 'TRACK',
         times: ['2024-01-14T08:00:00Z', '2024-01-14T09:00:00Z', '2024-01-14T10:00:00Z'],
       },
-    } as any)).toThrow('non-numeric times');
+    };
+    expect(() => extractTemporalData(featureWithStringTimes as unknown as Parameters<typeof extractTemporalData>[0])).toThrow('non-numeric times');
   });
 });

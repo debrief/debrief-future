@@ -8,15 +8,28 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { execute } from '../../../../src/tools/reference/generation/generateReferencePoints';
+import type { GenerateReferencePointsParams } from '../../../../src/tools/reference/generation/generateReferencePoints';
 
 const GOLDEN_DIR = resolve(__dirname, '../../../../../..', 'shared/tools/reference/generation');
 
-function loadGolden(name: string): any {
-  return JSON.parse(readFileSync(resolve(GOLDEN_DIR, name), 'utf-8'));
+interface GoldenFile {
+  features: Array<{ type: string; id?: string; geometry: { type: string; coordinates: unknown }; properties: Record<string, unknown> }>;
+  params: Record<string, unknown>;
+}
+
+function loadGolden(name: string): GoldenFile {
+  return JSON.parse(readFileSync(resolve(GOLDEN_DIR, name), 'utf-8')) as GoldenFile;
+}
+
+interface TestPolygonFeature {
+  type: 'Feature';
+  id: string;
+  geometry: { type: 'Polygon'; coordinates: number[][][] };
+  properties: { kind: string };
 }
 
 /** Create a RECTANGLE polygon feature for the given bounds. */
-function makePolygon(west: number, south: number, east: number, north: number): any {
+function makePolygon(west: number, south: number, east: number, north: number): TestPolygonFeature {
   return {
     type: 'Feature',
     id: 'test-rect',
@@ -119,9 +132,10 @@ describe('Grid Pattern', () => {
     expect(feature.properties.kind).toBe('POINT');
     expect(feature.properties.locationType).toBe('REFERENCE');
     expect((feature.properties.name as string)).toContain('grid 12');
-    expect((feature.properties.style as any).shape).toBe('square');
-    expect((feature.properties.style as any).color).toBe('#666666');
-    expect((feature.properties.style as any).radius).toBe(5);
+    const style = feature.properties.style as Record<string, unknown>;
+    expect(style.shape).toBe('square');
+    expect(style.color).toBe('#666666');
+    expect(style.radius).toBe(5);
   });
 
   it('pointMetadata is parallel to coordinates', () => {
@@ -131,10 +145,10 @@ describe('Grid Pattern', () => {
     });
 
     const coords = result[0].geometry.coordinates;
-    const metadata = result[0].properties.pointMetadata as any[];
+    const metadata = result[0].properties.pointMetadata as Array<{ index: number; name: string }>;
 
     expect(metadata).toHaveLength(coords.length);
-    metadata.forEach((entry: any, i: number) => {
+    metadata.forEach((entry, i: number) => {
       expect(entry.index).toBe(i);
       expect(entry.name).toBe(`Ref ${i + 1}`);
     });
@@ -177,7 +191,7 @@ describe('Grid Edge Cases', () => {
 
   it('invalid pattern throws', () => {
     expect(() =>
-      execute([defaultPolygon], { pattern: 'hexagonal' as any }),
+      execute([defaultPolygon], { pattern: 'hexagonal' as unknown as GenerateReferencePointsParams['pattern'] }),
     ).toThrow("'grid' or 'scatter'");
   });
 
@@ -302,10 +316,10 @@ describe('Scatter Pattern', () => {
     });
 
     const coords = result[0].geometry.coordinates;
-    const metadata = result[0].properties.pointMetadata as any[];
+    const metadata = result[0].properties.pointMetadata as Array<{ index: number; name: string }>;
 
     expect(metadata).toHaveLength(coords.length);
-    metadata.forEach((entry: any, i: number) => {
+    metadata.forEach((entry, i: number) => {
       expect(entry.index).toBe(i);
       expect(entry.name).toBe(`Ref ${i + 1}`);
     });

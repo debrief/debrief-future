@@ -71,6 +71,13 @@ tasks:
     cmds:
       - pnpm storybook
 
+  typecheck:
+    desc: "Run type checking (Python + TypeScript)"
+    deps: [install]
+    cmds:
+      - uv run pyright
+      - pnpm -r typecheck
+
   lint:
     desc: "Check code style (Python + TypeScript)"
     deps: [install, build]

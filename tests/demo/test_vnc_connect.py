@@ -113,7 +113,7 @@ def test_vnc_connection(url: str, timeout: int = 30) -> bool:
         return False
 
 
-def main():
+def main() -> None:
     """Main entry point."""
     print("=== Layer 3: VNC Connectivity Test ===")
     print()

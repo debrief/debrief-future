@@ -1,0 +1,212 @@
+/home/user/debrief-future/services/calc/debrief_calc/mcp/server.py
+  /home/user/debrief-future/services/calc/debrief_calc/mcp/server.py:35:24 - error: Variable not allowed in type expression (reportInvalidTypeForm)
+  /home/user/debrief-future/services/calc/debrief_calc/mcp/server.py:48:14 - error: Object of type "None" cannot be called (reportOptionalCall)
+  /home/user/debrief-future/services/calc/debrief_calc/mcp/server.py:51:36 - error: Variable not allowed in type expression (reportInvalidTypeForm)
+  /home/user/debrief-future/services/calc/debrief_calc/mcp/server.py:75:28 - error: Object of type "None" cannot be called (reportOptionalCall)
+  /home/user/debrief-future/services/calc/debrief_calc/mcp/server.py:85:28 - error: Object of type "None" cannot be called (reportOptionalCall)
+  /home/user/debrief-future/services/calc/debrief_calc/mcp/server.py:96:61 - error: Variable not allowed in type expression (reportInvalidTypeForm)
+  /home/user/debrief-future/services/calc/debrief_calc/mcp/server.py:121:17 - error: Object of type "None" cannot be called (reportOptionalCall)
+  /home/user/debrief-future/services/calc/debrief_calc/mcp/server.py:198:21 - error: Object of type "None" cannot be called (reportOptionalCall)
+  /home/user/debrief-future/services/calc/debrief_calc/mcp/server.py:210:21 - error: Object of type "None" cannot be called (reportOptionalCall)
+  /home/user/debrief-future/services/calc/debrief_calc/mcp/server.py:223:17 - error: Object of type "None" cannot be called (reportOptionalCall)
+  /home/user/debrief-future/services/calc/debrief_calc/mcp/server.py:238:16 - error: "stdio_server" is possibly unbound (reportPossiblyUnboundVariable)
+/home/user/debrief-future/services/calc/debrief_calc/provenance.py
+  /home/user/debrief-future/services/calc/debrief_calc/provenance.py:77:12 - error: Arguments missing for parameters "activityId", "wasGeneratedBy", "executionDuration" (reportCallIssue)
+  /home/user/debrief-future/services/calc/debrief_calc/provenance.py:78:9 - error: No parameter named "activity_id" (reportCallIssue)
+  /home/user/debrief-future/services/calc/debrief_calc/provenance.py:80:9 - error: No parameter named "was_generated_by" (reportCallIssue)
+  /home/user/debrief-future/services/calc/debrief_calc/provenance.py:80:26 - error: Argument missing for parameter "toolVersion" (reportCallIssue)
+  /home/user/debrief-future/services/calc/debrief_calc/provenance.py:82:13 - error: No parameter named "tool_version" (reportCallIssue)
+  /home/user/debrief-future/services/calc/debrief_calc/provenance.py:87:9 - error: No parameter named "execution_duration" (reportCallIssue)
+  /home/user/debrief-future/services/calc/debrief_calc/provenance.py:88:9 - error: No parameter named "generated_result_id" (reportCallIssue)
+/home/user/debrief-future/services/calc/debrief_calc/registry.py
+  /home/user/debrief-future/services/calc/debrief_calc/registry.py:241:17 - error: Cannot assign to attribute "tool" for class "_Wrapped[..., Unknown, ..., Unknown]"
+    Attribute "tool" is unknown (reportAttributeAccessIssue)
+/home/user/debrief-future/services/calc/tests/test_executor.py
+  /home/user/debrief-future/services/calc/tests/test_executor.py:82:20 - error: Argument of type "list[dict[str, Any]] | None" cannot be assigned to parameter "obj" of type "Sized" in function "len"
+    Type "list[dict[str, Any]] | None" is not assignable to type "Sized"
+      "None" is incompatible with protocol "Sized"
+        "__len__" is not present (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/test_executor.py:84:19 - error: Object of type "None" is not subscriptable (reportOptionalSubscript)
+  /home/user/debrief-future/services/calc/tests/test_executor.py:94:20 - error: Argument of type "list[dict[str, Any]] | None" cannot be assigned to parameter "obj" of type "Sized" in function "len"
+    Type "list[dict[str, Any]] | None" is not assignable to type "Sized"
+      "None" is incompatible with protocol "Sized"
+        "__len__" is not present (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/test_executor.py:96:19 - error: Object of type "None" is not subscriptable (reportOptionalSubscript)
+  /home/user/debrief-future/services/calc/tests/test_executor.py:109:20 - error: Argument of type "list[dict[str, Any]] | None" cannot be assigned to parameter "obj" of type "Sized" in function "len"
+    Type "list[dict[str, Any]] | None" is not assignable to type "Sized"
+      "None" is incompatible with protocol "Sized"
+        "__len__" is not present (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/test_executor.py:111:19 - error: Object of type "None" is not subscriptable (reportOptionalSubscript)
+  /home/user/debrief-future/services/calc/tests/test_executor.py:120:20 - error: Argument of type "list[dict[str, Any]] | None" cannot be assigned to parameter "obj" of type "Sized" in function "len"
+    Type "list[dict[str, Any]] | None" is not assignable to type "Sized"
+      "None" is incompatible with protocol "Sized"
+        "__len__" is not present (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/test_executor.py:126:22 - error: Object of type "None" is not subscriptable (reportOptionalSubscript)
+  /home/user/debrief-future/services/calc/tests/test_executor.py:159:29 - error: "code" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/calc/tests/test_executor.py:160:41 - error: "message" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/calc/tests/test_executor.py:161:40 - error: "message" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/calc/tests/test_executor.py:176:29 - error: "code" is not a known attribute of "None" (reportOptionalMemberAccess)
+/home/user/debrief-future/services/calc/tests/test_models.py
+  /home/user/debrief-future/services/calc/tests/test_models.py:59:13 - error: Argument missing for parameter "id" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:63:13 - error: Argument missing for parameter "kind" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:163:17 - error: Argument of type "list[str]" cannot be assigned to parameter "value" of type "str" in function "__setitem__"
+    "list[str]" is not assignable to "str" (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/test_models.py:164:37 - error: Argument of type "str" cannot be assigned to parameter "required" of type "bool" in function "__init__"
+    "str" is not assignable to "bool" (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/test_models.py:164:37 - error: Argument of type "str" cannot be assigned to parameter "choices" of type "list[Any] | None" in function "__init__"
+    Type "str" is not assignable to type "list[Any] | None"
+      "str" is not assignable to "list[Any]"
+      "str" is not assignable to "None" (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/test_models.py:197:20 - error: Argument of type "list[dict[str, Any]] | None" cannot be assigned to parameter "obj" of type "Sized" in function "len"
+    Type "list[dict[str, Any]] | None" is not assignable to type "Sized"
+      "None" is incompatible with protocol "Sized"
+        "__len__" is not present (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/test_models.py:257:20 - error: Argument of type "list[ModifiedFeature] | None" cannot be assigned to parameter "obj" of type "Sized" in function "len"
+    Type "list[ModifiedFeature] | None" is not assignable to type "Sized"
+      "None" is incompatible with protocol "Sized"
+        "__len__" is not present (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/test_models.py:258:16 - error: Object of type "None" is not subscriptable (reportOptionalSubscript)
+  /home/user/debrief-future/services/calc/tests/test_models.py:259:20 - error: Argument of type "list[str] | None" cannot be assigned to parameter "obj" of type "Sized" in function "len"
+    Type "list[str] | None" is not assignable to type "Sized"
+      "None" is incompatible with protocol "Sized"
+        "__len__" is not present (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/test_models.py:260:20 - error: Argument of type "list[CreatedAsset] | None" cannot be assigned to parameter "obj" of type "Sized" in function "len"
+    Type "list[CreatedAsset] | None" is not assignable to type "Sized"
+      "None" is incompatible with protocol "Sized"
+        "__len__" is not present (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/test_models.py:261:16 - error: Object of type "None" is not subscriptable (reportOptionalSubscript)
+  /home/user/debrief-future/services/calc/tests/test_models.py:277:16 - error: Object of type "None" is not subscriptable (reportOptionalSubscript)
+  /home/user/debrief-future/services/calc/tests/test_models.py:278:16 - error: Object of type "None" is not subscriptable (reportOptionalSubscript)
+  /home/user/debrief-future/services/calc/tests/test_models.py:457:13 - error: Argument missing for parameter "value" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:482:13 - error: Argument missing for parameter "new_value" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:484:13 - error: Argument missing for parameter "previous_value" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:513:13 - error: Argument missing for parameter "feature_id" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:517:13 - error: Argument missing for parameter "changed_properties" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:539:13 - error: Argument missing for parameter "result_id" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:543:13 - error: Argument missing for parameter "path" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:550:17 - error: Arguments missing for parameters "activityId", "wasGeneratedBy", "executionDuration" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:551:13 - error: No parameter named "activity_id" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:553:13 - error: No parameter named "was_generated_by" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:553:30 - error: Argument missing for parameter "toolVersion" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:555:17 - error: No parameter named "tool_version" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:560:13 - error: No parameter named "execution_duration" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:570:13 - error: Arguments missing for parameters "activityId", "wasGeneratedBy", "executionDuration" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:571:17 - error: No parameter named "activity_id" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:573:17 - error: No parameter named "was_generated_by" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:573:34 - error: Argument missing for parameter "toolVersion" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:573:59 - error: No parameter named "tool_version" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:576:17 - error: No parameter named "execution_duration" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:580:17 - error: Arguments missing for parameters "activityId", "wasGeneratedBy", "executionDuration" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:581:13 - error: No parameter named "activity_id" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:583:13 - error: No parameter named "was_generated_by" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:583:30 - error: Argument missing for parameter "toolVersion" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:583:55 - error: No parameter named "tool_version" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:586:13 - error: No parameter named "execution_duration" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:639:13 - error: No parameter named "snapshot_links" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:640:22 - error: Argument missing for parameter "provEntryCount" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:640:66 - error: No parameter named "prov_entry_count" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:644:34 - error: "prev" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/calc/tests/test_models.py:644:39 - error: "asset" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/calc/tests/test_models.py:645:34 - error: "prev" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/calc/tests/test_models.py:645:39 - error: "prov_entry_count" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/calc/tests/test_models.py:646:34 - error: "next" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/calc/tests/test_models.py:651:17 - error: Arguments missing for parameters "branchId", "branchedFrom", "branchedAt", "targetAsset" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:652:21 - error: No parameter named "branch_id" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:653:21 - error: No parameter named "branched_from" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:654:21 - error: No parameter named "branched_at" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:655:21 - error: No parameter named "target_asset" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:675:34 - error: "prev" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/calc/tests/test_models.py:676:34 - error: "prev" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/calc/tests/test_models.py:686:36 - error: No parameter named "feature_type" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:690:13 - error: Argument missing for parameter "activityId" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:691:17 - error: No parameter named "activity_id" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:698:13 - error: Argument missing for parameter "activityId" (reportCallIssue)
+  /home/user/debrief-future/services/calc/tests/test_models.py:699:17 - error: No parameter named "activity_id" (reportCallIssue)
+/home/user/debrief-future/services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py
+  /home/user/debrief-future/services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py:168:28 - error: Argument of type "list[tuple[int, int]]" cannot be assigned to parameter "points" of type "list[tuple[float, float]]" in function "convex_hull"
+    "list[tuple[int, int]]" is not assignable to "list[tuple[float, float]]"
+      Type parameter "_T@list" is invariant, but "tuple[int, int]" is not the same as "tuple[float, float]"
+      Consider switching from "list" to "Sequence" which is covariant (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py:175:28 - error: Argument of type "list[tuple[int, int]]" cannot be assigned to parameter "points" of type "list[tuple[float, float]]" in function "convex_hull"
+    "list[tuple[int, int]]" is not assignable to "list[tuple[float, float]]"
+      Type parameter "_T@list" is invariant, but "tuple[int, int]" is not the same as "tuple[float, float]"
+      Consider switching from "list" to "Sequence" which is covariant (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py:181:28 - error: Argument of type "list[tuple[int, int]]" cannot be assigned to parameter "points" of type "list[tuple[float, float]]" in function "convex_hull"
+    "list[tuple[int, int]]" is not assignable to "list[tuple[float, float]]"
+      Type parameter "_T@list" is invariant, but "tuple[int, int]" is not the same as "tuple[float, float]"
+      Consider switching from "list" to "Sequence" which is covariant (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py:189:28 - error: Argument of type "list[tuple[int, int]]" cannot be assigned to parameter "points" of type "list[tuple[float, float]]" in function "convex_hull"
+    "list[tuple[int, int]]" is not assignable to "list[tuple[float, float]]"
+      Type parameter "_T@list" is invariant, but "tuple[int, int]" is not the same as "tuple[float, float]"
+      Consider switching from "list" to "Sequence" which is covariant (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py:195:28 - error: Argument of type "list[tuple[int, int]]" cannot be assigned to parameter "points" of type "list[tuple[float, float]]" in function "convex_hull"
+    "list[tuple[int, int]]" is not assignable to "list[tuple[float, float]]"
+      Type parameter "_T@list" is invariant, but "tuple[int, int]" is not the same as "tuple[float, float]"
+      Consider switching from "list" to "Sequence" which is covariant (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py:201:28 - error: Argument of type "list[tuple[int, int]]" cannot be assigned to parameter "points" of type "list[tuple[float, float]]" in function "convex_hull"
+    "list[tuple[int, int]]" is not assignable to "list[tuple[float, float]]"
+      Type parameter "_T@list" is invariant, but "tuple[int, int]" is not the same as "tuple[float, float]"
+      Consider switching from "list" to "Sequence" which is covariant (reportArgumentType)
+  /home/user/debrief-future/services/calc/tests/tools/sensor/detection/test_buffer_zone_generator.py:210:28 - error: Argument of type "list[tuple[int, int]]" cannot be assigned to parameter "points" of type "list[tuple[float, float]]" in function "convex_hull"
+    "list[tuple[int, int]]" is not assignable to "list[tuple[float, float]]"
+      Type parameter "_T@list" is invariant, but "tuple[int, int]" is not the same as "tuple[float, float]"
+      Consider switching from "list" to "Sequence" which is covariant (reportArgumentType)
+/home/user/debrief-future/services/cli/debrief_cli/tools.py
+  /home/user/debrief-future/services/cli/debrief_cli/tools.py:193:42 - error: "message" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/cli/debrief_cli/tools.py:193:64 - error: "code" is not a known attribute of "None" (reportOptionalMemberAccess)
+/home/user/debrief-future/services/config/src/debrief_config/core.py
+  /home/user/debrief-future/services/config/src/debrief_config/core.py:56:24 - error: Argument missing for parameter "lastAccessed" (reportCallIssue)
+  /home/user/debrief-future/services/config/src/debrief_config/core.py:59:13 - error: No parameter named "last_accessed" (reportCallIssue)
+/home/user/debrief-future/services/config/src/debrief_config/storage.py
+  /home/user/debrief-future/services/config/src/debrief_config/storage.py:87:28 - error: Expected class but received "(obj: object, /) -> TypeIs[(...) -> object]" (reportGeneralTypeIssues)
+/home/user/debrief-future/services/debrief-tools/tests/test_decorators.py
+  /home/user/debrief-future/services/debrief-tools/tests/test_decorators.py:77:24 - error: Cannot access attribute "__tool_spec__" for class "FunctionType"
+    Attribute "__tool_spec__" is unknown (reportFunctionMemberAccess)
+  /home/user/debrief-future/services/debrief-tools/tests/test_decorators.py:95:24 - error: Cannot access attribute "__tool_spec__" for class "FunctionType"
+    Attribute "__tool_spec__" is unknown (reportFunctionMemberAccess)
+  /home/user/debrief-future/services/debrief-tools/tests/test_decorators.py:150:32 - error: Cannot access attribute "__tool_spec__" for class "FunctionType"
+    Attribute "__tool_spec__" is unknown (reportFunctionMemberAccess)
+  /home/user/debrief-future/services/debrief-tools/tests/test_decorators.py:164:29 - error: Cannot access attribute "__tool_spec__" for class "FunctionType"
+    Attribute "__tool_spec__" is unknown (reportFunctionMemberAccess)
+  /home/user/debrief-future/services/debrief-tools/tests/test_decorators.py:174:24 - error: Cannot access attribute "__tool_spec__" for class "FunctionType"
+    Attribute "__tool_spec__" is unknown (reportFunctionMemberAccess)
+/home/user/debrief-future/services/io/src/debrief_io/handlers/annotations/symbols.py
+  /home/user/debrief-future/services/io/src/debrief_io/handlers/annotations/symbols.py:247:30 - error: Argument of type "str | None" cannot be assigned to parameter "key" of type "str" in function "get"
+    Type "str | None" is not assignable to type "str"
+      "None" is not assignable to "str" (reportArgumentType)
+/home/user/debrief-future/services/io/tests/test_annotations/test_coordinates.py
+  /home/user/debrief-future/services/io/tests/test_annotations/test_coordinates.py:99:20 - error: "None" is not iterable
+    "__iter__" method not defined (reportGeneralTypeIssues)
+/home/user/debrief-future/services/io/tests/test_annotations/test_timestamps.py
+  /home/user/debrief-future/services/io/tests/test_annotations/test_timestamps.py:39:23 - error: "datetime" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/io/tests/test_annotations/test_timestamps.py:42:23 - error: "datetime" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/io/tests/test_annotations/test_timestamps.py:45:23 - error: "datetime" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/io/tests/test_annotations/test_timestamps.py:50:23 - error: "datetime" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/io/tests/test_annotations/test_timestamps.py:53:23 - error: "datetime" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/io/tests/test_annotations/test_timestamps.py:56:23 - error: "datetime" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/io/tests/test_annotations/test_timestamps.py:61:23 - error: "iso_string" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/io/tests/test_annotations/test_timestamps.py:66:23 - error: "datetime" is not a known attribute of "None" (reportOptionalMemberAccess)
+/home/user/debrief-future/services/session-state-py/tests/test_client.py
+  /home/user/debrief-future/services/session-state-py/tests/test_client.py:10:6 - error: Import "debrief_session" could not be resolved (reportMissingImports)
+/home/user/debrief-future/services/stac/src/debrief_stac/catalog.py
+  /home/user/debrief-future/services/stac/src/debrief_stac/catalog.py:205:19 - error: Argument missing for parameter "datetime" (reportCallIssue)
+  /home/user/debrief-future/services/stac/src/debrief_stac/catalog.py:208:13 - error: No parameter named "timestamp" (reportCallIssue)
+/home/user/debrief-future/services/stac/tests/conftest.py
+  /home/user/debrief-future/services/stac/tests/conftest.py:34:9 - error: No parameter named "timestamp" (reportCallIssue)
+/home/user/debrief-future/services/stac/tests/test_catalog.py
+  /home/user/debrief-future/services/stac/tests/test_catalog.py:201:66 - error: No parameter named "timestamp" (reportCallIssue)
+  /home/user/debrief-future/services/stac/tests/test_catalog.py:203:61 - error: No parameter named "timestamp" (reportCallIssue)
+  /home/user/debrief-future/services/stac/tests/test_catalog.py:206:61 - error: No parameter named "timestamp" (reportCallIssue)
+/home/user/debrief-future/services/stac/tests/test_coverage.py
+  /home/user/debrief-future/services/stac/tests/test_coverage.py:455:50 - error: Argument of type "list[str]" cannot be assigned to parameter "features" of type "Sequence[GeoJSONFeature]" in function "add_features"
+    "Literal['not a dict']" is not assignable to "dict[str, Any]" (reportArgumentType)
+/home/user/debrief-future/services/stac/tests/test_stac_validation.py
+  /home/user/debrief-future/services/stac/tests/test_stac_validation.py:17:10 - error: Import "stac_validator" could not be resolved (reportMissingImports)
+  /home/user/debrief-future/services/stac/tests/test_stac_validation.py:48:31 - error: "StacValidate" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/stac/tests/test_stac_validation.py:68:31 - error: "StacValidate" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/stac/tests/test_stac_validation.py:95:31 - error: "StacValidate" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/stac/tests/test_stac_validation.py:133:31 - error: "StacValidate" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/stac/tests/test_stac_validation.py:158:31 - error: "StacValidate" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/stac/tests/test_stac_validation.py:207:39 - error: "StacValidate" is not a known attribute of "None" (reportOptionalMemberAccess)
+  /home/user/debrief-future/services/stac/tests/test_stac_validation.py:216:48 - error: "StacValidate" is not a known attribute of "None" (reportOptionalMemberAccess)
+132 errors, 0 warnings, 0 informations

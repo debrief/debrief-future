@@ -6,7 +6,7 @@ from debrief_calc import registry
 class TestServerToolsList:
     """Verify that all registered tools can generate MCP definitions."""
 
-    def test_all_registered_tools_have_mcp_definitions(self):
+    def test_all_registered_tools_have_mcp_definitions(self) -> None:
         """Every registered tool should produce a valid MCP tool definition."""
         # Import tools to ensure they're registered
         import debrief_calc.tools  # noqa: F401
@@ -20,7 +20,7 @@ class TestServerToolsList:
             assert mcp["description"] == tool.description
             assert "annotations" in mcp
 
-    def test_styling_tools_have_track_requirements(self):
+    def test_styling_tools_have_track_requirements(self) -> None:
         """All 4 styling tools should require TRACK features."""
         # Import styling tools
         import debrief_calc.tools.track.styling  # noqa: F401

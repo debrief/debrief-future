@@ -7,8 +7,6 @@ import { describe, it, expect } from 'vitest';
 import { getFeatureColor } from '../utils/labels';
 import { isTrackFeature } from '../utils/types';
 import type { DebriefFeature } from '../utils/types';
-import { parseMenuItemId, resolvePresetValue } from './formatMenuItems';
-import { resolvePropertiesForKinds } from './stylePropertyMap';
 
 function makeTrack(): DebriefFeature {
   return {

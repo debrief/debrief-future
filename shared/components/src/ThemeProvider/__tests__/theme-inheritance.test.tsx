@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider } from '../ThemeProvider';
 import { useTheme } from '../../hooks/useTheme';
@@ -10,13 +10,13 @@ import type { TrackFeature } from '@debrief/schemas';
 
 // Mock react-leaflet for MapView
 vi.mock('react-leaflet', () => ({
-  MapContainer: ({ children, className }: any) => (
+  MapContainer: ({ children, className }: { children: React.ReactNode; className?: string }) => (
     <div data-testid="map-container" className={className}>
       {children}
     </div>
   ),
   TileLayer: () => <div data-testid="tile-layer" />,
-  GeoJSON: ({ data }: any) => (
+  GeoJSON: ({ data }: { data: { features: unknown[] } }) => (
     <div data-testid="geojson-layer">
       {data.features.length} features
     </div>
@@ -35,7 +35,7 @@ vi.mock('react-leaflet', () => ({
 
 // Mock @tanstack/react-virtual for FeatureList
 vi.mock('@tanstack/react-virtual', () => ({
-  useVirtualizer: ({ count, estimateSize }: any) => ({
+  useVirtualizer: ({ count, estimateSize }: { count: number; estimateSize: () => number }) => ({
     getVirtualItems: () =>
       Array.from({ length: Math.min(count, 20) }, (_, i) => ({
         index: i,

@@ -75,17 +75,17 @@ def create_log_entry(
                 typed_params[key] = ParameterValue(value=val)
 
     return LogEntry(
-        activity_id=activity_id or str(uuid.uuid4()),
+        activityId=activity_id or str(uuid.uuid4()),
         timestamp=timestamp or datetime.now(UTC),
-        was_generated_by=WasGeneratedBy(
+        wasGeneratedBy=WasGeneratedBy(
             tool=tool_name,
-            tool_version=tool_version,
+            toolVersion=tool_version,
             parameters=typed_params,
         ),
         used=used,
         generated=generated or [],
-        execution_duration=_duration_ms_to_iso8601(duration_ms),
-        generated_result_id=generated_result_id,
+        executionDuration=_duration_ms_to_iso8601(duration_ms),
+        generatedResultId=generated_result_id,
         tune=None,
     )
 

@@ -54,7 +54,7 @@ SINGLE_POSITION_TRACK = {
 class TestGenerateCourseSpeeds:
     """Golden example and edge case tests."""
 
-    def test_basic_golden_example(self):
+    def test_basic_golden_example(self) -> None:
         """3-position track: verify course/speed computed and overrides existing values."""
         feature = copy.deepcopy(BASIC_TRACK)
         context = SelectionContext(type=ContextType.MULTI, features=[feature])
@@ -77,7 +77,7 @@ class TestGenerateCourseSpeeds:
         assert positions[2]["course"] == positions[1]["course"]
         assert positions[2]["speed"] == positions[1]["speed"]
 
-    def test_override_existing_values(self):
+    def test_override_existing_values(self) -> None:
         """Existing course=999/speed=999 are replaced with computed values."""
         feature = copy.deepcopy(BASIC_TRACK)
         context = SelectionContext(type=ContextType.MULTI, features=[feature])
@@ -89,7 +89,7 @@ class TestGenerateCourseSpeeds:
             assert pos["course"] != 999
             assert pos["speed"] != 999
 
-    def test_single_position_unchanged(self):
+    def test_single_position_unchanged(self) -> None:
         """Single-position track returned with no course/speed changes."""
         feature = copy.deepcopy(SINGLE_POSITION_TRACK)
         context = SelectionContext(type=ContextType.MULTI, features=[feature])
@@ -103,7 +103,7 @@ class TestGenerateCourseSpeeds:
         assert positions[0]["course"] == 45
         assert positions[0]["speed"] == 12
 
-    def test_two_position_track(self):
+    def test_two_position_track(self) -> None:
         """Two-position track: compute for first, last carries forward."""
         feature = {
             "type": "Feature",
@@ -132,7 +132,7 @@ class TestGenerateCourseSpeeds:
         assert positions[1]["course"] == positions[0]["course"]
         assert positions[1]["speed"] == positions[0]["speed"]
 
-    def test_stationary_vessel(self):
+    def test_stationary_vessel(self) -> None:
         """Two positions at identical coordinates: course=0, speed=0."""
         feature = {
             "type": "Feature",
@@ -159,7 +159,7 @@ class TestGenerateCourseSpeeds:
         assert positions[1]["course"] == 0
         assert positions[1]["speed"] == 0
 
-    def test_zero_time_interval(self):
+    def test_zero_time_interval(self) -> None:
         """Two positions at same time: speed=0, course computed from geometry."""
         feature = {
             "type": "Feature",
@@ -185,7 +185,7 @@ class TestGenerateCourseSpeeds:
         assert positions[0]["course"] == pytest.approx(32.67, abs=0.01)
         assert positions[0]["speed"] == 0
 
-    def test_no_track_features_raises(self):
+    def test_no_track_features_raises(self) -> None:
         """FeatureCollection with no TRACK features raises ValueError."""
         feature = {
             "type": "Feature",
@@ -198,7 +198,7 @@ class TestGenerateCourseSpeeds:
         with pytest.raises(ValueError, match="No track features found"):
             generate_courses_speeds(context, {})
 
-    def test_course_in_valid_range(self):
+    def test_course_in_valid_range(self) -> None:
         """All computed course values fall within [0, 360)."""
         feature = copy.deepcopy(BASIC_TRACK)
         context = SelectionContext(type=ContextType.MULTI, features=[feature])
@@ -208,7 +208,7 @@ class TestGenerateCourseSpeeds:
         for pos in result[0]["properties"]["positions"]:
             assert 0 <= pos["course"] < 360
 
-    def test_speed_non_negative(self):
+    def test_speed_non_negative(self) -> None:
         """All computed speed values are >= 0."""
         feature = copy.deepcopy(BASIC_TRACK)
         context = SelectionContext(type=ContextType.MULTI, features=[feature])
@@ -218,7 +218,7 @@ class TestGenerateCourseSpeeds:
         for pos in result[0]["properties"]["positions"]:
             assert pos["speed"] >= 0
 
-    def test_skips_non_track_features(self):
+    def test_skips_non_track_features(self) -> None:
         """Non-TRACK features are silently skipped; TRACK features still processed."""
         track = copy.deepcopy(BASIC_TRACK)
         shape = {

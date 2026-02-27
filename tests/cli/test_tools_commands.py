@@ -9,13 +9,13 @@ from debrief_cli.main import cli
 
 
 @pytest.fixture
-def runner():
+def runner() -> CliRunner:
     """Create a Click test runner."""
     return CliRunner()
 
 
 @pytest.fixture
-def single_track_path():
+def single_track_path() -> Path:
     """Path to single track fixture."""
     return (
         Path(__file__).parent.parent.parent
@@ -28,7 +28,7 @@ def single_track_path():
 
 
 @pytest.fixture
-def tracks_pair_path():
+def tracks_pair_path() -> Path:
     """Path to tracks pair fixture."""
     return (
         Path(__file__).parent.parent.parent
@@ -43,7 +43,7 @@ def tracks_pair_path():
 class TestToolsList:
     """Tests for 'tools list' command."""
 
-    def test_list_all_tools(self, runner):
+    def test_list_all_tools(self, runner: CliRunner) -> None:
         result = runner.invoke(cli, ["tools", "list"])
 
         assert result.exit_code == 0
@@ -51,7 +51,7 @@ class TestToolsList:
         assert "range-bearing" in result.output
         assert "area-summary" in result.output
 
-    def test_list_tools_json(self, runner):
+    def test_list_tools_json(self, runner: CliRunner) -> None:
         result = runner.invoke(cli, ["--json", "tools", "list"])
 
         assert result.exit_code == 0
@@ -59,7 +59,7 @@ class TestToolsList:
         assert "tools" in data
         assert len(data["tools"]) >= 3
 
-    def test_list_tools_filtered_by_input(self, runner, single_track_path):
+    def test_list_tools_filtered_by_input(self, runner: CliRunner, single_track_path: Path) -> None:
         result = runner.invoke(cli, ["tools", "list", "--input", str(single_track_path)])
 
         assert result.exit_code == 0
@@ -70,7 +70,7 @@ class TestToolsList:
 class TestToolsDescribe:
     """Tests for 'tools describe' command."""
 
-    def test_describe_tool(self, runner):
+    def test_describe_tool(self, runner: CliRunner) -> None:
         result = runner.invoke(cli, ["tools", "describe", "track-stats"])
 
         assert result.exit_code == 0
@@ -78,7 +78,7 @@ class TestToolsDescribe:
         assert "single" in result.output.lower()
         assert "track" in result.output
 
-    def test_describe_tool_json(self, runner):
+    def test_describe_tool_json(self, runner: CliRunner) -> None:
         result = runner.invoke(cli, ["--json", "tools", "describe", "track-stats"])
 
         assert result.exit_code == 0
@@ -86,7 +86,7 @@ class TestToolsDescribe:
         assert data["name"] == "track-stats"
         assert data["context_type"] == "single"
 
-    def test_describe_nonexistent_tool(self, runner):
+    def test_describe_nonexistent_tool(self, runner: CliRunner) -> None:
         result = runner.invoke(cli, ["tools", "describe", "nonexistent"])
 
         assert result.exit_code == 4
@@ -96,7 +96,7 @@ class TestToolsDescribe:
 class TestToolsRun:
     """Tests for 'tools run' command."""
 
-    def test_run_track_stats(self, runner, single_track_path):
+    def test_run_track_stats(self, runner: CliRunner, single_track_path: Path) -> None:
         result = runner.invoke(
             cli, ["tools", "run", "track-stats", "--input", str(single_track_path)]
         )
@@ -107,7 +107,7 @@ class TestToolsRun:
         assert len(data["features"]) == 1
         assert data["features"][0]["properties"]["kind"] == "track/statistics"
 
-    def test_run_range_bearing(self, runner, tracks_pair_path):
+    def test_run_range_bearing(self, runner: CliRunner, tracks_pair_path: Path) -> None:
         result = runner.invoke(
             cli, ["tools", "run", "range-bearing", "--input", str(tracks_pair_path)]
         )
@@ -120,7 +120,7 @@ class TestToolsRun:
         assert series["type"] == "range-bearing-series"
         assert len(series["entries"]) == 5  # one per matching timestamp
 
-    def test_run_with_parameters(self, runner, tracks_pair_path):
+    def test_run_with_parameters(self, runner: CliRunner, tracks_pair_path: Path) -> None:
         result = runner.invoke(
             cli,
             [
@@ -139,14 +139,14 @@ class TestToolsRun:
         data = json.loads(result.output)
         assert len(data["features"]) == 1
 
-    def test_run_nonexistent_tool(self, runner, single_track_path):
+    def test_run_nonexistent_tool(self, runner: CliRunner, single_track_path: Path) -> None:
         result = runner.invoke(
             cli, ["tools", "run", "nonexistent", "--input", str(single_track_path)]
         )
 
         assert result.exit_code == 4
 
-    def test_run_wrong_context(self, runner, tracks_pair_path):
+    def test_run_wrong_context(self, runner: CliRunner, tracks_pair_path: Path) -> None:
         # track-stats requires SINGLE, but tracks-pair has 2 features
         result = runner.invoke(
             cli, ["tools", "run", "track-stats", "--input", str(tracks_pair_path)]
@@ -159,25 +159,25 @@ class TestToolsRun:
 class TestHelpText:
     """Tests for --help on all commands."""
 
-    def test_main_help(self, runner):
+    def test_main_help(self, runner: CliRunner) -> None:
         result = runner.invoke(cli, ["--help"])
         assert result.exit_code == 0
         assert "Debrief CLI" in result.output
         assert "Exit codes" in result.output
 
-    def test_tools_help(self, runner):
+    def test_tools_help(self, runner: CliRunner) -> None:
         result = runner.invoke(cli, ["tools", "--help"])
         assert result.exit_code == 0
         assert "list" in result.output
         assert "describe" in result.output
         assert "run" in result.output
 
-    def test_tools_list_help(self, runner):
+    def test_tools_list_help(self, runner: CliRunner) -> None:
         result = runner.invoke(cli, ["tools", "list", "--help"])
         assert result.exit_code == 0
         assert "--input" in result.output
 
-    def test_tools_run_help(self, runner):
+    def test_tools_run_help(self, runner: CliRunner) -> None:
         result = runner.invoke(cli, ["tools", "run", "--help"])
         assert result.exit_code == 0
         assert "--input" in result.output

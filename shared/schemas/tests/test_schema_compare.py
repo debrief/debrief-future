@@ -27,19 +27,19 @@ ENTITY_SCHEMAS = [
 class TestSchemaStructure:
     """Test that generated JSON Schema has proper structure."""
 
-    def test_main_schema_exists(self):
+    def test_main_schema_exists(self) -> None:
         """Main debrief.schema.json should exist."""
         main_schema = JSONSCHEMA_DIR / "debrief.schema.json"
         assert main_schema.exists(), "Main schema file should exist"
 
     @pytest.mark.parametrize("entity_name", ENTITY_SCHEMAS)
-    def test_entity_schema_exists(self, entity_name: str):
+    def test_entity_schema_exists(self, entity_name: str) -> None:
         """Per-entity schema files should exist."""
         schema_file = JSONSCHEMA_DIR / f"{entity_name}.schema.json"
         assert schema_file.exists(), f"Schema file for {entity_name} should exist"
 
     @pytest.mark.parametrize("entity_name", ENTITY_SCHEMAS)
-    def test_entity_schema_is_valid_json(self, entity_name: str):
+    def test_entity_schema_is_valid_json(self, entity_name: str) -> None:
         """Per-entity schema files should be valid JSON."""
         schema_file = JSONSCHEMA_DIR / f"{entity_name}.schema.json"
         try:
@@ -48,7 +48,7 @@ class TestSchemaStructure:
             pytest.fail(f"Invalid JSON in {entity_name}.schema.json: {e}")
 
     @pytest.mark.parametrize("entity_name", ENTITY_SCHEMAS)
-    def test_entity_schema_has_required_fields(self, entity_name: str):
+    def test_entity_schema_has_required_fields(self, entity_name: str) -> None:
         """Per-entity schemas should have $schema and type fields."""
         schema_file = JSONSCHEMA_DIR / f"{entity_name}.schema.json"
         schema = json.loads(schema_file.read_text())
@@ -62,7 +62,7 @@ class TestSchemaStructure:
 class TestEnumConsistency:
     """Test that enum values are consistent across schemas."""
 
-    def test_track_type_enum_values(self):
+    def test_track_type_enum_values(self) -> None:
         """TrackTypeEnum should have consistent values."""
         main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
 
@@ -74,7 +74,7 @@ class TestEnumConsistency:
             f"TrackTypeEnum values mismatch: {enum_values} vs {expected}"
         )
 
-    def test_location_type_enum_values(self):
+    def test_location_type_enum_values(self) -> None:
         """LocationTypeEnum should have consistent values."""
         main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
 
@@ -86,7 +86,7 @@ class TestEnumConsistency:
             f"LocationTypeEnum values mismatch: {enum_values} vs {expected}"
         )
 
-    def test_segment_type_enum_values(self):
+    def test_segment_type_enum_values(self) -> None:
         """SegmentTypeEnum should have consistent values."""
         main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
 
@@ -98,7 +98,7 @@ class TestEnumConsistency:
             f"SegmentTypeEnum values mismatch: {enum_values} vs {expected}"
         )
 
-    def test_feature_kind_enum_values(self):
+    def test_feature_kind_enum_values(self) -> None:
         """FeatureKindEnum should include all feature type discriminators."""
         main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
 
@@ -127,7 +127,7 @@ class TestEnumConsistency:
 class TestRequiredFields:
     """Test that required fields are properly defined."""
 
-    def test_track_feature_required_fields(self):
+    def test_track_feature_required_fields(self) -> None:
         """TrackFeature should require type, id, geometry, properties."""
         schema = json.loads((JSONSCHEMA_DIR / "TrackFeature.schema.json").read_text())
 
@@ -137,7 +137,7 @@ class TestRequiredFields:
         for field in expected:
             assert field in required, f"TrackFeature should require {field}"
 
-    def test_track_feature_geometry_union(self):
+    def test_track_feature_geometry_union(self) -> None:
         """TrackFeature geometry should accept LineString or MultiLineString."""
         schema = json.loads((JSONSCHEMA_DIR / "TrackFeature.schema.json").read_text())
 
@@ -153,7 +153,7 @@ class TestRequiredFields:
             "geometry anyOf should include GeoJSONMultiLineString"
         )
 
-    def test_track_properties_has_compound_fields(self):
+    def test_track_properties_has_compound_fields(self) -> None:
         """TrackProperties should have segments, sensors, tuas fields."""
         main_schema = json.loads((JSONSCHEMA_DIR / "debrief.schema.json").read_text())
 
@@ -163,7 +163,7 @@ class TestRequiredFields:
         for field in ["segments", "sensors", "tuas"]:
             assert field in properties, f"TrackProperties should have {field} field"
 
-    def test_reference_location_required_fields(self):
+    def test_reference_location_required_fields(self) -> None:
         """ReferenceLocation should require type, id, geometry, properties."""
         schema = json.loads((JSONSCHEMA_DIR / "ReferenceLocation.schema.json").read_text())
 
