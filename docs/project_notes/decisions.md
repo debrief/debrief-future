@@ -199,3 +199,60 @@ Each decision should include:
 - ❌ Patches are fragile — tied to code-server internals, may break on upgrades
 - ❌ Requires headed Chromium + xvfb-run in CI (heavier than headless)
 - ❌ MessagePort injection is a workaround for a code-server bug, not a stable API
+
+### ADR-008: Schema-Validated Tool Inputs and Outputs (2026-02-27)
+
+**Context:**
+- ADR-002 established schema-first development: LinkML generates Pydantic models (Python) and TypeScript interfaces
+- The TypeScript renderer correctly uses generated types (`import type { TrackFeature, PositionStyle } from '@debrief/schemas'`)
+- However, **all 12 calc tools** bypass generated schemas entirely, working with `dict[str, Any]` throughout
+- `SelectionContext.features` is typed as `list[dict[str, Any]]` — no schema enforcement at the service boundary
+- Tool parameters are validated via hardcoded enum sets that duplicate schema definitions (e.g., `valid_symbols = {"circle", "square", ...}` instead of importing `PointShapeEnum`)
+- Tool metadata references schema types by name string only (`param_type="MarkerSymbol"`) with no actual import or validation
+- `validate_tool_output()` checks structural GeoJSON validity and provenance, but not property types or field names
+
+**Symptom that exposed this:**
+- `apply-symbol-style` tool wrote `style.point.shape` (complete marker styling)
+- The TypeScript renderer read from `default_position_style.symbol` (position-level control)
+- Both fields exist in the schema for valid reasons, but the tool needed to update both
+- Because the tool used raw dict access, no type checker caught the mismatch
+- Had the tool validated its output against `TrackProperties`, the missing/inconsistent field would have been caught
+
+**Scope of the problem (audit results):**
+- 0 of 12 tools import from `debrief_schemas`
+- 0 of 12 tools validate input features against schema models
+- 0 of 12 tools validate output features against schema models
+- `debrief_calc` has no dependency on `debrief_schemas`
+- Every tool that accepts enums (symbol shape, color, direction) hardcodes the valid set
+- Property field names are convention-based with no schema cross-reference
+
+**Decision:**
+- Tools must validate inputs against generated Pydantic models at the service boundary
+- Tools must validate outputs against generated Pydantic models before returning
+- `debrief_calc` must depend on `debrief_schemas`
+- `SelectionContext.features` should carry typed feature models, not raw dicts
+- Tool parameter enums must import from schema-generated enums, not hardcode values
+- Validation failures at the boundary are errors, not warnings
+
+**Implementation approach:**
+1. Add `debrief_schemas` as a dependency of `debrief_calc`
+2. Create a `parse_feature()` utility that dispatches on `kind` and returns the appropriate typed model (e.g., `TrackFeature`, `PointFeature`)
+3. Tools receive typed models; internal logic works with validated, typed data
+4. Tool outputs are constructed via Pydantic models (or validated against them before return)
+5. Executor validates tool output against the declared `output_kind` schema before passing results back
+6. Replace hardcoded enum sets with imports from `debrief_schemas` (e.g., `PointShapeEnum`, `NamedColor`)
+
+**Alternatives Considered:**
+- Keep raw dicts, add runtime assertions → Rejected: still no type-checker coverage, assertions are just manual schema reimplementation
+- Validate only at MCP boundary (entry/exit of the service) → Rejected: tools still work with untyped data internally, same class of bugs possible
+- Generate tool-specific input/output types → Rejected: duplicates schema; the schema already defines these types
+
+**Consequences:**
+- ✅ Type mismatches between Python tools and TypeScript renderers caught at development time
+- ✅ Schema changes automatically surface as validation errors in affected tools
+- ✅ Eliminates duplicated enum definitions across tools
+- ✅ Enforces ADR-002 (schema-first) through the full stack, not just at the edges
+- ✅ Tool authors get IDE autocompletion and type checking on feature properties
+- ❌ All existing tools need migration (12 tools)
+- ❌ Slight performance cost for Pydantic validation on every tool invocation
+- ❌ Tools can no longer add ad-hoc properties without updating the schema first (this is intentional — specs before code)
