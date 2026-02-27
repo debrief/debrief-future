@@ -668,6 +668,7 @@ print(json.dumps(tools))
         const props = feature.properties as Record<string, unknown>;
         resolved.push({
           type: 'Feature',
+          id: feature.id,
           geometry: feature.geometry,
           properties: {
             ...props,

@@ -136,12 +136,15 @@ function MapViewApp(): React.ReactElement {
           setResultFeatures(prev => [...prev, ...newFeatures]);
           break;
         case 'updatePlotFeatures': {
-          // Mutation tools: replace matching features in plotFeatures by ID
+          // Mutation tools: replace matching features in plotFeatures by ID.
+          // Features may carry their ID at root (f.id) or in properties.id.
+          const fid = (f: { id?: unknown; properties?: Record<string, unknown> | null }) =>
+            String(f.id ?? f.properties?.id ?? '');
           const updatedMap = new Map(
-            msg.features.features.map(f => [String(f.id), f as DebriefFeature])
+            msg.features.features.map(f => [fid(f), f as DebriefFeature])
           );
           setPlotFeatures(prev =>
-            prev.map(f => updatedMap.get(String(f.id)) ?? f)
+            prev.map(f => updatedMap.get(fid(f)) ?? f)
           );
           break;
         }
