@@ -636,11 +636,31 @@ export default function App() {
 
   // Handle tool execution — persist result to STAC assets and record a log entry
   const handleRunTool = useCallback((toolId: string, params?: Record<string, unknown>) => {
+    // Determine if this is a mutation tool BEFORE execution
+    const replacesInPlace = toolId === 'move-shape';
+
+    // Capture pre-tool geometry for mutation tools BEFORE execution.
+    // executeTool() mutates feature geometry and properties in-place,
+    // so we must snapshot the originals before the call.
+    const inputState = replacesInPlace && selectedFeatures.length > 0
+      ? selectedFeatures.map(f => {
+          const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
+          const { provenance: _p, ...restProps } = props;
+          return {
+            featureId: String(f.id),
+            geometry: JSON.parse(JSON.stringify(f.geometry)),
+            properties: JSON.parse(JSON.stringify(restProps)),
+          };
+        })
+      : null;
+
+    // Also snapshot full originals for revert before execution
+    const originalSnapshots = replacesInPlace && selectedFeatures.length > 0
+      ? selectedFeatures.map(f => JSON.parse(JSON.stringify(f)) as Feature)
+      : null;
+
     const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[], params);
     setToolMessage(result.message);
-
-    // Tools that transform features in-place (e.g. move-shape): replace in currentPlot
-    const replacesInPlace = toolId === 'move-shape';
 
     if (replacesInPlace) {
       // Replace the original features in the plot with the moved versions
@@ -725,19 +745,6 @@ export default function App() {
 
     const activityId = `act-${String(nextId).padStart(3, '0')}`;
 
-    // Capture pre-tool geometry for mutation tools (enables correct tune replay)
-    const inputState = replacesInPlace && selectedFeatures.length > 0
-      ? selectedFeatures.map(f => {
-          const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
-          const { provenance: _p, ...restProps } = props;
-          return {
-            featureId: String(f.id),
-            geometry: JSON.parse(JSON.stringify(f.geometry)),
-            properties: JSON.parse(JSON.stringify(restProps)),
-          };
-        })
-      : null;
-
     const entry: TimelineEntry = {
       activityId,
       timestamp: new Date().toISOString(),
@@ -752,14 +759,11 @@ export default function App() {
       inputState,
     };
 
-    // Snapshot originals so revert can restore them
-    if (replacesInPlace && selectedFeatures.length > 0) {
-      const originals = selectedFeatures.map(f =>
-        JSON.parse(JSON.stringify(f)) as Feature
-      );
+    // Store pre-tool snapshots for revert (captured before execution above)
+    if (originalSnapshots) {
       setActivitySnapshots(prev => ({
         ...prev,
-        [activityId]: originals,
+        [activityId]: originalSnapshots,
       }));
     }
 
