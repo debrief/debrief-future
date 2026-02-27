@@ -159,7 +159,7 @@ This runs lint, typecheck, and test — the same three steps CI runs.
 
 ### Fallback (when `task` is not installed)
 
-Run these three commands in order. All three must pass before pushing:
+Run these four commands in order. All must pass before pushing:
 
 ```sh
 # Step 1: Lint (Python + TypeScript)
@@ -168,9 +168,14 @@ uv run ruff check . && pnpm lint
 # Step 2: Type check (Python + TypeScript)
 uv run pyright && pnpm -r typecheck
 
-# Step 3: Tests (Python + TypeScript)
-uv run pytest && pnpm test
+# Step 3: Unit tests (Python + TypeScript — excludes Playwright E2E)
+uv run pytest && pnpm --filter '!@debrief/web-shell' test
+
+# Step 4: Playwright E2E tests (requires browser binaries)
+pnpm --filter @debrief/web-shell test
 ```
+
+**Playwright note:** Step 4 requires Chromium binaries (`pnpm exec playwright install --with-deps chromium`). If browsers are not installed, step 4 will fail with "Executable doesn't exist" — this is an environment issue, not a code issue. Steps 1-3 are always runnable. If step 4 cannot run locally, ensure steps 1-3 pass and note that E2E coverage is deferred to CI.
 
 ### What CI actually runs (`.github/workflows/ci.yml`)
 
@@ -178,7 +183,7 @@ uv run pytest && pnpm test
 |---------|---------|-----------------|
 | Lint | `task lint` | ruff (Python) + ESLint (TypeScript) |
 | Typecheck | `task typecheck` | pyright (Python) + tsc --noEmit (TypeScript) |
-| Test | `task test` | pytest (Python) + vitest (TypeScript) |
+| Test | `task test` | pytest (Python) + vitest + Playwright E2E |
 
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
