@@ -1,6 +1,6 @@
 # Feature Specification: Log Panel Flip-Card Interaction
 
-**Feature Branch**: `102-prov-card-flip`
+**Feature Branch**: `113-prov-card-flip`
 **Created**: 2026-02-27
 **Status**: Draft
 **Input**: User description: "Log Panel: Flip-Card Interaction Model — replaces alert-dialog parameter editing with a flip-card paradigm for provenance card editing, live tool re-execution, and inline metadata management"
