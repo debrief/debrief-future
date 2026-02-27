@@ -101,6 +101,8 @@ export class CalcService {
   private currentExecution: ToolExecution | null = null;
   private getMapPanel: () => MapPanel | undefined;
   private outputChannel: vscode.OutputChannel | undefined;
+  private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
+  private readonly HEARTBEAT_INTERVAL_MS = 5 * 60 * 1000;
 
   constructor(context: vscode.ExtensionContext, getMapPanel: () => MapPanel | undefined) {
     this.context = context;
@@ -138,7 +140,11 @@ export class CalcService {
       // Attempt to connect
       await this.connect();
       this.log('debrief-calc available');
-      return this.connectionState === 'connected';
+      const available = this.connectionState === 'connected';
+      if (available) {
+        this.startHeartbeat();
+      }
+      return available;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       this.log(`debrief-calc unavailable: ${msg}`);
@@ -188,6 +194,15 @@ export class CalcService {
   disconnect(): void {
     this.connectionState = 'disconnected';
     this.toolCache = null;
+    this.stopHeartbeat();
+  }
+
+  /**
+   * Dispose of resources held by this service.
+   */
+  dispose(): void {
+    this.stopHeartbeat();
+    this.disconnect();
   }
 
   /**
@@ -431,6 +446,44 @@ export class CalcService {
   private recordFailure(): void {
     this.failureCount++;
     this.lastFailureTime = Date.now();
+  }
+
+  /**
+   * Start periodic heartbeat to re-validate Python dependency availability.
+   * Feature: 111-heartbeat-revalidation
+   */
+  private startHeartbeat(): void {
+    if (this.heartbeatInterval) {
+      return; // Already running
+    }
+
+    this.log(`Starting heartbeat (interval: ${this.HEARTBEAT_INTERVAL_MS}ms)`);
+    this.heartbeatInterval = setInterval(() => {
+      void (async () => {
+        try {
+          // Force a fresh connection check by resetting state
+          this.connectionState = 'disconnected';
+          await this.connect();
+          this.log('Heartbeat: debrief-calc still available');
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          this.log(`Heartbeat: debrief-calc became unavailable: ${msg}`);
+          this.connectionState = 'error';
+          this.stopHeartbeat();
+        }
+      })();
+    }, this.HEARTBEAT_INTERVAL_MS);
+  }
+
+  /**
+   * Stop the periodic heartbeat timer.
+   */
+  private stopHeartbeat(): void {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+      this.log('Heartbeat stopped');
+    }
   }
 
   private async waitForConnection(): Promise<void> {

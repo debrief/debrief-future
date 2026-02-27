@@ -125,6 +125,179 @@ interface GeoJSONFeature {
   properties: Record<string, unknown>;
 }
 
+// ---------------------------------------------------------------------------
+// Provenance helpers — mirrors Python's debrief_calc/provenance.py (#102)
+// ---------------------------------------------------------------------------
+
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = (Math.random() * 16) | 0;
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+}
+
+function durationMsToIso8601(durationMs: number): string {
+  const seconds = durationMs / 1000;
+  if (seconds === Math.floor(seconds)) return `PT${seconds}S`;
+  const formatted = seconds.toFixed(6).replace(/0+$/, '').replace(/\.$/, '');
+  return `PT${formatted}S`;
+}
+
+interface LogEntry {
+  activityId: string;
+  timestamp: string;
+  wasGeneratedBy: {
+    tool: string;
+    toolVersion: string;
+    parameters: Record<string, { value: unknown; default?: boolean; tunable?: boolean }>;
+  };
+  used: string[];
+  generated: string[];
+  executionDuration: string;
+  generatedResultId: string | null;
+  tune: null;
+}
+
+function createLogEntry(
+  toolName: string,
+  toolVersion: string,
+  sourceFeatureIds: string[],
+  params: Record<string, unknown>,
+  durationMs: number,
+): LogEntry {
+  const typedParams: Record<string, { value: unknown }> = {};
+  for (const [key, val] of Object.entries(params)) {
+    typedParams[key] = { value: val };
+  }
+
+  return {
+    activityId: generateUUID(),
+    timestamp: new Date().toISOString(),
+    wasGeneratedBy: {
+      tool: toolName,
+      toolVersion,
+      parameters: typedParams,
+    },
+    used: sourceFeatureIds,
+    generated: [],
+    executionDuration: durationMsToIso8601(durationMs),
+    generatedResultId: null,
+    tune: null,
+  };
+}
+
+function attachLogEntry(feature: GeoJSONFeature, logEntry: LogEntry): void {
+  if (!feature.properties) feature.properties = {};
+  const existing = feature.properties.provenance;
+  if (existing === undefined || existing === null) {
+    feature.properties.provenance = [logEntry];
+  } else if (Array.isArray(existing)) {
+    existing.push(logEntry);
+  } else {
+    // Legacy single-object format — wrap then append
+    feature.properties.provenance = [existing, logEntry];
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Output validation — mirrors Python's debrief_calc/validation.py (#106)
+// ---------------------------------------------------------------------------
+
+interface ValidationError {
+  featureIndex: number;
+  error: string;
+}
+
+function validateToolOutput(
+  features: GeoJSONFeature[],
+  expectedKind: string,
+  toolName: string,
+): void {
+  const errors: ValidationError[] = [];
+
+  for (let i = 0; i < features.length; i++) {
+    const feature = features[i];
+
+    // Validate GeoJSON structure
+    if (!feature || typeof feature !== 'object') {
+      errors.push({ featureIndex: i, error: 'Feature must be an object' });
+      continue;
+    }
+    if (feature.type !== 'Feature') {
+      errors.push({ featureIndex: i, error: "Feature.type must be 'Feature'" });
+    }
+    if (!feature.properties || typeof feature.properties !== 'object') {
+      errors.push({ featureIndex: i, error: 'Feature.properties is required' });
+      continue;
+    }
+
+    // Check kind attribute
+    const kind = feature.properties.kind;
+    if (kind === undefined || kind === null) {
+      errors.push({ featureIndex: i, error: 'Feature.properties.kind is required' });
+    } else if (kind !== expectedKind) {
+      errors.push({ featureIndex: i, error: `Expected kind '${expectedKind}', got '${String(kind)}'` });
+    }
+
+    // Check provenance (PROV-aligned array format)
+    const provenance = feature.properties.provenance;
+    if (provenance === undefined || provenance === null) {
+      errors.push({ featureIndex: i, error: 'Feature.properties.provenance is required' });
+    } else if (!Array.isArray(provenance)) {
+      errors.push({ featureIndex: i, error: 'Feature.properties.provenance must be an array' });
+    } else if (provenance.length === 0) {
+      errors.push({ featureIndex: i, error: 'Feature.properties.provenance must not be empty' });
+    } else {
+      const latest = provenance[provenance.length - 1] as Record<string, unknown>;
+      if (!latest || typeof latest !== 'object') {
+        errors.push({ featureIndex: i, error: 'provenance entry must be an object' });
+      } else {
+        if (!latest.activityId) errors.push({ featureIndex: i, error: 'provenance entry activityId is required' });
+        if (!latest.timestamp) errors.push({ featureIndex: i, error: 'provenance entry timestamp is required' });
+        const wgb = latest.wasGeneratedBy as Record<string, unknown> | undefined;
+        if (!wgb) {
+          errors.push({ featureIndex: i, error: 'provenance entry wasGeneratedBy is required' });
+        } else {
+          if (!wgb.tool) errors.push({ featureIndex: i, error: 'wasGeneratedBy.tool is required' });
+          if (!wgb.toolVersion) errors.push({ featureIndex: i, error: 'wasGeneratedBy.toolVersion is required' });
+        }
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(
+      `Tool '${toolName}' produced invalid output:\n` +
+      errors.map(e => `  features[${e.featureIndex}]: ${e.error}`).join('\n')
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Result type helpers — per TOOL-RESULTS.md (#112)
+// ---------------------------------------------------------------------------
+
+/**
+ * Determine the top-level result category for a tool based on its output kind.
+ * Styling/mutation tools produce "mutation", dataset tools produce "artifact",
+ * and most analysis tools produce "addition".
+ */
+function determineResultCategory(toolId: string, outputKind: string): string {
+  // Styling/manipulation tools that modify existing features
+  const mutationTools = new Set([
+    'set-track-color', 'apply-symbol-style', 'label-interval',
+    'symbol-interval', 'move-shape',
+  ]);
+  if (mutationTools.has(toolId)) return 'mutation';
+
+  // Dataset tools that produce non-GeoJSON artifacts
+  if (outputKind.startsWith('dataset/')) return 'artifact';
+
+  // Default: new feature creation
+  return 'addition';
+}
+
 /**
  * Tool execute function type. Params are typed as Record<string, unknown>
  * because each tool has its own specific parameter interface; validation
@@ -249,6 +422,13 @@ export function listTools(): MCPToolDefinition[] {
 /**
  * Execute a tool by ID with the given features and parameters.
  *
+ * Mirrors the Python executor pipeline (debrief_calc/executor.py):
+ * 1. Execute the tool handler
+ * 2. Set output kind on each feature (#103)
+ * 3. Create and attach W3C PROV LogEntry to each feature (#102)
+ * 4. Validate output features (#106)
+ * 5. Build MCP response with correct resultType prefix (#112)
+ *
  * @param toolId - The tool identifier (e.g., 'set-track-color')
  * @param features - GeoJSON features to pass to the tool
  * @param params - Tool-specific parameters
@@ -274,14 +454,46 @@ export function executeTool(
     .map((f) => (f.id as string) ?? (f.properties?.id as string) ?? '')
     .filter(Boolean);
 
+  const outputKind = entry.definition.annotations['debrief:outputKind'];
+  const toolVersion = entry.definition.annotations['debrief:version'];
+
+  // Attach provenance only to GeoJSON Feature outputs (not artifact data)
+  // Mirrors Python executor.py lines 88-96
+  const isGeoJSON = modifiedFeatures.every(f => f.type === 'Feature');
+  if (isGeoJSON) {
+    // Create PROV-aligned LogEntry (#102)
+    const logEntry = createLogEntry(
+      toolId,
+      toolVersion,
+      sourceFeatureIds,
+      params,
+      durationMs,
+    );
+
+    for (const feature of modifiedFeatures) {
+      // Set canonical output kind (#103) — mirrors Python set_output_kind()
+      if (!feature.properties) feature.properties = {};
+      feature.properties.kind = outputKind;
+
+      // Attach W3C PROV LogEntry (#102) — mirrors Python attach_log_entry()
+      attachLogEntry(feature, logEntry);
+    }
+
+    // Validate output features (#106) — mirrors Python validate_tool_output()
+    validateToolOutput(modifiedFeatures, outputKind, toolId);
+  }
+
   // Build the FeatureCollection for the resource content
   const featureCollection = {
     type: 'FeatureCollection' as const,
     features: modifiedFeatures,
   };
 
+  // Build resultType with proper category prefix per TOOL-RESULTS.md (#112)
+  const resultCategory = determineResultCategory(toolId, outputKind);
+
   const annotations: DebriefAnnotations = {
-    'debrief:resultType': entry.definition.annotations['debrief:outputKind'],
+    'debrief:resultType': `${resultCategory}/${outputKind}`,
     'debrief:sourceFeatures': sourceFeatureIds,
     'debrief:label': `${entry.definition.description} result`,
   };

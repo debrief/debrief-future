@@ -95,18 +95,35 @@ class TestRunSuccess:
         assert result.success is True
         assert result.tool == "range-bearing"
         assert result.features is not None
-        assert len(result.features) == 1  # single wrapper
+        assert len(result.features) == 1  # single GeoJSON Feature wrapper
 
-        wrapper = result.features[0]
-        assert wrapper["type"] == "range-bearing-series"
-        assert "entries" in wrapper
-        assert len(wrapper["entries"]) == 2
-        for entry in wrapper["entries"]:
-            assert "range_nm" in entry
-            assert "bearing_deg" in entry
+        feature = result.features[0]
+        assert feature["type"] == "Feature"
+        assert feature["properties"]["kind"] == "dataset/range_bearing_series"
+        assert "__datasets" in feature["properties"]
+        datasets = feature["properties"]["__datasets"]
+        assert len(datasets) == 2
+        for dataset in datasets:
+            assert dataset["type"] == "range_bearing_series"
+            assert len(dataset["series"][0]["data"]) == 2
 
-    def test_run_area_summary(self, region_context: SelectionContext) -> None:
-        result = run("area-summary", region_context)
+    def test_run_area_summary(self) -> None:
+        # area-summary now uses MULTI context type, extracts bounds from features (#107)
+        features = [
+            {
+                "type": "Feature",
+                "id": "zone-1",
+                "properties": {"kind": "RECTANGLE"},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [[-5.0, 49.5], [-3.0, 49.5], [-3.0, 51.0], [-5.0, 51.0], [-5.0, 49.5]]
+                    ],
+                },
+            }
+        ]
+        context = SelectionContext(type=ContextType.MULTI, features=features)
+        result = run("area-summary", context)
 
         assert result.success is True
         assert result.tool == "area-summary"

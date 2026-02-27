@@ -10,7 +10,6 @@ from datetime import (
 from decimal import Decimal
 from enum import Enum
 from typing import (
-    Any,
     ClassVar,
     Literal,
     Optional,
@@ -48,7 +47,7 @@ class ConfiguredBaseModel(BaseModel):
     @model_serializer(mode='wrap', when_used='unless-none')
     def treat_empty_lists_as_none(
             self, handler: SerializerFunctionWrapHandler,
-            info: SerializationInfo) -> dict[str, Any]:
+            info: SerializationInfo) -> dict[str, object]:
         if info.exclude_none:
             _instance = self.model_copy()
             for field, field_info in type(_instance).model_fields.items():
@@ -62,7 +61,7 @@ class ConfiguredBaseModel(BaseModel):
 
 
 class LinkMLMeta(RootModel):
-    root: dict[str, Any] = {}
+    root: dict[str, object] = {}
     model_config = ConfigDict(frozen=True)
 
     def __getattr__(self, key:str):
@@ -512,6 +511,46 @@ class SystemStateTypeEnum(str, Enum):
     selection = "selection"
     """
     Feature selection state (selected IDs)
+    """
+
+
+class OutputKindEnum(str, Enum):
+    """
+    Canonical output kind identifiers for tool result features. Set on feature.properties.kind by the executor after tool execution. Values use slash-delimited hierarchical paths matching domain/subtype. Both Python and TypeScript executors MUST use these values — no hand-authored kind strings in tool implementations.
+    """
+    trackSOLIDUSstatistics = "track/statistics"
+    """
+    Track statistics summary (point count, distance, speed, duration)
+    """
+    datasetSOLIDUSrange_bearing_series = "dataset/range_bearing_series"
+    """
+    Range-bearing time-series dataset between two features
+    """
+    regionSOLIDUSstatistics = "region/statistics"
+    """
+    Region/area statistics summary (extent, area, dimensions)
+    """
+
+
+class ResultCategoryEnum(str, Enum):
+    """
+    Top-level result type categories per TOOL-RESULTS.md. Used as prefix for debrief:resultType annotations.
+    """
+    mutation = "mutation"
+    """
+    Modifies existing feature(s) in the FeatureCollection
+    """
+    addition = "addition"
+    """
+    Creates new GeoJSON feature(s)
+    """
+    deletion = "deletion"
+    """
+    Removes feature(s) from the FeatureCollection
+    """
+    artifact = "artifact"
+    """
+    Creates non-GeoJSON output (image, report, dataset)
     """
 
 

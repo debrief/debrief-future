@@ -114,16 +114,15 @@ class TestAreaSummaryTool:
 class TestAreaSummaryEdgeCases:
     """Edge case tests for area-summary tool."""
 
-    def test_invalid_bounds_returns_empty(self) -> None:
-        # Test that tool handles None bounds gracefully
-        # Note: SelectionContext with REGION type requires bounds,
-        # so we test the tool function directly with None bounds
+    def test_invalid_bounds_and_no_features_returns_empty(self) -> None:
+        # Test that tool handles None bounds + no features gracefully
         from unittest.mock import MagicMock
 
         from debrief_calc.tools.area_summary import area_summary as fn
 
         mock_context = MagicMock()
         mock_context.bounds = None
+        mock_context.features = []
 
         results = fn(mock_context, {})
         assert results == []
@@ -137,3 +136,45 @@ class TestAreaSummaryEdgeCases:
         stats = results[0]["properties"]["statistics"]
         assert stats["area_sq_nm"] > 0  # Still positive
         assert stats["area_sq_nm"] < 1  # But very small
+
+
+class TestAreaSummaryFromFeatures:
+    """Tests for extracting bounds from feature coordinates (#107)."""
+
+    def test_multi_context_with_tracks(self) -> None:
+        """MULTI context extracts bounds from feature coordinates."""
+        features = [
+            {
+                "type": "Feature",
+                "id": "t1",
+                "properties": {"kind": "TRACK"},
+                "geometry": {"type": "LineString", "coordinates": [[-5.0, 49.5], [-3.0, 51.0]]},
+            }
+        ]
+        context = SelectionContext(type=ContextType.MULTI, features=features)
+        results = area_summary(context, {})
+
+        assert len(results) == 1
+        assert results[0]["properties"]["bounds"] == [-5.0, 49.5, -3.0, 51.0]
+
+    def test_multi_context_with_points(self) -> None:
+        features = [
+            {
+                "type": "Feature",
+                "id": "p1",
+                "properties": {"kind": "POINT"},
+                "geometry": {"type": "Point", "coordinates": [-4.0, 50.0]},
+            },
+            {
+                "type": "Feature",
+                "id": "p2",
+                "properties": {"kind": "POINT"},
+                "geometry": {"type": "Point", "coordinates": [-3.0, 51.0]},
+            },
+        ]
+        context = SelectionContext(type=ContextType.MULTI, features=features)
+        results = area_summary(context, {})
+
+        assert len(results) == 1
+        stats = results[0]["properties"]["statistics"]
+        assert stats["area_sq_nm"] > 0

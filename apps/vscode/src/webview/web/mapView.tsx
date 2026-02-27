@@ -54,10 +54,16 @@ function MapViewApp(): React.ReactElement {
   const [viewport, setViewport] = useState<{ center: [number, number]; zoom: number } | undefined>();
   const [fitBoundsTrigger, setFitBoundsTrigger] = useState(0);
 
-  // Drawing state
+  // Drawing state — wired to session-state via message bridge (#108)
   const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
   const [paletteIndex, setPaletteIndex] = useState(0);
+
+  // Notify extension when drawing mode changes (session-state bridge, #108)
+  const handleDrawingModeChange = useCallback((mode: DrawingMode) => {
+    setDrawingMode(mode); // update local state for immediate UI feedback
+    vscode.postMessage({ type: 'drawingModeChanged', drawingMode: mode });
+  }, []);
 
   // Temporal state
   const [currentTime, setCurrentTime] = useState<number | undefined>();
@@ -131,6 +137,12 @@ function MapViewApp(): React.ReactElement {
           break;
         case 'removeResultLayer':
           setResultFeatures(prev => prev.filter(f => !String(f.id).startsWith(msg.layerId)));
+          break;
+        case 'setDrawingMode':
+          setDrawingMode(msg.drawingMode);
+          break;
+        case 'setDrawingPaletteIndex':
+          setPaletteIndex(msg.paletteIndex);
           break;
       }
     };
@@ -293,7 +305,7 @@ function MapViewApp(): React.ReactElement {
       onBoundsChange={handleBoundsChange}
       onZoomChange={handleZoomChange}
       drawingMode={drawingMode}
-      onDrawingModeChange={setDrawingMode}
+      onDrawingModeChange={handleDrawingModeChange}
       onShapeCreated={handleShapeCreated}
       height="100vh"
     />

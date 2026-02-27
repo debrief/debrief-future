@@ -93,13 +93,14 @@ class TestCli:
         assert "debrief:href" in item["annotations"]
         assert item["annotations"]["debrief:href"].endswith(".json")
 
-        # Check resource contains valid JSON time-series
+        # Check resource contains valid JSON (GeoJSON Feature with __datasets)
         assert item["type"] == "resource"
         import json
 
         series_data = json.loads(item["resource"]["text"])
-        assert series_data["type"] == "range-bearing-series"
-        assert len(series_data["entries"]) == 2
+        assert series_data["type"] == "Feature"
+        assert "__datasets" in series_data["properties"]
+        assert len(series_data["properties"]["__datasets"]) == 2
 
     def test_malformed_json_returns_error(self) -> None:
         """CLI handles malformed stdin gracefully."""

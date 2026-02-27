@@ -89,8 +89,10 @@ export {
   createSelection,
   createSelectionFromCounts,
   extractParameters,
+  fromMCPTool,
+  fromMCPTools,
 } from './ToolMatch';
-export type { Selection, MatchResult, Tool, SelectionRequirement } from './ToolMatch';
+export type { Selection, MatchResult, Tool, SelectionRequirement, MCPToolDefinition as SharedMCPToolDefinition } from './ToolMatch';
 
 // ToolsPanel
 export { ToolsPanel } from './ToolsPanel';

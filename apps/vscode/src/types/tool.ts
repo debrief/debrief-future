@@ -1,40 +1,36 @@
 /**
  * Tool-related type definitions for the Debrief VS Code Extension
  *
- * This module re-exports types from @debrief/components/ToolMatch and defines
- * additional extension-specific types for tool execution and result layers.
+ * Imports base types from @debrief/schemas (the single source of truth,
+ * generated from LinkML) and extends with VS Code extension-specific fields.
+ * #105 — no hand-authored type shadows.
  */
 
-/**
- * Selection requirement for a tool (from @debrief/schemas).
- * Defines what feature kinds and counts a tool needs.
- */
-export interface SelectionRequirement {
-  /** Feature kind (e.g., 'TRACK', 'POINT', 'CIRCLE') */
-  kind: string;
-  /** Minimum count required (default: 1) */
-  min?: number;
-  /** Maximum count allowed (undefined = no limit) */
-  max?: number;
-}
+import type {
+  SelectionRequirement as SchemaSelectionRequirement,
+  Tool as SchemaTool,
+} from '@debrief/schemas';
 
 /**
- * Tool definition (from @debrief/schemas).
- * Describes an analysis tool and its requirements.
+ * Selection requirement — re-exported directly from schema (no extension needed).
  */
+export type SelectionRequirement = SchemaSelectionRequirement;
+
 /**
  * A configurable parameter for a tool, extracted from MCP annotations.
+ * Uses view-layer field names (valueType, defaultValue) adapted from
+ * the schema's snake_case conventions (type, default_value).
  */
 export interface ToolParameter {
   /** Parameter identifier */
   name: string;
-  /** Value type */
+  /** Value type (mapped from schema's "type" field) */
   valueType: 'string' | 'number' | 'boolean' | 'enum';
   /** Human-readable description */
   description: string;
   /** Whether parameter is required */
   required?: boolean;
-  /** Default value */
+  /** Default value (mapped from schema's "default_value" field) */
   defaultValue?: unknown;
   /** Explicit choices (for enum type) */
   choices?: string[];
@@ -42,17 +38,11 @@ export interface ToolParameter {
   paramType?: string;
 }
 
-export interface Tool {
-  /** Unique tool identifier */
-  id: string;
-  /** Display name */
-  name: string;
-  /** Description of what the tool does */
-  description?: string;
-  /** Tool version */
-  version?: string;
-  /** Selection requirements for the tool to be active */
-  requirements?: SelectionRequirement[];
+/**
+ * Tool definition — extends schema's Tool with VS Code-specific fields.
+ * Base fields (id, name, description, version, requirements) come from schema.
+ */
+export interface Tool extends SchemaTool {
   /** Minimum total features across all kinds (for multi-kind tools) */
   minFeatures?: number;
   /** Configurable parameters (only those with paramType or choices) */

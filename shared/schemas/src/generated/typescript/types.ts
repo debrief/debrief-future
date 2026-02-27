@@ -248,6 +248,32 @@ export enum SystemStateTypeEnum {
     selection = "selection",
 };
 /**
+* Canonical output kind identifiers for tool result features. Set on feature.properties.kind by the executor after tool execution. Values use slash-delimited hierarchical paths matching domain/subtype. Both Python and TypeScript executors MUST use these values — no hand-authored kind strings in tool implementations.
+*/
+export enum OutputKindEnum {
+    
+    /** Track statistics summary (point count, distance, speed, duration) */
+    trackSOLIDUSstatistics = "track/statistics",
+    /** Range-bearing time-series dataset between two features */
+    datasetSOLIDUSrange_bearing_series = "dataset/range_bearing_series",
+    /** Region/area statistics summary (extent, area, dimensions) */
+    regionSOLIDUSstatistics = "region/statistics",
+};
+/**
+* Top-level result type categories per TOOL-RESULTS.md. Used as prefix for debrief:resultType annotations.
+*/
+export enum ResultCategoryEnum {
+    
+    /** Modifies existing feature(s) in the FeatureCollection */
+    mutation = "mutation",
+    /** Creates new GeoJSON feature(s) */
+    addition = "addition",
+    /** Removes feature(s) from the FeatureCollection */
+    deletion = "deletion",
+    /** Creates non-GeoJSON output (image, report, dataset) */
+    artifact = "artifact",
+};
+/**
 * Names of available schema-defined parameter types. Referenced by ToolParameter.param_type to link tool parameters to their value enums defined in common.yaml.
 */
 export enum ParameterTypeEnum {

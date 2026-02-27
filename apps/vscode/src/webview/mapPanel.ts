@@ -33,6 +33,7 @@ import {
   type SessionStoreApi,
   type SessionStoreWithUndo,
   type LogService,
+  type DrawingMode,
 } from '@debrief/session-state';
 import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
 import { calculateBounds, mergeBounds } from '../utils/bounds';
@@ -78,6 +79,7 @@ export class MapPanel {
   private selectionUnsubscribe?: () => void;
   private temporalUnsubscribe?: () => void;
   private hiddenUnsubscribe?: () => void;
+  private drawingUnsubscribe?: () => void;
   private sessionChangeDisposable?: vscode.Disposable;
   private viewportUpdateTimeout?: NodeJS.Timeout;
   private static readonly VIEWPORT_DEBOUNCE_MS = 100;
@@ -571,10 +573,12 @@ export class MapPanel {
     this.selectionUnsubscribe?.();
     this.temporalUnsubscribe?.();
     this.hiddenUnsubscribe?.();
+    this.drawingUnsubscribe?.();
     this.spatialUnsubscribe = undefined;
     this.selectionUnsubscribe = undefined;
     this.temporalUnsubscribe = undefined;
     this.hiddenUnsubscribe = undefined;
+    this.drawingUnsubscribe = undefined;
 
     this.activeSession = session ?? undefined;
 
@@ -656,6 +660,31 @@ export class MapPanel {
           });
         }
       );
+
+      // Subscribe to drawing state changes (#108)
+      type DrawingState = { drawingMode: DrawingMode; drawingPaletteIndex: number };
+      const drawingSelector = (state: SessionStoreWithUndo): DrawingState => ({
+        drawingMode: state.drawingMode,
+        drawingPaletteIndex: state.drawingPaletteIndex,
+      });
+      this.drawingUnsubscribe = subscribeToSlice(
+        session,
+        drawingSelector,
+        (drawing: DrawingState, prev: DrawingState) => {
+          if (drawing.drawingMode !== prev.drawingMode) {
+            this.postMessage({
+              type: 'setDrawingMode',
+              drawingMode: drawing.drawingMode,
+            });
+          }
+          if (drawing.drawingPaletteIndex !== prev.drawingPaletteIndex) {
+            this.postMessage({
+              type: 'setDrawingPaletteIndex',
+              paletteIndex: drawing.drawingPaletteIndex,
+            });
+          }
+        }
+      );
     }
   }
 
@@ -702,6 +731,7 @@ export class MapPanel {
     this.spatialUnsubscribe?.();
     this.selectionUnsubscribe?.();
     this.temporalUnsubscribe?.();
+    this.drawingUnsubscribe?.();
     this.sessionChangeDisposable?.dispose();
     if (this.viewportUpdateTimeout) {
       clearTimeout(this.viewportUpdateTimeout);
@@ -829,6 +859,13 @@ export class MapPanel {
           }
         }
         break;
+
+      case 'drawingModeChanged':
+        // Handle drawing mode change from webview (#108)
+        if (this.activeSession) {
+          this.activeSession.getState().setDrawingMode(message.drawingMode);
+        }
+        break;
     }
   }
 
@@ -871,6 +908,11 @@ export class MapPanel {
     } as DebriefFeature;
     this.currentFeatures = [...this.currentFeatures, drawnFeature];
     console.log('[debrief] Added drawn feature, features count:', this.currentFeatures.length);
+
+    // Increment drawing palette index in session state (#108)
+    if (this.activeSession) {
+      this.activeSession.getState().incrementDrawingPaletteIndex();
+    }
 
     // Update layers and activity panels
     if (this.layersTreeProvider) {

@@ -103,36 +103,44 @@ class TestClosestPointHelpers:
 class TestRangeBearingTrackTrack:
     """Track + Track time-series tests."""
 
-    def test_returns_time_series(self, multi_track_context: SelectionContext) -> None:
+    def test_returns_geojson_feature(self, multi_track_context: SelectionContext) -> None:
         results = range_bearing(multi_track_context, {})
         assert len(results) == 1
-        wrapper = results[0]
-        assert wrapper["type"] == "range-bearing-series"
-        assert len(wrapper["entries"]) == 5
+        feature = results[0]
+        assert feature["type"] == "Feature"
+        assert feature["geometry"]["type"] == "Point"
+        assert "__datasets" in feature["properties"]
+        assert len(feature["properties"]["__datasets"]) == 2
 
-    def test_entries_have_required_fields(self, multi_track_context: SelectionContext) -> None:
-        wrapper = range_bearing(multi_track_context, {})[0]
-        for entry in wrapper["entries"]:
-            assert "time" in entry
-            assert "range_nm" in entry
-            assert "bearing_deg" in entry
-            assert isinstance(entry["range_nm"], (int, float))
-            assert 0 <= entry["bearing_deg"] < 360
+    def test_datasets_have_series_data(self, multi_track_context: SelectionContext) -> None:
+        feature = range_bearing(multi_track_context, {})[0]
+        for dataset in feature["properties"]["__datasets"]:
+            assert dataset["type"] == "range_bearing_series"
+            assert "series" in dataset
+            assert len(dataset["series"]) == 1
+            data = dataset["series"][0]["data"]
+            assert len(data) == 5
+            for point in data:
+                assert "time" in point
+                assert "value" in point
 
     def test_references_features(self, multi_track_context: SelectionContext) -> None:
-        wrapper = range_bearing(multi_track_context, {})[0]
-        assert wrapper["from_feature"] == "Alpha"
-        assert wrapper["to_feature"] == "Bravo"
+        feature = range_bearing(multi_track_context, {})[0]
+        assert feature["properties"]["from_feature"] == "Alpha"
+        assert feature["properties"]["to_feature"] == "Bravo"
 
-    def test_range_positive(self, multi_track_context: SelectionContext) -> None:
-        wrapper = range_bearing(multi_track_context, {})[0]
-        for entry in wrapper["entries"]:
-            assert entry["range_nm"] >= 0
+    def test_range_values_positive(self, multi_track_context: SelectionContext) -> None:
+        feature = range_bearing(multi_track_context, {})[0]
+        range_dataset = feature["properties"]["__datasets"][0]
+        for point in range_dataset["series"][0]["data"]:
+            assert point["value"] >= 0
 
-    def test_times_are_epoch_ms(self, multi_track_context: SelectionContext) -> None:
-        wrapper = range_bearing(multi_track_context, {})[0]
-        for entry in wrapper["entries"]:
-            assert isinstance(entry["time"], int)
+    def test_times_are_iso_strings(self, multi_track_context: SelectionContext) -> None:
+        feature = range_bearing(multi_track_context, {})[0]
+        range_dataset = feature["properties"]["__datasets"][0]
+        for point in range_dataset["series"][0]["data"]:
+            assert isinstance(point["time"], str)
+            assert "T" in point["time"]  # ISO 8601
 
 
 class TestRangeBearingTrackPoint:
@@ -144,10 +152,12 @@ class TestRangeBearingTrackPoint:
         ctx = SelectionContext(type=ContextType.MULTI, features=[track, point])
         results = range_bearing(ctx, {})
         assert len(results) == 1
-        wrapper = results[0]
-        assert len(wrapper["entries"]) == 2
-        assert wrapper["from_feature"] == "T1"
-        assert wrapper["to_feature"] == "P1"
+        feature = results[0]
+        assert feature["type"] == "Feature"
+        datasets = feature["properties"]["__datasets"]
+        assert len(datasets[0]["series"][0]["data"]) == 2
+        assert feature["properties"]["from_feature"] == "T1"
+        assert feature["properties"]["to_feature"] == "P1"
 
     def test_point_track_order(self) -> None:
         """Point first, track second — still produces series."""
@@ -156,7 +166,7 @@ class TestRangeBearingTrackPoint:
         ctx = SelectionContext(type=ContextType.MULTI, features=[point, track])
         results = range_bearing(ctx, {})
         assert len(results) == 1
-        assert len(results[0]["entries"]) == 2
+        assert len(results[0]["properties"]["__datasets"][0]["series"][0]["data"]) == 2
 
 
 class TestRangeBearingTrackPolygon:
@@ -169,10 +179,12 @@ class TestRangeBearingTrackPolygon:
         ctx = SelectionContext(type=ContextType.MULTI, features=[track, poly])
         results = range_bearing(ctx, {})
         assert len(results) == 1
-        wrapper = results[0]
-        assert len(wrapper["entries"]) == 2
-        for entry in wrapper["entries"]:
-            assert entry["range_nm"] >= 0
+        feature = results[0]
+        assert feature["type"] == "Feature"
+        datasets = feature["properties"]["__datasets"]
+        assert len(datasets[0]["series"][0]["data"]) == 2
+        for point in datasets[0]["series"][0]["data"]:
+            assert point["value"] >= 0
 
 
 class TestRangeBearingEdgeCases:

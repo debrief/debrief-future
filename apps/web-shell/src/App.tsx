@@ -59,6 +59,7 @@ import {
   resetSessionStore,
   createTimeInstant,
   type DisplayMode as StoreDisplayMode,
+  type GeoJSONFeature,
 } from '@debrief/session-state';
 import type { DisplayMode as ComponentDisplayMode } from '@debrief/components';
 
@@ -141,7 +142,8 @@ export default function App() {
   // View state (local — not part of session-state)
   const [view, setView] = useState<View>('welcome');
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
-  const [resultLayers, setResultLayers] = useState<Feature[]>([]);
+  // Result layers now live in session-state store (#109)
+  const resultLayers = state.resultLayers;
   /** Maps activityId → original feature snapshots so revert can restore them */
   const [, setActivitySnapshots] = useState<
     Record<string, Feature[]>
@@ -165,8 +167,8 @@ export default function App() {
   const [activeResultTabId, setActiveResultTabId] = useState<string | null>(null);
   const [layoutResetCount, setLayoutResetCount] = useState(0);
 
-  // Drawing state (Feature: 094)
-  const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
+  // Drawing state (Feature: 094) — drawingMode wired to session-state store (#108)
+  const drawingMode = state.drawingMode;
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
 
   // Catalog items
@@ -233,7 +235,15 @@ export default function App() {
 
       if (e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
-        store.getState().undo();
+        // Tool-level undo (#110): if last tool execution is recorded,
+        // remove its result layers instead of performing UI-state undo
+        const s = store.getState();
+        if (s.lastToolExecution) {
+          s.removeResultLayers(s.lastToolExecution.resultLayerIds);
+          s.clearLastToolExecution();
+        } else {
+          s.undo();
+        }
       } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
         e.preventDefault();
         store.getState().redo();
@@ -277,9 +287,9 @@ export default function App() {
         title: item?.properties.title ?? itemPath,
         features: plotData,
       });
-      setResultLayers([]);
+      freshStore.getState().clearResultLayers();
       setDrawnFeatures([]);
-      setDrawingMode(null);
+      freshStore.getState().setDrawingMode(null);
       setToolMessage(null);
       setLogEntries([]);
       setView('analysis');
@@ -292,7 +302,7 @@ export default function App() {
   const handleBackToCatalog = useCallback(() => {
     setView('welcome');
     setCurrentPlot(null);
-    setResultLayers([]);
+    store.getState().clearResultLayers();
     setToolMessage(null);
     setLogEntries([]);
     store.getState().clearSelection();
@@ -493,6 +503,11 @@ export default function App() {
     store.getState().clearSelection();
   }, [store]);
 
+  // Handle drawing mode change — write to session-state store (#108)
+  const handleDrawingModeChange = useCallback((mode: DrawingMode) => {
+    store.getState().setDrawingMode(mode);
+  }, [store]);
+
   // Handle shape drawn on map (Feature: 094, 096)
   const handleShapeCreated = useCallback((geojson: GeoJSON.Feature, mode: DrawingMode) => {
     const defaultName = mode === 'point' ? 'Drawn Point' : 'Drawn Rectangle';
@@ -621,11 +636,31 @@ export default function App() {
 
   // Handle tool execution — persist result to STAC assets and record a log entry
   const handleRunTool = useCallback((toolId: string, params?: Record<string, unknown>) => {
+    // Determine if this is a mutation tool BEFORE execution
+    const replacesInPlace = toolId === 'move-shape';
+
+    // Capture pre-tool geometry for mutation tools BEFORE execution.
+    // executeTool() mutates feature geometry and properties in-place,
+    // so we must snapshot the originals before the call.
+    const inputState = replacesInPlace && selectedFeatures.length > 0
+      ? selectedFeatures.map(f => {
+          const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
+          const { provenance: _p, ...restProps } = props;
+          return {
+            featureId: String(f.id),
+            geometry: JSON.parse(JSON.stringify(f.geometry)),
+            properties: JSON.parse(JSON.stringify(restProps)),
+          };
+        })
+      : null;
+
+    // Also snapshot full originals for revert before execution
+    const originalSnapshots = replacesInPlace && selectedFeatures.length > 0
+      ? selectedFeatures.map(f => JSON.parse(JSON.stringify(f)) as Feature)
+      : null;
+
     const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[], params);
     setToolMessage(result.message);
-
-    // Tools that transform features in-place (e.g. move-shape): replace in currentPlot
-    const replacesInPlace = toolId === 'move-shape';
 
     if (replacesInPlace) {
       // Replace the original features in the plot with the moved versions
@@ -655,7 +690,17 @@ export default function App() {
         ];
 
     if (allResultLayers.length > 0) {
-      setResultLayers(prev => [...prev, ...allResultLayers]);
+      store.getState().addResultLayers(allResultLayers as GeoJSONFeature[]);
+
+      // Record last tool execution for single-step undo (#110)
+      const resultIds = allResultLayers.map((layer, i) =>
+        String((layer as unknown as Record<string, unknown>).id ?? (layer.properties as Record<string, unknown> | null)?.id ?? `result-${activityCounter + 1}-${i}`)
+      );
+      store.getState().setLastToolExecution({
+        toolId,
+        sourceFeatureIds: selectedFeatures.map(f => String(f.id)),
+        resultLayerIds: resultIds,
+      });
 
       // Persist results as STAC assets in the current item's assets/ directory
       if (currentPlot) {
@@ -700,19 +745,6 @@ export default function App() {
 
     const activityId = `act-${String(nextId).padStart(3, '0')}`;
 
-    // Capture pre-tool geometry for mutation tools (enables correct tune replay)
-    const inputState = replacesInPlace && selectedFeatures.length > 0
-      ? selectedFeatures.map(f => {
-          const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
-          const { provenance: _p, ...restProps } = props;
-          return {
-            featureId: String(f.id),
-            geometry: JSON.parse(JSON.stringify(f.geometry)),
-            properties: JSON.parse(JSON.stringify(restProps)),
-          };
-        })
-      : null;
-
     const entry: TimelineEntry = {
       activityId,
       timestamp: new Date().toISOString(),
@@ -727,14 +759,11 @@ export default function App() {
       inputState,
     };
 
-    // Snapshot originals so revert can restore them
-    if (replacesInPlace && selectedFeatures.length > 0) {
-      const originals = selectedFeatures.map(f =>
-        JSON.parse(JSON.stringify(f)) as Feature
-      );
+    // Store pre-tool snapshots for revert (captured before execution above)
+    if (originalSnapshots) {
       setActivitySnapshots(prev => ({
         ...prev,
-        [activityId]: originals,
+        [activityId]: originalSnapshots,
       }));
     }
 
@@ -891,7 +920,7 @@ export default function App() {
       currentTime: playback.currentTime,
       displayMode: toComponentMode(state.displayMode),
       drawingMode,
-      onDrawingModeChange: setDrawingMode,
+      onDrawingModeChange: handleDrawingModeChange,
       onShapeCreated: handleShapeCreated,
       height: '100%',
       className: 'web-shell__map',
@@ -929,7 +958,7 @@ export default function App() {
     panelComponents, currentPlot, timeExtent, playback.currentTime,
     playback.playbackState, playback.speed, state.displayMode,
     tools, allFeatures, state.selection.featureIds, handleActivityMessage,
-    selectedIds, handleMapSelect, handleBackgroundClick, drawingMode,
+    selectedIds, handleMapSelect, handleBackgroundClick, drawingMode, handleDrawingModeChange,
     handleShapeCreated, logEntries, featureNames, logPresentationMode,
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
     handleLogMessage, handleTuneRequest, handleRestoreRequest,

@@ -163,6 +163,18 @@ export interface SetTrackColorMessage {
   color: string; // hex #RRGGBB
 }
 
+/** Set active drawing mode from session state (#108) */
+export interface SetDrawingModeMessage {
+  type: 'setDrawingMode';
+  drawingMode: 'point' | 'rectangle' | 'polygon' | 'polyline' | null;
+}
+
+/** Set drawing palette index from session state (#108) */
+export interface SetDrawingPaletteIndexMessage {
+  type: 'setDrawingPaletteIndex';
+  paletteIndex: number;
+}
+
 /** Response to export PNG request */
 export interface RequestExportPngResponse extends ResponseMessage {
   type: 'requestExportPngResponse';
@@ -256,6 +268,12 @@ export interface FeatureDrawnMessage {
   };
 }
 
+/** Notify extension of drawing mode change from webview (#108) */
+export interface DrawingModeChangedMessage {
+  type: 'drawingModeChanged';
+  drawingMode: 'point' | 'rectangle' | 'polygon' | 'polyline' | null;
+}
+
 /** Notify extension of viewport change for session state (Feature: 029) */
 export interface ViewportChangedMessage {
   type: 'viewportChanged';
@@ -312,6 +330,8 @@ export type ExtensionToWebviewMessage =
   | SetCurrentTimeMessage
   | SetDisplayModeMessage
   | SetHiddenIdsMessage
+  | SetDrawingModeMessage
+  | SetDrawingPaletteIndexMessage
   | RequestExportPngResponse
   | RequestTrackDetailsResponse
   | ImportProgressMessage
@@ -329,7 +349,8 @@ export type WebviewToExtensionMessage =
   | RepFileDropMessage
   | RequestUndoMessage
   | RequestRedoMessage
-  | FeatureDrawnMessage;
+  | FeatureDrawnMessage
+  | DrawingModeChangedMessage;
 
 // ============================================================================
 // Re-exports for webview
