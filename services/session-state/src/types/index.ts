@@ -8,12 +8,14 @@ export * from './temporal.js';
 export * from './spatial.js';
 export * from './features.js';
 export * from './document.js';
+export * from './results.js';
 
 // Import for composite types
 import type { TemporalSlice, TemporalActions } from './temporal.js';
 import type { SpatialSlice, SpatialActions } from './spatial.js';
 import type { FeaturesSlice, FeaturesActions } from './features.js';
 import type { DocumentSlice, DocumentActions } from './document.js';
+import type { ResultsSlice, ResultsActions } from './results.js';
 
 /**
  * Schema version for persistence compatibility (FR-026).
@@ -28,10 +30,12 @@ export type SessionStore = TemporalSlice &
   SpatialSlice &
   FeaturesSlice &
   DocumentSlice &
+  ResultsSlice &
   TemporalActions &
   SpatialActions &
   FeaturesActions &
-  DocumentActions & {
+  DocumentActions &
+  ResultsActions & {
     /** Reset all state to defaults */
     reset: () => void;
   };
@@ -44,6 +48,7 @@ export interface SessionState {
   spatial: SpatialSlice;
   features: FeaturesSlice;
   document: DocumentSlice;
+  results: ResultsSlice;
 }
 
 /**
@@ -53,7 +58,8 @@ export interface SessionActions
   extends TemporalActions,
     SpatialActions,
     FeaturesActions,
-    DocumentActions {
+    DocumentActions,
+    ResultsActions {
   /** Reset all state to defaults */
   reset: () => void;
 }

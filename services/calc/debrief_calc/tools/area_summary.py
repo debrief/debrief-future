@@ -2,10 +2,15 @@
 Area summary tool.
 
 Summarizes features within a geographic region (bounding box or polygon).
+
+Accepts both REGION context (with explicit bounds) and MULTI context
+(extracting bbox from feature coordinates), aligning Python and TypeScript
+implementations per #107 (F-2.6).
 """
 
 from __future__ import annotations
 
+import math
 import uuid
 from typing import Any
 
@@ -24,33 +29,61 @@ def _calculate_bbox_area_sq_nm(bbox: list[float]) -> float:
     Calculate approximate area of a bounding box in square nautical miles.
     Uses a simple rectangular approximation.
     """
-    import math
-
     minx, miny, maxx, maxy = bbox
-
-    # Width in degrees
     width_deg = maxx - minx
-    # Height in degrees
     height_deg = maxy - miny
-
-    # Average latitude for longitude correction
     avg_lat = (miny + maxy) / 2
-
-    # Convert to nautical miles
-    # 1 degree latitude = ~60 nm
-    # 1 degree longitude = ~60 nm * cos(latitude)
     height_nm = height_deg * 60
     width_nm = width_deg * 60 * math.cos(math.radians(avg_lat))
-
     return width_nm * height_nm
+
+
+def _flatten_coords(coords: list) -> list[list[float]]:  # type: ignore[type-arg]
+    """Recursively extract all [lon, lat] positions from GeoJSON coordinates."""
+    if not isinstance(coords, list):
+        return []
+    if len(coords) > 0 and isinstance(coords[0], (int, float)):
+        return [coords]
+    result: list[list[float]] = []
+    for item in coords:
+        result.extend(_flatten_coords(item))
+    return result
+
+
+def _bounds_from_features(features: list[dict[str, Any]]) -> list[float] | None:
+    """Extract bounding box from feature coordinates (matching TS approach)."""
+    min_lon = float("inf")
+    min_lat = float("inf")
+    max_lon = float("-inf")
+    max_lat = float("-inf")
+
+    for f in features:
+        geom = f.get("geometry")
+        if not geom or "coordinates" not in geom:
+            continue
+        for pos in _flatten_coords(geom["coordinates"]):
+            if len(pos) >= 2:
+                lon, lat = pos[0], pos[1]
+                if lon < min_lon:
+                    min_lon = lon
+                if lon > max_lon:
+                    max_lon = lon
+                if lat < min_lat:
+                    min_lat = lat
+                if lat > max_lat:
+                    max_lat = lat
+
+    if not math.isfinite(min_lon):
+        return None
+    return [min_lon, min_lat, max_lon, max_lat]
 
 
 @tool(
     name="area-summary",
-    description="Summarize the geographic extent and properties of a selected region",
-    input_kinds=["ZONE", "REGION", "POLYGON"],
+    description="Summarize the geographic extent and properties of selected features or a region",
+    input_kinds=["TRACK", "POINT", "RECTANGLE", "CIRCLE", "ZONE", "REGION", "POLYGON", "POLY"],
     output_kind="region/statistics",
-    context_type=ContextType.REGION,
+    context_type=ContextType.MULTI,
     parameters=[
         ToolParameter(
             name="include_centroid",
@@ -64,8 +97,11 @@ def area_summary(context: SelectionContext, params: dict[str, Any]) -> list[dict
     """
     Summarize a geographic region.
 
+    Accepts both explicit bounds (REGION context) and feature coordinates
+    (MULTI context), aligning Python and TypeScript implementations (#107).
+
     Args:
-        context: SelectionContext with bounds [minx, miny, maxx, maxy]
+        context: SelectionContext with bounds or features
         params: Optional parameters (include_centroid)
 
     Returns:
@@ -73,7 +109,10 @@ def area_summary(context: SelectionContext, params: dict[str, Any]) -> list[dict
     """
     include_centroid = params.get("include_centroid", True)
 
+    # Try explicit bounds first (REGION context), fall back to feature coordinates
     bounds = context.bounds
+    if not bounds or len(bounds) != 4:
+        bounds = _bounds_from_features(context.features)
     if not bounds or len(bounds) != 4:
         return []
 

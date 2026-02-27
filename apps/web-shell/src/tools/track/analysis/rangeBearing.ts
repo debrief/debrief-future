@@ -136,13 +136,10 @@ export function execute(
     id: `rb-${generateUUID()}`,
     geometry: { type: 'Point', coordinates: [0, 0] },
     properties: {
-      kind: 'DATASET',
+      kind: toolDefinition.annotations['debrief:outputKind'],
       name: `Range & Bearing: ${name1} \u2192 ${name2}`,
       from_feature: name1,
       to_feature: name2,
-      'debrief:resultType': 'dataset/range_bearing_series',
-      'debrief:sourceFeatures': [String(track1.id ?? ''), String(track2.id ?? '')],
-      'debrief:label': `Range & bearing from ${name1} to ${name2}`,
       '__datasets': [rangeDataset, bearingDataset],
     },
   }];

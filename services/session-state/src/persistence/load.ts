@@ -164,6 +164,10 @@ function applySessionState(
       dirty: state.dirty,
       savePath: state.savePath,
     },
+    results: {
+      resultLayers: state.resultLayers ?? [],
+      lastToolExecution: state.lastToolExecution ?? null,
+    },
   };
 }
 

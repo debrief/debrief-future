@@ -144,7 +144,7 @@ export function execute(
     id: `stats-${generateUUID()}`,
     geometry: { type: 'Point', coordinates: [centroidLon, centroidLat] },
     properties: {
-      kind: 'STATISTICS',
+      kind: toolDefinition.annotations['debrief:outputKind'],
       name: `Statistics: ${trackName}`,
       source_track: String(track.id ?? ''),
       source_name: trackName,
@@ -154,9 +154,6 @@ export function execute(
         [distanceKey(distanceUnit)]: Math.round(distance * 100) / 100,
         [speedKey(distanceUnit)]: Math.round(speed * 100) / 100,
       },
-      'debrief:resultType': 'track/statistics',
-      'debrief:sourceFeatures': [String(track.id ?? '')],
-      'debrief:label': `Track statistics for ${trackName}`,
     },
   }];
 }

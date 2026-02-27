@@ -7,6 +7,8 @@ Calculates range and bearing time-series between two features.
 from __future__ import annotations
 
 import math
+import uuid
+from datetime import UTC, datetime
 from typing import Any
 
 from debrief_calc.models import ContextType, SelectionContext
@@ -196,12 +198,41 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dic
     if not series:
         return []
 
-    # Return as single wrapper feature containing the series data
+    # Build DatasetEnvelope series matching TS format
+    series_name = f"{name1} → {name2}"
+    range_data = [{"time": datetime.fromtimestamp(e["time"] / 1000, tz=UTC).isoformat(), "value": e["range_nm"]} for e in series]
+    bearing_data = [{"time": datetime.fromtimestamp(e["time"] / 1000, tz=UTC).isoformat(), "value": e["bearing_deg"]} for e in series]
+
+    range_dataset = {
+        "type": "range_bearing_series",
+        "title": f"Range: {name1} → {name2}",
+        "metadata": {
+            "xAxis": {"label": "Time", "type": "temporal"},
+            "yAxis": {"label": "Range", "type": "quantitative", "units": "nm"},
+        },
+        "series": [{"name": series_name, "data": range_data}],
+    }
+    bearing_dataset = {
+        "type": "range_bearing_series",
+        "title": f"Bearing: {name1} → {name2}",
+        "metadata": {
+            "xAxis": {"label": "Time", "type": "temporal"},
+            "yAxis": {"label": "Bearing", "type": "quantitative", "units": "°"},
+        },
+        "series": [{"name": series_name, "data": bearing_data}],
+    }
+
+    # Return as valid GeoJSON Feature wrapping datasets (#104 — F-2.5)
     return [
         {
-            "type": "range-bearing-series",
-            "from_feature": name1,
-            "to_feature": name2,
-            "entries": series,
+            "type": "Feature",
+            "id": f"rb-{uuid.uuid4().hex[:8]}",
+            "geometry": {"type": "Point", "coordinates": [0, 0]},
+            "properties": {
+                "name": f"Range & Bearing: {name1} → {name2}",
+                "from_feature": name1,
+                "to_feature": name2,
+                "__datasets": [range_dataset, bearing_dataset],
+            },
         }
     ]

@@ -105,10 +105,6 @@ export function execute(
     statistics.centroid = [(minLon + maxLon) / 2, (minLat + maxLat) / 2];
   }
 
-  const featureNames = features
-    .map(f => (f.properties?.name ?? f.id ?? 'feature') as string)
-    .join(', ');
-
   return [{
     type: 'Feature',
     id: `area-${generateUUID()}`,
@@ -123,7 +119,7 @@ export function execute(
       ]],
     },
     properties: {
-      kind: 'RECTANGLE',
+      kind: toolDefinition.annotations['debrief:outputKind'],
       name: `Area Summary`,
       label: `Area Summary`,
       statistics,
@@ -138,9 +134,6 @@ export function execute(
         opacity: 0.8,
         dash_array: '5, 5',
       },
-      'debrief:resultType': 'region/statistics',
-      'debrief:sourceFeatures': features.map(f => String(f.id ?? '')),
-      'debrief:label': `Area summary for ${featureNames}`,
     },
   }];
 }

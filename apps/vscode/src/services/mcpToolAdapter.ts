@@ -1,34 +1,16 @@
 /**
  * MCP Tool Adapter for VS Code Extension
  *
- * Converts MCP tool definitions (from tools/list) to ToolMatchService-compatible
- * Tool[]. Inlines the adaptation logic using local types so that tsc can
- * resolve all imports without requiring a pre-built @debrief/components dist.
+ * Delegates to the shared adapter in @debrief/components for core conversion
+ * (MCP annotations → Tool requirements), adding VS Code-specific parameter
+ * extraction. Eliminates duplicate adaptation logic (#105 — F-5.2).
  *
  * Feature: 052-tool-api-integration (US2 Tool Filtering, T016)
- *
- * ---
- * T018 Verification: Both the VS Code extension and the web-shell use equivalent
- * adaptation logic (MCP annotations → Tool requirements). The shared
- * ToolMatchService then produces identical enabled/disabled results for any
- * given selection. The only difference is how each UI obtains the MCP tools/list
- * response (VS Code via CalcService Python subprocess, web-shell via direct
- * TypeScript registry).
- * ---
  */
 
-import type { MCPToolDefinition, Tool, ToolParameter, SelectionRequirement } from '../types/tool';
-
-/**
- * Convert kebab-case tool name to display name.
- * e.g., "set-track-color" → "Set Track Color"
- */
-function formatToolName(name: string): string {
-  return name
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
+import { fromMCPTool as sharedFromMCPTool } from '@debrief/components/ToolMatch';
+import type { MCPToolDefinition as SharedMCPToolDefinition } from '@debrief/components/ToolMatch';
+import type { MCPToolDefinition, Tool, ToolParameter } from '../types/tool';
 
 /** JSON Schema property shape inside inputSchema.properties.params.properties */
 interface MCPParamSchema {
@@ -57,7 +39,7 @@ function mapParamType(schema: MCPParamSchema): ToolParameter['valueType'] {
  * Only returns parameters that have a paramType or explicit choices,
  * matching the web-shell's ParameterCollector filter.
  */
-function extractParameters(mcpTool: MCPToolDefinition): ToolParameter[] {
+function extractPickerParameters(mcpTool: MCPToolDefinition): ToolParameter[] {
   const paramsSchema = mcpTool.inputSchema?.properties?.params as
     | { type: 'object'; properties: Record<string, MCPParamSchema> }
     | undefined;
@@ -80,37 +62,25 @@ function extractParameters(mcpTool: MCPToolDefinition): ToolParameter[] {
 }
 
 /**
- * Convert a single MCP tool definition to ToolMatchService Tool format.
- */
-function fromMCPTool(mcpTool: MCPToolDefinition): Tool {
-  const requirements: SelectionRequirement[] =
-    mcpTool.annotations['debrief:selectionRequirements'].map((req) => ({
-      kind: req.kind,
-      min: req.min,
-      ...(req.max !== undefined ? { max: req.max } : {}),
-    }));
-
-  const parameters = extractParameters(mcpTool);
-
-  return {
-    id: mcpTool.name,
-    name: formatToolName(mcpTool.name),
-    description: mcpTool.description,
-    version: mcpTool.annotations['debrief:version'],
-    requirements,
-    ...(parameters.length > 0 ? { parameters } : {}),
-  };
-}
-
-/**
  * Adapt MCP tool definitions for use with ToolMatchService.
  *
- * Converts MCPToolDefinition[] (from MCP tools/list response) to Tool[]
- * compatible with the shared ToolMatchService matching algorithm.
+ * Uses the shared adapter for base conversion, then enriches with
+ * VS Code-specific parameter data.
  *
  * @param mcpTools - Array of MCP tool definitions with Debrief annotations
  * @returns Tool[] for use with ToolMatchService
  */
 export function adaptMCPToolsForMatching(mcpTools: MCPToolDefinition[]): Tool[] {
-  return mcpTools.map(fromMCPTool);
+  return mcpTools.map((mcpTool) => {
+    // Delegate core conversion to shared adapter
+    const baseTool = sharedFromMCPTool(mcpTool as SharedMCPToolDefinition);
+
+    // Add VS Code-specific parameter extraction
+    const parameters = extractPickerParameters(mcpTool);
+
+    return {
+      ...baseTool,
+      ...(parameters.length > 0 ? { parameters } : {}),
+    } as Tool;
+  });
 }

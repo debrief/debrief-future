@@ -59,6 +59,7 @@ import {
   resetSessionStore,
   createTimeInstant,
   type DisplayMode as StoreDisplayMode,
+  type GeoJSONFeature,
 } from '@debrief/session-state';
 import type { DisplayMode as ComponentDisplayMode } from '@debrief/components';
 
@@ -141,7 +142,8 @@ export default function App() {
   // View state (local — not part of session-state)
   const [view, setView] = useState<View>('welcome');
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
-  const [resultLayers, setResultLayers] = useState<Feature[]>([]);
+  // Result layers now live in session-state store (#109)
+  const resultLayers = state.resultLayers;
   /** Maps activityId → original feature snapshots so revert can restore them */
   const [, setActivitySnapshots] = useState<
     Record<string, Feature[]>
@@ -165,8 +167,8 @@ export default function App() {
   const [activeResultTabId, setActiveResultTabId] = useState<string | null>(null);
   const [layoutResetCount, setLayoutResetCount] = useState(0);
 
-  // Drawing state (Feature: 094)
-  const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
+  // Drawing state (Feature: 094) — drawingMode wired to session-state store (#108)
+  const drawingMode = state.drawingMode;
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
 
   // Catalog items
@@ -233,7 +235,15 @@ export default function App() {
 
       if (e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
-        store.getState().undo();
+        // Tool-level undo (#110): if last tool execution is recorded,
+        // remove its result layers instead of performing UI-state undo
+        const s = store.getState();
+        if (s.lastToolExecution) {
+          s.removeResultLayers(s.lastToolExecution.resultLayerIds);
+          s.clearLastToolExecution();
+        } else {
+          s.undo();
+        }
       } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
         e.preventDefault();
         store.getState().redo();
@@ -277,9 +287,9 @@ export default function App() {
         title: item?.properties.title ?? itemPath,
         features: plotData,
       });
-      setResultLayers([]);
+      freshStore.getState().clearResultLayers();
       setDrawnFeatures([]);
-      setDrawingMode(null);
+      freshStore.getState().setDrawingMode(null);
       setToolMessage(null);
       setLogEntries([]);
       setView('analysis');
@@ -292,7 +302,7 @@ export default function App() {
   const handleBackToCatalog = useCallback(() => {
     setView('welcome');
     setCurrentPlot(null);
-    setResultLayers([]);
+    store.getState().clearResultLayers();
     setToolMessage(null);
     setLogEntries([]);
     store.getState().clearSelection();
@@ -493,6 +503,11 @@ export default function App() {
     store.getState().clearSelection();
   }, [store]);
 
+  // Handle drawing mode change — write to session-state store (#108)
+  const handleDrawingModeChange = useCallback((mode: DrawingMode) => {
+    store.getState().setDrawingMode(mode);
+  }, [store]);
+
   // Handle shape drawn on map (Feature: 094, 096)
   const handleShapeCreated = useCallback((geojson: GeoJSON.Feature, mode: DrawingMode) => {
     const defaultName = mode === 'point' ? 'Drawn Point' : 'Drawn Rectangle';
@@ -655,7 +670,17 @@ export default function App() {
         ];
 
     if (allResultLayers.length > 0) {
-      setResultLayers(prev => [...prev, ...allResultLayers]);
+      store.getState().addResultLayers(allResultLayers as GeoJSONFeature[]);
+
+      // Record last tool execution for single-step undo (#110)
+      const resultIds = allResultLayers.map((layer, i) =>
+        String((layer as unknown as Record<string, unknown>).id ?? (layer.properties as Record<string, unknown> | null)?.id ?? `result-${activityCounter + 1}-${i}`)
+      );
+      store.getState().setLastToolExecution({
+        toolId,
+        sourceFeatureIds: selectedFeatures.map(f => String(f.id)),
+        resultLayerIds: resultIds,
+      });
 
       // Persist results as STAC assets in the current item's assets/ directory
       if (currentPlot) {
@@ -891,7 +916,7 @@ export default function App() {
       currentTime: playback.currentTime,
       displayMode: toComponentMode(state.displayMode),
       drawingMode,
-      onDrawingModeChange: setDrawingMode,
+      onDrawingModeChange: handleDrawingModeChange,
       onShapeCreated: handleShapeCreated,
       height: '100%',
       className: 'web-shell__map',
@@ -929,7 +954,7 @@ export default function App() {
     panelComponents, currentPlot, timeExtent, playback.currentTime,
     playback.playbackState, playback.speed, state.displayMode,
     tools, allFeatures, state.selection.featureIds, handleActivityMessage,
-    selectedIds, handleMapSelect, handleBackgroundClick, drawingMode,
+    selectedIds, handleMapSelect, handleBackgroundClick, drawingMode, handleDrawingModeChange,
     handleShapeCreated, logEntries, featureNames, logPresentationMode,
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
     handleLogMessage, handleTuneRequest, handleRestoreRequest,
