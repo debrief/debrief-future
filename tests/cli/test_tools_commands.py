@@ -115,10 +115,13 @@ class TestToolsRun:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["type"] == "FeatureCollection"
-        assert len(data["features"]) == 1  # single range-bearing-series
-        series = data["features"][0]
-        assert series["type"] == "range-bearing-series"
-        assert len(series["entries"]) == 5  # one per matching timestamp
+        assert len(data["features"]) == 1  # single GeoJSON Feature wrapping datasets
+        feature = data["features"][0]
+        assert feature["type"] == "Feature"
+        assert "__datasets" in feature["properties"]
+        datasets = feature["properties"]["__datasets"]
+        assert len(datasets) == 2  # range + bearing datasets
+        assert len(datasets[0]["series"][0]["data"]) == 5  # one per matching timestamp
 
     def test_run_with_parameters(self, runner: CliRunner, tracks_pair_path: Path) -> None:
         result = runner.invoke(

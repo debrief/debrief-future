@@ -200,8 +200,20 @@ def range_bearing(context: SelectionContext, params: dict[str, Any]) -> list[dic
 
     # Build DatasetEnvelope series matching TS format
     series_name = f"{name1} → {name2}"
-    range_data = [{"time": datetime.fromtimestamp(e["time"] / 1000, tz=UTC).isoformat(), "value": e["range_nm"]} for e in series]
-    bearing_data = [{"time": datetime.fromtimestamp(e["time"] / 1000, tz=UTC).isoformat(), "value": e["bearing_deg"]} for e in series]
+    range_data = [
+        {
+            "time": datetime.fromtimestamp(e["time"] / 1000, tz=UTC).isoformat(),
+            "value": e["range_nm"],
+        }
+        for e in series
+    ]
+    bearing_data = [
+        {
+            "time": datetime.fromtimestamp(e["time"] / 1000, tz=UTC).isoformat(),
+            "value": e["bearing_deg"],
+        }
+        for e in series
+    ]
 
     range_dataset = {
         "type": "range_bearing_series",

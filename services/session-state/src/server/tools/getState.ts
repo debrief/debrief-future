@@ -10,15 +10,16 @@ import type {
   SpatialSlice,
   FeaturesSlice,
   DocumentSlice,
+  ResultsSlice,
 } from '../../types/index.js';
 
 export interface GetStateInput {
-  slice?: 'temporal' | 'spatial' | 'features' | 'document';
+  slice?: 'temporal' | 'spatial' | 'features' | 'document' | 'results';
 }
 
 export interface GetStateOutput {
   success: boolean;
-  state?: SessionState | TemporalSlice | SpatialSlice | FeaturesSlice | DocumentSlice;
+  state?: SessionState | TemporalSlice | SpatialSlice | FeaturesSlice | DocumentSlice | ResultsSlice;
   error?: string;
 }
 
@@ -60,6 +61,10 @@ export function getState(
         document: {
           dirty: state.dirty,
           savePath: state.savePath,
+        },
+        results: {
+          resultLayers: state.resultLayers,
+          lastToolExecution: state.lastToolExecution,
         },
       },
     };
@@ -105,6 +110,14 @@ export function getState(
         state: {
           dirty: state.dirty,
           savePath: state.savePath,
+        },
+      };
+    case 'results':
+      return {
+        success: true,
+        state: {
+          resultLayers: state.resultLayers,
+          lastToolExecution: state.lastToolExecution,
         },
       };
     default:

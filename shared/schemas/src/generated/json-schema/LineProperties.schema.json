@@ -1036,6 +1036,16 @@
       "title": "NumericPresetEnum",
       "type": "string"
     },
+    "OutputKindEnum": {
+      "description": "Canonical output kind identifiers for tool result features. Set on feature.properties.kind by the executor after tool execution. Values use slash-delimited hierarchical paths matching domain/subtype. Both Python and TypeScript executors MUST use these values \u2014 no hand-authored kind strings in tool implementations.",
+      "enum": [
+        "track/statistics",
+        "dataset/range_bearing_series",
+        "region/statistics"
+      ],
+      "title": "OutputKindEnum",
+      "type": "string"
+    },
     "ParameterTypeEnum": {
       "description": "Names of available schema-defined parameter types. Referenced by ToolParameter.param_type to link tool parameters to their value enums defined in common.yaml.",
       "enum": [
@@ -1600,6 +1610,17 @@
         "scatter"
       ],
       "title": "ReferencePointPatternEnum",
+      "type": "string"
+    },
+    "ResultCategoryEnum": {
+      "description": "Top-level result type categories per TOOL-RESULTS.md. Used as prefix for debrief:resultType annotations.",
+      "enum": [
+        "mutation",
+        "addition",
+        "deletion",
+        "artifact"
+      ],
+      "title": "ResultCategoryEnum",
       "type": "string"
     },
     "SegmentMetadata": {

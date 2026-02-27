@@ -116,7 +116,9 @@ class TestRunSuccess:
                 "properties": {"kind": "RECTANGLE"},
                 "geometry": {
                     "type": "Polygon",
-                    "coordinates": [[[-5.0, 49.5], [-3.0, 49.5], [-3.0, 51.0], [-5.0, 51.0], [-5.0, 49.5]]],
+                    "coordinates": [
+                        [[-5.0, 49.5], [-3.0, 49.5], [-3.0, 51.0], [-5.0, 51.0], [-5.0, 49.5]]
+                    ],
                 },
             }
         ]
