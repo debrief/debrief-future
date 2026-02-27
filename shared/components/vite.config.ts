@@ -30,7 +30,7 @@ export default defineConfig({
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime', 'leaflet', 'react-leaflet', 'vega', 'vega-lite', 'vega-embed'],
+      external: ['react', 'react-dom', 'react/jsx-runtime', 'leaflet', 'react-leaflet', 'vega', 'vega-lite', 'vega-embed', 'vscrui'],
       output: {
         preserveModules: true,
         preserveModulesRoot: 'src',
