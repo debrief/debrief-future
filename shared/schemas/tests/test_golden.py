@@ -138,7 +138,7 @@ class TestValidFixtures:
     """Test that all valid fixtures pass Pydantic validation."""
 
     @pytest.mark.parametrize("entity_type,fixture_path", get_valid_fixtures())
-    def test_valid_fixture_passes(self, entity_type: str, fixture_path: Path):
+    def test_valid_fixture_passes(self, entity_type: str, fixture_path: Path) -> None:
         """Valid fixtures should pass Pydantic validation."""
         model_class = ENTITY_MAP[entity_type]
         data = json.loads(fixture_path.read_text())
@@ -167,7 +167,7 @@ class TestInvalidFixtures:
     """Test that all invalid fixtures fail Pydantic validation."""
 
     @pytest.mark.parametrize("entity_type,fixture_path", get_invalid_fixtures())
-    def test_invalid_fixture_fails(self, entity_type: str, fixture_path: Path):
+    def test_invalid_fixture_fails(self, entity_type: str, fixture_path: Path) -> None:
         """Invalid fixtures should raise Pydantic ValidationError."""
         model_class = ENTITY_MAP[entity_type]
         data = json.loads(fixture_path.read_text())
@@ -184,19 +184,19 @@ class TestInvalidFixtures:
 class TestFixtureConsistency:
     """Test fixture organization and naming conventions."""
 
-    def test_all_entities_have_valid_fixtures(self):
+    def test_all_entities_have_valid_fixtures(self) -> None:
         """Each entity type should have at least one valid fixture."""
         for entity_type in ENTITY_MAP:
             fixtures = [f for et, f in get_valid_fixtures() if et == entity_type]
             assert len(fixtures) >= 1, f"No valid fixtures for {entity_type}"
 
-    def test_all_entities_have_invalid_fixtures(self):
+    def test_all_entities_have_invalid_fixtures(self) -> None:
         """Each entity type should have at least one invalid fixture."""
         for entity_type in ENTITY_MAP:
             fixtures = [f for et, f in get_invalid_fixtures() if et == entity_type]
             assert len(fixtures) >= 1, f"No invalid fixtures for {entity_type}"
 
-    def test_fixture_files_are_valid_json(self):
+    def test_fixture_files_are_valid_json(self) -> None:
         """All fixture files should be valid JSON."""
         for fixture_dir in [VALID_DIR, INVALID_DIR]:
             if fixture_dir.exists():

@@ -19,7 +19,7 @@ Defines the entities used throughout the tool registry and execution system:
 from __future__ import annotations
 
 import re
-from collections.abc import Callable
+from collections.abc import Callable  # noqa: TC003 — Pydantic needs Callable at runtime
 from datetime import datetime
 from enum import StrEnum
 from typing import Any

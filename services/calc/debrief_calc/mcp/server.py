@@ -229,7 +229,7 @@ def create_server() -> Server:
     return server
 
 
-async def serve():
+async def serve() -> None:
     """Run the MCP server on stdio."""
     if not HAS_MCP:
         raise ImportError("MCP SDK not installed. Install with: pip install mcp")
@@ -239,7 +239,7 @@ async def serve():
         await server.run(read_stream, write_stream, server.create_initialization_options())
 
 
-def main():
+def main() -> None:
     """Entry point for MCP server."""
     import asyncio
 

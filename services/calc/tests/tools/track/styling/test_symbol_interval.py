@@ -55,7 +55,7 @@ TRACK_FEATURE = {
 class TestSymbolInterval:
     """Golden example tests for the symbol-interval tool."""
 
-    def test_basic_golden_example(self):
+    def test_basic_golden_example(self) -> None:
         """Apply interval='PT30M'. Verify show_symbol=True and symbol_interval set."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -71,7 +71,7 @@ class TestSymbolInterval:
         assert dps["symbol"] == "circle"
         assert dps["show_label"] is False
 
-    def test_no_existing_dps(self):
+    def test_no_existing_dps(self) -> None:
         """Track with no default_position_style gets one with show_symbol=True."""
         feature = copy.deepcopy(TRACK_FEATURE)
         del feature["properties"]["default_position_style"]
@@ -88,7 +88,7 @@ class TestSymbolInterval:
         assert dps["symbol"] == "circle"
         assert dps["show_label"] is False
 
-    def test_overwrites_existing(self):
+    def test_overwrites_existing(self) -> None:
         """Existing symbol_interval is replaced with the new value."""
         feature = copy.deepcopy(TRACK_FEATURE)
         feature["properties"]["default_position_style"]["symbol_interval"] = "PT5M"
@@ -102,7 +102,7 @@ class TestSymbolInterval:
         assert dps["symbol_interval"] == "PT1H"
         assert dps["show_symbol"] is True
 
-    def test_error_no_tracks(self):
+    def test_error_no_tracks(self) -> None:
         """Empty feature list raises ValueError."""
         context = SelectionContext(type=ContextType.NONE, features=[])
         params = {"interval": "PT30M"}
@@ -110,7 +110,7 @@ class TestSymbolInterval:
         with pytest.raises(ValueError, match="No track features found"):
             symbol_interval(context, params)
 
-    def test_default_interval(self):
+    def test_default_interval(self) -> None:
         """Missing interval param defaults to PT15M."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])

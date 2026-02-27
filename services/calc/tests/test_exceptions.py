@@ -1,5 +1,7 @@
 """Unit tests for debrief-calc exceptions."""
 
+from typing import Never
+
 import pytest
 from debrief_calc.exceptions import (
     DebriefCalcError,
@@ -14,24 +16,24 @@ from debrief_calc.exceptions import (
 class TestDebriefCalcError:
     """Tests for base DebriefCalcError."""
 
-    def test_create_error(self):
+    def test_create_error(self) -> None:
         error = DebriefCalcError("Something went wrong")
         assert str(error) == "Something went wrong"
         assert error.message == "Something went wrong"
         assert error.details == {}
 
-    def test_create_error_with_details(self):
+    def test_create_error_with_details(self) -> None:
         error = DebriefCalcError("Error", details={"key": "value"})
         assert error.details == {"key": "value"}
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         error = DebriefCalcError("Error", details={"foo": "bar"})
         d = error.to_dict()
         assert d["code"] == "DEBRIEFCALC"
         assert d["message"] == "Error"
         assert d["details"] == {"foo": "bar"}
 
-    def test_inheritance(self):
+    def test_inheritance(self) -> None:
         error = DebriefCalcError("Test")
         assert isinstance(error, Exception)
 
@@ -39,19 +41,19 @@ class TestDebriefCalcError:
 class TestToolNotFoundError:
     """Tests for ToolNotFoundError."""
 
-    def test_create_error(self):
+    def test_create_error(self) -> None:
         error = ToolNotFoundError("unknown-tool")
         assert error.tool_name == "unknown-tool"
         assert "unknown-tool" in error.message
         assert "not found" in error.message
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         error = ToolNotFoundError("missing")
         d = error.to_dict()
         assert d["code"] == "TOOL_NOT_FOUND"
         assert d["details"]["tool_name"] == "missing"
 
-    def test_is_debrief_calc_error(self):
+    def test_is_debrief_calc_error(self) -> None:
         error = ToolNotFoundError("test")
         assert isinstance(error, DebriefCalcError)
 
@@ -59,18 +61,18 @@ class TestToolNotFoundError:
 class TestInvalidContextError:
     """Tests for InvalidContextError."""
 
-    def test_create_error(self):
+    def test_create_error(self) -> None:
         error = InvalidContextError("track-stats", "single", "multi")
         assert error.tool_name == "track-stats"
         assert error.expected == "single"
         assert error.actual == "multi"
 
-    def test_message_contains_context_info(self):
+    def test_message_contains_context_info(self) -> None:
         error = InvalidContextError("tool", "single", "multi")
         assert "single" in error.message
         assert "multi" in error.message
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         error = InvalidContextError("tool", "single", "multi")
         d = error.to_dict()
         assert d["code"] == "INVALID_CONTEXT"
@@ -81,18 +83,18 @@ class TestInvalidContextError:
 class TestKindMismatchError:
     """Tests for KindMismatchError."""
 
-    def test_create_error(self):
+    def test_create_error(self) -> None:
         error = KindMismatchError("tool", ["track"], {"zone"})
         assert error.tool_name == "tool"
         assert error.accepted_kinds == ["track"]
         assert error.actual_kinds == {"zone"}
 
-    def test_message_contains_kinds(self):
+    def test_message_contains_kinds(self) -> None:
         error = KindMismatchError("tool", ["track", "point"], {"zone"})
         assert "track" in error.message
         assert "zone" in error.message
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         error = KindMismatchError("tool", ["track"], {"zone"})
         d = error.to_dict()
         assert d["code"] == "KIND_MISMATCH"
@@ -102,12 +104,12 @@ class TestKindMismatchError:
 class TestValidationError:
     """Tests for ValidationError."""
 
-    def test_create_error(self):
+    def test_create_error(self) -> None:
         error = ValidationError("Invalid GeoJSON")
         assert error.message == "Invalid GeoJSON"
         assert error.validation_errors == []
 
-    def test_create_error_with_errors(self):
+    def test_create_error_with_errors(self) -> None:
         errors = [
             {"field": "properties.kind", "error": "required"},
             {"field": "geometry", "error": "invalid"},
@@ -115,7 +117,7 @@ class TestValidationError:
         error = ValidationError("Validation failed", errors)
         assert len(error.validation_errors) == 2
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         errors = [{"field": "test", "error": "bad"}]
         error = ValidationError("Failed", errors)
         d = error.to_dict()
@@ -126,18 +128,18 @@ class TestValidationError:
 class TestExecutionError:
     """Tests for ExecutionError."""
 
-    def test_create_error(self):
+    def test_create_error(self) -> None:
         original = ValueError("division by zero")
         error = ExecutionError("calc-tool", original)
         assert error.tool_name == "calc-tool"
         assert error.original_error is original
 
-    def test_message_contains_original_error(self):
+    def test_message_contains_original_error(self) -> None:
         original = RuntimeError("connection failed")
         error = ExecutionError("remote-tool", original)
         assert "connection failed" in error.message
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         original = TypeError("wrong type")
         error = ExecutionError("tool", original)
         d = error.to_dict()
@@ -145,7 +147,7 @@ class TestExecutionError:
         assert d["details"]["error_type"] == "TypeError"
         assert "wrong type" in d["details"]["original_error"]
 
-    def test_error_can_be_caught_as_base(self):
+    def test_error_can_be_caught_as_base(self) -> Never:
         original = ValueError("test")
         error = ExecutionError("tool", original)
 

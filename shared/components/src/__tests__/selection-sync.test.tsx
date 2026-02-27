@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { useState } from 'react';
 import { MapView } from '../MapView';
 import { Timeline } from '../Timeline';
@@ -105,33 +105,6 @@ const mockFeatures: DebriefFeatureCollection = {
     createTrack('track-003', 'Contact Charlie'),
   ],
 };
-
-// Test wrapper that provides shared selection state
-function SelectionSyncTestWrapper({
-  children,
-}: {
-  children: (props: {
-    selectedIds: Set<string>;
-    onSelect: (id: string) => void;
-    onClear: () => void;
-  }) => React.ReactNode;
-}) {
-  const selection = useSelection();
-
-  const handleSelect = (id: string) => {
-    selection.toggle(id);
-  };
-
-  return (
-    <ThemeProvider>
-      {children({
-        selectedIds: selection.selectedIds,
-        onSelect: handleSelect,
-        onClear: selection.clear,
-      })}
-    </ThemeProvider>
-  );
-}
 
 describe('Cross-Component Selection Sync', () => {
   beforeEach(() => {

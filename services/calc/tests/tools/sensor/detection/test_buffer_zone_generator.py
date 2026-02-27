@@ -1,6 +1,7 @@
 """Tests for the buffer-zone-generator tool."""
 
 import copy
+from typing import Any
 
 import pytest
 from debrief_calc.models import ContextType, SelectionContext
@@ -97,7 +98,11 @@ NON_TRACK_FEATURE = {
 # ============================================================
 
 
-def _run(track=None, params=None, **kwargs):
+def _run(
+    track: dict[str, Any] | None = None,
+    params: dict[str, Any] | None = None,
+    **kwargs: object,
+) -> tuple[dict[str, Any], list[dict[str, Any]], list[object]]:
     """Run the tool and return (feature, zones, rings) for convenience."""
     if track is None:
         track = copy.deepcopy(SIMPLE_TRACK)
@@ -117,30 +122,30 @@ def _run(track=None, params=None, **kwargs):
 class TestTranslatePoint:
     """Tests for the Vincenty destination formula helper."""
 
-    def test_east_translation(self):
+    def test_east_translation(self) -> None:
         """Translate 5km East from (50, 0). Latitude unchanged, longitude increased."""
         lat, lon = translate_point(50.0, 0.0, 90, 5.0)
         assert lat == pytest.approx(50.0, abs=0.001)
         assert lon > 0.0
 
-    def test_north_translation(self):
+    def test_north_translation(self) -> None:
         """Translate 10km North from (50, 0). Latitude increased, longitude unchanged."""
         lat, lon = translate_point(50.0, 0.0, 0, 10.0)
         assert lat > 50.0
         assert lon == pytest.approx(0.0, abs=0.001)
 
-    def test_south_translation(self):
+    def test_south_translation(self) -> None:
         """Translate 10km South. Latitude decreased."""
         lat, lon = translate_point(50.0, 0.0, 180, 10.0)
         assert lat < 50.0
 
-    def test_zero_distance(self):
+    def test_zero_distance(self) -> None:
         """Zero distance returns original coordinates."""
         lat, lon = translate_point(50.0, 0.0, 90, 0.0)
         assert lat == 50.0
         assert lon == 0.0
 
-    def test_nautical_mile_conversion(self):
+    def test_nautical_mile_conversion(self) -> None:
         """3nm = 5.556km. Verify approximate distance."""
         distance_km = 3.0 * 1.852
         lat, lon = translate_point(0.0, 0.0, 0, distance_km)
@@ -148,7 +153,7 @@ class TestTranslatePoint:
         expected_lat_change = distance_km / 111.32
         assert lat == pytest.approx(expected_lat_change, abs=0.001)
 
-    def test_antimeridian_wrapping(self):
+    def test_antimeridian_wrapping(self) -> None:
         """Translating East across antimeridian wraps to negative longitude."""
         lat, lon = translate_point(0.0, 179.99, 90, 20.0)
         assert lon < 0  # Should wrap to negative
@@ -162,20 +167,20 @@ class TestTranslatePoint:
 class TestConvexHull:
     """Tests for the convex hull algorithm."""
 
-    def test_triangle(self):
+    def test_triangle(self) -> None:
         """Three points forming a triangle."""
         points = [(0, 0), (4, 0), (2, 3)]
         hull = convex_hull(points)
         assert len(hull) == 3
         assert set(hull) == {(0, 0), (4, 0), (2, 3)}
 
-    def test_square(self):
+    def test_square(self) -> None:
         """Four corner points of a square."""
         points = [(0, 0), (4, 0), (4, 4), (0, 4)]
         hull = convex_hull(points)
         assert len(hull) == 4
 
-    def test_collinear(self):
+    def test_collinear(self) -> None:
         """Collinear points: hull should be just the endpoints."""
         points = [(0, 0), (1, 1), (2, 2), (3, 3)]
         hull = convex_hull(points)
@@ -183,19 +188,19 @@ class TestConvexHull:
         assert (0, 0) in hull
         assert (3, 3) in hull
 
-    def test_single_point(self):
+    def test_single_point(self) -> None:
         """Single point returns that point."""
         points = [(5, 5)]
         hull = convex_hull(points)
         assert hull == [(5, 5)]
 
-    def test_two_points(self):
+    def test_two_points(self) -> None:
         """Two points returns both."""
         points = [(0, 0), (5, 5)]
         hull = convex_hull(points)
         assert len(hull) == 2
 
-    def test_interior_points_excluded(self):
+    def test_interior_points_excluded(self) -> None:
         """Interior points not in hull."""
         points = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2), (1, 1), (3, 3)]
         hull = convex_hull(points)
@@ -204,7 +209,7 @@ class TestConvexHull:
         assert (1, 1) not in hull
         assert (3, 3) not in hull
 
-    def test_duplicate_points(self):
+    def test_duplicate_points(self) -> None:
         """Duplicate points handled correctly."""
         points = [(0, 0), (0, 0), (4, 0), (4, 0), (2, 3)]
         hull = convex_hull(points)
@@ -219,20 +224,20 @@ class TestConvexHull:
 class TestBufferZoneGeneratorUS1:
     """User Story 1: Generate 3 detection zones as a single MultiPolygon."""
 
-    def test_returns_single_feature(self):
+    def test_returns_single_feature(self) -> None:
         """Tool returns a list with exactly 1 MultiPolygon feature."""
         track = copy.deepcopy(SIMPLE_TRACK)
         context = SelectionContext(type=ContextType.SINGLE, features=[track])
         result = buffer_zone_generator(context, {})
         assert len(result) == 1
 
-    def test_multipolygon_geometry(self):
+    def test_multipolygon_geometry(self) -> None:
         """The single feature has MultiPolygon geometry with 3 sub-polygons."""
         feature, _, rings = _run()
         assert feature["geometry"]["type"] == "MultiPolygon"
         assert len(rings) == 3
 
-    def test_zones_metadata(self):
+    def test_zones_metadata(self) -> None:
         """The feature carries a zones array with per-ring metadata."""
         feature, zones, _ = _run()
         assert feature["properties"]["kind"] == "ZONE"
@@ -243,7 +248,7 @@ class TestBufferZoneGeneratorUS1:
             assert "buffer_distance_nm" in z
             assert "style" in z
 
-    def test_zone_names_and_distances(self):
+    def test_zone_names_and_distances(self) -> None:
         """Zones have correct names matching default stub model."""
         _, zones, _ = _run()
         assert zones[0]["name"] == "75%"
@@ -253,21 +258,21 @@ class TestBufferZoneGeneratorUS1:
         assert zones[2]["name"] == "25%"
         assert zones[2]["buffer_distance_nm"] == 12.0
 
-    def test_zones_ordered_innermost_to_outermost(self):
+    def test_zones_ordered_innermost_to_outermost(self) -> None:
         """Zones ordered by ascending distance (innermost first)."""
         _, zones, _ = _run()
         distances = [z["buffer_distance_nm"] for z in zones]
         assert distances == sorted(distances)
         assert distances == [3.0, 6.0, 12.0]
 
-    def test_zone_styles_purple_red_orange(self):
+    def test_zone_styles_purple_red_orange(self) -> None:
         """Zone styles are purple (inner), red (middle), orange (outer)."""
         _, zones, _ = _run()
         assert zones[0]["style"]["color"] == "#9C27B0"  # purple
         assert zones[1]["style"]["color"] == "#F44336"  # red
         assert zones[2]["style"]["color"] == "#FF9800"  # orange
 
-    def test_zone_encloses_track(self):
+    def test_zone_encloses_track(self) -> None:
         """Each zone polygon fully contains all track positions."""
         track = copy.deepcopy(SIMPLE_TRACK)
         feature, zones, rings = _run(track)
@@ -281,7 +286,7 @@ class TestBufferZoneGeneratorUS1:
                     f"Track point ({lon}, {lat}) not inside zone {zones[i]['name']}"
                 )
 
-    def test_concentric_containment(self):
+    def test_concentric_containment(self) -> None:
         """Inner zone vertices are inside the outer zone polygon."""
         _, _, rings = _run()
 
@@ -301,13 +306,13 @@ class TestBufferZoneGeneratorUS1:
                 f"Middle zone point ({point[0]}, {point[1]}) not inside outer zone"
             )
 
-    def test_error_empty_input(self):
+    def test_error_empty_input(self) -> None:
         """Empty feature list raises ValueError."""
         context = SelectionContext(type=ContextType.NONE, features=[])
         with pytest.raises(ValueError, match="No track features found"):
             buffer_zone_generator(context, {})
 
-    def test_error_no_track_features(self):
+    def test_error_no_track_features(self) -> None:
         """Input with only non-track features raises ValueError."""
         context = SelectionContext(
             type=ContextType.SINGLE, features=[copy.deepcopy(NON_TRACK_FEATURE)]
@@ -315,7 +320,7 @@ class TestBufferZoneGeneratorUS1:
         with pytest.raises(ValueError, match="No track features found"):
             buffer_zone_generator(context, {})
 
-    def test_non_track_features_skipped(self):
+    def test_non_track_features_skipped(self) -> None:
         """Non-track features are silently skipped; first track is used."""
         track = copy.deepcopy(SIMPLE_TRACK)
         non_track = copy.deepcopy(NON_TRACK_FEATURE)
@@ -324,7 +329,7 @@ class TestBufferZoneGeneratorUS1:
         assert len(result) == 1
         assert result[0]["properties"]["debrief:sourceFeatures"] == ["track-001"]
 
-    def test_single_point_track_circular_zones(self):
+    def test_single_point_track_circular_zones(self) -> None:
         """Single-point track produces approximately circular zones."""
         feature, _, rings = _run(copy.deepcopy(SINGLE_POINT_TRACK))
         assert feature["geometry"]["type"] == "MultiPolygon"
@@ -334,7 +339,7 @@ class TestBufferZoneGeneratorUS1:
             assert len(ring) >= 4  # At least triangle + closing point
             assert ring[0] == ring[-1]
 
-    def test_valid_multipolygon_rings(self):
+    def test_valid_multipolygon_rings(self) -> None:
         """Each sub-polygon has a valid closed ring."""
         _, _, rings = _run()
         for ring_wrapper in rings:
@@ -342,12 +347,12 @@ class TestBufferZoneGeneratorUS1:
             assert len(ring) >= 4
             assert ring[0] == ring[-1]  # Closed ring
 
-    def test_feature_has_uuid_id(self):
+    def test_feature_has_uuid_id(self) -> None:
         """The feature has a unique ID starting with 'zone-'."""
         feature, _, _ = _run()
         assert feature["id"].startswith("zone-")
 
-    def test_empty_track_coordinates_error(self):
+    def test_empty_track_coordinates_error(self) -> None:
         """Track with no coordinates raises ValueError."""
         track = {
             "type": "Feature",
@@ -368,7 +373,7 @@ class TestBufferZoneGeneratorUS1:
 class TestBufferZoneGeneratorUS2:
     """User Story 2: Custom buffer distances."""
 
-    def test_custom_distances(self):
+    def test_custom_distances(self) -> None:
         """Custom distances produce zones at specified ranges."""
         _, zones, _ = _run(
             params={"distance_1_nm": 2.0, "distance_2_nm": 8.0, "distance_3_nm": 15.0}
@@ -376,7 +381,7 @@ class TestBufferZoneGeneratorUS2:
         distances = [z["buffer_distance_nm"] for z in zones]
         assert distances == [2.0, 8.0, 15.0]
 
-    def test_non_ascending_reordered(self):
+    def test_non_ascending_reordered(self) -> None:
         """Non-ascending distances are sorted ascending."""
         _, zones, _ = _run(
             params={"distance_1_nm": 15.0, "distance_2_nm": 2.0, "distance_3_nm": 8.0}
@@ -384,7 +389,7 @@ class TestBufferZoneGeneratorUS2:
         distances = [z["buffer_distance_nm"] for z in zones]
         assert distances == [2.0, 8.0, 15.0]
 
-    def test_error_zero_distance(self):
+    def test_error_zero_distance(self) -> None:
         """Zero distance raises ValueError."""
         track = copy.deepcopy(SIMPLE_TRACK)
         context = SelectionContext(type=ContextType.SINGLE, features=[track])
@@ -392,7 +397,7 @@ class TestBufferZoneGeneratorUS2:
         with pytest.raises(ValueError, match="All buffer distances must be positive"):
             buffer_zone_generator(context, params)
 
-    def test_error_negative_distance(self):
+    def test_error_negative_distance(self) -> None:
         """Negative distance raises ValueError."""
         track = copy.deepcopy(SIMPLE_TRACK)
         context = SelectionContext(type=ContextType.SINGLE, features=[track])
@@ -400,13 +405,13 @@ class TestBufferZoneGeneratorUS2:
         with pytest.raises(ValueError, match="All buffer distances must be positive"):
             buffer_zone_generator(context, params)
 
-    def test_partial_custom_distances(self):
+    def test_partial_custom_distances(self) -> None:
         """Partial custom distances use defaults for unspecified."""
         _, zones, _ = _run(params={"distance_1_nm": 1.0})
         distances = [z["buffer_distance_nm"] for z in zones]
         assert distances == [1.0, 6.0, 12.0]
 
-    def test_custom_distances_preserve_likelihood_ordering(self):
+    def test_custom_distances_preserve_likelihood_ordering(self) -> None:
         """Highest likelihood paired with smallest distance."""
         _, zones, _ = _run(
             params={"distance_1_nm": 2.0, "distance_2_nm": 8.0, "distance_3_nm": 15.0}
@@ -424,7 +429,7 @@ class TestBufferZoneGeneratorUS2:
 class TestBufferZoneGeneratorUS3:
     """User Story 3: Stateless re-invocation and provenance."""
 
-    def test_stateless_reinvocation(self):
+    def test_stateless_reinvocation(self) -> None:
         """Different tracks produce different zones."""
         track_a = copy.deepcopy(SIMPLE_TRACK)
         track_b = copy.deepcopy(SIMPLE_TRACK)
@@ -440,7 +445,7 @@ class TestBufferZoneGeneratorUS3:
         # Innermost rings should differ
         assert rings_a[0][0] != rings_b[0][0]
 
-    def test_provenance_annotations(self):
+    def test_provenance_annotations(self) -> None:
         """The feature has correct provenance annotations."""
         feature, _, _ = _run()
         props = feature["properties"]
@@ -448,17 +453,17 @@ class TestBufferZoneGeneratorUS3:
         assert props["debrief:sourceFeatures"] == ["track-001"]
         assert "detection zones" in props["debrief:label"]
 
-    def test_provenance_label_format(self):
+    def test_provenance_label_format(self) -> None:
         """Provenance label follows expected format."""
         feature, _, _ = _run()
         expected = "Generated 3 detection zones (75%, 50%, 25%) for track"
         assert feature["properties"]["debrief:label"] == expected
 
-    def test_sensor_model_swappability(self):
+    def test_sensor_model_swappability(self) -> None:
         """Injecting a different sensor model changes the output."""
 
         class TestSensorModel:
-            def get_detection_zones(self, track):
+            def get_detection_zones(self, track: dict[str, Any]) -> list[SensorModelZone]:
                 return [
                     SensorModelZone(distance_nm=1.0, likelihood_pct=90, name="90%"),
                     SensorModelZone(distance_nm=2.0, likelihood_pct=60, name="60%"),
@@ -480,7 +485,7 @@ class TestBufferZoneGeneratorUS3:
 class TestBufferZoneGeneratorEdgeCases:
     """Edge case tests for buffer-zone-generator."""
 
-    def test_antimeridian_crossing_track(self):
+    def test_antimeridian_crossing_track(self) -> None:
         """Track crossing antimeridian produces valid polygons."""
         feature, _, rings = _run(copy.deepcopy(ANTIMERIDIAN_TRACK))
         assert len(rings) == 3
@@ -492,7 +497,7 @@ class TestBufferZoneGeneratorEdgeCases:
                 assert -180 <= point[0] <= 180
                 assert -90 <= point[1] <= 90
 
-    def test_close_positions_track(self):
+    def test_close_positions_track(self) -> None:
         """Track with sub-metre spacing produces valid zones."""
         _, _, rings = _run(copy.deepcopy(CLOSE_POSITIONS_TRACK))
         assert len(rings) == 3
@@ -501,7 +506,7 @@ class TestBufferZoneGeneratorEdgeCases:
             assert len(ring) >= 4
             assert ring[0] == ring[-1]
 
-    def test_two_point_track(self):
+    def test_two_point_track(self) -> None:
         """Two-point track (line segment) produces valid zones."""
         track = copy.deepcopy(TWO_POINT_TRACK)
         _, _, rings = _run(track)

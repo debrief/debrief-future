@@ -246,7 +246,7 @@ def validate_fixtures() -> bool:
     return True
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Generate derived schemas from LinkML master schema"
     )

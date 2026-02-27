@@ -42,14 +42,14 @@ def _load_stores() -> dict[str, dict]:
 
 
 @click.group()
-def catalog():
+def catalog() -> None:
     """Browse STAC catalogs."""
     pass
 
 
 @catalog.command("stores")
 @pass_context
-def list_stores(ctx: Context):
+def list_stores(ctx: Context) -> None:
     """
     List configured STAC stores.
 
@@ -85,7 +85,7 @@ def list_stores(ctx: Context):
 @catalog.command("list")
 @click.option("--store", required=True, help="Store name")
 @pass_context
-def list_items(ctx: Context, store: str):
+def list_items(ctx: Context, store: str) -> None:
     """
     List items in a STAC catalog.
 
@@ -129,7 +129,7 @@ def list_items(ctx: Context, store: str):
 @click.option("--store", required=True, help="Store name")
 @click.option("--item", required=True, help="Item ID")
 @pass_context
-def get_item(ctx: Context, store: str, item: str):
+def get_item(ctx: Context, store: str, item: str) -> None:
     """
     Get a specific item from a STAC catalog.
 

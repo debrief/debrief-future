@@ -240,7 +240,7 @@ def _extract_bounds(features: list[dict[str, Any]]) -> list[float]:
     return [min_x, min_y, max_x, max_y]
 
 
-def _flatten_coordinates(coords: Any) -> list[list[float]]:  # complex nested GeoJSON coords
+def _flatten_coordinates(coords: list[object]) -> list[list[float]]:  # complex nested GeoJSON coords
     """Recursively flatten nested coordinate arrays."""
     if not coords:
         return []

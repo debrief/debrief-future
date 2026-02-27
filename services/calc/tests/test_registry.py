@@ -7,13 +7,13 @@ from debrief_calc.registry import ToolRegistry
 
 
 @pytest.fixture
-def fresh_registry():
+def fresh_registry() -> ToolRegistry:
     """Create a fresh registry for each test."""
     return ToolRegistry()
 
 
 @pytest.fixture
-def sample_tool():
+def sample_tool() -> Tool:
     """Create a sample tool for testing."""
     return Tool(
         name="test-tool",
@@ -26,7 +26,7 @@ def sample_tool():
 
 
 @pytest.fixture
-def multi_tool():
+def multi_tool() -> Tool:
     """Create a multi-track tool for testing."""
     return Tool(
         name="multi-tool",
@@ -39,7 +39,7 @@ def multi_tool():
 
 
 @pytest.fixture
-def zone_tool():
+def zone_tool() -> Tool:
     """Create a zone analysis tool for testing."""
     return Tool(
         name="zone-tool",
@@ -54,31 +54,31 @@ def zone_tool():
 class TestToolRegistry:
     """Tests for ToolRegistry class."""
 
-    def test_register_tool(self, fresh_registry, sample_tool):
+    def test_register_tool(self, fresh_registry: ToolRegistry, sample_tool: Tool) -> None:
         fresh_registry.register(sample_tool)
         assert len(fresh_registry) == 1
         assert "test-tool" in fresh_registry
 
-    def test_register_duplicate_raises(self, fresh_registry, sample_tool):
+    def test_register_duplicate_raises(self, fresh_registry: ToolRegistry, sample_tool: Tool) -> None:
         fresh_registry.register(sample_tool)
         with pytest.raises(ValueError, match="already registered"):
             fresh_registry.register(sample_tool)
 
-    def test_get_tool(self, fresh_registry, sample_tool):
+    def test_get_tool(self, fresh_registry: ToolRegistry, sample_tool: Tool) -> None:
         fresh_registry.register(sample_tool)
         retrieved = fresh_registry.get_tool("test-tool")
         assert retrieved.name == "test-tool"
         assert retrieved is sample_tool
 
-    def test_get_nonexistent_tool_raises(self, fresh_registry):
+    def test_get_nonexistent_tool_raises(self, fresh_registry: ToolRegistry) -> None:
         with pytest.raises(ToolNotFoundError):
             fresh_registry.get_tool("nonexistent")
 
-    def test_list_all_empty(self, fresh_registry):
+    def test_list_all_empty(self, fresh_registry: ToolRegistry) -> None:
         tools = fresh_registry.list_all()
         assert tools == []
 
-    def test_list_all_sorted(self, fresh_registry, sample_tool, multi_tool, zone_tool):
+    def test_list_all_sorted(self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool, zone_tool: Tool) -> None:
         fresh_registry.register(zone_tool)
         fresh_registry.register(sample_tool)
         fresh_registry.register(multi_tool)
@@ -87,7 +87,7 @@ class TestToolRegistry:
         names = [t.name for t in tools]
         assert names == ["multi-tool", "test-tool", "zone-tool"]
 
-    def test_find_tools_by_context_type(self, fresh_registry, sample_tool, multi_tool):
+    def test_find_tools_by_context_type(self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool) -> None:
         fresh_registry.register(sample_tool)
         fresh_registry.register(multi_tool)
 
@@ -99,7 +99,7 @@ class TestToolRegistry:
         assert len(multi_tools) == 1
         assert multi_tools[0].name == "multi-tool"
 
-    def test_find_tools_by_kinds(self, fresh_registry, sample_tool, zone_tool):
+    def test_find_tools_by_kinds(self, fresh_registry: ToolRegistry, sample_tool: Tool, zone_tool: Tool) -> None:
         fresh_registry.register(sample_tool)
         fresh_registry.register(zone_tool)
 
@@ -112,8 +112,8 @@ class TestToolRegistry:
         assert zone_tools[0].name == "zone-tool"
 
     def test_find_tools_by_context_and_kinds(
-        self, fresh_registry, sample_tool, multi_tool, zone_tool
-    ):
+        self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool, zone_tool: Tool
+    ) -> None:
         fresh_registry.register(sample_tool)
         fresh_registry.register(multi_tool)
         fresh_registry.register(zone_tool)
@@ -128,7 +128,7 @@ class TestToolRegistry:
         assert len(tools) == 1
         assert tools[0].name == "zone-tool"
 
-    def test_find_tools_no_match(self, fresh_registry, sample_tool):
+    def test_find_tools_no_match(self, fresh_registry: ToolRegistry, sample_tool: Tool) -> None:
         fresh_registry.register(sample_tool)
 
         # No tools match region context
@@ -139,7 +139,7 @@ class TestToolRegistry:
         tools = fresh_registry.find_tools(kinds={"POINT"})
         assert tools == []
 
-    def test_find_tools_for_context(self, fresh_registry, sample_tool, multi_tool):
+    def test_find_tools_for_context(self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool) -> None:
         fresh_registry.register(sample_tool)
         fresh_registry.register(multi_tool)
 
@@ -151,7 +151,7 @@ class TestToolRegistry:
         assert len(tools) == 1
         assert tools[0].name == "test-tool"
 
-    def test_describe_returns_metadata(self, fresh_registry, sample_tool):
+    def test_describe_returns_metadata(self, fresh_registry: ToolRegistry, sample_tool: Tool) -> None:
         fresh_registry.register(sample_tool)
 
         metadata = fresh_registry.describe("test-tool")
@@ -160,11 +160,11 @@ class TestToolRegistry:
         assert metadata["input_kinds"] == ["TRACK"]
         assert metadata["context_type"] == "single"
 
-    def test_describe_nonexistent_raises(self, fresh_registry):
+    def test_describe_nonexistent_raises(self, fresh_registry: ToolRegistry) -> None:
         with pytest.raises(ToolNotFoundError):
             fresh_registry.describe("nonexistent")
 
-    def test_clear(self, fresh_registry, sample_tool, multi_tool):
+    def test_clear(self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool) -> None:
         fresh_registry.register(sample_tool)
         fresh_registry.register(multi_tool)
         assert len(fresh_registry) == 2
@@ -172,7 +172,7 @@ class TestToolRegistry:
         fresh_registry.clear()
         assert len(fresh_registry) == 0
 
-    def test_contains(self, fresh_registry, sample_tool):
+    def test_contains(self, fresh_registry: ToolRegistry, sample_tool: Tool) -> None:
         assert "test-tool" not in fresh_registry
         fresh_registry.register(sample_tool)
         assert "test-tool" in fresh_registry
@@ -181,7 +181,7 @@ class TestToolRegistry:
 class TestToolDecorator:
     """Tests for @tool decorator."""
 
-    def test_decorator_registers_tool(self, fresh_registry):
+    def test_decorator_registers_tool(self, fresh_registry: ToolRegistry) -> None:
         # Use a fresh registry to avoid pollution
         from debrief_calc import registry as global_registry
 
@@ -189,7 +189,7 @@ class TestToolDecorator:
 
         # Note: We can't easily test the decorator without modifying global state
         # So we test registration manually instead
-        def my_handler(context, params):
+        def my_handler(context: SelectionContext, params: dict[str, object]) -> list[object]:
             return []
 
         tool_instance = Tool(
@@ -205,7 +205,7 @@ class TestToolDecorator:
         assert "decorator-test" in fresh_registry
         assert fresh_registry.get_tool("decorator-test").handler is my_handler
 
-    def test_tool_with_parameters(self, fresh_registry):
+    def test_tool_with_parameters(self, fresh_registry: ToolRegistry) -> None:
         tool_instance = Tool(
             name="param-tool",
             description="Tool with params",
@@ -232,7 +232,7 @@ class TestToolDecorator:
 class TestFindToolsEdgeCases:
     """Edge case tests for find_tools."""
 
-    def test_tool_accepting_multiple_kinds(self, fresh_registry):
+    def test_tool_accepting_multiple_kinds(self, fresh_registry: ToolRegistry) -> None:
         """Tool that accepts multiple kinds should match any of them."""
         multi_kind_tool = Tool(
             name="multi-kind",
@@ -256,7 +256,7 @@ class TestFindToolsEdgeCases:
         tools = fresh_registry.find_tools(kinds={"TRACK", "ZONE"})
         assert len(tools) == 1
 
-    def test_empty_kinds_filter_returns_all(self, fresh_registry, sample_tool, zone_tool):
+    def test_empty_kinds_filter_returns_all(self, fresh_registry: ToolRegistry, sample_tool: Tool, zone_tool: Tool) -> None:
         """Empty kinds set should not filter (return all)."""
         fresh_registry.register(sample_tool)
         fresh_registry.register(zone_tool)
@@ -269,7 +269,7 @@ class TestFindToolsEdgeCases:
         tools = fresh_registry.find_tools(kinds=set())
         assert len(tools) == 0
 
-    def test_find_tools_returns_sorted_copy(self, fresh_registry, sample_tool, multi_tool):
+    def test_find_tools_returns_sorted_copy(self, fresh_registry: ToolRegistry, sample_tool: Tool, multi_tool: Tool) -> None:
         """Returned list should be a new list, sorted alphabetically."""
         fresh_registry.register(multi_tool)
         fresh_registry.register(sample_tool)

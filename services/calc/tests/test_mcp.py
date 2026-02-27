@@ -9,14 +9,14 @@ mcp = pytest.importorskip("mcp")
 class TestMCPServer:
     """Tests for MCP server creation and tool registration."""
 
-    def test_create_server(self):
+    def test_create_server(self) -> None:
         from debrief_calc.mcp import create_server
 
         server = create_server()
         assert server is not None
         assert server.name == "debrief-calc"
 
-    def test_server_has_tools(self):
+    def test_server_has_tools(self) -> None:
         from debrief_calc.mcp import create_server
 
         server = create_server()
@@ -27,14 +27,14 @@ class TestMCPServer:
 class TestMCPToolExecution:
     """Tests for tool execution via MCP (simulated)."""
 
-    def test_tool_name_conversion(self):
+    def test_tool_name_conversion(self) -> None:
         """Test that tool names are converted correctly between MCP and calc formats."""
         # MCP uses underscores, calc uses hyphens
         mcp_name = "calc_track_stats"
         calc_name = mcp_name.replace("calc_", "").replace("_", "-")
         assert calc_name == "track-stats"
 
-    def test_context_building_single(self):
+    def test_context_building_single(self) -> None:
         """Test context building for single-feature tools."""
         from debrief_calc.models import ContextType, SelectionContext
 
@@ -44,7 +44,7 @@ class TestMCPToolExecution:
         assert context.type == ContextType.SINGLE
         assert len(context.features) == 1
 
-    def test_context_building_multi(self):
+    def test_context_building_multi(self) -> None:
         """Test context building for multi-feature tools."""
         from debrief_calc.models import ContextType, SelectionContext
 
@@ -57,7 +57,7 @@ class TestMCPToolExecution:
         assert context.type == ContextType.MULTI
         assert len(context.features) == 2
 
-    def test_context_building_region(self):
+    def test_context_building_region(self) -> None:
         """Test context building for region tools."""
         from debrief_calc.models import ContextType, SelectionContext
 
@@ -71,7 +71,7 @@ class TestMCPToolExecution:
 class TestMCPResponseFormat:
     """Tests for MCP response format using result_builder."""
 
-    def test_build_addition_response(self):
+    def test_build_addition_response(self) -> None:
         """Verify result_builder produces correct MCP content structure."""
         from debrief_calc.result_builder import build_addition, build_response
 
@@ -93,7 +93,7 @@ class TestMCPResponseFormat:
         assert item["annotations"]["debrief:resultType"] == "addition/track/statistics"
         assert item["annotations"]["debrief:sourceFeatures"] == ["track-1"]
 
-    def test_build_error_response(self):
+    def test_build_error_response(self) -> None:
         """Verify result_builder produces correct MCP error structure."""
         from debrief_calc.result_builder import build_error
 
@@ -111,7 +111,7 @@ class TestMCPResponseFormat:
 class TestMCPArtifactResponse:
     """Tests for artifact result format."""
 
-    def test_build_artifact_response(self):
+    def test_build_artifact_response(self) -> None:
         """Verify result_builder produces correct artifact content."""
         from debrief_calc.result_builder import build_artifact, build_response
 
@@ -140,7 +140,7 @@ class TestMCPArtifactResponse:
 class TestMCPErrorCodes:
     """Tests for MCP error code handling."""
 
-    def test_error_codes_defined(self):
+    def test_error_codes_defined(self) -> None:
         from debrief_calc.mcp.server import (
             ERROR_EXECUTION_FAILED,
             ERROR_INVALID_CONTEXT,
@@ -157,7 +157,7 @@ class TestMCPErrorCodes:
 class TestMCPWithoutSDK:
     """Tests for behavior when MCP SDK is not installed."""
 
-    def test_has_mcp_flag(self):
+    def test_has_mcp_flag(self) -> None:
         from debrief_calc.mcp.server import HAS_MCP
 
         # If we got here, MCP is installed

@@ -62,7 +62,7 @@ vi.mock('react-leaflet', () => ({
       getNorth: () => 52,
     }),
   }),
-  useMapEvents: (_handlers: Record<string, unknown>) => {
+  useMapEvents: (/* _handlers */) => {
     // Store handlers for potential use
     return null;
   },

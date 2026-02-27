@@ -5,19 +5,21 @@ Ensures that track parsing is UNCHANGED when annotation support is added.
 These tests establish a baseline and verify no regression occurs.
 """
 
+from pathlib import Path
+
 import pytest
 
 from debrief_io.handlers.rep import REPHandler
 
 
 @pytest.fixture
-def rep_handler():
+def rep_handler() -> REPHandler:
     """Create REP handler instance."""
     return REPHandler()
 
 
 @pytest.fixture
-def shapes_content(valid_fixtures_dir):
+def shapes_content(valid_fixtures_dir: Path) -> str:
     """Load shapes.rep fixture."""
     return (valid_fixtures_dir / "shapes.rep").read_text()
 
@@ -25,19 +27,19 @@ def shapes_content(valid_fixtures_dir):
 class TestTrackRegressionBoat1:
     """Regression tests using boat1.rep fixture."""
 
-    def test_track_count_unchanged(self, rep_handler, boat1_content):
+    def test_track_count_unchanged(self, rep_handler: REPHandler, boat1_content: str) -> None:
         """Verify exactly one track is parsed from boat1.rep."""
         result = rep_handler.parse(boat1_content, "boat1.rep")
         tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
         assert len(tracks) == 1
 
-    def test_track_name_unchanged(self, rep_handler, boat1_content):
+    def test_track_name_unchanged(self, rep_handler: REPHandler, boat1_content: str) -> None:
         """Verify track name is NELSON."""
         result = rep_handler.parse(boat1_content, "boat1.rep")
         tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
         assert tracks[0]["properties"]["platform_id"] == "NELSON"
 
-    def test_position_count_unchanged(self, rep_handler, boat1_content):
+    def test_position_count_unchanged(self, rep_handler: REPHandler, boat1_content: str) -> None:
         """Verify position count matches expected."""
         result = rep_handler.parse(boat1_content, "boat1.rep")
         tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
@@ -45,25 +47,25 @@ class TestTrackRegressionBoat1:
         # boat1.rep has 402 lines = 402 positions
         assert len(positions) == 402
 
-    def test_start_time_unchanged(self, rep_handler, boat1_content):
+    def test_start_time_unchanged(self, rep_handler: REPHandler, boat1_content: str) -> None:
         """Verify start time is unchanged."""
         result = rep_handler.parse(boat1_content, "boat1.rep")
         tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
         assert tracks[0]["properties"]["start_time"] == "1995-12-12T05:00:00+00:00"
 
-    def test_end_time_unchanged(self, rep_handler, boat1_content):
+    def test_end_time_unchanged(self, rep_handler: REPHandler, boat1_content: str) -> None:
         """Verify end time is unchanged."""
         result = rep_handler.parse(boat1_content, "boat1.rep")
         tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
         assert tracks[0]["properties"]["end_time"] == "1995-12-12T11:41:00+00:00"
 
-    def test_geometry_type_unchanged(self, rep_handler, boat1_content):
+    def test_geometry_type_unchanged(self, rep_handler: REPHandler, boat1_content: str) -> None:
         """Verify geometry is LineString."""
         result = rep_handler.parse(boat1_content, "boat1.rep")
         tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
         assert tracks[0]["geometry"]["type"] == "LineString"
 
-    def test_coordinate_values_unchanged(self, rep_handler, boat1_content):
+    def test_coordinate_values_unchanged(self, rep_handler: REPHandler, boat1_content: str) -> None:
         """Verify first and last coordinates are unchanged."""
         result = rep_handler.parse(boat1_content, "boat1.rep")
         tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
@@ -85,7 +87,7 @@ class TestTrackRegressionBoat1:
 class TestTrackRegressionShapesRep:
     """Regression tests for tracks in shapes.rep (mixed tracks and annotations)."""
 
-    def test_track_parsing_with_annotations(self, rep_handler, shapes_content):
+    def test_track_parsing_with_annotations(self, rep_handler: REPHandler, shapes_content: str) -> None:
         """Verify tracks are parsed correctly alongside annotations."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
         tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
@@ -101,7 +103,7 @@ class TestTrackRegressionShapesRep:
         # NEL_STYLE4 uses standard @GA20 format and should be parsed
         assert "NEL_STYLE4" in track_names
 
-    def test_track_positions_not_affected_by_annotations(self, rep_handler, shapes_content):
+    def test_track_positions_not_affected_by_annotations(self, rep_handler: REPHandler, shapes_content: str) -> None:
         """Verify annotation lines don't corrupt track position data."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
         tracks = [f for f in result.features if f["properties"]["kind"] == "TRACK"]
@@ -130,39 +132,39 @@ class TestTrackRegressionShapesRep:
 class TestAnnotationCountInShapesRep:
     """Test annotation parsing counts for shapes.rep."""
 
-    def test_circle_annotations_parsed(self, rep_handler, shapes_content):
+    def test_circle_annotations_parsed(self, rep_handler: REPHandler, shapes_content: str) -> None:
         """Verify CIRCLE annotations are parsed."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
         circles = [f for f in result.features if f["properties"].get("kind") == "CIRCLE"]
         # shapes.rep has 8 CIRCLE entries
         assert len(circles) == 8
 
-    def test_rectangle_annotations_parsed(self, rep_handler, shapes_content):
+    def test_rectangle_annotations_parsed(self, rep_handler: REPHandler, shapes_content: str) -> None:
         """Verify RECT annotations are parsed."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
         rects = [f for f in result.features if f["properties"].get("kind") == "RECTANGLE"]
         assert len(rects) == 1
 
-    def test_line_annotations_parsed(self, rep_handler, shapes_content):
+    def test_line_annotations_parsed(self, rep_handler: REPHandler, shapes_content: str) -> None:
         """Verify LINE annotations are parsed."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
         lines = [f for f in result.features if f["properties"].get("kind") == "LINE"]
         assert len(lines) == 1
 
-    def test_vector_annotations_parsed(self, rep_handler, shapes_content):
+    def test_vector_annotations_parsed(self, rep_handler: REPHandler, shapes_content: str) -> None:
         """Verify VECTOR annotations are parsed."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
         vectors = [f for f in result.features if f["properties"].get("kind") == "VECTOR"]
         assert len(vectors) == 1
 
-    def test_text_annotations_parsed(self, rep_handler, shapes_content):
+    def test_text_annotations_parsed(self, rep_handler: REPHandler, shapes_content: str) -> None:
         """Verify TEXT annotations are parsed."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
         texts = [f for f in result.features if f["properties"].get("kind") == "TEXT"]
         # shapes.rep has many TEXT entries with various symbols and layers
         assert len(texts) >= 40  # At least 40 TEXT entries
 
-    def test_narrative_annotations_parsed(self, rep_handler, shapes_content):
+    def test_narrative_annotations_parsed(self, rep_handler: REPHandler, shapes_content: str) -> None:
         """Verify NARRATIVE annotations are parsed."""
         result = rep_handler.parse(shapes_content, "shapes.rep")
         narratives = [f for f in result.features if f["properties"].get("kind") == "NARRATIVE"]

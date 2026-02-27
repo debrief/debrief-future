@@ -12,7 +12,7 @@ from debrief_calc.result_builder import build_mutation, build_response
 class TestServerToolsCall:
     """Verify tool execution returns properly structured ToolResponse."""
 
-    def test_mutation_tool_returns_response_with_provenance(self):
+    def test_mutation_tool_returns_response_with_provenance(self) -> None:
         """A mutation tool should return content items with debrief annotations."""
         from debrief_calc.models import SelectionContext
         from debrief_calc.tools.track.styling.set_track_color import set_track_color
@@ -61,7 +61,7 @@ class TestServerToolsCall:
             )
             assert annotations["debrief:label"] == "set-track-color results"
 
-    def test_mutation_content_contains_modified_feature(self):
+    def test_mutation_content_contains_modified_feature(self) -> None:
         """The content text should contain the modified feature as JSON."""
         from debrief_calc.models import SelectionContext
         from debrief_calc.tools.track.styling.set_track_color import set_track_color
@@ -95,7 +95,7 @@ class TestServerToolsCall:
             feature_json = json.loads(item["resource"]["text"])
             assert feature_json["properties"]["style"]["line"]["color"] == "#FF0000"
 
-    def test_each_mutation_content_has_feature_uri(self):
+    def test_each_mutation_content_has_feature_uri(self) -> None:
         """Each content item URI should reference the feature ID."""
         from debrief_calc.models import SelectionContext
         from debrief_calc.tools.track.styling.set_track_color import set_track_color
@@ -128,7 +128,7 @@ class TestServerToolsCall:
         assert "feature://track-001" in uris
         assert "feature://track-002" in uris
 
-    def test_all_styling_tools_produce_mutation_results(self):
+    def test_all_styling_tools_produce_mutation_results(self) -> None:
         """All 4 styling tools must produce mutation/track/styled result type."""
         import debrief_calc.tools  # noqa: F401
         from debrief_calc import registry

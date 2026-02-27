@@ -61,7 +61,7 @@ class TestPythonRoundTrip:
     """Test Python → JSON → Python round-trip serialization."""
 
     @pytest.mark.parametrize("entity_type,fixture_path", get_roundtrip_fixtures())
-    def test_roundtrip_preserves_data(self, entity_type: str, fixture_path: Path):
+    def test_roundtrip_preserves_data(self, entity_type: str, fixture_path: Path) -> None:
         """Data should be preserved through JSON round-trip."""
         model_class = ROUNDTRIP_ENTITY_MAP[entity_type]
         original_data = json.loads(fixture_path.read_text())
@@ -80,7 +80,7 @@ class TestPythonRoundTrip:
         assert instance == instance2, "Round-trip should preserve data"
 
     @pytest.mark.parametrize("entity_type,fixture_path", get_roundtrip_fixtures())
-    def test_roundtrip_preserves_required_fields(self, entity_type: str, fixture_path: Path):
+    def test_roundtrip_preserves_required_fields(self, entity_type: str, fixture_path: Path) -> None:
         """Required fields should be present after round-trip."""
         model_class = ROUNDTRIP_ENTITY_MAP[entity_type]
         original_data = json.loads(fixture_path.read_text())
@@ -103,7 +103,7 @@ class TestModelDumpModes:
     """Test different serialization modes."""
 
     @pytest.mark.parametrize("entity_type,fixture_path", get_roundtrip_fixtures())
-    def test_model_dump_dict(self, entity_type: str, fixture_path: Path):
+    def test_model_dump_dict(self, entity_type: str, fixture_path: Path) -> None:
         """model_dump() should return a valid dictionary."""
         model_class = ROUNDTRIP_ENTITY_MAP[entity_type]
         original_data = json.loads(fixture_path.read_text())
@@ -114,7 +114,7 @@ class TestModelDumpModes:
         assert isinstance(dumped, dict), "model_dump() should return dict"
 
     @pytest.mark.parametrize("entity_type,fixture_path", get_roundtrip_fixtures())
-    def test_model_dump_json(self, entity_type: str, fixture_path: Path):
+    def test_model_dump_json(self, entity_type: str, fixture_path: Path) -> None:
         """model_dump_json() should return valid JSON string."""
         model_class = ROUNDTRIP_ENTITY_MAP[entity_type]
         original_data = json.loads(fixture_path.read_text())
