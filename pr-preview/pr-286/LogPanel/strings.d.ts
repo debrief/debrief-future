@@ -60,7 +60,6 @@ export declare const LOG_PANEL_STRINGS: {
     readonly versionMismatch: (tool: string, expected: string, installed: string) => string;
     readonly editIconTooltip: "Edit parameters";
     readonly editFaceDone: "Done";
-    readonly editFaceMetadataTitle: "Metadata";
     readonly editFaceParametersTitle: "Parameters";
     readonly editFaceNoParameters: "This tool has no tunable parameters.";
     readonly editFaceSchemaLoading: "Loading parameter schema…";
