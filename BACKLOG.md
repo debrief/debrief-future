@@ -136,6 +136,7 @@ Large features broken down into multiple backlog items.
 | E03 | Buffer Zone Analysis Demo | [Reactive PROV cascade with 5-tool chain for stakeholder demo](docs/ideas/E03-buffer-zone-analysis-demo.md) | approved | #078, #079, #080, #081, #082, #084 |
 | E04 | Results Visualization | [Vega-Lite based results viewing infrastructure](docs/ideas/E04-results-visualization.md) | approved | #085, #086, #087, #088, #089, #090 |
 | ~~E05~~ | ~~Shape Drawing Tools~~ | ~~Add shape drawing tools to map via Geoman (point, rectangle, polygon, polyline) with '+' toolbar dropdown~~ | ~~complete~~ | ~~#091, #092, #093, #094, #095, #096~~ |
+| E06 | Architectural Consistency | [Fix implementation drift and constitutional violations from six-axis review](docs/architectural-consistency-review.md) | approved | #102, #103, #104, #105, #106, #107, #108, #109, #110, #111, #112 |
 
 ## Items
 
@@ -153,6 +154,17 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
+| 102 | Bug | [Add feature-level provenance to TS tool executor](docs/architectural-consistency-review.md#f-15-web-shell-provenance-on-tool-results-art-iii1) [E06] — TS toolService lacks W3C PROV LogEntry attachment; constitutional violation Art. III.1 (Blocking) | 5 | 3 | 4 | 12 | Medium | approved |
+| 103 | Bug | [Canonicalize `kind` attribute values in LinkML schema](docs/architectural-consistency-review.md#f-22-kind-attribute-values-diverge) [E06] — Python/TS produce different kind values; define in LinkML and propagate constants (Blocking) | 5 | 3 | 4 | 12 | Medium | approved |
+| 104 | Bug | [Align range-bearing tool: selection requirements + GeoJSON output](docs/architectural-consistency-review.md#f-24-range-bearing-selection-requirements-diverge) [E06] — Python accepts TRACK+SHAPE and returns non-GeoJSON; TS requires 2 TRACK and returns GeoJSON; align both (F-2.4, F-2.5) | 4 | 3 | 4 | 11 | Medium | approved |
+| 105 | Tech Debt | [Unify tool type definitions and consolidate MCP adapters](docs/architectural-consistency-review.md#f-51-vs-code-typestooltts-extends-schema-types) [E06] — VS Code hand-authored types shadow schema-generated types; two mcpAdapter files diverge; no legacy to support (F-5.1, F-5.2) | 4 | 2 | 4 | 10 | Medium | approved |
+| 106 | Tech Debt | [Add post-execution output validation to TS tools](docs/architectural-consistency-review.md#f-23-typescript-has-no-output-validation) [E06] — Python validates tool output; TS has zero post-execution validation (requires #103) | 4 | 2 | 4 | 10 | Medium | approved |
+| 107 | Bug | [Align area-summary tool input semantics](docs/architectural-consistency-review.md#f-26-area-summary-input-semantics-diverge) [E06] — Python expects context.bounds; TS extracts bbox from coordinates; same algorithm, different contract | 4 | 2 | 4 | 10 | Low | approved |
+| 108 | Tech Debt | [Wire drawing mode and palette to session-state store](docs/architectural-consistency-review.md#f-31-drawing-mode-not-using-session-state-store) [E06] — both frontends use local useState instead of session-state; drawing mode resets on webview re-render (F-3.1, F-3.2) | 3 | 2 | 5 | 10 | Low | approved |
+| 109 | Tech Debt | [Unify result layer lifecycle across frontends](docs/architectural-consistency-review.md#f-33-result-layers-have-different-lifecycles) [E06] — web-shell uses persistent app state; VS Code uses ephemeral webview state; neither persists to STAC | 4 | 3 | 3 | 10 | High | approved |
+| 110 | Tech Debt | [Investigate and resolve tool-level undo gap in VS Code](docs/architectural-consistency-review.md#f-35-tool-level-undo-only-in-web-shell) [E06] — web-shell has full tool undo via Log Service; VS Code only has UI-state undo; Log Service exists but VS Code never invokes it | 4 | 3 | 3 | 10 | High | approved |
+| 111 | Tech Debt | [Add periodic heartbeat re-validation for Python dependencies](docs/architectural-consistency-review.md#f-65-periodic-heartbeats-missing) [E06] — after activation, if debrief-calc becomes unavailable, status bar stays green until next tool execution fails | 3 | 2 | 5 | 10 | Low | approved |
+| 112 | Tech Debt | [Align result type annotations and provenance field naming with spec](docs/architectural-consistency-review.md#f-42-web-shell-resulttype-annotation-uses-wrong-format) [E06] — resultType missing type prefix; provenance field naming needs doc/code alignment (F-4.2, F-4.3) | 3 | 1 | 5 | 9 | Low | approved |
 | 061 | Feature | [Add generate courses and speeds for track tool spec](specs/061-generate-courses-speeds/spec.md) (requires #049) | 4 | 3 | 5 | 12 | Low | implementing |
 | ~~028~~ | ~~Tech Debt~~ | ~~[Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md)~~ | ~~4~~ | ~~2~~ | ~~5~~ | ~~11~~ | ~~Low~~ | ~~complete~~ |
 | 076 | Feature | [Implement replay and parameter tuning](specs/076-replay-tune/spec.md) [E02] — parameter editing, positional replay, revert operations (requires #071, #074) | 5 | 4 | 2 | 11 | High | implementing |
