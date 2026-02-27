@@ -121,10 +121,12 @@ const track2 = createStyledTrack(
 // Track 3: Both symbols (PT15M) and labels (PT30M) + overrides
 const track3Data = generatePositions(BASE_TIME + 10 * MINUTE, 30, -4.05, 50.25);
 const track3Overrides: Array<PositionStyleOverride | null> = new Array(30).fill(null);
-// Add custom labels at specific positions
-track3Overrides[5] = { show_symbol: true, show_label: true, symbol: 'square', label: 'Contact detected' };
-track3Overrides[15] = { show_symbol: true, show_label: true, symbol: 'triangle', label: 'Course change' };
-track3Overrides[25] = { show_symbol: true, show_label: true, symbol: 'square', label: 'Lost contact' };
+// Add custom labels at specific positions — demonstrate all five shapes
+track3Overrides[3] = { show_symbol: true, show_label: true, symbol: 'square', label: 'Contact detected' };
+track3Overrides[9] = { show_symbol: true, show_label: true, symbol: 'triangle', label: 'Course change' };
+track3Overrides[15] = { show_symbol: true, show_label: true, symbol: 'diamond', label: 'Manoeuvre' };
+track3Overrides[21] = { show_symbol: true, show_label: true, symbol: 'cross', label: 'Datum' };
+track3Overrides[27] = { show_symbol: true, show_label: true, symbol: 'square', label: 'Lost contact' };
 
 const track3 = createStyledTrack(
   'track-combined',
@@ -157,7 +159,7 @@ function PositionStylingDemo() {
         <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
           <li>Blue track: Symbols every 20 minutes</li>
           <li>Green track: Labels every 30 minutes</li>
-          <li>Orange track: Symbols every 15m, labels every 1h, plus custom overrides</li>
+          <li>Orange track: Symbols every 15m, labels every 1h, plus overrides (square, triangle, diamond, cross)</li>
         </ul>
       </div>
       <div style={{ flex: 1, minHeight: 0 }}>

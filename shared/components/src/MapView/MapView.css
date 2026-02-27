@@ -110,6 +110,12 @@
   animation: debrief-selection-pulse 2s ease-in-out infinite;
 }
 
+/* Custom SVG symbol icons — strip default Leaflet divIcon chrome */
+.debrief-symbol-icon {
+  background: none;
+  border: none;
+}
+
 /* Loading state */
 .debrief-mapview--loading {
   opacity: 0.7;
