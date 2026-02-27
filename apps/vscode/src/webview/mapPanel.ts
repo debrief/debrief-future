@@ -33,6 +33,7 @@ import {
   type SessionStoreApi,
   type SessionStoreWithUndo,
   type LogService,
+  type DrawingMode,
 } from '@debrief/session-state';
 import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
 import { calculateBounds, mergeBounds } from '../utils/bounds';
@@ -661,7 +662,7 @@ export class MapPanel {
       );
 
       // Subscribe to drawing state changes (#108)
-      type DrawingState = { drawingMode: string | null; drawingPaletteIndex: number };
+      type DrawingState = { drawingMode: DrawingMode; drawingPaletteIndex: number };
       const drawingSelector = (state: SessionStoreWithUndo): DrawingState => ({
         drawingMode: state.drawingMode,
         drawingPaletteIndex: state.drawingPaletteIndex,
