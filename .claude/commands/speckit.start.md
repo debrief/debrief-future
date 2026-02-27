@@ -196,7 +196,7 @@ After both the spec creation and backlog update:
 ### Workflow Progress
 
 ```
-[x] proposed → [x] approved → [x] specified → [ ] clarified → [ ] planned → [ ] tasked → [ ] implementing → [ ] complete
+[x] proposed → [x] approved → [x] specified → [ ] clarified → [ ] planned → [ ] reviewed → [ ] tasked → [ ] implementing → [ ] complete
 ```
 ```
 
@@ -251,6 +251,11 @@ needs-interview ──[/interview]──> proposed
                                       │
                                       v
 specified ──[/speckit.clarify]──> clarified ──[/speckit.plan]──> planned
+                                                                    │
+                                                      [/speckit.review]
+                                                                    │
+                                                                    v
+                                                                reviewed
                                                                     │
                                                        [/speckit.tasks]
                                                                     │
