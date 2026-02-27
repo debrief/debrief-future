@@ -61,6 +61,28 @@ export function LogPanel({
   // Ref for rationale auto-focus from action bar
   const rationaleRef = useRef<HTMLTextAreaElement>(null);
 
+  // Feature 113: Request schema and handle async resolution if Promise is returned.
+  const requestSchema = useCallback(
+    (toolId: string) => {
+      setSchemaLoading(true);
+      const result = onSchemaRequest?.(toolId);
+      if (result && typeof (result as Promise<unknown>).then === 'function') {
+        (result as Promise<ReadonlyArray<ParameterSchemaEntry>>).then(
+          (schema) => {
+            schemaCacheRef.current.set(toolId, schema);
+            setSchemaLoading(false);
+            setSchemaError(null);
+          },
+          (err: unknown) => {
+            setSchemaLoading(false);
+            setSchemaError(err instanceof Error ? err.message : 'Schema load failed');
+          }
+        );
+      }
+    },
+    [onSchemaRequest]
+  );
+
   // Apply filters to entries
   const filteredEntries = useMemo(
     () => filterEntries(entries, filterState, featureNames),
@@ -104,8 +126,7 @@ export function LogPanel({
           // Request schema if not cached
           const cached = schemaCacheRef.current.get(entry.toolName);
           if (!cached) {
-            setSchemaLoading(true);
-            onSchemaRequest?.(entry.toolName);
+            requestSchema(entry.toolName);
           }
           // Focus rationale after render
           setTimeout(() => rationaleRef.current?.focus(), 100);
@@ -118,7 +139,7 @@ export function LogPanel({
         payload: { actionType, activityId },
       });
     },
-    [onMessage, entries, onSchemaRequest]
+    [onMessage, entries, requestSchema]
   );
 
   // Phase 6: Wrap onTuneRequest for LogEntry's onTuneClick signature
@@ -151,13 +172,12 @@ export function LogPanel({
       // Check schema cache
       const cached = schemaCacheRef.current.get(entry.toolName);
       if (!cached) {
-        setSchemaLoading(true);
-        onSchemaRequest?.(entry.toolName);
+        requestSchema(entry.toolName);
       } else {
         setSchemaLoading(false);
       }
     },
-    [onSchemaRequest]
+    [requestSchema]
   );
 
   // Feature 113: Handle Done click — flip card back to read-only
@@ -199,11 +219,10 @@ export function LogPanel({
   // Feature 113: Handle retry schema load
   const handleRetrySchema = useCallback(
     (toolId: string) => {
-      setSchemaLoading(true);
       setSchemaError(null);
-      onSchemaRequest?.(toolId);
+      requestSchema(toolId);
     },
-    [onSchemaRequest]
+    [requestSchema]
   );
 
   // Feature 113: Handle disable toggle

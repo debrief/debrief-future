@@ -183,8 +183,11 @@ export interface LogPanelProps {
   onRevertThisRequest?: (activityId: string) => void;
   onRestoreRequest?: (activityId: string) => void;
   onReplayCancel?: () => void;
-  /** Flip-card: request tool schema for edit face controls. Feature: 113 */
-  onSchemaRequest?: (toolId: string) => void;
+  /** Flip-card: request tool schema for edit face controls.
+   *  May return void (VS Code integration pushes schema via message),
+   *  or a Promise resolving to the schema array (web-shell / Storybook).
+   *  Feature: 113 */
+  onSchemaRequest?: (toolId: string) => void | Promise<ReadonlyArray<ParameterSchemaEntry>>;
   /** Flip-card: toggle entry disabled state. Feature: 113 */
   onDisableToggle?: (activityId: string, disabled: boolean) => void;
   /** Flip-card: update rationale text. Feature: 113 */

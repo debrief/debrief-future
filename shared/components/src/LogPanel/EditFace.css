@@ -1,12 +1,13 @@
 /**
  * EditFace CSS — styles for the flip-card edit face.
+ * Fallback values ensure readability outside VS Code (web-shell, Storybook).
  * Feature: 113-prov-card-flip
  */
 
 .log-panel__edit-face {
   padding: 8px;
-  background: var(--vscode-sideBar-background);
-  border: 1px solid var(--vscode-panel-border);
+  background: var(--vscode-sideBar-background, #252526);
+  border: 1px solid var(--vscode-panel-border, #454545);
   border-radius: 2px;
   display: flex;
   flex-direction: column;
@@ -14,7 +15,7 @@
 }
 
 .log-panel__edit-face-section {
-  border-bottom: 1px solid var(--vscode-panel-border);
+  border-bottom: 1px solid var(--vscode-panel-border, #454545);
   padding-bottom: 8px;
 }
 
@@ -27,7 +28,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--vscode-descriptionForeground);
+  color: var(--vscode-descriptionForeground, #969696);
   margin-bottom: 6px;
 }
 
@@ -47,11 +48,11 @@
 .log-panel__edit-face-param-label {
   font-size: 11px;
   font-weight: 500;
-  color: var(--vscode-foreground);
+  color: var(--vscode-foreground, #cccccc);
 }
 
 .log-panel__edit-face-param-desc {
-  color: var(--vscode-descriptionForeground);
+  color: var(--vscode-descriptionForeground, #969696);
   cursor: help;
   font-size: 10px;
 }
@@ -61,9 +62,9 @@
   width: 100%;
   padding: 3px 6px;
   font-size: 12px;
-  background: var(--vscode-input-background);
-  color: var(--vscode-input-foreground);
-  border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+  background: var(--vscode-input-background, #3c3c3c);
+  color: var(--vscode-input-foreground, #cccccc);
+  border: 1px solid var(--vscode-input-border, #3c3c3c);
   border-radius: 2px;
   outline: none;
   box-sizing: border-box;
@@ -71,7 +72,7 @@
 
 .log-panel__edit-face-input:focus,
 .log-panel__edit-face-select:focus {
-  border-color: var(--vscode-focusBorder);
+  border-color: var(--vscode-focusBorder, #007fd4);
 }
 
 .log-panel__edit-face-toggle {
@@ -84,7 +85,7 @@
 
 .log-panel__edit-face-no-params {
   font-size: 12px;
-  color: var(--vscode-descriptionForeground);
+  color: var(--vscode-descriptionForeground, #969696);
   font-style: italic;
   padding: 4px 0;
 }
@@ -102,15 +103,15 @@
 .log-panel__edit-face-retry-btn {
   padding: 2px 6px;
   font-size: 11px;
-  background: var(--vscode-button-secondaryBackground);
-  color: var(--vscode-button-secondaryForeground);
+  background: var(--vscode-button-secondaryBackground, #3a3d41);
+  color: var(--vscode-button-secondaryForeground, #ffffff);
   border: 1px solid var(--vscode-button-border, transparent);
   border-radius: 2px;
   cursor: pointer;
 }
 
 .log-panel__edit-face-retry-btn:hover {
-  background: var(--vscode-button-secondaryHoverBackground);
+  background: var(--vscode-button-secondaryHoverBackground, #45494e);
 }
 
 /* Metadata */
@@ -127,7 +128,7 @@
 }
 
 .log-panel__edit-face-meta-label {
-  color: var(--vscode-descriptionForeground);
+  color: var(--vscode-descriptionForeground, #969696);
   min-width: 80px;
 }
 
@@ -141,16 +142,16 @@
 .log-panel__rationale-label {
   font-size: 11px;
   font-weight: 500;
-  color: var(--vscode-foreground);
+  color: var(--vscode-foreground, #cccccc);
 }
 
 .log-panel__rationale-textarea {
   width: 100%;
   padding: 4px 6px;
   font-size: 12px;
-  background: var(--vscode-input-background);
-  color: var(--vscode-input-foreground);
-  border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+  background: var(--vscode-input-background, #3c3c3c);
+  color: var(--vscode-input-foreground, #cccccc);
+  border: 1px solid var(--vscode-input-border, #3c3c3c);
   border-radius: 2px;
   outline: none;
   resize: vertical;
@@ -159,7 +160,7 @@
 }
 
 .log-panel__rationale-textarea:focus {
-  border-color: var(--vscode-focusBorder);
+  border-color: var(--vscode-focusBorder, #007fd4);
 }
 
 /* Disable toggle */
@@ -219,7 +220,7 @@
 
 .log-panel__delete-confirm-message {
   font-size: 11px;
-  color: var(--vscode-foreground);
+  color: var(--vscode-foreground, #cccccc);
   margin-bottom: 8px;
 }
 
@@ -231,8 +232,8 @@
 .log-panel__delete-confirm-btn {
   padding: 3px 8px;
   font-size: 11px;
-  background: var(--vscode-button-secondaryBackground);
-  color: var(--vscode-button-secondaryForeground);
+  background: var(--vscode-button-secondaryBackground, #3a3d41);
+  color: var(--vscode-button-secondaryForeground, #ffffff);
   border: 1px solid var(--vscode-button-border, transparent);
   border-radius: 2px;
   cursor: pointer;
@@ -254,15 +255,15 @@
   padding: 4px 8px;
   font-size: 12px;
   font-weight: 500;
-  background: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
+  background: var(--vscode-button-background, #0078d4);
+  color: var(--vscode-button-foreground, #ffffff);
   border: none;
   border-radius: 2px;
   cursor: pointer;
 }
 
 .log-panel__edit-face-done-btn:hover {
-  background: var(--vscode-button-hoverBackground);
+  background: var(--vscode-button-hoverBackground, #1177bb);
 }
 
 /* Replay progress indicator on card */
@@ -294,12 +295,12 @@
 .log-panel__slider-input {
   flex: 1;
   height: 4px;
-  accent-color: var(--vscode-focusBorder);
+  accent-color: var(--vscode-focusBorder, #007fd4);
 }
 
 .log-panel__slider-readout {
   font-size: 11px;
-  font-family: var(--vscode-editor-font-family, monospace);
+  font-family: var(--vscode-editor-font-family, 'Consolas', monospace);
   min-width: 40px;
   text-align: right;
 }
@@ -321,12 +322,12 @@
 }
 
 .log-panel__color-swatch--selected {
-  border-color: var(--vscode-focusBorder);
-  box-shadow: 0 0 0 1px var(--vscode-focusBorder);
+  border-color: var(--vscode-focusBorder, #007fd4);
+  box-shadow: 0 0 0 1px var(--vscode-focusBorder, #007fd4);
 }
 
 .log-panel__color-swatch:hover:not(.log-panel__color-swatch--selected) {
-  border-color: var(--vscode-foreground);
+  border-color: var(--vscode-foreground, #cccccc);
 }
 
 .log-panel__color-swatch:disabled {
@@ -345,10 +346,10 @@
   width: 100%;
   padding: 4px 6px;
   font-size: 11px;
-  font-family: var(--vscode-editor-font-family, monospace);
-  background: var(--vscode-input-background);
-  color: var(--vscode-input-foreground);
-  border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+  font-family: var(--vscode-editor-font-family, 'Consolas', monospace);
+  background: var(--vscode-input-background, #3c3c3c);
+  color: var(--vscode-input-foreground, #cccccc);
+  border: 1px solid var(--vscode-input-border, #3c3c3c);
   border-radius: 2px;
   outline: none;
   resize: vertical;
@@ -356,7 +357,7 @@
 }
 
 .log-panel__json-editor-textarea:focus {
-  border-color: var(--vscode-focusBorder);
+  border-color: var(--vscode-focusBorder, #007fd4);
 }
 
 .log-panel__json-editor-error {

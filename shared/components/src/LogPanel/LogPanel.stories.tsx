@@ -13,10 +13,10 @@ import type {
   ViewMode,
   FilterState,
   LogPanelMessage,
+  ParameterSchemaEntry,
 } from './types';
 import { DEFAULT_FILTER_STATE } from './types';
 import { CardFlip } from './CardFlip';
-import { EditFace } from './EditFace';
 
 // --- Sample data ---
 
@@ -410,9 +410,32 @@ function FlipCardInteractive(props: {
     }
   }, []);
 
-  const handleSchemaRequest = useCallback((_toolId: string) => {
-    // Simulate schema loading — no-op in stories
-  }, []);
+  const handleSchemaRequest = useCallback(
+    (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
+      // Derive mock schema from matching entry's parameters
+      const entry = localEntries.find((e) => e.toolName === toolId);
+      const schema: ParameterSchemaEntry[] = [];
+      if (entry) {
+        for (const [name, param] of Object.entries(entry.parameters)) {
+          const isNum = typeof param.value === 'number';
+          schema.push({
+            name,
+            type: isNum ? 'number' : 'string',
+            description: `Parameter "${name}"`,
+            tunable: param.tunable,
+            defaultValue: param.default ? param.value : null,
+            minimum: isNum ? 0 : null,
+            maximum: isNum ? Number(param.value) * 3 : null,
+            step: isNum ? 1 : null,
+            choices: null,
+            paramType: null,
+          });
+        }
+      }
+      return Promise.resolve(schema);
+    },
+    [localEntries]
+  );
 
   const handleDisableToggle = useCallback((activityId: string, disabled: boolean) => {
     setLocalEntries((prev) =>
