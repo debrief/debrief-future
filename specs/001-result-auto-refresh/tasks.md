@@ -47,9 +47,9 @@
 
 **Purpose**: Create the module structure and type definitions for the auto-refresh feature.
 
-- [ ] T001 Create auto-refresh types module `services/session-state/src/refresh/types.ts`
-- [ ] T002 [P] Create auto-refresh module index with public exports `services/session-state/src/refresh/index.ts`
-- [ ] T003 [P] Create useAutoRefresh hook file `shared/components/src/hooks/useAutoRefresh.ts`
+- [x] T001 Create auto-refresh types module `services/session-state/src/refresh/types.ts`
+- [x] T002 [P] Create auto-refresh module index with public exports `services/session-state/src/refresh/index.ts`
+- [x] T003 [P] Create useAutoRefresh hook file `shared/components/src/hooks/useAutoRefresh.ts`
 
 ---
 
@@ -63,14 +63,14 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T004 [test] Write controller unit tests: register, dispose, event forwarding `services/session-state/tests/refresh/controller.test.ts`
-- [ ] T005 [P][test] Write viewport capture/restore unit tests `shared/components/tests/ChartRenderer/viewport.test.ts`
+- [x] T004 [test] Write controller unit tests: register, dispose, event forwarding `services/session-state/tests/unit/refresh/controller.test.ts`
+- [x] T005 [P][test] Write viewport capture/restore unit tests `shared/components/src/ChartRenderer/viewport.test.ts`
 
 ### Implementation for Foundation
 
-- [ ] T006 Implement AutoRefreshController: register/unregister, event subscription, state management `services/session-state/src/refresh/controller.ts`
-- [ ] T007 Extend ChartRenderer with useImperativeHandle exposing ChartRendererHandle (captureViewport, restoreViewport) `shared/components/src/ChartRenderer/ChartRenderer.tsx`
-- [ ] T008 Implement useAutoRefresh React hook: register on mount, unregister on unmount, expose state/pause/resume/toggle `shared/components/src/hooks/useAutoRefresh.ts`
+- [x] T006 Implement AutoRefreshController: register/unregister, event subscription, state management `services/session-state/src/refresh/controller.ts`
+- [x] T007 Extend ChartRenderer with useImperativeHandle exposing ChartRendererHandle (captureViewport, restoreViewport) `shared/components/src/ChartRenderer/ChartRenderer.tsx`
+- [x] T008 Implement useAutoRefresh React hook: register on mount, unregister on unmount, expose state/pause/resume/toggle `shared/components/src/hooks/useAutoRefresh.ts`
 
 **Checkpoint**: Controller can register views, subscribe to registry events, and forward change events. ChartRenderer exposes viewport capture/restore. Hook bridges controller to React lifecycle.
 

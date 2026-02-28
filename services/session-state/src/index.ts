@@ -175,6 +175,18 @@ export {
   type StacAssetForHydration,
 } from './registry/index.js';
 
+// Auto-Refresh Controller (Feature: 089)
+export {
+  createAutoRefreshController,
+  type AutoRefreshStatus,
+  type AutoRefreshState,
+  type ViewportState,
+  type RefreshCallback,
+  type RefreshEvent,
+  type AutoRefreshController,
+  type AutoRefreshControllerOptions,
+} from './refresh/index.js';
+
 // Server (for standalone mode)
 export {
   createApp,
