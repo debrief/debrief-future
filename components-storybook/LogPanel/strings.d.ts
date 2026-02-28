@@ -58,5 +58,25 @@ export declare const LOG_PANEL_STRINGS: {
     readonly deletedEntryBadge: "Removed";
     readonly tunedEntryBadge: "Tuned";
     readonly versionMismatch: (tool: string, expected: string, installed: string) => string;
+    readonly editIconTooltip: "Edit parameters";
+    readonly editFaceDone: "Done";
+    readonly editFaceParametersTitle: "Parameters";
+    readonly editFaceNoParameters: "This tool has no tunable parameters.";
+    readonly editFaceSchemaLoading: "Loading parameter schema…";
+    readonly editFaceSchemaError: "Failed to load parameter schema.";
+    readonly editFaceSchemaRetry: "Retry";
+    readonly editFaceRationaleLabel: "Rationale";
+    readonly editFaceRationalePlaceholder: "Why was this operation performed?";
+    readonly editFaceDisableLabel: "Disable this entry";
+    readonly editFaceDisableWarning: (causeId: string) => string;
+    readonly editFaceDeleteButton: "Delete";
+    readonly editFaceDeleteConfirmTitle: "Delete this entry?";
+    readonly editFaceDeleteConfirmMessage: "All subsequent operations will replay without this entry.";
+    readonly editFaceDeleteConfirm: "Delete";
+    readonly editFaceDeleteCancel: "Cancel";
+    readonly disabledEntryBadge: "Disabled";
+    readonly sliderValueLabel: (value: number) => string;
+    readonly jsonEditorParseError: "Invalid JSON";
+    readonly colorPickerLabel: "Select colour";
 };
 //# sourceMappingURL=strings.d.ts.map
