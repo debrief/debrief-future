@@ -171,11 +171,11 @@ uv run pyright && pnpm -r typecheck
 # Step 3: Unit tests (Python + TypeScript — excludes Playwright E2E)
 uv run pytest && pnpm --filter '!@debrief/web-shell' test
 
-# Step 4: Playwright E2E tests (requires browser binaries)
-pnpm --filter @debrief/web-shell test
+# Step 4: Playwright E2E tests
+cd apps/web-shell && node run-playwright.mjs && cd ../..
 ```
 
-**Playwright note:** Step 4 requires Chromium binaries (`pnpm exec playwright install --with-deps chromium`). If browsers are not installed, step 4 will fail with "Executable doesn't exist" — this is an environment issue, not a code issue. Steps 1-3 are always runnable. If step 4 cannot run locally, ensure steps 1-3 pass and note that E2E coverage is deferred to CI.
+**Playwright note:** Step 4 uses `run-playwright.mjs` which extracts Chromium via `@sparticuz/chromium` — this works in both cloud (Claude Code) and CI environments. For local macOS/Windows, use `pnpm exec playwright install chromium` then `pnpm --filter @debrief/web-shell test` instead. See `docs/project_notes/playwright-installation-research.md` for details.
 
 ### What CI actually runs (`.github/workflows/ci.yml`)
 
