@@ -171,6 +171,16 @@
             "null"
           ]
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "radius": {
           "description": "Circle radius in meters for precise reconstruction",
           "minimum": 0,
@@ -519,6 +529,16 @@
             "null"
           ]
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "source_file": {
           "description": "Original source file path",
           "type": [
@@ -774,6 +794,16 @@
           "description": "Human-readable result label",
           "type": "string"
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "source_features": {
           "description": "IDs of input features used to generate this result",
           "items": {
@@ -866,6 +896,16 @@
         "label": {
           "description": "Human-readable result label",
           "type": "string"
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "source_features": {
           "description": "IDs of input features used to generate this result",
@@ -960,6 +1000,16 @@
           "$ref": "#/$defs/FeatureKindEnum",
           "const": "NARRATIVE",
           "description": "Feature type discriminator"
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "source_file": {
           "description": "Original source file path",
@@ -1237,6 +1287,16 @@
             "null"
           ]
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "source_file": {
           "description": "Original source file path",
           "type": [
@@ -1451,6 +1511,16 @@
             "null"
           ]
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "source_file": {
           "description": "Original source file path",
           "type": [
@@ -1543,6 +1613,16 @@
           "description": "Per-point metadata array, parallel to MultiPoint coordinates. Each entry contains at minimum an index and name. Downstream tools extend entries with zone/color fields.",
           "items": {
             "$ref": "#/$defs/PointMetadataEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
           },
           "type": [
             "array",
@@ -2057,6 +2137,16 @@
           "const": "SYSTEM",
           "description": "Feature type discriminator"
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "selected_ids": {
           "description": "Array of selected feature IDs - for selection state",
           "items": {
@@ -2272,6 +2362,16 @@
           "$ref": "#/$defs/FeatureKindEnum",
           "const": "TEXT",
           "description": "Feature type discriminator"
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "source_file": {
           "description": "Original source file path",
@@ -2536,6 +2636,16 @@
           "minItems": 2,
           "type": "array"
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "segments": {
           "description": "Per-segment metadata for compound tracks. When present, geometry MUST be MultiLineString and segments[i] describes coordinates[i]. When absent, geometry is LineString and the flat positions array is used.",
           "items": {
@@ -2731,6 +2841,16 @@
           "maxItems": 2,
           "minItems": 2,
           "type": "array"
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "range": {
           "description": "Vector length/range in meters for precise reconstruction",
