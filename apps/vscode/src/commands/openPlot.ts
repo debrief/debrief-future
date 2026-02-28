@@ -17,6 +17,7 @@ import { createTimeInstant } from '@debrief/session-state';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
+import type { LogPanelViewProvider } from '../views/logPanelView';
 import { MapPanel } from '../webview/mapPanel';
 import { isTrackFeature, isReferenceLocation } from '@debrief/components';
 import { parseStacUri, buildStacUri } from '../types/stac';
@@ -69,7 +70,8 @@ export function createOpenPlotCommand(
   activityPanelProvider: ActivityPanelViewProvider,
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void,
-  resultIdRegistry?: ResultIdRegistry
+  resultIdRegistry?: ResultIdRegistry,
+  logPanelProvider?: LogPanelViewProvider
 ): (args?: OpenPlotArgs) => Promise<void> {
   return async (args?: OpenPlotArgs) => {
     let storeId: string;
@@ -255,6 +257,18 @@ export function createOpenPlotCommand(
     });
     panel.setLogService(logService);
 
+    // Wire LogPanelViewProvider with logService + path resolvers (Feature: 113)
+    if (logPanelProvider) {
+      logPanelProvider.setLogService(logService);
+      logPanelProvider.setPathResolvers(
+        () => panel.getCurrentStore()?.path,
+        () => panel.getCurrentPlot()?.itemPath
+      );
+      console.log('[debrief] LogPanel: logService + path resolvers wired for', plot.title);
+    } else {
+      console.warn('[debrief] LogPanel: logPanelProvider not provided — provenance display will not work');
+    }
+
     // Load plot into panel
     panel.loadPlot(plot, plotData.features);
 
@@ -264,6 +278,17 @@ export function createOpenPlotCommand(
 
     // Update activity panel webview with all features
     activityPanelProvider.setFeatures(plotData.features);
+
+    // Update Log Panel with feature names for display resolution (Feature: 113)
+    if (logPanelProvider) {
+      const featureNames: Record<string, string> = {};
+      for (const f of plotData.features) {
+        const props = (f.properties ?? {}) as Record<string, unknown>;
+        const name = (props.name ?? props.title ?? String(f.id)) as string;
+        featureNames[String(f.id)] = name;
+      }
+      logPanelProvider.setFeatureNames(featureNames);
+    }
 
     // Load existing result files from STAC item (Feature: 051-load-result-attachments)
     const resultFiles = await stacService.loadResultFiles(store, itemPath);

@@ -12,10 +12,10 @@ import React from 'react';
 import type { LogActionBarProps, ActionType, ViewMode, PresentationMode } from './types';
 import { LOG_PANEL_STRINGS } from './strings';
 
+// Feature 113: Tune button removed — replaced by flip-card edit face.
 const ACTION_BUTTONS: Array<{ type: ActionType; label: string }> = [
   { type: 'revertTo', label: LOG_PANEL_STRINGS.actionRevertTo },
   { type: 'revertThis', label: LOG_PANEL_STRINGS.actionRevertThis },
-  { type: 'tune', label: LOG_PANEL_STRINGS.actionTune },
   { type: 'snapshot', label: LOG_PANEL_STRINGS.actionSnapshot },
   { type: 'rationale', label: LOG_PANEL_STRINGS.actionRationale },
 ];

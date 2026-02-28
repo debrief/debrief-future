@@ -40,6 +40,10 @@ export interface LogEntry {
   generatedResultId?: string | null;
   tune: TuneAnnotation | null;
   deleted?: boolean;
+  /** Whether this entry is skipped during replay. Feature: 113-prov-card-flip */
+  disabled?: boolean;
+  /** Free-text analyst annotation. Feature: 113-prov-card-flip */
+  rationale?: string | null;
   /** Pre-tool geometry for mutation tools — enables correct tune replay. */
   inputState?: InputFeatureState[] | null;
 }
@@ -139,6 +143,21 @@ export interface LogService {
     itemPath: string,
     activityId: string
   ): Promise<ReplayResult>;
+
+  // Feature 113: Flip-card edit operations
+  disableEntry(
+    storePath: string,
+    itemPath: string,
+    activityId: string,
+    disabled: boolean
+  ): Promise<{ disabledActivityIds: string[] }>;
+
+  setRationale(
+    storePath: string,
+    itemPath: string,
+    activityId: string,
+    rationale: string
+  ): Promise<void>;
 
   // Delegated stubs (moved to dedicated services)
   createSnapshot(): Promise<void>;

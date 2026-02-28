@@ -196,6 +196,8 @@ export type {
   SelectionUpdatePayload,
   ActionResultPayload,
   ModeInitPayload,
+  ParameterSchemaEntry,
+  CardReplayStatus,
 } from './LogPanel';
 export {
   DEFAULT_FILTER_STATE as LOG_DEFAULT_FILTER_STATE,

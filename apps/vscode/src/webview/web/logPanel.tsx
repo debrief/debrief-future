@@ -4,9 +4,11 @@
  * Bridges VS Code webview API to the LogPanel React component.
  * Handles message passing between extension host and React component.
  * Phase 6: Adds tune/revert/replay message forwarding.
+ * Feature 113: Adds schema cache, disable/rationale handlers.
  *
  * Feature: 072-log-panel (E02, Phase 2)
  * Updated: 076-replay-tune (E02, Phase 6)
+ * Updated: 113-prov-card-flip (flip-card edit wiring)
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -36,12 +38,13 @@ interface ReplayResultPayload {
   haltReason: { type: string; toolId: string; message: string } | null;
 }
 
-// Extended message type to include Phase 6 messages
+// Extended message type to include Phase 6 + Feature 113 messages
 type ExtendedExtensionMessage =
   | ExtensionToWebviewMessage
   | { type: 'replay:progress'; payload: ReplayProgressPayload }
   | { type: 'replay:result'; payload: ReplayResultPayload }
-  | { type: 'replay:error'; payload: { message: string } };
+  | { type: 'replay:error'; payload: { message: string } }
+  | { type: 'schema:response'; payload: { toolId: string; schema: unknown[]; error: string | null } };
 
 // VS Code API type
 declare function acquireVsCodeApi(): {
@@ -144,6 +147,12 @@ function LogPanelApp(): React.ReactElement {
           setActionResultMessage(msg.payload.message);
           setTimeout(() => setActionResultMessage(null), 5000);
           break;
+
+        // Feature 113: schema response — handled by LogPanel via schema cache
+        case 'schema:response':
+          // Schema responses are handled internally by the LogPanel component.
+          // The webview just needs to forward them if needed.
+          break;
       }
     };
 
@@ -210,6 +219,30 @@ function LogPanelApp(): React.ReactElement {
     vscode.postMessage({ type: 'replay:cancel' });
   }, []);
 
+  // Feature 113: schema request → forward to extension
+  const handleSchemaRequest = useCallback((toolId: string) => {
+    vscode.postMessage({
+      type: 'schema:request',
+      payload: { toolId },
+    });
+  }, []);
+
+  // Feature 113: disable toggle → forward to extension
+  const handleDisableToggle = useCallback((activityId: string, disabled: boolean) => {
+    vscode.postMessage({
+      type: 'disable:toggle',
+      payload: { activityId, disabled },
+    });
+  }, []);
+
+  // Feature 113: rationale update → forward to extension
+  const handleRationaleUpdate = useCallback((activityId: string, rationale: string) => {
+    vscode.postMessage({
+      type: 'rationale:update',
+      payload: { activityId, rationale },
+    });
+  }, []);
+
   return (
     <LogPanel
       entries={entries}
@@ -232,6 +265,9 @@ function LogPanelApp(): React.ReactElement {
       onRevertThisRequest={handleRevertThisRequest}
       onRestoreRequest={handleRestoreRequest}
       onReplayCancel={handleReplayCancel}
+      onSchemaRequest={handleSchemaRequest}
+      onDisableToggle={handleDisableToggle}
+      onRationaleUpdate={handleRationaleUpdate}
     />
   );
 }

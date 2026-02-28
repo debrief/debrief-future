@@ -5,6 +5,7 @@
  * Within each group, entries are sorted most-recent-first.
  *
  * Feature: 072-log-panel (US5)
+ * Updated: 113-prov-card-flip (flip-card pass-through)
  */
 
 import React, { useMemo } from 'react';
@@ -20,6 +21,18 @@ export function LogByFeature({
   onEntryClick,
   onTuneClick,
   onRestoreClick,
+  editingActivityId,
+  editingSchema,
+  schemaLoading,
+  schemaError,
+  rationaleRef,
+  onEditClick,
+  onDoneClick,
+  onParameterChange,
+  onDisableToggle,
+  onDeleteClick,
+  onRationaleChange,
+  onRetrySchema,
   className,
 }: LogByFeatureProps): React.ReactElement {
   const groups = useMemo(
@@ -48,6 +61,18 @@ export function LogByFeature({
               onClick={onEntryClick}
               onTuneClick={onTuneClick}
               onRestoreClick={onRestoreClick}
+              isEditing={editingActivityId === entry.activityId}
+              schema={editingActivityId === entry.activityId ? editingSchema : undefined}
+              schemaLoading={editingActivityId === entry.activityId ? schemaLoading : false}
+              schemaError={editingActivityId === entry.activityId ? schemaError : null}
+              rationaleRef={editingActivityId === entry.activityId ? rationaleRef : undefined}
+              onEditClick={onEditClick}
+              onDoneClick={onDoneClick}
+              onParameterChange={onParameterChange}
+              onDisableToggle={onDisableToggle}
+              onDeleteClick={onDeleteClick}
+              onRationaleChange={onRationaleChange}
+              onRetrySchema={onRetrySchema}
             />
           ))}
         </div>

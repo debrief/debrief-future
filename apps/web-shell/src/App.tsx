@@ -51,6 +51,7 @@ import type {
   ChartTabData,
   PanelWorkspaceElement,
   ResultArtifactType,
+  ParameterSchemaEntry,
 } from '@debrief/components';
 import type { LogFilterState } from '@debrief/components';
 import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
@@ -338,11 +339,7 @@ export default function App() {
       store.getState().clearSelection();
     } else if (message.type === 'action:invoke') {
       const { actionType, activityId } = message.payload;
-      if (actionType === 'tune') {
-        // Tune is handled inline via onTuneRequest — prompt user
-        setLogNotification('Click a tunable parameter value to edit it.');
-        setTimeout(() => setLogNotification(null), 3000);
-      } else if (actionType === 'revertTo') {
+      if (actionType === 'revertTo') {
         // Remove all entries after the target and restore their original features
         setLogEntries((prev: TimelineEntry[]) => {
           const idx = prev.findIndex((e: TimelineEntry) => e.activityId === activityId);
@@ -481,6 +478,59 @@ export default function App() {
     setLogNotification('Operation restored.');
     setTimeout(() => setLogNotification(null), 3000);
   }, []);
+
+  // Feature 113: Flip-card schema request — returns mock schema for demo
+  const handleSchemaRequest = useCallback(
+    (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
+      // Find the first entry with this toolName to derive schema from its parameters
+      const entry = logEntries.find((e: TimelineEntry) => e.toolName === toolId);
+      const schema: ParameterSchemaEntry[] = [];
+      if (entry) {
+        for (const [name, param] of Object.entries(entry.parameters)) {
+          const valueType = typeof param.value;
+          schema.push({
+            name,
+            type: valueType === 'number' ? 'number' : valueType === 'boolean' ? 'boolean' : 'string',
+            description: `Parameter "${name}"`,
+            tunable: param.tunable,
+            defaultValue: param.default ? param.value : null,
+            minimum: valueType === 'number' ? 0 : null,
+            maximum: valueType === 'number' ? Number(param.value) * 3 : null,
+            step: valueType === 'number' ? 1 : null,
+            choices: null,
+            paramType: null,
+          });
+        }
+      }
+      // Simulate async — resolve immediately
+      return Promise.resolve(schema);
+    },
+    [logEntries]
+  );
+
+  // Feature 113: Flip-card disable toggle
+  const handleDisableToggle = useCallback(
+    (activityId: string, disabled: boolean) => {
+      setLogEntries((prev: TimelineEntry[]) =>
+        prev.map((e: TimelineEntry) =>
+          e.activityId === activityId ? { ...e, disabled } : e
+        )
+      );
+    },
+    []
+  );
+
+  // Feature 113: Flip-card rationale update
+  const handleRationaleUpdate = useCallback(
+    (activityId: string, rationale: string) => {
+      setLogEntries((prev: TimelineEntry[]) =>
+        prev.map((e: TimelineEntry) =>
+          e.activityId === activityId ? { ...e, rationale } : e
+        )
+      );
+    },
+    []
+  );
 
   // Handle map feature selection (goes through session-state)
   const handleMapSelect = useCallback((featureId: string, event: React.MouseEvent) => {
@@ -942,6 +992,9 @@ export default function App() {
       onSelectedEntryChange: setLogSelectedEntryId,
       onTuneRequest: handleTuneRequest,
       onRestoreRequest: handleRestoreRequest,
+      onSchemaRequest: handleSchemaRequest,
+      onDisableToggle: handleDisableToggle,
+      onRationaleUpdate: handleRationaleUpdate,
     } : null,
     stacFileTreeProps: currentPlot ? {
       fs: mockFsAdapter,
@@ -962,6 +1015,7 @@ export default function App() {
     handleShapeCreated, logEntries, featureNames, logPresentationMode,
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
     handleLogMessage, handleTuneRequest, handleRestoreRequest,
+    handleSchemaRequest, handleDisableToggle, handleRationaleUpdate,
     handleFileSelect, treeRefreshKey, chartContextProps,
   ]);
 

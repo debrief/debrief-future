@@ -155,9 +155,45 @@ Only updated when a feature introduces a technology not already listed here.
 
 ## Before Pushing
 
-**Always run `task verify` before pushing any commits.** This mirrors CI locally: it builds all packages (components, web-shell, vscode), runs linting, and runs all tests. Do not push if `task verify` fails.
+**Always run the full CI check before pushing any commits.** Do not push if any step fails.
 
-Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during `pnpm build`) does. The `verify` task ensures type checking is performed across all three entry points: `@debrief/components`, `@debrief/web-shell`, and `apps/vscode`.
+### Using `task` (preferred)
+
+```sh
+task verify
+```
+
+This runs lint, typecheck, and test — the same three steps CI runs.
+
+### Fallback (when `task` is not installed)
+
+Run these four commands in order. All must pass before pushing:
+
+```sh
+# Step 1: Lint (Python + TypeScript)
+uv run ruff check . && pnpm lint
+
+# Step 2: Type check (Python + TypeScript)
+uv run pyright && pnpm -r typecheck
+
+# Step 3: Unit tests (Python + TypeScript — excludes Playwright E2E)
+uv run pytest && pnpm --filter '!@debrief/web-shell' test
+
+# Step 4: Playwright E2E tests
+cd apps/web-shell && node run-playwright.mjs && cd ../..
+```
+
+**Playwright note:** Step 4 uses `run-playwright.mjs` which extracts Chromium via `@sparticuz/chromium` — this works in both cloud (Claude Code) and CI environments. For local macOS/Windows, use `pnpm exec playwright install chromium` then `pnpm --filter @debrief/web-shell test` instead. See `docs/project_notes/playwright-installation-research.md` for details.
+
+### What CI actually runs (`.github/workflows/ci.yml`)
+
+| CI Step | Command | What it catches |
+|---------|---------|-----------------|
+| Lint | `task lint` | ruff (Python) + ESLint (TypeScript) |
+| Typecheck | `task typecheck` | pyright (Python) + tsc --noEmit (TypeScript) |
+| Test | `task test` | pytest (Python) + vitest + Playwright E2E |
+
+Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
 - 115-schema-validated-tool-io: Added Python 3.11 (services, schemas), TypeScript 5.x (VS Code, shared components, web-shell) + Pydantic v2 (validation), LinkML >= 1.7.0 (schema source), `debrief-schemas` (generated models)

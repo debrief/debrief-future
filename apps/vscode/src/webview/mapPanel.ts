@@ -523,6 +523,13 @@ export class MapPanel {
   }
 
   /**
+   * Get LogService for provenance recording.
+   */
+  public getLogService(): LogService | null {
+    return this.logService;
+  }
+
+  /**
    * Get current plot info
    */
   public getCurrentPlot(): Plot | null {
@@ -935,6 +942,9 @@ export class MapPanel {
     }
 
     // Record provenance (Feature: 094)
+    if (!this.logService) {
+      console.warn('[debrief] MapPanel: drawn-feature provenance skipped — logService not set. Was setLogService() called?');
+    }
     if (this.logService && this.stacService) {
       try {
         const store = this.getCurrentStore();

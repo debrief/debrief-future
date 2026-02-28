@@ -1,0 +1,33 @@
+/**
+ * SkeletonLoader CSS — shimmer animation for loading state.
+ * Feature: 113-prov-card-flip
+ */
+
+.skeleton-loader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.skeleton-loader__row {
+  height: 14px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--vscode-input-background, #2d2d2d) 25%,
+    var(--vscode-list-hoverBackground, #3a3a3a) 50%,
+    var(--vscode-input-background, #2d2d2d) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

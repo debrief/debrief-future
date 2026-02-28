@@ -50,6 +50,8 @@ export interface TimelineEntry {
   generatedResultId: string | null;
   operationCategory: OperationCategory;
   deleted?: boolean;
+  disabled?: boolean;
+  rationale?: string | null;
   tuneAnnotation?: { parameter: string; previousValue: unknown; newValue: unknown } | null;
   /** Pre-tool geometry for mutation tools — enables correct tune replay. */
   inputState?: InputFeatureState[] | null;
@@ -86,8 +88,33 @@ export const DEFAULT_FILTER_STATE: FilterState = {
 
 /**
  * Action types available in the action bar.
+ * Feature 113: Tune removed (replaced by flip-card edit face).
  */
-export type ActionType = 'tune' | 'revertTo' | 'revertThis' | 'snapshot' | 'rationale';
+export type ActionType = 'revertTo' | 'revertThis' | 'snapshot' | 'rationale';
+
+/**
+ * Parameter schema entry describing a tool parameter's type and constraints.
+ * Used by the flip-card edit face to render type-aware controls.
+ * Feature: 113-prov-card-flip
+ */
+export interface ParameterSchemaEntry {
+  readonly name: string;
+  readonly type: 'number' | 'string' | 'boolean' | 'enum' | 'object' | 'array';
+  readonly description: string;
+  readonly tunable: boolean;
+  readonly defaultValue: unknown;
+  readonly minimum: number | null;
+  readonly maximum: number | null;
+  readonly step: number | null;
+  readonly choices: ReadonlyArray<unknown> | null;
+  readonly paramType: string | null;
+}
+
+/**
+ * Replay status for a card during live editing.
+ * Feature: 113-prov-card-flip
+ */
+export type CardReplayStatus = 'idle' | 'pending' | 'in-progress' | 'error';
 
 // --- Messages: Webview → Extension ---
 
@@ -156,6 +183,15 @@ export interface LogPanelProps {
   onRevertThisRequest?: (activityId: string) => void;
   onRestoreRequest?: (activityId: string) => void;
   onReplayCancel?: () => void;
+  /** Flip-card: request tool schema for edit face controls.
+   *  May return void (VS Code integration pushes schema via message),
+   *  or a Promise resolving to the schema array (web-shell / Storybook).
+   *  Feature: 113 */
+  onSchemaRequest?: (toolId: string) => void | Promise<ReadonlyArray<ParameterSchemaEntry>>;
+  /** Flip-card: toggle entry disabled state. Feature: 113 */
+  onDisableToggle?: (activityId: string, disabled: boolean) => void;
+  /** Flip-card: update rationale text. Feature: 113 */
+  onRationaleUpdate?: (activityId: string, rationale: string) => void;
   className?: string;
 }
 
@@ -170,6 +206,32 @@ export interface LogEntryProps {
   onClick?: (entry: TimelineEntry) => void;
   onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
   onRestoreClick?: (entry: TimelineEntry) => void;
+  /** Flip-card: whether this entry is in edit mode (flipped). Feature: 113 */
+  isEditing?: boolean;
+  /** Flip-card: callback to request edit mode (pencil icon click). Feature: 113 */
+  onEditClick?: (entry: TimelineEntry) => void;
+  /** Flip-card: callback when Done is clicked on the edit face. Feature: 113 */
+  onDoneClick?: (entry: TimelineEntry) => void;
+  /** Flip-card: tool parameter schema for the edit face (null while loading). Feature: 113 */
+  schema?: ReadonlyArray<ParameterSchemaEntry> | null;
+  /** Flip-card: whether the schema is currently loading. Feature: 113 */
+  schemaLoading?: boolean;
+  /** Flip-card: schema load error message. Feature: 113 */
+  schemaError?: string | null;
+  /** Flip-card: callback when a parameter value changes on the edit face. Feature: 113 */
+  onParameterChange?: (activityId: string, parameterName: string, newValue: unknown) => void;
+  /** Flip-card: callback to toggle disabled state. Feature: 113 */
+  onDisableToggle?: (activityId: string, disabled: boolean) => void;
+  /** Flip-card: callback to delete entry. Feature: 113 */
+  onDeleteClick?: (activityId: string) => void;
+  /** Flip-card: callback to update rationale. Feature: 113 */
+  onRationaleChange?: (activityId: string, rationale: string) => void;
+  /** Flip-card: callback to retry schema loading. Feature: 113 */
+  onRetrySchema?: (toolId: string) => void;
+  /** Flip-card: ref for rationale field auto-focus (from action bar). Feature: 113 */
+  rationaleRef?: React.Ref<HTMLTextAreaElement>;
+  /** Flip-card: current replay status for this card. Feature: 113 */
+  replayStatus?: CardReplayStatus;
   className?: string;
 }
 
@@ -184,6 +246,24 @@ export interface LogTimelineProps {
   onEntryClick?: (entry: TimelineEntry) => void;
   onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
   onRestoreClick?: (entry: TimelineEntry) => void;
+  /** Flip-card: currently editing entry ID. Feature: 113 */
+  editingActivityId?: string | null;
+  /** Flip-card: tool parameter schema for the editing entry. Feature: 113 */
+  editingSchema?: ReadonlyArray<ParameterSchemaEntry> | null;
+  /** Flip-card: whether the schema is loading. Feature: 113 */
+  schemaLoading?: boolean;
+  /** Flip-card: schema error message. Feature: 113 */
+  schemaError?: string | null;
+  /** Flip-card: ref for rationale field auto-focus. Feature: 113 */
+  rationaleRef?: React.Ref<HTMLTextAreaElement>;
+  /** Flip-card callbacks (pass-through). Feature: 113 */
+  onEditClick?: (entry: TimelineEntry) => void;
+  onDoneClick?: (entry: TimelineEntry) => void;
+  onParameterChange?: (activityId: string, parameterName: string, newValue: unknown) => void;
+  onDisableToggle?: (activityId: string, disabled: boolean) => void;
+  onDeleteClick?: (activityId: string) => void;
+  onRationaleChange?: (activityId: string, rationale: string) => void;
+  onRetrySchema?: (toolId: string) => void;
   className?: string;
 }
 
@@ -198,6 +278,24 @@ export interface LogByFeatureProps {
   onEntryClick?: (entry: TimelineEntry) => void;
   onTuneClick?: (entry: TimelineEntry, parameterName: string) => void;
   onRestoreClick?: (entry: TimelineEntry) => void;
+  /** Flip-card: currently editing entry ID. Feature: 113 */
+  editingActivityId?: string | null;
+  /** Flip-card: tool parameter schema for the editing entry. Feature: 113 */
+  editingSchema?: ReadonlyArray<ParameterSchemaEntry> | null;
+  /** Flip-card: whether the schema is loading. Feature: 113 */
+  schemaLoading?: boolean;
+  /** Flip-card: schema error message. Feature: 113 */
+  schemaError?: string | null;
+  /** Flip-card: ref for rationale field auto-focus. Feature: 113 */
+  rationaleRef?: React.Ref<HTMLTextAreaElement>;
+  /** Flip-card callbacks (pass-through). Feature: 113 */
+  onEditClick?: (entry: TimelineEntry) => void;
+  onDoneClick?: (entry: TimelineEntry) => void;
+  onParameterChange?: (activityId: string, parameterName: string, newValue: unknown) => void;
+  onDisableToggle?: (activityId: string, disabled: boolean) => void;
+  onDeleteClick?: (activityId: string) => void;
+  onRationaleChange?: (activityId: string, rationale: string) => void;
+  onRetrySchema?: (toolId: string) => void;
   className?: string;
 }
 
