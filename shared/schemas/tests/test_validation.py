@@ -4,8 +4,6 @@ Tests FEATURE_MODEL_MAP, validate_feature(), validate_features(),
 resolve_feature_model(), resolve_enum_values(), and SchemaValidationError.
 """
 
-from __future__ import annotations
-
 import pytest
 
 from debrief_schemas.validation import (
@@ -17,7 +15,6 @@ from debrief_schemas.validation import (
     validate_feature,
     validate_features,
 )
-
 
 # ============================================================================
 # T009: Tests for FEATURE_MODEL_MAP covering all 12 feature kinds
