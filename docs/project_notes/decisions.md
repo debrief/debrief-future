@@ -10,6 +10,7 @@ Each decision should include:
 - Decision (what was chosen)
 - Alternatives considered
 - Consequences (trade-offs, implications)
+- Evidence link (optional): reference to `specs/[feature]/evidence/` artifacts that validate the decision
 
 ---
 

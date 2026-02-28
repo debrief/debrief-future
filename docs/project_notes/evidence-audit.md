@@ -186,13 +186,22 @@ coverage_pct: 89.3
 
 ---
 
-## Implementation Priority
+## Implementation Status
 
-If implementing three changes now:
+All recommendations implemented on 2026-02-28:
 
-1. **A (Content Specialist integration)** — immediate value from existing evidence, no capture changes needed
-2. **C + E (Machine-readable front matter + template)** — unlocks aggregation, validation, and consistency
-3. **D (Quality rubric by type)** — addresses the root cause of low-quality evidence
+| Rec | Change | Files Modified |
+|-----|--------|----------------|
+| A | Content Specialist reads evidence for blog posts | `.claude/agents/media/content.md` |
+| B | Project notes cross-reference evidence | `docs/project_notes/decisions.md`, `bugs.md`, `issues.md` |
+| C | Machine-readable front matter on test-summary | `.specify/templates/evidence/test-summary-template.md` (new) |
+| D | Quality rubric by feature type | `.specify/templates/tasks-template.md` |
+| E | Test-summary template | `.specify/templates/evidence/test-summary-template.md` (new) |
+| F | Evidence freshness check in PR workflow | `.claude/commands/speckit.pr.md` |
+| G | Evidence index generation | `.claude/commands/speckit.pr.md` |
+| H | CHANGELOG generation from evidence | `.claude/commands/speckit.pr.md` |
+
+Also updated: `speckit.tasks.md`, `speckit.implement.md`, `CLAUDE.md`
 
 ---
 
