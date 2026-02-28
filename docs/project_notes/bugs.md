@@ -9,6 +9,7 @@ Each bug entry should include:
 - Brief description of the bug/issue
 - Solution or fix applied
 - Any prevention notes (optional)
+- Evidence (optional): link to `specs/[feature]/evidence/test-summary.md` that proves the fix works
 
 Use bullet lists for simplicity. Older entries can be manually removed when they become irrelevant.
 

@@ -10,6 +10,7 @@ Each entry should include:
 - Brief description (1-2 lines)
 - URL to ticket
 - Status (completed, in-progress, blocked)
+- Evidence (optional): link to `specs/[feature]/evidence/` directory with proof-of-work artifacts
 
 ---
 

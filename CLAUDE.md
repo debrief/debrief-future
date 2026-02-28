@@ -119,6 +119,13 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 
 **When completing work:**
 - Log in `docs/project_notes/issues.md` with ticket ID and URL
+- Link evidence: reference `specs/[feature]/evidence/` in issues.md and decisions.md entries
+
+**When capturing evidence:**
+- Use the test-summary template at `.specify/templates/evidence/test-summary-template.md`
+- Include YAML front matter with `git_sha` and `captured_at` for freshness tracking
+- Follow the Quality Rubric per feature type (see `.specify/templates/tasks-template.md`)
+- For UI components: capture interaction GIF alongside theme screenshots
 
 ## Active Technologies
 Only updated when a feature introduces a technology not already listed here.

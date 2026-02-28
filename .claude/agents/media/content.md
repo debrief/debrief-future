@@ -124,6 +124,10 @@ excerpt: "One-line summary of what we delivered"
 
 [2-4 annotated screenshots showing it working]
 
+## By the Numbers
+
+[Test metrics and key results from evidence — see Evidence-Driven Content below]
+
 ## Lessons Learned
 
 [What surprised us, what we'd do differently]
@@ -135,6 +139,38 @@ excerpt: "One-line summary of what we delivered"
 → [See the code](link to PR or spec)
 → [Try it yourself](if applicable)
 ```
+
+### Evidence-Driven Content
+
+When writing shipped posts, **always read the feature's evidence directory** (`specs/[feature]/evidence/`) and incorporate artifacts into the narrative. Evidence makes posts credible and concrete.
+
+#### Required Evidence Sources
+
+| Evidence File | How to Use in Post |
+|---|---|
+| `test-summary.md` | Extract metrics for "By the Numbers" section: test counts, coverage %, key scenarios verified. Use front matter values (`tests_passed`, `coverage_pct`) for callout boxes. |
+| `usage-example.md` | Pull concrete code/CLI examples into "What We Built". Show real usage, not abstract descriptions. |
+| `screenshots/*.png` | Embed in "Screenshots" section. Prefer interaction GIFs over static screenshots when available. |
+| `e2e-summary.md` | Reference E2E pass rates as credibility evidence. Mention theme variant coverage. |
+| `cli-demo.txt` | Include terminal sessions as code blocks — readers can see exactly what the tool does. |
+| `*.json` samples | Use sparingly for API/data features — show a representative snippet, not the full file. |
+
+#### Evidence Callout Pattern
+
+For the "By the Numbers" section, use this pattern:
+
+```markdown
+## By the Numbers
+
+| | |
+|---|---|
+| Tests passing | 47 |
+| Coverage | 89% |
+| Theme variants | 3/3 |
+| E2E scenarios | 12 |
+```
+
+If the feature has no quantitative evidence, omit this section rather than fabricating numbers. The section is optional — the evidence sources are not.
 
 ## Front Matter Reference
 
