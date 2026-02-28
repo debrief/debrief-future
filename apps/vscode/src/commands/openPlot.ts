@@ -264,6 +264,9 @@ export function createOpenPlotCommand(
         () => panel.getCurrentStore()?.path,
         () => panel.getCurrentPlot()?.itemPath
       );
+      console.log('[debrief] LogPanel: logService + path resolvers wired for', plot.title);
+    } else {
+      console.warn('[debrief] LogPanel: logPanelProvider not provided — provenance display will not work');
     }
 
     // Load plot into panel

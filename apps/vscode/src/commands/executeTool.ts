@@ -265,6 +265,9 @@ export function createExecuteToolCommand(
       // Resolve logService dynamically: prefer MapPanel's logService (set per-plot),
       // fall back to the static logService parameter (legacy path).
       const resolvedLogService = panel.getLogService?.() ?? logService;
+      if (!resolvedLogService) {
+        console.warn('[debrief] executeTool: logService not available — provenance will not be recorded. Was the plot opened correctly?');
+      }
       if (resolvedLogService && stacService) {
         try {
           const store = panel.getCurrentStore?.();

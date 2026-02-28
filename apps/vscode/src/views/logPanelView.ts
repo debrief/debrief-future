@@ -296,6 +296,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
    */
   private async _sendTimelineUpdate(): Promise<void> {
     if (!this._logService || !this._getStorePath || !this._getItemPath) {
+      console.warn('[debrief] LogPanel: timeline update skipped — logService or path resolvers not wired');
       return;
     }
 
@@ -492,6 +493,29 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
+  // ─── Service wiring guard ────────────────────────────────────────
+
+  /**
+   * Check that logService and path resolvers are wired. If not, send an
+   * error to the webview so the user sees feedback instead of nothing.
+   * Returns true if services are ready, false otherwise.
+   */
+  private _assertLogServiceReady(action: string): boolean {
+    if (this._logService && this._getStorePath && this._getItemPath) {
+      return true;
+    }
+    const missing: string[] = [];
+    if (!this._logService) { missing.push('logService'); }
+    if (!this._getStorePath) { missing.push('storePath resolver'); }
+    if (!this._getItemPath) { missing.push('itemPath resolver'); }
+    console.warn(`[debrief] LogPanel: ${action} skipped — missing ${missing.join(', ')}. Reopen the plot to reconnect.`);
+    this._postMessage({
+      type: 'replay:error',
+      payload: { message: `Log service not connected. Please reopen the plot. (missing: ${missing.join(', ')})` },
+    });
+    return false;
+  }
+
   // ─── Phase 6 handlers (Feature: 076-replay-tune) ──────────────────
 
   private async _handleTuneRequest(payload: {
@@ -499,17 +523,15 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     parameter: string;
     newValue: unknown;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) {
-      return;
-    }
-    const storePath = this._getStorePath();
-    const itemPath = this._getItemPath();
+    if (!this._assertLogServiceReady('tune:request')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
     if (!storePath || !itemPath) {
       return;
     }
 
     try {
-      const result = await this._logService.tuneEntry(
+      const result = await this._logService!.tuneEntry(
         storePath, itemPath,
         payload.activityId, payload.parameter, payload.newValue
       );
@@ -526,17 +548,15 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   private async _handleRevertToRequest(payload: {
     activityId: string;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) {
-      return;
-    }
-    const storePath = this._getStorePath();
-    const itemPath = this._getItemPath();
+    if (!this._assertLogServiceReady('revert-to:request')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
     if (!storePath || !itemPath) {
       return;
     }
 
     try {
-      await this._logService.revertTo(storePath, itemPath, payload.activityId);
+      await this._logService!.revertTo(storePath, itemPath, payload.activityId);
       this._postMessage({
         type: 'action:result',
         payload: {
@@ -557,17 +577,15 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   private async _handleRevertThisRequest(payload: {
     activityId: string;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) {
-      return;
-    }
-    const storePath = this._getStorePath();
-    const itemPath = this._getItemPath();
+    if (!this._assertLogServiceReady('revert-this:request')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
     if (!storePath || !itemPath) {
       return;
     }
 
     try {
-      const result = await this._logService.revertThis(
+      const result = await this._logService!.revertThis(
         storePath, itemPath, payload.activityId
       );
       this._sendReplayResult(result);
@@ -583,17 +601,15 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   private async _handleRestoreRequest(payload: {
     activityId: string;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) {
-      return;
-    }
-    const storePath = this._getStorePath();
-    const itemPath = this._getItemPath();
+    if (!this._assertLogServiceReady('restore:request')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
     if (!storePath || !itemPath) {
       return;
     }
 
     try {
-      const result = await this._logService.restoreEntry(
+      const result = await this._logService!.restoreEntry(
         storePath, itemPath, payload.activityId
       );
       this._sendReplayResult(result);
@@ -626,17 +642,15 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     activityId: string;
     disabled: boolean;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) {
-      return;
-    }
-    const storePath = this._getStorePath();
-    const itemPath = this._getItemPath();
+    if (!this._assertLogServiceReady('disable:toggle')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
     if (!storePath || !itemPath) {
       return;
     }
 
     try {
-      await this._logService.disableEntry(
+      await this._logService!.disableEntry(
         storePath, itemPath,
         payload.activityId, payload.disabled
       );
@@ -653,17 +667,15 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     activityId: string;
     rationale: string;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) {
-      return;
-    }
-    const storePath = this._getStorePath();
-    const itemPath = this._getItemPath();
+    if (!this._assertLogServiceReady('rationale:update')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
     if (!storePath || !itemPath) {
       return;
     }
 
     try {
-      await this._logService.setRationale(
+      await this._logService!.setRationale(
         storePath, itemPath,
         payload.activityId, payload.rationale
       );
