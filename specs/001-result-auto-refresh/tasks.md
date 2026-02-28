@@ -173,13 +173,13 @@
 
 ### Storybook Stories
 
-- [ ] T034 Add auto-refresh Storybook story: simulates data updates with viewport preservation `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
-- [ ] T035 [P] Add pause/resume Storybook story: demonstrates toggle and pending badge `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
+- [x] T034 Add auto-refresh Storybook story: simulates data updates with viewport preservation `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
+- [x] T035 [P] Add pause/resume Storybook story: demonstrates toggle and pending badge `shared/components/src/ChartRenderer/ChartRenderer.stories.tsx`
 
 ### E2E Tests
 
-- [ ] T036 Create Playwright test for auto-refresh rendering across theme variants `shared/components/e2e/ChartAutoRefresh.spec.ts`
-- [ ] T037 [P] Add interaction tests: data update trigger, pause/resume toggle, zoom-then-refresh `shared/components/e2e/ChartAutoRefresh.spec.ts`
+- [x] T036 Create Playwright test for auto-refresh rendering across theme variants `shared/components/e2e/ChartAutoRefresh.spec.ts`
+- [x] T037 [P] Add interaction tests: data update trigger, pause/resume toggle, zoom-then-refresh `shared/components/e2e/ChartAutoRefresh.spec.ts`
 - [ ] T038 Run e2e tests: `pnpm --filter @debrief/components test:e2e ChartAutoRefresh`
 
 **Checkpoint**: Storybook stories demonstrate auto-refresh behaviour. E2E tests capture screenshots across themes.
