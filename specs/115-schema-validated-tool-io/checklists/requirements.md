@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Enforce Schema-Validated Tool Inputs and Outputs
+# Specification Quality Checklist: Enforce Schema-Validated GeoJSON Across All Services
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-02-28
@@ -32,5 +32,7 @@
 ## Notes
 
 - All checklist items pass. Spec is ready for `/speckit.clarify` or `/speckit.plan`.
-- UI Feature Validation section not applicable — this is a backend service feature with no user interface.
-- Spec references "11 tools" based on current codebase audit; the exact count may vary if tools are added/removed before implementation.
+- UI Feature Validation section not applicable — this is a backend/service/type-safety feature with no user interface.
+- Scope expanded from calc-only to cover all five GeoJSON service boundaries: parser output (io), catalog write (stac), catalog read (stac), tool input (calc), tool output (calc), plus frontend type migration.
+- 22 functional requirements across 5 categories: calc (5), io (4), stac (3), frontend (3), cross-cutting (7).
+- 12 success criteria covering all boundaries.
