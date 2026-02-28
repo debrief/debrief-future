@@ -6,7 +6,7 @@ The edit face also surfaces disable (skip this step during replay but keep it in
 
 The tricky part was the disable cascade. When an entry is disabled, we need to know which downstream entries depend on its outputs and auto-disable them too. That requires traversing the used/generated graph, but graphs can have cycles. Added a visited guard to prevent infinite loops without adding a heavy dependency — just a Set.
 
-597 components tests, 335 extension tests, all building and shipping.
+932 TypeScript tests, 871 Python tests, 71 Playwright E2E tests — all passing. Screenshots in the full post show the empty log, tunable parameters, the edit card with sliders, and the map reflecting tuned operations.
 
 [Link to full shipped post]
 

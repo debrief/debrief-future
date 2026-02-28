@@ -1,10 +1,10 @@
 ---
 layout: future-post
 title: "Shipped: Provenance Card Flip"
-date: 2026-02-27
+date: 2026-02-28
 track: [credibility]
 author: Ian
-reading_time: 6
+reading_time: 7
 tags: [tracer-bullet, prov-logging, log-panel, ui-interaction]
 excerpt: "Edit parameters right on the card. Flip, adjust, watch the map update."
 ---
@@ -18,6 +18,32 @@ We shipped a flip-card interaction instead. Each card in the Log Panel now has a
 The edit face surfaces metadata the front can't show: timestamp, duration, file size, tool version. It has an editable rationale text field for analyst notes, a disable toggle that replays the timeline skipping that step, and a delete button behind a confirmation prompt. Click Done and the card flips back to read-only.
 
 The controls are schema-driven. When a card flips for the first time, we request the tool's parameter schema from the extension. The extension queries the MCP tool registry and returns types, bounds, constraints. A loading skeleton shows while the schema arrives. Once fetched, it's cached for the session — flip a second card from the same tool and controls render instantly.
+
+## Screenshots
+
+The Log Panel starts empty — a clean slate before any analysis work.
+
+![Empty log panel showing the "No operations recorded yet" message alongside the map view](../evidence/logpanel-empty.png)
+
+Run a few tools and entries appear as cards in the timeline. Each card shows the tool name, affected features, and parameters at a glance.
+
+![Log panel with tool entries for track-length and bounding-box after running analysis tools](../evidence/logpanel-entries.png)
+
+Parameters with dashed underlines are tunable — click one to adjust. Here the move-shape tool shows `direction: 90` and `distance_km: 5` as inline tunable values.
+
+![Close-up of a move-shape log entry with tunable direction and distance parameters](../evidence/logpanel-tunable-params.png)
+
+Click the pencil icon and the card flips to reveal the edit face. Sliders for bounded numbers, a rationale text field, disable toggle, and delete button — all in place without leaving the timeline.
+
+![Edit card back face showing parameter sliders, rationale field, disable toggle, and delete button](../evidence/logpanel-edit-card.png)
+
+After tuning `distance_km` from 5 to 10, the entry shows a "Tuned" badge and a notification confirms the change.
+
+![Tuned entry with badge and notification after adjusting the distance parameter](../evidence/logpanel-tuned-entry.png)
+
+The full layout with three log entries and the map reflecting the moved annotation shape. The rectangle has shifted according to the move-shape tool's parameters.
+
+![Full page showing the log panel with three entries alongside the map with a moved annotation shape](../evidence/logpanel-full-page.png)
 
 ## Lessons Learned
 
