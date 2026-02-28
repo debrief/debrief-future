@@ -18,6 +18,13 @@ import type {
   MultiPolygonFeatureProperties,
   SegmentMetadata,
   PositionStyleOverride,
+  NarrativeEntry,
+  CircleAnnotation,
+  RectangleAnnotation,
+  LineAnnotation,
+  TextAnnotation,
+  VectorAnnotation,
+  PolyAnnotation,
 } from '@debrief/schemas';
 
 // Re-export all schema types for convenience
@@ -36,14 +43,28 @@ export type {
   MultiPolygonFeatureProperties,
   SegmentMetadata,
   PositionStyleOverride,
+  NarrativeEntry,
+  CircleAnnotation,
+  RectangleAnnotation,
+  LineAnnotation,
+  TextAnnotation,
+  VectorAnnotation,
+  PolyAnnotation,
 };
 
 // Re-export DisplayMode from TimeController for use by MapView temporal rendering
 export type { DisplayMode } from '../TimeController/types';
 
 /**
- * GeoJSON Feature for annotation/shape types (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR, POLY)
- * that don't have dedicated schema types yet. Preserves all original GeoJSON properties.
+ * Schema-typed annotation features — union of all 7 annotation types
+ * from @debrief/schemas. Available for precise type narrowing when needed.
+ */
+export type SchemaAnnotationFeature = NarrativeEntry | CircleAnnotation | RectangleAnnotation | LineAnnotation | TextAnnotation | VectorAnnotation | PolyAnnotation;
+
+/**
+ * Loose annotation interface for backward compatibility.
+ * Used in the DebriefFeature union as a catch-all for annotation types.
+ * Components can narrow to specific schema types using kind-based type guards.
  */
 export interface AnnotationFeature {
   type: 'Feature';

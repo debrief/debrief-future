@@ -92,7 +92,7 @@ export function createDrawnFeature(
       id,
       geometry: {
         type: 'Polygon',
-        coordinates: polygonGeometry.coordinates as unknown as number[],
+        coordinates: polygonGeometry.coordinates as unknown as number[][][],
       },
       properties: {
         kind: 'RECTANGLE',
@@ -116,7 +116,7 @@ export function createDrawnFeature(
       id,
       geometry: {
         type: 'Polygon',
-        coordinates: polygonGeometry.coordinates as unknown as number[],
+        coordinates: polygonGeometry.coordinates as unknown as number[][][],
       },
       properties: {
         kind: 'POLY',
@@ -138,7 +138,7 @@ export function createDrawnFeature(
       id,
       geometry: {
         type: 'LineString',
-        coordinates: lineGeometry.coordinates as unknown as number[],
+        coordinates: lineGeometry.coordinates as unknown as number[][],
       },
       properties: {
         kind: 'LINE',
