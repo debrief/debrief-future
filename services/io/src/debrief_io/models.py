@@ -124,9 +124,7 @@ class ParseResult(BaseModel):
                     code="SCHEMA_VALIDATION",
                 )
                 schema_warnings.append(warning)
-                logger.warning(
-                    "Parser output schema warning for feature[%d]: %s", i, e
-                )
+                logger.warning("Parser output schema warning for feature[%d]: %s", i, e)
 
         self.warnings.extend(schema_warnings)
         return schema_warnings

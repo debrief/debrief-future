@@ -51,7 +51,13 @@ def apply_symbol_style(context: SelectionContext, params: dict[str, Any]) -> lis
     # Validate against schema-defined MarkerSymbol enum
     from debrief_schemas.validation import resolve_enum_values
 
-    valid_symbols = resolve_enum_values("MarkerSymbol") or {"circle", "square", "triangle", "diamond", "cross"}
+    valid_symbols = resolve_enum_values("MarkerSymbol") or {
+        "circle",
+        "square",
+        "triangle",
+        "diamond",
+        "cross",
+    }
     if symbol not in valid_symbols:
         raise ValueError(f"symbol must be one of: {', '.join(sorted(valid_symbols))}")
 

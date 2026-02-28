@@ -280,7 +280,14 @@ class TestSchemaValidationError:
             boundary="tool_output",
             feature_id="track-001",
             feature_kind="TRACK",
-            errors=[FieldError(field_path="properties.name", expected="string", actual="int", message="wrong type")],
+            errors=[
+                FieldError(
+                    field_path="properties.name",
+                    expected="string",
+                    actual="int",
+                    message="wrong type",
+                )
+            ],
         )
         s = str(err)
         assert "tool_output" in s
@@ -293,8 +300,18 @@ class TestSchemaValidationError:
             feature_id="ref-001",
             feature_kind="POINT",
             errors=[
-                FieldError(field_path="properties.name", expected="string", actual="int", message="wrong type"),
-                FieldError(field_path="properties.style", expected="object", actual="null", message="required"),
+                FieldError(
+                    field_path="properties.name",
+                    expected="string",
+                    actual="int",
+                    message="wrong type",
+                ),
+                FieldError(
+                    field_path="properties.style",
+                    expected="object",
+                    actual="null",
+                    message="required",
+                ),
             ],
         )
         s = str(err)

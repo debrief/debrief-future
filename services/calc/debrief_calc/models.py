@@ -202,10 +202,24 @@ def _get_valid_param_types() -> set[str]:
         from debrief_schemas.validation import resolve_enum_values as _resolve
 
         # These are the param_type names that match schema enums
-        candidates = {"NamedColor", "MarkerSymbol", "CardinalDirection", "DurationPreset", "NumericPreset", "ReferencePointPattern"}
+        candidates = {
+            "NamedColor",
+            "MarkerSymbol",
+            "CardinalDirection",
+            "DurationPreset",
+            "NumericPreset",
+            "ReferencePointPattern",
+        }
         return {name for name in candidates if _resolve(name) is not None}
     except ImportError:
-        return {"NamedColor", "MarkerSymbol", "CardinalDirection", "DurationPreset", "NumericPreset", "ReferencePointPattern"}
+        return {
+            "NamedColor",
+            "MarkerSymbol",
+            "CardinalDirection",
+            "DurationPreset",
+            "NumericPreset",
+            "ReferencePointPattern",
+        }
 
 
 VALID_PARAM_TYPES = _get_valid_param_types()
