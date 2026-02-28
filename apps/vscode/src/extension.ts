@@ -310,7 +310,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     (panel) => {
       mapPanel = panel;
     },
-    resultIdRegistry
+    resultIdRegistry,
+    logPanelProvider
   );
   context.subscriptions.push(...commands);
 

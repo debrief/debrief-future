@@ -523,6 +523,13 @@ export class MapPanel {
   }
 
   /**
+   * Get LogService for provenance recording.
+   */
+  public getLogService(): LogService | null {
+    return this.logService;
+  }
+
+  /**
    * Get current plot info
    */
   public getCurrentPlot(): Plot | null {

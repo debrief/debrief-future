@@ -16,6 +16,7 @@ import type { MapPanel } from '../webview/mapPanel';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import type { LogService, InputFeatureState, ResultIdRegistry } from '@debrief/session-state';
+import type { LogPanelViewProvider } from '../views/logPanelView';
 import type { ToolParameter } from '../types/tool';
 
 /**
@@ -79,8 +80,9 @@ async function collectParameters(
  * @param layersTreeProvider - LayersTreeProvider for displaying results
  * @param stacService - StacService for persisting results to STAC
  * @param activityPanelProvider - ActivityPanelViewProvider for updating result files
- * @param logService - LogService for recording provenance (Feature: 071)
+ * @param logService - LogService for recording provenance (Feature: 071) — deprecated, prefer MapPanel getter
  * @param resultIdRegistry - ResultIdRegistry for tracking result IDs (Feature: 087)
+ * @param logPanelProvider - LogPanelViewProvider for refreshing timeline after tool execution (Feature: 113)
  */
 export function createExecuteToolCommand(
   calcService: CalcService,
@@ -90,7 +92,8 @@ export function createExecuteToolCommand(
   stacService?: StacService,
   activityPanelProvider?: ActivityPanelViewProvider,
   logService?: LogService,
-  resultIdRegistry?: ResultIdRegistry
+  resultIdRegistry?: ResultIdRegistry,
+  logPanelProvider?: LogPanelViewProvider
 ): (toolIdOrMessage: string | { toolId: string; params?: Record<string, unknown> }) => Promise<void> {
   return async (toolIdOrMessage: string | { toolId: string; params?: Record<string, unknown> }) => {
     // Handle string, { toolId, params } object, and legacy { toolName } format
@@ -259,14 +262,17 @@ export function createExecuteToolCommand(
       }
 
       // Record provenance via Log Service (Feature: 071)
-      if (logService && stacService) {
+      // Resolve logService dynamically: prefer MapPanel's logService (set per-plot),
+      // fall back to the static logService parameter (legacy path).
+      const resolvedLogService = panel.getLogService?.() ?? logService;
+      if (resolvedLogService && stacService) {
         try {
           const store = panel.getCurrentStore?.();
           const plot = panel.getCurrentPlot?.();
           if (store?.path && plot?.itemPath) {
             // Include pre-tool inputState for mutation tools
             const isMutation = result.resultType?.startsWith('mutation/');
-            const recordResult = await logService.recordToolResult(
+            const recordResult = await resolvedLogService.recordToolResult(
               {
                 success: true,
                 features: result.features,
@@ -291,6 +297,11 @@ export function createExecuteToolCommand(
             // Update Result ID Registry from recorded entries (Feature: 087)
             if (resultIdRegistry) {
               resultIdRegistry.registerFromRecordResult(recordResult);
+            }
+
+            // Refresh Log Panel timeline to show the new entry (Feature: 113)
+            if (logPanelProvider) {
+              void logPanelProvider.refreshTimeline();
             }
           }
         } catch (logErr) {
