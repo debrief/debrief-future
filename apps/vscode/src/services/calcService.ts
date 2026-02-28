@@ -652,7 +652,7 @@ print(json.dumps(tools))
    */
   private resolveFeatures(
     featureIds: string[]
-  ): Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> {
+  ): Array<{ type: 'Feature'; id?: string | number; geometry: unknown; properties: Record<string, unknown> }> {
     const panel = this.getMapPanel();
     if (!panel) {
       throw new Error('No map panel available');
@@ -660,7 +660,7 @@ print(json.dumps(tools))
 
     const allFeatures = panel.getFeatures();
     const resultLayers = panel.getResultLayers();
-    const resolved: Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> = [];
+    const resolved: Array<{ type: 'Feature'; id?: string | number; geometry: unknown; properties: Record<string, unknown> }> = [];
 
     for (const id of featureIds) {
       const feature = allFeatures.find((f) => String(f.id) === id);
