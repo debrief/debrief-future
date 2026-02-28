@@ -248,12 +248,13 @@ def _validate_feature(feature: GeoJSONFeature) -> None:
     # Schema validation (warn-and-continue)
     try:
         from debrief_schemas.validation import SchemaValidationError, validate_feature
-
-        validate_feature(feature, "catalog_write")
-    except SchemaValidationError as e:
-        logger.warning("Catalog schema validation: %s", e)
     except ImportError:
         pass
+    else:
+        try:
+            validate_feature(feature, "catalog_write")
+        except SchemaValidationError as e:
+            logger.warning("Catalog schema validation: %s", e)
 
 
 def _calculate_bbox(features: Sequence[GeoJSONFeature]) -> BoundingBox | None:
