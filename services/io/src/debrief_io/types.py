@@ -15,10 +15,10 @@ if TYPE_CHECKING:
 # Path to a file to parse - accepts both str and Path
 FilePath = Path | str
 
-# Any GeoJSON feature type output by parser
-# Using Any to avoid circular imports with debrief-schemas
-# Actual types: TrackFeature | ReferenceLocation | SensorContact
-Feature = Any
+# GeoJSON feature dict output by parser.
+# Runtime: validated against debrief-schemas Pydantic models at the
+# parser output boundary (warn-and-continue).
+Feature = dict[str, Any]
 
 # Handler class type for registration
 HandlerClass = type["BaseHandler"]

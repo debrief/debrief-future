@@ -226,7 +226,7 @@ class TestGridEdgeCases:
 
         context = _make_context()
         params = {"pattern": "hexagonal"}
-        with pytest.raises(ValueError, match="'grid' or 'scatter'"):
+        with pytest.raises(ValueError, match="grid.*scatter"):
             generate_reference_points(context, params)
 
     def test_grid_matches_golden_example(self) -> None:

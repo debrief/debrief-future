@@ -4,12 +4,13 @@ Tool execution engine for debrief-calc.
 Provides the main entry point for running analysis tools with:
 - Input validation (context type, kind compatibility)
 - Provenance tracking
-- Output validation
+- Output validation (structural + schema)
 - Error handling
 """
 
 from __future__ import annotations
 
+import logging
 import time
 from typing import Any
 
@@ -30,6 +31,8 @@ from debrief_calc.models import (
 from debrief_calc.provenance import attach_log_entry, create_log_entry, set_output_kind
 from debrief_calc.registry import registry
 from debrief_calc.validation import validate_tool_output
+
+logger = logging.getLogger(__name__)
 
 
 def run(
@@ -70,6 +73,10 @@ def run(
         # Validate feature kinds
         _validate_kinds(tool, context)
 
+        # Schema-validate input features (warn-and-continue)
+        if context.features:
+            _schema_validate_features(context.features, f"{tool_name}:input")
+
         # Execute the tool handler
         output_features = _execute_handler(tool, context, params)
 
@@ -98,6 +105,10 @@ def run(
             # Validate output if requested (skip kind check for mutations)
             if validate_output and not is_mutation:
                 validate_tool_output(output_features, tool.output_kind, tool.name)
+
+            # Schema validation (warn-and-continue during gradual adoption)
+            if validate_output:
+                _schema_validate_features(output_features, tool.name)
 
         return ToolResult(
             tool=tool_name, success=True, features=output_features, duration_ms=duration_ms
@@ -185,6 +196,30 @@ def _validate_kinds(tool: Tool, context: SelectionContext) -> None:
 
     if not accepted:
         raise KindMismatchError(tool.name, tool.input_kinds, kinds)
+
+
+def _schema_validate_features(features: list[dict[str, Any]], tool_name: str) -> None:
+    """Run schema validation on output features (warn-and-continue).
+
+    Validates each feature that has a known ``kind`` against the Pydantic model
+    from ``debrief_schemas.validation.FEATURE_MODEL_MAP``. Schema failures are
+    logged as warnings rather than raising, to allow gradual adoption.
+    """
+    try:
+        from debrief_schemas.validation import SchemaValidationError, validate_feature
+    except ImportError:
+        return  # debrief-schemas not available
+
+    for i, feature in enumerate(features):
+        try:
+            validate_feature(feature, "tool_output")
+        except SchemaValidationError as e:
+            logger.warning(
+                "Schema validation warning for tool '%s' feature[%d]: %s",
+                tool_name,
+                i,
+                e,
+            )
 
 
 def _execute_handler(
