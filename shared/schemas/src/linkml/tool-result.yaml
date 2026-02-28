@@ -89,3 +89,64 @@ classes:
         multivalued: true
         minimum_cardinality: 1
         slot_uri: debrief:deletedFeatures
+
+  DatasetAxisMetadata:
+    description: Axis label and type metadata for a dataset chart
+    attributes:
+      label:
+        description: Human-readable axis label (e.g., "Time", "Range")
+        range: string
+        required: true
+      type:
+        description: Axis data type (temporal, quantitative)
+        range: string
+        required: true
+      units:
+        description: Units for the axis values (e.g., "m", "°")
+        range: string
+
+  DatasetMetadata:
+    description: Chart metadata for a dataset entry
+    attributes:
+      xAxis:
+        description: X-axis metadata
+        range: DatasetAxisMetadata
+        required: true
+      yAxis:
+        description: Y-axis metadata
+        range: DatasetAxisMetadata
+        required: true
+
+  DatasetSeries:
+    description: A named data series within a dataset
+    attributes:
+      name:
+        description: Series display name
+        range: string
+        required: true
+      data:
+        description: Array of [timestamp, value] data points
+        range: float
+        multivalued: true
+
+  DatasetEntry:
+    description: A dataset entry containing time-series data for chart rendering
+    attributes:
+      type:
+        description: Dataset type identifier (e.g., "range_bearing_series")
+        range: string
+        required: true
+      title:
+        description: Human-readable dataset title
+        range: string
+        required: true
+      metadata:
+        description: Chart axis metadata
+        range: DatasetMetadata
+        required: true
+      series:
+        description: Data series array
+        range: DatasetSeries
+        multivalued: true
+        required: true
+        inlined_as_list: true

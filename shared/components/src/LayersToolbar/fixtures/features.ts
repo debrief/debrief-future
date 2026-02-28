@@ -31,7 +31,7 @@ export function generateTracks(count: number): TrackFeature[] {
     id: `track-${i.toString().padStart(3, '0')}`,
     geometry: {
       type: 'LineString' as const,
-      coordinates: [[-5 + i * 0.1, 50], [-4 + i * 0.1, 51]] as unknown as number[],
+      coordinates: [[-5 + i * 0.1, 50], [-4 + i * 0.1, 51]] as unknown as number[][],
     },
     properties: {
       kind: 'TRACK' as const,

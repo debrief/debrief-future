@@ -48,14 +48,14 @@
 
 **Purpose**: Extend the LinkML schema with missing fields and fix the TypeScript generator, then regenerate all derived schemas. This unblocks all downstream validation work.
 
-- [ ] T001 Add `provenance` field (Optional list of LogEntry) to all feature property classes in LinkML `shared/schemas/src/linkml/geojson.yaml`
-- [ ] T002 [P] Add `provenance` field to all annotation property classes in LinkML `shared/schemas/src/linkml/annotations.yaml`
-- [ ] T003 [P] Add `__datasets` field to range-bearing result properties in LinkML `shared/schemas/src/linkml/tool-result.yaml`
-- [ ] T004 Fix TypeScript geometry coordinate types in schema generator `shared/schemas/scripts/generate.py`
-- [ ] T005 Regenerate all derived schemas (Pydantic, JSON Schema, TypeScript) `shared/schemas/src/generated/`
-- [ ] T006 [P] Add valid/invalid fixtures with provenance fields `shared/schemas/src/fixtures/`
-- [ ] T007 [P] Add valid/invalid fixtures for __datasets field `shared/schemas/fixtures/tool-result/`
-- [ ] T008 [test] Run schema adherence tests to verify new fields pass `shared/schemas/tests/`
+- [x] T001 Add `provenance` field (Optional list of LogEntry) to all feature property classes in LinkML `shared/schemas/src/linkml/geojson.yaml`
+- [x] T002 [P] Add `provenance` field to all annotation property classes in LinkML `shared/schemas/src/linkml/annotations.yaml`
+- [x] T003 [P] Add `__datasets` field to range-bearing result properties in LinkML `shared/schemas/src/linkml/tool-result.yaml`
+- [x] T004 Fix TypeScript geometry coordinate types in schema generator `shared/schemas/scripts/generate.py`
+- [x] T005 Regenerate all derived schemas (Pydantic, JSON Schema, TypeScript) `shared/schemas/src/generated/`
+- [x] T006 [P] Add valid/invalid fixtures with provenance fields `shared/schemas/src/fixtures/`
+- [x] T007 [P] Add valid/invalid fixtures for __datasets field `shared/schemas/fixtures/tool-result/`
+- [x] T008 [test] Run schema adherence tests to verify new fields pass `shared/schemas/tests/`
 
 **Checkpoint**: Schema prerequisites complete — all feature property classes include `provenance`, TypeScript types have correct coordinate types, and all derived schemas are regenerated.
 
@@ -69,23 +69,23 @@
 
 ### Tests
 
-- [ ] T009 [test] Write tests for FEATURE_MODEL_MAP covering all 12 feature kinds `shared/schemas/tests/test_validation.py`
-- [ ] T010 [P][test] Write tests for validate_feature() success and failure paths `shared/schemas/tests/test_validation.py`
-- [ ] T011 [P][test] Write tests for validate_features() batch validation with fail-fast `shared/schemas/tests/test_validation.py`
-- [ ] T012 [P][test] Write tests for resolve_feature_model() with known and unknown kinds `shared/schemas/tests/test_validation.py`
-- [ ] T013 [P][test] Write tests for resolve_enum_values() for all 6 enum types `shared/schemas/tests/test_validation.py`
-- [ ] T014 [P][test] Write tests for SchemaValidationError string formatting `shared/schemas/tests/test_validation.py`
+- [x] T009 [test] Write tests for FEATURE_MODEL_MAP covering all 12 feature kinds `shared/schemas/tests/test_validation.py`
+- [x] T010 [P][test] Write tests for validate_feature() success and failure paths `shared/schemas/tests/test_validation.py`
+- [x] T011 [P][test] Write tests for validate_features() batch validation with fail-fast `shared/schemas/tests/test_validation.py`
+- [x] T012 [P][test] Write tests for resolve_feature_model() with known and unknown kinds `shared/schemas/tests/test_validation.py`
+- [x] T013 [P][test] Write tests for resolve_enum_values() for all 6 enum types `shared/schemas/tests/test_validation.py`
+- [x] T014 [P][test] Write tests for SchemaValidationError string formatting `shared/schemas/tests/test_validation.py`
 
 ### Implementation
 
-- [ ] T015 Create SchemaValidationError and FieldError classes `shared/schemas/src/generated/python/debrief_schemas/validation.py`
-- [ ] T016 Create FEATURE_MODEL_MAP dispatch dictionary for all 12 kinds `shared/schemas/src/generated/python/debrief_schemas/validation.py`
-- [ ] T017 Implement validate_feature() with kind extraction and model dispatch `shared/schemas/src/generated/python/debrief_schemas/validation.py`
-- [ ] T018 Implement validate_features() batch wrapper with fail-fast `shared/schemas/src/generated/python/debrief_schemas/validation.py`
-- [ ] T019 Implement resolve_feature_model() `shared/schemas/src/generated/python/debrief_schemas/validation.py`
-- [ ] T020 Implement resolve_enum_values() for all 6 schema enums `shared/schemas/src/generated/python/debrief_schemas/validation.py`
-- [ ] T021 Export validation API from debrief_schemas package `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
-- [ ] T022 Run foundation tests and verify all pass `shared/schemas/tests/test_validation.py`
+- [x] T015 Create SchemaValidationError and FieldError classes `shared/schemas/src/generated/python/debrief_schemas/validation.py`
+- [x] T016 Create FEATURE_MODEL_MAP dispatch dictionary for all 12 kinds `shared/schemas/src/generated/python/debrief_schemas/validation.py`
+- [x] T017 Implement validate_feature() with kind extraction and model dispatch `shared/schemas/src/generated/python/debrief_schemas/validation.py`
+- [x] T018 Implement validate_features() batch wrapper with fail-fast `shared/schemas/src/generated/python/debrief_schemas/validation.py`
+- [x] T019 Implement resolve_feature_model() `shared/schemas/src/generated/python/debrief_schemas/validation.py`
+- [x] T020 Implement resolve_enum_values() for all 6 schema enums `shared/schemas/src/generated/python/debrief_schemas/validation.py`
+- [x] T021 Export validation API from debrief_schemas package `shared/schemas/src/generated/python/debrief_schemas/__init__.py`
+- [x] T022 Run foundation tests and verify all pass `shared/schemas/tests/test_validation.py`
 
 **Checkpoint**: Foundation ready — `validate_feature()`, `FEATURE_MODEL_MAP`, `resolve_enum_values()`, and `SchemaValidationError` are tested and exported from `debrief_schemas`. User story implementation can now begin.
 
@@ -99,19 +99,19 @@
 
 ### Tests
 
-- [ ] T023 [test] Write test: tool output with invalid field name is rejected `services/calc/tests/test_schema_validation.py`
-- [ ] T024 [P][test] Write test: tool output with correct fields passes validation `services/calc/tests/test_schema_validation.py`
-- [ ] T025 [P][test] Write test: tool output with wrong type (string where number expected) is rejected `services/calc/tests/test_schema_validation.py`
-- [ ] T026 [P][test] Write test: validation error identifies boundary as "tool_output" `services/calc/tests/test_schema_validation.py`
+- [x] T023 [test] Write test: tool output with invalid field name is rejected `services/calc/tests/test_schema_validation.py`
+- [x] T024 [P][test] Write test: tool output with correct fields passes validation `services/calc/tests/test_schema_validation.py`
+- [x] T025 [P][test] Write test: tool output with wrong type (string where number expected) is rejected `services/calc/tests/test_schema_validation.py`
+- [x] T026 [P][test] Write test: validation error identifies boundary as "tool_output" `services/calc/tests/test_schema_validation.py`
 
 ### Implementation
 
-- [ ] T027 Add debrief-schemas dependency to calc service `services/calc/pyproject.toml`
-- [ ] T028 Integrate schema validation for tool outputs in executor (after handler, before provenance) `services/calc/debrief_calc/executor.py`
-- [ ] T029 Type SelectionContext.features with schema union type `services/calc/debrief_calc/models.py`
-- [ ] T030 Integrate schema validation alongside existing checks in validation module `services/calc/debrief_calc/validation.py`
-- [ ] T031 Update existing tool tests to verify output schema compliance `services/calc/tests/tools/`
-- [ ] T032 Run full calc test suite and verify no regressions `services/calc/tests/`
+- [x] T027 Add debrief-schemas dependency to calc service `services/calc/pyproject.toml`
+- [x] T028 Integrate schema validation for tool outputs in executor (after handler, before provenance) `services/calc/debrief_calc/executor.py`
+- [x] T029 Type SelectionContext.features with schema union type `services/calc/debrief_calc/models.py`
+- [x] T030 Integrate schema validation alongside existing checks in validation module `services/calc/debrief_calc/validation.py`
+- [x] T031 Update existing tool tests to verify output schema compliance `services/calc/tests/tools/`
+- [x] T032 Run full calc test suite and verify no regressions `services/calc/tests/`
 
 **Checkpoint**: Tool outputs are schema-validated. Field-name mismatches in tool output produce clear validation errors at the tool_output boundary.
 
@@ -125,20 +125,20 @@
 
 ### Tests
 
-- [ ] T033 [test] Write test: tool rejects invalid enum value with schema-derived valid values `services/calc/tests/test_schema_validation.py`
-- [ ] T034 [P][test] Write test: tool accepts valid enum values from schema `services/calc/tests/test_schema_validation.py`
-- [ ] T035 [P][test] Write test: tool parameter choices match schema enum values exactly `services/calc/tests/test_schema_validation.py`
+- [x] T033 [test] Write test: tool rejects invalid enum value with schema-derived valid values `services/calc/tests/test_schema_validation.py`
+- [x] T034 [P][test] Write test: tool accepts valid enum values from schema `services/calc/tests/test_schema_validation.py`
+- [x] T035 [P][test] Write test: tool parameter choices match schema enum values exactly `services/calc/tests/test_schema_validation.py`
 
 ### Implementation
 
-- [ ] T036 Replace hardcoded valid_symbols in apply_symbol_style with schema enum `services/calc/debrief_calc/tools/track/styling/apply_symbol_style.py`
-- [ ] T037 [P] Replace hardcoded color defaults in set_track_color with schema enum `services/calc/debrief_calc/tools/track/styling/set_track_color.py`
-- [ ] T038 [P] Replace hardcoded pattern check in generate-reference-points with schema enum `services/calc/debrief_calc/tools/reference/generation.py`
-- [ ] T039 Add executor-level enum parameter validation using resolve_enum_values() `services/calc/debrief_calc/executor.py`
-- [ ] T040 Update tool tests for apply_symbol_style to verify schema-derived enum usage `services/calc/tests/tools/track/styling/test_apply_symbol_style.py`
-- [ ] T041 [P] Update tool tests for set_track_color `services/calc/tests/tools/track/styling/test_set_track_color.py`
-- [ ] T042 [P] Update tool tests for generate-reference-points `services/calc/tests/tools/reference/test_generation.py`
-- [ ] T043 Run full calc test suite and verify no regressions `services/calc/tests/`
+- [x] T036 Replace hardcoded valid_symbols in apply_symbol_style with schema enum `services/calc/debrief_calc/tools/track/styling/apply_symbol_style.py`
+- [x] T037 [P] Replace hardcoded color defaults in set_track_color with schema enum `services/calc/debrief_calc/tools/track/styling/set_track_color.py`
+- [x] T038 [P] Replace hardcoded pattern check in generate-reference-points with schema enum `services/calc/debrief_calc/tools/reference/generation.py`
+- [x] T039 Add executor-level enum parameter validation using resolve_enum_values() `services/calc/debrief_calc/executor.py`
+- [x] T040 Update tool tests for apply_symbol_style to verify schema-derived enum usage `services/calc/tests/tools/track/styling/test_apply_symbol_style.py`
+- [x] T041 [P] Update tool tests for set_track_color `services/calc/tests/tools/track/styling/test_set_track_color.py`
+- [x] T042 [P] Update tool tests for generate-reference-points `services/calc/tests/tools/reference/test_generation.py`
+- [x] T043 Run full calc test suite and verify no regressions `services/calc/tests/`
 
 **Checkpoint**: All hardcoded enum sets removed. Tool parameters validated against schema-derived enum values.
 
@@ -152,15 +152,15 @@
 
 ### Tests
 
-- [ ] T044 [test] Write test: input feature missing required property is rejected at tool_input boundary `services/calc/tests/test_schema_validation.py`
-- [ ] T045 [P][test] Write test: input feature with unknown kind is rejected `services/calc/tests/test_schema_validation.py`
-- [ ] T046 [P][test] Write test: valid input feature passes validation and tool processes normally `services/calc/tests/test_schema_validation.py`
+- [x] T044 [test] Write test: input feature missing required property is rejected at tool_input boundary `services/calc/tests/test_schema_validation.py`
+- [x] T045 [P][test] Write test: input feature with unknown kind is rejected `services/calc/tests/test_schema_validation.py`
+- [x] T046 [P][test] Write test: valid input feature passes validation and tool processes normally `services/calc/tests/test_schema_validation.py`
 
 ### Implementation
 
-- [ ] T047 Integrate schema validation for tool inputs in executor (before handler execution) `services/calc/debrief_calc/executor.py`
-- [ ] T048 Update existing executor tests to account for input validation `services/calc/tests/test_executor.py`
-- [ ] T049 Run full calc test suite and verify no regressions `services/calc/tests/`
+- [x] T047 Integrate schema validation for tool inputs in executor (before handler execution) `services/calc/debrief_calc/executor.py`
+- [x] T048 Update existing executor tests to account for input validation `services/calc/tests/test_executor.py`
+- [x] T049 Run full calc test suite and verify no regressions `services/calc/tests/`
 
 **Checkpoint**: Tool inputs are schema-validated. Malformed features are rejected at the tool_input boundary with clear error messages.
 
@@ -174,20 +174,20 @@
 
 ### Tests
 
-- [ ] T050 [test] Write test: parsed REP track features pass schema validation `services/io/tests/test_schema_compliance.py`
-- [ ] T051 [P][test] Write test: parsed annotation features (all types) pass schema validation `services/io/tests/test_schema_compliance.py`
-- [ ] T052 [P][test] Write test: parser with intentionally broken output is rejected at parser_output boundary `services/io/tests/test_schema_compliance.py`
-- [ ] T053 [P][test] Write test: each feature validates against correct schema model based on its kind `services/io/tests/test_schema_compliance.py`
+- [x] T050 [test] Write test: parsed REP track features pass schema validation `services/io/tests/test_schema_compliance.py`
+- [x] T051 [P][test] Write test: parsed annotation features (all types) pass schema validation `services/io/tests/test_schema_compliance.py`
+- [x] T052 [P][test] Write test: parser with intentionally broken output is rejected at parser_output boundary `services/io/tests/test_schema_compliance.py`
+- [x] T053 [P][test] Write test: each feature validates against correct schema model based on its kind `services/io/tests/test_schema_compliance.py`
 
 ### Implementation
 
-- [ ] T054 Replace Feature = Any with schema union type in IO types `services/io/src/debrief_io/types.py`
-- [ ] T055 Add schema validation after parse() in base handler `services/io/src/debrief_io/handlers/base.py`
-- [ ] T056 Ensure REP handler produces schema-compliant track features `services/io/src/debrief_io/handlers/rep.py`
-- [ ] T057 Ensure all annotation builders produce schema-compliant output `services/io/src/debrief_io/handlers/annotations/builders.py`
-- [ ] T058 Update existing parser tests to verify schema compliance `services/io/tests/test_rep_handler.py`
-- [ ] T059 [P] Update annotation integration tests for schema compliance `services/io/tests/test_annotations/test_integration.py`
-- [ ] T060 Run full IO test suite and verify no regressions `services/io/tests/`
+- [x] T054 Replace Feature = Any with schema union type in IO types `services/io/src/debrief_io/types.py`
+- [x] T055 Add schema validation after parse() in base handler `services/io/src/debrief_io/handlers/base.py`
+- [x] T056 Ensure REP handler produces schema-compliant track features `services/io/src/debrief_io/handlers/rep.py`
+- [x] T057 Ensure all annotation builders produce schema-compliant output `services/io/src/debrief_io/handlers/annotations/builders.py`
+- [x] T058 Update existing parser tests to verify schema compliance `services/io/tests/test_rep_handler.py`
+- [x] T059 [P] Update annotation integration tests for schema compliance `services/io/tests/test_annotations/test_integration.py`
+- [x] T060 Run full IO test suite and verify no regressions `services/io/tests/`
 
 **Checkpoint**: All parsers produce schema-validated features. Malformed parser output is rejected at the parser_output boundary.
 
@@ -201,18 +201,18 @@
 
 ### Tests
 
-- [ ] T061 [test] Write test: catalog rejects malformed feature on write at catalog_write boundary `services/stac/tests/test_schema_validation.py`
-- [ ] T062 [P][test] Write test: valid features stored and retrieved pass schema validation `services/stac/tests/test_schema_validation.py`
-- [ ] T063 [P][test] Write test: catalog read validates features at catalog_read boundary `services/stac/tests/test_schema_validation.py`
+- [x] T061 [test] Write test: catalog rejects malformed feature on write at catalog_write boundary `services/stac/tests/test_schema_validation.py`
+- [x] T062 [P][test] Write test: valid features stored and retrieved pass schema validation `services/stac/tests/test_schema_validation.py`
+- [x] T063 [P][test] Write test: catalog read validates features at catalog_read boundary `services/stac/tests/test_schema_validation.py`
 
 ### Implementation
 
-- [ ] T064 Replace untyped GeoJSON aliases with schema types in STAC types `services/stac/src/debrief_stac/types.py`
-- [ ] T065 Add schema validation on feature write in features module `services/stac/src/debrief_stac/features.py`
-- [ ] T066 Add schema validation on feature read in features module `services/stac/src/debrief_stac/features.py`
-- [ ] T067 Use schema types in MCP server function signatures `services/stac/src/debrief_stac/mcp_server.py`
-- [ ] T068 Update existing catalog tests for schema-typed operations `services/stac/tests/test_features.py`
-- [ ] T069 Run full STAC test suite and verify no regressions `services/stac/tests/`
+- [x] T064 Replace untyped GeoJSON aliases with schema types in STAC types `services/stac/src/debrief_stac/types.py`
+- [x] T065 Add schema validation on feature write in features module `services/stac/src/debrief_stac/features.py`
+- [x] T066 Add schema validation on feature read in features module `services/stac/src/debrief_stac/features.py`
+- [x] T067 Use schema types in MCP server function signatures `services/stac/src/debrief_stac/mcp_server.py`
+- [x] T068 Update existing catalog tests for schema-typed operations `services/stac/tests/test_features.py`
+- [x] T069 Run full STAC test suite and verify no regressions `services/stac/tests/`
 
 **Checkpoint**: Catalog validates features at both write and read boundaries. All untyped GeoJSON aliases replaced with schema types.
 
@@ -226,12 +226,12 @@
 
 ### Implementation
 
-- [ ] T070 Replace SafeFeature interface with schema types in stacService `apps/vscode/src/services/stacService.ts`
-- [ ] T071 [P] Replace custom GeoJSONFeature with schema types in diffFeatureCollections `shared/components/diff/src/diffFeatureCollections.ts`
-- [ ] T072 [P] Remove `as unknown` casts in flattenFeatures after coordinate type fix `shared/components/src/FeatureList/flattenFeatures.ts`
-- [ ] T073 [P] Replace `as any` casts in App.tsx with proper typed handlers `apps/web-shell/src/App.tsx`
-- [ ] T074 Run TypeScript build across all packages to verify compile-time safety `shared/components/`, `apps/vscode/`, `apps/web-shell/`
-- [ ] T075 Run existing frontend tests to verify no regressions `shared/components/src/FeatureList/flattenFeatures.test.ts`
+- [x] T070 Replace SafeFeature interface with schema types in stacService `apps/vscode/src/services/stacService.ts`
+- [x] T071 [P] Replace custom GeoJSONFeature with schema types in diffFeatureCollections `shared/components/diff/src/diffFeatureCollections.ts`
+- [x] T072 [P] Remove `as unknown` casts in flattenFeatures after coordinate type fix `shared/components/src/FeatureList/flattenFeatures.ts`
+- [x] T073 [P] Replace `as any` casts in App.tsx with proper typed handlers `apps/web-shell/src/App.tsx`
+- [x] T074 Run TypeScript build across all packages to verify compile-time safety `shared/components/`, `apps/vscode/`, `apps/web-shell/`
+- [x] T075 Run existing frontend tests to verify no regressions `shared/components/src/FeatureList/flattenFeatures.test.ts`
 
 **Checkpoint**: All frontend components use shared schema types. No local workaround types or untyped casts remain for GeoJSON feature property access.
 
@@ -245,13 +245,13 @@
 
 ### Tests
 
-- [ ] T076 [test] Write integration test: rename a schema field and verify Python services fail with SchemaValidationError `shared/schemas/tests/test_validation.py`
-- [ ] T077 [P][test] Write integration test: add required field and verify constructors without it fail `shared/schemas/tests/test_validation.py`
+- [x] T076 [test] Write integration test: rename a schema field and verify Python services fail with SchemaValidationError `shared/schemas/tests/test_validation.py`
+- [x] T077 [P][test] Write integration test: add required field and verify constructors without it fail `shared/schemas/tests/test_validation.py`
 
 ### Implementation
 
-- [ ] T078 Verify full project build (`task verify`) catches schema field rename across all packages
-- [ ] T079 Document schema evolution safety net in quickstart.md `specs/115-schema-validated-tool-io/quickstart.md`
+- [x] T078 Verify full project build (`task verify`) catches schema field rename across all packages
+- [x] T079 Document schema evolution safety net in quickstart.md `specs/115-schema-validated-tool-io/quickstart.md`
 
 **Checkpoint**: Schema changes are surfaced across the full stack — Python validation errors, TypeScript compiler errors, and test failures all point to affected code.
 
@@ -263,21 +263,21 @@
 
 ### Cross-Cutting
 
-- [ ] T080 Run `task verify` across entire monorepo to confirm no regressions
-- [ ] T081 Run quickstart.md validation — verify all examples in quickstart work `specs/115-schema-validated-tool-io/quickstart.md`
+- [x] T080 Run `task verify` across entire monorepo to confirm no regressions
+- [x] T081 Run quickstart.md validation — verify all examples in quickstart work `specs/115-schema-validated-tool-io/quickstart.md`
 
 ### Evidence Collection
 
-- [ ] T082 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/115-schema-validated-tool-io/evidence/test-summary.md`
-- [ ] T083 Create usage demonstration showing validate_feature() catching invalid data `specs/115-schema-validated-tool-io/evidence/usage-example.md`
-- [ ] T084 [P] Capture round-trip proof (Python → JSON → TypeScript → JSON) for provenance fields `specs/115-schema-validated-tool-io/evidence/round-trip-evidence.md`
-- [ ] T085 [P] Capture sample tool request JSON showing schema-validated input `specs/115-schema-validated-tool-io/evidence/sample-request.json`
-- [ ] T086 [P] Capture sample tool response JSON showing schema-validated output `specs/115-schema-validated-tool-io/evidence/sample-response.json`
+- [x] T082 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/115-schema-validated-tool-io/evidence/test-summary.md`
+- [x] T083 Create usage demonstration showing validate_feature() catching invalid data `specs/115-schema-validated-tool-io/evidence/usage-example.md`
+- [x] T084 [P] Capture round-trip proof (Python → JSON → TypeScript → JSON) for provenance fields `specs/115-schema-validated-tool-io/evidence/round-trip-evidence.md`
+- [x] T085 [P] Capture sample tool request JSON showing schema-validated input `specs/115-schema-validated-tool-io/evidence/sample-request.json`
+- [x] T086 [P] Capture sample tool response JSON showing schema-validated output `specs/115-schema-validated-tool-io/evidence/sample-response.json`
 
 ### Media Content
 
-- [ ] T087 Create shipped blog post `specs/115-schema-validated-tool-io/media/shipped-post.md`
-- [ ] T088 [P] Create LinkedIn shipped summary `specs/115-schema-validated-tool-io/media/linkedin-shipped.md`
+- [x] T087 Create shipped blog post `specs/115-schema-validated-tool-io/media/shipped-post.md`
+- [x] T088 [P] Create LinkedIn shipped summary `specs/115-schema-validated-tool-io/media/linkedin-shipped.md`
 
 ### PR Creation
 

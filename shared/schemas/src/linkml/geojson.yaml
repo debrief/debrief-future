@@ -17,6 +17,7 @@ imports:
   - linkml:types
   - common
   - styling
+  - log-entry
 
 # ============================================================================
 # GeoJSON Geometry Types
@@ -401,6 +402,11 @@ classes:
         range: TUAData
         multivalued: true
         inlined_as_list: true
+      provenance:
+        description: PROV-aligned provenance records (append-only log of tool operations)
+        range: LogEntry
+        multivalued: true
+        inlined_as_list: true
 
   TrackFeature:
     description: GeoJSON Feature representing a vessel track
@@ -486,6 +492,11 @@ classes:
         range: PointMetadataEntry
         multivalued: true
         inlined_as_list: true
+      provenance:
+        description: PROV-aligned provenance records (append-only log of tool operations)
+        range: LogEntry
+        multivalued: true
+        inlined_as_list: true
 
   ReferenceLocation:
     description: GeoJSON Feature for fixed reference points or reference point sets
@@ -549,6 +560,11 @@ classes:
         description: Array of selected feature IDs - for selection state
         range: string
         multivalued: true
+      provenance:
+        description: PROV-aligned provenance records (append-only log of tool operations)
+        range: LogEntry
+        multivalued: true
+        inlined_as_list: true
 
   SystemState:
     description: GeoJSON Feature for storing non-spatial system state
@@ -598,6 +614,11 @@ classes:
         multivalued: true
       description:
         description: Additional description or notes
+      provenance:
+        description: PROV-aligned provenance records (append-only log of tool operations)
+        range: LogEntry
+        multivalued: true
+        inlined_as_list: true
 
   MultiPointFeature:
     description: GeoJSON Feature for multi-point tool results
@@ -652,6 +673,11 @@ classes:
         multivalued: true
       description:
         description: Additional description or notes
+      provenance:
+        description: PROV-aligned provenance records (append-only log of tool operations)
+        range: LogEntry
+        multivalued: true
+        inlined_as_list: true
 
   MultiPolygonFeature:
     description: GeoJSON Feature for multi-polygon tool results

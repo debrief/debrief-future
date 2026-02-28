@@ -1,0 +1,45 @@
+{
+  "tool_name": "apply-symbol-style",
+  "context": {
+    "type": "MULTI",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "track-001",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-5.0, 50.0], [-4.0, 51.0]]
+        },
+        "properties": {
+          "kind": "TRACK",
+          "platform_id": "PLT-001",
+          "platform_name": "HMS Victory",
+          "track_type": "OWNSHIP",
+          "start_time": "2024-06-15T08:00:00Z",
+          "end_time": "2024-06-15T20:00:00Z",
+          "positions": [],
+          "style": {
+            "line": { "color": "#1565c0" },
+            "point": {
+              "shape": "circle",
+              "radius": 4,
+              "fill": true,
+              "fill_color": "#1565c0",
+              "color": "#1565c0"
+            }
+          },
+          "default_position_style": {
+            "show_symbol": false,
+            "symbol": "circle",
+            "show_label": false
+          }
+        }
+      }
+    ]
+  },
+  "params": {
+    "symbol": "diamond",
+    "radius": 6
+  },
+  "_note": "Input features are schema-validated at the tool_input boundary before the handler executes. The 'symbol' parameter value 'diamond' is validated against the MarkerSymbol schema enum."
+}

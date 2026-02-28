@@ -471,7 +471,7 @@ export interface GeoJSONLineString {
     /** Geometry type discriminator */
     type: string,
     /** Array of [longitude, latitude] pairs */
-    coordinates: number[],
+    coordinates: number[][],
 }
 
 
@@ -482,7 +482,7 @@ export interface GeoJSONPolygon {
     /** Geometry type discriminator */
     type: string,
     /** Array of linear rings (arrays of [lon, lat] pairs) */
-    coordinates: number[],
+    coordinates: number[][][],
 }
 
 
@@ -493,7 +493,7 @@ export interface GeoJSONMultiPoint {
     /** Geometry type discriminator */
     type: string,
     /** Array of [longitude, latitude] pairs */
-    coordinates: number[],
+    coordinates: number[][],
 }
 
 
@@ -504,7 +504,7 @@ export interface GeoJSONMultiLineString {
     /** Geometry type discriminator */
     type: string,
     /** Array of LineString coordinate arrays */
-    coordinates: number[],
+    coordinates: number[][][],
 }
 
 
@@ -515,7 +515,7 @@ export interface GeoJSONMultiPolygon {
     /** Geometry type discriminator */
     type: string,
     /** Array of polygon coordinate arrays (each an array of linear rings) */
-    coordinates: number[],
+    coordinates: number[][][][],
 }
 
 
@@ -674,6 +674,8 @@ export interface TrackProperties {
     sensors?: SensorData[],
     /** Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions. */
     tuas?: TUAData[],
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -727,6 +729,8 @@ export interface ReferenceLocationProperties {
     valid_until?: string,
     /** Per-point metadata array, parallel to MultiPoint coordinates. Each entry contains at minimum an index and name. Downstream tools extend entries with zone/color fields. */
     point_metadata?: PointMetadataEntry[],
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -765,6 +769,8 @@ export interface SystemStateProperties {
     center?: number[],
     /** Array of selected feature IDs - for selection state */
     selected_ids?: string[],
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -799,6 +805,8 @@ export interface MultiPointFeatureProperties {
     source_features?: string[],
     /** Additional description or notes */
     description?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -835,6 +843,8 @@ export interface MultiPolygonFeatureProperties {
     source_features?: string[],
     /** Additional description or notes */
     description?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -856,6 +866,70 @@ export interface MultiPolygonFeature {
 
 
 /**
+ * A PROV-aligned provenance record stored on GeoJSON features. Contains activity identity, timestamp, generator information, input/output references, execution duration, and tuning annotations.
+ */
+export interface LogEntry {
+    /** Unique operation identifier (UUID v4). Shared across features in multi-feature operations. */
+    activity_id: string,
+    /** When the operation occurred (ISO 8601 with timezone). */
+    timestamp: string,
+    /** Tool identity and parameters for this invocation. */
+    was_generated_by: WasGeneratedBy,
+    /** Feature IDs of inputs. May be empty for operations with no explicit inputs. */
+    used: string[],
+    /** Feature IDs or versioned asset paths of outputs. May be empty for in-place modifications. */
+    generated: string[],
+    /** Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S). */
+    execution_duration: string,
+    /** Stable logical identity for artifact-producing tools. Null for non-artifact tools. */
+    generated_result_id?: string,
+    /** Parameter tuning record. Null until a tuning operation modifies this entry. */
+    tune?: TuneAnnotation,
+}
+
+
+/**
+ * Identifies the tool and its parameters for a specific invocation. Named after the W3C PROV vocabulary term.
+ */
+export interface WasGeneratedBy {
+    /** Tool identifier (kebab-case, e.g., calculate-range). */
+    tool: string,
+    /** Semantic version of the tool (e.g., 1.2.0). */
+    tool_version: string,
+    /** Full resolved parameter set. Keys are parameter names, values are ParameterValue objects. May be empty dict. */
+    parameters: ParameterValue[],
+}
+
+
+/**
+ * A typed parameter value with replay metadata.
+ */
+export interface ParameterValue {
+    /** The parameter value (any JSON type). */
+    value: string,
+    /** Whether this is the default value. */
+    default?: boolean,
+    /** Whether this parameter can be modified during replay. */
+    tunable?: boolean,
+}
+
+
+/**
+ * Records a parameter modification (appended, not replacing original).
+ */
+export interface TuneAnnotation {
+    /** When the tuning occurred (ISO 8601 with timezone). */
+    timestamp: string,
+    /** Name of the parameter that was changed. */
+    parameter: string,
+    /** Value before tuning. */
+    previous_value: string,
+    /** Value after tuning. */
+    new_value: string,
+}
+
+
+/**
  * Properties for a NarrativeEntry annotation
  */
 export interface NarrativeEntryProperties {
@@ -873,6 +947,8 @@ export interface NarrativeEntryProperties {
     style: PointProperties,
     /** Original source file path */
     source_file?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -909,6 +985,8 @@ export interface CircleAnnotationProperties {
     style: PolygonProperties,
     /** Original source file path */
     source_file?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -941,6 +1019,8 @@ export interface RectangleAnnotationProperties {
     style: PolygonProperties,
     /** Original source file path */
     source_file?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -973,6 +1053,8 @@ export interface LineAnnotationProperties {
     style: LineProperties,
     /** Original source file path */
     source_file?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -1005,6 +1087,8 @@ export interface TextAnnotationProperties {
     style: PointProperties,
     /** Original source file path */
     source_file?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -1043,6 +1127,8 @@ export interface VectorAnnotationProperties {
     style: LineProperties,
     /** Original source file path */
     source_file?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -1079,6 +1165,8 @@ export interface PolyAnnotationProperties {
     source_file?: string,
     /** Source line number for debugging */
     line_number?: number,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -1145,70 +1233,6 @@ export interface ToolParameter {
     default_value?: string,
     /** References a schema-defined parameter-type enum by name. When set, the client resolves enum values from generated types rather than using inline choices. */
     param_type?: string,
-}
-
-
-/**
- * A PROV-aligned provenance record stored on GeoJSON features. Contains activity identity, timestamp, generator information, input/output references, execution duration, and tuning annotations.
- */
-export interface LogEntry {
-    /** Unique operation identifier (UUID v4). Shared across features in multi-feature operations. */
-    activity_id: string,
-    /** When the operation occurred (ISO 8601 with timezone). */
-    timestamp: string,
-    /** Tool identity and parameters for this invocation. */
-    was_generated_by: WasGeneratedBy,
-    /** Feature IDs of inputs. May be empty for operations with no explicit inputs. */
-    used: string[],
-    /** Feature IDs or versioned asset paths of outputs. May be empty for in-place modifications. */
-    generated: string[],
-    /** Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S). */
-    execution_duration: string,
-    /** Stable logical identity for artifact-producing tools. Null for non-artifact tools. */
-    generated_result_id?: string,
-    /** Parameter tuning record. Null until a tuning operation modifies this entry. */
-    tune?: TuneAnnotation,
-}
-
-
-/**
- * Identifies the tool and its parameters for a specific invocation. Named after the W3C PROV vocabulary term.
- */
-export interface WasGeneratedBy {
-    /** Tool identifier (kebab-case, e.g., calculate-range). */
-    tool: string,
-    /** Semantic version of the tool (e.g., 1.2.0). */
-    tool_version: string,
-    /** Full resolved parameter set. Keys are parameter names, values are ParameterValue objects. May be empty dict. */
-    parameters: ParameterValue[],
-}
-
-
-/**
- * A typed parameter value with replay metadata.
- */
-export interface ParameterValue {
-    /** The parameter value (any JSON type). */
-    value: string,
-    /** Whether this is the default value. */
-    default?: boolean,
-    /** Whether this parameter can be modified during replay. */
-    tunable?: boolean,
-}
-
-
-/**
- * Records a parameter modification (appended, not replacing original).
- */
-export interface TuneAnnotation {
-    /** When the tuning occurred (ISO 8601 with timezone). */
-    timestamp: string,
-    /** Name of the parameter that was changed. */
-    parameter: string,
-    /** Value before tuning. */
-    previous_value: string,
-    /** Value after tuning. */
-    new_value: string,
 }
 
 

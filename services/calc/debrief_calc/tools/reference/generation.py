@@ -212,8 +212,12 @@ def generate_reference_points(
         raise ValueError("Requires exactly one polygon feature")
 
     pattern = params.get("pattern")
-    if pattern not in ("grid", "scatter"):
-        raise ValueError("Pattern must be 'grid' or 'scatter'")
+    # Validate against schema-defined ReferencePointPattern enum
+    from debrief_schemas.validation import resolve_enum_values
+
+    valid_patterns = resolve_enum_values("ReferencePointPattern") or {"grid", "scatter"}
+    if pattern not in valid_patterns:
+        raise ValueError(f"Pattern must be one of: {', '.join(sorted(valid_patterns))}")
 
     count = int(params.get("count", 20))
     _validate_positive_int(count, "count")
