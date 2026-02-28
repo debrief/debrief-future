@@ -49,7 +49,7 @@ export declare function findIntervalPositions(timestamps: number[], intervalMs: 
  */
 export interface ResolvedPositionStyle {
     showSymbol: boolean;
-    symbol: 'circle' | 'square' | 'triangle';
+    symbol: 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
     showLabel: boolean;
     labelText: string | null;
     /** Per-position colour override from position_style_overrides (format menu) */
