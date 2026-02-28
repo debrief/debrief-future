@@ -195,16 +195,22 @@ export function createExecuteToolCommand(
     );
 
     if (layer) {
-      // Add to map (skip webview message for artifact layers — no map geometry)
-      if (!layer.artifactHref) {
-        panel.addResultLayer(layer);
+      const isMutationResult = result.resultType?.startsWith('mutation/');
+
+      if (isMutationResult && !layer.artifactHref) {
+        // Mutation tools: update the original plot features in-place
+        // rather than adding a duplicate result layer.
+        panel.updatePlotFeatures(layer);
       } else {
-        // Still store in panel's result layers for tracking
+        // Additive tools or artifacts: add as result layer
         panel.addResultLayer(layer);
       }
 
-      // Update layers panel
-      layersTreeProvider.addResultLayer(layer);
+      // Update layers panel (additive results only — mutations
+      // don't create new layers, they modify existing ones)
+      if (!isMutationResult) {
+        layersTreeProvider.addResultLayer(layer);
+      }
 
       // Auto-persist artifact results to STAC
       if (stacService && result.artifactData && result.artifactHref) {

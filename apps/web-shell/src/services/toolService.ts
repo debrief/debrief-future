@@ -213,6 +213,7 @@ function validateToolOutput(
   features: GeoJSONFeature[],
   expectedKind: string,
   toolName: string,
+  skipKindCheck = false,
 ): void {
   const errors: ValidationError[] = [];
 
@@ -232,11 +233,11 @@ function validateToolOutput(
       continue;
     }
 
-    // Check kind attribute
+    // Check kind attribute — skip for mutation tools which preserve original kind
     const kind = feature.properties.kind;
     if (kind === undefined || kind === null) {
       errors.push({ featureIndex: i, error: 'Feature.properties.kind is required' });
-    } else if (kind !== expectedKind) {
+    } else if (!skipKindCheck && kind !== expectedKind) {
       errors.push({ featureIndex: i, error: `Expected kind '${expectedKind}', got '${String(kind)}'` });
     }
 
@@ -283,13 +284,22 @@ function validateToolOutput(
  * Styling/mutation tools produce "mutation", dataset tools produce "artifact",
  * and most analysis tools produce "addition".
  */
+/** Tool IDs that modify existing features in-place rather than creating new ones. */
+const MUTATION_TOOL_IDS = new Set([
+  'set-track-color', 'apply-symbol-style', 'label-interval',
+  'symbol-interval', 'move-shape',
+]);
+
+/**
+ * Returns true if the given tool modifies features in-place (mutation)
+ * rather than creating new result layers (addition).
+ */
+export function isMutationTool(toolId: string): boolean {
+  return MUTATION_TOOL_IDS.has(toolId);
+}
+
 function determineResultCategory(toolId: string, outputKind: string): string {
-  // Styling/manipulation tools that modify existing features
-  const mutationTools = new Set([
-    'set-track-color', 'apply-symbol-style', 'label-interval',
-    'symbol-interval', 'move-shape',
-  ]);
-  if (mutationTools.has(toolId)) return 'mutation';
+  if (MUTATION_TOOL_IDS.has(toolId)) return 'mutation';
 
   // Dataset tools that produce non-GeoJSON artifacts
   if (outputKind.startsWith('dataset/')) return 'artifact';
@@ -457,6 +467,9 @@ export function executeTool(
   const outputKind = entry.definition.annotations['debrief:outputKind'];
   const toolVersion = entry.definition.annotations['debrief:version'];
 
+  // Determine result category early — mutation tools preserve the original kind
+  const resultCategory = determineResultCategory(toolId, outputKind);
+
   // Attach provenance only to GeoJSON Feature outputs (not artifact data)
   // Mirrors Python executor.py lines 88-96
   const isGeoJSON = modifiedFeatures.every(f => f.type === 'Feature');
@@ -471,16 +484,21 @@ export function executeTool(
     );
 
     for (const feature of modifiedFeatures) {
-      // Set canonical output kind (#103) — mirrors Python set_output_kind()
       if (!feature.properties) feature.properties = {};
-      feature.properties.kind = outputKind;
+      // Only set output kind for additive tools that create new features.
+      // Mutation tools preserve the original kind (e.g. 'TRACK') so that
+      // type guards like isTrackFeature() continue to work after mutation.
+      if (resultCategory !== 'mutation') {
+        feature.properties.kind = outputKind;
+      }
 
       // Attach W3C PROV LogEntry (#102) — mirrors Python attach_log_entry()
       attachLogEntry(feature, logEntry);
     }
 
     // Validate output features (#106) — mirrors Python validate_tool_output()
-    validateToolOutput(modifiedFeatures, outputKind, toolId);
+    // Mutation tools preserve original kind, so skip the kind equality check.
+    validateToolOutput(modifiedFeatures, outputKind, toolId, resultCategory === 'mutation');
   }
 
   // Build the FeatureCollection for the resource content
@@ -488,9 +506,6 @@ export function executeTool(
     type: 'FeatureCollection' as const,
     features: modifiedFeatures,
   };
-
-  // Build resultType with proper category prefix per TOOL-RESULTS.md (#112)
-  const resultCategory = determineResultCategory(toolId, outputKind);
 
   const annotations: DebriefAnnotations = {
     'debrief:resultType': `${resultCategory}/${outputKind}`,

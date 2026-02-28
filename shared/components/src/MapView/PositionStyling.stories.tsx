@@ -121,10 +121,12 @@ const track2 = createStyledTrack(
 // Track 3: Both symbols (PT15M) and labels (PT30M) + overrides
 const track3Data = generatePositions(BASE_TIME + 10 * MINUTE, 30, -4.05, 50.25);
 const track3Overrides: Array<PositionStyleOverride | null> = new Array(30).fill(null);
-// Add custom labels at specific positions
-track3Overrides[5] = { show_symbol: true, show_label: true, symbol: 'square', label: 'Contact detected' };
-track3Overrides[15] = { show_symbol: true, show_label: true, symbol: 'triangle', label: 'Course change' };
-track3Overrides[25] = { show_symbol: true, show_label: true, symbol: 'square', label: 'Lost contact' };
+// Add custom labels at specific positions — demonstrate all five shapes
+track3Overrides[3] = { show_symbol: true, show_label: true, symbol: 'square', label: 'Contact detected' };
+track3Overrides[9] = { show_symbol: true, show_label: true, symbol: 'triangle', label: 'Course change' };
+track3Overrides[15] = { show_symbol: true, show_label: true, symbol: 'diamond', label: 'Manoeuvre' };
+track3Overrides[21] = { show_symbol: true, show_label: true, symbol: 'cross', label: 'Datum' };
+track3Overrides[27] = { show_symbol: true, show_label: true, symbol: 'square', label: 'Lost contact' };
 
 const track3 = createStyledTrack(
   'track-combined',
@@ -157,7 +159,7 @@ function PositionStylingDemo() {
         <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
           <li>Blue track: Symbols every 20 minutes</li>
           <li>Green track: Labels every 30 minutes</li>
-          <li>Orange track: Symbols every 15m, labels every 1h, plus custom overrides</li>
+          <li>Orange track: Symbols every 15m, labels every 1h, plus overrides (square, triangle, diamond, cross)</li>
         </ul>
       </div>
       <div style={{ flex: 1, minHeight: 0 }}>
@@ -190,6 +192,64 @@ const meta: Meta = {
 };
 
 export default meta;
+
+// ------------- Per-track default symbol shapes (simulates apply-symbol-style tool output) -------
+
+const SHAPES: Array<{ shape: string; name: string; color: string }> = [
+  { shape: 'circle', name: 'Circle (default)', color: '#2196F3' },
+  { shape: 'square', name: 'Square', color: '#4CAF50' },
+  { shape: 'triangle', name: 'Triangle', color: '#FF9800' },
+  { shape: 'diamond', name: 'Diamond', color: '#E91E63' },
+  { shape: 'cross', name: 'Cross', color: '#9C27B0' },
+];
+
+const shapeTracks: DebriefFeature[] = SHAPES.map((s, idx) => {
+  const data = generatePositions(BASE_TIME, 15, -4.0 + idx * 0.04, 50.3 - idx * 0.02);
+  return createStyledTrack(
+    `track-shape-${s.shape}`,
+    s.name,
+    s.color,
+    data.coordinates,
+    data.positions,
+    data.times,
+    { show_symbol: true, symbol: s.shape, show_label: false },
+  );
+});
+
+const shapeTimeExtent: TimeExtent = [BASE_TIME, BASE_TIME + 60 * MINUTE];
+
+function SymbolShapesDemo() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', gap: 0 }}>
+      <div style={{ padding: '8px', background: '#2d2d2d', color: '#fff', fontSize: '14px' }}>
+        <strong>Symbol Shapes Demo</strong> — each track uses a different default symbol shape
+        <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+          {SHAPES.map((s) => (
+            <li key={s.shape} style={{ color: s.color }}>{s.name}</li>
+          ))}
+        </ul>
+      </div>
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <MapView features={shapeTracks} height="100%" autoFitBounds />
+      </div>
+    </div>
+  );
+}
+
+export const SymbolShapes: StoryObj = {
+  render: () => <SymbolShapesDemo />,
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Demonstrates all five symbol shapes as default track symbols.
+Each track has \`default_position_style.show_symbol: true\` with a different symbol.
+This matches the output of the **apply-symbol-style** tool.
+        `,
+      },
+    },
+  },
+};
 
 export const IntervalBasedStyling: StoryObj = {
   render: () => <PositionStylingDemo />,

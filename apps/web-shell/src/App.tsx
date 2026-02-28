@@ -72,7 +72,7 @@ const toStoreMode = (m: string): StoreDisplayMode =>
 import { useSessionStore } from './hooks/useSessionStore';
 import { stacService } from './mocks/stacService';
 import { calcService } from './mocks/calcService';
-import { executeTool } from './services/toolService';
+import { executeTool, isMutationTool } from './services/toolService';
 import type { ToolResult } from './mocks/calcService';
 import { mockFsAdapter } from './mocks/fsAdapter';
 
@@ -637,7 +637,7 @@ export default function App() {
   // Handle tool execution — persist result to STAC assets and record a log entry
   const handleRunTool = useCallback((toolId: string, params?: Record<string, unknown>) => {
     // Determine if this is a mutation tool BEFORE execution
-    const replacesInPlace = toolId === 'move-shape';
+    const replacesInPlace = isMutationTool(toolId);
 
     // Capture pre-tool geometry for mutation tools BEFORE execution.
     // executeTool() mutates feature geometry and properties in-place,

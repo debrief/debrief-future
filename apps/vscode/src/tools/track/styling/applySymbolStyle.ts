@@ -106,6 +106,14 @@ export function execute(
 
     style.point = point;
     props.style = style;
+
+    // Update default_position_style so the PositionSymbolsLayer renderer
+    // shows the chosen symbol shape on the map.
+    const dps = (props.default_position_style as Record<string, unknown>) ?? {};
+    dps.symbol = symbol;
+    dps.show_symbol = true;
+    props.default_position_style = dps;
+
     feature.properties = props;
     modified.push(feature);
   }

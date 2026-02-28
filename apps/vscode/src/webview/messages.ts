@@ -100,6 +100,12 @@ export interface AddResultLayerMessage {
   };
 }
 
+/** Update plot features in-place (mutation tool results) */
+export interface UpdatePlotFeaturesMessage {
+  type: 'updatePlotFeatures';
+  features: SafeFeatureCollection;
+}
+
 /** Remove a result layer */
 export interface RemoveResultLayerMessage {
   type: 'removeResultLayer';
@@ -321,6 +327,7 @@ export type ExtensionToWebviewMessage =
   | SetSelectionMessage
   | ClearSelectionMessage
   | AddResultLayerMessage
+  | UpdatePlotFeaturesMessage
   | RemoveResultLayerMessage
   | SetLayerVisibilityMessage
   | FitBoundsMessage

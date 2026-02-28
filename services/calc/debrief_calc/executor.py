@@ -87,12 +87,16 @@ def run(
         # Attach provenance only to GeoJSON Feature outputs (not artifact data)
         is_geojson = all(f.get("type") == "Feature" for f in output_features)
         if is_geojson:
+            # Mutation tools preserve the original kind (e.g. 'TRACK') so that
+            # downstream type guards continue to work after mutation.
+            is_mutation = tool.output_kind.startswith("mutation/")
             for feature in output_features:
-                set_output_kind(feature, tool.output_kind)
+                if not is_mutation:
+                    set_output_kind(feature, tool.output_kind)
                 attach_log_entry(feature, log_entry)
 
-            # Validate output if requested
-            if validate_output:
+            # Validate output if requested (skip kind check for mutations)
+            if validate_output and not is_mutation:
                 validate_tool_output(output_features, tool.output_kind, tool.name)
 
         return ToolResult(

@@ -75,6 +75,10 @@ class TestApplySymbolStyle:
         assert point["color"] == "#ffffff"
         assert point["weight"] == 1
         assert point["opacity"] == 1.0
+        # default_position_style must also be updated for the renderer
+        dps = result[0]["properties"]["default_position_style"]
+        assert dps["symbol"] == "diamond"
+        assert dps["show_symbol"] is True
 
     def test_default_radius(self) -> None:
         """Only symbol param provided, radius defaults to 4."""
@@ -115,6 +119,7 @@ class TestApplySymbolStyle:
         """Track with no style gets defaults then symbol applied."""
         feature = copy.deepcopy(TRACK_FEATURE)
         del feature["properties"]["style"]
+        del feature["properties"]["default_position_style"]
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
         params = {"symbol": "cross", "radius": 8}
 
@@ -132,6 +137,10 @@ class TestApplySymbolStyle:
         assert point["color"] == "#ffffff"
         assert point["weight"] == 1
         assert point["opacity"] == 1.0
+        # default_position_style created from scratch
+        dps = result[0]["properties"]["default_position_style"]
+        assert dps["symbol"] == "cross"
+        assert dps["show_symbol"] is True
 
     def test_error_invalid_symbol(self) -> None:
         """Invalid symbol raises ValueError."""
