@@ -263,21 +263,21 @@
 
 ### Cross-Cutting
 
-- [ ] T080 Run `task verify` across entire monorepo to confirm no regressions
-- [ ] T081 Run quickstart.md validation — verify all examples in quickstart work `specs/115-schema-validated-tool-io/quickstart.md`
+- [x] T080 Run `task verify` across entire monorepo to confirm no regressions
+- [x] T081 Run quickstart.md validation — verify all examples in quickstart work `specs/115-schema-validated-tool-io/quickstart.md`
 
 ### Evidence Collection
 
-- [ ] T082 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/115-schema-validated-tool-io/evidence/test-summary.md`
-- [ ] T083 Create usage demonstration showing validate_feature() catching invalid data `specs/115-schema-validated-tool-io/evidence/usage-example.md`
-- [ ] T084 [P] Capture round-trip proof (Python → JSON → TypeScript → JSON) for provenance fields `specs/115-schema-validated-tool-io/evidence/round-trip-evidence.md`
-- [ ] T085 [P] Capture sample tool request JSON showing schema-validated input `specs/115-schema-validated-tool-io/evidence/sample-request.json`
-- [ ] T086 [P] Capture sample tool response JSON showing schema-validated output `specs/115-schema-validated-tool-io/evidence/sample-response.json`
+- [x] T082 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/115-schema-validated-tool-io/evidence/test-summary.md`
+- [x] T083 Create usage demonstration showing validate_feature() catching invalid data `specs/115-schema-validated-tool-io/evidence/usage-example.md`
+- [x] T084 [P] Capture round-trip proof (Python → JSON → TypeScript → JSON) for provenance fields `specs/115-schema-validated-tool-io/evidence/round-trip-evidence.md`
+- [x] T085 [P] Capture sample tool request JSON showing schema-validated input `specs/115-schema-validated-tool-io/evidence/sample-request.json`
+- [x] T086 [P] Capture sample tool response JSON showing schema-validated output `specs/115-schema-validated-tool-io/evidence/sample-response.json`
 
 ### Media Content
 
-- [ ] T087 Create shipped blog post `specs/115-schema-validated-tool-io/media/shipped-post.md`
-- [ ] T088 [P] Create LinkedIn shipped summary `specs/115-schema-validated-tool-io/media/linkedin-shipped.md`
+- [x] T087 Create shipped blog post `specs/115-schema-validated-tool-io/media/shipped-post.md`
+- [x] T088 [P] Create LinkedIn shipped summary `specs/115-schema-validated-tool-io/media/linkedin-shipped.md`
 
 ### PR Creation
 

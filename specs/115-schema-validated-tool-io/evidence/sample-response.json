@@ -1,0 +1,57 @@
+{
+  "tool": "apply-symbol-style",
+  "success": true,
+  "duration_ms": 1.23,
+  "features": [
+    {
+      "type": "Feature",
+      "id": "track-001",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-5.0, 50.0], [-4.0, 51.0]]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "PLT-001",
+        "platform_name": "HMS Victory",
+        "track_type": "OWNSHIP",
+        "start_time": "2024-06-15T08:00:00Z",
+        "end_time": "2024-06-15T20:00:00Z",
+        "positions": [],
+        "style": {
+          "line": { "color": "#1565c0" },
+          "point": {
+            "shape": "diamond",
+            "radius": 6,
+            "fill": true,
+            "fill_color": "#1565c0",
+            "fill_opacity": 0.8,
+            "stroke": true,
+            "color": "#ffffff",
+            "weight": 1,
+            "opacity": 1.0
+          }
+        },
+        "default_position_style": {
+          "show_symbol": true,
+          "symbol": "diamond",
+          "show_label": false
+        },
+        "provenance": [
+          {
+            "tool_name": "apply-symbol-style",
+            "tool_version": "1.0.0",
+            "timestamp": "2024-06-15T14:30:00Z",
+            "source_ids": ["track-001"],
+            "parameters": {
+              "symbol": "diamond",
+              "radius": 6
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "error": null,
+  "_note": "Output features are schema-validated at the tool_output boundary after the handler returns. The provenance log entry is attached by the executor. The 'diamond' symbol was validated against MarkerSymbolEnum from the shared schema."
+}
