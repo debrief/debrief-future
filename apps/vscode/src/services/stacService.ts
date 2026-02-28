@@ -377,7 +377,7 @@ export class StacService {
             },
           } as DebriefFeature);
           trackCount++;
-        } else if (geom.type === 'Point' && (props.kind === 'POINT' || props.kind === 'LOCATION')) {
+        } else if (geom.type === 'Point' && (props.kind === 'POINT' || props.kind === 'LOCATION' || props.locationType || props.location_type)) {
           // Reference location: Point with kind=POINT or LOCATION
           const pointCoords = geom.coordinates as number[];
           const id = (props.id as string) ?? `location-${locationCount}`;

@@ -64,6 +64,7 @@
       },
       "properties": {
         "id": "loc-start-point",
+        "kind": "POINT",
         "name": "Start Point",
         "locationType": "Waypoint"
       }
@@ -76,6 +77,7 @@
       },
       "properties": {
         "id": "loc-turn-point",
+        "kind": "POINT",
         "name": "Turn Point",
         "locationType": "Waypoint"
       }
