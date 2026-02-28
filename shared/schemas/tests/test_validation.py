@@ -312,3 +312,187 @@ class TestSchemaValidationError:
             errors=[],
         )
         str(err)  # Should not raise
+
+
+# ============================================================================
+# T076: Integration test — rename a schema field → Python validation catches it
+# ============================================================================
+
+
+class TestSchemaFieldRename:
+    """Verify that renaming a field in a feature is caught by schema validation.
+
+    Simulates the scenario where a schema field is renamed (e.g., ``name`` →
+    ``display_name``) and ensures that all boundaries reject the stale field.
+    """
+
+    @pytest.fixture
+    def valid_reference(self) -> dict:
+        """A known-good ReferenceLocation (POINT) feature."""
+        return {
+            "type": "Feature",
+            "id": "ref-rename-test",
+            "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
+            "properties": {
+                "kind": "POINT",
+                "name": "Alpha Point",
+                "location_type": "REFERENCE",
+                "style": {
+                    "shape": "square",
+                    "color": "#666666",
+                    "radius": 5,
+                    "fill": True,
+                    "fill_color": "#666666",
+                    "fill_opacity": 0.8,
+                    "stroke": True,
+                    "weight": 1,
+                    "opacity": 1.0,
+                },
+            },
+        }
+
+    def test_renamed_field_rejected_at_tool_output(self, valid_reference: dict) -> None:
+        """A feature with a renamed field (name → display_name) fails tool_output validation."""
+        # Simulate a schema change: 'name' is renamed to 'display_name'
+        valid_reference["properties"]["display_name"] = valid_reference["properties"].pop("name")
+        with pytest.raises(SchemaValidationError) as exc_info:
+            validate_feature(valid_reference, "tool_output")
+        assert exc_info.value.boundary == "tool_output"
+        assert exc_info.value.feature_kind == "POINT"
+        # The error should mention the missing required 'name' field
+        error_str = str(exc_info.value)
+        assert "name" in error_str.lower() or len(exc_info.value.errors) > 0
+
+    def test_renamed_field_rejected_at_parser_output(self, valid_reference: dict) -> None:
+        """A feature with a renamed field fails parser_output validation."""
+        valid_reference["properties"]["display_name"] = valid_reference["properties"].pop("name")
+        with pytest.raises(SchemaValidationError) as exc_info:
+            validate_feature(valid_reference, "parser_output")
+        assert exc_info.value.boundary == "parser_output"
+
+    def test_renamed_field_rejected_at_catalog_write(self, valid_reference: dict) -> None:
+        """A feature with a renamed field fails catalog_write validation."""
+        valid_reference["properties"]["display_name"] = valid_reference["properties"].pop("name")
+        with pytest.raises(SchemaValidationError) as exc_info:
+            validate_feature(valid_reference, "catalog_write")
+        assert exc_info.value.boundary == "catalog_write"
+
+    def test_renamed_field_rejected_at_tool_input(self, valid_reference: dict) -> None:
+        """A feature with a renamed field fails tool_input validation."""
+        valid_reference["properties"]["display_name"] = valid_reference["properties"].pop("name")
+        with pytest.raises(SchemaValidationError) as exc_info:
+            validate_feature(valid_reference, "tool_input")
+        assert exc_info.value.boundary == "tool_input"
+
+    def test_original_valid_after_no_rename(self, valid_reference: dict) -> None:
+        """Baseline: the un-modified feature passes all boundaries."""
+        for boundary in ("tool_input", "tool_output", "parser_output", "catalog_write"):
+            validate_feature(valid_reference, boundary)  # no error
+
+
+# ============================================================================
+# T077: Integration test — add required field → constructors without it fail
+# ============================================================================
+
+
+class TestSchemaNewRequiredField:
+    """Verify that missing a required schema field is caught.
+
+    Tests that if a new required field were added to the schema, all features
+    lacking it would be rejected. We simulate this by omitting existing
+    required fields.
+    """
+
+    def test_missing_required_location_type_rejected(self) -> None:
+        """POINT feature missing required 'location_type' is rejected."""
+        feature = {
+            "type": "Feature",
+            "id": "ref-missing-field",
+            "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
+            "properties": {
+                "kind": "POINT",
+                "name": "Test Location",
+                # 'location_type' is intentionally missing
+                "style": {
+                    "shape": "square",
+                    "color": "#666666",
+                    "radius": 5,
+                    "fill": True,
+                    "fill_color": "#666666",
+                    "fill_opacity": 0.8,
+                    "stroke": True,
+                    "weight": 1,
+                    "opacity": 1.0,
+                },
+            },
+        }
+        with pytest.raises(SchemaValidationError) as exc_info:
+            validate_feature(feature, "tool_output")
+        assert exc_info.value.feature_kind == "POINT"
+        assert len(exc_info.value.errors) > 0
+
+    def test_missing_required_kind_rejected(self) -> None:
+        """Feature missing 'kind' discriminator is rejected at every boundary."""
+        feature = {
+            "type": "Feature",
+            "id": "no-kind",
+            "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
+            "properties": {"name": "Test"},
+        }
+        for boundary in ("tool_input", "tool_output", "parser_output", "catalog_write"):
+            with pytest.raises(SchemaValidationError) as exc_info:
+                validate_feature(feature, boundary)
+            assert "Missing kind" in str(exc_info.value)
+
+    def test_missing_required_style_rejected(self) -> None:
+        """POINT feature missing required 'style' is rejected."""
+        feature = {
+            "type": "Feature",
+            "id": "ref-no-style",
+            "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
+            "properties": {
+                "kind": "POINT",
+                "name": "No Style Point",
+                "location_type": "REFERENCE",
+                # 'style' is intentionally missing
+            },
+        }
+        with pytest.raises(SchemaValidationError) as exc_info:
+            validate_feature(feature, "tool_output")
+        assert exc_info.value.feature_kind == "POINT"
+
+    def test_batch_validation_catches_missing_field_first(self) -> None:
+        """validate_features() stops at the first feature missing a required field."""
+        good = {
+            "type": "Feature",
+            "id": "good-ref",
+            "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
+            "properties": {
+                "kind": "POINT",
+                "name": "Good",
+                "location_type": "REFERENCE",
+                "style": {
+                    "shape": "square",
+                    "color": "#666666",
+                    "radius": 5,
+                    "fill": True,
+                    "fill_color": "#666666",
+                    "fill_opacity": 0.8,
+                    "stroke": True,
+                    "weight": 1,
+                    "opacity": 1.0,
+                },
+            },
+        }
+        bad = {
+            "type": "Feature",
+            "id": "bad-ref",
+            "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
+            "properties": {
+                "kind": "POINT",
+                "name": "Bad",
+                # missing location_type and style
+            },
+        }
+        with pytest.raises(SchemaValidationError):
+            validate_features([good, bad], "tool_output")

@@ -105,3 +105,46 @@ This is intentional — the schema is the contract.
 | `tool_output` | Calc | After handler returns, before provenance attachment |
 | `catalog_write` | STAC | Before writing features to disk |
 | `catalog_read` | STAC | After reading features from disk |
+
+## Schema Evolution Safety Net
+
+When you modify the LinkML schema (rename, remove, or add a required field), the validation infrastructure ensures every affected consumer is surfaced:
+
+### What happens when you rename a field
+
+1. **Update LinkML** — rename the field in `shared/schemas/src/linkml/*.yaml`
+2. **Regenerate schemas** — run `uv run --directory shared/schemas python scripts/generate.py`
+3. **Run tests** — the full test suite surfaces every affected location:
+   - **Python**: `SchemaValidationError` in calc, IO, and STAC service tests
+   - **TypeScript**: compiler errors in `pnpm build` for property access mismatches
+   - **Fixtures**: `test_golden.py` rejects fixtures with stale field names
+
+### What happens when you add a required field
+
+1. Every existing feature dict that lacks the new field will fail `model_validate()`
+2. The validation module's `validate_feature()` reports the missing field with its expected type
+3. All boundaries (tool input/output, parser output, catalog read/write) will flag it
+
+### Verification tests
+
+The test suite in `shared/schemas/tests/test_validation.py` includes dedicated schema evolution tests:
+
+- `TestSchemaFieldRename` — verifies renamed fields are rejected at all 4 write boundaries
+- `TestSchemaNewRequiredField` — verifies missing required fields are caught and clearly reported
+
+### Recommended workflow
+
+```bash
+# 1. Make schema change
+vim shared/schemas/src/linkml/geojson.yaml
+
+# 2. Regenerate
+uv run --directory shared/schemas python scripts/generate.py
+
+# 3. Run all tests (Python + TypeScript)
+uv run pytest              # Python: schema, calc, io, stac
+pnpm build                 # TypeScript: compiler catches type mismatches
+pnpm test                  # TypeScript: runtime tests
+
+# 4. Fix every failure — each is a consumer that needs updating
+```
