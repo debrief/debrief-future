@@ -180,7 +180,7 @@
 
 - [x] T036 Create Playwright test for auto-refresh rendering across theme variants `shared/components/e2e/ChartAutoRefresh.spec.ts`
 - [x] T037 [P] Add interaction tests: data update trigger, pause/resume toggle, zoom-then-refresh `shared/components/e2e/ChartAutoRefresh.spec.ts`
-- [ ] T038 Run e2e tests: `pnpm --filter @debrief/components test:e2e ChartAutoRefresh`
+- [x] T038 Run e2e tests: `pnpm --filter @debrief/components test:e2e ChartAutoRefresh`
 
 **Checkpoint**: Storybook stories demonstrate auto-refresh behaviour. E2E tests capture screenshots across themes.
 
@@ -192,21 +192,21 @@
 
 ### Evidence Collection
 
-- [ ] T039 Create evidence directory `specs/001-result-auto-refresh/evidence/`
-- [ ] T040 Capture test summary with pass/fail counts `specs/001-result-auto-refresh/evidence/test-summary.md`
-- [ ] T041 [P] Create usage example showing controller + hook integration `specs/001-result-auto-refresh/evidence/usage-example.md`
-- [ ] T042 [P] Capture screenshots of auto-refresh states `specs/001-result-auto-refresh/evidence/screenshots/`
+- [x] T039 Create evidence directory `specs/001-result-auto-refresh/evidence/`
+- [x] T040 Capture test summary with pass/fail counts `specs/001-result-auto-refresh/evidence/test-summary.md`
+- [x] T041 [P] Create usage example showing controller + hook integration `specs/001-result-auto-refresh/evidence/usage-example.md`
+- [x] T042 [P] Capture screenshots of auto-refresh states `specs/001-result-auto-refresh/evidence/screenshots/`
 
 ### E2E Evidence Collection
 
-- [ ] T043 Run full e2e suite: `pnpm --filter @debrief/components test:e2e`
-- [ ] T044 [P] Capture theme variant screenshots `specs/001-result-auto-refresh/evidence/screenshots/`
-- [ ] T045 Document e2e results `specs/001-result-auto-refresh/evidence/e2e-summary.md`
+- [x] T043 Run full e2e suite: `pnpm --filter @debrief/components test:e2e`
+- [x] T044 [P] Capture theme variant screenshots `specs/001-result-auto-refresh/evidence/screenshots/`
+- [x] T045 Document e2e results `specs/001-result-auto-refresh/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T046 Create shipped blog post `specs/001-result-auto-refresh/media/shipped-post.md`
-- [ ] T047 [P] Create LinkedIn shipped summary `specs/001-result-auto-refresh/media/linkedin-shipped.md`
+- [x] T046 Create shipped blog post `specs/001-result-auto-refresh/media/shipped-post.md`
+- [x] T047 [P] Create LinkedIn shipped summary `specs/001-result-auto-refresh/media/linkedin-shipped.md`
 
 ### PR Creation
 
