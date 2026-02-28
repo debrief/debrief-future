@@ -84,15 +84,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T009 [test] Write controller test: change event triggers onRefresh callback `services/session-state/tests/refresh/controller.test.ts`
-- [ ] T010 [P][test] Write controller test: file path change triggers refresh with new path `services/session-state/tests/refresh/controller.test.ts`
+- [x] T009 [test] Write controller test: change event triggers onRefresh callback `services/session-state/tests/unit/refresh/controller.test.ts`
+- [x] T010 [P][test] Write controller test: file path change triggers refresh with new path `services/session-state/tests/unit/refresh/controller.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T011 Implement controller event handling: subscribe to registry per resultId, invoke onRefresh callback on change `services/session-state/src/refresh/controller.ts`
-- [ ] T012 Integrate useAutoRefresh hook into ChartPanelWrapper: bind active tab to auto-refresh, reload data on refresh callback `shared/components/src/panels/ChartPanelWrapper.tsx`
-- [ ] T013 Wire AutoRefreshController in VS Code extension: create controller, pass registry, connect to webview panel `apps/vscode/src/extension.ts`
-- [ ] T014 Add provenance logging for refresh events via LogService (FR-012) `services/session-state/src/refresh/controller.ts`
+- [x] T011 Implement controller event handling: subscribe to registry per resultId, invoke onRefresh callback on change `services/session-state/src/refresh/controller.ts`
+- [x] T012 Integrate useAutoRefresh hook into ChartPanelWrapper: bind active tab to auto-refresh, reload data on refresh callback `shared/components/src/panels/ChartPanelWrapper.tsx`
+- [x] T013 Wire AutoRefreshController in VS Code extension: create controller, pass registry, connect to webview panel `apps/vscode/src/extension.ts`
+- [x] T014 Add provenance logging for refresh events via LogService (FR-012) `services/session-state/src/refresh/controller.ts`
 
 **Checkpoint**: Result views auto-refresh when registry emits a change event. Provenance is recorded.
 
@@ -106,14 +106,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T015 [test] Write viewport test: signals captured before re-render, restored after `shared/components/tests/ChartRenderer/viewport.test.ts`
-- [ ] T016 [P][test] Write controller test: refresh callback receives viewport state from captureViewport `services/session-state/tests/refresh/controller.test.ts`
+- [x] T015 [test] Write viewport test: signals captured before re-render, restored after `shared/components/src/ChartRenderer/viewport.test.ts`
+- [x] T016 [P][test] Write controller test: refresh callback receives viewport state from captureViewport `services/session-state/tests/unit/refresh/controller.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T017 Implement captureViewport: read Vega view signals matching VIEWPORT_SIGNAL_PREFIXES `shared/components/src/ChartRenderer/ChartRenderer.tsx`
-- [ ] T018 Implement restoreViewport: write signals back to Vega view and run dataflow `shared/components/src/ChartRenderer/ChartRenderer.tsx`
-- [ ] T019 Update ChartPanelWrapper refresh flow: capture viewport before data reload, restore after re-render `shared/components/src/panels/ChartPanelWrapper.tsx`
+- [x] T017 Implement captureViewport: read Vega view signals matching VIEWPORT_SIGNAL_PREFIXES `shared/components/src/ChartRenderer/ChartRenderer.tsx`
+- [x] T018 Implement restoreViewport: write signals back to Vega view and run dataflow `shared/components/src/ChartRenderer/ChartRenderer.tsx`
+- [x] T019 Update ChartPanelWrapper refresh flow: capture viewport before data reload, restore after re-render `shared/components/src/panels/ChartPanelWrapper.tsx`
 
 **Checkpoint**: Zooming into a chart, triggering an update, and verifying the zoom level is preserved.
 
@@ -127,15 +127,15 @@
 
 ### Tests for User Story 3
 
-- [ ] T020 [test] Write controller test: two views registered to different IDs, change event for one ID triggers only that view's callback `services/session-state/tests/refresh/controller.test.ts`
-- [ ] T021 [P][test] Write controller test: two views bound to same ID both receive refresh independently `services/session-state/tests/refresh/controller.test.ts`
+- [x] T020 [test] Write controller test: two views registered to different IDs, change event for one ID triggers only that view's callback `services/session-state/tests/unit/refresh/controller.test.ts`
+- [x] T021 [P][test] Write controller test: two views bound to same ID both receive refresh independently `services/session-state/tests/unit/refresh/controller.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T022 Implement per-resultId subscription in controller: each register() creates an independent subscription, multiple views per ID supported `services/session-state/src/refresh/controller.ts`
-- [ ] T023 Implement debouncing per logical result ID (300ms trailing edge) in controller (FR-005) `services/session-state/src/refresh/controller.ts`
-- [ ] T024 Implement visibility-deferred refresh: setVisible(false) sets stale flag, setVisible(true) flushes stale (FR-006) `services/session-state/src/refresh/controller.ts`
-- [ ] T025 Connect tab activation to setVisible in ChartPanelWrapper: active tab = visible, inactive tabs = not visible `shared/components/src/panels/ChartPanelWrapper.tsx`
+- [x] T022 Implement per-resultId subscription in controller: each register() creates an independent subscription, multiple views per ID supported `services/session-state/src/refresh/controller.ts`
+- [x] T023 Implement debouncing per logical result ID (300ms trailing edge) in controller (FR-005) `services/session-state/src/refresh/controller.ts`
+- [x] T024 Implement visibility-deferred refresh: setVisible(false) sets stale flag, setVisible(true) flushes stale (FR-006) `services/session-state/src/refresh/controller.ts`
+- [x] T025 Connect tab activation to setVisible in ChartPanelWrapper: active tab = visible, inactive tabs = not visible `shared/components/src/panels/ChartPanelWrapper.tsx`
 
 **Checkpoint**: Multiple result views work independently. Debouncing prevents burst re-renders. Background tabs defer refresh.
 
@@ -149,17 +149,17 @@
 
 ### Tests for User Story 4
 
-- [ ] T026 [test] Write controller test: pause() suppresses refresh, pending event captured `services/session-state/tests/refresh/controller.test.ts`
-- [ ] T027 [P][test] Write controller test: resume() flushes pending event, triggers refresh `services/session-state/tests/refresh/controller.test.ts`
-- [ ] T028 [P][test] Write hook test: toggle() switches between paused/active, hasPendingUpdate reflects state `shared/components/tests/hooks/useAutoRefresh.test.ts`
+- [x] T026 [test] Write controller test: pause() suppresses refresh, pending event captured `services/session-state/tests/unit/refresh/controller.test.ts`
+- [x] T027 [P][test] Write controller test: resume() flushes pending event, triggers refresh `services/session-state/tests/unit/refresh/controller.test.ts`
+- [x] T028 [P][test] Write hook test: toggle() switches between paused/active, hasPendingUpdate reflects state `shared/components/src/hooks/useAutoRefresh.test.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T029 Implement pause/resume in controller: pause stores pendingEvent, resume flushes it (FR-007, FR-008) `services/session-state/src/refresh/controller.ts`
-- [ ] T030 Implement onStateChange subscription in controller for UI reactivity `services/session-state/src/refresh/controller.ts`
-- [ ] T031 Add pause/resume icon button to ChartPanelWrapper tab header (next to close button) `shared/components/src/panels/ChartPanelWrapper.tsx`
-- [ ] T032 Add pending update badge to tab header when paused with pending event `shared/components/src/panels/ChartPanelWrapper.tsx`
-- [ ] T033 Handle error/unavailable states: display warning banner with last-known data (FR-009, FR-010) `shared/components/src/panels/ChartPanelWrapper.tsx`
+- [x] T029 Implement pause/resume in controller: pause stores pendingEvent, resume flushes it (FR-007, FR-008) `services/session-state/src/refresh/controller.ts`
+- [x] T030 Implement onStateChange subscription in controller for UI reactivity `services/session-state/src/refresh/controller.ts`
+- [x] T031 Add pause/resume icon button to ChartPanelWrapper tab header (next to close button) `shared/components/src/panels/ChartPanelWrapper.tsx`
+- [x] T032 Add pending update badge to tab header when paused with pending event `shared/components/src/panels/ChartPanelWrapper.tsx`
+- [x] T033 Handle error/unavailable states: display warning banner with last-known data (FR-009, FR-010) `shared/components/src/panels/ChartPanelWrapper.tsx`
 
 **Checkpoint**: Pause/resume toggle visible in tab header. Pending badge appears when paused with updates. Error states show warning banners.
 

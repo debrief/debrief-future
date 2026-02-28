@@ -8,11 +8,41 @@
  */
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import type {
-  AutoRefreshController,
-  AutoRefreshState,
-  ViewportState,
-} from '@debrief/session-state';
+
+// ─── Types (mirrored from @debrief/session-state to avoid heavy import) ─
+
+/** Per-view auto-refresh state. */
+export interface AutoRefreshState {
+  readonly resultId: string;
+  readonly viewId: string;
+  readonly paused: boolean;
+  readonly stale: boolean;
+  readonly visible: boolean;
+  readonly lastRefreshTimestamp: number | null;
+  readonly pendingEvent: unknown | null;
+  readonly status: 'active' | 'paused' | 'error' | 'unavailable';
+  readonly errorMessage: string | null;
+}
+
+/** Captured Vega viewport signals. */
+export interface ViewportState {
+  readonly signals: Record<string, unknown>;
+  readonly capturedAt: number;
+}
+
+/** Minimal controller interface consumed by the hook. */
+export interface AutoRefreshControllerLike {
+  register(
+    viewId: string,
+    resultId: string,
+    onRefresh: (event: { newPath: string }, viewportState: ViewportState | null) => void
+  ): () => void;
+  pause(viewId: string): void;
+  resume(viewId: string): void;
+  setVisible(viewId: string, visible: boolean): void;
+  getState(viewId: string): AutoRefreshState | undefined;
+  onStateChange(viewId: string, callback: (state: AutoRefreshState) => void): () => void;
+}
 
 // ─── Hook Return Type ────────────────────────────────────────────────
 
@@ -50,13 +80,13 @@ function makeDefaultState(resultId: string, viewId: string): AutoRefreshState {
 /**
  * React hook that connects a result view to the auto-refresh controller.
  *
- * @param controller - The AutoRefreshController instance.
+ * @param controller - The AutoRefreshController instance (or null if not yet available).
  * @param resultId - The logical result ID this view is bound to.
  * @param viewId - Unique identifier for this view instance.
  * @param onRefresh - Callback invoked when the view should re-render with new data.
  */
 export function useAutoRefresh(
-  controller: AutoRefreshController | null,
+  controller: AutoRefreshControllerLike | null,
   resultId: string,
   viewId: string,
   onRefresh: (newPath: string, viewportState: ViewportState | null) => void
