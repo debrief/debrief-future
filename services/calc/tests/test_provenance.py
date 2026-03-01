@@ -341,9 +341,9 @@ class TestInputFeatureState:
         assert data["properties"]["center"] == [0.0, 50.0]
 
     def test_input_feature_state_populate_by_name(self) -> None:
+        # populate_by_name allows using the Python field name at runtime
         state = InputFeatureState(
-            feature_id="f1",
-            geometry={"type": "Point", "coordinates": [1.0, 2.0]},
+            **{"feature_id": "f1", "geometry": {"type": "Point", "coordinates": [1.0, 2.0]}}
         )
         assert state.feature_id == "f1"
 
