@@ -58,6 +58,16 @@ classes:
         description: Parameter tuning record. Null until a tuning operation modifies this entry.
         range: TuneAnnotation
         required: false
+      input_state:
+        description: >-
+          Pre-operation feature states for coordinate-mutating tools.
+          Captures geometry and spatial properties as they were immediately
+          before the operation, enabling correct replay with modified parameters.
+          Null for non-mutation tools.
+        range: InputFeatureState
+        multivalued: true
+        inlined_as_list: true
+        required: false
       disabled:
         description: Whether this entry is skipped during replay. Toggled via the flip-card edit face.
         range: boolean
@@ -107,6 +117,37 @@ classes:
         range: boolean
         required: false
         ifabsent: "true"
+
+  InputFeatureState:
+    description: >-
+      Pre-operation state of a feature captured before a coordinate-mutating
+      tool executes. Enables correct replay by providing the original geometry
+      as the anchor for re-computation with modified parameters.
+    attributes:
+      feature_id:
+        description: ID of the feature whose pre-operation state is captured.
+        range: string
+        required: true
+      geometry:
+        description: >-
+          Full GeoJSON geometry object (type + coordinates) as it was
+          immediately before the operation. Stored as a JSON object.
+        range: string
+        required: true
+        notes: >-
+          Typed as string in LinkML but serialized as a JSON object in practice.
+          GeoJSON geometry is polymorphic (Point, Polygon, LineString, etc.)
+          and LinkML does not have a native geometry type.
+      properties:
+        description: >-
+          Kind-specific spatial properties captured before the operation.
+          Excludes provenance (which is append-only). Null if no spatial
+          properties need capturing.
+        range: string
+        required: false
+        notes: >-
+          Typed as string in LinkML but serialized as a JSON object in practice.
+          Contains keys like "center", "origin", "radius_km" etc.
 
   TuneAnnotation:
     description: Records a parameter modification (appended, not replacing original).

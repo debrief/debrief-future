@@ -17,7 +17,14 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from debrief_calc.models import LogEntry, ParameterValue, Provenance, SourceRef, WasGeneratedBy
+from debrief_calc.models import (
+    InputFeatureState,
+    LogEntry,
+    ParameterValue,
+    Provenance,
+    SourceRef,
+    WasGeneratedBy,
+)
 
 
 def _duration_ms_to_iso8601(duration_ms: float) -> str:
@@ -41,6 +48,7 @@ def create_log_entry(
     generated_result_id: str | None = None,
     timestamp: datetime | None = None,
     activity_id: str | None = None,
+    input_state: list[InputFeatureState] | None = None,
 ) -> LogEntry:
     """
     Create a PROV-aligned LogEntry from tool execution context.
@@ -55,6 +63,7 @@ def create_log_entry(
         generated_result_id: Optional stable result ID for artifact tools
         timestamp: Optional execution timestamp (defaults to UTC now)
         activity_id: Optional activity ID (defaults to UUID v4)
+        input_state: Optional pre-operation feature states for mutation tools
 
     Returns:
         LogEntry instance ready to be attached to features
@@ -87,6 +96,7 @@ def create_log_entry(
         executionDuration=_duration_ms_to_iso8601(duration_ms),
         generatedResultId=generated_result_id,
         tune=None,
+        inputState=input_state,
     )
 
 

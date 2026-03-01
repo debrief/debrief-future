@@ -109,6 +109,22 @@ class CreatedAsset(BaseModel):
     mime_type: str | None = Field(default=None, description="MIME type of the artifact")
 
 
+class InputFeatureState(BaseModel):
+    """Pre-operation state of a feature before a coordinate-mutating tool executes."""
+
+    feature_id: str = Field(
+        ..., alias="featureId", description="ID of the feature"
+    )
+    geometry: dict[str, Any] = Field(
+        ..., description="GeoJSON geometry object (type + coordinates)"
+    )
+    properties: dict[str, Any] | None = Field(
+        default=None, description="Kind-specific spatial properties (excludes provenance)"
+    )
+
+    model_config = {"populate_by_name": True}
+
+
 class TuneAnnotation(BaseModel):
     """Records a parameter modification (appended, not replacing original)."""
 
@@ -180,6 +196,11 @@ class LogEntry(BaseModel):
     )
     tune: TuneAnnotation | None = Field(
         default=None, description="Parameter tuning record (null until tuned)"
+    )
+    input_state: list[InputFeatureState] | None = Field(
+        default=None,
+        alias="inputState",
+        description="Pre-operation feature states for coordinate-mutating tools",
     )
 
     model_config = {"populate_by_name": True}

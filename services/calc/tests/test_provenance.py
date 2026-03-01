@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 
-from debrief_calc.models import LogEntry, ParameterValue, Provenance, SourceRef
+from debrief_calc.models import InputFeatureState, LogEntry, ParameterValue, Provenance, SourceRef
 from debrief_calc.provenance import (
     _duration_ms_to_iso8601,
     attach_log_entry,
@@ -303,3 +303,162 @@ class TestSetOutputKind:
         set_output_kind(feature, "new")
 
         assert feature["properties"]["kind"] == "new"
+
+
+class TestInputFeatureState:
+    """Tests for InputFeatureState model creation and serialization (T007)."""
+
+    def test_create_input_feature_state(self) -> None:
+        state = InputFeatureState(
+            featureId="circle-001",
+            geometry={"type": "Polygon", "coordinates": [[[0.0, 50.0], [0.01, 50.01], [0.0, 50.0]]]},
+            properties={"kind": "CIRCLE", "center": [0.0, 50.0]},
+        )
+        assert state.feature_id == "circle-001"
+        assert state.geometry["type"] == "Polygon"
+        assert state.properties is not None
+        assert state.properties["center"] == [0.0, 50.0]
+
+    def test_create_input_feature_state_no_properties(self) -> None:
+        state = InputFeatureState(
+            featureId="text-001",
+            geometry={"type": "Point", "coordinates": [0.0, 50.0]},
+        )
+        assert state.feature_id == "text-001"
+        assert state.properties is None
+
+    def test_input_feature_state_serializes_camelcase(self) -> None:
+        state = InputFeatureState(
+            featureId="circle-001",
+            geometry={"type": "Polygon", "coordinates": [[[0.0, 50.0]]]},
+            properties={"center": [0.0, 50.0]},
+        )
+        data = state.model_dump(mode="json", by_alias=True)
+        assert "featureId" in data
+        assert "feature_id" not in data
+        assert data["featureId"] == "circle-001"
+        assert data["geometry"]["type"] == "Polygon"
+        assert data["properties"]["center"] == [0.0, 50.0]
+
+    def test_input_feature_state_populate_by_name(self) -> None:
+        state = InputFeatureState(
+            feature_id="f1",
+            geometry={"type": "Point", "coordinates": [1.0, 2.0]},
+        )
+        assert state.feature_id == "f1"
+
+
+class TestLogEntryWithInputState:
+    """Tests for LogEntry with inputState field (T008)."""
+
+    def test_log_entry_with_input_state_serializes_camelcase(self) -> None:
+        state = InputFeatureState(
+            featureId="circle-001",
+            geometry={"type": "Polygon", "coordinates": [[[0.0, 50.0]]]},
+            properties={"center": [0.0, 50.0]},
+        )
+        entry = create_log_entry(
+            tool_name="move-shape",
+            tool_version="1.0.0",
+            source_features=[{"id": "circle-001", "properties": {"kind": "CIRCLE"}, "geometry": None}],
+            duration_ms=12.0,
+            input_state=[state],
+        )
+
+        data = entry.model_dump(mode="json", by_alias=True)
+        assert "inputState" in data
+        assert "input_state" not in data
+        assert len(data["inputState"]) == 1
+        assert data["inputState"][0]["featureId"] == "circle-001"
+
+    def test_log_entry_without_input_state(self) -> None:
+        entry = create_log_entry(
+            tool_name="track-stats",
+            tool_version="1.0.0",
+            source_features=[{"id": "t1", "properties": {"kind": "TRACK"}, "geometry": None}],
+            duration_ms=0.0,
+        )
+
+        data = entry.model_dump(mode="json", by_alias=True)
+        assert data["inputState"] is None
+
+
+class TestCreateLogEntryWithInputState:
+    """Tests for create_log_entry() with input_state parameter (T009, T010)."""
+
+    def test_create_log_entry_with_input_state(self) -> None:
+        state = InputFeatureState(
+            featureId="circle-001",
+            geometry={"type": "Polygon", "coordinates": [[[0.0, 50.0]]]},
+            properties={"center": [0.0, 50.0]},
+        )
+        entry = create_log_entry(
+            tool_name="move-shape",
+            tool_version="1.0.0",
+            source_features=[{"id": "circle-001", "properties": {"kind": "CIRCLE"}, "geometry": None}],
+            duration_ms=10.0,
+            input_state=[state],
+        )
+
+        assert entry.input_state is not None
+        assert len(entry.input_state) == 1
+        assert entry.input_state[0].feature_id == "circle-001"
+
+    def test_create_log_entry_without_input_state_returns_none(self) -> None:
+        entry = create_log_entry(
+            tool_name="track-stats",
+            tool_version="1.0.0",
+            source_features=[{"id": "t1", "properties": {"kind": "TRACK"}, "geometry": None}],
+            duration_ms=0.0,
+        )
+
+        assert entry.input_state is None
+
+
+class TestLogEntryRoundTrip:
+    """Tests for LogEntry round-trip with inputState (T011)."""
+
+    def test_round_trip_preserves_input_state(self) -> None:
+        state = InputFeatureState(
+            featureId="circle-001",
+            geometry={
+                "type": "Polygon",
+                "coordinates": [[[0.0, 50.0], [0.01, 50.01], [-0.01, 50.01], [0.0, 50.0]]],
+            },
+            properties={"kind": "CIRCLE", "center": [0.0, 50.0], "radius": 1000.0},
+        )
+        original = create_log_entry(
+            tool_name="move-shape",
+            tool_version="1.0.0",
+            source_features=[{"id": "circle-001", "properties": {"kind": "CIRCLE"}, "geometry": None}],
+            duration_ms=12.0,
+            input_state=[state],
+            activity_id="test-round-trip",
+        )
+
+        # Serialize to JSON dict (camelCase)
+        json_data = original.model_dump(mode="json", by_alias=True)
+
+        # Deserialize back to LogEntry
+        restored = LogEntry.model_validate(json_data)
+
+        assert restored.input_state is not None
+        assert len(restored.input_state) == 1
+        assert restored.input_state[0].feature_id == "circle-001"
+        assert restored.input_state[0].geometry["type"] == "Polygon"
+        assert restored.input_state[0].geometry["coordinates"] == state.geometry["coordinates"]
+        assert restored.input_state[0].properties == state.properties
+
+    def test_round_trip_preserves_null_input_state(self) -> None:
+        original = create_log_entry(
+            tool_name="track-stats",
+            tool_version="1.0.0",
+            source_features=[{"id": "t1", "properties": {"kind": "TRACK"}, "geometry": None}],
+            duration_ms=0.0,
+            activity_id="test-null-round-trip",
+        )
+
+        json_data = original.model_dump(mode="json", by_alias=True)
+        restored = LogEntry.model_validate(json_data)
+
+        assert restored.input_state is None
