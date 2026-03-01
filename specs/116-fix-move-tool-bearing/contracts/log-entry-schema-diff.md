@@ -123,15 +123,25 @@ return LogEntry(
 
 ### Modified Function: run (in `executor.py`)
 
-Before calling the handler, capture pre-tool geometry for mutation tools:
+**CRITICAL**: Capture MUST happen BEFORE `_execute_handler()` because mutation tool
+handlers (e.g., `move_shape`) mutate `context.features` in-place. Capturing after the
+handler would snapshot the already-mutated geometry — the exact opposite of what we need.
+
+This matches the TypeScript pattern in `executeTool.ts:145-162` which captures
+`preToolInputState` before calling `calcService.executeTool()`.
 
 ```python
-# After _execute_handler returns, before creating log entry:
+# BEFORE _execute_handler — mutation tools mutate context.features in-place
 is_mutation = tool.output_kind.startswith("mutation/")
 
 input_state_list: list[InputFeatureState] | None = None
 if is_mutation:
     input_state_list = _capture_input_state(context.features)
+
+# Execute the tool handler (may mutate context.features for mutation tools)
+output_features = _execute_handler(tool, context, params)
+
+duration_ms = (time.perf_counter() - start_time) * 1000
 
 log_entry = create_log_entry(
     ...existing args...,

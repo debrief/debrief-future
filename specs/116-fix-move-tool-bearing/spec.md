@@ -80,7 +80,7 @@ An analyst applies two sequential move operations: first East 5 km, then North 3
 ### Functional Requirements
 
 - **FR-001**: The PROV log entry for any coordinate-mutating tool MUST include a snapshot of the input feature's geometry and spatially-relevant properties as they were immediately before the operation.
-- **FR-002**: The input snapshot MUST include the full geometry object (type + coordinates) and any kind-specific spatial properties (e.g., `center` for circles, `origin` for vectors).
+- **FR-002**: The input snapshot MUST include the full geometry object (type + coordinates) and all non-provenance properties. This captures kind-specific spatial properties (e.g., `center` for circles, `origin` for vectors) as well as other properties that may be relevant to future tool types. The `provenance` property is excluded because it is append-only.
 - **FR-003**: When a PROV log entry is replayed with modified parameters, the system MUST apply the new parameters to the stored input snapshot geometry, not to the feature's current geometry.
 - **FR-004**: Replaying a PROV entry with the original (unchanged) parameters MUST produce the same output as the original execution (idempotent replay).
 - **FR-005**: Each PROV log entry MUST store its own input snapshot independently — the snapshot represents the state immediately before that specific operation, supporting correct chained-operation replay.
