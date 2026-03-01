@@ -259,25 +259,19 @@ export function createOpenPlotCommand(
       },
 
       // Phase 6: replay deps (Feature: 076-replay-tune)
-      writeGeoJson: async (
-        sp: string,
-        ip: string,
-        fc: { type: 'FeatureCollection'; features: Array<Record<string, unknown>> }
-      ) => {
+      writeGeoJson: async (sp, ip, fc) => {
         await stacService.writeGeoJson(
           sp, ip,
           fc as unknown as Parameters<typeof stacService.writeGeoJson>[2]
         );
       },
 
-      executeTool: async (
-        toolId: string,
-        featureIds: string[],
-        params: Record<string, unknown>
-      ) => {
+      executeTool: async (toolId, featureIds, params) => {
+        const startMs = Date.now();
+
         // Load current features from disk (geometry restored by logService before replay)
         const fc = await stacService.loadGeoJsonForItem(store.path, itemPath);
-        if (!fc) { return { success: false }; }
+        if (!fc) { return { success: false, durationMs: Date.now() - startMs }; }
 
         // Find requested features — SafeFeature lacks `id`, access via cast
         type FeatureWithId = { id?: string | number; geometry: unknown; properties: Record<string, unknown> | null };
@@ -285,7 +279,7 @@ export function createOpenPlotCommand(
         const features = allFeatures.filter(
           (f) => featureIds.includes(String(f.id ?? (f.properties as Record<string, unknown>)?.id))
         );
-        if (features.length === 0) { return { success: false }; }
+        if (features.length === 0) { return { success: false, durationMs: Date.now() - startMs }; }
 
         // Execute tool via Python CLI
         const result = await calcService.executeToolDirect(
@@ -293,7 +287,7 @@ export function createOpenPlotCommand(
           features as Parameters<typeof calcService.executeToolDirect>[1],
           params
         );
-        if (!result.success || !result.features) { return { success: false }; }
+        if (!result.success || !result.features) { return { success: false, durationMs: Date.now() - startMs }; }
 
         // Apply mutations: merge result features back into fc
         const isMutation = result.resultType?.startsWith('mutation/');
@@ -332,16 +326,18 @@ export function createOpenPlotCommand(
 
         return {
           success: true,
+          durationMs: Date.now() - startMs,
           artifactHref: result.artifactHref,
+          toolVersion: result.toolVersion,
         };
       },
 
-      loadSnapshot: async (sp: string, ip: string, assetFilename: string) => {
+      loadSnapshot: async (sp, ip, assetFilename) => {
         const fc = await stacService.loadSnapshotGeoJson(sp, ip, assetFilename);
-        return fc as { type: 'FeatureCollection'; features: Array<Record<string, unknown>> } | null;
+        return fc as unknown as Awaited<ReturnType<typeof stacService.loadSnapshotGeoJson>>;
       },
 
-      resolveToolVersion: (toolId: string) => {
+      resolveToolVersion: (toolId) => {
         return Promise.resolve(calcService.getToolVersion(toolId));
       },
     });

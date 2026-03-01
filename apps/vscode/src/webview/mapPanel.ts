@@ -275,6 +275,17 @@ export class MapPanel {
    * features in plotFeatures by ID.
    */
   public updatePlotFeatures(layer: ResultLayer): void {
+    // Update in-memory currentFeatures so subsequent tool executions
+    // (via getFeatures/resolveFeatures) see the mutated geometry.
+    const fid = (f: DebriefFeature | { id?: unknown; properties?: Record<string, unknown> | null }) =>
+      String((f as { id?: unknown }).id ?? (f.properties as Record<string, unknown> | null)?.id ?? '');
+    const updatedMap = new Map(
+      layer.features.features.map((f) => [fid(f), f as DebriefFeature])
+    );
+    this.currentFeatures = this.currentFeatures.map(
+      (f) => updatedMap.get(fid(f)) ?? f
+    );
+
     this.postMessage({
       type: 'updatePlotFeatures',
       features: layer.features,
