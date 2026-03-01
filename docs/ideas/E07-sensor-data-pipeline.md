@@ -10,6 +10,8 @@ Legacy Debrief has a mature sensor data system spanning ~10,000 lines of Java ac
 
 A 7-phase implementation delivering sensor capabilities incrementally. Each phase produces a working end-to-end demo scenario. Sensor data is embedded under `track.properties.sensors` (not standalone features). The existing backlog item #067 (9 sensor tool implementations) is absorbed into the relevant phases of this epic.
 
+**Phases 1-4 are approved for immediate work. Phases 5-7 (residual analysis, TMA data model, TMA interactive drag) are deferred pending executive sponsorship.**
+
 ### Architecture Decisions
 
 - **Embedded storage**: Sensors live under `track.properties.sensors[]` in GeoJSON, matching the legacy parent-child relationship
@@ -20,15 +22,15 @@ A 7-phase implementation delivering sensor capabilities incrementally. Each phas
 
 ### Phase Summary
 
-| Phase | Title | Key Deliverables |
-|-------|-------|-----------------|
-| 1 | Schema Overhaul | Full SensorContact/SensorData redesign, display properties, array offset modes, measured positions, update 9 tool specs |
-| 2 | REP Import | SENSOR v1, then SENSOR2, SENSOR3, SENSORARC parsers |
-| 3 | Rendering | Leaflet custom layer for bearing lines, ambiguous bearings, sensor arcs, snail mode |
-| 4 | Array Offsets | PLAIN, WORM, MEASURED array centre calculations |
-| 5 | Residual Analysis | Doublet infrastructure, bearing + frequency residuals, custom React scatter component |
-| 6 | TMA Data Model | TMA schemas, Absolute/Relative segments, solution generation from sensor cuts |
-| 7 | TMA Interactive Drag | Rotate/shear/stretch drag modes, live residual feedback |
+| Phase | Title | Key Deliverables | Status |
+|-------|-------|-----------------|--------|
+| 1 | Schema Overhaul | Full SensorContact/SensorData redesign, display properties, array offset modes, measured positions, update 9 tool specs | Approved |
+| 2 | REP Import | SENSOR v1, then SENSOR2, SENSOR3, SENSORARC parsers | Approved |
+| 3 | Rendering | Leaflet custom layer for bearing lines, ambiguous bearings, sensor arcs, snail mode | Approved |
+| 4 | Array Offsets | PLAIN, WORM, MEASURED array centre calculations | Approved |
+| 5 | Residual Analysis | Doublet infrastructure, bearing + frequency residuals, custom React scatter component | **Deferred** |
+| 6 | TMA Data Model | TMA schemas, Absolute/Relative segments, solution generation from sensor cuts | **Deferred** |
+| 7 | TMA Interactive Drag | Rotate/shear/stretch drag modes, live residual feedback | **Deferred** |
 
 ---
 
