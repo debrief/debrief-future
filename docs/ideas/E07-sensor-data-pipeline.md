@@ -2,6 +2,8 @@
 
 Port legacy Debrief sensor capabilities to Debrief-Future in 7 phases, from schema through TMA interactive drag.
 
+**Parent document:** [SENSOR_DATA.md](https://github.com/debrief/debrief/blob/develop/SENSOR_DATA.md) — comprehensive reference covering the legacy sensor data model, import/export formats, rendering, analysis, and TMA capabilities with links to all source files.
+
 ## Problem
 
 Legacy Debrief has a mature sensor data system spanning ~10,000 lines of Java across 30+ source files. It covers passive sonar observations, bearing/frequency analysis, towed array offset calculations, bearing residual "stacked dots" views, and full Target Motion Analysis (TMA) with interactive drag refinement. Debrief-Future has partial sensor schema support (SensorContact, SensorData in LinkML) and 9 sensor tool specifications, but only 1 tool implemented (buffer-zone-generator). No sensor import, rendering, analysis, or TMA capabilities exist yet.
@@ -97,6 +99,16 @@ Redesign SensorContact and SensorData from scratch in LinkML to fully capture th
 - Golden fixtures (valid + invalid) for new schema
 - Round-trip tests (Python -> JSON -> TypeScript -> JSON -> Python)
 
+### Legacy source reference
+
+The field tables above are derived from these legacy Java classes. Engineers should consult these for edge cases, validation rules, and colour inheritance logic:
+
+| Source | Key algorithms |
+|--------|---------------|
+| [SensorContactWrapper.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/SensorContactWrapper.java) (1,544 lines) | Colour inheritance from parent sensor (`getColor()` delegation), port/starboard bearing determination (`isBearingToPort()`, `relBearing()`), ambiguity resolution (`ditchBearing()`), bearing line extent calculation (`getFarEnd()`) |
+| [SensorWrapper.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/SensorWrapper.java) (1,639 lines) | Contact merging on same-name sensors (`append()`), decimation with bearing wraparound (`setResampleDataAt()`), array centre mode management |
+| [TacticalDataWrapper.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/TacticalDataWrapper.java) (~800 lines) | Time-ordered storage base class, linear interpolation with 0/360 degree wraparound handling, visibility frequency controls |
+
 ### Demo
 
 Load a fixture file containing a track with embedded sensor data -> validate with Pydantic -> serialize to JSON -> deserialize in TypeScript -> verify all fields preserved.
@@ -127,6 +139,18 @@ Parse legacy REP sensor format lines and populate the new sensor schema. Start w
 ### Integration with debrief-io
 
 Extend the existing REP parser in `services/io/` to handle `;SENSOR:`, `;SENSOR2:`, `;SENSOR3:`, and `;SENSORARC` lines. Parsed sensors embedded into the parent TrackFeature's properties.sensors array.
+
+### Legacy source reference
+
+Each REP format version has a dedicated importer. Engineers should study these for field parsing order, DMS coordinate handling, NULL/NAN sentinel values, and symbology-to-colour mapping:
+
+| Source | Format | Key details |
+|--------|--------|-------------|
+| [ImportSensor.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/ReaderWriter/Replay/ImportSensor.java) | `;SENSOR:` (v1) | Base format: timestamp, track name (quoted if multi-word), 2-char symbology, DMS lat/lon or NULL, bearing, range in yards, sensor name, free-text label |
+| [ImportSensor2.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/ReaderWriter/Replay/ImportSensor2.java) | `;SENSOR2:` (v2) | Adds ambiguous bearing and frequency fields after primary bearing |
+| [ImportSensor3.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/ReaderWriter/Replay/ImportSensor3.java) | `;SENSOR3:` (v3) | Adds bearing accuracy and frequency accuracy (parsed but not stored — legacy TODO) |
+| [ImportSensorArc.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/ReaderWriter/Replay/ImportSensorArc.java) | `;SENSORARC` | Two timestamps (start/end), left/right arc angles, inner/outer range in metres; creates [DynamicTrackCoverageWrapper](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/DynamicTrackShapes/DynamicTrackCoverageWrapper.java) |
+| [ImportReplay.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/ReaderWriter/Replay/ImportReplay.java) | — | Registration of all sensor importers in `initialise()`; symbology colour code table (@=White, A=Blue, B=Green, C=Red, D=Yellow, etc.) |
 
 ### Demo
 
@@ -169,6 +193,18 @@ Render sensor data on the Leaflet map using a custom Canvas/SVG layer.
 - Visibility culling: skip contacts outside current viewport
 - Time filtering: only render contacts visible at current time slider position
 
+### Legacy source reference
+
+The rendering pipeline is split across several files. Engineers should pay close attention to the snail mode fading algorithm, the port/starboard colour convention for ambiguous bearings, and the bearing line extent capping:
+
+| Source | Key algorithms |
+|--------|---------------|
+| [SensorContactWrapper.java `paint()`](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/SensorContactWrapper.java) | Main rendering pipeline: visibility check -> origin calculation -> bearing line extent (`getFarEnd()` uses range or viewport clip capped at `MAXIMUM_SENSOR_BEARING_RANGE` = 5 degrees) -> alpha transparency -> label placement at START/MIDDLE/END |
+| [SensorContactWrapper.java `isBearingToPort()`](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/SensorContactWrapper.java) | Port/starboard determination: calculates relative bearing from host vessel course using `relBearing(course, bearing)` static method (returns +/-180); port bearing drawn in base colour, starboard drawn in `baseColor.darker()` |
+| [SnailDrawTacticalContact.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/GUI/Tote/Painters/SnailDrawTacticalContact.java) | Snail mode time-trail fading: iterates contacts from `(currentDTG - trailLength)` to `currentDTG`, calculates `proportion = (trailLength - age) / trailLength` (1.0 = newest, 0.0 = oldest), applies `Color(R*p, G*p, B*p)` creating fade-to-black effect |
+| [SnailDrawSWTSensorContact.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.core/src/org/mwc/debrief/core/editors/painters/snail/SnailDrawSWTSensorContact.java) | SWT-specific sensor rendering variant (alternative reference for the same snail mode algorithm) |
+| [DynamicTrackCoverageWrapper.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/DynamicTrackShapes/DynamicTrackCoverageWrapper.java) | Sensor arc rendering: fan/wedge shape with left/right angular bounds and inner/outer range bounds |
+
 ### Demo
 
 Load REP file with sensor data -> render bearing lines on map -> toggle ambiguous bearings -> demonstrate snail mode time trail -> show sensor arc coverage fan.
@@ -203,6 +239,16 @@ Uses actual position data from `measured_positions` time-series:
 - `SensorContact.getCalculatedOrigin()` uses array offset mode from parent SensorData
 - When offset or mode changes, all contact origins must be invalidated and recalculated
 - Bearing line origin shifts based on calculated array centre
+
+### Legacy source reference
+
+The array offset system is the most algorithmically complex part of sensor positioning. The WORM mode ("worm in hole") requires walking backwards along track history, which is non-trivial with segmented tracks and varying fix intervals. Engineers should study ArrayOffsetHelper and the track backtracking methods carefully:
+
+| Source | Key algorithms |
+|--------|---------------|
+| [ArrayOffsetHelper.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/Track/ArrayOffsetHelper.java) (~300 lines) | Central dispatch: `getArrayCentre(sensor, time, hostLocation, track)` selects mode -> PLAIN/WORM delegates to `track.getBacktraceTo(time, offset, isWorm)`, MEASURED delegates to `sensor.getMeasuredLocationAt()`. Supports `LegacyArrayOffsetModes.PLAIN`, `LegacyArrayOffsetModes.WORM`, `MeasuredDatasetArrayMode`, and `DeferredDatasetArrayMode` |
+| [SensorContactWrapper.java `getCalculatedOrigin()`](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/SensorContactWrapper.java) | Origin resolution chain: if `_absoluteOrigin != null` use it directly; otherwise call `ArrayOffsetHelper.getArrayCentre()` with parent sensor settings; cache result in `_calculatedOrigin`; invalidated by `clearCalculatedOrigin()` when offset/mode changes |
+| [SensorWrapper.java `clearChildOffsets()`](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/SensorWrapper.java) | Cache invalidation: when sensor offset or array mode changes, iterates all child contacts calling `clearCalculatedOrigin()` to force recalculation on next paint or analysis operation |
 
 ### Absorbs from #067
 
@@ -255,6 +301,19 @@ Custom React scatter plot component (not Vega-Lite):
 - Ownship course shown as context line
 - Ownship leg zones highlighted as colored bands
 - Ambiguous bearing residuals shown as second series
+
+### Legacy source reference
+
+The residual analysis system is centred on the Doublet pairing algorithm and Doppler shift calculations. Engineers should study the Doublet generation loop (which pairs only visible contacts with interpolated target fixes) and the frequency correction pipeline:
+
+| Source | Key algorithms |
+|--------|---------------|
+| [Doublet.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/Track/Doublet.java) (~400 lines) | Core pairing: `getMeasuredBearing()`, `getCalculatedBearing(sensorOffset, targetOffset)`, `calculateBearingError()` (wraps to +/-180). Frequency pipeline: `getMeasuredFrequency()` -> `getCorrectedFrequency()` (removes observer Doppler) -> `getPredictedFrequency(speedOfSoundKts)` (adds target Doppler). Also `getAmbiguousMeasuredBearing()` for second residual series |
+| [StackedDotHelper.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.track_shift/src/org/mwc/debrief/track_shift/views/StackedDotHelper.java) | `getDoublets()` algorithm: for each ownship track -> for each visible sensor -> for each visible contact -> find target segment covering DTG -> interpolate target fix -> interpolate host fix -> create Doublet. Produces `TimeSeriesCollection` datasets for chart rendering |
+| [FrequencyCalcs.java](https://github.com/debrief/debrief/blob/master/org.mwc.cmap.legacy/src/MWC/Algorithms/FrequencyCalcs.java) | `calcDopplerComponent()`: Doppler shift from relative motion along bearing line. `calcPredictedFreq()`: expected received frequency given base freq, relative geometry, speed of sound |
+| [BearingResidualsView.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.track_shift/src/org/mwc/debrief/track_shift/views/BearingResidualsView.java) | Concrete bearing residual stacked dots view |
+| [FrequencyResidualsView.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.track_shift/src/org/mwc/debrief/track_shift/views/FrequencyResidualsView.java) | Concrete frequency residual stacked dots view |
+| [BaseStackedDotsView.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.track_shift/src/org/mwc/debrief/track_shift/views/BaseStackedDotsView.java) | Abstract base: chart layout, track selection, ownship leg zone detection and display |
 
 ### Absorbs from #067
 
@@ -332,6 +391,20 @@ Primary TMA workflow:
 
 TMA segments serve as target hypothesis for Doublet pairing in Phase 5's residual views. After generating a TMA solution, the analyst views bearing/frequency residuals to assess quality.
 
+### Legacy source reference
+
+The TMA system spans segment types (constant-course dead-reckoning), contact wrappers (individual solution estimates with uncertainty ellipses), and the solution generation workflow from sensor cuts:
+
+| Source | Key algorithms |
+|--------|---------------|
+| [CoreTMASegment.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/Track/CoreTMASegment.java) (336 lines) | Abstract base: constant course/speed, drag operations (`rotate()`, `stretch()`, `shear()`, `shift()`), real-time drag feedback via `_dragMsg` field |
+| [AbsoluteTMASegment.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/Track/AbsoluteTMASegment.java) (457 lines) | Fixed-origin dead reckoning: `createFixAt(theTime, startTime)` calculates elapsed time, applies `origin + (speed * time) along course` |
+| [RelativeTMASegment.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/Track/RelativeTMASegment.java) (>1,500 lines) | Offset-from-ownship positioning: constructor takes `SensorContactWrapper[]` array, creates fix at each observation time. Recalculates when ownship moves. Most commonly used TMA segment type |
+| [TMAContactWrapper.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/TMAContactWrapper.java) (1,309 lines) | Individual TMA solution: bearing, range, course, speed, depth, uncertainty ellipse. `getCentre(track)` computes position (relative = host + offset, absolute = `_originalLocation`). Renders bearing line, ellipse, symbol, velocity vector |
+| [TMAWrapper.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.legacy/src/Debrief/Wrappers/TMAWrapper.java) (777 lines) | Container for time-ordered TMA solutions, extends TacticalDataWrapper |
+| [GenerateTMASegmentFromCuts.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.core/src/org/mwc/debrief/core/ContextOperations/GenerateTMASegmentFromCuts.java) (1,029 lines) | Primary manual TMA workflow: wizard collects range/bearing/course/speed estimates, creates `RelativeTMASegment`, optionally colours associated sensor cuts |
+| [ConvertAbsoluteTmaToRelative.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.core/src/org/mwc/debrief/core/ContextOperations/ConvertAbsoluteTmaToRelative.java) | Converts AbsoluteTMA to RelativeTMA by calculating offset from sensor array centre at start time |
+
 ### Demo
 
 Load ownship track with sensor data -> select sensor contacts -> generate TMA solution with initial estimates -> view TMA track on map -> observe bearing residuals for the solution.
@@ -363,6 +436,18 @@ Add interactive drag operations for refining TMA segments on the map.
 - During drag, bearing residual view updates in real-time
 - Analyst can observe residuals approaching zero as solution improves
 - Frequency residuals also update (Doppler predictions change with course/speed)
+
+### Legacy source reference
+
+The drag system uses a mode pattern where each drag mode implements a different geometric transformation. The shear mode (default) is the most commonly used, adjusting both course and speed simultaneously:
+
+| Source | Key algorithms |
+|--------|---------------|
+| [DragSegment.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.core/src/org/mwc/debrief/core/actions/DragSegment.java) (258 lines) | Entry point: selects drag mode (translate/rotate/stretch/shear), maps cursor position to segment transformation, reads `getDragTextMessage()` for live feedback overlay |
+| [ShearDragMode.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.core/src/org/mwc/debrief/core/actions/drag/ShearDragMode.java) | Default mode: `segment.shear(cursorLocation, origin)` changes both course and speed; feedback shows `"[speed kts newCourse°]"` |
+| [RotateDragMode.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.core/src/org/mwc/debrief/core/actions/drag/RotateDragMode.java) | Course-only: `segment.rotate(angle, origin)` pivots segment around endpoint; feedback shows `"[newCourse°]"` |
+| [StretchDragMode.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.core/src/org/mwc/debrief/core/actions/drag/StretchDragMode.java) | Speed-only: `segment.stretch(range, origin)` extends/contracts along bearing; feedback shows `"[newSpeed kts]"` |
+| [CoreDragOperation.java](https://github.com/debrief/debrief/blob/master/org.mwc.debrief.core/src/org/mwc/debrief/core/actions/drag/CoreDragOperation.java) | Base class providing translate/shift functionality common to all modes |
 
 ### Demo
 
