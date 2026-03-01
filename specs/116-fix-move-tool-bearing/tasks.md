@@ -48,29 +48,29 @@
 
 ### LinkML Schema
 
-- [ ] T001 Add `InputFeatureState` class to LinkML schema `shared/schemas/src/linkml/log-entry.yaml`
-- [ ] T002 Add `input_state` attribute to `LogEntry` class in `shared/schemas/src/linkml/log-entry.yaml`
+- [x] T001 Add `InputFeatureState` class to LinkML schema `shared/schemas/src/linkml/log-entry.yaml`
+- [x] T002 Add `input_state` attribute to `LogEntry` class in `shared/schemas/src/linkml/log-entry.yaml`
 
 ### Python Model
 
-- [ ] T003 Add `InputFeatureState` Pydantic model to `services/calc/debrief_calc/models.py`
-- [ ] T004 Add `input_state` field to `LogEntry` model in `services/calc/debrief_calc/models.py`
+- [x] T003 Add `InputFeatureState` Pydantic model to `services/calc/debrief_calc/models.py`
+- [x] T004 Add `input_state` field to `LogEntry` model in `services/calc/debrief_calc/models.py`
 
 ### Golden Fixture
 
-- [ ] T005 Create golden fixture with inputState `shared/schemas/src/fixtures/valid/circle-annotation-input-state-01.json`
+- [x] T005 Create golden fixture with inputState `shared/schemas/src/fixtures/valid/circle-annotation-input-state-01.json`
 
 ### Provenance Function
 
-- [ ] T006 Add `input_state` parameter to `create_log_entry()` in `services/calc/debrief_calc/provenance.py`
+- [x] T006 Add `input_state` parameter to `create_log_entry()` in `services/calc/debrief_calc/provenance.py`
 
 ### Foundation Tests
 
-- [ ] T007 [test] Test `InputFeatureState` model creation and serialization `services/calc/tests/test_provenance.py`
-- [ ] T008 [test] Test `LogEntry` with inputState serializes to camelCase JSON `services/calc/tests/test_provenance.py`
-- [ ] T009 [test] Test `create_log_entry()` with input_state parameter `services/calc/tests/test_provenance.py`
-- [ ] T010 [test] Test `create_log_entry()` without input_state returns null `services/calc/tests/test_provenance.py`
-- [ ] T011 [test] Test LogEntry round-trip: Python → JSON → Python preserves inputState `services/calc/tests/test_provenance.py`
+- [x] T007 [test] Test `InputFeatureState` model creation and serialization `services/calc/tests/test_provenance.py`
+- [x] T008 [test] Test `LogEntry` with inputState serializes to camelCase JSON `services/calc/tests/test_provenance.py`
+- [x] T009 [test] Test `create_log_entry()` with input_state parameter `services/calc/tests/test_provenance.py`
+- [x] T010 [test] Test `create_log_entry()` without input_state returns null `services/calc/tests/test_provenance.py`
+- [x] T011 [test] Test LogEntry round-trip: Python → JSON → Python preserves inputState `services/calc/tests/test_provenance.py`
 
 **Checkpoint**: InputFeatureState exists in schema, Python model, and provenance function. All serialization tests pass.
 
@@ -86,22 +86,22 @@
 
 ### Tests (write FIRST — must FAIL before implementation)
 
-- [ ] T012 [test] Test `_capture_input_state` captures geometry and non-provenance properties `services/calc/tests/test_executor.py`
-- [ ] T013 [test] Test `_capture_input_state` excludes provenance from captured properties `services/calc/tests/test_executor.py`
-- [ ] T014 [test] Test `_capture_input_state` handles feature missing id (uses "unknown") `services/calc/tests/test_executor.py`
-- [ ] T015 [test] Test executor attaches inputState to provenance for mutation tool `services/calc/tests/test_executor.py`
-- [ ] T016 [test] Test executor sets inputState=null for non-mutation tool `services/calc/tests/test_executor.py`
-- [ ] T017 [test] Test capture happens BEFORE handler (pre-mutation geometry, not post) `services/calc/tests/test_executor.py`
-- [ ] T018 [test] Test move-shape circle: inputState contains original center and polygon geometry `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
-- [ ] T019 [P][test] Test move-shape vector: inputState contains original origin property `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
-- [ ] T020 [P][test] Test move-shape text: inputState contains original Point geometry `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T012 [test] Test `_capture_input_state` captures geometry and non-provenance properties `services/calc/tests/test_executor.py`
+- [x] T013 [test] Test `_capture_input_state` excludes provenance from captured properties `services/calc/tests/test_executor.py`
+- [x] T014 [test] Test `_capture_input_state` handles feature missing id (uses "unknown") `services/calc/tests/test_executor.py`
+- [x] T015 [test] Test executor attaches inputState to provenance for mutation tool `services/calc/tests/test_executor.py`
+- [x] T016 [test] Test executor sets inputState=null for non-mutation tool `services/calc/tests/test_executor.py`
+- [x] T017 [test] Test capture happens BEFORE handler (pre-mutation geometry, not post) `services/calc/tests/test_executor.py`
+- [x] T018 [test] Test move-shape circle: inputState contains original center and polygon geometry `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T019 [P][test] Test move-shape vector: inputState contains original origin property `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
+- [x] T020 [P][test] Test move-shape text: inputState contains original Point geometry `services/calc/tests/tools/shape/manipulation/test_move_shape.py`
 
 ### Implementation
 
-- [ ] T021 Add `_capture_input_state()` helper function to `services/calc/debrief_calc/executor.py`
-- [ ] T022 Wire inputState capture into `run()` BEFORE `_execute_handler()` in `services/calc/debrief_calc/executor.py`
-- [ ] T023 Pass `input_state` to `create_log_entry()` call in `services/calc/debrief_calc/executor.py`
-- [ ] T024 Run all executor and move-shape tests to verify `services/calc/tests/`
+- [x] T021 Add `_capture_input_state()` helper function to `services/calc/debrief_calc/executor.py`
+- [x] T022 Wire inputState capture into `run()` BEFORE `_execute_handler()` in `services/calc/debrief_calc/executor.py`
+- [x] T023 Pass `input_state` to `create_log_entry()` call in `services/calc/debrief_calc/executor.py`
+- [x] T024 Run all executor and move-shape tests to verify `services/calc/tests/`
 
 **Checkpoint**: After executing move-shape, the output feature's provenance entry contains inputState with pre-operation geometry. Non-mutation tools have inputState=null.
 
@@ -115,12 +115,12 @@
 
 ### Tests
 
-- [ ] T025 [test] Test set-track-color (mutation tool) gets inputState captured automatically `services/calc/tests/test_executor.py`
-- [ ] T026 [test] Test track-stats (non-mutation tool) gets inputState=null `services/calc/tests/test_executor.py`
+- [x] T025 [test] Test set-track-color (mutation tool) gets inputState captured automatically `services/calc/tests/test_executor.py`
+- [x] T026 [test] Test track-stats (non-mutation tool) gets inputState=null `services/calc/tests/test_executor.py`
 
 ### Verification
 
-- [ ] T027 Run full test suite to verify no regressions: `uv run pytest services/calc/tests/ -v`
+- [x] T027 Run full test suite to verify no regressions: `uv run pytest services/calc/tests/ -v`
 
 **Checkpoint**: All existing mutation tools automatically capture inputState. Convention is proven by tests, not just documentation.
 
@@ -134,11 +134,11 @@
 
 ### Tests
 
-- [ ] T028 [test] Test chained moves: second inputState reflects post-first-move geometry `services/calc/tests/test_executor.py`
+- [x] T028 [test] Test chained moves: second inputState reflects post-first-move geometry `services/calc/tests/test_executor.py`
 
 ### Verification
 
-- [ ] T029 Run full calc test suite: `uv run pytest services/calc/tests/ -v`
+- [x] T029 Run full calc test suite: `uv run pytest services/calc/tests/ -v`
 
 **Checkpoint**: Chained mutations each capture their own inputState independently.
 
@@ -148,12 +148,12 @@
 
 **Purpose**: Run the full CI verification to ensure nothing is broken across the monorepo.
 
-- [ ] T030 Run Python lint: `uv run ruff check .`
-- [ ] T031 [P] Run Python typecheck: `uv run pyright`
-- [ ] T032 [P] Run TypeScript lint: `pnpm lint`
-- [ ] T033 [P] Run TypeScript typecheck: `pnpm -r typecheck`
-- [ ] T034 Run full Python test suite: `uv run pytest`
-- [ ] T035 [P] Run full TypeScript test suite: `pnpm --filter '!@debrief/web-shell' test`
+- [x] T030 Run Python lint: `uv run ruff check .`
+- [x] T031 [P] Run Python typecheck: `uv run pyright`
+- [x] T032 [P] Run TypeScript lint: `pnpm lint`
+- [x] T033 [P] Run TypeScript typecheck: `pnpm -r typecheck`
+- [x] T034 Run full Python test suite: `uv run pytest`
+- [x] T035 [P] Run full TypeScript test suite: `pnpm --filter '!@debrief/web-shell' test`
 
 **Checkpoint**: All CI checks pass. Ready for evidence collection.
 
@@ -163,18 +163,18 @@
 
 ### Evidence Collection
 
-- [ ] T036 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/116-fix-move-tool-bearing/evidence/test-summary.md`
-- [ ] T037 Create usage demonstration `specs/116-fix-move-tool-bearing/evidence/usage-example.md`
-- [ ] T038 [P] Capture round-trip proof (Python LogEntry → JSON → Python) `specs/116-fix-move-tool-bearing/evidence/round-trip-evidence.md`
+- [x] T036 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/116-fix-move-tool-bearing/evidence/test-summary.md`
+- [x] T037 Create usage demonstration `specs/116-fix-move-tool-bearing/evidence/usage-example.md`
+- [x] T038 [P] Capture round-trip proof (Python LogEntry → JSON → Python) `specs/116-fix-move-tool-bearing/evidence/round-trip-evidence.md`
 
 ### Media Content
 
-- [ ] T039 Create shipped blog post `specs/116-fix-move-tool-bearing/media/shipped-post.md`
-- [ ] T040 [P] Create LinkedIn shipped summary `specs/116-fix-move-tool-bearing/media/linkedin-shipped.md`
+- [x] T039 Create shipped blog post `specs/116-fix-move-tool-bearing/media/shipped-post.md`
+- [x] T040 [P] Create LinkedIn shipped summary `specs/116-fix-move-tool-bearing/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T041 Create PR and publish blog: run /speckit.pr
+- [x] T041 Create PR and publish blog: run /speckit.pr
 
 **Task T041 must run last. It depends on all evidence and media tasks being complete.**
 
