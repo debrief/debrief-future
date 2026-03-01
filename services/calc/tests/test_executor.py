@@ -1,9 +1,10 @@
 """Unit tests for debrief-calc executor."""
 
+import copy
 from collections.abc import Iterator
 
 import pytest
-from debrief_calc.executor import run
+from debrief_calc.executor import _capture_input_state, run
 from debrief_calc.models import ContextType, SelectionContext
 
 
@@ -212,3 +213,211 @@ class TestRunDuration:
     def test_duration_on_error(self, single_track_context: SelectionContext) -> None:
         result = run("nonexistent-tool", single_track_context)
         assert result.duration_ms > 0  # Duration tracked even on error
+
+
+class TestCaptureInputState:
+    """Tests for _capture_input_state helper (T012-T014)."""
+
+    def test_captures_geometry_and_properties(self) -> None:
+        """T012: Captures geometry and non-provenance properties."""
+        features = [
+            {
+                "id": "circle-001",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[[0.0, 50.0], [0.01, 50.01], [0.0, 50.0]]],
+                },
+                "properties": {
+                    "kind": "CIRCLE",
+                    "center": [0.0, 50.0],
+                    "radius": 1000,
+                    "label": "Test",
+                },
+            }
+        ]
+
+        states = _capture_input_state(features)
+
+        assert len(states) == 1
+        assert states[0].feature_id == "circle-001"
+        assert states[0].geometry["type"] == "Polygon"
+        assert states[0].geometry["coordinates"] == [[[0.0, 50.0], [0.01, 50.01], [0.0, 50.0]]]
+        assert states[0].properties is not None
+        assert states[0].properties["center"] == [0.0, 50.0]
+        assert states[0].properties["kind"] == "CIRCLE"
+
+    def test_excludes_provenance(self) -> None:
+        """T013: Excludes provenance from captured properties."""
+        features = [
+            {
+                "id": "f1",
+                "geometry": {"type": "Point", "coordinates": [0.0, 50.0]},
+                "properties": {
+                    "kind": "TEXT",
+                    "provenance": [{"activityId": "abc", "tool": "old-tool"}],
+                },
+            }
+        ]
+
+        states = _capture_input_state(features)
+
+        assert len(states) == 1
+        assert states[0].properties is not None
+        assert "provenance" not in states[0].properties
+        assert states[0].properties["kind"] == "TEXT"
+
+    def test_handles_missing_id(self) -> None:
+        """T014: Uses 'unknown' when feature has no id."""
+        features = [
+            {
+                "geometry": {"type": "Point", "coordinates": [1.0, 2.0]},
+                "properties": {"kind": "TEXT"},
+            }
+        ]
+
+        states = _capture_input_state(features)
+
+        assert len(states) == 1
+        assert states[0].feature_id == "unknown"
+
+    def test_deep_copies_geometry(self) -> None:
+        """Verify geometry is deep-copied so mutations don't affect the snapshot."""
+        features = [
+            {
+                "id": "f1",
+                "geometry": {"type": "Point", "coordinates": [0.0, 50.0]},
+                "properties": {"kind": "TEXT"},
+            }
+        ]
+
+        states = _capture_input_state(features)
+
+        # Mutate the original
+        features[0]["geometry"]["coordinates"] = [99.0, 99.0]
+
+        # Snapshot should be unchanged
+        assert states[0].geometry["coordinates"] == [0.0, 50.0]
+
+    def test_empty_properties_returns_none(self) -> None:
+        """Properties is None when feature has no non-provenance properties."""
+        features = [
+            {
+                "id": "f1",
+                "geometry": {"type": "Point", "coordinates": [0.0, 50.0]},
+                "properties": {"provenance": [{"activityId": "abc"}]},
+            }
+        ]
+
+        states = _capture_input_state(features)
+
+        assert states[0].properties is None
+
+
+class TestExecutorInputState:
+    """Tests for executor attaching inputState to provenance (T015-T017)."""
+
+    def test_mutation_tool_gets_input_state(self) -> None:
+        """T015: Executor attaches inputState for mutation tool (move-shape)."""
+        feature = copy.deepcopy(
+            {
+                "type": "Feature",
+                "id": "circle-001",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [0.008993, 50.0],
+                            [0.006363, 50.006363],
+                            [0.0, 50.008993],
+                            [-0.006363, 50.006363],
+                            [-0.008993, 50.0],
+                            [-0.006363, 49.993637],
+                            [0.0, 49.991007],
+                            [0.006363, 49.993637],
+                            [0.008993, 50.0],
+                        ]
+                    ],
+                },
+                "properties": {
+                    "kind": "CIRCLE",
+                    "center": [0.0, 50.0],
+                    "radius": 1000,
+                    "label": "Test",
+                },
+            }
+        )
+        context = SelectionContext(type=ContextType.SINGLE, features=[feature])
+        result = run("move-shape", context, params={"direction": 90, "distance_km": 5})
+
+        assert result.success is True
+        assert result.features is not None
+
+        prov = result.features[0]["properties"]["provenance"]
+        assert isinstance(prov, list)
+        assert len(prov) == 1
+
+        entry = prov[0]
+        assert "inputState" in entry
+        assert entry["inputState"] is not None
+        assert len(entry["inputState"]) == 1
+        assert entry["inputState"][0]["featureId"] == "circle-001"
+        assert entry["inputState"][0]["geometry"]["type"] == "Polygon"
+
+    def test_non_mutation_tool_gets_null_input_state(
+        self, single_track_context: SelectionContext
+    ) -> None:
+        """T016: Non-mutation tool has inputState=null."""
+        result = run("track-stats", single_track_context)
+
+        assert result.success is True
+        assert result.features is not None
+
+        prov = result.features[0]["properties"]["provenance"]
+        entry = prov[0]
+        assert entry["inputState"] is None
+
+    def test_capture_happens_before_handler(self) -> None:
+        """T017: InputState captures pre-mutation geometry (not post-mutation)."""
+        original_center = [0.0, 50.0]
+        feature = copy.deepcopy(
+            {
+                "type": "Feature",
+                "id": "circle-001",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [0.008993, 50.0],
+                            [0.006363, 50.006363],
+                            [0.0, 50.008993],
+                            [-0.006363, 50.006363],
+                            [-0.008993, 50.0],
+                            [-0.006363, 49.993637],
+                            [0.0, 49.991007],
+                            [0.006363, 49.993637],
+                            [0.008993, 50.0],
+                        ]
+                    ],
+                },
+                "properties": {
+                    "kind": "CIRCLE",
+                    "center": original_center[:],
+                    "radius": 1000,
+                },
+            }
+        )
+        context = SelectionContext(type=ContextType.SINGLE, features=[feature])
+        result = run("move-shape", context, params={"direction": 90, "distance_km": 5})
+
+        assert result.success is True
+        assert result.features is not None
+
+        entry = result.features[0]["properties"]["provenance"][0]
+        input_state = entry["inputState"][0]
+
+        # inputState center should be the ORIGINAL (pre-move), not the moved position
+        assert input_state["properties"]["center"] == original_center
+
+        # The output feature's center should be DIFFERENT (moved East)
+        output_center = result.features[0]["properties"]["center"]
+        assert output_center[0] > original_center[0]

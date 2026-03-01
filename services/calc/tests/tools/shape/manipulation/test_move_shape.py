@@ -3,6 +3,7 @@
 import copy
 
 import pytest
+from debrief_calc.executor import run
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.shape.manipulation.move_shape import move_shape, translate_point
 
@@ -400,3 +401,64 @@ class TestMoveShapeEdgeCases:
         result_lon = result[0]["geometry"]["coordinates"][0]
         # With default direction=90 (East) and distance=5km, longitude should increase
         assert result_lon > original_lon
+
+
+class TestMoveShapeInputState:
+    """Tests for inputState capture via the executor (T018-T020)."""
+
+    def test_circle_input_state_contains_original_center_and_geometry(self) -> None:
+        """T018: Circle inputState contains original center and polygon geometry."""
+        feature = copy.deepcopy(CIRCLE_FEATURE)
+        original_center = CIRCLE_FEATURE["properties"]["center"][:]
+        original_coords = copy.deepcopy(CIRCLE_FEATURE["geometry"]["coordinates"])
+
+        context = SelectionContext(type=ContextType.SINGLE, features=[feature])
+        result = run("move-shape", context, params={"direction": 90, "distance_km": 5})
+
+        assert result.success is True
+        assert result.features is not None
+
+        entry = result.features[0]["properties"]["provenance"][0]
+        assert entry["inputState"] is not None
+        assert len(entry["inputState"]) == 1
+
+        state = entry["inputState"][0]
+        assert state["featureId"] == "circle-001"
+        assert state["geometry"]["type"] == "Polygon"
+        assert state["geometry"]["coordinates"] == original_coords
+        assert state["properties"]["center"] == original_center
+
+    def test_vector_input_state_contains_original_origin(self) -> None:
+        """T019: Vector inputState contains original origin property."""
+        feature = copy.deepcopy(VECTOR_FEATURE)
+        original_origin = VECTOR_FEATURE["properties"]["origin"][:]
+        original_coords = copy.deepcopy(VECTOR_FEATURE["geometry"]["coordinates"])
+
+        context = SelectionContext(type=ContextType.SINGLE, features=[feature])
+        result = run("move-shape", context, params={"direction": 0, "distance_km": 10})
+
+        assert result.success is True
+        assert result.features is not None
+
+        entry = result.features[0]["properties"]["provenance"][0]
+        state = entry["inputState"][0]
+        assert state["featureId"] == "vector-001"
+        assert state["geometry"]["coordinates"] == original_coords
+        assert state["properties"]["origin"] == original_origin
+
+    def test_text_input_state_contains_original_point(self) -> None:
+        """T020: Text inputState contains original Point geometry."""
+        feature = copy.deepcopy(TEXT_FEATURE)
+        original_coords = TEXT_FEATURE["geometry"]["coordinates"][:]
+
+        context = SelectionContext(type=ContextType.SINGLE, features=[feature])
+        result = run("move-shape", context, params={"direction": 90, "distance_km": 5})
+
+        assert result.success is True
+        assert result.features is not None
+
+        entry = result.features[0]["properties"]["provenance"][0]
+        state = entry["inputState"][0]
+        assert state["featureId"] == "text-001"
+        assert state["geometry"]["type"] == "Point"
+        assert state["geometry"]["coordinates"] == original_coords

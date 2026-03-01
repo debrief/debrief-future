@@ -23,6 +23,7 @@ from debrief_calc.exceptions import (
 )
 from debrief_calc.models import (
     ContextType,
+    InputFeatureState,
     SelectionContext,
     Tool,
     ToolError,
@@ -77,6 +78,12 @@ def run(
         if context.features:
             _schema_validate_features(context.features, f"{tool_name}:input")
 
+        # BEFORE _execute_handler — mutation tools mutate context.features in-place
+        is_mutation = tool.output_kind.startswith("mutation/")
+        input_state_list: list[InputFeatureState] | None = None
+        if is_mutation:
+            input_state_list = _capture_input_state(context.features)
+
         # Execute the tool handler
         output_features = _execute_handler(tool, context, params)
 
@@ -89,6 +96,7 @@ def run(
             source_features=context.features,
             parameters=params,
             duration_ms=duration_ms,
+            input_state=input_state_list,
         )
 
         # Attach provenance only to GeoJSON Feature outputs (not artifact data)
@@ -96,7 +104,6 @@ def run(
         if is_geojson:
             # Mutation tools preserve the original kind (e.g. 'TRACK') so that
             # downstream type guards continue to work after mutation.
-            is_mutation = tool.output_kind.startswith("mutation/")
             for feature in output_features:
                 if not is_mutation:
                     set_output_kind(feature, tool.output_kind)
@@ -220,6 +227,31 @@ def _schema_validate_features(features: list[dict[str, Any]], tool_name: str) ->
                 i,
                 e,
             )
+
+
+def _capture_input_state(
+    features: list[dict[str, Any]],
+) -> list[InputFeatureState]:
+    """Capture pre-operation geometry and spatial properties from input features."""
+    import copy
+
+    states = []
+    for feature in features:
+        feature_id = str(feature.get("id", "unknown"))
+        geometry = copy.deepcopy(feature.get("geometry", {}))
+        props = feature.get("properties", {})
+        # Exclude provenance (append-only, never restored)
+        spatial_props = {
+            k: copy.deepcopy(v)
+            for k, v in props.items()
+            if k != "provenance"
+        }
+        states.append(InputFeatureState(
+            featureId=feature_id,
+            geometry=geometry,
+            properties=spatial_props if spatial_props else None,
+        ))
+    return states
 
 
 def _execute_handler(
