@@ -81,9 +81,11 @@ import { mockFsAdapter } from './mocks/fsAdapter';
 declare global {
   interface Window {
     __sessionStore: ReturnType<typeof getSessionStore>;
+    __currentPlotFeatures: Feature[];
   }
 }
 window.__sessionStore = getSessionStore();
+window.__currentPlotFeatures = [];
 
 /** Current view state */
 type View = 'welcome' | 'analysis';
@@ -197,6 +199,11 @@ export default function App() {
     }
     return names;
   }, [allFeatures]);
+
+  // Expose plot features on window for Playwright test introspection
+  useEffect(() => {
+    window.__currentPlotFeatures = plotFeatures as Feature[];
+  }, [plotFeatures]);
 
   // Calculate time extent from features
   const timeExtent = useMemo<[number, number] | null>(() => {
@@ -386,16 +393,31 @@ export default function App() {
       // Find the entry being tuned
       const entry = logEntries.find((e: TimelineEntry) => e.activityId === activityId);
 
+      // Extract raw parameter values from a log entry's ParameterValue wrappers
+      const unwrapParams = (params: Record<string, { value: unknown }>): Record<string, unknown> => {
+        const result: Record<string, unknown> = {};
+        for (const [key, param] of Object.entries(params)) {
+          if (param && typeof param === 'object' && 'value' in param) {
+            result[key] = param.value;
+          } else {
+            result[key] = param;
+          }
+        }
+        return result;
+      };
+
+      // Track updated inputState for subsequent entries replayed during propagation
+      const updatedInputStates = new Map<string, typeof entry extends { inputState?: infer T } ? T : never>();
+
       // Restore features from inputState and re-execute for mutation tools
-      if (entry?.inputState && entry.inputState.length > 0 && entry.toolName === 'move-shape') {
-        // Build restored features from inputState (pre-tool geometry)
+      if (entry?.inputState && entry.inputState.length > 0 && isMutationTool(entry.toolName)) {
         setCurrentPlot(plot => {
           if (!plot) return plot;
           const restoredMap = new Map(
             entry.inputState!.map(is => [is.featureId, is])
           );
-          // Restore original geometry in the plot
-          const restoredFeatures = plot.features.features.map(f => {
+          // Restore original geometry in the plot (pre-tuned-entry state)
+          let currentFeatures = plot.features.features.map(f => {
             const saved = restoredMap.get(String(f.id));
             if (!saved) return f;
             return {
@@ -408,58 +430,102 @@ export default function App() {
             };
           });
 
-          // Collect the restored features that the tool will operate on
-          const featuresToMove = restoredFeatures.filter(f =>
+          // Collect the restored features that the tuned tool will operate on
+          const featuresToMove = currentFeatures.filter(f =>
             restoredMap.has(String(f.id))
           ) as Feature[];
 
-          // Read the updated parameters (apply the new value)
-          const params = { ...entry.parameters };
-          if (params[parameter]) {
-            params[parameter] = { ...params[parameter], value: newValue };
-          }
-          const distKm = Number((params.distance_km?.value) ?? 5);
-          const dirDeg = Number((params.direction?.value) ?? 90);
+          // Build parameters with the tuned value applied
+          const tunedParams = unwrapParams(entry.parameters as Record<string, { value: unknown }>);
+          tunedParams[parameter] = newValue;
 
-          // Re-execute the tool from original position using the proper tool
+          // Re-execute the tuned entry from the restored geometry
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const response = executeTool('move-shape', featuresToMove as any, {
-            distance_km: distKm,
-            direction: dirDeg,
-          });
+          const response = executeTool(entry.toolName, featuresToMove as any, tunedParams);
           const fc = JSON.parse(response.content[0]?.resource?.text ?? '{"features":[]}');
           const moved = (fc.features ?? []) as Feature[];
           const movedMap = new Map(moved.map(m => [String(m.id), m]));
 
-          // Apply the re-executed result
-          const finalFeatures = restoredFeatures.map(f => {
+          // Apply the tuned entry's result
+          currentFeatures = currentFeatures.map(f => {
             const m = movedMap.get(String(f.id));
             return m ?? f;
           });
 
+          // Propagate: replay all subsequent mutation entries on affected features.
+          // logEntries is stored newest-first, so entries at indices before tunedIdx
+          // are chronologically after the tuned entry. Iterate from tunedIdx-1 → 0
+          // to replay in chronological order.
+          const tunedIdx = logEntries.findIndex((e: TimelineEntry) => e.activityId === activityId);
+          if (tunedIdx > 0) {
+            for (let i = tunedIdx - 1; i >= 0; i--) {
+              const nextEntry = logEntries[i]!;
+              if (!isMutationTool(nextEntry.toolName)) continue;
+              if (!nextEntry.inputState || nextEntry.inputState.length === 0) continue;
+
+              // Only replay if this entry affects features that were modified
+              const affectedIds = new Set(nextEntry.inputState.map(is => is.featureId));
+              const featuresToReplay = currentFeatures.filter(f =>
+                affectedIds.has(String(f.id))
+              ) as Feature[];
+              if (featuresToReplay.length === 0) continue;
+
+              // Capture pre-execution state as updated inputState for this entry
+              updatedInputStates.set(nextEntry.activityId, featuresToReplay.map(f => {
+                const props = (f.properties ?? {}) as Record<string, unknown>;
+                const { provenance: _p, ...restProps } = props;
+                return {
+                  featureId: String(f.id),
+                  geometry: JSON.parse(JSON.stringify(f.geometry)),
+                  properties: JSON.parse(JSON.stringify(restProps)),
+                };
+              }));
+
+              // Re-execute subsequent entry with its original parameters
+              const subParams = unwrapParams(nextEntry.parameters as Record<string, { value: unknown }>);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const subResponse = executeTool(nextEntry.toolName, featuresToReplay as any, subParams);
+              const subFc = JSON.parse(subResponse.content[0]?.resource?.text ?? '{"features":[]}');
+              const subMoved = (subFc.features ?? []) as Feature[];
+              const subMovedMap = new Map(subMoved.map(m => [String(m.id), m]));
+
+              currentFeatures = currentFeatures.map(f => {
+                const m = subMovedMap.get(String(f.id));
+                return m ?? f;
+              });
+            }
+          }
+
           return {
             ...plot,
-            features: { ...plot.features, features: finalFeatures },
+            features: { ...plot.features, features: currentFeatures },
           };
         });
       }
 
-      // Update the log entry parameters and tune annotation
+      // Update the tuned entry's parameters/annotation and inputState for replayed entries
       setLogEntries((prev: TimelineEntry[]) =>
         prev.map((e: TimelineEntry) => {
-          if (e.activityId !== activityId) return e;
-          const updatedParams = { ...e.parameters };
-          if (updatedParams[parameter]) {
-            updatedParams[parameter] = {
-              ...updatedParams[parameter],
-              value: newValue,
+          if (e.activityId === activityId) {
+            const updatedParams = { ...e.parameters };
+            if (updatedParams[parameter]) {
+              updatedParams[parameter] = {
+                ...updatedParams[parameter],
+                value: newValue,
+              };
+            }
+            return {
+              ...e,
+              parameters: updatedParams,
+              tuneAnnotation: { parameter, previousValue: currentValue, newValue },
             };
           }
-          return {
-            ...e,
-            parameters: updatedParams,
-            tuneAnnotation: { parameter, previousValue: currentValue, newValue },
-          };
+          // Update inputState for subsequent entries that were replayed
+          const newState = updatedInputStates.get(e.activityId);
+          if (newState) {
+            return { ...e, inputState: newState };
+          }
+          return e;
         })
       );
       setLogNotification(`Tuned "${parameter}" to ${String(newValue)}.`);
