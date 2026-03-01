@@ -68,6 +68,7 @@ export function registerCommands(
         context,
         configService,
         stacService,
+        calcService,
         ioService,
         recentPlotsService,
         openPlotsService,

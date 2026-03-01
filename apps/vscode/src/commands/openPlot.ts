@@ -7,6 +7,7 @@ import { access, readFile } from 'fs/promises';
 import { loadSession, createLogService, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
+import type { CalcService } from '../services/calcService';
 import type { IoService } from '../services/ioService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
 import type { OpenPlotsService } from '../services/openPlotsService';
@@ -59,6 +60,7 @@ export function createOpenPlotCommand(
   context: vscode.ExtensionContext,
   configService: ConfigService,
   stacService: StacService,
+  calcService: CalcService,
   ioService: IoService,
   recentPlotsService: RecentPlotsService,
   openPlotsService: OpenPlotsService,
@@ -242,6 +244,7 @@ export function createOpenPlotCommand(
     panel.setImportServices(ioService, stacService, store, layersTreeProvider, activityPanelProvider);
 
     // Create and wire LogService for provenance recording (Feature: 094)
+    // Phase 6 replay deps wired for tune/revert operations (Feature: 076)
     const logService = createLogService({
       appendProvenance: stacService.appendProvenance.bind(stacService),
       loadGeoJson: async (sp: string, ip: string) => {
@@ -254,6 +257,93 @@ export function createOpenPlotCommand(
           activeSession.getState().markDirty();
         }
       },
+
+      // Phase 6: replay deps (Feature: 076-replay-tune)
+      writeGeoJson: async (
+        sp: string,
+        ip: string,
+        fc: { type: 'FeatureCollection'; features: Array<Record<string, unknown>> }
+      ) => {
+        await stacService.writeGeoJson(
+          sp, ip,
+          fc as unknown as Parameters<typeof stacService.writeGeoJson>[2]
+        );
+      },
+
+      executeTool: async (
+        toolId: string,
+        featureIds: string[],
+        params: Record<string, unknown>
+      ) => {
+        // Load current features from disk (geometry restored by logService before replay)
+        const fc = await stacService.loadGeoJsonForItem(store.path, itemPath);
+        if (!fc) { return { success: false }; }
+
+        // Find requested features — SafeFeature lacks `id`, access via cast
+        type FeatureWithId = { id?: string | number; geometry: unknown; properties: Record<string, unknown> | null };
+        const allFeatures = fc.features as unknown as FeatureWithId[];
+        const features = allFeatures.filter(
+          (f) => featureIds.includes(String(f.id ?? (f.properties as Record<string, unknown>)?.id))
+        );
+        if (features.length === 0) { return { success: false }; }
+
+        // Execute tool via Python CLI
+        const result = await calcService.executeToolDirect(
+          toolId,
+          features as Parameters<typeof calcService.executeToolDirect>[1],
+          params
+        );
+        if (!result.success || !result.features) { return { success: false }; }
+
+        // Apply mutations: merge result features back into fc
+        const isMutation = result.resultType?.startsWith('mutation/');
+        if (isMutation) {
+          const resultMap = new Map(
+            result.features.features.map((f) => [
+              String((f.properties as Record<string, unknown>)?.id),
+              f,
+            ])
+          );
+          for (const feat of allFeatures) {
+            const fId = String(feat.id ?? (feat.properties as Record<string, unknown>)?.id);
+            const updated = resultMap.get(fId);
+            if (updated) {
+              feat.geometry = updated.geometry;
+              // Merge properties but preserve provenance
+              const existingProv = (feat.properties as Record<string, unknown>)?.provenance;
+              feat.properties = {
+                ...updated.properties,
+                provenance: existingProv,
+              };
+            }
+          }
+        } else {
+          // Additive: append new features
+          for (const f of result.features.features) {
+            (fc.features as unknown[]).push(f);
+          }
+        }
+
+        // Write back to disk
+        await stacService.writeGeoJson(
+          store.path, itemPath,
+          fc as unknown as Parameters<typeof stacService.writeGeoJson>[2]
+        );
+
+        return {
+          success: true,
+          artifactHref: result.artifactHref,
+        };
+      },
+
+      loadSnapshot: async (sp: string, ip: string, assetFilename: string) => {
+        const fc = await stacService.loadSnapshotGeoJson(sp, ip, assetFilename);
+        return fc as { type: 'FeatureCollection'; features: Array<Record<string, unknown>> } | null;
+      },
+
+      resolveToolVersion: (toolId: string) => {
+        return Promise.resolve(calcService.getToolVersion(toolId));
+      },
     });
     panel.setLogService(logService);
 
@@ -264,6 +354,19 @@ export function createOpenPlotCommand(
         () => panel.getCurrentStore()?.path,
         () => panel.getCurrentPlot()?.itemPath
       );
+
+      // Refresh MapPanel features from disk after replay/tune (Feature: 076)
+      logPanelProvider.setOnFeaturesChanged(() => {
+        void (async () => {
+          const updatedData = await stacService.loadPlotData(store, itemPath);
+          if (updatedData && panel) {
+            panel.loadPlot(plot, updatedData.features);
+            layersTreeProvider.setFeatures(updatedData.features);
+            activityPanelProvider.setFeatures(updatedData.features);
+          }
+        })();
+      });
+
       console.log('[debrief] LogPanel: logService + path resolvers wired for', plot.title);
     } else {
       console.warn('[debrief] LogPanel: logPanelProvider not provided — provenance display will not work');

@@ -306,11 +306,15 @@ export function createLogService(deps: LogServiceDeps): LogService {
 
       const result = await engine.execute(plan);
 
-      // If completed, write the tune annotation to provenance
+      // If completed, write the tune annotation to provenance.
+      // Reload from disk because executeTool callbacks may have written
+      // updated feature geometry during replay (the in-memory fc is stale).
       if (result.status === 'completed' && result.tuneAnnotation) {
+        const updatedFc = await deps.loadGeoJson(storePath, itemPath);
+        const targetFc = updatedFc ?? fc;
+
         // Append tune annotation to all features that have this activity
-        const provEntries: FeatureProvenance[] = [];
-        for (const feature of fc.features) {
+        for (const feature of targetFc.features) {
           const props = feature.properties as Record<string, unknown> | null;
           if (!props) continue;
           const prov = normaliseProvenanceArray(props.provenance);
@@ -328,7 +332,7 @@ export function createLogService(deps: LogServiceDeps): LogService {
           await deps.writeGeoJson(
             storePath,
             itemPath,
-            fc as unknown as GeoJsonFeatureCollection
+            targetFc as unknown as GeoJsonFeatureCollection
           );
         }
 
