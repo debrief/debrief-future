@@ -407,7 +407,7 @@ export default function App() {
       };
 
       // Track updated inputState for subsequent entries replayed during propagation
-      const updatedInputStates = new Map<string, typeof entry extends { inputState?: infer T } ? T : never>();
+      const updatedInputStates = new Map<string, Array<{ featureId: string; geometry: unknown; properties: Record<string, unknown> }>>();
 
       // Restore features from inputState and re-execute for mutation tools
       if (entry?.inputState && entry.inputState.length > 0 && isMutationTool(entry.toolName)) {
