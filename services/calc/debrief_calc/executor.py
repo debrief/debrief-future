@@ -84,8 +84,15 @@ def run(
         if is_mutation:
             input_state_list = _capture_input_state(context.features)
 
+        # Merge tool default parameter values so provenance records the
+        # actual values used, even when the caller omits optional params.
+        effective_params = dict(params)
+        for p in tool.parameters:
+            if p.name not in effective_params and p.default is not None:
+                effective_params[p.name] = p.default
+
         # Execute the tool handler
-        output_features = _execute_handler(tool, context, params)
+        output_features = _execute_handler(tool, context, effective_params)
 
         duration_ms = (time.perf_counter() - start_time) * 1000
 
@@ -94,7 +101,7 @@ def run(
             tool_name=tool.name,
             tool_version=tool.version,
             source_features=context.features,
-            parameters=params,
+            parameters=effective_params,
             duration_ms=duration_ms,
             input_state=input_state_list,
         )
