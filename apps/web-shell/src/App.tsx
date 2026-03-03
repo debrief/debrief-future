@@ -15,7 +15,7 @@
  * Feature: 073-undo-redo-split (runtime verification)
  */
 
-import { useState, useCallback, useMemo, useEffect, createElement } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef, createElement } from 'react';
 import type { Feature, FeatureCollection } from 'geojson';
 import {
   CatalogOverview,
@@ -377,19 +377,28 @@ export default function App() {
     }
   }, [store, restoreSnapshots]);
 
-  // Phase 6: Handle tune request from inline parameter click
+  // Phase 6: Debounce timer for slider tune requests.
+  // Without this, every pixel of slider drag fires a full tool re-execution.
+  const tuneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Phase 6: Handle tune request from slider or inline parameter edit.
+  // The newValue is provided directly by the slider/control — no prompt needed.
+  // Debounced (300ms) so rapid slider drags only trigger one re-execution.
   const handleTuneRequest = useCallback(
-    (activityId: string, parameter: string, currentValue: unknown) => {
-      // Prompt for new value (simple approach for web-shell demo)
-      const input = window.prompt(
-        `Tune "${parameter}" (current: ${String(currentValue)}):`,
-        String(currentValue)
-      );
-      if (input === null) return; // cancelled
+    (activityId: string, parameter: string, newValue: unknown) => {
+      if (tuneTimerRef.current) clearTimeout(tuneTimerRef.current);
+      tuneTimerRef.current = setTimeout(() => {
+        tuneTimerRef.current = null;
+        applyTune(activityId, parameter, newValue);
+      }, 300);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [logEntries]
+  );
 
-      // Coerce to number if the current value is numeric
-      const newValue = typeof currentValue === 'number' ? Number(input) : input;
-
+  // Actual tune logic, called after debounce settles.
+  const applyTune = useCallback(
+    (activityId: string, parameter: string, newValue: unknown) => {
       // Find the entry being tuned
       const entry = logEntries.find((e: TimelineEntry) => e.activityId === activityId);
 
@@ -517,7 +526,7 @@ export default function App() {
             return {
               ...e,
               parameters: updatedParams,
-              tuneAnnotation: { parameter, previousValue: currentValue, newValue },
+              tuneAnnotation: { parameter, previousValue: e.parameters[parameter]?.value, newValue },
             };
           }
           // Update inputState for subsequent entries that were replayed
