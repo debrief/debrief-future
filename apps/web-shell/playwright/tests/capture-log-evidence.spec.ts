@@ -171,14 +171,23 @@ test.describe('Evidence screenshots: LogPanel states', () => {
     await analysisPage.switchToLogTab();
 
     const entry = analysisPage.logEntries.first();
-    const distanceParam = entry.locator('[data-testid="tune-param-distance_km"]');
-    await expect(distanceParam).toBeVisible();
 
-    // Tune distance_km: 5 → 10
-    page.once('dialog', async (dialog) => {
-      await dialog.accept('10');
-    });
-    await distanceParam.click();
+    // Open edit face and tune distance_km: 5 → 10 via slider
+    const editIcon = entry.locator('[data-testid^="edit-icon-"]');
+    await editIcon.click();
+    const params = page.getByTestId('edit-face-params');
+    await expect(params).toBeVisible({ timeout: 3000 });
+
+    const sliderInput = page.getByTestId('slider-input-distance_km');
+    await sliderInput.fill('10');
+    await page.waitForTimeout(500); // debounce
+
+    // Close edit face
+    await page.getByTestId('edit-face-done').click();
+    await page.waitForTimeout(200);
+
+    // Verify parameter updated on display face
+    const distanceParam = entry.locator('[data-testid="tune-param-distance_km"]');
     await expect(distanceParam).toHaveText('10');
 
     // Tuned badge should appear

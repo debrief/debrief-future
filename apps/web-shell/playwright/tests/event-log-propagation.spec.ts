@@ -6,7 +6,8 @@
  *   1. Select an annotation shape, record its original coordinates
  *   2. Apply move-shape tool (5 km East) — first event
  *   3. Apply move-shape tool (5 km East) — second event
- *   4. Amend the first event: change direction from 90° (East) to 270° (West)
+ *   4. Amend the first event via edit-face slider: change direction from
+ *      90° (East) to 270° (West)
  *   5. Verify the second event was re-applied, so the shape ends up at
  *      approximately its original position (5 km West + 5 km East ≈ 0 net)
  *
@@ -39,6 +40,33 @@ async function runMoveShapeTool(page: import('@playwright/test').Page) {
   await expect(moveTool).toBeVisible({ timeout: 5000 });
   const runButton = moveTool.locator('button');
   await runButton.click();
+}
+
+/**
+ * Helper: open the edit face for a log entry and wait for slider controls.
+ */
+async function openEditFace(
+  page: import('@playwright/test').Page,
+  entry: import('@playwright/test').Locator
+) {
+  const editIcon = entry.locator('[data-testid^="edit-icon-"]');
+  await editIcon.click();
+  const params = page.getByTestId('edit-face-params');
+  await expect(params).toBeVisible({ timeout: 3000 });
+}
+
+/**
+ * Helper: set a slider to a new value.
+ */
+async function setSliderValue(
+  page: import('@playwright/test').Page,
+  paramName: string,
+  newValue: number
+) {
+  const sliderInput = page.getByTestId(`slider-input-${paramName}`);
+  await sliderInput.fill(String(newValue));
+  // Wait for debounce (300ms) + processing
+  await page.waitForTimeout(500);
 }
 
 /**
@@ -107,20 +135,18 @@ test.describe('Event Log Propagation', () => {
     const olderEntry = analysisPage.logEntries.nth(1);
     await expect(olderEntry).toBeVisible();
 
-    // Step 5: Tune the older entry's direction from 90 (East) to 270 (West)
+    // Step 5: Tune the older entry's direction from 90 (East) to 270 (West) via edit face
+    await openEditFace(page, olderEntry);
+    await setSliderValue(page, 'direction', 270);
+
+    // Close edit face
+    // Only one edit face is visible at a time (CSS backface-visibility).
+    // Use the visible edit-face container to scope the Done button.
+    await page.locator('.card-flip__inner--flipped [data-testid="edit-face-done"]').click();
+    await page.waitForTimeout(200);
+
+    // Verify parameter updated on display face
     const directionParam = olderEntry.locator('[data-testid="tune-param-direction"]');
-    await expect(directionParam).toBeVisible();
-    await expect(directionParam).toHaveText('90');
-
-    // Set up dialog handler to supply new value
-    page.once('dialog', async (dialog) => {
-      expect(dialog.type()).toBe('prompt');
-      await dialog.accept('270');
-    });
-
-    await directionParam.click();
-
-    // Wait for the parameter to update
     await expect(directionParam).toHaveText('270');
 
     // Allow time for the tune handler to re-execute and propagate
@@ -165,15 +191,16 @@ test.describe('Event Log Propagation', () => {
     await analysisPage.switchToLogTab();
     expect(await analysisPage.getLogEntryCount()).toBe(2);
 
-    // Tune the older entry
+    // Tune the older entry's direction via edit face
     const olderEntry = analysisPage.logEntries.nth(1);
-    const directionParam = olderEntry.locator('[data-testid="tune-param-direction"]');
-    await expect(directionParam).toBeVisible();
+    await openEditFace(page, olderEntry);
+    await setSliderValue(page, 'direction', 0);
+    // Only one edit face is visible at a time (CSS backface-visibility).
+    // Use the visible edit-face container to scope the Done button.
+    await page.locator('.card-flip__inner--flipped [data-testid="edit-face-done"]').click();
+    await page.waitForTimeout(200);
 
-    page.once('dialog', async (dialog) => {
-      await dialog.accept('0');
-    });
-    await directionParam.click();
+    const directionParam = olderEntry.locator('[data-testid="tune-param-direction"]');
     await expect(directionParam).toHaveText('0');
 
     // Both entries should still exist after tuning

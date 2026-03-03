@@ -389,23 +389,16 @@ export default function App() {
       const entry = logEntries.find((e: TimelineEntry) => e.activityId === activityId);
       const currentValue = entry?.parameters[parameter]?.value;
 
-      if (value === currentValue) {
-        // Display face click — prompt for new value
-        const input = window.prompt(
-          `Tune "${parameter}" (current: ${String(currentValue)}):`,
-          String(currentValue)
-        );
-        if (input === null) return; // cancelled
-        const newValue = typeof currentValue === 'number' ? Number(input) : input;
-        applyTune(activityId, parameter, newValue);
-      } else {
-        // Edit face slider — debounce so rapid drags don't re-execute per pixel
-        if (tuneTimerRef.current) clearTimeout(tuneTimerRef.current);
-        tuneTimerRef.current = setTimeout(() => {
-          tuneTimerRef.current = null;
-          applyTune(activityId, parameter, value);
-        }, 300);
-      }
+      // Ignore display-face clicks (value unchanged) — tuning is done via
+      // the edit-face slider only.
+      if (value === currentValue) return;
+
+      // Edit face slider — debounce so rapid drags don't re-execute per pixel
+      if (tuneTimerRef.current) clearTimeout(tuneTimerRef.current);
+      tuneTimerRef.current = setTimeout(() => {
+        tuneTimerRef.current = null;
+        applyTune(activityId, parameter, value);
+      }, 300);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [logEntries]
