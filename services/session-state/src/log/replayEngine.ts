@@ -194,11 +194,13 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
           phase: 'replaying',
         });
 
-        // Execute the tool
+        // Execute the tool, passing the original activityId so the callee
+        // can stamp it on output provenance (prevents duplicate timeline entries).
         const result = await deps.executeTool(
           entry.toolId,
           entry.featureIds,
-          entry.parameters
+          entry.parameters,
+          entry.activityId
         );
 
         if (!result.success) {

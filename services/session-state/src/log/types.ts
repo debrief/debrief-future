@@ -240,7 +240,9 @@ export interface ToolExecutionResultForReplay {
 export type ToolExecutor = (
   toolId: string,
   featureIds: string[],
-  params: Record<string, unknown>
+  params: Record<string, unknown>,
+  /** Original activityId — callee should stamp this on output provenance. */
+  activityId?: string
 ) => Promise<ToolExecutionResultForReplay>;
 
 /** Callback to load a snapshot GeoJSON for cross-snapshot replay. */

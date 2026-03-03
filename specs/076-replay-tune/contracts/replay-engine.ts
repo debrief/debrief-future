@@ -97,7 +97,9 @@ export interface ReplayResult {
 export type ToolExecutor = (
   toolId: string,
   featureIds: string[],
-  params: Record<string, unknown>
+  params: Record<string, unknown>,
+  /** Original activityId — callee should stamp this on output provenance. */
+  activityId?: string
 ) => Promise<ToolExecutionResultForReplay>;
 
 /** Minimal result shape the Replay Engine needs from tool execution. */
