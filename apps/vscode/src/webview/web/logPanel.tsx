@@ -21,6 +21,7 @@ import type {
   LogFilterState,
   LogPanelMessage,
   ExtensionToWebviewMessage,
+  ParameterSchemaEntry,
 } from '@debrief/components';
 
 // Phase 6 message types from the extension
@@ -148,10 +149,8 @@ function LogPanelApp(): React.ReactElement {
           setTimeout(() => setActionResultMessage(null), 5000);
           break;
 
-        // Feature 113: schema response — handled by LogPanel via schema cache
         case 'schema:response':
-          // Schema responses are handled internally by the LogPanel component.
-          // The webview just needs to forward them if needed.
+          // Schema is now derived locally — no extension round-trip needed.
           break;
       }
     };
@@ -219,13 +218,33 @@ function LogPanelApp(): React.ReactElement {
     vscode.postMessage({ type: 'replay:cancel' });
   }, []);
 
-  // Feature 113: schema request → forward to extension
-  const handleSchemaRequest = useCallback((toolId: string) => {
-    vscode.postMessage({
-      type: 'schema:request',
-      payload: { toolId },
-    });
-  }, []);
+  // Feature 113: derive schema from existing parameter metadata.
+  // Parameters already carry value/tunable/default info — no extension round-trip needed.
+  const handleSchemaRequest = useCallback(
+    (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
+      const entry = entries.find((e) => e.toolName === toolId);
+      const schema: ParameterSchemaEntry[] = [];
+      if (entry) {
+        for (const [name, param] of Object.entries(entry.parameters)) {
+          const isNum = typeof param.value === 'number';
+          schema.push({
+            name,
+            type: isNum ? 'number' : 'string',
+            description: `Parameter "${name}"`,
+            tunable: param.tunable,
+            defaultValue: param.default ? param.value : null,
+            minimum: isNum ? 0 : null,
+            maximum: isNum ? Number(param.value) * 3 : null,
+            step: isNum ? 1 : null,
+            choices: null,
+            paramType: null,
+          });
+        }
+      }
+      return Promise.resolve(schema);
+    },
+    [entries]
+  );
 
   // Feature 113: disable toggle → forward to extension
   const handleDisableToggle = useCallback((activityId: string, disabled: boolean) => {
