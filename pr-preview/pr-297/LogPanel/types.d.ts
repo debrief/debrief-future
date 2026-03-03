@@ -88,7 +88,7 @@ export type ActionType = 'revertTo' | 'revertThis' | 'snapshot' | 'rationale';
 export interface ParameterSchemaEntry {
     readonly name: string;
     readonly type: 'number' | 'string' | 'boolean' | 'enum' | 'object' | 'array';
-    readonly description: string;
+    readonly description: string | null;
     readonly tunable: boolean;
     readonly defaultValue: unknown;
     readonly minimum: number | null;
