@@ -161,9 +161,16 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
 
         const entry = plan.entries[i];
 
-        // Resolve installed tool version
+        // Resolve installed tool version.
+        // "0.0.0" is the fallback placeholder used when the recording side
+        // didn't know the real version (e.g. MCP annotations missing).
+        // Treat it as "any version" so replay isn't blocked.
         const installedVersion = await deps.resolveToolVersion(entry.toolId);
-        if (installedVersion !== null && installedVersion !== entry.toolVersion) {
+        if (
+          installedVersion !== null &&
+          installedVersion !== entry.toolVersion &&
+          entry.toolVersion !== '0.0.0'
+        ) {
           return {
             status: 'halted',
             entriesReplayed,
