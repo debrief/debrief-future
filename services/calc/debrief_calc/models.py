@@ -112,9 +112,7 @@ class CreatedAsset(BaseModel):
 class InputFeatureState(BaseModel):
     """Pre-operation state of a feature before a coordinate-mutating tool executes."""
 
-    feature_id: str = Field(
-        ..., alias="featureId", description="ID of the feature"
-    )
+    feature_id: str = Field(..., alias="featureId", description="ID of the feature")
     geometry: dict[str, Any] = Field(
         ..., description="GeoJSON geometry object (type + coordinates)"
     )

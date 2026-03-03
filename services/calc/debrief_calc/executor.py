@@ -248,16 +248,14 @@ def _capture_input_state(
         geometry = copy.deepcopy(feature.get("geometry", {}))
         props = feature.get("properties", {})
         # Exclude provenance (append-only, never restored)
-        spatial_props = {
-            k: copy.deepcopy(v)
-            for k, v in props.items()
-            if k != "provenance"
-        }
-        states.append(InputFeatureState(
-            featureId=feature_id,
-            geometry=geometry,
-            properties=spatial_props if spatial_props else None,
-        ))
+        spatial_props = {k: copy.deepcopy(v) for k, v in props.items() if k != "provenance"}
+        states.append(
+            InputFeatureState(
+                featureId=feature_id,
+                geometry=geometry,
+                properties=spatial_props if spatial_props else None,
+            )
+        )
     return states
 
 
