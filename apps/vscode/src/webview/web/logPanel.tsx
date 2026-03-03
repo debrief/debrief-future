@@ -11,7 +11,7 @@
  * Updated: 113-prov-card-flip (flip-card edit wiring)
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { LogPanel, LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
 import type {
@@ -182,13 +182,38 @@ function LogPanelApp(): React.ReactElement {
     setSelectedEntryId(entryId);
   }, []);
 
-  // Phase 6: tune/revert handlers → send dedicated messages to extension
+  // Phase 6: tune/revert handlers → send dedicated messages to extension.
+  // Optimistic local update so the slider responds instantly during drag.
+  // Debounced (400ms) so rapid slider drags only trigger one replay.
+  const tuneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleTuneRequest = useCallback(
     (activityId: string, parameter: string, newValue: unknown) => {
-      vscode.postMessage({
-        type: 'tune:request',
-        payload: { activityId, parameter, newValue },
-      });
+      // Optimistic update: immediately reflect the new value in local state
+      // so the slider doesn't snap back while waiting for the replay round-trip.
+      setEntries((prev) =>
+        prev.map((e) => {
+          if (e.activityId !== activityId) return e;
+          const paramEntry = e.parameters[parameter];
+          if (!paramEntry) return e;
+          return {
+            ...e,
+            parameters: {
+              ...e.parameters,
+              [parameter]: { ...paramEntry, value: newValue },
+            },
+          };
+        })
+      );
+
+      // Debounce the actual replay request
+      if (tuneTimerRef.current) clearTimeout(tuneTimerRef.current);
+      tuneTimerRef.current = setTimeout(() => {
+        tuneTimerRef.current = null;
+        vscode.postMessage({
+          type: 'tune:request',
+          payload: { activityId, parameter, newValue },
+        });
+      }, 400);
     },
     []
   );
