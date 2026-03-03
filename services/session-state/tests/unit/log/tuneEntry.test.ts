@@ -139,6 +139,32 @@ describe('LogService.tuneEntry', () => {
     expect(tune.newValue).toBe('PT30S');
   });
 
+  it('updates parameter value in provenance after tune', async () => {
+    const deps = makeDeps();
+    const service = createLogService(deps);
+
+    await service.tuneEntry(
+      '/store',
+      'item.json',
+      'act-001',
+      'interval',
+      'PT30S'
+    );
+
+    // The written provenance should have the tuned value, not the original
+    const writtenFc = (deps.writeGeoJson as ReturnType<typeof vi.fn>).mock
+      .calls[0][2] as { features: Array<Record<string, unknown>> };
+    const props = writtenFc.features[0].properties as Record<string, unknown>;
+    const prov = props.provenance as Array<Record<string, unknown>>;
+    const targetEntry = prov.find(
+      (e: Record<string, unknown>) => e.activityId === 'act-001'
+    );
+    const wgb = targetEntry!.wasGeneratedBy as {
+      parameters: Record<string, { value: unknown }>;
+    };
+    expect(wgb.parameters.interval.value).toBe('PT30S');
+  });
+
   it('calls executeTool during replay', async () => {
     const deps = makeDeps();
     const service = createLogService(deps);

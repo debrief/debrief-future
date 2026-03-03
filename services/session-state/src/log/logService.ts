@@ -354,6 +354,18 @@ export function createLogService(deps: LogServiceDeps): LogService {
             if (entry.activityId === activityId) {
               // Mark the tune annotation on the entry
               entry.tune = result.tuneAnnotation;
+              // Update the parameter value so the timeline reflects the
+              // tuned value.  The executeTool callback for mutation tools
+              // preserves the original provenance (to keep the activityId
+              // stable), so we must patch the value in-place here.
+              const wgb = entry.wasGeneratedBy as Record<string, unknown> | undefined;
+              if (wgb?.parameters) {
+                const params = wgb.parameters as Record<string, unknown>;
+                const pv = params[parameter];
+                if (pv && typeof pv === 'object' && 'value' in (pv as Record<string, unknown>)) {
+                  (pv as Record<string, unknown>).value = newValue;
+                }
+              }
               break;
             }
           }
