@@ -8,6 +8,7 @@
 import type {
   LogEntry,
   InputFeatureState,
+  ParameterValue,
   WasGeneratedBy,
   ToolResultForLog,
   ExpandedToolResultFields,
@@ -65,16 +66,51 @@ export function extractActivityIdFromOutputFeatures(
 }
 
 /**
+ * Extract parameters from Python-generated provenance on output features.
+ * The Python executor attaches provenance entries with full ParameterValue
+ * objects ({value, default, tunable}). When expanded.parameters is not
+ * available (e.g. MCP response lacks debrief:parameters annotation),
+ * this provides a fallback.
+ */
+export function extractParametersFromOutputFeatures(
+  features: Array<Record<string, unknown>>,
+  activityId: string | undefined
+): Record<string, ParameterValue> | undefined {
+  for (const feature of features) {
+    const props = feature.properties as Record<string, unknown> | null;
+    if (!props) continue;
+    const prov = props.provenance;
+    if (!Array.isArray(prov)) continue;
+    for (const entry of prov) {
+      const e = entry as Record<string, unknown>;
+      if (activityId && e.activityId !== activityId) continue;
+      const wgb = e.wasGeneratedBy as Record<string, unknown> | undefined;
+      if (!wgb?.parameters) continue;
+      const params = wgb.parameters as Record<string, unknown>;
+      // Verify it has ParameterValue shape (at least one entry with 'value' key)
+      const keys = Object.keys(params);
+      if (keys.length === 0) continue;
+      const first = params[keys[0]!] as Record<string, unknown> | undefined;
+      if (first && typeof first === 'object' && 'value' in first) {
+        return params as unknown as Record<string, ParameterValue>;
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
  * Build a WasGeneratedBy from available data.
  */
 function buildWasGeneratedBy(
   toolId: string,
-  expanded: ExpandedToolResultFields | undefined
+  expanded: ExpandedToolResultFields | undefined,
+  fallbackParameters?: Record<string, ParameterValue>
 ): WasGeneratedBy {
   return {
     tool: toolId,
     toolVersion: expanded?.toolVersion ?? '0.0.0',
-    parameters: expanded?.parameters ?? {},
+    parameters: expanded?.parameters ?? fallbackParameters ?? {},
   };
 }
 
@@ -147,10 +183,21 @@ export function buildLogEntry(
   const resolvedActivityId = activityId ?? generateActivityId();
   const toolId = toolResult.toolId ?? 'unknown-tool';
 
+  // When expanded.parameters is missing, try to extract from Python provenance
+  // on the output features. The Python executor always attaches full
+  // ParameterValue objects ({value, default, tunable}) to feature provenance.
+  let fallbackParameters: Record<string, ParameterValue> | undefined;
+  if (!expanded?.parameters && toolResult.features?.features) {
+    fallbackParameters = extractParametersFromOutputFeatures(
+      toolResult.features.features as Array<Record<string, unknown>>,
+      resolvedActivityId
+    );
+  }
+
   return {
     activityId: resolvedActivityId,
     timestamp: new Date().toISOString(),
-    wasGeneratedBy: buildWasGeneratedBy(toolId, expanded),
+    wasGeneratedBy: buildWasGeneratedBy(toolId, expanded, fallbackParameters),
     used: resolveUsedFeatureIds(toolResult, expanded),
     generated: resolveGeneratedOutputs(toolResult, expanded),
     executionDuration: msToIsoDuration(toolResult.durationMs),

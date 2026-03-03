@@ -558,7 +558,7 @@ export default function App() {
             name,
             type: valueType === 'number' ? 'number' : valueType === 'boolean' ? 'boolean' : 'string',
             description: `Parameter "${name}"`,
-            tunable: param.tunable,
+            tunable: param.tunable !== false,
             defaultValue: param.default ? param.value : null,
             minimum: valueType === 'number' ? 0 : null,
             maximum: valueType === 'number' ? Number(param.value) * 3 : null,

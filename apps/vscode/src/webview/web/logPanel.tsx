@@ -231,7 +231,7 @@ function LogPanelApp(): React.ReactElement {
             name,
             type: isNum ? 'number' : 'string',
             description: `Parameter "${name}"`,
-            tunable: param.tunable,
+            tunable: param.tunable !== false,
             defaultValue: param.default ? param.value : null,
             minimum: isNum ? 0 : null,
             maximum: isNum ? Number(param.value) * 3 : null,
