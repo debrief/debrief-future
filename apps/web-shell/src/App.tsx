@@ -574,7 +574,7 @@ export default function App() {
           schema.push({
             name,
             type: valueType === 'number' ? 'number' : valueType === 'boolean' ? 'boolean' : 'string',
-            description: `Parameter "${name}"`,
+            description: null,
             tunable: param.tunable !== false,
             defaultValue: param.default ? param.value : null,
             minimum: valueType === 'number' ? 0 : null,

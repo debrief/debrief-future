@@ -255,7 +255,7 @@ function LogPanelApp(): React.ReactElement {
           schema.push({
             name,
             type: isNum ? 'number' : 'string',
-            description: `Parameter "${name}"`,
+            description: null,
             tunable: param.tunable !== false,
             defaultValue: param.default ? param.value : null,
             minimum: isNum ? 0 : null,
