@@ -381,22 +381,37 @@ export default function App() {
   // Without this, every pixel of slider drag fires a full tool re-execution.
   const tuneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Phase 6: Handle tune request from slider or inline parameter edit.
-  // The newValue is provided directly by the slider/control — no prompt needed.
-  // Debounced (300ms) so rapid slider drags only trigger one re-execution.
+  // Phase 6: Handle tune request from slider/edit face or display face click.
+  // Display face click passes the current value (needs prompt for new value).
+  // Edit face slider passes the already-new value (use directly, debounced).
   const handleTuneRequest = useCallback(
-    (activityId: string, parameter: string, newValue: unknown) => {
-      if (tuneTimerRef.current) clearTimeout(tuneTimerRef.current);
-      tuneTimerRef.current = setTimeout(() => {
-        tuneTimerRef.current = null;
+    (activityId: string, parameter: string, value: unknown) => {
+      const entry = logEntries.find((e: TimelineEntry) => e.activityId === activityId);
+      const currentValue = entry?.parameters[parameter]?.value;
+
+      if (value === currentValue) {
+        // Display face click — prompt for new value
+        const input = window.prompt(
+          `Tune "${parameter}" (current: ${String(currentValue)}):`,
+          String(currentValue)
+        );
+        if (input === null) return; // cancelled
+        const newValue = typeof currentValue === 'number' ? Number(input) : input;
         applyTune(activityId, parameter, newValue);
-      }, 300);
+      } else {
+        // Edit face slider — debounce so rapid drags don't re-execute per pixel
+        if (tuneTimerRef.current) clearTimeout(tuneTimerRef.current);
+        tuneTimerRef.current = setTimeout(() => {
+          tuneTimerRef.current = null;
+          applyTune(activityId, parameter, value);
+        }, 300);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [logEntries]
   );
 
-  // Actual tune logic, called after debounce settles.
+  // Actual tune logic, called after debounce settles (slider) or immediately (prompt).
   const applyTune = useCallback(
     (activityId: string, parameter: string, newValue: unknown) => {
       // Find the entry being tuned
