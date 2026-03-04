@@ -377,6 +377,16 @@ export function createOpenPlotCommand(
             panel.loadPlot(plot, updatedData.features);
             layersTreeProvider.setFeatures(updatedData.features);
             activityPanelProvider.setFeatures(updatedData.features);
+
+            // Update feature names so timeline shows correct labels
+            // for features created/removed during replay
+            const updatedNames: Record<string, string> = {};
+            for (const f of updatedData.features) {
+              const props = (f.properties ?? {}) as Record<string, unknown>;
+              const name = (props.name ?? props.title ?? String(f.id)) as string;
+              updatedNames[String(f.id)] = name;
+            }
+            logPanelProvider.setFeatureNames(updatedNames);
           }
         })();
       });

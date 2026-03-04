@@ -163,7 +163,7 @@ function toTimelineEntry(entry: LogEntry): TimelineEntry {
     deleted: entry.deleted === true,
     disabled: entry.disabled === true,
     rationale: entry.rationale ?? null,
-    tuneAnnotation: entry.tune !== null
+    tuneAnnotation: entry.tune
       ? { parameter: entry.tune.parameter, previousValue: entry.tune.previousValue, newValue: entry.tune.newValue }
       : null,
   };
@@ -329,6 +329,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
         },
       });
     } catch (err) {
+      console.error('[debrief] LogPanel: timeline update failed:', err);
       // Graceful degradation — send empty timeline
       this._postMessage({
         type: 'timeline:update',
