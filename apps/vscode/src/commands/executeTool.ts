@@ -274,8 +274,10 @@ export function createExecuteToolCommand(
         }
       }
 
-      // Auto-persist addition results to STAC (#041)
-      if (stacService && !result.artifactData && result.resultType?.startsWith('addition/')) {
+      // Auto-persist non-mutation feature results to STAC (#041)
+      // All additive/reference/etc. results must be on disk so that
+      // the tune replay cycle (cleanup → re-execute → write) works.
+      if (stacService && !result.artifactData && !isMutationResult) {
         try {
           const store = panel.getCurrentStore?.();
           const plot = panel.getCurrentPlot?.();
