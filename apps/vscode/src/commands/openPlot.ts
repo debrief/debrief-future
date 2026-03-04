@@ -266,7 +266,7 @@ export function createOpenPlotCommand(
         );
       },
 
-      executeTool: async (toolId, featureIds, params, activityId) => {
+      executeTool: async (toolId, featureIds, params, activityId, timestamp) => {
         const startMs = Date.now();
 
         // Load current features from disk (geometry restored by logService before replay)
@@ -289,15 +289,19 @@ export function createOpenPlotCommand(
         );
         if (!result.success || !result.features) { return { success: false, durationMs: Date.now() - startMs }; }
 
-        // Helper: stamp the original activityId on Python-generated provenance
-        // so the timeline shows one entry per original activity, not duplicates.
-        const stampActivityId = (f: Record<string, unknown>): void => {
+        // Helper: stamp the original activityId and timestamp on Python-generated
+        // provenance so the timeline shows one entry per original activity at
+        // its original position, not duplicates sorted to the end.
+        const stampProvenance = (f: Record<string, unknown>): void => {
           if (!activityId) { return; }
           const props = f.properties as Record<string, unknown> | null;
           if (!props?.provenance || !Array.isArray(props.provenance)) { return; }
           for (const prov of props.provenance as Array<Record<string, unknown>>) {
             if (prov.activityId) {
               prov.activityId = activityId;
+            }
+            if (timestamp && prov.timestamp) {
+              prov.timestamp = timestamp;
             }
           }
         };
@@ -327,7 +331,7 @@ export function createOpenPlotCommand(
         } else {
           // Additive: append new features, stamping original activityId
           for (const f of result.features.features) {
-            stampActivityId(f as Record<string, unknown>);
+            stampProvenance(f as Record<string, unknown>);
             (fc.features as unknown[]).push(f);
           }
         }

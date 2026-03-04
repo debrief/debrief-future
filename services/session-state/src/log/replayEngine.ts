@@ -100,6 +100,7 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
 
         entries.push({
           activityId: entry.activityId,
+          timestamp: entry.timestamp,
           toolId: entry.wasGeneratedBy.tool,
           toolVersion: entry.wasGeneratedBy.toolVersion,
           parameters: rawParams,
@@ -200,7 +201,8 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
           entry.toolId,
           entry.featureIds,
           entry.parameters,
-          entry.activityId
+          entry.activityId,
+          entry.timestamp
         );
 
         if (!result.success) {
