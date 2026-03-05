@@ -310,10 +310,11 @@ export function createOpenPlotCommand(
         const isMutation = result.resultType?.startsWith('mutation/');
         if (isMutation) {
           const resultMap = new Map(
-            result.features.features.map((f) => [
-              String((f.properties as Record<string, unknown>)?.id),
-              f,
-            ])
+            result.features.features.map((f) => {
+              const fProps = f.properties;
+              const fKey = String((f as unknown as Record<string, unknown>).id ?? fProps?.id);
+              return [fKey, f];
+            })
           );
           for (const feat of allFeatures) {
             const fId = String(feat.id ?? (feat.properties as Record<string, unknown>)?.id);
