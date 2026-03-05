@@ -88,7 +88,7 @@ export type ActionType = 'revertTo' | 'revertThis' | 'snapshot' | 'rationale';
 export interface ParameterSchemaEntry {
     readonly name: string;
     readonly type: 'number' | 'string' | 'boolean' | 'enum' | 'object' | 'array';
-    readonly description: string;
+    readonly description: string | null;
     readonly tunable: boolean;
     readonly defaultValue: unknown;
     readonly minimum: number | null;
@@ -234,6 +234,8 @@ export interface LogEntryProps {
     rationaleRef?: React.Ref<HTMLTextAreaElement>;
     /** Flip-card: current replay status for this card. Feature: 113 */
     replayStatus?: CardReplayStatus;
+    /** Chronological step number (1 = oldest operation). */
+    stepIndex?: number;
     className?: string;
 }
 /**
