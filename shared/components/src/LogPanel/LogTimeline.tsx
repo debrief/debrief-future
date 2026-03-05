@@ -38,10 +38,11 @@ export function LogTimeline({
       data-testid="log-timeline"
       role="list"
     >
-      {entries.map((entry) => (
+      {entries.map((entry, idx) => (
         <LogEntry
           key={entry.activityId}
           entry={entry}
+          stepIndex={idx + 1}
           featureNames={featureNames}
           presentationMode={presentationMode}
           isSelected={entry.activityId === selectedEntryId}

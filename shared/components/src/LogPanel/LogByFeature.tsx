@@ -40,6 +40,14 @@ export function LogByFeature({
     [entries, featureNames]
   );
 
+  // Build a global chronological index map so entries within groups
+  // still show their overall step number.
+  const stepIndexMap = useMemo(() => {
+    const map = new Map<string, number>();
+    entries.forEach((e, i) => { map.set(e.activityId, i + 1); });
+    return map;
+  }, [entries]);
+
   return (
     <div
       className={`log-panel__timeline ${className ?? ''}`}
@@ -55,6 +63,7 @@ export function LogByFeature({
             <LogEntry
               key={`${group.featureId}-${entry.activityId}`}
               entry={entry}
+              stepIndex={stepIndexMap.get(entry.activityId)}
               featureNames={featureNames}
               presentationMode={presentationMode}
               isSelected={entry.activityId === selectedEntryId}

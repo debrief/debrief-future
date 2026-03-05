@@ -42,6 +42,7 @@ export function LogEntry({
   onRetrySchema,
   rationaleRef,
   replayStatus = 'idle',
+  stepIndex,
   className,
 }: LogEntryProps): React.ReactElement {
   const affectedIds = getAffectedFeatureIds(entry);
@@ -99,8 +100,11 @@ export function LogEntry({
         }
       }}
     >
-      {/* Header: tool name + primary feature + badges + edit icon (all modes) */}
+      {/* Header: step index + tool name + primary feature + badges + edit icon (all modes) */}
       <div className="log-panel__entry-header">
+        {stepIndex != null && (
+          <span className="log-panel__entry-step">{stepIndex}</span>
+        )}
         <span className="log-panel__entry-tool">{entry.toolName}</span>
         {primaryFeature && (
           <span
