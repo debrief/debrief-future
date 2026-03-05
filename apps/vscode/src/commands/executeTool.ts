@@ -204,6 +204,36 @@ export function createExecuteToolCommand(
         // Mutation tools: update the original plot features in-place
         // rather than adding a duplicate result layer.
         panel.updatePlotFeatures(layer);
+
+        // Persist mutated features to disk so Python provenance (with full
+        // parameter metadata including tunable flags) is stored alongside
+        // the updated geometry. Without this, only in-memory state would
+        // reflect the mutation, and recordToolResult would write provenance
+        // entries with empty parameters.
+        if (stacService) {
+          try {
+            const store = panel.getCurrentStore?.();
+            const plot = panel.getCurrentPlot?.();
+            if (store?.path && plot?.itemPath) {
+              const fc = await stacService.loadGeoJsonForItem(store.path, plot.itemPath);
+              if (fc) {
+                const fid = (f: { id?: unknown; properties?: Record<string, unknown> | null }): string =>
+                  String(f.id ?? f.properties?.['id'] ?? '');
+                const updatedMap = new Map(
+                  layer.features.features.map((f) => [fid(f), f])
+                );
+                fc.features = fc.features.map((f) => {
+                  const id = fid(f);
+                  const updated = updatedMap.get(id);
+                  return updated ? (updated as typeof f) : f;
+                });
+                await stacService.writeGeoJson(store.path, plot.itemPath, fc);
+              }
+            }
+          } catch (persistErr) {
+            console.warn('[debrief] Failed to persist mutation to STAC:', persistErr);
+          }
+        }
       } else {
         // Additive tools or artifacts: add as result layer
         panel.addResultLayer(layer);
@@ -244,8 +274,10 @@ export function createExecuteToolCommand(
         }
       }
 
-      // Auto-persist addition results to STAC (#041)
-      if (stacService && !result.artifactData && result.resultType?.startsWith('addition/')) {
+      // Auto-persist non-mutation feature results to STAC (#041)
+      // All additive/reference/etc. results must be on disk so that
+      // the tune replay cycle (cleanup → re-execute → write) works.
+      if (stacService && !result.artifactData && !isMutationResult) {
         try {
           const store = panel.getCurrentStore?.();
           const plot = panel.getCurrentPlot?.();

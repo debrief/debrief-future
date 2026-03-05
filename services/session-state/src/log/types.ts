@@ -169,6 +169,8 @@ export interface LogService {
 /** Describes a single entry in a replay plan. */
 export interface ReplayEntry {
   activityId: string;
+  /** Original ISO-8601 timestamp — stamped on output provenance to preserve ordering. */
+  timestamp: string;
   toolId: string;
   toolVersion: string;
   parameters: Record<string, unknown>;
@@ -240,7 +242,11 @@ export interface ToolExecutionResultForReplay {
 export type ToolExecutor = (
   toolId: string,
   featureIds: string[],
-  params: Record<string, unknown>
+  params: Record<string, unknown>,
+  /** Original activityId — callee should stamp this on output provenance. */
+  activityId?: string,
+  /** Original timestamp — callee should stamp this on output provenance to preserve ordering. */
+  timestamp?: string
 ) => Promise<ToolExecutionResultForReplay>;
 
 /** Callback to load a snapshot GeoJSON for cross-snapshot replay. */

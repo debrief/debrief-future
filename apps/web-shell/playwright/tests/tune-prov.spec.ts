@@ -5,9 +5,8 @@
  * 1. Loading a plot and selecting an annotation shape
  * 2. Running move-shape tool (defaults: 5 km at 90°)
  * 3. Switching to the Log tab to view the entry
- * 4. Tuning the distance parameter via inline parameter editor
- * 5. Tuning the direction parameter
- * 6. Verifying tune annotations appear on the log entry
+ * 4. Opening the edit face and tuning via slider controls
+ * 5. Verifying tune annotations appear on the log entry
  *
  * Feature: 076-replay-tune
  */
@@ -41,6 +40,34 @@ async function runMoveShapeTool(page: import('@playwright/test').Page) {
   await expect(moveTool).toBeVisible({ timeout: 5000 });
   const runButton = moveTool.locator('button');
   await runButton.click();
+}
+
+/**
+ * Helper: open the edit face for a log entry and wait for slider controls.
+ */
+async function openEditFace(
+  page: import('@playwright/test').Page,
+  entry: import('@playwright/test').Locator
+) {
+  const editIcon = entry.locator('[data-testid^="edit-icon-"]');
+  await editIcon.click();
+  const params = page.getByTestId('edit-face-params');
+  await expect(params).toBeVisible({ timeout: 3000 });
+}
+
+/**
+ * Helper: set a slider to a new value by evaluating on the input element.
+ * Uses native input setter + React-compatible event dispatch.
+ */
+async function setSliderValue(
+  page: import('@playwright/test').Page,
+  paramName: string,
+  newValue: number
+) {
+  const sliderInput = page.getByTestId(`slider-input-${paramName}`);
+  await sliderInput.fill(String(newValue));
+  // Wait for debounce (300ms) + processing time
+  await page.waitForTimeout(500);
 }
 
 test.describe('PROV Tuning (move-shape)', () => {
@@ -100,7 +127,7 @@ test.describe('PROV Tuning (move-shape)', () => {
     expect(tunableCount).toBe(2); // distance_km and direction
   });
 
-  test('tuning distance parameter updates entry and shows annotation', async ({ page }) => {
+  test('tuning distance parameter via edit face updates entry and shows annotation', async ({ page }) => {
     await selectRectangleViaFeatureList(page);
     await runMoveShapeTool(page);
 
@@ -109,21 +136,22 @@ test.describe('PROV Tuning (move-shape)', () => {
 
     const entry = analysisPage.logEntries.first();
 
-    // Click the distance_km tunable parameter value to trigger tune
+    // Open the edit face
+    await openEditFace(page, entry);
+
+    // Verify initial distance value
+    const distanceReadout = page.getByTestId('slider-readout-distance_km');
+    await expect(distanceReadout).toContainText('5');
+
+    // Tune distance_km to 10 via slider
+    await setSliderValue(page, 'distance_km', 10);
+
+    // Close edit face
+    await page.getByTestId('edit-face-done').click();
+    await page.waitForTimeout(200);
+
+    // After tuning, the display face parameter value should update to 10
     const distanceParam = entry.locator('[data-testid="tune-param-distance_km"]');
-    await expect(distanceParam).toBeVisible();
-    await expect(distanceParam).toHaveText('5');
-
-    // Set up dialog handler BEFORE clicking — supply new value
-    page.once('dialog', async (dialog) => {
-      expect(dialog.type()).toBe('prompt');
-      expect(dialog.message()).toContain('distance_km');
-      await dialog.accept('10');
-    });
-
-    await distanceParam.click();
-
-    // After tuning, the parameter value should update to 10
     await expect(distanceParam).toHaveText('10');
 
     // A tune notification should appear
@@ -137,26 +165,29 @@ test.describe('PROV Tuning (move-shape)', () => {
     await expect(tunedBadge).toBeVisible();
   });
 
-  test('tuning direction parameter updates entry', async ({ page }) => {
+  test('tuning direction parameter via edit face updates entry', async ({ page }) => {
     await selectRectangleViaFeatureList(page);
     await runMoveShapeTool(page);
     await analysisPage.switchToLogTab();
 
     const entry = analysisPage.logEntries.first();
 
-    // Click the direction tunable parameter
+    // Open edit face
+    await openEditFace(page, entry);
+
+    // Verify initial direction value
+    const directionReadout = page.getByTestId('slider-readout-direction');
+    await expect(directionReadout).toContainText('90');
+
+    // Tune direction to 180 via slider
+    await setSliderValue(page, 'direction', 180);
+
+    // Close edit face
+    await page.getByTestId('edit-face-done').click();
+    await page.waitForTimeout(200);
+
+    // After tuning, display face value should update to 180
     const directionParam = entry.locator('[data-testid="tune-param-direction"]');
-    await expect(directionParam).toBeVisible();
-    await expect(directionParam).toHaveText('90');
-
-    // Supply new value via dialog
-    page.once('dialog', async (dialog) => {
-      await dialog.accept('180');
-    });
-
-    await directionParam.click();
-
-    // After tuning, value should update to 180
     await expect(directionParam).toHaveText('180');
 
     // Tuned badge should appear
@@ -164,7 +195,7 @@ test.describe('PROV Tuning (move-shape)', () => {
     await expect(tunedBadge).toBeVisible();
   });
 
-  test('repeated tuning updates the tune annotation', async ({ page }) => {
+  test('repeated tuning via edit face updates the tune annotation', async ({ page }) => {
     await selectRectangleViaFeatureList(page);
     await runMoveShapeTool(page);
     await analysisPage.switchToLogTab();
@@ -172,29 +203,31 @@ test.describe('PROV Tuning (move-shape)', () => {
     const entry = analysisPage.logEntries.first();
 
     // First tune: change distance to 10
+    await openEditFace(page, entry);
+    await setSliderValue(page, 'distance_km', 10);
+    await page.getByTestId('edit-face-done').click();
+    await page.waitForTimeout(200);
+
     const distanceParam = entry.locator('[data-testid="tune-param-distance_km"]');
-    page.once('dialog', async (dialog) => {
-      await dialog.accept('10');
-    });
-    await distanceParam.click();
     await expect(distanceParam).toHaveText('10');
 
     // Tuned badge visible
     await expect(entry.locator('[data-testid="badge-tuned"]')).toBeVisible();
 
     // Second tune: change direction to 270
+    await openEditFace(page, entry);
+    await setSliderValue(page, 'direction', 270);
+    await page.getByTestId('edit-face-done').click();
+    await page.waitForTimeout(200);
+
     const directionParam = entry.locator('[data-testid="tune-param-direction"]');
-    page.once('dialog', async (dialog) => {
-      await dialog.accept('270');
-    });
-    await directionParam.click();
     await expect(directionParam).toHaveText('270');
 
     // Tuned badge still visible
     await expect(entry.locator('[data-testid="badge-tuned"]')).toBeVisible();
   });
 
-  test('cancelling tune prompt does not change the entry', async ({ page }) => {
+  test('display face parameter click does not trigger tune', async ({ page }) => {
     await selectRectangleViaFeatureList(page);
     await runMoveShapeTool(page);
     await analysisPage.switchToLogTab();
@@ -203,11 +236,9 @@ test.describe('PROV Tuning (move-shape)', () => {
     const distanceParam = entry.locator('[data-testid="tune-param-distance_km"]');
     await expect(distanceParam).toHaveText('5');
 
-    // Dismiss the dialog (cancel)
-    page.once('dialog', async (dialog) => {
-      await dialog.dismiss();
-    });
+    // Click the display face parameter value — should NOT trigger tune
     await distanceParam.click();
+    await page.waitForTimeout(500);
 
     // Value should remain unchanged
     await expect(distanceParam).toHaveText('5');

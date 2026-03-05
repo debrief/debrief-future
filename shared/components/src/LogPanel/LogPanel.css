@@ -198,6 +198,20 @@
   gap: 6px;
 }
 
+.log-panel__entry-step {
+  font-size: 0.8em;
+  font-weight: 600;
+  min-width: 18px;
+  text-align: center;
+  color: var(--vscode-descriptionForeground, #969696);
+  flex-shrink: 0;
+}
+
+.log-panel__entry--selected .log-panel__entry-step {
+  color: var(--vscode-list-activeSelectionForeground, #ffffff);
+  opacity: 0.7;
+}
+
 .log-panel__entry-tool {
   font-weight: 600;
   white-space: nowrap;

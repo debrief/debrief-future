@@ -163,7 +163,7 @@ function toTimelineEntry(entry: LogEntry): TimelineEntry {
     deleted: entry.deleted === true,
     disabled: entry.disabled === true,
     rationale: entry.rationale ?? null,
-    tuneAnnotation: entry.tune !== null
+    tuneAnnotation: entry.tune
       ? { parameter: entry.tune.parameter, previousValue: entry.tune.previousValue, newValue: entry.tune.newValue }
       : null,
   };
@@ -202,6 +202,9 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   // Result ID Registry for tracking replay artifacts (Feature: 087)
   private _resultIdRegistry?: ResultIdRegistry;
 
+  // Callback to refresh MapPanel features after replay (Feature: 076)
+  private _onFeaturesChanged?: () => void;
+
   constructor(
     extensionUri: vscode.Uri,
     private readonly _context: vscode.ExtensionContext,
@@ -227,6 +230,13 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
    */
   public setResultIdRegistry(registry: ResultIdRegistry): void {
     this._resultIdRegistry = registry;
+  }
+
+  /**
+   * Set callback to refresh MapPanel features after replay/tune operations.
+   */
+  public setOnFeaturesChanged(callback: () => void): void {
+    this._onFeaturesChanged = callback;
   }
 
   /**
@@ -319,6 +329,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
         },
       });
     } catch (err) {
+      console.error('[debrief] LogPanel: timeline update failed:', err);
       // Graceful degradation — send empty timeline
       this._postMessage({
         type: 'timeline:update',
@@ -537,6 +548,8 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
       );
       this._sendReplayResult(result);
       await this._sendTimelineUpdate();
+      // Refresh MapPanel with updated features from disk
+      this._onFeaturesChanged?.();
     } catch (err) {
       this._postMessage({
         type: 'replay:error',
@@ -566,6 +579,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
         },
       });
       await this._sendTimelineUpdate();
+      this._onFeaturesChanged?.();
     } catch (err) {
       this._postMessage({
         type: 'replay:error',
@@ -590,6 +604,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
       );
       this._sendReplayResult(result);
       await this._sendTimelineUpdate();
+      this._onFeaturesChanged?.();
     } catch (err) {
       this._postMessage({
         type: 'replay:error',
@@ -614,6 +629,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
       );
       this._sendReplayResult(result);
       await this._sendTimelineUpdate();
+      this._onFeaturesChanged?.();
     } catch (err) {
       this._postMessage({
         type: 'replay:error',

@@ -76,7 +76,7 @@ def create_log_entry(
 
     # Convert flat parameters dict to ParameterValue dict
     typed_params: dict[str, ParameterValue] = {}
-    if parameters:
+    if parameters is not None:
         for key, val in parameters.items():
             if isinstance(val, ParameterValue):
                 typed_params[key] = val

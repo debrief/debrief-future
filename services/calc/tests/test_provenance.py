@@ -311,7 +311,10 @@ class TestInputFeatureState:
     def test_create_input_feature_state(self) -> None:
         state = InputFeatureState(
             featureId="circle-001",
-            geometry={"type": "Polygon", "coordinates": [[[0.0, 50.0], [0.01, 50.01], [0.0, 50.0]]]},
+            geometry={
+                "type": "Polygon",
+                "coordinates": [[[0.0, 50.0], [0.01, 50.01], [0.0, 50.0]]],
+            },
             properties={"kind": "CIRCLE", "center": [0.0, 50.0]},
         )
         assert state.feature_id == "circle-001"
@@ -360,7 +363,9 @@ class TestLogEntryWithInputState:
         entry = create_log_entry(
             tool_name="move-shape",
             tool_version="1.0.0",
-            source_features=[{"id": "circle-001", "properties": {"kind": "CIRCLE"}, "geometry": None}],
+            source_features=[
+                {"id": "circle-001", "properties": {"kind": "CIRCLE"}, "geometry": None}
+            ],
             duration_ms=12.0,
             input_state=[state],
         )
@@ -395,7 +400,9 @@ class TestCreateLogEntryWithInputState:
         entry = create_log_entry(
             tool_name="move-shape",
             tool_version="1.0.0",
-            source_features=[{"id": "circle-001", "properties": {"kind": "CIRCLE"}, "geometry": None}],
+            source_features=[
+                {"id": "circle-001", "properties": {"kind": "CIRCLE"}, "geometry": None}
+            ],
             duration_ms=10.0,
             input_state=[state],
         )
@@ -430,7 +437,9 @@ class TestLogEntryRoundTrip:
         original = create_log_entry(
             tool_name="move-shape",
             tool_version="1.0.0",
-            source_features=[{"id": "circle-001", "properties": {"kind": "CIRCLE"}, "geometry": None}],
+            source_features=[
+                {"id": "circle-001", "properties": {"kind": "CIRCLE"}, "geometry": None}
+            ],
             duration_ms=12.0,
             input_state=[state],
             activity_id="test-round-trip",

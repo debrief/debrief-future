@@ -702,6 +702,76 @@ print(json.dumps(tools))
     return resolved;
   }
 
+  /**
+   * Execute a tool with caller-provided features (for replay engine use).
+   * Bypasses MapPanel feature resolution — caller provides features directly.
+   */
+  async executeToolDirect(
+    toolId: string,
+    features: Array<{ type: 'Feature'; id?: string | number; geometry: unknown; properties: Record<string, unknown> | null }>,
+    params: Record<string, unknown>
+  ): Promise<{ success: boolean; features?: SafeFeatureCollection; resultType?: string; artifactHref?: string; toolVersion?: string }> {
+    await this.connect();
+
+    const input = JSON.stringify({
+      tool: toolId,
+      features,
+      params,
+    });
+
+    const pythonPath = this.getPythonPath();
+    const stdout = await spawnWithStdin(
+      pythonPath,
+      ['-m', 'debrief_calc.cli'],
+      input,
+      30000
+    );
+
+    const parsed = JSON.parse(stdout.trim()) as MCPToolResponse | MCPErrorResponse;
+    if ('error' in parsed) {
+      return { success: false };
+    }
+
+    const geoFeatures: SafeFeatureCollection['features'] = [];
+    let resultType: string | undefined;
+    let artifactHref: string | undefined;
+    let toolVersion: string | undefined;
+
+    for (const item of parsed.content) {
+      if (!resultType && item.annotations?.['debrief:resultType']) {
+        resultType = item.annotations['debrief:resultType'];
+      }
+      if (item.annotations?.['debrief:toolVersion']) {
+        toolVersion = item.annotations['debrief:toolVersion'];
+      }
+      if (item.annotations?.['debrief:href']) {
+        artifactHref = item.annotations['debrief:href'];
+        continue;
+      }
+      if (item.type === 'resource' && item.resource) {
+        const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+        geoFeatures.push(feature);
+      }
+    }
+
+    return {
+      success: true,
+      features: { type: 'FeatureCollection', features: geoFeatures },
+      resultType,
+      artifactHref,
+      toolVersion,
+    };
+  }
+
+  /**
+   * Get the version of an installed tool from the cached tool list.
+   */
+  getToolVersion(toolId: string): string | null {
+    const tools = this.toolCache?.tools ?? [];
+    const tool = tools.find((t) => t.id === toolId);
+    return tool?.version ?? null;
+  }
+
   private async executeToolOnMcp(
     toolId: string,
     featureIds: string[],

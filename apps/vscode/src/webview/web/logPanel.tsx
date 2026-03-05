@@ -11,7 +11,7 @@
  * Updated: 113-prov-card-flip (flip-card edit wiring)
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { LogPanel, LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
 import type {
@@ -21,6 +21,7 @@ import type {
   LogFilterState,
   LogPanelMessage,
   ExtensionToWebviewMessage,
+  ParameterSchemaEntry,
 } from '@debrief/components';
 
 // Phase 6 message types from the extension
@@ -148,10 +149,8 @@ function LogPanelApp(): React.ReactElement {
           setTimeout(() => setActionResultMessage(null), 5000);
           break;
 
-        // Feature 113: schema response — handled by LogPanel via schema cache
         case 'schema:response':
-          // Schema responses are handled internally by the LogPanel component.
-          // The webview just needs to forward them if needed.
+          // Schema is now derived locally — no extension round-trip needed.
           break;
       }
     };
@@ -183,13 +182,38 @@ function LogPanelApp(): React.ReactElement {
     setSelectedEntryId(entryId);
   }, []);
 
-  // Phase 6: tune/revert handlers → send dedicated messages to extension
+  // Phase 6: tune/revert handlers → send dedicated messages to extension.
+  // Optimistic local update so the slider responds instantly during drag.
+  // Debounced (400ms) so rapid slider drags only trigger one replay.
+  const tuneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleTuneRequest = useCallback(
     (activityId: string, parameter: string, newValue: unknown) => {
-      vscode.postMessage({
-        type: 'tune:request',
-        payload: { activityId, parameter, newValue },
-      });
+      // Optimistic update: immediately reflect the new value in local state
+      // so the slider doesn't snap back while waiting for the replay round-trip.
+      setEntries((prev) =>
+        prev.map((e) => {
+          if (e.activityId !== activityId) return e;
+          const paramEntry = e.parameters[parameter];
+          if (!paramEntry) return e;
+          return {
+            ...e,
+            parameters: {
+              ...e.parameters,
+              [parameter]: { ...paramEntry, value: newValue },
+            },
+          };
+        })
+      );
+
+      // Debounce the actual replay request
+      if (tuneTimerRef.current) clearTimeout(tuneTimerRef.current);
+      tuneTimerRef.current = setTimeout(() => {
+        tuneTimerRef.current = null;
+        vscode.postMessage({
+          type: 'tune:request',
+          payload: { activityId, parameter, newValue },
+        });
+      }, 400);
     },
     []
   );
@@ -219,13 +243,33 @@ function LogPanelApp(): React.ReactElement {
     vscode.postMessage({ type: 'replay:cancel' });
   }, []);
 
-  // Feature 113: schema request → forward to extension
-  const handleSchemaRequest = useCallback((toolId: string) => {
-    vscode.postMessage({
-      type: 'schema:request',
-      payload: { toolId },
-    });
-  }, []);
+  // Feature 113: derive schema from existing parameter metadata.
+  // Parameters already carry value/tunable/default info — no extension round-trip needed.
+  const handleSchemaRequest = useCallback(
+    (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
+      const entry = entries.find((e) => e.toolName === toolId);
+      const schema: ParameterSchemaEntry[] = [];
+      if (entry) {
+        for (const [name, param] of Object.entries(entry.parameters)) {
+          const isNum = typeof param.value === 'number';
+          schema.push({
+            name,
+            type: isNum ? 'number' : 'string',
+            description: null,
+            tunable: param.tunable !== false,
+            defaultValue: param.default ? param.value : null,
+            minimum: isNum ? 0 : null,
+            maximum: isNum ? Number(param.value) * 3 : null,
+            step: isNum ? 1 : null,
+            choices: null,
+            paramType: null,
+          });
+        }
+      }
+      return Promise.resolve(schema);
+    },
+    [entries]
+  );
 
   // Feature 113: disable toggle → forward to extension
   const handleDisableToggle = useCallback((activityId: string, disabled: boolean) => {
