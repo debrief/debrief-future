@@ -234,6 +234,8 @@ export interface LogEntryProps {
     rationaleRef?: React.Ref<HTMLTextAreaElement>;
     /** Flip-card: current replay status for this card. Feature: 113 */
     replayStatus?: CardReplayStatus;
+    /** Chronological step number (1 = oldest operation). */
+    stepIndex?: number;
     className?: string;
 }
 /**
