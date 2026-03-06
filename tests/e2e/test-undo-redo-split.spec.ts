@@ -9,48 +9,49 @@
 import { test, expect } from './fixtures/base';
 
 test.describe('Undo / Redo', () => {
-  test('undo reverts the last selection', async ({ codeServerPage, page }) => {
-    test.fixme();
-    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
+  test.setTimeout(120_000);
 
-    // Select a track
-    const features = frame.locator('.leaflet-interactive');
+  test('undo reverts the last selection', async ({ codeServerPage }) => {
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
+    const mapFrame = await codeServerPage.getWebviewFrame();
+
+    // Select a track on the map
+    const features = mapFrame.locator('.leaflet-interactive');
     await features.first().waitFor({ state: 'visible', timeout: 10_000 });
     await features.first().click({ force: true });
 
-    const selected = frame.locator('.debrief-feature-row--selected');
-    await selected.first().waitFor({ state: 'visible', timeout: 5_000 });
+    // Verify selection in activity panel
+    const activityFrame = await codeServerPage.getActivityPanelFrame();
+    const selected = activityFrame.locator('.debrief-feature-row--selected');
+    await selected.first().waitFor({ state: 'visible', timeout: 10_000 });
     expect(await selected.count()).toBeGreaterThan(0);
 
-    // Undo with Ctrl+Z
-    await page.keyboard.press('Control+z');
+    // Undo via VS Code command
+    await codeServerPage.executeCommand('Debrief: Undo');
 
     // Selection should be reverted
     await expect(selected).toHaveCount(0, { timeout: 5_000 });
   });
 
-  test('redo restores the undone selection', async ({
-    codeServerPage,
-    page,
-  }) => {
-    test.fixme();
+  test('redo restores the undone selection', async ({ codeServerPage }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
+    const mapFrame = await codeServerPage.getWebviewFrame();
 
-    // Select a track
-    const features = frame.locator('.leaflet-interactive');
+    // Select a track on the map
+    const features = mapFrame.locator('.leaflet-interactive');
     await features.first().waitFor({ state: 'visible', timeout: 10_000 });
     await features.first().click({ force: true });
 
-    const selected = frame.locator('.debrief-feature-row--selected');
-    await selected.first().waitFor({ state: 'visible', timeout: 5_000 });
+    // Verify selection in activity panel
+    const activityFrame = await codeServerPage.getActivityPanelFrame();
+    const selected = activityFrame.locator('.debrief-feature-row--selected');
+    await selected.first().waitFor({ state: 'visible', timeout: 10_000 });
 
-    // Undo then redo
-    await page.keyboard.press('Control+z');
+    // Undo then redo via VS Code commands
+    await codeServerPage.executeCommand('Debrief: Undo');
     await expect(selected).toHaveCount(0, { timeout: 5_000 });
 
-    await page.keyboard.press('Control+y');
+    await codeServerPage.executeCommand('Debrief: Redo');
 
     // Selection should be restored
     await selected.first().waitFor({ state: 'visible', timeout: 5_000 });

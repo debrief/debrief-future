@@ -12,7 +12,7 @@ test.describe('Drawing Tools', () => {
   test('drawing toolbar trigger is present on the map', async ({
     codeServerPage,
   }) => {
-    test.fixme();
+    test.setTimeout(120_000);
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
@@ -24,7 +24,7 @@ test.describe('Drawing Tools', () => {
   test('clicking draw trigger opens the shape palette', async ({
     codeServerPage,
   }) => {
-    test.fixme();
+    test.setTimeout(120_000);
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
@@ -40,7 +40,7 @@ test.describe('Drawing Tools', () => {
   test('drawing a rectangle appears in features', async ({
     codeServerPage,
   }) => {
-    test.fixme();
+    test.setTimeout(120_000);
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 

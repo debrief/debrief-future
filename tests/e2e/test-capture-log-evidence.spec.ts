@@ -11,20 +11,16 @@ import { test, expect } from './fixtures/base';
 const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 
 test.describe('Capture Log Evidence', () => {
+  test.setTimeout(120_000);
+
   test('capture empty log panel screenshot', async ({
     codeServerPage,
     page,
   }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
+    const logFrame = await codeServerPage.getLogPanelFrame();
 
-    // Switch to the Log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
-
-    const emptyState = frame.locator(
+    const emptyState = logFrame.locator(
       '[data-testid="log-panel-empty-no-entries"]',
     );
     await emptyState.waitFor({ state: 'visible', timeout: 5_000 });
@@ -39,16 +35,17 @@ test.describe('Capture Log Evidence', () => {
     codeServerPage,
     page,
   }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
 
-    // Switch to the Log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
+    // Select a feature and run a tool to generate log entries
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    await mapFrame.locator('.leaflet-interactive').first().click();
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
+    await page.waitForTimeout(3_000);
 
-    const entries = frame.locator('.log-panel__entry');
+    const logFrame = await codeServerPage.getLogPanelFrame();
+
+    const entries = logFrame.locator('.log-panel__entry');
     await entries.first().waitFor({ state: 'visible', timeout: 10_000 });
     expect(await entries.count()).toBeGreaterThan(0);
 
@@ -62,16 +59,17 @@ test.describe('Capture Log Evidence', () => {
     codeServerPage,
     page,
   }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
 
-    // Switch to the Log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
+    // Select a feature and run a tool to generate tunable params
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    await mapFrame.locator('.leaflet-interactive').first().click();
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
+    await page.waitForTimeout(3_000);
 
-    const directionParam = frame.locator(
+    const logFrame = await codeServerPage.getLogPanelFrame();
+
+    const directionParam = logFrame.locator(
       '[data-testid="tune-param-direction"]',
     );
     await directionParam.waitFor({ state: 'visible', timeout: 10_000 });
@@ -83,21 +81,22 @@ test.describe('Capture Log Evidence', () => {
   });
 
   test('capture edit card screenshot', async ({ codeServerPage, page }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
 
-    // Switch to the Log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
+    // Select a feature and run a tool to generate log entries
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    await mapFrame.locator('.leaflet-interactive').first().click();
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
+    await page.waitForTimeout(3_000);
+
+    const logFrame = await codeServerPage.getLogPanelFrame();
 
     // Click the first edit icon
-    const editIcon = frame.locator('[data-testid^="edit-icon-"]').first();
+    const editIcon = logFrame.locator('[data-testid^="edit-icon-"]').first();
     await editIcon.waitFor({ state: 'visible', timeout: 10_000 });
     await editIcon.click();
 
-    const editFace = frame.locator('[data-testid="edit-face"]');
+    const editFace = logFrame.locator('[data-testid="edit-face"]');
     await editFace.waitFor({ state: 'visible', timeout: 5_000 });
 
     await page.screenshot({
@@ -107,21 +106,22 @@ test.describe('Capture Log Evidence', () => {
   });
 
   test('capture tuned entry screenshot', async ({ codeServerPage, page }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
 
-    // Switch to the Log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
+    // Select a feature and run a tool to generate log entries with tunable params
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    await mapFrame.locator('.leaflet-interactive').first().click();
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
+    await page.waitForTimeout(3_000);
+
+    const logFrame = await codeServerPage.getLogPanelFrame();
 
     // Tune a parameter
-    const slider = frame.locator('[data-testid="slider-input-direction"]');
+    const slider = logFrame.locator('[data-testid="slider-input-direction"]');
     await slider.waitFor({ state: 'visible', timeout: 10_000 });
     await slider.fill('60');
 
-    const entries = frame.locator('.log-panel__entry');
+    const entries = logFrame.locator('.log-panel__entry');
     await entries.first().waitFor({ state: 'visible', timeout: 5_000 });
 
     await page.screenshot({

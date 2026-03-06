@@ -12,9 +12,9 @@ test.describe('Time Controller', () => {
   test('time controller is visible after loading a plot', async ({
     codeServerPage,
   }) => {
-    test.fixme();
+    test.setTimeout(120_000);
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
+    const frame = await codeServerPage.getActivityPanelFrame();
 
     const timeController = frame.locator('.debrief-time-controller');
     await timeController.waitFor({ state: 'visible', timeout: 15_000 });
@@ -24,9 +24,9 @@ test.describe('Time Controller', () => {
   test('time controller shows playback controls', async ({
     codeServerPage,
   }) => {
-    test.fixme();
+    test.setTimeout(120_000);
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
+    const frame = await codeServerPage.getActivityPanelFrame();
 
     const playPause = frame.locator('[data-testid="play-pause"]');
     await playPause.waitFor({ state: 'visible', timeout: 15_000 });
@@ -36,9 +36,9 @@ test.describe('Time Controller', () => {
   test('play/pause button toggles playback state', async ({
     codeServerPage,
   }) => {
-    test.fixme();
+    test.setTimeout(120_000);
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
+    const frame = await codeServerPage.getActivityPanelFrame();
 
     const playPause = frame.locator('[data-testid="play-pause"]');
     await playPause.waitFor({ state: 'visible', timeout: 15_000 });
@@ -51,9 +51,9 @@ test.describe('Time Controller', () => {
   test('scrubber starts at the beginning of the time range', async ({
     codeServerPage,
   }) => {
-    test.fixme();
+    test.setTimeout(120_000);
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
+    const frame = await codeServerPage.getActivityPanelFrame();
 
     const scrubber = frame.locator('.debrief-time-scrubber');
     await scrubber.waitFor({ state: 'visible', timeout: 15_000 });

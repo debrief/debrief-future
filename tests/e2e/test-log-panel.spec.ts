@@ -9,56 +9,56 @@
 import { test, expect } from './fixtures/base';
 
 test.describe('Log Panel', () => {
+  test.setTimeout(120_000);
+
   test('log panel shows empty state when no tools have run', async ({
     codeServerPage,
   }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
+    const logFrame = await codeServerPage.getLogPanelFrame();
 
-    // Switch to the Log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
-
-    const logPanel = frame.locator('[data-testid="log-panel"]');
+    const logPanel = logFrame.locator('[data-testid="log-panel"]');
     await logPanel.waitFor({ state: 'visible', timeout: 5_000 });
 
-    const emptyState = frame.locator(
+    const emptyState = logFrame.locator(
       '[data-testid="log-panel-empty-no-entries"]',
     );
     await expect(emptyState).toBeVisible({ timeout: 5_000 });
   });
 
   test('running a tool creates a log entry', async ({ codeServerPage }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
 
-    // Switch to the Log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
+    // Select a track and run a tool to create a log entry
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    const features = mapFrame.locator('.leaflet-interactive');
+    await features.first().waitFor({ state: 'visible', timeout: 15_000 });
+    await features.first().click({ force: true });
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
 
-    const entries = frame.locator('.log-panel__entry');
-    await entries.first().waitFor({ state: 'visible', timeout: 10_000 });
+    const logFrame = await codeServerPage.getLogPanelFrame();
+    const entries = logFrame.locator('.log-panel__entry');
+    await entries.first().waitFor({ state: 'visible', timeout: 15_000 });
     expect(await entries.count()).toBeGreaterThan(0);
   });
 
   test('log entries are shown most recent first', async ({
     codeServerPage,
   }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
 
-    // Switch to the Log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
+    // Run tools to create multiple entries
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    const features = mapFrame.locator('.leaflet-interactive');
+    await features.first().waitFor({ state: 'visible', timeout: 15_000 });
+    await features.first().click({ force: true });
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
+    await codeServerPage.page.waitForTimeout(3_000);
+    await codeServerPage.executeCommand('Debrief: Track Stats');
 
-    const entries = frame.locator('.log-panel__entry');
-    await entries.first().waitFor({ state: 'visible', timeout: 10_000 });
+    const logFrame = await codeServerPage.getLogPanelFrame();
+    const entries = logFrame.locator('.log-panel__entry');
+    await entries.first().waitFor({ state: 'visible', timeout: 15_000 });
     expect(await entries.count()).toBeGreaterThanOrEqual(2);
   });
 });

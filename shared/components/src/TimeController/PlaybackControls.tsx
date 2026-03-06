@@ -30,6 +30,7 @@ export function PlaybackControls({
       disabled={disabled}
       aria-label={isPlaying ? 'Pause' : 'Play'}
       title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
+      data-testid="play-pause"
     >
       <Icon name={isPlaying ? 'debug-pause' : 'debug-start'} />
     </Button>

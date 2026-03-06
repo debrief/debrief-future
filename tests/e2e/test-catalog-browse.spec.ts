@@ -4,8 +4,8 @@
  * Adapted from web-shell test: apps/web-shell/playwright/tests/catalog-browse.spec.ts
  * Tests exercise the same workflows through VS Code's webview iframe hierarchy.
  *
- * FIXME: catalog-overview is rendered in a separate panel (CatalogOverviewPanel),
- * not inside the map webview. These tests need to target the correct webview.
+ * The CatalogOverview is rendered in a separate editor panel (CatalogOverviewPanel),
+ * opened via the "Debrief: Open Catalog Overview" command.
  *
  * CREATED: 2026-03-06 — Dual-platform E2E expansion (SC-006)
  */
@@ -14,36 +14,64 @@ import { test, expect } from './fixtures/base';
 test.describe('Catalog Browse', () => {
   test.setTimeout(120_000);
 
-  test.fixme('catalog overview is visible after loading a plot', async ({
+  test('catalog overview is visible after opening it', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
+    await codeServerPage.executeCommand('Debrief: Open Catalog Overview');
+    await codeServerPage.page.waitForTimeout(3_000);
 
-    const catalogOverview = frame.locator('.catalog-overview');
-    await catalogOverview.waitFor({ state: 'visible', timeout: 15_000 });
-    await expect(catalogOverview).toBeVisible();
+    // The catalog overview opens as a webview panel
+    const allFrames = codeServerPage.page.frames();
+    let catalogVisible = false;
+    for (const frame of allFrames) {
+      for (const child of frame.childFrames()) {
+        const has = await child.locator('.catalog-overview').isVisible().catch(() => false);
+        if (has) { catalogVisible = true; break; }
+      }
+      if (catalogVisible) break;
+    }
+    expect(catalogVisible).toBe(true);
   });
 
-  test.fixme('catalog shows plot items from loaded file', async ({
+  test('catalog shows timeline bars from loaded file', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
+    await codeServerPage.executeCommand('Debrief: Open Catalog Overview');
+    await codeServerPage.page.waitForTimeout(3_000);
 
-    const plotItems = frame.locator('.catalog-plot-item');
-    await plotItems.first().waitFor({ state: 'visible', timeout: 15_000 });
-    expect(await plotItems.count()).toBeGreaterThan(0);
+    // Find the catalog overview webview frame
+    const allFrames = codeServerPage.page.frames();
+    for (const frame of allFrames) {
+      for (const child of frame.childFrames()) {
+        const bars = child.locator('.catalog-overview__timeline-bar');
+        const count = await bars.count().catch(() => 0);
+        if (count > 0) {
+          expect(count).toBeGreaterThan(0);
+          return;
+        }
+      }
+    }
+    throw new Error('No catalog timeline bars found in any webview frame');
   });
 
-  test.fixme('catalog overview shows timeline metadata', async ({
+  test('catalog overview shows timeline metadata', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
+    await codeServerPage.executeCommand('Debrief: Open Catalog Overview');
+    await codeServerPage.page.waitForTimeout(3_000);
 
-    const timeline = frame.locator('.catalog-overview__timeline');
-    await timeline.waitFor({ state: 'visible', timeout: 15_000 });
-    await expect(timeline).toBeVisible();
+    const allFrames = codeServerPage.page.frames();
+    let timelineVisible = false;
+    for (const frame of allFrames) {
+      for (const child of frame.childFrames()) {
+        const has = await child.locator('.catalog-overview__timeline').isVisible().catch(() => false);
+        if (has) { timelineVisible = true; break; }
+      }
+      if (timelineVisible) break;
+    }
+    expect(timelineVisible).toBe(true);
   });
 });

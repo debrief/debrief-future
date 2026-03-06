@@ -287,6 +287,114 @@ export class CodeServerPage {
     await this.fileExplorer.waitFor({ state: 'visible', timeout: 5_000 });
   }
 
+  /**
+   * Open the Debrief sidebar (Activity Panel + Log Panel views).
+   * Clicks the Debrief icon in the activity bar to reveal the sidebar container.
+   */
+  async openDebriefSidebar(): Promise<void> {
+    const debriefIcon = this.page.locator(
+      [
+        '.action-item a[aria-label="Debrief"]',
+        '[role="tab"][aria-label*="Debrief"]',
+        '.activitybar [aria-label*="Debrief" i]',
+      ].join(', ')
+    ).first();
+    await debriefIcon.click();
+    await this.page.waitForTimeout(2_000);
+  }
+
+  /**
+   * Access the Activity Panel webview frame (sidebar — FeatureList, ToolsPanel, TimeController).
+   *
+   * The Activity Panel lives in the Debrief sidebar container as a webview view.
+   * It uses the same two-level iframe nesting as editor webviews.
+   *
+   * @returns FrameLocator pointing to the innermost Activity Panel content
+   */
+  async getActivityPanelFrame(): Promise<FrameLocator> {
+    // Ensure the Debrief sidebar is open
+    await this.openDebriefSidebar();
+    await this.page.waitForTimeout(2_000);
+
+    // Find the Activity Panel webview by probing frame content.
+    // The Activity Panel renders .debrief-activity-panel as its root element.
+    return this.findWebviewFrameByContent('.debrief-activity-panel', 20_000);
+  }
+
+  /**
+   * Access the Log Panel webview frame (sidebar — LogPanel with entries and edit face).
+   *
+   * The Log Panel lives alongside the Activity Panel in the Debrief sidebar.
+   * It may need to be scrolled into view or its tab clicked.
+   *
+   * @returns FrameLocator pointing to the innermost Log Panel content
+   */
+  async getLogPanelFrame(): Promise<FrameLocator> {
+    // Ensure the Debrief sidebar is open
+    await this.openDebriefSidebar();
+
+    // Try to focus the Log Panel view via command palette
+    await this.page.keyboard.press('Control+Shift+P');
+    await this.page.waitForTimeout(500);
+    await this.page.keyboard.type('Debrief Log: Focus on Debrief Log View', { delay: 20 });
+    await this.page.waitForTimeout(1_000);
+    await this.page.keyboard.press('Enter');
+    await this.page.waitForTimeout(2_000);
+
+    // Find the Log Panel webview by probing frame content.
+    // The Log Panel renders [data-testid="log-panel"] as its root element.
+    return this.findWebviewFrameByContent('[data-testid="log-panel"]', 20_000);
+  }
+
+  /**
+   * Find a specific webview frame by probing for a CSS selector in its content.
+   *
+   * Iterates all webview host frames and checks each inner frame for the
+   * given selector. Returns a FrameLocator for the matching inner frame.
+   *
+   * @param selector - CSS selector to probe for inside the webview
+   * @param timeoutMs - Maximum time to wait for the frame to appear
+   */
+  private async findWebviewFrameByContent(
+    selector: string,
+    timeoutMs: number
+  ): Promise<FrameLocator> {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      const frames = this.page.frames();
+      for (const frame of frames) {
+        if (!frame.url().includes('webview')) continue;
+        const children = frame.childFrames();
+        for (const child of children) {
+          const hasContent = await child
+            .locator(selector)
+            .first()
+            .isVisible()
+            .catch(() => false);
+          if (hasContent) {
+            // Found it — return a FrameLocator chain for stable access
+            // We need to identify which outer iframe this is.
+            // Use the frame's URL to create a specific FrameLocator.
+            const outerUrl = frame.url();
+            const outerLocator = this.page.frameLocator(
+              `iframe.webview[src*="${this.extractFrameId(outerUrl)}"]`
+            );
+            return outerLocator.frameLocator('#active-frame');
+          }
+        }
+      }
+      await this.page.waitForTimeout(1_000);
+    }
+    throw new Error(`Webview frame with content "${selector}" not found after ${timeoutMs}ms`);
+  }
+
+  /** Extract a unique identifier from a webview frame URL for locator targeting. */
+  private extractFrameId(url: string): string {
+    // Webview URLs contain a unique ID. Extract a substring for matching.
+    const match = url.match(/vscode-webview:\/\/([^/]+)/);
+    return match ? match[1].substring(0, 20) : '';
+  }
+
   // ─────────────────────────────────────────────────────────────────────────────
   // STAC Tree Helpers (private)
   // ─────────────────────────────────────────────────────────────────────────────

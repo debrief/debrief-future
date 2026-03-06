@@ -9,58 +9,68 @@
 import { test, expect } from './fixtures/base';
 
 test.describe('Event Log Propagation', () => {
+  test.setTimeout(120_000);
+
   test('amending first event re-applies subsequent events', async ({
     codeServerPage,
   }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
 
-    // Navigate to log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
+    // Run a tool to create log entries with tunable parameters
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    await mapFrame
+      .locator('.leaflet-interactive')
+      .first()
+      .waitFor({ state: 'visible', timeout: 15_000 });
+    await mapFrame.locator('.leaflet-interactive').first().click();
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
+
+    const logFrame = await codeServerPage.getLogPanelFrame();
 
     // Find the tune parameter for direction on first entry
-    const directionParam = frame.locator(
+    const directionParam = logFrame.locator(
       '[data-testid="tune-param-direction"]',
     );
     await directionParam.waitFor({ state: 'visible', timeout: 10_000 });
 
-    const slider = frame.locator('[data-testid="slider-input-direction"]');
+    const slider = logFrame.locator('[data-testid="slider-input-direction"]');
     await slider.waitFor({ state: 'visible', timeout: 5_000 });
 
     // Adjust the slider
     await slider.fill('45');
 
     // Verify subsequent log entries are still present (re-applied)
-    const entries = frame.locator('.log-panel__entry');
+    const entries = logFrame.locator('.log-panel__entry');
     expect(await entries.count()).toBeGreaterThan(1);
   });
 
   test('log entries persist after tuning a parameter', async ({
     codeServerPage,
   }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
 
-    // Navigate to log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
+    // Run a tool to create log entries with tunable parameters
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    await mapFrame
+      .locator('.leaflet-interactive')
+      .first()
+      .waitFor({ state: 'visible', timeout: 15_000 });
+    await mapFrame.locator('.leaflet-interactive').first().click();
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
 
-    const entries = frame.locator('.log-panel__entry');
+    const logFrame = await codeServerPage.getLogPanelFrame();
+
+    const entries = logFrame.locator('.log-panel__entry');
     await entries.first().waitFor({ state: 'visible', timeout: 10_000 });
     const initialCount = await entries.count();
 
     // Tune a parameter
-    const directionParam = frame.locator(
+    const directionParam = logFrame.locator(
       '[data-testid="tune-param-direction"]',
     );
     await directionParam.waitFor({ state: 'visible', timeout: 10_000 });
 
-    const slider = frame.locator('[data-testid="slider-input-direction"]');
+    const slider = logFrame.locator('[data-testid="slider-input-direction"]');
     await slider.fill('90');
 
     // Entries should still be present

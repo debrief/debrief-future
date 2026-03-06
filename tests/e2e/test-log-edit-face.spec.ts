@@ -9,44 +9,50 @@
 import { test, expect } from './fixtures/base';
 
 test.describe('Log Edit Face', () => {
+  test.setTimeout(120_000);
+
   test('clicking edit icon shows the edit face', async ({
     codeServerPage,
   }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
 
-    // Navigate to log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
+    // Run a tool to create a log entry
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    const features = mapFrame.locator('.leaflet-interactive');
+    await features.first().waitFor({ state: 'visible', timeout: 15_000 });
+    await features.first().click({ force: true });
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
+
+    const logFrame = await codeServerPage.getLogPanelFrame();
 
     // Click the first edit icon
-    const editIcon = frame.locator('[data-testid^="edit-icon-"]').first();
-    await editIcon.waitFor({ state: 'visible', timeout: 10_000 });
+    const editIcon = logFrame.locator('[data-testid^="edit-icon-"]').first();
+    await editIcon.waitFor({ state: 'visible', timeout: 15_000 });
     await editIcon.click();
 
-    const editFace = frame.locator('[data-testid="edit-face"]');
+    const editFace = logFrame.locator('[data-testid="edit-face"]');
     await editFace.waitFor({ state: 'visible', timeout: 5_000 });
     await expect(editFace).toBeVisible();
   });
 
   test('edit face shows parameter editors', async ({ codeServerPage }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
 
-    // Navigate to log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
+    // Run a tool to create a log entry
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    const features = mapFrame.locator('.leaflet-interactive');
+    await features.first().waitFor({ state: 'visible', timeout: 15_000 });
+    await features.first().click({ force: true });
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
+
+    const logFrame = await codeServerPage.getLogPanelFrame();
 
     // Click the first edit icon
-    const editIcon = frame.locator('[data-testid^="edit-icon-"]').first();
-    await editIcon.waitFor({ state: 'visible', timeout: 10_000 });
+    const editIcon = logFrame.locator('[data-testid^="edit-icon-"]').first();
+    await editIcon.waitFor({ state: 'visible', timeout: 15_000 });
     await editIcon.click();
 
-    const editParams = frame.locator('[data-testid="edit-face-params"]');
+    const editParams = logFrame.locator('[data-testid="edit-face-params"]');
     await editParams.waitFor({ state: 'visible', timeout: 5_000 });
     await expect(editParams).toBeVisible();
   });
@@ -54,21 +60,23 @@ test.describe('Log Edit Face', () => {
   test('sliders in edit face have correct initial values', async ({
     codeServerPage,
   }) => {
-    test.fixme();
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
-    const frame = await codeServerPage.getWebviewFrame();
 
-    // Navigate to log tab
-    const logTab = frame.locator('.lm_tab:has-text("Log")');
-    await logTab.waitFor({ state: 'visible', timeout: 15_000 });
-    await logTab.click();
+    // Run a tool to create a log entry
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    const features = mapFrame.locator('.leaflet-interactive');
+    await features.first().waitFor({ state: 'visible', timeout: 15_000 });
+    await features.first().click({ force: true });
+    await codeServerPage.executeCommand('Debrief: Range Bearing');
+
+    const logFrame = await codeServerPage.getLogPanelFrame();
 
     // Click the first edit icon
-    const editIcon = frame.locator('[data-testid^="edit-icon-"]').first();
-    await editIcon.waitFor({ state: 'visible', timeout: 10_000 });
+    const editIcon = logFrame.locator('[data-testid^="edit-icon-"]').first();
+    await editIcon.waitFor({ state: 'visible', timeout: 15_000 });
     await editIcon.click();
 
-    const params = frame.locator('[data-testid="edit-face-params"]');
+    const params = logFrame.locator('[data-testid="edit-face-params"]');
     await params.waitFor({ state: 'visible', timeout: 5_000 });
 
     // Verify sliders exist within the parameter editors
