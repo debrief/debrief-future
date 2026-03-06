@@ -1,46 +1,46 @@
 ---
 layout: future-post
-title: "Planning: End-to-End Workflow Tests with Code-Server and Playwright"
-date: 2026-02-06
+title: "Planning: Dual-Platform E2E Workflow Tests"
+date: 2026-03-06
 track: [momentum]
 author: Ian
 reading_time: 4
-tags: [tracer-bullet, testing, e2e, playwright, code-server]
-excerpt: "Planning browser-driven tests that exercise the full user workflow through VS Code -- file load to map display to analysis results"
+tags: [tracer-bullet, testing, e2e, playwright, vscode, web-shell]
+excerpt: "Dual-platform E2E testing that exercises the full io-stac-calc workflow through both browser and VS Code"
 ---
 
 ## What We're Building
 
-Debrief's three Python services each have solid unit tests. The VS Code extension has its own test suite. But nothing currently verifies the workflow that actually matters to an analyst: open a REP file, see tracks on the map, select features, run an analysis tool, check the results in the catalog. That complete journey passes through io (parsing), stac (storage), calc (analysis), and the extension's TypeScript orchestration layer that wires them together. A subtle regression at any boundary could break the entire experience, and no existing test would notice.
+Debrief's three Python services each have unit tests. The VS Code extension has its own test suite. The web-shell has 81 Playwright tests across 13 spec files. But until now, nothing verified the complete analyst workflow through the real VS Code extension environment -- open a REP file, see tracks on the map, select features, run analysis, check results -- with actual Python services parsing actual data.
 
-We are adding true end-to-end tests that drive the real extension UI in a browser. code-server hosts VS Code as a web application, Playwright automates a Chromium browser pointed at it, and the tests interact with the actual panels, webviews, command palette, and notifications that a user would see. No mocks, no simulated environment -- the real extension running against real Python services, exercised through real DOM interactions.
+We're building a dual-platform E2E test strategy. The web-shell tests (already working, 81 tests, mock data) give fast CI feedback on orchestration regressions. The VS Code E2E tests (expanding from 8 spec files to 13+) drive openvscode-server with a sideloaded VSIX, hitting real debrief-io, debrief-stac, and debrief-calc services parsing real REP files. Same workflows exercised on both surfaces, but the VS Code suite additionally validates extension activation, VSIX packaging, and webview lifecycle -- things the web-shell simply cannot reach.
 
 ## How It Fits
 
-The tracer bullet roadmap calls for proving that the components integrate correctly before investing in breadth. These e2e tests are the verification layer for that integration. They sit above the unit and service-level tests, exercising the exact path a DSTL scientist would follow in daily work.
+The tracer bullet roadmap requires proving that components integrate correctly before investing in breadth. These E2E tests are the verification layer for that integration. They sit above unit and service-level tests, exercising the exact path a scientist follows in daily work.
 
-This also extends infrastructure the project already has. Playwright is already in the project at version 1.57 with seven test files across four configurations. The web shell tests (`plot-load.spec.ts`, `tool-execution.spec.ts`, `catalog-browse.spec.ts`) already exercise similar workflows against a Vite dev server. What changes here is the target: instead of a lightweight shell, we test against the full VS Code environment where the extension actually runs. Same patterns, higher fidelity.
+The web-shell already proved the orchestration logic works. Now we extend that confidence into the real deployment environment. Both suites use the same Playwright infrastructure, the same assertion patterns, and target the same 13 workflow categories. One runs in seconds with mocks; the other takes longer but catches the problems that only surface when real services parse real files inside real VS Code.
 
 ## Key Decisions
 
-- **code-server as the VS Code host.** MIT-licensed, Docker-ready, and its own test suite uses Playwright -- so we have a reference implementation for the nested iframe patterns we need. Authentication disabled for testing (`--auth none`). Current release tracks VS Code 1.108.
+- **openvscode-server preferred over code-server.** Our global-setup.ts prefers openvscode-server because it avoids the proprietary `vsda` module that code-server requires. Falls back to code-server if openvscode-server is unavailable. This was a pragmatic decision -- fewer licensing questions, cleaner CI.
 
-- **Webview access via nested frameLocator().** VS Code renders extension webviews inside two layers of iframe: an outer `iframe.webview.ready` container and an inner `#active-frame`. Playwright's `frameLocator` handles this at the CDP level. The key insight: most of our test assertions target Debrief-controlled components (Leaflet map, catalog tree, tool result panel) whose DOM we own, not VS Code's internal chrome. That reduces brittleness significantly.
+- **Real Python services in VS Code E2E, not mocks.** The VS Code E2E environment starts actual debrief-io, debrief-stac, and debrief-calc services. Test assertions accommodate real data characteristics -- variable track counts, real coordinate values -- rather than matching against mock fixtures. This is slower but catches the integration bugs that matter most.
 
-- **Page object model for maintainability.** `CodeServerPage` encapsulates VS Code chrome interactions (open file, trigger command palette, read notifications). `DebriefWebview` encapsulates project-owned components (wait for map ready, count tracks, check catalog entries). Tests read like user stories.
+- **`test.fixme()` over `.skip()` for missing features.** When a VS Code E2E test reveals something not yet implemented, we annotate it with `test.fixme()` and cross-reference a backlog item. The test stays visible in reports as a known gap rather than disappearing into a skip count. This keeps the test suite honest about what works and what doesn't.
 
-- **Docker for CI, local code-server for dev.** The Dockerfile layers code-server, Python services, and the packaged .vsix extension into a reproducible image. Developers install code-server locally and run the same Playwright test scripts. Same tests, both environments, single `npx playwright test` command.
+- **Dedicated CI job running in parallel.** E2E tests run in `e2e.yml`, separate from the unit test workflow. A developer pushing a one-line Python fix shouldn't wait for Docker images to build and openvscode-server to start. Unit test feedback stays fast; E2E feedback arrives alongside it, not blocking it.
 
-- **Three test files aligned to user stories.** Load-and-display (P1) covers the fundamental workflow every user hits first. Analysis-tool (P2) covers the core analytical round-trip through calc and back to the catalog. Error-feedback (P3) verifies that failures at any service boundary surface as clear user-visible messages rather than silent corruption.
+- **13 spec categories on both platforms.** The VS Code E2E suite expands to match every web-shell category: catalog browse, plot load, tool execution, selection sync, time control, drawing, log panel, styling tools, undo/redo, provenance, and more. Where a category requires webview-specific adaptations (iframe traversal, page objects), the test patterns adjust but the workflow assertions remain equivalent.
 
-- **Test workspace with symlinked fixtures.** Sample REP files point back to existing io test fixtures rather than duplicating data. STAC catalogs are created fresh for test isolation.
+- **Docker for CI, local install for development.** The Docker image layers openvscode-server, Python services, and the packaged VSIX into a reproducible environment. Developers can also install openvscode-server locally and run the same Playwright scripts. One test suite, two environments.
 
 ## What We'd Love Feedback On
 
-- **Iframe stability in CI.** Playwright issue #36943 documents intermittent failures with nested iframe access under load. Our mitigation is generous timeouts, waiting for `.ready` class before drilling into iframes, and retry logic. If you have experience testing VS Code webviews with Playwright -- particularly in Docker-based CI -- we would value hearing what worked and what did not.
+- **Which workflows catch regressions in practice?** We've prioritised file loading, analysis execution, selection sync, and temporal control. If you regularly hit bugs in sequences we haven't covered -- say, re-running a tool after changing the time window, or switching between plots mid-analysis -- that would influence our spec file priorities.
 
-- **Which workflows matter most.** We have prioritised file loading, single-track analysis, multi-track analysis, and error feedback. For maritime analysts: are there interaction sequences you find yourself repeating that we should add? Selecting tracks across multiple plots, perhaps, or re-running a tool with different parameters?
+- **Real services versus mock fidelity.** The VS Code E2E suite intentionally uses real Python services for maximum fidelity, but this makes tests slower and more sensitive to service-level changes. If you've navigated this trade-off in similar projects, we'd appreciate hearing how you balanced speed against confidence.
 
-- **code-server versus OpenVSCode Server.** We chose code-server for its documented Playwright patterns and auth handling. OpenVSCode Server (from Gitpod) tracks upstream VS Code more closely but has less Playwright reference material. If you have operational experience with either for automated testing, that context would inform whether we have picked the right horse.
+- **`test.fixme()` as a backlog discovery mechanism.** We're treating the E2E expansion partly as a feature-completeness audit -- tests that can't pass yet become documented gaps. If you've used a similar pattern, we're curious whether it stayed useful as the backlog grew or became noise.
 
 > [Join the discussion](https://github.com/debrief/debrief-future/discussions)
