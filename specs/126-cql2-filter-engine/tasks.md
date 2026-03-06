@@ -143,12 +143,12 @@
 
 ### Media Content
 
-- [ ] T024 Create shipped blog post in `specs/126-cql2-filter-engine/media/shipped-post.md`
-- [ ] T025 [P] Create LinkedIn shipped summary in `specs/126-cql2-filter-engine/media/linkedin-shipped.md`
+- [x] T024 Create shipped blog post in `specs/126-cql2-filter-engine/media/shipped-post.md`
+- [x] T025 [P] Create LinkedIn shipped summary in `specs/126-cql2-filter-engine/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T026 Create PR and publish blog: run /speckit.pr
+- [x] T026 Create PR and publish blog: run /speckit.pr
 
 **Task T026 must run last. It depends on all evidence and media tasks being complete.**
 
