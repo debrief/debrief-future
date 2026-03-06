@@ -1,7 +1,8 @@
 # Specification Quality Checklist: End-to-End Workflow Tests
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-02-06 (revised)
+**Created**: 2026-02-06
+**Revised**: 2026-03-06
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -31,6 +32,7 @@
 
 ## Notes
 
-- UI Feature Validation section omitted — this spec is about test infrastructure, not a user-facing UI feature. The tests *interact* with a UI but don't create one.
-- Spec intentionally names "code-server" only as an example in assumptions ("such as code-server"), not as a prescribed solution. The requirement is technology-agnostic: "browser-accessible VS Code environment."
-- This is a significant revision from the original spec, which described Python-only contract tests. The revised spec reflects discussion that concluded: (a) Python services have no orchestration layer, (b) the VS Code extension is the real production glue, (c) VNC-based solutions don't allow DOM-level interaction, (d) browser-hosted VS Code (like code-server) enables Playwright to drive real user workflows.
+- UI Feature Validation section omitted — this spec is about test infrastructure, not a user-facing UI feature
+- Spec revised 2026-03-06 to reflect that the web-shell Playwright tests (81 tests, 13 files, zero skipped) supersede the original code-server Docker approach (tests/e2e/, all skipped)
+- The three user stories now map directly to implemented test files: plot-load.spec.ts + catalog-browse.spec.ts (US1), tool-execution.spec.ts (US2), selection-sync.spec.ts + time-controller.spec.ts + drawing.spec.ts (US3)
+- Success criteria are met: tests run in CI via run-playwright.mjs, complete within timeout, and catch regressions

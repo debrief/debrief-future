@@ -1,95 +1,122 @@
-# Research: End-to-End Workflow Tests
+# Research: End-to-End Workflow Tests (Revised)
+
+**Revised**: 2026-03-06 — Updated for dual-platform strategy (web-shell + VS Code E2E with real Python services)
 
 ## Decision 1: VS Code Hosting Solution
 
-**Decision**: Use code-server (by Coder) as the browser-hosted VS Code instance.
+**Decision**: Use openvscode-server (preferred) with code-server as fallback.
 
-**Rationale**: code-server is the strongest choice for several reasons: (1) MIT-licensed, no vendor lock-in, (2) its own test suite uses Playwright — a proven reference implementation we can study, (3) official Docker image with extension installation support, (4) `--auth none` for frictionless testing, (5) v4.108.2 tracks VS Code 1.108.2 (Jan 2026). The nested webview iframe access pattern (`frameLocator("iframe.webview.ready").frameLocator("#active-frame")`) is documented and tested in their own codebase.
+**Rationale**: `global-setup.ts` already implements this resolution order: (1) `CODE_SERVER_URL` env var for external servers, (2) already-running server on default port, (3) openvscode-server binary, (4) code-server binary. openvscode-server is preferred because it does not require the proprietary `vsda` WASM module for WebSocket authentication, making it simpler in sandboxed environments. The Docker CI environment continues to use `codercom/code-server:latest` as the base image because it provides a well-tested Docker distribution.
 
 **Alternatives considered**:
-- OpenVSCode Server (Gitpod) — MIT-licensed, closer to upstream VS Code, used by CodiumAI for extension testing. Viable but less documented Playwright patterns and no built-in auth handling.
-- @vscode/test-web (Microsoft) — designed for running extension test modules *inside* the VS Code host, not for Playwright-driven UI interaction testing. Wrong tool for this job.
-- VS Code Server (Microsoft) — proprietary license prohibits hosting as a service; not viable for automated testing.
+- code-server only — still supported as fallback but not preferred for local runs
+- @vscode/test-web (Microsoft) — designed for running extension test modules *inside* the VS Code host, not for Playwright-driven UI interaction testing
+- VS Code Server (Microsoft) — proprietary license; not viable
 
 ## Decision 2: Browser Automation Tool
 
 **Decision**: Use Playwright (already in the project at @playwright/test ^1.57.0).
 
-**Rationale**: Playwright is already used extensively in this project (7 test files, 4 configs, CI integration). The team has solved the hard problems — @sparticuz/chromium for Claude Code sessions, custom launch args for sandboxed environments, and screenshot capture patterns. Adding e2e tests against code-server is an incremental extension, not a new capability.
+**Rationale**: Playwright is already used extensively — 13 web-shell test files, 8 VS Code E2E spec files, dedicated CI workflow (`.github/workflows/e2e.yml`). The team has solved sandboxed Chromium extraction (`@sparticuz/chromium`, `ensure-chromium.sh`), custom launch args, and screenshot capture patterns.
 
 **Alternatives considered**:
-- Cypress — less capable with iframe interaction, which is critical for VS Code webview testing
-- Selenium — more overhead, less developer-friendly than Playwright for modern web apps
+- Cypress — less capable with iframe interaction critical for VS Code webview testing
+- Selenium — more overhead, less developer-friendly
 
-## Decision 3: Webview Interaction Strategy
+## Decision 3: Dual-Platform Test Strategy
 
-**Decision**: Use Playwright's `frameLocator()` to drill into VS Code's nested webview iframes, targeting Debrief-controlled DOM elements inside the innermost frame.
+**Decision**: Maintain two complementary test suites — web-shell (13 spec files, 81+ tests) and VS Code E2E (expanding from 8 to 13+ spec files) — covering the same workflow categories.
 
-**Rationale**: VS Code webviews use a two-level iframe structure: an outer `iframe.webview.ready` container and an inner `#active-frame` content iframe. Playwright's `frameLocator` handles cross-origin boundaries at the CDP level. Most test assertions target Debrief-controlled components (map panel with Leaflet, catalog tree view, tool result panels) whose DOM structure is stable and owned by the project.
+**Rationale**: Web-shell tests catch orchestration regressions quickly and cheaply (no VS Code startup). VS Code E2E tests catch extension-specific issues (activation, command palette, webview lifecycle, VSIX packaging). Testing both surfaces provides higher confidence. The web-shell uses mock STAC data for speed; VS Code E2E uses real Python services for fidelity.
 
-**Known risks**:
-- Playwright issue #36943 documents CI instability with nested iframe access. Mitigation: generous timeouts, wait for `.ready` class before drilling in, retry flaky frame access.
-- Service workers in VS Code web add startup latency. Mitigation: globalSetup waits for full VS Code + extension readiness before tests begin.
+**Key differences**:
 
-**Alternatives considered**:
-- WebSocket-based proxy (CodiumAI approach) — messages from webview are proxied to test. More reliable but significantly more infrastructure to build. Reserve as fallback if iframe approach proves too flaky.
-
-## Decision 4: Test Environment Architecture
-
-**Decision**: Docker for CI reproducibility, local code-server for developer workflow. Same Playwright test scripts in both modes.
-
-**Rationale**: A Dockerfile pre-installs code-server, Python services (via uv), and the Debrief extension (.vsix). This guarantees reproducibility in CI. For local development, developers install code-server directly and run the same tests. The Playwright config detects the environment and adjusts the base URL accordingly.
-
-**Docker image layers**:
-1. `codercom/code-server:latest` — base
-2. Python 3.11 + uv — service runtime
-3. `uv pip install` workspace services — io, stac, calc
-4. `code-server --install-extension debrief.vsix` — extension
-5. Copy test workspace with sample data
+| Aspect | Web-Shell | VS Code E2E |
+|--------|-----------|-------------|
+| Server | Vite dev server | openvscode-server / code-server |
+| Data | Mock STAC fixtures | Real REP files → real Python services |
+| Speed | Fast (no extension host) | Slower (extension activation + services) |
+| Scope | Orchestration logic | Extension-specific + orchestration |
+| CI | Part of main `ci.yml` | Separate `e2e.yml` workflow |
 
 **Alternatives considered**:
-- Docker-only — rejected because developers need fast feedback loops; waiting for Docker builds slows iteration
-- Local-only — rejected because CI needs reproducibility; "works on my machine" failures are unacceptable
+- Web-shell only — misses extension-specific regressions
+- VS Code E2E only — too slow for rapid feedback; web-shell catches most regressions faster
+- Mock services in VS Code E2E — lower fidelity; spec requires real services for true end-to-end
+
+## Decision 4: Real Python Services in VS Code E2E
+
+**Decision**: The VS Code E2E environment uses real Python services (debrief-io, debrief-stac, debrief-calc) parsing real sample REP files for true end-to-end fidelity.
+
+**Rationale**: The spec explicitly requires this (FR-003). The Docker image already installs Python services via `uv pip install` in a virtual environment. Sample REP files exist at `services/io/tests/fixtures/valid/` (boat1.rep, boat2.rep, shapes.rep, narrative.rep) and are copied into the test workspace. The test workspace includes a pre-built STAC `local-store` with `catalog.json` and sample plots.
+
+**Implications for test assertions**:
+- Real service outputs may have different track counts, coordinate values, and timing than mock fixtures
+- VS Code E2E assertions must be structurally-oriented (e.g., "at least one track exists") rather than value-exact (e.g., "exactly 3 tracks")
+- Provenance chains from real services contain actual UUIDs and timestamps
+
+**Alternatives considered**:
+- Mock Python services — lower fidelity, misses real parsing edge cases, but faster
+- Pre-computed fixtures only — doesn't test the actual service code path
 
 ## Decision 5: Test File Organization
 
-**Decision**: Three test files aligned with spec user stories, plus a page object model and shared fixtures.
+**Decision**: Expand VS Code E2E from 8 to 13+ spec files, matching web-shell's 13 spec file categories. Use `test.fixme()` for tests that reveal missing features.
 
-**Rationale**: Follows the pattern established in `apps/web-shell/playwright/tests/` which has separate spec files per workflow (plot-load.spec.ts, tool-execution.spec.ts, catalog-browse.spec.ts). Page objects encapsulate VS Code chrome interactions (CodeServerPage) and Debrief webview interactions (DebriefWebview), making tests readable and maintainable.
+**Rationale**: The spec requires VS Code E2E to cover all 13 web-shell spec categories (SC-006). Currently the VS Code E2E suite has 8 spec files. Missing categories (from web-shell) include: `capture-log-evidence`, `event-log-propagation`, `log-edit-face`, `log-panel`, `styling-tools`, `undo-redo-split`. New spec files will be created for these.
+
+**`test.fixme()` strategy** (FR-011):
+- When a VS Code E2E test reveals a missing or incomplete extension feature, annotate with `test.fixme("Feature X not implemented — see backlog item #NNN")`
+- Create a corresponding backlog item with cross-reference to the test file and line
+- This keeps the test suite green while documenting known gaps
+- `test.fixme()` differs from `test.skip()` — fixme tests appear in reports as "to be implemented"
 
 **Alternatives considered**:
-- Single test file — rejected because isolation matters; a failure in error testing shouldn't block load/display verification
-- One file per acceptance scenario — rejected because too granular; shared setup within a story group avoids repetition
+- Only restore the original 3 spec files — doesn't meet SC-006 coverage requirement
+- Skip tests for missing features — `.skip()` hides gaps; `.fixme()` makes them visible
 
-## Decision 6: Extension Installation in code-server
+## Decision 6: Webview Interaction Strategy
 
-**Decision**: Pre-build the extension as a .vsix, install via `code-server --install-extension` in the Dockerfile.
+**Decision**: Use Playwright's `frameLocator()` to drill into VS Code's nested webview iframes.
 
-**Rationale**: The extension must be fully packaged before testing. The .vsix includes all TypeScript bundles, Python service wrappers, and webview assets. Installing during Docker build ensures the extension is ready when tests start, with no runtime dependency on npm/pnpm.
+**Rationale**: VS Code webviews use a two-level iframe structure: outer `iframe.webview.ready` and inner `#active-frame`. Playwright's `frameLocator` handles cross-origin boundaries at the CDP level. The existing `models/code-server-page.ts` and `helpers/webview-injector.ts` already implement this pattern.
 
-**Key consideration**: code-server uses Open VSX, not the Microsoft Marketplace. Since the Debrief extension is not published to either marketplace, .vsix installation is the only viable path — and it works identically in code-server and desktop VS Code.
+**Known risks**:
+- CI instability with nested iframe access (Playwright issue #36943). Mitigation: generous timeouts, `.ready` class wait, retry on flaky frame access
+- Service workers in VS Code web add startup latency. Mitigation: globalSetup waits for full readiness
 
-## Decision 7: Existing Web Shell Tests as Reference
+**Alternatives considered**:
+- WebSocket-based proxy — more reliable but significantly more infrastructure
 
-**Decision**: Use the `apps/web-shell/playwright/tests/` patterns as the primary reference for test structure, selectors, and assertions.
+## Decision 7: Docker Environment Architecture
 
-**Rationale**: The web shell tests already exercise very similar workflows — `plot-load.spec.ts` tests file loading, `tool-execution.spec.ts` tests calc integration, `catalog-browse.spec.ts` tests STAC navigation. These use selectors like `.catalog-overview`, `.leaflet-container`, `.web-shell--analysis` that the e2e tests can adapt for the VS Code webview context.
+**Decision**: Docker container (code-server base) for CI with real Python services installed. Local openvscode-server for developer workflow.
 
-**Key difference**: Web shell tests run against a Vite dev server. E2e tests run against code-server. The webview components are the same React/Leaflet code, but accessed through VS Code's iframe hierarchy instead of a direct URL.
+**Rationale**: The `docker/code-server/Dockerfile` already implements this — installs Python 3.11, uv, Python services in a virtualenv, copies test workspace, and installs the VSIX. CI builds and starts this container, runs Playwright tests against it, and tears down.
+
+**Docker image layers** (current):
+1. `codercom/code-server:latest` — base
+2. Python 3.11 + uv — service runtime
+3. `uv pip install` workspace services (io, stac, calc, schemas)
+4. Copy test workspace with REP files + STAC local-store
+5. Install Debrief VSIX as `coder` user
+6. Pre-seed VS Code settings (trust disabled, welcome tab disabled)
 
 ## Decision 8: CI Integration
 
-**Decision**: Add a new CI job that builds the Docker image, starts code-server, and runs Playwright tests.
+**Decision**: Dedicated `e2e.yml` workflow running in parallel with the main CI job.
 
-**Rationale**: Matches the existing CI pattern (`.github/workflows/ci.yml` already installs Playwright browsers). The Docker-based approach ensures reproducibility. Health check loop (`until curl -s http://localhost:8080`) waits for code-server readiness before test execution.
+**Rationale**: Already implemented at `.github/workflows/e2e.yml`. Triggers on push to main and PRs touching `tests/e2e/`, `docker/code-server/`, `apps/vscode/`, `services/`, or `shared/schemas/`. Runs as a separate job with 20-minute timeout.
 
-**CI workflow outline**:
-1. Build Docker image (code-server + services + extension)
-2. Start container with `--auth none` and health check
-3. Run `npx playwright test --config tests/e2e/playwright.config.ts`
-4. Upload HTML report + screenshots as artifacts
-5. Teardown container
-
-**Alternatives considered**:
-- Run in existing test job — rejected because code-server startup adds significant time; separate job allows parallel execution
-- Use GitHub Actions services — viable but less control over extension installation timing
+**CI workflow steps** (current):
+1. Checkout, install Task/uv/Node.js/pnpm
+2. Install Playwright browsers
+3. Build workspace dependencies (session-state, components)
+4. Build and package VS Code extension (.vsix)
+5. Build Docker image
+6. Start code-server container
+7. Wait for readiness (health check loop)
+8. Verify container config (Debrief config, STAC store, extension)
+9. Run Playwright tests (`--grep-invert "Heroku"`)
+10. Upload artifacts (report, screenshots, traces)
+11. Teardown container

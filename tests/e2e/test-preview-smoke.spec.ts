@@ -20,8 +20,11 @@
  */
 import { test, expect } from '@playwright/test';
 
-const CODE_SERVER_URL =
-  process.env.CODE_SERVER_URL ?? 'http://localhost:8080';
+const baseUrl = process.env.CODE_SERVER_URL ?? 'http://localhost:8080';
+const workspaceFolder = process.env.E2E_WORKSPACE_FOLDER;
+const CODE_SERVER_URL = workspaceFolder
+  ? `${baseUrl}/?folder=${encodeURIComponent(workspaceFolder)}`
+  : baseUrl;
 
 // Longer timeouts for code-server cold-start in cloud
 test.setTimeout(90_000);

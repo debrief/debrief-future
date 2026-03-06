@@ -2,36 +2,25 @@
  * E2E Test: Load and Display Workflow (User Story 1 — P1)
  *
  * Verifies the complete file-loading pipeline:
- *   Open REP file → io parses → stac stores → map displays tracks
+ *   Open plot via STAC tree → map displays tracks
  *
  * This is the most fundamental user workflow — the first thing every user does.
- * It exercises the full path from file open through io parsing, stac catalog
- * storage, and map rendering via the VS Code extension's orchestration layer.
- *
- * STATUS: Commented out — requires Debrief VS Code extension installed in the
- * server. See docs/e2e-test-restoration-requirements.md for prerequisites.
+ * It exercises the path from STAC catalog through map rendering via the
+ * VS Code extension's orchestration layer.
  *
  * @see specs/005-e2e-workflow-tests/spec.md — User Story 1
  */
-import { test } from './fixtures/base';
+import { test, expect } from './fixtures/base';
 
-// All tests in this file require the Debrief VS Code extension to be
-// installed and activated in the code-server/openvscode-server instance.
-// The extension provides:
-//   - REP file handling (open → parse → store)
-//   - Leaflet map webview with track rendering
-//   - STAC catalog panel
-//   - Track selection and highlighting
-//
-// These tests are commented out until the extension is available in the
-// E2E test environment. The infrastructure (Chromium, server, Playwright)
-// is verified working — see evidence/screenshots/.
+const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 
-test.describe.skip('US1: Load and Display Workflow', () => {
-  test('T014: open REP file shows track lines on map', async ({
+test.describe('US1: Load and Display Workflow', () => {
+  test.setTimeout(120_000);
+
+  test('T014: open plot via STAC tree shows track lines on map', async ({
     codeServerPage,
   }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
     await frame.locator('.leaflet-container').waitFor({
       state: 'visible',
@@ -40,41 +29,50 @@ test.describe.skip('US1: Load and Display Workflow', () => {
     const features = frame.locator('.leaflet-interactive');
     await features.first().waitFor({ state: 'visible', timeout: 10_000 });
     const trackCount = await features.count();
-    // expect(trackCount).toBeGreaterThan(0);
+    expect(trackCount).toBeGreaterThan(0);
   });
 
-  test('T015: STAC catalog panel shows new plot with features', async ({
+  test('T015: STAC catalog overview shows plot timeline after loading', async ({
     codeServerPage,
   }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
-    const frame = await codeServerPage.getWebviewFrame();
-    await frame.locator('.catalog-overview').waitFor({
-      state: 'visible',
-      timeout: 15_000,
-    });
-    const plotItems = frame.locator('.catalog-plot-item');
-    await plotItems.first().waitFor({ state: 'visible', timeout: 10_000 });
-    // expect(await plotItems.count()).toBeGreaterThan(0);
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
+    await codeServerPage.executeCommand('Debrief: Open Catalog Overview');
+    await codeServerPage.page.waitForTimeout(3_000);
+
+    // Find catalog overview in any webview frame
+    const allFrames = codeServerPage.page.frames();
+    let found = false;
+    for (const frame of allFrames) {
+      for (const child of frame.childFrames()) {
+        const has = await child.locator('.catalog-overview').isVisible().catch(() => false);
+        if (has) { found = true; break; }
+      }
+      if (found) break;
+    }
+    expect(found).toBe(true);
   });
 
-  test('T016: select track on map highlights it and shows properties', async ({
+  test('T016: select track on map highlights it in feature list', async ({
     codeServerPage,
   }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
-    const frame = await codeServerPage.getWebviewFrame();
-    const features = frame.locator('.leaflet-interactive');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
+    const mapFrame = await codeServerPage.getWebviewFrame();
+    const features = mapFrame.locator('.leaflet-interactive');
     await features.first().waitFor({ state: 'visible', timeout: 10_000 });
     await features.first().click({ force: true });
-    const selectedTrack = frame.locator('.track--selected, .debrief-feature-row--selected');
-    await selectedTrack.first().waitFor({ state: 'visible', timeout: 5_000 });
-    // expect(await selectedTrack.count()).toBeGreaterThan(0);
+
+    // Selection reflected in activity panel feature list
+    const activityFrame = await codeServerPage.getActivityPanelFrame();
+    const selectedRow = activityFrame.locator('.debrief-feature-row--selected');
+    await selectedRow.first().waitFor({ state: 'visible', timeout: 10_000 });
+    expect(await selectedRow.count()).toBeGreaterThan(0);
   });
 
   test('T017: capture evidence screenshot of map with tracks', async ({
     codeServerPage,
     page,
   }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
     await frame.locator('.leaflet-container').waitFor({
       state: 'visible',
@@ -84,6 +82,9 @@ test.describe.skip('US1: Load and Display Workflow', () => {
       state: 'visible',
       timeout: 10_000,
     });
-    // await page.screenshot({ path: ..., fullPage: false });
+    await page.screenshot({
+      path: `${EVIDENCE_DIR}/vscode-map-tracks.png`,
+      fullPage: false,
+    });
   });
 });
