@@ -458,10 +458,11 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
           break;
 
         case 'layer:delete':
-          // Delegate to SessionManager (future implementation)
-          void vscode.window.showInformationMessage(
-            `Delete layers: ${message.payload.featureIds.join(', ')}`
-          );
+          if (this._activeSession) {
+            const deleteState: SessionStoreWithUndo = this._activeSession.getState();
+            deleteState.setSelection(message.payload.featureIds);
+            void vscode.commands.executeCommand('debrief.deleteSelection');
+          }
           break;
 
         case 'layer:select':
