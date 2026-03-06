@@ -1,0 +1,95 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-exercise-alpha-095",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          2.4316,
+          33.877
+        ],
+        [
+          3.7086,
+          33.877
+        ],
+        [
+          3.7086,
+          35.154
+        ],
+        [
+          2.4316,
+          35.154
+        ],
+        [
+          2.4316,
+          33.877
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    2.4316,
+    33.877,
+    3.7086,
+    35.154
+  ],
+  "properties": {
+    "title": "Exercise Exercise Alpha-095",
+    "description": "Exercise Alpha-095 \u2014 Mediterranean exercise. 1 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-05-15T15:00:00Z",
+    "end_datetime": "2021-06-05T19:42:57Z",
+    "debrief:vessel_classes": [
+      "surface/auxiliary/survey/echo"
+    ],
+    "debrief:tags": [
+      "AAW",
+      "EW",
+      "amphibious",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "intercept"
+    ],
+    "debrief:track_names": [
+      "HMS Portland"
+    ],
+    "debrief:nationalities": [
+      "SE",
+      "AU"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-exercise-alpha-095.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

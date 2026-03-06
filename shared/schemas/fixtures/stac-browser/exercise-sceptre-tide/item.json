@@ -1,0 +1,98 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-sceptre-tide",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          6.6825,
+          39.953
+        ],
+        [
+          8.3403,
+          39.953
+        ],
+        [
+          8.3403,
+          41.6107
+        ],
+        [
+          6.6825,
+          41.6107
+        ],
+        [
+          6.6825,
+          39.953
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    6.6825,
+    39.953,
+    8.3403,
+    41.6107
+  ],
+  "properties": {
+    "title": "Exercise Sceptre Tide",
+    "description": "Sceptre Tide \u2014 Mediterranean exercise. 4 track(s), 3 nation(s).",
+    "datetime": null,
+    "start_datetime": "2025-12-24T11:00:00Z",
+    "end_datetime": "2026-01-07T16:38:01Z",
+    "debrief:vessel_classes": [
+      "surface/warship/frigate/type26"
+    ],
+    "debrief:tags": [
+      "transit",
+      "boarding",
+      "missile-firing"
+    ],
+    "debrief:feature_tags": [
+      "prosecution",
+      "intercept"
+    ],
+    "debrief:track_names": [
+      "SPS Nykoping",
+      "HDMS Roald Amundsen",
+      "HNLMS Kent",
+      "SPS Roosevelt"
+    ],
+    "debrief:nationalities": [
+      "ES",
+      "DK",
+      "NL"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-sceptre-tide.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

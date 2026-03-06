@@ -632,13 +632,11 @@ class SystemRecordProperties(BaseModel):
     """
     Properties for the non-spatial system record feature.
 
-    A system record is a GeoJSON Feature with featureType "system"
+    A system record is a GeoJSON Feature with kind SYSTEM_RECORD
     and Point geometry with empty coordinates.
     """
 
-    feature_type: str = Field(
-        default="system", alias="featureType", description="Discriminator, always 'system'"
-    )
+    kind: str = Field(default="SYSTEM_RECORD", description="Feature type discriminator")
     snapshot_links: SnapshotLinks | None = Field(
         default=None,
         alias="snapshotLinks",
@@ -651,9 +649,9 @@ class SystemRecordProperties(BaseModel):
 
     model_config = {"populate_by_name": True}
 
-    @field_validator("feature_type")
+    @field_validator("kind")
     @classmethod
-    def validate_feature_type(cls, v: str) -> str:
-        if v != "system":
-            raise ValueError(f"feature_type must be 'system', got: {v}")
+    def validate_kind(cls, v: str) -> str:
+        if v != "SYSTEM_RECORD":
+            raise ValueError(f"kind must be 'SYSTEM_RECORD', got: {v}")
         return v

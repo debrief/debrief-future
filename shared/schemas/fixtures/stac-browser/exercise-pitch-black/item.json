@@ -1,0 +1,99 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-pitch-black",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          28.9415,
+          66.6193
+        ],
+        [
+          31.4636,
+          66.6193
+        ],
+        [
+          31.4636,
+          69.1414
+        ],
+        [
+          28.9415,
+          69.1414
+        ],
+        [
+          28.9415,
+          66.6193
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    28.9415,
+    66.6193,
+    31.4636,
+    69.1414
+  ],
+  "properties": {
+    "title": "Exercise Pitch Black",
+    "description": "Pitch Black \u2014 Arctic exercise. 3 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-02-16T06:00:00Z",
+    "end_datetime": "2021-02-17T10:44:24Z",
+    "debrief:vessel_classes": [
+      "surface/auxiliary/survey/echo",
+      "surface/auxiliary/supply/fort-victoria"
+    ],
+    "debrief:tags": [
+      "harbour-ops",
+      "mine-clearance",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "helicopter-ops",
+      "depth-charge",
+      "torpedo-run",
+      "track-merge"
+    ],
+    "debrief:track_names": [
+      "HMS Lancaster",
+      "INS Bretagne",
+      "HMS Harnosand"
+    ],
+    "debrief:nationalities": [
+      "SE",
+      "IN"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-pitch-black.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}
