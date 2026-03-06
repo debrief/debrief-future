@@ -11,7 +11,7 @@ import { test, expect } from './fixtures/base';
 test.describe('Styling Tools', () => {
   test('tools panel lists available tools', async ({ codeServerPage }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     const toolItems = frame.locator('.debrief-tools-panel__item');
@@ -23,7 +23,7 @@ test.describe('Styling Tools', () => {
     codeServerPage,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     const inactiveTools = frame.locator(
@@ -37,7 +37,7 @@ test.describe('Styling Tools', () => {
     codeServerPage,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Select a track on the map

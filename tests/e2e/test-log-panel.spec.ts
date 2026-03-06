@@ -13,7 +13,7 @@ test.describe('Log Panel', () => {
     codeServerPage,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Switch to the Log tab
@@ -32,7 +32,7 @@ test.describe('Log Panel', () => {
 
   test('running a tool creates a log entry', async ({ codeServerPage }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Switch to the Log tab
@@ -49,7 +49,7 @@ test.describe('Log Panel', () => {
     codeServerPage,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Switch to the Log tab

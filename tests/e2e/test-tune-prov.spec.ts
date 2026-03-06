@@ -17,12 +17,14 @@
 import { test, expect } from './fixtures/base';
 
 test.describe('US-Tune: PROV Tuning Workflow', () => {
+  test.setTimeout(120_000);
+
   test.fixme('T-TUNE-01: run move-shape on annotation, log entry appears with tunable parameters', async ({
     codeServerPage,
     debriefWebview,
   }) => {
-    // Load a file with annotation shapes
-    await codeServerPage.openFile('samples/boat1.rep');
+    // Load a plot via STAC tree
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await debriefWebview.waitForMapReady();
 
     // Select an annotation feature (rectangle, circle, etc.)
@@ -52,7 +54,7 @@ test.describe('US-Tune: PROV Tuning Workflow', () => {
     page,
   }) => {
     // Setup: load file, select annotation, run move-shape
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await debriefWebview.waitForMapReady();
     await debriefWebview.mapFeatures.first().click({ force: true });
     await codeServerPage.executeCommand('Debrief: Move Shape');
@@ -92,7 +94,7 @@ test.describe('US-Tune: PROV Tuning Workflow', () => {
     debriefWebview,
   }) => {
     // Setup: load file, select annotation, run move-shape
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await debriefWebview.waitForMapReady();
     await debriefWebview.mapFeatures.first().click({ force: true });
     await codeServerPage.executeCommand('Debrief: Move Shape');
@@ -124,7 +126,7 @@ test.describe('US-Tune: PROV Tuning Workflow', () => {
     debriefWebview,
   }) => {
     // Setup
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await debriefWebview.waitForMapReady();
     await debriefWebview.mapFeatures.first().click({ force: true });
     await codeServerPage.executeCommand('Debrief: Move Shape');
@@ -160,7 +162,7 @@ test.describe('US-Tune: PROV Tuning Workflow', () => {
     debriefWebview,
   }) => {
     // Setup
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await debriefWebview.waitForMapReady();
     await debriefWebview.mapFeatures.first().click({ force: true });
     await codeServerPage.executeCommand('Debrief: Move Shape');
@@ -188,7 +190,7 @@ test.describe('US-Tune: PROV Tuning Workflow', () => {
     page,
   }) => {
     // Setup and tune
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await debriefWebview.waitForMapReady();
     await debriefWebview.mapFeatures.first().click({ force: true });
     await codeServerPage.executeCommand('Debrief: Move Shape');

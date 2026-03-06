@@ -4,90 +4,76 @@
  * Adapted from web-shell test: apps/web-shell/playwright/tests/selection-sync.spec.ts
  * Tests exercise the same workflows through VS Code's webview iframe hierarchy.
  *
- * FIXME: 2026-03-06 — All tests marked fixme. Opening a .rep file via Quick
- * Open (Ctrl+P) opens it as plain text — it does NOT trigger the Debrief
- * extension's webview. Need debrief.openPlot or debrief.importRep.
+ * FIXME: All tests marked fixme — .debrief-feature-list / .debrief-feature-row
+ * CSS classes not yet implemented in MapView components.
+ *
+ * CREATED: 2026-03-06 — Dual-platform E2E expansion (SC-006)
  */
 import { test, expect } from './fixtures/base';
 
 test.describe('Selection Sync', () => {
-  // openFile opens .rep as text, not via the Debrief webview
+  test.setTimeout(120_000);
+
   test.fixme('clicking a track on the map selects it', async ({ codeServerPage }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
-
     const features = frame.locator('.leaflet-interactive');
-    await features.first().waitFor({ state: 'visible', timeout: 10_000 });
+    await features.first().waitFor({ state: 'visible', timeout: 15_000 });
     await features.first().click({ force: true });
-
-    const selected = frame.locator('.debrief-feature-row--selected');
-    await selected.first().waitFor({ state: 'visible', timeout: 5_000 });
-    expect(await selected.count()).toBeGreaterThan(0);
+    const selected = frame.locator('.track--selected');
+    await expect(selected.first()).toBeVisible({ timeout: 5_000 });
   });
 
   test.fixme('feature list shows loaded features', async ({ codeServerPage }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
-
-    const featureList = frame.locator('.debrief-feature-list');
-    await featureList.waitFor({ state: 'visible', timeout: 10_000 });
-
-    const rows = frame.locator('.debrief-feature-row');
-    await rows.first().waitFor({ state: 'visible', timeout: 5_000 });
-    expect(await rows.count()).toBeGreaterThan(0);
+    const featureRows = frame.locator('.debrief-feature-row');
+    await featureRows.first().waitFor({ state: 'visible', timeout: 15_000 });
+    expect(await featureRows.count()).toBeGreaterThan(0);
   });
 
   test.fixme('clicking feature in list selects it on the map', async ({
     codeServerPage,
   }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
-
-    const rows = frame.locator('.debrief-feature-row');
-    await rows.first().waitFor({ state: 'visible', timeout: 10_000 });
-    await rows.first().click();
-
-    const selectedRow = frame.locator('.debrief-feature-row--selected');
-    await selectedRow.first().waitFor({ state: 'visible', timeout: 5_000 });
-    expect(await selectedRow.count()).toBeGreaterThan(0);
+    const featureRows = frame.locator('.debrief-feature-row');
+    await featureRows.first().waitFor({ state: 'visible', timeout: 15_000 });
+    await featureRows.first().click();
+    const selected = frame.locator('.track--selected');
+    await expect(selected.first()).toBeVisible({ timeout: 5_000 });
   });
 
   test.fixme('selection persists after brief interaction', async ({
     codeServerPage,
   }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
-
     const features = frame.locator('.leaflet-interactive');
-    await features.first().waitFor({ state: 'visible', timeout: 10_000 });
+    await features.first().waitFor({ state: 'visible', timeout: 15_000 });
     await features.first().click({ force: true });
-
     const selected = frame.locator('.debrief-feature-row--selected');
-    await selected.first().waitFor({ state: 'visible', timeout: 5_000 });
-
-    // Wait briefly and verify selection still present
-    await frame.locator('.leaflet-container').waitFor({ state: 'visible' });
-    expect(await selected.count()).toBeGreaterThan(0);
+    await expect(selected.first()).toBeVisible({ timeout: 5_000 });
+    // Pan the map slightly
+    const map = frame.locator('.leaflet-container');
+    await map.click({ position: { x: 100, y: 100 } });
+    // Selection should persist
+    await expect(selected.first()).toBeVisible();
   });
 
   test.fixme('clicking map background clears selection', async ({
     codeServerPage,
   }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
-
     const features = frame.locator('.leaflet-interactive');
-    await features.first().waitFor({ state: 'visible', timeout: 10_000 });
+    await features.first().waitFor({ state: 'visible', timeout: 15_000 });
     await features.first().click({ force: true });
-
     const selected = frame.locator('.debrief-feature-row--selected');
-    await selected.first().waitFor({ state: 'visible', timeout: 5_000 });
-
-    // Click on the map background to clear selection
-    const mapContainer = frame.locator('.leaflet-container');
-    await mapContainer.click({ position: { x: 10, y: 10 }, force: true });
-
-    // Expect selection to be cleared
+    await expect(selected.first()).toBeVisible({ timeout: 5_000 });
+    // Click empty area on map
+    const map = frame.locator('.leaflet-container');
+    await map.click({ position: { x: 10, y: 10 } });
     await expect(selected).toHaveCount(0, { timeout: 5_000 });
   });
 });

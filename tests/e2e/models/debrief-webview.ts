@@ -5,15 +5,38 @@
  * All selectors target Debrief-controlled components (map, catalog, tool UI)
  * whose DOM structure is owned and stabilised by this project.
  *
+ * The frame is resolved lazily — call waitForMapReady() or getFrame() after
+ * opening a plot via CodeServerPage.openPlotViaStacTree().
+ *
  * @see contracts/webview-selectors.md for the full selector contract
  */
 import type { FrameLocator, Locator } from '@playwright/test';
+import type { CodeServerPage } from './code-server-page';
 
 export class DebriefWebview {
-  readonly frame: FrameLocator;
+  private readonly codeServerPage: CodeServerPage;
+  private _frame: FrameLocator | null = null;
 
-  constructor(frame: FrameLocator) {
-    this.frame = frame;
+  constructor(codeServerPage: CodeServerPage) {
+    this.codeServerPage = codeServerPage;
+  }
+
+  /** Resolve the webview frame (lazy — waits for iframe to appear). */
+  get frame(): FrameLocator {
+    if (!this._frame) {
+      throw new Error(
+        'Webview frame not resolved yet. Call waitForMapReady() or getFrame() first.'
+      );
+    }
+    return this._frame;
+  }
+
+  /** Resolve the webview frame explicitly. */
+  async getFrame(): Promise<FrameLocator> {
+    if (!this._frame) {
+      this._frame = await this.codeServerPage.getWebviewFrame();
+    }
+    return this._frame;
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -42,8 +65,10 @@ export class DebriefWebview {
 
   /**
    * Wait for the Leaflet map to initialise inside the webview.
+   * Also resolves the webview frame if not already done.
    */
   async waitForMapReady(): Promise<void> {
+    await this.getFrame();
     await this.mapContainer.waitFor({ state: 'visible', timeout: 15_000 });
   }
 

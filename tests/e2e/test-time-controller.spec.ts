@@ -13,7 +13,7 @@ test.describe('Time Controller', () => {
     codeServerPage,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     const timeController = frame.locator('.debrief-time-controller');
@@ -25,7 +25,7 @@ test.describe('Time Controller', () => {
     codeServerPage,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     const playPause = frame.locator('[data-testid="play-pause"]');
@@ -37,7 +37,7 @@ test.describe('Time Controller', () => {
     codeServerPage,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     const playPause = frame.locator('[data-testid="play-pause"]');
@@ -52,7 +52,7 @@ test.describe('Time Controller', () => {
     codeServerPage,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     const scrubber = frame.locator('.debrief-time-scrubber');

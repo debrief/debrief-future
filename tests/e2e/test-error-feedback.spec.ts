@@ -5,9 +5,8 @@
  * user-visible feedback in the VS Code interface. Error handling across
  * service boundaries is where silent failures are most likely.
  *
- * FIXME: 2026-03-06 — T022/T023 marked fixme. Opening a .rep file via Quick
- * Open (Ctrl+P) opens it as plain text — it does NOT trigger the Debrief
- * extension's import/parse pipeline. T024 (screenshot-only) remains active.
+ * FIXME: T022/T023 marked fixme — error handling pipeline not yet
+ * wired through VS Code extension commands.
  *
  * @see specs/005-e2e-workflow-tests/spec.md — User Story 3
  */
@@ -16,7 +15,8 @@ import { test, expect } from './fixtures/base';
 const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 
 test.describe('US3: Error Feedback Workflow', () => {
-  // openFile opens .rep as text, not via the Debrief extension
+  test.setTimeout(120_000);
+
   test.fixme('T022: open malformed REP file shows error notification, no corrupt data', async ({
     codeServerPage,
   }) => {
@@ -38,7 +38,7 @@ test.describe('US3: Error Feedback Workflow', () => {
   test.fixme('T023: run incompatible tool shows clear mismatch message', async ({
     codeServerPage,
   }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
     await frame.locator('.leaflet-interactive').first().waitFor({
       state: 'visible',

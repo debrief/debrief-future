@@ -11,7 +11,7 @@ import { test, expect } from './fixtures/base';
 test.describe('Undo / Redo', () => {
   test('undo reverts the last selection', async ({ codeServerPage, page }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Select a track
@@ -35,7 +35,7 @@ test.describe('Undo / Redo', () => {
     page,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Select a track

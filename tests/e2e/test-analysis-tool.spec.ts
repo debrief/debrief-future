@@ -8,9 +8,8 @@
  * extension UI — the path that has no Python-level orchestration and can
  * only be tested through the extension.
  *
- * FIXME: 2026-03-06 — Tests marked fixme. Opening a .rep file via Quick Open
- * (Ctrl+P) opens it as plain text — it does NOT trigger the Debrief extension's
- * webview. These tests need to use debrief.openPlot or debrief.importRep.
+ * FIXME: Tests marked fixme — .tool-result-item and analysis command
+ * not yet implemented in the extension UI.
  *
  * @see specs/005-e2e-workflow-tests/spec.md — User Story 2
  */
@@ -19,10 +18,12 @@ import { test, expect } from './fixtures/base';
 const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 
 test.describe('US2: Analysis Tool Execution Workflow', () => {
+  test.setTimeout(120_000);
+
   test.fixme('T018: select track, run single-track tool, result appears in catalog', async ({
     codeServerPage,
   }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
     const features = frame.locator('.leaflet-interactive');
     await features.first().waitFor({ state: 'visible', timeout: 15_000 });
@@ -38,17 +39,13 @@ test.describe('US2: Analysis Tool Execution Workflow', () => {
   test.fixme('T019: load two files, select both tracks, run multi-track tool, verify provenance', async ({
     codeServerPage,
   }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
     await frame.locator('.leaflet-interactive').first().waitFor({
       state: 'visible',
       timeout: 15_000,
     });
-    await codeServerPage.openFile('samples/boat2.rep');
-    await frame.locator('.leaflet-interactive').nth(1).waitFor({
-      state: 'visible',
-      timeout: 10_000,
-    });
+    // Multi-track selection not yet possible via STAC tree
     await frame.locator('.leaflet-interactive').first().click({ force: true });
     await frame.locator('.leaflet-interactive').nth(1).click({
       force: true,
@@ -65,7 +62,7 @@ test.describe('US2: Analysis Tool Execution Workflow', () => {
   test.fixme('T020: verify plot feature count increases after tool execution', async ({
     codeServerPage,
   }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
     await frame.locator('.leaflet-interactive').first().waitFor({
       state: 'visible',
@@ -86,7 +83,7 @@ test.describe('US2: Analysis Tool Execution Workflow', () => {
     codeServerPage,
     page,
   }) => {
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
     await frame.locator('.leaflet-interactive').first().waitFor({
       state: 'visible',

@@ -16,7 +16,7 @@ test.describe('Capture Log Evidence', () => {
     page,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Switch to the Log tab
@@ -40,7 +40,7 @@ test.describe('Capture Log Evidence', () => {
     page,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Switch to the Log tab
@@ -63,7 +63,7 @@ test.describe('Capture Log Evidence', () => {
     page,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Switch to the Log tab
@@ -84,7 +84,7 @@ test.describe('Capture Log Evidence', () => {
 
   test('capture edit card screenshot', async ({ codeServerPage, page }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Switch to the Log tab
@@ -108,7 +108,7 @@ test.describe('Capture Log Evidence', () => {
 
   test('capture tuned entry screenshot', async ({ codeServerPage, page }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Switch to the Log tab

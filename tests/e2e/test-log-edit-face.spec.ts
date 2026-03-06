@@ -13,7 +13,7 @@ test.describe('Log Edit Face', () => {
     codeServerPage,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Navigate to log tab
@@ -33,7 +33,7 @@ test.describe('Log Edit Face', () => {
 
   test('edit face shows parameter editors', async ({ codeServerPage }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Navigate to log tab
@@ -55,7 +55,7 @@ test.describe('Log Edit Face', () => {
     codeServerPage,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Navigate to log tab

@@ -13,7 +13,7 @@ test.describe('Event Log Propagation', () => {
     codeServerPage,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Navigate to log tab
@@ -42,7 +42,7 @@ test.describe('Event Log Propagation', () => {
     codeServerPage,
   }) => {
     test.fixme();
-    await codeServerPage.openFile('samples/boat1.rep');
+    await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     const frame = await codeServerPage.getWebviewFrame();
 
     // Navigate to log tab
