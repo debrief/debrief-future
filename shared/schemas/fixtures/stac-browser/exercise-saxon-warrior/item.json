@@ -1,0 +1,95 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-saxon-warrior",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -29.0969,
+          53.9952
+        ],
+        [
+          -27.9992,
+          53.9952
+        ],
+        [
+          -27.9992,
+          55.0929
+        ],
+        [
+          -29.0969,
+          55.0929
+        ],
+        [
+          -29.0969,
+          53.9952
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -29.0969,
+    53.9952,
+    -27.9992,
+    55.0929
+  ],
+  "properties": {
+    "title": "Exercise Saxon Warrior",
+    "description": "Saxon Warrior \u2014 North Atlantic exercise. 2 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2022-03-01T10:00:00Z",
+    "end_datetime": "2022-03-08T14:18:55Z",
+    "debrief:vessel_classes": [
+      "surface/auxiliary/supply/fort-victoria",
+      "surface/auxiliary/survey/echo"
+    ],
+    "debrief:tags": [
+      "gunnery",
+      "harbour-ops"
+    ],
+    "debrief:feature_tags": [
+      "minefield",
+      "prosecution",
+      "intercept"
+    ],
+    "debrief:track_names": [
+      "HMS Fridtjof Nansen",
+      "HMS Tromp"
+    ],
+    "debrief:nationalities": [
+      "SE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-saxon-warrior.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

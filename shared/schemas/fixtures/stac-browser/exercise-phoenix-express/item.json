@@ -1,0 +1,98 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-phoenix-express",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.9975,
+          36.4473
+        ],
+        [
+          1.3084,
+          36.4473
+        ],
+        [
+          1.3084,
+          38.7532
+        ],
+        [
+          -0.9975,
+          38.7532
+        ],
+        [
+          -0.9975,
+          36.4473
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.9975,
+    36.4473,
+    1.3084,
+    38.7532
+  ],
+  "properties": {
+    "title": "Exercise Phoenix Express",
+    "description": "Phoenix Express \u2014 Mediterranean exercise. 1 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-08-04T08:00:00Z",
+    "end_datetime": "2021-08-04T11:14:52Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssbn/vanguard"
+    ],
+    "debrief:tags": [
+      "certification",
+      "transit",
+      "missile-firing",
+      "NGFS",
+      "force-protection"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "sonar-contact",
+      "passive-search",
+      "prosecution"
+    ],
+    "debrief:track_names": [
+      "HMS Hessen"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "DK"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-phoenix-express.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

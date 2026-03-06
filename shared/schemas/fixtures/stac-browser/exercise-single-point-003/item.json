@@ -1,0 +1,91 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-single-point-003",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          93.9191,
+          18.4918
+        ],
+        [
+          96.5448,
+          18.4918
+        ],
+        [
+          96.5448,
+          21.1175
+        ],
+        [
+          93.9191,
+          21.1175
+        ],
+        [
+          93.9191,
+          18.4918
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    93.9191,
+    18.4918,
+    96.5448,
+    21.1175
+  ],
+  "properties": {
+    "title": "Exercise Single Point 003",
+    "description": "Single Point 003 \u2014 Indo-Pacific exercise. 2 track(s), 2 nation(s). Single-point observation, no time range.",
+    "datetime": "2026-05-11T19:00:00Z",
+    "debrief:vessel_classes": [
+      "surface/auxiliary/tanker/tide",
+      "surface/merchant/passenger/ferry"
+    ],
+    "debrief:tags": [
+      "missile-firing",
+      "force-protection",
+      "AAW"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:track_names": [
+      "USS Dauntless",
+      "HMS Tromp"
+    ],
+    "debrief:nationalities": [
+      "US",
+      "SE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-single-point-003.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

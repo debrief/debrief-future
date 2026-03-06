@@ -1,0 +1,86 @@
+id: https://debrief.info/schemas/stac-extension
+name: stac-extension
+title: Debrief STAC Extension Properties
+description: >
+  STAC extension properties for Debrief maritime tactical analysis items.
+  Defines the debrief: namespace properties stored in item.properties for
+  vessel classification, tags, track metadata, and nationalities.
+  These properties enable discovery and filtering in the STAC Stack Browser UI.
+  Author is derived from PROV lineage, not stored here (see R7).
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  debrief: https://debrief.info/schemas/
+
+default_prefix: debrief
+default_range: string
+
+imports:
+  - linkml:types
+
+enums:
+  VesselDomainEnum:
+    description: Top-level vessel domain classification
+    permissible_values:
+      surface:
+        description: Surface vessels (warships, auxiliaries, merchant)
+      subsurface:
+        description: Subsurface vessels (submarines)
+      unknown:
+        description: Vessel domain not determined or not applicable
+
+classes:
+  StacExtensionProperties:
+    description: >
+      Extension properties added to STAC item.properties under the debrief: namespace.
+      All properties are optional — existing items without extension properties remain valid.
+      These properties enable filtering, searching, and colour-coding in the Discovery UI.
+    attributes:
+      vessel_classes:
+        description: >
+          Hierarchical vessel classification paths using slash-separated notation.
+          Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23).
+          Partial paths allowed for imprecise classification (e.g., surface/warship).
+        range: string
+        multivalued: true
+        required: false
+        pattern: "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$"
+        slot_uri: debrief:vessel_classes
+
+      tags:
+        description: >
+          Plot-level tags — free-text labels applied to the entire plot by the analyst.
+          Trimmed non-empty strings with no duplicates.
+        range: string
+        multivalued: true
+        required: false
+        slot_uri: debrief:tags
+
+      feature_tags:
+        description: >
+          Union of all feature-level tags from the plot's GeoJSON features.
+          Aggregated at item level for discoverability. Authoritative per-feature
+          tags remain in each GeoJSON feature's properties.
+        range: string
+        multivalued: true
+        required: false
+        slot_uri: debrief:feature_tags
+
+      track_names:
+        description: >
+          Names of all tracks in the plot's GeoJSON FeatureCollection.
+          Corresponds to track features where properties.kind == TRACK.
+        range: string
+        multivalued: true
+        required: false
+        slot_uri: debrief:track_names
+
+      nationalities:
+        description: >
+          Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2
+          country codes (e.g., GB, US, FR). Uppercase two-letter codes only.
+        range: string
+        multivalued: true
+        required: false
+        pattern: "^[A-Z]{2}$"
+        slot_uri: debrief:nationalities

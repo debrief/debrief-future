@@ -1,0 +1,100 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-thunder-forge",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          58.3614,
+          5.6819
+        ],
+        [
+          60.7929,
+          5.6819
+        ],
+        [
+          60.7929,
+          8.1134
+        ],
+        [
+          58.3614,
+          8.1134
+        ],
+        [
+          58.3614,
+          5.6819
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    58.3614,
+    5.6819,
+    60.7929,
+    8.1134
+  ],
+  "properties": {
+    "title": "Exercise Thunder Forge",
+    "description": "Thunder Forge \u2014 Indian Ocean exercise. 7 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2024-03-11T19:00:00Z",
+    "end_datetime": "2024-03-13T10:17:21Z",
+    "debrief:vessel_classes": [
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/frigate/type26"
+    ],
+    "debrief:tags": [
+      "multi-national",
+      "missile-firing",
+      "AAW"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "USS Somerset",
+      "USS Provence",
+      "USS Helge Ingstad",
+      "USS Mason",
+      "USS Bergamini",
+      "USS Harnosand",
+      "USS Sutherland"
+    ],
+    "debrief:nationalities": [
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-thunder-forge.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}
