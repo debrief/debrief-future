@@ -1,102 +1,177 @@
 # Quickstart: End-to-End Workflow Tests
 
+**Revised**: 2026-03-06 — Updated for dual-platform test strategy
+
 ## Prerequisites
 
 - Node.js 20+ and pnpm
 - Python 3.11+ and uv
-- Docker (for CI mode or containerised testing)
-- code-server (for local mode): `npm install -g code-server`
+- Docker (for VS Code E2E CI mode)
+- openvscode-server or code-server (for VS Code E2E local mode)
 
-## Quick Start (Local)
+## Web-Shell Tests (Fast Feedback)
 
 ```bash
-# 1. Install dependencies and build the extension
-task install
-pnpm run build --filter @debrief/vscode
+# Run web-shell E2E tests (mock data, no VS Code needed)
+cd apps/web-shell && node run-playwright.mjs
 
-# 2. Package the extension as .vsix
-cd apps/vscode && pnpm run package && cd ../..
+# Or run specific spec files
+cd apps/web-shell && npx playwright test playwright/tests/plot-load.spec.ts
+```
 
-# 3. Install extension in code-server
-code-server --install-extension apps/vscode/debrief-*.vsix
+The web-shell suite uses `run-playwright.mjs` which handles Chromium extraction in sandboxed environments (CI, Claude Code).
 
-# 4. Start code-server with test workspace
-code-server --auth none --port 8080 tests/e2e/test-workspace/
+## VS Code E2E Tests (True End-to-End)
 
-# 5. In another terminal, run the tests
+### Option 1: Docker (CI-equivalent, recommended)
+
+```bash
+# 1. Build workspace dependencies
+pnpm --filter @debrief/session-state --filter @debrief/components build
+
+# 2. Build and package the VS Code extension
+cd apps/vscode && pnpm run build && pnpm run package && cd ../..
+
+# 3. Build and start the Docker container
+docker compose -f docker/code-server/docker-compose.yml build
+docker compose -f docker/code-server/docker-compose.yml up -d
+
+# 4. Run VS Code E2E tests
+CODE_SERVER_URL=http://localhost:8080 npx playwright test --config tests/e2e/playwright.config.ts
+
+# 5. Tear down
+docker compose -f docker/code-server/docker-compose.yml down
+```
+
+### Option 2: Local openvscode-server
+
+```bash
+# 1. Install openvscode-server (or code-server as fallback)
+# See: https://github.com/nicedoc/openvscode-server
+
+# 2. Build and package the extension
+cd apps/vscode && pnpm run build && pnpm run package && cd ../..
+
+# 3. Run tests (global-setup.ts auto-starts openvscode-server)
 npx playwright test --config tests/e2e/playwright.config.ts
 ```
 
-## Quick Start (Docker)
+### Option 3: Cloud Environment Setup
 
 ```bash
-# 1. Build the Docker image
-docker compose -f docker/code-server/docker-compose.yml build
+# Use the cloud setup script (installs openvscode-server + Chromium)
+bash tests/e2e/scripts/cloud-e2e-setup.sh
 
-# 2. Run tests (starts code-server + runs Playwright + tears down)
-docker compose -f docker/code-server/docker-compose.yml up --abort-on-container-exit
+# Then run tests
+npx playwright test --config tests/e2e/playwright.config.ts
+```
+
+## Running Both Suites
+
+```bash
+# Run web-shell tests (fast)
+cd apps/web-shell && node run-playwright.mjs && cd ../..
+
+# Run VS Code E2E tests (Docker)
+docker compose -f docker/code-server/docker-compose.yml up -d
+CODE_SERVER_URL=http://localhost:8080 npx playwright test --config tests/e2e/playwright.config.ts
+docker compose -f docker/code-server/docker-compose.yml down
 ```
 
 ## Running Individual Test Files
 
 ```bash
-# Load and display workflow (P1)
+# Web-shell
+cd apps/web-shell
+npx playwright test playwright/tests/plot-load.spec.ts
+npx playwright test playwright/tests/tool-execution.spec.ts
+npx playwright test playwright/tests/selection-sync.spec.ts
+
+# VS Code E2E
 npx playwright test --config tests/e2e/playwright.config.ts test-load-display
-
-# Analysis tool workflow (P2)
 npx playwright test --config tests/e2e/playwright.config.ts test-analysis-tool
-
-# Error feedback workflow (P3)
 npx playwright test --config tests/e2e/playwright.config.ts test-error-feedback
 ```
 
 ## Debugging
 
 ```bash
-# Run with Playwright UI (headed mode)
+# Playwright UI mode (headed)
 npx playwright test --config tests/e2e/playwright.config.ts --ui
 
-# Run with trace recording
+# With trace recording
 npx playwright test --config tests/e2e/playwright.config.ts --trace on
 
 # View last test report
 npx playwright show-report
+
+# Headed mode in CI (requires xvfb)
+E2E_HEADED=1 xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts
 ```
 
 ## Test Structure
 
 ```
+# Web-shell (13 spec files, mock data)
+apps/web-shell/playwright/tests/
+├── catalog-browse.spec.ts         # Catalog navigation
+├── capture-log-evidence.spec.ts   # Log capture
+├── drawing.spec.ts                # Drawing tools
+├── event-log-propagation.spec.ts  # Event propagation
+├── log-edit-face.spec.ts          # Log editing
+├── log-panel.spec.ts              # Log panel
+├── plot-load.spec.ts              # Plot loading
+├── selection-sync.spec.ts         # Selection synchronization
+├── styling-tools.spec.ts          # Styling tools
+├── time-controller.spec.ts        # Time controller
+├── tool-execution.spec.ts         # Tool execution
+├── tune-prov.spec.ts              # Provenance tuning
+└── undo-redo-split.spec.ts        # Undo/redo/split
+
+# VS Code E2E (8 existing, expanding to 13+, real Python services)
 tests/e2e/
-├── playwright.config.ts          # Config (baseURL, timeouts, retries)
-├── global-setup.ts               # Starts code-server before all tests
-├── global-teardown.ts            # Stops code-server after all tests
-├── fixtures/base.ts              # Custom fixture: codeServerPage
-├── models/
-│   ├── code-server-page.ts       # VS Code chrome interactions
-│   └── debrief-webview.ts        # Debrief component interactions
-├── test-workspace/               # Pre-configured workspace for tests
-├── test-load-display.spec.ts     # P1: File loading workflow
-├── test-analysis-tool.spec.ts    # P2: Tool execution workflow
-└── test-error-feedback.spec.ts   # P3: Error handling workflow
+├── playwright.config.ts           # Config (baseURL, timeouts, Chromium)
+├── global-setup.ts                # Server start + config seeding
+├── global-teardown.ts             # Server stop
+├── fixtures/base.ts               # Custom fixture: codeServerPage
+├── helpers/webview-injector.ts    # Iframe access helpers
+├── models/code-server-page.ts     # VS Code chrome page object
+├── scripts/                       # Setup scripts
+├── test-workspace/                # Real REP files + STAC store
+├── test-load-display.spec.ts      # P1: File loading
+├── test-analysis-tool.spec.ts     # P2: Tool execution
+├── test-error-feedback.spec.ts    # P3: Error handling
+├── test-tune-prov.spec.ts         # Provenance tuning
+├── test-real-webview.spec.ts      # Webview interaction
+├── test-webview-probe.spec.ts     # Webview probing
+├── test-preview-smoke.spec.ts     # Preview smoke
+└── test-heroku-smoke.spec.ts      # Heroku deployment
 ```
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CODE_SERVER_URL` | `http://localhost:8080` | Base URL for openvscode-server/code-server |
+| `CHROMIUM_PATH` | unset | Explicit path to Chromium binary |
+| `CLAUDE_CODE` | unset | Set to `1` to use @sparticuz/chromium flags |
+| `E2E_HEADED` | unset | Set to `1` for headed mode (use with xvfb-run) |
+| `CI` | unset | Set by GitHub Actions; enables `forbidOnly` |
 
 ## Key Patterns
 
-### Accessing Webview Content
-
-VS Code webviews use nested iframes. Use Playwright's `frameLocator()`:
+### Accessing Webview Content (VS Code E2E)
 
 ```typescript
-// Access Debrief components inside the webview
+// Navigate through VS Code's nested iframe structure
 const webview = page
   .frameLocator("iframe.webview.ready")
   .frameLocator("#active-frame");
 
-// Interact with the map
 await webview.locator(".leaflet-container").waitFor();
 ```
 
-### Using Page Objects
+### Using Page Objects (VS Code E2E)
 
 ```typescript
 import { test } from "../fixtures/base";
@@ -113,10 +188,11 @@ test("loads REP file and shows tracks", async ({ codeServerPage }) => {
 });
 ```
 
-## Environment Variables
+### Using test.fixme() for Missing Features
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CODE_SERVER_URL` | `http://localhost:8080` | Base URL for code-server |
-| `CODE_SERVER_AUTH` | `none` | Authentication mode |
-| `CLAUDE_CODE` | unset | Set to `1` to use @sparticuz/chromium |
+```typescript
+test.fixme("should display bearing overlay after calc", async ({ codeServerPage }) => {
+  // Bearing overlay rendering not yet implemented
+  // Backlog item: #NNN
+});
+```

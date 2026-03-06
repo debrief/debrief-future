@@ -44,7 +44,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 1
       }
     },
@@ -74,7 +73,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 3
       }
     },
@@ -110,7 +108,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 5
       }
     },
@@ -274,7 +271,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 7
       }
     },
@@ -438,7 +434,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 8
       }
     },
@@ -602,7 +597,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 9
       }
     },
@@ -767,7 +761,6 @@
           "opacity": 1.0,
           "dash_array": "1, 3"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 10
       }
     },
@@ -932,7 +925,6 @@
           "opacity": 1.0,
           "dash_array": "5, 3, 1, 3"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 11
       }
     },
@@ -1097,7 +1089,6 @@
           "opacity": 1.0,
           "dash_array": "5, 5"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 12
       }
     },
@@ -1262,7 +1253,6 @@
           "opacity": 1.0,
           "dash_array": "10, 5"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 13
       }
     },
@@ -1426,7 +1416,6 @@
           "weight": 5,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 14
       }
     },
@@ -1455,7 +1444,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 16
       }
     },
@@ -1484,7 +1472,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 17
       }
     },
@@ -1513,7 +1500,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 18
       }
     },
@@ -1542,7 +1528,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 20
       }
     },
@@ -1571,7 +1556,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 21
       }
     },
@@ -1600,7 +1584,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 22
       }
     },
@@ -1629,7 +1612,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 23
       }
     },
@@ -1658,7 +1640,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 24
       }
     },
@@ -1687,7 +1668,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 25
       }
     },
@@ -1716,7 +1696,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 26
       }
     },
@@ -1745,7 +1724,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 27
       }
     },
@@ -1774,7 +1752,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 28
       }
     },
@@ -1803,7 +1780,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 29
       }
     },
@@ -1832,7 +1808,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 30
       }
     },
@@ -1861,7 +1836,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 31
       }
     },
@@ -1890,7 +1864,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 33
       }
     },
@@ -1919,7 +1892,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 34
       }
     },
@@ -1948,7 +1920,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 35
       }
     },
@@ -1977,7 +1948,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 36
       }
     },
@@ -2006,7 +1976,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 37
       }
     },
@@ -2035,7 +2004,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 38
       }
     },
@@ -2064,7 +2032,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 39
       }
     },
@@ -2093,7 +2060,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 40
       }
     },
@@ -2122,7 +2088,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 41
       }
     },
@@ -2151,7 +2116,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 42
       }
     },
@@ -2180,7 +2144,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 43
       }
     },
@@ -2209,7 +2172,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 44
       }
     },
@@ -2239,7 +2201,6 @@
           "opacity": 1.0,
           "legacy_style": "anomaly"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 47
       }
     },
@@ -2269,7 +2230,6 @@
           "opacity": 1.0,
           "legacy_style": "bottomed_mine"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 48
       }
     },
@@ -2299,7 +2259,6 @@
           "opacity": 1.0,
           "legacy_style": "cleared"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 49
       }
     },
@@ -2329,7 +2288,6 @@
           "opacity": 1.0,
           "legacy_style": "countermeasure"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 50
       }
     },
@@ -2359,7 +2317,6 @@
           "opacity": 1.0,
           "legacy_style": "decoy"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 51
       }
     },
@@ -2389,7 +2346,6 @@
           "opacity": 1.0,
           "legacy_style": "decoy_aw"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 52
       }
     },
@@ -2419,7 +2375,6 @@
           "opacity": 1.0,
           "legacy_style": "decoy_uw"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 53
       }
     },
@@ -2449,7 +2404,6 @@
           "opacity": 1.0,
           "legacy_style": "enemy_subsurface"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 54
       }
     },
@@ -2479,7 +2433,6 @@
           "opacity": 1.0,
           "legacy_style": "flagged_marker"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 55
       }
     },
@@ -2509,7 +2462,6 @@
           "opacity": 1.0,
           "legacy_style": "floating_mine"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 56
       }
     },
@@ -2539,7 +2491,6 @@
           "opacity": 1.0,
           "legacy_style": "friend_air"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 57
       }
     },
@@ -2569,7 +2520,6 @@
           "opacity": 1.0,
           "legacy_style": "highlights_1"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 58
       }
     },
@@ -2599,7 +2549,6 @@
           "opacity": 1.0,
           "legacy_style": "usv_5"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 59
       }
     },
@@ -2629,7 +2578,6 @@
           "opacity": 1.0,
           "legacy_style": "highlights_2"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 62
       }
     },
@@ -2659,7 +2607,6 @@
           "opacity": 1.0,
           "legacy_style": "jammer"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 63
       }
     },
@@ -2689,7 +2636,6 @@
           "opacity": 1.0,
           "legacy_style": "mine_like_object"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 64
       }
     },
@@ -2719,7 +2665,6 @@
           "opacity": 1.0,
           "legacy_style": "moored_mine"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 65
       }
     },
@@ -2749,7 +2694,6 @@
           "opacity": 1.0,
           "legacy_style": "tagged_marker"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 66
       }
     },
@@ -2779,7 +2723,6 @@
           "opacity": 1.0,
           "legacy_style": "torpedo"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 67
       }
     },
@@ -2809,7 +2752,6 @@
           "opacity": 1.0,
           "legacy_style": "uav_1"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 68
       }
     },
@@ -2839,7 +2781,6 @@
           "opacity": 1.0,
           "legacy_style": "uav_2"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 69
       }
     },
@@ -2869,7 +2810,6 @@
           "opacity": 1.0,
           "legacy_style": "usv_1"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 70
       }
     },
@@ -2899,7 +2839,6 @@
           "opacity": 1.0,
           "legacy_style": "usv_2"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 71
       }
     },
@@ -2929,7 +2868,6 @@
           "opacity": 1.0,
           "legacy_style": "usv_3"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 72
       }
     },
@@ -2959,7 +2897,6 @@
           "opacity": 1.0,
           "legacy_style": "usv_4"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 73
       }
     },
@@ -2989,7 +2926,6 @@
           "opacity": 1.0,
           "legacy_style": "wreck"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 74
       }
     },
@@ -3019,7 +2955,6 @@
           "opacity": 1.0,
           "legacy_style": "xxx_contact"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 75
       }
     },
@@ -3048,7 +2983,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 87
       }
     },
@@ -3077,7 +3011,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 88
       }
     },
@@ -3106,7 +3039,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 89
       }
     },
@@ -3273,7 +3205,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 91
       }
     },
@@ -3440,7 +3371,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 92
       }
     },
@@ -3607,7 +3537,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 93
       }
     },
@@ -3774,7 +3703,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 94
       }
     },
@@ -3941,7 +3869,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 95
       }
     },
@@ -4108,7 +4035,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 96
       }
     },
@@ -4276,7 +4202,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 97
       }
     },
@@ -4321,7 +4246,6 @@
           "opacity": 1.0,
           "dash_array": "1, 3"
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 99
       }
     },
@@ -4356,7 +4280,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 101
       }
     },
@@ -4656,7 +4579,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 103
       }
     },
@@ -4686,7 +4608,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 105
       }
     },
@@ -4717,7 +4638,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 107
       }
     },
@@ -4748,7 +4668,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 108
       }
     },
@@ -4764,7 +4683,6 @@
         "time": "1995-12-12T05:02:00+00:00",
         "text": "comment 3",
         "track_id": "NEL_STYLE",
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 110
       }
     },
@@ -4780,7 +4698,6 @@
         "time": "1995-12-12T05:05:00+00:00",
         "text": "GenComment2 Mk Rge BAAA R121212",
         "track_id": "NEL_STYLE",
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 112
       }
     },
@@ -4829,7 +4746,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 114
       }
     },
@@ -4878,7 +4794,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 115
       }
     },
@@ -4927,7 +4842,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 116
       }
     },
@@ -4976,7 +4890,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 117
       }
     },
@@ -5025,7 +4938,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 118
       }
     },
@@ -5074,7 +4986,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 119
       }
     },
@@ -5123,7 +5034,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 120
       }
     },
@@ -5172,7 +5082,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 121
       }
     },
@@ -5221,7 +5130,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 122
       }
     },
@@ -5270,7 +5178,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 123
       }
     },
@@ -5319,7 +5226,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 124
       }
     },
@@ -5485,7 +5391,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 125
       }
     },
@@ -5651,7 +5556,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 126
       }
     },
@@ -5817,7 +5721,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 127
       }
     },
@@ -5866,7 +5769,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 128
       }
     },
@@ -5915,7 +5817,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 129
       }
     },
@@ -5965,7 +5866,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 130
       }
     },
@@ -6015,7 +5915,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 131
       }
     },
@@ -6064,7 +5963,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 132
       }
     },
@@ -6113,7 +6011,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 133
       }
     },
@@ -6162,7 +6059,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 135
       }
     },
@@ -6211,7 +6107,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 136
       }
     },
@@ -6260,7 +6155,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 137
       }
     },
@@ -6309,7 +6203,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 138
       }
     },
@@ -6358,7 +6251,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 139
       }
     },
@@ -6407,7 +6299,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 140
       }
     },
@@ -6456,7 +6347,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 141
       }
     },
@@ -6505,7 +6395,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 142
       }
     },
@@ -6554,7 +6443,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 143
       }
     },
@@ -6603,7 +6491,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 144
       }
     },
@@ -6652,7 +6539,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 145
       }
     },
@@ -6818,7 +6704,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 146
       }
     },
@@ -6984,7 +6869,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 147
       }
     },
@@ -7150,7 +7034,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 148
       }
     },
@@ -7199,7 +7082,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 149
       }
     },
@@ -7248,7 +7130,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 150
       }
     },
@@ -7420,7 +7301,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 165
       }
     },
@@ -7592,7 +7472,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 167
       }
     },
@@ -7764,7 +7643,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 169
       }
     },
@@ -7936,7 +7814,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 171
       }
     },
@@ -8108,7 +7985,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 172
       }
     },
@@ -8120,7 +7996,6 @@
         "kind": "TRACKSPLIT",
         "track_id": "NEL_STYLE2",
         "timestamp": "1995-12-12T05:02:10+00:00",
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 224
       }
     },
@@ -8155,7 +8030,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 227
       }
     },
@@ -8180,7 +8054,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 229
       }
     },
@@ -8205,7 +8078,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 230
       }
     },
@@ -8230,7 +8102,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 231
       }
     },
@@ -8255,7 +8126,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 232
       }
     },
@@ -8284,7 +8154,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 234
       }
     },
@@ -8314,7 +8183,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 235
       }
     },
@@ -8345,7 +8213,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 236
       }
     },
@@ -8374,7 +8241,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 237
       }
     },
@@ -8403,7 +8269,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 238
       }
     },
@@ -8432,7 +8297,6 @@
           "weight": 1,
           "opacity": 1.0
         },
-        "source_file": "/home/user/debrief-future/services/io/tests/fixtures/valid/shapes.rep",
         "line_number": 239
       }
     }

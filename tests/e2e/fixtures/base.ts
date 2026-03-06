@@ -23,8 +23,11 @@ export const test = base.extend<{
   },
 
   debriefWebview: async ({ codeServerPage }, use) => {
-    const frame = await codeServerPage.getWebviewFrame();
-    const webview = new DebriefWebview(frame);
+    // Lazy: frame is resolved when test calls waitForMapReady() or
+    // accesses the webview after opening a plot via STAC tree.
+    // We still need to resolve the frame before passing to DebriefWebview,
+    // but tests that use this fixture should open the plot first.
+    const webview = new DebriefWebview(codeServerPage);
     await use(webview);
   },
 });

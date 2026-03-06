@@ -147,15 +147,6 @@ class TestTracksAndAnnotations:
 class TestAnnotationProvenance:
     """Test that annotations have correct provenance information."""
 
-    def test_annotation_source_file(self, rep_handler: REPHandler) -> None:
-        """Verify annotations include source file in properties."""
-        content = ";CIRCLE: @A 21 0 0 N 20 0 0 W 1000 test"
-
-        result = rep_handler.parse(content, "data/shapes.rep")
-
-        assert len(result.features) == 1
-        assert result.features[0]["properties"]["source_file"] == "data/shapes.rep"
-
     def test_annotation_line_number(self, rep_handler: REPHandler) -> None:
         """Verify annotations include correct line number."""
         content = """; Header comment

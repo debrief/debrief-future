@@ -1,11 +1,11 @@
-Four attempts to run Playwright against a VS Code workbench inside a sandboxed environment. Four failures. Then the pieces came together.
+Debrief's VS Code E2E test suite went from 8 skipped spec files to 18 active ones this week -- all driven by real Python services parsing real REP data, not mocks.
 
-Standard Playwright CDN downloads are blocked (403). The Lambda-optimized @sparticuz/chromium crashes on VS Code's complex DOM. code-server's WebSocket auth depends on a proprietary module. And multi-process Chromium kills its own renderer when you take a screenshot in a container.
+The interesting part isn't the test count. It's the dual-platform strategy: 81 web-shell tests with mock data run in 30 seconds for fast CI feedback. 18 VS Code E2E specs with real debrief-io, debrief-stac, and debrief-calc services take 3 minutes but catch integration bugs that mocks hide. Both suites run in parallel.
 
-The fix was three substitutions and a flag: host Chromium as a GitHub Release asset instead of using CDN, use openvscode-server instead of code-server, run `--single-process --no-zygote` instead of default multi-process, and close the Welcome tab that silently captures keyboard focus.
+We also wrote 28 tests for features that don't exist yet, using Playwright's test.fixme() instead of .skip(). They show up in reports as known gaps, cross-referenced to backlog items. When those features ship, the tests are already waiting.
 
-Result: Playwright driving a full VS Code command palette, Quick Open dialog, and file navigation -- all inside the sandbox. The E2E test infrastructure is ready for real workflow tests.
+Writing tests against real services forced us toward structural assertions -- "at least one track exists" rather than "exactly three tracks". More resilient, and they still catch the failures that matter.
 
-[Read the full story][BLOG_URL]
+https://debrief.github.io/shipped-dual-platform-e2e-tests
 
-#FutureDebrief #Playwright #VSCode
+#FutureDebrief #MaritimeAnalysis #Testing
