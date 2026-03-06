@@ -9,9 +9,9 @@ from typing import Any
 from debrief_calc.models import ContextType, SelectionContext, ToolParameter
 from debrief_calc.registry import tool
 from debrief_calc.tools.sensor.detection.sensor_model import (
+    DefaultSensorModel,
     SensorModel,
     SensorModelZone,
-    StubSensorModel,
 )
 
 EARTH_RADIUS_KM = 6371.0
@@ -292,7 +292,7 @@ def buffer_zone_generator(
     Args:
         context: SelectionContext containing at least one TRACK feature.
         params: Tool parameters (optional distance overrides).
-        sensor_model: Optional sensor model override (default: StubSensorModel).
+        sensor_model: Optional sensor model override (default: DefaultSensorModel).
 
     Returns:
         List containing a single GeoJSON Feature with MultiPolygon geometry
@@ -308,7 +308,7 @@ def buffer_zone_generator(
 
     # Get sensor model zones
     if sensor_model is None:
-        sensor_model = StubSensorModel()
+        sensor_model = DefaultSensorModel()
 
     zones = sensor_model.get_detection_zones(track)
 

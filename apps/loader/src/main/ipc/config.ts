@@ -73,11 +73,17 @@ async function checkStoreAccess(path: string): Promise<{ accessible: boolean; er
 }
 
 /**
- * Counts plots in a store (placeholder - would call debrief-stac).
+ * Counts plots in a store by listing plots via debrief-stac.
  */
-async function countPlots(_path: string): Promise<number> {
-  // TODO: Implement via debrief-stac list_plots call
-  return 0;
+async function countPlots(storePath: string): Promise<number> {
+  try {
+    const { listPlots } = await import('./stac.js');
+    const plots = await listPlots(storePath);
+    return plots.length;
+  } catch {
+    // Service may not be available (e.g., first launch before config)
+    return 0;
+  }
 }
 
 /**

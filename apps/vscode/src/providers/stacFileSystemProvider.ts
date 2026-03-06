@@ -24,13 +24,14 @@ export class StacFileSystemProvider implements vscode.FileSystemProvider {
   }
 
   /**
-   * Watch for changes (not implemented for read-only provider)
+   * Watch for changes — returns no-op disposable since STAC stores
+   * are read-only and changes are driven by explicit user actions
+   * (load/import) rather than external file system events.
    */
   watch(
     _uri: vscode.Uri,
     _options: { readonly recursive: boolean; readonly excludes: readonly string[] }
   ): vscode.Disposable {
-    // Read-only, no watching needed
     return new vscode.Disposable(() => {});
   }
 
@@ -53,10 +54,11 @@ export class StacFileSystemProvider implements vscode.FileSystemProvider {
   }
 
   /**
-   * Read directory contents
+   * Read directory contents — returns empty since STAC items are
+   * presented via StacTreeProvider, not the file system hierarchy.
+   * The virtual FS is used only for individual item content (readFile).
    */
   readDirectory(_uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
-    // Not implemented for this provider
     return Promise.resolve([]);
   }
 
