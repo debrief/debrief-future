@@ -16,6 +16,7 @@ The Discovery UI requires agreed property names and data structures before any c
 - Fixture set of ≥10 realistic `item.json` files created
 - Mock data contract reviewed and agreed by team
 - Duration representation (computed vs stored) decided and documented
+- ID naming convention documented: lowercase characters, numbers, underscores, hyphens only; no reserved URI characters (per STAC best practices §13.2.7 of SRD)
 
 ## Existing Code
 
