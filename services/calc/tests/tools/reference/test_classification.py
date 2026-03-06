@@ -98,9 +98,9 @@ def _make_zone_feature(
 # Inner zone: -1,-1 to 1,1
 # Middle zone: -2,-2 to 2,2
 # Outer zone: -3,-3 to 3,3
-_INNER_RING = [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]]
-_MIDDLE_RING = [[-2, -2], [2, -2], [2, 2], [-2, 2], [-2, -2]]
-_OUTER_RING = [[-3, -3], [3, -3], [3, 3], [-3, 3], [-3, -3]]
+_INNER_RING = [[-1.0, -1.0], [1.0, -1.0], [1.0, 1.0], [-1.0, 1.0], [-1.0, -1.0]]
+_MIDDLE_RING = [[-2.0, -2.0], [2.0, -2.0], [2.0, 2.0], [-2.0, 2.0], [-2.0, -2.0]]
+_OUTER_RING = [[-3.0, -3.0], [3.0, -3.0], [3.0, 3.0], [-3.0, 3.0], [-3.0, -3.0]]
 
 _SIMPLE_ZONES = [[_INNER_RING], [_MIDDLE_RING], [_OUTER_RING]]
 
@@ -280,7 +280,7 @@ class TestMetadataPreservation:
         assert result1[0]["properties"]["pointMetadata"][0]["zone"] == "75%"
 
         # Re-classify with a zone that doesn't contain the origin
-        far_ring = [[5, 5], [6, 5], [6, 6], [5, 6], [5, 5]]
+        far_ring = [[5.0, 5.0], [6.0, 5.0], [6.0, 6.0], [5.0, 6.0], [5.0, 5.0]]
         far_zones = [[far_ring]]
         far_zone = _make_zone_feature(
             far_zones,
