@@ -44,6 +44,17 @@ export const toolDefinition: MCPToolDefinition = {
     type: 'object',
     properties: {
       features: { type: 'array', items: { type: 'object' } },
+      params: {
+        type: 'object',
+        properties: {
+          distance_unit: {
+            type: 'string',
+            enum: ['nm', 'km', 'mi'],
+            default: 'nm',
+            description: 'Unit for distance measurements',
+          },
+        },
+      },
     },
   },
   annotations: {
@@ -54,10 +65,42 @@ export const toolDefinition: MCPToolDefinition = {
   },
 };
 
+type DistanceUnit = 'nm' | 'km' | 'mi';
+
+// Conversion factors from nautical miles
+const NM_TO_KM = 1.852;
+const NM_TO_MI = 1.15078;
+
+function convertDistance(distanceNm: number, unit: DistanceUnit): number {
+  if (unit === 'km') return distanceNm * NM_TO_KM;
+  if (unit === 'mi') return distanceNm * NM_TO_MI;
+  return distanceNm;
+}
+
+function convertSpeed(speedKts: number, unit: DistanceUnit): number {
+  if (unit === 'km') return speedKts * NM_TO_KM;
+  if (unit === 'mi') return speedKts * NM_TO_MI;
+  return speedKts;
+}
+
+function distanceKey(unit: DistanceUnit): string {
+  return `distance_${unit}`;
+}
+
+function speedKey(unit: DistanceUnit): string {
+  const labels: Record<DistanceUnit, string> = { nm: 'kts', km: 'kmh', mi: 'mph' };
+  return `average_speed_${labels[unit]}`;
+}
+
 export function execute(
   features: GeoJSONFeature[],
-  _params: Record<string, unknown>,
+  params: Record<string, unknown>,
 ): GeoJSONFeature[] {
+  const distanceUnit = ((params?.distance_unit as string) || 'nm') as DistanceUnit;
+  if (!['nm', 'km', 'mi'].includes(distanceUnit)) {
+    throw new Error(`distance_unit must be one of: nm, km, mi (got '${distanceUnit}')`);
+  }
+
   const track = features.find(
     f => f.properties?.kind === 'TRACK' && f.geometry?.type === 'LineString',
   );
@@ -86,6 +129,10 @@ export function execute(
 
   const avgSpeedKts = durationHours > 0 ? totalDistanceNm / durationHours : 0;
 
+  // Convert to requested unit
+  const distance = convertDistance(totalDistanceNm, distanceUnit);
+  const speed = convertSpeed(avgSpeedKts, distanceUnit);
+
   // Centroid for result feature placement
   const centroidLon = coords.reduce((s, c) => s + c[0], 0) / coords.length;
   const centroidLat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
@@ -97,19 +144,16 @@ export function execute(
     id: `stats-${generateUUID()}`,
     geometry: { type: 'Point', coordinates: [centroidLon, centroidLat] },
     properties: {
-      kind: 'STATISTICS',
+      kind: toolDefinition.annotations['debrief:outputKind'],
       name: `Statistics: ${trackName}`,
       source_track: String(track.id ?? ''),
       source_name: trackName,
       statistics: {
         point_count: pointCount,
         duration_hours: Math.round(durationHours * 100) / 100,
-        distance_nm: Math.round(totalDistanceNm * 100) / 100,
-        average_speed_kts: Math.round(avgSpeedKts * 100) / 100,
+        [distanceKey(distanceUnit)]: Math.round(distance * 100) / 100,
+        [speedKey(distanceUnit)]: Math.round(speed * 100) / 100,
       },
-      'debrief:resultType': 'track/statistics',
-      'debrief:sourceFeatures': [String(track.id ?? '')],
-      'debrief:label': `Track statistics for ${trackName}`,
     },
   }];
 }

@@ -16,6 +16,60 @@ import type { MapPanel } from '../webview/mapPanel';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import type { LogService, InputFeatureState, ResultIdRegistry } from '@debrief/session-state';
+import type { LogPanelViewProvider } from '../views/logPanelView';
+import type { ToolParameter } from '../types/tool';
+
+/**
+ * Known parameter type → values map.
+ * Mirrors @debrief/components paramTypeResolver for use in VS Code QuickPick.
+ */
+const PARAM_TYPE_VALUES: Record<string, string[]> = {
+  ReferencePointPattern: ['grid', 'scatter'],
+  NamedColor: ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'brown', 'grey', 'black', 'white'],
+  MarkerSymbol: ['circle', 'square', 'triangle', 'diamond', 'cross', 'star'],
+  CardinalDirection: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'],
+};
+
+/**
+ * Collect tool parameters via VS Code QuickPick.
+ * Returns collected params or undefined if the user cancelled.
+ */
+async function collectParameters(
+  parameters: ToolParameter[],
+  toolName: string,
+): Promise<Record<string, unknown> | undefined> {
+  const collected: Record<string, unknown> = {};
+
+  for (const param of parameters) {
+    // Resolve choices: explicit choices, or from known paramType
+    const choices: string[] =
+      param.choices?.map(String) ??
+      (param.paramType ? PARAM_TYPE_VALUES[param.paramType] ?? [] : []);
+
+    if (choices.length === 0) { continue; }
+
+    const items: vscode.QuickPickItem[] = choices.map((c) => ({
+      label: c.charAt(0).toUpperCase() + c.slice(1),
+      description: param.defaultValue !== undefined && String(param.defaultValue) === c ? '(default)' : undefined,
+      detail: undefined,
+      picked: false,
+    }));
+
+    const picked = await vscode.window.showQuickPick(items, {
+      placeHolder: `${toolName}: ${param.description || param.name}`,
+      title: param.description || param.name,
+    });
+
+    if (!picked) { return undefined; } // user cancelled
+
+    // Store the raw value (lowercase original)
+    const rawValue = choices[items.indexOf(picked)];
+    // Convert numeric strings to numbers for numeric params
+    collected[param.name] = param.valueType === 'number' ? Number(rawValue) : rawValue;
+  }
+
+  return collected;
+}
 
 /**
  * Create the execute tool command
@@ -26,8 +80,9 @@ import type { LogService, InputFeatureState, ResultIdRegistry } from '@debrief/s
  * @param layersTreeProvider - LayersTreeProvider for displaying results
  * @param stacService - StacService for persisting results to STAC
  * @param activityPanelProvider - ActivityPanelViewProvider for updating result files
- * @param logService - LogService for recording provenance (Feature: 071)
+ * @param logService - LogService for recording provenance (Feature: 071) — deprecated, prefer MapPanel getter
  * @param resultIdRegistry - ResultIdRegistry for tracking result IDs (Feature: 087)
+ * @param logPanelProvider - LogPanelViewProvider for refreshing timeline after tool execution (Feature: 113)
  */
 export function createExecuteToolCommand(
   calcService: CalcService,
@@ -37,7 +92,8 @@ export function createExecuteToolCommand(
   stacService?: StacService,
   activityPanelProvider?: ActivityPanelViewProvider,
   logService?: LogService,
-  resultIdRegistry?: ResultIdRegistry
+  resultIdRegistry?: ResultIdRegistry,
+  logPanelProvider?: LogPanelViewProvider
 ): (toolIdOrMessage: string | { toolId: string; params?: Record<string, unknown> }) => Promise<void> {
   return async (toolIdOrMessage: string | { toolId: string; params?: Record<string, unknown> }) => {
     // Handle string, { toolId, params } object, and legacy { toolName } format
@@ -77,18 +133,28 @@ export function createExecuteToolCommand(
     const tool = tools.find((t) => t.id === resolvedToolId);
     const toolName = tool?.name ?? resolvedToolId;
 
+    // Collect parameters if needed (Feature: 091)
+    if (!toolParams && tool?.parameters && tool.parameters.length > 0) {
+      const collected = await collectParameters(tool.parameters, toolName);
+      if (!collected) {
+        return; // user cancelled parameter collection
+      }
+      toolParams = collected;
+    }
+
     // Capture pre-tool geometry for mutation tools (enables correct tune replay)
     let preToolInputState: InputFeatureState[] | undefined;
     const selectedIdSet = new Set(selectedFeatureIds);
-    const otherFeatures = panel.getOtherFeatures();
-    const preToolFeatures = otherFeatures.filter(
-      (f) => selectedIdSet.has(String(f.id ?? f.properties?.id))
+    const allFeatures = panel.getFeatures();
+    const preToolFeatures = allFeatures.filter(
+      (f) => selectedIdSet.has(String(f.id))
     );
     if (preToolFeatures.length > 0) {
       preToolInputState = preToolFeatures.map((f) => {
-        const { provenance: _p, ...restProps } = f.properties ?? {};
+        const props = (f.properties ?? {}) as Record<string, unknown>;
+        const { provenance: _p, ...restProps } = props;
         return {
-          featureId: String(f.id ?? f.properties?.id),
+          featureId: String(f.id),
           geometry: JSON.parse(JSON.stringify(f.geometry)) as unknown,
           properties: JSON.parse(JSON.stringify(restProps)) as Record<string, unknown>,
         };
@@ -132,16 +198,52 @@ export function createExecuteToolCommand(
     );
 
     if (layer) {
-      // Add to map (skip webview message for artifact layers — no map geometry)
-      if (!layer.artifactHref) {
-        panel.addResultLayer(layer);
+      const isMutationResult = result.resultType?.startsWith('mutation/');
+
+      if (isMutationResult && !layer.artifactHref) {
+        // Mutation tools: update the original plot features in-place
+        // rather than adding a duplicate result layer.
+        panel.updatePlotFeatures(layer);
+
+        // Persist mutated features to disk so Python provenance (with full
+        // parameter metadata including tunable flags) is stored alongside
+        // the updated geometry. Without this, only in-memory state would
+        // reflect the mutation, and recordToolResult would write provenance
+        // entries with empty parameters.
+        if (stacService) {
+          try {
+            const store = panel.getCurrentStore?.();
+            const plot = panel.getCurrentPlot?.();
+            if (store?.path && plot?.itemPath) {
+              const fc = await stacService.loadGeoJsonForItem(store.path, plot.itemPath);
+              if (fc) {
+                const fid = (f: { id?: unknown; properties?: Record<string, unknown> | null }): string =>
+                  String(f.id ?? f.properties?.['id'] ?? '');
+                const updatedMap = new Map(
+                  layer.features.features.map((f) => [fid(f), f])
+                );
+                fc.features = fc.features.map((f) => {
+                  const id = fid(f);
+                  const updated = updatedMap.get(id);
+                  return updated ? (updated as typeof f) : f;
+                });
+                await stacService.writeGeoJson(store.path, plot.itemPath, fc);
+              }
+            }
+          } catch (persistErr) {
+            console.warn('[debrief] Failed to persist mutation to STAC:', persistErr);
+          }
+        }
       } else {
-        // Still store in panel's result layers for tracking
+        // Additive tools or artifacts: add as result layer
         panel.addResultLayer(layer);
       }
 
-      // Update layers panel
-      layersTreeProvider.addResultLayer(layer);
+      // Update layers panel (additive results only — mutations
+      // don't create new layers, they modify existing ones)
+      if (!isMutationResult) {
+        layersTreeProvider.addResultLayer(layer);
+      }
 
       // Auto-persist artifact results to STAC
       if (stacService && result.artifactData && result.artifactHref) {
@@ -172,8 +274,10 @@ export function createExecuteToolCommand(
         }
       }
 
-      // Auto-persist addition results to STAC (#041)
-      if (stacService && !result.artifactData && result.resultType?.startsWith('addition/')) {
+      // Auto-persist non-mutation feature results to STAC (#041)
+      // All additive/reference/etc. results must be on disk so that
+      // the tune replay cycle (cleanup → re-execute → write) works.
+      if (stacService && !result.artifactData && !isMutationResult) {
         try {
           const store = panel.getCurrentStore?.();
           const plot = panel.getCurrentPlot?.();
@@ -190,14 +294,20 @@ export function createExecuteToolCommand(
       }
 
       // Record provenance via Log Service (Feature: 071)
-      if (logService && stacService) {
+      // Resolve logService dynamically: prefer MapPanel's logService (set per-plot),
+      // fall back to the static logService parameter (legacy path).
+      const resolvedLogService = panel.getLogService?.() ?? logService;
+      if (!resolvedLogService) {
+        console.warn('[debrief] executeTool: logService not available — provenance will not be recorded. Was the plot opened correctly?');
+      }
+      if (resolvedLogService && stacService) {
         try {
           const store = panel.getCurrentStore?.();
           const plot = panel.getCurrentPlot?.();
           if (store?.path && plot?.itemPath) {
             // Include pre-tool inputState for mutation tools
             const isMutation = result.resultType?.startsWith('mutation/');
-            const recordResult = await logService.recordToolResult(
+            const recordResult = await resolvedLogService.recordToolResult(
               {
                 success: true,
                 features: result.features,
@@ -222,6 +332,11 @@ export function createExecuteToolCommand(
             // Update Result ID Registry from recorded entries (Feature: 087)
             if (resultIdRegistry) {
               resultIdRegistry.registerFromRecordResult(recordResult);
+            }
+
+            // Refresh Log Panel timeline to show the new entry (Feature: 113)
+            if (logPanelProvider) {
+              void logPanelProvider.refreshTimeline();
             }
           }
         } catch (logErr) {

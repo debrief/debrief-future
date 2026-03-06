@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://measurement-position-range-bearing-track-alpha-1",
+      "mimeType": "application/json",
+      "text": "{\"range_nm\":3.57,\"bearing_deg\":32.7,\"selected_track\":\"track-alpha\",\"selected_position_index\":1,\"selected_time\":1705314600000,\"selected_coordinates\":[-1.0,50.0],\"matched_track\":\"track-bravo\",\"matched_position_index\":1,\"matched_time\":1705314660000,\"matched_coordinates\":[-0.95,50.05],\"time_delta_ms\":60000}",
+      "annotations": {
+        "debrief:resultType": "artifact/measurement/position_range_bearing",
+        "debrief:sourceFeatures": ["track-alpha", "track-bravo"],
+        "debrief:label": "Range 3.57 nm, bearing 032.7° from track-alpha/positions/1 to track-bravo/positions/1"
+      }
+    }
+  ]
+}

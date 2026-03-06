@@ -4,12 +4,14 @@
  * Bridges VS Code webview API to the LogPanel React component.
  * Handles message passing between extension host and React component.
  * Phase 6: Adds tune/revert/replay message forwarding.
+ * Feature 113: Adds schema cache, disable/rationale handlers.
  *
  * Feature: 072-log-panel (E02, Phase 2)
  * Updated: 076-replay-tune (E02, Phase 6)
+ * Updated: 113-prov-card-flip (flip-card edit wiring)
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { LogPanel, LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
 import type {
@@ -19,6 +21,7 @@ import type {
   LogFilterState,
   LogPanelMessage,
   ExtensionToWebviewMessage,
+  ParameterSchemaEntry,
 } from '@debrief/components';
 
 // Phase 6 message types from the extension
@@ -36,12 +39,13 @@ interface ReplayResultPayload {
   haltReason: { type: string; toolId: string; message: string } | null;
 }
 
-// Extended message type to include Phase 6 messages
+// Extended message type to include Phase 6 + Feature 113 messages
 type ExtendedExtensionMessage =
   | ExtensionToWebviewMessage
   | { type: 'replay:progress'; payload: ReplayProgressPayload }
   | { type: 'replay:result'; payload: ReplayResultPayload }
-  | { type: 'replay:error'; payload: { message: string } };
+  | { type: 'replay:error'; payload: { message: string } }
+  | { type: 'schema:response'; payload: { toolId: string; schema: unknown[]; error: string | null } };
 
 // VS Code API type
 declare function acquireVsCodeApi(): {
@@ -144,6 +148,49 @@ function LogPanelApp(): React.ReactElement {
           setActionResultMessage(msg.payload.message);
           setTimeout(() => setActionResultMessage(null), 5000);
           break;
+
+        case 'schema:response': {
+          const { toolId: schemaToolId, schema: rawSchema, error: schemaErr } = msg.payload;
+          const pending = pendingSchemaRef.current.get(schemaToolId);
+          if (pending) {
+            pendingSchemaRef.current.delete(schemaToolId);
+            if (schemaErr || !rawSchema || (rawSchema as unknown[]).length === 0) {
+              // Extension returned empty/error — fall back to local derivation
+              const entry = entries.find((e) => e.toolName === schemaToolId);
+              const fallback: ParameterSchemaEntry[] = [];
+              if (entry) {
+                for (const [name, param] of Object.entries(entry.parameters)) {
+                  const isNum = typeof param.value === 'number';
+                  fallback.push({
+                    name,
+                    type: isNum ? 'number' : 'string',
+                    description: null,
+                    tunable: param.tunable !== false,
+                    defaultValue: param.default ? param.value : null,
+                    minimum: null,
+                    maximum: null,
+                    step: isNum ? 1 : null,
+                    choices: null,
+                    paramType: null,
+                  });
+                }
+              }
+              pending.resolve(fallback);
+            } else {
+              // Merge extension schema with local parameter tunability/values
+              const entry = entries.find((e) => e.toolName === schemaToolId);
+              const merged = (rawSchema as ParameterSchemaEntry[]).map((s) => {
+                const paramVal = entry?.parameters[s.name];
+                return {
+                  ...s,
+                  tunable: paramVal ? paramVal.tunable !== false : s.tunable,
+                };
+              });
+              pending.resolve(merged);
+            }
+          }
+          break;
+        }
       }
     };
 
@@ -174,13 +221,38 @@ function LogPanelApp(): React.ReactElement {
     setSelectedEntryId(entryId);
   }, []);
 
-  // Phase 6: tune/revert handlers → send dedicated messages to extension
+  // Phase 6: tune/revert handlers → send dedicated messages to extension.
+  // Optimistic local update so the slider responds instantly during drag.
+  // Debounced (400ms) so rapid slider drags only trigger one replay.
+  const tuneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleTuneRequest = useCallback(
     (activityId: string, parameter: string, newValue: unknown) => {
-      vscode.postMessage({
-        type: 'tune:request',
-        payload: { activityId, parameter, newValue },
-      });
+      // Optimistic update: immediately reflect the new value in local state
+      // so the slider doesn't snap back while waiting for the replay round-trip.
+      setEntries((prev) =>
+        prev.map((e) => {
+          if (e.activityId !== activityId) return e;
+          const paramEntry = e.parameters[parameter];
+          if (!paramEntry) return e;
+          return {
+            ...e,
+            parameters: {
+              ...e.parameters,
+              [parameter]: { ...paramEntry, value: newValue },
+            },
+          };
+        })
+      );
+
+      // Debounce the actual replay request
+      if (tuneTimerRef.current) clearTimeout(tuneTimerRef.current);
+      tuneTimerRef.current = setTimeout(() => {
+        tuneTimerRef.current = null;
+        vscode.postMessage({
+          type: 'tune:request',
+          payload: { activityId, parameter, newValue },
+        });
+      }, 400);
     },
     []
   );
@@ -210,6 +282,70 @@ function LogPanelApp(): React.ReactElement {
     vscode.postMessage({ type: 'replay:cancel' });
   }, []);
 
+  // Feature 113: Schema resolution via extension host round-trip.
+  // Sends schema:request to extension, which looks up tool definitions
+  // and returns ParameterSchemaEntry[] with proper choices/paramType.
+  // Falls back to local parameter-based derivation if no response.
+  const pendingSchemaRef = useRef(new Map<string, {
+    resolve: (schema: ReadonlyArray<ParameterSchemaEntry>) => void;
+  }>());
+
+  const handleSchemaRequest = useCallback(
+    (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
+      return new Promise<ReadonlyArray<ParameterSchemaEntry>>((resolve) => {
+        // Store resolver for when schema:response arrives
+        pendingSchemaRef.current.set(toolId, { resolve });
+
+        // Send request to extension host
+        vscode.postMessage({ type: 'schema:request', payload: { toolId } });
+
+        // Timeout fallback: derive from local parameter metadata after 2s
+        setTimeout(() => {
+          if (!pendingSchemaRef.current.has(toolId)) return; // Already resolved
+          pendingSchemaRef.current.delete(toolId);
+
+          const entry = entries.find((e) => e.toolName === toolId);
+          const schema: ParameterSchemaEntry[] = [];
+          if (entry) {
+            for (const [name, param] of Object.entries(entry.parameters)) {
+              const isNum = typeof param.value === 'number';
+              schema.push({
+                name,
+                type: isNum ? 'number' : 'string',
+                description: null,
+                tunable: param.tunable !== false,
+                defaultValue: param.default ? param.value : null,
+                minimum: null,
+                maximum: null,
+                step: isNum ? 1 : null,
+                choices: null,
+                paramType: null,
+              });
+            }
+          }
+          resolve(schema);
+        }, 2000);
+      });
+    },
+    [entries]
+  );
+
+  // Feature 113: disable toggle → forward to extension
+  const handleDisableToggle = useCallback((activityId: string, disabled: boolean) => {
+    vscode.postMessage({
+      type: 'disable:toggle',
+      payload: { activityId, disabled },
+    });
+  }, []);
+
+  // Feature 113: rationale update → forward to extension
+  const handleRationaleUpdate = useCallback((activityId: string, rationale: string) => {
+    vscode.postMessage({
+      type: 'rationale:update',
+      payload: { activityId, rationale },
+    });
+  }, []);
+
   return (
     <LogPanel
       entries={entries}
@@ -232,6 +368,9 @@ function LogPanelApp(): React.ReactElement {
       onRevertThisRequest={handleRevertThisRequest}
       onRestoreRequest={handleRestoreRequest}
       onReplayCancel={handleReplayCancel}
+      onSchemaRequest={handleSchemaRequest}
+      onDisableToggle={handleDisableToggle}
+      onRationaleUpdate={handleRationaleUpdate}
     />
   );
 }

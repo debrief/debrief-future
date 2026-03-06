@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { Timeline } from './Timeline';
 import type { DebriefFeatureCollection } from '../utils/types';
 import type { TrackFeature, ReferenceLocation } from '@debrief/schemas';

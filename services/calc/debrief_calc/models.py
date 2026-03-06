@@ -19,7 +19,7 @@ Defines the entities used throughout the tool registry and execution system:
 from __future__ import annotations
 
 import re
-from collections.abc import Callable
+from collections.abc import Callable  # noqa: TC003 — Pydantic needs Callable at runtime
 from datetime import datetime
 from enum import StrEnum
 from typing import Any
@@ -63,7 +63,7 @@ class Provenance(BaseModel):
     version: str = Field(..., description="Tool version")
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="Execution timestamp")
     sources: list[SourceRef] = Field(default_factory=list, description="Input features used")
-    parameters: dict[str, Any] = Field(
+    parameters: dict[str, Any] = Field(  # JSON-serializable value
         default_factory=dict, description="Parameters passed to tool"
     )
 
@@ -76,7 +76,7 @@ class ParameterValue(BaseModel):
     the default value and whether it can be tuned during replay.
     """
 
-    value: Any = Field(..., description="The parameter value")
+    value: Any = Field(..., description="The parameter value")  # JSON-serializable value
     default: bool = Field(default=False, description="Whether this is the default value")
     tunable: bool = Field(
         default=True, description="Whether this parameter can be modified during replay"
@@ -86,8 +86,10 @@ class ParameterValue(BaseModel):
 class PropertyDelta(BaseModel):
     """Captures the previous and new value of a single property change."""
 
-    previous_value: Any = Field(..., description="Value before the change")
-    new_value: Any = Field(..., description="Value after the change")
+    previous_value: Any = Field(
+        ..., description="Value before the change"
+    )  # JSON-serializable value
+    new_value: Any = Field(..., description="Value after the change")  # JSON-serializable value
 
 
 class ModifiedFeature(BaseModel):
@@ -107,13 +109,27 @@ class CreatedAsset(BaseModel):
     mime_type: str | None = Field(default=None, description="MIME type of the artifact")
 
 
+class InputFeatureState(BaseModel):
+    """Pre-operation state of a feature before a coordinate-mutating tool executes."""
+
+    feature_id: str = Field(..., alias="featureId", description="ID of the feature")
+    geometry: dict[str, Any] = Field(
+        ..., description="GeoJSON geometry object (type + coordinates)"
+    )
+    properties: dict[str, Any] | None = Field(
+        default=None, description="Kind-specific spatial properties (excludes provenance)"
+    )
+
+    model_config = {"populate_by_name": True}
+
+
 class TuneAnnotation(BaseModel):
     """Records a parameter modification (appended, not replacing original)."""
 
     timestamp: datetime = Field(..., description="When the tuning occurred")
     parameter: str = Field(..., description="Name of the parameter that was changed")
-    previous_value: Any = Field(..., description="Value before tuning")
-    new_value: Any = Field(..., description="Value after tuning")
+    previous_value: Any = Field(..., description="Value before tuning")  # JSON-serializable value
+    new_value: Any = Field(..., description="Value after tuning")  # JSON-serializable value
 
     model_config = {
         "json_schema_extra": {
@@ -179,6 +195,11 @@ class LogEntry(BaseModel):
     tune: TuneAnnotation | None = Field(
         default=None, description="Parameter tuning record (null until tuned)"
     )
+    input_state: list[InputFeatureState] | None = Field(
+        default=None,
+        alias="inputState",
+        description="Pre-operation feature states for coordinate-mutating tools",
+    )
 
     model_config = {"populate_by_name": True}
 
@@ -194,14 +215,33 @@ class LogEntry(BaseModel):
         return v
 
 
-VALID_PARAM_TYPES = {
-    "NamedColor",
-    "MarkerSymbol",
-    "CardinalDirection",
-    "DurationPreset",
-    "NumericPreset",
-    "ReferencePointPattern",
-}
+def _get_valid_param_types() -> set[str]:
+    """Derive valid param_type values from the schema enum registry."""
+    try:
+        from debrief_schemas.validation import resolve_enum_values as _resolve
+
+        # These are the param_type names that match schema enums
+        candidates = {
+            "NamedColor",
+            "MarkerSymbol",
+            "CardinalDirection",
+            "DurationPreset",
+            "NumericPreset",
+            "ReferencePointPattern",
+        }
+        return {name for name in candidates if _resolve(name) is not None}
+    except ImportError:
+        return {
+            "NamedColor",
+            "MarkerSymbol",
+            "CardinalDirection",
+            "DurationPreset",
+            "NumericPreset",
+            "ReferencePointPattern",
+        }
+
+
+VALID_PARAM_TYPES = _get_valid_param_types()
 """Valid values for ToolParameter.param_type, referencing schema-defined parameter-type enums."""
 
 
@@ -217,8 +257,12 @@ class ToolParameter(BaseModel):
     type: str = Field(..., description="Data type: string, number, boolean, enum")
     description: str = Field(..., description="Human-readable description")
     required: bool = Field(default=False, description="Whether parameter is required")
-    default: Any | None = Field(default=None, description="Default value if not provided")
-    choices: list[Any] | None = Field(default=None, description="Valid values for enum type")
+    default: Any | None = Field(
+        default=None, description="Default value if not provided"
+    )  # JSON-serializable value
+    choices: list[Any] | None = Field(
+        default=None, description="Valid values for enum type"
+    )  # JSON-serializable value
     param_type: str | None = Field(
         default=None, description="References a schema-defined parameter-type enum by name"
     )
@@ -259,7 +303,7 @@ class ToolError(BaseModel):
 
     code: str = Field(..., description="Error code")
     message: str = Field(..., description="Human-readable error message")
-    details: dict[str, Any] | None = Field(
+    details: dict[str, Any] | None = Field(  # JSON-serializable value
         default=None, description="Additional context-specific details"
     )
 
@@ -499,8 +543,9 @@ class Tool(BaseModel):
             schema["type"] = "boolean"
         elif param.type == "enum":
             schema["type"] = "string"
-            if param.choices:
-                schema["enum"] = param.choices
+
+        if param.choices:
+            schema["enum"] = param.choices
 
         if param.default is not None:
             schema["default"] = param.default

@@ -230,7 +230,7 @@ def ensure_tools_installed(repo_root: Path) -> tuple[bool, str]:
     return True, ""
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Build Python services for Electron bundling")
     parser.add_argument(
         "--platform",

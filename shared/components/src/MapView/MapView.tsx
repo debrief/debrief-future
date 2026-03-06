@@ -278,15 +278,14 @@ export function MapView({
   const geojsonData = useMemo(() => {
     const expanded: GeoJSON.Feature[] = [];
     for (const f of staticFeatures) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const fProps = f.properties as any;
+      const fProps = f.properties as unknown as Record<string, unknown>;
       const isZone = fProps?.kind === 'ZONE' && f.geometry?.type === 'MultiPolygon';
       if (f.geometry?.type === 'MultiPolygon' && !isZone) {
         // Decompose MultiPolygon into individual Polygons
         const coords = f.geometry.coordinates as unknown as number[][][][];
         const overrides = fProps?.position_style_overrides as Record<string, Record<string, unknown>> | undefined;
         for (let i = 0; i < coords.length; i++) {
-          const childStyle = { ...(fProps?.style ?? {}) };
+          const childStyle: Record<string, unknown> = { ...(fProps?.style as Record<string, unknown> ?? {}) };
           // Merge per-polygon overrides into the child style
           const ov = overrides?.[String(i)];
           if (ov) {
@@ -329,10 +328,10 @@ export function MapView({
       const fillColor = (style?.fill_color as string) ?? color;
 
       return {
-        color: isSelected ? 'var(--debrief-selection-border)' : color,
+        color,
         weight: isSelected ? 4 : (style?.weight as number) ?? (isTrackFeature(debriefFeature) ? 3 : 2),
         opacity: (style?.opacity as number) ?? 1,
-        fillColor: isSelected ? 'var(--debrief-selection-border)' : fillColor,
+        fillColor,
         fillOpacity: isSelected ? 0.4 : (style?.fill_opacity as number) ?? 0.2,
         dashArray: (style?.dash_array as string) ?? undefined,
       };
@@ -345,6 +344,14 @@ export function MapView({
       const debriefFeature = feature as unknown as DebriefFeature;
       const featureId = debriefFeature.id;
       const label = getFeatureLabel(debriefFeature);
+
+      // Apply selected CSS class on layer options before it's added to the DOM.
+      // Leaflet's setStyle() ignores className, so we set it here in
+      // onEachFeature (called before addLayer → _initPath reads options.className).
+      if (selectedIds.has(featureId) && 'options' in layer) {
+        const path = layer as L.Path;
+        path.options.className = ((path.options.className ?? '') + ' debrief-map-feature--selected').trim();
+      }
 
       // Add tooltip
       layer.bindTooltip(label, {
@@ -373,8 +380,7 @@ export function MapView({
 
       // Apply per-ring styles for ZONE MultiPolygon features
       // (ZONEs are kept as MultiPolygon since they use a dedicated zones array)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const featureProps = feature.properties as any;
+      const featureProps = feature.properties as unknown as Record<string, unknown>;
       if (
         featureProps?.kind === 'ZONE' &&
         feature.geometry?.type === 'MultiPolygon' &&
@@ -382,8 +388,9 @@ export function MapView({
         'getLayers' in layer
       ) {
         const subLayers = (layer as unknown as { getLayers(): L.Layer[] }).getLayers();
+        const zones = featureProps.zones as Array<{ style?: Record<string, unknown> }>;
         subLayers.forEach((subLayer, i) => {
-          const s = featureProps.zones[i]?.style;
+          const s = zones[i]?.style;
           if (s && 'setStyle' in subLayer) {
             (subLayer as unknown as { setStyle(opts: PathOptions): void }).setStyle({
               color: (s.color as string) ?? '#999',
@@ -397,7 +404,7 @@ export function MapView({
         });
       }
     };
-  }, [onSelect]);
+  }, [onSelect, selectedIds]);
 
   // pointToLayer callback — renders Point and MultiPoint geometries as circle markers
   const pointToLayer = useMemo(() => {
@@ -409,13 +416,15 @@ export function MapView({
       const color = (featureStyle?.color as string) ?? getFeatureColor(debriefFeature);
       const fillColor = (featureStyle?.fill_color as string) ?? color;
 
+      const baseRadius = (featureStyle?.radius as number) ?? 6;
       return L.circleMarker(latlng, {
-        radius: (featureStyle?.radius as number) ?? 6,
-        fillColor: isSelected ? 'var(--debrief-selection-border)' : fillColor,
+        radius: isSelected ? baseRadius + 2 : baseRadius,
+        fillColor,
         fillOpacity: isSelected ? 0.6 : (featureStyle?.fill_opacity as number) ?? 0.7,
-        color: isSelected ? 'var(--debrief-selection-border)' : color,
+        color,
         weight: isSelected ? 3 : (featureStyle?.weight as number) ?? 2,
         opacity: (featureStyle?.opacity as number) ?? 1,
+        className: isSelected ? 'debrief-map-feature--selected' : undefined,
       });
     };
   }, [selectedIds]);

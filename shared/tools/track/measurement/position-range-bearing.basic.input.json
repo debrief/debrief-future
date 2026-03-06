@@ -1,0 +1,45 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "track-alpha",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-1.05, 49.95],
+          [-1.0, 50.0],
+          [-0.95, 50.05]
+        ]
+      },
+      "properties": {
+        "debrief:kind": "TRACK",
+        "name": "OWNSHIP",
+        "times": [1705314480000, 1705314600000, 1705314720000]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "track-bravo",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-0.9, 50.1],
+          [-0.95, 50.05],
+          [-0.85, 50.15]
+        ]
+      },
+      "properties": {
+        "debrief:kind": "TRACK",
+        "name": "TARGET",
+        "times": [1705314480000, 1705314660000, 1705314840000]
+      }
+    }
+  ],
+  "properties": {
+    "tool": "position-range-bearing",
+    "params": {
+      "selected_position_index": 1
+    }
+  }
+}

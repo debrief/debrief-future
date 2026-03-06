@@ -244,4 +244,6 @@ def get_dash_array(line_style: str | None) -> str | None:
         "long-dash": "10, 5",
         "unconnected": None,  # Points only, no line
     }
+    if line_style is None:
+        return None
     return dash_patterns.get(line_style)

@@ -1,0 +1,90 @@
+# Browser-based VS Code Extension Preview
+# Runs code-server with the Debrief extension and sample data pre-installed.
+#
+# Build:  docker build -t debrief-preview -f Dockerfile.preview .
+# Run:   docker run -p 8080:8080 -e PORT=8080 debrief-preview
+#
+# Heroku Review Apps: heroku.yml points here. Heroku sets $PORT automatically.
+
+# ---------------------------------------------------------------------------
+# Stage 1: Build the VS Code extension .vsix from source
+# ---------------------------------------------------------------------------
+FROM node:20-slim AS vsix-builder
+
+RUN npm install -g pnpm@9
+
+WORKDIR /build
+
+# Copy workspace config and all source upfront
+# (Heroku has no Docker layer cache, so separate COPY-for-cache is pointless)
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY shared/schemas/ ./shared/schemas/
+COPY shared/components/ ./shared/components/
+COPY shared/utils/ ./shared/utils/
+COPY shared/config-ts/package.json ./shared/config-ts/
+COPY services/session-state/ ./services/session-state/
+COPY apps/vscode/ ./apps/vscode/
+COPY apps/loader/package.json ./apps/loader/
+COPY apps/web-shell/package.json ./apps/web-shell/
+
+# Install, build, package, then delete node_modules — all in ONE layer.
+# Docker commits layer diffs: creating + deleting node_modules in the same
+# RUN means Docker never snapshots the ~500MB node_modules directory.
+# This prevents OOM on Heroku's constrained build dynos.
+RUN pnpm install --filter debrief-vscode... --no-frozen-lockfile && \
+    pnpm --filter debrief-vscode... build && \
+    cd apps/vscode && npx @vscode/vsce package --no-dependencies && \
+    cd /build && \
+    rm -rf node_modules
+
+# ---------------------------------------------------------------------------
+# Stage 2: Final image with code-server + Python services + extension
+# ---------------------------------------------------------------------------
+FROM codercom/code-server:latest
+
+USER root
+
+# Install Python 3.11 and system dependencies for Debrief services
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 \
+    python3.11-venv \
+    python3-pip \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv for Python package management
+# Use UV_INSTALL_DIR so uv lands in a fixed location regardless of $HOME
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
+
+# Copy Python service sources
+COPY services/io /workspace/services/io
+COPY services/stac /workspace/services/stac
+COPY services/calc /workspace/services/calc
+COPY shared/schemas /workspace/shared/schemas
+
+# Install Python services in a virtual environment
+WORKDIR /workspace
+RUN uv venv /opt/debrief-venv && \
+    VIRTUAL_ENV=/opt/debrief-venv uv pip install \
+    ./shared/schemas \
+    ./services/io \
+    ./services/stac \
+    ./services/calc
+ENV PATH="/opt/debrief-venv/bin:$PATH"
+
+# Copy preview workspace with sample data
+COPY preview/workspace /workspace/preview
+COPY preview/entrypoint.sh /opt/entrypoint.sh
+RUN chmod +x /opt/entrypoint.sh
+
+# Keep the .vsix in the image — the entrypoint installs it at runtime.
+# code-server's --install-extension at build time writes to extensions.json,
+# but this manifest can be lost at runtime (known issue: coder/code-server#7326).
+# Installing at container startup guarantees the extensions.json is fresh.
+USER coder
+COPY --chown=coder:coder --from=vsix-builder /build/apps/vscode/*.vsix /opt/debrief.vsix
+
+ENV PORT=8080
+EXPOSE 8080
+
+ENTRYPOINT ["/opt/entrypoint.sh"]

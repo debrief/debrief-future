@@ -13,8 +13,9 @@
  * the proprietary vsda WASM module for WebSocket authentication.
  */
 import { execSync, spawn, type ChildProcess } from 'child_process';
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
+import { homedir } from 'os';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -62,8 +63,9 @@ function whichSync(cmd: string): string | null {
 }
 
 /**
- * Write machine-level settings to disable the Welcome tab.
+ * Write machine-level settings to disable the Welcome tab and workspace trust.
  * The Welcome tab captures keyboard focus into an iframe, breaking shortcuts.
+ * Workspace trust must be disabled so extensions activate without user interaction.
  */
 function writeVSCodeSettings(dataDir: string): void {
   const settingsDir = join(dataDir, 'User');
@@ -72,6 +74,7 @@ function writeVSCodeSettings(dataDir: string): void {
     join(settingsDir, 'settings.json'),
     JSON.stringify(
       {
+        'security.workspace.trust.enabled': false,
         'workbench.startupEditor': 'none',
         'workbench.welcomePage.walkthroughs.openOnInstall': false,
         'workbench.tips.enabled': false,
@@ -82,7 +85,50 @@ function writeVSCodeSettings(dataDir: string): void {
   );
 }
 
+/**
+ * Ensure the Debrief config file exists with the test STAC store registered.
+ * Without this, the STAC tree view is empty and the E2E test cannot open a plot.
+ * In Docker, the Dockerfile handles this; for local runs, we seed it here.
+ */
+function ensureDebriefConfig(): void {
+  const xdgConfig = process.env.XDG_CONFIG_HOME ?? join(homedir(), '.config');
+  const configDir = join(xdgConfig, 'debrief');
+  const configFile = join(configDir, 'config.json');
+
+  if (existsSync(configFile)) {
+    return; // Already configured (e.g. developer has their own stores)
+  }
+
+  const storePath = join(WORKSPACE_PATH, 'local-store');
+  mkdirSync(configDir, { recursive: true });
+  writeFileSync(
+    configFile,
+    JSON.stringify(
+      {
+        stores: [
+          {
+            id: 'local-store',
+            path: storePath,
+            displayName: 'Test Maritime Data',
+            status: 'available',
+          },
+        ],
+        preferences: {},
+      },
+      null,
+      2
+    )
+  );
+  console.log(`Pre-seeded Debrief config at ${configFile}`);
+}
+
 async function globalSetup(): Promise<void> {
+  // Ensure the test STAC store is registered for locally-started servers.
+  // Docker environments are pre-seeded via the Dockerfile.
+  if (!process.env.CODE_SERVER_URL) {
+    ensureDebriefConfig();
+  }
+
   // If CODE_SERVER_URL is explicitly set, assume external management (Docker)
   if (process.env.CODE_SERVER_URL) {
     console.log(`Using external VS Code server at ${CODE_SERVER_URL}`);
@@ -119,12 +165,14 @@ async function globalSetup(): Promise<void> {
       { stdio: 'pipe', detached: true }
     );
   } else {
-    // Fall back to code-server
-    const csPath = whichSync('code-server');
+    // Fall back to code-server (check PATH, then standalone install location)
+    const csPath =
+      whichSync('code-server') ?? whichSync('/opt/code-server/bin/code-server');
     if (!csPath) {
       throw new Error(
         'Neither openvscode-server nor code-server found.\n' +
           'Install openvscode-server or code-server, or set CODE_SERVER_URL to an external instance.\n' +
+          'In cloud sessions: bash tests/e2e/scripts/cloud-e2e-setup.sh\n' +
           'Or use Docker: docker compose -f docker/code-server/docker-compose.yml up -d'
       );
     }

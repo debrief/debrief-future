@@ -62,7 +62,7 @@ export function getFeatureIcon(feature: DebriefFeature): string {
     return 'multi-point';
   } else if (isMultiPolygonFeature(feature)) {
     return 'multi-polygon';
-  } else {
+  } else if (isReferenceLocation(feature)) {
     // ReferenceLocation: use location_type to determine icon
     switch (feature.properties.location_type) {
       case 'WAYPOINT':
@@ -80,6 +80,8 @@ export function getFeatureIcon(feature: DebriefFeature): string {
       default:
         return 'location-unknown';
     }
+  } else {
+    return 'shape-annotation';
   }
 }
 
@@ -150,8 +152,10 @@ export function getFeatureDescription(feature: DebriefFeature): string {
     return feature.properties.description || 'multi-point';
   } else if (isMultiPolygonFeature(feature)) {
     return feature.properties.description || 'multi-polygon';
-  } else {
+  } else if (isReferenceLocation(feature)) {
     const locType = feature.properties.location_type.toLowerCase().replace('_', ' ');
     return feature.properties.description || locType;
+  } else {
+    return (feature.properties.kind ?? '').toLowerCase().replace('_', ' ') || 'annotation';
   }
 }

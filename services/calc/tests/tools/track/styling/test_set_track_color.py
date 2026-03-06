@@ -55,7 +55,7 @@ TRACK_FEATURE = {
 class TestSetTrackColor:
     """Golden example tests for the set-track-color tool."""
 
-    def test_basic_golden_example(self):
+    def test_basic_golden_example(self) -> None:
         """Apply color='#FF0000' to one track. Verify line color updated, other props unchanged."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -71,7 +71,7 @@ class TestSetTrackColor:
         assert line["weight"] == 3
         assert line["opacity"] == 1.0
 
-    def test_multiple_tracks(self):
+    def test_multiple_tracks(self) -> None:
         """Apply color to 2 tracks, both get updated."""
         feature_a = copy.deepcopy(TRACK_FEATURE)
         feature_b = copy.deepcopy(TRACK_FEATURE)
@@ -86,7 +86,7 @@ class TestSetTrackColor:
         assert result[0]["properties"]["style"]["line"]["color"] == "#00FF00"
         assert result[1]["properties"]["style"]["line"]["color"] == "#00FF00"
 
-    def test_no_existing_style(self):
+    def test_no_existing_style(self) -> None:
         """Track with no style property gets default style with applied color."""
         feature = copy.deepcopy(TRACK_FEATURE)
         del feature["properties"]["style"]
@@ -105,7 +105,7 @@ class TestSetTrackColor:
         assert line["weight"] == 3
         assert line["opacity"] == 1.0
 
-    def test_skips_non_track_features(self):
+    def test_skips_non_track_features(self) -> None:
         """Non-TRACK features are ignored without error."""
         track = copy.deepcopy(TRACK_FEATURE)
         non_track = {
@@ -124,7 +124,7 @@ class TestSetTrackColor:
         assert result[0]["id"] == "track-001"
         assert result[0]["properties"]["style"]["line"]["color"] == "#FF0000"
 
-    def test_error_no_tracks(self):
+    def test_error_no_tracks(self) -> None:
         """Empty feature list raises ValueError."""
         context = SelectionContext(type=ContextType.NONE, features=[])
         params = {"color": "#FF0000"}
@@ -132,7 +132,7 @@ class TestSetTrackColor:
         with pytest.raises(ValueError, match="No track features found"):
             set_track_color(context, params)
 
-    def test_error_missing_color(self):
+    def test_error_missing_color(self) -> None:
         """Missing color param raises ValueError."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])

@@ -183,6 +183,16 @@
             "null"
           ]
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "radius": {
           "description": "Circle radius in meters for precise reconstruction",
           "minimum": 0,
@@ -531,6 +541,16 @@
             "null"
           ]
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "source_file": {
           "description": "Original source file path",
           "type": [
@@ -786,6 +806,16 @@
           "description": "Human-readable result label",
           "type": "string"
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "source_features": {
           "description": "IDs of input features used to generate this result",
           "items": {
@@ -878,6 +908,16 @@
         "label": {
           "description": "Human-readable result label",
           "type": "string"
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "source_features": {
           "description": "IDs of input features used to generate this result",
@@ -973,6 +1013,16 @@
           "const": "NARRATIVE",
           "description": "Feature type discriminator"
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "source_file": {
           "description": "Original source file path",
           "type": [
@@ -1029,6 +1079,16 @@
         "n_100"
       ],
       "title": "NumericPresetEnum",
+      "type": "string"
+    },
+    "OutputKindEnum": {
+      "description": "Canonical output kind identifiers for tool result features. Set on feature.properties.kind by the executor after tool execution. Values use slash-delimited hierarchical paths matching domain/subtype. Both Python and TypeScript executors MUST use these values \u2014 no hand-authored kind strings in tool implementations.",
+      "enum": [
+        "track/statistics",
+        "dataset/range_bearing_series",
+        "region/statistics"
+      ],
+      "title": "OutputKindEnum",
       "type": "string"
     },
     "ParameterTypeEnum": {
@@ -1236,6 +1296,16 @@
           "description": "Source line number for debugging",
           "type": [
             "integer",
+            "null"
+          ]
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
             "null"
           ]
         },
@@ -1453,6 +1523,16 @@
             "null"
           ]
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "source_file": {
           "description": "Original source file path",
           "type": [
@@ -1551,6 +1631,16 @@
             "null"
           ]
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "style": {
           "$ref": "#/$defs/PointProperties",
           "description": "Point styling properties for display"
@@ -1595,6 +1685,17 @@
         "scatter"
       ],
       "title": "ReferencePointPatternEnum",
+      "type": "string"
+    },
+    "ResultCategoryEnum": {
+      "description": "Top-level result type categories per TOOL-RESULTS.md. Used as prefix for debrief:resultType annotations.",
+      "enum": [
+        "mutation",
+        "addition",
+        "deletion",
+        "artifact"
+      ],
+      "title": "ResultCategoryEnum",
       "type": "string"
     },
     "SegmentMetadata": {
@@ -2048,6 +2149,16 @@
           "const": "SYSTEM",
           "description": "Feature type discriminator"
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "selected_ids": {
           "description": "Array of selected feature IDs - for selection state",
           "items": {
@@ -2263,6 +2374,16 @@
           "$ref": "#/$defs/FeatureKindEnum",
           "const": "TEXT",
           "description": "Feature type discriminator"
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "source_file": {
           "description": "Original source file path",
@@ -2527,6 +2648,16 @@
           "minItems": 2,
           "type": "array"
         },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "segments": {
           "description": "Per-segment metadata for compound tracks. When present, geometry MUST be MultiLineString and segments[i] describes coordinates[i]. When absent, geometry is LineString and the flat positions array is used.",
           "items": {
@@ -2722,6 +2853,16 @@
           "maxItems": 2,
           "minItems": 2,
           "type": "array"
+        },
+        "provenance": {
+          "description": "PROV-aligned provenance records (append-only log of tool operations)",
+          "items": {
+            "$ref": "#/$defs/LogEntry"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "range": {
           "description": "Vector length/range in meters for precise reconstruction",

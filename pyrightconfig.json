@@ -1,0 +1,18 @@
+{
+  "include": [
+    "services",
+    "shared/schemas/src",
+    "shared/schemas/tests"
+  ],
+  "exclude": [
+    "shared/schemas/src/generated/",
+    "**/node_modules",
+    "**/__pycache__",
+    "**/dist",
+    "**/.venv"
+  ],
+  "pythonVersion": "3.11",
+  "typeCheckingMode": "standard",
+  "reportMissingTypeStubs": false,
+  "reportImplicitOverride": false
+}

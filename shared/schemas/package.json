@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "description": "TypeScript interfaces and JSON Schema for Debrief v4.x",
   "type": "module",
-  "main": "src/generated/typescript/index.js",
-  "types": "src/generated/typescript/index.d.ts",
+  "main": "src/generated/typescript/index.ts",
+  "types": "src/generated/typescript/index.ts",
   "exports": {
     ".": {
-      "types": "./src/generated/typescript/index.d.ts",
-      "import": "./src/generated/typescript/index.js"
+      "types": "./src/generated/typescript/index.ts",
+      "import": "./src/generated/typescript/index.ts"
     },
     "./json-schema/*": "./src/generated/json-schema/*"
   },

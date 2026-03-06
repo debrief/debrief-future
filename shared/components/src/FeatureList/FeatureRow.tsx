@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { DebriefFeature } from '../utils/types';
-import { isTrackFeature, isMultiPointFeature, isMultiPolygonFeature } from '../utils/types';
+import { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygonFeature } from '../utils/types';
 import { getFeatureLabel, getFeatureColor } from '../utils/labels';
 import type { DisplayItem } from './flattenFeatures';
 import './FeatureList.css';
@@ -33,6 +33,9 @@ export interface FeatureRowProps {
   /** Whether to show the format icon (Feature 097) */
   showFormatIcon?: boolean;
 
+  /** Whether to show the info icon (Feature 098) */
+  showInfoIcon?: boolean;
+
   /** Click handler */
   onClick: (event: React.MouseEvent) => void;
 
@@ -44,6 +47,12 @@ export interface FeatureRowProps {
 
   /** Format icon click handler for child rows (positions, points, polygons) */
   onChildFormatClick?: (event: React.MouseEvent, displayItem: DisplayItem) => void;
+
+  /** Info icon click handler for parent features (Feature 098) */
+  onInfoClick?: (event: React.MouseEvent, feature: DebriefFeature) => void;
+
+  /** Info icon click handler for child rows (Feature 098) */
+  onChildInfoClick?: (event: React.MouseEvent, displayItem: DisplayItem) => void;
 
   /** Optional inline style */
   style?: CSSProperties;
@@ -82,7 +91,10 @@ function getFeatureType(feature: DebriefFeature): string {
   if (isMultiPolygonFeature(feature)) {
     return 'MULTI_POLYGON';
   }
-  return (feature.properties.location_type || props.locationType as string) ?? 'POINT';
+  if (isReferenceLocation(feature)) {
+    return (feature.properties.location_type || props.locationType as string) ?? 'POINT';
+  }
+  return (props.kind as string) ?? 'ANNOTATION';
 }
 
 /**
@@ -139,10 +151,13 @@ export function FeatureRow({
   isExpanded = false,
   hasChildSelected: childSelected = false,
   showFormatIcon = false,
+  showInfoIcon = false,
   onClick,
   onToggleExpand,
   onFormatClick,
   onChildFormatClick,
+  onInfoClick,
+  onChildInfoClick,
   style,
 }: FeatureRowProps) {
   // Determine label, type, color based on whether this is a feature row or child row
@@ -267,6 +282,57 @@ export function FeatureRow({
             <path d="M12 2.5l1.5 1.5-9 9H3v-1.5l9-9z" />
             <path d="M10.5 4l1.5 1.5" />
             <path d="M2 13.5h12" />
+          </svg>
+        </span>
+      )}
+      {showInfoIcon && feature && onInfoClick && (
+        <span
+          className="debrief-feature-row__info-icon"
+          title="Info"
+          role="button"
+          tabIndex={-1}
+          data-testid={`info-icon-${feature.id}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onInfoClick(e, feature);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.stopPropagation();
+              onInfoClick(e as unknown as React.MouseEvent, feature);
+            }
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="8" cy="8" r="6" />
+            <path d="M8 7v4" />
+            <path d="M8 5v0.5" />
+          </svg>
+        </span>
+      )}
+      {showInfoIcon && !feature && displayItem && onChildInfoClick &&
+        (displayItem.type === 'position' || displayItem.type === 'point' || displayItem.type === 'polygon') && (
+        <span
+          className="debrief-feature-row__info-icon"
+          title="Info"
+          role="button"
+          tabIndex={-1}
+          data-testid={`info-icon-${displayItem.id}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onChildInfoClick(e, displayItem);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.stopPropagation();
+              onChildInfoClick(e as unknown as React.MouseEvent, displayItem);
+            }
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="8" cy="8" r="6" />
+            <path d="M8 7v4" />
+            <path d="M8 5v0.5" />
           </svg>
         </span>
       )}

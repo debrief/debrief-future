@@ -18,6 +18,13 @@ import type {
   MultiPolygonFeatureProperties,
   SegmentMetadata,
   PositionStyleOverride,
+  NarrativeEntry,
+  CircleAnnotation,
+  RectangleAnnotation,
+  LineAnnotation,
+  TextAnnotation,
+  VectorAnnotation,
+  PolyAnnotation,
 } from '@debrief/schemas';
 
 // Re-export all schema types for convenience
@@ -36,16 +43,50 @@ export type {
   MultiPolygonFeatureProperties,
   SegmentMetadata,
   PositionStyleOverride,
+  NarrativeEntry,
+  CircleAnnotation,
+  RectangleAnnotation,
+  LineAnnotation,
+  TextAnnotation,
+  VectorAnnotation,
+  PolyAnnotation,
 };
 
 // Re-export DisplayMode from TimeController for use by MapView temporal rendering
 export type { DisplayMode } from '../TimeController/types';
 
 /**
+ * Schema-typed annotation features — union of all 7 annotation types
+ * from @debrief/schemas. Available for precise type narrowing when needed.
+ */
+export type SchemaAnnotationFeature = NarrativeEntry | CircleAnnotation | RectangleAnnotation | LineAnnotation | TextAnnotation | VectorAnnotation | PolyAnnotation;
+
+/**
+ * Loose annotation interface for backward compatibility.
+ * Used in the DebriefFeature union as a catch-all for annotation types.
+ * Components can narrow to specific schema types using kind-based type guards.
+ */
+export interface AnnotationFeature {
+  type: 'Feature';
+  id: string;
+  geometry: {
+    type: string;
+    coordinates: unknown;
+  };
+  properties: {
+    kind: string;
+    name?: string;
+    label?: string;
+    style?: Record<string, unknown>;
+    [key: string]: unknown;
+  };
+}
+
+/**
  * Union type for all Debrief feature types.
  * Components should accept either type interchangeably.
  */
-export type DebriefFeature = TrackFeature | ReferenceLocation | MultiPointFeature | MultiPolygonFeature;
+export type DebriefFeature = TrackFeature | ReferenceLocation | MultiPointFeature | MultiPolygonFeature | AnnotationFeature;
 
 /**
  * GeoJSON FeatureCollection containing Debrief features.
@@ -102,6 +143,13 @@ export function isMultiPointFeature(feature: DebriefFeature): feature is MultiPo
  */
 export function isMultiPolygonFeature(feature: DebriefFeature): feature is MultiPolygonFeature {
   return feature.properties.kind === 'MULTI_POLYGON';
+}
+
+/**
+ * Type guard to check if a feature is an AnnotationFeature (shapes, annotations)
+ */
+export function isAnnotationFeature(feature: DebriefFeature): feature is AnnotationFeature {
+  return !isTrackFeature(feature) && !isReferenceLocation(feature) && !isMultiPointFeature(feature) && !isMultiPolygonFeature(feature);
 }
 
 /**

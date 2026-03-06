@@ -198,12 +198,10 @@ class TestListPlots:
         old = now - timedelta(days=30)
         older = now - timedelta(days=60)
 
-        create_plot(catalog_path, PlotMetadata(title="Old Plot", timestamp=old), plot_id="old")
+        create_plot(catalog_path, PlotMetadata(title="Old Plot", datetime=old), plot_id="old")
+        create_plot(catalog_path, PlotMetadata(title="Newest Plot", datetime=now), plot_id="newest")
         create_plot(
-            catalog_path, PlotMetadata(title="Newest Plot", timestamp=now), plot_id="newest"
-        )
-        create_plot(
-            catalog_path, PlotMetadata(title="Oldest Plot", timestamp=older), plot_id="oldest"
+            catalog_path, PlotMetadata(title="Oldest Plot", datetime=older), plot_id="oldest"
         )
 
         plots = list_plots(catalog_path)

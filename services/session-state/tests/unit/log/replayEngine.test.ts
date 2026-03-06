@@ -184,19 +184,23 @@ describe('createReplayEngine', () => {
       await engine.execute(plan);
 
       expect(deps.executeTool).toHaveBeenCalledTimes(2);
-      // First call should be tool-a
+      // First call should be tool-a with its activityId and timestamp
       expect(deps.executeTool).toHaveBeenNthCalledWith(
         1,
         'tool-a',
         expect.any(Array),
-        expect.any(Object)
+        expect.any(Object),
+        'act-1',
+        '2026-02-01T00:00:00Z'
       );
-      // Second call should be tool-b
+      // Second call should be tool-b with its activityId and timestamp
       expect(deps.executeTool).toHaveBeenNthCalledWith(
         2,
         'tool-b',
         expect.any(Array),
-        expect.any(Object)
+        expect.any(Object),
+        'act-2',
+        '2026-02-01T01:00:00Z'
       );
     });
 

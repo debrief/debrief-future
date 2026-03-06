@@ -4,12 +4,13 @@ Tool execution engine for debrief-calc.
 Provides the main entry point for running analysis tools with:
 - Input validation (context type, kind compatibility)
 - Provenance tracking
-- Output validation
+- Output validation (structural + schema)
 - Error handling
 """
 
 from __future__ import annotations
 
+import logging
 import time
 from typing import Any
 
@@ -22,6 +23,7 @@ from debrief_calc.exceptions import (
 )
 from debrief_calc.models import (
     ContextType,
+    InputFeatureState,
     SelectionContext,
     Tool,
     ToolError,
@@ -30,6 +32,8 @@ from debrief_calc.models import (
 from debrief_calc.provenance import attach_log_entry, create_log_entry, set_output_kind
 from debrief_calc.registry import registry
 from debrief_calc.validation import validate_tool_output
+
+logger = logging.getLogger(__name__)
 
 
 def run(
@@ -70,8 +74,25 @@ def run(
         # Validate feature kinds
         _validate_kinds(tool, context)
 
+        # Schema-validate input features (warn-and-continue)
+        if context.features:
+            _schema_validate_features(context.features, f"{tool_name}:input")
+
+        # BEFORE _execute_handler — mutation tools mutate context.features in-place
+        is_mutation = tool.output_kind.startswith("mutation/")
+        input_state_list: list[InputFeatureState] | None = None
+        if is_mutation:
+            input_state_list = _capture_input_state(context.features)
+
+        # Merge tool default parameter values so provenance records the
+        # actual values used, even when the caller omits optional params.
+        effective_params = dict(params)
+        for p in tool.parameters:
+            if p.name not in effective_params and p.default is not None:
+                effective_params[p.name] = p.default
+
         # Execute the tool handler
-        output_features = _execute_handler(tool, context, params)
+        output_features = _execute_handler(tool, context, effective_params)
 
         duration_ms = (time.perf_counter() - start_time) * 1000
 
@@ -80,20 +101,28 @@ def run(
             tool_name=tool.name,
             tool_version=tool.version,
             source_features=context.features,
-            parameters=params,
+            parameters=effective_params,
             duration_ms=duration_ms,
+            input_state=input_state_list,
         )
 
         # Attach provenance only to GeoJSON Feature outputs (not artifact data)
         is_geojson = all(f.get("type") == "Feature" for f in output_features)
         if is_geojson:
+            # Mutation tools preserve the original kind (e.g. 'TRACK') so that
+            # downstream type guards continue to work after mutation.
             for feature in output_features:
-                set_output_kind(feature, tool.output_kind)
+                if not is_mutation:
+                    set_output_kind(feature, tool.output_kind)
                 attach_log_entry(feature, log_entry)
 
-            # Validate output if requested
-            if validate_output:
+            # Validate output if requested (skip kind check for mutations)
+            if validate_output and not is_mutation:
                 validate_tool_output(output_features, tool.output_kind, tool.name)
+
+            # Schema validation (warn-and-continue during gradual adoption)
+            if validate_output:
+                _schema_validate_features(output_features, tool.name)
 
         return ToolResult(
             tool=tool_name, success=True, features=output_features, duration_ms=duration_ms
@@ -181,6 +210,53 @@ def _validate_kinds(tool: Tool, context: SelectionContext) -> None:
 
     if not accepted:
         raise KindMismatchError(tool.name, tool.input_kinds, kinds)
+
+
+def _schema_validate_features(features: list[dict[str, Any]], tool_name: str) -> None:
+    """Run schema validation on output features (warn-and-continue).
+
+    Validates each feature that has a known ``kind`` against the Pydantic model
+    from ``debrief_schemas.validation.FEATURE_MODEL_MAP``. Schema failures are
+    logged as warnings rather than raising, to allow gradual adoption.
+    """
+    try:
+        from debrief_schemas.validation import SchemaValidationError, validate_feature
+    except ImportError:
+        return  # debrief-schemas not available
+
+    for i, feature in enumerate(features):
+        try:
+            validate_feature(feature, "tool_output")
+        except SchemaValidationError as e:
+            logger.warning(
+                "Schema validation warning for tool '%s' feature[%d]: %s",
+                tool_name,
+                i,
+                e,
+            )
+
+
+def _capture_input_state(
+    features: list[dict[str, Any]],
+) -> list[InputFeatureState]:
+    """Capture pre-operation geometry and spatial properties from input features."""
+    import copy
+
+    states = []
+    for feature in features:
+        feature_id = str(feature.get("id", "unknown"))
+        geometry = copy.deepcopy(feature.get("geometry", {}))
+        props = feature.get("properties", {})
+        # Exclude provenance (append-only, never restored)
+        spatial_props = {k: copy.deepcopy(v) for k, v in props.items() if k != "provenance"}
+        states.append(
+            InputFeatureState(
+                featureId=feature_id,
+                geometry=geometry,
+                properties=spatial_props if spatial_props else None,
+            )
+        )
+    return states
 
 
 def _execute_handler(

@@ -173,8 +173,22 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 2. **Schema evolution expected** — the data model will change as we learn.
 3. **Deprecation rules suspended** — features may be added and removed without deprecation periods.
 4. **Strict on import, fail fast** — do not write forgiving parsers or accept multiple input formats. Validate inputs strictly and throw errors immediately when data does not match the expected format. Lenient import code pushes complexity downstream and masks data issues that should be fixed at the source. Fix the data, not the consumer.
+5. **Fix the data, never relax the schema** — when sample data, test fixtures, or legacy files do not comply with the current schema, fix the data to conform. Never weaken a schema, loosen a validator, or add special-case handling to accommodate non-compliant inputs. Our pre-release mandate is to establish a clean, strict data contract. Tolerant data handling is a production concern that will be introduced deliberately after v4.0.0 — not smuggled in prematurely because a test file has the wrong shape.
 
-**Trigger point:** Upon release of v4.0.0, Articles II (schema versioning), VIII (changelog), and XIII (contribution standards) become strictly enforced for all subsequent releases.
+**Trigger point:** Upon release of v4.0.0, Articles II (schema versioning), VIII (changelog), and XIII (contribution standards) become strictly enforced for all subsequent releases. Clauses XIV.4 and XIV.5 should be revisited at this point to introduce appropriate tolerance for real-world data ingestion.
+
+---
+
+## Article XV: Strict Type Safety
+
+**Every value has a concrete type. `Any` is not a type — it is the absence of one.**
+
+1. **Explicit types everywhere** — all function parameters, return types, and variable declarations must have explicit type annotations in both Python and TypeScript. Implicit or inferred types are acceptable only where the type checker can verify them unambiguously.
+2. **`Any`/`any` prohibited** — the use of `Any` (Python) and `any` (TypeScript) is forbidden in production code. These erase type information and defeat the purpose of static analysis. When external libraries return untyped data, narrow to a concrete type at the boundary immediately.
+3. **Strict mode mandatory** — all TypeScript projects must enable `strict: true`. All Python projects must pass strict static type checking. There are no "relaxed" configurations.
+4. **Schema types are canonical** — types generated from LinkML schemas must be fully typed with no `Any`/`any` in the output. Generated types are production code and meet the same standards.
+5. **Type boundaries are explicit** — every point where untyped data enters the system (JSON parsing, external API responses, user input) must validate through a typed model before the data is used in application code.
+6. **CI enforces compliance** — type checking for all languages must run as a required CI step. PRs with type violations cannot be merged.
 
 ---
 
@@ -187,4 +201,4 @@ This constitution recognises that Debrief v4.x is a ground-up rewrite. Until the
 
 ---
 
-*Document version: 1.1 — January 2026*
+*Document version: 1.3 — February 2026*

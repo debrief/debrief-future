@@ -7,7 +7,7 @@ from debrief_calc.result_builder import build_error
 class TestServerToolsCallErrors:
     """Verify error handling for tool execution via MCP."""
 
-    def test_error_has_code_and_message(self):
+    def test_error_has_code_and_message(self) -> None:
         """Error response must include code and message."""
         error = build_error(
             message="No track features found in input",
@@ -17,7 +17,7 @@ class TestServerToolsCallErrors:
         assert error["code"] == -32000
         assert error["message"] == "No track features found in input"
 
-    def test_error_has_debrief_category(self):
+    def test_error_has_debrief_category(self) -> None:
         """Error response must include debrief:errorCategory."""
         error = build_error(
             message="Test error",
@@ -26,7 +26,7 @@ class TestServerToolsCallErrors:
         )
         assert error["data"]["debrief:errorCategory"] == "invalid_input"
 
-    def test_error_has_affected_features(self):
+    def test_error_has_affected_features(self) -> None:
         """Error response must include debrief:affectedFeatures."""
         error = build_error(
             message="Test error",
@@ -37,7 +37,7 @@ class TestServerToolsCallErrors:
         assert "track-001" in affected
         assert "track-002" in affected
 
-    def test_invalid_error_category_rejected(self):
+    def test_invalid_error_category_rejected(self) -> None:
         """Only valid error categories should be accepted."""
         with pytest.raises(ValueError, match="category must be one of"):
             build_error(
@@ -46,7 +46,7 @@ class TestServerToolsCallErrors:
                 affected_feature_ids=[],
             )
 
-    def test_tool_missing_required_param_raises_error(self):
+    def test_tool_missing_required_param_raises_error(self) -> None:
         """Tool execution with missing required parameter should raise."""
         from debrief_calc.models import ContextType, SelectionContext
         from debrief_calc.tools.track.styling.set_track_color import set_track_color
@@ -69,7 +69,7 @@ class TestServerToolsCallErrors:
         with pytest.raises(ValueError, match="color parameter is required"):
             set_track_color(context, {})
 
-    def test_tool_no_matching_features_raises_error(self):
+    def test_tool_no_matching_features_raises_error(self) -> None:
         """Tool execution with no matching features should raise."""
         from debrief_calc.models import ContextType, SelectionContext
         from debrief_calc.tools.track.styling.set_track_color import set_track_color
@@ -92,7 +92,7 @@ class TestServerToolsCallErrors:
         with pytest.raises(ValueError, match="No track features found"):
             set_track_color(context, {"color": "#FF0000"})
 
-    def test_resource_not_found_error(self):
+    def test_resource_not_found_error(self) -> None:
         """Error response for unknown tool should use resource_not_found category."""
         error = build_error(
             message="Tool 'nonexistent-tool' not found",

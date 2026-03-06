@@ -181,7 +181,7 @@ def catalog_with_features(tmp_path: Path) -> tuple[Path, str]:
 
 
 class TestUpdateFeatures:
-    def test_update_existing_feature(self, catalog_with_features):
+    def test_update_existing_feature(self, catalog_with_features: tuple[Path, str]) -> None:
         catalog_path, plot_id = catalog_with_features
         updated = {
             "type": "Feature",
@@ -192,7 +192,7 @@ class TestUpdateFeatures:
         count = update_features(str(catalog_path), plot_id, [updated])
         assert count == 1
 
-    def test_update_nonexistent_feature(self, catalog_with_features):
+    def test_update_nonexistent_feature(self, catalog_with_features: tuple[Path, str]) -> None:
         catalog_path, plot_id = catalog_with_features
         updated = {
             "type": "Feature",
@@ -203,7 +203,7 @@ class TestUpdateFeatures:
         count = update_features(str(catalog_path), plot_id, [updated])
         assert count == 0
 
-    def test_update_no_features_file(self, tmp_path):
+    def test_update_no_features_file(self, tmp_path: Path) -> None:
         catalog_path = tmp_path / "catalog"
         create_catalog(str(catalog_path), "Test")
         plot_id = create_plot(str(catalog_path), PlotMetadata(title="Empty"))
@@ -212,22 +212,22 @@ class TestUpdateFeatures:
 
 
 class TestDeleteFeatures:
-    def test_delete_existing_feature(self, catalog_with_features):
+    def test_delete_existing_feature(self, catalog_with_features: tuple[Path, str]) -> None:
         catalog_path, plot_id = catalog_with_features
         count = delete_features(str(catalog_path), plot_id, ["track_a"])
         assert count == 1
 
-    def test_delete_nonexistent_feature(self, catalog_with_features):
+    def test_delete_nonexistent_feature(self, catalog_with_features: tuple[Path, str]) -> None:
         catalog_path, plot_id = catalog_with_features
         count = delete_features(str(catalog_path), plot_id, ["nonexistent"])
         assert count == 0
 
-    def test_delete_multiple(self, catalog_with_features):
+    def test_delete_multiple(self, catalog_with_features: tuple[Path, str]) -> None:
         catalog_path, plot_id = catalog_with_features
         count = delete_features(str(catalog_path), plot_id, ["track_a", "track_b"])
         assert count == 2
 
-    def test_delete_no_features_file(self, tmp_path):
+    def test_delete_no_features_file(self, tmp_path: Path) -> None:
         catalog_path = tmp_path / "catalog"
         create_catalog(str(catalog_path), "Test")
         plot_id = create_plot(str(catalog_path), PlotMetadata(title="Empty"))

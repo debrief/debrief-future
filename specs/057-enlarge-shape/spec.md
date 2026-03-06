@@ -1,142 +1,131 @@
 # Feature Specification: Enlarge Shape Tool Spec
 
 **Feature Branch**: `057-enlarge-shape`
-**Created**: 2026-02-10
+**Created**: 2026-02-13
 **Status**: Draft
-**Input**: User description: "Add enlarge shape tool spec (requires #049)"
+**Input**: User description: "Add enlarge shape tool spec — create a language-neutral tool specification (following #049 tool documentation model) for a shape scaling tool"
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Scale up a polygon annotation (Priority: P1)
+### User Story 1 - Scale Shape Up from Centroid (Priority: P1)
 
-An analyst has a rectangle or circle annotation representing an exercise area that needs to be enlarged. They invoke the enlarge-shape tool with a scale factor (e.g., 2.0) and the shape doubles in size, scaling outward from its geometric centroid. All vertices move proportionally away from the center.
+An analyst has a polygon annotation (e.g., an exercise area) on the map and needs to enlarge it to cover a wider region. They invoke the enlarge shape tool with a scale factor of 3.0, using the default geometric centroid as the origin. All vertices scale outward from the center, tripling the shape's extent.
 
-**Why this priority**: Polygon shapes (circles, rectangles) are the most common annotations that need resizing. Scaling from centroid is the natural default behavior.
+**Why this priority**: This is the core use case — scaling a shape relative to its geometric center with the default parameters. It validates the fundamental scaling algorithm and covers the most common analyst workflow.
 
-**Independent Test**: Can be verified by providing a Polygon FeatureCollection, running the enlarge-shape algorithm with scale_factor=2.0, and checking that all coordinates have moved to twice their original distance from the centroid.
+**Independent Test**: Can be fully tested by providing a polygon FeatureCollection with `scale_factor=3.0` and verifying all output coordinates are 3x farther from the centroid than the originals.
 
 **Acceptance Scenarios**:
 
-1. **Given** a FeatureCollection containing a RectangleAnnotation centered at [0, 50], **When** enlarge-shape is invoked with scale_factor=2.0 (default origin=centroid), **Then** all 4 corners move to twice their original distance from the centroid, and the rectangle is twice its original size.
-2. **Given** a FeatureCollection containing a CircleAnnotation with radius 1000m, **When** enlarge-shape is invoked with scale_factor=3.0, **Then** the polygon vertices scale outward from the center and the `radius` property is updated to 3000m.
+1. **Given** a FeatureCollection containing a single polygon annotation with known vertices, **When** the enlarge shape tool is invoked with `scale_factor=3.0` and no explicit origin, **Then** each vertex is repositioned 3x farther from the computed geometric centroid, and the output includes provenance recording the origin and scale factor.
+2. **Given** a circle annotation with a `center` property, **When** scaled by factor 2.0 from centroid, **Then** the polygon vertices scale outward and the `center` property remains at the centroid (unchanged since origin equals centroid).
+3. **Given** a rectangle annotation, **When** scaled by factor 1.5 from centroid, **Then** all ring vertices are repositioned 1.5x farther from the centroid and the shape retains its rectangular proportions.
 
 ---
 
-### User Story 2 - Scale from a custom origin point (Priority: P2)
+### User Story 2 - Scale Shape from Custom Origin (Priority: P2)
 
-An analyst wants to scale a shape relative to a specific point rather than the centroid. For example, scaling a rectangle from its bottom-left corner, keeping that corner fixed while the rest of the shape grows.
+An analyst wants to scale a shape relative to a specific point (e.g., a sensor location or a corner of the shape) rather than the geometric centroid. They provide an explicit `origin` parameter and a scale factor. All vertices move relative to that custom origin point.
 
-**Why this priority**: Custom origin provides flexibility for precise positioning, but the centroid default covers most use cases.
+**Why this priority**: Custom origin scaling enables more sophisticated analyst workflows, such as anchoring one edge of a shape while expanding the other side. This extends the core algorithm with a user-specified reference point.
 
-**Independent Test**: Provide a shape with an explicit origin parameter, verify the origin point remains fixed and all other points scale relative to it.
+**Independent Test**: Can be fully tested by providing a polygon with an explicit origin point and verifying vertices are repositioned relative to that origin rather than the centroid.
 
 **Acceptance Scenarios**:
 
-1. **Given** a RectangleAnnotation and origin=[0, 50] (a corner), **When** enlarge-shape is invoked with scale_factor=2.0, **Then** the corner at [0, 50] stays fixed and all other vertices move to twice their distance from that point.
-2. **Given** a LineAnnotation with origin at one endpoint, **When** enlarge-shape is invoked with scale_factor=0.5, **Then** the line shrinks toward that endpoint.
+1. **Given** a polygon annotation and an explicit origin at one of its vertices, **When** scaled by factor 2.0, **Then** the vertex at the origin remains fixed while all other vertices move 2x farther away from it.
+2. **Given** a line annotation and an explicit origin outside the shape, **When** scaled by factor 0.5, **Then** all line coordinates move halfway toward the origin point, shrinking the shape.
 
 ---
 
-### User Story 3 - Shrink a shape (Priority: P3)
+### User Story 3 - No-Op Scale Factor (Priority: P3)
 
-An analyst uses a scale factor less than 1 to reduce a shape. For example, shrinking an oversized danger area annotation to its correct proportional size.
+An analyst accidentally invokes the enlarge tool with a scale factor of 1.0. The system returns the shape unchanged, ensuring no data corruption from identity transformations.
 
-**Why this priority**: Shrinking is the inverse of enlarging and uses the same algorithm, just with factor < 1.
+**Why this priority**: Edge case safety — confirms the tool handles identity transformations correctly and produces valid provenance even when no geometric change occurs.
 
-**Independent Test**: Provide a shape with scale_factor=0.5, verify all vertices move to half their original distance from the origin.
+**Independent Test**: Can be fully tested by invoking with `scale_factor=1.0` and verifying output coordinates exactly match input coordinates.
 
 **Acceptance Scenarios**:
 
-1. **Given** a CircleAnnotation with radius 2000m, **When** enlarge-shape is invoked with scale_factor=0.5, **Then** the radius becomes 1000m and all polygon vertices move to half their distance from center.
+1. **Given** any annotation feature, **When** the enlarge shape tool is invoked with `scale_factor=1.0`, **Then** all coordinates remain unchanged and provenance still records the transformation with factor 1.0.
+
+---
+
+### User Story 4 - Shrink Shape (Priority: P3)
+
+An analyst needs to reduce a shape's size. They invoke the tool with a scale factor less than 1.0 (e.g., 0.5), which moves all vertices closer to the origin, effectively shrinking the shape.
+
+**Why this priority**: Shrinking is the inverse of enlarging and uses the same algorithm, but should be explicitly validated to confirm factors < 1.0 work correctly.
+
+**Independent Test**: Can be fully tested by providing a polygon with `scale_factor=0.5` and verifying all vertices are halfway between their original positions and the origin.
+
+**Acceptance Scenarios**:
+
+1. **Given** a polygon annotation, **When** the tool is invoked with `scale_factor=0.5` and default origin, **Then** each vertex is repositioned to the midpoint between its original position and the centroid.
 
 ---
 
 ### Edge Cases
 
-- What happens when scale_factor is 1.0? Shape should remain unchanged (no-op mutation).
-- What happens when scale_factor is 0? All points collapse to the origin (degenerate shape).
-- What happens with very large scale factors (e.g., 1000)? Coordinates may wrap or exceed valid lat/lon bounds.
-- What happens near the poles? Geographic scaling must handle latitude distortion.
-- What happens with an empty feature collection? Return an error response.
-- What happens with non-annotation features (e.g., TRACK features)? Skip them or return an error.
-- What happens with a CircleAnnotation? Both polygon vertices AND the `radius` property must be scaled; `center` stays at origin (or moves if scaling from non-center origin).
-- What happens with a VectorAnnotation? The `range` property must be scaled; `origin` moves relative to the scale origin; `bearing` is preserved.
+- What happens when the scale factor is 0? All vertices collapse to the origin point — the shape degenerates to a single point. The tool should return the degenerate geometry with provenance.
+- What happens when the scale factor is negative? Negative factors are invalid. The tool returns an error response.
+- What happens when a very large scale factor (e.g., 1000) is applied to shapes near the poles? Coordinates may exceed valid latitude bounds ([-90, 90]). The tool must clamp latitude to valid range.
+- What happens with an empty FeatureCollection? The tool returns an error indicating no features to process.
+- What happens when the FeatureCollection contains non-annotation features? Non-annotation features are silently skipped; only annotation kinds (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR) are processed.
+- What happens with a polygon that has multiple rings (holes)? All rings (exterior and interior) are scaled relative to the same origin.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: Tool spec MUST follow the #049 tool documentation model with all 9 required sections (metadata, description, MCP, inputs, outputs, algorithm, edge cases, examples, changelog).
-- **FR-002**: Algorithm MUST scale in geographic coordinates relative to a specified origin point.
-- **FR-003**: Tool MUST accept `scale_factor` parameter as a positive multiplicative factor (default: 3.0). Factor > 1 enlarges, factor < 1 shrinks, factor = 1 is no-op.
-- **FR-004**: Tool MUST accept `origin` parameter as [longitude, latitude] (default: geometric centroid of the shape).
-- **FR-005**: Tool MUST scale all geometry coordinates (Point, LineString, Polygon vertices) relative to the origin point.
-- **FR-006**: For CircleAnnotation features, tool MUST also update the `radius` property (radius * scale_factor) and the `center` property if it moves relative to the scale origin.
-- **FR-007**: For VectorAnnotation features, tool MUST update the `range` property (range * scale_factor) and recompute geometry endpoint; `bearing` is preserved.
-- **FR-008**: Tool MUST record provenance annotations including origin and scale_factor applied.
-- **FR-009**: Tool MUST clamp latitude to [-90, 90] and normalize longitude to [-180, 180] after scaling.
-- **FR-010**: Tool MUST produce golden I/O example files (`.input.json` / `.output.json`).
-- **FR-011**: Tool MUST return a mutation-type ToolResponse with `mutation/shape/scaled` result type.
-- **FR-012**: Tool MUST handle all annotation kinds: CIRCLE, RECTANGLE, LINE, TEXT, VECTOR.
-- **FR-013**: Tool MUST reject scale_factor <= 0 with an error response.
+- **FR-001**: Tool MUST accept a FeatureCollection containing annotation features and scale parameters (`origin`, `scale_factor`)
+- **FR-002**: Tool MUST compute the geometric centroid of each shape as the default origin when no explicit origin is provided
+- **FR-003**: Tool MUST scale all vertex coordinates relative to the origin by the given scale factor using geographic coordinate math (lat/lon differences multiplied by factor)
+- **FR-004**: Tool MUST support all five annotation kinds: CIRCLE, RECTANGLE, LINE, TEXT, VECTOR
+- **FR-005**: Tool MUST update the `center` property of CIRCLE annotations when scaling (recalculate from scaled vertices or scale the center point itself)
+- **FR-006**: Tool MUST update the `origin` property of VECTOR annotations when scaling
+- **FR-007**: Tool MUST preserve the `range` and `bearing` properties of VECTOR annotations (only the origin point changes, not the vector geometry definition)
+- **FR-008**: Tool MUST return a ToolResponse with `mutation/shape/scaled` result type and provenance annotations including source feature IDs, origin used, and scale factor
+- **FR-009**: Tool MUST return shapes unchanged when `scale_factor` is 1.0 (identity/no-op)
+- **FR-010**: Tool MUST return an error for negative scale factors
+- **FR-011**: Tool MUST return an error for empty input or input with no annotation features
+- **FR-012**: Tool MUST silently skip non-annotation features in the input collection
+- **FR-013**: Tool MUST clamp output latitude to [-90, 90] range to handle extreme scaling near poles
+- **FR-014**: Tool MUST normalise output longitude to [-180, 180] range
+- **FR-015**: Tool MUST follow the #049 tool documentation model with all 9 required sections
+- **FR-016**: Tool MUST include golden I/O example files (`.input.json` and `.output.json`) for validation
+- **FR-017**: Tool MUST record provenance including the origin point and scale factor used in the transformation
+- **FR-018**: Tool MUST use a default scale factor of 3.0 when none is provided
+- **FR-020**: Tool MUST declare `scale_factor` with preset choices (e.g., 0.25, 0.5, 1.5, 2.0, 3.0, 5.0) so frontends can present a selection menu before execution, while still accepting any non-negative numeric value via custom input
+- **FR-019**: Tool MUST work entirely offline with no network dependencies
 
 ### Key Entities
 
-- **Shape Feature**: Any GeoJSON Feature with annotation kind (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR). Each has geometry coordinates and kind-specific properties.
-- **Scale Parameters**: Scale factor (positive float) and origin point ([lon, lat]).
-- **Geometric Centroid**: Computed as the arithmetic mean of all vertex coordinates (for the default origin).
+- **Annotation Feature**: A GeoJSON Feature with a `kind` property indicating its annotation type (CIRCLE, RECTANGLE, LINE, TEXT, VECTOR). Contains geometry coordinates and type-specific properties (center, origin, radius, bearing, range).
+- **Scale Parameters**: The tool's input configuration consisting of an `origin` point (lat/lon, defaults to geometric centroid) and a `scale_factor` (multiplicative number, defaults to 3.0).
+- **ToolResponse**: The standardised response envelope containing content items with result type annotations and provenance metadata.
+- **Geometric Centroid**: The arithmetic mean of all vertex coordinates in a shape, used as the default scaling origin.
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001**: Tool spec file exists at `shared/tools/shape/manipulation/enlarge-shape.1.0.md` with all 9 required sections.
-- **SC-002**: At least 2 golden I/O example pairs exist (e.g., `enlarge-shape.basic-polygon.input.json` / `.output.json` and `enlarge-shape.shrink.input.json` / `.output.json`).
-- **SC-003**: Algorithm pseudocode is language-neutral and covers all 5 annotation kinds.
-- **SC-004**: Edge cases table covers at minimum: empty input, scale_factor=1, scale_factor=0, large factors, non-shape features.
-- **SC-005**: Provenance annotations include origin and scale_factor in the label.
+- **SC-001**: Tool specification contains all 9 required sections per the #049 tool documentation model (Metadata, MCP, Inputs, Outputs, Algorithm, Edge Cases, Examples, Changelog, References)
+- **SC-002**: At least 3 golden I/O example pairs are provided covering: basic polygon scaling, custom origin scaling, and scale factor of 1.0 (no-op)
+- **SC-003**: All golden I/O examples produce identical outputs when processed by both Python and TypeScript implementations (cross-language validation)
+- **SC-004**: Edge cases documented cover at minimum: scale factor of 0, negative scale factor, scale factor of 1, very large scale factors, empty input, non-annotation features, and shapes near geographic poles
+- **SC-005**: Provenance annotations on every output feature record the origin point and scale factor used
+- **SC-006**: The spec passes the existing tool-spec validation checklist without modifications
 
-## Deliverables
+### Assumptions
 
-| Deliverable | Path |
-|-------------|------|
-| Tool spec | `shared/tools/shape/manipulation/enlarge-shape.1.0.md` |
-| Golden example (basic polygon) | `shared/tools/shape/manipulation/enlarge-shape.basic-polygon.input.json` |
-| Golden example (basic polygon output) | `shared/tools/shape/manipulation/enlarge-shape.basic-polygon.output.json` |
-| Golden example (shrink) | `shared/tools/shape/manipulation/enlarge-shape.shrink.input.json` |
-| Golden example (shrink output) | `shared/tools/shape/manipulation/enlarge-shape.shrink.output.json` |
-
-## Technical Notes
-
-### Scaling Formula
-
-For each vertex (lon, lat) relative to origin (olon, olat):
-
-```
-new_lon = olon + (lon - olon) * scale_factor
-new_lat = olat + (lat - olat) * scale_factor
-```
-
-Then clamp: `new_lat = clamp(new_lat, -90, 90)` and normalize: `new_lon = normalize(new_lon, -180, 180)`.
-
-Note: This is a simple geographic coordinate scaling. For shapes spanning large areas, the distortion from Mercator-like scaling is acceptable for annotation purposes.
-
-### Centroid Computation
-
-For Polygon: average of exterior ring coordinates (excluding closing point).
-For LineString: average of all coordinates.
-For Point: the point itself (scaling a point from its own centroid is a no-op).
-
-### Annotation Kind to Property Updates
-
-| Kind | Geometry Type | Extra Properties to Update |
-|------|---------------|---------------------------|
-| CIRCLE | Polygon | `center` (recompute from origin), `radius` (multiply by scale_factor) |
-| RECTANGLE | Polygon | None |
-| LINE | LineString | None |
-| TEXT | Point | None |
-| VECTOR | LineString | `origin` (recompute from scale origin), `range` (multiply by scale_factor), `bearing` preserved |
+- Scaling operates in geographic coordinates (lat/lon) using simple linear interpolation of coordinate differences, consistent with the approach used by the move-shape tool for local-scale operations. This is acceptable for typical maritime exercise areas where shapes span small geographic extents.
+- The geometric centroid is computed as the arithmetic mean of polygon exterior ring vertices (excluding the closing vertex that duplicates the first). For LineString geometries, it is the mean of all coordinate points. For Point geometries (TEXT annotations), the centroid is the point itself.
+- VECTOR annotations have their geometry scaled like any other LineString, but `range` and `bearing` properties are preserved since they define the vector's directional meaning independently of absolute position.
+- The tool specification is the deliverable — Python and TypeScript implementations are out of scope for this feature and will be handled by a separate implementation task.
 
 ### Dependencies
 
-- Requires #049 (tool documentation model) - **complete**
+- **#049 - Tool Documentation Model**: The template, 9-section structure, and golden I/O conventions that this spec must follow. This dependency is already complete.
+- **#056 - Move Shape**: Sibling tool in `shape/manipulation` category. The enlarge-shape spec follows the same patterns and conventions established by move-shape.

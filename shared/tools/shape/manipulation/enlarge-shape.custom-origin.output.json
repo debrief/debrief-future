@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://rect-002",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"rect-002\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[-1.0,51.0],[0.0,51.0],[0.0,52.0],[-1.0,52.0],[-1.0,51.0]]]},\"properties\":{\"kind\":\"RECTANGLE\",\"label\":\"Patrol Zone\",\"style\":{\"fill\":true,\"fill_color\":\"#FF5733\",\"fill_opacity\":0.3,\"stroke\":true,\"color\":\"#FF0000\",\"weight\":2,\"opacity\":1.0}}}",
+      "annotations": {
+        "debrief:resultType": "mutation/shape/scaled",
+        "debrief:sourceFeatures": ["rect-002"],
+        "debrief:label": "Scaled 1 shape(s) by factor 2.0 from [-1.0, 51.0]"
+      }
+    }
+  ]
+}

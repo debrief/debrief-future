@@ -1,0 +1,35 @@
+# Dockerfile.preview build context exclusions
+# Heroku builds from git, but these further reduce context size
+
+# Version control
+.git
+.github
+
+# Development environments
+.venv
+.pytest_cache
+.specify
+.claude
+.vscode
+
+# Local node_modules (rebuilt inside Docker)
+node_modules
+**/node_modules
+
+# Build artifacts (rebuilt inside Docker)
+**/dist
+**/*.vsix
+!apps/vscode/*.vsix
+
+# Documentation not needed at runtime
+docs
+specs
+*.md
+!preview/workspace/WELCOME.md
+
+# Test files
+**/__tests__
+**/*.test.*
+**/*.spec.*
+**/playwright-report
+**/test-results

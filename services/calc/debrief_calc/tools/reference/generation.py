@@ -51,7 +51,7 @@ def _validate_bounds(
     return west, south, east, north
 
 
-def _validate_positive_int(value: Any, name: str) -> int:
+def _validate_positive_int(value: object, name: str) -> int:
     """Validate that a value is a positive integer."""
     if not isinstance(value, int) or value < 1:
         raise ValueError(f"{name.capitalize()} must be a positive integer")
@@ -186,6 +186,7 @@ def _generate_scatter(
             type="number",
             description="Number of reference points to generate",
             default=20,
+            choices=[1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000],
         ),
         ToolParameter(
             name="seed",
@@ -211,8 +212,12 @@ def generate_reference_points(
         raise ValueError("Requires exactly one polygon feature")
 
     pattern = params.get("pattern")
-    if pattern not in ("grid", "scatter"):
-        raise ValueError("Pattern must be 'grid' or 'scatter'")
+    # Validate against schema-defined ReferencePointPattern enum
+    from debrief_schemas.validation import resolve_enum_values
+
+    valid_patterns = resolve_enum_values("ReferencePointPattern") or {"grid", "scatter"}
+    if pattern not in valid_patterns:
+        raise ValueError(f"Pattern must be one of: {', '.join(sorted(valid_patterns))}")
 
     count = int(params.get("count", 20))
     _validate_positive_int(count, "count")

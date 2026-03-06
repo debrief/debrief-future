@@ -1,0 +1,40 @@
+{
+  "type": "Feature",
+  "id": "rb-abc12345",
+  "geometry": {"type": "Point", "coordinates": [0, 0]},
+  "properties": {
+    "name": "Range & Bearing: Track A → Track B",
+    "from_feature": "Track A",
+    "to_feature": "Track B",
+    "__datasets": [
+      {
+        "type": "range_bearing_series",
+        "title": "Range: Track A → Track B",
+        "metadata": {
+          "xAxis": {"label": "Time", "type": "temporal"},
+          "yAxis": {"label": "Range", "type": "quantitative", "units": "m"}
+        },
+        "series": [
+          {
+            "name": "Track A to Track B",
+            "data": [[1704790800000, 5000.0], [1704794400000, 4500.0]]
+          }
+        ]
+      },
+      {
+        "type": "range_bearing_series",
+        "title": "Bearing: Track A → Track B",
+        "metadata": {
+          "xAxis": {"label": "Time", "type": "temporal"},
+          "yAxis": {"label": "Bearing", "type": "quantitative", "units": "°"}
+        },
+        "series": [
+          {
+            "name": "Track A to Track B",
+            "data": [[1704790800000, 45.0], [1704794400000, 90.0]]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -7,6 +7,7 @@ Provides safe concurrent access to the config file using:
 
 import json
 import logging
+from collections.abc import Callable
 
 from filelock import FileLock, Timeout
 
@@ -84,7 +85,7 @@ def write_config(config: Config) -> None:
         raise
 
 
-def update_config(updater: callable) -> Config:
+def update_config(updater: Callable[[Config], Config]) -> Config:
     """Read, update, and write config atomically.
 
     Args:

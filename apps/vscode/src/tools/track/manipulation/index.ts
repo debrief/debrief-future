@@ -1,7 +1,7 @@
 /**
  * Track manipulation tools barrel file.
  *
- * Exports tool definitions and execute stubs for all track manipulation tools.
+ * Exports tool definitions for all track manipulation tools.
  * These are consumed by the TypeScript tool registry for web-shell and
  * by the VS Code extension when the Python backend is unavailable.
  */

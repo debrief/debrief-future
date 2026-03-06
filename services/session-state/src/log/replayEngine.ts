@@ -80,11 +80,12 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
         }
       }
 
-      // Collect entries from startIndex onward, skipping deleted
+      // Collect entries from startIndex onward, skipping deleted and disabled
       const entries: ReplayEntry[] = [];
       for (let i = startIndex; i < timeline.length; i++) {
         const entry = timeline[i];
         if (deletedSet.has(entry.activityId)) continue;
+        if (entry.disabled === true) continue;
 
         const rawParams = unwrapParameters(
           entry.wasGeneratedBy.parameters as Record<string, unknown>
@@ -99,6 +100,7 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
 
         entries.push({
           activityId: entry.activityId,
+          timestamp: entry.timestamp,
           toolId: entry.wasGeneratedBy.tool,
           toolVersion: entry.wasGeneratedBy.toolVersion,
           parameters: rawParams,
@@ -160,9 +162,16 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
 
         const entry = plan.entries[i];
 
-        // Resolve installed tool version
+        // Resolve installed tool version.
+        // "0.0.0" is the fallback placeholder used when the recording side
+        // didn't know the real version (e.g. MCP annotations missing).
+        // Treat it as "any version" so replay isn't blocked.
         const installedVersion = await deps.resolveToolVersion(entry.toolId);
-        if (installedVersion !== null && installedVersion !== entry.toolVersion) {
+        if (
+          installedVersion !== null &&
+          installedVersion !== entry.toolVersion &&
+          entry.toolVersion !== '0.0.0'
+        ) {
           return {
             status: 'halted',
             entriesReplayed,
@@ -186,11 +195,14 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
           phase: 'replaying',
         });
 
-        // Execute the tool
+        // Execute the tool, passing the original activityId so the callee
+        // can stamp it on output provenance (prevents duplicate timeline entries).
         const result = await deps.executeTool(
           entry.toolId,
           entry.featureIds,
-          entry.parameters
+          entry.parameters,
+          entry.activityId,
+          entry.timestamp
         );
 
         if (!result.success) {

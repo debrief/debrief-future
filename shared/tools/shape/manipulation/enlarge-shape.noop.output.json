@@ -1,0 +1,15 @@
+{
+  "content": [
+    {
+      "type": "resource",
+      "uri": "feature://circle-002",
+      "mimeType": "application/geo+json",
+      "text": "{\"type\":\"Feature\",\"id\":\"circle-002\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[0.0,50.009],[0.01,50.006],[0.014,50.0],[0.01,49.994],[0.0,49.991],[-0.01,49.994],[-0.014,50.0],[-0.01,50.006],[0.0,50.009]]]},\"properties\":{\"kind\":\"CIRCLE\",\"center\":[0.0,50.0],\"radius\":1000,\"label\":\"Search Area\",\"style\":{\"fill\":true,\"fill_color\":\"#00FF00\",\"fill_opacity\":0.2,\"stroke\":true,\"color\":\"#00FF00\",\"weight\":2,\"opacity\":1.0}}}",
+      "annotations": {
+        "debrief:resultType": "mutation/shape/scaled",
+        "debrief:sourceFeatures": ["circle-002"],
+        "debrief:label": "Scaled 1 shape(s) by factor 1.0 from centroid"
+      }
+    }
+  ]
+}

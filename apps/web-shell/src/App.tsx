@@ -15,7 +15,7 @@
  * Feature: 073-undo-redo-split (runtime verification)
  */
 
-import { useState, useCallback, useMemo, useEffect, createElement } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef, createElement } from 'react';
 import type { Feature, FeatureCollection } from 'geojson';
 import {
   CatalogOverview,
@@ -51,6 +51,7 @@ import type {
   ChartTabData,
   PanelWorkspaceElement,
   ResultArtifactType,
+  ParameterSchemaEntry,
 } from '@debrief/components';
 import type { LogFilterState } from '@debrief/components';
 import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
@@ -59,6 +60,7 @@ import {
   resetSessionStore,
   createTimeInstant,
   type DisplayMode as StoreDisplayMode,
+  type GeoJSONFeature,
 } from '@debrief/session-state';
 import type { DisplayMode as ComponentDisplayMode } from '@debrief/components';
 
@@ -70,7 +72,8 @@ const toStoreMode = (m: string): StoreDisplayMode =>
   m === 'trail' ? 'snailTrail' : 'normal';
 import { useSessionStore } from './hooks/useSessionStore';
 import { stacService } from './mocks/stacService';
-import { calcService, moveShapeFeatures } from './mocks/calcService';
+import { calcService } from './mocks/calcService';
+import { executeTool, isMutationTool, listTools } from './services/toolService';
 import type { ToolResult } from './mocks/calcService';
 import { mockFsAdapter } from './mocks/fsAdapter';
 
@@ -78,9 +81,11 @@ import { mockFsAdapter } from './mocks/fsAdapter';
 declare global {
   interface Window {
     __sessionStore: ReturnType<typeof getSessionStore>;
+    __currentPlotFeatures: Feature[];
   }
 }
 window.__sessionStore = getSessionStore();
+window.__currentPlotFeatures = [];
 
 /** Current view state */
 type View = 'welcome' | 'analysis';
@@ -140,7 +145,8 @@ export default function App() {
   // View state (local — not part of session-state)
   const [view, setView] = useState<View>('welcome');
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
-  const [resultLayers, setResultLayers] = useState<Feature[]>([]);
+  // Result layers now live in session-state store (#109)
+  const resultLayers = state.resultLayers;
   /** Maps activityId → original feature snapshots so revert can restore them */
   const [, setActivitySnapshots] = useState<
     Record<string, Feature[]>
@@ -164,8 +170,8 @@ export default function App() {
   const [activeResultTabId, setActiveResultTabId] = useState<string | null>(null);
   const [layoutResetCount, setLayoutResetCount] = useState(0);
 
-  // Drawing state (Feature: 094)
-  const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
+  // Drawing state (Feature: 094) — drawingMode wired to session-state store (#108)
+  const drawingMode = state.drawingMode;
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
 
   // Catalog items
@@ -193,6 +199,11 @@ export default function App() {
     }
     return names;
   }, [allFeatures]);
+
+  // Expose plot features on window for Playwright test introspection
+  useEffect(() => {
+    window.__currentPlotFeatures = plotFeatures as Feature[];
+  }, [plotFeatures]);
 
   // Calculate time extent from features
   const timeExtent = useMemo<[number, number] | null>(() => {
@@ -232,7 +243,15 @@ export default function App() {
 
       if (e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
-        store.getState().undo();
+        // Tool-level undo (#110): if last tool execution is recorded,
+        // remove its result layers instead of performing UI-state undo
+        const s = store.getState();
+        if (s.lastToolExecution) {
+          s.removeResultLayers(s.lastToolExecution.resultLayerIds);
+          s.clearLastToolExecution();
+        } else {
+          s.undo();
+        }
       } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
         e.preventDefault();
         store.getState().redo();
@@ -276,9 +295,9 @@ export default function App() {
         title: item?.properties.title ?? itemPath,
         features: plotData,
       });
-      setResultLayers([]);
+      freshStore.getState().clearResultLayers();
       setDrawnFeatures([]);
-      setDrawingMode(null);
+      freshStore.getState().setDrawingMode(null);
       setToolMessage(null);
       setLogEntries([]);
       setView('analysis');
@@ -291,7 +310,7 @@ export default function App() {
   const handleBackToCatalog = useCallback(() => {
     setView('welcome');
     setCurrentPlot(null);
-    setResultLayers([]);
+    store.getState().clearResultLayers();
     setToolMessage(null);
     setLogEntries([]);
     store.getState().clearSelection();
@@ -327,11 +346,7 @@ export default function App() {
       store.getState().clearSelection();
     } else if (message.type === 'action:invoke') {
       const { actionType, activityId } = message.payload;
-      if (actionType === 'tune') {
-        // Tune is handled inline via onTuneRequest — prompt user
-        setLogNotification('Click a tunable parameter value to edit it.');
-        setTimeout(() => setLogNotification(null), 3000);
-      } else if (actionType === 'revertTo') {
+      if (actionType === 'revertTo') {
         // Remove all entries after the target and restore their original features
         setLogEntries((prev: TimelineEntry[]) => {
           const idx = prev.findIndex((e: TimelineEntry) => e.activityId === activityId);
@@ -362,32 +377,64 @@ export default function App() {
     }
   }, [store, restoreSnapshots]);
 
-  // Phase 6: Handle tune request from inline parameter click
+  // Phase 6: Debounce timer for slider tune requests.
+  // Without this, every pixel of slider drag fires a full tool re-execution.
+  const tuneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Phase 6: Handle tune request from slider/edit face or display face click.
+  // Display face click passes the current value (needs prompt for new value).
+  // Edit face slider passes the already-new value (use directly, debounced).
   const handleTuneRequest = useCallback(
-    (activityId: string, parameter: string, currentValue: unknown) => {
-      // Prompt for new value (simple approach for web-shell demo)
-      const input = window.prompt(
-        `Tune "${parameter}" (current: ${String(currentValue)}):`,
-        String(currentValue)
-      );
-      if (input === null) return; // cancelled
+    (activityId: string, parameter: string, value: unknown) => {
+      const entry = logEntries.find((e: TimelineEntry) => e.activityId === activityId);
+      const currentValue = entry?.parameters[parameter]?.value;
 
-      // Coerce to number if the current value is numeric
-      const newValue = typeof currentValue === 'number' ? Number(input) : input;
+      // Ignore display-face clicks (value unchanged) — tuning is done via
+      // the edit-face slider only.
+      if (value === currentValue) return;
 
+      // Edit face slider — debounce so rapid drags don't re-execute per pixel
+      if (tuneTimerRef.current) clearTimeout(tuneTimerRef.current);
+      tuneTimerRef.current = setTimeout(() => {
+        tuneTimerRef.current = null;
+        applyTune(activityId, parameter, value);
+      }, 300);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [logEntries]
+  );
+
+  // Actual tune logic, called after debounce settles (slider) or immediately (prompt).
+  const applyTune = useCallback(
+    (activityId: string, parameter: string, newValue: unknown) => {
       // Find the entry being tuned
       const entry = logEntries.find((e: TimelineEntry) => e.activityId === activityId);
 
+      // Extract raw parameter values from a log entry's ParameterValue wrappers
+      const unwrapParams = (params: Record<string, { value: unknown }>): Record<string, unknown> => {
+        const result: Record<string, unknown> = {};
+        for (const [key, param] of Object.entries(params)) {
+          if (param && typeof param === 'object' && 'value' in param) {
+            result[key] = param.value;
+          } else {
+            result[key] = param;
+          }
+        }
+        return result;
+      };
+
+      // Track updated inputState for subsequent entries replayed during propagation
+      const updatedInputStates = new Map<string, Array<{ featureId: string; geometry: unknown; properties: Record<string, unknown> }>>();
+
       // Restore features from inputState and re-execute for mutation tools
-      if (entry?.inputState && entry.inputState.length > 0 && entry.toolName === 'move-shape') {
-        // Build restored features from inputState (pre-tool geometry)
+      if (entry?.inputState && entry.inputState.length > 0 && isMutationTool(entry.toolName)) {
         setCurrentPlot(plot => {
           if (!plot) return plot;
           const restoredMap = new Map(
             entry.inputState!.map(is => [is.featureId, is])
           );
-          // Restore original geometry in the plot
-          const restoredFeatures = plot.features.features.map(f => {
+          // Restore original geometry in the plot (pre-tuned-entry state)
+          let currentFeatures = plot.features.features.map(f => {
             const saved = restoredMap.get(String(f.id));
             if (!saved) return f;
             return {
@@ -400,52 +447,102 @@ export default function App() {
             };
           });
 
-          // Collect the restored features that the tool will operate on
-          const featuresToMove = restoredFeatures.filter(f =>
+          // Collect the restored features that the tuned tool will operate on
+          const featuresToMove = currentFeatures.filter(f =>
             restoredMap.has(String(f.id))
           ) as Feature[];
 
-          // Read the updated parameters (apply the new value)
-          const params = { ...entry.parameters };
-          if (params[parameter]) {
-            params[parameter] = { ...params[parameter], value: newValue };
-          }
-          const distNm = Number((params.distance_nm?.value) ?? 5);
-          const dirDeg = Number((params.direction_deg?.value) ?? 45);
+          // Build parameters with the tuned value applied
+          const tunedParams = unwrapParams(entry.parameters as Record<string, { value: unknown }>);
+          tunedParams[parameter] = newValue;
 
-          // Re-execute the tool from original position
-          const moved = moveShapeFeatures(featuresToMove, distNm, dirDeg);
+          // Re-execute the tuned entry from the restored geometry
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const response = executeTool(entry.toolName, featuresToMove as any, tunedParams);
+          const fc = JSON.parse(response.content[0]?.resource?.text ?? '{"features":[]}');
+          const moved = (fc.features ?? []) as Feature[];
           const movedMap = new Map(moved.map(m => [String(m.id), m]));
 
-          // Apply the re-executed result
-          const finalFeatures = restoredFeatures.map(f => {
+          // Apply the tuned entry's result
+          currentFeatures = currentFeatures.map(f => {
             const m = movedMap.get(String(f.id));
             return m ?? f;
           });
 
+          // Propagate: replay all subsequent mutation entries on affected features.
+          // logEntries is stored newest-first, so entries at indices before tunedIdx
+          // are chronologically after the tuned entry. Iterate from tunedIdx-1 → 0
+          // to replay in chronological order.
+          const tunedIdx = logEntries.findIndex((e: TimelineEntry) => e.activityId === activityId);
+          if (tunedIdx > 0) {
+            for (let i = tunedIdx - 1; i >= 0; i--) {
+              const nextEntry = logEntries[i]!;
+              if (!isMutationTool(nextEntry.toolName)) continue;
+              if (!nextEntry.inputState || nextEntry.inputState.length === 0) continue;
+
+              // Only replay if this entry affects features that were modified
+              const affectedIds = new Set(nextEntry.inputState.map(is => is.featureId));
+              const featuresToReplay = currentFeatures.filter(f =>
+                affectedIds.has(String(f.id))
+              ) as Feature[];
+              if (featuresToReplay.length === 0) continue;
+
+              // Capture pre-execution state as updated inputState for this entry
+              updatedInputStates.set(nextEntry.activityId, featuresToReplay.map(f => {
+                const props = (f.properties ?? {}) as Record<string, unknown>;
+                const { provenance: _p, ...restProps } = props;
+                return {
+                  featureId: String(f.id),
+                  geometry: JSON.parse(JSON.stringify(f.geometry)),
+                  properties: JSON.parse(JSON.stringify(restProps)),
+                };
+              }));
+
+              // Re-execute subsequent entry with its original parameters
+              const subParams = unwrapParams(nextEntry.parameters as Record<string, { value: unknown }>);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const subResponse = executeTool(nextEntry.toolName, featuresToReplay as any, subParams);
+              const subFc = JSON.parse(subResponse.content[0]?.resource?.text ?? '{"features":[]}');
+              const subMoved = (subFc.features ?? []) as Feature[];
+              const subMovedMap = new Map(subMoved.map(m => [String(m.id), m]));
+
+              currentFeatures = currentFeatures.map(f => {
+                const m = subMovedMap.get(String(f.id));
+                return m ?? f;
+              });
+            }
+          }
+
           return {
             ...plot,
-            features: { ...plot.features, features: finalFeatures },
+            features: { ...plot.features, features: currentFeatures },
           };
         });
       }
 
-      // Update the log entry parameters and tune annotation
+      // Update the tuned entry's parameters/annotation and inputState for replayed entries
       setLogEntries((prev: TimelineEntry[]) =>
         prev.map((e: TimelineEntry) => {
-          if (e.activityId !== activityId) return e;
-          const updatedParams = { ...e.parameters };
-          if (updatedParams[parameter]) {
-            updatedParams[parameter] = {
-              ...updatedParams[parameter],
-              value: newValue,
+          if (e.activityId === activityId) {
+            const updatedParams = { ...e.parameters };
+            if (updatedParams[parameter]) {
+              updatedParams[parameter] = {
+                ...updatedParams[parameter],
+                value: newValue,
+              };
+            }
+            return {
+              ...e,
+              parameters: updatedParams,
+              tuneAnnotation: { parameter, previousValue: e.parameters[parameter]?.value, newValue },
             };
           }
-          return {
-            ...e,
-            parameters: updatedParams,
-            tuneAnnotation: { parameter, previousValue: currentValue, newValue },
-          };
+          // Update inputState for subsequent entries that were replayed
+          const newState = updatedInputStates.get(e.activityId);
+          if (newState) {
+            return { ...e, inputState: newState };
+          }
+          return e;
         })
       );
       setLogNotification(`Tuned "${parameter}" to ${String(newValue)}.`);
@@ -464,6 +561,86 @@ export default function App() {
     setLogNotification('Operation restored.');
     setTimeout(() => setLogNotification(null), 3000);
   }, []);
+
+  // Feature 113: Flip-card schema request — builds schema from tool definitions
+  const handleSchemaRequest = useCallback(
+    (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
+      // Look up the tool definition to get proper schema info (enum, paramType, etc.)
+      const toolDefs = listTools();
+      const toolDef = toolDefs.find((t) => t.name === toolId);
+      const paramsSchema = (toolDef?.inputSchema?.properties?.params as
+        | { properties?: Record<string, { type?: string; enum?: unknown[]; default?: unknown; description?: string; minimum?: number; maximum?: number; step?: number; 'x-debrief-param-type'?: string }> }
+        | undefined)?.properties;
+
+      // Find the log entry to get current values and tunability
+      const entry = logEntries.find((e: TimelineEntry) => e.toolName === toolId);
+      const schema: ParameterSchemaEntry[] = [];
+      if (entry) {
+        for (const [name, param] of Object.entries(entry.parameters)) {
+          const propSchema = paramsSchema?.[name];
+          const hasEnum = propSchema?.enum && propSchema.enum.length > 0;
+          const schemaType = propSchema?.type;
+
+          // Determine type: enum if choices exist, otherwise from schema or runtime value
+          let type: ParameterSchemaEntry['type'];
+          if (hasEnum) {
+            type = 'enum';
+          } else if (schemaType === 'number' || schemaType === 'integer') {
+            type = 'number';
+          } else if (schemaType === 'boolean') {
+            type = 'boolean';
+          } else if (schemaType === 'object') {
+            type = 'object';
+          } else if (schemaType === 'array') {
+            type = 'array';
+          } else {
+            // Fallback to runtime value type
+            const valueType = typeof param.value;
+            type = valueType === 'number' ? 'number' : valueType === 'boolean' ? 'boolean' : 'string';
+          }
+
+          schema.push({
+            name,
+            type,
+            description: propSchema?.description ?? null,
+            tunable: param.tunable !== false,
+            defaultValue: propSchema?.default ?? (param.default ? param.value : null),
+            minimum: propSchema?.minimum ?? (type === 'number' ? 0 : null),
+            maximum: propSchema?.maximum ?? (type === 'number' ? Number(param.value) * 3 : null),
+            step: propSchema?.step ?? (type === 'number' ? 1 : null),
+            choices: hasEnum ? (propSchema!.enum as unknown[]) : null,
+            paramType: propSchema?.['x-debrief-param-type'] ?? null,
+          });
+        }
+      }
+      return Promise.resolve(schema);
+    },
+    [logEntries]
+  );
+
+  // Feature 113: Flip-card disable toggle
+  const handleDisableToggle = useCallback(
+    (activityId: string, disabled: boolean) => {
+      setLogEntries((prev: TimelineEntry[]) =>
+        prev.map((e: TimelineEntry) =>
+          e.activityId === activityId ? { ...e, disabled } : e
+        )
+      );
+    },
+    []
+  );
+
+  // Feature 113: Flip-card rationale update
+  const handleRationaleUpdate = useCallback(
+    (activityId: string, rationale: string) => {
+      setLogEntries((prev: TimelineEntry[]) =>
+        prev.map((e: TimelineEntry) =>
+          e.activityId === activityId ? { ...e, rationale } : e
+        )
+      );
+    },
+    []
+  );
 
   // Handle map feature selection (goes through session-state)
   const handleMapSelect = useCallback((featureId: string, event: React.MouseEvent) => {
@@ -484,6 +661,11 @@ export default function App() {
   // Handle background click (clear selection via session-state)
   const handleBackgroundClick = useCallback(() => {
     store.getState().clearSelection();
+  }, [store]);
+
+  // Handle drawing mode change — write to session-state store (#108)
+  const handleDrawingModeChange = useCallback((mode: DrawingMode) => {
+    store.getState().setDrawingMode(mode);
   }, [store]);
 
   // Handle shape drawn on map (Feature: 094, 096)
@@ -614,25 +796,49 @@ export default function App() {
 
   // Handle tool execution — persist result to STAC assets and record a log entry
   const handleRunTool = useCallback((toolId: string, params?: Record<string, unknown>) => {
+    // Determine if this is a mutation tool BEFORE execution
+    const replacesInPlace = isMutationTool(toolId);
+
+    // Capture pre-tool geometry for mutation tools BEFORE execution.
+    // executeTool() mutates feature geometry and properties in-place,
+    // so we must snapshot the originals before the call.
+    const inputState = replacesInPlace && selectedFeatures.length > 0
+      ? selectedFeatures.map(f => {
+          const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
+          const { provenance: _p, ...restProps } = props;
+          return {
+            featureId: String(f.id),
+            geometry: JSON.parse(JSON.stringify(f.geometry)),
+            properties: JSON.parse(JSON.stringify(restProps)),
+          };
+        })
+      : null;
+
+    // Also snapshot full originals for revert before execution
+    const originalSnapshots = replacesInPlace && selectedFeatures.length > 0
+      ? selectedFeatures.map(f => JSON.parse(JSON.stringify(f)) as Feature)
+      : null;
+
     const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[], params);
     setToolMessage(result.message);
 
-    // Tools that transform features in-place (e.g. move-shape): replace in currentPlot
-    const replacesInPlace = toolId === 'move-shape';
-
-    if (result.resultLayer && replacesInPlace) {
-      // Replace the original feature in the plot with the moved version
-      const movedId = String(result.resultLayer.id);
-      setCurrentPlot(plot => {
-        if (!plot) return plot;
-        const updatedFeatures = plot.features.features.map(f =>
-          String(f.id) === movedId ? result.resultLayer! : f
-        );
-        return {
-          ...plot,
-          features: { ...plot.features, features: updatedFeatures },
-        };
-      });
+    if (replacesInPlace) {
+      // Replace the original features in the plot with the moved versions
+      const movedFeatures = result.resultLayers ?? (result.resultLayer ? [result.resultLayer] : []);
+      if (movedFeatures.length > 0) {
+        const movedMap = new Map(movedFeatures.map(m => [String(m.id), m]));
+        setCurrentPlot(plot => {
+          if (!plot) return plot;
+          const updatedFeatures = plot.features.features.map(f => {
+            const moved = movedMap.get(String(f.id));
+            return moved ?? f;
+          });
+          return {
+            ...plot,
+            features: { ...plot.features, features: updatedFeatures },
+          };
+        });
+      }
     }
 
     // Collect all result layers (singular or plural) for additive tools
@@ -644,7 +850,17 @@ export default function App() {
         ];
 
     if (allResultLayers.length > 0) {
-      setResultLayers(prev => [...prev, ...allResultLayers]);
+      store.getState().addResultLayers(allResultLayers as GeoJSONFeature[]);
+
+      // Record last tool execution for single-step undo (#110)
+      const resultIds = allResultLayers.map((layer, i) =>
+        String((layer as unknown as Record<string, unknown>).id ?? (layer.properties as Record<string, unknown> | null)?.id ?? `result-${activityCounter + 1}-${i}`)
+      );
+      store.getState().setLastToolExecution({
+        toolId,
+        sourceFeatureIds: selectedFeatures.map(f => String(f.id)),
+        resultLayerIds: resultIds,
+      });
 
       // Persist results as STAC assets in the current item's assets/ directory
       if (currentPlot) {
@@ -689,19 +905,6 @@ export default function App() {
 
     const activityId = `act-${String(nextId).padStart(3, '0')}`;
 
-    // Capture pre-tool geometry for mutation tools (enables correct tune replay)
-    const inputState = replacesInPlace && selectedFeatures.length > 0
-      ? selectedFeatures.map(f => {
-          const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
-          const { provenance: _p, ...restProps } = props;
-          return {
-            featureId: String(f.id),
-            geometry: JSON.parse(JSON.stringify(f.geometry)),
-            properties: JSON.parse(JSON.stringify(restProps)),
-          };
-        })
-      : null;
-
     const entry: TimelineEntry = {
       activityId,
       timestamp: new Date().toISOString(),
@@ -716,14 +919,11 @@ export default function App() {
       inputState,
     };
 
-    // Snapshot originals so revert can restore them
-    if (replacesInPlace && selectedFeatures.length > 0) {
-      const originals = selectedFeatures.map(f =>
-        JSON.parse(JSON.stringify(f)) as Feature
-      );
+    // Store pre-tool snapshots for revert (captured before execution above)
+    if (originalSnapshots) {
       setActivitySnapshots(prev => ({
         ...prev,
-        [activityId]: originals,
+        [activityId]: originalSnapshots,
       }));
     }
 
@@ -880,7 +1080,7 @@ export default function App() {
       currentTime: playback.currentTime,
       displayMode: toComponentMode(state.displayMode),
       drawingMode,
-      onDrawingModeChange: setDrawingMode,
+      onDrawingModeChange: handleDrawingModeChange,
       onShapeCreated: handleShapeCreated,
       height: '100%',
       className: 'web-shell__map',
@@ -902,6 +1102,9 @@ export default function App() {
       onSelectedEntryChange: setLogSelectedEntryId,
       onTuneRequest: handleTuneRequest,
       onRestoreRequest: handleRestoreRequest,
+      onSchemaRequest: handleSchemaRequest,
+      onDisableToggle: handleDisableToggle,
+      onRationaleUpdate: handleRationaleUpdate,
     } : null,
     stacFileTreeProps: currentPlot ? {
       fs: mockFsAdapter,
@@ -918,10 +1121,11 @@ export default function App() {
     panelComponents, currentPlot, timeExtent, playback.currentTime,
     playback.playbackState, playback.speed, state.displayMode,
     tools, allFeatures, state.selection.featureIds, handleActivityMessage,
-    selectedIds, handleMapSelect, handleBackgroundClick, drawingMode,
+    selectedIds, handleMapSelect, handleBackgroundClick, drawingMode, handleDrawingModeChange,
     handleShapeCreated, logEntries, featureNames, logPresentationMode,
     logViewMode, logSelectedEntryId, logFilterState, logNotification,
     handleLogMessage, handleTuneRequest, handleRestoreRequest,
+    handleSchemaRequest, handleDisableToggle, handleRationaleUpdate,
     handleFileSelect, treeRefreshKey, chartContextProps,
   ]);
 
@@ -948,14 +1152,24 @@ export default function App() {
         <header className="web-shell__header">
           <h1 className="web-shell__title">Debrief Web Shell</h1>
           <p className="web-shell__subtitle">STAC Catalog Browser</p>
-          <a
-            className="web-shell__storybook-link"
-            href="https://debrief.github.io/debrief-future/components-storybook/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Component Storybook &rarr;
-          </a>
+          <div className="web-shell__header-links">
+            <a
+              className="web-shell__header-link"
+              href="https://debrief.github.io/debrief-future/components-storybook/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Component Storybook &rarr;
+            </a>
+            <a
+              className="web-shell__header-link"
+              href="https://debrief-future-main-c900643d7496.herokuapp.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              VS Code Preview &rarr;
+            </a>
+          </div>
         </header>
         <main className="web-shell__main">
           <CatalogOverview

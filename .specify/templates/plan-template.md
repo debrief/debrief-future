@@ -143,6 +143,31 @@ directories captured above]
 
 *If no e2e tests needed, write "None - no interactive UI components"*
 
+## VS Code Webview E2E Testing
+
+*Identify extension workflows that require end-to-end testing through code-server. Skip if feature has no VS Code extension changes.*
+
+> **Reference**: `docs/e2e-testing-guide.md` — full guide to the webview E2E architecture, patches, and patterns.
+
+| Workflow | Panels Involved | Key Selectors | Interactions |
+|----------|----------------|---------------|--------------|
+| [e.g., Open REP file] | Map Panel, Activity Panel | `.leaflet-container`, `.catalog-overview` | open file, verify tracks render |
+
+**Testing Strategy**:
+- [ ] Extension workflow works end-to-end in code-server
+- [ ] Webview content accessible via `frameLocator` chaining
+- [ ] Page objects updated for new selectors
+- [ ] Screenshots captured for evidence
+
+**Test File Location**: `tests/e2e/test-{workflow}.spec.ts`
+
+**Infrastructure**:
+- Patches applied by `tests/e2e/scripts/patch-webview.sh`
+- Content injection via `tests/e2e/helpers/webview-injector.ts`
+- Headed Chromium required: `xvfb-run --auto-servernum npx playwright test ...`
+
+*If no webview E2E tests needed, write "None - no extension workflow changes"*
+
 ## Complexity Tracking
 
 > **Fill ONLY if Constitution Check has violations that must be justified**

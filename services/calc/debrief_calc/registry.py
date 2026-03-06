@@ -25,15 +25,17 @@ Usage:
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from functools import wraps
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar
 
 from debrief_calc.exceptions import ToolNotFoundError
 from debrief_calc.models import ContextType, SelectionContext, Tool, ToolParameter
 
 if TYPE_CHECKING:
-    pass
+    from collections.abc import Callable
+
+_P = ParamSpec("_P")
+_R = TypeVar("_R")
 
 
 class ToolRegistry:
@@ -45,7 +47,7 @@ class ToolRegistry:
     querying by context type and feature kinds.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._tools: dict[str, Tool] = {}
 
     def register(self, tool: Tool) -> None:
@@ -217,7 +219,7 @@ def tool(
         Decorator function that registers the tool
     """
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[_P, _R]) -> Callable[_P, _R]:
         # Create the Tool instance
         tool_instance = Tool(
             name=name,
@@ -234,11 +236,11 @@ def tool(
         registry.register(tool_instance)
 
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> _R:
             return func(*args, **kwargs)
 
         # Attach tool metadata to the wrapper
-        wrapper.tool = tool_instance
+        setattr(wrapper, "tool", tool_instance)  # noqa: B010
 
         return wrapper
 

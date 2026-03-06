@@ -119,9 +119,21 @@ Institutional knowledge lives in `docs/project_notes/` for consistency across se
 
 **When completing work:**
 - Log in `docs/project_notes/issues.md` with ticket ID and URL
+- Link evidence: reference `specs/[feature]/evidence/` in issues.md and decisions.md entries
+
+**When capturing evidence:**
+- Use the test-summary template at `.specify/templates/evidence/test-summary-template.md`
+- Include YAML front matter with `git_sha` and `captured_at` for freshness tracking
+- Follow the Quality Rubric per feature type (see `.specify/templates/tasks-template.md`)
+- For UI components: capture interaction GIF alongside theme screenshots
 
 ## Active Technologies
 Only updated when a feature introduces a technology not already listed here.
+- TypeScript 5.x (VS Code extension + shared components) + `@debrief/schemas` (generated types), `@debrief/components` (MapView), VS Code Extension API ^1.85.0 (100-unify-feature-pipeline)
+- CSS3 (within TypeScript 5.x React component library) + React 18.x, @tanstack/react-virtual (FeatureList virtualisation) (101-layers-panel-vertical-space)
+- Python 3.11, TypeScript 5.x + pyright (new), ruff (existing — add ANN/TC rules), ESLint + @typescript-eslint (existing — tighten config) (098-strict-type-checking)
+- N/A — configuration and code quality feature (098-strict-type-checking)
+- Python 3.11 (services, schemas), TypeScript 5.x (VS Code, shared components, web-shell) + Pydantic v2 (validation), LinkML >= 1.7.0 (schema source), `debrief-schemas` (generated models) (115-schema-validated-tool-io)
 
 - Python 3.11 (services, schemas, calc tools)
 - TypeScript 5.x (VS Code extension, webview, shared components, session-state)
@@ -141,5 +153,48 @@ Only updated when a feature introduces a technology not already listed here.
 - pytest / pytest-cov (Python tests)
 - Local filesystem STAC catalogs (JSON + GeoJSON storage)
 
+## Before Pushing
+
+**Always run the full CI check before pushing any commits.** Do not push if any step fails.
+
+### Using `task` (preferred)
+
+```sh
+task verify
+```
+
+This runs lint, typecheck, and test — the same three steps CI runs.
+
+### Fallback (when `task` is not installed)
+
+Run these four commands in order. All must pass before pushing:
+
+```sh
+# Step 1: Lint (Python + TypeScript)
+uv run ruff check . && pnpm lint
+
+# Step 2: Type check (Python + TypeScript)
+uv run pyright && pnpm -r typecheck
+
+# Step 3: Unit tests (Python + TypeScript — excludes Playwright E2E)
+uv run pytest && pnpm --filter '!@debrief/web-shell' test
+
+# Step 4: Playwright E2E tests
+cd apps/web-shell && node run-playwright.mjs && cd ../..
+```
+
+**Playwright note:** Step 4 uses `run-playwright.mjs` which extracts Chromium via `@sparticuz/chromium` — this works in both cloud (Claude Code) and CI environments. For local macOS/Windows, use `pnpm exec playwright install chromium` then `pnpm --filter @debrief/web-shell test` instead. See `docs/project_notes/playwright-installation-research.md` for details.
+
+### What CI actually runs (`.github/workflows/ci.yml`)
+
+| CI Step | Command | What it catches |
+|---------|---------|-----------------|
+| Lint | `task lint` | ruff (Python) + ESLint (TypeScript) |
+| Typecheck | `task typecheck` | pyright (Python) + tsc --noEmit (TypeScript) |
+| Test | `task test` | pytest (Python) + vitest + Playwright E2E |
+
+Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
+
 ## Recent Changes
-- 039-wire-timecontroller-temporal-track: Added TypeScript 5.x (VS Code extension webview) + Leaflet (vanilla JS), VS Code webview API, `@debrief/session-state` (Zustand store)
+- 115-schema-validated-tool-io: Added Python 3.11 (services, schemas), TypeScript 5.x (VS Code, shared components, web-shell) + Pydantic v2 (validation), LinkML >= 1.7.0 (schema source), `debrief-schemas` (generated models)
+- 100-unify-feature-pipeline: Added TypeScript 5.x (VS Code extension + shared components) + `@debrief/schemas` (generated types), `@debrief/components` (MapView), VS Code Extension API ^1.85.0

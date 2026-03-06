@@ -18,7 +18,7 @@ from debrief_cli.main import Context, pass_context
 @click.argument("file", type=click.Path(exists=True))
 @click.option("--strict", is_flag=True, help="Enable strict validation (require kind attribute)")
 @pass_context
-def validate(ctx: Context, file: str, strict: bool):
+def validate(ctx: Context, file: str, strict: bool) -> None:
     """
     Validate a GeoJSON file.
 

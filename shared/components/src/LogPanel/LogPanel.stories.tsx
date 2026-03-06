@@ -4,7 +4,7 @@
  * Feature: 072-log-panel
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { LogPanel } from './LogPanel';
 import type {
@@ -13,8 +13,10 @@ import type {
   ViewMode,
   FilterState,
   LogPanelMessage,
+  ParameterSchemaEntry,
 } from './types';
 import { DEFAULT_FILTER_STATE } from './types';
+import { CardFlip } from './CardFlip';
 
 // --- Sample data ---
 
@@ -75,7 +77,7 @@ const sampleEntries: TimelineEntry[] = [
     toolName: 'change-track-color',
     toolVersion: '1.0.0',
     parameters: {
-      color: { value: '#ff0000', default: false, tunable: false },
+      color: { value: 'red', default: false, tunable: true },
     },
     usedFeatureIds: ['track-bravo'],
     generatedFeatureIds: [],
@@ -363,6 +365,171 @@ export const ActionsDisabled: Story = {
             plotName="Exercise Alpha"
             actionResultMessage={null}
             onFilterStateChange={setFilterState}
+          />
+        </div>
+      );
+    };
+    return <Wrapper />;
+  },
+};
+
+// --- Feature 113: Flip-Card Interaction ---
+
+// Sample disabled entry
+const disabledEntry: TimelineEntry = {
+  ...sampleEntries[0],
+  activityId: 'act-disabled-001',
+  disabled: true,
+};
+
+// Sample entry with rationale
+const entryWithRationale: TimelineEntry = {
+  ...sampleEntries[0],
+  activityId: 'act-rationale-001',
+  rationale: 'Increased range to capture distant contacts from the latest exercise data.',
+};
+
+/**
+ * Interactive flip-card wrapper that wires edit callbacks.
+ */
+function FlipCardInteractive(props: {
+  entries: TimelineEntry[];
+  featureNames: Record<string, string>;
+}) {
+  const [presentationMode, setPresentationMode] = useState<PresentationMode>('normal');
+  const [viewMode, setViewMode] = useState<ViewMode>('timeline');
+  const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
+  const [filterState, setFilterState] = useState<FilterState>(DEFAULT_FILTER_STATE);
+  const [notification, setNotification] = useState<string | null>(null);
+  const [localEntries, setLocalEntries] = useState(props.entries);
+
+  const handleMessage = useCallback((message: LogPanelMessage) => {
+    if (message.type === 'action:invoke') {
+      setNotification(`Action "${message.payload.actionType}" invoked.`);
+      setTimeout(() => setNotification(null), 3000);
+    }
+  }, []);
+
+  const handleSchemaRequest = useCallback(
+    (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
+      // Derive mock schema from matching entry's parameters
+      const entry = localEntries.find((e) => e.toolName === toolId);
+      const schema: ParameterSchemaEntry[] = [];
+      if (entry) {
+        for (const [name, param] of Object.entries(entry.parameters)) {
+          const isNum = typeof param.value === 'number';
+          const isColor = name === 'color';
+          schema.push({
+            name,
+            type: isNum ? 'number' : 'string',
+            description: null,
+            tunable: param.tunable,
+            defaultValue: param.default ? param.value : null,
+            minimum: isNum ? 0 : null,
+            maximum: isNum ? Number(param.value) * 3 : null,
+            step: isNum ? 1 : null,
+            choices: isColor ? ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'cyan', 'magenta', 'white', 'pink', 'navy', 'teal'] : null,
+            paramType: isColor ? 'NamedColor' : null,
+          });
+        }
+      }
+      return Promise.resolve(schema);
+    },
+    [localEntries]
+  );
+
+  const handleDisableToggle = useCallback((activityId: string, disabled: boolean) => {
+    setLocalEntries((prev) =>
+      prev.map((e) => (e.activityId === activityId ? { ...e, disabled } : e))
+    );
+  }, []);
+
+  const handleRationaleUpdate = useCallback((activityId: string, rationale: string) => {
+    setLocalEntries((prev) =>
+      prev.map((e) => (e.activityId === activityId ? { ...e, rationale } : e))
+    );
+  }, []);
+
+  return (
+    <div style={{ width: 320, height: 600, border: '1px solid #333' }}>
+      <LogPanel
+        entries={localEntries}
+        featureNames={props.featureNames}
+        presentationMode={presentationMode}
+        viewMode={viewMode}
+        selectedEntryId={selectedEntryId}
+        filterState={filterState}
+        hasActiveSession={true}
+        plotName="Exercise Alpha"
+        actionResultMessage={notification}
+        onMessage={handleMessage}
+        onPresentationModeChange={setPresentationMode}
+        onViewModeChange={setViewMode}
+        onFilterStateChange={setFilterState}
+        onSelectedEntryChange={setSelectedEntryId}
+        onSchemaRequest={handleSchemaRequest}
+        onDisableToggle={handleDisableToggle}
+        onRationaleUpdate={handleRationaleUpdate}
+      />
+    </div>
+  );
+}
+
+export const FlipCardDefault: Story = {
+  name: 'Flip Card — Edit Icon',
+  render: () => (
+    <FlipCardInteractive
+      entries={sampleEntries}
+      featureNames={sampleFeatureNames}
+    />
+  ),
+};
+
+export const FlipCardDisabled: Story = {
+  name: 'Flip Card — Disabled Entry',
+  render: () => (
+    <FlipCardInteractive
+      entries={[disabledEntry, ...sampleEntries.slice(1)]}
+      featureNames={sampleFeatureNames}
+    />
+  ),
+};
+
+export const FlipCardRationale: Story = {
+  name: 'Flip Card — With Rationale',
+  render: () => (
+    <FlipCardInteractive
+      entries={[entryWithRationale, ...sampleEntries.slice(1)]}
+      featureNames={sampleFeatureNames}
+    />
+  ),
+};
+
+// --- CardFlip primitive story ---
+export const CardFlipPrimitive: Story = {
+  name: 'CardFlip Primitive',
+  render: () => {
+    const Wrapper = () => {
+      const [isFlipped, setIsFlipped] = useState(false);
+      return (
+        <div style={{ width: 320, padding: 16 }}>
+          <button onClick={() => setIsFlipped(!isFlipped)} style={{ marginBottom: 8 }}>
+            {isFlipped ? 'Show Front' : 'Show Back'}
+          </button>
+          <CardFlip
+            isFlipped={isFlipped}
+            front={
+              <div style={{ padding: 16, background: '#1e1e1e', border: '1px solid #333' }}>
+                <strong>Front Face</strong>
+                <p>Tool name, features, parameters</p>
+              </div>
+            }
+            back={
+              <div style={{ padding: 16, background: '#252526', border: '1px solid #333' }}>
+                <strong>Back Face (Edit)</strong>
+                <p>Parameter controls, rationale, disable</p>
+              </div>
+            }
           />
         </div>
       );

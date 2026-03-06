@@ -1,0 +1,11 @@
+{
+  "stores": [
+    {
+      "id": "local-store",
+      "path": "/workspace/test-workspace/local-store",
+      "displayName": "Test Maritime Data",
+      "status": "available"
+    }
+  ],
+  "preferences": {}
+}

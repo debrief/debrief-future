@@ -1,40 +1,52 @@
 /**
  * Tool-related type definitions for the Debrief VS Code Extension
  *
- * This module re-exports types from @debrief/components/ToolMatch and defines
- * additional extension-specific types for tool execution and result layers.
+ * Imports base types from @debrief/schemas (the single source of truth,
+ * generated from LinkML) and extends with VS Code extension-specific fields.
+ * #105 — no hand-authored type shadows.
  */
 
+import type {
+  SelectionRequirement as SchemaSelectionRequirement,
+  Tool as SchemaTool,
+} from '@debrief/schemas';
+
 /**
- * Selection requirement for a tool (from @debrief/schemas).
- * Defines what feature kinds and counts a tool needs.
+ * Selection requirement — re-exported directly from schema (no extension needed).
  */
-export interface SelectionRequirement {
-  /** Feature kind (e.g., 'TRACK', 'POINT', 'CIRCLE') */
-  kind: string;
-  /** Minimum count required (default: 1) */
-  min?: number;
-  /** Maximum count allowed (undefined = no limit) */
-  max?: number;
+export type SelectionRequirement = SchemaSelectionRequirement;
+
+/**
+ * A configurable parameter for a tool, extracted from MCP annotations.
+ * Uses view-layer field names (valueType, defaultValue) adapted from
+ * the schema's snake_case conventions (type, default_value).
+ */
+export interface ToolParameter {
+  /** Parameter identifier */
+  name: string;
+  /** Value type (mapped from schema's "type" field) */
+  valueType: 'string' | 'number' | 'boolean' | 'enum';
+  /** Human-readable description */
+  description: string;
+  /** Whether parameter is required */
+  required?: boolean;
+  /** Default value (mapped from schema's "default_value" field) */
+  defaultValue?: unknown;
+  /** Explicit choices (for enum type) */
+  choices?: string[];
+  /** Schema-defined parameter type name (from x-debrief-param-type) */
+  paramType?: string;
 }
 
 /**
- * Tool definition (from @debrief/schemas).
- * Describes an analysis tool and its requirements.
+ * Tool definition — extends schema's Tool with VS Code-specific fields.
+ * Base fields (id, name, description, version, requirements) come from schema.
  */
-export interface Tool {
-  /** Unique tool identifier */
-  id: string;
-  /** Display name */
-  name: string;
-  /** Description of what the tool does */
-  description?: string;
-  /** Tool version */
-  version?: string;
-  /** Selection requirements for the tool to be active */
-  requirements?: SelectionRequirement[];
+export interface Tool extends SchemaTool {
   /** Minimum total features across all kinds (for multi-kind tools) */
   minFeatures?: number;
+  /** Configurable parameters (only those with paramType or choices) */
+  parameters?: ToolParameter[];
 }
 
 /**
@@ -69,31 +81,25 @@ export function createSelectionFromCounts(counts: Record<string, number>): ToolS
 }
 
 /**
- * Check if a tool's requirements are satisfied by a selection.
+ * Check if ANY of a tool's requirements are satisfied by a selection (OR semantics).
+ *
+ * Each requirement entry is an alternative — selecting 1 POLY or 1 RECTANGLE
+ * or 1 CIRCLE each independently satisfies a tool that lists all three.
  */
 function checkRequirements(requirements: SelectionRequirement[], selection: ToolSelection): boolean {
-  const acceptedKinds = new Set(requirements.map((r) => r.kind));
-
-  // Reject if selection contains kinds the tool doesn't accept
-  for (const kind of selection.keys()) {
-    if (!acceptedKinds.has(kind) && (selection.get(kind) ?? 0) > 0) {
-      return false;
-    }
-  }
-
   for (const req of requirements) {
     const count = selection.get(req.kind) ?? 0;
     const min = req.min ?? 1;
-    const max = req.max;
 
     if (count < min) {
-      return false;
+      continue;
     }
-    if (max !== undefined && count > max) {
-      return false;
+    if (req.max !== undefined && count > req.max) {
+      continue;
     }
+    return true;
   }
-  return true;
+  return false;
 }
 
 /**
@@ -104,38 +110,17 @@ export function getInactiveReason(tool: Tool, selection: ToolSelection): string 
     return '';
   }
 
-  const reasons: string[] = [];
-  const acceptedKinds = new Set(tool.requirements.map((r) => r.kind));
+  // OR semantics — show what kinds would satisfy the tool
+  const accepted = tool.requirements.map((r) => r.kind);
+  const selectedKinds = [...selection.entries()]
+    .filter(([, count]) => count > 0)
+    .map(([kind]) => kind);
 
-  for (const [kind, count] of selection) {
-    if (!acceptedKinds.has(kind) && count > 0) {
-      reasons.push(`Unexpected ${kind} in selection`);
-    }
+  if (selectedKinds.length === 0) {
+    return `Select ${accepted.join(' or ')}`;
   }
 
-  for (const req of tool.requirements) {
-    const count = selection.get(req.kind) ?? 0;
-    const min = req.min ?? 1;
-    const max = req.max;
-
-    if (count < min) {
-      reasons.push(`Need ${min} ${req.kind}, have ${count}`);
-    } else if (max !== undefined && count > max) {
-      reasons.push(`Need at most ${max} ${req.kind}, have ${count}`);
-    }
-  }
-
-  if (tool.minFeatures !== undefined) {
-    let total = 0;
-    for (const count of selection.values()) {
-      total += count;
-    }
-    if (total < tool.minFeatures) {
-      reasons.push(`Need ${tool.minFeatures} features total, have ${total}`);
-    }
-  }
-
-  return reasons.join('; ');
+  return `Need ${accepted.join(' or ')}, have ${selectedKinds.join(', ')}`;
 }
 
 /**

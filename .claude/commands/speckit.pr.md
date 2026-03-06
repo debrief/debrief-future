@@ -94,9 +94,32 @@ You **MUST** consider the user input before proceeding (if not empty).
      - `.md` files: Include content directly (formatted)
      - `.txt` files: Include in code blocks
      - `.json` files: Include as collapsible JSON blocks
-     - `.png`, `.jpg`, `.gif` images: Reference with relative paths (will need to be added to repo)
+     - `.png`, `.jpg` images: Reference with relative paths (will need to be added to repo)
+     - `.gif` images: Embed inline — interaction GIFs are high-value evidence for UI features
      - `.csv` files: Convert to markdown tables
    - If evidence directory is missing or empty, add a note: "⚠️ No evidence artifacts captured. Consider running evidence collection tasks."
+
+7a. **Check evidence freshness**:
+   - For each evidence file in `FEATURE_DIR/evidence/`:
+     - If `test-summary.md` has YAML front matter with `git_sha`, compare it against the current branch HEAD
+     - If the SHA doesn't match HEAD, check whether any source files (not evidence/media files) have been modified since the evidence was captured:
+       ```bash
+       git log --oneline <evidence_git_sha>..HEAD -- . ':!specs/*/evidence/' ':!specs/*/media/'
+       ```
+     - If source files have changed since evidence capture, add a warning to the PR description:
+       ```
+       > ⚠️ Evidence may be stale — source files modified after evidence was captured at <sha>.
+       > Consider re-running evidence collection tasks.
+       ```
+   - If `test-summary.md` lacks front matter, add a note: "Evidence uses legacy format — consider updating to template with front matter."
+
+7b. **Check evidence completeness against quality rubric**:
+   - Determine feature type from spec.md (UI Component, CLI Tool, API/Service, etc.)
+   - Check whether the feature-type-specific evidence files exist per the Quality Rubric in `.specify/templates/tasks-template.md`
+   - For UI components: verify theme screenshots and interaction GIF exist
+   - For CLI tools: verify `cli-demo.txt` exists
+   - For APIs: verify sample request/response JSON exists
+   - Report missing type-specific evidence as warnings (not blockers)
 
 8. **Check git and branch status**:
    - Verify all changes are committed
@@ -124,6 +147,37 @@ You **MUST** consider the user input before proceeding (if not empty).
 11. **Capture feature PR URL**:
     - Store the PR URL for use in blog post PR
     - Extract PR number for cross-referencing
+
+11a. **Update evidence index** (`docs/evidence-index.md`):
+    - Read or create `docs/evidence-index.md`
+    - Add or update an entry for this feature:
+      ```markdown
+      | Feature | Files | Types | Captured | Freshness | PR |
+      |---------|-------|-------|----------|-----------|----|
+      | [###-name] | N | md, png, gif, json | YYYY-MM-DD | current/stale | #PR |
+      ```
+    - Extract file count and types from `FEATURE_DIR/evidence/`
+    - Extract `captured_at` from `test-summary.md` front matter (if available)
+    - Set freshness to "current" if `git_sha` matches HEAD, "stale" otherwise
+    - Link to the PR just created
+    - Sort entries by feature number
+    - Commit the updated index alongside the PR
+
+11b. **Update CHANGELOG** (`docs/CHANGELOG.md`):
+    - Read or create `docs/CHANGELOG.md`
+    - Add an entry under the current date heading:
+      ```markdown
+      ## [YYYY-MM-DD]
+
+      ### Added
+      - **[Feature Name]** — [1-line summary from spec.md excerpt]. ([#PR](url))
+        - Tests: [passed]/[total] passing, [coverage]% coverage
+        - Evidence: [list of key evidence files]
+      ```
+    - Pull test metrics from `test-summary.md` front matter
+    - If no front matter, use "see evidence/" as fallback
+    - Group entries under existing date heading if one exists for today
+    - Commit the updated CHANGELOG alongside the PR
 
 12. **Check for publishable media content**:
     - Look for `FEATURE_DIR/media/shipped-post.md`

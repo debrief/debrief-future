@@ -6,19 +6,23 @@ import type { TrackFeature, ReferenceLocation } from '@debrief/schemas';
 
 // Mock react-leaflet components
 vi.mock('react-leaflet', () => ({
-  MapContainer: ({ children, className, style }: any) => (
+  MapContainer: ({ children, className, style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) => (
     <div data-testid="map-container" className={className} style={style}>
       {children}
     </div>
   ),
-  TileLayer: ({ url }: any) => <div data-testid="tile-layer" data-url={url} />,
-  GeoJSON: ({ data, onEachFeature, style: styleFn }: any) => {
+  TileLayer: ({ url }: { url: string }) => <div data-testid="tile-layer" data-url={url} />,
+  GeoJSON: ({ data, onEachFeature }: {
+    data: { features: Array<{ id?: string | number; properties: Record<string, unknown> }> };
+    onEachFeature?: (feature: Record<string, unknown>, layer: { on: ReturnType<typeof vi.fn>; bindTooltip: ReturnType<typeof vi.fn>; setStyle: ReturnType<typeof vi.fn>; bringToFront: ReturnType<typeof vi.fn> }) => void;
+    style?: (feature: Record<string, unknown>) => Record<string, unknown>;
+  }) => {
     // Simulate rendering features
     return (
       <div data-testid="geojson-layer">
-        {data.features.map((feature: any, index: number) => (
+        {data.features.map((feature, index: number) => (
           <div
-            key={feature.id || index}
+            key={String(feature.id) || String(index)}
             data-testid={`feature-${feature.id}`}
             onClick={() => {
               // Mock layer with all required methods
@@ -30,7 +34,7 @@ vi.mock('react-leaflet', () => ({
               };
               onEachFeature?.(feature, layer);
               // Simulate click handler
-              const clickHandler = layer.on.mock.calls.find((c: any[]) => c[0] === 'click');
+              const clickHandler = (layer.on.mock.calls as Array<[string, (e: Record<string, unknown>) => void]>).find((c) => c[0] === 'click');
               if (clickHandler) {
                 clickHandler[1]({ originalEvent: { stopPropagation: vi.fn() } });
               }
@@ -55,7 +59,7 @@ vi.mock('react-leaflet', () => ({
       getNorth: () => 52,
     }),
   }),
-  useMapEvents: (handlers: any) => {
+  useMapEvents: (/* _handlers */) => {
     // Store handlers for testing
     return null;
   },

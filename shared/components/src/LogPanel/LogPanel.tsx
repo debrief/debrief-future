@@ -8,13 +8,15 @@
  * - Empty states for no plot / no entries
  *
  * Feature: 072-log-panel
+ * Updated: 113-prov-card-flip (flip-card edit state, schema cache)
  */
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState, useRef } from 'react';
 import type {
   LogPanelProps,
   TimelineEntry,
   ActionType,
+  ParameterSchemaEntry,
 } from './types';
 import { LogTimeline } from './LogTimeline';
 import { LogByFeature } from './LogByFeature';
@@ -43,8 +45,44 @@ export function LogPanel({
   onTuneRequest,
   onRestoreRequest,
   onReplayCancel,
+  onSchemaRequest,
+  onDisableToggle,
+  onRationaleUpdate,
   className,
 }: LogPanelProps): React.ReactElement {
+  // Feature 113: Flip-card edit state
+  const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
+  const [schemaLoading, setSchemaLoading] = useState(false);
+  const [schemaError, setSchemaError] = useState<string | null>(null);
+
+  // Feature 113: Schema cache (plain Map via useRef, review decision 3A)
+  const schemaCacheRef = useRef(new Map<string, ReadonlyArray<ParameterSchemaEntry>>());
+
+  // Ref for rationale auto-focus from action bar
+  const rationaleRef = useRef<HTMLTextAreaElement>(null);
+
+  // Feature 113: Request schema and handle async resolution if Promise is returned.
+  const requestSchema = useCallback(
+    (toolId: string) => {
+      setSchemaLoading(true);
+      const result = onSchemaRequest?.(toolId);
+      if (result && typeof (result as Promise<unknown>).then === 'function') {
+        (result as Promise<ReadonlyArray<ParameterSchemaEntry>>).then(
+          (schema) => {
+            schemaCacheRef.current.set(toolId, schema);
+            setSchemaLoading(false);
+            setSchemaError(null);
+          },
+          (err: unknown) => {
+            setSchemaLoading(false);
+            setSchemaError(err instanceof Error ? err.message : 'Schema load failed');
+          }
+        );
+      }
+    },
+    [onSchemaRequest]
+  );
+
   // Apply filters to entries
   const filteredEntries = useMemo(
     () => filterEntries(entries, filterState, featureNames),
@@ -80,12 +118,28 @@ export function LogPanel({
   // Handle action button clicks
   const handleActionInvoke = useCallback(
     (actionType: ActionType, activityId: string) => {
+      // Feature 113: Rationale action bar shortcut flips the card and focuses rationale
+      if (actionType === 'rationale') {
+        const entry = entries.find((e) => e.activityId === activityId);
+        if (entry) {
+          setEditingActivityId(activityId);
+          // Request schema if not cached
+          const cached = schemaCacheRef.current.get(entry.toolName);
+          if (!cached) {
+            requestSchema(entry.toolName);
+          }
+          // Focus rationale after render
+          setTimeout(() => rationaleRef.current?.focus(), 100);
+        }
+        return;
+      }
+
       onMessage?.({
         type: 'action:invoke',
         payload: { actionType, activityId },
       });
     },
-    [onMessage]
+    [onMessage, entries, requestSchema]
   );
 
   // Phase 6: Wrap onTuneRequest for LogEntry's onTuneClick signature
@@ -108,6 +162,85 @@ export function LogPanel({
     [onRestoreRequest]
   );
 
+  // Feature 113: Handle edit icon click — flip card to edit face
+  const handleEditClick = useCallback(
+    (entry: TimelineEntry) => {
+      // Single-card constraint: auto-close any currently editing card
+      setEditingActivityId(entry.activityId);
+      setSchemaError(null);
+
+      // Check schema cache
+      const cached = schemaCacheRef.current.get(entry.toolName);
+      if (!cached) {
+        requestSchema(entry.toolName);
+      } else {
+        setSchemaLoading(false);
+      }
+    },
+    [requestSchema]
+  );
+
+  // Feature 113: Handle Done click — flip card back to read-only
+  const handleDoneClick = useCallback(
+    () => {
+      setEditingActivityId(null);
+    },
+    []
+  );
+
+  // Feature 113: Handle parameter change — debounced live replay via tune:request
+  const handleParameterChange = useCallback(
+    (activityId: string, parameterName: string, newValue: unknown) => {
+      onTuneRequest?.(activityId, parameterName, newValue);
+    },
+    [onTuneRequest]
+  );
+
+  // Feature 113: Handle delete — soft delete via revert-this
+  const handleDeleteClick = useCallback(
+    (activityId: string) => {
+      setEditingActivityId(null);
+      onMessage?.({
+        type: 'action:invoke',
+        payload: { actionType: 'revertThis', activityId },
+      });
+    },
+    [onMessage]
+  );
+
+  // Feature 113: Handle rationale change
+  const handleRationaleChange = useCallback(
+    (activityId: string, rationale: string) => {
+      onRationaleUpdate?.(activityId, rationale);
+    },
+    [onRationaleUpdate]
+  );
+
+  // Feature 113: Handle retry schema load
+  const handleRetrySchema = useCallback(
+    (toolId: string) => {
+      setSchemaError(null);
+      requestSchema(toolId);
+    },
+    [requestSchema]
+  );
+
+  // Feature 113: Handle disable toggle
+  const handleDisableToggle = useCallback(
+    (activityId: string, disabled: boolean) => {
+      onDisableToggle?.(activityId, disabled);
+    },
+    [onDisableToggle]
+  );
+
+  // Feature 113: Get cached schema for currently editing entry
+  const editingEntry = editingActivityId
+    ? entries.find((e) => e.activityId === editingActivityId)
+    : null;
+  const editingSchema = editingEntry
+    ? schemaCacheRef.current.get(editingEntry.toolName) ?? null
+    : null;
+
   // Empty state: no plot open
   if (!hasActiveSession) {
     return (
@@ -129,6 +262,17 @@ export function LogPanel({
       </div>
     );
   }
+
+  // Common LogEntry props for flip-card interaction
+  const flipCardProps = onSchemaRequest ? {
+    onEditClick: handleEditClick,
+    onDoneClick: handleDoneClick,
+    onParameterChange: handleParameterChange,
+    onDisableToggle: handleDisableToggle,
+    onDeleteClick: handleDeleteClick,
+    onRationaleChange: handleRationaleChange,
+    onRetrySchema: handleRetrySchema,
+  } : {};
 
   return (
     <div className={`log-panel ${className ?? ''}`} data-testid="log-panel">
@@ -184,6 +328,12 @@ export function LogPanel({
           onEntryClick={handleEntryClick}
           onTuneClick={onTuneRequest ? handleTuneClick : undefined}
           onRestoreClick={onRestoreRequest ? handleRestoreClick : undefined}
+          editingActivityId={editingActivityId}
+          editingSchema={editingSchema}
+          schemaLoading={schemaLoading}
+          schemaError={schemaError}
+          rationaleRef={rationaleRef}
+          {...flipCardProps}
         />
       ) : (
         <LogByFeature
@@ -194,6 +344,12 @@ export function LogPanel({
           onEntryClick={handleEntryClick}
           onTuneClick={onTuneRequest ? handleTuneClick : undefined}
           onRestoreClick={onRestoreRequest ? handleRestoreClick : undefined}
+          editingActivityId={editingActivityId}
+          editingSchema={editingSchema}
+          schemaLoading={schemaLoading}
+          schemaError={schemaError}
+          rationaleRef={rationaleRef}
+          {...flipCardProps}
         />
       )}
     </div>

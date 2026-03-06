@@ -8,6 +8,7 @@ import {
   msToIsoDuration,
   generateActivityId,
   extractActivityIdFromOutputFeatures,
+  extractParametersFromOutputFeatures,
 } from '../../../src/log/entryBuilder.js';
 import type { ToolResultForLog, ExpandedToolResultFields } from '../../../src/log/types.js';
 
@@ -48,7 +49,7 @@ describe('generateActivityId', () => {
 
 describe('extractActivityIdFromOutputFeatures', () => {
   it('returns activityId from last provenance entry', () => {
-    const features = [
+    const features: Array<Record<string, unknown>> = [
       {
         type: 'Feature',
         properties: {
@@ -59,22 +60,22 @@ describe('extractActivityIdFromOutputFeatures', () => {
         },
       },
     ];
-    expect(extractActivityIdFromOutputFeatures(features as any)).toBe('new-id');
+    expect(extractActivityIdFromOutputFeatures(features)).toBe('new-id');
   });
 
   it('returns undefined when no provenance exists', () => {
-    const features = [{ type: 'Feature', properties: {} }];
-    expect(extractActivityIdFromOutputFeatures(features as any)).toBeUndefined();
+    const features: Array<Record<string, unknown>> = [{ type: 'Feature', properties: {} }];
+    expect(extractActivityIdFromOutputFeatures(features)).toBeUndefined();
   });
 
   it('returns undefined when properties is null', () => {
-    const features = [{ type: 'Feature', properties: null }];
-    expect(extractActivityIdFromOutputFeatures(features as any)).toBeUndefined();
+    const features: Array<Record<string, unknown>> = [{ type: 'Feature', properties: null }];
+    expect(extractActivityIdFromOutputFeatures(features)).toBeUndefined();
   });
 
   it('returns undefined when provenance is empty array', () => {
-    const features = [{ type: 'Feature', properties: { provenance: [] } }];
-    expect(extractActivityIdFromOutputFeatures(features as any)).toBeUndefined();
+    const features: Array<Record<string, unknown>> = [{ type: 'Feature', properties: { provenance: [] } }];
+    expect(extractActivityIdFromOutputFeatures(features)).toBeUndefined();
   });
 });
 
@@ -175,5 +176,126 @@ describe('buildLogEntry', () => {
   it('always sets tune to null in Phase 1', () => {
     const entry = buildLogEntry(baseToolResult, undefined);
     expect(entry.tune).toBeNull();
+  });
+
+  it('extracts parameters from Python provenance when expanded.parameters missing', () => {
+    const pythonParams = {
+      direction: { value: 90, default: false, tunable: true },
+      distance_km: { value: 5, default: false, tunable: true },
+    };
+    const result: ToolResultForLog = {
+      success: true,
+      durationMs: 100,
+      toolId: 'move-shape',
+      sourceFeatureIds: ['rect-1'],
+      features: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'rect-1',
+          type: 'Feature',
+          properties: {
+            provenance: [{
+              activityId: 'act-123',
+              wasGeneratedBy: {
+                tool: 'move-shape',
+                toolVersion: '1.0.0',
+                parameters: pythonParams,
+              },
+            }],
+          },
+        }],
+      },
+    };
+
+    const entry = buildLogEntry(result, { toolVersion: '1.0.0' }, 'act-123');
+    expect(entry.wasGeneratedBy.parameters).toEqual(pythonParams);
+    expect(entry.wasGeneratedBy.parameters.direction.tunable).toBe(true);
+    expect(entry.wasGeneratedBy.parameters.distance_km.tunable).toBe(true);
+  });
+
+  it('prefers expanded.parameters over Python provenance extraction', () => {
+    const expandedParams = {
+      direction: { value: 45, default: false, tunable: true },
+    };
+    const result: ToolResultForLog = {
+      success: true,
+      durationMs: 100,
+      toolId: 'move-shape',
+      features: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'rect-1',
+          type: 'Feature',
+          properties: {
+            provenance: [{
+              activityId: 'act-456',
+              wasGeneratedBy: {
+                tool: 'move-shape',
+                parameters: { direction: { value: 90, default: false, tunable: true } },
+              },
+            }],
+          },
+        }],
+      },
+    };
+
+    const entry = buildLogEntry(result, { parameters: expandedParams }, 'act-456');
+    expect(entry.wasGeneratedBy.parameters).toEqual(expandedParams);
+  });
+});
+
+describe('extractParametersFromOutputFeatures', () => {
+  it('extracts parameters matching activityId', () => {
+    const features: Array<Record<string, unknown>> = [{
+      type: 'Feature',
+      properties: {
+        provenance: [{
+          activityId: 'act-1',
+          wasGeneratedBy: {
+            tool: 'move-shape',
+            parameters: {
+              direction: { value: 90, default: false, tunable: true },
+            },
+          },
+        }],
+      },
+    }];
+    const params = extractParametersFromOutputFeatures(features, 'act-1');
+    expect(params).toBeDefined();
+    expect(params!.direction).toEqual({ value: 90, default: false, tunable: true });
+  });
+
+  it('returns undefined when no matching activityId', () => {
+    const features: Array<Record<string, unknown>> = [{
+      type: 'Feature',
+      properties: {
+        provenance: [{
+          activityId: 'act-other',
+          wasGeneratedBy: { tool: 'x', parameters: { a: { value: 1 } } },
+        }],
+      },
+    }];
+    expect(extractParametersFromOutputFeatures(features, 'act-1')).toBeUndefined();
+  });
+
+  it('returns undefined when no provenance', () => {
+    const features: Array<Record<string, unknown>> = [{
+      type: 'Feature',
+      properties: {},
+    }];
+    expect(extractParametersFromOutputFeatures(features, 'act-1')).toBeUndefined();
+  });
+
+  it('returns undefined when parameters are empty', () => {
+    const features: Array<Record<string, unknown>> = [{
+      type: 'Feature',
+      properties: {
+        provenance: [{
+          activityId: 'act-1',
+          wasGeneratedBy: { tool: 'x', parameters: {} },
+        }],
+      },
+    }];
+    expect(extractParametersFromOutputFeatures(features, 'act-1')).toBeUndefined();
   });
 });

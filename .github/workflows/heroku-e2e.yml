@@ -1,0 +1,79 @@
+name: Heroku E2E Tests
+
+on:
+  # Manual trigger — paste the Heroku review app URL
+  workflow_dispatch:
+    inputs:
+      heroku_url:
+        description: 'Heroku review app URL (e.g. https://debrief-preview-pr-123.herokuapp.com)'
+        required: true
+        type: string
+
+jobs:
+  heroku-e2e:
+    name: Playwright vs Heroku Review App
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Enable corepack
+        run: corepack enable pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install chromium
+
+      - name: Wait for Heroku app readiness
+        run: |
+          echo "Waiting for ${{ inputs.heroku_url }}..."
+          for i in $(seq 1 30); do
+            if curl -sf --connect-timeout 10 "${{ inputs.heroku_url }}" -o /dev/null 2>/dev/null; then
+              echo "App reachable after attempt $i"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "App not reachable after 30 attempts"
+          exit 1
+
+      - name: Run Heroku E2E tests
+        env:
+          HEROKU_APP_URL: ${{ inputs.heroku_url }}
+          CODE_SERVER_URL: ${{ inputs.heroku_url }}
+          CI: true
+        run: pnpm exec playwright test --config tests/e2e/playwright.config.ts tests/e2e/test-heroku-smoke.spec.ts
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: heroku-e2e-report
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: heroku-e2e-screenshots
+          path: tests/e2e/evidence/heroku-review-app.png
+          retention-days: 14
+
+      - name: Upload trace
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: heroku-e2e-trace
+          path: test-results/
+          retention-days: 14

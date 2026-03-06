@@ -13,6 +13,7 @@
 #   task dev          Start development watch mode
 #   task lint         Check code style
 #   task lint:fix     Auto-fix code style issues
+#   task verify       Run full CI checks locally before pushing
 #   task clean        Remove build artifacts
 
 version: '3'
@@ -70,6 +71,13 @@ tasks:
     cmds:
       - pnpm storybook
 
+  typecheck:
+    desc: "Run type checking (Python + TypeScript)"
+    deps: [install]
+    cmds:
+      - uv run pyright
+      - pnpm -r typecheck
+
   lint:
     desc: "Check code style (Python + TypeScript)"
     deps: [install, build]
@@ -84,6 +92,36 @@ tasks:
       - uv run ruff check --fix .
       - uv run ruff format .
       - pnpm lint -- --fix
+
+  verify:
+    desc: "Run full CI checks locally (lint + typecheck + test) before pushing"
+    deps: [install]
+    cmds:
+      - task: lint
+      - task: typecheck
+      - task: test
+
+  preview:build:
+    desc: "Build the preview container (code-server + Debrief extension)"
+    preconditions:
+      - sh: command -v docker
+        msg: "Docker not found. Install Docker to build the preview container."
+    cmds:
+      - docker build -t debrief-preview -f Dockerfile.preview .
+
+  preview:run:
+    desc: "Run the preview container locally (http://localhost:8080)"
+    preconditions:
+      - sh: docker image inspect debrief-preview >/dev/null 2>&1
+        msg: "Preview image not built. Run 'task preview:build' first."
+    cmds:
+      - docker run --rm -p 8080:8080 -e PORT=8080 debrief-preview
+
+  preview:package:
+    desc: "Package the VS Code extension as .vsix"
+    deps: [build]
+    cmds:
+      - cd apps/vscode && npx vsce package --no-dependencies
 
   clean:
     desc: "Remove build artifacts and caches"

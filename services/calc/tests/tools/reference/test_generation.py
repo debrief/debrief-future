@@ -65,7 +65,7 @@ def _make_context(
 class TestGridBasic:
     """Basic grid generation tests (T015)."""
 
-    def test_grid_count12_returns_12_coordinates(self):
+    def test_grid_count12_returns_12_coordinates(self) -> None:
         """count=12 grid should produce exactly 12 coordinates (3x4 layout)."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -81,7 +81,7 @@ class TestGridBasic:
         coords = feature["geometry"]["coordinates"]
         assert len(coords) == 12
 
-    def test_grid_count12_correct_positions(self):
+    def test_grid_count12_correct_positions(self) -> None:
         """Verify exact coordinate positions for count=12 grid (3x4 layout)."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -109,7 +109,7 @@ class TestGridBasic:
         assert coords[10] == [-1.0, 52.0]
         assert coords[11] == [1.0, 52.0]
 
-    def test_grid_count1_centre_point(self):
+    def test_grid_count1_centre_point(self) -> None:
         """count=1 grid should produce a single point at the bounding box centre."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -121,7 +121,7 @@ class TestGridBasic:
         assert len(coords) == 1
         assert coords[0] == pytest.approx([-2.0, 50.5])
 
-    def test_grid_count25_even_spacing(self):
+    def test_grid_count25_even_spacing(self) -> None:
         """count=25 grid should have 25 coordinates at even intervals (5x5)."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -142,7 +142,7 @@ class TestGridBasic:
         assert coords[1] == [1.0, 0.0]
         assert coords[5] == [0.0, 1.0]
 
-    def test_grid_feature_properties(self):
+    def test_grid_feature_properties(self) -> None:
         """Verify feature properties are correct."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -161,7 +161,7 @@ class TestGridBasic:
         assert props["style"]["color"] == "#666666"
         assert props["style"]["radius"] == 5
 
-    def test_grid_point_metadata_parallel(self):
+    def test_grid_point_metadata_parallel(self) -> None:
         """pointMetadata must be parallel to coordinates array."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -182,7 +182,7 @@ class TestGridBasic:
 class TestGridEdgeCases:
     """Grid edge case tests (T016)."""
 
-    def test_zero_area_bounds_same_lon(self):
+    def test_zero_area_bounds_same_lon(self) -> None:
         """Zero-area bounds (west==east) should raise ValueError."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -191,7 +191,7 @@ class TestGridEdgeCases:
         with pytest.raises(ValueError, match="positive area"):
             generate_reference_points(context, params)
 
-    def test_zero_area_bounds_same_lat(self):
+    def test_zero_area_bounds_same_lat(self) -> None:
         """Zero-area bounds (south==north) should raise ValueError."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -200,7 +200,7 @@ class TestGridEdgeCases:
         with pytest.raises(ValueError, match="must be less than north"):
             generate_reference_points(context, params)
 
-    def test_count_zero(self):
+    def test_count_zero(self) -> None:
         """count=0 should raise ValueError."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -209,7 +209,7 @@ class TestGridEdgeCases:
         with pytest.raises(ValueError, match="positive integer"):
             generate_reference_points(context, params)
 
-    def test_count10_trims_incomplete_last_row(self):
+    def test_count10_trims_incomplete_last_row(self) -> None:
         """count=10 should trim incomplete last row (cols=4, rows=3 → 12 slots, keep 10)."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -220,16 +220,16 @@ class TestGridEdgeCases:
         coords = result[0]["geometry"]["coordinates"]
         assert len(coords) == 10
 
-    def test_invalid_pattern(self):
+    def test_invalid_pattern(self) -> None:
         """Invalid pattern should raise ValueError."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
         context = _make_context()
         params = {"pattern": "hexagonal"}
-        with pytest.raises(ValueError, match="'grid' or 'scatter'"):
+        with pytest.raises(ValueError, match="grid.*scatter"):
             generate_reference_points(context, params)
 
-    def test_grid_matches_golden_example(self):
+    def test_grid_matches_golden_example(self) -> None:
         """Grid output should match the golden example exactly."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -252,7 +252,7 @@ class TestGridEdgeCases:
             == expected_feature["properties"]["pointMetadata"]
         )
 
-    def test_no_features_raises(self):
+    def test_no_features_raises(self) -> None:
         """Missing polygon feature should raise ValueError."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -272,7 +272,7 @@ class TestGridEdgeCases:
 class TestScatterBasic:
     """Basic scatter generation tests (T025)."""
 
-    def test_scatter_20_points(self):
+    def test_scatter_20_points(self) -> None:
         """Scatter with count=20 should produce exactly 20 coordinates."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -286,7 +286,7 @@ class TestScatterBasic:
         coords = feature["geometry"]["coordinates"]
         assert len(coords) == 20
 
-    def test_scatter_seed_reproducibility(self):
+    def test_scatter_seed_reproducibility(self) -> None:
         """Same seed should produce identical coordinates."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -299,7 +299,7 @@ class TestScatterBasic:
         coords2 = result2[0]["geometry"]["coordinates"]
         assert coords1 == coords2
 
-    def test_scatter_different_seeds_produce_different_output(self):
+    def test_scatter_different_seeds_produce_different_output(self) -> None:
         """Different seeds should produce different coordinates."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -313,7 +313,7 @@ class TestScatterBasic:
         coords2 = result2[0]["geometry"]["coordinates"]
         assert coords1 != coords2
 
-    def test_scatter_all_within_bounds(self):
+    def test_scatter_all_within_bounds(self) -> None:
         """All scatter points must be within the bounding box."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -326,7 +326,7 @@ class TestScatterBasic:
             assert -5 <= lon <= 1, f"lon {lon} out of bounds"
             assert 49 <= lat <= 52, f"lat {lat} out of bounds"
 
-    def test_scatter_feature_properties(self):
+    def test_scatter_feature_properties(self) -> None:
         """Verify scatter feature properties."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -341,7 +341,7 @@ class TestScatterBasic:
         assert props["locationType"] == "REFERENCE"
         assert "scatter 20" in props["name"]
 
-    def test_scatter_point_metadata_parallel(self):
+    def test_scatter_point_metadata_parallel(self) -> None:
         """pointMetadata must be parallel to coordinates array."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -362,7 +362,7 @@ class TestScatterBasic:
 class TestScatterEdgeCases:
     """Scatter edge case tests (T026)."""
 
-    def test_scatter_count_zero(self):
+    def test_scatter_count_zero(self) -> None:
         """count=0 should raise ValueError."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -371,7 +371,7 @@ class TestScatterEdgeCases:
         with pytest.raises(ValueError, match="positive integer"):
             generate_reference_points(context, params)
 
-    def test_scatter_missing_count(self):
+    def test_scatter_missing_count(self) -> None:
         """Missing count should use default (20)."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -382,7 +382,7 @@ class TestScatterEdgeCases:
         coords = result[0]["geometry"]["coordinates"]
         assert len(coords) == 20
 
-    def test_scatter_antimeridian_crossing(self):
+    def test_scatter_antimeridian_crossing(self) -> None:
         """Antimeridian crossing (west > east) should wrap longitudes."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -396,7 +396,7 @@ class TestScatterEdgeCases:
             assert -180 <= lon <= 180, f"lon {lon} not normalised"
             assert -10 <= lat <= 10, f"lat {lat} out of bounds"
 
-    def test_scatter_matches_golden_example(self):
+    def test_scatter_matches_golden_example(self) -> None:
         """Scatter output should match the golden example exactly."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -431,7 +431,7 @@ class TestScatterEdgeCases:
 class TestDownstreamCompatibility:
     """Downstream compatibility tests (T035, T036)."""
 
-    def test_output_is_valid_geojson_feature(self):
+    def test_output_is_valid_geojson_feature(self) -> None:
         """Generated feature must be a valid GeoJSON Feature."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -447,7 +447,7 @@ class TestDownstreamCompatibility:
         assert feature["geometry"]["type"] == "MultiPoint"
         assert isinstance(feature["geometry"]["coordinates"], list)
 
-    def test_point_metadata_extensible(self):
+    def test_point_metadata_extensible(self) -> None:
         """pointMetadata entries should be extensible with zone/color fields."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -470,7 +470,7 @@ class TestDownstreamCompatibility:
             assert entry["zone"] == "inner"
             assert entry["color"] == "#ff0000"
 
-    def test_grid_antimeridian_crossing(self):
+    def test_grid_antimeridian_crossing(self) -> None:
         """Grid with antimeridian crossing should normalise longitudes."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -493,7 +493,7 @@ class TestDownstreamCompatibility:
 class TestCrossLanguageParity:
     """Cross-language parity tests — Python output must match golden examples."""
 
-    def test_grid_parity_with_golden(self):
+    def test_grid_parity_with_golden(self) -> None:
         """Python grid output must match golden example."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 
@@ -512,7 +512,7 @@ class TestCrossLanguageParity:
         assert actual["geometry"]["coordinates"] == expected["geometry"]["coordinates"]
         assert actual["properties"]["pointMetadata"] == expected["properties"]["pointMetadata"]
 
-    def test_scatter_parity_with_golden(self):
+    def test_scatter_parity_with_golden(self) -> None:
         """Python scatter output must match golden example (seed=42)."""
         from debrief_calc.tools.reference.generation import generate_reference_points
 

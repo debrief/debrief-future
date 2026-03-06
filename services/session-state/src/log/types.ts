@@ -40,6 +40,10 @@ export interface LogEntry {
   generatedResultId?: string | null;
   tune: TuneAnnotation | null;
   deleted?: boolean;
+  /** Whether this entry is skipped during replay. Feature: 113-prov-card-flip */
+  disabled?: boolean;
+  /** Free-text analyst annotation. Feature: 113-prov-card-flip */
+  rationale?: string | null;
   /** Pre-tool geometry for mutation tools — enables correct tune replay. */
   inputState?: InputFeatureState[] | null;
 }
@@ -140,6 +144,21 @@ export interface LogService {
     activityId: string
   ): Promise<ReplayResult>;
 
+  // Feature 113: Flip-card edit operations
+  disableEntry(
+    storePath: string,
+    itemPath: string,
+    activityId: string,
+    disabled: boolean
+  ): Promise<{ disabledActivityIds: string[] }>;
+
+  setRationale(
+    storePath: string,
+    itemPath: string,
+    activityId: string,
+    rationale: string
+  ): Promise<void>;
+
   // Delegated stubs (moved to dedicated services)
   createSnapshot(): Promise<void>;
   branchFrom(activityId: string): Promise<string>;
@@ -150,6 +169,8 @@ export interface LogService {
 /** Describes a single entry in a replay plan. */
 export interface ReplayEntry {
   activityId: string;
+  /** Original ISO-8601 timestamp — stamped on output provenance to preserve ordering. */
+  timestamp: string;
   toolId: string;
   toolVersion: string;
   parameters: Record<string, unknown>;
@@ -221,7 +242,11 @@ export interface ToolExecutionResultForReplay {
 export type ToolExecutor = (
   toolId: string,
   featureIds: string[],
-  params: Record<string, unknown>
+  params: Record<string, unknown>,
+  /** Original activityId — callee should stamp this on output provenance. */
+  activityId?: string,
+  /** Original timestamp — callee should stamp this on output provenance to preserve ordering. */
+  timestamp?: string
 ) => Promise<ToolExecutionResultForReplay>;
 
 /** Callback to load a snapshot GeoJSON for cross-snapshot replay. */

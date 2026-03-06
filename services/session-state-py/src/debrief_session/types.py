@@ -59,7 +59,7 @@ class Coordinate(BaseModel):
 
     __root__: tuple[float, float]
 
-    def __init__(self, lon: float, lat: float, **kwargs):
+    def __init__(self, lon: float, lat: float, **kwargs: object) -> None:
         super().__init__(__root__=(lon, lat), **kwargs)
 
     @property

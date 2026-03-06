@@ -3,6 +3,7 @@
 import json
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import pytest
 from debrief_calc.models import (
@@ -35,13 +36,13 @@ FIXTURES_ROOT = Path(__file__).resolve().parents[2] / ".." / "shared" / "schemas
 class TestContextType:
     """Tests for ContextType enum."""
 
-    def test_enum_values(self):
+    def test_enum_values(self) -> None:
         assert ContextType.SINGLE.value == "single"
         assert ContextType.MULTI.value == "multi"
         assert ContextType.REGION.value == "region"
         assert ContextType.NONE.value == "none"
 
-    def test_enum_is_string(self):
+    def test_enum_is_string(self) -> None:
         assert isinstance(ContextType.SINGLE, str)
         assert ContextType.SINGLE == "single"
 
@@ -49,24 +50,24 @@ class TestContextType:
 class TestSourceRef:
     """Tests for SourceRef model."""
 
-    def test_create_source_ref(self):
+    def test_create_source_ref(self) -> None:
         ref = SourceRef(id="track-001", kind="TRACK")
         assert ref.id == "track-001"
         assert ref.kind == "TRACK"
 
-    def test_source_ref_requires_id(self):
+    def test_source_ref_requires_id(self) -> None:
         with pytest.raises(PydanticValidationError):
-            SourceRef(kind="TRACK")
+            SourceRef(kind="TRACK")  # type: ignore[reportCallIssue]
 
-    def test_source_ref_requires_kind(self):
+    def test_source_ref_requires_kind(self) -> None:
         with pytest.raises(PydanticValidationError):
-            SourceRef(id="track-001")
+            SourceRef(id="track-001")  # type: ignore[reportCallIssue]
 
 
 class TestProvenance:
     """Tests for Provenance model."""
 
-    def test_create_provenance(self):
+    def test_create_provenance(self) -> None:
         prov = Provenance(
             tool="track-stats", version="1.0.0", sources=[SourceRef(id="track-001", kind="TRACK")]
         )
@@ -75,11 +76,11 @@ class TestProvenance:
         assert len(prov.sources) == 1
         assert isinstance(prov.timestamp, datetime)
 
-    def test_provenance_default_timestamp(self):
+    def test_provenance_default_timestamp(self) -> None:
         prov = Provenance(tool="test", version="1.0.0")
         assert prov.timestamp is not None
 
-    def test_provenance_default_empty_parameters(self):
+    def test_provenance_default_empty_parameters(self) -> None:
         prov = Provenance(tool="test", version="1.0.0")
         assert prov.parameters == {}
 
@@ -87,23 +88,23 @@ class TestProvenance:
 class TestToolParameter:
     """Tests for ToolParameter model."""
 
-    def test_create_string_parameter(self):
+    def test_create_string_parameter(self) -> None:
         param = ToolParameter(name="unit", type="string", description="Measurement unit")
         assert param.name == "unit"
         assert param.type == "string"
         assert param.required is False
 
-    def test_create_enum_parameter_with_choices(self):
+    def test_create_enum_parameter_with_choices(self) -> None:
         param = ToolParameter(
             name="format", type="enum", description="Output format", choices=["json", "csv", "xml"]
         )
         assert param.choices == ["json", "csv", "xml"]
 
-    def test_enum_parameter_requires_choices_or_param_type(self):
+    def test_enum_parameter_requires_choices_or_param_type(self) -> None:
         with pytest.raises(PydanticValidationError, match="choices or param_type"):
             ToolParameter(name="format", type="enum", description="Output format")
 
-    def test_enum_parameter_valid_with_param_type_only(self):
+    def test_enum_parameter_valid_with_param_type_only(self) -> None:
         """T018: enum type is valid when param_type is provided instead of choices."""
         param = ToolParameter(
             name="color",
@@ -114,7 +115,7 @@ class TestToolParameter:
         assert param.param_type == "NamedColor"
         assert param.choices is None
 
-    def test_enum_parameter_valid_with_both_choices_and_param_type(self):
+    def test_enum_parameter_valid_with_both_choices_and_param_type(self) -> None:
         """T018: enum type is valid when both choices and param_type are provided."""
         param = ToolParameter(
             name="color",
@@ -126,7 +127,7 @@ class TestToolParameter:
         assert param.choices == ["red", "blue", "green"]
         assert param.param_type == "NamedColor"
 
-    def test_invalid_param_type_rejected(self):
+    def test_invalid_param_type_rejected(self) -> None:
         """T018: Invalid param_type values are rejected."""
         with pytest.raises(PydanticValidationError, match="param_type must be one of"):
             ToolParameter(
@@ -136,12 +137,12 @@ class TestToolParameter:
                 param_type="InvalidType",
             )
 
-    def test_param_type_none_by_default(self):
+    def test_param_type_none_by_default(self) -> None:
         """T018: param_type defaults to None."""
         param = ToolParameter(name="unit", type="string", description="Unit")
         assert param.param_type is None
 
-    def test_all_valid_param_types_accepted(self):
+    def test_all_valid_param_types_accepted(self) -> None:
         """T018: All members of VALID_PARAM_TYPES are accepted."""
         for pt in VALID_PARAM_TYPES:
             param = ToolParameter(
@@ -152,13 +153,13 @@ class TestToolParameter:
             )
             assert param.param_type == pt
 
-    def test_invalid_type_rejected(self):
+    def test_invalid_type_rejected(self) -> None:
         with pytest.raises(PydanticValidationError):
             ToolParameter(name="test", type="invalid", description="Test")
 
-    def test_valid_types_accepted(self):
+    def test_valid_types_accepted(self) -> None:
         for param_type in ["string", "number", "boolean", "enum"]:
-            kwargs = {"name": "test", "type": param_type, "description": "Test"}
+            kwargs: dict[str, Any] = {"name": "test", "type": param_type, "description": "Test"}
             if param_type == "enum":
                 kwargs["choices"] = ["a", "b"]
             param = ToolParameter(**kwargs)
@@ -168,13 +169,13 @@ class TestToolParameter:
 class TestToolError:
     """Tests for ToolError model."""
 
-    def test_create_tool_error(self):
+    def test_create_tool_error(self) -> None:
         error = ToolError(code="TOOL_NOT_FOUND", message="Tool 'unknown' not found")
         assert error.code == "TOOL_NOT_FOUND"
         assert error.message == "Tool 'unknown' not found"
         assert error.details is None
 
-    def test_create_tool_error_with_details(self):
+    def test_create_tool_error_with_details(self) -> None:
         error = ToolError(
             code="KIND_MISMATCH",
             message="Kind mismatch",
@@ -186,7 +187,7 @@ class TestToolError:
 class TestToolResult:
     """Tests for ToolResult model."""
 
-    def test_successful_result(self):
+    def test_successful_result(self) -> None:
         result = ToolResult(
             tool="track-stats",
             success=True,
@@ -194,10 +195,11 @@ class TestToolResult:
             duration_ms=42.5,
         )
         assert result.success is True
+        assert result.features is not None
         assert len(result.features) == 1
         assert result.error is None
 
-    def test_failed_result(self):
+    def test_failed_result(self) -> None:
         result = ToolResult(
             tool="track-stats",
             success=False,
@@ -208,15 +210,15 @@ class TestToolResult:
         assert result.error is not None
         assert result.features is None
 
-    def test_success_requires_features(self):
+    def test_success_requires_features(self) -> None:
         with pytest.raises(PydanticValidationError):
             ToolResult(tool="test", success=True, duration_ms=10.0)
 
-    def test_failure_requires_error(self):
+    def test_failure_requires_error(self) -> None:
         with pytest.raises(PydanticValidationError):
             ToolResult(tool="test", success=False, duration_ms=10.0)
 
-    def test_new_fields_default_to_none(self):
+    def test_new_fields_default_to_none(self) -> None:
         """SC-006: All new ToolResult fields are optional with None defaults."""
         result = ToolResult(
             tool="track-stats",
@@ -230,7 +232,7 @@ class TestToolResult:
         assert result.created_assets is None
         assert result.parameters is None
 
-    def test_expanded_result_with_all_fields(self):
+    def test_expanded_result_with_all_fields(self) -> None:
         result = ToolResult(
             tool="set-track-color",
             success=True,
@@ -254,13 +256,17 @@ class TestToolResult:
             },
         )
         assert result.tool_version == "1.2.0"
+        assert result.modified_features is not None
+        assert result.created_features is not None
+        assert result.created_assets is not None
+        assert result.parameters is not None
         assert len(result.modified_features) == 1
         assert result.modified_features[0].feature_id == "track-001"
         assert len(result.created_features) == 1
         assert len(result.created_assets) == 1
         assert result.parameters["color"].value == "#FF0000"
 
-    def test_expanded_result_serialization_roundtrip(self):
+    def test_expanded_result_serialization_roundtrip(self) -> None:
         result = ToolResult(
             tool="test",
             success=True,
@@ -274,6 +280,7 @@ class TestToolResult:
         data = result.model_dump()
         restored = ToolResult.model_validate(data)
         assert restored.tool_version == "2.0.0"
+        assert restored.parameters is not None
         assert restored.parameters["interval"].value == 60
         assert restored.parameters["interval"].default is True
 
@@ -281,13 +288,13 @@ class TestToolResult:
 class TestSelectionContext:
     """Tests for SelectionContext model."""
 
-    def test_single_context(self):
+    def test_single_context(self) -> None:
         feature = {"type": "Feature", "properties": {"kind": "TRACK"}, "geometry": None}
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
         assert context.type == ContextType.SINGLE
         assert len(context.features) == 1
 
-    def test_single_requires_exactly_one_feature(self):
+    def test_single_requires_exactly_one_feature(self) -> None:
         with pytest.raises(PydanticValidationError):
             SelectionContext(type=ContextType.SINGLE, features=[])
 
@@ -295,41 +302,41 @@ class TestSelectionContext:
             feature = {"type": "Feature", "properties": {}, "geometry": None}
             SelectionContext(type=ContextType.SINGLE, features=[feature, feature])
 
-    def test_multi_context(self):
+    def test_multi_context(self) -> None:
         feature1 = {"type": "Feature", "properties": {"kind": "TRACK"}, "geometry": None}
         feature2 = {"type": "Feature", "properties": {"kind": "TRACK"}, "geometry": None}
         context = SelectionContext(type=ContextType.MULTI, features=[feature1, feature2])
         assert context.type == ContextType.MULTI
         assert len(context.features) == 2
 
-    def test_multi_accepts_single_feature(self):
+    def test_multi_accepts_single_feature(self) -> None:
         feature = {"type": "Feature", "properties": {}, "geometry": None}
         context = SelectionContext(type=ContextType.MULTI, features=[feature])
         assert len(context.features) == 1
 
-    def test_multi_rejects_empty_features(self):
+    def test_multi_rejects_empty_features(self) -> None:
         with pytest.raises(PydanticValidationError):
             SelectionContext(type=ContextType.MULTI, features=[])
 
-    def test_region_context(self):
+    def test_region_context(self) -> None:
         context = SelectionContext(type=ContextType.REGION, bounds=[-5.0, 49.0, -3.0, 51.0])
         assert context.type == ContextType.REGION
         assert context.bounds == [-5.0, 49.0, -3.0, 51.0]
 
-    def test_region_requires_bounds(self):
+    def test_region_requires_bounds(self) -> None:
         with pytest.raises(PydanticValidationError):
             SelectionContext(type=ContextType.REGION)
 
-    def test_bounds_must_have_four_values(self):
+    def test_bounds_must_have_four_values(self) -> None:
         with pytest.raises(PydanticValidationError):
             SelectionContext(type=ContextType.REGION, bounds=[-5.0, 49.0])
 
-    def test_none_context(self):
+    def test_none_context(self) -> None:
         context = SelectionContext(type=ContextType.NONE)
         assert context.type == ContextType.NONE
         assert context.features == []
 
-    def test_get_kinds(self):
+    def test_get_kinds(self) -> None:
         feature1 = {"type": "Feature", "properties": {"kind": "TRACK"}, "geometry": None}
         feature2 = {"type": "Feature", "properties": {"kind": "ZONE"}, "geometry": None}
         context = SelectionContext(type=ContextType.MULTI, features=[feature1, feature2])
@@ -340,7 +347,7 @@ class TestSelectionContext:
 class TestTool:
     """Tests for Tool model."""
 
-    def test_create_tool(self):
+    def test_create_tool(self) -> None:
         tool = Tool(
             name="track-stats",
             description="Calculate track statistics",
@@ -351,7 +358,7 @@ class TestTool:
         assert tool.name == "track-stats"
         assert tool.version == "1.0.0"  # default
 
-    def test_name_must_be_kebab_case(self):
+    def test_name_must_be_kebab_case(self) -> None:
         with pytest.raises(PydanticValidationError):
             Tool(
                 name="trackStats",  # camelCase not allowed
@@ -361,7 +368,7 @@ class TestTool:
                 context_type=ContextType.SINGLE,
             )
 
-    def test_name_must_start_with_letter(self):
+    def test_name_must_start_with_letter(self) -> None:
         with pytest.raises(PydanticValidationError):
             Tool(
                 name="123-tool",
@@ -371,7 +378,7 @@ class TestTool:
                 context_type=ContextType.SINGLE,
             )
 
-    def test_input_kinds_must_not_be_empty(self):
+    def test_input_kinds_must_not_be_empty(self) -> None:
         with pytest.raises(PydanticValidationError):
             Tool(
                 name="test-tool",
@@ -381,7 +388,7 @@ class TestTool:
                 context_type=ContextType.SINGLE,
             )
 
-    def test_accepts_kind(self):
+    def test_accepts_kind(self) -> None:
         tool = Tool(
             name="test",
             description="Test",
@@ -393,7 +400,7 @@ class TestTool:
         assert tool.accepts_kind("ZONE") is True
         assert tool.accepts_kind("POINT") is False
 
-    def test_accepts_context(self):
+    def test_accepts_context(self) -> None:
         tool = Tool(
             name="test",
             description="Test",
@@ -404,7 +411,7 @@ class TestTool:
         assert tool.accepts_context(ContextType.SINGLE) is True
         assert tool.accepts_context(ContextType.MULTI) is False
 
-    def test_multi_tool_accepts_single_context(self):
+    def test_multi_tool_accepts_single_context(self) -> None:
         tool = Tool(
             name="test-multi",
             description="Test multi",
@@ -416,7 +423,7 @@ class TestTool:
         assert tool.accepts_context(ContextType.SINGLE) is True
         assert tool.accepts_context(ContextType.REGION) is False
 
-    def test_to_metadata(self):
+    def test_to_metadata(self) -> None:
         tool = Tool(
             name="track-stats",
             description="Calculate statistics",
@@ -436,27 +443,27 @@ class TestTool:
 class TestParameterValue:
     """Tests for ParameterValue model."""
 
-    def test_create_basic_parameter_value(self):
+    def test_create_basic_parameter_value(self) -> None:
         pv = ParameterValue(value=60)
         assert pv.value == 60
         assert pv.default is False
         assert pv.tunable is True
 
-    def test_parameter_value_with_defaults(self):
+    def test_parameter_value_with_defaults(self) -> None:
         pv = ParameterValue(value="nm", default=True, tunable=True)
         assert pv.value == "nm"
         assert pv.default is True
         assert pv.tunable is True
 
-    def test_parameter_value_non_tunable(self):
+    def test_parameter_value_non_tunable(self) -> None:
         pv = ParameterValue(value="track-alpha", default=False, tunable=False)
         assert pv.tunable is False
 
-    def test_parameter_value_requires_value(self):
+    def test_parameter_value_requires_value(self) -> None:
         with pytest.raises(PydanticValidationError):
-            ParameterValue()
+            ParameterValue()  # type: ignore[reportCallIssue]
 
-    def test_parameter_value_accepts_any_type(self):
+    def test_parameter_value_accepts_any_type(self) -> None:
         assert ParameterValue(value=42).value == 42
         assert ParameterValue(value="text").value == "text"
         assert ParameterValue(value=True).value is True
@@ -467,27 +474,27 @@ class TestParameterValue:
 class TestPropertyDelta:
     """Tests for PropertyDelta model."""
 
-    def test_create_property_delta(self):
+    def test_create_property_delta(self) -> None:
         delta = PropertyDelta(previous_value="blue", new_value="red")
         assert delta.previous_value == "blue"
         assert delta.new_value == "red"
 
-    def test_property_delta_accepts_any_types(self):
+    def test_property_delta_accepts_any_types(self) -> None:
         delta = PropertyDelta(previous_value=10, new_value=20)
         assert delta.previous_value == 10
         assert delta.new_value == 20
 
-    def test_property_delta_requires_both_values(self):
+    def test_property_delta_requires_both_values(self) -> None:
         with pytest.raises(PydanticValidationError):
-            PropertyDelta(previous_value="old")
+            PropertyDelta(previous_value="old")  # type: ignore[reportCallIssue]
         with pytest.raises(PydanticValidationError):
-            PropertyDelta(new_value="new")
+            PropertyDelta(new_value="new")  # type: ignore[reportCallIssue]
 
 
 class TestModifiedFeature:
     """Tests for ModifiedFeature model."""
 
-    def test_create_modified_feature(self):
+    def test_create_modified_feature(self) -> None:
         mf = ModifiedFeature(
             feature_id="track-001",
             changed_properties={
@@ -498,7 +505,7 @@ class TestModifiedFeature:
         assert len(mf.changed_properties) == 1
         assert mf.changed_properties["color"].new_value == "red"
 
-    def test_modified_feature_multiple_properties(self):
+    def test_modified_feature_multiple_properties(self) -> None:
         mf = ModifiedFeature(
             feature_id="track-002",
             changed_properties={
@@ -508,25 +515,25 @@ class TestModifiedFeature:
         )
         assert len(mf.changed_properties) == 2
 
-    def test_modified_feature_requires_feature_id(self):
+    def test_modified_feature_requires_feature_id(self) -> None:
         with pytest.raises(PydanticValidationError):
-            ModifiedFeature(changed_properties={})
+            ModifiedFeature(changed_properties={})  # type: ignore[reportCallIssue]
 
-    def test_modified_feature_requires_changed_properties(self):
+    def test_modified_feature_requires_changed_properties(self) -> None:
         with pytest.raises(PydanticValidationError):
-            ModifiedFeature(feature_id="track-001")
+            ModifiedFeature(feature_id="track-001")  # type: ignore[reportCallIssue]
 
 
 class TestCreatedAsset:
     """Tests for CreatedAsset model."""
 
-    def test_create_asset_basic(self):
+    def test_create_asset_basic(self) -> None:
         asset = CreatedAsset(result_id="bt_plot_001", path="./results/bt_plot_001_v1.png")
         assert asset.result_id == "bt_plot_001"
         assert asset.path == "./results/bt_plot_001_v1.png"
         assert asset.mime_type is None
 
-    def test_create_asset_with_mime_type(self):
+    def test_create_asset_with_mime_type(self) -> None:
         asset = CreatedAsset(
             result_id="bt_plot_001",
             path="./results/bt_plot_001_v1.png",
@@ -534,30 +541,30 @@ class TestCreatedAsset:
         )
         assert asset.mime_type == "image/png"
 
-    def test_create_asset_requires_result_id(self):
+    def test_create_asset_requires_result_id(self) -> None:
         with pytest.raises(PydanticValidationError):
-            CreatedAsset(path="./results/output.png")
+            CreatedAsset(path="./results/output.png")  # type: ignore[reportCallIssue]
 
-    def test_create_asset_requires_path(self):
+    def test_create_asset_requires_path(self) -> None:
         with pytest.raises(PydanticValidationError):
-            CreatedAsset(result_id="bt_plot_001")
+            CreatedAsset(result_id="bt_plot_001")  # type: ignore[reportCallIssue]
 
 
 class TestLogEntry:
     """Tests for LogEntry model."""
 
-    def test_create_log_entry(self):
+    def test_create_log_entry(self) -> None:
         entry = LogEntry(
-            activity_id="550e8400-e29b-41d4-a716-446655440000",
+            activityId="550e8400-e29b-41d4-a716-446655440000",
             timestamp=datetime(2026, 1, 15, 10, 30, 0, tzinfo=UTC),
-            was_generated_by=WasGeneratedBy(
+            wasGeneratedBy=WasGeneratedBy(
                 tool="calculate-range",
-                tool_version="1.0.0",
+                toolVersion="1.0.0",
                 parameters={"interval": ParameterValue(value=60, default=True, tunable=True)},
             ),
             used=["track-alpha"],
             generated=["range-001"],
-            execution_duration="PT0.3S",
+            executionDuration="PT0.3S",
         )
         assert entry.activity_id == "550e8400-e29b-41d4-a716-446655440000"
         assert entry.was_generated_by.tool == "calculate-range"
@@ -565,25 +572,25 @@ class TestLogEntry:
         assert entry.tune is None
         assert entry.generated_result_id is None
 
-    def test_log_entry_invalid_duration(self):
+    def test_log_entry_invalid_duration(self) -> None:
         with pytest.raises(PydanticValidationError):
             LogEntry(
-                activity_id="test",
+                activityId="test",
                 timestamp=datetime.now(UTC),
-                was_generated_by=WasGeneratedBy(tool="t", tool_version="1.0", parameters={}),
+                wasGeneratedBy=WasGeneratedBy(tool="t", toolVersion="1.0", parameters={}),
                 used=[],
                 generated=[],
-                execution_duration="300ms",  # Invalid format
+                executionDuration="300ms",  # Invalid format
             )
 
-    def test_log_entry_serialization_camelcase(self):
+    def test_log_entry_serialization_camelcase(self) -> None:
         entry = LogEntry(
-            activity_id="test-id",
+            activityId="test-id",
             timestamp=datetime(2026, 1, 15, 10, 0, 0, tzinfo=UTC),
-            was_generated_by=WasGeneratedBy(tool="t", tool_version="1.0", parameters={}),
+            wasGeneratedBy=WasGeneratedBy(tool="t", toolVersion="1.0", parameters={}),
             used=[],
             generated=[],
-            execution_duration="PT1S",
+            executionDuration="PT1S",
         )
         data = entry.model_dump(mode="json", by_alias=True)
         assert "activityId" in data
@@ -591,7 +598,7 @@ class TestLogEntry:
         assert "executionDuration" in data
         assert "toolVersion" in data["wasGeneratedBy"]
 
-    def test_log_entry_from_fixture(self):
+    def test_log_entry_from_fixture(self) -> None:
         fixture = FIXTURES_ROOT / "log-entry" / "valid" / "tool-invocation.json"
         data = json.loads(fixture.read_text())
         entry = LogEntry.model_validate(data)
@@ -600,7 +607,7 @@ class TestLogEntry:
         assert len(entry.was_generated_by.parameters) == 2
         assert entry.execution_duration == "PT0.3S"
 
-    def test_log_entry_roundtrip(self):
+    def test_log_entry_roundtrip(self) -> None:
         """SC-007: Round-trip test for LogEntry serialisation."""
         fixture = FIXTURES_ROOT / "log-entry" / "valid" / "artifact-producing.json"
         data = json.loads(fixture.read_text())
@@ -611,13 +618,13 @@ class TestLogEntry:
         assert restored.generated_result_id == entry.generated_result_id
         assert restored.was_generated_by.tool == entry.was_generated_by.tool
 
-    def test_invalid_fixture_missing_activity_id(self):
+    def test_invalid_fixture_missing_activity_id(self) -> None:
         fixture = FIXTURES_ROOT / "log-entry" / "invalid" / "missing-activity-id.json"
         data = json.loads(fixture.read_text())
         with pytest.raises(PydanticValidationError):
             LogEntry.model_validate(data)
 
-    def test_invalid_fixture_bad_duration(self):
+    def test_invalid_fixture_bad_duration(self) -> None:
         fixture = FIXTURES_ROOT / "log-entry" / "invalid" / "bad-duration-format.json"
         data = json.loads(fixture.read_text())
         with pytest.raises(PydanticValidationError):
@@ -627,39 +634,41 @@ class TestLogEntry:
 class TestSystemRecordProperties:
     """Tests for system record models."""
 
-    def test_create_empty_system_record(self):
+    def test_create_empty_system_record(self) -> None:
         sr = SystemRecordProperties()
         assert sr.feature_type == "system"
         assert sr.snapshot_links is None
         assert sr.branches == []
         assert sr.provenance == []
 
-    def test_system_record_with_snapshot_links(self):
+    def test_system_record_with_snapshot_links(self) -> None:
         sr = SystemRecordProperties(
-            snapshot_links=SnapshotLinks(
-                prev=SnapshotRef(asset="./snapshots/v1.geojson", prov_entry_count=3),
+            snapshotLinks=SnapshotLinks(
+                prev=SnapshotRef(asset="./snapshots/v1.geojson", provEntryCount=3),
                 next=None,
             ),
         )
+        assert sr.snapshot_links is not None
+        assert sr.snapshot_links.prev is not None
         assert sr.snapshot_links.prev.asset == "./snapshots/v1.geojson"
         assert sr.snapshot_links.prev.prov_entry_count == 3
         assert sr.snapshot_links.next is None
 
-    def test_system_record_with_branches(self):
+    def test_system_record_with_branches(self) -> None:
         sr = SystemRecordProperties(
             branches=[
                 BranchRecord(
-                    branch_id="branch-001",
-                    branched_from="act-123",
-                    branched_at=datetime(2026, 1, 16, 9, 0, 0, tzinfo=UTC),
-                    target_asset="./branches/branch-001/plot.geojson",
+                    branchId="branch-001",
+                    branchedFrom="act-123",
+                    branchedAt=datetime(2026, 1, 16, 9, 0, 0, tzinfo=UTC),
+                    targetAsset="./branches/branch-001/plot.geojson",
                 ),
             ],
         )
         assert len(sr.branches) == 1
         assert sr.branches[0].branch_id == "branch-001"
 
-    def test_system_record_from_empty_fixture(self):
+    def test_system_record_from_empty_fixture(self) -> None:
         fixture = FIXTURES_ROOT / "system-record" / "valid" / "empty-system-record.json"
         data = json.loads(fixture.read_text())
         sr = SystemRecordProperties.model_validate(data)
@@ -667,11 +676,12 @@ class TestSystemRecordProperties:
         assert sr.snapshot_links is None
         assert sr.branches == []
 
-    def test_system_record_from_populated_fixture(self):
+    def test_system_record_from_populated_fixture(self) -> None:
         fixture = FIXTURES_ROOT / "system-record" / "valid" / "populated-system-record.json"
         data = json.loads(fixture.read_text())
         sr = SystemRecordProperties.model_validate(data)
         assert sr.feature_type == "system"
+        assert sr.snapshot_links is not None
         assert sr.snapshot_links.prev is not None
         assert sr.snapshot_links.prev.prov_entry_count == 5
         assert len(sr.branches) == 1
@@ -681,22 +691,22 @@ class TestSystemRecordProperties:
         assert sr.provenance[1].type == "branch"
         assert sr.provenance[1].direction == "source"
 
-    def test_system_record_invalid_feature_type(self):
+    def test_system_record_invalid_feature_type(self) -> None:
         with pytest.raises(PydanticValidationError):
-            SystemRecordProperties(feature_type="not-system")
+            SystemRecordProperties(featureType="not-system")
 
-    def test_file_prov_entry_invalid_type(self):
+    def test_file_prov_entry_invalid_type(self) -> None:
         with pytest.raises(PydanticValidationError):
             FileProvEntry(
-                activity_id="test",
+                activityId="test",
                 type="invalid",
                 timestamp=datetime.now(UTC),
             )
 
-    def test_file_prov_entry_invalid_direction(self):
+    def test_file_prov_entry_invalid_direction(self) -> None:
         with pytest.raises(PydanticValidationError):
             FileProvEntry(
-                activity_id="test",
+                activityId="test",
                 type="branch",
                 timestamp=datetime.now(UTC),
                 direction="invalid",

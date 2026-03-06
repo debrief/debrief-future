@@ -64,7 +64,20 @@ def generate_pydantic() -> bool:
 
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        output_file.write_text(result.stdout)
+        content = result.stdout
+
+        # Post-process: gen-pydantic emits dict[str, Any] in boilerplate classes
+        # (ConfiguredBaseModel, LinkMLMeta). Replace with dict[str, object] to
+        # eliminate Any from generated code. These are infrastructure classes,
+        # not domain models — object is sufficient for their serialisation needs.
+        content = content.replace("dict[str, Any]", "dict[str, object]")
+        # Remove the Any import if it's no longer used
+        content = content.replace(
+            "from typing import (\n    Any,\n",
+            "from typing import (\n",
+        )
+
+        output_file.write_text(content)
         print(f"  [OK] Generated: {output_file}")
         return True
     except subprocess.CalledProcessError as e:
@@ -199,6 +212,41 @@ def generate_typescript() -> bool:
             "    geometry: GeoJSONPoint | GeoJSONMultiPoint,",
         )
 
+        # Post-process: Fix coordinate types for nested geometries.
+        # gen-typescript emits `coordinates: number[]` for all geometries,
+        # but GeoJSON coordinate nesting varies by geometry type.
+        _coordinate_type_fixes = {
+            # Point: [lon, lat] → number[] (already correct)
+            # LineString: [[lon, lat], ...] → number[][]
+            "GeoJSONLineString": ("number[]", "number[][]"),
+            # Polygon: [[[lon, lat], ...], ...] → number[][][]
+            "GeoJSONPolygon": ("number[]", "number[][][]"),
+            # MultiPoint: [[lon, lat], ...] → number[][]
+            "GeoJSONMultiPoint": ("number[]", "number[][]"),
+            # MultiLineString: [[[lon, lat], ...], ...] → number[][][]
+            "GeoJSONMultiLineString": ("number[]", "number[][][]"),
+            # MultiPolygon: [[[[lon, lat], ...], ...], ...] → number[][][][]
+            "GeoJSONMultiPolygon": ("number[]", "number[][][][]"),
+        }
+        for iface_name, (old_type, new_type) in _coordinate_type_fixes.items():
+            # Match within the specific interface block to avoid false replacements
+            # Pattern: inside the interface, replace `coordinates: number[]` with correct type
+            old_sig = f"export interface {iface_name}"
+            if old_sig in content:
+                # Find the interface block and fix the coordinates type within it
+                idx = content.index(old_sig)
+                # Find the closing brace of the interface
+                brace_idx = content.index("}", idx)
+                block = content[idx:brace_idx]
+                fixed_block = block.replace(
+                    f"coordinates?: {old_type}",
+                    f"coordinates?: {new_type}",
+                ).replace(
+                    f"coordinates: {old_type}",
+                    f"coordinates: {new_type}",
+                )
+                content = content[:idx] + fixed_block + content[brace_idx:]
+
         output_file.write_text(content)
         print(f"  [OK] Generated: {output_file}")
 
@@ -233,7 +281,7 @@ def validate_fixtures() -> bool:
     return True
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Generate derived schemas from LinkML master schema"
     )

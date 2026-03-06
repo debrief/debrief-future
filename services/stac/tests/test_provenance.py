@@ -13,7 +13,7 @@ from debrief_calc.provenance import attach_log_entry, create_log_entry
 class TestUnifiedProvenance:
     """Tests for unified provenance via debrief-calc module."""
 
-    def test_basic_provenance_on_feature(self):
+    def test_basic_provenance_on_feature(self) -> None:
         feature = {"type": "Feature", "geometry": None, "properties": {"name": "Track A"}}
         entry = create_log_entry(
             tool_name="track-smoother",
@@ -33,7 +33,7 @@ class TestUnifiedProvenance:
         assert "timestamp" in prov[0]
         assert prov[0]["used"] == ["track_a"]
 
-    def test_provenance_with_parameters(self):
+    def test_provenance_with_parameters(self) -> None:
         feature = {"type": "Feature", "geometry": None, "properties": {}}
         entry = create_log_entry(
             tool_name="cpa-calculator",
@@ -53,7 +53,7 @@ class TestUnifiedProvenance:
         assert prov["used"] == ["track_a", "track_b"]
         assert prov["wasGeneratedBy"]["parameters"]["threshold"]["value"] == 500
 
-    def test_provenance_modifies_in_place(self):
+    def test_provenance_modifies_in_place(self) -> None:
         feature = {"type": "Feature", "geometry": None, "properties": {}}
         entry = create_log_entry(
             tool_name="tool",
@@ -65,7 +65,7 @@ class TestUnifiedProvenance:
         assert result is feature
         assert "provenance" in feature["properties"]
 
-    def test_provenance_creates_properties_if_missing(self):
+    def test_provenance_creates_properties_if_missing(self) -> None:
         feature = {"type": "Feature", "geometry": None}
         entry = create_log_entry(
             tool_name="tool",
@@ -76,7 +76,7 @@ class TestUnifiedProvenance:
         result = attach_log_entry(feature, entry)
         assert "provenance" in result["properties"]
 
-    def test_provenance_timestamp_is_iso(self):
+    def test_provenance_timestamp_is_iso(self) -> None:
         feature = {"type": "Feature", "geometry": None, "properties": {}}
         entry = create_log_entry(
             tool_name="tool",
@@ -88,7 +88,7 @@ class TestUnifiedProvenance:
         ts = feature["properties"]["provenance"][0]["timestamp"]
         assert "T" in ts
 
-    def test_provenance_multiple_sources(self):
+    def test_provenance_multiple_sources(self) -> None:
         feature = {"type": "Feature", "geometry": None, "properties": {}}
         entry = create_log_entry(
             tool_name="tool",

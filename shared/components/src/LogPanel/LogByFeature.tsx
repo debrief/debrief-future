@@ -5,6 +5,7 @@
  * Within each group, entries are sorted most-recent-first.
  *
  * Feature: 072-log-panel (US5)
+ * Updated: 113-prov-card-flip (flip-card pass-through)
  */
 
 import React, { useMemo } from 'react';
@@ -20,12 +21,32 @@ export function LogByFeature({
   onEntryClick,
   onTuneClick,
   onRestoreClick,
+  editingActivityId,
+  editingSchema,
+  schemaLoading,
+  schemaError,
+  rationaleRef,
+  onEditClick,
+  onDoneClick,
+  onParameterChange,
+  onDisableToggle,
+  onDeleteClick,
+  onRationaleChange,
+  onRetrySchema,
   className,
 }: LogByFeatureProps): React.ReactElement {
   const groups = useMemo(
     () => groupEntriesByFeature(entries, featureNames),
     [entries, featureNames]
   );
+
+  // Build a global chronological index map so entries within groups
+  // still show their overall step number.
+  const stepIndexMap = useMemo(() => {
+    const map = new Map<string, number>();
+    entries.forEach((e, i) => { map.set(e.activityId, i + 1); });
+    return map;
+  }, [entries]);
 
   return (
     <div
@@ -42,12 +63,25 @@ export function LogByFeature({
             <LogEntry
               key={`${group.featureId}-${entry.activityId}`}
               entry={entry}
+              stepIndex={stepIndexMap.get(entry.activityId)}
               featureNames={featureNames}
               presentationMode={presentationMode}
               isSelected={entry.activityId === selectedEntryId}
               onClick={onEntryClick}
               onTuneClick={onTuneClick}
               onRestoreClick={onRestoreClick}
+              isEditing={editingActivityId === entry.activityId}
+              schema={editingActivityId === entry.activityId ? editingSchema : undefined}
+              schemaLoading={editingActivityId === entry.activityId ? schemaLoading : false}
+              schemaError={editingActivityId === entry.activityId ? schemaError : null}
+              rationaleRef={editingActivityId === entry.activityId ? rationaleRef : undefined}
+              onEditClick={onEditClick}
+              onDoneClick={onDoneClick}
+              onParameterChange={onParameterChange}
+              onDisableToggle={onDisableToggle}
+              onDeleteClick={onDeleteClick}
+              onRationaleChange={onRationaleChange}
+              onRetrySchema={onRetrySchema}
             />
           ))}
         </div>

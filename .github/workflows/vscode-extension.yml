@@ -33,13 +33,17 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - name: Enable corepack
+        run: corepack enable pnpm
 
       - name: Install dependencies
         run: pnpm install
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
+
+      - name: Build shared packages
+        run: pnpm --filter @debrief/components build
+        working-directory: .
 
       - name: Lint
         run: pnpm run lint
@@ -77,13 +81,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - name: Enable corepack
+        run: corepack enable pnpm
 
       - name: Install dependencies
         run: pnpm install
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
 
       - name: Build and package
         run: |

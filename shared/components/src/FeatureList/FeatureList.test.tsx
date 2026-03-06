@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FeatureList } from './FeatureList';
 import { FeatureRow } from './FeatureRow';
@@ -364,6 +364,120 @@ describe('FeatureList virtualization', () => {
 
     const scrollContainer = container.querySelector('.debrief-feature-list__scroll');
     expect(scrollContainer).toBeInTheDocument();
+  });
+});
+
+describe('FeatureRow info button (Feature 098)', () => {
+  const mockTrack: typeof mockTrackFeature = mockTrackFeature;
+
+  it('renders info icon when showInfoIcon is true and handler is provided', () => {
+    const onInfoClick = vi.fn();
+    render(
+      <FeatureRow
+        feature={mockTrack}
+        isSelected={false}
+        showInfoIcon={true}
+        onInfoClick={onInfoClick}
+        onClick={() => {}}
+      />
+    );
+
+    expect(screen.getByTestId(`info-icon-${mockTrack.id}`)).toBeInTheDocument();
+  });
+
+  it('does not render info icon when showInfoIcon is false', () => {
+    render(
+      <FeatureRow
+        feature={mockTrack}
+        isSelected={false}
+        showInfoIcon={false}
+        onClick={() => {}}
+      />
+    );
+
+    expect(screen.queryByTestId(`info-icon-${mockTrack.id}`)).not.toBeInTheDocument();
+  });
+
+  it('does not render info icon when no handler is provided', () => {
+    render(
+      <FeatureRow
+        feature={mockTrack}
+        isSelected={false}
+        showInfoIcon={true}
+        onClick={() => {}}
+      />
+    );
+
+    expect(screen.queryByTestId(`info-icon-${mockTrack.id}`)).not.toBeInTheDocument();
+  });
+
+  it('calls onInfoClick with feature when info icon is clicked', () => {
+    const onInfoClick = vi.fn();
+    render(
+      <FeatureRow
+        feature={mockTrack}
+        isSelected={false}
+        showInfoIcon={true}
+        onInfoClick={onInfoClick}
+        onClick={() => {}}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId(`info-icon-${mockTrack.id}`));
+    expect(onInfoClick).toHaveBeenCalledTimes(1);
+    expect(onInfoClick).toHaveBeenCalledWith(expect.any(Object), mockTrack);
+  });
+
+  it('does not trigger row click when info icon is clicked', () => {
+    const onInfoClick = vi.fn();
+    const onClick = vi.fn();
+    render(
+      <FeatureRow
+        feature={mockTrack}
+        isSelected={false}
+        showInfoIcon={true}
+        onInfoClick={onInfoClick}
+        onClick={onClick}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId(`info-icon-${mockTrack.id}`));
+    expect(onInfoClick).toHaveBeenCalledTimes(1);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('info icon has correct role and title', () => {
+    const onInfoClick = vi.fn();
+    render(
+      <FeatureRow
+        feature={mockTrack}
+        isSelected={false}
+        showInfoIcon={true}
+        onInfoClick={onInfoClick}
+        onClick={() => {}}
+      />
+    );
+
+    const infoIcon = screen.getByTestId(`info-icon-${mockTrack.id}`);
+    expect(infoIcon).toHaveAttribute('role', 'button');
+    expect(infoIcon).toHaveAttribute('title', 'Info');
+  });
+
+  it('calls onInfoClick on Enter keydown', () => {
+    const onInfoClick = vi.fn();
+    render(
+      <FeatureRow
+        feature={mockTrack}
+        isSelected={false}
+        showInfoIcon={true}
+        onInfoClick={onInfoClick}
+        onClick={() => {}}
+      />
+    );
+
+    const infoIcon = screen.getByTestId(`info-icon-${mockTrack.id}`);
+    fireEvent.keyDown(infoIcon, { key: 'Enter' });
+    expect(onInfoClick).toHaveBeenCalledTimes(1);
   });
 });
 

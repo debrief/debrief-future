@@ -29,6 +29,9 @@ export type {
 export { FeatureList } from './FeatureList';
 export type { FeatureListProps } from './FeatureList';
 
+export { GeometryDialog } from './GeometryDialog';
+export type { GeometryDialogProps } from './GeometryDialog';
+
 export { LayersToolbar, FilterDropdown } from './LayersToolbar';
 export type {
   LayersToolbarProps,
@@ -56,7 +59,15 @@ export { useTheme } from './hooks/useTheme';
 export { useTemporalTrack } from './MapView/useTemporalTrack';
 
 // Types
-export type { DebriefFeature, DebriefFeatureCollection } from './utils/types';
+export type { DebriefFeature, DebriefFeatureCollection, AnnotationFeature, TrackFeature, ReferenceLocation } from './utils/types';
+export {
+  isTrackFeature,
+  isReferenceLocation,
+  isMultiPointFeature,
+  isMultiPolygonFeature,
+  isAnnotationFeature,
+  isExpandableFeature,
+} from './utils/types';
 
 // Utilities
 export { calculateBounds } from './utils/bounds';
@@ -78,8 +89,10 @@ export {
   createSelection,
   createSelectionFromCounts,
   extractParameters,
+  fromMCPTool,
+  fromMCPTools,
 } from './ToolMatch';
-export type { Selection, MatchResult, Tool, SelectionRequirement } from './ToolMatch';
+export type { Selection, MatchResult, Tool, SelectionRequirement, MCPToolDefinition as SharedMCPToolDefinition } from './ToolMatch';
 
 // ToolsPanel
 export { ToolsPanel } from './ToolsPanel';
@@ -183,6 +196,8 @@ export type {
   SelectionUpdatePayload,
   ActionResultPayload,
   ModeInitPayload,
+  ParameterSchemaEntry,
+  CardReplayStatus,
 } from './LogPanel';
 export {
   DEFAULT_FILTER_STATE as LOG_DEFAULT_FILTER_STATE,

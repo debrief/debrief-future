@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { Selection, SelectionContextType } from '../../src/types/plot';
-import { computeContextType, createEmptySelection } from '../../src/types/plot';
+import { describe, it, expect, vi } from 'vitest';
+import type { Selection } from '../../src/types/plot';
+import { createEmptySelection } from '../../src/types/plot';
 
 /**
  * Integration tests for the selection workflow.
@@ -13,43 +13,6 @@ describe('Selection Workflow', () => {
 
       expect(selection.trackIds).toHaveLength(0);
       expect(selection.locationIds).toHaveLength(0);
-      expect(selection.contextType).toBe('none');
-    });
-
-    it('computes correct context type for single track', () => {
-      const selection: Selection = {
-        trackIds: ['track-1'],
-        locationIds: [],
-        contextType: 'none',
-        featureKinds: ['UI_TRACK'],
-      };
-
-      const contextType = computeContextType(selection);
-      expect(contextType).toBe('single-track');
-    });
-
-    it('computes correct context type for multi-track', () => {
-      const selection: Selection = {
-        trackIds: ['track-1', 'track-2'],
-        locationIds: [],
-        contextType: 'none',
-        featureKinds: ['UI_TRACK'],
-      };
-
-      const contextType = computeContextType(selection);
-      expect(contextType).toBe('multi-track');
-    });
-
-    it('computes correct context type for mixed selection', () => {
-      const selection: Selection = {
-        trackIds: ['track-1'],
-        locationIds: ['loc-1'],
-        contextType: 'none',
-        featureKinds: ['UI_TRACK', 'UI_LOCATION'],
-      };
-
-      const contextType = computeContextType(selection);
-      expect(contextType).toBe('mixed');
     });
   });
 
@@ -59,8 +22,6 @@ describe('Selection Workflow', () => {
       const selection: Selection = {
         trackIds: ['track-1', 'track-2'],
         locationIds: [],
-        contextType: 'multi-track',
-        featureKinds: ['UI_TRACK'],
       };
 
       // Simulate selection change triggering tools update
@@ -76,7 +37,7 @@ describe('Selection Workflow', () => {
       toolsUpdater(selection);
 
       expect(toolsUpdater).toHaveBeenCalledWith(
-        expect.objectContaining({ contextType: 'none' })
+        expect.objectContaining({ trackIds: [], locationIds: [] })
       );
     });
   });
@@ -105,8 +66,6 @@ describe('Selection Workflow', () => {
       const selection: Selection = {
         trackIds: ['track-1', 'track-2'],
         locationIds: ['loc-1'],
-        contextType: 'mixed',
-        featureKinds: ['UI_TRACK', 'UI_LOCATION'],
       };
 
       const serialized = JSON.stringify(selection);
@@ -114,7 +73,6 @@ describe('Selection Workflow', () => {
 
       expect(restored.trackIds).toEqual(['track-1', 'track-2']);
       expect(restored.locationIds).toEqual(['loc-1']);
-      expect(restored.contextType).toBe('mixed');
     });
   });
 
@@ -126,32 +84,21 @@ describe('Selection Workflow', () => {
       const selection: Selection = {
         trackIds: [...allTrackIds],
         locationIds: [],
-        contextType: computeContextType({
-          trackIds: allTrackIds,
-          locationIds: [],
-          contextType: 'none',
-          featureKinds: ['UI_TRACK'],
-        }),
-        featureKinds: ['UI_TRACK'],
       };
 
       expect(selection.trackIds).toHaveLength(3);
-      expect(selection.contextType).toBe('multi-track');
     });
 
     it('escape/delete clears selection', () => {
       let selection: Selection = {
         trackIds: ['track-1'],
         locationIds: [],
-        contextType: 'single-track',
-        featureKinds: ['UI_TRACK'],
       };
 
       // Simulate Escape/Delete clearing selection
       selection = createEmptySelection();
 
       expect(selection.trackIds).toHaveLength(0);
-      expect(selection.contextType).toBe('none');
     });
   });
 });

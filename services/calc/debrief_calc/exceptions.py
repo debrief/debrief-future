@@ -12,7 +12,7 @@ from typing import Any
 class DebriefCalcError(Exception):
     """Base exception for all debrief-calc errors."""
 
-    def __init__(self, message: str, details: dict[str, Any] | None = None):
+    def __init__(self, message: str, details: dict[str, Any] | None = None) -> None:
         super().__init__(message)
         self.message = message
         self.details = details or {}
@@ -29,7 +29,7 @@ class DebriefCalcError(Exception):
 class ToolNotFoundError(DebriefCalcError):
     """Raised when a requested tool does not exist in the registry."""
 
-    def __init__(self, tool_name: str):
+    def __init__(self, tool_name: str) -> None:
         super().__init__(f"Tool '{tool_name}' not found in registry", {"tool_name": tool_name})
         self.tool_name = tool_name
 
@@ -44,7 +44,7 @@ class ToolNotFoundError(DebriefCalcError):
 class InvalidContextError(DebriefCalcError):
     """Raised when selection context doesn't match tool requirements."""
 
-    def __init__(self, tool_name: str, expected: str, actual: str):
+    def __init__(self, tool_name: str, expected: str, actual: str) -> None:
         super().__init__(
             f"Tool '{tool_name}' requires context type '{expected}', got '{actual}'",
             {"tool_name": tool_name, "expected": expected, "actual": actual},
@@ -64,7 +64,7 @@ class InvalidContextError(DebriefCalcError):
 class KindMismatchError(DebriefCalcError):
     """Raised when feature kind is not accepted by the tool."""
 
-    def __init__(self, tool_name: str, accepted_kinds: list[str], actual_kinds: set[str]):
+    def __init__(self, tool_name: str, accepted_kinds: list[str], actual_kinds: set[str]) -> None:
         super().__init__(
             f"Tool '{tool_name}' accepts kinds {accepted_kinds}, got {list(actual_kinds)}",
             {
@@ -88,7 +88,7 @@ class KindMismatchError(DebriefCalcError):
 class ValidationError(DebriefCalcError):
     """Raised when input or output fails schema validation."""
 
-    def __init__(self, message: str, validation_errors: list[dict[str, Any]] | None = None):
+    def __init__(self, message: str, validation_errors: list[dict[str, Any]] | None = None) -> None:
         super().__init__(message, {"validation_errors": validation_errors or []})
         self.validation_errors = validation_errors or []
 
@@ -103,7 +103,7 @@ class ValidationError(DebriefCalcError):
 class ExecutionError(DebriefCalcError):
     """Raised when tool handler raises an exception during execution."""
 
-    def __init__(self, tool_name: str, original_error: Exception):
+    def __init__(self, tool_name: str, original_error: Exception) -> None:
         super().__init__(
             f"Tool '{tool_name}' execution failed: {str(original_error)}",
             {

@@ -3,6 +3,7 @@
 import copy
 
 import pytest
+from debrief_calc.executor import run
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.shape.manipulation.move_shape import move_shape, translate_point
 
@@ -124,21 +125,21 @@ TEXT_FEATURE = {
 class TestTranslatePoint:
     """Tests for the translate_point utility function."""
 
-    def test_east_translation(self):
+    def test_east_translation(self) -> None:
         """Translate point East 5km from (50, 0). Verify latitude unchanged and longitude increased."""
         lat, lon = translate_point(50, 0, 90, 5)
 
         assert lat == pytest.approx(50.0, abs=0.001)
         assert lon == pytest.approx(0.070, abs=0.001)
 
-    def test_north_translation(self):
+    def test_north_translation(self) -> None:
         """Translate point North 10km from (50, 0). Verify latitude increased and longitude unchanged."""
         lat, lon = translate_point(50, 0, 0, 10)
 
         assert lat == pytest.approx(50.09, abs=0.001)
         assert lon == pytest.approx(0.0, abs=0.001)
 
-    def test_zero_distance(self):
+    def test_zero_distance(self) -> None:
         """Translate with zero distance. Verify coordinates unchanged."""
         lat, lon = translate_point(50, 0, 90, 0)
 
@@ -149,7 +150,7 @@ class TestTranslatePoint:
 class TestMoveShapeCircle:
     """Golden example tests for move-shape with CIRCLE features (US1)."""
 
-    def test_circle_vertices_translated(self):
+    def test_circle_vertices_translated(self) -> None:
         """Move circle East 5km. Verify all vertex longitudes increased."""
         feature = copy.deepcopy(CIRCLE_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -169,7 +170,7 @@ class TestMoveShapeCircle:
             # Latitudes should be approximately equal
             assert result_pt[1] == pytest.approx(orig_pt[1], abs=0.001)
 
-    def test_circle_center_updated(self):
+    def test_circle_center_updated(self) -> None:
         """Move circle East 5km. Verify center property updated."""
         feature = copy.deepcopy(CIRCLE_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -186,7 +187,7 @@ class TestMoveShapeCircle:
         # Center latitude should be approximately equal
         assert result_center[1] == pytest.approx(original_center[1], abs=0.001)
 
-    def test_circle_radius_preserved(self):
+    def test_circle_radius_preserved(self) -> None:
         """Move circle East 5km. Verify radius property unchanged."""
         feature = copy.deepcopy(CIRCLE_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -201,7 +202,7 @@ class TestMoveShapeCircle:
 class TestMoveShapeRectangle:
     """Golden example tests for move-shape with RECTANGLE features (US1)."""
 
-    def test_rectangle_vertices_translated(self):
+    def test_rectangle_vertices_translated(self) -> None:
         """Move rectangle North 10km. Verify all vertex latitudes increased."""
         feature = copy.deepcopy(RECTANGLE_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -225,7 +226,7 @@ class TestMoveShapeRectangle:
 class TestMoveShapeVector:
     """Golden example tests for move-shape with VECTOR features (US2)."""
 
-    def test_vector_coords_translated(self):
+    def test_vector_coords_translated(self) -> None:
         """Move vector North 10km. Verify both line coordinates shifted North."""
         feature = copy.deepcopy(VECTOR_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -242,7 +243,7 @@ class TestMoveShapeVector:
             assert result_pt[1] > orig_pt[1]
             assert result_pt[0] == pytest.approx(orig_pt[0], abs=0.001)
 
-    def test_vector_origin_updated(self):
+    def test_vector_origin_updated(self) -> None:
         """Move vector North 10km. Verify origin property updated."""
         feature = copy.deepcopy(VECTOR_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -259,7 +260,7 @@ class TestMoveShapeVector:
         # Origin longitude should be approximately equal
         assert result_origin[0] == pytest.approx(original_origin[0], abs=0.001)
 
-    def test_vector_range_bearing_preserved(self):
+    def test_vector_range_bearing_preserved(self) -> None:
         """Move vector North 10km. Verify range and bearing properties unchanged."""
         feature = copy.deepcopy(VECTOR_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -275,7 +276,7 @@ class TestMoveShapeVector:
 class TestMoveShapeLine:
     """Golden example tests for move-shape with LINE features (US2)."""
 
-    def test_line_coords_translated(self):
+    def test_line_coords_translated(self) -> None:
         """Move line South 2km. Verify both endpoints shifted South (latitude decreased)."""
         feature = copy.deepcopy(LINE_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -297,7 +298,7 @@ class TestMoveShapeLine:
 class TestMoveShapeText:
     """Golden example tests for move-shape with TEXT features (US3)."""
 
-    def test_text_point_translated(self):
+    def test_text_point_translated(self) -> None:
         """Move text point East 5km. Verify point coordinates shifted East."""
         feature = copy.deepcopy(TEXT_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -317,7 +318,7 @@ class TestMoveShapeText:
 class TestMoveShapeEdgeCases:
     """Edge case tests for move-shape tool (Phase 6)."""
 
-    def test_zero_distance_noop(self):
+    def test_zero_distance_noop(self) -> None:
         """Move with zero distance. Verify features returned unchanged."""
         feature = copy.deepcopy(CIRCLE_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -328,7 +329,7 @@ class TestMoveShapeEdgeCases:
         assert len(result) == 1
         assert result[0] == feature
 
-    def test_empty_features_error(self):
+    def test_empty_features_error(self) -> None:
         """Move with empty feature list. Verify ValueError raised."""
         context = SelectionContext(type=ContextType.NONE, features=[])
         params = {"direction": 90, "distance_km": 5}
@@ -336,7 +337,7 @@ class TestMoveShapeEdgeCases:
         with pytest.raises(ValueError, match="No annotation features found"):
             move_shape(context, params)
 
-    def test_non_annotation_skipped(self):
+    def test_non_annotation_skipped(self) -> None:
         """Move with TRACK feature and annotation feature. Verify only annotation returned."""
         track = {
             "type": "Feature",
@@ -354,7 +355,7 @@ class TestMoveShapeEdgeCases:
         assert len(result) == 1
         assert result[0]["id"] == "text-001"
 
-    def test_antimeridian_wrap(self):
+    def test_antimeridian_wrap(self) -> None:
         """Move point East across antimeridian. Verify longitude wraps correctly."""
         feature = {
             "type": "Feature",
@@ -378,7 +379,7 @@ class TestMoveShapeEdgeCases:
         # Longitude should wrap to negative when crossing antimeridian
         assert result_lon < 0
 
-    def test_negative_distance_error(self):
+    def test_negative_distance_error(self) -> None:
         """Move with negative distance. Verify ValueError raised."""
         feature = copy.deepcopy(TEXT_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -387,7 +388,7 @@ class TestMoveShapeEdgeCases:
         with pytest.raises(ValueError, match="distance_km must be >= 0"):
             move_shape(context, params)
 
-    def test_default_params(self):
+    def test_default_params(self) -> None:
         """Move without explicit params. Verify defaults used (direction=90, distance_km=5)."""
         feature = copy.deepcopy(TEXT_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -400,3 +401,64 @@ class TestMoveShapeEdgeCases:
         result_lon = result[0]["geometry"]["coordinates"][0]
         # With default direction=90 (East) and distance=5km, longitude should increase
         assert result_lon > original_lon
+
+
+class TestMoveShapeInputState:
+    """Tests for inputState capture via the executor (T018-T020)."""
+
+    def test_circle_input_state_contains_original_center_and_geometry(self) -> None:
+        """T018: Circle inputState contains original center and polygon geometry."""
+        feature = copy.deepcopy(CIRCLE_FEATURE)
+        original_center = CIRCLE_FEATURE["properties"]["center"][:]
+        original_coords = copy.deepcopy(CIRCLE_FEATURE["geometry"]["coordinates"])
+
+        context = SelectionContext(type=ContextType.SINGLE, features=[feature])
+        result = run("move-shape", context, params={"direction": 90, "distance_km": 5})
+
+        assert result.success is True
+        assert result.features is not None
+
+        entry = result.features[0]["properties"]["provenance"][0]
+        assert entry["inputState"] is not None
+        assert len(entry["inputState"]) == 1
+
+        state = entry["inputState"][0]
+        assert state["featureId"] == "circle-001"
+        assert state["geometry"]["type"] == "Polygon"
+        assert state["geometry"]["coordinates"] == original_coords
+        assert state["properties"]["center"] == original_center
+
+    def test_vector_input_state_contains_original_origin(self) -> None:
+        """T019: Vector inputState contains original origin property."""
+        feature = copy.deepcopy(VECTOR_FEATURE)
+        original_origin = VECTOR_FEATURE["properties"]["origin"][:]
+        original_coords = copy.deepcopy(VECTOR_FEATURE["geometry"]["coordinates"])
+
+        context = SelectionContext(type=ContextType.SINGLE, features=[feature])
+        result = run("move-shape", context, params={"direction": 0, "distance_km": 10})
+
+        assert result.success is True
+        assert result.features is not None
+
+        entry = result.features[0]["properties"]["provenance"][0]
+        state = entry["inputState"][0]
+        assert state["featureId"] == "vector-001"
+        assert state["geometry"]["coordinates"] == original_coords
+        assert state["properties"]["origin"] == original_origin
+
+    def test_text_input_state_contains_original_point(self) -> None:
+        """T020: Text inputState contains original Point geometry."""
+        feature = copy.deepcopy(TEXT_FEATURE)
+        original_coords = TEXT_FEATURE["geometry"]["coordinates"][:]
+
+        context = SelectionContext(type=ContextType.SINGLE, features=[feature])
+        result = run("move-shape", context, params={"direction": 90, "distance_km": 5})
+
+        assert result.success is True
+        assert result.features is not None
+
+        entry = result.features[0]["properties"]["provenance"][0]
+        state = entry["inputState"][0]
+        assert state["featureId"] == "text-001"
+        assert state["geometry"]["type"] == "Point"
+        assert state["geometry"]["coordinates"] == original_coords

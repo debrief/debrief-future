@@ -9,7 +9,14 @@
 import { describe, it, expect } from 'vitest';
 import { execute } from '../../src/tools/track/styling/labelInterval';
 
-function makeTrackFeature(): any {
+interface TestTrackFeature {
+  type: 'Feature';
+  id: string;
+  geometry: { type: string; coordinates: number[][] };
+  properties: Record<string, unknown>;
+}
+
+function makeTrackFeature(): TestTrackFeature {
   return {
     type: 'Feature' as const,
     id: 'track-001',
@@ -93,7 +100,7 @@ describe('labelInterval (T033)', () => {
     expect(result1[0].properties.default_position_style.label_interval).toBe('PT15M');
 
     const feature2 = makeTrackFeature();
-    const result2 = execute([feature2], {} as any);
+    const result2 = execute([feature2], {} as Record<string, unknown>);
     expect(result2).toHaveLength(1);
     expect(result2[0].properties.default_position_style.label_interval).toBe('PT15M');
   });

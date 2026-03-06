@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 from debrief_calc.models import ContextType, SelectionContext
@@ -9,7 +10,7 @@ from debrief_calc.tools.track_stats import _calculate_track_stats, _haversine_di
 
 
 @pytest.fixture
-def single_track_fixture():
+def single_track_fixture() -> dict[str, Any]:
     """Load the single track fixture."""
     fixture_path = Path(__file__).parent.parent / "fixtures" / "track-single.geojson"
     with open(fixture_path) as f:
@@ -17,7 +18,7 @@ def single_track_fixture():
 
 
 @pytest.fixture
-def single_track_context(single_track_fixture):
+def single_track_context(single_track_fixture: dict[str, Any]) -> SelectionContext:
     """Create a context from the single track fixture."""
     return SelectionContext(type=ContextType.SINGLE, features=[single_track_fixture])
 
@@ -25,16 +26,16 @@ def single_track_context(single_track_fixture):
 class TestHaversineDistance:
     """Tests for haversine distance calculation."""
 
-    def test_same_point_zero_distance(self):
+    def test_same_point_zero_distance(self) -> None:
         dist = _haversine_distance(-4.0, 50.0, -4.0, 50.0)
         assert dist == 0.0
 
-    def test_known_distance(self):
+    def test_known_distance(self) -> None:
         # Plymouth to Falmouth is approximately 35 nautical miles
         dist = _haversine_distance(-4.14, 50.37, -5.07, 50.15)
         assert 30 < dist < 40  # Approximate check
 
-    def test_north_south_distance(self):
+    def test_north_south_distance(self) -> None:
         # 1 degree of latitude is approximately 60 nautical miles
         dist = _haversine_distance(0.0, 50.0, 0.0, 51.0)
         assert 59 < dist < 61
@@ -43,20 +44,20 @@ class TestHaversineDistance:
 class TestCalculateTrackStats:
     """Tests for track statistics calculation."""
 
-    def test_empty_coordinates(self):
+    def test_empty_coordinates(self) -> None:
         stats = _calculate_track_stats([])
         assert stats["point_count"] == 0
         assert stats["duration_hours"] == 0
         assert stats["distance_nm"] == 0
         assert stats["average_speed_kts"] == 0
 
-    def test_single_point(self):
+    def test_single_point(self) -> None:
         coords = [[-4.0, 50.0, 0, 1000000]]
         stats = _calculate_track_stats(coords)
         assert stats["point_count"] == 1
         assert stats["distance_nm"] == 0
 
-    def test_two_points_with_timestamps(self):
+    def test_two_points_with_timestamps(self) -> None:
         # Two points 1 hour apart, approximately 60nm apart (1 degree latitude)
         coords = [
             [0.0, 50.0, 0, 0],
@@ -69,7 +70,7 @@ class TestCalculateTrackStats:
         assert 59 < stats["distance_nm"] < 61
         assert 59 < stats["average_speed_kts"] < 61
 
-    def test_multiple_points(self):
+    def test_multiple_points(self) -> None:
         coords = [
             [-4.5, 50.2, 0, 1705305600000],
             [-4.4, 50.3, 0, 1705309200000],
@@ -85,13 +86,13 @@ class TestCalculateTrackStats:
 class TestTrackStatsTool:
     """Tests for the track-stats tool handler."""
 
-    def test_returns_single_feature(self, single_track_context):
+    def test_returns_single_feature(self, single_track_context: SelectionContext) -> None:
         results = track_stats(single_track_context, {})
 
         assert isinstance(results, list)
         assert len(results) == 1
 
-    def test_result_is_feature(self, single_track_context):
+    def test_result_is_feature(self, single_track_context: SelectionContext) -> None:
         results = track_stats(single_track_context, {})
         feature = results[0]
 
@@ -100,7 +101,7 @@ class TestTrackStatsTool:
         assert "properties" in feature
         assert "geometry" in feature
 
-    def test_result_has_statistics(self, single_track_context):
+    def test_result_has_statistics(self, single_track_context: SelectionContext) -> None:
         results = track_stats(single_track_context, {})
         stats = results[0]["properties"]["statistics"]
 
@@ -109,21 +110,23 @@ class TestTrackStatsTool:
         assert "distance_nm" in stats
         assert "average_speed_kts" in stats
 
-    def test_result_references_source_track(self, single_track_context):
+    def test_result_references_source_track(self, single_track_context: SelectionContext) -> None:
         results = track_stats(single_track_context, {})
         props = results[0]["properties"]
 
         assert props["source_track"] == "track-001"
         assert props["source_name"] == "HMS Example"
 
-    def test_result_geometry_is_centroid(self, single_track_context):
+    def test_result_geometry_is_centroid(self, single_track_context: SelectionContext) -> None:
         results = track_stats(single_track_context, {})
         geom = results[0]["geometry"]
 
         assert geom["type"] == "Point"
         assert len(geom["coordinates"]) == 2
 
-    def test_with_fixture_data(self, single_track_context, single_track_fixture):
+    def test_with_fixture_data(
+        self, single_track_context: SelectionContext, single_track_fixture: dict[str, Any]
+    ) -> None:
         results = track_stats(single_track_context, {})
         stats = results[0]["properties"]["statistics"]
 
