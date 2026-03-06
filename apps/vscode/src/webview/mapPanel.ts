@@ -246,10 +246,8 @@ export class MapPanel {
       this.layersTreeProvider.setResultLayers([...this.resultLayers]);
     }
 
-    // Update activity panel webview if available
-    if (this.activityPanelProvider) {
-      this.activityPanelProvider.setFeatures(this.currentFeatures);
-    }
+    // Update activity panel webview with combined features
+    this.syncActivityPanelFeatures();
   }
 
   /**
@@ -323,6 +321,10 @@ export class MapPanel {
       'debrief.hasResultLayers',
       true
     );
+
+    // Sync combined features to activity panel so result layers
+    // appear in the Layers listing immediately (not only after refresh)
+    this.syncActivityPanelFeatures();
   }
 
   /**
@@ -550,8 +552,9 @@ export class MapPanel {
   /**
    * Get the feature kind for a feature ID (Feature: 038).
    *
-   * Looks up the 'kind' property of features from the current plot data.
-   * Returns the kind string (e.g., 'TRACK', 'POINT', 'CIRCLE') or undefined if unknown.
+   * Looks up the 'kind' property of features from the current plot data
+   * and from result layer features.
+   * Returns the kind string (e.g., 'TRACK', 'POINT', 'CIRCLE', 'ZONE') or undefined if unknown.
    *
    * @param featureId - The feature ID to look up
    * @returns The feature kind string or undefined
@@ -562,10 +565,23 @@ export class MapPanel {
       return (feature.properties as Record<string, unknown>).kind as string;
     }
 
-    // Check result layers
-    const resultLayer = this.resultLayers.find((l) => l.id === featureId);
-    if (resultLayer) {
-      return 'RESULT';
+    // Check individual features inside result layers
+    for (const rl of this.resultLayers) {
+      if (rl.id === featureId) {
+        // Layer-level match — inspect first feature for kind
+        const firstFeature = rl.features.features[0];
+        if (firstFeature) {
+          const kind = (firstFeature.properties ?? {} as Record<string, unknown>)['kind'];
+          return (typeof kind === 'string' ? kind : undefined) ?? 'RESULT';
+        }
+        return 'RESULT';
+      }
+      for (const f of rl.features.features) {
+        if (String(f.id) === featureId) {
+          const kind = (f.properties ?? {} as Record<string, unknown>)['kind'];
+          return (typeof kind === 'string' ? kind : undefined) ?? 'RESULT';
+        }
+      }
     }
 
     return undefined;
@@ -791,6 +807,25 @@ export class MapPanel {
   // ============================================================================
   // Private Methods
   // ============================================================================
+
+  /**
+   * Sync combined source + result-layer features to the activity panel
+   * so the Layers listing stays in sync without requiring a page refresh.
+   */
+  private syncActivityPanelFeatures(): void {
+    if (!this.activityPanelProvider) {
+      return;
+    }
+    const allFeatures: DebriefFeature[] = [...this.currentFeatures];
+    for (const rl of this.resultLayers) {
+      if (!rl.artifactHref) {
+        for (const f of rl.features.features) {
+          allFeatures.push(f as DebriefFeature);
+        }
+      }
+    }
+    this.activityPanelProvider.setFeatures(allFeatures);
+  }
 
   private postMessage(message: ExtensionToWebviewMessage): void {
     if (this.isWebviewReady) {
