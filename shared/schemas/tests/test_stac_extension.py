@@ -81,8 +81,7 @@ def _get_exercise_dirs() -> list[Path]:
     if not STAC_BROWSER_DIR.exists():
         return []
     return sorted(
-        p for p in STAC_BROWSER_DIR.iterdir()
-        if p.is_dir() and p.name.startswith("exercise-")
+        p for p in STAC_BROWSER_DIR.iterdir() if p.is_dir() and p.name.startswith("exercise-")
     )
 
 
@@ -241,9 +240,7 @@ class TestExerciseDiversity:
     @pytest.fixture(autouse=True)
     def _load_all_items(self) -> None:
         """Load all exercise items once per test class."""
-        self.items: list[dict[str, object]] = [
-            _load_exercise_item(d) for d in _exercise_dirs
-        ]
+        self.items: list[dict[str, object]] = [_load_exercise_item(d) for d in _exercise_dirs]
         self.all_props: list[dict[str, object]] = [
             _extract_extension_props(item.get("properties", {}))  # type: ignore[arg-type]
             for item in self.items
@@ -321,8 +318,7 @@ class TestExerciseDiversity:
                 )
                 pct = count / n * 100.0
                 assert 3 <= pct <= 80, (
-                    f"Filtering {field}={value!r} returns {pct:.1f}% "
-                    f"({count}/{n}), expected 3-80%"
+                    f"Filtering {field}={value!r} returns {pct:.1f}% ({count}/{n}), expected 3-80%"
                 )
 
 
@@ -332,9 +328,7 @@ class TestExerciseEdgeCases:
 
     @pytest.fixture(autouse=True)
     def _load_all_items(self) -> None:
-        self.items: list[dict[str, object]] = [
-            _load_exercise_item(d) for d in _exercise_dirs
-        ]
+        self.items: list[dict[str, object]] = [_load_exercise_item(d) for d in _exercise_dirs]
         self.all_props: list[dict[str, object]] = [
             _extract_extension_props(item.get("properties", {}))  # type: ignore[arg-type]
             for item in self.items
@@ -367,9 +361,7 @@ class TestExerciseEdgeCases:
             has_end = item_props.get("end_datetime") is not None
             if not has_start and not has_end:
                 count += 1
-        assert count >= 3, (
-            f"Only {count} items without start/end datetime, expected >= 3"
-        )
+        assert count >= 3, f"Only {count} items without start/end datetime, expected >= 3"
 
 
 # ---------------------------------------------------------------------------

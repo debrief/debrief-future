@@ -30,9 +30,7 @@ TAXONOMY_FILE = FIXTURES_DIR / "vessel-taxonomy.json"
 # Constants
 # ---------------------------------------------------------------------------
 STAC_VERSION = "1.0.0"
-STAC_EXTENSIONS = [
-    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
-]
+STAC_EXTENSIONS = ["https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"]
 
 # ---------------------------------------------------------------------------
 # Vessel taxonomy (4-level paths)
@@ -197,8 +195,21 @@ FEATURE_TAGS: list[str] = [
 ]
 
 NATIONALITIES_POOL: list[str] = [
-    "GB", "US", "FR", "DE", "NO", "SE",
-    "IT", "NL", "DK", "ES", "CA", "AU", "JP", "KR", "IN",
+    "GB",
+    "US",
+    "FR",
+    "DE",
+    "NO",
+    "SE",
+    "IT",
+    "NL",
+    "DK",
+    "ES",
+    "CA",
+    "AU",
+    "JP",
+    "KR",
+    "IN",
 ]
 
 # Track name prefixes by nationality
@@ -221,17 +232,56 @@ TRACK_NAME_PREFIXES: dict[str, list[str]] = {
 }
 
 SHIP_NAMES: list[str] = [
-    "Argyll", "Sutherland", "Portland", "Westminster", "Kent",
-    "Lancaster", "Richmond", "Somerset", "Northumberland", "Iron Duke",
-    "Defender", "Diamond", "Dragon", "Duncan", "Dauntless",
-    "Mahan", "Cole", "Carney", "Roosevelt", "Mason",
-    "Bainbridge", "Truxtun", "Gonzalez", "Laboon", "Ramage",
-    "Aquitaine", "Provence", "Languedoc", "Auvergne", "Bretagne",
-    "Sachsen", "Hamburg", "Hessen", "Nordrhein-Westfalen",
-    "Fridtjof Nansen", "Roald Amundsen", "Otto Sverdrup", "Helge Ingstad",
-    "Visby", "Helsingborg", "Harnosand", "Nykoping",
-    "Andrea Doria", "Caio Duilio", "Bergamini", "Margottini",
-    "De Zeven Provincien", "Tromp", "De Ruyter", "Evertsen",
+    "Argyll",
+    "Sutherland",
+    "Portland",
+    "Westminster",
+    "Kent",
+    "Lancaster",
+    "Richmond",
+    "Somerset",
+    "Northumberland",
+    "Iron Duke",
+    "Defender",
+    "Diamond",
+    "Dragon",
+    "Duncan",
+    "Dauntless",
+    "Mahan",
+    "Cole",
+    "Carney",
+    "Roosevelt",
+    "Mason",
+    "Bainbridge",
+    "Truxtun",
+    "Gonzalez",
+    "Laboon",
+    "Ramage",
+    "Aquitaine",
+    "Provence",
+    "Languedoc",
+    "Auvergne",
+    "Bretagne",
+    "Sachsen",
+    "Hamburg",
+    "Hessen",
+    "Nordrhein-Westfalen",
+    "Fridtjof Nansen",
+    "Roald Amundsen",
+    "Otto Sverdrup",
+    "Helge Ingstad",
+    "Visby",
+    "Helsingborg",
+    "Harnosand",
+    "Nykoping",
+    "Andrea Doria",
+    "Caio Duilio",
+    "Bergamini",
+    "Margottini",
+    "De Zeven Provincien",
+    "Tromp",
+    "De Ruyter",
+    "Evertsen",
 ]
 
 # ---------------------------------------------------------------------------
@@ -252,25 +302,29 @@ REGIONS: list[tuple[Region, int]] = [
 # Duration buckets (hours)
 # ---------------------------------------------------------------------------
 DURATION_BUCKETS: list[tuple[float, float, int]] = [
-    (1.0, 6.0, 15),       # <6H
-    (6.0, 24.0, 25),       # <24H
-    (24.0, 72.0, 30),      # <72H
-    (72.0, 240.0, 20),     # <10D
-    (240.0, 720.0, 10),    # >10D
+    (1.0, 6.0, 15),  # <6H
+    (6.0, 24.0, 25),  # <24H
+    (24.0, 72.0, 30),  # <72H
+    (72.0, 240.0, 20),  # <10D
+    (240.0, 720.0, 10),  # >10D
 ]
 
 # Nationality distribution targets
 NATIONALITY_WEIGHTS: list[tuple[str, int]] = [
-    ("GB", 30), ("US", 20), ("FR", 15), ("DE", 10),
-    ("NO", 8), ("SE", 7),
+    ("GB", 30),
+    ("US", 20),
+    ("FR", 15),
+    ("DE", 10),
+    ("NO", 8),
+    ("SE", 7),
 ]
 
 # Track count buckets
 TRACK_BUCKETS: list[tuple[int, int, int]] = [
-    (0, 0, 5),     # 0 tracks
-    (1, 2, 30),    # 1-2
-    (3, 4, 40),    # 3-4
-    (5, 8, 25),    # 5+
+    (0, 0, 5),  # 0 tracks
+    (1, 2, 30),  # 1-2
+    (3, 4, 40),  # 3-4
+    (5, 8, 25),  # 5+
 ]
 
 
@@ -278,9 +332,8 @@ TRACK_BUCKETS: list[tuple[int, int, int]] = [
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _flatten_taxonomy_tree(
-    node: dict[str, Any], prefix: str = ""
-) -> list[str]:
+
+def _flatten_taxonomy_tree(node: dict[str, Any], prefix: str = "") -> list[str]:
     """Recursively flatten a nested taxonomy tree into slash-separated paths."""
     paths: list[str] = []
     children = node.get("children", {})
@@ -356,9 +409,7 @@ def pick_from_buckets(
     return assignments
 
 
-def generate_bbox(
-    region: Region, rng: random.Random, size_deg: float | None = None
-) -> list[float]:
+def generate_bbox(region: Region, rng: random.Random, size_deg: float | None = None) -> list[float]:
     """Generate a random bounding box within a region."""
     name, lat_min, lat_max, lon_min, lon_max = region
     if size_deg is None:
@@ -378,9 +429,7 @@ def bbox_to_polygon(bbox: list[float]) -> dict[str, Any]:
     w, s, e, n = bbox
     return {
         "type": "Polygon",
-        "coordinates": [[
-            [w, s], [e, s], [e, n], [w, n], [w, s]
-        ]],
+        "coordinates": [[[w, s], [e, s], [e, n], [w, n], [w, s]]],
     }
 
 
@@ -440,6 +489,7 @@ def make_slug(name: str) -> str:
 # Named edge-case definitions
 # ---------------------------------------------------------------------------
 
+
 class EdgeCase:
     """Defines a named edge-case exercise."""
 
@@ -455,35 +505,56 @@ class EdgeCase:
 
 
 EDGE_CASES: list[EdgeCase] = [
-    EdgeCase("empty-plot", 3, {
-        "track_count": 0,
-        "vessel_classes": [],
-        "track_names": [],
-        "nationalities": [],
-        "description_note": "Empty plot with no track data.",
-    }),
-    EdgeCase("multi-nation", 5, {
-        "multi_nation": True,
-        "description_note": "Multi-national exercise with 4+ participant nations.",
-    }),
-    EdgeCase("single-point", 3, {
-        "single_point": True,
-        "description_note": "Single-point observation, no time range.",
-    }),
-    EdgeCase("long-duration", 3, {
-        "duration_hours": (300.0, 600.0),
-        "description_note": "Extended duration exercise (10+ days).",
-    }),
-    EdgeCase("dense-tracks", 3, {
-        "track_count_range": (5, 8),
-        "description_note": "Dense track exercise with many participants.",
-    }),
+    EdgeCase(
+        "empty-plot",
+        3,
+        {
+            "track_count": 0,
+            "vessel_classes": [],
+            "track_names": [],
+            "nationalities": [],
+            "description_note": "Empty plot with no track data.",
+        },
+    ),
+    EdgeCase(
+        "multi-nation",
+        5,
+        {
+            "multi_nation": True,
+            "description_note": "Multi-national exercise with 4+ participant nations.",
+        },
+    ),
+    EdgeCase(
+        "single-point",
+        3,
+        {
+            "single_point": True,
+            "description_note": "Single-point observation, no time range.",
+        },
+    ),
+    EdgeCase(
+        "long-duration",
+        3,
+        {
+            "duration_hours": (300.0, 600.0),
+            "description_note": "Extended duration exercise (10+ days).",
+        },
+    ),
+    EdgeCase(
+        "dense-tracks",
+        3,
+        {
+            "track_count_range": (5, 8),
+            "description_note": "Dense track exercise with many participants.",
+        },
+    ),
 ]
 
 
 # ---------------------------------------------------------------------------
 # Item generation
 # ---------------------------------------------------------------------------
+
 
 def generate_item(
     num: int,
@@ -562,7 +633,11 @@ def generate_item(
         vessel_classes: list[str] = overrides["vessel_classes"]
     else:
         vc_count = min(n_tracks, rng.randint(1, 3)) if n_tracks > 0 else 0
-        vessel_classes = pick_vessel_classes(taxonomy, vessel_category, max(vc_count, 1), rng) if vc_count > 0 else []
+        vessel_classes = (
+            pick_vessel_classes(taxonomy, vessel_category, max(vc_count, 1), rng)
+            if vc_count > 0
+            else []
+        )
 
     # Tags and feature tags
     n_tags = rng.randint(1, 5)
@@ -624,19 +699,20 @@ def generate_catalog(item_ids: list[str]) -> dict[str, Any]:
         {"rel": "self", "href": "./catalog.json", "type": "application/json"},
     ]
     for item_id in item_ids:
-        links.append({
-            "rel": "item",
-            "href": f"./{item_id}/item.json",
-            "type": "application/json",
-        })
+        links.append(
+            {
+                "rel": "item",
+                "href": f"./{item_id}/item.json",
+                "type": "application/json",
+            }
+        )
 
     return {
         "type": "Catalog",
         "id": "debrief-exercises",
         "stac_version": STAC_VERSION,
         "description": (
-            "Debrief maritime exercise catalog — "
-            "100 deterministic fixtures for testing."
+            "Debrief maritime exercise catalog — 100 deterministic fixtures for testing."
         ),
         "title": "Debrief Exercise Catalog",
         "links": links,
@@ -646,6 +722,7 @@ def generate_catalog(item_ids: list[str]) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     """Generate 100 STAC item fixtures and a root catalog."""
@@ -658,7 +735,7 @@ def main() -> None:
     # Build assignment pools
     # Region assignments
     region_assignments: list[Region] = []
-    for (region, count) in REGIONS:
+    for region, count in REGIONS:
         region_assignments.extend([region] * count)
     rng.shuffle(region_assignments)
 
@@ -773,7 +850,7 @@ def main() -> None:
         center_lat = (bbox[1] + bbox[3]) / 2
         center_lon = (bbox[0] + bbox[2]) / 2
         region_name = "Unknown"
-        for (reg, _count) in REGIONS:
+        for reg, _count in REGIONS:
             rname, lat_min, lat_max, lon_min, lon_max = reg
             if lat_min <= center_lat <= lat_max and lon_min <= center_lon <= lon_max:
                 region_name = rname

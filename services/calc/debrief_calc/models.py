@@ -636,9 +636,7 @@ class SystemRecordProperties(BaseModel):
     and Point geometry with empty coordinates.
     """
 
-    kind: str = Field(
-        default="SYSTEM_RECORD", description="Feature type discriminator"
-    )
+    kind: str = Field(default="SYSTEM_RECORD", description="Feature type discriminator")
     snapshot_links: SnapshotLinks | None = Field(
         default=None,
         alias="snapshotLinks",
