@@ -152,20 +152,7 @@ EXERCISE_NAMES: list[str] = [
     "Dagger Point",
 ]
 
-AUTHORS: list[str] = [
-    "Lt Cdr J. Smith RN",
-    "Cdr A. Brown RN",
-    "Lt R. Hughes USN",
-    "LCdr M. Dupont MN",
-    "KptLt H. Weber",
-    "Cdr P. Andersen RNoN",
-    "Lt Cdr S. Eriksson SwN",
-    "Lt K. Yamamoto JMSDF",
-    "Cdr F. Rossi MMI",
-    "Lt Cdr D. Kowalski",
-    "Cdr N. Petrov",
-    "Lt Cdr C. O'Brien RN",
-]
+## Author removed — derived from PROV lineage at query time (see research.md R7)
 
 TAGS: list[str] = [
     "ASW",
@@ -586,9 +573,6 @@ def generate_item(
     n_ftags = rng.randint(0, 4)
     feature_tags = rng.sample(FEATURE_TAGS, n_ftags)
 
-    # Author
-    author = rng.choice(AUTHORS)
-
     # Description
     region_name = region[0]
     desc_note = overrides.get("description_note", "")
@@ -606,7 +590,6 @@ def generate_item(
         "debrief:vessel_classes": vessel_classes,
         "debrief:tags": tags,
         "debrief:feature_tags": feature_tags,
-        "debrief:author": author,
         "debrief:track_names": track_names,
         "debrief:nationalities": nationalities,
     }

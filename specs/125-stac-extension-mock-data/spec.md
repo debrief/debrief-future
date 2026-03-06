@@ -86,13 +86,13 @@ The SRD identifies duration as a filter dimension but leaves open whether durati
 ### Functional Requirements
 
 - **FR-001**: The extension specification MUST define a namespace prefix for all custom properties (e.g., `debrief:` prefix), consistent with existing `debrief:toolId` and `debrief:sourceFeatures` usage in STAC assets.
-- **FR-002**: The extension specification MUST define property names, types, and constraints for: vessel class, plot-level tags, feature-level tags, author, track names, nationalities, and duration representation.
+- **FR-002**: The extension specification MUST define property names, types, and constraints for: vessel class, plot-level tags, feature-level tags, track names, nationalities, and duration representation. Author is derived from PROV lineage, not stored.
 - **FR-003**: Each extension property MUST document whether it is required or optional, and its default value when optional.
 - **FR-004**: The extension MUST define a hierarchical vessel classification structure with at least 4 levels (domain > role > class > type).
 - **FR-005**: The fixture set MUST contain exactly 100 valid STAC item.json files, each conforming to STAC 1.0.0 and the extension specification.
 - **FR-006**: Fixtures MUST include realistic geographic extents (bbox and geometry) spanning multiple ocean regions, not placeholder coordinates.
 - **FR-007**: Fixtures MUST include realistic temporal ranges spanning multiple years, with durations distributed across all SRD filter buckets (`<6H`, `<24H`, `<72H`, `<10D`, `>10D`).
-- **FR-008**: Fixtures MUST include at least 5 distinct vessel classes, 6 distinct nationalities, 10 distinct authors, and 15 distinct tag values.
+- **FR-008**: Fixtures MUST include at least 5 distinct vessel classes, 6 distinct nationalities, and 15 distinct tag values.
 - **FR-009**: Fixtures MUST be compatible with the existing `CatalogOverviewItem` interface (`id`, `title`, `bbox`, `datetime`, `startDatetime`, `endDatetime`, `itemPath`).
 - **FR-010**: A LinkML schema module MUST be authored in `shared/schemas/src/linkml/` defining the extension properties, importable from the root `debrief.yaml` schema.
 - **FR-011**: The extension MUST NOT modify or conflict with existing STAC core properties (`datetime`, `start_datetime`, `end_datetime`, `title`, `description`) or existing custom properties (`trackColors`, `sourcePath`).

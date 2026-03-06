@@ -24,19 +24,20 @@ Use `debrief:` as the extension namespace prefix, consistent with existing usage
 ### Decision
 Define these properties in `item.properties` under `debrief:` prefix:
 
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `debrief:vessel_classes` | `string[]` | No | Hierarchical vessel classification paths (e.g., `["surface/warship/frigate/type23"]`) |
-| `debrief:tags` | `string[]` | No | Plot-level tags (free text labels) |
-| `debrief:feature_tags` | `string[]` | No | Union of all feature-level tags from GeoJSON features |
-| `debrief:author` | `string` | No | Creator/analyst who authored the plot |
-| `debrief:track_names` | `string[]` | No | Names of all tracks in the plot |
-| `debrief:nationalities` | `string[]` | No | Distinct nationalities of vessels in the plot |
+| Property | Type | Required | Source | Description |
+|----------|------|----------|--------|-------------|
+| `debrief:vessel_classes` | `string[]` | No | Aggregated from tracks | Hierarchical vessel classification paths. Union of `vessel_class` from all `kind==TRACK` features. |
+| `debrief:tags` | `string[]` | No | Plot-level | Plot-level tags set directly by analyst on the plot. |
+| `debrief:feature_tags` | `string[]` | No | Aggregated from all features | Union of all feature-level tags from GeoJSON features (any feature kind). |
+| `debrief:track_names` | `string[]` | No | Aggregated from tracks | Names of all tracks. Derived from `platform_name` of each `kind==TRACK` feature. |
+| `debrief:nationalities` | `string[]` | No | Aggregated from tracks | Distinct nationalities of vessels. Union of `nationality` from all `kind==TRACK` features. ISO 3166-1 alpha-2 codes only. |
+
+**Removed**: `debrief:author` — authorship is derivable from the W3C PROV `LogEntry` attached to each feature's `provenance` array. Storing it redundantly in `item.properties` would introduce staleness if features are added/removed by different analysts. The Discovery UI can compute author at query time from provenance records, following the same "derived, not stored" principle as duration (R3).
 
 ### Rationale
 - All properties optional: existing items without extension properties remain valid
 - Arrays for multi-valued fields (a plot may have multiple vessel classes, tags, tracks)
-- `vessel_classes` uses hierarchical path notation (`category/class/type`) enabling prefix matching for subtree queries
+- `vessel_classes` uses hierarchical path notation (`domain/role/class/type`) enabling prefix matching for subtree queries
 - `feature_tags` aggregated at item level for discoverability; authoritative per-feature tags remain in GeoJSON features
 - Property names use snake_case per STAC convention (lowercase, underscores)
 
@@ -44,6 +45,42 @@ Define these properties in `item.properties` under `debrief:` prefix:
 1. **Storing vessel class as a nested object** — rejected because STAC filter extensions (CQL2) work best with flat string matching and prefix queries
 2. **Separate `debrief:vessel_category`, `debrief:vessel_class`, `debrief:vessel_type`** — rejected because it requires knowing taxonomy depth in advance; hierarchical paths are more flexible
 3. **Combining plot tags and feature tags** — rejected because they serve different purposes (plot-level categorisation vs. feature-level annotation)
+4. **Storing `debrief:author` as a property** — rejected because it duplicates provenance data and can become stale (same reasoning as R3 duration)
+
+## R7: Property Provenance Tiers
+
+### Decision
+Extension properties in `item.properties` fall into three provenance tiers:
+
+| Tier | Scope | Storage | Aggregation |
+|------|-------|---------|-------------|
+| **Plot-level** | `item.properties` | Stored directly | Set by analyst on the plot itself |
+| **Track-aggregated** | `item.properties` ← track features | Stored (aggregated on save) | Union of per-track values from `kind==TRACK` features |
+| **All-feature-aggregated** | `item.properties` ← all features | Stored (aggregated on save) | Union of per-feature values from any GeoJSON feature |
+| **Derived** | Computed at query time | Not stored | Computed from PROV records or STAC core fields |
+
+Property assignments:
+
+| Property | Tier | Feature-level source |
+|----------|------|---------------------|
+| `debrief:tags` | Plot-level | N/A — set on plot |
+| `debrief:vessel_classes` | Track-aggregated | `TrackProperties.vessel_class` (future) |
+| `debrief:nationalities` | Track-aggregated | `TrackProperties.nationality` (future) |
+| `debrief:track_names` | Track-aggregated | `TrackProperties.platform_name` (existing) |
+| `debrief:feature_tags` | All-feature-aggregated | Per-feature `tags` property |
+| Author | Derived | `LogEntry.agent` in feature `provenance` |
+| Duration | Derived | `end_datetime - start_datetime` (R3) |
+
+### Rationale
+- Track-specific metadata (nationality, vessel class) belongs on individual tracks, not on the plot — a plot may contain tracks from different nations with different vessel types
+- Aggregation to `item.properties` provides the query/filter surface the Discovery UI needs without requiring feature-level traversal
+- Aggregation happens at plot-save time (#135), keeping queries fast
+- Author and duration are derived to avoid staleness (same principle as R3)
+- `track_names` is already derivable from existing `TrackProperties.platform_name`; nationality and vessel_class require new fields on `TrackProperties` (future work)
+
+### Alternatives Considered
+1. **All properties stored flat at plot level** — rejected because it loses the source-of-truth relationship between features and their metadata
+2. **No aggregation, always traverse features** — rejected because Discovery UI needs fast filtering across 100+ items without loading full GeoJSON
 
 ## R3: Duration Representation
 

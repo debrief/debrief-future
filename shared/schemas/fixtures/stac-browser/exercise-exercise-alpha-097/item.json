@@ -10,61 +10,63 @@
     "coordinates": [
       [
         [
-          -26.7112,
-          53.5189
+          -26.4951,
+          47.8968
         ],
         [
-          -26.5957,
-          53.5189
+          -24.0765,
+          47.8968
         ],
         [
-          -26.5957,
-          53.6345
+          -24.0765,
+          50.3154
         ],
         [
-          -26.7112,
-          53.6345
+          -26.4951,
+          50.3154
         ],
         [
-          -26.7112,
-          53.5189
+          -26.4951,
+          47.8968
         ]
       ]
     ]
   },
   "bbox": [
-    -26.7112,
-    53.5189,
-    -26.5957,
-    53.6345
+    -26.4951,
+    47.8968,
+    -24.0765,
+    50.3154
   ],
   "properties": {
     "title": "Exercise Exercise Alpha-097",
-    "description": "Exercise Alpha-097 \u2014 North Atlantic exercise. 3 track(s), 1 nation(s).",
+    "description": "Exercise Alpha-097 \u2014 North Atlantic exercise. 4 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2023-11-12T04:00:00Z",
-    "end_datetime": "2023-12-11T12:40:03Z",
+    "start_datetime": "2021-07-13T18:00:00Z",
+    "end_datetime": "2021-07-28T05:45:13Z",
     "debrief:vessel_classes": [
-      "surface/warship/frigate/type26",
-      "unknown"
+      "surface/warship/frigate/type26"
     ],
     "debrief:tags": [
-      "gunnery",
+      "SAR",
       "mine-clearance",
-      "NGFS"
+      "training",
+      "EW",
+      "AAW"
     ],
     "debrief:feature_tags": [
-      "towed-array",
-      "depth-charge"
+      "datum",
+      "sonar-contact"
     ],
-    "debrief:author": "Lt Cdr J. Smith RN",
     "debrief:track_names": [
-      "HMS Nordrhein-Westfalen",
-      "HMS Languedoc",
-      "HMS Iron Duke"
+      "HNoMS Iron Duke",
+      "HMS Lancaster",
+      "HNoMS Laboon",
+      "HMS Defender"
     ],
     "debrief:nationalities": [
-      "GB"
+      "NO",
+      "SE"
     ]
   },
   "links": [

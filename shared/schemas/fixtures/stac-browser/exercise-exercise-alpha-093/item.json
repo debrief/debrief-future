@@ -10,60 +10,59 @@
     "coordinates": [
       [
         [
-          -36.6742,
-          57.3186
+          -23.1779,
+          56.8166
         ],
         [
-          -34.9138,
-          57.3186
+          -22.6879,
+          56.8166
         ],
         [
-          -34.9138,
-          59.079
+          -22.6879,
+          57.3066
         ],
         [
-          -36.6742,
-          59.079
+          -23.1779,
+          57.3066
         ],
         [
-          -36.6742,
-          57.3186
+          -23.1779,
+          56.8166
         ]
       ]
     ]
   },
   "bbox": [
-    -36.6742,
-    57.3186,
-    -34.9138,
-    59.079
+    -23.1779,
+    56.8166,
+    -22.6879,
+    57.3066
   ],
   "properties": {
     "title": "Exercise Exercise Alpha-093",
-    "description": "Exercise Alpha-093 \u2014 North Atlantic exercise. 2 track(s), 1 nation(s).",
+    "description": "Exercise Alpha-093 \u2014 North Atlantic exercise. 2 track(s), 3 nation(s).",
     "datetime": null,
-    "start_datetime": "2025-04-11T15:00:00Z",
-    "end_datetime": "2025-04-13T15:07:58Z",
+    "start_datetime": "2020-10-22T15:00:00Z",
+    "end_datetime": "2020-10-24T22:41:01Z",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssk/gotland",
-      "subsurface/submarine/ssn/astute"
+      "subsurface/submarine/ssn/astute",
+      "subsurface/submarine/ssn/virginia"
     ],
     "debrief:tags": [
-      "transit",
-      "multi-national"
+      "missile-firing"
     ],
     "debrief:feature_tags": [
-      "sprint-and-drift",
-      "radar-detection",
-      "active-search"
+      "active-search",
+      "torpedo-run"
     ],
-    "debrief:author": "Cdr A. Brown RN",
     "debrief:track_names": [
-      "USS Mason",
-      "USS Otto Sverdrup"
+      "HNoMS Gonzalez",
+      "HMCS Roosevelt"
     ],
     "debrief:nationalities": [
-      "US"
+      "NO",
+      "CA",
+      "AU"
     ]
   },
   "links": [

@@ -10,66 +10,65 @@
     "coordinates": [
       [
         [
-          -2.0471,
-          34.5764
+          4.5739,
+          39.1861
         ],
         [
-          -0.2968,
-          34.5764
+          6.8945,
+          39.1861
         ],
         [
-          -0.2968,
-          36.3266
+          6.8945,
+          41.5067
         ],
         [
-          -2.0471,
-          36.3266
+          4.5739,
+          41.5067
         ],
         [
-          -2.0471,
-          34.5764
+          4.5739,
+          39.1861
         ]
       ]
     ]
   },
   "bbox": [
-    -2.0471,
-    34.5764,
-    -0.2968,
-    36.3266
+    4.5739,
+    39.1861,
+    6.8945,
+    41.5067
   ],
   "properties": {
     "title": "Exercise Polaris Star",
-    "description": "Polaris Star \u2014 Mediterranean exercise. 4 track(s), 3 nation(s).",
+    "description": "Polaris Star \u2014 Mediterranean exercise. 4 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2022-08-06T15:00:00Z",
-    "end_datetime": "2022-08-06T20:07:42Z",
+    "start_datetime": "2023-08-13T00:00:00Z",
+    "end_datetime": "2023-08-13T04:37:53Z",
     "debrief:vessel_classes": [
       "surface/merchant/cargo/bulk",
-      "surface/merchant/tanker/vlcc"
+      "surface/merchant/passenger/ferry"
     ],
     "debrief:tags": [
-      "NGFS",
       "EW",
-      "surveillance",
-      "MCM",
-      "amphibious"
+      "transit",
+      "SAR",
+      "force-protection",
+      "replenishment"
     ],
     "debrief:feature_tags": [
-      "minefield",
-      "active-search",
-      "depth-charge"
+      "prosecution",
+      "track-merge",
+      "towed-array",
+      "visual-sighting"
     ],
-    "debrief:author": "Cdr A. Brown RN",
     "debrief:track_names": [
-      "HMS Nykoping",
-      "HNoMS Visby",
-      "JS Argyll",
-      "HMS Harnosand"
+      "HMS Carney",
+      "JS Roald Amundsen",
+      "HMS Hessen",
+      "JS De Ruyter"
     ],
     "debrief:nationalities": [
       "GB",
-      "NO",
       "JP"
     ]
   },

@@ -10,60 +10,58 @@
     "coordinates": [
       [
         [
-          -10.6055,
-          66.7344
+          34.0527,
+          65.3893
         ],
         [
-          -8.2105,
-          66.7344
+          35.2399,
+          65.3893
         ],
         [
-          -8.2105,
-          69.1294
+          35.2399,
+          66.5766
         ],
         [
-          -10.6055,
-          69.1294
+          34.0527,
+          66.5766
         ],
         [
-          -10.6055,
-          66.7344
+          34.0527,
+          65.3893
         ]
       ]
     ]
   },
   "bbox": [
-    -10.6055,
-    66.7344,
-    -8.2105,
-    69.1294
+    34.0527,
+    65.3893,
+    35.2399,
+    66.5766
   ],
   "properties": {
     "title": "Exercise Griffin Strike",
-    "description": "Griffin Strike \u2014 Arctic exercise. 4 track(s), 1 nation(s).",
+    "description": "Griffin Strike \u2014 Arctic exercise. 3 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2026-08-23T04:00:00Z",
-    "end_datetime": "2026-08-23T23:39:32Z",
+    "start_datetime": "2026-12-21T10:00:00Z",
+    "end_datetime": "2026-12-22T06:14:41Z",
     "debrief:vessel_classes": [
-      "surface/warship/corvette/visby",
-      "surface/warship/patrol/river"
+      "surface/warship/destroyer/arleigh-burke",
+      "surface/warship/corvette/visby"
     ],
     "debrief:tags": [
-      "replenishment",
-      "AAW"
+      "surveillance"
     ],
     "debrief:feature_tags": [
-      "visual-sighting"
+      "visual-sighting",
+      "sonar-contact"
     ],
-    "debrief:author": "Cdr A. Brown RN",
     "debrief:track_names": [
-      "FS Roosevelt",
-      "FS Mahan",
-      "FS Mason",
-      "FS Somerset"
+      "USS Iron Duke",
+      "USS Roald Amundsen",
+      "USS De Zeven Provincien"
     ],
     "debrief:nationalities": [
-      "FR"
+      "US"
     ]
   },
   "links": [

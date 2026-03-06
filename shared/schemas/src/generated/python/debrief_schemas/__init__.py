@@ -100,7 +100,7 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
                               'prefix_reference': 'https://purl.org/geojson/vocab#'},
                   'linkml': {'prefix_prefix': 'linkml',
                              'prefix_reference': 'https://w3id.org/linkml/'}},
-     'source_file': '/home/user/debrief-future/shared/schemas/src/linkml/debrief.yaml',
+     'source_file': '/Users/ian/git/debrief-future/shared/schemas/src/linkml/debrief.yaml',
      'title': 'Debrief Maritime Analysis Schemas'} )
 
 class FeatureKindEnum(str, Enum):
@@ -3209,8 +3209,6 @@ class StacExtensionProperties(ConfiguredBaseModel):
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:tags'} })
     feature_tags: Optional[list[str]] = Field(default=[], description="""Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:feature_tags'} })
-    author: Optional[str] = Field(default=None, description="""Analyst who created or last modified the plot. Free-text identifier.
-""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:author'} })
     track_names: Optional[list[str]] = Field(default=[], description="""Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.
 """, json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:track_names'} })
     nationalities: Optional[list[str]] = Field(default=[], description="""Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.

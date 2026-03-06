@@ -17,7 +17,6 @@ ext = StacExtensionProperties(
     vessel_classes=props.get("debrief:vessel_classes", []),
     tags=props.get("debrief:tags", []),
     feature_tags=props.get("debrief:feature_tags", []),
-    author=props.get("debrief:author"),
     track_names=props.get("debrief:track_names", []),
     nationalities=props.get("debrief:nationalities", []),
 )
@@ -25,7 +24,7 @@ ext = StacExtensionProperties(
 print(f"Exercise: {item['id']}")
 print(f"Vessel classes: {ext.vessel_classes}")
 print(f"Nationalities: {ext.nationalities}")
-print(f"Author: {ext.author}")
+# Author is derived from PROV lineage, not stored in extension properties
 ```
 
 **Expected output:**
@@ -33,7 +32,6 @@ print(f"Author: {ext.author}")
 Exercise: exercise-joint-warrior
 Vessel classes: ['surface/warship/frigate/type23', 'subsurface/submarine/ssn/astute']
 Nationalities: ['GB', 'US']
-Author: Lt Cdr J. Davies
 ```
 
 ## Python: Filter Fixtures by Vessel Class
@@ -68,7 +66,6 @@ interface StacItem {
     'debrief:vessel_classes'?: string[];
     'debrief:tags'?: string[];
     'debrief:feature_tags'?: string[];
-    'debrief:author'?: string;
     'debrief:track_names'?: string[];
     'debrief:nationalities'?: string[];
   };
@@ -80,7 +77,6 @@ function getExtensionProps(item: StacItem): StacExtensionProperties {
     vessel_classes: p['debrief:vessel_classes'] ?? [],
     tags: p['debrief:tags'] ?? [],
     feature_tags: p['debrief:feature_tags'] ?? [],
-    author: p['debrief:author'],
     track_names: p['debrief:track_names'] ?? [],
     nationalities: p['debrief:nationalities'] ?? [],
   };

@@ -10,63 +10,60 @@
     "coordinates": [
       [
         [
-          -26.4951,
-          -43.5273
+          -8.5614,
+          -49.3147
         ],
         [
-          -24.0765,
-          -43.5273
+          -6.0794,
+          -49.3147
         ],
         [
-          -24.0765,
-          -41.1086
+          -6.0794,
+          -46.8327
         ],
         [
-          -26.4951,
-          -41.1086
+          -8.5614,
+          -46.8327
         ],
         [
-          -26.4951,
-          -43.5273
+          -8.5614,
+          -49.3147
         ]
       ]
     ]
   },
   "bbox": [
-    -26.4951,
-    -43.5273,
-    -24.0765,
-    -41.1086
+    -8.5614,
+    -49.3147,
+    -6.0794,
+    -46.8327
   ],
   "properties": {
     "title": "Exercise Exercise Alpha-096",
-    "description": "Exercise Alpha-096 \u2014 South Atlantic exercise. 2 track(s), 2 nation(s).",
+    "description": "Exercise Alpha-096 \u2014 South Atlantic exercise. 2 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2021-07-13T18:00:00Z",
-    "end_datetime": "2021-07-15T04:46:31Z",
+    "start_datetime": "2024-01-27T23:00:00Z",
+    "end_datetime": "2024-01-30T06:47:12Z",
     "debrief:vessel_classes": [
-      "surface/warship/patrol/river",
-      "surface/warship/corvette/visby"
+      "surface/warship/destroyer/type45"
     ],
     "debrief:tags": [
-      "amphibious",
-      "MCM",
-      "escort",
-      "SAR",
-      "NGFS"
+      "harbour-ops",
+      "training",
+      "replenishment",
+      "AAW",
+      "transit"
     ],
     "debrief:feature_tags": [
-      "helicopter-ops",
-      "active-search"
+      "radar-detection",
+      "minefield"
     ],
-    "debrief:author": "Cdr P. Andersen RNoN",
     "debrief:track_names": [
-      "HNoMS Iron Duke",
-      "HMS Lancaster"
+      "FS Aquitaine",
+      "FS Cole"
     ],
     "debrief:nationalities": [
-      "NO",
-      "SE"
+      "FR"
     ]
   },
   "links": [

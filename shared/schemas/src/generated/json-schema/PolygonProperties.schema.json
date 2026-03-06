@@ -2104,13 +2104,6 @@
       "additionalProperties": false,
       "description": "Extension properties added to STAC item.properties under the debrief: namespace. All properties are optional \u2014 existing items without extension properties remain valid. These properties enable filtering, searching, and colour-coding in the Discovery UI.",
       "properties": {
-        "author": {
-          "description": "Analyst who created or last modified the plot. Free-text identifier.\n",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "feature_tags": {
           "description": "Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.\n",
           "items": {

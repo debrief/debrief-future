@@ -10,56 +10,55 @@
     "coordinates": [
       [
         [
-          28.1066,
-          66.5413
+          -16.7898,
+          72.5183
         ],
         [
-          30.26,
-          66.5413
+          -14.5603,
+          72.5183
         ],
         [
-          30.26,
-          68.6947
+          -14.5603,
+          74.7478
         ],
         [
-          28.1066,
-          68.6947
+          -16.7898,
+          74.7478
         ],
         [
-          28.1066,
-          66.5413
+          -16.7898,
+          72.5183
         ]
       ]
     ]
   },
   "bbox": [
-    28.1066,
-    66.5413,
-    30.26,
-    68.6947
+    -16.7898,
+    72.5183,
+    -14.5603,
+    74.7478
   ],
   "properties": {
     "title": "Exercise Storm Petrel",
-    "description": "Storm Petrel \u2014 Arctic exercise. 0 track(s), 3 nation(s).",
+    "description": "Storm Petrel \u2014 Arctic exercise. 0 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2021-07-22T20:00:00Z",
-    "end_datetime": "2021-07-24T23:10:16Z",
+    "start_datetime": "2022-11-23T05:00:00Z",
+    "end_datetime": "2022-11-24T20:02:13Z",
     "debrief:vessel_classes": [],
     "debrief:tags": [
-      "amphibious",
-      "gunnery",
-      "MCM"
+      "SAR",
+      "ASW"
     ],
     "debrief:feature_tags": [
-      "datum",
-      "towed-array"
+      "prosecution",
+      "sonar-contact",
+      "depth-charge",
+      "minefield"
     ],
-    "debrief:author": "Lt Cdr S. Eriksson SwN",
     "debrief:track_names": [],
     "debrief:nationalities": [
-      "SE",
-      "KR",
-      "IN"
+      "GB",
+      "SE"
     ]
   },
   "links": [

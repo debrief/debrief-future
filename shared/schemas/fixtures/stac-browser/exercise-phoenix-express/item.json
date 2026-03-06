@@ -10,60 +10,62 @@
     "coordinates": [
       [
         [
-          1.257,
-          40.0782
+          -0.9975,
+          36.4473
         ],
         [
-          2.077,
-          40.0782
+          1.3084,
+          36.4473
         ],
         [
-          2.077,
-          40.8982
+          1.3084,
+          38.7532
         ],
         [
-          1.257,
-          40.8982
+          -0.9975,
+          38.7532
         ],
         [
-          1.257,
-          40.0782
+          -0.9975,
+          36.4473
         ]
       ]
     ]
   },
   "bbox": [
-    1.257,
-    40.0782,
-    2.077,
-    40.8982
+    -0.9975,
+    36.4473,
+    1.3084,
+    38.7532
   ],
   "properties": {
     "title": "Exercise Phoenix Express",
-    "description": "Phoenix Express \u2014 Mediterranean exercise. 2 track(s), 2 nation(s).",
+    "description": "Phoenix Express \u2014 Mediterranean exercise. 1 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2022-10-24T10:00:00Z",
-    "end_datetime": "2022-10-24T11:56:57Z",
+    "start_datetime": "2021-08-04T08:00:00Z",
+    "end_datetime": "2021-08-04T11:14:52Z",
     "debrief:vessel_classes": [
       "subsurface/submarine/ssbn/vanguard"
     ],
     "debrief:tags": [
-      "NGFS",
-      "replenishment",
+      "certification",
       "transit",
-      "mine-clearance"
+      "missile-firing",
+      "NGFS",
+      "force-protection"
     ],
     "debrief:feature_tags": [
-      "minefield"
+      "datum",
+      "sonar-contact",
+      "passive-search",
+      "prosecution"
     ],
-    "debrief:author": "Lt Cdr D. Kowalski",
     "debrief:track_names": [
-      "FS Duncan",
-      "HNoMS Helge Ingstad"
+      "HMS Hessen"
     ],
     "debrief:nationalities": [
-      "FR",
-      "NO"
+      "GB",
+      "DK"
     ]
   },
   "links": [

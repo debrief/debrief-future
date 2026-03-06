@@ -10,58 +10,61 @@
     "coordinates": [
       [
         [
-          -30.0633,
-          56.0141
+          -14.5845,
+          59.4486
         ],
         [
-          -29.6031,
-          56.0141
+          -13.859,
+          59.4486
         ],
         [
-          -29.6031,
-          56.4742
+          -13.859,
+          60.1741
         ],
         [
-          -30.0633,
-          56.4742
+          -14.5845,
+          60.1741
         ],
         [
-          -30.0633,
-          56.0141
+          -14.5845,
+          59.4486
         ]
       ]
     ]
   },
   "bbox": [
-    -30.0633,
-    56.0141,
-    -29.6031,
-    56.4742
+    -14.5845,
+    59.4486,
+    -13.859,
+    60.1741
   ],
   "properties": {
     "title": "Exercise Exercise Alpha-088",
-    "description": "Exercise Alpha-088 \u2014 North Atlantic exercise. 2 track(s), 2 nation(s).",
+    "description": "Exercise Alpha-088 \u2014 North Atlantic exercise. 1 track(s), 3 nation(s).",
     "datetime": null,
-    "start_datetime": "2021-08-23T20:00:00Z",
-    "end_datetime": "2021-08-24T06:24:19Z",
+    "start_datetime": "2023-08-10T05:00:00Z",
+    "end_datetime": "2023-08-11T01:30:07Z",
     "debrief:vessel_classes": [
-      "surface/warship/frigate/type26"
+      "surface/warship/patrol/river"
     ],
     "debrief:tags": [
-      "transit",
-      "NGFS"
+      "AAW",
+      "escort",
+      "certification"
     ],
     "debrief:feature_tags": [
-      "towed-array"
+      "sonar-contact",
+      "sprint-and-drift",
+      "visual-sighting",
+      "prosecution"
     ],
-    "debrief:author": "Cdr F. Rossi MMI",
     "debrief:track_names": [
-      "USS Sutherland",
-      "HMCS Cole"
+      "HMS Ramage"
     ],
     "debrief:nationalities": [
-      "US",
-      "CA"
+      "GB",
+      "CA",
+      "KR"
     ]
   },
   "links": [

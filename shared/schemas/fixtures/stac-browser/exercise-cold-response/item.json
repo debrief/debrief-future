@@ -10,60 +10,60 @@
     "coordinates": [
       [
         [
-          10.2341,
-          33.3036
+          29.3037,
+          33.7042
         ],
         [
-          10.9292,
-          33.3036
+          30.191,
+          33.7042
         ],
         [
-          10.9292,
-          33.9986
+          30.191,
+          34.5915
         ],
         [
-          10.2341,
-          33.9986
+          29.3037,
+          34.5915
         ],
         [
-          10.2341,
-          33.3036
+          29.3037,
+          33.7042
         ]
       ]
     ]
   },
   "bbox": [
-    10.2341,
-    33.3036,
-    10.9292,
-    33.9986
+    29.3037,
+    33.7042,
+    30.191,
+    34.5915
   ],
   "properties": {
     "title": "Exercise Cold Response",
     "description": "Cold Response \u2014 Mediterranean exercise. 3 track(s), 3 nation(s).",
     "datetime": null,
-    "start_datetime": "2026-09-04T00:00:00Z",
-    "end_datetime": "2026-09-20T05:16:15Z",
+    "start_datetime": "2022-08-27T09:00:00Z",
+    "end_datetime": "2022-09-10T16:44:49Z",
     "debrief:vessel_classes": [
+      "subsurface/submarine/ssbn/vanguard",
+      "subsurface/submarine/ssn/virginia",
       "subsurface/submarine/ssn/astute"
     ],
     "debrief:tags": [
       "surveillance",
-      "transit",
-      "MCM",
-      "replenishment"
+      "EW",
+      "gunnery"
     ],
     "debrief:feature_tags": [],
-    "debrief:author": "Lt K. Yamamoto JMSDF",
     "debrief:track_names": [
-      "HNoMS Dragon",
-      "ITS Roosevelt",
-      "FGS Carney"
+      "FS Truxtun",
+      "FGS Sachsen",
+      "HNoMS De Zeven Provincien"
     ],
     "debrief:nationalities": [
-      "NO",
-      "IT",
-      "DE"
+      "FR",
+      "DE",
+      "NO"
     ]
   },
   "links": [

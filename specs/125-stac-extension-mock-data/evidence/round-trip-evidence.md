@@ -10,7 +10,6 @@ original = StacExtensionProperties(
     vessel_classes=["surface/warship/frigate/type23", "subsurface/submarine"],
     tags=["ASW", "training"],
     feature_tags=["sonar-contact", "datum"],
-    author="Lt Cdr J. Smith",
     track_names=["HMS Argyll", "SUBMERGED CONTACT 01"],
     nationalities=["GB", "US"],
 )
@@ -19,7 +18,7 @@ original = StacExtensionProperties(
 json_str = original.model_dump_json()
 # {"vessel_classes":["surface/warship/frigate/type23","subsurface/submarine"],
 #  "tags":["ASW","training"],"feature_tags":["sonar-contact","datum"],
-#  "author":"Lt Cdr J. Smith","track_names":["HMS Argyll","SUBMERGED CONTACT 01"],
+#  "track_names":["HMS Argyll","SUBMERGED CONTACT 01"],
 #  "nationalities":["GB","US"]}
 
 # 3. Deserialize back to dict, then to model
@@ -30,7 +29,6 @@ restored = StacExtensionProperties(**data)
 assert restored.vessel_classes == original.vessel_classes  # ✓
 assert restored.tags == original.tags                      # ✓
 assert restored.feature_tags == original.feature_tags      # ✓
-assert restored.author == original.author                  # ✓
 assert restored.track_names == original.track_names        # ✓
 assert restored.nationalities == original.nationalities    # ✓
 ```
@@ -40,7 +38,7 @@ assert restored.nationalities == original.nationalities    # ✓
 ```python
 original = StacExtensionProperties()
 json_str = original.model_dump_json()
-# {"vessel_classes":[],"tags":[],"feature_tags":[],"author":null,
+# {"vessel_classes":[],"tags":[],"feature_tags":[],
 #  "track_names":[],"nationalities":[]}
 
 restored = StacExtensionProperties(**json.loads(json_str))
@@ -63,6 +61,5 @@ assert restored == original  # ✓
 
 All 3 round-trip tests pass. Extension properties survive JSON serialisation with zero data loss. The Pydantic model correctly handles:
 - Populated arrays (vessel_classes, tags, etc.)
-- Optional string fields (author = null when absent)
 - Empty default arrays
 - Fixture files loaded from disk

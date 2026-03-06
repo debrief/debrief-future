@@ -10,46 +10,45 @@
     "coordinates": [
       [
         [
-          19.7762,
-          38.48
+          0.992,
+          33.1696
         ],
         [
-          21.7616,
-          38.48
+          1.6701,
+          33.1696
         ],
         [
-          21.7616,
-          40.4654
+          1.6701,
+          33.8477
         ],
         [
-          19.7762,
-          40.4654
+          0.992,
+          33.8477
         ],
         [
-          19.7762,
-          38.48
+          0.992,
+          33.1696
         ]
       ]
     ]
   },
   "bbox": [
-    19.7762,
-    38.48,
-    21.7616,
-    40.4654
+    0.992,
+    33.1696,
+    1.6701,
+    33.8477
   ],
   "properties": {
     "title": "Exercise Multi Nation 003",
     "description": "Multi Nation 003 \u2014 Mediterranean exercise. 3 track(s), 5 nation(s). Multi-national exercise with 4+ participant nations.",
     "datetime": null,
-    "start_datetime": "2026-01-08T06:00:00Z",
-    "end_datetime": "2026-01-09T03:06:22Z",
+    "start_datetime": "2021-08-22T03:00:00Z",
+    "end_datetime": "2021-08-22T19:09:05Z",
     "debrief:vessel_classes": [
-      "surface/warship/carrier/queen-elizabeth",
-      "surface/warship/destroyer/type45"
+      "surface/warship/destroyer/arleigh-burke",
+      "surface/warship/patrol/river"
     ],
     "debrief:tags": [
-      "MCM",
       "amphibious"
     ],
     "debrief:feature_tags": [
@@ -57,18 +56,17 @@
       "zig-zag",
       "active-search"
     ],
-    "debrief:author": "Lt Cdr D. Kowalski",
     "debrief:track_names": [
-      "FGS Otto Sverdrup",
-      "FS Duncan",
-      "HNLMS Bretagne"
+      "HNLMS Visby",
+      "HMAS Evertsen",
+      "HNoMS Tromp"
     ],
     "debrief:nationalities": [
-      "DE",
-      "FR",
       "NL",
-      "CA",
-      "US"
+      "AU",
+      "NO",
+      "SE",
+      "FR"
     ]
   },
   "links": [

@@ -4,7 +4,7 @@
 
 ## What This Feature Delivers
 
-1. **STAC Extension Specification** — a formal JSON Schema defining the `debrief:` namespace properties for vessel class, tags, author, tracks, and nationalities
+1. **STAC Extension Specification** — a formal JSON Schema defining the `debrief:` namespace properties for vessel class, tags, tracks, and nationalities
 2. **LinkML Schema Module** — `stac-extension.yaml` in `shared/schemas/src/linkml/` generating Pydantic + TypeScript types
 3. **100 Fixture Items** — realistic STAC item.json files in `shared/schemas/fixtures/stac-browser/`
 4. **Fixture Generator** — deterministic Python script for regeneration if schema changes
@@ -38,7 +38,7 @@ shared/schemas/
 const item: StacItem = await loadItem(path);
 const vesselClasses = item.properties['debrief:vessel_classes'] as string[];
 const tags = item.properties['debrief:tags'] as string[];
-const author = item.properties['debrief:author'] as string | undefined;
+const nationalities = item.properties['debrief:nationalities'] as string[];
 ```
 
 ### Filtering by vessel class hierarchy
@@ -73,8 +73,8 @@ uv run python scripts/generate-stac-fixtures.py
 
 | Downstream Item | Uses These Extension Properties |
 |----------------|-------------------------------|
-| #126 Filter Bar | All properties (vessel_classes, tags, author, nationalities, track_names) |
-| #127 List View | title, vessel_classes, tags, author, datetime range |
+| #126 Filter Bar | All properties (vessel_classes, tags, nationalities, track_names) + derived author |
+| #127 List View | title, vessel_classes, tags, datetime range |
 | #129 Map View | bbox, geometry, vessel_classes (for colour) |
 | #130 Timeline | datetime range, vessel_classes (for colour) |
 | #131 Colour Scheme | vessel_classes, tags (colour dimensions) |

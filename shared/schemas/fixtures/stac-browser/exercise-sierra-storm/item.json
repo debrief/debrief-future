@@ -10,57 +10,60 @@
     "coordinates": [
       [
         [
-          131.8131,
-          11.4499
+          142.0542,
+          -4.1664
         ],
         [
-          133.8232,
-          11.4499
+          144.8572,
+          -4.1664
         ],
         [
-          133.8232,
-          13.46
+          144.8572,
+          -1.3634
         ],
         [
-          131.8131,
-          13.46
+          142.0542,
+          -1.3634
         ],
         [
-          131.8131,
-          11.4499
+          142.0542,
+          -4.1664
         ]
       ]
     ]
   },
   "bbox": [
-    131.8131,
-    11.4499,
-    133.8232,
-    13.46
+    142.0542,
+    -4.1664,
+    144.8572,
+    -1.3634
   ],
   "properties": {
     "title": "Exercise Sierra Storm",
-    "description": "Sierra Storm \u2014 Indo-Pacific exercise. 4 track(s), 2 nation(s).",
+    "description": "Sierra Storm \u2014 Indo-Pacific exercise. 3 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2020-08-20T15:00:00Z",
-    "end_datetime": "2020-08-22T18:56:51Z",
+    "start_datetime": "2021-11-25T17:00:00Z",
+    "end_datetime": "2021-11-26T18:17:31Z",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssbn/vanguard"
+      "subsurface/submarine/ssn/astute",
+      "subsurface/submarine/ssk/gotland"
     ],
     "debrief:tags": [
-      "escort"
+      "certification",
+      "multi-national"
     ],
-    "debrief:feature_tags": [],
-    "debrief:author": "Cdr P. Andersen RNoN",
+    "debrief:feature_tags": [
+      "passive-search",
+      "zig-zag"
+    ],
     "debrief:track_names": [
-      "HMS Nykoping",
-      "FS Helsingborg",
-      "HMS Portland",
-      "FS Otto Sverdrup"
+      "USS Languedoc",
+      "JS Ramage",
+      "USS Kent"
     ],
     "debrief:nationalities": [
-      "SE",
-      "FR"
+      "US",
+      "JP"
     ]
   },
   "links": [

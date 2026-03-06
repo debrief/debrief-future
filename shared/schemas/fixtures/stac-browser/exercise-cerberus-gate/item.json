@@ -10,65 +10,59 @@
     "coordinates": [
       [
         [
-          110.5957,
-          19.6647
+          112.3016,
+          -3.6903
         ],
         [
-          111.8655,
-          19.6647
+          112.8,
+          -3.6903
         ],
         [
-          111.8655,
-          20.9345
+          112.8,
+          -3.192
         ],
         [
-          110.5957,
-          20.9345
+          112.3016,
+          -3.192
         ],
         [
-          110.5957,
-          19.6647
+          112.3016,
+          -3.6903
         ]
       ]
     ]
   },
   "bbox": [
-    110.5957,
-    19.6647,
-    111.8655,
-    20.9345
+    112.3016,
+    -3.6903,
+    112.8,
+    -3.192
   ],
   "properties": {
     "title": "Exercise Cerberus Gate",
-    "description": "Cerberus Gate \u2014 Indo-Pacific exercise. 8 track(s), 1 nation(s).",
+    "description": "Cerberus Gate \u2014 Indo-Pacific exercise. 6 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2020-09-07T23:00:00Z",
-    "end_datetime": "2020-09-13T13:40:51Z",
+    "start_datetime": "2024-08-05T10:00:00Z",
+    "end_datetime": "2024-08-14T10:52:55Z",
     "debrief:vessel_classes": [
-      "surface/merchant/cargo/container",
-      "surface/merchant/cargo/bulk",
-      "surface/merchant/tanker/vlcc"
+      "surface/merchant/cargo/bulk"
     ],
     "debrief:tags": [
-      "NGFS"
+      "transit",
+      "missile-firing"
     ],
-    "debrief:feature_tags": [
-      "visual-sighting",
-      "towed-array"
-    ],
-    "debrief:author": "Cdr A. Brown RN",
+    "debrief:feature_tags": [],
     "debrief:track_names": [
-      "HMS Hessen",
-      "HMS Helge Ingstad",
-      "HMS Mason",
+      "HMS Otto Sverdrup",
+      "FGS De Ruyter",
       "HMS Defender",
-      "HMS Kent",
-      "HMS Portland",
-      "HMS Tromp",
-      "HMS Roosevelt"
+      "FGS Hamburg",
+      "HMS Lancaster",
+      "FGS Northumberland"
     ],
     "debrief:nationalities": [
-      "GB"
+      "GB",
+      "DE"
     ]
   },
   "links": [

@@ -10,61 +10,65 @@
     "coordinates": [
       [
         [
-          124.7841,
-          17.0726
+          107.0333,
+          -2.9551
         ],
         [
-          126.9932,
-          17.0726
+          109.4243,
+          -2.9551
         ],
         [
-          126.9932,
-          19.2816
+          109.4243,
+          -0.5641
         ],
         [
-          124.7841,
-          19.2816
+          107.0333,
+          -0.5641
         ],
         [
-          124.7841,
-          17.0726
+          107.0333,
+          -2.9551
         ]
       ]
     ]
   },
   "bbox": [
-    124.7841,
-    17.0726,
-    126.9932,
-    19.2816
+    107.0333,
+    -2.9551,
+    109.4243,
+    -0.5641
   ],
   "properties": {
     "title": "Exercise Long Duration 003",
-    "description": "Long Duration 003 \u2014 Indo-Pacific exercise. 3 track(s), 1 nation(s). Extended duration exercise (10+ days).",
+    "description": "Long Duration 003 \u2014 Indo-Pacific exercise. 4 track(s), 3 nation(s). Extended duration exercise (10+ days).",
     "datetime": null,
-    "start_datetime": "2022-08-21T00:00:00Z",
-    "end_datetime": "2022-09-03T06:14:51Z",
+    "start_datetime": "2021-05-02T04:00:00Z",
+    "end_datetime": "2021-05-23T22:30:55Z",
     "debrief:vessel_classes": [
-      "surface/merchant/cargo/container",
       "surface/merchant/cargo/bulk",
       "surface/merchant/tanker/vlcc"
     ],
     "debrief:tags": [
-      "escort",
+      "MCM",
+      "mine-clearance",
       "surveillance",
-      "NGFS"
+      "boarding"
     ],
     "debrief:feature_tags": [
-      "visual-sighting"
+      "track-merge",
+      "intercept",
+      "passive-search"
     ],
-    "debrief:author": "Cdr N. Petrov",
     "debrief:track_names": [
-      "HMS Helsingborg",
-      "HMS Harnosand",
-      "HMS Helge Ingstad"
+      "HMS Andrea Doria",
+      "USS Nordrhein-Westfalen",
+      "JS Mason",
+      "HMS Bretagne"
     ],
     "debrief:nationalities": [
-      "GB"
+      "GB",
+      "US",
+      "JP"
     ]
   },
   "links": [

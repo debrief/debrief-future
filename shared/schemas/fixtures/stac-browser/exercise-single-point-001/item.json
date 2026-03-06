@@ -10,38 +10,38 @@
     "coordinates": [
       [
         [
-          -13.1286,
-          53.6885
+          -14.2218,
+          50.0506
         ],
         [
-          -10.73,
-          53.6885
+          -13.6406,
+          50.0506
         ],
         [
-          -10.73,
-          56.0871
+          -13.6406,
+          50.6318
         ],
         [
-          -13.1286,
-          56.0871
+          -14.2218,
+          50.6318
         ],
         [
-          -13.1286,
-          53.6885
+          -14.2218,
+          50.0506
         ]
       ]
     ]
   },
   "bbox": [
-    -13.1286,
-    53.6885,
-    -10.73,
-    56.0871
+    -14.2218,
+    50.0506,
+    -13.6406,
+    50.6318
   ],
   "properties": {
     "title": "Exercise Single Point 001",
-    "description": "Single Point 001 \u2014 North Atlantic exercise. 1 track(s), 1 nation(s). Single-point observation, no time range.",
-    "datetime": "2022-08-04T14:00:00Z",
+    "description": "Single Point 001 \u2014 North Atlantic exercise. 1 track(s), 2 nation(s). Single-point observation, no time range.",
+    "datetime": "2024-05-15T03:00:00Z",
     "debrief:vessel_classes": [
       "unknown"
     ],
@@ -55,12 +55,12 @@
       "passive-search",
       "active-search"
     ],
-    "debrief:author": "Lt Cdr C. O'Brien RN",
     "debrief:track_names": [
-      "INS Cole"
+      "FS Cole"
     ],
     "debrief:nationalities": [
-      "IN"
+      "FR",
+      "CA"
     ]
   },
   "links": [

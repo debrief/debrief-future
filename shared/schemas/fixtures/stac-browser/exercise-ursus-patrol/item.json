@@ -10,62 +10,64 @@
     "coordinates": [
       [
         [
-          -17.8606,
-          49.9855
+          -29.5777,
+          49.0015
         ],
         [
-          -16.7641,
-          49.9855
+          -26.6375,
+          49.0015
         ],
         [
-          -16.7641,
-          51.082
+          -26.6375,
+          51.9417
         ],
         [
-          -17.8606,
-          51.082
+          -29.5777,
+          51.9417
         ],
         [
-          -17.8606,
-          49.9855
+          -29.5777,
+          49.0015
         ]
       ]
     ]
   },
   "bbox": [
-    -17.8606,
-    49.9855,
-    -16.7641,
-    51.082
+    -29.5777,
+    49.0015,
+    -26.6375,
+    51.9417
   ],
   "properties": {
     "title": "Exercise Ursus Patrol",
     "description": "Ursus Patrol \u2014 North Atlantic exercise. 6 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2025-05-20T20:00:00Z",
-    "end_datetime": "2025-05-22T14:58:54Z",
+    "start_datetime": "2024-08-25T23:00:00Z",
+    "end_datetime": "2024-08-27T20:27:09Z",
     "debrief:vessel_classes": [
-      "surface/warship/carrier/queen-elizabeth",
-      "surface/warship/destroyer/type45"
+      "surface/warship/frigate/type23"
     ],
     "debrief:tags": [
-      "amphibious",
-      "transit",
-      "multi-national",
-      "ASW"
+      "training",
+      "AAW",
+      "replenishment"
     ],
-    "debrief:feature_tags": [],
-    "debrief:author": "Cdr F. Rossi MMI",
+    "debrief:feature_tags": [
+      "torpedo-run",
+      "active-search",
+      "helicopter-ops",
+      "prosecution"
+    ],
     "debrief:track_names": [
-      "HMS Tromp",
-      "HMS Bergamini",
-      "HMS Evertsen",
-      "HMS Lancaster",
-      "HMS Duncan",
-      "HMS Defender"
+      "HMS Dauntless",
+      "HMS Bainbridge",
+      "HMS De Ruyter",
+      "HMS Nykoping",
+      "HMS Roosevelt",
+      "HMS Carney"
     ],
     "debrief:nationalities": [
-      "SE"
+      "GB"
     ]
   },
   "links": [

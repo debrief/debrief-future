@@ -10,65 +10,63 @@
     "coordinates": [
       [
         [
-          -36.274,
-          -28.2214
+          -22.2264,
+          -35.4337
         ],
         [
-          -33.5806,
-          -28.2214
+          -21.1549,
+          -35.4337
         ],
         [
-          -33.5806,
-          -25.5281
+          -21.1549,
+          -34.3621
         ],
         [
-          -36.274,
-          -25.5281
+          -22.2264,
+          -34.3621
         ],
         [
-          -36.274,
-          -28.2214
+          -22.2264,
+          -35.4337
         ]
       ]
     ]
   },
   "bbox": [
-    -36.274,
-    -28.2214,
-    -33.5806,
-    -25.5281
+    -22.2264,
+    -35.4337,
+    -21.1549,
+    -34.3621
   ],
   "properties": {
     "title": "Exercise Aegis Lance",
     "description": "Aegis Lance \u2014 South Atlantic exercise. 3 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2025-09-01T01:00:00Z",
-    "end_datetime": "2025-09-28T05:10:14Z",
+    "start_datetime": "2022-12-19T20:00:00Z",
+    "end_datetime": "2022-12-31T08:59:37Z",
     "debrief:vessel_classes": [
-      "surface/warship/carrier/queen-elizabeth",
-      "surface/warship/frigate/type23",
+      "unknown",
+      "surface/warship/patrol/river",
       "surface/warship/frigate/type26"
     ],
     "debrief:tags": [
       "EW",
+      "transit",
+      "ASW",
       "harbour-ops",
-      "AAW",
-      "SAR",
-      "transit"
+      "boarding"
     ],
     "debrief:feature_tags": [
-      "prosecution",
-      "sonar-contact"
+      "intercept"
     ],
-    "debrief:author": "LCdr M. Dupont MN",
     "debrief:track_names": [
-      "SPS Dauntless",
-      "ITS Bainbridge",
-      "SPS Mahan"
+      "FGS Dauntless",
+      "USS Tromp",
+      "FGS Hessen"
     ],
     "debrief:nationalities": [
-      "ES",
-      "IT"
+      "DE",
+      "US"
     ]
   },
   "links": [

@@ -10,64 +10,65 @@
     "coordinates": [
       [
         [
-          -32.2024,
-          -46.2298
+          -16.47,
+          -22.6457
         ],
         [
-          -31.4352,
-          -46.2298
+          -15.8082,
+          -22.6457
         ],
         [
-          -31.4352,
-          -45.4627
+          -15.8082,
+          -21.9839
         ],
         [
-          -32.2024,
-          -45.4627
+          -16.47,
+          -21.9839
         ],
         [
-          -32.2024,
-          -46.2298
+          -16.47,
+          -22.6457
         ]
       ]
     ]
   },
   "bbox": [
-    -32.2024,
-    -46.2298,
-    -31.4352,
-    -45.4627
+    -16.47,
+    -22.6457,
+    -15.8082,
+    -21.9839
   ],
   "properties": {
     "title": "Exercise Steadfast Defender",
-    "description": "Steadfast Defender \u2014 South Atlantic exercise. 7 track(s), 1 nation(s).",
+    "description": "Steadfast Defender \u2014 South Atlantic exercise. 5 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2021-12-14T06:00:00Z",
-    "end_datetime": "2021-12-19T21:05:21Z",
+    "start_datetime": "2023-08-06T05:00:00Z",
+    "end_datetime": "2023-08-13T21:35:02Z",
     "debrief:vessel_classes": [
-      "surface/warship/patrol/river",
-      "surface/warship/destroyer/arleigh-burke"
+      "surface/warship/destroyer/type45",
+      "surface/warship/patrol/river"
     ],
     "debrief:tags": [
-      "replenishment"
+      "EW",
+      "multi-national",
+      "gunnery"
     ],
     "debrief:feature_tags": [
-      "helicopter-ops",
-      "datum",
-      "torpedo-run"
+      "radar-detection",
+      "depth-charge",
+      "torpedo-run",
+      "track-merge"
     ],
-    "debrief:author": "Lt Cdr J. Smith RN",
     "debrief:track_names": [
-      "USS Bretagne",
-      "USS De Zeven Provincien",
-      "USS Dragon",
-      "USS Harnosand",
-      "USS Gonzalez",
-      "USS Carney",
-      "USS Tromp"
+      "HMS Diamond",
+      "SPS Defender",
+      "HMS Sutherland",
+      "SPS Hamburg",
+      "HMS Hessen"
     ],
     "debrief:nationalities": [
-      "US"
+      "GB",
+      "ES"
     ]
   },
   "links": [

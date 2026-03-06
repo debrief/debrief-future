@@ -2,7 +2,7 @@
 feature: "125-stac-extension-mock-data"
 captured_at: "2026-03-06T12:00:00Z"
 git_sha: "caf2570"
-tests_passed: 210
+tests_passed: 209
 tests_failed: 0
 tests_skipped: 0
 coverage_pct: null
@@ -14,8 +14,8 @@ coverage_pct: null
 
 | Metric | Value |
 |--------|-------|
-| Total Tests | 210 |
-| Passed | 210 |
+| Total Tests | 209 |
+| Passed | 209 |
 | Failed | 0 |
 | Skipped | 0 |
 | Coverage | N/A (schema fixtures, not service code) |
@@ -31,7 +31,7 @@ coverage_pct: null
 | Round-trip serialisation (46 pairs) | Pass |
 | Schema comparison (51 checks) | Pass |
 
-### STAC Extension Tests (test_stac_extension.py — 21 new)
+### STAC Extension Tests (test_stac_extension.py — 20 new)
 
 | Test | Status |
 |------|--------|
@@ -43,7 +43,6 @@ coverage_pct: null
 | All 100 fixtures validate against Pydantic model | Pass |
 | Vessel class diversity (>= 5 distinct) | Pass |
 | Nationality diversity (>= 6, all alpha-2) | Pass |
-| Author diversity (>= 10 distinct) | Pass |
 | Geographic distribution (>= 4 regions) | Pass |
 | All 5 duration buckets represented | Pass |
 | Filter selectivity (3-80% per categorical value) | Pass |
@@ -57,7 +56,7 @@ coverage_pct: null
 ## Key Scenarios Verified
 
 - Schema enforcement: LinkML-generated Pydantic model correctly validates vessel class paths (lowercase slash-separated, 1-4 segments) and nationality codes (ISO alpha-2 `^[A-Z]{2}$`)
-- Distribution realism: 100 fixtures span 5+ vessel classes, 6+ nationalities, 10+ authors, 4+ geographic regions, all 5 duration buckets
+- Distribution realism: 100 fixtures span 5+ vessel classes, 6+ nationalities, 4+ geographic regions, all 5 duration buckets
 - Edge case coverage: empty plots (0 tracks), dense plots (5+ tracks), single-timestamp items (no start/end datetime)
 - Round-trip fidelity: Pydantic model serialises to JSON and deserialises back with zero data loss
 - No regressions: all 189 existing schema tests continue to pass after adding the new LinkML module

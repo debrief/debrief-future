@@ -10,62 +10,60 @@
     "coordinates": [
       [
         [
-          114.1781,
-          5.2494
+          98.3491,
+          5.2103
         ],
         [
-          114.9797,
-          5.2494
+          100.83,
+          5.2103
         ],
         [
-          114.9797,
-          6.051
+          100.83,
+          7.6912
         ],
         [
-          114.1781,
-          6.051
+          98.3491,
+          7.6912
         ],
         [
-          114.1781,
-          5.2494
+          98.3491,
+          5.2103
         ]
       ]
     ]
   },
   "bbox": [
-    114.1781,
-    5.2494,
-    114.9797,
-    6.051
+    98.3491,
+    5.2103,
+    100.83,
+    7.6912
   ],
   "properties": {
     "title": "Exercise Formidable Shield",
-    "description": "Formidable Shield \u2014 Indo-Pacific exercise. 3 track(s), 1 nation(s).",
+    "description": "Formidable Shield \u2014 Indo-Pacific exercise. 4 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2026-08-19T17:00:00Z",
-    "end_datetime": "2026-08-19T19:44:55Z",
+    "start_datetime": "2022-12-17T12:00:00Z",
+    "end_datetime": "2022-12-17T13:40:41Z",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssn/virginia",
-      "subsurface/submarine/ssn/astute",
-      "subsurface/submarine/ssk/gotland"
+      "subsurface/submarine/ssbn/vanguard",
+      "subsurface/submarine/ssn/astute"
     ],
     "debrief:tags": [
-      "transit",
-      "ASW",
-      "AAW"
+      "multi-national",
+      "NGFS",
+      "force-protection",
+      "escort"
     ],
-    "debrief:feature_tags": [
-      "torpedo-run",
-      "passive-search"
-    ],
-    "debrief:author": "Lt Cdr S. Eriksson SwN",
+    "debrief:feature_tags": [],
     "debrief:track_names": [
-      "HNoMS Duncan",
-      "HNoMS Carney",
-      "HNoMS Nykoping"
+      "USS Laboon",
+      "HMS Bretagne",
+      "USS Hessen",
+      "HMS Aquitaine"
     ],
     "debrief:nationalities": [
-      "NO"
+      "US",
+      "SE"
     ]
   },
   "links": [

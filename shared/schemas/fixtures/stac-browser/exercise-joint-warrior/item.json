@@ -10,61 +10,59 @@
     "coordinates": [
       [
         [
-          -24.6815,
-          -26.6232
+          -25.3057,
+          -38.7804
         ],
         [
-          -22.5965,
-          -26.6232
+          -23.4272,
+          -38.7804
         ],
         [
-          -22.5965,
-          -24.5382
+          -23.4272,
+          -36.902
         ],
         [
-          -24.6815,
-          -24.5382
+          -25.3057,
+          -36.902
         ],
         [
-          -24.6815,
-          -26.6232
+          -25.3057,
+          -38.7804
         ]
       ]
     ]
   },
   "bbox": [
-    -24.6815,
-    -26.6232,
-    -22.5965,
-    -24.5382
+    -25.3057,
+    -38.7804,
+    -23.4272,
+    -36.902
   ],
   "properties": {
     "title": "Exercise Joint Warrior",
-    "description": "Joint Warrior \u2014 South Atlantic exercise. 2 track(s), 1 nation(s).",
+    "description": "Joint Warrior \u2014 South Atlantic exercise. 2 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2021-04-05T19:00:00Z",
-    "end_datetime": "2021-04-07T07:23:11Z",
+    "start_datetime": "2021-01-16T21:00:00Z",
+    "end_datetime": "2021-01-17T23:25:18Z",
     "debrief:vessel_classes": [
-      "surface/merchant/cargo/container",
-      "surface/merchant/tanker/vlcc"
+      "surface/merchant/passenger/ferry",
+      "surface/merchant/cargo/container"
     ],
     "debrief:tags": [
-      "force-protection",
-      "training",
+      "EW",
+      "boarding",
+      "gunnery",
       "AAW",
-      "SAR",
-      "MCM"
+      "force-protection"
     ],
-    "debrief:feature_tags": [
-      "visual-sighting"
-    ],
-    "debrief:author": "Lt Cdr D. Kowalski",
+    "debrief:feature_tags": [],
     "debrief:track_names": [
-      "HMS Bretagne",
-      "HMS Defender"
+      "HMS Fridtjof Nansen",
+      "HMAS Lancaster"
     ],
     "debrief:nationalities": [
-      "GB"
+      "GB",
+      "AU"
     ]
   },
   "links": [

@@ -10,67 +10,63 @@
     "coordinates": [
       [
         [
-          142.084,
-          -5.0798
+          95.212,
+          0.5844
         ],
         [
-          144.1478,
-          -5.0798
+          96.8232,
+          0.5844
         ],
         [
-          144.1478,
-          -3.0161
+          96.8232,
+          2.1956
         ],
         [
-          142.084,
-          -3.0161
+          95.212,
+          2.1956
         ],
         [
-          142.084,
-          -5.0798
+          95.212,
+          0.5844
         ]
       ]
     ]
   },
   "bbox": [
-    142.084,
-    -5.0798,
-    144.1478,
-    -3.0161
+    95.212,
+    0.5844,
+    96.8232,
+    2.1956
   ],
   "properties": {
     "title": "Exercise Nomad Venture",
-    "description": "Nomad Venture \u2014 Indo-Pacific exercise. 5 track(s), 2 nation(s).",
+    "description": "Nomad Venture \u2014 Indo-Pacific exercise. 6 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2021-09-06T17:00:00Z",
-    "end_datetime": "2021-09-07T01:52:56Z",
+    "start_datetime": "2025-12-15T10:00:00Z",
+    "end_datetime": "2025-12-15T17:12:32Z",
     "debrief:vessel_classes": [
-      "surface/auxiliary/supply/fort-victoria",
-      "surface/auxiliary/survey/echo",
       "surface/auxiliary/tanker/tide"
     ],
     "debrief:tags": [
-      "boarding",
-      "gunnery",
-      "mine-clearance",
-      "surveillance"
+      "transit",
+      "NGFS",
+      "force-protection"
     ],
     "debrief:feature_tags": [
+      "visual-sighting",
       "depth-charge",
-      "prosecution",
-      "passive-search"
+      "towed-array"
     ],
-    "debrief:author": "Cdr P. Andersen RNoN",
     "debrief:track_names": [
-      "JS Auvergne",
-      "FGS Helge Ingstad",
-      "JS Languedoc",
-      "FGS Ramage",
-      "JS Argyll"
+      "HMS Languedoc",
+      "HMS Bretagne",
+      "HMS Dauntless",
+      "HMS Aquitaine",
+      "HMS Harnosand",
+      "HMS Diamond"
     ],
     "debrief:nationalities": [
-      "JP",
-      "DE"
+      "GB"
     ]
   },
   "links": [

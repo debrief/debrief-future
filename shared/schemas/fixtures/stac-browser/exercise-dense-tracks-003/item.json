@@ -10,61 +10,64 @@
     "coordinates": [
       [
         [
-          6.4231,
-          36.2415
+          19.3853,
+          39.1079
         ],
         [
-          6.6321,
-          36.2415
+          21.4606,
+          39.1079
         ],
         [
-          6.6321,
-          36.4506
+          21.4606,
+          41.1832
         ],
         [
-          6.4231,
-          36.4506
+          19.3853,
+          41.1832
         ],
         [
-          6.4231,
-          36.2415
+          19.3853,
+          39.1079
         ]
       ]
     ]
   },
   "bbox": [
-    6.4231,
-    36.2415,
-    6.6321,
-    36.4506
+    19.3853,
+    39.1079,
+    21.4606,
+    41.1832
   ],
   "properties": {
     "title": "Exercise Dense Tracks 003",
-    "description": "Dense Tracks 003 \u2014 Mediterranean exercise. 7 track(s), 1 nation(s). Dense track exercise with many participants.",
+    "description": "Dense Tracks 003 \u2014 Mediterranean exercise. 5 track(s), 2 nation(s). Dense track exercise with many participants.",
     "datetime": null,
-    "start_datetime": "2025-02-20T19:00:00Z",
-    "end_datetime": "2025-02-22T19:20:21Z",
+    "start_datetime": "2024-06-28T20:00:00Z",
+    "end_datetime": "2024-06-30T11:10:28Z",
     "debrief:vessel_classes": [
-      "unknown",
+      "surface/warship/patrol/river",
       "surface/warship/frigate/type26"
     ],
     "debrief:tags": [
-      "transit",
-      "mine-clearance"
+      "MCM",
+      "multi-national",
+      "boarding",
+      "force-protection",
+      "training"
     ],
-    "debrief:feature_tags": [],
-    "debrief:author": "KptLt H. Weber",
+    "debrief:feature_tags": [
+      "prosecution"
+    ],
     "debrief:track_names": [
-      "FS Margottini",
-      "FS Lancaster",
-      "FS Hessen",
-      "FS Nykoping",
-      "FS Diamond",
-      "FS Portland",
-      "FS Mahan"
+      "USS Laboon",
+      "HMS Roosevelt",
+      "USS Kent",
+      "HMS Nykoping",
+      "USS Lancaster"
     ],
     "debrief:nationalities": [
-      "FR"
+      "US",
+      "GB"
     ]
   },
   "links": [

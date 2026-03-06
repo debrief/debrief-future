@@ -10,67 +10,66 @@
     "coordinates": [
       [
         [
-          109.7094,
-          6.772
+          111.8858,
+          0.612
         ],
         [
-          111.0009,
-          6.772
+          114.4315,
+          0.612
         ],
         [
-          111.0009,
-          8.0634
+          114.4315,
+          3.1577
         ],
         [
-          109.7094,
-          8.0634
+          111.8858,
+          3.1577
         ],
         [
-          109.7094,
-          6.772
+          111.8858,
+          0.612
         ]
       ]
     ]
   },
   "bbox": [
-    109.7094,
-    6.772,
-    111.0009,
-    8.0634
+    111.8858,
+    0.612,
+    114.4315,
+    3.1577
   ],
   "properties": {
     "title": "Exercise Zephyr Gale",
-    "description": "Zephyr Gale \u2014 Indo-Pacific exercise. 7 track(s), 2 nation(s).",
+    "description": "Zephyr Gale \u2014 Indo-Pacific exercise. 8 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2020-10-16T22:00:00Z",
-    "end_datetime": "2020-10-17T10:38:03Z",
+    "start_datetime": "2022-11-05T04:00:00Z",
+    "end_datetime": "2022-11-05T10:12:31Z",
     "debrief:vessel_classes": [
-      "surface/merchant/cargo/bulk",
-      "surface/merchant/passenger/ferry"
+      "surface/merchant/tanker/vlcc",
+      "surface/merchant/passenger/ferry",
+      "surface/merchant/cargo/bulk"
     ],
     "debrief:tags": [
-      "AAW",
-      "gunnery"
+      "AAW"
     ],
     "debrief:feature_tags": [
-      "datum",
       "radar-detection",
-      "active-search",
-      "prosecution"
+      "depth-charge",
+      "sonar-contact",
+      "minefield"
     ],
-    "debrief:author": "Lt Cdr D. Kowalski",
     "debrief:track_names": [
-      "USS Andrea Doria",
-      "JS Evertsen",
-      "USS Kent",
-      "JS Caio Duilio",
-      "USS Harnosand",
-      "JS Fridtjof Nansen",
-      "USS Helge Ingstad"
+      "HNoMS Hessen",
+      "HNoMS Languedoc",
+      "HNoMS Roald Amundsen",
+      "HNoMS Auvergne",
+      "HNoMS Ramage",
+      "HNoMS Gonzalez",
+      "HNoMS Dauntless",
+      "HNoMS Diamond"
     ],
     "debrief:nationalities": [
-      "US",
-      "JP"
+      "NO"
     ]
   },
   "links": [

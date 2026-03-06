@@ -10,64 +10,62 @@
     "coordinates": [
       [
         [
-          -28.9842,
-          -32.7688
+          -19.6021,
+          -43.9782
         ],
         [
-          -27.9916,
-          -32.7688
+          -18.0739,
+          -43.9782
         ],
         [
-          -27.9916,
-          -31.7762
+          -18.0739,
+          -42.4499
         ],
         [
-          -28.9842,
-          -31.7762
+          -19.6021,
+          -42.4499
         ],
         [
-          -28.9842,
-          -32.7688
+          -19.6021,
+          -43.9782
         ]
       ]
     ]
   },
   "bbox": [
-    -28.9842,
-    -32.7688,
-    -27.9916,
-    -31.7762
+    -19.6021,
+    -43.9782,
+    -18.0739,
+    -42.4499
   ],
   "properties": {
     "title": "Exercise Yeoman Guard",
-    "description": "Yeoman Guard \u2014 South Atlantic exercise. 3 track(s), 2 nation(s).",
+    "description": "Yeoman Guard \u2014 South Atlantic exercise. 4 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2020-02-22T10:00:00Z",
-    "end_datetime": "2020-02-22T12:42:24Z",
+    "start_datetime": "2025-05-07T00:00:00Z",
+    "end_datetime": "2025-05-07T01:35:27Z",
     "debrief:vessel_classes": [
-      "surface/merchant/cargo/container",
-      "surface/merchant/cargo/bulk"
+      "surface/merchant/cargo/bulk",
+      "surface/merchant/tanker/vlcc",
+      "surface/merchant/passenger/ferry"
     ],
     "debrief:tags": [
-      "transit",
-      "missile-firing",
-      "training",
-      "AAW",
-      "multi-national"
+      "mine-clearance",
+      "escort"
     ],
     "debrief:feature_tags": [
-      "visual-sighting",
-      "zig-zag"
+      "minefield",
+      "intercept"
     ],
-    "debrief:author": "Cdr A. Brown RN",
     "debrief:track_names": [
-      "HMS Fridtjof Nansen",
-      "INS Truxtun",
-      "HMS Bretagne"
+      "HMS Roosevelt",
+      "JS Cole",
+      "HMS Kent",
+      "JS Mason"
     ],
     "debrief:nationalities": [
       "GB",
-      "IN"
+      "JP"
     ]
   },
   "links": [

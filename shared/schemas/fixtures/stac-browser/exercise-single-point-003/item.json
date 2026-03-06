@@ -10,57 +10,54 @@
     "coordinates": [
       [
         [
-          104.4922,
-          14.7611
+          93.9191,
+          18.4918
         ],
         [
-          104.8092,
-          14.7611
+          96.5448,
+          18.4918
         ],
         [
-          104.8092,
-          15.0781
+          96.5448,
+          21.1175
         ],
         [
-          104.4922,
-          15.0781
+          93.9191,
+          21.1175
         ],
         [
-          104.4922,
-          14.7611
+          93.9191,
+          18.4918
         ]
       ]
     ]
   },
   "bbox": [
-    104.4922,
-    14.7611,
-    104.8092,
-    15.0781
+    93.9191,
+    18.4918,
+    96.5448,
+    21.1175
   ],
   "properties": {
     "title": "Exercise Single Point 003",
-    "description": "Single Point 003 \u2014 Indo-Pacific exercise. 1 track(s), 2 nation(s). Single-point observation, no time range.",
-    "datetime": "2024-12-13T20:00:00Z",
+    "description": "Single Point 003 \u2014 Indo-Pacific exercise. 2 track(s), 2 nation(s). Single-point observation, no time range.",
+    "datetime": "2026-05-11T19:00:00Z",
     "debrief:vessel_classes": [
-      "surface/merchant/tanker/vlcc"
+      "surface/auxiliary/tanker/tide",
+      "surface/merchant/passenger/ferry"
     ],
     "debrief:tags": [
-      "replenishment",
-      "multi-national",
-      "missile-firing"
+      "missile-firing",
+      "force-protection",
+      "AAW"
     ],
-    "debrief:feature_tags": [
-      "active-search",
-      "datum",
-      "track-merge"
-    ],
-    "debrief:author": "Lt Cdr S. Eriksson SwN",
+    "debrief:feature_tags": [],
     "debrief:track_names": [
-      "HNoMS Dauntless"
+      "USS Dauntless",
+      "HMS Tromp"
     ],
     "debrief:nationalities": [
-      "NO",
+      "US",
       "SE"
     ]
   },

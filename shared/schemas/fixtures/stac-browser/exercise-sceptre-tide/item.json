@@ -10,61 +10,62 @@
     "coordinates": [
       [
         [
-          19.9323,
-          35.193
+          6.6825,
+          39.953
         ],
         [
-          22.7917,
-          35.193
+          8.3403,
+          39.953
         ],
         [
-          22.7917,
-          38.0525
+          8.3403,
+          41.6107
         ],
         [
-          19.9323,
-          38.0525
+          6.6825,
+          41.6107
         ],
         [
-          19.9323,
-          35.193
+          6.6825,
+          39.953
         ]
       ]
     ]
   },
   "bbox": [
-    19.9323,
-    35.193,
-    22.7917,
-    38.0525
+    6.6825,
+    39.953,
+    8.3403,
+    41.6107
   ],
   "properties": {
     "title": "Exercise Sceptre Tide",
-    "description": "Sceptre Tide \u2014 Mediterranean exercise. 4 track(s), 1 nation(s).",
+    "description": "Sceptre Tide \u2014 Mediterranean exercise. 4 track(s), 3 nation(s).",
     "datetime": null,
-    "start_datetime": "2021-02-10T19:00:00Z",
-    "end_datetime": "2021-02-22T04:30:29Z",
+    "start_datetime": "2025-12-24T11:00:00Z",
+    "end_datetime": "2026-01-07T16:38:01Z",
     "debrief:vessel_classes": [
-      "surface/warship/destroyer/type45",
-      "surface/warship/patrol/river",
-      "surface/warship/carrier/queen-elizabeth"
+      "surface/warship/frigate/type26"
     ],
     "debrief:tags": [
-      "replenishment",
-      "gunnery"
+      "transit",
+      "boarding",
+      "missile-firing"
     ],
     "debrief:feature_tags": [
-      "visual-sighting"
+      "prosecution",
+      "intercept"
     ],
-    "debrief:author": "Lt Cdr C. O'Brien RN",
     "debrief:track_names": [
-      "HMS Mahan",
-      "HMS Dauntless",
-      "HMS Margottini",
-      "HMS Nykoping"
+      "SPS Nykoping",
+      "HDMS Roald Amundsen",
+      "HNLMS Kent",
+      "SPS Roosevelt"
     ],
     "debrief:nationalities": [
-      "GB"
+      "ES",
+      "DK",
+      "NL"
     ]
   },
   "links": [

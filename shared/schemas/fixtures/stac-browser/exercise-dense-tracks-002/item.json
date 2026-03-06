@@ -10,64 +10,64 @@
     "coordinates": [
       [
         [
-          22.718,
-          36.1901
+          -2.8492,
+          41.132
         ],
         [
-          23.3275,
-          36.1901
+          -2.1097,
+          41.132
         ],
         [
-          23.3275,
-          36.7996
+          -2.1097,
+          41.8715
         ],
         [
-          22.718,
-          36.7996
+          -2.8492,
+          41.8715
         ],
         [
-          22.718,
-          36.1901
+          -2.8492,
+          41.132
         ]
       ]
     ]
   },
   "bbox": [
-    22.718,
-    36.1901,
-    23.3275,
-    36.7996
+    -2.8492,
+    41.132,
+    -2.1097,
+    41.8715
   ],
   "properties": {
     "title": "Exercise Dense Tracks 002",
-    "description": "Dense Tracks 002 \u2014 Mediterranean exercise. 5 track(s), 2 nation(s). Dense track exercise with many participants.",
+    "description": "Dense Tracks 002 \u2014 Mediterranean exercise. 7 track(s), 1 nation(s). Dense track exercise with many participants.",
     "datetime": null,
-    "start_datetime": "2024-09-27T21:00:00Z",
-    "end_datetime": "2024-09-28T02:01:51Z",
+    "start_datetime": "2021-05-07T04:00:00Z",
+    "end_datetime": "2021-05-07T08:49:14Z",
     "debrief:vessel_classes": [
-      "unknown",
+      "surface/warship/destroyer/type45",
+      "surface/warship/patrol/river",
       "surface/warship/corvette/visby"
     ],
     "debrief:tags": [
-      "amphibious",
-      "surveillance",
-      "SAR"
+      "gunnery"
     ],
     "debrief:feature_tags": [
-      "prosecution",
-      "visual-sighting"
+      "passive-search",
+      "zig-zag",
+      "depth-charge"
     ],
-    "debrief:author": "Lt K. Yamamoto JMSDF",
     "debrief:track_names": [
-      "HNLMS Aquitaine",
-      "HNoMS Sutherland",
-      "HNLMS Bainbridge",
-      "HNoMS Defender",
-      "HNLMS Helsingborg"
+      "HMCS Kent",
+      "HMCS Aquitaine",
+      "HMCS Tromp",
+      "HMCS Portland",
+      "HMCS Languedoc",
+      "HMCS Sutherland",
+      "HMCS Bretagne"
     ],
     "debrief:nationalities": [
-      "NL",
-      "NO"
+      "CA"
     ]
   },
   "links": [

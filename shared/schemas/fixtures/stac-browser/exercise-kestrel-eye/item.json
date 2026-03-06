@@ -10,61 +10,60 @@
     "coordinates": [
       [
         [
-          -8.2021,
-          47.5944
+          -8.3857,
+          46.0703
         ],
         [
-          -7.2201,
-          47.5944
+          -5.898,
+          46.0703
         ],
         [
-          -7.2201,
-          48.5764
+          -5.898,
+          48.558
         ],
         [
-          -8.2021,
-          48.5764
+          -8.3857,
+          48.558
         ],
         [
-          -8.2021,
-          47.5944
+          -8.3857,
+          46.0703
         ]
       ]
     ]
   },
   "bbox": [
-    -8.2021,
-    47.5944,
-    -7.2201,
-    48.5764
+    -8.3857,
+    46.0703,
+    -5.898,
+    48.558
   ],
   "properties": {
     "title": "Exercise Kestrel Eye",
-    "description": "Kestrel Eye \u2014 North Atlantic exercise. 1 track(s), 3 nation(s).",
+    "description": "Kestrel Eye \u2014 North Atlantic exercise. 2 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2021-06-17T09:00:00Z",
-    "end_datetime": "2021-07-14T07:02:53Z",
+    "start_datetime": "2025-02-15T14:00:00Z",
+    "end_datetime": "2025-03-11T04:27:08Z",
     "debrief:vessel_classes": [
-      "surface/warship/carrier/queen-elizabeth"
+      "surface/warship/patrol/river",
+      "surface/warship/destroyer/arleigh-burke"
     ],
     "debrief:tags": [
-      "EW",
+      "missile-firing",
+      "training",
       "transit",
-      "escort",
-      "SAR"
+      "surveillance"
     ],
     "debrief:feature_tags": [
-      "zig-zag",
-      "sprint-and-drift"
+      "intercept",
+      "towed-array"
     ],
-    "debrief:author": "Lt Cdr D. Kowalski",
     "debrief:track_names": [
-      "HNoMS Andrea Doria"
+      "HMS Defender",
+      "HMS Bainbridge"
     ],
     "debrief:nationalities": [
-      "NO",
-      "FR",
-      "IN"
+      "GB"
     ]
   },
   "links": [

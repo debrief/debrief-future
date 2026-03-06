@@ -10,64 +10,62 @@
     "coordinates": [
       [
         [
-          -25.1857,
-          54.7179
+          -25.2133,
+          56.3105
         ],
         [
-          -22.8902,
-          54.7179
+          -24.5094,
+          56.3105
         ],
         [
-          -22.8902,
-          57.0134
+          -24.5094,
+          57.0144
         ],
         [
-          -25.1857,
-          57.0134
+          -25.2133,
+          57.0144
         ],
         [
-          -25.1857,
-          54.7179
+          -25.2133,
+          56.3105
         ]
       ]
     ]
   },
   "bbox": [
-    -25.1857,
-    54.7179,
-    -22.8902,
-    57.0134
+    -25.2133,
+    56.3105,
+    -24.5094,
+    57.0144
   ],
   "properties": {
     "title": "Exercise Cobra Warrior",
-    "description": "Cobra Warrior \u2014 North Atlantic exercise. 3 track(s), 3 nation(s).",
+    "description": "Cobra Warrior \u2014 North Atlantic exercise. 4 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2022-07-20T18:00:00Z",
-    "end_datetime": "2022-07-26T21:07:22Z",
+    "start_datetime": "2023-10-26T10:00:00Z",
+    "end_datetime": "2023-11-02T05:28:49Z",
     "debrief:vessel_classes": [
-      "surface/warship/corvette/visby",
-      "surface/warship/frigate/type26"
+      "surface/warship/patrol/river",
+      "surface/warship/destroyer/arleigh-burke",
+      "unknown"
     ],
     "debrief:tags": [
-      "harbour-ops",
-      "ASW"
+      "boarding",
+      "missile-firing",
+      "gunnery",
+      "AAW"
     ],
     "debrief:feature_tags": [
-      "active-search",
-      "sprint-and-drift",
-      "intercept",
-      "track-merge"
+      "towed-array"
     ],
-    "debrief:author": "Lt Cdr C. O'Brien RN",
     "debrief:track_names": [
-      "HMS Roald Amundsen",
-      "USS Westminster",
-      "ITS Argyll"
+      "HMS Aquitaine",
+      "HMS Kent",
+      "HMS Visby",
+      "HMS Richmond"
     ],
     "debrief:nationalities": [
-      "GB",
-      "US",
-      "IT"
+      "GB"
     ]
   },
   "links": [

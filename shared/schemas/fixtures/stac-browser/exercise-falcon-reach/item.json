@@ -10,62 +10,59 @@
     "coordinates": [
       [
         [
-          65.8711,
-          -4.4529
+          56.1537,
+          8.4979
         ],
         [
-          66.9091,
-          -4.4529
+          57.7504,
+          8.4979
         ],
         [
-          66.9091,
-          -3.4148
+          57.7504,
+          10.0947
         ],
         [
-          65.8711,
-          -3.4148
+          56.1537,
+          10.0947
         ],
         [
-          65.8711,
-          -4.4529
+          56.1537,
+          8.4979
         ]
       ]
     ]
   },
   "bbox": [
-    65.8711,
-    -4.4529,
-    66.9091,
-    -3.4148
+    56.1537,
+    8.4979,
+    57.7504,
+    10.0947
   ],
   "properties": {
     "title": "Exercise Falcon Reach",
-    "description": "Falcon Reach \u2014 Indian Ocean exercise. 4 track(s), 3 nation(s).",
+    "description": "Falcon Reach \u2014 Indian Ocean exercise. 4 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2025-04-15T02:00:00Z",
-    "end_datetime": "2025-04-15T04:15:01Z",
+    "start_datetime": "2022-08-13T09:00:00Z",
+    "end_datetime": "2022-08-13T13:52:06Z",
     "debrief:vessel_classes": [
-      "surface/warship/frigate/type26"
+      "surface/warship/patrol/river"
     ],
     "debrief:tags": [
-      "mine-clearance",
-      "multi-national",
-      "training",
-      "MCM",
-      "SAR"
+      "mine-clearance"
     ],
-    "debrief:feature_tags": [],
-    "debrief:author": "Lt Cdr S. Eriksson SwN",
+    "debrief:feature_tags": [
+      "sonar-contact",
+      "helicopter-ops"
+    ],
     "debrief:track_names": [
-      "HNoMS Ramage",
-      "HNLMS Portland",
-      "SPS Defender",
-      "HNoMS Truxtun"
+      "HMS Diamond",
+      "FS Helge Ingstad",
+      "HMS Bergamini",
+      "FS Fridtjof Nansen"
     ],
     "debrief:nationalities": [
-      "NO",
-      "NL",
-      "ES"
+      "GB",
+      "FR"
     ]
   },
   "links": [

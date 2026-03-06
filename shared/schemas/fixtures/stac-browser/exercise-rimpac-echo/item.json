@@ -10,64 +10,65 @@
     "coordinates": [
       [
         [
-          -20.4108,
-          47.4801
+          -26.2168,
+          46.8367
         ],
         [
-          -19.9844,
-          47.4801
+          -23.7723,
+          46.8367
         ],
         [
-          -19.9844,
-          47.9064
+          -23.7723,
+          49.2812
         ],
         [
-          -20.4108,
-          47.9064
+          -26.2168,
+          49.2812
         ],
         [
-          -20.4108,
-          47.4801
+          -26.2168,
+          46.8367
         ]
       ]
     ]
   },
   "bbox": [
-    -20.4108,
-    47.4801,
-    -19.9844,
-    47.9064
+    -26.2168,
+    46.8367,
+    -23.7723,
+    49.2812
   ],
   "properties": {
     "title": "Exercise RIMPAC Echo",
-    "description": "RIMPAC Echo \u2014 North Atlantic exercise. 8 track(s), 2 nation(s).",
+    "description": "RIMPAC Echo \u2014 North Atlantic exercise. 6 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2024-02-04T18:00:00Z",
-    "end_datetime": "2024-02-05T14:01:54Z",
+    "start_datetime": "2025-07-07T20:00:00Z",
+    "end_datetime": "2025-07-08T04:39:42Z",
     "debrief:vessel_classes": [
-      "surface/merchant/cargo/bulk",
-      "surface/merchant/passenger/ferry"
+      "surface/merchant/passenger/ferry",
+      "surface/merchant/tanker/vlcc",
+      "surface/merchant/cargo/container"
     ],
     "debrief:tags": [
       "replenishment",
-      "NGFS",
-      "force-protection"
+      "missile-firing"
     ],
-    "debrief:feature_tags": [],
-    "debrief:author": "Cdr N. Petrov",
+    "debrief:feature_tags": [
+      "active-search",
+      "zig-zag",
+      "torpedo-run"
+    ],
     "debrief:track_names": [
-      "USS Visby",
-      "HMCS Caio Duilio",
-      "USS Bergamini",
-      "HMCS Aquitaine",
-      "USS Portland",
-      "HMCS De Zeven Provincien",
-      "USS Truxtun",
-      "HMCS Mahan"
+      "FGS Argyll",
+      "INS Bergamini",
+      "FGS Helsingborg",
+      "INS Helge Ingstad",
+      "FGS Nordrhein-Westfalen",
+      "INS Provence"
     ],
     "debrief:nationalities": [
-      "US",
-      "CA"
+      "DE",
+      "IN"
     ]
   },
   "links": [

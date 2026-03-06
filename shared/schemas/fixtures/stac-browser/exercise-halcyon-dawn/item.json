@@ -10,58 +10,52 @@
     "coordinates": [
       [
         [
-          69.6097,
-          6.4259
+          62.5182,
+          1.6438
         ],
         [
-          72.291,
-          6.4259
+          64.7974,
+          1.6438
         ],
         [
-          72.291,
-          9.1072
+          64.7974,
+          3.923
         ],
         [
-          69.6097,
-          9.1072
+          62.5182,
+          3.923
         ],
         [
-          69.6097,
-          6.4259
+          62.5182,
+          1.6438
         ]
       ]
     ]
   },
   "bbox": [
-    69.6097,
-    6.4259,
-    72.291,
-    9.1072
+    62.5182,
+    1.6438,
+    64.7974,
+    3.923
   ],
   "properties": {
     "title": "Exercise Halcyon Dawn",
-    "description": "Halcyon Dawn \u2014 Indian Ocean exercise. 2 track(s), 1 nation(s).",
+    "description": "Halcyon Dawn \u2014 Indian Ocean exercise. 1 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2023-06-12T01:00:00Z",
-    "end_datetime": "2023-06-14T16:11:46Z",
+    "start_datetime": "2022-01-17T07:00:00Z",
+    "end_datetime": "2022-01-19T09:25:25Z",
     "debrief:vessel_classes": [
-      "surface/warship/corvette/visby",
-      "surface/warship/carrier/queen-elizabeth"
+      "surface/warship/destroyer/arleigh-burke"
     ],
     "debrief:tags": [
-      "harbour-ops",
-      "EW",
-      "amphibious",
+      "escort",
       "force-protection"
     ],
     "debrief:feature_tags": [
-      "depth-charge",
-      "helicopter-ops"
+      "passive-search"
     ],
-    "debrief:author": "Lt R. Hughes USN",
     "debrief:track_names": [
-      "USS Harnosand",
-      "USS Roosevelt"
+      "USS Hamburg"
     ],
     "debrief:nationalities": [
       "US"

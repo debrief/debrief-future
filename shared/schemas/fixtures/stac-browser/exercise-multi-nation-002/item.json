@@ -10,59 +10,61 @@
     "coordinates": [
       [
         [
-          101.5084,
-          -5.2952
+          128.3086,
+          11.6716
         ],
         [
-          102.7192,
-          -5.2952
+          129.0793,
+          11.6716
         ],
         [
-          102.7192,
-          -4.0844
+          129.0793,
+          12.4423
         ],
         [
-          101.5084,
-          -4.0844
+          128.3086,
+          12.4423
         ],
         [
-          101.5084,
-          -5.2952
+          128.3086,
+          11.6716
         ]
       ]
     ]
   },
   "bbox": [
-    101.5084,
-    -5.2952,
-    102.7192,
-    -4.0844
+    128.3086,
+    11.6716,
+    129.0793,
+    12.4423
   ],
   "properties": {
     "title": "Exercise Multi Nation 002",
-    "description": "Multi Nation 002 \u2014 Indo-Pacific exercise. 3 track(s), 4 nation(s). Multi-national exercise with 4+ participant nations.",
+    "description": "Multi Nation 002 \u2014 Indo-Pacific exercise. 3 track(s), 7 nation(s). Multi-national exercise with 4+ participant nations.",
     "datetime": null,
-    "start_datetime": "2023-07-11T17:00:00Z",
-    "end_datetime": "2023-07-13T15:21:51Z",
+    "start_datetime": "2020-07-14T10:00:00Z",
+    "end_datetime": "2020-07-16T12:02:43Z",
     "debrief:vessel_classes": [
-      "surface/warship/frigate/type26",
-      "surface/warship/destroyer/arleigh-burke"
+      "surface/warship/destroyer/arleigh-burke",
+      "surface/warship/corvette/visby"
     ],
     "debrief:tags": [
-      "boarding"
+      "SAR"
     ],
     "debrief:feature_tags": [],
-    "debrief:author": "Cdr P. Andersen RNoN",
     "debrief:track_names": [
-      "FGS Evertsen",
-      "ROKS Helge Ingstad",
-      "ITS Bergamini"
+      "HMS Sachsen",
+      "FGS Argyll",
+      "ITS Gonzalez"
     ],
     "debrief:nationalities": [
+      "GB",
       "DE",
-      "KR",
       "IT",
-      "JP"
+      "JP",
+      "ES",
+      "IN",
+      "AU"
     ]
   },
   "links": [

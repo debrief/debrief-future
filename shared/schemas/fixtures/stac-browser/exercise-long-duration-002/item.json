@@ -10,64 +10,57 @@
     "coordinates": [
       [
         [
-          102.2124,
-          -6.6311
+          111.3387,
+          -1.1571
         ],
         [
-          105.2006,
-          -6.6311
+          114.0759,
+          -1.1571
         ],
         [
-          105.2006,
-          -3.6429
+          114.0759,
+          1.5801
         ],
         [
-          102.2124,
-          -3.6429
+          111.3387,
+          1.5801
         ],
         [
-          102.2124,
-          -6.6311
+          111.3387,
+          -1.1571
         ]
       ]
     ]
   },
   "bbox": [
-    102.2124,
-    -6.6311,
-    105.2006,
-    -3.6429
+    111.3387,
+    -1.1571,
+    114.0759,
+    1.5801
   ],
   "properties": {
     "title": "Exercise Long Duration 002",
     "description": "Long Duration 002 \u2014 Indo-Pacific exercise. 2 track(s), 2 nation(s). Extended duration exercise (10+ days).",
     "datetime": null,
-    "start_datetime": "2024-03-13T14:00:00Z",
-    "end_datetime": "2024-03-30T17:18:12Z",
+    "start_datetime": "2021-01-02T09:00:00Z",
+    "end_datetime": "2021-01-27T07:46:41Z",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssk/gotland"
+      "subsurface/submarine/ssbn/vanguard"
     ],
     "debrief:tags": [
       "escort",
-      "MCM",
-      "AAW",
-      "replenishment",
-      "certification"
+      "ASW"
     ],
     "debrief:feature_tags": [
-      "track-merge",
-      "helicopter-ops",
-      "torpedo-run",
-      "active-search"
+      "sonar-contact"
     ],
-    "debrief:author": "Lt Cdr D. Kowalski",
     "debrief:track_names": [
-      "HMS Laboon",
-      "HNoMS Richmond"
+      "HNoMS Provence",
+      "FS Nykoping"
     ],
     "debrief:nationalities": [
-      "GB",
-      "NO"
+      "NO",
+      "FR"
     ]
   },
   "links": [

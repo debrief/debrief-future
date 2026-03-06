@@ -4,8 +4,9 @@ title: Debrief STAC Extension Properties
 description: >
   STAC extension properties for Debrief maritime tactical analysis items.
   Defines the debrief: namespace properties stored in item.properties for
-  vessel classification, tags, authorship, track metadata, and nationalities.
+  vessel classification, tags, track metadata, and nationalities.
   These properties enable discovery and filtering in the STAC Stack Browser UI.
+  Author is derived from PROV lineage, not stored here (see R7).
 
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -64,13 +65,6 @@ classes:
         multivalued: true
         required: false
         slot_uri: debrief:feature_tags
-
-      author:
-        description: >
-          Analyst who created or last modified the plot. Free-text identifier.
-        range: string
-        required: false
-        slot_uri: debrief:author
 
       track_names:
         description: >

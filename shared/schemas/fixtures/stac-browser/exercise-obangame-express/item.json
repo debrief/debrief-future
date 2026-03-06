@@ -10,58 +10,59 @@
     "coordinates": [
       [
         [
-          -36.8906,
-          48.0288
+          -37.9063,
+          54.3419
         ],
         [
-          -36.7722,
-          48.0288
+          -36.0809,
+          54.3419
         ],
         [
-          -36.7722,
-          48.1472
+          -36.0809,
+          56.1673
         ],
         [
-          -36.8906,
-          48.1472
+          -37.9063,
+          56.1673
         ],
         [
-          -36.8906,
-          48.0288
+          -37.9063,
+          54.3419
         ]
       ]
     ]
   },
   "bbox": [
-    -36.8906,
-    48.0288,
-    -36.7722,
-    48.1472
+    -37.9063,
+    54.3419,
+    -36.0809,
+    56.1673
   ],
   "properties": {
     "title": "Exercise Obangame Express",
-    "description": "Obangame Express \u2014 North Atlantic exercise. 1 track(s), 2 nation(s).",
+    "description": "Obangame Express \u2014 North Atlantic exercise. 2 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2025-10-10T13:00:00Z",
-    "end_datetime": "2025-10-18T09:30:30Z",
+    "start_datetime": "2021-07-11T23:00:00Z",
+    "end_datetime": "2021-07-19T16:58:15Z",
     "debrief:vessel_classes": [
       "subsurface/submarine/ssn/astute"
     ],
     "debrief:tags": [
-      "EW"
+      "certification",
+      "boarding",
+      "NGFS",
+      "EW",
+      "replenishment"
     ],
     "debrief:feature_tags": [
-      "minefield",
-      "towed-array",
-      "track-merge"
+      "torpedo-run"
     ],
-    "debrief:author": "Lt Cdr C. O'Brien RN",
     "debrief:track_names": [
-      "HNoMS Diamond"
+      "HMS De Ruyter",
+      "HMS Provence"
     ],
     "debrief:nationalities": [
-      "NO",
-      "CA"
+      "GB"
     ]
   },
   "links": [

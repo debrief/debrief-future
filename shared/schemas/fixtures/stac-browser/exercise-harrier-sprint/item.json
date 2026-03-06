@@ -10,40 +10,40 @@
     "coordinates": [
       [
         [
-          -26.6514,
-          -38.0453
+          -33.3595,
+          -39.5312
         ],
         [
-          -23.8998,
-          -38.0453
+          -31.0508,
+          -39.5312
         ],
         [
-          -23.8998,
-          -35.2938
+          -31.0508,
+          -37.2224
         ],
         [
-          -26.6514,
-          -35.2938
+          -33.3595,
+          -37.2224
         ],
         [
-          -26.6514,
-          -38.0453
+          -33.3595,
+          -39.5312
         ]
       ]
     ]
   },
   "bbox": [
-    -26.6514,
-    -38.0453,
-    -23.8998,
-    -35.2938
+    -33.3595,
+    -39.5312,
+    -31.0508,
+    -37.2224
   ],
   "properties": {
     "title": "Exercise Harrier Sprint",
     "description": "Harrier Sprint \u2014 South Atlantic exercise. 4 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2024-04-24T04:00:00Z",
-    "end_datetime": "2024-04-24T10:17:31Z",
+    "start_datetime": "2022-07-02T18:00:00Z",
+    "end_datetime": "2022-07-03T15:33:12Z",
     "debrief:vessel_classes": [
       "surface/warship/destroyer/arleigh-burke"
     ],
@@ -53,16 +53,15 @@
     "debrief:feature_tags": [
       "helicopter-ops"
     ],
-    "debrief:author": "LCdr M. Dupont MN",
     "debrief:track_names": [
-      "FGS Truxtun",
-      "HMAS Cole",
-      "FGS Hamburg",
-      "HMAS De Zeven Provincien"
+      "USS Hamburg",
+      "HNoMS Roald Amundsen",
+      "USS Nykoping",
+      "HNoMS Caio Duilio"
     ],
     "debrief:nationalities": [
-      "DE",
-      "AU"
+      "US",
+      "NO"
     ]
   },
   "links": [

@@ -10,62 +10,62 @@
     "coordinates": [
       [
         [
-          -26.9505,
-          -37.8028
+          -15.5414,
+          -36.383
         ],
         [
-          -26.3261,
-          -37.8028
+          -12.5962,
+          -36.383
         ],
         [
-          -26.3261,
-          -37.1783
+          -12.5962,
+          -33.4377
         ],
         [
-          -26.9505,
-          -37.1783
+          -15.5414,
+          -33.4377
         ],
         [
-          -26.9505,
-          -37.8028
+          -15.5414,
+          -36.383
         ]
       ]
     ]
   },
   "bbox": [
-    -26.9505,
-    -37.8028,
-    -26.3261,
-    -37.1783
+    -15.5414,
+    -36.383,
+    -12.5962,
+    -33.4377
   ],
   "properties": {
     "title": "Exercise Exercise Alpha-090",
-    "description": "Exercise Alpha-090 \u2014 South Atlantic exercise. 5 track(s), 1 nation(s).",
+    "description": "Exercise Alpha-090 \u2014 South Atlantic exercise. 6 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2021-09-08T13:00:00Z",
-    "end_datetime": "2021-09-09T18:24:59Z",
+    "start_datetime": "2020-02-01T15:00:00Z",
+    "end_datetime": "2020-02-04T03:21:07Z",
     "debrief:vessel_classes": [
-      "surface/auxiliary/tanker/tide",
-      "surface/warship/carrier/queen-elizabeth",
-      "surface/merchant/passenger/ferry"
+      "surface/warship/destroyer/arleigh-burke",
+      "subsurface/submarine/ssn/virginia"
     ],
     "debrief:tags": [
-      "escort"
+      "AAW",
+      "certification"
     ],
     "debrief:feature_tags": [
-      "active-search",
-      "helicopter-ops"
+      "datum",
+      "active-search"
     ],
-    "debrief:author": "LCdr M. Dupont MN",
     "debrief:track_names": [
-      "ROKS Bainbridge",
-      "ROKS Hamburg",
-      "ROKS Somerset",
-      "ROKS Ramage",
-      "ROKS Roosevelt"
+      "HMS Argyll",
+      "HMS De Ruyter",
+      "HMS Richmond",
+      "HMS Somerset",
+      "HMS Visby",
+      "HMS Duncan"
     ],
     "debrief:nationalities": [
-      "KR"
+      "GB"
     ]
   },
   "links": [

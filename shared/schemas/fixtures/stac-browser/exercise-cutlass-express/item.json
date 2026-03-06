@@ -10,58 +10,63 @@
     "coordinates": [
       [
         [
-          -15.3088,
-          -31.9567
+          -29.676,
+          -49.3906
         ],
         [
-          -13.7365,
-          -31.9567
+          -28.1014,
+          -49.3906
         ],
         [
-          -13.7365,
-          -30.3844
+          -28.1014,
+          -47.816
         ],
         [
-          -15.3088,
-          -30.3844
+          -29.676,
+          -47.816
         ],
         [
-          -15.3088,
-          -31.9567
+          -29.676,
+          -49.3906
         ]
       ]
     ]
   },
   "bbox": [
-    -15.3088,
-    -31.9567,
-    -13.7365,
-    -30.3844
+    -29.676,
+    -49.3906,
+    -28.1014,
+    -47.816
   ],
   "properties": {
     "title": "Exercise Cutlass Express",
-    "description": "Cutlass Express \u2014 South Atlantic exercise. 3 track(s), 2 nation(s).",
+    "description": "Cutlass Express \u2014 South Atlantic exercise. 4 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2024-01-22T10:00:00Z",
-    "end_datetime": "2024-01-31T13:14:02Z",
+    "start_datetime": "2021-06-25T15:00:00Z",
+    "end_datetime": "2021-06-29T23:15:24Z",
     "debrief:vessel_classes": [
-      "surface/auxiliary/tanker/tide",
-      "surface/auxiliary/supply/fort-victoria"
+      "surface/auxiliary/tanker/tide"
     ],
     "debrief:tags": [
+      "certification",
       "ASW",
-      "training"
+      "harbour-ops",
+      "SAR"
     ],
-    "debrief:feature_tags": [],
-    "debrief:author": "Lt Cdr C. O'Brien RN",
+    "debrief:feature_tags": [
+      "intercept",
+      "track-merge",
+      "towed-array"
+    ],
     "debrief:track_names": [
-      "HMS Helsingborg",
-      "HDMS Roosevelt",
-      "HMS Tromp"
+      "ITS Ramage",
+      "HMCS Iron Duke",
+      "ITS Defender",
+      "HMCS Diamond"
     ],
     "debrief:nationalities": [
-      "SE",
-      "DK"
+      "IT",
+      "CA"
     ]
   },
   "links": [

@@ -36,7 +36,6 @@ EXTENSION_FIELDS: list[str] = [
     "vessel_classes",
     "tags",
     "feature_tags",
-    "author",
     "track_names",
     "nationalities",
 ]
@@ -271,15 +270,6 @@ class TestExerciseDiversity:
                 nats.add(nat)
         assert len(nats) >= 6, f"Only {len(nats)} distinct nationalities: {nats}"
 
-    def test_author_diversity(self) -> None:
-        """At least 10 distinct authors across all exercises."""
-        authors: set[str] = set()
-        for props in self.all_props:
-            author = props.get("author")
-            if author is not None:
-                authors.add(str(author))
-        assert len(authors) >= 10, f"Only {len(authors)} distinct authors: {authors}"
-
     def test_geographic_distribution(self) -> None:
         """Items must span at least 4 distinct geographic regions."""
         regions: set[str] = set()
@@ -396,7 +386,6 @@ class TestRoundTrip:
             vessel_classes=["surface/warship/frigate/type23", "subsurface/submarine"],
             tags=["ASW", "training"],
             feature_tags=["sonar-contact", "datum"],
-            author="Lt Cdr J. Smith",
             track_names=["HMS Argyll", "SUBMERGED CONTACT 01"],
             nationalities=["GB", "US"],
         )
@@ -409,7 +398,7 @@ class TestRoundTrip:
         assert restored.vessel_classes == original.vessel_classes
         assert restored.tags == original.tags
         assert restored.feature_tags == original.feature_tags
-        assert restored.author == original.author
+        # author removed — derived from PROV (R7)
         assert restored.track_names == original.track_names
         assert restored.nationalities == original.nationalities
 
@@ -422,7 +411,7 @@ class TestRoundTrip:
 
         assert restored.vessel_classes == original.vessel_classes
         assert restored.tags == original.tags
-        assert restored.author == original.author
+        # author removed — derived from PROV (R7)
         assert restored.nationalities == original.nationalities
 
     def test_round_trip_from_fixture(self) -> None:

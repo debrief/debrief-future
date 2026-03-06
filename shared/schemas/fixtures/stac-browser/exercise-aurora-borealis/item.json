@@ -10,56 +10,60 @@
     "coordinates": [
       [
         [
-          19.9201,
-          35.9313
+          20.5058,
+          35.014
         ],
         [
-          21.5555,
-          35.9313
+          20.9719,
+          35.014
         ],
         [
-          21.5555,
-          37.5668
+          20.9719,
+          35.48
         ],
         [
-          19.9201,
-          37.5668
+          20.5058,
+          35.48
         ],
         [
-          19.9201,
-          35.9313
+          20.5058,
+          35.014
         ]
       ]
     ]
   },
   "bbox": [
-    19.9201,
-    35.9313,
-    21.5555,
-    37.5668
+    20.5058,
+    35.014,
+    20.9719,
+    35.48
   ],
   "properties": {
     "title": "Exercise Aurora Borealis",
     "description": "Aurora Borealis \u2014 Mediterranean exercise. 3 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2021-02-01T23:00:00Z",
-    "end_datetime": "2021-02-03T07:55:49Z",
+    "start_datetime": "2022-07-19T01:00:00Z",
+    "end_datetime": "2022-07-21T06:02:40Z",
     "debrief:vessel_classes": [
-      "surface/warship/destroyer/type45"
+      "surface/warship/destroyer/type45",
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/frigate/type23"
     ],
     "debrief:tags": [
-      "harbour-ops",
-      "NGFS"
+      "multi-national"
     ],
-    "debrief:feature_tags": [],
-    "debrief:author": "Cdr A. Brown RN",
+    "debrief:feature_tags": [
+      "active-search",
+      "torpedo-run",
+      "towed-array"
+    ],
     "debrief:track_names": [
-      "HMS Kent",
-      "HMS Auvergne",
-      "HMS Diamond"
+      "HMS Somerset",
+      "HMS Sutherland",
+      "HMS Tromp"
     ],
     "debrief:nationalities": [
-      "GB"
+      "SE"
     ]
   },
   "links": [

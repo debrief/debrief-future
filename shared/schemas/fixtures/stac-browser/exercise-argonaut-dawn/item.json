@@ -10,62 +10,55 @@
     "coordinates": [
       [
         [
-          75.324,
-          10.9104
+          72.9681,
+          9.2324
         ],
         [
-          75.4509,
-          10.9104
+          73.2183,
+          9.2324
         ],
         [
-          75.4509,
-          11.0374
+          73.2183,
+          9.4826
         ],
         [
-          75.324,
-          11.0374
+          72.9681,
+          9.4826
         ],
         [
-          75.324,
-          10.9104
+          72.9681,
+          9.2324
         ]
       ]
     ]
   },
   "bbox": [
-    75.324,
-    10.9104,
-    75.4509,
-    11.0374
+    72.9681,
+    9.2324,
+    73.2183,
+    9.4826
   ],
   "properties": {
     "title": "Exercise Argonaut Dawn",
-    "description": "Argonaut Dawn \u2014 Indian Ocean exercise. 2 track(s), 3 nation(s).",
+    "description": "Argonaut Dawn \u2014 Indian Ocean exercise. 1 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2026-07-23T04:00:00Z",
-    "end_datetime": "2026-07-23T18:35:54Z",
+    "start_datetime": "2026-04-14T20:00:00Z",
+    "end_datetime": "2026-04-15T03:38:29Z",
     "debrief:vessel_classes": [
-      "subsurface/submarine/ssk/gotland"
+      "subsurface/submarine/ssbn/vanguard"
     ],
     "debrief:tags": [
-      "MCM",
-      "NGFS",
-      "ASW",
-      "certification",
-      "training"
+      "multi-national"
     ],
     "debrief:feature_tags": [
-      "zig-zag"
+      "towed-array"
     ],
-    "debrief:author": "Lt Cdr D. Kowalski",
     "debrief:track_names": [
-      "JS Nykoping",
-      "INS Caio Duilio"
+      "HMS Somerset"
     ],
     "debrief:nationalities": [
-      "JP",
-      "IN",
-      "FR"
+      "GB",
+      "IN"
     ]
   },
   "links": [

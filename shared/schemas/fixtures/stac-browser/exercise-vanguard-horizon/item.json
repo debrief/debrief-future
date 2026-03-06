@@ -10,63 +10,55 @@
     "coordinates": [
       [
         [
-          9.8979,
-          34.7472
+          8.5051,
+          34.7928
         ],
         [
-          12.362,
-          34.7472
+          10.4025,
+          34.7928
         ],
         [
-          12.362,
-          37.2113
+          10.4025,
+          36.6902
         ],
         [
-          9.8979,
-          37.2113
+          8.5051,
+          36.6902
         ],
         [
-          9.8979,
-          34.7472
+          8.5051,
+          34.7928
         ]
       ]
     ]
   },
   "bbox": [
-    9.8979,
-    34.7472,
-    12.362,
-    37.2113
+    8.5051,
+    34.7928,
+    10.4025,
+    36.6902
   ],
   "properties": {
     "title": "Exercise Vanguard Horizon",
-    "description": "Vanguard Horizon \u2014 Mediterranean exercise. 2 track(s), 2 nation(s).",
+    "description": "Vanguard Horizon \u2014 Mediterranean exercise. 1 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2022-07-15T18:00:00Z",
-    "end_datetime": "2022-07-16T04:22:39Z",
+    "start_datetime": "2026-07-03T11:00:00Z",
+    "end_datetime": "2026-07-04T10:16:02Z",
     "debrief:vessel_classes": [
-      "surface/auxiliary/supply/fort-victoria",
-      "surface/auxiliary/survey/echo"
+      "surface/auxiliary/tanker/tide"
     ],
     "debrief:tags": [
-      "EW",
-      "certification",
-      "boarding",
-      "force-protection"
+      "mine-clearance",
+      "force-protection",
+      "training"
     ],
-    "debrief:feature_tags": [
-      "radar-detection",
-      "minefield",
-      "depth-charge"
-    ],
-    "debrief:author": "Cdr N. Petrov",
+    "debrief:feature_tags": [],
     "debrief:track_names": [
-      "HMS Defender",
-      "JS Lancaster"
+      "FGS Argyll"
     ],
     "debrief:nationalities": [
-      "GB",
-      "JP"
+      "DE",
+      "AU"
     ]
   },
   "links": [

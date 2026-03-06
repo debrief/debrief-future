@@ -1369,9 +1369,6 @@ export interface StacExtensionProperties {
     /** Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
  */
     feature_tags?: string[],
-    /** Analyst who created or last modified the plot. Free-text identifier.
- */
-    author?: string,
     /** Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.
  */
     track_names?: string[],

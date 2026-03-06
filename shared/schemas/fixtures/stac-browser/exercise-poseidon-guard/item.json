@@ -10,56 +10,61 @@
     "coordinates": [
       [
         [
-          22.3608,
-          37.3667
+          1.883,
+          37.8604
         ],
         [
-          24.8436,
-          37.3667
+          2.6304,
+          37.8604
         ],
         [
-          24.8436,
-          39.8495
+          2.6304,
+          38.6078
         ],
         [
-          22.3608,
-          39.8495
+          1.883,
+          38.6078
         ],
         [
-          22.3608,
-          37.3667
+          1.883,
+          37.8604
         ]
       ]
     ]
   },
   "bbox": [
-    22.3608,
-    37.3667,
-    24.8436,
-    39.8495
+    1.883,
+    37.8604,
+    2.6304,
+    38.6078
   ],
   "properties": {
     "title": "Exercise Poseidon Guard",
-    "description": "Poseidon Guard \u2014 Mediterranean exercise. 3 track(s), 2 nation(s).",
+    "description": "Poseidon Guard \u2014 Mediterranean exercise. 4 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2022-08-01T08:00:00Z",
-    "end_datetime": "2022-08-01T17:46:27Z",
+    "start_datetime": "2022-12-23T09:00:00Z",
+    "end_datetime": "2022-12-23T17:17:32Z",
     "debrief:vessel_classes": [
-      "surface/warship/corvette/visby"
+      "surface/warship/destroyer/type45",
+      "surface/warship/carrier/queen-elizabeth"
     ],
     "debrief:tags": [
-      "harbour-ops"
+      "gunnery",
+      "SAR",
+      "escort",
+      "training"
     ],
-    "debrief:feature_tags": [],
-    "debrief:author": "KptLt H. Weber",
+    "debrief:feature_tags": [
+      "towed-array"
+    ],
     "debrief:track_names": [
-      "FS Gonzalez",
-      "HNLMS Fridtjof Nansen",
-      "FS Ramage"
+      "SPS Gonzalez",
+      "SPS Bainbridge",
+      "SPS Defender",
+      "SPS Harnosand"
     ],
     "debrief:nationalities": [
-      "FR",
-      "NL"
+      "ES"
     ]
   },
   "links": [

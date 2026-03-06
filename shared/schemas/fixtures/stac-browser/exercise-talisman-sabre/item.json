@@ -10,64 +10,69 @@
     "coordinates": [
       [
         [
-          -28.5226,
-          -36.0435
+          -23.5969,
+          -38.412
         ],
         [
-          -26.4745,
-          -36.0435
+          -23.0677,
+          -38.412
         ],
         [
-          -26.4745,
-          -33.9955
+          -23.0677,
+          -37.8828
         ],
         [
-          -28.5226,
-          -33.9955
+          -23.5969,
+          -37.8828
         ],
         [
-          -28.5226,
-          -36.0435
+          -23.5969,
+          -38.412
         ]
       ]
     ]
   },
   "bbox": [
-    -28.5226,
-    -36.0435,
-    -26.4745,
-    -33.9955
+    -23.5969,
+    -38.412,
+    -23.0677,
+    -37.8828
   ],
   "properties": {
     "title": "Exercise Talisman Sabre",
-    "description": "Talisman Sabre \u2014 South Atlantic exercise. 5 track(s), 2 nation(s).",
+    "description": "Talisman Sabre \u2014 South Atlantic exercise. 8 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2022-06-20T20:00:00Z",
-    "end_datetime": "2022-06-24T00:04:00Z",
+    "start_datetime": "2025-01-18T12:00:00Z",
+    "end_datetime": "2025-01-23T08:06:35Z",
     "debrief:vessel_classes": [
-      "surface/auxiliary/supply/fort-victoria"
+      "surface/auxiliary/survey/echo",
+      "surface/auxiliary/supply/fort-victoria",
+      "surface/auxiliary/tanker/tide"
     ],
     "debrief:tags": [
-      "escort",
-      "training",
-      "AAW",
-      "MCM",
-      "gunnery"
+      "transit",
+      "ASW",
+      "force-protection",
+      "NGFS",
+      "SAR"
     ],
     "debrief:feature_tags": [
-      "passive-search"
+      "radar-detection",
+      "sonar-contact"
     ],
-    "debrief:author": "Cdr F. Rossi MMI",
     "debrief:track_names": [
-      "HMS Lancaster",
-      "INS Somerset",
-      "HMS Tromp",
-      "INS Westminster",
-      "HMS Mahan"
+      "HMS Helsingborg",
+      "SPS Tromp",
+      "HMS Nordrhein-Westfalen",
+      "SPS Mahan",
+      "HMS De Zeven Provincien",
+      "SPS Kent",
+      "HMS Carney",
+      "SPS Languedoc"
     ],
     "debrief:nationalities": [
-      "GB",
-      "IN"
+      "SE",
+      "ES"
     ]
   },
   "links": [

@@ -9,12 +9,13 @@ Properties added to `item.properties` under the `debrief:` namespace.
 
 | Field | Type | Required | Default | Constraints |
 |-------|------|----------|---------|-------------|
-| `debrief:vessel_classes` | `string[]` | No | `[]` | Each value is a slash-separated taxonomy path (e.g., `surface/warship/frigate/type23`). Valid paths defined by vessel taxonomy. |
-| `debrief:tags` | `string[]` | No | `[]` | Trimmed non-empty strings. No duplicates. |
-| `debrief:feature_tags` | `string[]` | No | `[]` | Union of all per-feature tags. Trimmed non-empty strings. No duplicates. |
-| `debrief:author` | `string` | No | `null` | Free text. Represents the analyst who created/last modified the plot. |
-| `debrief:track_names` | `string[]` | No | `[]` | Names of all tracks in the plot's GeoJSON FeatureCollection. |
-| `debrief:nationalities` | `string[]` | No | `[]` | ISO 3166-1 alpha-2 country codes only (e.g., `"GB"`, `"US"`, `"FR"`). Pattern: `^[A-Z]{2}$`. |
+| `debrief:vessel_classes` | `string[]` | No | `[]` | Aggregated from tracks. Slash-separated taxonomy path (e.g., `surface/warship/frigate/type23`). |
+| `debrief:tags` | `string[]` | No | `[]` | Plot-level. Trimmed non-empty strings. No duplicates. |
+| `debrief:feature_tags` | `string[]` | No | `[]` | Aggregated from all features. Union of per-feature tags. No duplicates. |
+| `debrief:track_names` | `string[]` | No | `[]` | Aggregated from tracks. Names from `TrackProperties.platform_name`. |
+| `debrief:nationalities` | `string[]` | No | `[]` | Aggregated from tracks. ISO 3166-1 alpha-2 codes only. Pattern: `^[A-Z]{2}$`. |
+
+**Not stored**: `author` — derived from W3C PROV `LogEntry.agent` in feature provenance at query time (see research.md R7).
 
 ### Validation Rules
 
@@ -112,7 +113,6 @@ A complete STAC 1.0.0 Item JSON file used for Storybook development.
 | Geographic regions | North Atlantic: ~30, Mediterranean: ~25, Indo-Pacific: ~20, Arctic: ~10, South Atlantic: ~10, Indian Ocean: ~5 |
 | Vessel class categories | Surface warship: ~45, Subsurface: ~20, Auxiliary: ~15, Merchant: ~10, Mixed: ~10 |
 | Nationalities | GB: ~30, US: ~20, FR: ~15, DE: ~10, NO: ~8, SE: ~7, Other: ~10 |
-| Author count | 10-12 distinct authors |
 | Tag count | 15-20 distinct plot-level tags |
 | Track counts per item | 0 tracks: ~5, 1-2 tracks: ~30, 3-4 tracks: ~40, 5+ tracks: ~25 |
 | Year range | 2020-2026 |

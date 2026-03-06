@@ -10,56 +10,59 @@
     "coordinates": [
       [
         [
-          90.4483,
-          4.4995
+          129.8321,
+          3.7815
         ],
         [
-          91.5456,
-          4.4995
+          131.6455,
+          3.7815
         ],
         [
-          91.5456,
-          5.5968
+          131.6455,
+          5.5949
         ],
         [
-          90.4483,
-          5.5968
+          129.8321,
+          5.5949
         ],
         [
-          90.4483,
-          4.4995
+          129.8321,
+          3.7815
         ]
       ]
     ]
   },
   "bbox": [
-    90.4483,
-    4.4995,
-    91.5456,
-    5.5968
+    129.8321,
+    3.7815,
+    131.6455,
+    5.5949
   ],
   "properties": {
     "title": "Exercise Javelin Thrust",
     "description": "Javelin Thrust \u2014 Indo-Pacific exercise. 3 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2023-08-10T00:00:00Z",
-    "end_datetime": "2023-08-10T19:47:08Z",
+    "start_datetime": "2024-07-17T20:00:00Z",
+    "end_datetime": "2024-07-18T13:30:41Z",
     "debrief:vessel_classes": [
-      "surface/warship/carrier/queen-elizabeth",
-      "surface/warship/patrol/river"
+      "unknown",
+      "surface/warship/frigate/type26"
     ],
     "debrief:tags": [
-      "certification",
-      "replenishment",
-      "SAR",
-      "training"
+      "ASW",
+      "transit",
+      "SAR"
     ],
-    "debrief:feature_tags": [],
-    "debrief:author": "Lt R. Hughes USN",
+    "debrief:feature_tags": [
+      "sonar-contact",
+      "prosecution",
+      "datum",
+      "visual-sighting"
+    ],
     "debrief:track_names": [
-      "USS Tromp",
-      "USS Nykoping",
-      "USS Ramage"
+      "USS Argyll",
+      "USS Evertsen",
+      "USS Nordrhein-Westfalen"
     ],
     "debrief:nationalities": [
       "US"

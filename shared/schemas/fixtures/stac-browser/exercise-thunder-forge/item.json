@@ -10,69 +10,64 @@
     "coordinates": [
       [
         [
-          73.0606,
-          17.2183
+          58.3614,
+          5.6819
         ],
         [
-          73.6319,
-          17.2183
+          60.7929,
+          5.6819
         ],
         [
-          73.6319,
-          17.7895
+          60.7929,
+          8.1134
         ],
         [
-          73.0606,
-          17.7895
+          58.3614,
+          8.1134
         ],
         [
-          73.0606,
-          17.2183
+          58.3614,
+          5.6819
         ]
       ]
     ]
   },
   "bbox": [
-    73.0606,
-    17.2183,
-    73.6319,
-    17.7895
+    58.3614,
+    5.6819,
+    60.7929,
+    8.1134
   ],
   "properties": {
     "title": "Exercise Thunder Forge",
-    "description": "Thunder Forge \u2014 Indian Ocean exercise. 7 track(s), 3 nation(s).",
+    "description": "Thunder Forge \u2014 Indian Ocean exercise. 7 track(s), 1 nation(s).",
     "datetime": null,
-    "start_datetime": "2022-10-11T16:00:00Z",
-    "end_datetime": "2022-10-14T07:45:28Z",
+    "start_datetime": "2024-03-11T19:00:00Z",
+    "end_datetime": "2024-03-13T10:17:21Z",
     "debrief:vessel_classes": [
-      "unknown",
-      "surface/warship/destroyer/type45"
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/frigate/type26"
     ],
     "debrief:tags": [
-      "amphibious",
       "multi-national",
-      "escort",
-      "force-protection",
-      "NGFS"
+      "missile-firing",
+      "AAW"
     ],
     "debrief:feature_tags": [
-      "visual-sighting",
-      "active-search"
+      "active-search",
+      "radar-detection"
     ],
-    "debrief:author": "Lt Cdr J. Smith RN",
     "debrief:track_names": [
-      "HMCS Visby",
-      "HMAS Sachsen",
-      "HMS Cole",
-      "HMCS Nykoping",
-      "HMAS Helge Ingstad",
-      "HMS Otto Sverdrup",
-      "HMCS Dauntless"
+      "USS Somerset",
+      "USS Provence",
+      "USS Helge Ingstad",
+      "USS Mason",
+      "USS Bergamini",
+      "USS Harnosand",
+      "USS Sutherland"
     ],
     "debrief:nationalities": [
-      "CA",
-      "AU",
-      "GB"
+      "US"
     ]
   },
   "links": [

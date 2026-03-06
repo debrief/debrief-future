@@ -10,59 +10,59 @@
     "coordinates": [
       [
         [
-          21.6146,
-          36.3827
+          2.4316,
+          33.877
         ],
         [
-          22.6325,
-          36.3827
+          3.7086,
+          33.877
         ],
         [
-          22.6325,
-          37.4005
+          3.7086,
+          35.154
         ],
         [
-          21.6146,
-          37.4005
+          2.4316,
+          35.154
         ],
         [
-          21.6146,
-          36.3827
+          2.4316,
+          33.877
         ]
       ]
     ]
   },
   "bbox": [
-    21.6146,
-    36.3827,
-    22.6325,
-    37.4005
+    2.4316,
+    33.877,
+    3.7086,
+    35.154
   ],
   "properties": {
     "title": "Exercise Exercise Alpha-095",
-    "description": "Exercise Alpha-095 \u2014 Mediterranean exercise. 1 track(s), 1 nation(s).",
+    "description": "Exercise Alpha-095 \u2014 Mediterranean exercise. 1 track(s), 2 nation(s).",
     "datetime": null,
-    "start_datetime": "2022-03-12T15:00:00Z",
-    "end_datetime": "2022-04-05T22:31:19Z",
+    "start_datetime": "2021-05-15T15:00:00Z",
+    "end_datetime": "2021-06-05T19:42:57Z",
     "debrief:vessel_classes": [
-      "surface/auxiliary/tanker/tide"
+      "surface/auxiliary/survey/echo"
     ],
     "debrief:tags": [
-      "transit",
-      "harbour-ops",
-      "training",
-      "replenishment",
-      "AAW"
+      "AAW",
+      "EW",
+      "amphibious",
+      "transit"
     ],
     "debrief:feature_tags": [
-      "torpedo-run"
+      "active-search",
+      "intercept"
     ],
-    "debrief:author": "Lt R. Hughes USN",
     "debrief:track_names": [
-      "HMS Mahan"
+      "HMS Portland"
     ],
     "debrief:nationalities": [
-      "SE"
+      "SE",
+      "AU"
     ]
   },
   "links": [
