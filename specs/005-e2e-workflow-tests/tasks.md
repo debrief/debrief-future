@@ -188,7 +188,7 @@
 
 ### PR Creation
 
-- [ ] T412 Create PR and publish blog: run /speckit.pr
+- [ ] T412 Create PR and publish blog: run /speckit.pr (gh CLI not available — PR must be created manually)
 
 **Task T412 must run last. It depends on all evidence and media tasks being complete.**
 
