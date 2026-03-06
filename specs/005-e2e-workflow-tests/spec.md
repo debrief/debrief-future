@@ -12,6 +12,7 @@
 
 - Q: Should VS Code E2E tests be restored (existing `tests/e2e/`), written from scratch, or replaced with webview-only approach? → A: Restore existing `tests/e2e/` skipped tests (unskip, fix selectors, sideload VSIX)
 - Q: How should missing/incomplete features discovered during VS Code E2E test restoration be recorded? → A: Use Playwright `test.fixme()` annotation in the test + create a backlog item with cross-reference
+- Q: Should VS Code E2E suite be expanded to match web-shell coverage or stay focused on extension-specific concerns? → A: Expand VS Code E2E to match web-shell coverage (all 13 spec categories)
 
 ## Context
 
@@ -38,7 +39,7 @@ As a developer, I need automated tests that verify a user can open a plot from t
 
 **Why this priority**: This is the most fundamental user workflow — the first thing every user does. It exercises the full path from catalog selection through io parsing, stac catalog storage, and map rendering.
 
-**Independent Test**: Covered by `apps/web-shell/playwright/tests/plot-load.spec.ts` (6 tests) and `catalog-browse.spec.ts` (4 tests).
+**Independent Test**: Web-shell: `apps/web-shell/playwright/tests/plot-load.spec.ts` (6 tests) and `catalog-browse.spec.ts` (4 tests). VS Code: `tests/e2e/test-load-display.spec.ts` (to be restored + expanded to match web-shell coverage).
 
 **Acceptance Scenarios**:
 
@@ -54,7 +55,7 @@ As a developer, I need automated tests that verify a user can select features an
 
 **Why this priority**: Running analysis tools on loaded data is the core analytical workflow. This exercises the stac-to-calc round-trip through the real UI orchestration layer.
 
-**Independent Test**: Covered by `apps/web-shell/playwright/tests/tool-execution.spec.ts` (6 tests).
+**Independent Test**: Web-shell: `apps/web-shell/playwright/tests/tool-execution.spec.ts` (6 tests). VS Code: `tests/e2e/test-analysis-tool.spec.ts` (to be restored + expanded to match web-shell coverage).
 
 **Acceptance Scenarios**:
 
@@ -70,7 +71,7 @@ As a developer, I need automated tests that verify feature selection, time contr
 
 **Why this priority**: These interactions exercise the session-state store, selection sync, and temporal state — shared infrastructure that all workflows depend on.
 
-**Independent Test**: Covered by `selection-sync.spec.ts` (5 tests), `time-controller.spec.ts` (14 tests), and `drawing.spec.ts` (7 tests).
+**Independent Test**: Web-shell: `selection-sync.spec.ts` (5 tests), `time-controller.spec.ts` (14 tests), and `drawing.spec.ts` (7 tests). VS Code: new test files to be created matching web-shell coverage for selection sync, time control, and drawing interactions.
 
 **Acceptance Scenarios**:
 
@@ -105,7 +106,8 @@ As a developer, I need automated tests that verify feature selection, time contr
 ### Key Entities
 
 - **Web Shell**: A browser-accessible React application that mirrors the VS Code extension's orchestration of io, stac, and calc services, providing a testable surface for Playwright automation
-- **Playwright Test Suite**: 81 automated browser tests across 13 spec files, exercising user workflows through the web-shell
+- **Web-Shell Playwright Suite**: 81 automated browser tests across 13 spec files, exercising user workflows through the web-shell
+- **VS Code E2E Playwright Suite**: To be expanded from 11 skipped tests to full coverage matching web-shell's 13 spec categories, exercising the same workflows through the real VS Code extension host
 - **Sample STAC Catalog**: Pre-configured mock catalog data with tracks, annotations, and temporal data for test scenarios
 - **Session State Store**: Zustand-based shared state that synchronises selection, temporal, and drawing state across components — the core integration point validated by E2E tests
 
@@ -115,10 +117,10 @@ As a developer, I need automated tests that verify feature selection, time contr
 
 - **SC-001**: The automated test suite exercises the complete user workflow (browse catalog → open plot → view on map → run tool → verify results) without manual intervention
 - **SC-002**: A breaking change in any component's output causes at least one E2E test to fail, proving the tests catch cross-component regressions
-- **SC-003**: The full E2E test suite completes within 5 minutes in CI
+- **SC-003**: The full E2E test suite (web-shell + VS Code) completes within 10 minutes in CI
 - **SC-004**: Developers can run the same tests locally with a single command (`node run-playwright.mjs` or `pnpm test`)
 - **SC-005**: All web-shell test spec files (13) pass with zero skipped tests
-- **SC-006**: VS Code E2E tests (`tests/e2e/`) are unskipped and passing for at least the P1 Load and Display workflow; any tests that reveal missing features are documented as backlog items (not skipped silently)
+- **SC-006**: VS Code E2E tests (`tests/e2e/`) are expanded to cover all 13 web-shell spec categories; tests pass or are annotated with `test.fixme()` with corresponding backlog items for any missing features discovered
 - **SC-007**: The test suite covers at least the three core workflows across both platforms: catalog browse, plot load/display, and tool execution
 
 ## Assumptions
@@ -141,15 +143,17 @@ As a developer, I need automated tests that verify feature selection, time contr
 
 ## Dual-Platform Test Strategy
 
-The web-shell and VS Code E2E suites are **complementary**, not redundant:
+The web-shell and VS Code E2E suites provide **full parallel coverage** — the same workflows are tested in both environments. The VS Code suite additionally validates extension-specific concerns:
 
 | Concern | Web-Shell Tests | VS Code E2E Tests |
 |---------|----------------|-------------------|
 | Orchestration logic (io → stac → calc) | Yes | Yes |
+| Catalog browse & plot load | Yes (13 spec files) | Yes (matching coverage) |
+| Tool execution & selection sync | Yes | Yes |
+| Time control & drawing | Yes | Yes |
 | Extension activation & commands | No | Yes |
 | VSIX packaging correctness | No | Yes |
 | Webview lifecycle (dispose, restore) | No | Yes |
-| Shared component rendering | Yes | Yes |
 | CI speed (lightweight) | Fast | Slower (openvscode-server) |
 
-Both suites use Playwright with headless Chromium. The VS Code E2E tests (`tests/e2e/`) will be restored from their current `.skip()`'d state as part of this feature.
+Both suites use Playwright with headless Chromium. The VS Code E2E tests (`tests/e2e/`) will be restored from `.skip()` and expanded to match the web-shell's 13 spec file categories. Tests that reveal missing extension features will use `test.fixme()` with backlog cross-references.
