@@ -19,7 +19,6 @@
       {"time": "2026-01-09T10:30:00Z"},
       {"time": "2026-01-09T11:30:00Z", "depth": -50}
     ],
-    "source_file": "contact_alpha.rep",
     "default_position_style": {
       "show_symbol": false,
       "symbol": "triangle",

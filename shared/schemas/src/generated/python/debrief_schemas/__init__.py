@@ -1159,14 +1159,6 @@ class TrackProperties(ConfiguredBaseModel):
     start_time: datetime  = Field(default=..., description="""Track start time (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
     end_time: datetime  = Field(default=..., description="""Track end time (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
     positions: list[TimestampedPosition] = Field(default=..., description="""Array of timestamped positions""", min_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
     style: TrackStyle = Field(default=..., description="""Composite styling for track line and position markers""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -1275,6 +1267,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1287,6 +1280,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1436,6 +1430,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1448,6 +1443,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1548,6 +1544,7 @@ class SystemState(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1560,6 +1557,7 @@ class SystemState(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1692,6 +1690,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1704,6 +1703,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1827,6 +1827,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1839,6 +1840,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1866,6 +1868,9 @@ class LogEntry(ConfiguredBaseModel):
     execution_duration: str = Field(default=..., description="""Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
     generated_result_id: Optional[str] = Field(default=None, description="""Stable logical identity for artifact-producing tools. Null for non-artifact tools.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
     tune: Optional[TuneAnnotation] = Field(default=None, description="""Parameter tuning record. Null until a tuning operation modifies this entry.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
+    input_state: Optional[list[InputFeatureState]] = Field(default=[], description="""Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
+    disabled: Optional[bool] = Field(default=False, description="""Whether this entry is skipped during replay. Toggled via the flip-card edit face.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry'], 'ifabsent': 'false'} })
+    rationale: Optional[str] = Field(default=None, description="""Free-text analyst annotation explaining the reasoning for this operation.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
 
     @field_validator('execution_duration')
     def pattern_execution_duration(cls, v):
@@ -1901,6 +1906,47 @@ class ParameterValue(ConfiguredBaseModel):
     value: str = Field(default=..., description="""The parameter value (any JSON type).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue']} })
     default: Optional[bool] = Field(default=False, description="""Whether this is the default value.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue'], 'ifabsent': 'false'} })
     tunable: Optional[bool] = Field(default=True, description="""Whether this parameter can be modified during replay.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue'], 'ifabsent': 'true'} })
+
+
+class InputFeatureState(ConfiguredBaseModel):
+    """
+    Pre-operation state of a feature captured before a coordinate-mutating tool executes. Enables correct replay by providing the original geometry as the anchor for re-computation with modified parameters.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/log-entry'})
+
+    feature_id: str = Field(default=..., description="""ID of the feature whose pre-operation state is captured.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InputFeatureState']} })
+    geometry: str = Field(default=..., description="""Full GeoJSON geometry object (type + coordinates) as it was immediately before the operation. Stored as a JSON object.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'InputFeatureState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation'],
+         'notes': ['Typed as string in LinkML but serialized as a JSON object in '
+                   'practice. GeoJSON geometry is polymorphic (Point, Polygon, '
+                   'LineString, etc.) and LinkML does not have a native geometry '
+                   'type.']} })
+    properties: Optional[str] = Field(default=None, description="""Kind-specific spatial properties captured before the operation. Excludes provenance (which is append-only). Null if no spatial properties need capturing.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'InputFeatureState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation'],
+         'notes': ['Typed as string in LinkML but serialized as a JSON object in '
+                   'practice. Contains keys like "center", "origin", "radius_km" etc.']} })
 
 
 class TuneAnnotation(ConfiguredBaseModel):
@@ -1956,14 +2002,6 @@ class NarrativeEntryProperties(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -2032,6 +2070,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2044,6 +2083,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2100,14 +2140,6 @@ class CircleAnnotationProperties(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -2176,6 +2208,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2188,6 +2221,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2242,14 +2276,6 @@ class RectangleAnnotationProperties(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -2318,6 +2344,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2330,6 +2357,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2384,14 +2412,6 @@ class LineAnnotationProperties(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -2460,6 +2480,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2472,6 +2493,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2517,14 +2539,6 @@ class TextAnnotationProperties(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -2593,6 +2607,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2605,6 +2620,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2662,14 +2678,6 @@ class VectorAnnotationProperties(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -2738,6 +2746,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2750,6 +2759,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2805,14 +2815,6 @@ class PolyAnnotationProperties(ConfiguredBaseModel):
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -2882,6 +2884,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2894,6 +2897,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -3144,6 +3148,7 @@ MultiPolygonFeature.model_rebuild()
 LogEntry.model_rebuild()
 WasGeneratedBy.model_rebuild()
 ParameterValue.model_rebuild()
+InputFeatureState.model_rebuild()
 TuneAnnotation.model_rebuild()
 NarrativeEntryProperties.model_rebuild()
 NarrativeEntry.model_rebuild()

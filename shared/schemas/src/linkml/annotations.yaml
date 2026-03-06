@@ -48,8 +48,6 @@ classes:
         description: Point styling properties for display position
         range: PointProperties
         required: true
-      source_file:
-        description: Original source file path
       provenance:
         description: PROV-aligned provenance records (append-only log of tool operations)
         range: LogEntry
@@ -111,8 +109,6 @@ classes:
         description: Polygon styling properties for the circle area
         range: PolygonProperties
         required: true
-      source_file:
-        description: Original source file path
       provenance:
         description: PROV-aligned provenance records (append-only log of tool operations)
         range: LogEntry
@@ -162,8 +158,6 @@ classes:
         description: Polygon styling properties for the rectangle area
         range: PolygonProperties
         required: true
-      source_file:
-        description: Original source file path
       provenance:
         description: PROV-aligned provenance records (append-only log of tool operations)
         range: LogEntry
@@ -212,8 +206,6 @@ classes:
         description: Line styling properties for the line segment
         range: LineProperties
         required: true
-      source_file:
-        description: Original source file path
       provenance:
         description: PROV-aligned provenance records (append-only log of tool operations)
         range: LogEntry
@@ -263,8 +255,6 @@ classes:
         description: Point styling properties for the text position marker
         range: PointProperties
         required: true
-      source_file:
-        description: Original source file path
       provenance:
         description: PROV-aligned provenance records (append-only log of tool operations)
         range: LogEntry
@@ -331,8 +321,6 @@ classes:
         description: Line styling properties for the vector
         range: LineProperties
         required: true
-      source_file:
-        description: Original source file path
       provenance:
         description: PROV-aligned provenance records (append-only log of tool operations)
         range: LogEntry
@@ -387,8 +375,6 @@ classes:
         description: Polygon styling properties for the polygon area
         range: PolygonProperties
         required: true
-      source_file:
-        description: Original source file path
       line_number:
         description: Source line number for debugging
         range: integer

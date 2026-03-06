@@ -186,13 +186,6 @@
           "minimum": 0,
           "type": "number"
         },
-        "source_file": {
-          "description": "Original source file path",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "style": {
           "$ref": "#/$defs/PolygonProperties",
           "description": "Polygon styling properties for the circle area"
@@ -482,6 +475,33 @@
       "title": "GeoJSONPolygon",
       "type": "object"
     },
+    "InputFeatureState": {
+      "additionalProperties": false,
+      "description": "Pre-operation state of a feature captured before a coordinate-mutating tool executes. Enables correct replay by providing the original geometry as the anchor for re-computation with modified parameters.",
+      "properties": {
+        "feature_id": {
+          "description": "ID of the feature whose pre-operation state is captured.",
+          "type": "string"
+        },
+        "geometry": {
+          "description": "Full GeoJSON geometry object (type + coordinates) as it was immediately before the operation. Stored as a JSON object.",
+          "type": "string"
+        },
+        "properties": {
+          "description": "Kind-specific spatial properties captured before the operation. Excludes provenance (which is append-only). Null if no spatial properties need capturing.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "feature_id",
+        "geometry"
+      ],
+      "title": "InputFeatureState",
+      "type": "object"
+    },
     "LineAnnotation": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for line segment annotations. Geometry is a LineString with 2 points (start and end).",
@@ -536,13 +556,6 @@
           },
           "type": [
             "array",
-            "null"
-          ]
-        },
-        "source_file": {
-          "description": "Original source file path",
-          "type": [
-            "string",
             "null"
           ]
         },
@@ -661,6 +674,13 @@
           "description": "Unique operation identifier (UUID v4). Shared across features in multi-feature operations.",
           "type": "string"
         },
+        "disabled": {
+          "description": "Whether this entry is skipped during replay. Toggled via the flip-card edit face.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
         "execution_duration": {
           "description": "Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S).",
           "pattern": "^PT[0-9]+(\\.[0-9]+)?S$",
@@ -675,6 +695,23 @@
         },
         "generated_result_id": {
           "description": "Stable logical identity for artifact-producing tools. Null for non-artifact tools.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "input_state": {
+          "description": "Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools.",
+          "items": {
+            "$ref": "#/$defs/InputFeatureState"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "rationale": {
+          "description": "Free-text analyst annotation explaining the reasoning for this operation.",
           "type": [
             "string",
             "null"
@@ -1011,13 +1048,6 @@
             "null"
           ]
         },
-        "source_file": {
-          "description": "Original source file path",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "style": {
           "$ref": "#/$defs/PointProperties",
           "description": "Point styling properties for display position"
@@ -1297,13 +1327,6 @@
             "null"
           ]
         },
-        "source_file": {
-          "description": "Original source file path",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "style": {
           "$ref": "#/$defs/PolygonProperties",
           "description": "Polygon styling properties for the polygon area"
@@ -1518,13 +1541,6 @@
           },
           "type": [
             "array",
-            "null"
-          ]
-        },
-        "source_file": {
-          "description": "Original source file path",
-          "type": [
-            "string",
             "null"
           ]
         },
@@ -2373,13 +2389,6 @@
             "null"
           ]
         },
-        "source_file": {
-          "description": "Original source file path",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "style": {
           "$ref": "#/$defs/PointProperties",
           "description": "Point styling properties for the text position marker"
@@ -2666,13 +2675,6 @@
             "null"
           ]
         },
-        "source_file": {
-          "description": "Original source file path",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "start_time": {
           "description": "Track start time (ISO8601)",
           "format": "date-time",
@@ -2856,13 +2858,6 @@
           "description": "Vector length/range in meters for precise reconstruction",
           "minimum": 0,
           "type": "number"
-        },
-        "source_file": {
-          "description": "Original source file path",
-          "type": [
-            "string",
-            "null"
-          ]
         },
         "style": {
           "$ref": "#/$defs/LineProperties",

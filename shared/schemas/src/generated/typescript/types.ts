@@ -656,8 +656,6 @@ export interface TrackProperties {
     end_time: string,
     /** Array of timestamped positions */
     positions: TimestampedPosition[],
-    /** Original source file path */
-    source_file?: string,
     /** Composite styling for track line and position markers */
     style: TrackStyle,
     /** Default styling applied to all positions */
@@ -885,6 +883,12 @@ export interface LogEntry {
     generated_result_id?: string,
     /** Parameter tuning record. Null until a tuning operation modifies this entry. */
     tune?: TuneAnnotation,
+    /** Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools. */
+    input_state?: InputFeatureState[],
+    /** Whether this entry is skipped during replay. Toggled via the flip-card edit face. */
+    disabled?: boolean,
+    /** Free-text analyst annotation explaining the reasoning for this operation. */
+    rationale?: string,
 }
 
 
@@ -911,6 +915,19 @@ export interface ParameterValue {
     default?: boolean,
     /** Whether this parameter can be modified during replay. */
     tunable?: boolean,
+}
+
+
+/**
+ * Pre-operation state of a feature captured before a coordinate-mutating tool executes. Enables correct replay by providing the original geometry as the anchor for re-computation with modified parameters.
+ */
+export interface InputFeatureState {
+    /** ID of the feature whose pre-operation state is captured. */
+    feature_id: string,
+    /** Full GeoJSON geometry object (type + coordinates) as it was immediately before the operation. Stored as a JSON object. */
+    geometry: string,
+    /** Kind-specific spatial properties captured before the operation. Excludes provenance (which is append-only). Null if no spatial properties need capturing. */
+    properties?: string,
 }
 
 
@@ -945,8 +962,6 @@ export interface NarrativeEntryProperties {
     symbol?: string,
     /** Point styling properties for display position */
     style: PointProperties,
-    /** Original source file path */
-    source_file?: string,
     /** PROV-aligned provenance records (append-only log of tool operations) */
     provenance?: LogEntry[],
 }
@@ -983,8 +998,6 @@ export interface CircleAnnotationProperties {
     symbol?: string,
     /** Polygon styling properties for the circle area */
     style: PolygonProperties,
-    /** Original source file path */
-    source_file?: string,
     /** PROV-aligned provenance records (append-only log of tool operations) */
     provenance?: LogEntry[],
 }
@@ -1017,8 +1030,6 @@ export interface RectangleAnnotationProperties {
     symbol?: string,
     /** Polygon styling properties for the rectangle area */
     style: PolygonProperties,
-    /** Original source file path */
-    source_file?: string,
     /** PROV-aligned provenance records (append-only log of tool operations) */
     provenance?: LogEntry[],
 }
@@ -1051,8 +1062,6 @@ export interface LineAnnotationProperties {
     symbol?: string,
     /** Line styling properties for the line segment */
     style: LineProperties,
-    /** Original source file path */
-    source_file?: string,
     /** PROV-aligned provenance records (append-only log of tool operations) */
     provenance?: LogEntry[],
 }
@@ -1085,8 +1094,6 @@ export interface TextAnnotationProperties {
     symbol?: string,
     /** Point styling properties for the text position marker */
     style: PointProperties,
-    /** Original source file path */
-    source_file?: string,
     /** PROV-aligned provenance records (append-only log of tool operations) */
     provenance?: LogEntry[],
 }
@@ -1125,8 +1132,6 @@ export interface VectorAnnotationProperties {
     symbol?: string,
     /** Line styling properties for the vector */
     style: LineProperties,
-    /** Original source file path */
-    source_file?: string,
     /** PROV-aligned provenance records (append-only log of tool operations) */
     provenance?: LogEntry[],
 }
@@ -1161,8 +1166,6 @@ export interface PolyAnnotationProperties {
     symbol?: string,
     /** Polygon styling properties for the polygon area */
     style: PolygonProperties,
-    /** Original source file path */
-    source_file?: string,
     /** Source line number for debugging */
     line_number?: number,
     /** PROV-aligned provenance records (append-only log of tool operations) */

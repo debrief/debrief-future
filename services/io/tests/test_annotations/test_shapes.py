@@ -203,9 +203,8 @@ class TestShapeIntegration:
         ids = {circle["id"], rect["id"], line["id"]}
         assert len(ids) == 3
 
-    def test_all_shapes_have_source_info(self) -> None:
-        """All shapes include source file and line number."""
+    def test_all_shapes_have_line_number(self) -> None:
+        """All shapes include line number for debugging."""
         circle = build_circle(";CIRCLE: @A 21 0 0 N 45 0 0 W 1000 test", 10, "shapes.rep")
 
-        assert circle["properties"]["source_file"] == "shapes.rep"
         assert circle["properties"]["line_number"] == 10
