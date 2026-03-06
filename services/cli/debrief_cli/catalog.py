@@ -1,8 +1,7 @@
 """
 Catalog commands for debrief-cli.
 
-Provides access to STAC catalog browsing functionality.
-Note: Full implementation requires debrief-stac and debrief-config packages.
+Provides access to STAC catalog browsing functionality via debrief-stac.
 """
 
 from __future__ import annotations
@@ -14,10 +13,6 @@ from pathlib import Path
 import click
 
 from debrief_cli.main import Context, pass_context
-
-# Placeholder for store configuration
-# In full implementation, this would come from debrief-config via XDG config
-_STORES: dict[str, dict] = {}
 
 
 def _get_config_path() -> Path:
@@ -89,7 +84,7 @@ def list_items(ctx: Context, store: str) -> None:
     """
     List items in a STAC catalog.
 
-    Requires debrief-stac package for full functionality.
+    Lists all plots in the specified store using debrief-stac.
     """
     formatter = ctx.get_formatter()
 
@@ -102,20 +97,49 @@ def list_items(ctx: Context, store: str) -> None:
             sys.exit(5)
 
         store_config = stores[store]
+        store_path = store_config.get("path")
 
-        # Placeholder: In full implementation, use debrief-stac to list items
+        if not store_path:
+            formatter.error(f"Store '{store}' has no path configured", "STORE_CONFIG_ERROR")
+            formatter.finish()
+            sys.exit(5)
+
+        from debrief_stac.catalog import list_plots
+        from debrief_stac.exceptions import CatalogNotFoundError
+
+        try:
+            plots = list_plots(store_path)
+        except CatalogNotFoundError:
+            formatter.error(f"No STAC catalog found at: {store_path}", "CATALOG_NOT_FOUND")
+            formatter.finish()
+            sys.exit(5)
+
         if ctx.json_mode:
             formatter.json_output(
                 {
                     "store": store,
-                    "items": [],
-                    "message": "debrief-stac integration not yet implemented",
+                    "items": [
+                        {
+                            "id": p.id,
+                            "title": p.title,
+                            "datetime": p.timestamp.isoformat(),
+                            "feature_count": p.feature_count,
+                        }
+                        for p in plots
+                    ],
+                    "count": len(plots),
                 }
             )
         else:
-            formatter.info(f"Store: {store}")
-            formatter.info("Note: Full STAC browsing requires debrief-stac package")
-            formatter.info(f"Store path: {store_config.get('path', 'N/A')}")
+            formatter.info(f"Store: {store} ({store_path})")
+            if not plots:
+                formatter.info("No plots found.")
+            else:
+                rows = [
+                    [p.id, p.title, p.timestamp.strftime("%Y-%m-%d %H:%M"), str(p.feature_count)]
+                    for p in plots
+                ]
+                formatter.table(["ID", "Title", "Date", "Features"], rows)
 
         formatter.finish()
 
@@ -133,7 +157,7 @@ def get_item(ctx: Context, store: str, item: str) -> None:
     """
     Get a specific item from a STAC catalog.
 
-    Requires debrief-stac package for full functionality.
+    Reads a plot from the specified store using debrief-stac.
     """
     formatter = ctx.get_formatter()
 
@@ -145,19 +169,44 @@ def get_item(ctx: Context, store: str, item: str) -> None:
             formatter.finish()
             sys.exit(5)
 
-        # Placeholder: In full implementation, use debrief-stac to get item
+        store_config = stores[store]
+        store_path = store_config.get("path")
+
+        if not store_path:
+            formatter.error(f"Store '{store}' has no path configured", "STORE_CONFIG_ERROR")
+            formatter.finish()
+            sys.exit(5)
+
+        from debrief_stac.exceptions import CatalogNotFoundError, PlotNotFoundError
+        from debrief_stac.plot import read_plot
+
+        try:
+            item_data = read_plot(store_path, item)
+        except CatalogNotFoundError:
+            formatter.error(f"No STAC catalog found at: {store_path}", "CATALOG_NOT_FOUND")
+            formatter.finish()
+            sys.exit(5)
+        except PlotNotFoundError:
+            formatter.error(f"Item '{item}' not found in store '{store}'", "ITEM_NOT_FOUND")
+            formatter.finish()
+            sys.exit(4)
+
         if ctx.json_mode:
-            formatter.json_output(
-                {
-                    "store": store,
-                    "item": item,
-                    "message": "debrief-stac integration not yet implemented",
-                }
-            )
+            formatter.json_output(item_data)
         else:
+            title = item_data.get("properties", {}).get("title", "Untitled")
+            datetime_str = item_data.get("properties", {}).get("datetime", "N/A")
             formatter.info(f"Store: {store}")
             formatter.info(f"Item: {item}")
-            formatter.info("Note: Full STAC access requires debrief-stac package")
+            formatter.info(f"Title: {title}")
+            formatter.info(f"Datetime: {datetime_str}")
+
+            assets = item_data.get("assets", {})
+            if assets:
+                formatter.info(f"Assets: {len(assets)}")
+                for key, asset in assets.items():
+                    media_type = asset.get("type", "unknown")
+                    formatter.info(f"  {key}: {media_type}")
 
         formatter.finish()
 

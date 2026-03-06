@@ -167,6 +167,7 @@ Description formats:
 | 111 | Tech Debt | [Add periodic heartbeat re-validation for Python dependencies](docs/architectural-consistency-review.md#f-65-periodic-heartbeats-missing) [E06] — after activation, if debrief-calc becomes unavailable, status bar stays green until next tool execution fails | 3 | 2 | 5 | 10 | Low | approved |
 | 112 | Tech Debt | [Align result type annotations and provenance field naming with spec](docs/architectural-consistency-review.md#f-42-web-shell-resulttype-annotation-uses-wrong-format) [E06] — resultType missing type prefix; provenance field naming needs doc/code alignment (F-4.2, F-4.3) | 3 | 1 | 5 | 9 | Low | approved |
 | 123 | Tech Debt | Add `disabled` and `rationale` fields to Python `LogEntry` model — fields exist in LinkML schema (log-entry.yaml:61-69) and TypeScript types but not in Python Pydantic model (models.py); Art. II.1 violation, same gap pattern as #116's inputState fix | 3 | 1 | 5 | 9 | Low | proposed |
+| 124 | Feature | Wire exportPng command to leaflet-image for real PNG map export — currently shows placeholder message instead of capturing the Leaflet map canvas | 3 | 3 | 4 | 10 | Medium | proposed |
 | 061 | Feature | [Add generate courses and speeds for track tool spec](specs/061-generate-courses-speeds/spec.md) (requires #049) | 4 | 3 | 5 | 12 | Low | implementing |
 | ~~028~~ | ~~Tech Debt~~ | ~~[Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md)~~ | ~~4~~ | ~~2~~ | ~~5~~ | ~~11~~ | ~~Low~~ | ~~complete~~ |
 | 076 | Feature | [Implement replay and parameter tuning](specs/076-replay-tune/spec.md) [E02] — parameter editing, positional replay, revert operations (requires #071, #074) | 5 | 4 | 2 | 11 | High | implementing |
@@ -229,8 +230,8 @@ Description formats:
 | 001 | Infrastructure | Extract shared MCP utilities into mcp-common package | 3 | 2 | 4 | 9 | Medium | proposed |
 | 037 | Tech Debt | [Fix test isolation in debrief-config tests](docs/ideas/030-fix-config-test-isolation.md) | 3 | 1 | 5 | 9 | Low | proposed |
 | 053 | Tech Debt | Remove migration-specific tool commands after Legacy Debrief migration complete (keep /tool.spec and /tool.implement for general use) | 2 | 1 | 5 | 8 | Low | proposed |
-| 010 | Tech Debt | Add rollback/cleanup API to debrief-stac for interrupted operations | 3 | 1 | 4 | 8 | Medium | proposed |
-| 012 | Enhancement | Wire loader plot count to debrief-stac list_plots call | 2 | 1 | 5 | 8 | Low | proposed |
+| ~~010~~ | ~~Tech Debt~~ | ~~Add rollback/cleanup API to debrief-stac for interrupted operations~~ | ~~3~~ | ~~1~~ | ~~4~~ | ~~8~~ | ~~Medium~~ | ~~complete~~ |
+| ~~012~~ | ~~Enhancement~~ | ~~Wire loader plot count to debrief-stac list_plots call~~ | ~~2~~ | ~~1~~ | ~~5~~ | ~~8~~ | ~~Low~~ | ~~complete~~ |
 | 018 | Infrastructure | [Add VS Code multi-root workspace configuration](specs/018-vscode-workspace-config/spec.md) | 3 | 1 | 5 | 9 | Low | shipped |
 | ~~042~~ | ~~Feature~~ | ~~[Add STAC catalog overview panel with map and timeline](specs/042-stac-catalog-overview-panel/spec.md)~~ | ~~5~~ | ~~5~~ | ~~3~~ | ~~13~~ | ~~High~~ | ~~complete~~ |
 | ~~051~~ | ~~Bug~~ | ~~[Load existing result files into Attachments dropdown](specs/051-load-result-attachments/spec.md)~~ | ~~5~~ | ~~3~~ | ~~4~~ | ~~12~~ | ~~Low~~ | ~~complete~~ |

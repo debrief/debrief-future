@@ -7,6 +7,11 @@ import pytest
 from click.testing import CliRunner
 from debrief_cli.main import cli
 
+from debrief_stac.catalog import create_catalog
+from debrief_stac.features import add_features
+from debrief_stac.models import PlotMetadata
+from debrief_stac.plot import create_plot
+
 
 @pytest.fixture
 def runner() -> CliRunner:
@@ -16,15 +21,35 @@ def runner() -> CliRunner:
 
 @pytest.fixture
 def config_with_stores(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """Create a config file with test stores."""
+    """Create a config file with test stores pointing to real STAC catalogs."""
+    # Create a real STAC catalog
+    catalog_path = tmp_path / "test-catalog"
+    create_catalog(catalog_path, catalog_id="test", title="Test Catalog")
+
+    # Create a plot with features
+    metadata = PlotMetadata(title="Test Plot")
+    plot_id = create_plot(catalog_path, metadata, plot_id="plot-001")
+    add_features(
+        catalog_path,
+        plot_id,
+        [
+            {
+                "type": "Feature",
+                "id": "track-1",
+                "geometry": {"type": "LineString", "coordinates": [[-4.5, 50.2], [-4.4, 50.3]]},
+                "properties": {"kind": "TRACK", "name": "HMS Example"},
+            }
+        ],
+    )
+
     config_dir = tmp_path / ".config" / "debrief"
     config_dir.mkdir(parents=True)
     config_file = config_dir / "config.json"
 
     config = {
         "stores": {
-            "test-store": {"type": "local", "path": "/tmp/test-catalog"},
-            "remote-store": {"type": "remote", "url": "https://example.com/stac"},
+            "test-store": {"type": "local", "path": str(catalog_path)},
+            "missing-store": {"type": "local", "path": "/tmp/nonexistent-catalog"},
         }
     }
     config_file.write_text(json.dumps(config))
@@ -54,7 +79,7 @@ class TestCatalogStores:
 
         assert result.exit_code == 0
         assert "test-store" in result.output
-        assert "remote-store" in result.output
+        assert "missing-store" in result.output
 
     def test_stores_json(self, runner: CliRunner, config_with_stores: Path) -> None:
         result = runner.invoke(cli, ["--json", "catalog", "stores"])
@@ -88,8 +113,24 @@ class TestCatalogList:
         result = runner.invoke(cli, ["catalog", "list", "--store", "test-store"])
 
         assert result.exit_code == 0
-        # Note: Full functionality requires debrief-stac
         assert "test-store" in result.output
+        assert "plot-001" in result.output or "Test Plot" in result.output
+
+    def test_list_json(self, runner: CliRunner, config_with_stores: Path) -> None:
+        result = runner.invoke(cli, ["--json", "catalog", "list", "--store", "test-store"])
+
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "items" in data
+        assert len(data["items"]) == 1
+        assert data["items"][0]["id"] == "plot-001"
+        assert data["items"][0]["feature_count"] == 1
+
+    def test_list_missing_catalog(self, runner: CliRunner, config_with_stores: Path) -> None:
+        result = runner.invoke(cli, ["catalog", "list", "--store", "missing-store"])
+
+        assert result.exit_code == 5
+        assert "not found" in result.output.lower() or "catalog" in result.output.lower()
 
 
 class TestCatalogGet:
@@ -111,14 +152,33 @@ class TestCatalogGet:
 
         assert result.exit_code == 5
 
-    def test_get_known_store(self, runner: CliRunner, config_with_stores: Path) -> None:
+    def test_get_known_item(self, runner: CliRunner, config_with_stores: Path) -> None:
         result = runner.invoke(
-            cli, ["catalog", "get", "--store", "test-store", "--item", "item-001"]
+            cli, ["catalog", "get", "--store", "test-store", "--item", "plot-001"]
         )
 
         assert result.exit_code == 0
         assert "test-store" in result.output
-        assert "item-001" in result.output
+        assert "plot-001" in result.output
+        assert "Test Plot" in result.output
+
+    def test_get_json(self, runner: CliRunner, config_with_stores: Path) -> None:
+        result = runner.invoke(
+            cli, ["--json", "catalog", "get", "--store", "test-store", "--item", "plot-001"]
+        )
+
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["id"] == "plot-001"
+        assert data["properties"]["title"] == "Test Plot"
+
+    def test_get_missing_item(self, runner: CliRunner, config_with_stores: Path) -> None:
+        result = runner.invoke(
+            cli, ["catalog", "get", "--store", "test-store", "--item", "nonexistent"]
+        )
+
+        assert result.exit_code == 4
+        assert "not found" in result.output.lower()
 
 
 class TestCatalogHelp:

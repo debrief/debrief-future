@@ -75,12 +75,20 @@ export async function checkAndCleanup(): Promise<void> {
 
   for (const op of ops) {
     try {
-      // For now, we just log the interrupted operation
-      // In a full implementation, we would call debrief-stac to rollback partial writes
       console.log(`Cleaning up operation ${op.id} (phase: ${op.phase}, store: ${op.storePath})`);
 
-      // TODO: Implement actual cleanup via debrief-stac rollback API
-      // await stacService.rollback(op.storePath, op.plotId);
+      // Remove the partial plot directory if the operation was interrupted
+      // during create/write/copy phases and we have a plot ID
+      if (op.plotId && op.storePath && op.phase !== 'parse') {
+        const plotDir = join(op.storePath, op.plotId);
+        try {
+          await fs.rm(plotDir, { recursive: true, force: true });
+          console.log(`Removed partial plot directory: ${plotDir}`);
+        } catch (rmErr) {
+          // Directory may not exist if the operation failed before creation
+          console.warn(`Could not remove ${plotDir}:`, rmErr);
+        }
+      }
     } catch (err) {
       console.error(`Failed to cleanup operation ${op.id}:`, err);
     }

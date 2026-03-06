@@ -43,10 +43,10 @@ const NUM_BEARINGS = 36;
 const BEARING_STEP = 360.0 / NUM_BEARINGS;
 
 // ============================================================
-// STUB SENSOR MODEL
+// DEFAULT SENSOR MODEL
 // ============================================================
 
-class StubSensorModel implements SensorModel {
+class DefaultSensorModel implements SensorModel {
   getDetectionZones(_track: GeoJSONFeature): SensorModelZone[] {
     return [
       { distance_nm: 3.0, likelihood_pct: 75, name: '75%' },
@@ -289,7 +289,7 @@ export function execute(
   }
 
   // Get sensor model zones
-  const model = sensorModel ?? new StubSensorModel();
+  const model = sensorModel ?? new DefaultSensorModel();
   let zones = model.getDetectionZones(track);
 
   // Check for custom distance overrides

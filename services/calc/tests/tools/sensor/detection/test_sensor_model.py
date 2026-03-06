@@ -1,10 +1,10 @@
-"""Tests for the sensor model interface and stub implementation."""
+"""Tests for the sensor model interface and default implementation."""
 
 import pytest
 from debrief_calc.tools.sensor.detection.sensor_model import (
+    DefaultSensorModel,
     SensorModel,
     SensorModelZone,
-    StubSensorModel,
 )
 
 SAMPLE_TRACK = {
@@ -33,50 +33,50 @@ class TestSensorModelZone:
             zone.distance_nm = 5.0  # type: ignore[misc]
 
 
-class TestStubSensorModel:
-    """Tests for the stub sensor model implementation."""
+class TestDefaultSensorModel:
+    """Tests for the default sensor model implementation."""
 
     def test_returns_three_zones(self) -> None:
-        model = StubSensorModel()
+        model = DefaultSensorModel()
         zones = model.get_detection_zones(SAMPLE_TRACK)
         assert len(zones) == 3
 
     def test_zone_distances(self) -> None:
-        model = StubSensorModel()
+        model = DefaultSensorModel()
         zones = model.get_detection_zones(SAMPLE_TRACK)
         assert zones[0].distance_nm == 3.0
         assert zones[1].distance_nm == 6.0
         assert zones[2].distance_nm == 12.0
 
     def test_zone_likelihoods(self) -> None:
-        model = StubSensorModel()
+        model = DefaultSensorModel()
         zones = model.get_detection_zones(SAMPLE_TRACK)
         assert zones[0].likelihood_pct == 75
         assert zones[1].likelihood_pct == 50
         assert zones[2].likelihood_pct == 25
 
     def test_zone_names(self) -> None:
-        model = StubSensorModel()
+        model = DefaultSensorModel()
         zones = model.get_detection_zones(SAMPLE_TRACK)
         assert zones[0].name == "75%"
         assert zones[1].name == "50%"
         assert zones[2].name == "25%"
 
     def test_ordered_ascending_distance(self) -> None:
-        model = StubSensorModel()
+        model = DefaultSensorModel()
         zones = model.get_detection_zones(SAMPLE_TRACK)
         distances = [z.distance_nm for z in zones]
         assert distances == sorted(distances)
 
     def test_satisfies_protocol(self) -> None:
-        """Verify StubSensorModel satisfies the SensorModel Protocol."""
-        model: SensorModel = StubSensorModel()
+        """Verify DefaultSensorModel satisfies the SensorModel Protocol."""
+        model: SensorModel = DefaultSensorModel()
         zones = model.get_detection_zones(SAMPLE_TRACK)
         assert len(zones) == 3
 
     def test_ignores_track_content(self) -> None:
         """Stub returns same result regardless of track."""
-        model = StubSensorModel()
+        model = DefaultSensorModel()
         zones_a = model.get_detection_zones(SAMPLE_TRACK)
         zones_b = model.get_detection_zones({"type": "Feature", "geometry": {}, "properties": {}})
         assert zones_a == zones_b
