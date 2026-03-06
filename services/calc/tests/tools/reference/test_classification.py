@@ -121,7 +121,7 @@ def _make_context(ref_feature: dict[str, Any], zone_feature: dict[str, Any]) -> 
 class TestClassifyBasic:
     """Basic classification tests."""
 
-    def test_point_inside_inner_zone(self):
+    def test_point_inside_inner_zone(self) -> None:
         """Point at origin should be classified as innermost zone."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -136,7 +136,7 @@ class TestClassifyBasic:
         assert md[0]["zone"] == "75%"
         assert md[0]["color"] == "#9C27B0"
 
-    def test_point_in_middle_zone(self):
+    def test_point_in_middle_zone(self) -> None:
         """Point at (1.5, 0) should be in middle zone (outside inner, inside middle)."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -149,7 +149,7 @@ class TestClassifyBasic:
         assert md[0]["zone"] == "50%"
         assert md[0]["color"] == "#F44336"
 
-    def test_point_in_outer_zone(self):
+    def test_point_in_outer_zone(self) -> None:
         """Point at (2.5, 0) should be in outer zone."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -162,7 +162,7 @@ class TestClassifyBasic:
         assert md[0]["zone"] == "25%"
         assert md[0]["color"] == "#FF9800"
 
-    def test_point_outside_all_zones(self):
+    def test_point_outside_all_zones(self) -> None:
         """Point at (10, 10) should be outside all zones."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -175,7 +175,7 @@ class TestClassifyBasic:
         assert md[0]["zone"] == "none"
         assert md[0]["color"] == "#666666"
 
-    def test_multiple_points_classified_correctly(self):
+    def test_multiple_points_classified_correctly(self) -> None:
         """Multiple points should each be classified independently."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -196,7 +196,7 @@ class TestClassifyBasic:
         assert md[2]["zone"] == "25%"
         assert md[3]["zone"] == "none"
 
-    def test_point_colors_array_parallel(self):
+    def test_point_colors_array_parallel(self) -> None:
         """pointColors must be parallel to coordinates."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -212,7 +212,7 @@ class TestClassifyBasic:
         assert pc[1] == "#F44336"
         assert pc[2] == "#666666"
 
-    def test_innermost_zone_wins(self):
+    def test_innermost_zone_wins(self) -> None:
         """Point inside innermost zone must not be assigned to outer zones."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -234,7 +234,7 @@ class TestClassifyBasic:
 class TestMetadataPreservation:
     """Metadata preservation tests."""
 
-    def test_preserves_index_and_name(self):
+    def test_preserves_index_and_name(self) -> None:
         """Existing index and name fields must survive classification."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -252,7 +252,7 @@ class TestMetadataPreservation:
         assert md[1]["name"] == "Beta"
         assert md[1]["zone"] == "none"
 
-    def test_preserves_custom_fields(self):
+    def test_preserves_custom_fields(self) -> None:
         """Custom fields in metadata must survive classification."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -268,7 +268,7 @@ class TestMetadataPreservation:
         assert "zone" in md[0]
         assert "color" in md[0]
 
-    def test_reclassification_updates_zone_color(self):
+    def test_reclassification_updates_zone_color(self) -> None:
         """Re-classification with different zones should update zone/color fields."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -300,7 +300,7 @@ class TestMetadataPreservation:
         assert md[0]["zone"] == "none"
         assert md[0]["color"] == "#666666"
 
-    def test_does_not_mutate_input(self):
+    def test_does_not_mutate_input(self) -> None:
         """Input feature must not be mutated in place."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -323,7 +323,7 @@ class TestMetadataPreservation:
 class TestDeterminism:
     """Determinism and statelessness tests."""
 
-    def test_identical_inputs_produce_identical_output(self):
+    def test_identical_inputs_produce_identical_output(self) -> None:
         """Same inputs must produce identical output."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -336,7 +336,7 @@ class TestDeterminism:
 
         assert result1 == result2
 
-    def test_geometry_unchanged(self):
+    def test_geometry_unchanged(self) -> None:
         """Output geometry must be identical to input geometry."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -357,7 +357,7 @@ class TestDeterminism:
 class TestEdgeCases:
     """Edge case tests."""
 
-    def test_no_ref_feature_raises(self):
+    def test_no_ref_feature_raises(self) -> None:
         """Missing reference feature should raise ValueError."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -366,7 +366,7 @@ class TestEdgeCases:
         with pytest.raises(ValueError, match="No reference point feature"):
             point_in_zone_classifier(ctx, {})
 
-    def test_no_zone_feature_raises(self):
+    def test_no_zone_feature_raises(self) -> None:
         """Missing zone feature should raise ValueError."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -375,7 +375,7 @@ class TestEdgeCases:
         with pytest.raises(ValueError, match="No zone feature"):
             point_in_zone_classifier(ctx, {})
 
-    def test_non_multipoint_raises(self):
+    def test_non_multipoint_raises(self) -> None:
         """Non-MultiPoint reference feature should raise ValueError."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -390,7 +390,7 @@ class TestEdgeCases:
         with pytest.raises(ValueError, match="MultiPoint"):
             point_in_zone_classifier(ctx, {})
 
-    def test_non_multipolygon_raises(self):
+    def test_non_multipolygon_raises(self) -> None:
         """Non-MultiPolygon zone feature should raise ValueError."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -405,7 +405,7 @@ class TestEdgeCases:
         with pytest.raises(ValueError, match="MultiPolygon"):
             point_in_zone_classifier(ctx, {})
 
-    def test_metadata_length_mismatch_raises(self):
+    def test_metadata_length_mismatch_raises(self) -> None:
         """Mismatched pointMetadata/coordinates lengths should raise ValueError."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -415,7 +415,7 @@ class TestEdgeCases:
         with pytest.raises(ValueError, match="pointMetadata length"):
             point_in_zone_classifier(ctx, {})
 
-    def test_empty_coordinates(self):
+    def test_empty_coordinates(self) -> None:
         """Empty coordinates should return feature with empty metadata and colors."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -428,7 +428,7 @@ class TestEdgeCases:
         assert classified["properties"]["pointMetadata"] == []
         assert classified["properties"]["pointColors"] == []
 
-    def test_empty_zones_array(self):
+    def test_empty_zones_array(self) -> None:
         """Empty zones metadata should classify all points as 'none'."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -449,7 +449,7 @@ class TestEdgeCases:
 class TestGoldenExamples:
     """Golden example validation tests."""
 
-    def test_basic_golden_example(self):
+    def test_basic_golden_example(self) -> None:
         """Python output must match the basic golden example."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 
@@ -481,7 +481,7 @@ class TestGoldenExamples:
         # Verify pointColors array
         assert actual["properties"]["pointColors"] == expected_feature["properties"]["pointColors"]
 
-    def test_all_outside_golden_example(self):
+    def test_all_outside_golden_example(self) -> None:
         """Python output must match the all-outside golden example."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier
 

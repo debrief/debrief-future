@@ -32,24 +32,24 @@
     },
     "provenance": [
       {
-        "activityId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "activity_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
         "timestamp": "2026-03-01T10:30:00Z",
-        "wasGeneratedBy": {
+        "was_generated_by": {
           "tool": "move-shape",
-          "toolVersion": "1.0.0",
-          "parameters": {
-            "direction": { "value": 90, "default": true, "tunable": true },
-            "distance_km": { "value": 5, "default": true, "tunable": true }
-          }
+          "tool_version": "1.0.0",
+          "parameters": [
+            { "value": "90", "default": true, "tunable": true },
+            { "value": "5", "default": true, "tunable": true }
+          ]
         },
         "used": ["circle-001"],
         "generated": ["circle-input-state-001"],
-        "executionDuration": "PT0.012S",
-        "generatedResultId": null,
+        "execution_duration": "PT0.012S",
+        "generated_result_id": null,
         "tune": null,
-        "inputState": [
+        "input_state": [
           {
-            "featureId": "circle-001",
+            "feature_id": "circle-001",
             "geometry": {
               "type": "Polygon",
               "coordinates": [
