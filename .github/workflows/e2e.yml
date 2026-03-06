@@ -112,8 +112,8 @@ jobs:
       # Install openvscode-server (lightweight, no Docker)
       - name: Install openvscode-server
         run: |
-          OVS_VERSION="1.96.4"
-          OVS_URL="https://github.com/nicedoc/openvscode-server/releases/download/openvscode-server-v${OVS_VERSION}/openvscode-server-v${OVS_VERSION}-linux-x64.tar.gz"
+          OVS_VERSION="1.109.5"
+          OVS_URL="https://github.com/gitpod-io/openvscode-server/releases/download/openvscode-server-v${OVS_VERSION}/openvscode-server-v${OVS_VERSION}-linux-x64.tar.gz"
           echo "Downloading openvscode-server v${OVS_VERSION}..."
           curl -fsSL "$OVS_URL" | tar xz -C /tmp
           sudo mv "/tmp/openvscode-server-v${OVS_VERSION}-linux-x64" /opt/openvscode-server
