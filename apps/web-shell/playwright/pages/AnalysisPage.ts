@@ -14,8 +14,7 @@ import { TimeController } from '../components/TimeController';
  *
  * The analysis view shows:
  * - Header with back button and plot title
- * - Sidebar with ActivityPanel (TimeController, Tools, Layers)
- * - Main area with MapView
+ * - GoldenLayout panel workspace with Navigation, Activity/Log (tabbed), and Map panels
  */
 export class AnalysisPage {
   readonly page: Page;
@@ -36,7 +35,8 @@ export class AnalysisPage {
    */
   async waitForLoad(): Promise<void> {
     await this.page.waitForSelector('.web-shell--analysis', { state: 'visible' });
-    await this.page.waitForSelector('.leaflet-container', { state: 'visible' });
+    // GoldenLayout initialises panels asynchronously; allow extra time for map mount
+    await this.page.waitForSelector('.leaflet-container', { state: 'visible', timeout: 15000 });
   }
 
   /**
@@ -69,7 +69,7 @@ export class AnalysisPage {
    * The back button.
    */
   get backButton(): Locator {
-    return this.page.locator('.web-shell__back-button');
+    return this.page.locator('.web-shell__back-button[aria-label="Back to catalog"]');
   }
 
   /**
@@ -80,10 +80,10 @@ export class AnalysisPage {
   }
 
   /**
-   * The sidebar containing the activity panel.
+   * The panel workspace container (GoldenLayout).
    */
-  get sidebar(): Locator {
-    return this.page.locator('.web-shell__sidebar');
+  get workspace(): Locator {
+    return this.page.locator('[data-testid="panel-workspace"]');
   }
 
   /**
@@ -94,10 +94,10 @@ export class AnalysisPage {
   }
 
   /**
-   * The map container.
+   * The map container (GoldenLayout panel).
    */
   get mapContainer(): Locator {
-    return this.page.locator('.web-shell__map-container');
+    return this.page.locator('[data-testid="panel-map"]');
   }
 
   /**
@@ -259,42 +259,47 @@ export class AnalysisPage {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // Sidebar Tabs
+  // Panel Tabs (GoldenLayout)
   // ─────────────────────────────────────────────────────────────────────────────
 
   /**
-   * The tab bar in the sidebar.
+   * The GoldenLayout tab header containing Activity and Log tabs.
+   * Activity and Log share a tabbed stack in the default layout.
    */
   get tabBar(): Locator {
-    return this.page.locator('.web-shell__tab-bar');
+    return this.page.locator('.lm_header:has(.lm_tab:has-text("Activity"))');
   }
 
   /**
-   * The Activity tab button.
+   * The Activity tab in the GoldenLayout tab bar.
    */
   get activityTab(): Locator {
-    return this.page.getByTestId('sidebar-tab-activity');
+    return this.page.locator('.lm_tab:has-text("Activity")');
   }
 
   /**
-   * The Log tab button.
+   * The Log tab in the GoldenLayout tab bar.
    */
   get logTab(): Locator {
-    return this.page.getByTestId('sidebar-tab-log');
+    return this.page.locator('.lm_tab:has-text("Log")');
   }
 
   /**
-   * Switch to the Activity tab.
+   * Switch to the Activity tab in GoldenLayout.
    */
   async switchToActivityTab(): Promise<void> {
     await this.activityTab.click();
+    // Wait for Activity panel to become visible
+    await this.page.waitForTimeout(100);
   }
 
   /**
-   * Switch to the Log tab.
+   * Switch to the Log tab in GoldenLayout.
    */
   async switchToLogTab(): Promise<void> {
     await this.logTab.click();
+    // Wait for Log panel to become visible
+    await this.page.waitForTimeout(100);
   }
 
   // ─────────────────────────────────────────────────────────────────────────────

@@ -42,16 +42,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     concurrency:
-      group: storybook-main
+      group: pages
       cancel-in-progress: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - name: Enable corepack
+        run: corepack enable pnpm
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -96,16 +94,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     concurrency:
-      group: storybook-preview-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
+      group: pages
+      cancel-in-progress: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - name: Enable corepack
+        run: corepack enable pnpm
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -153,6 +149,7 @@ jobs:
             const baseUrl = `https://debrief.github.io/debrief-future`;
             const previewUrl = `${baseUrl}/pr-preview/pr-${prNumber}/`;
             const webShellPreviewUrl = `${baseUrl}/pr-preview/pr-${prNumber}/web-shell/`;
+            const codeServerUrl = `https://debrief-preview-pr-${prNumber}.herokuapp.com`;
             const persistentUrl = `${baseUrl}/components-storybook/`;
             const webShellUrl = `${baseUrl}/web-shell/`;
 
@@ -175,6 +172,11 @@ jobs:
               marker,
               '## 🚀 Preview Deployments',
               '',
+              '### Code Server (Full VS Code Extension)',
+              `🖥️ [Open Code Server](${codeServerUrl})`,
+              '',
+              'Browser-based VS Code with the Debrief extension and sample data pre-installed.',
+              '',
               '### Web Shell (Standalone App)',
               `📱 [Open Web Shell](${webShellPreviewUrl})`,
               '',
@@ -190,10 +192,10 @@ jobs:
               '<details>',
               '<summary>All Links</summary>',
               '',
-              '| Environment | Web Shell | Storybook |',
-              '|-------------|-----------|-----------|',
-              `| This PR | [Open App](${webShellPreviewUrl}) | [Open Storybook](${previewUrl}) |`,
-              `| Main branch | [Open App](${webShellUrl}) | [Open Storybook](${persistentUrl}) |`,
+              '| Environment | Code Server | Web Shell | Storybook |',
+              '|-------------|-------------|-----------|-----------|',
+              `| This PR | [Open IDE](${codeServerUrl}) | [Open App](${webShellPreviewUrl}) | [Open Storybook](${previewUrl}) |`,
+              `| Main branch | — | [Open App](${webShellUrl}) | [Open Storybook](${persistentUrl}) |`,
               '',
               '</details>',
               '',

@@ -55,7 +55,7 @@ TRACK_FEATURE = {
 class TestApplySymbolStyle:
     """Golden example tests for the apply-symbol-style tool."""
 
-    def test_basic_golden_example(self):
+    def test_basic_golden_example(self) -> None:
         """Apply symbol='diamond', radius=6, fill_color='#00FF00'. Verify point style updated."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -75,8 +75,12 @@ class TestApplySymbolStyle:
         assert point["color"] == "#ffffff"
         assert point["weight"] == 1
         assert point["opacity"] == 1.0
+        # default_position_style must also be updated for the renderer
+        dps = result[0]["properties"]["default_position_style"]
+        assert dps["symbol"] == "diamond"
+        assert dps["show_symbol"] is True
 
-    def test_default_radius(self):
+    def test_default_radius(self) -> None:
         """Only symbol param provided, radius defaults to 4."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -89,7 +93,7 @@ class TestApplySymbolStyle:
         assert point["shape"] == "square"
         assert point["radius"] == 4
 
-    def test_fill_color_from_line(self):
+    def test_fill_color_from_line(self) -> None:
         """No fill_color param, no existing point.fill_color -> uses line color."""
         feature = copy.deepcopy(TRACK_FEATURE)
         # Replace point style with one that has no fill_color
@@ -111,10 +115,11 @@ class TestApplySymbolStyle:
         # fill_color should be inherited from line color
         assert point["fill_color"] == "#FF0000"
 
-    def test_no_existing_style(self):
+    def test_no_existing_style(self) -> None:
         """Track with no style gets defaults then symbol applied."""
         feature = copy.deepcopy(TRACK_FEATURE)
         del feature["properties"]["style"]
+        del feature["properties"]["default_position_style"]
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
         params = {"symbol": "cross", "radius": 8}
 
@@ -132,8 +137,12 @@ class TestApplySymbolStyle:
         assert point["color"] == "#ffffff"
         assert point["weight"] == 1
         assert point["opacity"] == 1.0
+        # default_position_style created from scratch
+        dps = result[0]["properties"]["default_position_style"]
+        assert dps["symbol"] == "cross"
+        assert dps["show_symbol"] is True
 
-    def test_error_invalid_symbol(self):
+    def test_error_invalid_symbol(self) -> None:
         """Invalid symbol raises ValueError."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -142,7 +151,7 @@ class TestApplySymbolStyle:
         with pytest.raises(ValueError, match="symbol must be one of"):
             apply_symbol_style(context, params)
 
-    def test_default_symbol(self):
+    def test_default_symbol(self) -> None:
         """No symbol param defaults to square."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])

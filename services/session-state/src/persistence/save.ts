@@ -40,11 +40,13 @@ export function extractPersistentState(store: SessionStoreApi): PersistentSessio
       viewport: state.viewport,
       rotation: state.rotation,
       drawingMode: null, // Ephemeral — always null in persisted state (FR-010)
+      drawingPaletteIndex: 0, // Ephemeral — always reset in persisted state (FR-096)
     },
     features: {
       featureCollectionUri: state.featureCollectionUri,
       selection: state.selection,
       hiddenFeatureIds: state.hiddenFeatureIds,
+      styleVersion: 0, // Ephemeral — always reset to 0 on load
     },
   };
 }

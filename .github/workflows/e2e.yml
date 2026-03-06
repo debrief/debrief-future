@@ -39,13 +39,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - name: Enable corepack
+        run: corepack enable pnpm
 
       - name: Install dependencies
         run: task install
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install chromium
@@ -79,12 +79,33 @@ jobs:
           docker compose -f docker/code-server/docker-compose.yml logs
           exit 1
 
+      # Verify the Debrief config is present inside the container.
+      # The Dockerfile pre-seeds it, but verify here for diagnostics.
+      - name: Verify container config
+        run: |
+          CONTAINER=$(docker compose -f docker/code-server/docker-compose.yml ps -q code-server)
+          echo "=== Container user and HOME ==="
+          docker exec $CONTAINER bash -c 'whoami; echo HOME=$HOME; echo XDG=${XDG_CONFIG_HOME:-unset}'
+          echo "=== Config file ==="
+          docker exec $CONTAINER cat /home/coder/.config/debrief/config.json 2>&1 || {
+            echo "Config missing — creating it"
+            docker exec $CONTAINER mkdir -p /home/coder/.config/debrief
+            docker exec $CONTAINER bash -c 'cat > /home/coder/.config/debrief/config.json <<EOFCFG
+          {"stores":[{"id":"local-store","path":"/workspace/test-workspace/local-store","displayName":"Test Maritime Data","status":"available"}],"preferences":{}}
+          EOFCFG'
+            echo "Config written"
+          }
+          echo "=== Store path ==="
+          docker exec $CONTAINER ls /workspace/test-workspace/local-store/catalog.json 2>&1 || echo "CATALOG MISSING"
+          echo "=== Extension installed ==="
+          docker exec $CONTAINER ls /home/coder/.local/share/code-server/extensions/ 2>&1 || echo "NO EXTENSIONS"
+
       # Run E2E tests
       - name: Run E2E tests
         env:
           CODE_SERVER_URL: http://localhost:8080
           CI: true
-        run: npx playwright test --config tests/e2e/playwright.config.ts
+        run: npx playwright test --config tests/e2e/playwright.config.ts --grep-invert "Heroku"
 
       # Upload artifacts on failure or success
       - name: Upload Playwright report

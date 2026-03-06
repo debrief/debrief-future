@@ -25,7 +25,7 @@ import type { SessionManager } from '../services/sessionManager';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
 import type { CalcService } from '../services/calcService';
 import type { MatchResult } from '../types/tool';
-import type { Track, ReferenceLocation } from '../types/plot';
+import type { DebriefFeature } from '@debrief/components';
 import type { AssociatedFile } from '../services/stacService';
 
 // Message types from webview
@@ -50,7 +50,7 @@ interface TemporalDisplayModeMessage {
 
 interface ToolRunMessage {
   type: 'tool:run';
-  payload: { toolId: string };
+  payload: { toolId: string; params?: Record<string, unknown> };
 }
 
 interface LayerToggleVisibilityMessage {
@@ -68,6 +68,11 @@ interface LayerSelectMessage {
   payload: { featureIds: string[] };
 }
 
+interface LayerFormatMessage {
+  type: 'layer:format';
+  payload: { featureIds: string[]; property: string; value: string | number | boolean };
+}
+
 interface WebviewReadyMessage {
   type: 'webviewReady';
 }
@@ -81,6 +86,7 @@ type WebviewMessage =
   | LayerToggleVisibilityMessage
   | LayerDeleteMessage
   | LayerSelectMessage
+  | LayerFormatMessage
   | WebviewReadyMessage;
 
 export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
@@ -98,8 +104,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   private _sessionChangeDisposable?: vscode.Disposable;
 
   // Feature data from MapPanel
-  private _tracks: Track[] = [];
-  private _locations: ReferenceLocation[] = [];
+  private _features: DebriefFeature[] = [];
 
   // Result files for Associated Files dropdown
   private _resultFiles: AssociatedFile[] = [];
@@ -237,6 +242,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
       description: match.tool.description,
       applicable: match.isActive,
       explanation: match.isActive ? undefined : match.explanation,
+      ...(match.tool.parameters ? { parameters: match.tool.parameters } : {}),
     }));
 
     // hasToolInventory: undefined = still checking (show loading),
@@ -262,39 +268,10 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     const hiddenIds: string[] = this._activeSession?.getState().hiddenFeatureIds ?? [];
     const toolMatches: MatchResult[] = this._toolMatchAdapter.getMatchResults();
 
-    // Transform tracks and locations to DebriefFeature format
-    const features = [
-      ...this._tracks.map((track) => ({
-        type: 'Feature' as const,
-        id: track.id,
-        geometry: track.geometry,
-        properties: {
-          kind: 'TRACK' as const,
-          platform_name: track.name,
-          platform_id: track.id,
-          track_type: track.platformType ?? 'CONTACT',
-          start_time: track.startTime,
-          end_time: track.endTime,
-          positions: track.times ?? [],
-          style: { line: { color: track.color ?? '#0066cc' } },
-        },
-      })),
-      ...this._locations.map((loc) => ({
-        type: 'Feature' as const,
-        id: loc.id,
-        geometry: loc.geometry,
-        properties: {
-          kind: 'POINT' as const,
-          name: loc.name,
-          location_type: loc.locationType ?? 'REFERENCE',
-        },
-      })),
-    ];
-
     this._postMessage({
       type: 'layers:update',
       payload: {
-        layers: features,
+        layers: this._features,
         hiddenIds,
         toolMatches,
         resultFiles: this._resultFiles,
@@ -328,9 +305,8 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
    * Set features to display in the layers panel.
    * Called by MapPanel when plot data is loaded/updated.
    */
-  public setFeatures(tracks: Track[], locations: ReferenceLocation[]): void {
-    this._tracks = tracks;
-    this._locations = locations;
+  public setFeatures(features: DebriefFeature[]): void {
+    this._features = features;
     this._sendLayersUpdate();
   }
 
@@ -455,8 +431,8 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
           break;
 
         case 'tool:run':
-          // Delegate to CalcService
-          void this._handleToolRun(message.payload.toolId);
+          // Delegate to CalcService (pass params collected by webview ParameterCollector)
+          void this._handleToolRun(message.payload.toolId, message.payload.params);
           break;
 
         case 'layer:toggleVisibility':
@@ -494,6 +470,16 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
             state.setSelection(message.payload.featureIds);
           }
           break;
+
+        case 'layer:format':
+          // Apply style change to features via formatService
+          // For now, delegate to a command that the extension host can handle
+          void vscode.commands.executeCommand('debrief.applyFormat', {
+            featureIds: message.payload.featureIds,
+            property: message.payload.property,
+            value: message.payload.value,
+          });
+          break;
       }
     });
   }
@@ -501,10 +487,11 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
   /**
    * Handle tool execution request - delegates to registered command
    */
-  private async _handleToolRun(toolId: string): Promise<void> {
+  private async _handleToolRun(toolId: string, params?: Record<string, unknown>): Promise<void> {
     // Delegate to the registered executeTool command which handles
     // result layer creation, map updates, STAC persistence, and notifications
-    await vscode.commands.executeCommand('debrief.executeTool', toolId);
+    await vscode.commands.executeCommand('debrief.executeTool',
+      params ? { toolId, params } : toolId);
   }
 
   /**
@@ -540,13 +527,14 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     );
 
     const cspSource = webview.cspSource;
+    const nonce = getNonce();
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; font-src ${cspSource} data:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; font-src ${cspSource} data:; img-src ${cspSource} data:;">
   <title>Activity Panel</title>
   <style>
     :root {
@@ -582,8 +570,17 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
 </head>
 <body>
   <div id="root"></div>
-  <script src="${scriptUri.toString()}"></script>
+  <script nonce="${nonce}" src="${scriptUri.toString()}"></script>
 </body>
 </html>`;
   }
+}
+
+function getNonce(): string {
+  let text = '';
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < 32; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
 }

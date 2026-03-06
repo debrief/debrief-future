@@ -15,7 +15,7 @@ from debrief_cli.output import OutputFormatter
 
 # Global context object to store shared state
 class Context:
-    def __init__(self):
+    def __init__(self) -> None:
         self.json_mode = False
         self.formatter = None
 
@@ -32,7 +32,7 @@ pass_context = click.make_pass_decorator(Context, ensure=True)
 @click.option("--json", "json_mode", is_flag=True, help="Output in JSON format")
 @click.version_option(message="%(version)s")
 @pass_context
-def cli(ctx: Context, json_mode: bool):
+def cli(ctx: Context, json_mode: bool) -> None:
     """
     Debrief CLI - Command-line tools for maritime tactical analysis.
 
@@ -48,7 +48,7 @@ def cli(ctx: Context, json_mode: bool):
     ctx.json_mode = json_mode
 
 
-def _register_commands():
+def _register_commands() -> None:
     """Register subcommand groups (deferred to avoid E402)."""
     from debrief_cli.catalog import catalog
     from debrief_cli.tools import tools
@@ -63,7 +63,7 @@ def _register_commands():
 _register_commands()
 
 
-def main():
+def main() -> None:
     """Main entry point."""
     try:
         cli()

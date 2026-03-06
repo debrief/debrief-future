@@ -8,6 +8,7 @@
 import type {
   LogEntry,
   InputFeatureState,
+  ParameterValue,
   WasGeneratedBy,
   ToolResultForLog,
   ExpandedToolResultFields,
@@ -64,17 +65,84 @@ export function extractActivityIdFromOutputFeatures(
   return undefined;
 }
 
+/** Fields extracted from Python-generated provenance on output features. */
+export interface PythonProvenanceFallback {
+  parameters?: Record<string, ParameterValue>;
+  toolVersion?: string;
+}
+
+/**
+ * Extract parameters and toolVersion from Python-generated provenance on
+ * output features. The Python executor attaches provenance entries with full
+ * ParameterValue objects ({value, default, tunable}) and toolVersion. When
+ * expanded fields are not available (e.g. MCP response lacks annotations),
+ * this provides a fallback.
+ */
+export function extractFromOutputFeatures(
+  features: Array<Record<string, unknown>>,
+  activityId: string | undefined
+): PythonProvenanceFallback {
+  for (const feature of features) {
+    const props = feature.properties as Record<string, unknown> | null;
+    if (!props) continue;
+    const prov = props.provenance;
+    if (!Array.isArray(prov)) continue;
+    for (const entry of prov) {
+      const e = entry as Record<string, unknown>;
+      if (activityId && e.activityId !== activityId) continue;
+      const wgb = e.wasGeneratedBy as Record<string, unknown> | undefined;
+      if (!wgb) continue;
+
+      const result: PythonProvenanceFallback = {};
+
+      // Extract toolVersion
+      if (typeof wgb.toolVersion === 'string' && wgb.toolVersion !== '0.0.0') {
+        result.toolVersion = wgb.toolVersion;
+      }
+
+      // Extract parameters (verify ParameterValue shape)
+      if (wgb.parameters) {
+        const params = wgb.parameters as Record<string, unknown>;
+        const keys = Object.keys(params);
+        if (keys.length > 0) {
+          const first = params[keys[0]!] as Record<string, unknown> | undefined;
+          if (first && typeof first === 'object' && 'value' in first) {
+            result.parameters = params as unknown as Record<string, ParameterValue>;
+          }
+        }
+      }
+
+      if (result.toolVersion ?? result.parameters) {
+        return result;
+      }
+    }
+  }
+  return {};
+}
+
+/**
+ * Extract parameters from Python-generated provenance on output features.
+ * @deprecated Use extractFromOutputFeatures instead.
+ */
+export function extractParametersFromOutputFeatures(
+  features: Array<Record<string, unknown>>,
+  activityId: string | undefined
+): Record<string, ParameterValue> | undefined {
+  return extractFromOutputFeatures(features, activityId).parameters;
+}
+
 /**
  * Build a WasGeneratedBy from available data.
  */
 function buildWasGeneratedBy(
   toolId: string,
-  expanded: ExpandedToolResultFields | undefined
+  expanded: ExpandedToolResultFields | undefined,
+  fallback?: PythonProvenanceFallback
 ): WasGeneratedBy {
   return {
     tool: toolId,
-    toolVersion: expanded?.toolVersion ?? '0.0.0',
-    parameters: expanded?.parameters ?? {},
+    toolVersion: expanded?.toolVersion ?? fallback?.toolVersion ?? '0.0.0',
+    parameters: expanded?.parameters ?? fallback?.parameters ?? {},
   };
 }
 
@@ -147,10 +215,21 @@ export function buildLogEntry(
   const resolvedActivityId = activityId ?? generateActivityId();
   const toolId = toolResult.toolId ?? 'unknown-tool';
 
+  // When expanded fields are missing, try to extract from Python provenance
+  // on the output features. The Python executor always attaches full
+  // ParameterValue objects ({value, default, tunable}) and toolVersion.
+  let fallback: PythonProvenanceFallback | undefined;
+  if ((!expanded?.parameters || !expanded?.toolVersion) && toolResult.features?.features) {
+    fallback = extractFromOutputFeatures(
+      toolResult.features.features as Array<Record<string, unknown>>,
+      resolvedActivityId
+    );
+  }
+
   return {
     activityId: resolvedActivityId,
     timestamp: new Date().toISOString(),
-    wasGeneratedBy: buildWasGeneratedBy(toolId, expanded),
+    wasGeneratedBy: buildWasGeneratedBy(toolId, expanded, fallback),
     used: resolveUsedFeatureIds(toolResult, expanded),
     generated: resolveGeneratedOutputs(toolResult, expanded),
     executionDuration: msToIsoDuration(toolResult.durationMs),

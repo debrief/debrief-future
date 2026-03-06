@@ -1,0 +1,11 @@
+/**
+ * FormatMenu.css — minimal styling for FormatMenu component.
+ *
+ * FormatMenu is a thin wrapper around CascadingMenu, so most styling
+ * is handled by CascadingMenu.css. This file is reserved for any
+ * FormatMenu-specific overrides if needed in the future.
+ */
+
+.format-menu {
+  /* Currently no additional styling needed */
+}

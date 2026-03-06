@@ -78,6 +78,25 @@ The BACKLOG.md scoring dimensions (Value, Media, Autonomy) should be interpreted
 
 AI-implementation suitability remains objective, not strategy-dependent.
 
+## Future Ideas
+
+Large capabilities identified for future phases. These are epic-scale and not yet broken down into backlog items. When the ideas-guy proposes new work, the highest-value item here should be considered for promotion.
+
+| # | Capability | Description | Analyst Impact |
+|---|-----------|-------------|----------------|
+| F1 | CPA Analysis Suite | Auto-detect Closest Point of Approach across all track pairs; CPA timeline (range vs. time); what-if CPA prediction; miss-distance analysis for weapon engagements. Family of calc tools returning `cpa_events` features. | The single most fundamental derived measurement in post-exercise maritime analysis |
+| F2 | Export & Reporting Pipeline | PDF report generation (exercise summary with maps, charts, narrative); PowerPoint/briefing slides; CSV/Excel data export; georeferenced PDF map export; configurable report templates. New Python service or calc tool category. | Without reports, analysis stays in the tool and never reaches decision-makers |
+| F3 | Cross-Exercise Aggregate Query Engine | Query across multiple STAC catalogs: "Show all exercises where detection range was under 5nm." Python query API over STAC collections with results materializable as new plots or exportable datasets. | Transforms Debrief from single-plot tool to institutional knowledge platform |
+| F4 | Narrative Timeline & Event Annotation | Structured event chronology: detection, maneuver, weapon release, comms, failure. Event-to-feature linking. Auto-event-detection from track behaviour (speed changes, bearing rate). Timeline panel alongside time slider. | Makes the temporal story a first-class citizen alongside spatial visualization |
+| F5 | Spatial Search & Area-of-Interest Analysis | Draw polygon → get all tracks/events within. Transit corridor analysis. Exclusion zone monitoring. Area dwell time. Generalises point-in-zone-classifier to any user-drawn polygon. | Natural extension of drawing tools; answers "what happened in this area?" |
+| F6 | Track Reconstruction & Dead Reckoning | Gap interpolation (cubic spline, great-circle, rhumb-line). Dead reckoning projection. Position uncertainty ellipses. Track smoothing (moving average, Kalman filter). Builds on legacy `interpolate-track`, `smooth-track-jumps`, `generate-infill-segment`. | Real-world data is incomplete; critical for submarine analysis |
+| F7 | Tactical "What-If" Analysis | Branch at a timeline point, modify ownship course/speed, see how tactical picture evolves. Track projection, sensor coverage recalculation, CPA prediction under modified conditions. Side-by-side actual vs. hypothetical. Extends branching + PROV replay. | The central training question: "could we have done better?" |
+| F8 | Multi-Source Data Import | AIS, NMEA 0183/2000, NATO STANAG (4607, 4676), GPX, bathymetric/environmental overlays (GeoTIFF, S-57). Each handler is a self-contained `io` module producing GeoJSON features. | Opens Debrief beyond REP files to much wider user base |
+| F9 | AI-Assisted Analysis Companion | LLM with MCP access to all tools. Natural-language queries ("What was the closest approach?"). Tool suggestion from context. Narrative summary generation. Guided workflows for less experienced analysts. Local model option for offline use. | Reduces learning curve; the payoff of the MCP architectural choice |
+| F10 | Collaborative STAC Catalog Sharing | Push/pull sync between local and shared STAC catalogs. Conflict detection. Read-only shared access. Annotation/comment threads. Pull-based sync preserves offline-first principle. Note: overlaps with Parking Lot "Cloud STAC synchronisation". | Team analysis is essential but conflicts with current offline-first phase |
+
+*Added: 2026-02-14. Source: opportunity-scout maritime analyst capability scan.*
+
 ## Parking Lot
 
 Items that don't fit current strategy but may return later:
@@ -121,6 +140,7 @@ Record significant prioritisation decisions here for future reference.
 | 2026-02-11 | Approved E04 Results Visualization (#085-#089) | 5 items implementing Vega-Lite results viewing infrastructure; absorbs E03 #083 as #089; Vega-Lite chosen for schema-first philosophy (JSON specs, not code); bottom panel with tabs + editor tab for drag-to-float; logical result ID registry for stable view binding; critical enabler for E03 demo and all future tool output visualization |
 | 2026-02-12 | Parked #091 Tool-provided undo via inverse slug | Well-designed (ADR-006 exists) but wrong timing: #076 replay-tune is mid-implementation, changing revert mechanism now is disruptive; scaling concern (10k-position deep-copies) is real but not acute at demo/tracer bullet scale; revisit when E01 tool volume makes generic undo infra urgent |
 | 2026-02-13 | Approved E05 Shape Drawing Tools (#091-infra, #092, #093, #094, #095, #096) | 6 items adding map drawing via Geoman library: schema extension (POLY FeatureKind), library integration, toolbar, point/rectangle drawing, polygon/polyline drawing, UX guidance + STAC persistence. Serves all three themes: extends architecture (schema + map interaction model), enables user-created inputs for analysis tools (scientist self-service), and highly demo-able for stakeholder engagement ("draw a polygon, analyse within it"). Well-structured dependency chain with scores 10-12 |
+| 2026-02-27 | Approved E06 Architectural Consistency (#102-#112) | 11 items from six-axis architectural consistency review. 2 blocking (constitutional violation on provenance Art. III.1, kind value divergence violating schema-first Art. II.1), 7 significant (tool parity, state management, type unification), 2 minor (annotation alignment). Serves Theme 1 primarily — cannot credibly claim architecture is validated if implementations diverge from governing documents. Demo-critical items (#102, #103, #104, #109) also serve Theme 3 — visible inconsistencies during stakeholder demos undermine confidence. All 11 approved at high priority per user direction |
 
 ---
 

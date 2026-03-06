@@ -1,6 +1,10 @@
 ---
 description: Execute the implementation planning workflow using the plan template to generate design artifacts.
-handoffs: 
+handoffs:
+  - label: Review Plan
+    agent: speckit.review
+    prompt: Review the plan before task generation
+    send: true
   - label: Create Tasks
     agent: speckit.tasks
     prompt: Break the plan into tasks

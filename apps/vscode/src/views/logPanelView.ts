@@ -42,6 +42,8 @@ interface TimelineEntry {
   generatedResultId: string | null;
   operationCategory: OperationCategory;
   deleted?: boolean;
+  disabled?: boolean;
+  rationale?: string | null;
   tuneAnnotation?: { parameter: string; previousValue: unknown; newValue: unknown } | null;
 }
 
@@ -94,6 +96,22 @@ interface ReplayCancelMessage {
   type: 'replay:cancel';
 }
 
+// Feature 113: flip-card edit messages
+interface DisableToggleMessage {
+  type: 'disable:toggle';
+  payload: { activityId: string; disabled: boolean };
+}
+
+interface RationaleUpdateMessage {
+  type: 'rationale:update';
+  payload: { activityId: string; rationale: string };
+}
+
+interface SchemaRequestMessage {
+  type: 'schema:request';
+  payload: { toolId: string };
+}
+
 type WebviewMessage =
   | EntrySelectMessage
   | EntryDeselectMessage
@@ -104,7 +122,10 @@ type WebviewMessage =
   | RevertToRequestMessage
   | RevertThisRequestMessage
   | RestoreRequestMessage
-  | ReplayCancelMessage;
+  | ReplayCancelMessage
+  | DisableToggleMessage
+  | RationaleUpdateMessage
+  | SchemaRequestMessage;
 
 // Tool category mapping for operation classification
 const TOOL_CATEGORY_MAP: Record<string, OperationCategory> = {
@@ -140,7 +161,9 @@ function toTimelineEntry(entry: LogEntry): TimelineEntry {
     generatedResultId: entry.generatedResultId ?? null,
     operationCategory: classifyOperation(entry.wasGeneratedBy.tool),
     deleted: entry.deleted === true,
-    tuneAnnotation: entry.tune !== null
+    disabled: entry.disabled === true,
+    rationale: entry.rationale ?? null,
+    tuneAnnotation: entry.tune
       ? { parameter: entry.tune.parameter, previousValue: entry.tune.previousValue, newValue: entry.tune.newValue }
       : null,
   };
@@ -179,6 +202,9 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   // Result ID Registry for tracking replay artifacts (Feature: 087)
   private _resultIdRegistry?: ResultIdRegistry;
 
+  // Callback to refresh MapPanel features after replay (Feature: 076)
+  private _onFeaturesChanged?: () => void;
+
   constructor(
     extensionUri: vscode.Uri,
     private readonly _context: vscode.ExtensionContext,
@@ -204,6 +230,13 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
    */
   public setResultIdRegistry(registry: ResultIdRegistry): void {
     this._resultIdRegistry = registry;
+  }
+
+  /**
+   * Set callback to refresh MapPanel features after replay/tune operations.
+   */
+  public setOnFeaturesChanged(callback: () => void): void {
+    this._onFeaturesChanged = callback;
   }
 
   /**
@@ -273,6 +306,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
    */
   private async _sendTimelineUpdate(): Promise<void> {
     if (!this._logService || !this._getStorePath || !this._getItemPath) {
+      console.warn('[debrief] LogPanel: timeline update skipped — logService or path resolvers not wired');
       return;
     }
 
@@ -295,6 +329,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
         },
       });
     } catch (err) {
+      console.error('[debrief] LogPanel: timeline update failed:', err);
       // Graceful degradation — send empty timeline
       this._postMessage({
         type: 'timeline:update',
@@ -441,6 +476,19 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
             message.payload.presentationMode
           );
           break;
+
+        // Feature 113: flip-card edit messages
+        case 'disable:toggle':
+          void this._handleDisableToggle(message.payload);
+          break;
+
+        case 'rationale:update':
+          void this._handleRationaleUpdate(message.payload);
+          break;
+
+        case 'schema:request':
+          void this._handleSchemaRequest(message.payload);
+          break;
       }
     });
   }
@@ -456,6 +504,29 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
+  // ─── Service wiring guard ────────────────────────────────────────
+
+  /**
+   * Check that logService and path resolvers are wired. If not, send an
+   * error to the webview so the user sees feedback instead of nothing.
+   * Returns true if services are ready, false otherwise.
+   */
+  private _assertLogServiceReady(action: string): boolean {
+    if (this._logService && this._getStorePath && this._getItemPath) {
+      return true;
+    }
+    const missing: string[] = [];
+    if (!this._logService) { missing.push('logService'); }
+    if (!this._getStorePath) { missing.push('storePath resolver'); }
+    if (!this._getItemPath) { missing.push('itemPath resolver'); }
+    console.warn(`[debrief] LogPanel: ${action} skipped — missing ${missing.join(', ')}. Reopen the plot to reconnect.`);
+    this._postMessage({
+      type: 'replay:error',
+      payload: { message: `Log service not connected. Please reopen the plot. (missing: ${missing.join(', ')})` },
+    });
+    return false;
+  }
+
   // ─── Phase 6 handlers (Feature: 076-replay-tune) ──────────────────
 
   private async _handleTuneRequest(payload: {
@@ -463,22 +534,22 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     parameter: string;
     newValue: unknown;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) {
-      return;
-    }
-    const storePath = this._getStorePath();
-    const itemPath = this._getItemPath();
+    if (!this._assertLogServiceReady('tune:request')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
     if (!storePath || !itemPath) {
       return;
     }
 
     try {
-      const result = await this._logService.tuneEntry(
+      const result = await this._logService!.tuneEntry(
         storePath, itemPath,
         payload.activityId, payload.parameter, payload.newValue
       );
       this._sendReplayResult(result);
       await this._sendTimelineUpdate();
+      // Refresh MapPanel with updated features from disk
+      this._onFeaturesChanged?.();
     } catch (err) {
       this._postMessage({
         type: 'replay:error',
@@ -490,17 +561,15 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   private async _handleRevertToRequest(payload: {
     activityId: string;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) {
-      return;
-    }
-    const storePath = this._getStorePath();
-    const itemPath = this._getItemPath();
+    if (!this._assertLogServiceReady('revert-to:request')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
     if (!storePath || !itemPath) {
       return;
     }
 
     try {
-      await this._logService.revertTo(storePath, itemPath, payload.activityId);
+      await this._logService!.revertTo(storePath, itemPath, payload.activityId);
       this._postMessage({
         type: 'action:result',
         payload: {
@@ -510,6 +579,7 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
         },
       });
       await this._sendTimelineUpdate();
+      this._onFeaturesChanged?.();
     } catch (err) {
       this._postMessage({
         type: 'replay:error',
@@ -521,21 +591,20 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   private async _handleRevertThisRequest(payload: {
     activityId: string;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) {
-      return;
-    }
-    const storePath = this._getStorePath();
-    const itemPath = this._getItemPath();
+    if (!this._assertLogServiceReady('revert-this:request')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
     if (!storePath || !itemPath) {
       return;
     }
 
     try {
-      const result = await this._logService.revertThis(
+      const result = await this._logService!.revertThis(
         storePath, itemPath, payload.activityId
       );
       this._sendReplayResult(result);
       await this._sendTimelineUpdate();
+      this._onFeaturesChanged?.();
     } catch (err) {
       this._postMessage({
         type: 'replay:error',
@@ -547,21 +616,20 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   private async _handleRestoreRequest(payload: {
     activityId: string;
   }): Promise<void> {
-    if (!this._logService || !this._getStorePath || !this._getItemPath) {
-      return;
-    }
-    const storePath = this._getStorePath();
-    const itemPath = this._getItemPath();
+    if (!this._assertLogServiceReady('restore:request')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
     if (!storePath || !itemPath) {
       return;
     }
 
     try {
-      const result = await this._logService.restoreEntry(
+      const result = await this._logService!.restoreEntry(
         storePath, itemPath, payload.activityId
       );
       this._sendReplayResult(result);
       await this._sendTimelineUpdate();
+      this._onFeaturesChanged?.();
     } catch (err) {
       this._postMessage({
         type: 'replay:error',
@@ -584,6 +652,75 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
   // ─── End Phase 6 handlers ────────────────────────────────────────
 
+  // ─── Feature 113: Flip-card edit handlers ──────────────────────────
+
+  private async _handleDisableToggle(payload: {
+    activityId: string;
+    disabled: boolean;
+  }): Promise<void> {
+    if (!this._assertLogServiceReady('disable:toggle')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
+    if (!storePath || !itemPath) {
+      return;
+    }
+
+    try {
+      await this._logService!.disableEntry(
+        storePath, itemPath,
+        payload.activityId, payload.disabled
+      );
+      await this._sendTimelineUpdate();
+    } catch (err) {
+      this._postMessage({
+        type: 'replay:error',
+        payload: { message: err instanceof Error ? err.message : String(err) },
+      });
+    }
+  }
+
+  private async _handleRationaleUpdate(payload: {
+    activityId: string;
+    rationale: string;
+  }): Promise<void> {
+    if (!this._assertLogServiceReady('rationale:update')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
+    if (!storePath || !itemPath) {
+      return;
+    }
+
+    try {
+      await this._logService!.setRationale(
+        storePath, itemPath,
+        payload.activityId, payload.rationale
+      );
+      // No timeline update needed — rationale is metadata only
+    } catch (err) {
+      this._postMessage({
+        type: 'replay:error',
+        payload: { message: err instanceof Error ? err.message : String(err) },
+      });
+    }
+  }
+
+  private _handleSchemaRequest(payload: {
+    toolId: string;
+  }): void {
+    // TODO: Wire to actual tool schema registry when available.
+    // For now, return an empty schema array (no type-aware controls, fallback only).
+    this._postMessage({
+      type: 'schema:response',
+      payload: {
+        toolId: payload.toolId,
+        schema: [],
+        error: null,
+      },
+    });
+  }
+
+  // ─── End Feature 113 handlers ──────────────────────────────────────
+
   /**
    * Dispose resources.
    */
@@ -602,13 +739,14 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     );
 
     const cspSource = webview.cspSource;
+    const nonce = getNonce();
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; font-src ${cspSource} data:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; font-src ${cspSource} data:; img-src ${cspSource} data:;">
   <title>Log Panel</title>
   <style>
     :root {
@@ -639,8 +777,17 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 </head>
 <body>
   <div id="root"></div>
-  <script src="${scriptUri.toString()}"></script>
+  <script nonce="${nonce}" src="${scriptUri.toString()}"></script>
 </body>
 </html>`;
   }
+}
+
+function getNonce(): string {
+  let text = '';
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < 32; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
 }

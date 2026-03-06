@@ -139,6 +139,32 @@ describe('LogService.tuneEntry', () => {
     expect(tune.newValue).toBe('PT30S');
   });
 
+  it('updates parameter value in provenance after tune', async () => {
+    const deps = makeDeps();
+    const service = createLogService(deps);
+
+    await service.tuneEntry(
+      '/store',
+      'item.json',
+      'act-001',
+      'interval',
+      'PT30S'
+    );
+
+    // The written provenance should have the tuned value, not the original
+    const writtenFc = (deps.writeGeoJson as ReturnType<typeof vi.fn>).mock
+      .calls[0][2] as { features: Array<Record<string, unknown>> };
+    const props = writtenFc.features[0].properties as Record<string, unknown>;
+    const prov = props.provenance as Array<Record<string, unknown>>;
+    const targetEntry = prov.find(
+      (e: Record<string, unknown>) => e.activityId === 'act-001'
+    );
+    const wgb = targetEntry!.wasGeneratedBy as {
+      parameters: Record<string, { value: unknown }>;
+    };
+    expect(wgb.parameters.interval.value).toBe('PT30S');
+  });
+
   it('calls executeTool during replay', async () => {
     const deps = makeDeps();
     const service = createLogService(deps);
@@ -171,6 +197,104 @@ describe('LogService.tuneEntry', () => {
     );
 
     expect(deps.markDirty).toHaveBeenCalled();
+  });
+
+  it('removes generated features by activityId before replay (not stale IDs)', async () => {
+    // Simulate additive tool output: a generated feature whose provenance
+    // has the original activityId stamped (by the replay engine).
+    // On the second tune, the cleanup should find it by activityId even
+    // though the feature ID is different from the original `generated` list.
+    const fc = {
+      features: [
+        {
+          type: 'Feature',
+          id: 'rect-1',
+          geometry: null,
+          properties: {
+            id: 'rect-1',
+            provenance: [
+              {
+                activityId: 'act-move',
+                timestamp: '2026-03-01T10:00:00Z',
+                wasGeneratedBy: {
+                  tool: 'move-shape',
+                  toolVersion: '1.0.0',
+                  parameters: {
+                    direction: { value: 90, default: true, tunable: true },
+                  },
+                },
+                used: ['rect-1'],
+                generated: [],
+                executionDuration: 'PT0.1S',
+                generatedResultId: null,
+                tune: null,
+              },
+              {
+                activityId: 'act-gen',
+                timestamp: '2026-03-01T10:01:00Z',
+                wasGeneratedBy: {
+                  tool: 'generate-reference-points',
+                  toolVersion: '1.0.0',
+                  parameters: {},
+                },
+                used: ['rect-1'],
+                generated: ['old-point-id'],
+                executionDuration: 'PT0.1S',
+                generatedResultId: null,
+                tune: null,
+              },
+            ],
+          },
+        },
+        // This feature was created by a PREVIOUS replay — its ID is different
+        // from 'old-point-id' (the original generated list), but its
+        // provenance has the stamped activityId 'act-gen'.
+        {
+          type: 'Feature',
+          id: 'new-point-xyz',
+          geometry: { type: 'Point', coordinates: [0, 0] },
+          properties: {
+            id: 'new-point-xyz',
+            provenance: [
+              {
+                activityId: 'act-gen',
+                timestamp: '2026-03-01T10:01:00Z',
+                wasGeneratedBy: {
+                  tool: 'generate-reference-points',
+                  toolVersion: '1.0.0',
+                  parameters: {},
+                },
+                used: ['rect-1'],
+                generated: [],
+                executionDuration: 'PT0.1S',
+                generatedResultId: null,
+                tune: null,
+              },
+            ],
+          },
+        },
+      ],
+    };
+
+    const writeGeoJson = vi.fn().mockResolvedValue(undefined);
+    const deps = makeDeps({
+      loadGeoJson: vi.fn().mockResolvedValue(fc),
+      writeGeoJson,
+    });
+    const service = createLogService(deps);
+
+    await service.tuneEntry('/store', 'item.json', 'act-move', 'direction', 180);
+
+    // The generated feature (new-point-xyz) should have been removed before
+    // replay, despite its ID not matching 'old-point-id' in the generated list.
+    // The first writeGeoJson call is the cleanup pass.
+    const cleanupCall = writeGeoJson.mock.calls[0];
+    const cleanedFc = cleanupCall[2] as { features: Array<Record<string, unknown>> };
+    const remainingIds = cleanedFc.features.map(
+      (f) => (f.properties as Record<string, unknown>)?.id
+    );
+    expect(remainingIds).toContain('rect-1');
+    expect(remainingIds).not.toContain('new-point-xyz');
   });
 
   it('throws if replay deps not provided', async () => {

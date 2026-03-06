@@ -18,6 +18,7 @@ import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
+import type { LogPanelViewProvider } from '../views/logPanelView';
 import type { MapPanel } from '../webview/mapPanel';
 
 import { createOpenPlotCommand } from './openPlot';
@@ -54,7 +55,8 @@ export function registerCommands(
   toolMatchAdapter: ToolMatchAdapter,
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void,
-  resultIdRegistry?: ResultIdRegistry
+  resultIdRegistry?: ResultIdRegistry,
+  logPanelProvider?: LogPanelViewProvider
 ): vscode.Disposable[] {
   const disposables: vscode.Disposable[] = [];
 
@@ -66,6 +68,7 @@ export function registerCommands(
         context,
         configService,
         stacService,
+        calcService,
         ioService,
         recentPlotsService,
         openPlotsService,
@@ -77,7 +80,8 @@ export function registerCommands(
         activityPanelProvider,
         getMapPanel,
         setMapPanel,
-        resultIdRegistry
+        resultIdRegistry,
+        logPanelProvider
       )
     )
   );
@@ -182,7 +186,7 @@ export function registerCommands(
   disposables.push(
     vscode.commands.registerCommand(
       'debrief.executeTool',
-      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider, stacService, activityPanelProvider, undefined, resultIdRegistry)
+      createExecuteToolCommand(calcService, toolMatchAdapter, getMapPanel, layersTreeProvider, stacService, activityPanelProvider, undefined, resultIdRegistry, logPanelProvider)
     )
   );
 
@@ -279,35 +283,9 @@ export function registerCommands(
           const isVisible = !hiddenIds.includes(featureId);
           panel.setLayerVisibility(args.layerId, isVisible);
         } else {
-          // Fallback to legacy behavior for backward compatibility
-          const tracks = panel.getTracks();
-          const locations = panel.getLocations();
-          const results = panel.getResultLayers();
-
-          if (args.layerId.startsWith('track-')) {
-            const trackId = args.layerId.replace('track-', '');
-            const track = tracks.find((t) => t.id === trackId);
-            if (track) {
-              track.visible = !track.visible;
-              panel.setLayerVisibility(args.layerId, track.visible);
-              layersTreeProvider.setTracks(tracks);
-            }
-          } else if (args.layerId.startsWith('location-')) {
-            const locationId = args.layerId.replace('location-', '');
-            const location = locations.find((l) => l.id === locationId);
-            if (location) {
-              location.visible = !location.visible;
-              panel.setLayerVisibility(args.layerId, location.visible);
-              layersTreeProvider.setLocations(locations);
-            }
-          } else {
-            const layer = results.find((l) => l.id === args.layerId);
-            if (layer) {
-              layer.visible = !layer.visible;
-              panel.setLayerVisibility(args.layerId, layer.visible);
-              layersTreeProvider.setResultLayers(results);
-            }
-          }
+          // Fallback: toggle visibility directly when no session is active
+          panel.setLayerVisibility(args.layerId, true);
+          layersTreeProvider.setFeatures(panel.getFeatures());
         }
       }
     )

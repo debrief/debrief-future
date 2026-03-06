@@ -1,5 +1,5 @@
 /**
- * Playwright e2e tests for Drawing (Point & Rectangle).
+ * Playwright e2e tests for Drawing (All Shapes).
  *
  * Tests the drawing toolbar integration with MapView, verifying that
  * point and rectangle shapes can be drawn and appear in the feature list.
@@ -8,7 +8,7 @@
 import { test, expect } from '@playwright/test';
 
 const STORY_URL =
-  '/iframe.html?id=components-mapview-drawing--point-and-rectangle';
+  '/iframe.html?id=components-mapview-drawing--all-shapes';
 
 const withTheme = (storyUrl: string, theme: 'light' | 'dark' | 'vscode') =>
   `${storyUrl}&globals=theme:${theme}`;

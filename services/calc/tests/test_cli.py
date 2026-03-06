@@ -20,7 +20,7 @@ def run_cli(input_data: dict) -> dict:
 class TestCli:
     """Tests for debrief_calc.cli module."""
 
-    def test_track_stats_single_feature(self):
+    def test_track_stats_single_feature(self) -> None:
         """CLI returns MCP content for a valid single-track tool invocation."""
         feature = {
             "type": "Feature",
@@ -55,7 +55,7 @@ class TestCli:
         assert item["annotations"]["debrief:sourceFeatures"] == ["track-1"]
         assert item["annotations"]["debrief:label"] == "track-stats results"
 
-    def test_unknown_tool(self):
+    def test_unknown_tool(self) -> None:
         """CLI returns MCP error for unknown tool name."""
         output = run_cli({"tool": "nonexistent-tool", "features": [], "params": {}})
         assert "error" in output
@@ -63,7 +63,7 @@ class TestCli:
         assert "message" in output["error"]
         assert "data" in output["error"]
 
-    def test_range_bearing_two_tracks(self):
+    def test_range_bearing_two_tracks(self) -> None:
         """CLI returns artifact MCP content for range-bearing with two tracks."""
         base_coords = [[-1.0, 50.0], [-1.1, 50.1]]
         times = [1704067200000, 1704070800000]
@@ -93,15 +93,16 @@ class TestCli:
         assert "debrief:href" in item["annotations"]
         assert item["annotations"]["debrief:href"].endswith(".json")
 
-        # Check resource contains valid JSON time-series
+        # Check resource contains valid JSON (GeoJSON Feature with __datasets)
         assert item["type"] == "resource"
         import json
 
         series_data = json.loads(item["resource"]["text"])
-        assert series_data["type"] == "range-bearing-series"
-        assert len(series_data["entries"]) == 2
+        assert series_data["type"] == "Feature"
+        assert "__datasets" in series_data["properties"]
+        assert len(series_data["properties"]["__datasets"]) == 2
 
-    def test_malformed_json_returns_error(self):
+    def test_malformed_json_returns_error(self) -> None:
         """CLI handles malformed stdin gracefully."""
         result = subprocess.run(
             [sys.executable, "-m", "debrief_calc.cli"],

@@ -50,14 +50,7 @@ def handle_parse_file(params: dict[str, Any]) -> dict[str, Any]:
     result = parse(path)
 
     # Convert features to JSON-serializable format
-    features = []
-    for feature in result.features:
-        if hasattr(feature, "model_dump"):
-            features.append(feature.model_dump(mode="json"))
-        elif isinstance(feature, dict):
-            features.append(feature)
-        else:
-            features.append(dict(feature))
+    features = list(result.features)
 
     return {
         "features": features,

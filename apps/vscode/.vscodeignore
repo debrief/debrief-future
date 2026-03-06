@@ -1,0 +1,12 @@
+.vscode/**
+src/**
+e2e/**
+**/*.test.ts
+**/*.spec.ts
+tsconfig.json
+vitest.config.ts
+playwright.config.ts
+.eslintrc.*
+.prettierrc*
+CHANGELOG.md
+node_modules/**

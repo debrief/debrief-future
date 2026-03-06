@@ -17,6 +17,7 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@debrief/components": ["../../shared/components/src/index.ts"],
+      "@debrief/schemas": ["../../shared/schemas/src/generated/typescript/types.ts"],
       "@test-data/*": ["../vscode/test-data/*"],
       "@debrief/session-state": ["./src/session-state-browser.ts"]
     },

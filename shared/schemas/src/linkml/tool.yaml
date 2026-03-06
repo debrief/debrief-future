@@ -21,6 +21,35 @@ imports:
 # ============================================================================
 
 enums:
+  OutputKindEnum:
+    description: >-
+      Canonical output kind identifiers for tool result features.
+      Set on feature.properties.kind by the executor after tool execution.
+      Values use slash-delimited hierarchical paths matching domain/subtype.
+      Both Python and TypeScript executors MUST use these values — no
+      hand-authored kind strings in tool implementations.
+    permissible_values:
+      track/statistics:
+        description: Track statistics summary (point count, distance, speed, duration)
+      dataset/range_bearing_series:
+        description: Range-bearing time-series dataset between two features
+      region/statistics:
+        description: Region/area statistics summary (extent, area, dimensions)
+
+  ResultCategoryEnum:
+    description: >-
+      Top-level result type categories per TOOL-RESULTS.md.
+      Used as prefix for debrief:resultType annotations.
+    permissible_values:
+      mutation:
+        description: Modifies existing feature(s) in the FeatureCollection
+      addition:
+        description: Creates new GeoJSON feature(s)
+      deletion:
+        description: Removes feature(s) from the FeatureCollection
+      artifact:
+        description: Creates non-GeoJSON output (image, report, dataset)
+
   ParameterTypeEnum:
     description: >-
       Names of available schema-defined parameter types.
@@ -37,6 +66,8 @@ enums:
         description: Common ISO 8601 duration intervals (maps to DurationPresetEnum)
       NumericPreset:
         description: Common numeric values (maps to NumericPresetEnum)
+      ReferencePointPattern:
+        description: Reference point generation patterns (maps to ReferencePointPatternEnum)
 
 # ============================================================================
 # Classes

@@ -277,9 +277,17 @@ export function findIntervalPositions(
  */
 export interface ResolvedPositionStyle {
   showSymbol: boolean;
-  symbol: 'circle' | 'square' | 'triangle';
+  symbol: 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
   showLabel: boolean;
   labelText: string | null;
+  /** Per-position colour override from position_style_overrides (format menu) */
+  fillColor?: string;
+  /** Per-position stroke colour override */
+  strokeColor?: string;
+  /** Per-position radius override */
+  radius?: number;
+  /** Per-position fill opacity override */
+  fillOpacity?: number;
 }
 
 /**
@@ -304,7 +312,7 @@ export function resolvePositionStyle(
 ): ResolvedPositionStyle {
   // Start with defaults
   let showSymbol = defaultStyle.show_symbol;
-  let symbol = defaultStyle.symbol as 'circle' | 'square' | 'triangle';
+  let symbol = defaultStyle.symbol as 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
   let showLabel = defaultStyle.show_label;
   let labelText: string | null = null;
 
@@ -316,19 +324,37 @@ export function resolvePositionStyle(
     showLabel = true;
   }
 
+  // Visual override fields from format menu
+  let fillColor: string | undefined;
+  let strokeColor: string | undefined;
+  let radius: number | undefined;
+  let fillOpacity: number | undefined;
+
   // Apply overrides (highest priority)
   if (override) {
     if (override.show_symbol !== undefined && override.show_symbol !== null) {
       showSymbol = override.show_symbol;
     }
     if (override.symbol) {
-      symbol = override.symbol as 'circle' | 'square' | 'triangle';
+      symbol = override.symbol as 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
     }
     if (override.show_label !== undefined && override.show_label !== null) {
       showLabel = override.show_label;
     }
     if (override.label) {
       labelText = override.label;
+    }
+
+    // Visual style overrides (from format menu per-position formatting)
+    const ov = override as Record<string, unknown>;
+    if (typeof ov.fill_color === 'string') fillColor = ov.fill_color;
+    if (typeof ov.stroke_color === 'string') strokeColor = ov.stroke_color;
+    if (typeof ov.radius === 'number') radius = ov.radius;
+    if (typeof ov.fill_opacity === 'number') fillOpacity = ov.fill_opacity;
+    // Also check shape from format menu (maps to symbol)
+    if (typeof ov.shape === 'string') {
+      symbol = ov.shape as 'circle' | 'square' | 'triangle' | 'diamond' | 'cross';
+      showSymbol = true;
     }
   }
 
@@ -342,7 +368,7 @@ export function resolvePositionStyle(
     }
   }
 
-  return { showSymbol, symbol, showLabel, labelText };
+  return { showSymbol, symbol, showLabel, labelText, fillColor, strokeColor, radius, fillOpacity };
 }
 
 /**
@@ -360,7 +386,7 @@ export function computeAllPositionStyles(
   defaultStyle: PositionStyle,
   symbolInterval: string | null | undefined,
   labelInterval: string | null | undefined,
-  overrides: Array<PositionStyleOverride | null> | undefined
+  overrides: Array<PositionStyleOverride | null> | Record<string, PositionStyleOverride> | undefined
 ): ResolvedPositionStyle[] {
   // Parse timestamps
   const timestamps = positions.map(p => Date.parse(p.time));
@@ -377,9 +403,14 @@ export function computeAllPositionStyles(
     ? findIntervalPositions(timestamps, labelIntervalMs)
     : new Set<number>();
 
+  // Normalize overrides: support both array and object (keyed by string index) formats
+  const isArrayOverrides = Array.isArray(overrides);
+
   // Resolve each position
   return positions.map((pos, index) => {
-    const override = overrides?.[index] ?? null;
+    const override = isArrayOverrides
+      ? (overrides?.[index] ?? null)
+      : ((overrides as Record<string, PositionStyleOverride> | undefined)?.[String(index)] ?? null);
     return resolvePositionStyle(
       index,
       defaultStyle,

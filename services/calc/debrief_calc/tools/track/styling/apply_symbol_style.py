@@ -48,8 +48,16 @@ def apply_symbol_style(context: SelectionContext, params: dict[str, Any]) -> lis
         List of modified track features with updated symbol style
     """
     symbol = params.get("symbol") or "square"
-    # Validation uses MarkerSymbol enum values from schema (param_type="MarkerSymbol")
-    valid_symbols = {"circle", "square", "triangle", "diamond", "cross"}
+    # Validate against schema-defined MarkerSymbol enum
+    from debrief_schemas.validation import resolve_enum_values
+
+    valid_symbols = resolve_enum_values("MarkerSymbol") or {
+        "circle",
+        "square",
+        "triangle",
+        "diamond",
+        "cross",
+    }
     if symbol not in valid_symbols:
         raise ValueError(f"symbol must be one of: {', '.join(sorted(valid_symbols))}")
 
@@ -92,6 +100,12 @@ def apply_symbol_style(context: SelectionContext, params: dict[str, Any]) -> lis
             line = style.get("line", {})
             if line.get("color"):
                 point["fill_color"] = line["color"]
+
+        # Update default_position_style so the PositionSymbolsLayer renderer
+        # shows the chosen symbol shape on the map.
+        dps = props.setdefault("default_position_style", {})
+        dps["symbol"] = symbol
+        dps["show_symbol"] = True
 
         modified.append(feature)
 

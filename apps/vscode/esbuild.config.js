@@ -16,6 +16,10 @@ const extensionConfig = {
   target: 'node18',
   sourcemap: true,
   minify: !isWatch,
+  alias: {
+    // Resolve subpath import to source (ToolMatch has no bundled index.js)
+    '@debrief/components/ToolMatch': path.resolve(__dirname, '../../shared/components/src/ToolMatch/index.ts'),
+  },
 };
 
 /** @type {esbuild.BuildOptions} */

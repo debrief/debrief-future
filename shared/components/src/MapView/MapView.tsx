@@ -11,6 +11,7 @@ import { TemporalTrackLayer } from './TemporalTrackLayer';
 import { PositionSymbolsLayer } from './PositionSymbolsLayer';
 import { LeafletToolbar } from './LeafletToolbar';
 import type { DrawingMode } from './LeafletToolbar';
+import { DrawingGuidanceOverlay } from './DrawingGuidanceOverlay/DrawingGuidanceOverlay';
 import '@geoman-io/leaflet-geoman-free';
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
@@ -270,18 +271,49 @@ export function MapView({
     return calculateBounds(visibleFeatures);
   }, [featureArray, visibleIds, bounds]);
 
-  // Create GeoJSON data structure for static (non-temporal) features
-  const geojsonData = useMemo(() => ({
-    type: 'FeatureCollection' as const,
-    features: staticFeatures.map((f) => ({
-      ...f,
-      geometry: {
-        ...f.geometry,
-        // Ensure coordinates are proper arrays for GeoJSON
-        coordinates: f.geometry.coordinates,
-      },
-    })),
-  }), [staticFeatures]);
+  // Create GeoJSON data structure for static (non-temporal) features.
+  // MultiPolygon features are decomposed into individual Polygon features
+  // because Leaflet renders MultiPolygon as a single L.Polygon (not a
+  // FeatureGroup), making per-sub-polygon selection/styling impossible.
+  const geojsonData = useMemo(() => {
+    const expanded: GeoJSON.Feature[] = [];
+    for (const f of staticFeatures) {
+      const fProps = f.properties as unknown as Record<string, unknown>;
+      const isZone = fProps?.kind === 'ZONE' && f.geometry?.type === 'MultiPolygon';
+      if (f.geometry?.type === 'MultiPolygon' && !isZone) {
+        // Decompose MultiPolygon into individual Polygons
+        const coords = f.geometry.coordinates as unknown as number[][][][];
+        const overrides = fProps?.position_style_overrides as Record<string, Record<string, unknown>> | undefined;
+        for (let i = 0; i < coords.length; i++) {
+          const childStyle: Record<string, unknown> = { ...(fProps?.style as Record<string, unknown> ?? {}) };
+          // Merge per-polygon overrides into the child style
+          const ov = overrides?.[String(i)];
+          if (ov) {
+            for (const [k, v] of Object.entries(ov)) {
+              childStyle[k] = v;
+            }
+          }
+          expanded.push({
+            type: 'Feature',
+            id: `${f.id}/polygons/${i}`,
+            geometry: { type: 'Polygon', coordinates: coords[i] },
+            properties: {
+              ...fProps,
+              style: childStyle,
+              _parentId: f.id,
+              _childIndex: i,
+            },
+          } as GeoJSON.Feature);
+        }
+      } else {
+        expanded.push({
+          ...f,
+          geometry: { ...f.geometry, coordinates: f.geometry.coordinates },
+        } as GeoJSON.Feature);
+      }
+    }
+    return { type: 'FeatureCollection' as const, features: expanded };
+  }, [staticFeatures]);
 
   // Style function for features — reads from properties.style when available
   const featureStyle = useMemo(() => {
@@ -296,10 +328,10 @@ export function MapView({
       const fillColor = (style?.fill_color as string) ?? color;
 
       return {
-        color: isSelected ? 'var(--debrief-selection-border)' : color,
+        color,
         weight: isSelected ? 4 : (style?.weight as number) ?? (isTrackFeature(debriefFeature) ? 3 : 2),
         opacity: (style?.opacity as number) ?? 1,
-        fillColor: isSelected ? 'var(--debrief-selection-border)' : fillColor,
+        fillColor,
         fillOpacity: isSelected ? 0.4 : (style?.fill_opacity as number) ?? 0.2,
         dashArray: (style?.dash_array as string) ?? undefined,
       };
@@ -310,7 +342,16 @@ export function MapView({
   const onEachFeature = useMemo(() => {
     return (feature: GeoJSON.Feature, layer: L.Layer) => {
       const debriefFeature = feature as unknown as DebriefFeature;
+      const featureId = debriefFeature.id;
       const label = getFeatureLabel(debriefFeature);
+
+      // Apply selected CSS class on layer options before it's added to the DOM.
+      // Leaflet's setStyle() ignores className, so we set it here in
+      // onEachFeature (called before addLayer → _initPath reads options.className).
+      if (selectedIds.has(featureId) && 'options' in layer) {
+        const path = layer as L.Path;
+        path.options.className = ((path.options.className ?? '') + ' debrief-map-feature--selected').trim();
+      }
 
       // Add tooltip
       layer.bindTooltip(label, {
@@ -318,26 +359,26 @@ export function MapView({
         direction: 'top',
       });
 
-      // Add click handler
+      // Click handler — works for all features including decomposed
+      // MultiPolygon child polygons (which now have IDs like "parent/polygons/0")
       layer.on('click', (e) => {
         e.originalEvent.stopPropagation();
-        onSelect?.(debriefFeature.id, e.originalEvent as unknown as React.MouseEvent);
+        onSelect?.(featureId, e.originalEvent as unknown as React.MouseEvent);
       });
 
       // Apply per-ring styles for ZONE MultiPolygon features
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const featureProps = feature.properties as any;
-      const zoneRingStyles: Array<{ style?: Record<string, unknown> }> | undefined =
+      // (ZONEs are kept as MultiPolygon since they use a dedicated zones array)
+      const featureProps = feature.properties as unknown as Record<string, unknown>;
+      if (
         featureProps?.kind === 'ZONE' &&
         feature.geometry?.type === 'MultiPolygon' &&
-        Array.isArray(featureProps?.zones)
-          ? featureProps.zones
-          : undefined;
-
-      if (zoneRingStyles && 'getLayers' in layer) {
+        Array.isArray(featureProps?.zones) &&
+        'getLayers' in layer
+      ) {
         const subLayers = (layer as unknown as { getLayers(): L.Layer[] }).getLayers();
+        const zones = featureProps.zones as Array<{ style?: Record<string, unknown> }>;
         subLayers.forEach((subLayer, i) => {
-          const s = zoneRingStyles[i]?.style;
+          const s = zones[i]?.style;
           if (s && 'setStyle' in subLayer) {
             (subLayer as unknown as { setStyle(opts: PathOptions): void }).setStyle({
               color: (s.color as string) ?? '#999',
@@ -351,7 +392,7 @@ export function MapView({
         });
       }
     };
-  }, [onSelect]);
+  }, [onSelect, selectedIds]);
 
   // pointToLayer callback — renders Point and MultiPoint geometries as circle markers
   const pointToLayer = useMemo(() => {
@@ -363,24 +404,34 @@ export function MapView({
       const color = (featureStyle?.color as string) ?? getFeatureColor(debriefFeature);
       const fillColor = (featureStyle?.fill_color as string) ?? color;
 
+      const baseRadius = (featureStyle?.radius as number) ?? 6;
       return L.circleMarker(latlng, {
-        radius: (featureStyle?.radius as number) ?? 6,
-        fillColor: isSelected ? 'var(--debrief-selection-border)' : fillColor,
+        radius: isSelected ? baseRadius + 2 : baseRadius,
+        fillColor,
         fillOpacity: isSelected ? 0.6 : (featureStyle?.fill_opacity as number) ?? 0.7,
-        color: isSelected ? 'var(--debrief-selection-border)' : color,
+        color,
         weight: isSelected ? 3 : (featureStyle?.weight as number) ?? 2,
         opacity: (featureStyle?.opacity as number) ?? 1,
+        className: isSelected ? 'debrief-map-feature--selected' : undefined,
       });
     };
   }, [selectedIds]);
 
-  // Track a revision counter for the GeoJSON key — react-leaflet's GeoJSON
-  // component only renders on mount, so the key must change whenever data changes.
+  // Track revision counters for the GeoJSON key — react-leaflet's GeoJSON
+  // component only renders on mount, so the key must change whenever data
+  // or selection changes to force re-mount with updated styles.
   const geojsonRevision = useRef(0);
   const prevGeojsonRef = useRef(geojsonData);
   if (prevGeojsonRef.current !== geojsonData) {
     geojsonRevision.current += 1;
     prevGeojsonRef.current = geojsonData;
+  }
+
+  const selectionRevision = useRef(0);
+  const prevSelectedRef = useRef(selectedIds);
+  if (prevSelectedRef.current !== selectedIds) {
+    selectionRevision.current += 1;
+    prevSelectedRef.current = selectedIds;
   }
 
   const containerStyle: React.CSSProperties = {
@@ -422,7 +473,7 @@ export function MapView({
 
         {staticFeatures.length > 0 && (
           <GeoJSON
-            key={`geojson-${geojsonRevision.current}-${selectedIds.size}`}
+            key={`geojson-${geojsonRevision.current}-sel-${selectionRevision.current}`}
             data={geojsonData}
             style={featureStyle}
             pointToLayer={pointToLayer}
@@ -432,9 +483,10 @@ export function MapView({
 
         {staticFeatures.filter(isTrackFeature).map((f) => (
           <PositionSymbolsLayer
-            key={`pos-${String(f.id)}`}
+            key={`pos-${String(f.id)}-sel-${selectionRevision.current}`}
             feature={f}
             isSelected={selectedIds.has(f.id)}
+            selectedIds={selectedIds}
           />
         ))}
 
@@ -445,10 +497,12 @@ export function MapView({
             currentTime={currentTime}
             displayMode={displayMode}
             isSelected={selectedIds.has(f.id)}
+            selectedIds={selectedIds}
             onClick={onSelect}
           />
         ))}
       </MapContainer>
+      <DrawingGuidanceOverlay drawingMode={drawingMode ?? null} />
     </div>
   );
 }

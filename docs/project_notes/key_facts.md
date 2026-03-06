@@ -99,3 +99,35 @@ PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install @playwright/test playwright-chrom
 npm install @sparticuz/chromium
 ```
 - Config requires `executablePath: '/tmp/chromium'` and sandbox-disable flags
+
+### E2E Testing Infrastructure
+
+**Two test suites:**
+- **Storybook E2E**: `shared/components/e2e/` — isolated React component tests against Storybook
+- **VS Code Webview E2E**: `tests/e2e/` — full extension workflow tests against code-server
+
+**Key files:**
+- Patch script: `tests/e2e/scripts/patch-webview.sh`
+- Webview injector: `tests/e2e/helpers/webview-injector.ts`
+- Page objects: `tests/e2e/models/code-server-page.ts`, `tests/e2e/models/debrief-webview.ts`
+- Playwright configs: `tests/e2e/playwright.config.ts` (webview), `shared/components/playwright.config.ts` (Storybook)
+
+**Running webview E2E tests:**
+```bash
+bash tests/e2e/scripts/patch-webview.sh
+xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts
+```
+
+**Running Storybook E2E tests:**
+```bash
+pnpm --filter @debrief/components test:e2e
+```
+
+**Environment variables:**
+- `CODE_SERVER_URL` — default `http://localhost:8080`
+- `E2E_HEADED=1` — enables headed Chromium (required for webview tests)
+- `CLAUDE_CODE=1` — uses `@sparticuz/chromium` bundled binary
+
+**Developer guide:** `docs/e2e-testing-guide.md`
+**Research notes:** `docs/project_notes/webview-e2e-research.md`
+**Architecture decision:** ADR-007 in `docs/project_notes/decisions.md`

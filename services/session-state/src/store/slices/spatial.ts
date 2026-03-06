@@ -48,6 +48,10 @@ export const createSpatialSlice: StateCreator<
     set({ drawingMode: mode });
   },
 
+  incrementDrawingPaletteIndex: () => {
+    set({ drawingPaletteIndex: get().drawingPaletteIndex + 1 });
+  },
+
   getCenter: (): Coordinate | null => {
     const { viewport } = get();
     if (!viewport) return null;

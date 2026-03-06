@@ -10,15 +10,16 @@ import type {
   SpatialSlice,
   FeaturesSlice,
   DocumentSlice,
+  ResultsSlice,
 } from '../../types/index.js';
 
 export interface GetStateInput {
-  slice?: 'temporal' | 'spatial' | 'features' | 'document';
+  slice?: 'temporal' | 'spatial' | 'features' | 'document' | 'results';
 }
 
 export interface GetStateOutput {
   success: boolean;
-  state?: SessionState | TemporalSlice | SpatialSlice | FeaturesSlice | DocumentSlice;
+  state?: SessionState | TemporalSlice | SpatialSlice | FeaturesSlice | DocumentSlice | ResultsSlice;
   error?: string;
 }
 
@@ -49,15 +50,21 @@ export function getState(
           viewport: state.viewport,
           rotation: state.rotation,
           drawingMode: state.drawingMode,
+          drawingPaletteIndex: state.drawingPaletteIndex,
         },
         features: {
           featureCollectionUri: state.featureCollectionUri,
           selection: state.selection,
           hiddenFeatureIds: state.hiddenFeatureIds,
+          styleVersion: state.styleVersion,
         },
         document: {
           dirty: state.dirty,
           savePath: state.savePath,
+        },
+        results: {
+          resultLayers: state.resultLayers,
+          lastToolExecution: state.lastToolExecution,
         },
       },
     };
@@ -84,6 +91,7 @@ export function getState(
           viewport: state.viewport,
           rotation: state.rotation,
           drawingMode: state.drawingMode,
+          drawingPaletteIndex: state.drawingPaletteIndex,
         },
       };
     case 'features':
@@ -93,6 +101,7 @@ export function getState(
           featureCollectionUri: state.featureCollectionUri,
           selection: state.selection,
           hiddenFeatureIds: state.hiddenFeatureIds,
+          styleVersion: state.styleVersion,
         },
       };
     case 'document':
@@ -101,6 +110,14 @@ export function getState(
         state: {
           dirty: state.dirty,
           savePath: state.savePath,
+        },
+      };
+    case 'results':
+      return {
+        success: true,
+        state: {
+          resultLayers: state.resultLayers,
+          lastToolExecution: state.lastToolExecution,
         },
       };
     default:

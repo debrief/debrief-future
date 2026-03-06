@@ -181,29 +181,7 @@ export interface Selection {
   /** Selected location IDs */
   locationIds: string[];
 
-  /** Selection context type for tool matching */
-  contextType: SelectionContextType;
-
-  /** Feature kinds in selection (for tool filtering) */
-  featureKinds: FeatureKind[];
 }
-
-/**
- * Selection context types
- */
-export type SelectionContextType =
-  | 'none'
-  | 'single-track'
-  | 'multi-track'
-  | 'location'
-  | 'position'         // Feature 053: single position selected
-  | 'multi-position'   // Feature 053: multiple positions selected
-  | 'mixed';
-
-/**
- * Feature kinds
- */
-export type FeatureKind = 'UI_TRACK' | 'UI_LOCATION';
 
 /**
  * Time range for filtering
@@ -303,35 +281,11 @@ export interface PlotFeatureCollection {
 }
 
 /**
- * Compute selection context type from selection
- */
-export function computeContextType(selection: Selection): SelectionContextType {
-  const hasTrack = selection.trackIds.length > 0;
-  const hasLocation = selection.locationIds.length > 0;
-
-  if (!hasTrack && !hasLocation) {
-    return 'none';
-  }
-
-  if (hasTrack && hasLocation) {
-    return 'mixed';
-  }
-
-  if (hasLocation) {
-    return 'location';
-  }
-
-  return selection.trackIds.length === 1 ? 'single-track' : 'multi-track';
-}
-
-/**
  * Create an empty selection
  */
 export function createEmptySelection(): Selection {
   return {
     trackIds: [],
     locationIds: [],
-    contextType: 'none',
-    featureKinds: [],
   };
 }

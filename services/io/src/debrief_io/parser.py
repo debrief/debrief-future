@@ -8,12 +8,15 @@ Provides the main entry points for parsing files:
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from debrief_io.exceptions import UnsupportedFormatError
 from debrief_io.handlers.rep import REPHandler
-from debrief_io.models import ParseResult
 from debrief_io.registry import get_handler, get_supported_extensions
-from debrief_io.types import FilePath
+
+if TYPE_CHECKING:
+    from debrief_io.models import ParseResult
+    from debrief_io.types import FilePath
 
 
 def _read_file(path: Path) -> tuple[str, str]:

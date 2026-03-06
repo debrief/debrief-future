@@ -1,7 +1,8 @@
-import { useRef, useMemo, useCallback, CSSProperties } from 'react';
+import React, { useRef, useMemo, useCallback, useState, CSSProperties } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { DebriefFeature, DebriefFeatureCollection } from '../utils/types';
 import { FeatureRow } from './FeatureRow';
+import { flattenFeatures, hasChildSelected } from './flattenFeatures';
 import './FeatureList.css';
 
 export interface FeatureListProps {
@@ -25,6 +26,9 @@ export interface FeatureListProps {
    */
   onSelect?: (id: string) => void;
 
+  /** Called when a feature is expanded or collapsed */
+  onToggleExpand?: (featureId: string, isExpanded: boolean) => void;
+
   /** Set of hidden feature IDs (shown with eye-slash icon) */
   hiddenIds?: Set<string>;
 
@@ -42,6 +46,24 @@ export interface FeatureListProps {
 
   /** Additional inline styles */
   style?: CSSProperties;
+
+  /** Show format icon on rows for features with editable properties (Feature 097) */
+  showFormatIcon?: boolean;
+
+  /** Called when the format icon is clicked on a feature row (Feature 097) */
+  onFormatClick?: (event: React.MouseEvent, feature: DebriefFeature) => void;
+
+  /** Called when the format icon is clicked on a child row (position, point, polygon) */
+  onChildFormatClick?: (event: React.MouseEvent, displayItem: import('./flattenFeatures').DisplayItem) => void;
+
+  /** Show info icon on rows to display geometry data (Feature 098) */
+  showInfoIcon?: boolean;
+
+  /** Called when the info icon is clicked on a feature row (Feature 098) */
+  onInfoClick?: (event: React.MouseEvent, feature: DebriefFeature) => void;
+
+  /** Called when the info icon is clicked on a child row (Feature 098) */
+  onChildInfoClick?: (event: React.MouseEvent, displayItem: import('./flattenFeatures').DisplayItem) => void;
 }
 
 /**
@@ -57,19 +79,8 @@ function normalizeFeatures(
 }
 
 /**
- * FeatureList displays a virtualized list of features.
- *
- * Uses @tanstack/react-virtual for efficient rendering of large lists.
- *
- * @example
- * ```tsx
- * <FeatureList
- *   features={featureCollection}
- *   selectedIds={selectedIds}
- *   onSelect={(id) => toggleSelection(id)}
- *   height={400}
- * />
- * ```
+ * FeatureList displays a virtualized list of features with expand/collapse
+ * support for viewing child elements (positions, points, polygons).
  */
 export function FeatureList({
   features,
@@ -77,14 +88,22 @@ export function FeatureList({
   hiddenIds,
   onSelectionChange,
   onSelect,
+  onToggleExpand,
   filter,
   height = 300,
   rowHeight = 40,
   className,
   style,
+  showFormatIcon,
+  onFormatClick,
+  onChildFormatClick,
+  showInfoIcon,
+  onInfoClick,
+  onChildInfoClick,
 }: FeatureListProps) {
   const parentRef = useRef<HTMLDivElement>(null);
   const lastClickedIndex = useRef<number | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   // Normalize and filter features
   const featureArray = useMemo(() => {
@@ -95,14 +114,39 @@ export function FeatureList({
     return normalized;
   }, [features, filter]);
 
+  // Flatten features with expansion state
+  const flattenedItems = useMemo(
+    () => flattenFeatures(featureArray, expandedIds),
+    [featureArray, expandedIds],
+  );
+
+  const handleToggleExpand = useCallback(
+    (itemId: string) => {
+      setExpandedIds((prev) => {
+        const next = new Set(prev);
+        const willExpand = !next.has(itemId);
+        if (willExpand) {
+          next.add(itemId);
+        } else {
+          next.delete(itemId);
+        }
+        onToggleExpand?.(itemId, willExpand);
+        return next;
+      });
+    },
+    [onToggleExpand],
+  );
+
   const handleRowClick = useCallback(
     (index: number, event: React.MouseEvent) => {
-      const feature = featureArray[index];
-      if (!feature) return;
+      const item = flattenedItems[index];
+      if (!item) return;
+
+      const itemId = item.id;
 
       // Legacy callback
       if (!onSelectionChange) {
-        onSelect?.(feature.id);
+        onSelect?.(itemId);
         lastClickedIndex.current = index;
         return;
       }
@@ -113,36 +157,33 @@ export function FeatureList({
       let next: Set<string>;
 
       if (isShift && lastClickedIndex.current !== null) {
-        // Range select: from last-clicked to current
         const start = Math.min(lastClickedIndex.current, index);
         const end = Math.max(lastClickedIndex.current, index);
         next = new Set(isCtrl ? selectedIds : []);
         for (let i = start; i <= end; i++) {
-          const f = featureArray[i];
-          if (f) next.add(f.id);
+          const it = flattenedItems[i];
+          if (it) next.add(it.id);
         }
       } else if (isCtrl) {
-        // Toggle individual item
         next = new Set(selectedIds);
-        if (next.has(feature.id)) {
-          next.delete(feature.id);
+        if (next.has(itemId)) {
+          next.delete(itemId);
         } else {
-          next.add(feature.id);
+          next.add(itemId);
         }
       } else {
-        // Plain click: select only this item
-        next = new Set([feature.id]);
+        next = new Set([itemId]);
       }
 
       lastClickedIndex.current = index;
       onSelectionChange(next);
     },
-    [featureArray, selectedIds, onSelectionChange, onSelect],
+    [flattenedItems, selectedIds, onSelectionChange, onSelect],
   );
 
   // Setup virtualizer
   const virtualizer = useVirtualizer({
-    count: featureArray.length,
+    count: flattenedItems.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => rowHeight,
     overscan: 5,
@@ -188,10 +229,12 @@ export function FeatureList({
           }}
         >
           {virtualItems.map((virtualItem) => {
-            const feature = featureArray[virtualItem.index];
-            if (!feature) return null;
-            const isSelected = selectedIds.has(feature.id);
-            const isHidden = hiddenIds?.has(feature.id) ?? false;
+            const item = flattenedItems[virtualItem.index];
+            if (!item) return null;
+            const isSelected = selectedIds.has(item.id);
+            const isHidden = hiddenIds?.has(item.id) ?? false;
+            const isExpanded = expandedIds.has(item.id);
+            const childSel = !isExpanded && hasChildSelected(item.id, selectedIds);
 
             return (
               <div
@@ -206,10 +249,22 @@ export function FeatureList({
                 }}
               >
                 <FeatureRow
-                  feature={feature}
+                  feature={item.feature ?? undefined}
+                  displayItem={item.type !== 'feature' ? item : undefined}
                   isSelected={isSelected}
                   isHidden={isHidden}
+                  depth={item.depth}
+                  isExpandable={item.isExpandable}
+                  isExpanded={isExpanded}
+                  hasChildSelected={childSel}
+                  showFormatIcon={showFormatIcon}
+                  onFormatClick={onFormatClick}
+                  onChildFormatClick={onChildFormatClick}
+                  showInfoIcon={showInfoIcon}
+                  onInfoClick={onInfoClick}
+                  onChildInfoClick={onChildInfoClick}
                   onClick={(e) => handleRowClick(virtualItem.index, e)}
+                  onToggleExpand={() => handleToggleExpand(item.id)}
                   style={{ height: '100%' }}
                 />
               </div>

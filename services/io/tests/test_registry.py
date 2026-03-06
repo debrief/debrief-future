@@ -1,5 +1,7 @@
 """Tests for handler registry."""
 
+from collections.abc import Iterator
+
 import pytest
 
 from debrief_io.handlers.base import BaseHandler
@@ -16,7 +18,7 @@ from debrief_io.registry import (
 
 
 @pytest.fixture(autouse=True)
-def clean_registry():
+def clean_registry() -> Iterator[None]:
     """Clean registry before and after each test."""
     clear_registry()
     # Re-register REP handler for tests that need it
@@ -28,7 +30,7 @@ def clean_registry():
 class TestRegisterHandler:
     """Tests for register_handler function."""
 
-    def test_register_handler_success(self):
+    def test_register_handler_success(self) -> None:
         """Register a handler successfully."""
         clear_registry()
         register_handler(".rep", REPHandler)
@@ -36,14 +38,14 @@ class TestRegisterHandler:
         assert handler is not None
         assert isinstance(handler, REPHandler)
 
-    def test_register_handler_lowercase(self):
+    def test_register_handler_lowercase(self) -> None:
         """Extension is normalized to lowercase."""
         clear_registry()
         register_handler(".REP", REPHandler)
         handler = get_handler("test.rep")
         assert handler is not None
 
-    def test_register_handler_invalid_extension(self):
+    def test_register_handler_invalid_extension(self) -> None:
         """Raise ValueError for extension without dot."""
         with pytest.raises(ValueError, match="must start with"):
             register_handler("rep", REPHandler)
@@ -52,18 +54,18 @@ class TestRegisterHandler:
 class TestGetHandler:
     """Tests for get_handler function."""
 
-    def test_get_handler_found(self):
+    def test_get_handler_found(self) -> None:
         """Return handler for registered extension."""
         handler = get_handler("test.rep")
         assert handler is not None
         assert isinstance(handler, REPHandler)
 
-    def test_get_handler_not_found(self):
+    def test_get_handler_not_found(self) -> None:
         """Return None for unregistered extension."""
         handler = get_handler("test.unknown")
         assert handler is None
 
-    def test_get_handler_case_insensitive(self):
+    def test_get_handler_case_insensitive(self) -> None:
         """Extension lookup is case-insensitive."""
         handler = get_handler("test.REP")
         assert handler is not None
@@ -72,13 +74,13 @@ class TestGetHandler:
 class TestListHandlers:
     """Tests for list_handlers function."""
 
-    def test_list_handlers_empty(self):
+    def test_list_handlers_empty(self) -> None:
         """Return empty list when no handlers registered."""
         clear_registry()
         handlers = list_handlers()
         assert handlers == []
 
-    def test_list_handlers_with_handler(self):
+    def test_list_handlers_with_handler(self) -> None:
         """Return handler info for registered handlers."""
         handlers = list_handlers()
         assert len(handlers) >= 1
@@ -92,13 +94,13 @@ class TestListHandlers:
 class TestUnregisterHandler:
     """Tests for unregister_handler function."""
 
-    def test_unregister_handler_success(self):
+    def test_unregister_handler_success(self) -> None:
         """Unregister existing handler."""
         result = unregister_handler(".rep")
         assert result is True
         assert get_handler("test.rep") is None
 
-    def test_unregister_handler_not_found(self):
+    def test_unregister_handler_not_found(self) -> None:
         """Return False for non-existent handler."""
         result = unregister_handler(".unknown")
         assert result is False
@@ -107,12 +109,12 @@ class TestUnregisterHandler:
 class TestGetSupportedExtensions:
     """Tests for get_supported_extensions function."""
 
-    def test_get_supported_extensions(self):
+    def test_get_supported_extensions(self) -> None:
         """Return list of registered extensions."""
         extensions = get_supported_extensions()
         assert ".rep" in extensions
 
-    def test_get_supported_extensions_empty(self):
+    def test_get_supported_extensions_empty(self) -> None:
         """Return empty list when no handlers registered."""
         clear_registry()
         extensions = get_supported_extensions()
@@ -122,7 +124,7 @@ class TestGetSupportedExtensions:
 class TestCustomHandler:
     """Tests for registering custom handlers."""
 
-    def test_register_custom_handler(self):
+    def test_register_custom_handler(self) -> None:
         """Register and use a custom handler."""
 
         class CustomHandler(BaseHandler):

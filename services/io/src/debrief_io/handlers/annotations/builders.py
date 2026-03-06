@@ -17,7 +17,7 @@ from .coordinates import (
     validate_longitude,
 )
 from .parser import generate_feature_id
-from .symbols import get_dash_array, parse_symbol
+from .symbols import ParsedSymbol, get_dash_array, parse_symbol
 from .timestamps import parse_timestamp
 
 
@@ -32,7 +32,7 @@ def _extract_content_after_prefix(line: str) -> str:
 
 
 def _build_point_style(
-    symbol,
+    symbol: ParsedSymbol,
     default_shape: str = "circle",
     default_radius: float = 5.0,
 ) -> dict[str, Any]:
@@ -53,7 +53,7 @@ def _build_point_style(
     return style
 
 
-def _build_line_style(symbol) -> dict[str, Any]:
+def _build_line_style(symbol: ParsedSymbol) -> dict[str, Any]:
     """Build LineProperties style from parsed symbol."""
     style = {
         "stroke": True,
@@ -67,7 +67,7 @@ def _build_line_style(symbol) -> dict[str, Any]:
     return style
 
 
-def _build_polygon_style(symbol) -> dict[str, Any]:
+def _build_polygon_style(symbol: ParsedSymbol) -> dict[str, Any]:
     """Build PolygonProperties style from parsed symbol."""
     fill_opacity = 0.3  # Default semi-transparent
     if symbol.fill_style == "solid":

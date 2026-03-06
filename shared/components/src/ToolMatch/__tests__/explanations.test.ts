@@ -103,21 +103,35 @@ describe('getInactiveReason', () => {
     });
   });
 
-  describe('multiple requirements', () => {
-    it('should return first unmet requirement', () => {
+  describe('multiple requirements (OR semantics)', () => {
+    it('should list alternative kinds when none are satisfied', () => {
       const tool: Tool = {
         id: 'test',
         name: 'Test',
         requirements: [
-          { kind: 'TRACK', min: 1, max: 1 },
-          { kind: 'POINT', min: 1, max: 1 },
+          { kind: 'RECTANGLE', min: 1, max: 1 },
+          { kind: 'POLY', min: 1, max: 1 },
         ],
       };
       const selection = createSelectionFromCounts({ TRACK: 1 });
 
       expect(getInactiveReason(tool, selection)).toBe(
-        'Requires at least 1 point'
+        'Requires rectangle or poly feature selected'
       );
+    });
+
+    it('should return empty string when any alternative is satisfied', () => {
+      const tool: Tool = {
+        id: 'test',
+        name: 'Test',
+        requirements: [
+          { kind: 'RECTANGLE', min: 1, max: 1 },
+          { kind: 'POLY', min: 1, max: 1 },
+        ],
+      };
+      const selection = createSelectionFromCounts({ POLY: 1 });
+
+      expect(getInactiveReason(tool, selection)).toBe('');
     });
   });
 
@@ -181,21 +195,20 @@ describe('getInactiveReason', () => {
 });
 
 describe('getAllInactiveReasons', () => {
-  it('should return all reasons for multiple failures', () => {
+  it('should return one reason for multiple alternative kinds not satisfied', () => {
     const tool: Tool = {
       id: 'test',
       name: 'Test',
       requirements: [
-        { kind: 'TRACK', min: 1, max: 1 },
-        { kind: 'POINT', min: 1, max: 1 },
+        { kind: 'RECTANGLE', min: 1, max: 1 },
+        { kind: 'POLY', min: 1, max: 1 },
       ],
     };
     const selection = createSelectionFromCounts({ TRACK: 3 });
 
     const reasons = getAllInactiveReasons(tool, selection);
-    expect(reasons).toHaveLength(2);
-    expect(reasons[0]).toContain('track');
-    expect(reasons[1]).toContain('point');
+    expect(reasons).toHaveLength(1);
+    expect(reasons[0]).toContain('rectangle or poly');
   });
 
   it('should return empty array for active tool', () => {

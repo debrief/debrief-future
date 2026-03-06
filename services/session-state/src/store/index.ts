@@ -11,11 +11,13 @@ import {
   DEFAULT_SPATIAL_SLICE,
   DEFAULT_FEATURES_SLICE,
   DEFAULT_DOCUMENT_SLICE,
+  DEFAULT_RESULTS_SLICE,
 } from '../types/index.js';
 import { createTemporalSlice } from './slices/temporal.js';
 import { createSpatialSlice } from './slices/spatial.js';
 import { createFeaturesSlice } from './slices/features.js';
 import { createDocumentSlice } from './slices/document.js';
+import { createResultsSlice } from './slices/results.js';
 import { MAX_UNDO_STEPS } from './middleware/undo.js';
 import { DIRTY_TRIGGER_FIELDS } from './middleware/dirty.js';
 
@@ -211,6 +213,9 @@ export function createSessionStore() {
         // Document slice (uses regular set to avoid dirty tracking loop)
         ...createDocumentSlice(set, get, api),
 
+        // Results slice (uses regular set — result layers are data, not UI state)
+        ...createResultsSlice(set, get, api),
+
         // Global reset action
         reset: () => {
           history.past = [];
@@ -220,6 +225,7 @@ export function createSessionStore() {
             ...DEFAULT_SPATIAL_SLICE,
             ...DEFAULT_FEATURES_SLICE,
             ...DEFAULT_DOCUMENT_SLICE,
+            ...DEFAULT_RESULTS_SLICE,
           });
         },
 
@@ -315,3 +321,4 @@ export { createTemporalSlice } from './slices/temporal.js';
 export { createSpatialSlice } from './slices/spatial.js';
 export { createFeaturesSlice } from './slices/features.js';
 export { createDocumentSlice } from './slices/document.js';
+export { createResultsSlice } from './slices/results.js';

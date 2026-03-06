@@ -1,5 +1,5 @@
 /**
- * LogEntry component — renders a single timeline entry.
+ * LogEntry component — renders a single timeline entry with flip-card support.
  *
  * Supports three presentation modes:
  * - Compact: tool name + primary feature name
@@ -7,14 +7,19 @@
  * - Detailed: + timestamp, duration, attachment info
  *
  * Feature: 072-log-panel
+ * Updated: 113-prov-card-flip (flip-card edit face)
  */
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import type { LogEntryProps } from './types';
 import { resolveFeatureDisplay, getAffectedFeatureIds, formatDuration, formatTimestamp } from './utils';
 import { LOG_PANEL_STRINGS } from './strings';
+import { CardFlip } from './CardFlip';
+import { EditFace } from './EditFace';
 import './LogPanel.css';
 import './ParameterEditor.css';
+import './CardFlip.css';
+import './EditFace.css';
 
 export function LogEntry({
   entry,
@@ -24,6 +29,20 @@ export function LogEntry({
   onClick,
   onTuneClick,
   onRestoreClick,
+  isEditing = false,
+  onEditClick,
+  onDoneClick,
+  schema,
+  schemaLoading = false,
+  schemaError,
+  onParameterChange,
+  onDisableToggle,
+  onDeleteClick,
+  onRationaleChange,
+  onRetrySchema,
+  rationaleRef,
+  replayStatus = 'idle',
+  stepIndex,
   className,
 }: LogEntryProps): React.ReactElement {
   const affectedIds = getAffectedFeatureIds(entry);
@@ -34,16 +53,38 @@ export function LogEntry({
     onClick?.(entry);
   };
 
+  const handleEditIconClick = useCallback(
+    (e: React.MouseEvent | React.KeyboardEvent) => {
+      e.stopPropagation();
+      if (!entry.deleted) {
+        onEditClick?.(entry);
+      }
+    },
+    [entry, onEditClick]
+  );
+
+  const handleEditIconKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleEditIconClick(e);
+      }
+    },
+    [handleEditIconClick]
+  );
+
   const entryClass = [
     'log-panel__entry',
     isSelected ? 'log-panel__entry--selected' : '',
     entry.deleted ? 'log-panel__entry--deleted' : '',
+    entry.disabled ? 'log-panel__entry--disabled' : '',
     className ?? '',
   ]
     .filter(Boolean)
     .join(' ');
 
-  return (
+  // Front face — the read-only card content
+  const frontFace = (
     <div
       className={entryClass}
       onClick={handleClick}
@@ -59,8 +100,11 @@ export function LogEntry({
         }
       }}
     >
-      {/* Header: tool name + primary feature + badges (all modes) */}
+      {/* Header: step index + tool name + primary feature + badges + edit icon (all modes) */}
       <div className="log-panel__entry-header">
+        {stepIndex != null && (
+          <span className="log-panel__entry-step">{stepIndex}</span>
+        )}
         <span className="log-panel__entry-tool">{entry.toolName}</span>
         {primaryFeature && (
           <span
@@ -78,6 +122,27 @@ export function LogEntry({
         {entry.deleted && (
           <span className="log-panel__entry-badge log-panel__entry-badge--deleted" data-testid="badge-deleted">
             {LOG_PANEL_STRINGS.deletedEntryBadge}
+          </span>
+        )}
+        {entry.disabled && !entry.deleted && (
+          <span className="log-panel__entry-badge log-panel__entry-badge--disabled" data-testid="badge-disabled">
+            {LOG_PANEL_STRINGS.disabledEntryBadge}
+          </span>
+        )}
+
+        {/* Edit (pencil) icon — only on non-deleted entries */}
+        {!entry.deleted && onEditClick && (
+          <span
+            className="log-panel__entry-edit-icon"
+            role="button"
+            tabIndex={0}
+            onClick={handleEditIconClick}
+            onKeyDown={handleEditIconKeyDown}
+            data-testid={`edit-icon-${entry.activityId}`}
+            title={LOG_PANEL_STRINGS.editIconTooltip}
+            aria-label={LOG_PANEL_STRINGS.editIconTooltip}
+          >
+            &#x270E;
           </span>
         )}
       </div>
@@ -163,4 +228,45 @@ export function LogEntry({
       )}
     </div>
   );
+
+  // Back face — the edit face (only rendered when flip-card props are provided)
+  const backFace = onEditClick ? (
+    <EditFace
+      entry={entry}
+      schema={schema ?? null}
+      schemaLoading={schemaLoading}
+      schemaError={schemaError ?? null}
+      replayStatus={replayStatus}
+      onParameterChange={(paramName, newValue) =>
+        onParameterChange?.(entry.activityId, paramName, newValue)
+      }
+      onDisableToggle={(disabled) =>
+        onDisableToggle?.(entry.activityId, disabled)
+      }
+      onDeleteClick={() => onDeleteClick?.(entry.activityId)}
+      onRationaleChange={(text) =>
+        onRationaleChange?.(entry.activityId, text)
+      }
+      onDone={() => onDoneClick?.(entry)}
+      onRetrySchema={() => onRetrySchema?.(entry.toolName)}
+      rationaleRef={rationaleRef}
+    />
+  ) : (
+    <div />
+  );
+
+  // If flip-card interaction is available, wrap in CardFlip
+  if (onEditClick) {
+    return (
+      <CardFlip
+        isFlipped={isEditing}
+        front={frontFace}
+        back={backFace}
+        data-testid={`card-flip-${entry.activityId}`}
+      />
+    );
+  }
+
+  // Otherwise, just render the front face (backwards compatible)
+  return frontFace;
 }

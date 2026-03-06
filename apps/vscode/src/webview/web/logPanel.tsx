@@ -4,12 +4,14 @@
  * Bridges VS Code webview API to the LogPanel React component.
  * Handles message passing between extension host and React component.
  * Phase 6: Adds tune/revert/replay message forwarding.
+ * Feature 113: Adds schema cache, disable/rationale handlers.
  *
  * Feature: 072-log-panel (E02, Phase 2)
  * Updated: 076-replay-tune (E02, Phase 6)
+ * Updated: 113-prov-card-flip (flip-card edit wiring)
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { LogPanel, LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
 import type {
@@ -19,6 +21,7 @@ import type {
   LogFilterState,
   LogPanelMessage,
   ExtensionToWebviewMessage,
+  ParameterSchemaEntry,
 } from '@debrief/components';
 
 // Phase 6 message types from the extension
@@ -36,12 +39,13 @@ interface ReplayResultPayload {
   haltReason: { type: string; toolId: string; message: string } | null;
 }
 
-// Extended message type to include Phase 6 messages
+// Extended message type to include Phase 6 + Feature 113 messages
 type ExtendedExtensionMessage =
   | ExtensionToWebviewMessage
   | { type: 'replay:progress'; payload: ReplayProgressPayload }
   | { type: 'replay:result'; payload: ReplayResultPayload }
-  | { type: 'replay:error'; payload: { message: string } };
+  | { type: 'replay:error'; payload: { message: string } }
+  | { type: 'schema:response'; payload: { toolId: string; schema: unknown[]; error: string | null } };
 
 // VS Code API type
 declare function acquireVsCodeApi(): {
@@ -144,6 +148,10 @@ function LogPanelApp(): React.ReactElement {
           setActionResultMessage(msg.payload.message);
           setTimeout(() => setActionResultMessage(null), 5000);
           break;
+
+        case 'schema:response':
+          // Schema is now derived locally — no extension round-trip needed.
+          break;
       }
     };
 
@@ -174,13 +182,38 @@ function LogPanelApp(): React.ReactElement {
     setSelectedEntryId(entryId);
   }, []);
 
-  // Phase 6: tune/revert handlers → send dedicated messages to extension
+  // Phase 6: tune/revert handlers → send dedicated messages to extension.
+  // Optimistic local update so the slider responds instantly during drag.
+  // Debounced (400ms) so rapid slider drags only trigger one replay.
+  const tuneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleTuneRequest = useCallback(
     (activityId: string, parameter: string, newValue: unknown) => {
-      vscode.postMessage({
-        type: 'tune:request',
-        payload: { activityId, parameter, newValue },
-      });
+      // Optimistic update: immediately reflect the new value in local state
+      // so the slider doesn't snap back while waiting for the replay round-trip.
+      setEntries((prev) =>
+        prev.map((e) => {
+          if (e.activityId !== activityId) return e;
+          const paramEntry = e.parameters[parameter];
+          if (!paramEntry) return e;
+          return {
+            ...e,
+            parameters: {
+              ...e.parameters,
+              [parameter]: { ...paramEntry, value: newValue },
+            },
+          };
+        })
+      );
+
+      // Debounce the actual replay request
+      if (tuneTimerRef.current) clearTimeout(tuneTimerRef.current);
+      tuneTimerRef.current = setTimeout(() => {
+        tuneTimerRef.current = null;
+        vscode.postMessage({
+          type: 'tune:request',
+          payload: { activityId, parameter, newValue },
+        });
+      }, 400);
     },
     []
   );
@@ -210,6 +243,50 @@ function LogPanelApp(): React.ReactElement {
     vscode.postMessage({ type: 'replay:cancel' });
   }, []);
 
+  // Feature 113: derive schema from existing parameter metadata.
+  // Parameters already carry value/tunable/default info — no extension round-trip needed.
+  const handleSchemaRequest = useCallback(
+    (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
+      const entry = entries.find((e) => e.toolName === toolId);
+      const schema: ParameterSchemaEntry[] = [];
+      if (entry) {
+        for (const [name, param] of Object.entries(entry.parameters)) {
+          const isNum = typeof param.value === 'number';
+          schema.push({
+            name,
+            type: isNum ? 'number' : 'string',
+            description: null,
+            tunable: param.tunable !== false,
+            defaultValue: param.default ? param.value : null,
+            minimum: isNum ? 0 : null,
+            maximum: isNum ? Number(param.value) * 3 : null,
+            step: isNum ? 1 : null,
+            choices: null,
+            paramType: null,
+          });
+        }
+      }
+      return Promise.resolve(schema);
+    },
+    [entries]
+  );
+
+  // Feature 113: disable toggle → forward to extension
+  const handleDisableToggle = useCallback((activityId: string, disabled: boolean) => {
+    vscode.postMessage({
+      type: 'disable:toggle',
+      payload: { activityId, disabled },
+    });
+  }, []);
+
+  // Feature 113: rationale update → forward to extension
+  const handleRationaleUpdate = useCallback((activityId: string, rationale: string) => {
+    vscode.postMessage({
+      type: 'rationale:update',
+      payload: { activityId, rationale },
+    });
+  }, []);
+
   return (
     <LogPanel
       entries={entries}
@@ -232,6 +309,9 @@ function LogPanelApp(): React.ReactElement {
       onRevertThisRequest={handleRevertThisRequest}
       onRestoreRequest={handleRestoreRequest}
       onReplayCancel={handleReplayCancel}
+      onSchemaRequest={handleSchemaRequest}
+      onDisableToggle={handleDisableToggle}
+      onRationaleUpdate={handleRationaleUpdate}
     />
   );
 }

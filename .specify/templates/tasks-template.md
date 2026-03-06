@@ -36,30 +36,65 @@ description: "Task list template for feature implementation"
 Every completed feature MUST include:
 
 1. **Test Summary** (`evidence/test-summary.md`):
+   - Use the template at `.specify/templates/evidence/test-summary-template.md`
+   - MUST include YAML front matter with `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`
    - Total tests: passed/failed/skipped
    - Coverage percentage (if applicable)
-   - Key test scenarios verified
+   - Key test scenarios verified (not just counts — describe what was tested and why)
 
 2. **Usage Example** (`evidence/usage-example.md` or `evidence/usage-demo.txt`):
    - A concrete example of using the feature
    - Expected output/behavior
    - Can be CLI output, API call, or code snippet
 
-3. **Feature-Specific Evidence** (varies by feature type):
-   - CLI tools: Terminal session showing commands and output
-   - APIs: Sample request/response JSON
-   - UI: Screenshots of key states
-   - Libraries: Code example with output
-   - Data processing: Before/after data samples
+3. **Feature-Specific Evidence** (required per feature type — see Quality Rubric below)
+
+### Evidence Quality Rubric by Feature Type
+
+Every feature type has **minimum evidence requirements** beyond the mandatory test-summary and usage-example. These are not optional.
+
+| Feature Type | Required Evidence | Files |
+|---|---|---|
+| **UI Component** | 3 theme screenshots (light, dark, vscode) + interaction GIF showing key user flow | `screenshots/component-light.png`, `screenshots/component-dark.png`, `screenshots/component-vscode.png`, `screenshots/interaction.gif` |
+| **CLI Tool** | Full terminal session transcript showing commands and output | `cli-demo.txt` |
+| **API/Service** | Sample request and response JSON | `sample-request.json`, `sample-response.json` |
+| **Parser/Converter** | Sample input file + parsed output side-by-side | `sample-input.*`, `parsed-output.*` |
+| **Schema Change** | Round-trip proof (Python -> JSON -> TypeScript -> JSON) | `round-trip-evidence.md` |
+| **Data Processing** | Before and after data samples | `input-sample.*`, `output-sample.*` |
+| **Library/SDK** | Code example with output | `usage-example.py` or `.ts`, `output.txt` |
+| **Integration** | End-to-end flow documentation + sequence diagram | `integration-flow.md`, `sequence.mermaid` |
+| **Electron/Desktop App** | Runtime startup screenshot, workflow screenshot, E2E trace | `runtime-startup.png`, `runtime-workflow.png`, `e2e-trace.zip` |
+| **Infrastructure** | Configuration sample + validation output | `config-sample.*`, `validation-output.txt` |
+
+### Interaction GIF Guidance (UI Components)
+
+For UI components, capture a short GIF (< 5 seconds) demonstrating the primary user interaction. This is more valuable than static screenshots because it proves the component responds correctly.
+
+**What to capture:**
+- The key user flow (click, drag, hover, selection)
+- State transitions (collapsed -> expanded, idle -> active)
+- Visual feedback (hover effects, loading states, animations)
+
+**How to capture:**
+- During Playwright E2E tests, use the `page.video()` API or `recordVideo` config option, then convert to GIF
+- Alternatively, use screen recording tools and trim to the key interaction
+- Save as `evidence/screenshots/interaction.gif`
+- Keep under 2MB — trim and optimize
 
 ### Evidence Collection Tasks
 
 Include these as final tasks in the Polish phase:
 
 ```markdown
-- [ ] TXXX Capture test summary in specs/[feature]/evidence/test-summary.md
+- [ ] TXXX Capture test summary using template (.specify/templates/evidence/test-summary-template.md) in specs/[feature]/evidence/test-summary.md
 - [ ] TXXX Record usage example in specs/[feature]/evidence/usage-example.md
-- [ ] TXXX [Add feature-specific evidence task]
+- [ ] TXXX [Add feature-type-specific evidence per Quality Rubric above]
+```
+
+For UI components, always include:
+```markdown
+- [ ] TXXX [P] Capture theme screenshots (light/dark/vscode) to specs/[feature]/evidence/screenshots/
+- [ ] TXXX Capture interaction GIF showing key user flow to specs/[feature]/evidence/screenshots/interaction.gif
 ```
 
 ## Format: `[ID] [P?] [Story] Description`
@@ -88,7 +123,7 @@ Include these as final tasks in the Polish phase:
   Tasks MUST be organized by user story so each story can be:
   - Implemented independently
   - Tested independently
-  - Delivered as an MVP increment
+  - Delivered as an increment
   
   DO NOT keep these sample tasks in the generated tasks.md file.
   ============================================================================
@@ -123,7 +158,7 @@ Examples of foundational tasks (adjust based on your project):
 
 ---
 
-## Phase 3: User Story 1 - [Title] (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - [Title] (Priority: P1)
 
 **Goal**: [Brief description of what this story delivers]
 
@@ -140,11 +175,23 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE**: Include this section when the user story involves visual components with Storybook stories.
 > See plan.md "Storybook E2E Testing" section for which stories need tests.
+>
+> **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip these tests because you think browsers can't be installed. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
 - [ ] T0XX [P] [US1] Create Playwright test `shared/components/e2e/[Component].spec.ts`
 - [ ] T0XX [P] [US1] Add theme variant tests (light, dark, vscode)
 - [ ] T0XX [P] [US1] Add interaction tests for user flows
 - [ ] T0XX [US1] Run e2e tests: `pnpm --filter @debrief/components test:e2e [Component]`
+
+### VS Code Webview E2E Tests for User Story 1 (REQUIRED for extension workflows) 🖥️
+
+> **NOTE**: Include this section when the user story involves VS Code extension workflows (opening files, running commands, interacting with webview panels).
+> See plan.md "VS Code Webview E2E Testing" section for which workflows need tests.
+> Full architecture guide: `docs/e2e-testing-guide.md`
+
+- [ ] T0XX [P] [US1] Update page objects in `tests/e2e/models/` with new selectors
+- [ ] T0XX [P] [US1] Create Playwright test `tests/e2e/test-[workflow].spec.ts`
+- [ ] T0XX [US1] Run webview e2e tests: `xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts test-[workflow]`
 
 ### Implementation for User Story 1
 
@@ -229,6 +276,8 @@ Examples of foundational tasks (adjust based on your project):
 ### E2E Evidence Collection (REQUIRED for UI components) 🎭
 
 > **Purpose**: Capture visual evidence from Playwright tests for PR and blog posts
+>
+> **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip these tests because you think browsers can't be installed. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
 - [ ] TXXX Run full e2e suite: `pnpm --filter @debrief/components test:e2e`
 - [ ] TXXX [P] Capture theme variant screenshots to specs/[feature]/evidence/screenshots/
@@ -249,6 +298,15 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] Dark theme: `screenshots/component-dark.png`
 - [ ] VS Code theme: `screenshots/component-vscode.png`
 ```
+
+### VS Code Webview E2E Evidence Collection (REQUIRED for extension workflows) 🖥️
+
+> **Purpose**: Capture workflow evidence from VS Code webview tests
+> Full guide: `docs/e2e-testing-guide.md`
+
+- [ ] TXXX Run webview e2e suite: `xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts`
+- [ ] TXXX [P] Capture workflow screenshots to tests/e2e/evidence/
+- [ ] TXXX Document webview e2e results in evidence/webview-e2e-summary.md
 
 **Checkpoint**: Evidence collected - ready for PR creation via `/speckit.pr`
 
@@ -306,21 +364,14 @@ Task: "Create [Entity2] model in src/models/[entity2].py"
 
 ## Implementation Strategy
 
-### MVP First (User Story 1 Only)
-
-1. Complete Phase 1: Setup
-2. Complete Phase 2: Foundational (CRITICAL - blocks all stories)
-3. Complete Phase 3: User Story 1
-4. **STOP and VALIDATE**: Test User Story 1 independently
-5. Deploy/demo if ready
-
 ### Incremental Delivery
 
 1. Complete Setup + Foundational → Foundation ready
-2. Add User Story 1 → Test independently → Deploy/Demo (MVP!)
-3. Add User Story 2 → Test independently → Deploy/Demo
-4. Add User Story 3 → Test independently → Deploy/Demo
-5. Each story adds value without breaking previous stories
+2. Add User Story 1 → Test independently
+3. Add User Story 2 → Test independently
+4. Add User Story 3 → Test independently
+5. Complete all user stories, then Polish phase
+6. Each story adds value without breaking previous stories
 
 ### Parallel Team Strategy
 

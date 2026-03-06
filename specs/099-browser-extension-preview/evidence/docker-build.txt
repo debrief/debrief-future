@@ -1,0 +1,49 @@
+Docker Build Evidence — Feature 099: Browser-Based VS Code Extension Preview
+=============================================================================
+
+Date: 2026-02-20
+Environment: Cloud session (Docker daemon not available)
+
+Dockerfile Validation
+---------------------
+Dockerfile syntax validated with dockerfilelint.
+Result: 1 informational warning (latest tag usage — consistent with existing docker/code-server/Dockerfile).
+No errors.
+
+Dockerfile Location: preview/Dockerfile
+Base Image: codercom/code-server:latest
+Build Context: repository root (.)
+
+Dockerfile Structure
+--------------------
+1. FROM codercom/code-server:latest
+2. Install Python 3.11 + uv (same as docker/code-server/Dockerfile)
+3. Copy and install Python services (io, stac, calc, schemas)
+4. Install .vsix extension via code-server --install-extension
+5. Copy preview workspace with sample data
+6. Copy entrypoint.sh
+7. Expose $PORT (default 8080)
+8. Run entrypoint.sh as coder user
+
+Expected Build Command
+----------------------
+docker build -t debrief-preview -f preview/Dockerfile .
+
+Expected Build Output
+---------------------
+Successfully built image 'debrief-preview'
+Image contains: code-server, Python 3.11, uv, Debrief services, .vsix extension, sample data
+
+Note: Docker daemon was not available in this cloud session.
+The Dockerfile follows the exact same pattern as the working docker/code-server/Dockerfile
+used for E2E testing, with the addition of:
+- preview/workspace sample data
+- preview/entrypoint.sh for Heroku $PORT binding
+- Sample STAC catalogs and REP files
+
+Local Build Verification
+------------------------
+To verify locally:
+  task preview:package  # Build the .vsix
+  task preview:build    # Build the Docker image
+  task preview:run      # Start on http://localhost:8080

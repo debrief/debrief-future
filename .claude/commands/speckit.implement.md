@@ -78,9 +78,17 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Polish and validation**: Unit tests, performance optimization, documentation
    - **Evidence collection**: During Polish phase, capture evidence artifacts as specified in tasks.md:
      - Create `FEATURE_DIR/evidence/` directory
-     - Capture test-summary.md with test results
+     - Capture test-summary.md using the template at `.specify/templates/evidence/test-summary-template.md`:
+       - Fill YAML front matter: `feature`, `captured_at` (ISO 8601), `git_sha` (current HEAD short SHA), `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`
+       - Include test breakdown by suite, key scenarios verified, and known issues
      - Create usage-example.md demonstrating the feature
-     - Capture any feature-specific artifacts (screenshots, API samples, CLI output, etc.)
+     - Capture feature-type-specific evidence per the Quality Rubric in `.specify/templates/tasks-template.md`:
+       - UI Components: 3 theme screenshots (light/dark/vscode) + interaction GIF
+       - CLI Tools: full terminal session transcript (`cli-demo.txt`)
+       - APIs: sample request + response JSON
+       - Parsers: input + output side-by-side
+       - Schema changes: round-trip proof
+     - For UI components: capture interaction GIF showing the key user flow (< 5s, < 2MB) via Playwright `recordVideo` or screen recording
    - **Media component bundling**: If plan.md has Media Components entries:
      - For each component in the Media Components table:
        - Locate the Storybook story source file
@@ -97,7 +105,8 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Add `data-testid` attributes to components for reliable selection
      - Capture screenshots for evidence: `await page.screenshot({ path: 'specs/[feature]/evidence/screenshots/...' })`
      - Run tests: `pnpm --filter @debrief/components test:e2e [testfile]`
-     - For Claude Code sessions: Tests run with `@sparticuz/chromium` (see key_facts.md)
+
+> **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip Playwright tests because you think browsers can't be installed. Standard browser CDN downloads are blocked (403), but `@sparticuz/chromium` bundles a Linux Chromium binary via npm and works fully. The project's `playwright.config.ts` auto-detects the environment and uses the bundled binary when `CLAUDE_CODE=1` is set. Run via `node apps/web-shell/run-playwright.mjs` to extract and configure the bundled browser. Full details: `docs/project_notes/playwright-installation-research.md`
 
 8. Progress tracking and error handling:
    - Report progress after each completed task
@@ -117,6 +126,16 @@ You **MUST** consider the user input before proceeding (if not empty).
       - `evidence/test-summary.md` - REQUIRED
       - `evidence/usage-example.md` - REQUIRED
       - Feature-specific artifacts as defined in tasks.md
+    - **Verify test-summary.md quality**:
+      - Check for YAML front matter with required fields (`feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`)
+      - If front matter is missing, WARN: "test-summary.md should use the template at .specify/templates/evidence/test-summary-template.md"
+      - If `git_sha` doesn't match current HEAD, WARN: "Evidence was captured at a different commit — consider refreshing"
+    - **Verify feature-type evidence** (per Quality Rubric):
+      - Determine feature type from spec.md
+      - For UI components: check for `screenshots/` directory with theme variants and interaction GIF
+      - For CLI tools: check for `cli-demo.txt`
+      - For APIs: check for sample request/response JSON
+      - WARN about any missing type-specific evidence
     - Verify media directory exists: `FEATURE_DIR/media/`
     - Check that required media files are present:
       - `media/shipped-post.md` - REQUIRED

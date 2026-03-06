@@ -14,8 +14,7 @@ export const exerciseAlphaTimeExtent: TimeExtent = [
 ];
 
 // All renderable features (excludes NARRATIVE which has empty coordinates)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const exerciseAlphaFeatures: any[] = [
+export const exerciseAlphaFeatures: GeoJSON.Feature[] = [
   {
     type: 'Feature',
     geometry: {

@@ -6,6 +6,7 @@ within plot FeatureCollection assets.
 """
 
 import json
+import logging
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -18,6 +19,8 @@ from debrief_stac.types import (
     GeoJSONFeature,
     GeoJSONFeatureCollection,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def add_features(
@@ -221,11 +224,14 @@ def delete_features(
 def _validate_feature(feature: GeoJSONFeature) -> None:
     """Validate a GeoJSON feature has required fields.
 
+    Performs structural validation (required fields) and schema validation
+    against debrief-schemas Pydantic models (warn-and-continue).
+
     Args:
         feature: Feature dictionary to validate
 
     Raises:
-        ValueError: If feature is missing required fields
+        ValueError: If feature is missing required structural fields
     """
     if not isinstance(feature, dict):
         raise ValueError("Feature must be a dictionary")
@@ -238,6 +244,17 @@ def _validate_feature(feature: GeoJSONFeature) -> None:
 
     if "properties" not in feature:
         raise ValueError("Feature must have a 'properties' field")
+
+    # Schema validation (warn-and-continue)
+    try:
+        from debrief_schemas.validation import SchemaValidationError, validate_feature
+    except ImportError:
+        pass
+    else:
+        try:
+            validate_feature(feature, "catalog_write")
+        except SchemaValidationError as e:
+            logger.warning("Catalog schema validation: %s", e)
 
 
 def _calculate_bbox(features: Sequence[GeoJSONFeature]) -> BoundingBox | None:

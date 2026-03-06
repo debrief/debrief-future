@@ -12,7 +12,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
-import type { Plot, Track, ReferenceLocation, Selection } from '../types/plot';
+import type { Plot } from '../types/plot';
 import type { ResultLayer } from '../types/tool';
 import type {
   ExtensionToWebviewMessage,
@@ -33,9 +33,12 @@ import {
   type SessionStoreApi,
   type SessionStoreWithUndo,
   type LogService,
+  type DrawingMode,
 } from '@debrief/session-state';
 import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
 import { calculateBounds, mergeBounds } from '../utils/bounds';
+import type { DebriefFeature } from '@debrief/components';
+import { isTrackFeature } from '@debrief/components';
 
 export class MapPanel {
   public static currentPanel: MapPanel | undefined;
@@ -47,9 +50,7 @@ export class MapPanel {
 
   // Current state
   private currentPlot: Plot | null = null;
-  private currentTracks: Track[] = [];
-  private currentLocations: ReferenceLocation[] = [];
-  private otherFeatures: GeoJSONFeature[] = [];
+  private currentFeatures: DebriefFeature[] = [];
   private resultLayers: ResultLayer[] = [];
   private isWebviewReady = false;
   private pendingMessages: ExtensionToWebviewMessage[] = [];
@@ -66,7 +67,7 @@ export class MapPanel {
 
   // Event handlers
   private onSelectionChangedCallback:
-    | ((selection: Selection) => void)
+    | ((selection: { featureIds: string[] }) => void)
     | undefined;
   private onExportPngCallback:
     | ((requestId: string) => Promise<void>)
@@ -78,6 +79,7 @@ export class MapPanel {
   private selectionUnsubscribe?: () => void;
   private temporalUnsubscribe?: () => void;
   private hiddenUnsubscribe?: () => void;
+  private drawingUnsubscribe?: () => void;
   private sessionChangeDisposable?: vscode.Disposable;
   private viewportUpdateTimeout?: NodeJS.Timeout;
   private static readonly VIEWPORT_DEBOUNCE_MS = 100;
@@ -179,14 +181,10 @@ export class MapPanel {
    */
   public loadPlot(
     plot: Plot,
-    tracks: Track[],
-    locations: ReferenceLocation[],
-    otherFeatures: GeoJSONFeature[] = []
+    features: DebriefFeature[]
   ): void {
     this.currentPlot = plot;
-    this.currentTracks = tracks;
-    this.currentLocations = locations;
-    this.otherFeatures = otherFeatures;
+    this.currentFeatures = features;
     this.resultLayers = [];
 
     // Update panel title
@@ -198,9 +196,7 @@ export class MapPanel {
       plot: {
         id: plot.id,
         title: plot.title,
-        tracks,
-        locations,
-        otherFeatures,
+        features,
         bbox: plot.bbox,
         timeExtent: plot.timeExtent,
       },
@@ -211,7 +207,7 @@ export class MapPanel {
   }
 
   /**
-   * Remove features by ID from all in-memory arrays, then re-send loadPlot to webview.
+   * Remove features by ID from in-memory array, then re-send loadPlot to webview.
    */
   public removeFeatures(ids: string[]): void {
     if (!this.currentPlot) {
@@ -220,12 +216,7 @@ export class MapPanel {
 
     const idSet = new Set(ids);
 
-    this.currentTracks = this.currentTracks.filter((t) => !idSet.has(t.id));
-    this.currentLocations = this.currentLocations.filter((l) => !idSet.has(l.id));
-    this.otherFeatures = this.otherFeatures.filter((f) => {
-      const fId = (f.properties as Record<string, unknown>)?.id as string | undefined;
-      return !fId || !idSet.has(fId);
-    });
+    this.currentFeatures = this.currentFeatures.filter((f) => !idSet.has(String(f.id)));
     this.resultLayers = this.resultLayers.filter((l) => !idSet.has(l.id));
 
     // Re-send full plot data so webview rebuilds from source of truth
@@ -234,9 +225,7 @@ export class MapPanel {
       plot: {
         id: this.currentPlot.id,
         title: this.currentPlot.title,
-        tracks: this.currentTracks,
-        locations: this.currentLocations,
-        otherFeatures: this.otherFeatures,
+        features: this.currentFeatures,
         bbox: this.currentPlot.bbox,
         timeExtent: this.currentPlot.timeExtent,
       },
@@ -253,27 +242,14 @@ export class MapPanel {
 
     // Update layers tree provider if available
     if (this.layersTreeProvider) {
-      this.layersTreeProvider.setTracks(this.currentTracks);
-      this.layersTreeProvider.setLocations(this.currentLocations);
-      this.layersTreeProvider.setShapes(this.otherFeatures);
+      this.layersTreeProvider.setFeatures(this.currentFeatures);
       this.layersTreeProvider.setResultLayers([...this.resultLayers]);
     }
 
     // Update activity panel webview if available
     if (this.activityPanelProvider) {
-      this.activityPanelProvider.setFeatures(this.currentTracks, this.currentLocations);
+      this.activityPanelProvider.setFeatures(this.currentFeatures);
     }
-  }
-
-  /**
-   * Update tracks (e.g., after time filter change)
-   */
-  public updateTracks(tracks: Track[]): void {
-    this.currentTracks = tracks;
-    this.postMessage({
-      type: 'updateTracks',
-      tracks,
-    });
   }
 
   /**
@@ -291,6 +267,29 @@ export class MapPanel {
    */
   public clearSelection(): void {
     this.postMessage({ type: 'clearSelection' });
+  }
+
+  /**
+   * Update plot features in-place (for mutation tool results).
+   * Sends the modified features to the webview which replaces matching
+   * features in plotFeatures by ID.
+   */
+  public updatePlotFeatures(layer: ResultLayer): void {
+    // Update in-memory currentFeatures so subsequent tool executions
+    // (via getFeatures/resolveFeatures) see the mutated geometry.
+    const fid = (f: DebriefFeature | { id?: unknown; properties?: Record<string, unknown> | null }) =>
+      String((f as { id?: unknown }).id ?? (f.properties as Record<string, unknown> | null)?.id ?? '');
+    const updatedMap = new Map(
+      layer.features.features.map((f) => [fid(f), f as DebriefFeature])
+    );
+    this.currentFeatures = this.currentFeatures.map(
+      (f) => updatedMap.get(fid(f)) ?? f
+    );
+
+    this.postMessage({
+      type: 'updatePlotFeatures',
+      features: layer.features,
+    });
   }
 
   /**
@@ -406,35 +405,59 @@ export class MapPanel {
    * Fit to selection
    */
   public fitToSelection(): void {
-    const selectedTracks = this.currentTracks.filter((t) => t.selected);
-    if (selectedTracks.length === 0) {
+    // Get selected IDs from session state
+    const selectedIds = this.activeSession
+      ? new Set(this.activeSession.getState().selection.featureIds)
+      : new Set<string>();
+
+    if (selectedIds.size === 0) {
       return;
     }
 
-    // Calculate bounds from selected tracks
+    const selectedFeatures = this.currentFeatures.filter(
+      (f) => selectedIds.has(String(f.id))
+    );
+    if (selectedFeatures.length === 0) {
+      return;
+    }
+
+    // Calculate bounds from selected features
     let minLat = Infinity;
     let maxLat = -Infinity;
     let minLng = Infinity;
     let maxLng = -Infinity;
 
-    for (const track of selectedTracks) {
-      const geom = track.geometry as { coordinates: number[][] };
-      for (const coord of geom.coordinates) {
-        const lng = coord[0];
-        const lat = coord[1];
-        if (typeof lng === 'number' && typeof lat === 'number') {
-          minLat = Math.min(minLat, lat);
-          maxLat = Math.max(maxLat, lat);
-          minLng = Math.min(minLng, lng);
-          maxLng = Math.max(maxLng, lng);
+    for (const feature of selectedFeatures) {
+      const geom = feature.geometry;
+      const coords = geom.coordinates;
+      if (geom.type === 'LineString') {
+        for (const coord of coords as number[][]) {
+          const lng = coord[0];
+          const lat = coord[1];
+          if (typeof lng === 'number' && typeof lat === 'number') {
+            minLat = Math.min(minLat, lat);
+            maxLat = Math.max(maxLat, lat);
+            minLng = Math.min(minLng, lng);
+            maxLng = Math.max(maxLng, lng);
+          }
+        }
+      } else if (geom.type === 'Point') {
+        const coord = coords as number[];
+        if (coord.length >= 2) {
+          minLat = Math.min(minLat, coord[1]!);
+          maxLat = Math.max(maxLat, coord[1]!);
+          minLng = Math.min(minLng, coord[0]!);
+          maxLng = Math.max(maxLng, coord[0]!);
         }
       }
     }
 
-    this.fitBounds([
-      [minLat, minLng],
-      [maxLat, maxLng],
-    ]);
+    if (minLat !== Infinity) {
+      this.fitBounds([
+        [minLat, minLng],
+        [maxLat, maxLng],
+      ]);
+    }
   }
 
   /**
@@ -456,18 +479,12 @@ export class MapPanel {
       trackId,
       color,
     });
-
-    // Update local state
-    const track = this.currentTracks.find((t) => t.id === trackId);
-    if (track) {
-      track.color = color;
-    }
   }
 
   /**
    * Register selection change callback
    */
-  public onSelectionChanged(callback: (selection: Selection) => void): void {
+  public onSelectionChanged(callback: (selection: { featureIds: string[] }) => void): void {
     this.onSelectionChangedCallback = callback;
   }
 
@@ -479,17 +496,10 @@ export class MapPanel {
   }
 
   /**
-   * Get current tracks
+   * Get current features
    */
-  public getTracks(): Track[] {
-    return this.currentTracks;
-  }
-
-  /**
-   * Get current locations
-   */
-  public getLocations(): ReferenceLocation[] {
-    return this.currentLocations;
+  public getFeatures(): DebriefFeature[] {
+    return this.currentFeatures;
   }
 
   /**
@@ -497,10 +507,6 @@ export class MapPanel {
    */
   public getResultLayers(): ResultLayer[] {
     return this.resultLayers;
-  }
-
-  public getOtherFeatures(): GeoJSONFeature[] {
-    return this.otherFeatures;
   }
 
   /**
@@ -528,6 +534,13 @@ export class MapPanel {
   }
 
   /**
+   * Get LogService for provenance recording.
+   */
+  public getLogService(): LogService | null {
+    return this.logService;
+  }
+
+  /**
    * Get current plot info
    */
   public getCurrentPlot(): Plot | null {
@@ -544,22 +557,9 @@ export class MapPanel {
    * @returns The feature kind string or undefined
    */
   public getFeatureKind(featureId: string): string | undefined {
-    // Check tracks first (most common)
-    const track = this.currentTracks.find((t) => t.id === featureId);
-    if (track) {
-      return 'TRACK';
-    }
-
-    // Check locations
-    const location = this.currentLocations.find((l) => l.id === featureId);
-    if (location) {
-      return 'POINT';
-    }
-
-    // Check shapes (other features)
-    const shape = this.otherFeatures.find((f) => (f.properties as Record<string, unknown>)?.id === featureId);
-    if (shape) {
-      return 'SHAPE';
+    const feature = this.currentFeatures.find((f) => String(f.id) === featureId);
+    if (feature) {
+      return (feature.properties as Record<string, unknown>).kind as string;
     }
 
     // Check result layers
@@ -603,10 +603,12 @@ export class MapPanel {
     this.selectionUnsubscribe?.();
     this.temporalUnsubscribe?.();
     this.hiddenUnsubscribe?.();
+    this.drawingUnsubscribe?.();
     this.spatialUnsubscribe = undefined;
     this.selectionUnsubscribe = undefined;
     this.temporalUnsubscribe = undefined;
     this.hiddenUnsubscribe = undefined;
+    this.drawingUnsubscribe = undefined;
 
     this.activeSession = session ?? undefined;
 
@@ -688,6 +690,31 @@ export class MapPanel {
           });
         }
       );
+
+      // Subscribe to drawing state changes (#108)
+      type DrawingState = { drawingMode: DrawingMode; drawingPaletteIndex: number };
+      const drawingSelector = (state: SessionStoreWithUndo): DrawingState => ({
+        drawingMode: state.drawingMode,
+        drawingPaletteIndex: state.drawingPaletteIndex,
+      });
+      this.drawingUnsubscribe = subscribeToSlice(
+        session,
+        drawingSelector,
+        (drawing: DrawingState, prev: DrawingState) => {
+          if (drawing.drawingMode !== prev.drawingMode) {
+            this.postMessage({
+              type: 'setDrawingMode',
+              drawingMode: drawing.drawingMode,
+            });
+          }
+          if (drawing.drawingPaletteIndex !== prev.drawingPaletteIndex) {
+            this.postMessage({
+              type: 'setDrawingPaletteIndex',
+              paletteIndex: drawing.drawingPaletteIndex,
+            });
+          }
+        }
+      );
     }
   }
 
@@ -734,6 +761,7 @@ export class MapPanel {
     this.spatialUnsubscribe?.();
     this.selectionUnsubscribe?.();
     this.temporalUnsubscribe?.();
+    this.drawingUnsubscribe?.();
     this.sessionChangeDisposable?.dispose();
     if (this.viewportUpdateTimeout) {
       clearTimeout(this.viewportUpdateTimeout);
@@ -861,45 +889,31 @@ export class MapPanel {
           }
         }
         break;
+
+      case 'drawingModeChanged':
+        // Handle drawing mode change from webview (#108)
+        if (this.activeSession) {
+          this.activeSession.getState().setDrawingMode(message.drawingMode);
+        }
+        break;
     }
   }
 
   private handleSelectionChanged(
     message: Extract<WebviewToExtensionMessage, { type: 'selectionChanged' }>
   ): void {
-    // Update local track state
-    for (const track of this.currentTracks) {
-      track.selected = message.selection.trackIds.includes(track.id);
-    }
-    for (const location of this.currentLocations) {
-      location.selected = message.selection.locationIds.includes(location.id);
-    }
-
     // Update context
-    const hasSelection =
-      message.selection.trackIds.length > 0 ||
-      message.selection.locationIds.length > 0;
+    const hasSelection = message.selection.featureIds.length > 0;
     void vscode.commands.executeCommand(
       'setContext',
       'debrief.hasSelection',
       hasSelection
     );
 
-    // Notify callback
+    // Notify callback with unified featureIds
     if (this.onSelectionChangedCallback) {
-      const featureKinds: Array<'UI_TRACK' | 'UI_LOCATION'> = [];
-      if (message.selection.trackIds.length > 0) {
-        featureKinds.push('UI_TRACK');
-      }
-      if (message.selection.locationIds.length > 0) {
-        featureKinds.push('UI_LOCATION');
-      }
-
       this.onSelectionChangedCallback({
-        trackIds: message.selection.trackIds,
-        locationIds: message.selection.locationIds,
-        contextType: message.selection.contextType,
-        featureKinds,
+        featureIds: message.selection.featureIds,
       });
     }
   }
@@ -910,55 +924,38 @@ export class MapPanel {
     const { feature } = message;
     console.log('[debrief] featureDrawn received:', feature.kind, feature.id);
 
-    if (feature.kind === 'POINT') {
-      // Add drawn point to locations list
-      const location: ReferenceLocation = {
-        id: feature.id,
-        name: feature.name ?? 'Drawn Point',
-        locationType: 'REFERENCE',
-        geometry: {
-          type: 'Point' as const,
-          coordinates: feature.geometry.coordinates as number[],
-        },
-        visible: true,
-        selected: true,
-      };
-      this.currentLocations = [...this.currentLocations, location];
-      console.log('[debrief] Added drawn point, locations count:', this.currentLocations.length);
-      if (this.layersTreeProvider) {
-        this.layersTreeProvider.setLocations(this.currentLocations);
-      } else {
-        console.warn('[debrief] layersTreeProvider is null — drawn point not added to Layers');
-      }
-    } else {
-      // Add drawn rectangle (or other shapes) to otherFeatures
-      const geoFeature: GeoJSONFeature = {
-        type: 'Feature',
-        id: feature.id,
-        geometry: {
-          type: feature.geometry.type,
-          coordinates: feature.geometry.coordinates as number[][],
-        },
-        properties: {
-          ...feature.properties,
-          id: feature.id,
-        },
-      };
-      this.otherFeatures = [...this.otherFeatures, geoFeature];
-      console.log('[debrief] Added drawn shape, shapes count:', this.otherFeatures.length);
-      if (this.layersTreeProvider) {
-        this.layersTreeProvider.setShapes(this.otherFeatures);
-      } else {
-        console.warn('[debrief] layersTreeProvider is null — drawn shape not added to Layers');
-      }
+    // Add drawn feature to unified features list
+    const drawnFeature: DebriefFeature = {
+      type: 'Feature',
+      id: feature.id,
+      geometry: feature.geometry,
+      properties: {
+        ...feature.properties,
+        kind: feature.kind,
+        name: feature.name,
+        label: feature.label,
+      },
+    } as DebriefFeature;
+    this.currentFeatures = [...this.currentFeatures, drawnFeature];
+    console.log('[debrief] Added drawn feature, features count:', this.currentFeatures.length);
+
+    // Increment drawing palette index in session state (#108)
+    if (this.activeSession) {
+      this.activeSession.getState().incrementDrawingPaletteIndex();
     }
 
-    // Update activity panel
+    // Update layers and activity panels
+    if (this.layersTreeProvider) {
+      this.layersTreeProvider.setFeatures(this.currentFeatures);
+    }
     if (this.activityPanelProvider) {
-      this.activityPanelProvider.setFeatures(this.currentTracks, this.currentLocations);
+      this.activityPanelProvider.setFeatures(this.currentFeatures);
     }
 
     // Record provenance (Feature: 094)
+    if (!this.logService) {
+      console.warn('[debrief] MapPanel: drawn-feature provenance skipped — logService not set. Was setLogService() called?');
+    }
     if (this.logService && this.stacService) {
       try {
         const store = this.getCurrentStore();
@@ -1010,8 +1007,11 @@ export class MapPanel {
     trackName: string
   ): Promise<void> {
     // Show color picker
-    const track = this.currentTracks.find((t) => t.id === trackId);
-    const currentColor = track?.color ?? '#377eb8';
+    const feature = this.currentFeatures.find((f) => String(f.id) === trackId);
+    const props = feature?.properties as Record<string, unknown> | undefined;
+    const style = props?.style as Record<string, unknown> | undefined;
+    const lineStyle = style?.line as Record<string, unknown> | undefined;
+    const currentColor = (lineStyle?.color as string) ?? (style?.color as string) ?? '#377eb8';
 
     const result = await vscode.window.showInputBox({
       prompt: `Enter color for ${trackName}`,
@@ -1170,30 +1170,23 @@ export class MapPanel {
 
       if (updatedData) {
         // Update internal state
-        this.currentTracks = updatedData.tracks;
-        this.currentLocations = updatedData.locations;
+        this.currentFeatures = updatedData.features;
 
-        // Update webview with new tracks
+        // Update webview with new features
         this.postMessage({
           type: 'loadPlot',
           plot: {
             id: currentPlot.id,
             title: currentPlot.title,
-            tracks: updatedData.tracks,
-            locations: updatedData.locations,
-            otherFeatures: updatedData.otherFeatures,
+            features: updatedData.features,
             bbox: mergedBounds ?? currentPlot.bbox,
             timeExtent: currentPlot.timeExtent,
           },
         });
 
-        // Update layers panel
-        this.layersTreeProvider?.setTracks(updatedData.tracks);
-        this.layersTreeProvider?.setLocations(updatedData.locations);
-        this.layersTreeProvider?.setShapes(updatedData.otherFeatures);
-
-        // Update activity panel webview
-        this.activityPanelProvider?.setFeatures(updatedData.tracks, updatedData.locations);
+        // Update layers and activity panels
+        this.layersTreeProvider?.setFeatures(updatedData.features);
+        this.activityPanelProvider?.setFeatures(updatedData.features);
       }
 
       // Send completion message
@@ -1233,9 +1226,9 @@ export class MapPanel {
     requestId: string,
     trackId: string
   ): void {
-    const track = this.currentTracks.find((t) => t.id === trackId);
+    const feature = this.currentFeatures.find((f) => String(f.id) === trackId);
 
-    if (!track) {
+    if (!feature || !isTrackFeature(feature)) {
       void this.panel.webview.postMessage({
         type: 'requestTrackDetailsResponse',
         requestId,
@@ -1245,9 +1238,10 @@ export class MapPanel {
       return;
     }
 
+    const props = feature.properties;
     // Calculate duration
-    const startDate = new Date(track.startTime);
-    const endDate = new Date(track.endTime);
+    const startDate = new Date(props.start_time);
+    const endDate = new Date(props.end_time);
     const durationMs = endDate.getTime() - startDate.getTime();
     const hours = Math.floor(durationMs / 3600000);
     const minutes = Math.floor((durationMs % 3600000) / 60000);
@@ -1259,11 +1253,11 @@ export class MapPanel {
       requestId,
       success: true,
       details: {
-        name: track.name,
-        platformType: track.platformType ?? 'Unknown',
-        pointCount: (track.geometry as { coordinates: number[][] }).coordinates.length,
-        startTime: track.startTime,
-        endTime: track.endTime,
+        name: props.platform_name ?? props.platform_id,
+        platformType: props.track_type ?? 'Unknown',
+        pointCount: (feature.geometry as unknown as { coordinates: number[][] }).coordinates.length,
+        startTime: props.start_time,
+        endTime: props.end_time,
         duration,
       },
     });
@@ -1284,13 +1278,14 @@ export class MapPanel {
     );
 
     const cspSource = webview.cspSource;
+    const nonce = getNonce();
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource}; img-src ${cspSource} data: https:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${cspSource} data: https:;">
   <title>Debrief Map</title>
   <link rel="stylesheet" href="${stylesUri.toString()}">
   <style>
@@ -1305,7 +1300,7 @@ export class MapPanel {
 </head>
 <body>
   <div id="root"></div>
-  <script src="${scriptUri.toString()}"></script>
+  <script nonce="${nonce}" src="${scriptUri.toString()}"></script>
 </body>
 </html>`;
   }
@@ -1324,4 +1319,13 @@ export class MapPanelSerializer implements vscode.WebviewPanelSerializer {
     MapPanel.revive(webviewPanel, this.extensionUri);
     return Promise.resolve();
   }
+}
+
+function getNonce(): string {
+  let text = '';
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < 32; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
 }

@@ -6,9 +6,12 @@ including features, warnings, and handler metadata.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger(__name__)
 
 
 class ParseWarning(BaseModel):
@@ -78,11 +81,11 @@ class ParseResult(BaseModel):
         handler: Name of handler that processed the file
     """
 
-    features: list[Any] = Field(default_factory=list)
+    features: list[dict[str, Any]] = Field(default_factory=list)
     """Parsed and validated GeoJSON features.
 
     Each feature is a TrackFeature or ReferenceLocation from debrief-schemas.
-    Using Any here to avoid circular import; actual types enforced at runtime.
+    Schema-validated at the parser output boundary (warn-and-continue).
     """
 
     warnings: list[ParseWarning] = Field(default_factory=list)
@@ -99,3 +102,29 @@ class ParseResult(BaseModel):
 
     handler: str
     """Name of handler that processed the file."""
+
+    def schema_validate_features(self) -> list[ParseWarning]:
+        """Run schema validation on parsed features (warn-and-continue).
+
+        Returns a list of ParseWarning for any schema validation failures.
+        Features that fail schema validation are NOT removed from the list.
+        """
+        schema_warnings: list[ParseWarning] = []
+        try:
+            from debrief_schemas.validation import SchemaValidationError, validate_feature
+        except ImportError:
+            return schema_warnings
+
+        for i, feature in enumerate(self.features):
+            try:
+                validate_feature(feature, "parser_output")
+            except SchemaValidationError as e:
+                warning = ParseWarning(
+                    message=f"Schema validation: {e}",
+                    code="SCHEMA_VALIDATION",
+                )
+                schema_warnings.append(warning)
+                logger.warning("Parser output schema warning for feature[%d]: %s", i, e)
+
+        self.warnings.extend(schema_warnings)
+        return schema_warnings

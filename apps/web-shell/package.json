@@ -11,15 +11,18 @@
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:ui": "playwright test --config=playwright/playwright.config.ts --ui",
-    "test:cloud": "node run-playwright.mjs"
+    "test:cloud": "node run-playwright.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@debrief/components": "workspace:*",
     "@debrief/session-state": "workspace:*",
+    "golden-layout": "^2.6.0",
     "leaflet": "^1.9.4",
+    "memfs": "^4.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "memfs": "^4.0.0",
+    "shared-zustand": "^2.1.0",
     "vscrui": "^0.1.0"
   },
   "devDependencies": {

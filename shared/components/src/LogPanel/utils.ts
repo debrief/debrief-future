@@ -199,3 +199,48 @@ export function formatTimestamp(isoTimestamp: string): string {
     return isoTimestamp;
   }
 }
+
+/**
+ * Calculate the cascade of entries that should be auto-disabled
+ * when a given entry is disabled.
+ *
+ * Uses a visited guard (F1) to prevent infinite loops in circular
+ * dependency graphs.
+ *
+ * Feature: 113-prov-card-flip
+ */
+export function cascadeDisable(
+  entryId: string,
+  timeline: TimelineEntry[]
+): string[] {
+  const visited = new Set<string>();
+  const disabled: string[] = [];
+  const queue = [entryId];
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+    if (visited.has(currentId)) continue;
+    visited.add(currentId);
+
+    const entry = timeline.find((e) => e.activityId === currentId);
+    if (!entry) continue;
+
+    const generatedFeatures = new Set(entry.generatedFeatureIds);
+
+    // Only check entries that come after the current entry in the timeline
+    const entryIndex = timeline.indexOf(entry);
+    for (let i = entryIndex + 1; i < timeline.length; i++) {
+      const subsequent = timeline[i];
+      if (!subsequent || visited.has(subsequent.activityId)) continue;
+      const dependsOnDisabled = subsequent.usedFeatureIds.some((f) =>
+        generatedFeatures.has(f)
+      );
+      if (dependsOnDisabled) {
+        disabled.push(subsequent.activityId);
+        queue.push(subsequent.activityId);
+      }
+    }
+  }
+
+  return disabled;
+}

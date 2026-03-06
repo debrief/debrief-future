@@ -186,6 +186,17 @@ release to the user community (v4.0.0):
 **Trigger point:** Upon release of v4.0.0, Articles II (schema versioning), VIII (changelog), and
 XIII (contribution standards) become strictly enforced for all subsequent releases.
 
+### XV. Strict Type Safety
+
+**Every value has a concrete type. `Any` is not a type — it is the absence of one.**
+
+1. **Explicit types everywhere** — all function parameters, return types, and variable declarations MUST have explicit type annotations in both Python and TypeScript.
+2. **`Any`/`any` prohibited** — the use of `Any` (Python) and `any` (TypeScript) is forbidden in production code. When external libraries return untyped data, narrow to a concrete type at the boundary immediately.
+3. **Strict mode mandatory** — all TypeScript projects MUST enable `strict: true`. All Python projects MUST pass strict static type checking.
+4. **Schema types are canonical** — types generated from LinkML schemas MUST be fully typed with no `Any`/`any` in the output.
+5. **Type boundaries are explicit** — every point where untyped data enters the system MUST validate through a typed model before the data is used in application code.
+6. **CI enforces compliance** — type checking for all languages MUST run as a required CI step. PRs with type violations cannot be merged.
+
 ---
 
 ## Governance
@@ -195,4 +206,4 @@ XIII (contribution standards) become strictly enforced for all subsequent releas
 - All PRs and code reviews MUST verify compliance with these principles.
 - Deviations require explicit documentation and justification.
 
-**Version**: 1.1.0 | **Ratified**: 2026-01-01 | **Last Amended**: 2026-01-09
+**Version**: 1.2.0 | **Ratified**: 2026-01-01 | **Last Amended**: 2026-02-17

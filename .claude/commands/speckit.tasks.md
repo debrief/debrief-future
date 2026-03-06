@@ -35,7 +35,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Clear file paths for each task
    - Dependencies section showing story completion order
    - Parallel execution examples per story
-   - Implementation strategy section (MVP first, incremental delivery)
+   - Implementation strategy section (incremental delivery)
 
 5. **Plan evidence artifacts**: Determine what evidence should be captured to demonstrate the feature works:
    - **Test evidence**: What test output/summary will prove correctness?
@@ -55,7 +55,6 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Independent test criteria for each story
    - **Evidence artifacts planned** (list what will be captured)
    - **PR task included**: Confirm final task triggers /speckit.pr
-   - Suggested MVP scope (typically just User Story 1)
    - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
 
 Context for task generation: $ARGUMENTS
@@ -117,9 +116,14 @@ Components:
 
 ```text
 specs/[###-feature-name]/evidence/
-├── test-summary.md     # REQUIRED: Test pass/fail counts, coverage
+├── test-summary.md     # REQUIRED: Use template from .specify/templates/evidence/test-summary-template.md
 ├── usage-example.md    # REQUIRED: Concrete usage demonstration
-└── [feature-specific]  # Varies by feature type
+├── screenshots/        # For UI features: theme variants + interaction GIF
+│   ├── component-light.png
+│   ├── component-dark.png
+│   ├── component-vscode.png
+│   └── interaction.gif   # Key user flow as short GIF (< 5s, < 2MB)
+└── [feature-specific]  # Per quality rubric (see below)
 ```
 
 ### Determining Feature-Specific Evidence
@@ -128,13 +132,15 @@ Based on the feature type detected from spec.md and plan.md:
 
 | Feature Type | Evidence to Plan | Example Files |
 |--------------|------------------|---------------|
-| **CLI Tool** | Command examples with output | `cli-demo.txt`, `help-output.txt` |
-| **API/Service** | Request/response samples | `api-sample.json`, `endpoints.md` |
+| **CLI Tool** | Full terminal session transcript | `cli-demo.txt`, `help-output.txt` |
+| **API/Service** | Sample request + response JSON | `sample-request.json`, `sample-response.json` |
 | **Library/SDK** | Code examples with results | `usage-example.py`, `output.txt` |
-| **Data Processing** | Before/after samples | `input-sample.json`, `output-sample.json` |
-| **UI Component** | Screenshots of states | `initial.png`, `completed.png` |
-| **Parser/Converter** | Input/output file pairs | `sample-input.rep`, `parsed-output.json` |
-| **Integration** | End-to-end flow demo | `integration-flow.md`, `sequence.mermaid` |
+| **Data Processing** | Before/after samples | `input-sample.*`, `output-sample.*` |
+| **UI Component** | 3 theme screenshots (light/dark/vscode) + interaction GIF showing key user flow | `screenshots/component-light.png`, `screenshots/component-dark.png`, `screenshots/component-vscode.png`, `screenshots/interaction.gif` |
+| **Parser/Converter** | Input/output file pairs side-by-side | `sample-input.rep`, `parsed-output.json` |
+| **Schema Change** | Round-trip proof (Python -> JSON -> TypeScript -> JSON) | `round-trip-evidence.md` |
+| **Integration** | End-to-end flow demo + sequence diagram | `integration-flow.md`, `sequence.mermaid` |
+| **Infrastructure** | Configuration sample + validation output | `config-sample.*`, `validation-output.txt` |
 | **Electron/Desktop App** | Runtime smoke test, app window screenshots, graceful error handling | `runtime-startup.png`, `runtime-workflow.png`, `e2e-trace.zip` |
 
 ### Evidence Task Generation
@@ -143,9 +149,9 @@ For the Polish phase, ALWAYS generate these tasks:
 
 1. **Test Summary Task** (REQUIRED):
    ```markdown
-   - [ ] TXXX Capture test results in specs/[feature]/evidence/test-summary.md
+   - [ ] TXXX Capture test results using template (.specify/templates/evidence/test-summary-template.md) in specs/[feature]/evidence/test-summary.md
    ```
-   Content should include: total tests, passed, failed, coverage %, key scenarios.
+   MUST use the test-summary template with YAML front matter including: `feature`, `captured_at`, `git_sha`, `tests_passed`, `tests_failed`, `tests_skipped`, `coverage_pct`. Body should include: total tests, passed, failed, coverage %, key scenarios verified.
 
 2. **Usage Example Task** (REQUIRED):
    ```markdown
@@ -172,7 +178,10 @@ For the Polish phase, ALWAYS generate these tasks:
    ```
    150-200 words, hook opening, link to full post
 
-6. **Runtime Verification Task** (REQUIRED for Electron/Desktop apps):
+6. **Playwright E2E Reminder** (include when generating E2E test tasks):
+   > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip or omit Playwright E2E tasks because you think browsers can't be installed. The project uses `@sparticuz/chromium` which bundles a Linux Chromium binary via npm. Standard browser CDN downloads are blocked (403), but this bundled binary works fully. Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
+
+7. **Runtime Verification Task** (REQUIRED for Electron/Desktop apps):
    ```markdown
    - [ ] TXXX Run app in dev mode and verify startup
    - [ ] TXXX [P] Capture runtime screenshot of actual app window
@@ -183,7 +192,7 @@ For the Polish phase, ALWAYS generate these tasks:
    - UI renders correctly in real Electron window
    - Error handling works when dependencies are unavailable
 
-7. **PR Creation Task** (REQUIRED - must be final task):
+8. **PR Creation Task** (REQUIRED - must be final task):
    ```markdown
    - [ ] TXXX Create PR and publish blog: run /speckit.pr
    ```
@@ -199,8 +208,19 @@ For the Polish phase, ALWAYS generate these tasks:
 Good evidence should be:
 - **Reproducible**: Others can follow the example and get the same result
 - **Concise**: Shows the key behavior without unnecessary complexity
-- **Visual when possible**: Screenshots, diagrams, or formatted output
+- **Visual when possible**: Screenshots, interaction GIFs, diagrams, or formatted output
 - **Self-contained**: Includes all context needed to understand it
+- **Machine-readable**: test-summary.md uses YAML front matter for automated aggregation
+- **Type-appropriate**: Meets the minimum requirements for its feature type (see table above)
+
+### Interaction GIF for UI Components
+
+For UI component features, always plan an interaction GIF task. The GIF should:
+- Be under 5 seconds and under 2MB
+- Show the primary user interaction (click, drag, hover, selection)
+- Demonstrate state transitions or visual feedback
+- Be captured during Playwright E2E tests via `page.video()` or `recordVideo` config, then converted to GIF
+- Be saved to `specs/[feature]/evidence/screenshots/interaction.gif`
 
 ### Example Evidence Section in tasks.md
 

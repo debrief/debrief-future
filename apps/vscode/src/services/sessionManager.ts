@@ -39,7 +39,8 @@ import {
   type TimeRange,
 } from '@debrief/session-state';
 import type { Express } from 'express';
-import type { Plot, Track, ReferenceLocation } from '../types/plot';
+import type { Plot } from '../types/plot';
+import type { TrackFeature, ReferenceLocation } from '@debrief/components';
 
 /**
  * Data needed to initialize a session with defaults derived from plot data.
@@ -48,7 +49,7 @@ export interface PlotSessionData {
   /** Plot metadata */
   plot: Plot;
   /** Track data for time range calculation */
-  tracks: Track[];
+  tracks: TrackFeature[];
   /** Location data */
   locations: ReferenceLocation[];
   /** URI to the feature collection */

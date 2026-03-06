@@ -240,3 +240,6 @@ tests/e2e/.code-server-pid
 tests/e2e/.vscode-server-data/
 apps/web-shell/playwright-report/
 apps/web-shell/test-results/
+
+# Vite temp files
+vite.config.ts.timestamp-*

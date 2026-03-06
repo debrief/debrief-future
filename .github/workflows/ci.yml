@@ -32,19 +32,22 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - name: Enable corepack
+        run: corepack enable pnpm
 
       - name: Install dependencies
         run: task install
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Run linting
         run: task lint
+
+      - name: Run type checking
+        run: task typecheck
 
       - name: Run tests
         run: task test

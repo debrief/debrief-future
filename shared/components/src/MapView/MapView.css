@@ -96,7 +96,25 @@
   cursor: pointer;
 }
 
-/* Selected feature styling - handled via style prop */
+/* Selected feature styling — glow + pulse, preserves original color.
+   White inner halo + dark outer shadow gives contrast on any background.
+   Doubled white shadow for intensity — temporal tracks re-mount on each
+   time step so the static filter must be visible without animation. */
+@keyframes debrief-selection-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px white) drop-shadow(0 0 4px white) drop-shadow(0 0 8px rgba(0, 0, 0, 0.5)); }
+  50% { filter: drop-shadow(0 0 8px white) drop-shadow(0 0 8px white) drop-shadow(0 0 14px rgba(0, 0, 0, 0.7)); }
+}
+
+.debrief-mapview .debrief-map-feature--selected {
+  filter: drop-shadow(0 0 4px white) drop-shadow(0 0 4px white) drop-shadow(0 0 8px rgba(0, 0, 0, 0.5));
+  animation: debrief-selection-pulse 2s ease-in-out infinite;
+}
+
+/* Custom SVG symbol icons — strip default Leaflet divIcon chrome */
+.debrief-symbol-icon {
+  background: none;
+  border: none;
+}
 
 /* Loading state */
 .debrief-mapview--loading {

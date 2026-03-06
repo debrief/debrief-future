@@ -43,14 +43,13 @@ test.describe('Log Panel', () => {
     await analysisPage.waitForLoad();
   });
 
-  test('sidebar shows Activity and Log tabs', async () => {
+  test('panel workspace shows Activity and Log tabs', async () => {
     await expect(analysisPage.tabBar).toBeVisible();
     await expect(analysisPage.activityTab).toBeVisible();
     await expect(analysisPage.logTab).toBeVisible();
 
-    // Activity tab should be active by default
-    await expect(analysisPage.activityTab).toHaveAttribute('aria-selected', 'true');
-    await expect(analysisPage.logTab).toHaveAttribute('aria-selected', 'false');
+    // Activity tab should be active by default (GoldenLayout uses .lm_active class)
+    await expect(analysisPage.activityTab).toHaveClass(/lm_active/);
   });
 
   test('switching to Log tab shows empty state', async () => {

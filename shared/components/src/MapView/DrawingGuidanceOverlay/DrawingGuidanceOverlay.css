@@ -1,0 +1,39 @@
+/**
+ * DrawingGuidanceOverlay styles — positioned at bottom-centre of map.
+ * Feature: 096-drawing-ux-persistence (FR-001, FR-003)
+ */
+
+.debrief-drawing-guidance {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--debrief-z-overlay, 1000);
+  pointer-events: none;
+  padding: 6px 14px;
+  border-radius: var(--debrief-radius-sm, 4px);
+  background-color: var(--debrief-bg-primary, rgba(255, 255, 255, 0.92));
+  color: var(--debrief-text-primary, #333);
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: nowrap;
+  box-shadow: var(--debrief-shadow-md, 0 2px 8px rgba(0, 0, 0, 0.15));
+  border: 1px solid var(--debrief-border-color, #ccc);
+  opacity: 0;
+  animation: debrief-guidance-fade-in 0.15s ease forwards;
+}
+
+@keyframes debrief-guidance-fade-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.debrief-drawing-guidance__cancel {
+  margin-left: 8px;
+  opacity: 0.6;
+}
+
+.debrief-drawing-guidance__separator {
+  margin: 0 6px;
+  opacity: 0.3;
+}

@@ -55,7 +55,7 @@ TRACK_FEATURE = {
 class TestLabelInterval:
     """Golden example tests for the label-interval tool."""
 
-    def test_basic_golden_example(self):
+    def test_basic_golden_example(self) -> None:
         """Apply interval='PT15M'. Verify show_label=True and label_interval set."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -71,7 +71,7 @@ class TestLabelInterval:
         assert dps["show_symbol"] is True
         assert dps["symbol"] == "circle"
 
-    def test_no_existing_dps(self):
+    def test_no_existing_dps(self) -> None:
         """Track with no default_position_style gets one with show_label=True."""
         feature = copy.deepcopy(TRACK_FEATURE)
         del feature["properties"]["default_position_style"]
@@ -88,7 +88,7 @@ class TestLabelInterval:
         assert dps["show_symbol"] is True
         assert dps["symbol"] == "circle"
 
-    def test_overwrites_existing(self):
+    def test_overwrites_existing(self) -> None:
         """Existing label_interval is replaced with the new value."""
         feature = copy.deepcopy(TRACK_FEATURE)
         feature["properties"]["default_position_style"]["label_interval"] = "PT5M"
@@ -103,7 +103,7 @@ class TestLabelInterval:
         assert dps["label_interval"] == "PT30M"
         assert dps["show_label"] is True
 
-    def test_error_no_tracks(self):
+    def test_error_no_tracks(self) -> None:
         """Empty feature list raises ValueError."""
         context = SelectionContext(type=ContextType.NONE, features=[])
         params = {"interval": "PT15M"}
@@ -111,7 +111,7 @@ class TestLabelInterval:
         with pytest.raises(ValueError, match="No track features found"):
             label_interval(context, params)
 
-    def test_default_interval(self):
+    def test_default_interval(self) -> None:
         """Missing interval param defaults to PT15M."""
         feature = copy.deepcopy(TRACK_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])

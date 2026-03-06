@@ -101,6 +101,8 @@ export class CalcService {
   private currentExecution: ToolExecution | null = null;
   private getMapPanel: () => MapPanel | undefined;
   private outputChannel: vscode.OutputChannel | undefined;
+  private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
+  private readonly HEARTBEAT_INTERVAL_MS = 5 * 60 * 1000;
 
   constructor(context: vscode.ExtensionContext, getMapPanel: () => MapPanel | undefined) {
     this.context = context;
@@ -138,7 +140,11 @@ export class CalcService {
       // Attempt to connect
       await this.connect();
       this.log('debrief-calc available');
-      return this.connectionState === 'connected';
+      const available = this.connectionState === 'connected';
+      if (available) {
+        this.startHeartbeat();
+      }
+      return available;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       this.log(`debrief-calc unavailable: ${msg}`);
@@ -188,6 +194,15 @@ export class CalcService {
   disconnect(): void {
     this.connectionState = 'disconnected';
     this.toolCache = null;
+    this.stopHeartbeat();
+  }
+
+  /**
+   * Dispose of resources held by this service.
+   */
+  dispose(): void {
+    this.stopHeartbeat();
+    this.disconnect();
   }
 
   /**
@@ -433,6 +448,44 @@ export class CalcService {
     this.lastFailureTime = Date.now();
   }
 
+  /**
+   * Start periodic heartbeat to re-validate Python dependency availability.
+   * Feature: 111-heartbeat-revalidation
+   */
+  private startHeartbeat(): void {
+    if (this.heartbeatInterval) {
+      return; // Already running
+    }
+
+    this.log(`Starting heartbeat (interval: ${this.HEARTBEAT_INTERVAL_MS}ms)`);
+    this.heartbeatInterval = setInterval(() => {
+      void (async () => {
+        try {
+          // Force a fresh connection check by resetting state
+          this.connectionState = 'disconnected';
+          await this.connect();
+          this.log('Heartbeat: debrief-calc still available');
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          this.log(`Heartbeat: debrief-calc became unavailable: ${msg}`);
+          this.connectionState = 'error';
+          this.stopHeartbeat();
+        }
+      })();
+    }, this.HEARTBEAT_INTERVAL_MS);
+  }
+
+  /**
+   * Stop the periodic heartbeat timer.
+   */
+  private stopHeartbeat(): void {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+      this.log('Heartbeat stopped');
+    }
+  }
+
   private async waitForConnection(): Promise<void> {
     // Simple polling wait for connection
     const maxWait = 5000;
@@ -536,30 +589,7 @@ export class CalcService {
     const script = `
 import json
 from debrief_calc.registry import registry
-from debrief_calc.models import ContextType
-tools = []
-for t in registry.list_all():
-    ctx = t.context_type
-    if ctx == ContextType.REGION:
-        reqs = [{"kind": "REGION", "min": 1, "max": 1}]
-    elif ctx == ContextType.NONE:
-        reqs = []
-    elif ctx == ContextType.SINGLE:
-        reqs = [{"kind": k.upper(), "min": 1, "max": 1} for k in t.input_kinds]
-    else:
-        reqs = [{"kind": k.upper(), "min": 1} for k in t.input_kinds]
-    entry = {
-        "name": t.name,
-        "description": t.description,
-        "inputSchema": {"type": "object", "properties": {}},
-        "annotations": {
-            "debrief:selectionRequirements": reqs,
-            "debrief:category": getattr(t, "category", "general"),
-            "debrief:version": t.version,
-            "debrief:outputKind": getattr(t, "output_kind", "unknown")
-        }
-    }
-    tools.append(entry)
+tools = [t.to_mcp_tool() for t in registry.list_all()]
 print(json.dumps(tools))
 `;
     const { stdout } = await execFileAsync(pythonPath, ['-c', script], {
@@ -592,7 +622,22 @@ for t in registry.list_all():
             reqs = [{"kind": k.upper(), "min": 1, "max": 1} for k in t.input_kinds]
         else:
             reqs = [{"kind": k.upper(), "min": 1} for k in t.input_kinds]
+    params = []
+    for p in t.parameters:
+        pd = {"name": p.name, "valueType": "enum" if p.type == "enum" else p.type, "description": p.description}
+        if p.required:
+            pd["required"] = True
+        if p.default is not None:
+            pd["defaultValue"] = p.default
+        if p.choices:
+            pd["choices"] = p.choices
+        if p.param_type:
+            pd["paramType"] = p.param_type
+        if p.param_type or p.choices:
+            params.append(pd)
     entry = {"id": t.name, "name": t.name, "description": t.description, "version": t.version, "requirements": reqs}
+    if params:
+        entry["parameters"] = params
     tools.append(entry)
 print(json.dumps(tools))
 `;
@@ -607,61 +652,27 @@ print(json.dumps(tools))
    */
   private resolveFeatures(
     featureIds: string[]
-  ): Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> {
+  ): Array<{ type: 'Feature'; id?: string | number; geometry: unknown; properties: Record<string, unknown> }> {
     const panel = this.getMapPanel();
     if (!panel) {
       throw new Error('No map panel available');
     }
 
-    const tracks = panel.getTracks();
-    const locations = panel.getLocations();
-    const otherFeatures = panel.getOtherFeatures();
+    const allFeatures = panel.getFeatures();
     const resultLayers = panel.getResultLayers();
-    const features: Array<{ type: 'Feature'; geometry: unknown; properties: Record<string, unknown> }> = [];
+    const resolved: Array<{ type: 'Feature'; id?: string | number; geometry: unknown; properties: Record<string, unknown> }> = [];
 
     for (const id of featureIds) {
-      const track = tracks.find((t) => t.id === id);
-      if (track) {
-        features.push({
+      const feature = allFeatures.find((f) => String(f.id) === id);
+      if (feature) {
+        const props = feature.properties as Record<string, unknown>;
+        resolved.push({
           type: 'Feature',
-          geometry: track.geometry,
-          properties: {
-            id: track.id,
-            name: track.name,
-            kind: 'TRACK',
-            platformType: track.platformType,
-            times: track.times,
-            startTime: track.startTime,
-            endTime: track.endTime,
-          },
-        });
-        continue;
-      }
-
-      const location = locations.find((l) => l.id === id);
-      if (location) {
-        features.push({
-          type: 'Feature',
-          geometry: location.geometry,
-          properties: {
-            id: location.id,
-            name: location.name,
-            kind: 'LOCATION',
-            locationType: location.locationType,
-          },
-        });
-        continue;
-      }
-
-      const shape = otherFeatures.find((f) => (f.properties as Record<string, unknown>)?.id === id);
-      if (shape) {
-        const props = shape.properties ?? {};
-        features.push({
-          type: 'Feature',
-          geometry: shape.geometry,
+          id: feature.id,
+          geometry: feature.geometry,
           properties: {
             ...props,
-            kind: (props.kind as string) ?? 'SHAPE',
+            id: feature.id,
           },
         });
         continue;
@@ -669,12 +680,12 @@ print(json.dumps(tools))
 
       const resultLayer = resultLayers.find((l) => l.id === id);
       if (resultLayer) {
-        for (const feature of resultLayer.features.features) {
-          features.push({
+        for (const rlFeature of resultLayer.features.features) {
+          resolved.push({
             type: 'Feature',
-            geometry: feature.geometry,
+            geometry: rlFeature.geometry,
             properties: {
-              ...feature.properties,
+              ...rlFeature.properties,
               kind: 'result',
               sourceToolId: resultLayer.toolId,
               sourceToolName: resultLayer.toolName,
@@ -688,7 +699,77 @@ print(json.dumps(tools))
       throw new Error(`Feature not found: ${id}`);
     }
 
-    return features;
+    return resolved;
+  }
+
+  /**
+   * Execute a tool with caller-provided features (for replay engine use).
+   * Bypasses MapPanel feature resolution — caller provides features directly.
+   */
+  async executeToolDirect(
+    toolId: string,
+    features: Array<{ type: 'Feature'; id?: string | number; geometry: unknown; properties: Record<string, unknown> | null }>,
+    params: Record<string, unknown>
+  ): Promise<{ success: boolean; features?: SafeFeatureCollection; resultType?: string; artifactHref?: string; toolVersion?: string }> {
+    await this.connect();
+
+    const input = JSON.stringify({
+      tool: toolId,
+      features,
+      params,
+    });
+
+    const pythonPath = this.getPythonPath();
+    const stdout = await spawnWithStdin(
+      pythonPath,
+      ['-m', 'debrief_calc.cli'],
+      input,
+      30000
+    );
+
+    const parsed = JSON.parse(stdout.trim()) as MCPToolResponse | MCPErrorResponse;
+    if ('error' in parsed) {
+      return { success: false };
+    }
+
+    const geoFeatures: SafeFeatureCollection['features'] = [];
+    let resultType: string | undefined;
+    let artifactHref: string | undefined;
+    let toolVersion: string | undefined;
+
+    for (const item of parsed.content) {
+      if (!resultType && item.annotations?.['debrief:resultType']) {
+        resultType = item.annotations['debrief:resultType'];
+      }
+      if (item.annotations?.['debrief:toolVersion']) {
+        toolVersion = item.annotations['debrief:toolVersion'];
+      }
+      if (item.annotations?.['debrief:href']) {
+        artifactHref = item.annotations['debrief:href'];
+        continue;
+      }
+      if (item.type === 'resource' && item.resource) {
+        const feature = JSON.parse(item.resource.text) as SafeFeatureCollection['features'][number];
+        geoFeatures.push(feature);
+      }
+    }
+
+    return {
+      success: true,
+      features: { type: 'FeatureCollection', features: geoFeatures },
+      resultType,
+      artifactHref,
+      toolVersion,
+    };
+  }
+
+  /**
+   * Get the version of an installed tool from the cached tool list.
+   */
+  getToolVersion(toolId: string): string | null {
+    const tools = this.toolCache?.tools ?? [];
+    const tool = tools.find((t) => t.id === toolId);
+    return tool?.version ?? null;
   }
 
   private async executeToolOnMcp(

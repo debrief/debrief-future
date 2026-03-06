@@ -29,6 +29,9 @@ export type {
 export { FeatureList } from './FeatureList';
 export type { FeatureListProps } from './FeatureList';
 
+export { GeometryDialog } from './GeometryDialog';
+export type { GeometryDialogProps } from './GeometryDialog';
+
 export { LayersToolbar, FilterDropdown } from './LayersToolbar';
 export type {
   LayersToolbarProps,
@@ -56,7 +59,15 @@ export { useTheme } from './hooks/useTheme';
 export { useTemporalTrack } from './MapView/useTemporalTrack';
 
 // Types
-export type { DebriefFeature, DebriefFeatureCollection } from './utils/types';
+export type { DebriefFeature, DebriefFeatureCollection, AnnotationFeature, TrackFeature, ReferenceLocation } from './utils/types';
+export {
+  isTrackFeature,
+  isReferenceLocation,
+  isMultiPointFeature,
+  isMultiPolygonFeature,
+  isAnnotationFeature,
+  isExpandableFeature,
+} from './utils/types';
 
 // Utilities
 export { calculateBounds } from './utils/bounds';
@@ -78,8 +89,10 @@ export {
   createSelection,
   createSelectionFromCounts,
   extractParameters,
+  fromMCPTool,
+  fromMCPTools,
 } from './ToolMatch';
-export type { Selection, MatchResult, Tool, SelectionRequirement } from './ToolMatch';
+export type { Selection, MatchResult, Tool, SelectionRequirement, MCPToolDefinition as SharedMCPToolDefinition } from './ToolMatch';
 
 // ToolsPanel
 export { ToolsPanel } from './ToolsPanel';
@@ -95,13 +108,35 @@ export type {
 export { ActivityPanel } from './ActivityPanel';
 export { DEFAULT_COLLAPSE_STATE } from './ActivityPanel/types';
 
+// CascadingMenu (Feature: 097-feature-format-menu)
+export { CascadingMenu } from './CascadingMenu';
+export type { CascadingMenuProps, CascadingMenuItem } from './CascadingMenu';
+
+// FormatMenu (Feature: 097-feature-format-menu)
+export { FormatMenu } from './FormatMenu';
+export type { FormatMenuProps } from './FormatMenu';
+export { buildFormatMenuItems, parseMenuItemId, resolvePresetValue } from './FormatMenu';
+export type { StylePropertyDescriptor as FormatStylePropertyDescriptor } from './FormatMenu';
+export {
+  COLOUR_PALETTE,
+  LINE_WEIGHT_PRESETS,
+  OPACITY_PRESETS,
+  RADIUS_PRESETS,
+  DASH_PATTERN_PRESETS,
+  SHAPE_PRESETS,
+} from './FormatMenu';
+export type { PresetValue } from './FormatMenu';
+
 // ContextMenu (Feature: 091-tool-parameter-context-menus)
 export { ContextMenu } from './ContextMenu';
 export type { ContextMenuItem, ContextMenuProps } from './ContextMenu';
 
-// Drawing (Feature: 094-point-rectangle-drawing)
+// Drawing (Feature: 094-point-rectangle-drawing, 096-drawing-ux-persistence)
 export { createDrawnFeature } from './MapView/drawing';
-export type { CreateDrawnFeatureOptions } from './MapView/drawing';
+export type { CreateDrawnFeatureOptions, DrawnFeatureProvenance } from './MapView/drawing';
+export { DRAWING_GUIDANCE, CANCEL_HINT } from './MapView/drawing';
+export type { GuidanceText } from './MapView/drawing';
+export { DRAWING_PALETTE, getPaletteColour, getPaletteStyleOverrides } from './MapView/drawing';
 export type { DrawingMode } from './MapView/LeafletToolbar';
 
 // ChartRenderer (Feature: 085-chart-renderer)
@@ -116,6 +151,25 @@ export type {
   TransformerError,
   TransformResult,
 } from './ChartRenderer';
+
+// PanelWorkspace (Feature: 096-add-goldenlayout-panels)
+export { PanelWorkspace } from './PanelWorkspace';
+export type { PanelWorkspaceProps, PanelWorkspaceElement } from './PanelWorkspace';
+export { createPanelRegistry } from './PanelWorkspace';
+export type { PanelDefinition, PanelProps, PanelRegistry } from './PanelWorkspace';
+export { DEFAULT_LAYOUT_CONFIG, PANEL_NAVIGATION, PANEL_ACTIVITY, PANEL_LOG, PANEL_MAP, PANEL_CHART } from './PanelWorkspace/defaultLayout';
+export { saveLayout, loadLayout, clearLayout, LAYOUT_STORAGE_KEY, LAYOUT_VERSION } from './PanelWorkspace/layoutPersistence';
+export { PanelErrorBoundary } from './PanelWorkspace/PanelErrorBoundary';
+export { createDefaultRegistry } from './PanelWorkspace/createDefaultRegistry';
+
+// Panel wrappers and context (Feature: 096-add-goldenlayout-panels)
+export { PanelContextProvider, usePanelContext } from './panels/PanelContext';
+export type { PanelContextValue, PanelComponents, ChartContextProps, ChartTabData, ResultArtifactType } from './panels/PanelContext';
+export { NavigationPanel } from './panels/NavigationPanel';
+export { ActivityPanelWrapper } from './panels/ActivityPanelWrapper';
+export { LogPanelWrapper } from './panels/LogPanelWrapper';
+export { MapPanel } from './panels/MapPanel';
+export { ChartPanelWrapper } from './panels/ChartPanelWrapper';
 
 // LogPanel (Feature: 072-log-panel)
 export { LogPanel } from './LogPanel';
@@ -142,6 +196,8 @@ export type {
   SelectionUpdatePayload,
   ActionResultPayload,
   ModeInitPayload,
+  ParameterSchemaEntry,
+  CardReplayStatus,
 } from './LogPanel';
 export {
   DEFAULT_FILTER_STATE as LOG_DEFAULT_FILTER_STATE,

@@ -1,5 +1,5 @@
 import type { DebriefFeature } from './types';
-import { isTrackFeature } from './types';
+import { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygonFeature } from './types';
 
 /**
  * Get a human-readable label for a feature.
@@ -22,8 +22,10 @@ export function getFeatureLabel(feature: DebriefFeature): string {
       feature.id ||
       'Unnamed Track'
     );
+  } else if (isMultiPointFeature(feature) || isMultiPolygonFeature(feature)) {
+    return feature.properties.label || feature.id || 'Unnamed Feature';
   } else {
-    // Schema: name; Legacy: label (used by shapes like CIRCLE, RECTANGLE, etc.)
+    // ReferenceLocation: name; Legacy: label
     return (
       feature.properties.name ||
       (props.label as string) ||
@@ -56,8 +58,12 @@ export function getFeatureIcon(feature: DebriefFeature): string {
       default:
         return 'vessel-unknown';
     }
-  } else {
-    // Use location_type to determine icon
+  } else if (isMultiPointFeature(feature)) {
+    return 'multi-point';
+  } else if (isMultiPolygonFeature(feature)) {
+    return 'multi-polygon';
+  } else if (isReferenceLocation(feature)) {
+    // ReferenceLocation: use location_type to determine icon
     switch (feature.properties.location_type) {
       case 'WAYPOINT':
         return 'location-waypoint';
@@ -74,6 +80,8 @@ export function getFeatureIcon(feature: DebriefFeature): string {
       default:
         return 'location-unknown';
     }
+  } else {
+    return 'shape-annotation';
   }
 }
 
@@ -115,7 +123,7 @@ export function getFeatureColor(feature: DebriefFeature): string {
       default:
         return '#999999';
     }
-  } else {
+  } else if (isReferenceLocation(feature)) {
     switch (feature.properties.location_type) {
       case 'DANGER_AREA':
         return '#cc0000'; // Red for danger
@@ -124,6 +132,8 @@ export function getFeatureColor(feature: DebriefFeature): string {
       default:
         return '#0066cc'; // Blue for other locations
     }
+  } else {
+    return '#0066cc'; // Default for multi-point/multi-polygon
   }
 }
 
@@ -138,8 +148,14 @@ export function getFeatureDescription(feature: DebriefFeature): string {
   if (isTrackFeature(feature)) {
     const trackType = feature.properties.track_type.toLowerCase().replace('_', ' ');
     return `${trackType} track`;
-  } else {
+  } else if (isMultiPointFeature(feature)) {
+    return feature.properties.description || 'multi-point';
+  } else if (isMultiPolygonFeature(feature)) {
+    return feature.properties.description || 'multi-polygon';
+  } else if (isReferenceLocation(feature)) {
     const locType = feature.properties.location_type.toLowerCase().replace('_', ' ');
     return feature.properties.description || locType;
+  } else {
+    return (feature.properties.kind ?? '').toLowerCase().replace('_', ' ') || 'annotation';
   }
 }

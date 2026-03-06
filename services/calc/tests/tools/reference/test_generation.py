@@ -1,0 +1,534 @@
+"""Unit tests for generate-reference-points tool."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+import pytest
+from debrief_calc.models import ContextType, SelectionContext
+
+# Golden example paths
+GOLDEN_DIR = (
+    Path(__file__).parent.parent.parent.parent.parent.parent
+    / "shared"
+    / "tools"
+    / "reference"
+    / "generation"
+)
+
+
+def _load_golden(name: str) -> dict[str, Any]:
+    """Load a golden example JSON file."""
+    path = GOLDEN_DIR / name
+    with open(path) as f:
+        return json.load(f)
+
+
+def _make_polygon(west: float, south: float, east: float, north: float) -> dict[str, Any]:
+    """Create a RECTANGLE polygon feature with the given bounds."""
+    return {
+        "type": "Feature",
+        "id": "test-rect",
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [west, south],
+                    [east, south],
+                    [east, north],
+                    [west, north],
+                    [west, south],
+                ]
+            ],
+        },
+        "properties": {"kind": "RECTANGLE"},
+    }
+
+
+def _make_context(
+    west: float = -5, south: float = 49, east: float = 1, north: float = 52
+) -> SelectionContext:
+    """Create a SINGLE context with a RECTANGLE polygon."""
+    return SelectionContext(
+        type=ContextType.SINGLE,
+        features=[_make_polygon(west, south, east, north)],
+    )
+
+
+# ============================================================================
+# User Story 1: Grid Pattern
+# ============================================================================
+
+
+class TestGridBasic:
+    """Basic grid generation tests (T015)."""
+
+    def test_grid_count12_returns_12_coordinates(self) -> None:
+        """count=12 grid should produce exactly 12 coordinates (3x4 layout)."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "grid", "count": 12}
+        result = generate_reference_points(context, params)
+
+        assert isinstance(result, list)
+        assert len(result) == 1
+
+        feature = result[0]
+        assert feature["geometry"]["type"] == "MultiPoint"
+        coords = feature["geometry"]["coordinates"]
+        assert len(coords) == 12
+
+    def test_grid_count12_correct_positions(self) -> None:
+        """Verify exact coordinate positions for count=12 grid (3x4 layout)."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "grid", "count": 12}
+        result = generate_reference_points(context, params)
+
+        coords = result[0]["geometry"]["coordinates"]
+
+        # Row 0 (lat=49): [-5,49], [-3,49], [-1,49], [1,49]
+        assert coords[0] == [-5.0, 49.0]
+        assert coords[1] == [-3.0, 49.0]
+        assert coords[2] == [-1.0, 49.0]
+        assert coords[3] == [1.0, 49.0]
+
+        # Row 1 (lat=50.5): [-5,50.5], [-3,50.5], [-1,50.5], [1,50.5]
+        assert coords[4] == [-5.0, 50.5]
+        assert coords[5] == [-3.0, 50.5]
+        assert coords[6] == [-1.0, 50.5]
+        assert coords[7] == [1.0, 50.5]
+
+        # Row 2 (lat=52): [-5,52], [-3,52], [-1,52], [1,52]
+        assert coords[8] == [-5.0, 52.0]
+        assert coords[9] == [-3.0, 52.0]
+        assert coords[10] == [-1.0, 52.0]
+        assert coords[11] == [1.0, 52.0]
+
+    def test_grid_count1_centre_point(self) -> None:
+        """count=1 grid should produce a single point at the bounding box centre."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "grid", "count": 1}
+        result = generate_reference_points(context, params)
+
+        coords = result[0]["geometry"]["coordinates"]
+        assert len(coords) == 1
+        assert coords[0] == pytest.approx([-2.0, 50.5])
+
+    def test_grid_count25_even_spacing(self) -> None:
+        """count=25 grid should have 25 coordinates at even intervals (5x5)."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context(0, 0, 4, 4)
+        params = {"pattern": "grid", "count": 25}
+        result = generate_reference_points(context, params)
+
+        coords = result[0]["geometry"]["coordinates"]
+        assert len(coords) == 25
+
+        # Check corners
+        assert coords[0] == [0.0, 0.0]  # SW
+        assert coords[4] == [4.0, 0.0]  # SE
+        assert coords[20] == [0.0, 4.0]  # NW
+        assert coords[24] == [4.0, 4.0]  # NE
+
+        # Check spacing (step = 1.0 for both lat and lon)
+        assert coords[1] == [1.0, 0.0]
+        assert coords[5] == [0.0, 1.0]
+
+    def test_grid_feature_properties(self) -> None:
+        """Verify feature properties are correct."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "grid", "count": 12}
+        result = generate_reference_points(context, params)
+
+        feature = result[0]
+        assert feature["type"] == "Feature"
+        assert feature["id"] == "ref-grid"
+        props = feature["properties"]
+        assert props["kind"] == "POINT"
+        assert props["locationType"] == "REFERENCE"
+        assert "grid 12" in props["name"]
+        assert props["style"]["shape"] == "square"
+        assert props["style"]["color"] == "#666666"
+        assert props["style"]["radius"] == 5
+
+    def test_grid_point_metadata_parallel(self) -> None:
+        """pointMetadata must be parallel to coordinates array."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "grid", "count": 12}
+        result = generate_reference_points(context, params)
+
+        feature = result[0]
+        coords = feature["geometry"]["coordinates"]
+        metadata = feature["properties"]["pointMetadata"]
+
+        assert len(metadata) == len(coords)
+        for i, entry in enumerate(metadata):
+            assert entry["index"] == i
+            assert entry["name"] == f"Ref {i + 1}"
+
+
+class TestGridEdgeCases:
+    """Grid edge case tests (T016)."""
+
+    def test_zero_area_bounds_same_lon(self) -> None:
+        """Zero-area bounds (west==east) should raise ValueError."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context(0, 0, 0, 1)
+        params = {"pattern": "grid", "count": 4}
+        with pytest.raises(ValueError, match="positive area"):
+            generate_reference_points(context, params)
+
+    def test_zero_area_bounds_same_lat(self) -> None:
+        """Zero-area bounds (south==north) should raise ValueError."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context(0, 0, 1, 0)
+        params = {"pattern": "grid", "count": 4}
+        with pytest.raises(ValueError, match="must be less than north"):
+            generate_reference_points(context, params)
+
+    def test_count_zero(self) -> None:
+        """count=0 should raise ValueError."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "grid", "count": 0}
+        with pytest.raises(ValueError, match="positive integer"):
+            generate_reference_points(context, params)
+
+    def test_count10_trims_incomplete_last_row(self) -> None:
+        """count=10 should trim incomplete last row (cols=4, rows=3 → 12 slots, keep 10)."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context(0, 0, 3, 2)
+        params = {"pattern": "grid", "count": 10}
+        result = generate_reference_points(context, params)
+
+        coords = result[0]["geometry"]["coordinates"]
+        assert len(coords) == 10
+
+    def test_invalid_pattern(self) -> None:
+        """Invalid pattern should raise ValueError."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "hexagonal"}
+        with pytest.raises(ValueError, match="grid.*scatter"):
+            generate_reference_points(context, params)
+
+    def test_grid_matches_golden_example(self) -> None:
+        """Grid output should match the golden example exactly."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        golden_input = _load_golden("generate-reference-points.grid.input.json")
+        golden_output = _load_golden("generate-reference-points.grid.output.json")
+
+        context = SelectionContext(
+            type=ContextType.SINGLE,
+            features=golden_input["features"],
+        )
+        result = generate_reference_points(context, golden_input["params"])
+
+        expected_feature = golden_output["features"][0]
+        actual_feature = result[0]
+
+        assert actual_feature["id"] == expected_feature["id"]
+        assert actual_feature["geometry"] == expected_feature["geometry"]
+        assert (
+            actual_feature["properties"]["pointMetadata"]
+            == expected_feature["properties"]["pointMetadata"]
+        )
+
+    def test_no_features_raises(self) -> None:
+        """Missing polygon feature should raise ValueError."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = SelectionContext(type=ContextType.SINGLE, features=[_make_polygon(-5, 49, 1, 52)])
+        # Manually clear features to test the guard
+        context.features = []
+        params = {"pattern": "grid", "count": 12}
+        with pytest.raises(ValueError, match="polygon feature"):
+            generate_reference_points(context, params)
+
+
+# ============================================================================
+# User Story 2: Scatter Pattern
+# ============================================================================
+
+
+class TestScatterBasic:
+    """Basic scatter generation tests (T025)."""
+
+    def test_scatter_20_points(self) -> None:
+        """Scatter with count=20 should produce exactly 20 coordinates."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "scatter", "count": 20, "seed": 42}
+        result = generate_reference_points(context, params)
+
+        assert len(result) == 1
+        feature = result[0]
+        assert feature["geometry"]["type"] == "MultiPoint"
+        coords = feature["geometry"]["coordinates"]
+        assert len(coords) == 20
+
+    def test_scatter_seed_reproducibility(self) -> None:
+        """Same seed should produce identical coordinates."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "scatter", "count": 20, "seed": 42}
+        result1 = generate_reference_points(context, params)
+        result2 = generate_reference_points(context, params)
+
+        coords1 = result1[0]["geometry"]["coordinates"]
+        coords2 = result2[0]["geometry"]["coordinates"]
+        assert coords1 == coords2
+
+    def test_scatter_different_seeds_produce_different_output(self) -> None:
+        """Different seeds should produce different coordinates."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params1 = {"pattern": "scatter", "count": 20, "seed": 1}
+        params2 = {"pattern": "scatter", "count": 20, "seed": 2}
+        result1 = generate_reference_points(context, params1)
+        result2 = generate_reference_points(context, params2)
+
+        coords1 = result1[0]["geometry"]["coordinates"]
+        coords2 = result2[0]["geometry"]["coordinates"]
+        assert coords1 != coords2
+
+    def test_scatter_all_within_bounds(self) -> None:
+        """All scatter points must be within the bounding box."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "scatter", "count": 100, "seed": 99}
+        result = generate_reference_points(context, params)
+
+        coords = result[0]["geometry"]["coordinates"]
+        for lon, lat in coords:
+            assert -5 <= lon <= 1, f"lon {lon} out of bounds"
+            assert 49 <= lat <= 52, f"lat {lat} out of bounds"
+
+    def test_scatter_feature_properties(self) -> None:
+        """Verify scatter feature properties."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "scatter", "count": 20, "seed": 42}
+        result = generate_reference_points(context, params)
+
+        feature = result[0]
+        assert feature["id"] == "ref-scatter"
+        props = feature["properties"]
+        assert props["kind"] == "POINT"
+        assert props["locationType"] == "REFERENCE"
+        assert "scatter 20" in props["name"]
+
+    def test_scatter_point_metadata_parallel(self) -> None:
+        """pointMetadata must be parallel to coordinates array."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "scatter", "count": 10, "seed": 42}
+        result = generate_reference_points(context, params)
+
+        feature = result[0]
+        coords = feature["geometry"]["coordinates"]
+        metadata = feature["properties"]["pointMetadata"]
+
+        assert len(metadata) == len(coords)
+        for i, entry in enumerate(metadata):
+            assert entry["index"] == i
+            assert entry["name"] == f"Ref {i + 1}"
+
+
+class TestScatterEdgeCases:
+    """Scatter edge case tests (T026)."""
+
+    def test_scatter_count_zero(self) -> None:
+        """count=0 should raise ValueError."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "scatter", "count": 0, "seed": 42}
+        with pytest.raises(ValueError, match="positive integer"):
+            generate_reference_points(context, params)
+
+    def test_scatter_missing_count(self) -> None:
+        """Missing count should use default (20)."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "scatter", "seed": 42}
+        result = generate_reference_points(context, params)
+
+        coords = result[0]["geometry"]["coordinates"]
+        assert len(coords) == 20
+
+    def test_scatter_antimeridian_crossing(self) -> None:
+        """Antimeridian crossing (west > east) should wrap longitudes."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context(170, -10, -170, 10)
+        params = {"pattern": "scatter", "count": 50, "seed": 42}
+        result = generate_reference_points(context, params)
+
+        coords = result[0]["geometry"]["coordinates"]
+        assert len(coords) == 50
+        for lon, lat in coords:
+            assert -180 <= lon <= 180, f"lon {lon} not normalised"
+            assert -10 <= lat <= 10, f"lat {lat} out of bounds"
+
+    def test_scatter_matches_golden_example(self) -> None:
+        """Scatter output should match the golden example exactly."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        golden_input = _load_golden("generate-reference-points.scatter.input.json")
+        golden_output = _load_golden("generate-reference-points.scatter.output.json")
+
+        context = SelectionContext(
+            type=ContextType.SINGLE,
+            features=golden_input["features"],
+        )
+        result = generate_reference_points(context, golden_input["params"])
+
+        expected_feature = golden_output["features"][0]
+        actual_feature = result[0]
+
+        assert actual_feature["id"] == expected_feature["id"]
+
+        # Compare coordinates with tolerance
+        expected_coords = expected_feature["geometry"]["coordinates"]
+        actual_coords = actual_feature["geometry"]["coordinates"]
+        assert len(actual_coords) == len(expected_coords)
+        for i, (actual, expected) in enumerate(zip(actual_coords, expected_coords, strict=True)):
+            assert actual[0] == pytest.approx(expected[0], abs=1e-6), f"coord {i} lon mismatch"
+            assert actual[1] == pytest.approx(expected[1], abs=1e-6), f"coord {i} lat mismatch"
+
+
+# ============================================================================
+# User Story 3: Downstream Compatibility
+# ============================================================================
+
+
+class TestDownstreamCompatibility:
+    """Downstream compatibility tests (T035, T036)."""
+
+    def test_output_is_valid_geojson_feature(self) -> None:
+        """Generated feature must be a valid GeoJSON Feature."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "grid", "count": 12}
+        result = generate_reference_points(context, params)
+
+        feature = result[0]
+        assert feature["type"] == "Feature"
+        assert "id" in feature
+        assert "geometry" in feature
+        assert "properties" in feature
+        assert feature["geometry"]["type"] == "MultiPoint"
+        assert isinstance(feature["geometry"]["coordinates"], list)
+
+    def test_point_metadata_extensible(self) -> None:
+        """pointMetadata entries should be extensible with zone/color fields."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context()
+        params = {"pattern": "grid", "count": 4}
+        result = generate_reference_points(context, params)
+
+        feature = result[0]
+        metadata = feature["properties"]["pointMetadata"]
+
+        # Simulate downstream classifier extending metadata
+        for entry in metadata:
+            entry["zone"] = "inner"
+            entry["color"] = "#ff0000"
+
+        # Verify original fields still present
+        for i, entry in enumerate(metadata):
+            assert entry["index"] == i
+            assert "name" in entry
+            assert entry["zone"] == "inner"
+            assert entry["color"] == "#ff0000"
+
+    def test_grid_antimeridian_crossing(self) -> None:
+        """Grid with antimeridian crossing should normalise longitudes."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        context = _make_context(170, -10, -170, 10)
+        params = {"pattern": "grid", "count": 9}
+        result = generate_reference_points(context, params)
+
+        coords = result[0]["geometry"]["coordinates"]
+        assert len(coords) == 9
+        for lon, lat in coords:
+            assert -180 <= lon <= 180, f"lon {lon} not normalised"
+            assert -10 <= lat <= 10, f"lat {lat} out of bounds"
+
+
+# ============================================================================
+# Cross-Language Parity (T024, T034)
+# ============================================================================
+
+
+class TestCrossLanguageParity:
+    """Cross-language parity tests — Python output must match golden examples."""
+
+    def test_grid_parity_with_golden(self) -> None:
+        """Python grid output must match golden example."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        golden_input = _load_golden("generate-reference-points.grid.input.json")
+        golden_output = _load_golden("generate-reference-points.grid.output.json")
+
+        context = SelectionContext(
+            type=ContextType.SINGLE,
+            features=golden_input["features"],
+        )
+        result = generate_reference_points(context, golden_input["params"])
+
+        expected = golden_output["features"][0]
+        actual = result[0]
+
+        assert actual["geometry"]["coordinates"] == expected["geometry"]["coordinates"]
+        assert actual["properties"]["pointMetadata"] == expected["properties"]["pointMetadata"]
+
+    def test_scatter_parity_with_golden(self) -> None:
+        """Python scatter output must match golden example (seed=42)."""
+        from debrief_calc.tools.reference.generation import generate_reference_points
+
+        golden_input = _load_golden("generate-reference-points.scatter.input.json")
+        golden_output = _load_golden("generate-reference-points.scatter.output.json")
+
+        context = SelectionContext(
+            type=ContextType.SINGLE,
+            features=golden_input["features"],
+        )
+        result = generate_reference_points(context, golden_input["params"])
+
+        expected_coords = golden_output["features"][0]["geometry"]["coordinates"]
+        actual_coords = result[0]["geometry"]["coordinates"]
+
+        assert len(actual_coords) == len(expected_coords)
+        for i, (actual, expected) in enumerate(zip(actual_coords, expected_coords, strict=True)):
+            assert actual[0] == pytest.approx(expected[0], abs=1e-6), f"coord {i} lon"
+            assert actual[1] == pytest.approx(expected[1], abs=1e-6), f"coord {i} lat"

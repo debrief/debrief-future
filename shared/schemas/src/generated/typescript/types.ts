@@ -65,7 +65,7 @@ export enum LocationTypeEnum {
 * Valid shapes for point markers
 */
 export enum PointShapeEnum {
-
+    
     /** Filled/stroked circle (default marker) */
     circle = "circle",
     /** Filled/stroked square (reference points) */
@@ -76,6 +76,126 @@ export enum PointShapeEnum {
     diamond = "diamond",
     /** Cross/plus shape */
     cross = "cross",
+};
+/**
+* Predefined named colours for styling tool parameters
+*/
+export enum NamedColorEnum {
+    
+    /** Red */
+    red = "red",
+    /** Green */
+    green = "green",
+    /** Blue */
+    blue = "blue",
+    /** Yellow */
+    yellow = "yellow",
+    /** Orange */
+    orange = "orange",
+    /** Purple */
+    purple = "purple",
+    /** Cyan */
+    cyan = "cyan",
+    /** Magenta */
+    magenta = "magenta",
+    /** White */
+    white = "white",
+    /** Black */
+    black = "black",
+    /** Grey */
+    grey = "grey",
+};
+/**
+* Marker shapes for tool parameter choices (superset of PointShapeEnum)
+*/
+export enum MarkerSymbolEnum {
+    
+    /** Filled/stroked circle (default marker) */
+    circle = "circle",
+    /** Filled/stroked square (reference points) */
+    square = "square",
+    /** Filled/stroked triangle (directional indicators) */
+    triangle = "triangle",
+    /** Diamond shape */
+    diamond = "diamond",
+    /** Cross/plus shape */
+    cross = "cross",
+};
+/**
+* Eight-point compass directions
+*/
+export enum CardinalDirectionEnum {
+    
+    /** North */
+    N = "N",
+    /** North-East */
+    NE = "NE",
+    /** East */
+    E = "E",
+    /** South-East */
+    SE = "SE",
+    /** South */
+    S = "S",
+    /** South-West */
+    SW = "SW",
+    /** West */
+    W = "W",
+    /** North-West */
+    NW = "NW",
+};
+/**
+* Common ISO 8601 duration presets for interval parameters
+*/
+export enum DurationPresetEnum {
+    
+    /** 1 minute */
+    PT1M = "PT1M",
+    /** 5 minutes */
+    PT5M = "PT5M",
+    /** 15 minutes */
+    PT15M = "PT15M",
+    /** 30 minutes */
+    PT30M = "PT30M",
+    /** 1 hour */
+    PT1H = "PT1H",
+    /** 2 hours */
+    PT2H = "PT2H",
+    /** 6 hours */
+    PT6H = "PT6H",
+    /** 12 hours */
+    PT12H = "PT12H",
+    /** 24 hours */
+    PT24H = "PT24H",
+};
+/**
+* Common numeric presets for count and distance parameters
+*/
+export enum NumericPresetEnum {
+    
+    /** One */
+    n_1 = "n_1",
+    /** Two */
+    n_2 = "n_2",
+    /** Five */
+    n_5 = "n_5",
+    /** Ten */
+    n_10 = "n_10",
+    /** Twenty-five */
+    n_25 = "n_25",
+    /** Fifty */
+    n_50 = "n_50",
+    /** One hundred */
+    n_100 = "n_100",
+};
+/**
+* Generation patterns for reference point placement
+*/
+export enum ReferencePointPatternEnum {
+    
+    /** Evenly spaced grid of rows and columns */
+    grid = "grid",
+    /** Randomly distributed points */
+    scatter = "scatter",
 };
 /**
 * How line endpoints are rendered (SVG/CSS standard)
@@ -128,6 +248,50 @@ export enum SystemStateTypeEnum {
     selection = "selection",
 };
 /**
+* Canonical output kind identifiers for tool result features. Set on feature.properties.kind by the executor after tool execution. Values use slash-delimited hierarchical paths matching domain/subtype. Both Python and TypeScript executors MUST use these values — no hand-authored kind strings in tool implementations.
+*/
+export enum OutputKindEnum {
+    
+    /** Track statistics summary (point count, distance, speed, duration) */
+    trackSOLIDUSstatistics = "track/statistics",
+    /** Range-bearing time-series dataset between two features */
+    datasetSOLIDUSrange_bearing_series = "dataset/range_bearing_series",
+    /** Region/area statistics summary (extent, area, dimensions) */
+    regionSOLIDUSstatistics = "region/statistics",
+};
+/**
+* Top-level result type categories per TOOL-RESULTS.md. Used as prefix for debrief:resultType annotations.
+*/
+export enum ResultCategoryEnum {
+    
+    /** Modifies existing feature(s) in the FeatureCollection */
+    mutation = "mutation",
+    /** Creates new GeoJSON feature(s) */
+    addition = "addition",
+    /** Removes feature(s) from the FeatureCollection */
+    deletion = "deletion",
+    /** Creates non-GeoJSON output (image, report, dataset) */
+    artifact = "artifact",
+};
+/**
+* Names of available schema-defined parameter types. Referenced by ToolParameter.param_type to link tool parameters to their value enums defined in common.yaml.
+*/
+export enum ParameterTypeEnum {
+    
+    /** Predefined named colours (maps to NamedColorEnum) */
+    NamedColor = "NamedColor",
+    /** Marker shapes (maps to MarkerSymbolEnum) */
+    MarkerSymbol = "MarkerSymbol",
+    /** Eight-point compass directions (maps to CardinalDirectionEnum) */
+    CardinalDirection = "CardinalDirection",
+    /** Common ISO 8601 duration intervals (maps to DurationPresetEnum) */
+    DurationPreset = "DurationPreset",
+    /** Common numeric values (maps to NumericPresetEnum) */
+    NumericPreset = "NumericPreset",
+    /** Reference point generation patterns (maps to ReferencePointPatternEnum) */
+    ReferencePointPattern = "ReferencePointPattern",
+};
+/**
 * Type of file-level provenance event.
 */
 export enum FileProvEventTypeEnum {
@@ -141,137 +305,11 @@ export enum FileProvEventTypeEnum {
 * Direction of a branch event.
 */
 export enum FileProvDirectionEnum {
-
+    
     /** This file is the source of the branch */
     source = "source",
     /** This file is the target of the branch */
     target = "target",
-};
-/**
-* Predefined named colours for styling tool parameters
-*/
-export enum NamedColorEnum {
-
-    /** Red */
-    red = "red",
-    /** Green */
-    green = "green",
-    /** Blue */
-    blue = "blue",
-    /** Yellow */
-    yellow = "yellow",
-    /** Orange */
-    orange = "orange",
-    /** Purple */
-    purple = "purple",
-    /** Cyan */
-    cyan = "cyan",
-    /** Magenta */
-    magenta = "magenta",
-    /** White */
-    white = "white",
-    /** Black */
-    black = "black",
-    /** Grey */
-    grey = "grey",
-};
-/**
-* Marker shapes for tool parameter choices (superset of PointShapeEnum)
-*/
-export enum MarkerSymbolEnum {
-
-    /** Filled/stroked circle (default marker) */
-    circle = "circle",
-    /** Filled/stroked square (reference points) */
-    square = "square",
-    /** Filled/stroked triangle (directional indicators) */
-    triangle = "triangle",
-    /** Diamond shape */
-    diamond = "diamond",
-    /** Cross/plus shape */
-    cross = "cross",
-};
-/**
-* Eight-point compass directions
-*/
-export enum CardinalDirectionEnum {
-
-    /** North */
-    N = "N",
-    /** North-East */
-    NE = "NE",
-    /** East */
-    E = "E",
-    /** South-East */
-    SE = "SE",
-    /** South */
-    S = "S",
-    /** South-West */
-    SW = "SW",
-    /** West */
-    W = "W",
-    /** North-West */
-    NW = "NW",
-};
-/**
-* Common ISO 8601 duration presets for interval parameters
-*/
-export enum DurationPresetEnum {
-
-    /** 1 minute */
-    PT1M = "PT1M",
-    /** 5 minutes */
-    PT5M = "PT5M",
-    /** 15 minutes */
-    PT15M = "PT15M",
-    /** 30 minutes */
-    PT30M = "PT30M",
-    /** 1 hour */
-    PT1H = "PT1H",
-    /** 2 hours */
-    PT2H = "PT2H",
-    /** 6 hours */
-    PT6H = "PT6H",
-    /** 12 hours */
-    PT12H = "PT12H",
-    /** 24 hours */
-    PT24H = "PT24H",
-};
-/**
-* Common numeric presets for count and distance parameters
-*/
-export enum NumericPresetEnum {
-
-    /** One */
-    n_1 = "n_1",
-    /** Two */
-    n_2 = "n_2",
-    /** Five */
-    n_5 = "n_5",
-    /** Ten */
-    n_10 = "n_10",
-    /** Twenty-five */
-    n_25 = "n_25",
-    /** Fifty */
-    n_50 = "n_50",
-    /** One hundred */
-    n_100 = "n_100",
-};
-/**
-* Names of available schema-defined parameter types
-*/
-export enum ParameterTypeEnum {
-
-    /** Predefined named colours (maps to NamedColorEnum) */
-    NamedColor = "NamedColor",
-    /** Marker shapes (maps to MarkerSymbolEnum) */
-    MarkerSymbol = "MarkerSymbol",
-    /** Eight-point compass directions (maps to CardinalDirectionEnum) */
-    CardinalDirection = "CardinalDirection",
-    /** Common ISO 8601 duration intervals (maps to DurationPresetEnum) */
-    DurationPreset = "DurationPreset",
-    /** Common numeric values (maps to NumericPresetEnum) */
-    NumericPreset = "NumericPreset",
 };
 
 
@@ -433,7 +471,7 @@ export interface GeoJSONLineString {
     /** Geometry type discriminator */
     type: string,
     /** Array of [longitude, latitude] pairs */
-    coordinates: number[],
+    coordinates: number[][],
 }
 
 
@@ -444,7 +482,18 @@ export interface GeoJSONPolygon {
     /** Geometry type discriminator */
     type: string,
     /** Array of linear rings (arrays of [lon, lat] pairs) */
-    coordinates: number[],
+    coordinates: number[][][],
+}
+
+
+/**
+ * GeoJSON MultiPoint geometry for reference point sets
+ */
+export interface GeoJSONMultiPoint {
+    /** Geometry type discriminator */
+    type: string,
+    /** Array of [longitude, latitude] pairs */
+    coordinates: number[][],
 }
 
 
@@ -455,18 +504,7 @@ export interface GeoJSONMultiLineString {
     /** Geometry type discriminator */
     type: string,
     /** Array of LineString coordinate arrays */
-    coordinates: number[],
-}
-
-
-/**
- * GeoJSON MultiPoint geometry for multi-point tool results
- */
-export interface GeoJSONMultiPoint {
-    /** Geometry type discriminator */
-    type: string,
-    /** Array of [longitude, latitude] positions */
-    coordinates: number[],
+    coordinates: number[][][],
 }
 
 
@@ -477,7 +515,7 @@ export interface GeoJSONMultiPolygon {
     /** Geometry type discriminator */
     type: string,
     /** Array of polygon coordinate arrays (each an array of linear rings) */
-    coordinates: number[],
+    coordinates: number[][][][],
 }
 
 
@@ -636,6 +674,8 @@ export interface TrackProperties {
     sensors?: SensorData[],
     /** Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions. */
     tuas?: TUAData[],
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -653,6 +693,17 @@ export interface TrackFeature {
     properties: TrackProperties,
     /** Bounding box [minLon, minLat, maxLon, maxLat] */
     bbox?: number[],
+}
+
+
+/**
+ * Metadata for a single point within a MultiPoint reference set. Entries are parallel to the MultiPoint coordinates array. Downstream tools (#081 classifier) extend entries with zone/color fields.
+ */
+export interface PointMetadataEntry {
+    /** 0-based ordinal matching coordinates array position */
+    index: number,
+    /** Human-readable point label (e.g., "Ref 1") */
+    name: string,
 }
 
 
@@ -676,19 +727,23 @@ export interface ReferenceLocationProperties {
     valid_from?: string,
     /** End of validity period */
     valid_until?: string,
+    /** Per-point metadata array, parallel to MultiPoint coordinates. Each entry contains at minimum an index and name. Downstream tools extend entries with zone/color fields. */
+    point_metadata?: PointMetadataEntry[],
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
 /**
- * GeoJSON Feature for fixed reference points
+ * GeoJSON Feature for fixed reference points or reference point sets
  */
 export interface ReferenceLocation {
     /** GeoJSON type discriminator */
     type: string,
     /** Unique identifier */
     id: string,
-    /** Location (Point) or area (Polygon) */
-    geometry: GeoJSONPoint,
+    /** Location (Point) or reference point set (MultiPoint) */
+    geometry: GeoJSONPoint | GeoJSONMultiPoint,
     /** Reference metadata */
     properties: ReferenceLocationProperties,
 }
@@ -714,6 +769,8 @@ export interface SystemStateProperties {
     center?: number[],
     /** Array of selected feature IDs - for selection state */
     selected_ids?: string[],
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -748,6 +805,8 @@ export interface MultiPointFeatureProperties {
     source_features?: string[],
     /** Additional description or notes */
     description?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -784,6 +843,8 @@ export interface MultiPolygonFeatureProperties {
     source_features?: string[],
     /** Additional description or notes */
     description?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
 }
 
 
@@ -801,280 +862,6 @@ export interface MultiPolygonFeature {
     properties: MultiPolygonFeatureProperties,
     /** Bounding box [minLon, minLat, maxLon, maxLat] */
     bbox?: number[],
-}
-
-
-/**
- * Properties for a NarrativeEntry annotation
- */
-export interface NarrativeEntryProperties {
-    /** Feature type discriminator */
-    kind: string,
-    /** Narrative timestamp (ISO8601) */
-    time: string,
-    /** Narrative text content */
-    text: string,
-    /** Associated track identifier (optional) */
-    track_id?: string,
-    /** Display symbol code from REP file */
-    symbol?: string,
-    /** Point styling properties for display position */
-    style: PointProperties,
-    /** Original source file path */
-    source_file?: string,
-}
-
-
-/**
- * GeoJSON Feature for timestamped narrative/log entries. Narratives are operator notes associated with a timestamp and optionally a track. Geometry is optional (Point for display position, or null).
- */
-export interface NarrativeEntry {
-    /** GeoJSON type discriminator */
-    type: string,
-    /** Unique identifier */
-    id: string,
-    /** Optional display position (Point) or null */
-    geometry?: GeoJSONPoint,
-    /** Narrative metadata */
-    properties: NarrativeEntryProperties,
-}
-
-
-/**
- * Properties for a CircleAnnotation
- */
-export interface CircleAnnotationProperties {
-    /** Feature type discriminator */
-    kind: string,
-    /** Circle center as [longitude, latitude] for precise reconstruction */
-    center: number[],
-    /** Circle radius in meters for precise reconstruction */
-    radius: number,
-    /** Annotation label text */
-    label?: string,
-    /** Display symbol code from REP file */
-    symbol?: string,
-    /** Polygon styling properties for the circle area */
-    style: PolygonProperties,
-    /** Original source file path */
-    source_file?: string,
-}
-
-
-/**
- * GeoJSON Feature for circle annotations. Geometry is a Polygon approximating the circle (vertices at regular intervals). Properties contain center and radius for precise reconstruction and smooth rendering.
- */
-export interface CircleAnnotation {
-    /** GeoJSON type discriminator */
-    type: string,
-    /** Unique identifier */
-    id: string,
-    /** Circle as Polygon (approximated with vertices, e.g., every 45 degrees) */
-    geometry: GeoJSONPolygon,
-    /** Circle metadata including center and radius for reconstruction */
-    properties: CircleAnnotationProperties,
-}
-
-
-/**
- * Properties for a RectangleAnnotation
- */
-export interface RectangleAnnotationProperties {
-    /** Feature type discriminator */
-    kind: string,
-    /** Annotation label text */
-    label?: string,
-    /** Display symbol code from REP file */
-    symbol?: string,
-    /** Polygon styling properties for the rectangle area */
-    style: PolygonProperties,
-    /** Original source file path */
-    source_file?: string,
-}
-
-
-/**
- * GeoJSON Feature for rectangle annotations. Geometry is a Polygon with 4 corners (plus closing point).
- */
-export interface RectangleAnnotation {
-    /** GeoJSON type discriminator */
-    type: string,
-    /** Unique identifier */
-    id: string,
-    /** Rectangle as Polygon (4 corners + close) */
-    geometry: GeoJSONPolygon,
-    /** Rectangle metadata */
-    properties: RectangleAnnotationProperties,
-}
-
-
-/**
- * Properties for a LineAnnotation
- */
-export interface LineAnnotationProperties {
-    /** Feature type discriminator */
-    kind: string,
-    /** Annotation label text */
-    label?: string,
-    /** Display symbol code from REP file */
-    symbol?: string,
-    /** Line styling properties for the line segment */
-    style: LineProperties,
-    /** Original source file path */
-    source_file?: string,
-}
-
-
-/**
- * GeoJSON Feature for line segment annotations. Geometry is a LineString with 2 points (start and end).
- */
-export interface LineAnnotation {
-    /** GeoJSON type discriminator */
-    type: string,
-    /** Unique identifier */
-    id: string,
-    /** Line as LineString (2 points) */
-    geometry: GeoJSONLineString,
-    /** Line metadata */
-    properties: LineAnnotationProperties,
-}
-
-
-/**
- * Properties for a TextAnnotation
- */
-export interface TextAnnotationProperties {
-    /** Feature type discriminator */
-    kind: string,
-    /** Text content to display */
-    text: string,
-    /** Display symbol code from REP file */
-    symbol?: string,
-    /** Point styling properties for the text position marker */
-    style: PointProperties,
-    /** Original source file path */
-    source_file?: string,
-}
-
-
-/**
- * GeoJSON Feature for text annotations at a position. Geometry is the Point where text should be displayed.
- */
-export interface TextAnnotation {
-    /** GeoJSON type discriminator */
-    type: string,
-    /** Unique identifier */
-    id: string,
-    /** Text display position */
-    geometry: GeoJSONPoint,
-    /** Text metadata */
-    properties: TextAnnotationProperties,
-}
-
-
-/**
- * Properties for a VectorAnnotation
- */
-export interface VectorAnnotationProperties {
-    /** Feature type discriminator */
-    kind: string,
-    /** Vector origin as [longitude, latitude] for precise reconstruction */
-    origin: number[],
-    /** Vector length/range in meters for precise reconstruction */
-    range: number,
-    /** Vector bearing in degrees (0-360, from north) for precise reconstruction */
-    bearing: number,
-    /** Annotation label text */
-    label?: string,
-    /** Display symbol code from REP file */
-    symbol?: string,
-    /** Line styling properties for the vector */
-    style: LineProperties,
-    /** Original source file path */
-    source_file?: string,
-}
-
-
-/**
- * GeoJSON Feature for vector annotations. Geometry is a LineString from origin to endpoint (computed from range/bearing). Properties contain origin, range, and bearing for precise reconstruction.
- */
-export interface VectorAnnotation {
-    /** GeoJSON type discriminator */
-    type: string,
-    /** Unique identifier */
-    id: string,
-    /** Vector as LineString (origin to computed endpoint) */
-    geometry: GeoJSONLineString,
-    /** Vector metadata including origin, range, and bearing for reconstruction */
-    properties: VectorAnnotationProperties,
-}
-
-
-/**
- * Properties for a PolyAnnotation
- */
-export interface PolyAnnotationProperties {
-    /** Feature type discriminator */
-    kind: string,
-    /** Number of unique vertices (excluding ring closure point) */
-    vertex_count: number,
-    /** Annotation label text */
-    label?: string,
-    /** Display symbol code from REP file */
-    symbol?: string,
-    /** Polygon styling properties for the polygon area */
-    style: PolygonProperties,
-    /** Original source file path */
-    source_file?: string,
-    /** Source line number for debugging */
-    line_number?: number,
-}
-
-
-/**
- * GeoJSON Feature for arbitrary polygon annotations. Geometry is a Polygon with user-defined vertices (freeform shape). Used for patrol zones, exclusion areas, search grids, etc.
- */
-export interface PolyAnnotation {
-    /** GeoJSON type discriminator */
-    type: string,
-    /** Unique identifier */
-    id: string,
-    /** Polygon with user-defined vertices (closed ring) */
-    geometry: GeoJSONPolygon,
-    /** Polygon metadata including vertex count and styling */
-    properties: PolyAnnotationProperties,
-}
-
-
-/**
- * A constraint specifying which feature kinds a tool accepts, with minimum and maximum counts. Used to determine if a tool is applicable to the current selection.
- */
-export interface SelectionRequirement {
-    /** The feature kind this requirement applies to. Supports flat values (e.g., "TRACK", "POINT") matching the 'kind' property of GeoJSON features, and dot-delimited hierarchical paths (e.g., "TRACK.SENSOR", "TRACK.SEGMENT") for targeting embedded children within compound features. */
-    kind: string,
-    /** Optional filter for segment type when kind targets TRACK.SEGMENT. Must be a valid SegmentTypeEnum value (e.g., "ABSOLUTE_TMA"). Only meaningful when kind is "TRACK.SEGMENT". */
-    segment_type?: string,
-    /** Minimum number of features of this kind required. Must be >= 0. Defaults to 0 if not specified. */
-    min?: number,
-    /** Maximum number of features of this kind allowed. Must be >= min if both specified. Null means no upper limit. */
-    max?: number,
-}
-
-
-/**
- * An analysis operation with a name, description, version, and selection requirements. Tools are discovered from debrief-calc via MCP and matched to analyst selections.
- */
-export interface Tool {
-    /** Unique identifier for the tool. Used for execution and deduplication. Should be stable across versions. */
-    id: string,
-    /** Human-readable name displayed in menus and panels. Should be concise (2-4 words). */
-    name: string,
-    /** Brief description of what the tool does. Displayed in tooltips and help text. Should be one sentence. */
-    description?: string,
-    /** Tool version string for provenance tracking. Follows semantic versioning (e.g., "1.0.0"). */
-    version?: string,
-    /** List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection. */
-    requirements?: SelectionRequirement[],
 }
 
 
@@ -1139,6 +926,313 @@ export interface TuneAnnotation {
     previous_value: string,
     /** Value after tuning. */
     new_value: string,
+}
+
+
+/**
+ * Properties for a NarrativeEntry annotation
+ */
+export interface NarrativeEntryProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Narrative timestamp (ISO8601) */
+    time: string,
+    /** Narrative text content */
+    text: string,
+    /** Associated track identifier (optional) */
+    track_id?: string,
+    /** Display symbol code from REP file */
+    symbol?: string,
+    /** Point styling properties for display position */
+    style: PointProperties,
+    /** Original source file path */
+    source_file?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
+}
+
+
+/**
+ * GeoJSON Feature for timestamped narrative/log entries. Narratives are operator notes associated with a timestamp and optionally a track. Geometry is optional (Point for display position, or null).
+ */
+export interface NarrativeEntry {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Unique identifier */
+    id: string,
+    /** Optional display position (Point) or null */
+    geometry?: GeoJSONPoint,
+    /** Narrative metadata */
+    properties: NarrativeEntryProperties,
+}
+
+
+/**
+ * Properties for a CircleAnnotation
+ */
+export interface CircleAnnotationProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Circle center as [longitude, latitude] for precise reconstruction */
+    center: number[],
+    /** Circle radius in meters for precise reconstruction */
+    radius: number,
+    /** Annotation label text */
+    label?: string,
+    /** Display symbol code from REP file */
+    symbol?: string,
+    /** Polygon styling properties for the circle area */
+    style: PolygonProperties,
+    /** Original source file path */
+    source_file?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
+}
+
+
+/**
+ * GeoJSON Feature for circle annotations. Geometry is a Polygon approximating the circle (vertices at regular intervals). Properties contain center and radius for precise reconstruction and smooth rendering.
+ */
+export interface CircleAnnotation {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Unique identifier */
+    id: string,
+    /** Circle as Polygon (approximated with vertices, e.g., every 45 degrees) */
+    geometry: GeoJSONPolygon,
+    /** Circle metadata including center and radius for reconstruction */
+    properties: CircleAnnotationProperties,
+}
+
+
+/**
+ * Properties for a RectangleAnnotation
+ */
+export interface RectangleAnnotationProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Annotation label text */
+    label?: string,
+    /** Display symbol code from REP file */
+    symbol?: string,
+    /** Polygon styling properties for the rectangle area */
+    style: PolygonProperties,
+    /** Original source file path */
+    source_file?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
+}
+
+
+/**
+ * GeoJSON Feature for rectangle annotations. Geometry is a Polygon with 4 corners (plus closing point).
+ */
+export interface RectangleAnnotation {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Unique identifier */
+    id: string,
+    /** Rectangle as Polygon (4 corners + close) */
+    geometry: GeoJSONPolygon,
+    /** Rectangle metadata */
+    properties: RectangleAnnotationProperties,
+}
+
+
+/**
+ * Properties for a LineAnnotation
+ */
+export interface LineAnnotationProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Annotation label text */
+    label?: string,
+    /** Display symbol code from REP file */
+    symbol?: string,
+    /** Line styling properties for the line segment */
+    style: LineProperties,
+    /** Original source file path */
+    source_file?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
+}
+
+
+/**
+ * GeoJSON Feature for line segment annotations. Geometry is a LineString with 2 points (start and end).
+ */
+export interface LineAnnotation {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Unique identifier */
+    id: string,
+    /** Line as LineString (2 points) */
+    geometry: GeoJSONLineString,
+    /** Line metadata */
+    properties: LineAnnotationProperties,
+}
+
+
+/**
+ * Properties for a TextAnnotation
+ */
+export interface TextAnnotationProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Text content to display */
+    text: string,
+    /** Display symbol code from REP file */
+    symbol?: string,
+    /** Point styling properties for the text position marker */
+    style: PointProperties,
+    /** Original source file path */
+    source_file?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
+}
+
+
+/**
+ * GeoJSON Feature for text annotations at a position. Geometry is the Point where text should be displayed.
+ */
+export interface TextAnnotation {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Unique identifier */
+    id: string,
+    /** Text display position */
+    geometry: GeoJSONPoint,
+    /** Text metadata */
+    properties: TextAnnotationProperties,
+}
+
+
+/**
+ * Properties for a VectorAnnotation
+ */
+export interface VectorAnnotationProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Vector origin as [longitude, latitude] for precise reconstruction */
+    origin: number[],
+    /** Vector length/range in meters for precise reconstruction */
+    range: number,
+    /** Vector bearing in degrees (0-360, from north) for precise reconstruction */
+    bearing: number,
+    /** Annotation label text */
+    label?: string,
+    /** Display symbol code from REP file */
+    symbol?: string,
+    /** Line styling properties for the vector */
+    style: LineProperties,
+    /** Original source file path */
+    source_file?: string,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
+}
+
+
+/**
+ * GeoJSON Feature for vector annotations. Geometry is a LineString from origin to endpoint (computed from range/bearing). Properties contain origin, range, and bearing for precise reconstruction.
+ */
+export interface VectorAnnotation {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Unique identifier */
+    id: string,
+    /** Vector as LineString (origin to computed endpoint) */
+    geometry: GeoJSONLineString,
+    /** Vector metadata including origin, range, and bearing for reconstruction */
+    properties: VectorAnnotationProperties,
+}
+
+
+/**
+ * Properties for a PolyAnnotation
+ */
+export interface PolyAnnotationProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Number of unique vertices (excluding ring closure point) */
+    vertex_count: number,
+    /** Annotation label text */
+    label?: string,
+    /** Display symbol code from REP file */
+    symbol?: string,
+    /** Polygon styling properties for the polygon area */
+    style: PolygonProperties,
+    /** Original source file path */
+    source_file?: string,
+    /** Source line number for debugging */
+    line_number?: number,
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
+}
+
+
+/**
+ * GeoJSON Feature for arbitrary polygon annotations. Geometry is a Polygon with user-defined vertices (freeform shape). Used for patrol zones, exclusion areas, search grids, etc.
+ */
+export interface PolyAnnotation {
+    /** GeoJSON type discriminator */
+    type: string,
+    /** Unique identifier */
+    id: string,
+    /** Polygon with user-defined vertices (closed ring) */
+    geometry: GeoJSONPolygon,
+    /** Polygon metadata including vertex count and styling */
+    properties: PolyAnnotationProperties,
+}
+
+
+/**
+ * A constraint specifying which feature kinds a tool accepts, with minimum and maximum counts. Used to determine if a tool is applicable to the current selection.
+ */
+export interface SelectionRequirement {
+    /** The feature kind this requirement applies to. Supports flat values (e.g., "TRACK", "POINT") matching the 'kind' property of GeoJSON features, and dot-delimited hierarchical paths (e.g., "TRACK.SENSOR", "TRACK.SEGMENT") for targeting embedded children within compound features. */
+    kind: string,
+    /** Optional filter for segment type when kind targets TRACK.SEGMENT. Must be a valid SegmentTypeEnum value (e.g., "ABSOLUTE_TMA"). Only meaningful when kind is "TRACK.SEGMENT". */
+    segment_type?: string,
+    /** Minimum number of features of this kind required. Must be >= 0. Defaults to 0 if not specified. */
+    min?: number,
+    /** Maximum number of features of this kind allowed. Must be >= min if both specified. Null means no upper limit. */
+    max?: number,
+}
+
+
+/**
+ * An analysis operation with a name, description, version, and selection requirements. Tools are discovered from debrief-calc via MCP and matched to analyst selections.
+ */
+export interface Tool {
+    /** Unique identifier for the tool. Used for execution and deduplication. Should be stable across versions. */
+    id: string,
+    /** Human-readable name displayed in menus and panels. Should be concise (2-4 words). */
+    name: string,
+    /** Brief description of what the tool does. Displayed in tooltips and help text. Should be one sentence. */
+    description?: string,
+    /** Tool version string for provenance tracking. Follows semantic versioning (e.g., "1.0.0"). */
+    version?: string,
+    /** List of selection requirements. Tool is active when ALL requirements are satisfied by the current selection. Empty list means tool accepts any selection. */
+    requirements?: SelectionRequirement[],
+}
+
+
+/**
+ * A configurable parameter for a tool. Supports string, number, boolean, and enum types with optional default values, explicit choices, and schema-defined parameter type references.
+ */
+export interface ToolParameter {
+    /** Parameter identifier (kebab-case) */
+    name: string,
+    /** Value type discriminator: string, number, boolean, enum */
+    type: string,
+    /** Human-readable parameter description */
+    description: string,
+    /** Whether parameter must be provided */
+    required?: boolean,
+    /** Default value if not provided */
+    default_value?: string,
+    /** References a schema-defined parameter-type enum by name. When set, the client resolves enum values from generated types rather than using inline choices. */
+    param_type?: string,
 }
 
 

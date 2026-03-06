@@ -70,9 +70,15 @@ body {
   color: var(--vscode-descriptionForeground, #969696);
 }
 
-/* Storybook link in welcome header */
-.web-shell__storybook-link {
+/* Header links container */
+.web-shell__header-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-left: auto;
+}
+
+.web-shell__header-link {
   padding: 4px 8px;
   font-size: 12px;
   color: var(--vscode-textLink-foreground, #3794ff);
@@ -81,7 +87,7 @@ body {
   transition: background-color 0.1s;
 }
 
-.web-shell__storybook-link:hover {
+.web-shell__header-link:hover {
   background: var(--vscode-button-secondaryBackground, #3a3d41);
   color: var(--vscode-textLink-activeForeground, #3794ff);
 }
@@ -128,239 +134,21 @@ body {
   min-height: 0;
 }
 
-/* Analysis view - split layout */
-.web-shell__main--split {
-  display: flex;
-  flex-direction: row;
-}
-
-/* Sidebar: StacFileTree (top) + Activity/Log tab panel (bottom) */
-.web-shell__sidebar {
-  width: 320px;
-  min-width: 240px;
-  max-width: 480px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  background: var(--vscode-sideBar-background, #252526);
-  border-right: 1px solid var(--vscode-panel-border, #454545);
-  overflow: hidden;
-}
-
-/* Collapsible section header (used for STAC Catalog toggle) */
-.web-shell__section-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+/* PanelWorkspace fills the main content area in analysis view */
+.web-shell__panel-workspace {
+  height: 100%;
   width: 100%;
-  padding: 6px 12px;
-  background: var(--vscode-sideBarSectionHeader-background, #333333);
-  border: none;
-  border-bottom: 1px solid var(--vscode-panel-border, #454545);
-  color: var(--vscode-sideBarTitle-foreground, #bbbbbb);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  flex-shrink: 0;
 }
 
-.web-shell__section-header:hover {
-  color: var(--vscode-foreground, #cccccc);
-}
-
-.web-shell__section-header:focus {
-  outline: 1px solid var(--vscode-focusBorder, #007fd4);
-  outline-offset: -1px;
-}
-
-.web-shell__section-chevron {
-  font-size: 8px;
-  transition: transform 0.15s ease;
-}
-
-.web-shell__section-chevron--expanded {
-  transform: rotate(90deg);
-}
-
-/* File tree in sidebar (top section, fixed height) */
-.web-shell__file-tree {
-  height: 200px;
-  min-height: 120px;
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--vscode-panel-border, #454545);
-  overflow-y: auto;
-}
-
-/* Tab bar between file tree and panel content */
-.web-shell__tab-bar {
-  display: flex;
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--vscode-panel-border, #454545);
-  background: var(--vscode-sideBarSectionHeader-background, #333333);
-}
-
-.web-shell__tab {
-  flex: 1;
-  padding: 6px 12px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--vscode-sideBarTitle-foreground, #bbbbbb);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: color 0.1s, border-color 0.1s;
-}
-
-.web-shell__tab:hover {
-  color: var(--vscode-foreground, #cccccc);
-}
-
-.web-shell__tab--active {
-  color: var(--vscode-foreground, #cccccc);
-  border-bottom-color: var(--vscode-focusBorder, #007fd4);
-}
-
-/* Tab content fills remaining space below tree + tab bar */
-.web-shell__tab-content {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* LogPanel fills tab content */
-.web-shell__tab-content .log-panel {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
-
-/* Right panel: map + chart panel stacked vertically */
-.web-shell__right-panel {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Map container */
-.web-shell__map-container {
-  flex: 1;
-  min-height: 0;
-  position: relative;
-}
-
-.web-shell__map-container--with-panel {
-  flex: 3;
-}
-
+/* Map within GoldenLayout panel needs absolute positioning */
 .web-shell__map {
   position: absolute;
   inset: 0;
 }
 
-/* Chart panel (bottom of right panel) */
-.web-shell__chart-panel {
-  flex: 2;
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid var(--vscode-panel-border, #454545);
-  background: var(--vscode-editor-background, #1e1e1e);
-}
-
-/* Chart tabs bar */
-.web-shell__chart-tabs {
-  display: flex;
-  flex-shrink: 0;
-  overflow-x: auto;
-  background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
-  border-bottom: 1px solid var(--vscode-panel-border, #454545);
-}
-
-.web-shell__chart-tab {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  max-width: 200px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--vscode-tab-inactiveForeground, #969696);
-  font-size: 12px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color 0.1s, border-color 0.1s;
-}
-
-.web-shell__chart-tab:hover {
-  color: var(--vscode-foreground, #cccccc);
-}
-
-.web-shell__chart-tab--active {
-  color: var(--vscode-tab-activeForeground, #ffffff);
-  border-bottom-color: var(--vscode-focusBorder, #007fd4);
-  background: var(--vscode-tab-activeBackground, #1e1e1e);
-}
-
-.web-shell__chart-tab-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.web-shell__chart-tab-close {
-  flex-shrink: 0;
-  padding: 0;
-  width: 16px;
-  height: 16px;
-  background: transparent;
-  border: none;
-  border-radius: 2px;
-  color: var(--vscode-icon-foreground, #c5c5c5);
-  font-size: 14px;
-  line-height: 16px;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.1s, background 0.1s;
-}
-
-.web-shell__chart-tab:hover .web-shell__chart-tab-close,
-.web-shell__chart-tab--active .web-shell__chart-tab-close {
-  opacity: 0.6;
-}
-
-.web-shell__chart-tab-close:hover {
-  opacity: 1 !important;
-  background: var(--vscode-button-secondaryBackground, #3a3d41);
-}
-
-/* Chart content area */
-.web-shell__chart-content {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-  padding: 8px;
-}
-
 .web-shell__chart {
   width: 100%;
   height: 100%;
-}
-
-.web-shell__chart-error {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--vscode-errorForeground, #d32f2f);
-  font-size: 13px;
 }
 
 /* Tool message toast */
@@ -403,26 +191,6 @@ body {
 
 .web-shell__tool-message button:hover {
   opacity: 1;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .web-shell__main--split {
-    flex-direction: column;
-  }
-
-  .web-shell__sidebar {
-    width: 100%;
-    max-width: none;
-    height: 40%;
-    min-height: 200px;
-    border-right: none;
-    border-bottom: 1px solid var(--vscode-panel-border, #454545);
-  }
-
-  .web-shell__map-container {
-    height: 60%;
-  }
 }
 
 /* Ensure Leaflet container fills space */

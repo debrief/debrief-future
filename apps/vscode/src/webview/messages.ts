@@ -5,8 +5,8 @@
  * and the map webview panel.
  */
 
-import type { Track, ReferenceLocation, SelectionContextType } from '../types/plot';
 import type { LayerStyle } from '../types/tool';
+import type { DebriefFeature } from '@debrief/components';
 
 // Type-safe properties to avoid any from geojson
 type SafeProperties = Record<string, unknown> | null;
@@ -72,18 +72,10 @@ export interface LoadPlotMessage {
   plot: {
     id: string;
     title: string;
-    tracks: Track[];
-    locations: ReferenceLocation[];
-    otherFeatures?: GeoJSONFeature[];
+    features: DebriefFeature[];
     bbox: [number, number, number, number];
     timeExtent: [string, string];
   };
-}
-
-/** Update track data (after time filter change) */
-export interface UpdateTracksMessage {
-  type: 'updateTracks';
-  tracks: Track[];
 }
 
 /** Set the current selection (from external source like Outline click) */
@@ -106,6 +98,12 @@ export interface AddResultLayerMessage {
     features: SafeFeatureCollection;
     style: LayerStyle;
   };
+}
+
+/** Update plot features in-place (mutation tool results) */
+export interface UpdatePlotFeaturesMessage {
+  type: 'updatePlotFeatures';
+  features: SafeFeatureCollection;
 }
 
 /** Remove a result layer */
@@ -171,6 +169,18 @@ export interface SetTrackColorMessage {
   color: string; // hex #RRGGBB
 }
 
+/** Set active drawing mode from session state (#108) */
+export interface SetDrawingModeMessage {
+  type: 'setDrawingMode';
+  drawingMode: 'point' | 'rectangle' | 'polygon' | 'polyline' | null;
+}
+
+/** Set drawing palette index from session state (#108) */
+export interface SetDrawingPaletteIndexMessage {
+  type: 'setDrawingPaletteIndex';
+  paletteIndex: number;
+}
+
 /** Response to export PNG request */
 export interface RequestExportPngResponse extends ResponseMessage {
   type: 'requestExportPngResponse';
@@ -197,11 +207,9 @@ export interface RequestTrackDetailsResponse extends ResponseMessage {
 export interface SelectionChangedMessage {
   type: 'selectionChanged';
   selection: {
-    trackIds: string[];
-    locationIds: string[];
+    featureIds: string[];
     /** Full selection paths for all selected elements (Feature 053) */
     paths?: string[];
-    contextType: SelectionContextType;
   };
 }
 
@@ -266,6 +274,12 @@ export interface FeatureDrawnMessage {
   };
 }
 
+/** Notify extension of drawing mode change from webview (#108) */
+export interface DrawingModeChangedMessage {
+  type: 'drawingModeChanged';
+  drawingMode: 'point' | 'rectangle' | 'polygon' | 'polyline' | null;
+}
+
 /** Notify extension of viewport change for session state (Feature: 029) */
 export interface ViewportChangedMessage {
   type: 'viewportChanged';
@@ -310,10 +324,10 @@ export interface ImportCompleteMessage {
 /** All messages from extension to webview */
 export type ExtensionToWebviewMessage =
   | LoadPlotMessage
-  | UpdateTracksMessage
   | SetSelectionMessage
   | ClearSelectionMessage
   | AddResultLayerMessage
+  | UpdatePlotFeaturesMessage
   | RemoveResultLayerMessage
   | SetLayerVisibilityMessage
   | FitBoundsMessage
@@ -323,6 +337,8 @@ export type ExtensionToWebviewMessage =
   | SetCurrentTimeMessage
   | SetDisplayModeMessage
   | SetHiddenIdsMessage
+  | SetDrawingModeMessage
+  | SetDrawingPaletteIndexMessage
   | RequestExportPngResponse
   | RequestTrackDetailsResponse
   | ImportProgressMessage
@@ -340,18 +356,12 @@ export type WebviewToExtensionMessage =
   | RepFileDropMessage
   | RequestUndoMessage
   | RequestRedoMessage
-  | FeatureDrawnMessage;
+  | FeatureDrawnMessage
+  | DrawingModeChangedMessage;
 
 // ============================================================================
 // Re-exports for webview
 // ============================================================================
 
-export type {
-  Track,
-  ReferenceLocation,
-  SelectionContextType,
-  PositionStyle,
-  PositionStyleOverride,
-  TimestampedPosition,
-} from '../types/plot';
 export type { LayerStyle, ResultLayer } from '../types/tool';
+export type { DebriefFeature } from '@debrief/components';

@@ -13,6 +13,12 @@ import { TimeController } from '../TimeController';
 import { ToolsPanel } from '../ToolsPanel';
 import { LayersToolbar } from '../LayersToolbar';
 import { FeatureList } from '../FeatureList';
+import { FormatMenu } from '../FormatMenu';
+import { GeometryDialog } from '../GeometryDialog';
+import type { DebriefFeature } from '../utils/types';
+import { isTrackFeature, isMultiPointFeature, isMultiPolygonFeature } from '../utils/types';
+import { getFeatureLabel } from '../utils/labels';
+import type { DisplayItem } from '../FeatureList/flattenFeatures';
 import type { ActivityPanelProps } from './types';
 import { DEFAULT_COLLAPSE_STATE } from './types';
 import './ActivityPanel.css';
@@ -268,6 +274,154 @@ export function ActivityPanel({
     [onMessage]
   );
 
+  // Format menu state (Feature 097)
+  const [formatMenuState, setFormatMenuState] = useState<{
+    featureIds: string[];
+    featureKinds: string[];
+    position: { x: number; y: number };
+    /** For child overrides (e.g., individual track point formatting) */
+    childOverride?: { parentFeatureId: string; childIndex: number; childType: string };
+  } | null>(null);
+
+  const handleFormatClick = useCallback(
+    (event: React.MouseEvent, feature: DebriefFeature) => {
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      const kind = feature.properties.kind as string | undefined;
+      setInfoDialogState(null); // Mutual exclusion
+      setFormatMenuState({
+        featureIds: [feature.id],
+        featureKinds: kind ? [kind] : ['TRACK'],
+        position: { x: rect.right + 4, y: rect.top },
+      });
+    },
+    []
+  );
+
+  const handleChildFormatClick = useCallback(
+    (event: React.MouseEvent, displayItem: DisplayItem) => {
+      if (!displayItem.parentId || displayItem.index === null) return;
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      setInfoDialogState(null); // Mutual exclusion
+
+      // Map child type to the menu kind
+      const childKindMap: Record<string, string> = {
+        position: 'POSITION',
+        point: 'POINT',
+        polygon: 'POLY',
+      };
+      const menuKind = childKindMap[displayItem.type] ?? 'POINT';
+
+      setFormatMenuState({
+        featureIds: [displayItem.parentId],
+        featureKinds: [menuKind],
+        position: { x: rect.right + 4, y: rect.top },
+        childOverride: {
+          parentFeatureId: displayItem.parentId,
+          childIndex: displayItem.index,
+          childType: displayItem.type,
+        },
+      });
+    },
+    []
+  );
+
+  const handleToolbarFormat = useCallback(
+    (featureIds: string[], anchorPosition: { x: number; y: number }) => {
+      const kinds = featureIds.map((id) => {
+        const f = features.find((feat) => feat.id === id);
+        const kind = f ? (f.properties.kind as string | undefined) : undefined;
+        return kind ?? 'TRACK';
+      });
+      // Deduplicate kinds
+      const uniqueKinds = [...new Set(kinds)];
+      setFormatMenuState({ featureIds, featureKinds: uniqueKinds, position: anchorPosition });
+    },
+    [features]
+  );
+
+  const handleFormatChange = useCallback(
+    (featureIds: readonly string[], property: string, value: string | number) => {
+      const override = formatMenuState?.childOverride;
+      onMessage?.({
+        type: 'layer:format',
+        payload: {
+          featureIds: [...featureIds],
+          property,
+          value,
+          ...(override && {
+            isPointOverride: true,
+            positionIndex: override.childIndex,
+            childType: override.childType,
+          }),
+        },
+      });
+      setFormatMenuState(null);
+    },
+    [onMessage, formatMenuState]
+  );
+
+  // Info dialog state (Feature 098)
+  const [infoDialogState, setInfoDialogState] = useState<{
+    featureId: string;
+    featureName: string;
+    geometryType: string;
+    coordinates: number[] | number[][] | number[][][] | number[][][][];
+    position: { x: number; y: number };
+  } | null>(null);
+
+  const handleInfoClick = useCallback(
+    (event: React.MouseEvent, feature: DebriefFeature) => {
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      setFormatMenuState(null); // Mutual exclusion
+      setInfoDialogState({
+        featureId: feature.id,
+        featureName: getFeatureLabel(feature),
+        geometryType: feature.geometry.type,
+        coordinates: feature.geometry.coordinates as number[] | number[][] | number[][][] | number[][][][],
+        position: { x: rect.right + 4, y: rect.top },
+      });
+    },
+    []
+  );
+
+  const handleChildInfoClick = useCallback(
+    (event: React.MouseEvent, displayItem: DisplayItem) => {
+      if (!displayItem.parentId || displayItem.index === null) return;
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      const parentFeature = features.find((f) => f.id === displayItem.parentId);
+      if (!parentFeature) return;
+
+      let geometryType: string;
+      let coordinates: number[] | number[][] | number[][][] | number[][][][];
+
+      if (isTrackFeature(parentFeature) && displayItem.type === 'position') {
+        const coords = parentFeature.geometry.coordinates as unknown as number[][];
+        geometryType = 'Point';
+        coordinates = coords[displayItem.index] ?? [];
+      } else if (isMultiPointFeature(parentFeature) && displayItem.type === 'point') {
+        const coords = parentFeature.geometry.coordinates as unknown as number[][];
+        geometryType = 'Point';
+        coordinates = coords[displayItem.index] ?? [];
+      } else if (isMultiPolygonFeature(parentFeature) && displayItem.type === 'polygon') {
+        const coords = parentFeature.geometry.coordinates as unknown as number[][][][];
+        geometryType = 'Polygon';
+        coordinates = coords[displayItem.index] ?? [];
+      } else {
+        return;
+      }
+
+      setFormatMenuState(null); // Mutual exclusion
+      setInfoDialogState({
+        featureId: displayItem.id,
+        featureName: displayItem.label,
+        geometryType,
+        coordinates,
+        position: { x: rect.right + 4, y: rect.top },
+      });
+    },
+    [features]
+  );
+
   // Determine how many flexible sections are expanded (for split calc)
   const toolsExpanded = !collapseState.toolsCollapsed;
   const layersExpanded = !collapseState.layersCollapsed;
@@ -344,6 +498,7 @@ export function ActivityPanel({
             resultsChanged={resultsChanged}
             onDelete={handleDelete}
             onToggleVisibility={handleToggleVisibility}
+            onFormat={handleToolbarFormat}
             onRunTool={(toolId) => onMessage?.({ type: 'tool:run', payload: { toolId } })}
           />
           <FeatureList
@@ -351,7 +506,31 @@ export function ActivityPanel({
             selectedIds={new Set(selectedFeatureIds)}
             hiddenIds={hiddenIds}
             onSelectionChange={handleSelectionChange}
+            showFormatIcon
+            onFormatClick={handleFormatClick}
+            onChildFormatClick={handleChildFormatClick}
+            showInfoIcon
+            onInfoClick={handleInfoClick}
+            onChildInfoClick={handleChildInfoClick}
           />
+          {formatMenuState && (
+            <FormatMenu
+              featureIds={formatMenuState.featureIds}
+              featureKinds={formatMenuState.featureKinds}
+              anchorPosition={formatMenuState.position}
+              onFormatChange={handleFormatChange}
+              onDismiss={() => setFormatMenuState(null)}
+            />
+          )}
+          {infoDialogState && (
+            <GeometryDialog
+              featureName={infoDialogState.featureName}
+              geometryType={infoDialogState.geometryType}
+              coordinates={infoDialogState.coordinates}
+              anchorPosition={infoDialogState.position}
+              onDismiss={() => setInfoDialogState(null)}
+            />
+          )}
         </SectionErrorBoundary>
       </PaneSection>
     </div>

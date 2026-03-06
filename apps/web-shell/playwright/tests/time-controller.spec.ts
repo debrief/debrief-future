@@ -5,12 +5,11 @@
  * when a plot with temporal features is loaded.
  */
 
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { CatalogPage, AnalysisPage } from '../pages';
 
-// STATUS: Skipped — requires web-shell app with TimeController and STAC data.
-// See docs/web-shell-test-restoration-requirements.md for restoration plan.
-test.describe.skip('Time Controller', () => {
+// Time Controller integration tests — verifies playback, layer selection, and navigation.
+test.describe('Time Controller', () => {
   let catalogPage: CatalogPage;
 
   test.beforeEach(async ({ page }) => {
@@ -180,11 +179,9 @@ test.describe.skip('Time Controller', () => {
         // Click first layer
         await analysisPage.selectLayer(layers.first());
 
-        // Should have exactly one selected
-        expect(await analysisPage.getSelectedLayerCount()).toBe(1);
-
-        // First layer should be selected
+        // Wait for selection class (retrying assertion) before checking count
         await expect(layers.first()).toHaveClass(/--selected/);
+        expect(await analysisPage.getSelectedLayerCount()).toBe(1);
 
         // Second layer should not be selected
         await expect(layers.nth(1)).not.toHaveClass(/--selected/);
@@ -198,13 +195,13 @@ test.describe.skip('Time Controller', () => {
       if (layerCount > 1) {
         // Click first layer
         await analysisPage.selectLayer(layers.first());
-        expect(await analysisPage.getSelectedLayerCount()).toBe(1);
         await expect(layers.first()).toHaveClass(/--selected/);
+        expect(await analysisPage.getSelectedLayerCount()).toBe(1);
 
         // Click second layer
         await analysisPage.selectLayer(layers.nth(1));
-        expect(await analysisPage.getSelectedLayerCount()).toBe(1);
         await expect(layers.nth(1)).toHaveClass(/--selected/);
+        expect(await analysisPage.getSelectedLayerCount()).toBe(1);
         await expect(layers.first()).not.toHaveClass(/--selected/);
       }
     });

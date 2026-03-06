@@ -7,7 +7,7 @@ Run: pnpm --filter @debrief/session-state dev
 """
 
 import pytest
-from debrief_session import SessionClient, TimeInstant
+from debrief_session import SessionClient, TimeInstant  # type: ignore[reportMissingImports]
 
 # Mark all tests as requiring the server
 pytestmark = pytest.mark.skipif(
@@ -20,11 +20,11 @@ class TestSessionClient:
     """Test the session client against a running server."""
 
     @pytest.fixture
-    def client(self):
+    def client(self) -> SessionClient:
         """Create a client instance."""
         return SessionClient("http://localhost:3001/mcp")
 
-    def test_get_state(self, client):
+    def test_get_state(self, client: SessionClient) -> None:
         """Test getting full state."""
         state = client.get_state()
         assert state.temporal is not None
@@ -32,13 +32,13 @@ class TestSessionClient:
         assert state.features is not None
         assert state.document is not None
 
-    def test_get_temporal_state(self, client):
+    def test_get_temporal_state(self, client: SessionClient) -> None:
         """Test getting temporal slice."""
         temporal = client.get_temporal_state()
         assert temporal.playbackState in ("stopped", "playing", "paused")
         assert temporal.displayMode in ("normal", "snailTrail")
 
-    def test_set_current_time_epoch(self, client):
+    def test_set_current_time_epoch(self, client: SessionClient) -> None:
         """Test setting current time with epoch."""
         epoch = 1706097600000
         result = client.set_current_time(epoch=epoch)
@@ -49,20 +49,20 @@ class TestSessionClient:
         assert state.currentTime is not None
         assert state.currentTime.epoch == epoch
 
-    def test_set_current_time_iso(self, client):
+    def test_set_current_time_iso(self, client: SessionClient) -> None:
         """Test setting current time with ISO string."""
         iso = "2024-01-24T12:00:00.000Z"
         result = client.set_current_time(iso=iso)
         assert result.iso == iso
 
-    def test_set_selection(self, client):
+    def test_set_selection(self, client: SessionClient) -> None:
         """Test setting feature selection."""
         feature_ids = ["track-001", "track-002"]
         selection = client.set_selection(feature_ids)
         assert selection.featureIds == feature_ids
         assert selection.primary == "track-001"
 
-    def test_clear_selection(self, client):
+    def test_clear_selection(self, client: SessionClient) -> None:
         """Test clearing feature selection."""
         # First set a selection
         client.set_selection(["track-001"])
@@ -71,7 +71,7 @@ class TestSessionClient:
         selection = client.clear_selection()
         assert selection.featureIds == []
 
-    def test_set_viewport(self, client):
+    def test_set_viewport(self, client: SessionClient) -> None:
         """Test setting viewport."""
         coordinates = [[-5, 55], [5, 55], [5, 50], [-5, 50]]
         result = client.set_viewport(coordinates)
@@ -79,7 +79,7 @@ class TestSessionClient:
         assert result["viewport"]["coordinates"] == coordinates
         assert result["center"] == [0, 52.5]
 
-    def test_hidden_features(self, client):
+    def test_hidden_features(self, client: SessionClient) -> None:
         """Test hidden features management."""
         # Set hidden features
         hidden = client.set_hidden_features(["track-003", "track-004"])
@@ -94,13 +94,13 @@ class TestSessionClient:
 class TestTimeInstant:
     """Test TimeInstant type."""
 
-    def test_now(self):
+    def test_now(self) -> None:
         """Test creating TimeInstant for current time."""
         now = TimeInstant.now()
         assert now.epoch > 0
         assert now.iso.endswith("Z")
 
-    def test_from_epoch(self):
+    def test_from_epoch(self) -> None:
         """Test creating TimeInstant from epoch."""
         epoch = 1706097600000
         instant = TimeInstant.from_epoch(epoch)

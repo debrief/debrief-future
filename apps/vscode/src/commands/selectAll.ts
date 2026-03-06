@@ -16,13 +16,11 @@ export function createSelectAllCommand(
       return;
     }
 
-    const tracks = panel.getTracks();
-    // Locations available for future use
-    void panel.getLocations();
+    const features = panel.getFeatures();
 
-    // Select all tracks
-    const trackIds = tracks.map((t) => t.id);
-    panel.setSelection(trackIds);
+    // Select all features
+    const featureIds = features.map((f) => String(f.id));
+    panel.setSelection(featureIds);
   };
 }
 

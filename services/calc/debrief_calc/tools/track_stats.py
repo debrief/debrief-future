@@ -37,20 +37,70 @@ def _haversine_distance(lon1: float, lat1: float, lon2: float, lat2: float) -> f
     return c * r
 
 
-def _calculate_track_stats(coordinates: list[list[float]]) -> dict[str, Any]:
+# Conversion factors from nautical miles
+_NM_TO_KM = 1.852
+_NM_TO_MI = 1.15078
+
+
+def _convert_distance(distance_nm: float, unit: str) -> float:
+    """Convert a distance from nautical miles to the requested unit."""
+    if unit == "km":
+        return distance_nm * _NM_TO_KM
+    if unit == "mi":
+        return distance_nm * _NM_TO_MI
+    return distance_nm  # "nm" or default
+
+
+def _convert_speed(speed_kts: float, unit: str) -> float:
+    """Convert a speed from knots (nm/h) to the requested unit's per-hour equivalent."""
+    if unit == "km":
+        return speed_kts * _NM_TO_KM
+    if unit == "mi":
+        return speed_kts * _NM_TO_MI
+    return speed_kts  # knots
+
+
+def _speed_label(unit: str) -> str:
+    """Return the speed unit label for the given distance unit."""
+    if unit == "km":
+        return "km/h"
+    if unit == "mi":
+        return "mph"
+    return "kts"
+
+
+def _distance_key(unit: str) -> str:
+    """Return the statistics key for distance in the given unit."""
+    return f"distance_{unit}"
+
+
+def _speed_key(unit: str) -> str:
+    """Return the statistics key for speed in the given unit."""
+    labels = {"nm": "kts", "km": "kmh", "mi": "mph"}
+    return f"average_speed_{labels.get(unit, 'kts')}"
+
+
+def _calculate_track_stats(
+    coordinates: list[list[float]], distance_unit: str = "nm"
+) -> dict[str, Any]:
     """Calculate statistics from track coordinates."""
     if not coordinates:
-        return {"point_count": 0, "duration_hours": 0, "distance_nm": 0, "average_speed_kts": 0}
+        return {
+            "point_count": 0,
+            "duration_hours": 0,
+            _distance_key(distance_unit): 0,
+            _speed_key(distance_unit): 0,
+        }
 
     point_count = len(coordinates)
 
-    # Calculate total distance
-    total_distance = 0.0
+    # Calculate total distance in nautical miles
+    total_distance_nm = 0.0
     for i in range(1, len(coordinates)):
         prev = coordinates[i - 1]
         curr = coordinates[i]
         # Coordinates are [lon, lat, elevation?, time?]
-        total_distance += _haversine_distance(prev[0], prev[1], curr[0], curr[1])
+        total_distance_nm += _haversine_distance(prev[0], prev[1], curr[0], curr[1])
 
     # Calculate duration if timestamps available (4th element)
     duration_hours = 0.0
@@ -59,16 +109,20 @@ def _calculate_track_stats(coordinates: list[list[float]]) -> dict[str, Any]:
         end_time = coordinates[-1][3]
         duration_hours = (end_time - start_time) / (1000 * 60 * 60)
 
-    # Calculate average speed
-    average_speed = 0.0
+    # Calculate average speed in nm/h (knots)
+    average_speed_kts = 0.0
     if duration_hours > 0:
-        average_speed = total_distance / duration_hours
+        average_speed_kts = total_distance_nm / duration_hours
+
+    # Convert to requested unit
+    distance = _convert_distance(total_distance_nm, distance_unit)
+    speed = _convert_speed(average_speed_kts, distance_unit)
 
     return {
         "point_count": point_count,
         "duration_hours": round(duration_hours, 2),
-        "distance_nm": round(total_distance, 2),
-        "average_speed_kts": round(average_speed, 2),
+        _distance_key(distance_unit): round(distance, 2),
+        _speed_key(distance_unit): round(speed, 2),
     }
 
 
@@ -99,11 +153,15 @@ def track_stats(context: SelectionContext, params: dict[str, Any]) -> list[dict[
     Returns:
         List containing one Feature with track statistics
     """
+    distance_unit = params.get("distance_unit", "nm")
+    if distance_unit not in ("nm", "km", "mi"):
+        raise ValueError(f"distance_unit must be one of: nm, km, mi (got '{distance_unit}')")
+
     feature = context.features[0]
     geometry = feature.get("geometry", {})
     coordinates = geometry.get("coordinates", [])
 
-    stats = _calculate_track_stats(coordinates)
+    stats = _calculate_track_stats(coordinates, distance_unit)
 
     # Get the track's bounding box for the result geometry
     if coordinates:

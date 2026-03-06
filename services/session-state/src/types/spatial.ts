@@ -54,6 +54,8 @@ export interface SpatialSlice {
   rotation: number;
   /** Active drawing mode for shape creation (FR-093) — EPHEMERAL */
   drawingMode: DrawingMode;
+  /** Index into the drawing colour palette — EPHEMERAL (FR-096) */
+  drawingPaletteIndex: number;
 }
 
 /**
@@ -63,6 +65,7 @@ export const DEFAULT_SPATIAL_SLICE: SpatialSlice = {
   viewport: null,
   rotation: 0,
   drawingMode: null,
+  drawingPaletteIndex: 0,
 };
 
 /**
@@ -72,6 +75,8 @@ export interface SpatialActions {
   setViewport: (viewport: ViewportPolygon | null) => void;
   setRotation: (rotation: number) => void;
   setDrawingMode: (mode: DrawingMode) => void;
+  /** Increment the drawing palette colour index (FR-096) */
+  incrementDrawingPaletteIndex: () => void;
   /** Get the derived center point (not stored) */
   getCenter: () => Coordinate | null;
 }

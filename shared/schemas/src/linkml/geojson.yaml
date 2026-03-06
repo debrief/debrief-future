@@ -17,6 +17,7 @@ imports:
   - linkml:types
   - common
   - styling
+  - log-entry
 
 # ============================================================================
 # GeoJSON Geometry Types
@@ -82,6 +83,20 @@ classes:
         multivalued: true
         required: true
 
+  GeoJSONMultiPoint:
+    description: GeoJSON MultiPoint geometry for reference point sets
+    attributes:
+      type:
+        description: Geometry type discriminator
+        range: string
+        required: true
+        equals_string: "MultiPoint"
+      coordinates:
+        description: Array of [longitude, latitude] pairs
+        range: float
+        multivalued: true
+        required: true
+
   GeoJSONMultiLineString:
     description: GeoJSON MultiLineString geometry for compound tracks
     attributes:
@@ -92,20 +107,6 @@ classes:
         equals_string: "MultiLineString"
       coordinates:
         description: Array of LineString coordinate arrays
-        range: float
-        multivalued: true
-        required: true
-
-  GeoJSONMultiPoint:
-    description: GeoJSON MultiPoint geometry for multi-point tool results
-    attributes:
-      type:
-        description: Geometry type discriminator
-        range: string
-        required: true
-        equals_string: "MultiPoint"
-      coordinates:
-        description: Array of [longitude, latitude] positions
         range: float
         multivalued: true
         required: true
@@ -401,6 +402,11 @@ classes:
         range: TUAData
         multivalued: true
         inlined_as_list: true
+      provenance:
+        description: PROV-aligned provenance records (append-only log of tool operations)
+        range: LogEntry
+        multivalued: true
+        inlined_as_list: true
 
   TrackFeature:
     description: GeoJSON Feature representing a vessel track
@@ -434,6 +440,21 @@ classes:
 # ReferenceLocation
 # ============================================================================
 
+  PointMetadataEntry:
+    description: >-
+      Metadata for a single point within a MultiPoint reference set.
+      Entries are parallel to the MultiPoint coordinates array.
+      Downstream tools (#081 classifier) extend entries with zone/color fields.
+    attributes:
+      index:
+        description: 0-based ordinal matching coordinates array position
+        range: integer
+        required: true
+      name:
+        description: Human-readable point label (e.g., "Ref 1")
+        range: string
+        required: true
+
   ReferenceLocationProperties:
     description: Properties for a ReferenceLocation
     attributes:
@@ -463,9 +484,22 @@ classes:
       valid_until:
         description: End of validity period
         range: datetime
+      point_metadata:
+        description: >-
+          Per-point metadata array, parallel to MultiPoint coordinates.
+          Each entry contains at minimum an index and name.
+          Downstream tools extend entries with zone/color fields.
+        range: PointMetadataEntry
+        multivalued: true
+        inlined_as_list: true
+      provenance:
+        description: PROV-aligned provenance records (append-only log of tool operations)
+        range: LogEntry
+        multivalued: true
+        inlined_as_list: true
 
   ReferenceLocation:
-    description: GeoJSON Feature for fixed reference points
+    description: GeoJSON Feature for fixed reference points or reference point sets
     attributes:
       type:
         description: GeoJSON type discriminator
@@ -476,12 +510,11 @@ classes:
         description: Unique identifier
         required: true
       geometry:
-        description: Location (Point) or area (Polygon)
-        range: GeoJSONPoint
+        description: Location (Point) or reference point set (MultiPoint)
         required: true
-        # Note: In full implementation, this would be a union type
-        # allowing Point or Polygon. LinkML handles this via
-        # any_of or abstract geometry class.
+        any_of:
+          - range: GeoJSONPoint
+          - range: GeoJSONMultiPoint
       properties:
         description: Reference metadata
         range: ReferenceLocationProperties
@@ -527,6 +560,11 @@ classes:
         description: Array of selected feature IDs - for selection state
         range: string
         multivalued: true
+      provenance:
+        description: PROV-aligned provenance records (append-only log of tool operations)
+        range: LogEntry
+        multivalued: true
+        inlined_as_list: true
 
   SystemState:
     description: GeoJSON Feature for storing non-spatial system state
@@ -576,6 +614,11 @@ classes:
         multivalued: true
       description:
         description: Additional description or notes
+      provenance:
+        description: PROV-aligned provenance records (append-only log of tool operations)
+        range: LogEntry
+        multivalued: true
+        inlined_as_list: true
 
   MultiPointFeature:
     description: GeoJSON Feature for multi-point tool results
@@ -630,6 +673,11 @@ classes:
         multivalued: true
       description:
         description: Additional description or notes
+      provenance:
+        description: PROV-aligned provenance records (append-only log of tool operations)
+        range: LogEntry
+        multivalued: true
+        inlined_as_list: true
 
   MultiPolygonFeature:
     description: GeoJSON Feature for multi-polygon tool results

@@ -7,6 +7,7 @@ import { access, readFile } from 'fs/promises';
 import { loadSession, createLogService, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
+import type { CalcService } from '../services/calcService';
 import type { IoService } from '../services/ioService';
 import type { RecentPlotsService } from '../services/recentPlotsService';
 import type { OpenPlotsService } from '../services/openPlotsService';
@@ -17,7 +18,9 @@ import { createTimeInstant } from '@debrief/session-state';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';
+import type { LogPanelViewProvider } from '../views/logPanelView';
 import { MapPanel } from '../webview/mapPanel';
+import { isTrackFeature, isReferenceLocation } from '@debrief/components';
 import { parseStacUri, buildStacUri } from '../types/stac';
 
 interface OpenPlotArgs {
@@ -57,6 +60,7 @@ export function createOpenPlotCommand(
   context: vscode.ExtensionContext,
   configService: ConfigService,
   stacService: StacService,
+  calcService: CalcService,
   ioService: IoService,
   recentPlotsService: RecentPlotsService,
   openPlotsService: OpenPlotsService,
@@ -68,7 +72,8 @@ export function createOpenPlotCommand(
   activityPanelProvider: ActivityPanelViewProvider,
   getMapPanel: () => MapPanel | undefined,
   setMapPanel: (panel: MapPanel | undefined) => void,
-  resultIdRegistry?: ResultIdRegistry
+  resultIdRegistry?: ResultIdRegistry,
+  logPanelProvider?: LogPanelViewProvider
 ): (args?: OpenPlotArgs) => Promise<void> {
   return async (args?: OpenPlotArgs) => {
     let storeId: string;
@@ -130,12 +135,16 @@ export function createOpenPlotCommand(
       return;
     }
 
+    // Derive track/location counts from unified features
+    const tracks = plotData.features.filter(isTrackFeature);
+    const locations = plotData.features.filter(isReferenceLocation);
+
     // Create session for this document
     const plotUri = buildStacUri(storeId, itemPath);
     const session = sessionManager.createSession(plotUri, {
       plot,
-      tracks: plotData.tracks,
-      locations: plotData.locations,
+      tracks,
+      locations,
       featureCollectionUri: plotUri,
     });
 
@@ -202,9 +211,7 @@ export function createOpenPlotCommand(
         void openPlotsService.clearAll();
 
         setMapPanel(undefined);
-        layersTreeProvider.setTracks([]);
-        layersTreeProvider.setLocations([]);
-        layersTreeProvider.setShapes([]);
+        layersTreeProvider.setFeatures([]);
         layersTreeProvider.setResultLayers([]);
         // Dispose all sessions since they're no longer visible (T028)
         sessionManager.disposeAllSessions();
@@ -214,7 +221,7 @@ export function createOpenPlotCommand(
     // Register selection change handler (runs for both new and reused panels)
     // Fix: 077 — previously only registered inside if(!panel), missing on reuse
     panel.onSelectionChanged((selection) => {
-      const featureIds = [...selection.trackIds, ...selection.locationIds];
+      const { featureIds } = selection;
 
       // Update session state - this will trigger subscriptions in ActivityPanelView
       // which will update toolMatchAdapter and refresh the UI
@@ -227,7 +234,7 @@ export function createOpenPlotCommand(
       // Also update toolMatchAdapter directly for tools tree provider
       toolMatchAdapter.updateSelection({
         featureIds,
-        primary: selection.trackIds[0] ?? selection.locationIds[0] ?? null,
+        primary: featureIds[0] ?? null,
         timestamp: createTimeInstant(Date.now()),
       });
       toolsTreeProvider.refresh();
@@ -237,6 +244,7 @@ export function createOpenPlotCommand(
     panel.setImportServices(ioService, stacService, store, layersTreeProvider, activityPanelProvider);
 
     // Create and wire LogService for provenance recording (Feature: 094)
+    // Phase 6 replay deps wired for tune/revert operations (Feature: 076)
     const logService = createLogService({
       appendProvenance: stacService.appendProvenance.bind(stacService),
       loadGeoJson: async (sp: string, ip: string) => {
@@ -249,20 +257,166 @@ export function createOpenPlotCommand(
           activeSession.getState().markDirty();
         }
       },
+
+      // Phase 6: replay deps (Feature: 076-replay-tune)
+      writeGeoJson: async (sp, ip, fc) => {
+        await stacService.writeGeoJson(
+          sp, ip,
+          fc as unknown as Parameters<typeof stacService.writeGeoJson>[2]
+        );
+      },
+
+      executeTool: async (toolId, featureIds, params, activityId, timestamp) => {
+        const startMs = Date.now();
+
+        // Load current features from disk (geometry restored by logService before replay)
+        const fc = await stacService.loadGeoJsonForItem(store.path, itemPath);
+        if (!fc) { return { success: false, durationMs: Date.now() - startMs }; }
+
+        // Find requested features — SafeFeature lacks `id`, access via cast
+        type FeatureWithId = { id?: string | number; geometry: unknown; properties: Record<string, unknown> | null };
+        const allFeatures = fc.features as unknown as FeatureWithId[];
+        const features = allFeatures.filter(
+          (f) => featureIds.includes(String(f.id ?? (f.properties as Record<string, unknown>)?.id))
+        );
+        if (features.length === 0) { return { success: false, durationMs: Date.now() - startMs }; }
+
+        // Execute tool via Python CLI
+        const result = await calcService.executeToolDirect(
+          toolId,
+          features as Parameters<typeof calcService.executeToolDirect>[1],
+          params
+        );
+        if (!result.success || !result.features) { return { success: false, durationMs: Date.now() - startMs }; }
+
+        // Helper: stamp the original activityId and timestamp on Python-generated
+        // provenance so the timeline shows one entry per original activity at
+        // its original position, not duplicates sorted to the end.
+        const stampProvenance = (f: Record<string, unknown>): void => {
+          if (!activityId) { return; }
+          const props = f.properties as Record<string, unknown> | null;
+          if (!props?.provenance || !Array.isArray(props.provenance)) { return; }
+          for (const prov of props.provenance as Array<Record<string, unknown>>) {
+            if (prov.activityId) {
+              prov.activityId = activityId;
+            }
+            if (timestamp && prov.timestamp) {
+              prov.timestamp = timestamp;
+            }
+          }
+        };
+
+        // Apply mutations: merge result features back into fc
+        const isMutation = result.resultType?.startsWith('mutation/');
+        if (isMutation) {
+          const resultMap = new Map(
+            result.features.features.map((f) => {
+              const fProps = f.properties;
+              const fKey = String((f as unknown as Record<string, unknown>).id ?? fProps?.id);
+              return [fKey, f];
+            })
+          );
+          for (const feat of allFeatures) {
+            const fId = String(feat.id ?? (feat.properties as Record<string, unknown>)?.id);
+            const updated = resultMap.get(fId);
+            if (updated) {
+              feat.geometry = updated.geometry;
+              // Merge properties but preserve provenance
+              const existingProv = (feat.properties as Record<string, unknown>)?.provenance;
+              feat.properties = {
+                ...updated.properties,
+                provenance: existingProv,
+              };
+            }
+          }
+        } else {
+          // Additive: append new features, stamping original activityId
+          for (const f of result.features.features) {
+            stampProvenance(f as Record<string, unknown>);
+            (fc.features as unknown[]).push(f);
+          }
+        }
+
+        // Write back to disk
+        await stacService.writeGeoJson(
+          store.path, itemPath,
+          fc as unknown as Parameters<typeof stacService.writeGeoJson>[2]
+        );
+
+        return {
+          success: true,
+          durationMs: Date.now() - startMs,
+          artifactHref: result.artifactHref,
+          toolVersion: result.toolVersion,
+        };
+      },
+
+      loadSnapshot: async (sp, ip, assetFilename) => {
+        const fc = await stacService.loadSnapshotGeoJson(sp, ip, assetFilename);
+        return fc as unknown as Awaited<ReturnType<typeof stacService.loadSnapshotGeoJson>>;
+      },
+
+      resolveToolVersion: (toolId) => {
+        return Promise.resolve(calcService.getToolVersion(toolId));
+      },
     });
     panel.setLogService(logService);
 
+    // Wire LogPanelViewProvider with logService + path resolvers (Feature: 113)
+    if (logPanelProvider) {
+      logPanelProvider.setLogService(logService);
+      logPanelProvider.setPathResolvers(
+        () => panel.getCurrentStore()?.path,
+        () => panel.getCurrentPlot()?.itemPath
+      );
+
+      // Refresh MapPanel features from disk after replay/tune (Feature: 076)
+      logPanelProvider.setOnFeaturesChanged(() => {
+        void (async () => {
+          const updatedData = await stacService.loadPlotData(store, itemPath);
+          if (updatedData && panel) {
+            panel.loadPlot(plot, updatedData.features);
+            layersTreeProvider.setFeatures(updatedData.features);
+            activityPanelProvider.setFeatures(updatedData.features);
+
+            // Update feature names so timeline shows correct labels
+            // for features created/removed during replay
+            const updatedNames: Record<string, string> = {};
+            for (const f of updatedData.features) {
+              const props = (f.properties ?? {}) as Record<string, unknown>;
+              const name = (props.name ?? props.title ?? String(f.id)) as string;
+              updatedNames[String(f.id)] = name;
+            }
+            logPanelProvider.setFeatureNames(updatedNames);
+          }
+        })();
+      });
+
+      console.log('[debrief] LogPanel: logService + path resolvers wired for', plot.title);
+    } else {
+      console.warn('[debrief] LogPanel: logPanelProvider not provided — provenance display will not work');
+    }
+
     // Load plot into panel
-    panel.loadPlot(plot, plotData.tracks, plotData.locations, plotData.otherFeatures);
+    panel.loadPlot(plot, plotData.features);
 
     // Update layers panel
-    layersTreeProvider.setTracks(plotData.tracks);
-    layersTreeProvider.setLocations(plotData.locations);
-    layersTreeProvider.setShapes(plotData.otherFeatures);
+    layersTreeProvider.setFeatures(plotData.features);
     layersTreeProvider.setResultLayers([]);
 
-    // Update activity panel webview with features
-    activityPanelProvider.setFeatures(plotData.tracks, plotData.locations);
+    // Update activity panel webview with all features
+    activityPanelProvider.setFeatures(plotData.features);
+
+    // Update Log Panel with feature names for display resolution (Feature: 113)
+    if (logPanelProvider) {
+      const featureNames: Record<string, string> = {};
+      for (const f of plotData.features) {
+        const props = (f.properties ?? {}) as Record<string, unknown>;
+        const name = (props.name ?? props.title ?? String(f.id)) as string;
+        featureNames[String(f.id)] = name;
+      }
+      logPanelProvider.setFeatureNames(featureNames);
+    }
 
     // Load existing result files from STAC item (Feature: 051-load-result-attachments)
     const resultFiles = await stacService.loadResultFiles(store, itemPath);

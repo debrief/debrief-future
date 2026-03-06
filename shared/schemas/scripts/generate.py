@@ -64,7 +64,20 @@ def generate_pydantic() -> bool:
 
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        output_file.write_text(result.stdout)
+        content = result.stdout
+
+        # Post-process: gen-pydantic emits dict[str, Any] in boilerplate classes
+        # (ConfiguredBaseModel, LinkMLMeta). Replace with dict[str, object] to
+        # eliminate Any from generated code. These are infrastructure classes,
+        # not domain models — object is sufficient for their serialisation needs.
+        content = content.replace("dict[str, Any]", "dict[str, object]")
+        # Remove the Any import if it's no longer used
+        content = content.replace(
+            "from typing import (\n    Any,\n",
+            "from typing import (\n",
+        )
+
+        output_file.write_text(content)
         print(f"  [OK] Generated: {output_file}")
         return True
     except subprocess.CalledProcessError as e:
@@ -73,6 +86,24 @@ def generate_pydantic() -> bool:
     except FileNotFoundError:
         print("  [FAIL] gen-pydantic not found. Install with: pip install linkml")
         return False
+
+
+def _strip_type_from_anyof(obj: object) -> None:
+    """Remove spurious ``"type": "string"`` from properties that have ``"anyOf"``.
+
+    LinkML gen-json-schema emits both ``anyOf`` (with the correct union refs) and
+    a fallback ``"type": "string"`` for ``any_of`` slots. AJV enforces both,
+    causing valid objects to fail with "must be string". Walk the schema tree and
+    delete the ``type`` key from any mapping that already carries ``anyOf``.
+    """
+    if isinstance(obj, dict):
+        if "anyOf" in obj and "type" in obj:
+            del obj["type"]
+        for v in obj.values():
+            _strip_type_from_anyof(v)
+    elif isinstance(obj, list):
+        for item in obj:
+            _strip_type_from_anyof(item)
 
 
 def generate_jsonschema() -> bool:
@@ -93,11 +124,15 @@ def generate_jsonschema() -> bool:
 
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        output_file.write_text(result.stdout)
-        print(f"  [OK] Generated: {output_file}")
 
-        # Generate per-entity schemas
+        # Post-process: gen-json-schema emits "type": "string" alongside "anyOf"
+        # for any_of union fields (e.g., geometry unions). The spurious "type" must
+        # be removed so AJV validates against the anyOf alternatives instead.
         full_schema = json.loads(result.stdout)
+        _strip_type_from_anyof(full_schema)
+
+        output_file.write_text(json.dumps(full_schema, indent=2))
+        print(f"  [OK] Generated: {output_file}")
         entity_types = [
             # Core types
             "TrackFeature",
@@ -116,6 +151,12 @@ def generate_jsonschema() -> bool:
             # Multi-geometry tool result types
             "MultiPointFeature",
             "MultiPolygonFeature",
+            # Sub-schema types (styling, state)
+            "LineProperties",
+            "PointProperties",
+            "PolygonProperties",
+            "TrackStyle",
+            "SystemState",
         ]
         for entity in entity_types:
             if entity in full_schema.get("$defs", {}):
@@ -158,13 +199,53 @@ def generate_typescript() -> bool:
 
         # Post-process: gen-typescript doesn't support any_of unions,
         # so it falls back to 'string' for union geometry fields.
-        # Patch TrackFeature.geometry to use the proper union type.
+        # Patch geometry fields to use the proper union types.
         content = content.replace(
             "/** Track path as LineString (simple) or MultiLineString (compound) */\n"
             "    geometry: string,",
             "/** Track path as LineString (simple) or MultiLineString (compound) */\n"
             "    geometry: GeoJSONLineString | GeoJSONMultiLineString,",
         )
+        content = content.replace(
+            "/** Location (Point) or reference point set (MultiPoint) */\n    geometry: string,",
+            "/** Location (Point) or reference point set (MultiPoint) */\n"
+            "    geometry: GeoJSONPoint | GeoJSONMultiPoint,",
+        )
+
+        # Post-process: Fix coordinate types for nested geometries.
+        # gen-typescript emits `coordinates: number[]` for all geometries,
+        # but GeoJSON coordinate nesting varies by geometry type.
+        _coordinate_type_fixes = {
+            # Point: [lon, lat] → number[] (already correct)
+            # LineString: [[lon, lat], ...] → number[][]
+            "GeoJSONLineString": ("number[]", "number[][]"),
+            # Polygon: [[[lon, lat], ...], ...] → number[][][]
+            "GeoJSONPolygon": ("number[]", "number[][][]"),
+            # MultiPoint: [[lon, lat], ...] → number[][]
+            "GeoJSONMultiPoint": ("number[]", "number[][]"),
+            # MultiLineString: [[[lon, lat], ...], ...] → number[][][]
+            "GeoJSONMultiLineString": ("number[]", "number[][][]"),
+            # MultiPolygon: [[[[lon, lat], ...], ...], ...] → number[][][][]
+            "GeoJSONMultiPolygon": ("number[]", "number[][][][]"),
+        }
+        for iface_name, (old_type, new_type) in _coordinate_type_fixes.items():
+            # Match within the specific interface block to avoid false replacements
+            # Pattern: inside the interface, replace `coordinates: number[]` with correct type
+            old_sig = f"export interface {iface_name}"
+            if old_sig in content:
+                # Find the interface block and fix the coordinates type within it
+                idx = content.index(old_sig)
+                # Find the closing brace of the interface
+                brace_idx = content.index("}", idx)
+                block = content[idx:brace_idx]
+                fixed_block = block.replace(
+                    f"coordinates?: {old_type}",
+                    f"coordinates?: {new_type}",
+                ).replace(
+                    f"coordinates: {old_type}",
+                    f"coordinates: {new_type}",
+                )
+                content = content[:idx] + fixed_block + content[brace_idx:]
 
         output_file.write_text(content)
         print(f"  [OK] Generated: {output_file}")
@@ -200,7 +281,7 @@ def validate_fixtures() -> bool:
     return True
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Generate derived schemas from LinkML master schema"
     )

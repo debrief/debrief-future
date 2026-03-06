@@ -15,7 +15,7 @@
  * Feature: 073-undo-redo-split (runtime verification)
  */
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef, createElement } from 'react';
 import type { Feature, FeatureCollection } from 'geojson';
 import {
   CatalogOverview,
@@ -29,8 +29,13 @@ import {
   ChartRenderer,
   transformDataset,
   createDrawnFeature,
+  getPaletteStyleOverrides,
+  PanelWorkspace,
+  PanelContextProvider,
+  createDefaultRegistry,
+  PANEL_CHART
 } from '@debrief/components';
-import type { DatasetEnvelope, DrawingMode } from '@debrief/components';
+import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance } from '@debrief/components';
 import type {
   CatalogOverviewItem,
   ToolsPanelItem,
@@ -40,6 +45,13 @@ import type {
   PresentationMode,
   ViewMode,
   LogPanelMessage,
+  PanelContextValue,
+  PanelComponents,
+  ChartContextProps,
+  ChartTabData,
+  PanelWorkspaceElement,
+  ResultArtifactType,
+  ParameterSchemaEntry,
 } from '@debrief/components';
 import type { LogFilterState } from '@debrief/components';
 import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
@@ -48,6 +60,7 @@ import {
   resetSessionStore,
   createTimeInstant,
   type DisplayMode as StoreDisplayMode,
+  type GeoJSONFeature,
 } from '@debrief/session-state';
 import type { DisplayMode as ComponentDisplayMode } from '@debrief/components';
 
@@ -59,7 +72,8 @@ const toStoreMode = (m: string): StoreDisplayMode =>
   m === 'trail' ? 'snailTrail' : 'normal';
 import { useSessionStore } from './hooks/useSessionStore';
 import { stacService } from './mocks/stacService';
-import { calcService, moveShapeFeatures } from './mocks/calcService';
+import { calcService } from './mocks/calcService';
+import { executeTool, isMutationTool } from './services/toolService';
 import type { ToolResult } from './mocks/calcService';
 import { mockFsAdapter } from './mocks/fsAdapter';
 
@@ -67,15 +81,14 @@ import { mockFsAdapter } from './mocks/fsAdapter';
 declare global {
   interface Window {
     __sessionStore: ReturnType<typeof getSessionStore>;
+    __currentPlotFeatures: Feature[];
   }
 }
 window.__sessionStore = getSessionStore();
+window.__currentPlotFeatures = [];
 
 /** Current view state */
 type View = 'welcome' | 'analysis';
-
-/** Sidebar tab */
-type SidebarTab = 'activity' | 'log';
 
 /** State for the currently loaded plot */
 interface PlotState {
@@ -84,12 +97,41 @@ interface PlotState {
   features: FeatureCollection;
 }
 
-/** An open chart tab in the bottom panel */
-interface ChartTab {
+/** An open result tab in the results panel */
+interface ResultTab {
   id: string;
   title: string;
   path: string;
-  dataset: DatasetEnvelope;
+  artifactType: ResultArtifactType;
+  /** Dataset envelope for chart rendering (artifactType === 'dataset') */
+  dataset?: DatasetEnvelope;
+  /** Base64 data URI for image display (artifactType === 'image') */
+  imageDataUri?: string;
+  /** File metadata for fallback display (artifactType === 'other') */
+  fileMeta?: { filename: string; mimeType: string; sizeBytes: number };
+}
+
+/** Image file extensions that should render inline */
+const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.svg', '.bmp', '.webp']);
+
+/** Determine artifact type from file path */
+function getArtifactType(filePath: string): ResultArtifactType {
+  const ext = filePath.toLowerCase().replace(/^.*(\.[^.]+)$/, '$1');
+  if (filePath.endsWith('.dataset.json') || ext === '.json') return 'dataset';
+  if (IMAGE_EXTENSIONS.has(ext)) return 'image';
+  return 'other';
+}
+
+/** MIME type lookup by extension */
+function getMimeType(filePath: string): string {
+  const ext = filePath.toLowerCase().replace(/^.*(\.[^.]+)$/, '$1');
+  const mimeMap: Record<string, string> = {
+    '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.svg': 'image/svg+xml',
+    '.bmp': 'image/bmp', '.webp': 'image/webp', '.pdf': 'application/pdf',
+    '.csv': 'text/csv', '.txt': 'text/plain',
+  };
+  return mimeMap[ext] ?? 'application/octet-stream';
 }
 
 /**
@@ -103,19 +145,14 @@ export default function App() {
   // View state (local — not part of session-state)
   const [view, setView] = useState<View>('welcome');
   const [currentPlot, setCurrentPlot] = useState<PlotState | null>(null);
-  const [resultLayers, setResultLayers] = useState<Feature[]>([]);
+  // Result layers now live in session-state store (#109)
+  const resultLayers = state.resultLayers;
   /** Maps activityId → original feature snapshots so revert can restore them */
   const [, setActivitySnapshots] = useState<
     Record<string, Feature[]>
   >({});
   const [toolMessage, setToolMessage] = useState<string | null>(null);
   const [treeRefreshKey, setTreeRefreshKey] = useState(0);
-
-  // Sidebar tab
-  const [sidebarTab, setSidebarTab] = useState<SidebarTab>('activity');
-
-  // STAC Catalog section collapsed state (collapsed by default to reduce sidebar clutter)
-  const [fileTreeCollapsed, setFileTreeCollapsed] = useState(true);
 
   // Log panel state
   const [logEntries, setLogEntries] = useState<TimelineEntry[]>([]);
@@ -128,12 +165,13 @@ export default function App() {
   // Counter for generating unique activity IDs
   const [activityCounter, setActivityCounter] = useState(0);
 
-  // Chart panel state — tabs opened by clicking dataset files in the STAC tree
-  const [chartTabs, setChartTabs] = useState<ChartTab[]>([]);
-  const [activeChartTabId, setActiveChartTabId] = useState<string | null>(null);
+  // Results panel state — tabs opened by clicking files in the STAC tree
+  const [resultTabs, setResultTabs] = useState<ResultTab[]>([]);
+  const [activeResultTabId, setActiveResultTabId] = useState<string | null>(null);
+  const [layoutResetCount, setLayoutResetCount] = useState(0);
 
-  // Drawing state (Feature: 094)
-  const [drawingMode, setDrawingMode] = useState<DrawingMode>(null);
+  // Drawing state (Feature: 094) — drawingMode wired to session-state store (#108)
+  const drawingMode = state.drawingMode;
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
 
   // Catalog items
@@ -161,6 +199,11 @@ export default function App() {
     }
     return names;
   }, [allFeatures]);
+
+  // Expose plot features on window for Playwright test introspection
+  useEffect(() => {
+    window.__currentPlotFeatures = plotFeatures as Feature[];
+  }, [plotFeatures]);
 
   // Calculate time extent from features
   const timeExtent = useMemo<[number, number] | null>(() => {
@@ -200,7 +243,15 @@ export default function App() {
 
       if (e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
-        store.getState().undo();
+        // Tool-level undo (#110): if last tool execution is recorded,
+        // remove its result layers instead of performing UI-state undo
+        const s = store.getState();
+        if (s.lastToolExecution) {
+          s.removeResultLayers(s.lastToolExecution.resultLayerIds);
+          s.clearLastToolExecution();
+        } else {
+          s.undo();
+        }
       } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
         e.preventDefault();
         store.getState().redo();
@@ -244,12 +295,11 @@ export default function App() {
         title: item?.properties.title ?? itemPath,
         features: plotData,
       });
-      setResultLayers([]);
+      freshStore.getState().clearResultLayers();
       setDrawnFeatures([]);
-      setDrawingMode(null);
+      freshStore.getState().setDrawingMode(null);
       setToolMessage(null);
       setLogEntries([]);
-      setSidebarTab('activity');
       setView('analysis');
     } catch (error) {
       console.error('Failed to load plot:', error);
@@ -260,10 +310,9 @@ export default function App() {
   const handleBackToCatalog = useCallback(() => {
     setView('welcome');
     setCurrentPlot(null);
-    setResultLayers([]);
+    store.getState().clearResultLayers();
     setToolMessage(null);
     setLogEntries([]);
-    setSidebarTab('activity');
     store.getState().clearSelection();
   }, [store]);
 
@@ -297,11 +346,7 @@ export default function App() {
       store.getState().clearSelection();
     } else if (message.type === 'action:invoke') {
       const { actionType, activityId } = message.payload;
-      if (actionType === 'tune') {
-        // Tune is handled inline via onTuneRequest — prompt user
-        setLogNotification('Click a tunable parameter value to edit it.');
-        setTimeout(() => setLogNotification(null), 3000);
-      } else if (actionType === 'revertTo') {
+      if (actionType === 'revertTo') {
         // Remove all entries after the target and restore their original features
         setLogEntries((prev: TimelineEntry[]) => {
           const idx = prev.findIndex((e: TimelineEntry) => e.activityId === activityId);
@@ -332,32 +377,64 @@ export default function App() {
     }
   }, [store, restoreSnapshots]);
 
-  // Phase 6: Handle tune request from inline parameter click
+  // Phase 6: Debounce timer for slider tune requests.
+  // Without this, every pixel of slider drag fires a full tool re-execution.
+  const tuneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Phase 6: Handle tune request from slider/edit face or display face click.
+  // Display face click passes the current value (needs prompt for new value).
+  // Edit face slider passes the already-new value (use directly, debounced).
   const handleTuneRequest = useCallback(
-    (activityId: string, parameter: string, currentValue: unknown) => {
-      // Prompt for new value (simple approach for web-shell demo)
-      const input = window.prompt(
-        `Tune "${parameter}" (current: ${String(currentValue)}):`,
-        String(currentValue)
-      );
-      if (input === null) return; // cancelled
+    (activityId: string, parameter: string, value: unknown) => {
+      const entry = logEntries.find((e: TimelineEntry) => e.activityId === activityId);
+      const currentValue = entry?.parameters[parameter]?.value;
 
-      // Coerce to number if the current value is numeric
-      const newValue = typeof currentValue === 'number' ? Number(input) : input;
+      // Ignore display-face clicks (value unchanged) — tuning is done via
+      // the edit-face slider only.
+      if (value === currentValue) return;
 
+      // Edit face slider — debounce so rapid drags don't re-execute per pixel
+      if (tuneTimerRef.current) clearTimeout(tuneTimerRef.current);
+      tuneTimerRef.current = setTimeout(() => {
+        tuneTimerRef.current = null;
+        applyTune(activityId, parameter, value);
+      }, 300);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [logEntries]
+  );
+
+  // Actual tune logic, called after debounce settles (slider) or immediately (prompt).
+  const applyTune = useCallback(
+    (activityId: string, parameter: string, newValue: unknown) => {
       // Find the entry being tuned
       const entry = logEntries.find((e: TimelineEntry) => e.activityId === activityId);
 
+      // Extract raw parameter values from a log entry's ParameterValue wrappers
+      const unwrapParams = (params: Record<string, { value: unknown }>): Record<string, unknown> => {
+        const result: Record<string, unknown> = {};
+        for (const [key, param] of Object.entries(params)) {
+          if (param && typeof param === 'object' && 'value' in param) {
+            result[key] = param.value;
+          } else {
+            result[key] = param;
+          }
+        }
+        return result;
+      };
+
+      // Track updated inputState for subsequent entries replayed during propagation
+      const updatedInputStates = new Map<string, Array<{ featureId: string; geometry: unknown; properties: Record<string, unknown> }>>();
+
       // Restore features from inputState and re-execute for mutation tools
-      if (entry?.inputState && entry.inputState.length > 0 && entry.toolName === 'move-shape') {
-        // Build restored features from inputState (pre-tool geometry)
+      if (entry?.inputState && entry.inputState.length > 0 && isMutationTool(entry.toolName)) {
         setCurrentPlot(plot => {
           if (!plot) return plot;
           const restoredMap = new Map(
             entry.inputState!.map(is => [is.featureId, is])
           );
-          // Restore original geometry in the plot
-          const restoredFeatures = plot.features.features.map(f => {
+          // Restore original geometry in the plot (pre-tuned-entry state)
+          let currentFeatures = plot.features.features.map(f => {
             const saved = restoredMap.get(String(f.id));
             if (!saved) return f;
             return {
@@ -370,52 +447,102 @@ export default function App() {
             };
           });
 
-          // Collect the restored features that the tool will operate on
-          const featuresToMove = restoredFeatures.filter(f =>
+          // Collect the restored features that the tuned tool will operate on
+          const featuresToMove = currentFeatures.filter(f =>
             restoredMap.has(String(f.id))
           ) as Feature[];
 
-          // Read the updated parameters (apply the new value)
-          const params = { ...entry.parameters };
-          if (params[parameter]) {
-            params[parameter] = { ...params[parameter], value: newValue };
-          }
-          const distNm = Number((params.distance_nm?.value) ?? 5);
-          const dirDeg = Number((params.direction_deg?.value) ?? 45);
+          // Build parameters with the tuned value applied
+          const tunedParams = unwrapParams(entry.parameters as Record<string, { value: unknown }>);
+          tunedParams[parameter] = newValue;
 
-          // Re-execute the tool from original position
-          const moved = moveShapeFeatures(featuresToMove, distNm, dirDeg);
+          // Re-execute the tuned entry from the restored geometry
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const response = executeTool(entry.toolName, featuresToMove as any, tunedParams);
+          const fc = JSON.parse(response.content[0]?.resource?.text ?? '{"features":[]}');
+          const moved = (fc.features ?? []) as Feature[];
           const movedMap = new Map(moved.map(m => [String(m.id), m]));
 
-          // Apply the re-executed result
-          const finalFeatures = restoredFeatures.map(f => {
+          // Apply the tuned entry's result
+          currentFeatures = currentFeatures.map(f => {
             const m = movedMap.get(String(f.id));
             return m ?? f;
           });
 
+          // Propagate: replay all subsequent mutation entries on affected features.
+          // logEntries is stored newest-first, so entries at indices before tunedIdx
+          // are chronologically after the tuned entry. Iterate from tunedIdx-1 → 0
+          // to replay in chronological order.
+          const tunedIdx = logEntries.findIndex((e: TimelineEntry) => e.activityId === activityId);
+          if (tunedIdx > 0) {
+            for (let i = tunedIdx - 1; i >= 0; i--) {
+              const nextEntry = logEntries[i]!;
+              if (!isMutationTool(nextEntry.toolName)) continue;
+              if (!nextEntry.inputState || nextEntry.inputState.length === 0) continue;
+
+              // Only replay if this entry affects features that were modified
+              const affectedIds = new Set(nextEntry.inputState.map(is => is.featureId));
+              const featuresToReplay = currentFeatures.filter(f =>
+                affectedIds.has(String(f.id))
+              ) as Feature[];
+              if (featuresToReplay.length === 0) continue;
+
+              // Capture pre-execution state as updated inputState for this entry
+              updatedInputStates.set(nextEntry.activityId, featuresToReplay.map(f => {
+                const props = (f.properties ?? {}) as Record<string, unknown>;
+                const { provenance: _p, ...restProps } = props;
+                return {
+                  featureId: String(f.id),
+                  geometry: JSON.parse(JSON.stringify(f.geometry)),
+                  properties: JSON.parse(JSON.stringify(restProps)),
+                };
+              }));
+
+              // Re-execute subsequent entry with its original parameters
+              const subParams = unwrapParams(nextEntry.parameters as Record<string, { value: unknown }>);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const subResponse = executeTool(nextEntry.toolName, featuresToReplay as any, subParams);
+              const subFc = JSON.parse(subResponse.content[0]?.resource?.text ?? '{"features":[]}');
+              const subMoved = (subFc.features ?? []) as Feature[];
+              const subMovedMap = new Map(subMoved.map(m => [String(m.id), m]));
+
+              currentFeatures = currentFeatures.map(f => {
+                const m = subMovedMap.get(String(f.id));
+                return m ?? f;
+              });
+            }
+          }
+
           return {
             ...plot,
-            features: { ...plot.features, features: finalFeatures },
+            features: { ...plot.features, features: currentFeatures },
           };
         });
       }
 
-      // Update the log entry parameters and tune annotation
+      // Update the tuned entry's parameters/annotation and inputState for replayed entries
       setLogEntries((prev: TimelineEntry[]) =>
         prev.map((e: TimelineEntry) => {
-          if (e.activityId !== activityId) return e;
-          const updatedParams = { ...e.parameters };
-          if (updatedParams[parameter]) {
-            updatedParams[parameter] = {
-              ...updatedParams[parameter],
-              value: newValue,
+          if (e.activityId === activityId) {
+            const updatedParams = { ...e.parameters };
+            if (updatedParams[parameter]) {
+              updatedParams[parameter] = {
+                ...updatedParams[parameter],
+                value: newValue,
+              };
+            }
+            return {
+              ...e,
+              parameters: updatedParams,
+              tuneAnnotation: { parameter, previousValue: e.parameters[parameter]?.value, newValue },
             };
           }
-          return {
-            ...e,
-            parameters: updatedParams,
-            tuneAnnotation: { parameter, previousValue: currentValue, newValue },
-          };
+          // Update inputState for subsequent entries that were replayed
+          const newState = updatedInputStates.get(e.activityId);
+          if (newState) {
+            return { ...e, inputState: newState };
+          }
+          return e;
         })
       );
       setLogNotification(`Tuned "${parameter}" to ${String(newValue)}.`);
@@ -434,6 +561,59 @@ export default function App() {
     setLogNotification('Operation restored.');
     setTimeout(() => setLogNotification(null), 3000);
   }, []);
+
+  // Feature 113: Flip-card schema request — returns mock schema for demo
+  const handleSchemaRequest = useCallback(
+    (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
+      // Find the first entry with this toolName to derive schema from its parameters
+      const entry = logEntries.find((e: TimelineEntry) => e.toolName === toolId);
+      const schema: ParameterSchemaEntry[] = [];
+      if (entry) {
+        for (const [name, param] of Object.entries(entry.parameters)) {
+          const valueType = typeof param.value;
+          schema.push({
+            name,
+            type: valueType === 'number' ? 'number' : valueType === 'boolean' ? 'boolean' : 'string',
+            description: null,
+            tunable: param.tunable !== false,
+            defaultValue: param.default ? param.value : null,
+            minimum: valueType === 'number' ? 0 : null,
+            maximum: valueType === 'number' ? Number(param.value) * 3 : null,
+            step: valueType === 'number' ? 1 : null,
+            choices: null,
+            paramType: null,
+          });
+        }
+      }
+      // Simulate async — resolve immediately
+      return Promise.resolve(schema);
+    },
+    [logEntries]
+  );
+
+  // Feature 113: Flip-card disable toggle
+  const handleDisableToggle = useCallback(
+    (activityId: string, disabled: boolean) => {
+      setLogEntries((prev: TimelineEntry[]) =>
+        prev.map((e: TimelineEntry) =>
+          e.activityId === activityId ? { ...e, disabled } : e
+        )
+      );
+    },
+    []
+  );
+
+  // Feature 113: Flip-card rationale update
+  const handleRationaleUpdate = useCallback(
+    (activityId: string, rationale: string) => {
+      setLogEntries((prev: TimelineEntry[]) =>
+        prev.map((e: TimelineEntry) =>
+          e.activityId === activityId ? { ...e, rationale } : e
+        )
+      );
+    },
+    []
+  );
 
   // Handle map feature selection (goes through session-state)
   const handleMapSelect = useCallback((featureId: string, event: React.MouseEvent) => {
@@ -456,99 +636,182 @@ export default function App() {
     store.getState().clearSelection();
   }, [store]);
 
-  // Handle shape drawn on map (Feature: 094)
+  // Handle drawing mode change — write to session-state store (#108)
+  const handleDrawingModeChange = useCallback((mode: DrawingMode) => {
+    store.getState().setDrawingMode(mode);
+  }, [store]);
+
+  // Handle shape drawn on map (Feature: 094, 096)
   const handleShapeCreated = useCallback((geojson: GeoJSON.Feature, mode: DrawingMode) => {
     const defaultName = mode === 'point' ? 'Drawn Point' : 'Drawn Rectangle';
     const promptLabel = mode === 'point' ? 'Name this point:' : 'Name this shape:';
     const name = window.prompt(promptLabel, defaultName);
     if (name === null) return; // user cancelled — discard the shape
 
-    const opts = mode === 'point' ? { name } : { label: name };
+    // FR-096: Get palette style overrides for sequential colour assignment
+    const paletteIndex = store.getState().drawingPaletteIndex;
+    const paletteOverrides = getPaletteStyleOverrides(mode, paletteIndex);
+
+    // FR-012: Build provenance metadata
+    const provenance: DrawnFeatureProvenance = {
+      source: 'user-drawn',
+      timestamp: new Date().toISOString(),
+      operator: 'unknown',
+      action: 'created',
+    };
+
+    const opts = mode === 'point'
+      ? { name, ...paletteOverrides, provenance }
+      : { label: name, ...paletteOverrides, provenance };
     const feature = createDrawnFeature(geojson, mode, opts);
     if (feature) {
       setDrawnFeatures(prev => [...prev, feature as DebriefFeature]);
       store.getState().setSelection([feature.id]);
-    }
-  }, [store]);
+      store.getState().incrementDrawingPaletteIndex();
 
-  // Handle file selection from STAC tree — open dataset files as chart tabs
+      // Record a log entry for the drawing action
+      const nextId = activityCounter + 1;
+      setActivityCounter(nextId);
+      const entry: TimelineEntry = {
+        activityId: `act-${String(nextId).padStart(3, '0')}`,
+        timestamp: new Date().toISOString(),
+        toolName: `draw-${mode ?? 'shape'}`,
+        toolVersion: '1.0.0',
+        parameters: {},
+        usedFeatureIds: [],
+        generatedFeatureIds: [feature.id],
+        executionDuration: 'PT0S',
+        generatedResultId: feature.id,
+        operationCategory: 'property-edit',
+      };
+      setLogEntries(prev => [entry, ...prev]);
+    }
+  }, [store, activityCounter]);
+
+  // Handle file selection from STAC tree — open result files as tabs
   const handleFileSelect = useCallback(async (filePath: string) => {
-    // Only handle .dataset.json files
-    if (!filePath.endsWith('.dataset.json')) return;
+    const artifactType = getArtifactType(filePath);
+    const filename = filePath.replace(/^.*\//, '');
+
+    // Skip item.json (STAC metadata, not a result)
+    if (filename === 'item.json' || filename === 'catalog.json') return;
 
     // Already open? Just activate the tab
-    const existing = chartTabs.find(t => t.path === filePath);
+    const existing = resultTabs.find(t => t.path === filePath);
     if (existing) {
-      setActiveChartTabId(existing.id);
+      setActiveResultTabId(existing.id);
       return;
     }
 
     try {
-      const content = await mockFsAdapter.readFile(filePath);
-      const parsed = JSON.parse(content) as DatasetEnvelope;
-
-      // Quick sanity check — must have type + title
-      if (!parsed.type || !parsed.title) return;
-
-      const tab: ChartTab = {
-        id: filePath,
-        title: parsed.title,
-        path: filePath,
-        dataset: parsed,
-      };
-      setChartTabs(prev => [...prev, tab]);
-      setActiveChartTabId(tab.id);
+      if (artifactType === 'dataset') {
+        const content = await mockFsAdapter.readFile(filePath);
+        const parsed = JSON.parse(content) as DatasetEnvelope;
+        if (!parsed.type || !parsed.title) return;
+        const tab: ResultTab = {
+          id: filePath, title: parsed.title, path: filePath,
+          artifactType: 'dataset', dataset: parsed,
+        };
+        setResultTabs(prev => [...prev, tab]);
+        setActiveResultTabId(tab.id);
+      } else if (artifactType === 'image') {
+        // Read image content — in the mock FS it's stored as text (SVG etc.)
+        const content = await mockFsAdapter.readFile(filePath);
+        const mime = getMimeType(filePath);
+        const dataUri = mime === 'image/svg+xml'
+          ? `data:${mime};base64,${btoa(content)}`
+          : `data:${mime};base64,${content}`;
+        const tab: ResultTab = {
+          id: filePath, title: filename, path: filePath,
+          artifactType: 'image', imageDataUri: dataUri,
+        };
+        setResultTabs(prev => [...prev, tab]);
+        setActiveResultTabId(tab.id);
+      } else {
+        // Fallback: show file metadata
+        const stats = await mockFsAdapter.stat(filePath);
+        const tab: ResultTab = {
+          id: filePath, title: filename, path: filePath,
+          artifactType: 'other',
+          fileMeta: { filename, mimeType: getMimeType(filePath), sizeBytes: stats.size },
+        };
+        setResultTabs(prev => [...prev, tab]);
+        setActiveResultTabId(tab.id);
+      }
     } catch {
-      // Not a valid dataset file — ignore silently
+      // Cannot read file — ignore silently
     }
-  }, [chartTabs]);
+  }, [resultTabs]);
 
-  // Close a chart tab
-  const handleCloseChartTab = useCallback((tabId: string) => {
-    setChartTabs(prev => {
+  // Close a result tab
+  const handleCloseResultTab = useCallback((tabId: string) => {
+    setResultTabs(prev => {
       const next = prev.filter(t => t.id !== tabId);
-      // If closing the active tab, switch to the last remaining or null
-      if (tabId === activeChartTabId) {
-        setActiveChartTabId(next.length > 0 ? next[next.length - 1].id : null);
+      if (tabId === activeResultTabId) {
+        setActiveResultTabId(next.length > 0 ? next[next.length - 1].id : null);
       }
       return next;
     });
-  }, [activeChartTabId]);
+  }, [activeResultTabId]);
 
-  // Active chart tab data
-  const activeChartTab = useMemo(
-    () => chartTabs.find(t => t.id === activeChartTabId) ?? null,
-    [chartTabs, activeChartTabId]
+  // Active result tab
+  const activeResultTab = useMemo(
+    () => resultTabs.find(t => t.id === activeResultTabId) ?? null,
+    [resultTabs, activeResultTabId]
   );
 
-  // Transform active chart dataset to Vega-Lite spec
+  // Transform active dataset to Vega-Lite spec (only for dataset tabs)
   const activeChartSpec = useMemo(() => {
-    if (!activeChartTab) return null;
-    const result = transformDataset(activeChartTab.dataset);
+    if (!activeResultTab || activeResultTab.artifactType !== 'dataset' || !activeResultTab.dataset) return null;
+    const result = transformDataset(activeResultTab.dataset);
     return result.ok ? result.spec : null;
-  }, [activeChartTab]);
+  }, [activeResultTab]);
 
   // Handle tool execution — persist result to STAC assets and record a log entry
   const handleRunTool = useCallback((toolId: string, params?: Record<string, unknown>) => {
+    // Determine if this is a mutation tool BEFORE execution
+    const replacesInPlace = isMutationTool(toolId);
+
+    // Capture pre-tool geometry for mutation tools BEFORE execution.
+    // executeTool() mutates feature geometry and properties in-place,
+    // so we must snapshot the originals before the call.
+    const inputState = replacesInPlace && selectedFeatures.length > 0
+      ? selectedFeatures.map(f => {
+          const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
+          const { provenance: _p, ...restProps } = props;
+          return {
+            featureId: String(f.id),
+            geometry: JSON.parse(JSON.stringify(f.geometry)),
+            properties: JSON.parse(JSON.stringify(restProps)),
+          };
+        })
+      : null;
+
+    // Also snapshot full originals for revert before execution
+    const originalSnapshots = replacesInPlace && selectedFeatures.length > 0
+      ? selectedFeatures.map(f => JSON.parse(JSON.stringify(f)) as Feature)
+      : null;
+
     const result: ToolResult = calcService.runTool(toolId, selectedFeatures as Feature[], params);
     setToolMessage(result.message);
 
-    // Tools that transform features in-place (e.g. move-shape): replace in currentPlot
-    const replacesInPlace = toolId === 'move-shape';
-
-    if (result.resultLayer && replacesInPlace) {
-      // Replace the original feature in the plot with the moved version
-      const movedId = String(result.resultLayer.id);
-      setCurrentPlot(plot => {
-        if (!plot) return plot;
-        const updatedFeatures = plot.features.features.map(f =>
-          String(f.id) === movedId ? result.resultLayer! : f
-        );
-        return {
-          ...plot,
-          features: { ...plot.features, features: updatedFeatures },
-        };
-      });
+    if (replacesInPlace) {
+      // Replace the original features in the plot with the moved versions
+      const movedFeatures = result.resultLayers ?? (result.resultLayer ? [result.resultLayer] : []);
+      if (movedFeatures.length > 0) {
+        const movedMap = new Map(movedFeatures.map(m => [String(m.id), m]));
+        setCurrentPlot(plot => {
+          if (!plot) return plot;
+          const updatedFeatures = plot.features.features.map(f => {
+            const moved = movedMap.get(String(f.id));
+            return moved ?? f;
+          });
+          return {
+            ...plot,
+            features: { ...plot.features, features: updatedFeatures },
+          };
+        });
+      }
     }
 
     // Collect all result layers (singular or plural) for additive tools
@@ -560,7 +823,17 @@ export default function App() {
         ];
 
     if (allResultLayers.length > 0) {
-      setResultLayers(prev => [...prev, ...allResultLayers]);
+      store.getState().addResultLayers(allResultLayers as GeoJSONFeature[]);
+
+      // Record last tool execution for single-step undo (#110)
+      const resultIds = allResultLayers.map((layer, i) =>
+        String((layer as unknown as Record<string, unknown>).id ?? (layer.properties as Record<string, unknown> | null)?.id ?? `result-${activityCounter + 1}-${i}`)
+      );
+      store.getState().setLastToolExecution({
+        toolId,
+        sourceFeatureIds: selectedFeatures.map(f => String(f.id)),
+        resultLayerIds: resultIds,
+      });
 
       // Persist results as STAC assets in the current item's assets/ directory
       if (currentPlot) {
@@ -580,6 +853,18 @@ export default function App() {
       }
     }
 
+    // Write dataset results to STAC assets and auto-open in Results panel
+    if (result.datasets && result.datasets.length > 0 && currentPlot) {
+      const itemDir = `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`;
+      for (const ds of result.datasets) {
+        const assetPath = `${itemDir}/assets/${ds.filename}`;
+        mockFsAdapter.writeFile(assetPath, JSON.stringify(ds.envelope, null, 2));
+        // Auto-open the dataset as a result tab
+        handleFileSelect(assetPath);
+      }
+      setTreeRefreshKey(k => k + 1);
+    }
+
     // Record a log entry
     const nextId = activityCounter + 1;
     setActivityCounter(nextId);
@@ -592,19 +877,6 @@ export default function App() {
       : [];
 
     const activityId = `act-${String(nextId).padStart(3, '0')}`;
-
-    // Capture pre-tool geometry for mutation tools (enables correct tune replay)
-    const inputState = replacesInPlace && selectedFeatures.length > 0
-      ? selectedFeatures.map(f => {
-          const props = (f.properties ?? {}) as unknown as Record<string, unknown>;
-          const { provenance: _p, ...restProps } = props;
-          return {
-            featureId: String(f.id),
-            geometry: JSON.parse(JSON.stringify(f.geometry)),
-            properties: JSON.parse(JSON.stringify(restProps)),
-          };
-        })
-      : null;
 
     const entry: TimelineEntry = {
       activityId,
@@ -620,19 +892,16 @@ export default function App() {
       inputState,
     };
 
-    // Snapshot originals so revert can restore them
-    if (replacesInPlace && selectedFeatures.length > 0) {
-      const originals = selectedFeatures.map(f =>
-        JSON.parse(JSON.stringify(f)) as Feature
-      );
+    // Store pre-tool snapshots for revert (captured before execution above)
+    if (originalSnapshots) {
       setActivitySnapshots(prev => ({
         ...prev,
-        [activityId]: originals,
+        [activityId]: originalSnapshots,
       }));
     }
 
     setLogEntries(prev => [entry, ...prev]);
-  }, [selectedFeatures, activityCounter, currentPlot]);
+  }, [selectedFeatures, activityCounter, currentPlot, handleFileSelect]);
 
   // Handle ActivityPanel messages
   const handleActivityMessage = useCallback((message: ActivityPanelMessage) => {
@@ -655,10 +924,199 @@ export default function App() {
       case 'layer:select':
         store.getState().setSelection(message.payload.featureIds);
         break;
+      case 'layer:format': {
+        const { featureIds, property, isPointOverride, positionIndex } = message.payload;
+        // Coerce boolean string values ('true'/'false') to actual booleans
+        const rawValue = message.payload.value;
+        const value = rawValue === 'true' ? true : rawValue === 'false' ? false : rawValue;
+        const targetIds = new Set(featureIds);
+
+        // Helper: apply a style property to a feature-level style object
+        const applyStyleProperty = (style: Record<string, unknown>, prop: string, val: unknown): Record<string, unknown> => {
+          const result = { ...style };
+          const dotIndex = prop.indexOf('.');
+          if (dotIndex > 0) {
+            const category = prop.slice(0, dotIndex);
+            const field = prop.slice(dotIndex + 1);
+            const oldCategory = (result[category] ?? {}) as Record<string, unknown>;
+            result[category] = { ...oldCategory, [field]: val };
+          } else {
+            result[prop] = val;
+          }
+          return result;
+        };
+
+        // Update features in the current plot
+        setCurrentPlot(plot => {
+          if (!plot) return plot;
+          const updatedFeatures = plot.features.features.map(f => {
+            if (!targetIds.has(String(f.id))) return f;
+
+            const props = (f.properties ?? {}) as Record<string, unknown>;
+
+            // Per-position override: write to position_style_overrides[index]
+            if (isPointOverride && positionIndex !== undefined) {
+              const overrides = { ...(props.position_style_overrides ?? {}) as Record<string, Record<string, unknown>> };
+              const key = String(positionIndex);
+              overrides[key] = { ...(overrides[key] ?? {}), [property]: value };
+              return { ...f, properties: { ...props, position_style_overrides: overrides } };
+            }
+
+            // Feature-level style change
+            const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+            const newStyle = applyStyleProperty(oldStyle, property, value);
+            return { ...f, properties: { ...props, style: newStyle } };
+          });
+
+          return {
+            ...plot,
+            features: { ...plot.features, features: updatedFeatures },
+          };
+        });
+
+        // Also update drawn features if targeted (drawn features don't have positions)
+        if (!isPointOverride) {
+          setDrawnFeatures(prev =>
+            prev.map(f => {
+              if (!targetIds.has(f.id)) return f;
+
+              const props = f.properties as unknown as Record<string, unknown>;
+              const oldStyle = (props.style ?? {}) as Record<string, unknown>;
+              const newStyle = applyStyleProperty(oldStyle, property, value);
+
+              return {
+                ...f,
+                properties: { ...props, style: newStyle },
+              } as unknown as DebriefFeature;
+            }),
+          );
+        }
+        break;
+      }
       default:
         break;
     }
   }, [playback, store, handleRunTool]);
+
+  // --- Panel workspace infrastructure ---
+  // Create panel registry once (stable reference)
+  const panelRegistry = useMemo(() => createDefaultRegistry(), []);
+
+  // Panel component references (stable across renders)
+  const panelComponents = useMemo<PanelComponents>(() => ({
+    ActivityPanel,
+    MapView,
+    LogPanel,
+    StacFileTree,
+    ChartRenderer,
+  }), []);
+
+  // Results context for the Chart/Results panel wrapper
+  const chartContextProps = useMemo<ChartContextProps | null>(() => {
+    if (resultTabs.length === 0 && !activeChartSpec) return null;
+    const tabData: ChartTabData[] = resultTabs.map(t => ({
+      id: t.id,
+      title: t.title,
+      artifactType: t.artifactType,
+      imageDataUri: t.imageDataUri,
+      fileMeta: t.fileMeta,
+    }));
+    return {
+      chartSpec: activeChartSpec,
+      chartTabs: tabData,
+      activeChartTabId: activeResultTabId,
+      onChartTabSelect: setActiveResultTabId,
+      onChartTabClose: handleCloseResultTab,
+    };
+  }, [resultTabs, activeChartSpec, activeResultTabId, handleCloseResultTab]);
+
+  // Full context value for all panel wrappers
+  const panelContextValue = useMemo<PanelContextValue>(() => ({
+    components: panelComponents,
+    activityPanelProps: currentPlot ? {
+      timeExtent,
+      currentTime: playback.currentTime,
+      playbackState: playback.playbackState,
+      playbackSpeed: playback.speed,
+      displayMode: toComponentMode(state.displayMode),
+      timeUiState: timeExtent ? 'ready' : 'empty',
+      tools,
+      features: allFeatures,
+      selectedFeatureIds: state.selection.featureIds,
+      onMessage: handleActivityMessage,
+    } : null,
+    mapViewProps: currentPlot ? {
+      features: allFeatures,
+      selectedIds: selectedIds,
+      onSelect: handleMapSelect,
+      onBackgroundClick: handleBackgroundClick,
+      currentTime: playback.currentTime,
+      displayMode: toComponentMode(state.displayMode),
+      drawingMode,
+      onDrawingModeChange: handleDrawingModeChange,
+      onShapeCreated: handleShapeCreated,
+      height: '100%',
+      className: 'web-shell__map',
+    } : null,
+    logPanelProps: currentPlot ? {
+      entries: logEntries,
+      featureNames,
+      presentationMode: logPresentationMode,
+      viewMode: logViewMode,
+      selectedEntryId: logSelectedEntryId,
+      filterState: logFilterState,
+      hasActiveSession: true,
+      plotName: currentPlot?.title ?? null,
+      actionResultMessage: logNotification,
+      onMessage: handleLogMessage,
+      onPresentationModeChange: setLogPresentationMode,
+      onViewModeChange: setLogViewMode,
+      onFilterStateChange: setLogFilterState,
+      onSelectedEntryChange: setLogSelectedEntryId,
+      onTuneRequest: handleTuneRequest,
+      onRestoreRequest: handleRestoreRequest,
+      onSchemaRequest: handleSchemaRequest,
+      onDisableToggle: handleDisableToggle,
+      onRationaleUpdate: handleRationaleUpdate,
+    } : null,
+    stacFileTreeProps: currentPlot ? {
+      fs: mockFsAdapter,
+      rootPath: '/local-store',
+      currentItemPath: currentPlot
+        ? `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}`
+        : undefined,
+      onFileSelect: handleFileSelect,
+      refreshKey: treeRefreshKey,
+      className: 'web-shell__file-tree',
+    } : null,
+    chartProps: chartContextProps,
+  }), [
+    panelComponents, currentPlot, timeExtent, playback.currentTime,
+    playback.playbackState, playback.speed, state.displayMode,
+    tools, allFeatures, state.selection.featureIds, handleActivityMessage,
+    selectedIds, handleMapSelect, handleBackgroundClick, drawingMode, handleDrawingModeChange,
+    handleShapeCreated, logEntries, featureNames, logPresentationMode,
+    logViewMode, logSelectedEntryId, logFilterState, logNotification,
+    handleLogMessage, handleTuneRequest, handleRestoreRequest,
+    handleSchemaRequest, handleDisableToggle, handleRationaleUpdate,
+    handleFileSelect, treeRefreshKey, chartContextProps,
+  ]);
+
+  // Context wrapper for the GoldenLayout bridge — wraps each panel in PanelContextProvider
+  const contextWrapper = useCallback(
+    (element: React.ReactElement) =>
+      createElement(PanelContextProvider, { value: panelContextValue }, element),
+    [panelContextValue]
+  );
+
+  // Dynamically add results panel when result data arrives (or after layout reset)
+  useEffect(() => {
+    if (resultTabs.length === 0) return;
+    const el = document.querySelector('[data-testid="panel-workspace"]') as PanelWorkspaceElement | null;
+    if (el?.__addPanel) {
+      el.__addPanel(PANEL_CHART, 'Results');
+    }
+  }, [resultTabs.length > 0, layoutResetCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Render welcome view
   if (view === 'welcome') {
@@ -667,14 +1125,24 @@ export default function App() {
         <header className="web-shell__header">
           <h1 className="web-shell__title">Debrief Web Shell</h1>
           <p className="web-shell__subtitle">STAC Catalog Browser</p>
-          <a
-            className="web-shell__storybook-link"
-            href="https://debrief.github.io/debrief-future/components-storybook/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Component Storybook &rarr;
-          </a>
+          <div className="web-shell__header-links">
+            <a
+              className="web-shell__header-link"
+              href="https://debrief.github.io/debrief-future/components-storybook/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Component Storybook &rarr;
+            </a>
+            <a
+              className="web-shell__header-link"
+              href="https://debrief-future-main-c900643d7496.herokuapp.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              VS Code Preview &rarr;
+            </a>
+          </div>
         </header>
         <main className="web-shell__main">
           <CatalogOverview
@@ -712,6 +1180,18 @@ export default function App() {
           {state.canUndo() ? 'Undo available' : ''}
           {state.canRedo() ? ' | Redo available' : ''}
         </span>
+        <button
+          type="button"
+          className="web-shell__back-button"
+          onClick={() => {
+            const el = document.querySelector('[data-testid="panel-workspace"]') as HTMLElement & { __resetLayout?: () => void };
+            el?.__resetLayout?.();
+          }}
+          data-testid="reset-layout"
+          aria-label="Reset panel layout"
+        >
+          Reset Layout
+        </button>
       </header>
 
       {toolMessage && (
@@ -727,144 +1207,13 @@ export default function App() {
         </div>
       )}
 
-      <main className="web-shell__main web-shell__main--split">
-        <aside className="web-shell__sidebar">
-          <button
-            type="button"
-            className="web-shell__section-header"
-            onClick={() => setFileTreeCollapsed(prev => !prev)}
-            aria-expanded={!fileTreeCollapsed}
-            aria-controls="sidebar-file-tree"
-            data-testid="file-tree-toggle"
-          >
-            <span className={`web-shell__section-chevron ${fileTreeCollapsed ? '' : 'web-shell__section-chevron--expanded'}`}>&#9654;</span>
-            STAC Catalog
-          </button>
-          {!fileTreeCollapsed && (
-            <div id="sidebar-file-tree">
-              <StacFileTree
-                fs={mockFsAdapter}
-                rootPath="/local-store"
-                currentItemPath={currentPlot ? `/local-store/${currentPlot.itemPath.replace('./', '').replace('/item.json', '')}` : undefined}
-                onFileSelect={handleFileSelect}
-                refreshKey={treeRefreshKey}
-                className="web-shell__file-tree"
-              />
-            </div>
-          )}
-          <div className="web-shell__tab-bar" role="tablist">
-            <button
-              type="button"
-              className={`web-shell__tab ${sidebarTab === 'activity' ? 'web-shell__tab--active' : ''}`}
-              role="tab"
-              aria-selected={sidebarTab === 'activity'}
-              aria-controls="sidebar-activity"
-              data-testid="sidebar-tab-activity"
-              onClick={() => setSidebarTab('activity')}
-            >
-              Activity
-            </button>
-            <button
-              type="button"
-              className={`web-shell__tab ${sidebarTab === 'log' ? 'web-shell__tab--active' : ''}`}
-              role="tab"
-              aria-selected={sidebarTab === 'log'}
-              aria-controls="sidebar-log"
-              data-testid="sidebar-tab-log"
-              onClick={() => setSidebarTab('log')}
-            >
-              Log
-            </button>
-          </div>
-
-          <div className="web-shell__tab-content">
-            {sidebarTab === 'activity' ? (
-              <ActivityPanel
-                timeExtent={timeExtent}
-                currentTime={playback.currentTime}
-                playbackState={playback.playbackState}
-                playbackSpeed={playback.speed}
-                displayMode={toComponentMode(state.displayMode)}
-                timeUiState={timeExtent ? 'ready' : 'empty'}
-                tools={tools}
-                features={allFeatures}
-                selectedFeatureIds={state.selection.featureIds}
-                onMessage={handleActivityMessage}
-              />
-            ) : (
-              <LogPanel
-                entries={logEntries}
-                featureNames={featureNames}
-                presentationMode={logPresentationMode}
-                viewMode={logViewMode}
-                selectedEntryId={logSelectedEntryId}
-                filterState={logFilterState}
-                hasActiveSession={true}
-                plotName={currentPlot?.title ?? null}
-                actionResultMessage={logNotification}
-                onMessage={handleLogMessage}
-                onPresentationModeChange={setLogPresentationMode}
-                onViewModeChange={setLogViewMode}
-                onFilterStateChange={setLogFilterState}
-                onSelectedEntryChange={setLogSelectedEntryId}
-                onTuneRequest={handleTuneRequest}
-                onRestoreRequest={handleRestoreRequest}
-              />
-            )}
-          </div>
-        </aside>
-        <section className="web-shell__right-panel">
-          <div className={`web-shell__map-container ${chartTabs.length > 0 ? 'web-shell__map-container--with-panel' : ''}`}>
-            <MapView
-              features={allFeatures}
-              selectedIds={selectedIds}
-              onSelect={handleMapSelect}
-              onBackgroundClick={handleBackgroundClick}
-              currentTime={playback.currentTime}
-              displayMode={toComponentMode(state.displayMode)}
-              drawingMode={drawingMode}
-              onDrawingModeChange={setDrawingMode}
-              onShapeCreated={handleShapeCreated}
-              height="100%"
-              className="web-shell__map"
-            />
-          </div>
-          {chartTabs.length > 0 && (
-            <div className="web-shell__chart-panel" data-testid="chart-panel">
-              <div className="web-shell__chart-tabs" role="tablist">
-                {chartTabs.map(tab => (
-                  <div
-                    key={tab.id}
-                    className={`web-shell__chart-tab ${tab.id === activeChartTabId ? 'web-shell__chart-tab--active' : ''}`}
-                    role="tab"
-                    aria-selected={tab.id === activeChartTabId}
-                    onClick={() => setActiveChartTabId(tab.id)}
-                  >
-                    <span className="web-shell__chart-tab-label">{tab.title}</span>
-                    <button
-                      type="button"
-                      className="web-shell__chart-tab-close"
-                      onClick={(e) => { e.stopPropagation(); handleCloseChartTab(tab.id); }}
-                      aria-label={`Close ${tab.title}`}
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <div className="web-shell__chart-content">
-                {activeChartSpec && (
-                  <ChartRenderer spec={activeChartSpec} className="web-shell__chart" />
-                )}
-                {activeChartTab && !activeChartSpec && (
-                  <div className="web-shell__chart-error">
-                    Unable to render dataset: {activeChartTab.dataset.type}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </section>
+      <main className="web-shell__main">
+        <PanelWorkspace
+          registry={panelRegistry}
+          contextWrapper={contextWrapper}
+          className="web-shell__panel-workspace"
+          onLayoutReset={() => setLayoutResetCount(c => c + 1)}
+        />
       </main>
     </div>
   );

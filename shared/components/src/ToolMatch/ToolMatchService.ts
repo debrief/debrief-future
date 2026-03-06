@@ -73,9 +73,10 @@ export class ToolMatchService {
   /**
    * Checks if a single tool is active for the given selection.
    *
-   * A tool is active when ALL of its requirements are satisfied:
-   * - For each requirement, the selection must have at least `min` features of that kind
-   * - For each requirement with a `max`, the selection must have at most `max` features
+   * A tool is active when ANY of its requirements are satisfied:
+   * - For each requirement, check if the selection has at least `min` features of that kind
+   *   and at most `max` features (if specified)
+   * - The tool is active if at least one requirement is fully satisfied
    * - If the selection has kinds not mentioned in any requirement, those are ignored
    *
    * A tool with no requirements (empty array) is always active.
@@ -92,23 +93,24 @@ export class ToolMatchService {
       return true;
     }
 
-    // Check each requirement
+    // Check if ANY requirement is satisfied (OR semantics)
     for (const req of requirements) {
       const count = selection.get(req.kind) ?? 0;
-
-      // Check minimum requirement
       const min = req.min ?? 0;
+
       if (count < min) {
-        return false;
+        continue;
       }
 
-      // Check maximum requirement (if specified)
       if (req.max !== undefined && req.max !== null && count > req.max) {
-        return false;
+        continue;
       }
+
+      // This requirement is satisfied
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   /**

@@ -85,7 +85,8 @@
       "Bash(python -c:*)",
       "Bash(npx eslint:*)",
       "Bash(node run-playwright.mjs:*)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(npx playwright:*)"
     ]
   }
 }

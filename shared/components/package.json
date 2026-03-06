@@ -67,6 +67,7 @@
     "@debrief/schemas": "workspace:*",
     "@geoman-io/leaflet-geoman-free": "^2.19.2",
     "@tanstack/react-virtual": "^3.0.0",
+    "golden-layout": "^2.6.0",
     "leaflet": "^1.9.0",
     "react-leaflet": "^4.2.1",
     "vega": "^5.30.0",
