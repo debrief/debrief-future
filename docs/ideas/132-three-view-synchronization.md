@@ -21,6 +21,10 @@ The three views (list, map, timeline) and the filter bar must all reflect the sa
 - Zero-results state handled consistently across all views
 - Performance remains responsive with complex filter combinations
 
+## Existing Code
+
+The `CatalogOverview` component (#042) uses a simple drag-bar split between map and timeline regions with local `useState` and memoized data filtering. E08 replaces this with a richer state model: shared filter state store (likely Zustand, already in the tech stack) coordinating filter bar + three views. The CatalogOverview's pattern of memoized data derivation from props is a good starting point, but the synchronization layer is fundamentally new.
+
 ## Dependencies
 Requires #127 (Filter bar), #129 (List view), #130 (Map view), #131 (Timeline view)
 

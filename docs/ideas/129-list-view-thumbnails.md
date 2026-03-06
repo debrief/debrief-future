@@ -21,6 +21,10 @@ Analysts need a scrollable list of matching exercises showing key metadata at a 
 - Exercise selection opens in new editor tab
 - "No matches" displayed when filter yields zero results
 
+## Existing Code
+
+The `CatalogOverview` component (#042) provides the STAC data loading pattern (`StacService.listItems()`) and the `CatalogOverviewItem` interface. The list view is new functionality — CatalogOverview has no list view — but the data pipeline and VS Code theming patterns (CSS custom properties) are directly reusable.
+
 ## Dependencies
 Requires #125 (STAC Extension spec + mock data fixtures)
 

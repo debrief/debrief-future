@@ -17,6 +17,10 @@ The Discovery UI requires agreed property names and data structures before any c
 - Mock data contract reviewed and agreed by team
 - Duration representation (computed vs stored) decided and documented
 
+## Existing Code
+
+The `CatalogOverview` component (#042) at `shared/components/src/CatalogOverview/` already consumes STAC item data with `bbox`, `datetime`, `startDatetime`, `endDatetime` fields via the `CatalogOverviewItem` interface. The mock data fixtures should extend this existing contract with the new extension properties (vessel class, tags, etc.) rather than starting from scratch. See `StacService.listItems()` for the current STAC data loading pipeline.
+
 ## Dependencies
 None — this is the foundational prerequisite for all other E08 items
 

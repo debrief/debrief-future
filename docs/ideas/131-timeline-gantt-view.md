@@ -19,6 +19,10 @@ Analysts need to discover exercises by time period. A Gantt-style timeline showi
 - "No matches" state handled
 - Time axis supports ISO 8601 datetime representation
 
+## Existing Code
+
+The `CatalogOverview` component (#042) at `shared/components/src/CatalogOverview/` already renders an SVG-based timeline with temporal extent bars, point markers for single-datetime items, and time axis formatting. Reusable helpers: `parseTime()`, `computeTimeRange()`, bar positioning math, `formatDate()`. The E08 timeline replaces CatalogOverview's timeline region, adding interactive time-range adjustment as a live filter, colour scheme support, and cross-view synchronization.
+
 ## Dependencies
 Requires #125 (STAC Extension spec + mock data fixtures)
 
