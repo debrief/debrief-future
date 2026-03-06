@@ -1,0 +1,103 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-nomad-venture",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          142.084,
+          -5.0798
+        ],
+        [
+          144.1478,
+          -5.0798
+        ],
+        [
+          144.1478,
+          -3.0161
+        ],
+        [
+          142.084,
+          -3.0161
+        ],
+        [
+          142.084,
+          -5.0798
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    142.084,
+    -5.0798,
+    144.1478,
+    -3.0161
+  ],
+  "properties": {
+    "title": "Exercise Nomad Venture",
+    "description": "Nomad Venture \u2014 Indo-Pacific exercise. 5 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-09-06T17:00:00Z",
+    "end_datetime": "2021-09-07T01:52:56Z",
+    "debrief:vessel_classes": [
+      "surface/auxiliary/supply/fort-victoria",
+      "surface/auxiliary/survey/echo",
+      "surface/auxiliary/tanker/tide"
+    ],
+    "debrief:tags": [
+      "boarding",
+      "gunnery",
+      "mine-clearance",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "depth-charge",
+      "prosecution",
+      "passive-search"
+    ],
+    "debrief:author": "Cdr P. Andersen RNoN",
+    "debrief:track_names": [
+      "JS Auvergne",
+      "FGS Helge Ingstad",
+      "JS Languedoc",
+      "FGS Ramage",
+      "JS Argyll"
+    ],
+    "debrief:nationalities": [
+      "JP",
+      "DE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-nomad-venture.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

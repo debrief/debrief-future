@@ -1,0 +1,95 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-harrier-sprint",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -26.6514,
+          -38.0453
+        ],
+        [
+          -23.8998,
+          -38.0453
+        ],
+        [
+          -23.8998,
+          -35.2938
+        ],
+        [
+          -26.6514,
+          -35.2938
+        ],
+        [
+          -26.6514,
+          -38.0453
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -26.6514,
+    -38.0453,
+    -23.8998,
+    -35.2938
+  ],
+  "properties": {
+    "title": "Exercise Harrier Sprint",
+    "description": "Harrier Sprint \u2014 South Atlantic exercise. 4 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2024-04-24T04:00:00Z",
+    "end_datetime": "2024-04-24T10:17:31Z",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/arleigh-burke"
+    ],
+    "debrief:tags": [
+      "NGFS"
+    ],
+    "debrief:feature_tags": [
+      "helicopter-ops"
+    ],
+    "debrief:author": "LCdr M. Dupont MN",
+    "debrief:track_names": [
+      "FGS Truxtun",
+      "HMAS Cole",
+      "FGS Hamburg",
+      "HMAS De Zeven Provincien"
+    ],
+    "debrief:nationalities": [
+      "DE",
+      "AU"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-harrier-sprint.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

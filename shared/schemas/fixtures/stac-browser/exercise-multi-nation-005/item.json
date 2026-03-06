@@ -1,0 +1,98 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-multi-nation-005",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          134.8958,
+          -2.6529
+        ],
+        [
+          137.7958,
+          -2.6529
+        ],
+        [
+          137.7958,
+          0.2471
+        ],
+        [
+          134.8958,
+          0.2471
+        ],
+        [
+          134.8958,
+          -2.6529
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    134.8958,
+    -2.6529,
+    137.7958,
+    0.2471
+  ],
+  "properties": {
+    "title": "Exercise Multi Nation 005",
+    "description": "Multi Nation 005 \u2014 Indo-Pacific exercise. 1 track(s), 4 nation(s). Multi-national exercise with 4+ participant nations.",
+    "datetime": null,
+    "start_datetime": "2020-02-13T15:00:00Z",
+    "end_datetime": "2020-02-13T22:20:00Z",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/arleigh-burke"
+    ],
+    "debrief:tags": [
+      "escort",
+      "boarding",
+      "EW",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting",
+      "datum"
+    ],
+    "debrief:author": "Lt Cdr J. Smith RN",
+    "debrief:track_names": [
+      "FS Mason"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "IN",
+      "JP",
+      "ES"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-multi-nation-005.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

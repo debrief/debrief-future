@@ -1,0 +1,95 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-exercise-alpha-095",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          21.6146,
+          36.3827
+        ],
+        [
+          22.6325,
+          36.3827
+        ],
+        [
+          22.6325,
+          37.4005
+        ],
+        [
+          21.6146,
+          37.4005
+        ],
+        [
+          21.6146,
+          36.3827
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    21.6146,
+    36.3827,
+    22.6325,
+    37.4005
+  ],
+  "properties": {
+    "title": "Exercise Exercise Alpha-095",
+    "description": "Exercise Alpha-095 \u2014 Mediterranean exercise. 1 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2022-03-12T15:00:00Z",
+    "end_datetime": "2022-04-05T22:31:19Z",
+    "debrief:vessel_classes": [
+      "surface/auxiliary/tanker/tide"
+    ],
+    "debrief:tags": [
+      "transit",
+      "harbour-ops",
+      "training",
+      "replenishment",
+      "AAW"
+    ],
+    "debrief:feature_tags": [
+      "torpedo-run"
+    ],
+    "debrief:author": "Lt R. Hughes USN",
+    "debrief:track_names": [
+      "HMS Mahan"
+    ],
+    "debrief:nationalities": [
+      "SE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-exercise-alpha-095.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

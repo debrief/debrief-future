@@ -1,0 +1,101 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-malabar-horizon",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          61.5503,
+          -2.3265
+        ],
+        [
+          64.4051,
+          -2.3265
+        ],
+        [
+          64.4051,
+          0.5283
+        ],
+        [
+          61.5503,
+          0.5283
+        ],
+        [
+          61.5503,
+          -2.3265
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    61.5503,
+    -2.3265,
+    64.4051,
+    0.5283
+  ],
+  "properties": {
+    "title": "Exercise Malabar Horizon",
+    "description": "Malabar Horizon \u2014 Indian Ocean exercise. 2 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2025-02-01T15:00:00Z",
+    "end_datetime": "2025-02-03T23:06:49Z",
+    "debrief:vessel_classes": [
+      "surface/merchant/passenger/ferry",
+      "surface/merchant/cargo/bulk"
+    ],
+    "debrief:tags": [
+      "NGFS",
+      "escort",
+      "AAW",
+      "multi-national",
+      "replenishment"
+    ],
+    "debrief:feature_tags": [
+      "intercept",
+      "zig-zag",
+      "minefield",
+      "active-search"
+    ],
+    "debrief:author": "Cdr A. Brown RN",
+    "debrief:track_names": [
+      "HDMS Harnosand",
+      "INS Kent"
+    ],
+    "debrief:nationalities": [
+      "DK",
+      "IN"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-malabar-horizon.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

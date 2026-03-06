@@ -1,0 +1,100 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-exercise-alpha-092",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25.1325,
+          58.3003
+        ],
+        [
+          -23.7271,
+          58.3003
+        ],
+        [
+          -23.7271,
+          59.7056
+        ],
+        [
+          -25.1325,
+          59.7056
+        ],
+        [
+          -25.1325,
+          58.3003
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -25.1325,
+    58.3003,
+    -23.7271,
+    59.7056
+  ],
+  "properties": {
+    "title": "Exercise Exercise Alpha-092",
+    "description": "Exercise Alpha-092 \u2014 North Atlantic exercise. 4 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2020-01-06T17:00:00Z",
+    "end_datetime": "2020-01-09T00:39:06Z",
+    "debrief:vessel_classes": [
+      "surface/auxiliary/survey/echo",
+      "surface/auxiliary/supply/fort-victoria",
+      "surface/auxiliary/tanker/tide"
+    ],
+    "debrief:tags": [
+      "AAW"
+    ],
+    "debrief:feature_tags": [
+      "sonar-contact",
+      "radar-detection",
+      "towed-array",
+      "depth-charge"
+    ],
+    "debrief:author": "Lt Cdr S. Eriksson SwN",
+    "debrief:track_names": [
+      "HMS Otto Sverdrup",
+      "SPS Sachsen",
+      "HMS De Ruyter",
+      "SPS Roald Amundsen"
+    ],
+    "debrief:nationalities": [
+      "SE",
+      "ES"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-exercise-alpha-092.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

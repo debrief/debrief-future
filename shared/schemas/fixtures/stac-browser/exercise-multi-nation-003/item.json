@@ -1,0 +1,101 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-multi-nation-003",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          19.7762,
+          38.48
+        ],
+        [
+          21.7616,
+          38.48
+        ],
+        [
+          21.7616,
+          40.4654
+        ],
+        [
+          19.7762,
+          40.4654
+        ],
+        [
+          19.7762,
+          38.48
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    19.7762,
+    38.48,
+    21.7616,
+    40.4654
+  ],
+  "properties": {
+    "title": "Exercise Multi Nation 003",
+    "description": "Multi Nation 003 \u2014 Mediterranean exercise. 3 track(s), 5 nation(s). Multi-national exercise with 4+ participant nations.",
+    "datetime": null,
+    "start_datetime": "2026-01-08T06:00:00Z",
+    "end_datetime": "2026-01-09T03:06:22Z",
+    "debrief:vessel_classes": [
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/destroyer/type45"
+    ],
+    "debrief:tags": [
+      "MCM",
+      "amphibious"
+    ],
+    "debrief:feature_tags": [
+      "helicopter-ops",
+      "zig-zag",
+      "active-search"
+    ],
+    "debrief:author": "Lt Cdr D. Kowalski",
+    "debrief:track_names": [
+      "FGS Otto Sverdrup",
+      "FS Duncan",
+      "HNLMS Bretagne"
+    ],
+    "debrief:nationalities": [
+      "DE",
+      "FR",
+      "NL",
+      "CA",
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-multi-nation-003.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

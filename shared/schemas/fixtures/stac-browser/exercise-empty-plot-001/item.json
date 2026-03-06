@@ -1,0 +1,92 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-empty-plot-001",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          23.8399,
+          36.731
+        ],
+        [
+          24.2543,
+          36.731
+        ],
+        [
+          24.2543,
+          37.1454
+        ],
+        [
+          23.8399,
+          37.1454
+        ],
+        [
+          23.8399,
+          36.731
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    23.8399,
+    36.731,
+    24.2543,
+    37.1454
+  ],
+  "properties": {
+    "title": "Exercise Empty Plot 001",
+    "description": "Empty Plot 001 \u2014 Mediterranean exercise. 0 track(s), 0 nation(s). Empty plot with no track data.",
+    "datetime": null,
+    "start_datetime": "2022-07-20T16:00:00Z",
+    "end_datetime": "2022-07-21T21:33:03Z",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "missile-firing",
+      "amphibious",
+      "SAR",
+      "harbour-ops",
+      "ASW"
+    ],
+    "debrief:feature_tags": [
+      "towed-array",
+      "radar-detection",
+      "active-search",
+      "datum"
+    ],
+    "debrief:author": "Cdr N. Petrov",
+    "debrief:track_names": [],
+    "debrief:nationalities": []
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-empty-plot-001.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

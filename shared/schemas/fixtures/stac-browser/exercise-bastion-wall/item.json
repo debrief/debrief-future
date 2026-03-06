@@ -1,0 +1,104 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-bastion-wall",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -7.9688,
+          50.538
+        ],
+        [
+          -5.8363,
+          50.538
+        ],
+        [
+          -5.8363,
+          52.6705
+        ],
+        [
+          -7.9688,
+          52.6705
+        ],
+        [
+          -7.9688,
+          50.538
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -7.9688,
+    50.538,
+    -5.8363,
+    52.6705
+  ],
+  "properties": {
+    "title": "Exercise Bastion Wall",
+    "description": "Bastion Wall \u2014 North Atlantic exercise. 8 track(s), 3 nation(s).",
+    "datetime": null,
+    "start_datetime": "2020-10-04T16:00:00Z",
+    "end_datetime": "2020-10-17T08:05:11Z",
+    "debrief:vessel_classes": [
+      "surface/merchant/tanker/vlcc",
+      "surface/merchant/passenger/ferry"
+    ],
+    "debrief:tags": [
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "torpedo-run",
+      "passive-search",
+      "sprint-and-drift",
+      "datum"
+    ],
+    "debrief:author": "Lt Cdr J. Smith RN",
+    "debrief:track_names": [
+      "HMS Auvergne",
+      "ITS Carney",
+      "INS Dauntless",
+      "HMS Kent",
+      "ITS Dragon",
+      "INS Northumberland",
+      "HMS Helge Ingstad",
+      "ITS Richmond"
+    ],
+    "debrief:nationalities": [
+      "SE",
+      "IT",
+      "IN"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-bastion-wall.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

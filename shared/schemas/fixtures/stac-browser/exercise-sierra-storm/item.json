@@ -1,0 +1,93 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-sierra-storm",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          131.8131,
+          11.4499
+        ],
+        [
+          133.8232,
+          11.4499
+        ],
+        [
+          133.8232,
+          13.46
+        ],
+        [
+          131.8131,
+          13.46
+        ],
+        [
+          131.8131,
+          11.4499
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    131.8131,
+    11.4499,
+    133.8232,
+    13.46
+  ],
+  "properties": {
+    "title": "Exercise Sierra Storm",
+    "description": "Sierra Storm \u2014 Indo-Pacific exercise. 4 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2020-08-20T15:00:00Z",
+    "end_datetime": "2020-08-22T18:56:51Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssbn/vanguard"
+    ],
+    "debrief:tags": [
+      "escort"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "Cdr P. Andersen RNoN",
+    "debrief:track_names": [
+      "HMS Nykoping",
+      "FS Helsingborg",
+      "HMS Portland",
+      "FS Otto Sverdrup"
+    ],
+    "debrief:nationalities": [
+      "SE",
+      "FR"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-sierra-storm.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-sea-breeze",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          129.7309,
+          -8.8207
+        ],
+        [
+          132.5545,
+          -8.8207
+        ],
+        [
+          132.5545,
+          -5.9971
+        ],
+        [
+          129.7309,
+          -5.9971
+        ],
+        [
+          129.7309,
+          -8.8207
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    129.7309,
+    -8.8207,
+    132.5545,
+    -5.9971
+  ],
+  "properties": {
+    "title": "Exercise Sea Breeze",
+    "description": "Sea Breeze \u2014 Indo-Pacific exercise. 4 track(s), 3 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-02-09T11:00:00Z",
+    "end_datetime": "2021-02-09T13:10:12Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/virginia"
+    ],
+    "debrief:tags": [
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection",
+      "prosecution",
+      "minefield",
+      "torpedo-run"
+    ],
+    "debrief:author": "Lt Cdr J. Smith RN",
+    "debrief:track_names": [
+      "SPS Tromp",
+      "HMAS Cole",
+      "HNoMS Helge Ingstad",
+      "SPS Fridtjof Nansen"
+    ],
+    "debrief:nationalities": [
+      "ES",
+      "AU",
+      "NO"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-sea-breeze.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

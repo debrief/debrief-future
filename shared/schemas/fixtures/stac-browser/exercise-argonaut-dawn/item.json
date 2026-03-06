@@ -1,0 +1,98 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-argonaut-dawn",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          75.324,
+          10.9104
+        ],
+        [
+          75.4509,
+          10.9104
+        ],
+        [
+          75.4509,
+          11.0374
+        ],
+        [
+          75.324,
+          11.0374
+        ],
+        [
+          75.324,
+          10.9104
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    75.324,
+    10.9104,
+    75.4509,
+    11.0374
+  ],
+  "properties": {
+    "title": "Exercise Argonaut Dawn",
+    "description": "Argonaut Dawn \u2014 Indian Ocean exercise. 2 track(s), 3 nation(s).",
+    "datetime": null,
+    "start_datetime": "2026-07-23T04:00:00Z",
+    "end_datetime": "2026-07-23T18:35:54Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssk/gotland"
+    ],
+    "debrief:tags": [
+      "MCM",
+      "NGFS",
+      "ASW",
+      "certification",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "zig-zag"
+    ],
+    "debrief:author": "Lt Cdr D. Kowalski",
+    "debrief:track_names": [
+      "JS Nykoping",
+      "INS Caio Duilio"
+    ],
+    "debrief:nationalities": [
+      "JP",
+      "IN",
+      "FR"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-argonaut-dawn.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

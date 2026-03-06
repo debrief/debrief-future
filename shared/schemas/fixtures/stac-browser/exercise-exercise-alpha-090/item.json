@@ -1,0 +1,98 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-exercise-alpha-090",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -26.9505,
+          -37.8028
+        ],
+        [
+          -26.3261,
+          -37.8028
+        ],
+        [
+          -26.3261,
+          -37.1783
+        ],
+        [
+          -26.9505,
+          -37.1783
+        ],
+        [
+          -26.9505,
+          -37.8028
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -26.9505,
+    -37.8028,
+    -26.3261,
+    -37.1783
+  ],
+  "properties": {
+    "title": "Exercise Exercise Alpha-090",
+    "description": "Exercise Alpha-090 \u2014 South Atlantic exercise. 5 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-09-08T13:00:00Z",
+    "end_datetime": "2021-09-09T18:24:59Z",
+    "debrief:vessel_classes": [
+      "surface/auxiliary/tanker/tide",
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/merchant/passenger/ferry"
+    ],
+    "debrief:tags": [
+      "escort"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "helicopter-ops"
+    ],
+    "debrief:author": "LCdr M. Dupont MN",
+    "debrief:track_names": [
+      "ROKS Bainbridge",
+      "ROKS Hamburg",
+      "ROKS Somerset",
+      "ROKS Ramage",
+      "ROKS Roosevelt"
+    ],
+    "debrief:nationalities": [
+      "KR"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-exercise-alpha-090.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

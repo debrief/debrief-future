@@ -1,0 +1,99 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-exercise-alpha-096",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -26.4951,
+          -43.5273
+        ],
+        [
+          -24.0765,
+          -43.5273
+        ],
+        [
+          -24.0765,
+          -41.1086
+        ],
+        [
+          -26.4951,
+          -41.1086
+        ],
+        [
+          -26.4951,
+          -43.5273
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -26.4951,
+    -43.5273,
+    -24.0765,
+    -41.1086
+  ],
+  "properties": {
+    "title": "Exercise Exercise Alpha-096",
+    "description": "Exercise Alpha-096 \u2014 South Atlantic exercise. 2 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-07-13T18:00:00Z",
+    "end_datetime": "2021-07-15T04:46:31Z",
+    "debrief:vessel_classes": [
+      "surface/warship/patrol/river",
+      "surface/warship/corvette/visby"
+    ],
+    "debrief:tags": [
+      "amphibious",
+      "MCM",
+      "escort",
+      "SAR",
+      "NGFS"
+    ],
+    "debrief:feature_tags": [
+      "helicopter-ops",
+      "active-search"
+    ],
+    "debrief:author": "Cdr P. Andersen RNoN",
+    "debrief:track_names": [
+      "HNoMS Iron Duke",
+      "HMS Lancaster"
+    ],
+    "debrief:nationalities": [
+      "NO",
+      "SE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-exercise-alpha-096.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

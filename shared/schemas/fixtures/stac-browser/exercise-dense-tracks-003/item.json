@@ -1,0 +1,97 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-dense-tracks-003",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          6.4231,
+          36.2415
+        ],
+        [
+          6.6321,
+          36.2415
+        ],
+        [
+          6.6321,
+          36.4506
+        ],
+        [
+          6.4231,
+          36.4506
+        ],
+        [
+          6.4231,
+          36.2415
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    6.4231,
+    36.2415,
+    6.6321,
+    36.4506
+  ],
+  "properties": {
+    "title": "Exercise Dense Tracks 003",
+    "description": "Dense Tracks 003 \u2014 Mediterranean exercise. 7 track(s), 1 nation(s). Dense track exercise with many participants.",
+    "datetime": null,
+    "start_datetime": "2025-02-20T19:00:00Z",
+    "end_datetime": "2025-02-22T19:20:21Z",
+    "debrief:vessel_classes": [
+      "unknown",
+      "surface/warship/frigate/type26"
+    ],
+    "debrief:tags": [
+      "transit",
+      "mine-clearance"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "KptLt H. Weber",
+    "debrief:track_names": [
+      "FS Margottini",
+      "FS Lancaster",
+      "FS Hessen",
+      "FS Nykoping",
+      "FS Diamond",
+      "FS Portland",
+      "FS Mahan"
+    ],
+    "debrief:nationalities": [
+      "FR"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-dense-tracks-003.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

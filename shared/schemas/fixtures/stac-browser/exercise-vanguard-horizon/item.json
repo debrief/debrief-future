@@ -1,0 +1,99 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-vanguard-horizon",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          9.8979,
+          34.7472
+        ],
+        [
+          12.362,
+          34.7472
+        ],
+        [
+          12.362,
+          37.2113
+        ],
+        [
+          9.8979,
+          37.2113
+        ],
+        [
+          9.8979,
+          34.7472
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    9.8979,
+    34.7472,
+    12.362,
+    37.2113
+  ],
+  "properties": {
+    "title": "Exercise Vanguard Horizon",
+    "description": "Vanguard Horizon \u2014 Mediterranean exercise. 2 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2022-07-15T18:00:00Z",
+    "end_datetime": "2022-07-16T04:22:39Z",
+    "debrief:vessel_classes": [
+      "surface/auxiliary/supply/fort-victoria",
+      "surface/auxiliary/survey/echo"
+    ],
+    "debrief:tags": [
+      "EW",
+      "certification",
+      "boarding",
+      "force-protection"
+    ],
+    "debrief:feature_tags": [
+      "radar-detection",
+      "minefield",
+      "depth-charge"
+    ],
+    "debrief:author": "Cdr N. Petrov",
+    "debrief:track_names": [
+      "HMS Defender",
+      "JS Lancaster"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "JP"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-vanguard-horizon.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-baltic-shield",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -37.4094,
+          51.5538
+        ],
+        [
+          -34.7229,
+          51.5538
+        ],
+        [
+          -34.7229,
+          54.2403
+        ],
+        [
+          -37.4094,
+          54.2403
+        ],
+        [
+          -37.4094,
+          51.5538
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -37.4094,
+    51.5538,
+    -34.7229,
+    54.2403
+  ],
+  "properties": {
+    "title": "Exercise Baltic Shield",
+    "description": "Baltic Shield \u2014 North Atlantic exercise. 0 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-05-03T03:00:00Z",
+    "end_datetime": "2021-05-07T06:40:50Z",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "ASW",
+      "multi-national",
+      "missile-firing",
+      "MCM"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "LCdr M. Dupont MN",
+    "debrief:track_names": [],
+    "debrief:nationalities": [
+      "GB",
+      "NL"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-baltic-shield.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

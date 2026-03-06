@@ -1,0 +1,98 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-tempest-anvil",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -23.6026,
+          51.4442
+        ],
+        [
+          -21.6872,
+          51.4442
+        ],
+        [
+          -21.6872,
+          53.3595
+        ],
+        [
+          -23.6026,
+          53.3595
+        ],
+        [
+          -23.6026,
+          51.4442
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -23.6026,
+    51.4442,
+    -21.6872,
+    53.3595
+  ],
+  "properties": {
+    "title": "Exercise Tempest Anvil",
+    "description": "Tempest Anvil \u2014 North Atlantic exercise. 3 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2022-11-22T12:00:00Z",
+    "end_datetime": "2022-12-01T00:00:54Z",
+    "debrief:vessel_classes": [
+      "surface/warship/corvette/visby",
+      "surface/warship/destroyer/type45"
+    ],
+    "debrief:tags": [
+      "certification",
+      "NGFS",
+      "AAW"
+    ],
+    "debrief:feature_tags": [
+      "track-merge",
+      "zig-zag",
+      "intercept"
+    ],
+    "debrief:author": "Lt K. Yamamoto JMSDF",
+    "debrief:track_names": [
+      "HMS Margottini",
+      "HMS Iron Duke",
+      "HMS Bretagne"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-tempest-anvil.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

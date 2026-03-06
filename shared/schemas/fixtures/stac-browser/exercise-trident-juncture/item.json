@@ -1,0 +1,102 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-trident-juncture",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.9017,
+          45.9752
+        ],
+        [
+          -20.3829,
+          45.9752
+        ],
+        [
+          -20.3829,
+          47.494
+        ],
+        [
+          -21.9017,
+          47.494
+        ],
+        [
+          -21.9017,
+          45.9752
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.9017,
+    45.9752,
+    -20.3829,
+    47.494
+  ],
+  "properties": {
+    "title": "Exercise Trident Juncture",
+    "description": "Trident Juncture \u2014 North Atlantic exercise. 6 track(s), 3 nation(s).",
+    "datetime": null,
+    "start_datetime": "2022-08-18T14:00:00Z",
+    "end_datetime": "2022-08-21T12:23:44Z",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/type45",
+      "surface/warship/destroyer/arleigh-burke",
+      "surface/warship/frigate/type26"
+    ],
+    "debrief:tags": [
+      "SAR",
+      "transit",
+      "escort",
+      "force-protection",
+      "gunnery"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "Lt K. Yamamoto JMSDF",
+    "debrief:track_names": [
+      "FS Iron Duke",
+      "INS Tromp",
+      "SPS Helge Ingstad",
+      "FS Dauntless",
+      "INS Kent",
+      "SPS Portland"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "IN",
+      "ES"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-trident-juncture.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}
