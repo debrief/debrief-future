@@ -321,6 +321,7 @@ classes:
 # ============================================================================
 
   TrackProperties:
+    is_a: BaseFeatureProperties
     description: Properties for a TrackFeature
     attributes:
       kind:
@@ -400,12 +401,6 @@ classes:
         range: TUAData
         multivalued: true
         inlined_as_list: true
-      provenance:
-        description: PROV-aligned provenance records (append-only log of tool operations)
-        range: LogEntry
-        multivalued: true
-        inlined_as_list: true
-
   TrackFeature:
     description: GeoJSON Feature representing a vessel track
     attributes:
@@ -454,6 +449,7 @@ classes:
         required: true
 
   ReferenceLocationProperties:
+    is_a: BaseFeatureProperties
     description: Properties for a ReferenceLocation
     attributes:
       kind:
@@ -490,12 +486,6 @@ classes:
         range: PointMetadataEntry
         multivalued: true
         inlined_as_list: true
-      provenance:
-        description: PROV-aligned provenance records (append-only log of tool operations)
-        range: LogEntry
-        multivalued: true
-        inlined_as_list: true
-
   ReferenceLocation:
     description: GeoJSON Feature for fixed reference points or reference point sets
     attributes:
@@ -590,6 +580,7 @@ classes:
 # ============================================================================
 
   MultiPointFeatureProperties:
+    is_a: BaseFeatureProperties
     description: Properties for a MultiPointFeature (multi-point tool results)
     attributes:
       kind:
@@ -612,12 +603,6 @@ classes:
         multivalued: true
       description:
         description: Additional description or notes
-      provenance:
-        description: PROV-aligned provenance records (append-only log of tool operations)
-        range: LogEntry
-        multivalued: true
-        inlined_as_list: true
-
   MultiPointFeature:
     description: GeoJSON Feature for multi-point tool results
     attributes:
@@ -649,6 +634,7 @@ classes:
 # ============================================================================
 
   MultiPolygonFeatureProperties:
+    is_a: BaseFeatureProperties
     description: Properties for a MultiPolygonFeature (multi-polygon tool results)
     attributes:
       kind:
@@ -671,12 +657,6 @@ classes:
         multivalued: true
       description:
         description: Additional description or notes
-      provenance:
-        description: PROV-aligned provenance records (append-only log of tool operations)
-        range: LogEntry
-        multivalued: true
-        inlined_as_list: true
-
   MultiPolygonFeature:
     description: GeoJSON Feature for multi-polygon tool results
     attributes:

@@ -1,0 +1,90 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-baltic-shield",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -28.1823,
+          46.5896
+        ],
+        [
+          -25.5072,
+          46.5896
+        ],
+        [
+          -25.5072,
+          49.2647
+        ],
+        [
+          -28.1823,
+          49.2647
+        ],
+        [
+          -28.1823,
+          46.5896
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -28.1823,
+    46.5896,
+    -25.5072,
+    49.2647
+  ],
+  "properties": {
+    "title": "Exercise Baltic Shield",
+    "description": "Baltic Shield \u2014 North Atlantic exercise. 0 track(s), 3 nation(s).",
+    "datetime": null,
+    "start_datetime": "2024-01-12T11:00:00Z",
+    "end_datetime": "2024-01-16T16:26:41Z",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "EW",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "torpedo-run",
+      "active-search"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": [
+      "DK",
+      "CA",
+      "JP"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-baltic-shield.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

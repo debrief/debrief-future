@@ -1,0 +1,95 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-obangame-express",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -37.9063,
+          54.3419
+        ],
+        [
+          -36.0809,
+          54.3419
+        ],
+        [
+          -36.0809,
+          56.1673
+        ],
+        [
+          -37.9063,
+          56.1673
+        ],
+        [
+          -37.9063,
+          54.3419
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -37.9063,
+    54.3419,
+    -36.0809,
+    56.1673
+  ],
+  "properties": {
+    "title": "Exercise Obangame Express",
+    "description": "Obangame Express \u2014 North Atlantic exercise. 2 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-07-11T23:00:00Z",
+    "end_datetime": "2021-07-19T16:58:15Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "certification",
+      "boarding",
+      "NGFS",
+      "EW",
+      "replenishment"
+    ],
+    "debrief:feature_tags": [
+      "torpedo-run"
+    ],
+    "debrief:track_names": [
+      "HMS De Ruyter",
+      "HMS Provence"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-obangame-express.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-argonaut-dawn",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          72.9681,
+          9.2324
+        ],
+        [
+          73.2183,
+          9.2324
+        ],
+        [
+          73.2183,
+          9.4826
+        ],
+        [
+          72.9681,
+          9.4826
+        ],
+        [
+          72.9681,
+          9.2324
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    72.9681,
+    9.2324,
+    73.2183,
+    9.4826
+  ],
+  "properties": {
+    "title": "Exercise Argonaut Dawn",
+    "description": "Argonaut Dawn \u2014 Indian Ocean exercise. 1 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2026-04-14T20:00:00Z",
+    "end_datetime": "2026-04-15T03:38:29Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssbn/vanguard"
+    ],
+    "debrief:tags": [
+      "multi-national"
+    ],
+    "debrief:feature_tags": [
+      "towed-array"
+    ],
+    "debrief:track_names": [
+      "HMS Somerset"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "IN"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-argonaut-dawn.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

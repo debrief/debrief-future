@@ -1,0 +1,98 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-yeoman-guard",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -19.6021,
+          -43.9782
+        ],
+        [
+          -18.0739,
+          -43.9782
+        ],
+        [
+          -18.0739,
+          -42.4499
+        ],
+        [
+          -19.6021,
+          -42.4499
+        ],
+        [
+          -19.6021,
+          -43.9782
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -19.6021,
+    -43.9782,
+    -18.0739,
+    -42.4499
+  ],
+  "properties": {
+    "title": "Exercise Yeoman Guard",
+    "description": "Yeoman Guard \u2014 South Atlantic exercise. 4 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2025-05-07T00:00:00Z",
+    "end_datetime": "2025-05-07T01:35:27Z",
+    "debrief:vessel_classes": [
+      "surface/merchant/cargo/bulk",
+      "surface/merchant/tanker/vlcc",
+      "surface/merchant/passenger/ferry"
+    ],
+    "debrief:tags": [
+      "mine-clearance",
+      "escort"
+    ],
+    "debrief:feature_tags": [
+      "minefield",
+      "intercept"
+    ],
+    "debrief:track_names": [
+      "HMS Roosevelt",
+      "JS Cole",
+      "HMS Kent",
+      "JS Mason"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "JP"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-yeoman-guard.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

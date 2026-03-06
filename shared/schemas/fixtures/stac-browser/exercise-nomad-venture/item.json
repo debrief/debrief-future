@@ -1,0 +1,99 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-nomad-venture",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          95.212,
+          0.5844
+        ],
+        [
+          96.8232,
+          0.5844
+        ],
+        [
+          96.8232,
+          2.1956
+        ],
+        [
+          95.212,
+          2.1956
+        ],
+        [
+          95.212,
+          0.5844
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    95.212,
+    0.5844,
+    96.8232,
+    2.1956
+  ],
+  "properties": {
+    "title": "Exercise Nomad Venture",
+    "description": "Nomad Venture \u2014 Indo-Pacific exercise. 6 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2025-12-15T10:00:00Z",
+    "end_datetime": "2025-12-15T17:12:32Z",
+    "debrief:vessel_classes": [
+      "surface/auxiliary/tanker/tide"
+    ],
+    "debrief:tags": [
+      "transit",
+      "NGFS",
+      "force-protection"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting",
+      "depth-charge",
+      "towed-array"
+    ],
+    "debrief:track_names": [
+      "HMS Languedoc",
+      "HMS Bretagne",
+      "HMS Dauntless",
+      "HMS Aquitaine",
+      "HMS Harnosand",
+      "HMS Diamond"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-nomad-venture.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

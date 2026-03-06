@@ -1,0 +1,100 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-dense-tracks-002",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -2.8492,
+          41.132
+        ],
+        [
+          -2.1097,
+          41.132
+        ],
+        [
+          -2.1097,
+          41.8715
+        ],
+        [
+          -2.8492,
+          41.8715
+        ],
+        [
+          -2.8492,
+          41.132
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -2.8492,
+    41.132,
+    -2.1097,
+    41.8715
+  ],
+  "properties": {
+    "title": "Exercise Dense Tracks 002",
+    "description": "Dense Tracks 002 \u2014 Mediterranean exercise. 7 track(s), 1 nation(s). Dense track exercise with many participants.",
+    "datetime": null,
+    "start_datetime": "2021-05-07T04:00:00Z",
+    "end_datetime": "2021-05-07T08:49:14Z",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/type45",
+      "surface/warship/patrol/river",
+      "surface/warship/corvette/visby"
+    ],
+    "debrief:tags": [
+      "gunnery"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "zig-zag",
+      "depth-charge"
+    ],
+    "debrief:track_names": [
+      "HMCS Kent",
+      "HMCS Aquitaine",
+      "HMCS Tromp",
+      "HMCS Portland",
+      "HMCS Languedoc",
+      "HMCS Sutherland",
+      "HMCS Bretagne"
+    ],
+    "debrief:nationalities": [
+      "CA"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-dense-tracks-002.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

@@ -118,6 +118,7 @@ class TestEnumConsistency:
             "POLY",
             "MULTI_POINT",
             "MULTI_POLYGON",
+            "SYSTEM_RECORD",
         ]
         assert set(enum_values) == set(expected), (
             f"FeatureKindEnum values mismatch: {enum_values} vs {expected}"

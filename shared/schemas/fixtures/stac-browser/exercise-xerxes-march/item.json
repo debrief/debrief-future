@@ -1,0 +1,89 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-xerxes-march",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -32.5564,
+          51.5905
+        ],
+        [
+          -30.1841,
+          51.5905
+        ],
+        [
+          -30.1841,
+          53.9628
+        ],
+        [
+          -32.5564,
+          53.9628
+        ],
+        [
+          -32.5564,
+          51.5905
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -32.5564,
+    51.5905,
+    -30.1841,
+    53.9628
+  ],
+  "properties": {
+    "title": "Exercise Xerxes March",
+    "description": "Xerxes March \u2014 North Atlantic exercise. 0 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2024-07-14T05:00:00Z",
+    "end_datetime": "2024-07-14T23:14:04Z",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "escort",
+      "MCM",
+      "ASW"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "radar-detection"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": [
+      "NL"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-xerxes-march.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

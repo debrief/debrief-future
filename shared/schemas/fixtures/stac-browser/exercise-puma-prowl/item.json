@@ -1,0 +1,97 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-puma-prowl",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -7.7672,
+          53.9059
+        ],
+        [
+          -6.7465,
+          53.9059
+        ],
+        [
+          -6.7465,
+          54.9266
+        ],
+        [
+          -7.7672,
+          54.9266
+        ],
+        [
+          -7.7672,
+          53.9059
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -7.7672,
+    53.9059,
+    -6.7465,
+    54.9266
+  ],
+  "properties": {
+    "title": "Exercise Puma Prowl",
+    "description": "Puma Prowl \u2014 North Atlantic exercise. 1 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2020-03-11T04:00:00Z",
+    "end_datetime": "2020-03-11T23:05:14Z",
+    "debrief:vessel_classes": [
+      "surface/warship/frigate/type23"
+    ],
+    "debrief:tags": [
+      "escort",
+      "replenishment",
+      "surveillance",
+      "SAR",
+      "EW"
+    ],
+    "debrief:feature_tags": [
+      "zig-zag",
+      "intercept",
+      "sonar-contact",
+      "torpedo-run"
+    ],
+    "debrief:track_names": [
+      "HMS Helsingborg"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-puma-prowl.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

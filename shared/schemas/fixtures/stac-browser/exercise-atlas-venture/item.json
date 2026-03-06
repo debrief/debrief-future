@@ -1,0 +1,92 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-atlas-venture",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -24.4323,
+          57.327
+        ],
+        [
+          -21.7324,
+          57.327
+        ],
+        [
+          -21.7324,
+          60.0269
+        ],
+        [
+          -24.4323,
+          60.0269
+        ],
+        [
+          -24.4323,
+          57.327
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -24.4323,
+    57.327,
+    -21.7324,
+    60.0269
+  ],
+  "properties": {
+    "title": "Exercise Atlas Venture",
+    "description": "Atlas Venture \u2014 North Atlantic exercise. 2 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2022-02-13T20:00:00Z",
+    "end_datetime": "2022-02-16T09:51:19Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute",
+      "subsurface/submarine/ssbn/vanguard"
+    ],
+    "debrief:tags": [
+      "force-protection",
+      "gunnery",
+      "replenishment"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:track_names": [
+      "USS Caio Duilio",
+      "USS Tromp"
+    ],
+    "debrief:nationalities": [
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-atlas-venture.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

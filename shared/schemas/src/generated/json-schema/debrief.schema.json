@@ -158,6 +158,16 @@
             "string",
             "null"
           ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [
@@ -199,7 +209,8 @@
         "SYSTEM",
         "POLY",
         "MULTI_POINT",
-        "MULTI_POLYGON"
+        "MULTI_POLYGON",
+        "SYSTEM_RECORD"
       ],
       "title": "FeatureKindEnum",
       "type": "string"
@@ -531,6 +542,16 @@
             "string",
             "null"
           ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [
@@ -823,6 +844,16 @@
         "style": {
           "$ref": "#/$defs/PointProperties",
           "description": "Point styling for all positions"
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [
@@ -926,6 +957,16 @@
         "style": {
           "$ref": "#/$defs/PolygonProperties",
           "description": "Polygon styling for all regions"
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [
@@ -1018,6 +1059,16 @@
           "description": "Display symbol code from REP file",
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
             "null"
           ]
         },
@@ -1300,6 +1351,16 @@
             "null"
           ]
         },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "vertex_count": {
           "description": "Number of unique vertices (excluding ring closure point)",
           "minimum": 3,
@@ -1516,6 +1577,16 @@
             "string",
             "null"
           ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [
@@ -1615,6 +1686,16 @@
           "description": "Map symbol identifier",
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
             "null"
           ]
         },
@@ -1988,9 +2069,69 @@
       "title": "SnapshotRef",
       "type": "object"
     },
+    "StacExtensionProperties": {
+      "additionalProperties": false,
+      "description": "Extension properties added to STAC item.properties under the debrief: namespace. All properties are optional \u2014 existing items without extension properties remain valid. These properties enable filtering, searching, and colour-coding in the Discovery UI.",
+      "properties": {
+        "feature_tags": {
+          "description": "Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.\n",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "nationalities": {
+          "description": "Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.\n",
+          "items": {
+            "pattern": "^[A-Z]{2}$",
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "tags": {
+          "description": "Plot-level tags \u2014 free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.\n",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "track_names": {
+          "description": "Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.\n",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "vessel_classes": {
+          "description": "Hierarchical vessel classification paths using slash-separated notation. Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23). Partial paths allowed for imprecise classification (e.g., surface/warship).\n",
+          "items": {
+            "pattern": "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$",
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "title": "StacExtensionProperties",
+      "type": "object"
+    },
     "SystemRecordProperties": {
       "additionalProperties": false,
-      "description": "Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with featureType \"system\" and Point geometry with empty coordinates.",
+      "description": "Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with kind SYSTEM_RECORD and Point geometry with empty coordinates.",
       "properties": {
         "branch_origin": {
           "anyOf": [
@@ -2013,10 +2154,10 @@
             "null"
           ]
         },
-        "feature_type": {
-          "const": "system",
-          "description": "Discriminator, always \"system\".",
-          "type": "string"
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "SYSTEM_RECORD",
+          "description": "Feature type discriminator"
         },
         "provenance": {
           "description": "File-level provenance events (snapshot and branch creation).",
@@ -2041,7 +2182,7 @@
         }
       },
       "required": [
-        "feature_type"
+        "kind"
       ],
       "title": "SystemRecordProperties",
       "type": "object"
@@ -2362,6 +2503,16 @@
             "null"
           ]
         },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "text": {
           "description": "Text content to display",
           "type": "string"
@@ -2654,6 +2805,16 @@
             "null"
           ]
         },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "track_type": {
           "$ref": "#/$defs/TrackTypeEnum",
           "description": "Type of track"
@@ -2831,6 +2992,16 @@
             "string",
             "null"
           ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [
@@ -2842,6 +3013,16 @@
       ],
       "title": "VectorAnnotationProperties",
       "type": "object"
+    },
+    "VesselDomainEnum": {
+      "description": "Top-level vessel domain classification",
+      "enum": [
+        "surface",
+        "subsurface",
+        "unknown"
+      ],
+      "title": "VesselDomainEnum",
+      "type": "string"
     },
     "WasGeneratedBy": {
       "additionalProperties": false,
