@@ -1,7 +1,7 @@
 /**
  * Track styling tools barrel file.
  *
- * Exports tool definitions and execute stubs for all track styling tools.
+ * Exports tool definitions for all track styling tools.
  * These are consumed by the TypeScript tool registry for web-shell and
  * by the VS Code extension when the Python backend is unavailable.
  */

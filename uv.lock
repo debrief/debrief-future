@@ -567,6 +567,7 @@ source = { editable = "services/cli" }
 dependencies = [
     { name = "click" },
     { name = "debrief-calc" },
+    { name = "debrief-stac" },
 ]
 
 [package.optional-dependencies]
@@ -579,6 +580,7 @@ dev = [
 requires-dist = [
     { name = "click", specifier = ">=8.0.0" },
     { name = "debrief-calc", editable = "services/calc" },
+    { name = "debrief-stac", editable = "services/stac" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
 ]

@@ -1,4 +1,4 @@
-"""Sensor model interface and stub implementation for detection zone generation."""
+"""Sensor model interface and default implementation for detection zone generation."""
 
 from __future__ import annotations
 
@@ -41,11 +41,12 @@ class SensorModel(Protocol):
         ...
 
 
-class StubSensorModel:
-    """Stub sensor model returning hardcoded detection zones.
+class DefaultSensorModel:
+    """Default sensor model returning standard detection zones.
 
     Returns three zones at 3nm/75%, 6nm/50%, 12nm/25% regardless of input.
-    This will be replaced by a real sensor model in future iterations.
+    Suitable for general-purpose detection analysis. Inject a custom
+    SensorModel implementation for platform-specific sensor characteristics.
     """
 
     def get_detection_zones(self, track: dict[str, Any]) -> list[SensorModelZone]:

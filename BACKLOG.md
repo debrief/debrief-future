@@ -138,6 +138,7 @@ Large features broken down into multiple backlog items.
 | ~~E05~~ | ~~Shape Drawing Tools~~ | ~~Add shape drawing tools to map via Geoman (point, rectangle, polygon, polyline) with '+' toolbar dropdown~~ | ~~complete~~ | ~~#091, #092, #093, #094, #095, #096~~ |
 | E06 | Architectural Consistency | [Fix implementation drift and constitutional violations from six-axis review](docs/architectural-consistency-review.md) | approved | #102, #103, #104, #105, #106, #107, #108, #109, #110, #111, #112 |
 | E07 | Sensor Data Pipeline | [Port legacy sensor capabilities in 7 phases: schema, import, rendering, array offsets, residuals, TMA, interactive drag](docs/ideas/E07-sensor-data-pipeline.md) | proposed | #116, #117, #118, #119, #120, #121, #122 |
+| E08 | STAC Stack Browser Discovery UI | [Analyst-facing discovery interface: filter bar, list/map/timeline views, vessel taxonomy, colour schemes](docs/stac-browser-srd.md) | approved | #125, #126, #127, #128, #129, #130, #131, #132, #133, #134 |
 
 ## Items
 
@@ -155,6 +156,16 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
+| 127 | Feature | [[E08] Filter bar with lozenge UI and AND/OR logic](docs/ideas/127-filter-bar-lozenge-ui.md) — persistent filter bar with add/edit/remove lozenges, all filter types, OR container with drag support, CQL2 serialisation (requires #125, #126) | 5 | 5 | 3 | 13 | Medium | approved |
+| 130 | Feature | [[E08] Map view with live spatial filtering](docs/ideas/130-map-view-spatial-filtering.md) — spatial footprints on map, pan/zoom as live spatial filter (requires #125) | 5 | 5 | 3 | 13 | Medium | approved |
+| 132 | Infrastructure | [[E08] Three-view synchronization and filter state](docs/ideas/132-three-view-synchronization.md) — shared filter state coordinating filter bar + list + map + timeline; dynamic updates; zero-results handling (requires #127, #129, #130, #131) | 5 | 4 | 3 | 12 | High | approved |
+| 126 | Infrastructure | [[E08] Client-side CQL2 filter engine](docs/ideas/126-cql2-filter-engine.md) — reference implementation of CQL2 AND/OR filter logic operating on mock data array; validates query model without backend (requires #125) | 4 | 3 | 4 | 11 | Medium | approved |
+| 129 | Feature | [[E08] List view with spatial thumbnails](docs/ideas/129-list-view-thumbnails.md) — scrollable exercise list with metadata summary, spatial thumbnail, flexible sorting, recent-work resumption (requires #125) | 4 | 4 | 3 | 11 | Medium | approved |
+| 131 | Feature | [[E08] Timeline/Gantt view with temporal filtering](docs/ideas/131-timeline-gantt-view.md) — temporal extent bars, time range adjustment as live temporal filter (requires #125) | 4 | 4 | 3 | 11 | Medium | approved |
+| 133 | Feature | [[E08] Vessel taxonomy and hierarchical filtering](docs/ideas/133-vessel-taxonomy.md) — hierarchical vessel classification tree, subtree filtering in filter bar dropdown (requires #125, #127) | 4 | 3 | 4 | 11 | Medium | approved |
+| 134 | Feature | [[E08] Colour scheme engine with legend](docs/ideas/134-colour-scheme-engine.md) — configurable colour dimension (age/vessel class/tag), shared legend for map and timeline views (requires #130, #131) | 3 | 4 | 4 | 11 | Low | approved |
+| 125 | Infrastructure | [[E08] STAC Extension spec + mock data fixtures](docs/ideas/125-stac-extension-mock-data.md) — define extension namespace, property names for vessel class/tags/author/tracks/nationalities; create fixture item.json set; document mock data contract | 4 | 2 | 4 | 10 | Medium | approved |
+| 128 | Feature | [[E08] Saved filter configurations](docs/ideas/128-saved-filter-configurations.md) — save/load/delete named filter sets as CQL2 JSON; historic filters dropdown (requires #127) | 2 | 2 | 5 | 9 | Low | approved |
 | 102 | Bug | [Add feature-level provenance to TS tool executor](docs/architectural-consistency-review.md#f-15-web-shell-provenance-on-tool-results-art-iii1) [E06] — TS toolService lacks W3C PROV LogEntry attachment; constitutional violation Art. III.1 (Blocking) | 5 | 3 | 4 | 12 | Medium | approved |
 | 103 | Bug | [Canonicalize `kind` attribute values in LinkML schema](docs/architectural-consistency-review.md#f-22-kind-attribute-values-diverge) [E06] — Python/TS produce different kind values; define in LinkML and propagate constants (Blocking) | 5 | 3 | 4 | 12 | Medium | approved |
 | 104 | Bug | [Align range-bearing tool: selection requirements + GeoJSON output](docs/architectural-consistency-review.md#f-24-range-bearing-selection-requirements-diverge) [E06] — Python accepts TRACK+SHAPE and returns non-GeoJSON; TS requires 2 TRACK and returns GeoJSON; align both (F-2.4, F-2.5) | 4 | 3 | 4 | 11 | Medium | approved |
@@ -167,7 +178,7 @@ Description formats:
 | 111 | Tech Debt | [Add periodic heartbeat re-validation for Python dependencies](docs/architectural-consistency-review.md#f-65-periodic-heartbeats-missing) [E06] — after activation, if debrief-calc becomes unavailable, status bar stays green until next tool execution fails | 3 | 2 | 5 | 10 | Low | approved |
 | 112 | Tech Debt | [Align result type annotations and provenance field naming with spec](docs/architectural-consistency-review.md#f-42-web-shell-resulttype-annotation-uses-wrong-format) [E06] — resultType missing type prefix; provenance field naming needs doc/code alignment (F-4.2, F-4.3) | 3 | 1 | 5 | 9 | Low | approved |
 | 123 | Tech Debt | Add `disabled` and `rationale` fields to Python `LogEntry` model — fields exist in LinkML schema (log-entry.yaml:61-69) and TypeScript types but not in Python Pydantic model (models.py); Art. II.1 violation, same gap pattern as #116's inputState fix | 3 | 1 | 5 | 9 | Low | proposed |
-| 124 | Bug | Log Panel webview fails to load in VS Code E2E (openvscode-server) — `getLogPanelFrame()` cannot find `[data-testid="log-panel"]` in any webview frame; all 5 `test-capture-log-evidence` tests time out; likely extension activation or webview view registration issue in openvscode-server | 4 | 1 | 4 | 9 | Medium | proposed |
+| 135 | Bug | Log Panel webview fails to load in VS Code E2E (openvscode-server) — `getLogPanelFrame()` cannot find `[data-testid="log-panel"]` in any webview frame; all 5 `test-capture-log-evidence` tests time out; likely extension activation or webview view registration issue in openvscode-server | 4 | 1 | 4 | 9 | Medium | approved |
 | 061 | Feature | [Add generate courses and speeds for track tool spec](specs/061-generate-courses-speeds/spec.md) (requires #049) | 4 | 3 | 5 | 12 | Low | implementing |
 | ~~028~~ | ~~Tech Debt~~ | ~~[Add comprehensive unit tests for stacService](specs/028-stacservice-unit-tests/spec.md)~~ | ~~4~~ | ~~2~~ | ~~5~~ | ~~11~~ | ~~Low~~ | ~~complete~~ |
 | 076 | Feature | [Implement replay and parameter tuning](specs/076-replay-tune/spec.md) [E02] — parameter editing, positional replay, revert operations (requires #071, #074) | 5 | 4 | 2 | 11 | High | implementing |
@@ -192,7 +203,7 @@ Description formats:
 | 122 | Feature | [[E07] TMA interactive drag](docs/ideas/E07-sensor-data-pipeline.md#phase-7-tma-interactive-drag-122) [E07] — rotate/shear/stretch drag modes with live residual feedback (requires #121, #120) — **deferred pending executive sponsorship** | - | - | - | - | High | proposed |
 | 063 | Infrastructure | [Analyse tool specs for phased implementation sequence](docs/ideas/063-tool-implementation-sequence.md) [E01] — dependency graph, phase groupings, and per-phase backlog items for 63 documented tools | 5 | 3 | 4 | 12 | Medium | approved |
 | ~~085~~ | ~~Feature~~ | ~~[Chart renderer + dataset-to-spec transformer](docs/ideas/E04-results-visualization.md) [E04] — React component with Vega-Lite (swappable); transformer converts standard result datasets to render specs~~ | ~~4~~ | ~~4~~ | ~~4~~ | ~~12~~ | ~~Medium~~ | ~~complete~~ |
-| 079 | Feature | [Implement move-track tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — offset track by range/bearing with map drag support (requires #049, #062) | 4 | 4 | 4 | 12 | Medium | approved |
+| 079 | Feature | [Implement move-track tool](specs/079-move-track/spec.md) [E03] — offset track by range/bearing with map drag support (requires #049, #062) | 4 | 4 | 4 | 12 | Medium | specified |
 | 081 | Feature | [Implement point-in-zone-classifier tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — classify and recolor reference points by buffer zone membership (requires #049, #078, #080) | 4 | 4 | 4 | 12 | Medium | approved |
 | 082 | Feature | [Implement zone-histogram-generator tool](docs/ideas/E03-buffer-zone-analysis-demo.md) [E03] — outputs dataset/zone_histogram, point counts per buffer zone (requires #049, #081) | 4 | 4 | 4 | 12 | Medium | approved |
 | ~~094~~ | ~~Feature~~ | ~~[[E05] Implement point and rectangle drawing](docs/ideas/094-point-rectangle-drawing.md) (requires #091, #092, #093) [E05]~~ | ~~4~~ | ~~4~~ | ~~4~~ | ~~12~~ | ~~Medium~~ | ~~complete~~ |
@@ -230,8 +241,8 @@ Description formats:
 | 001 | Infrastructure | Extract shared MCP utilities into mcp-common package | 3 | 2 | 4 | 9 | Medium | proposed |
 | 037 | Tech Debt | [Fix test isolation in debrief-config tests](docs/ideas/030-fix-config-test-isolation.md) | 3 | 1 | 5 | 9 | Low | proposed |
 | 053 | Tech Debt | Remove migration-specific tool commands after Legacy Debrief migration complete (keep /tool.spec and /tool.implement for general use) | 2 | 1 | 5 | 8 | Low | proposed |
-| 010 | Tech Debt | Add rollback/cleanup API to debrief-stac for interrupted operations | 3 | 1 | 4 | 8 | Medium | proposed |
-| 012 | Enhancement | Wire loader plot count to debrief-stac list_plots call | 2 | 1 | 5 | 8 | Low | proposed |
+| ~~010~~ | ~~Tech Debt~~ | ~~Add rollback/cleanup API to debrief-stac for interrupted operations~~ | ~~3~~ | ~~1~~ | ~~4~~ | ~~8~~ | ~~Medium~~ | ~~complete~~ |
+| ~~012~~ | ~~Enhancement~~ | ~~Wire loader plot count to debrief-stac list_plots call~~ | ~~2~~ | ~~1~~ | ~~5~~ | ~~8~~ | ~~Low~~ | ~~complete~~ |
 | 018 | Infrastructure | [Add VS Code multi-root workspace configuration](specs/018-vscode-workspace-config/spec.md) | 3 | 1 | 5 | 9 | Low | shipped |
 | ~~042~~ | ~~Feature~~ | ~~[Add STAC catalog overview panel with map and timeline](specs/042-stac-catalog-overview-panel/spec.md)~~ | ~~5~~ | ~~5~~ | ~~3~~ | ~~13~~ | ~~High~~ | ~~complete~~ |
 | ~~051~~ | ~~Bug~~ | ~~[Load existing result files into Attachments dropdown](specs/051-load-result-attachments/spec.md)~~ | ~~5~~ | ~~3~~ | ~~4~~ | ~~12~~ | ~~Low~~ | ~~complete~~ |

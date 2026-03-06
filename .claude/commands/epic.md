@@ -8,7 +8,7 @@ description: Break down a large feature into deliverable backlog items with [Ex]
 $ARGUMENTS
 ```
 
-You **MUST** have a feature description provided (text, local path, or GitHub URL).
+If the user input above is not empty, use it as the feature description (text, local path, or GitHub URL). If it is empty, **ask the user** for a feature description before proceeding — do NOT stop the session.
 
 ## Purpose
 
@@ -34,19 +34,14 @@ Determine input type from `$ARGUMENTS`:
 | Ends with `.md` or contains `/` | Local path | Read via Read tool |
 | Everything else | Text description | Use directly |
 
-If no input provided:
-> "Please provide a feature description, document path, or GitHub URL."
->
-> Examples:
-> - `/epic Add storyboard briefing capability for analysts`
-> - `/epic docs/storyboard-spec.md`
-> - `/epic https://github.com/debrief/debrief-future/blob/main/docs/storyboard-spec.md`
+If no input provided, **interactively ask the user** (using AskUserQuestion or a direct question) what feature they want to break down. Do NOT stop or end the session. Continue the workflow once the user responds.
 
 ### Step 2: Fetch Content (if link/path)
 
 **For local paths**:
-1. Use Read tool to fetch the file
-2. If file not found, report error and stop
+1. Resolve relative paths against the current working directory to get an absolute path before calling Read
+2. Use Read tool to fetch the file
+3. If file not found, tell the user which path was tried and **ask them** for the correct path — do NOT stop the session
 
 **For GitHub URLs**:
 1. Use WebFetch to retrieve the document
@@ -240,11 +235,11 @@ Output the final summary:
 | Scenario | Action |
 |----------|--------|
 | No input provided | Ask for description, path, or URL |
-| Local file not found | Report error, suggest alternatives |
-| GitHub URL fetch failed | Report error, suggest local path |
-| BACKLOG.md not found | ERROR — stop workflow |
-| Epics section not found | ERROR — BACKLOG.md needs Epics section |
-| Epic ID overflow (>E99) | ERROR — epic limit reached |
+| Local file not found | Report the path tried, ask the user for the correct path |
+| GitHub URL fetch failed | Report error, ask user for local path or text description |
+| BACKLOG.md not found | Report error, ask user how to proceed |
+| Epics section not found | Report error, offer to create the Epics section |
+| Epic ID overflow (>E99) | Report error, ask user how to proceed |
 | Analysis produces <3 items | Warn, proceed anyway |
 | Analysis produces >10 items | Suggest splitting into multiple epics |
 | `gh` CLI unavailable | Fall back to local files |
