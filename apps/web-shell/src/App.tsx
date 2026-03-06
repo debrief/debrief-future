@@ -73,7 +73,7 @@ const toStoreMode = (m: string): StoreDisplayMode =>
 import { useSessionStore } from './hooks/useSessionStore';
 import { stacService } from './mocks/stacService';
 import { calcService } from './mocks/calcService';
-import { executeTool, isMutationTool } from './services/toolService';
+import { executeTool, isMutationTool, listTools } from './services/toolService';
 import type { ToolResult } from './mocks/calcService';
 import { mockFsAdapter } from './mocks/fsAdapter';
 
@@ -562,30 +562,57 @@ export default function App() {
     setTimeout(() => setLogNotification(null), 3000);
   }, []);
 
-  // Feature 113: Flip-card schema request — returns mock schema for demo
+  // Feature 113: Flip-card schema request — builds schema from tool definitions
   const handleSchemaRequest = useCallback(
     (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
-      // Find the first entry with this toolName to derive schema from its parameters
+      // Look up the tool definition to get proper schema info (enum, paramType, etc.)
+      const toolDefs = listTools();
+      const toolDef = toolDefs.find((t) => t.name === toolId);
+      const paramsSchema = (toolDef?.inputSchema?.properties?.params as
+        | { properties?: Record<string, { type?: string; enum?: unknown[]; default?: unknown; description?: string; minimum?: number; maximum?: number; step?: number; 'x-debrief-param-type'?: string }> }
+        | undefined)?.properties;
+
+      // Find the log entry to get current values and tunability
       const entry = logEntries.find((e: TimelineEntry) => e.toolName === toolId);
       const schema: ParameterSchemaEntry[] = [];
       if (entry) {
         for (const [name, param] of Object.entries(entry.parameters)) {
-          const valueType = typeof param.value;
+          const propSchema = paramsSchema?.[name];
+          const hasEnum = propSchema?.enum && propSchema.enum.length > 0;
+          const schemaType = propSchema?.type;
+
+          // Determine type: enum if choices exist, otherwise from schema or runtime value
+          let type: ParameterSchemaEntry['type'];
+          if (hasEnum) {
+            type = 'enum';
+          } else if (schemaType === 'number' || schemaType === 'integer') {
+            type = 'number';
+          } else if (schemaType === 'boolean') {
+            type = 'boolean';
+          } else if (schemaType === 'object') {
+            type = 'object';
+          } else if (schemaType === 'array') {
+            type = 'array';
+          } else {
+            // Fallback to runtime value type
+            const valueType = typeof param.value;
+            type = valueType === 'number' ? 'number' : valueType === 'boolean' ? 'boolean' : 'string';
+          }
+
           schema.push({
             name,
-            type: valueType === 'number' ? 'number' : valueType === 'boolean' ? 'boolean' : 'string',
-            description: null,
+            type,
+            description: propSchema?.description ?? null,
             tunable: param.tunable !== false,
-            defaultValue: param.default ? param.value : null,
-            minimum: valueType === 'number' ? 0 : null,
-            maximum: valueType === 'number' ? Number(param.value) * 3 : null,
-            step: valueType === 'number' ? 1 : null,
-            choices: null,
-            paramType: null,
+            defaultValue: propSchema?.default ?? (param.default ? param.value : null),
+            minimum: propSchema?.minimum ?? (type === 'number' ? 0 : null),
+            maximum: propSchema?.maximum ?? (type === 'number' ? Number(param.value) * 3 : null),
+            step: propSchema?.step ?? (type === 'number' ? 1 : null),
+            choices: hasEnum ? (propSchema!.enum as unknown[]) : null,
+            paramType: propSchema?.['x-debrief-param-type'] ?? null,
           });
         }
       }
-      // Simulate async — resolve immediately
       return Promise.resolve(schema);
     },
     [logEntries]
