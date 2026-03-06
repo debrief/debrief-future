@@ -242,6 +242,27 @@ def _strip_type_from_anyof(obj: object) -> None:
             _strip_type_from_anyof(item)
 
 
+def _collect_refs(
+    node: object, all_defs: dict[str, object], seen: set[str] | None = None
+) -> set[str]:
+    """Collect all $ref targets reachable from *node* (transitively)."""
+    if seen is None:
+        seen = set()
+    if isinstance(node, dict):
+        ref = node.get("$ref")
+        if isinstance(ref, str) and ref.startswith("#/$defs/"):
+            name = ref.split("/")[-1]
+            if name not in seen and name in all_defs:
+                seen.add(name)
+                _collect_refs(all_defs[name], all_defs, seen)
+        for v in node.values():
+            _collect_refs(v, all_defs, seen)
+    elif isinstance(node, list):
+        for item in node:
+            _collect_refs(item, all_defs, seen)
+    return seen
+
+
 def generate_jsonschema() -> bool:
     """Generate JSON Schema from LinkML schema."""
     import json
@@ -295,13 +316,15 @@ def generate_jsonschema() -> bool:
             "TrackStyle",
             "SystemState",
         ]
+        all_defs = full_schema.get("$defs", {})
         for entity in entity_types:
-            if entity in full_schema.get("$defs", {}):
+            if entity in all_defs:
+                reachable = _collect_refs(all_defs[entity], all_defs)
                 entity_schema = {
                     "$schema": "https://json-schema.org/draft/2019-09/schema",
                     "$id": f"https://debrief.info/schemas/{entity}",
-                    **full_schema["$defs"][entity],
-                    "$defs": full_schema.get("$defs", {}),
+                    **all_defs[entity],
+                    "$defs": {k: v for k, v in all_defs.items() if k in reachable},
                 }
                 entity_file = JSONSCHEMA_OUT / f"{entity}.schema.json"
                 entity_file.write_text(json.dumps(entity_schema, indent=2))

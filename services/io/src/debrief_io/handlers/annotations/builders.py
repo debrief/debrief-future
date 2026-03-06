@@ -228,7 +228,6 @@ def build_narrative(line: str, line_number: int, filename: str) -> dict[str, Any
             "time": ts.iso_string,
             "text": text,
             "track_id": track_name,
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -325,7 +324,6 @@ def build_circle(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -400,7 +398,6 @@ def build_rectangle(line: str, line_number: int, filename: str) -> dict[str, Any
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -464,7 +461,6 @@ def build_line(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -570,7 +566,6 @@ def build_vector(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -629,7 +624,6 @@ def build_text(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "text": text,
             "symbol": symbol.color_code,
             "style": _build_point_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -703,7 +697,6 @@ def build_polygon(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -770,7 +763,6 @@ def build_polyline(line: str, line_number: int, filename: str) -> dict[str, Any]
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -857,7 +849,6 @@ def build_ellipse(line: str, line_number: int, filename: str) -> dict[str, Any]:
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_polygon_style(symbol),
-                "source_file": filename,
                 "line_number": line_number,
             },
         }
@@ -926,7 +917,6 @@ def build_ellipse(line: str, line_number: int, filename: str) -> dict[str, Any]:
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_polygon_style(symbol),
-                "source_file": filename,
                 "line_number": line_number,
             },
         }
@@ -991,7 +981,6 @@ def build_timetext(line: str, line_number: int, filename: str) -> dict[str, Any]
             "timestamp": timestamp.iso_string if timestamp else None,
             "symbol": symbol.color_code,
             "style": _build_point_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -1060,7 +1049,6 @@ def build_periodtext(line: str, line_number: int, filename: str) -> dict[str, An
             "time_end": time_end.iso_string if time_end else None,
             "symbol": symbol.color_code,
             "style": _build_point_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -1165,7 +1153,6 @@ def build_wheel(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -1265,7 +1252,6 @@ def build_dynamic_rect(line: str, line_number: int, filename: str) -> dict[str, 
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -1360,7 +1346,6 @@ def build_dynamic_circle(line: str, line_number: int, filename: str) -> dict[str
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -1448,7 +1433,6 @@ def build_dynamic_poly(line: str, line_number: int, filename: str) -> dict[str, 
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_polygon_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -1569,7 +1553,6 @@ def build_sensor(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -1655,7 +1638,6 @@ def build_sensor2(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-            "source_file": filename,
             "line_number": line_number,
         },
     }
@@ -1747,7 +1729,6 @@ def build_tma(line: str, line_number: int, filename: str) -> dict[str, Any] | No
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_line_style(symbol),
-                "source_file": filename,
                 "line_number": line_number,
             },
         }
@@ -1851,7 +1832,6 @@ def build_tma(line: str, line_number: int, filename: str) -> dict[str, Any] | No
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_polygon_style(symbol),
-                "source_file": filename,
                 "line_number": line_number,
             },
         }
@@ -1891,7 +1871,6 @@ def build_tracksplit(line: str, line_number: int, filename: str) -> dict[str, An
             "kind": "TRACKSPLIT",
             "track_id": track_id,
             "timestamp": timestamp.iso_string if timestamp else None,
-            "source_file": filename,
             "line_number": line_number,
         },
     }

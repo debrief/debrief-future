@@ -15,19 +15,20 @@ default_range: string
 
 imports:
   - linkml:types
+  - common
 
 classes:
   SystemRecordProperties:
     description: >-
       Properties for the non-spatial system record feature.
-      A system record is a GeoJSON Feature with featureType "system"
+      A system record is a GeoJSON Feature with kind SYSTEM_RECORD
       and Point geometry with empty coordinates.
     attributes:
-      feature_type:
-        description: Discriminator, always "system".
-        range: string
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
         required: true
-        equals_string: "system"
+        equals_string: "SYSTEM_RECORD"
       snapshot_links:
         description: Doubly-linked snapshot chain. Null when no snapshots exist.
         range: SnapshotLinks

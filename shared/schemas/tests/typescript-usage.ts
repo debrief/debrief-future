@@ -54,7 +54,6 @@ const trackFeature: TrackFeature = {
         coordinates: [-4.1245, 50.3467],
       },
     ],
-    source_file: "example.rep",
     color: "#0000FF",
   },
   bbox: [-4.1256, 50.3456, -4.1234, 50.3478],

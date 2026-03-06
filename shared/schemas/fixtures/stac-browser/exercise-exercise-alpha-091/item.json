@@ -1,0 +1,91 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-exercise-alpha-091",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -24.7068,
+          50.9519
+        ],
+        [
+          -23.1751,
+          50.9519
+        ],
+        [
+          -23.1751,
+          52.4837
+        ],
+        [
+          -24.7068,
+          52.4837
+        ],
+        [
+          -24.7068,
+          50.9519
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -24.7068,
+    50.9519,
+    -23.1751,
+    52.4837
+  ],
+  "properties": {
+    "title": "Exercise Exercise Alpha-091",
+    "description": "Exercise Alpha-091 \u2014 North Atlantic exercise. 0 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2025-05-22T14:00:00Z",
+    "end_datetime": "2025-05-27T03:56:48Z",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "NGFS",
+      "MCM",
+      "escort",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "zig-zag",
+      "intercept",
+      "depth-charge"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": [
+      "SE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-exercise-alpha-091.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

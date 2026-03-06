@@ -1,0 +1,95 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-joint-warrior",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25.3057,
+          -38.7804
+        ],
+        [
+          -23.4272,
+          -38.7804
+        ],
+        [
+          -23.4272,
+          -36.902
+        ],
+        [
+          -25.3057,
+          -36.902
+        ],
+        [
+          -25.3057,
+          -38.7804
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -25.3057,
+    -38.7804,
+    -23.4272,
+    -36.902
+  ],
+  "properties": {
+    "title": "Exercise Joint Warrior",
+    "description": "Joint Warrior \u2014 South Atlantic exercise. 2 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-01-16T21:00:00Z",
+    "end_datetime": "2021-01-17T23:25:18Z",
+    "debrief:vessel_classes": [
+      "surface/merchant/passenger/ferry",
+      "surface/merchant/cargo/container"
+    ],
+    "debrief:tags": [
+      "EW",
+      "boarding",
+      "gunnery",
+      "AAW",
+      "force-protection"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:track_names": [
+      "HMS Fridtjof Nansen",
+      "HMAS Lancaster"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "AU"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-joint-warrior.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

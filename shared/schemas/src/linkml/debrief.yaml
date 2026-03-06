@@ -23,6 +23,7 @@ imports:
   - tool
   - log-entry
   - system-record
+  - stac-extension
 
 # Root schema imports all modules - no additional classes needed here.
 # All entity definitions are in their respective module files:
@@ -33,3 +34,4 @@ imports:
 #                       LineAnnotation, TextAnnotation, VectorAnnotation
 #   - log-entry.yaml: LogEntry, WasGeneratedBy, ParameterValue, TuneAnnotation
 #   - system-record.yaml: SystemRecordProperties, SnapshotLinks, BranchRecord
+#   - stac-extension.yaml: StacExtensionProperties (STAC item.properties extension)
