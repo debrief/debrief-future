@@ -110,9 +110,7 @@ def list_items(ctx: Context, store: str) -> None:
         try:
             plots = list_plots(store_path)
         except CatalogNotFoundError:
-            formatter.error(
-                f"No STAC catalog found at: {store_path}", "CATALOG_NOT_FOUND"
-            )
+            formatter.error(f"No STAC catalog found at: {store_path}", "CATALOG_NOT_FOUND")
             formatter.finish()
             sys.exit(5)
 
@@ -185,9 +183,7 @@ def get_item(ctx: Context, store: str, item: str) -> None:
         try:
             item_data = read_plot(store_path, item)
         except CatalogNotFoundError:
-            formatter.error(
-                f"No STAC catalog found at: {store_path}", "CATALOG_NOT_FOUND"
-            )
+            formatter.error(f"No STAC catalog found at: {store_path}", "CATALOG_NOT_FOUND")
             formatter.finish()
             sys.exit(5)
         except PlotNotFoundError:
