@@ -1,0 +1,80 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-neptune-strike-2024",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [-5.2, 49.8],
+        [-3.1, 49.8],
+        [-3.1, 51.0],
+        [-5.2, 51.0],
+        [-5.2, 49.8]
+      ]
+    ]
+  },
+  "bbox": [-5.2, 49.8, -3.1, 51.0],
+  "properties": {
+    "title": "Exercise Neptune Strike 2024",
+    "description": "Multi-national anti-submarine warfare exercise in the Western Approaches",
+    "datetime": "2024-03-15T08:00:00Z",
+    "start_datetime": "2024-03-15T08:00:00Z",
+    "end_datetime": "2024-03-17T16:30:00Z",
+    "debrief:vessel_classes": [
+      "surface/warship/frigate/type23",
+      "surface/warship/destroyer/arleigh-burke",
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "multi-national",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "sonar-contact",
+      "datum",
+      "prosecution"
+    ],
+    "debrief:author": "Lt Cdr J. Smith",
+    "debrief:track_names": [
+      "HMS Argyll",
+      "USS Porter",
+      "SUBMERGED CONTACT 01"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-neptune-strike-2024.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}
