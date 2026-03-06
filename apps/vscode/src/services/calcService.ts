@@ -346,6 +346,14 @@ export class CalcService {
   }
 
   /**
+   * Get currently cached tools without triggering a fetch.
+   * Returns empty array if tools haven't been fetched yet.
+   */
+  getCurrentTools(): Tool[] {
+    return this.toolCache?.tools ?? [];
+  }
+
+  /**
    * Create a result layer from tool execution with provenance (FR-024).
    *
    * @param toolId - Tool ID that produced the result

@@ -149,9 +149,48 @@ function LogPanelApp(): React.ReactElement {
           setTimeout(() => setActionResultMessage(null), 5000);
           break;
 
-        case 'schema:response':
-          // Schema is now derived locally — no extension round-trip needed.
+        case 'schema:response': {
+          const { toolId: schemaToolId, schema: rawSchema, error: schemaErr } = msg.payload;
+          const pending = pendingSchemaRef.current.get(schemaToolId);
+          if (pending) {
+            pendingSchemaRef.current.delete(schemaToolId);
+            if (schemaErr || !rawSchema || (rawSchema as unknown[]).length === 0) {
+              // Extension returned empty/error — fall back to local derivation
+              const entry = entries.find((e) => e.toolName === schemaToolId);
+              const fallback: ParameterSchemaEntry[] = [];
+              if (entry) {
+                for (const [name, param] of Object.entries(entry.parameters)) {
+                  const isNum = typeof param.value === 'number';
+                  fallback.push({
+                    name,
+                    type: isNum ? 'number' : 'string',
+                    description: null,
+                    tunable: param.tunable !== false,
+                    defaultValue: param.default ? param.value : null,
+                    minimum: null,
+                    maximum: null,
+                    step: isNum ? 1 : null,
+                    choices: null,
+                    paramType: null,
+                  });
+                }
+              }
+              pending.resolve(fallback);
+            } else {
+              // Merge extension schema with local parameter tunability/values
+              const entry = entries.find((e) => e.toolName === schemaToolId);
+              const merged = (rawSchema as ParameterSchemaEntry[]).map((s) => {
+                const paramVal = entry?.parameters[s.name];
+                return {
+                  ...s,
+                  tunable: paramVal ? paramVal.tunable !== false : s.tunable,
+                };
+              });
+              pending.resolve(merged);
+            }
+          }
           break;
+        }
       }
     };
 
@@ -243,30 +282,50 @@ function LogPanelApp(): React.ReactElement {
     vscode.postMessage({ type: 'replay:cancel' });
   }, []);
 
-  // Feature 113: derive schema from existing parameter metadata.
-  // Parameters already carry value/tunable/default info — no extension round-trip needed.
+  // Feature 113: Schema resolution via extension host round-trip.
+  // Sends schema:request to extension, which looks up tool definitions
+  // and returns ParameterSchemaEntry[] with proper choices/paramType.
+  // Falls back to local parameter-based derivation if no response.
+  const pendingSchemaRef = useRef(new Map<string, {
+    resolve: (schema: ReadonlyArray<ParameterSchemaEntry>) => void;
+  }>());
+
   const handleSchemaRequest = useCallback(
     (toolId: string): Promise<ReadonlyArray<ParameterSchemaEntry>> => {
-      const entry = entries.find((e) => e.toolName === toolId);
-      const schema: ParameterSchemaEntry[] = [];
-      if (entry) {
-        for (const [name, param] of Object.entries(entry.parameters)) {
-          const isNum = typeof param.value === 'number';
-          schema.push({
-            name,
-            type: isNum ? 'number' : 'string',
-            description: null,
-            tunable: param.tunable !== false,
-            defaultValue: param.default ? param.value : null,
-            minimum: isNum ? 0 : null,
-            maximum: isNum ? Number(param.value) * 3 : null,
-            step: isNum ? 1 : null,
-            choices: null,
-            paramType: null,
-          });
-        }
-      }
-      return Promise.resolve(schema);
+      return new Promise<ReadonlyArray<ParameterSchemaEntry>>((resolve) => {
+        // Store resolver for when schema:response arrives
+        pendingSchemaRef.current.set(toolId, { resolve });
+
+        // Send request to extension host
+        vscode.postMessage({ type: 'schema:request', payload: { toolId } });
+
+        // Timeout fallback: derive from local parameter metadata after 2s
+        setTimeout(() => {
+          if (!pendingSchemaRef.current.has(toolId)) return; // Already resolved
+          pendingSchemaRef.current.delete(toolId);
+
+          const entry = entries.find((e) => e.toolName === toolId);
+          const schema: ParameterSchemaEntry[] = [];
+          if (entry) {
+            for (const [name, param] of Object.entries(entry.parameters)) {
+              const isNum = typeof param.value === 'number';
+              schema.push({
+                name,
+                type: isNum ? 'number' : 'string',
+                description: null,
+                tunable: param.tunable !== false,
+                defaultValue: param.default ? param.value : null,
+                minimum: null,
+                maximum: null,
+                step: isNum ? 1 : null,
+                choices: null,
+                paramType: null,
+              });
+            }
+          }
+          resolve(schema);
+        }, 2000);
+      });
     },
     [entries]
   );

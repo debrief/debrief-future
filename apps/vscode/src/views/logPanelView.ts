@@ -20,6 +20,8 @@ import {
   type ResultIdRegistry,
 } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
+import type { CalcService } from '../services/calcService';
+import type { ToolParameter } from '../types/tool';
 
 // Locally-defined types matching @debrief/components LogPanel types.
 // Defined here to avoid ESM-from-CJS import issues with @debrief/components.
@@ -45,6 +47,20 @@ interface TimelineEntry {
   disabled?: boolean;
   rationale?: string | null;
   tuneAnnotation?: { parameter: string; previousValue: unknown; newValue: unknown } | null;
+}
+
+// Locally-defined ParameterSchemaEntry matching @debrief/components LogPanel types.
+interface ParameterSchemaEntry {
+  name: string;
+  type: 'number' | 'string' | 'boolean' | 'enum' | 'object' | 'array';
+  description: string | null;
+  tunable: boolean;
+  defaultValue: unknown;
+  minimum: number | null;
+  maximum: number | null;
+  step: number | null;
+  choices: ReadonlyArray<unknown> | null;
+  paramType: string | null;
 }
 
 // Webview → Extension messages
@@ -205,6 +221,9 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   // Callback to refresh MapPanel features after replay (Feature: 076)
   private _onFeaturesChanged?: () => void;
 
+  // CalcService for resolving tool parameter schemas
+  private _calcService?: CalcService;
+
   constructor(
     extensionUri: vscode.Uri,
     private readonly _context: vscode.ExtensionContext,
@@ -237,6 +256,13 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
    */
   public setOnFeaturesChanged(callback: () => void): void {
     this._onFeaturesChanged = callback;
+  }
+
+  /**
+   * Set the CalcService for resolving tool parameter schemas in flip-card edit mode.
+   */
+  public setCalcService(calcService: CalcService): void {
+    this._calcService = calcService;
   }
 
   /**
@@ -707,15 +733,45 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   private _handleSchemaRequest(payload: {
     toolId: string;
   }): void {
-    // TODO: Wire to actual tool schema registry when available.
-    // For now, return an empty schema array (no type-aware controls, fallback only).
+    if (!this._calcService) {
+      // No CalcService — return empty schema (fallback to text inputs)
+      this._postMessage({
+        type: 'schema:response',
+        payload: { toolId: payload.toolId, schema: [], error: null },
+      });
+      return;
+    }
+
+    // Build schema from cached tool list (no async fetch — uses already-cached tools)
+    const tools = this._calcService.getCurrentTools?.() ?? [];
+    const tool = tools.find((t) => t.id === payload.toolId || t.name === payload.toolId);
+
+    if (!tool || !tool.parameters || tool.parameters.length === 0) {
+      this._postMessage({
+        type: 'schema:response',
+        payload: { toolId: payload.toolId, schema: [], error: null },
+      });
+      return;
+    }
+
+    const schema: ParameterSchemaEntry[] = tool.parameters.map(
+      (p: ToolParameter): ParameterSchemaEntry => ({
+        name: p.name,
+        type: p.valueType === 'enum' ? 'enum' : p.valueType,
+        description: p.description ?? null,
+        tunable: true,
+        defaultValue: p.defaultValue ?? null,
+        minimum: null,
+        maximum: null,
+        step: null,
+        choices: p.choices ?? null,
+        paramType: p.paramType ?? null,
+      })
+    );
+
     this._postMessage({
       type: 'schema:response',
-      payload: {
-        toolId: payload.toolId,
-        schema: [],
-        error: null,
-      },
+      payload: { toolId: payload.toolId, schema, error: null },
     });
   }
 
