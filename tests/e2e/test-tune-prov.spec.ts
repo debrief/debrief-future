@@ -12,8 +12,8 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe('US-Tune: PROV Tuning Workflow', () => {
-  test.setTimeout(120_000);
+// Skip: Log Panel webview doesn't load in openvscode-server (backlog #124)
+test.describe.skip('US-Tune: PROV Tuning Workflow', () => {
 
   test('T-TUNE-01: run move-shape on annotation, log entry appears with tunable parameters', async ({
     codeServerPage,

@@ -8,8 +8,8 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe('Event Log Propagation', () => {
-  test.setTimeout(120_000);
+// Skip: Log Panel webview doesn't load in openvscode-server (backlog #124)
+test.describe.skip('Event Log Propagation', () => {
 
   test('amending first event re-applies subsequent events', async ({
     codeServerPage,

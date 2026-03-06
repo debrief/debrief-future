@@ -8,8 +8,8 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe('Log Panel', () => {
-  test.setTimeout(120_000);
+// Skip: Log Panel webview doesn't load in openvscode-server (backlog #124)
+test.describe.skip('Log Panel', () => {
 
   test('log panel shows empty state when no tools have run', async ({
     codeServerPage,

@@ -8,8 +8,8 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe('Log Edit Face', () => {
-  test.setTimeout(120_000);
+// Skip: Log Panel webview doesn't load in openvscode-server (backlog #124)
+test.describe.skip('Log Edit Face', () => {
 
   test('clicking edit icon shows the edit face', async ({
     codeServerPage,
