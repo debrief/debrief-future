@@ -48,9 +48,7 @@ def compute_centroid(geometry: dict[str, Any]) -> list[float]:
     return [sum_lon / n, sum_lat / n]
 
 
-def scale_coordinate(
-    coord: list[float], origin: list[float], scale_factor: float
-) -> list[float]:
+def scale_coordinate(coord: list[float], origin: list[float], scale_factor: float) -> list[float]:
     """
     Scale a single [lon, lat] coordinate relative to an origin.
 
@@ -130,6 +128,7 @@ def enlarge_shape(context: SelectionContext, params: dict[str, Any]) -> list[dic
     raw_origin = params.get("origin")
     if isinstance(raw_origin, str):
         import json
+
         origin = json.loads(raw_origin)
     elif isinstance(raw_origin, list):
         origin = raw_origin
