@@ -174,7 +174,7 @@ export function execute(
       geometry.coordinates = polyCoords.map((ring) =>
         scaleCoordsList(ring, scalingOrigin, scaleFactor),
       );
-      if (kind === 'CIRCLE' && props.center != null) {
+      if (kind === 'CIRCLE' && props.center !== undefined) {
         props.center = scaleCoordinate(props.center as number[], scalingOrigin, scaleFactor);
       }
     } else if (kind === 'LINE') {
@@ -183,7 +183,7 @@ export function execute(
       geometry.coordinates = scaleCoordinate(coords as number[], scalingOrigin, scaleFactor);
     } else if (kind === 'VECTOR') {
       geometry.coordinates = scaleCoordsList(coords as number[][], scalingOrigin, scaleFactor);
-      if (props.origin != null) {
+      if (props.origin !== undefined) {
         props.origin = scaleCoordinate(props.origin as number[], scalingOrigin, scaleFactor);
       }
     }
