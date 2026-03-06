@@ -524,6 +524,33 @@
       "title": "GeoJSONPolygon",
       "type": "object"
     },
+    "InputFeatureState": {
+      "additionalProperties": false,
+      "description": "Pre-operation state of a feature captured before a coordinate-mutating tool executes. Enables correct replay by providing the original geometry as the anchor for re-computation with modified parameters.",
+      "properties": {
+        "feature_id": {
+          "description": "ID of the feature whose pre-operation state is captured.",
+          "type": "string"
+        },
+        "geometry": {
+          "description": "Full GeoJSON geometry object (type + coordinates) as it was immediately before the operation. Stored as a JSON object.",
+          "type": "string"
+        },
+        "properties": {
+          "description": "Kind-specific spatial properties captured before the operation. Excludes provenance (which is append-only). Null if no spatial properties need capturing.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "feature_id",
+        "geometry"
+      ],
+      "title": "InputFeatureState",
+      "type": "object"
+    },
     "LineAnnotation": {
       "additionalProperties": false,
       "description": "GeoJSON Feature for line segment annotations. Geometry is a LineString with 2 points (start and end).",
@@ -703,6 +730,13 @@
           "description": "Unique operation identifier (UUID v4). Shared across features in multi-feature operations.",
           "type": "string"
         },
+        "disabled": {
+          "description": "Whether this entry is skipped during replay. Toggled via the flip-card edit face.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
         "execution_duration": {
           "description": "Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S).",
           "pattern": "^PT[0-9]+(\\.[0-9]+)?S$",
@@ -717,6 +751,23 @@
         },
         "generated_result_id": {
           "description": "Stable logical identity for artifact-producing tools. Null for non-artifact tools.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "input_state": {
+          "description": "Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools.",
+          "items": {
+            "$ref": "#/$defs/InputFeatureState"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "rationale": {
+          "description": "Free-text analyst annotation explaining the reasoning for this operation.",
           "type": [
             "string",
             "null"
@@ -2052,6 +2103,73 @@
       "title": "SnapshotRef",
       "type": "object"
     },
+    "StacExtensionProperties": {
+      "additionalProperties": false,
+      "description": "Extension properties added to STAC item.properties under the debrief: namespace. All properties are optional \u2014 existing items without extension properties remain valid. These properties enable filtering, searching, and colour-coding in the Discovery UI.",
+      "properties": {
+        "author": {
+          "description": "Analyst who created or last modified the plot. Free-text identifier.\n",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "feature_tags": {
+          "description": "Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.\n",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "nationalities": {
+          "description": "Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.\n",
+          "items": {
+            "pattern": "^[A-Z]{2}$",
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "tags": {
+          "description": "Plot-level tags \u2014 free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.\n",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "track_names": {
+          "description": "Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.\n",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "vessel_classes": {
+          "description": "Hierarchical vessel classification paths using slash-separated notation. Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23). Partial paths allowed for imprecise classification (e.g., surface/warship).\n",
+          "items": {
+            "pattern": "^[a-z0-9-]+(/[a-z0-9-]+){0,3}$",
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "title": "StacExtensionProperties",
+      "type": "object"
+    },
     "SystemRecordProperties": {
       "additionalProperties": false,
       "description": "Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with featureType \"system\" and Point geometry with empty coordinates.",
@@ -2927,6 +3045,16 @@
       ],
       "title": "VectorAnnotationProperties",
       "type": "object"
+    },
+    "VesselDomainEnum": {
+      "description": "Top-level vessel domain classification",
+      "enum": [
+        "surface",
+        "subsurface",
+        "unknown"
+      ],
+      "title": "VesselDomainEnum",
+      "type": "string"
     },
     "WasGeneratedBy": {
       "additionalProperties": false,
