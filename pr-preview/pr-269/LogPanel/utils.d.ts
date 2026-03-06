@@ -44,4 +44,14 @@ export declare function formatDuration(isoDuration: string): string;
  * Format an ISO 8601 timestamp to a short display string.
  */
 export declare function formatTimestamp(isoTimestamp: string): string;
+/**
+ * Calculate the cascade of entries that should be auto-disabled
+ * when a given entry is disabled.
+ *
+ * Uses a visited guard (F1) to prevent infinite loops in circular
+ * dependency graphs.
+ *
+ * Feature: 113-prov-card-flip
+ */
+export declare function cascadeDisable(entryId: string, timeline: TimelineEntry[]): string[];
 //# sourceMappingURL=utils.d.ts.map
