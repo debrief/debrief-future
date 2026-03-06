@@ -86,6 +86,8 @@ Hierarchical vessel classification for expanding parent-node filters. Provided b
 
 ### Descendant Expansion
 
+Items store vessel classes as **full taxonomy paths** (e.g., `"surface/warship/frigate/type23"`), as defined by #125. The engine must expand a filter node ID to all full paths under that node.
+
 Given a taxonomy:
 ```
 surface/warship/frigate/type23
@@ -93,9 +95,27 @@ surface/warship/frigate/type26
 surface/warship/destroyer/type45
 ```
 
-Filtering on `warship` matches items with any of: `warship`, `frigate`, `type23`, `type26`, `destroyer`, `type45`, or the full paths `surface/warship`, `surface/warship/frigate`, etc.
+Filtering on `warship` expands to the set of full paths:
+```
+["surface/warship", "surface/warship/frigate", "surface/warship/frigate/type23",
+ "surface/warship/frigate/type26", "surface/warship/destroyer",
+ "surface/warship/destroyer/type45"]
+```
 
-The engine pre-computes a map: `{ "warship": ["warship", "frigate", "type23", "type26", "destroyer", "type45", ...] }` at construction time.
+An item matches if any of its `vesselClasses` entries appears in this expanded set.
+
+The engine pre-computes a map at construction time: `{ nodeId → Set<fullPath> }` for every node in the taxonomy. Example:
+```
+{
+  "surface":   Set(["surface", "surface/warship", "surface/warship/frigate", ...]),
+  "warship":   Set(["surface/warship", "surface/warship/frigate", ...]),
+  "frigate":   Set(["surface/warship/frigate", "surface/warship/frigate/type23", ...]),
+  "type23":    Set(["surface/warship/frigate/type23"]),
+  ...
+}
+```
+
+The filter value is a **node ID** (e.g., `"warship"`), not a full path. The expansion map resolves it to all descendant full paths for matching against item data.
 
 ## Entity: StacBrowserItem
 
