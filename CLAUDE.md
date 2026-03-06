@@ -134,6 +134,7 @@ Only updated when a feature introduces a technology not already listed here.
 - Python 3.11, TypeScript 5.x + pyright (new), ruff (existing — add ANN/TC rules), ESLint + @typescript-eslint (existing — tighten config) (098-strict-type-checking)
 - N/A — configuration and code quality feature (098-strict-type-checking)
 - Python 3.11 (services, schemas), TypeScript 5.x (VS Code, shared components, web-shell) + Pydantic v2 (validation), LinkML >= 1.7.0 (schema source), `debrief-schemas` (generated models) (115-schema-validated-tool-io)
+- Python 3.11 (service), TypeScript 5.x (VS Code + web-shell frontends) + debrief-calc (Python tool framework), VS Code Extension API (TypeScript) (079-move-track)
 
 - Python 3.11 (services, schemas, calc tools)
 - TypeScript 5.x (VS Code extension, webview, shared components, session-state)
@@ -196,5 +197,6 @@ cd apps/web-shell && node run-playwright.mjs && cd ../..
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 079-move-track: Added Python 3.11 (service), TypeScript 5.x (VS Code + web-shell frontends) + debrief-calc (Python tool framework), VS Code Extension API (TypeScript)
 - 115-schema-validated-tool-io: Added Python 3.11 (services, schemas), TypeScript 5.x (VS Code, shared components, web-shell) + Pydantic v2 (validation), LinkML >= 1.7.0 (schema source), `debrief-schemas` (generated models)
 - 100-unify-feature-pipeline: Added TypeScript 5.x (VS Code extension + shared components) + `@debrief/schemas` (generated types), `@debrief/components` (MapView), VS Code Extension API ^1.85.0
