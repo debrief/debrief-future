@@ -849,7 +849,7 @@ def build_ellipse(line: str, line_number: int, filename: str) -> dict[str, Any]:
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_polygon_style(symbol),
-                    "line_number": line_number,
+                "line_number": line_number,
             },
         }
     else:
@@ -917,7 +917,7 @@ def build_ellipse(line: str, line_number: int, filename: str) -> dict[str, Any]:
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_polygon_style(symbol),
-                    "line_number": line_number,
+                "line_number": line_number,
             },
         }
 
@@ -1729,7 +1729,7 @@ def build_tma(line: str, line_number: int, filename: str) -> dict[str, Any] | No
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_line_style(symbol),
-                    "line_number": line_number,
+                "line_number": line_number,
             },
         }
     else:
@@ -1832,7 +1832,7 @@ def build_tma(line: str, line_number: int, filename: str) -> dict[str, Any] | No
                 "label": label,
                 "symbol": symbol.color_code,
                 "style": _build_polygon_style(symbol),
-                    "line_number": line_number,
+                "line_number": line_number,
             },
         }
 

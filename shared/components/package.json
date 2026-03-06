@@ -35,6 +35,10 @@
     "./ChartRenderer": {
       "types": "./dist/ChartRenderer/index.d.ts",
       "import": "./dist/ChartRenderer/index.js"
+    },
+    "./filter-engine": {
+      "types": "./dist/filter-engine/index.d.ts",
+      "import": "./dist/filter-engine/index.js"
     }
   },
   "sideEffects": [
@@ -67,6 +71,7 @@
     "@debrief/schemas": "workspace:*",
     "@geoman-io/leaflet-geoman-free": "^2.19.2",
     "@tanstack/react-virtual": "^3.0.0",
+    "cql2-filters-parser": "^0.9.14",
     "golden-layout": "^2.6.0",
     "leaflet": "^1.9.0",
     "react-leaflet": "^4.2.1",
