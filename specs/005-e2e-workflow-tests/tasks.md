@@ -103,9 +103,9 @@
 - [x] T102 [P][US1] Remove `.skip()` from test-analysis-tool.spec.ts, fix selectors to match current extension output `tests/e2e/test-analysis-tool.spec.ts`
 - [x] T103 [P][US1] Remove `.skip()` from test-error-feedback.spec.ts, fix selectors to match current extension output `tests/e2e/test-error-feedback.spec.ts`
 - [x] T104 [P][US1] Remove `.skip()` from test-tune-prov.spec.ts, fix selectors to match current extension output `tests/e2e/test-tune-prov.spec.ts`
-- [ ] T105 [US1] Verify real Python services (debrief-io, debrief-stac, debrief-calc) are reachable from Docker container — test REP file parsing produces real GeoJSON `docker/code-server/Dockerfile`
+- [x] T105 [US1] Verify real Python services (debrief-io, debrief-stac, debrief-calc) are reachable from Docker container — test REP file parsing produces real GeoJSON `docker/code-server/Dockerfile`
 - [x] T106 [US1] Convert tests that reveal missing features to `test.fixme()` with backlog cross-references (FR-011) `tests/e2e/`
-- [ ] T107 [US1] Run restored tests against Docker environment and verify pass/fixme status `tests/e2e/`
+- [x] T107 [US1] Run restored tests against Docker environment and verify pass/fixme status `tests/e2e/`
 
 **Checkpoint**: The original 4 skipped spec files are now active (passing or fixme'd). Real Python services parse real REP files end-to-end.
 
@@ -137,7 +137,7 @@
 - [x] T213 [P][US2] Create undo-redo-split spec (adapt from `apps/web-shell/playwright/tests/undo-redo-split.spec.ts`) `tests/e2e/test-undo-redo-split.spec.ts`
 - [x] T214 [P][US2] Create capture-log-evidence spec (adapt from `apps/web-shell/playwright/tests/capture-log-evidence.spec.ts`) `tests/e2e/test-capture-log-evidence.spec.ts`
 - [x] T215 [US2] Convert tests that reveal missing features to `test.fixme()` with backlog cross-references (FR-011) `tests/e2e/`
-- [ ] T216 [US2] Run full expanded suite and verify 13+ spec files pass or fixme `tests/e2e/`
+- [x] T216 [US2] Run full expanded suite and verify 13+ spec files pass or fixme `tests/e2e/`
 
 **Checkpoint**: VS Code E2E suite now covers all 13 web-shell spec categories. Tests pass or are annotated with `test.fixme()` with corresponding backlog items.
 
@@ -151,10 +151,10 @@
 
 ### CI Workflow Updates
 
-- [ ] T301 [US3] Update `e2e.yml` to run all 13+ VS Code E2E spec files (not just original 3) `.github/workflows/e2e.yml`
-- [ ] T302 [P][US3] Verify web-shell Playwright tests still pass via `ci.yml` (regression check) `.github/workflows/ci.yml`
-- [ ] T303 [US3] Verify total CI time for both suites stays within 10 minutes (SC-003) `.github/workflows/`
-- [ ] T304 [US3] Update `docs/e2e-test-restoration-requirements.md` to reflect completed restoration `docs/e2e-test-restoration-requirements.md`
+- [x] T301 [US3] Update `e2e.yml` to run all 13+ VS Code E2E spec files (not just original 3) `.github/workflows/e2e.yml`
+- [x] T302 [P][US3] Verify web-shell Playwright tests still pass via `ci.yml` (regression check) `.github/workflows/ci.yml`
+- [x] T303 [US3] Verify total CI time for both suites stays within 10 minutes (SC-003) `.github/workflows/`
+- [x] T304 [US3] Update `docs/e2e-test-restoration-requirements.md` to reflect completed restoration `docs/e2e-test-restoration-requirements.md`
 
 **Checkpoint**: Both CI workflows pass. Dual-platform E2E strategy is validated.
 
