@@ -5,7 +5,7 @@
 
 ## Summary
 
-Add live spatial filtering to the STAC browser Discovery UI. The existing `CatalogOverview` component renders exercise footprints (bounding boxes) on a Leaflet map — this feature extends it to emit viewport-change events so that panning/zooming the map acts as a spatial filter, dynamically narrowing the list and timeline views. A new `bboxOverlapsViewport` utility handles intersection testing. Exercise footprints gain per-exercise colour support (pluggable, defaulting to accent colour until #134 lands). Double-click opens an exercise; hover shows a tooltip (both already exist). Cross-view synchronisation is achieved through the existing session-state Zustand store's spatial slice.
+Add live spatial filtering to the STAC browser Discovery UI. The existing `CatalogOverview` component renders exercise footprints (bounding boxes) on a Leaflet map — this feature extends it so that panning/zooming the map acts as a spatial filter. The **map** always shows all footprints (so users can pan toward them); the **timeline** filters internally to show only exercises overlapping the current viewport. A `bboxOverlapsViewport` utility (added to the existing `utils/bounds.ts`) handles AABB intersection testing, reusing the existing `Bounds` type. An `onViewportChange` callback emits debounced viewport bounds for external consumers (session-state store, future list views). Exercise footprints gain per-exercise colour support via a pluggable `colorMap` prop (defaulting to accent colour until #134 lands). Double-click opens an exercise; hover shows a tooltip (both already exist). Cross-view synchronisation is achieved through the existing session-state Zustand store's spatial slice.
 
 ## Technical Context
 
@@ -59,15 +59,13 @@ specs/130-map-spatial-filtering/
 ```text
 shared/components/src/
 ├── CatalogOverview/
-│   ├── CatalogOverview.tsx          # MODIFY — add onViewportChange, colour prop, empty overlay
+│   ├── CatalogOverview.tsx          # MODIFY — add onViewportChange, colour prop, empty overlay, internal timeline filtering
 │   ├── CatalogOverview.stories.tsx  # MODIFY — add spatial filter stories
 │   ├── CatalogOverview.test.tsx     # NEW — unit tests for spatial filtering logic
 │   ├── CatalogOverview.css          # MODIFY — empty state overlay styles
-│   └── types.ts                     # MODIFY — extend props with viewport/colour callbacks
-├── filter-engine/
-│   └── spatial.ts                   # NEW — bboxOverlapsViewport, filterBySpatialExtent
+│   └── types.ts                     # MODIFY — extend props with viewport/colour callbacks (uses existing Bounds type)
 └── utils/
-    └── useDebouncedCallback.ts      # NEW — reusable debounce hook
+    └── bounds.ts                    # MODIFY — add bboxOverlapsViewport, filterBySpatialExtent
 
 apps/vscode/src/
 ├── webview/web/
@@ -76,7 +74,14 @@ apps/vscode/src/
     └── catalogOverviewPanel.ts      # MODIFY — handle viewport messages, open exercise
 ```
 
-**Structure Decision**: Extends the existing shared component library and VS Code extension. No new packages or projects — all changes fit within `shared/components` and `apps/vscode`. The spatial intersection utility lives alongside the existing CQL2 filter engine in `filter-engine/spatial.ts` as a composable, orthogonal filter dimension.
+**Structure Decision**: Extends the existing shared component library and VS Code extension. No new packages or projects — all changes fit within `shared/components` and `apps/vscode`. The spatial intersection utility lives in `utils/bounds.ts` alongside existing geometry utilities (`calculateBounds`, `expandBounds`, `isPointInBounds`). No new files for debouncing — the existing `useRef` + `setTimeout` pattern (from `FilterDropdown.tsx`) is used inline. Timeline filtering happens **inside** CatalogOverview using the component's own viewport state — the map always shows all items while the timeline shows only spatially-overlapping ones.
+
+**Key design decisions from review**:
+- Reuse existing `Bounds` type from `utils/types.ts` — do NOT introduce `SpatialBounds`
+- `bboxOverlapsViewport` in `utils/bounds.ts` — NOT in `filter-engine/`
+- Timeline filters internally; map shows all items; `onViewportChange` emits for external consumers
+- Guard `moveend` handler against uninitialised map; cleanup debounce timer on unmount
+- Memoize Rectangle list to prevent unnecessary React reconciliation at 200 items
 
 ## Media Components
 

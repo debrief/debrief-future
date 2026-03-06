@@ -4,14 +4,22 @@
  * This file defines the extended public API for the CatalogOverview component
  * with spatial filtering support. It serves as the design contract — the
  * actual implementation will live in shared/components/src/CatalogOverview/types.ts.
+ *
+ * REVIEW NOTE: Uses existing Bounds type from utils/types.ts — NOT a new SpatialBounds.
+ * Spatial utilities (bboxOverlapsViewport, filterBySpatialExtent) live in utils/bounds.ts.
+ * Timeline filtering happens INSIDE CatalogOverview; map shows all items.
  */
 
 // =============================================================================
-// Types
+// Types (existing — imported from utils/types.ts in implementation)
 // =============================================================================
 
-/** Axis-aligned bounding box in STAC format: [west, south, east, north] */
-export type SpatialBounds = [number, number, number, number];
+/**
+ * Bounds as [minLon, minLat, maxLon, maxLat].
+ * Already defined at shared/components/src/utils/types.ts:103.
+ * Reused here for documentation — NOT a new type.
+ */
+export type Bounds = [number, number, number, number];
 
 /**
  * A single item in a STAC catalog overview (unchanged from existing).
@@ -24,7 +32,7 @@ export interface CatalogOverviewItem {
   /** Path to item.json relative to store root */
   itemPath: string;
   /** Bounding box [west, south, east, north] */
-  bbox: SpatialBounds | null;
+  bbox: Bounds | null;
   /** Single datetime (ISO 8601) */
   datetime: string | null;
   /** Range start datetime (ISO 8601) */
@@ -37,7 +45,7 @@ export interface CatalogOverviewItem {
  * Props for the CatalogOverview component (extended with spatial filtering).
  */
 export interface CatalogOverviewProps {
-  /** Items to display in the overview */
+  /** Items to display in the overview — ALL items, unfiltered */
   items: CatalogOverviewItem[];
 
   /** Callback when user double-clicks an item */
@@ -58,8 +66,12 @@ export interface CatalogOverviewProps {
    * Callback when the map viewport changes (debounced, 150ms).
    * Bounds in STAC format [west, south, east, north].
    * null when map is not yet initialised.
+   *
+   * The map always renders ALL items. The internal timeline filters to show
+   * only items overlapping the viewport. This callback is for EXTERNAL
+   * consumers (session-state store, future list views).
    */
-  onViewportChange?: (bounds: SpatialBounds | null) => void;
+  onViewportChange?: (bounds: Bounds | null) => void;
 
   /**
    * Map from item ID to CSS colour string.
@@ -70,25 +82,28 @@ export interface CatalogOverviewProps {
 }
 
 // =============================================================================
-// Spatial filtering utility contract
+// Spatial filtering utility contract (lives in utils/bounds.ts)
 // =============================================================================
 
 /**
  * Test whether two bounding boxes overlap.
  * Handles antimeridian-crossing boxes (where west > east).
  *
+ * Implementation note: Guard against uninitialised map — if either bbox
+ * has invalid coordinates, return false.
+ *
  * @param itemBbox - Exercise footprint [west, south, east, north]
  * @param viewportBbox - Map viewport [west, south, east, north]
  * @returns true if the bounding boxes overlap
  */
 export type BboxOverlapsViewport = (
-  itemBbox: SpatialBounds,
-  viewportBbox: SpatialBounds,
+  itemBbox: Bounds,
+  viewportBbox: Bounds,
 ) => boolean;
 
 /**
  * Filter items to those whose bounding boxes overlap the viewport.
- * Items without bbox are excluded from the result.
+ * Items without bbox are EXCLUDED from the result (they bypass spatial filtering).
  *
  * @param items - All items to filter
  * @param viewportBbox - Current map viewport bounds
@@ -96,7 +111,7 @@ export type BboxOverlapsViewport = (
  */
 export type FilterBySpatialExtent = <T extends CatalogOverviewItem>(
   items: readonly T[],
-  viewportBbox: SpatialBounds,
+  viewportBbox: Bounds,
 ) => T[];
 
 // =============================================================================
@@ -106,7 +121,7 @@ export type FilterBySpatialExtent = <T extends CatalogOverviewItem>(
 /** Message from webview to extension host when viewport changes */
 export interface ViewportChangedMessage {
   type: 'overviewViewportChanged';
-  bounds: SpatialBounds | null;
+  bounds: Bounds | null;
 }
 
 /** Existing message types (unchanged) */
@@ -125,3 +140,27 @@ export type OverviewWebviewMessage =
   | ViewportChangedMessage
   | OverviewItemSelectedMessage
   | OverviewWebviewReadyMessage;
+
+// =============================================================================
+// Implementation safety requirements (from review)
+// =============================================================================
+
+/**
+ * SAFETY REQUIREMENTS for CatalogOverview implementation:
+ *
+ * 1. Guard moveend handler: Check that map.getBounds() returns valid data
+ *    before extracting coordinates. The map may fire moveend before fully
+ *    initialised.
+ *
+ * 2. Debounce cleanup on unmount: The useRef+setTimeout debounce timer
+ *    MUST be cleared in the useEffect cleanup function to prevent
+ *    setState-on-unmounted-component warnings.
+ *
+ * 3. Memoize Rectangle list: Wrap the .map() generating <Rectangle>
+ *    elements in useMemo, keyed on items + colorMap, to prevent React
+ *    from diffing 200 elements on unrelated state changes.
+ *
+ * 4. Antimeridian edge case: When west === east (zero-width bbox),
+ *    treat as non-crossing and render as a single line. Do NOT enter
+ *    the split-into-two-rectangles codepath.
+ */

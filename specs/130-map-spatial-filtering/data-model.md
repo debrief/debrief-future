@@ -37,20 +37,20 @@ interface StacBrowserItem extends CatalogOverviewItem {
 }
 ```
 
-### 3. SpatialBounds (new type alias)
+### 3. Bounds (existing — reused)
 
-A STAC-format bounding box used for both exercise footprints and map viewport bounds.
+The existing `Bounds` type from `utils/types.ts` is reused for both exercise footprints and map viewport bounds. No new type introduced.
 
 ```typescript
-/** Axis-aligned bounding box in STAC format: [west, south, east, north] */
-type SpatialBounds = [number, number, number, number];
+/** Bounds as [minLon, minLat, maxLon, maxLat] — already defined in utils/types.ts:103 */
+export type Bounds = [number, number, number, number];
 ```
 
-This is a type alias for documentation clarity — it uses the same `[number, number, number, number]` tuple as `CatalogOverviewItem.bbox`.
+This is the same tuple used by `calculateBounds`, `expandBounds`, `isPointInBounds`, and `CatalogOverviewItem.bbox`.
 
 ### 4. ViewportPolygon (existing — reused)
 
-The session-state store's viewport representation. CatalogOverview emits `SpatialBounds`, which the integration layer converts to `ViewportPolygon` for the store.
+The session-state store's viewport representation. CatalogOverview emits `Bounds`, which the integration layer converts to `ViewportPolygon` for the store.
 
 ```typescript
 interface ViewportPolygon {
@@ -74,7 +74,7 @@ interface CatalogOverviewProps {
 
   // New props
   /** Callback when the map viewport changes (debounced). Bounds in STAC format, null if map uninitialised. */
-  onViewportChange?: (bounds: SpatialBounds | null) => void;
+  onViewportChange?: (bounds: Bounds | null) => void;
 
   /** Map from item ID to CSS colour string. Items not in the map use the default accent colour. */
   colorMap?: ReadonlyMap<string, string>;
@@ -84,28 +84,39 @@ interface CatalogOverviewProps {
 ## Relationships
 
 ```
-CatalogOverviewItem.bbox ──[intersects]──> Map Viewport (SpatialBounds)
-                                              │
-                                              ▼
-                                        ViewportPolygon
-                                        (session-state store)
-                                              │
-                                              ▼
-                                   List/Timeline views
-                                   (consume filtered items)
+                     ┌────────────────────────────────────┐
+                     │       CatalogOverview              │
+                     │                                    │
+CatalogOverviewItem  │  MAP: renders ALL items with bbox  │
+    .bbox ───────────│                                    │
+                     │  TIMELINE: filters internally      │
+                     │  (shows only viewport-overlapping  │
+                     │   items + items without bbox)      │
+                     │                                    │
+                     │  onViewportChange(Bounds | null) ──┼──► Parent / integration layer
+                     └────────────────────────────────────┘           │
+                                                                     ▼
+                                                              ViewportPolygon
+                                                              (session-state store)
+                                                                     │
+                                                                     ▼
+                                                          External list views
+                                                          (future consumers)
 ```
 
 ## Data Flow
 
-1. **Input**: Parent provides `items: CatalogOverviewItem[]` to CatalogOverview
-2. **Render**: Items with bbox rendered as Rectangles on map; items coloured via `colorMap` lookup
-3. **Interaction**: User pans/zooms map → Leaflet `moveend` → debounced → `onViewportChange(bounds)`
-4. **Integration**: Parent receives bounds → runs `filterBySpatialExtent(items, bounds)` → passes filtered items to list/timeline
-5. **Session state**: Parent converts bounds to `ViewportPolygon` → `store.setViewport()` → other views subscribe
+1. **Input**: Parent provides `items: CatalogOverviewItem[]` (ALL items) to CatalogOverview
+2. **Map render**: Items with bbox rendered as Rectangles on map (ALL items, memoized); items coloured via `colorMap` lookup
+3. **Interaction**: User pans/zooms map → Leaflet `moveend` (guarded against uninitialised map) → debounced 150ms → updates internal viewport state
+4. **Timeline render**: Timeline filters items internally using `bboxOverlapsViewport` against current viewport. Items without bbox are always included (FR-005). Items with bbox outside viewport are hidden.
+5. **External callback**: `onViewportChange(bounds)` emits debounced viewport bounds for parent/integration layer
+6. **Session state**: Parent converts bounds to `ViewportPolygon` → `store.setViewport()` → external views subscribe
+7. **Unmount**: Debounce timer cleaned up to prevent setState-on-unmounted
 
 ## Validation Rules
 
-- `SpatialBounds`: west in [-180, 180], south in [-90, 90], east in [-180, 180], north in [-90, 90]. South must be ≤ north. West may be > east (antimeridian crossing).
+- `Bounds`: west in [-180, 180], south in [-90, 90], east in [-180, 180], north in [-90, 90]. South must be ≤ north. West may be > east (antimeridian crossing).
 - `colorMap` values: Must be valid CSS colour strings (hex, rgb, hsl, named). No validation at runtime — invalid colours silently fall back to browser defaults.
 - `onViewportChange` debounce: 150ms from last `moveend` event.
 

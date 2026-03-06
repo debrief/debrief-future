@@ -51,7 +51,7 @@ pnpm --filter debrief-vscode build
 ## 4. Verify spatial intersection
 
 ```typescript
-import { bboxOverlapsViewport, filterBySpatialExtent } from '@debrief/components';
+import { bboxOverlapsViewport, filterBySpatialExtent } from '@debrief/components'; // from utils/bounds.ts
 
 // Basic overlap test
 const overlaps = bboxOverlapsViewport(
@@ -82,37 +82,39 @@ task verify
 ## Architecture overview
 
 ```
-┌─────────────────────────────────────────────────┐
-│  Parent Component (VS Code webview / web-shell)  │
-│                                                   │
-│  ┌──────────────┐  ┌──────────┐  ┌────────────┐ │
-│  │ CatalogOverview│  │ List View│  │Timeline View│ │
-│  │ (map + timeline)│  │          │  │            │ │
-│  └───────┬──────┘  └────▲─────┘  └─────▲──────┘ │
-│          │               │              │         │
-│    onViewportChange      │              │         │
-│    (debounced 150ms)     │              │         │
-│          │               │              │         │
-│          ▼               │              │         │
-│  filterBySpatialExtent ──┼──────────────┘         │
-│  (pure function)         │                        │
-│          │               │                        │
-│          ▼               │                        │
-│  session-state store ────┘                        │
-│  (setViewport)                                    │
-└───────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│            CatalogOverview Component                  │
+│                                                       │
+│  ┌─────────────────────┐  ┌────────────────────────┐ │
+│  │ MAP PANE             │  │ TIMELINE PANE           │ │
+│  │ Shows ALL items      │  │ Filters internally:     │ │
+│  │ with bbox            │  │ items overlapping       │ │
+│  │                      │  │ viewport + items        │ │
+│  │ moveend → debounce   │  │ without bbox (FR-005)   │ │
+│  └──────────┬───────────┘  └─────────▲──────────────┘ │
+│             │  viewport bounds        │                │
+│             └─────────────────────────┘                │
+│                                                       │
+│  onViewportChange(Bounds | null) ─────────────────────┼──► Parent
+└───────────────────────────────────────────────────────┘       │
+                                                                ▼
+                                                    session-state store
+                                                    (setViewport)
+                                                                │
+                                                                ▼
+                                                    External list views
+                                                    (future consumers)
 ```
 
 ## Files changed
 
 | File | Change |
 |------|--------|
-| `shared/components/src/CatalogOverview/types.ts` | Add `onViewportChange`, `colorMap` props, `SpatialBounds` type |
-| `shared/components/src/CatalogOverview/CatalogOverview.tsx` | Emit viewport events, use colorMap, show empty overlay |
+| `shared/components/src/CatalogOverview/types.ts` | Add `onViewportChange`, `colorMap` props (uses existing `Bounds` type) |
+| `shared/components/src/CatalogOverview/CatalogOverview.tsx` | Internal timeline filtering, viewport events, colorMap, empty overlay, memoized Rectangles |
 | `shared/components/src/CatalogOverview/CatalogOverview.css` | Empty state overlay styles |
 | `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx` | New stories: SpatialFilter, ColourScheme |
-| `shared/components/src/CatalogOverview/CatalogOverview.test.tsx` | Unit tests for viewport callback, colour, empty state |
-| `shared/components/src/filter-engine/spatial.ts` | `bboxOverlapsViewport`, `filterBySpatialExtent` |
-| `shared/components/src/utils/useDebouncedCallback.ts` | Reusable debounce hook |
+| `shared/components/src/CatalogOverview/CatalogOverview.test.tsx` | Unit tests for viewport callback, colour, empty state, timeline filtering |
+| `shared/components/src/utils/bounds.ts` | Add `bboxOverlapsViewport`, `filterBySpatialExtent` |
 | `apps/vscode/src/webview/web/catalogOverview.tsx` | Wire `onViewportChange` to postMessage |
 | `apps/vscode/src/panels/catalogOverviewPanel.ts` | Handle viewport messages |

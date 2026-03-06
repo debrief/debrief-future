@@ -31,13 +31,14 @@ This handles all overlap cases including partial overlap, containment, and items
 
 ## R3: Debounce Strategy for Viewport Changes
 
-**Decision**: Custom `useDebouncedCallback` hook with 150ms delay, using `useRef` + `setTimeout` pattern.
+**Decision**: Inline `useRef` + `setTimeout` debounce pattern with 150ms delay, matching existing codebase conventions.
 
-**Rationale**: The project already uses this pattern in `FilterDropdown.tsx` (line 31-52) for text input debouncing. A reusable hook standardises the approach. 150ms balances responsiveness (user doesn't perceive delay) with avoiding excessive re-renders during rapid pan/zoom gestures.
+**Rationale**: The project already uses this exact pattern in `FilterDropdown.tsx` (line 31-52) for text input debouncing. Rather than extracting a new hook file for 6 lines of code, the same inline pattern is used directly in CatalogOverview. 150ms balances responsiveness (user doesn't perceive delay) with avoiding excessive re-renders during rapid pan/zoom gestures.
 
-The debounce fires on Leaflet's `moveend` event (which already batches during animation). The 150ms is an additional guard for rapid discrete pan/zoom steps.
+The debounce fires on Leaflet's `moveend` event (which already batches during animation). The 150ms is an additional guard for rapid discrete pan/zoom steps. The debounce timer MUST be cleaned up on component unmount to prevent setState-on-unmounted warnings.
 
 **Alternatives considered**:
+- **Extracted `useDebouncedCallback` hook**: Adds a new file for minimal reuse benefit. Rejected in review — inline pattern is sufficient and matches existing codebase conventions.
 - **lodash.debounce**: Adds a dependency for a 10-line utility. Rejected per Constitution IX.1.
 - **requestAnimationFrame**: Fires too frequently (every 16ms); doesn't reduce computation enough during rapid gestures.
 - **No debounce (immediate)**: Leaflet's `moveend` fires after each gesture completes, so in practice updates are already somewhat batched. However, programmatic zoom-to-fit or rapid keyboard panning can fire multiple events within 150ms. Debounce is a safety net.
@@ -81,10 +82,11 @@ const viewport: ViewportPolygon = {
 };
 ```
 
-The spatial filtering itself happens at the integration layer (VS Code webview wrapper or web-shell parent), not inside CatalogOverview. This keeps the shared component pure and testable.
+For **external consumers** (future list views, session-state store), the `onViewportChange` callback emits bounds so the integration layer can apply spatial filtering. For the **internal timeline**, CatalogOverview filters items itself using `bboxOverlapsViewport` — this is necessary because CatalogOverview receives a single `items` array that feeds both the map (which must show ALL items so users can pan toward them) and the timeline (which must show only spatially-overlapping items).
 
 **Alternatives considered**:
-- **Filter inside CatalogOverview**: Would require the component to receive all items and emit filtered items, making it a data pipeline rather than a display component. Violates the "thin frontends" principle.
+- **Parent filters items before passing to CatalogOverview**: The map would lose footprints outside the viewport, preventing users from discovering and panning toward distant exercises. Also violates FR-005 (items without bbox must remain visible in the timeline). Rejected in review.
+- **Two item props (`items` + `filteredItems`)**: Adds API surface and pushes filtering responsibility to every consumer. The component already has the viewport information internally, so this is unnecessary indirection.
 - **Custom event bus**: Adds complexity when Zustand subscriptions already exist for exactly this purpose.
 
 ## R6: Empty State / No Matches Indicator
@@ -106,7 +108,7 @@ The overlay is CSS-positioned inside the Leaflet container, semi-transparent, an
 
 ## R7: Viewport Change Callback Shape
 
-**Decision**: `onViewportChange(bounds: [number, number, number, number] | null)` where bounds is `[west, south, east, north]` matching the STAC bbox format. `null` signals "no viewport constraint" (e.g., map not yet initialised).
+**Decision**: `onViewportChange(bounds: Bounds | null)` using the existing `Bounds` type from `utils/types.ts` (`[number, number, number, number]` = `[west, south, east, north]`). `null` signals "no viewport constraint" (e.g., map not yet initialised).
 
 **Rationale**: Using the same `[west, south, east, north]` format as STAC bounding boxes eliminates format conversion in the spatial intersection test. The callback fires after debounce on every Leaflet `moveend` event. The parent component receives bounds in STAC format and can directly compare with item bounding boxes.
 
