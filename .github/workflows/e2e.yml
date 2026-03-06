@@ -139,17 +139,21 @@ jobs:
             > ~/.config/debrief/config.json
 
       # Start openvscode-server (background)
+      # NOTE: openvscode-server appends /data to --user-data-dir internally (issue #512),
+      # so we write settings to BOTH paths as belt-and-suspenders.
       - name: Start openvscode-server
         run: |
           DATA_DIR="/tmp/ovs-data"
           WORKSPACE="${GITHUB_WORKSPACE}/tests/e2e/test-workspace"
-          mkdir -p "$DATA_DIR/User"
-          echo '{"security.workspace.trust.enabled":false,"workbench.startupEditor":"none","workbench.welcomePage.walkthroughs.openOnInstall":false,"workbench.tips.enabled":false}' \
-            > "$DATA_DIR/User/settings.json"
+          SETTINGS='{"security.workspace.trust.enabled":false,"workbench.startupEditor":"none","workbench.welcomePage.walkthroughs.openOnInstall":false,"workbench.tips.enabled":false}'
+          mkdir -p "$DATA_DIR/User" "$DATA_DIR/data/User"
+          echo "$SETTINGS" > "$DATA_DIR/User/settings.json"
+          echo "$SETTINGS" > "$DATA_DIR/data/User/settings.json"
           nohup openvscode-server \
             --host 0.0.0.0 --port 8080 \
             --without-connection-token \
             --telemetry-level off \
+            --disable-workspace-trust \
             --user-data-dir "$DATA_DIR" \
             --default-folder "$WORKSPACE" \
             > /tmp/ovs.log 2>&1 &

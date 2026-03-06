@@ -66,23 +66,27 @@ function whichSync(cmd: string): string | null {
  * Write machine-level settings to disable the Welcome tab and workspace trust.
  * The Welcome tab captures keyboard focus into an iframe, breaking shortcuts.
  * Workspace trust must be disabled so extensions activate without user interaction.
+ *
+ * NOTE: openvscode-server auto-appends a /data subdirectory to --user-data-dir
+ * (see https://github.com/gitpod-io/openvscode-server/issues/512), so we write
+ * settings to BOTH paths as belt-and-suspenders.
  */
 function writeVSCodeSettings(dataDir: string): void {
-  const settingsDir = join(dataDir, 'User');
-  mkdirSync(settingsDir, { recursive: true });
-  writeFileSync(
-    join(settingsDir, 'settings.json'),
-    JSON.stringify(
-      {
-        'security.workspace.trust.enabled': false,
-        'workbench.startupEditor': 'none',
-        'workbench.welcomePage.walkthroughs.openOnInstall': false,
-        'workbench.tips.enabled': false,
-      },
-      null,
-      2
-    )
+  const settings = JSON.stringify(
+    {
+      'security.workspace.trust.enabled': false,
+      'workbench.startupEditor': 'none',
+      'workbench.welcomePage.walkthroughs.openOnInstall': false,
+      'workbench.tips.enabled': false,
+    },
+    null,
+    2
   );
+  for (const base of [dataDir, join(dataDir, 'data')]) {
+    const settingsDir = join(base, 'User');
+    mkdirSync(settingsDir, { recursive: true });
+    writeFileSync(join(settingsDir, 'settings.json'), settings);
+  }
 }
 
 /**
@@ -157,8 +161,11 @@ async function globalSetup(): Promise<void> {
         '--without-connection-token',
         '--telemetry-level',
         'off',
+        '--disable-workspace-trust',
         '--user-data-dir',
         dataDir,
+        '--default-folder',
+        WORKSPACE_PATH,
       ],
       { stdio: 'pipe', detached: true }
     );
