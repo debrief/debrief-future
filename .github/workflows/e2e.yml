@@ -139,11 +139,10 @@ jobs:
             > ~/.config/debrief/config.json
 
       # Start openvscode-server (background)
-      # NOTE: openvscode-server does NOT accept a positional folder arg.
-      # The workspace folder is opened via ?folder= query param in the URL.
       - name: Start openvscode-server
         run: |
           DATA_DIR="/tmp/ovs-data"
+          WORKSPACE="${GITHUB_WORKSPACE}/tests/e2e/test-workspace"
           mkdir -p "$DATA_DIR/User"
           echo '{"security.workspace.trust.enabled":false,"workbench.startupEditor":"none","workbench.welcomePage.walkthroughs.openOnInstall":false,"workbench.tips.enabled":false}' \
             > "$DATA_DIR/User/settings.json"
@@ -152,6 +151,7 @@ jobs:
             --without-connection-token \
             --telemetry-level off \
             --user-data-dir "$DATA_DIR" \
+            --default-folder "$WORKSPACE" \
             > /tmp/ovs.log 2>&1 &
 
       - name: Wait for server readiness
