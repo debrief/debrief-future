@@ -88,9 +88,15 @@ def generate_pydantic() -> bool:
             # MultiPoint: [[lon, lat], ...] → list of position pairs
             "GeoJSONMultiPoint": ("coordinates: list[float]", "coordinates: list[list[float]]"),
             # MultiLineString: [[[lon, lat], ...], ...] → list of LineStrings
-            "GeoJSONMultiLineString": ("coordinates: list[float]", "coordinates: list[list[list[float]]]"),
+            "GeoJSONMultiLineString": (
+                "coordinates: list[float]",
+                "coordinates: list[list[list[float]]]",
+            ),
             # MultiPolygon: [[[[lon, lat], ...], ...], ...] → list of Polygons
-            "GeoJSONMultiPolygon": ("coordinates: list[float]", "coordinates: list[list[list[list[float]]]]"),
+            "GeoJSONMultiPolygon": (
+                "coordinates: list[float]",
+                "coordinates: list[list[list[list[float]]]]",
+            ),
         }
         for class_name, (old_type, new_type) in _pydantic_coord_fixes.items():
             class_marker = f"class {class_name}("
@@ -116,10 +122,11 @@ def generate_pydantic() -> bool:
         # conflicts with min_length constraints (e.g., bbox with min_length=4).
         # Change default=[] to default=None for Optional fields with min_length.
         import re
+
         content = re.sub(
-            r'(Optional\[list\[[^\]]+\]\])\s*=\s*Field\(default=\[\],'
+            r"(Optional\[list\[[^\]]+\]\])\s*=\s*Field\(default=\[\],"
             r'\s*(description="""[^"]*"""),\s*(min_length=\d+)',
-            r'\1 = Field(default=None, \2, \3',
+            r"\1 = Field(default=None, \2, \3",
             content,
         )
 
