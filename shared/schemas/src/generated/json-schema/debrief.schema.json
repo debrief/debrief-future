@@ -165,6 +165,16 @@
             "string",
             "null"
           ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [
@@ -206,7 +216,8 @@
         "SYSTEM",
         "POLY",
         "MULTI_POINT",
-        "MULTI_POLYGON"
+        "MULTI_POLYGON",
+        "SYSTEM_RECORD"
       ],
       "title": "FeatureKindEnum",
       "type": "string"
@@ -545,6 +556,16 @@
             "string",
             "null"
           ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [
@@ -837,6 +858,16 @@
         "style": {
           "$ref": "#/$defs/PointProperties",
           "description": "Point styling for all positions"
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [
@@ -940,6 +971,16 @@
         "style": {
           "$ref": "#/$defs/PolygonProperties",
           "description": "Polygon styling for all regions"
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [
@@ -1039,6 +1080,16 @@
           "description": "Display symbol code from REP file",
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
             "null"
           ]
         },
@@ -1328,6 +1379,16 @@
             "null"
           ]
         },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "vertex_count": {
           "description": "Number of unique vertices (excluding ring closure point)",
           "minimum": 3,
@@ -1551,6 +1612,16 @@
             "string",
             "null"
           ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [
@@ -1650,6 +1721,16 @@
           "description": "Map symbol identifier",
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
             "null"
           ]
         },
@@ -2085,7 +2166,7 @@
     },
     "SystemRecordProperties": {
       "additionalProperties": false,
-      "description": "Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with featureType \"system\" and Point geometry with empty coordinates.",
+      "description": "Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with kind SYSTEM_RECORD and Point geometry with empty coordinates.",
       "properties": {
         "branch_origin": {
           "anyOf": [
@@ -2108,10 +2189,10 @@
             "null"
           ]
         },
-        "feature_type": {
-          "const": "system",
-          "description": "Discriminator, always \"system\".",
-          "type": "string"
+        "kind": {
+          "$ref": "#/$defs/FeatureKindEnum",
+          "const": "SYSTEM_RECORD",
+          "description": "Feature type discriminator"
         },
         "provenance": {
           "description": "File-level provenance events (snapshot and branch creation).",
@@ -2136,7 +2217,7 @@
         }
       },
       "required": [
-        "feature_type"
+        "kind"
       ],
       "title": "SystemRecordProperties",
       "type": "object"
@@ -2464,6 +2545,16 @@
             "null"
           ]
         },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "text": {
           "description": "Text content to display",
           "type": "string"
@@ -2763,6 +2854,16 @@
             "null"
           ]
         },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
         "track_type": {
           "$ref": "#/$defs/TrackTypeEnum",
           "description": "Type of track"
@@ -2945,6 +3046,16 @@
           "description": "Display symbol code from REP file",
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
             "null"
           ]
         }

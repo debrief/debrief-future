@@ -14,6 +14,7 @@ default_range: string
 
 imports:
   - linkml:types
+  - log-entry
 
 # ============================================================================
 # Enums
@@ -47,6 +48,8 @@ enums:
         description: Multi-point tool result (MultiPoint geometry)
       MULTI_POLYGON:
         description: Multi-polygon tool result (MultiPolygon geometry)
+      SYSTEM_RECORD:
+        description: Plot-level system record (snapshot chain, branches)
 
   TrackTypeEnum:
     description: Type of track feature
@@ -266,6 +269,27 @@ types:
 # ============================================================================
 
 classes:
+  BaseFeatureProperties:
+    description: >-
+      Abstract base for all GeoJSON feature properties classes.
+      Provides shared attributes inherited by every concrete properties type.
+    abstract: true
+    attributes:
+      kind:
+        description: Feature type discriminator
+        range: FeatureKindEnum
+        required: true
+      tags:
+        description: Free-text labels assigned to this feature by the analyst
+        range: string
+        multivalued: true
+        required: false
+      provenance:
+        description: PROV-aligned provenance records (append-only log of tool operations)
+        range: LogEntry
+        multivalued: true
+        inlined_as_list: true
+
   TimestampedPosition:
     description: >-
       Temporal and kinematic metadata for a single track position.

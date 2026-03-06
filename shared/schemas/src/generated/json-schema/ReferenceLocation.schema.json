@@ -52,7 +52,8 @@
         "SYSTEM",
         "POLY",
         "MULTI_POINT",
-        "MULTI_POLYGON"
+        "MULTI_POLYGON",
+        "SYSTEM_RECORD"
       ],
       "title": "FeatureKindEnum",
       "type": "string"
@@ -430,6 +431,16 @@
           "description": "Map symbol identifier",
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
             "null"
           ]
         },

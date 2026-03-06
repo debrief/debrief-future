@@ -15,7 +15,7 @@ Fixture locations:
 
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -231,7 +231,7 @@ class TestExerciseValidation:
                 StacExtensionProperties(**props)  # type: ignore[arg-type]
             except ValidationError as e:
                 errors.append(f"{d.name}: {e}")
-        assert errors == [], f"Validation failures:\n" + "\n".join(errors)
+        assert errors == [], "Validation failures:\n" + "\n".join(errors)
 
 
 @_skip_no_exercises

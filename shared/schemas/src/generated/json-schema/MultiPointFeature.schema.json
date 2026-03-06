@@ -57,7 +57,8 @@
         "SYSTEM",
         "POLY",
         "MULTI_POINT",
-        "MULTI_POLYGON"
+        "MULTI_POLYGON",
+        "SYSTEM_RECORD"
       ],
       "title": "FeatureKindEnum",
       "type": "string"
@@ -253,6 +254,16 @@
         "style": {
           "$ref": "#/$defs/PointProperties",
           "description": "Point styling for all positions"
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "required": [

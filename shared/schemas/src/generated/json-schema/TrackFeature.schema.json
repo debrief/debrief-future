@@ -64,7 +64,8 @@
         "SYSTEM",
         "POLY",
         "MULTI_POINT",
-        "MULTI_POLYGON"
+        "MULTI_POLYGON",
+        "SYSTEM_RECORD"
       ],
       "title": "FeatureKindEnum",
       "type": "string"
@@ -1001,6 +1002,16 @@
           "pattern": "^P(T[0-9]+[HMS])+$|^P[0-9]+D(T[0-9]+[HMS]+)?$",
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "tags": {
+          "description": "Free-text labels assigned to this feature by the analyst",
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
             "null"
           ]
         },

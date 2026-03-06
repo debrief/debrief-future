@@ -636,7 +636,7 @@ class TestSystemRecordProperties:
 
     def test_create_empty_system_record(self) -> None:
         sr = SystemRecordProperties()
-        assert sr.feature_type == "system"
+        assert sr.kind == "SYSTEM_RECORD"
         assert sr.snapshot_links is None
         assert sr.branches == []
         assert sr.provenance == []
@@ -672,7 +672,7 @@ class TestSystemRecordProperties:
         fixture = FIXTURES_ROOT / "system-record" / "valid" / "empty-system-record.json"
         data = json.loads(fixture.read_text())
         sr = SystemRecordProperties.model_validate(data)
-        assert sr.feature_type == "system"
+        assert sr.kind == "SYSTEM_RECORD"
         assert sr.snapshot_links is None
         assert sr.branches == []
 
@@ -680,7 +680,7 @@ class TestSystemRecordProperties:
         fixture = FIXTURES_ROOT / "system-record" / "valid" / "populated-system-record.json"
         data = json.loads(fixture.read_text())
         sr = SystemRecordProperties.model_validate(data)
-        assert sr.feature_type == "system"
+        assert sr.kind == "SYSTEM_RECORD"
         assert sr.snapshot_links is not None
         assert sr.snapshot_links.prev is not None
         assert sr.snapshot_links.prev.prov_entry_count == 5
@@ -691,9 +691,9 @@ class TestSystemRecordProperties:
         assert sr.provenance[1].type == "branch"
         assert sr.provenance[1].direction == "source"
 
-    def test_system_record_invalid_feature_type(self) -> None:
+    def test_system_record_invalid_kind(self) -> None:
         with pytest.raises(PydanticValidationError):
-            SystemRecordProperties(featureType="not-system")
+            SystemRecordProperties(kind="not-system-record")
 
     def test_file_prov_entry_invalid_type(self) -> None:
         with pytest.raises(PydanticValidationError):

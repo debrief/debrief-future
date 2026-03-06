@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import json
 import random
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -349,7 +349,7 @@ def pick_from_buckets(
 ) -> list[Any]:
     """Build a shuffled assignment list from bucket definitions and counts."""
     assignments: list[Any] = []
-    for bucket, count in zip(buckets, counts):
+    for bucket, count in zip(buckets, counts, strict=True):
         for _ in range(count):
             assignments.append(bucket[:-1])  # everything except the count
     rng.shuffle(assignments)
@@ -409,10 +409,7 @@ def generate_track_names(
     for i in range(count):
         nat = nationalities[i % len(nationalities)] if nationalities else "GB"
         prefix = rng.choice(TRACK_NAME_PREFIXES.get(nat, ["WARSHIP"]))
-        if available_ships:
-            ship = available_ships.pop()
-        else:
-            ship = f"CONTACT {i + 1:02d}"
+        ship = available_ships.pop() if available_ships else f"CONTACT {i + 1:02d}"
         names.append(f"{prefix} {ship}")
     return names
 
@@ -512,7 +509,7 @@ def generate_item(
     month = rng.randint(1, 12)
     day = rng.randint(1, 28)
     hour = rng.randint(0, 23)
-    start_dt = datetime(year, month, day, hour, 0, 0, tzinfo=timezone.utc)
+    start_dt = datetime(year, month, day, hour, 0, 0, tzinfo=UTC)
 
     is_single_point = overrides.get("single_point", False)
 

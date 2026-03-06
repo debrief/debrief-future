@@ -28,6 +28,8 @@ export enum FeatureKindEnum {
     MULTI_POINT = "MULTI_POINT",
     /** Multi-polygon tool result (MultiPolygon geometry) */
     MULTI_POLYGON = "MULTI_POLYGON",
+    /** Plot-level system record (snapshot chain, branches) */
+    SYSTEM_RECORD = "SYSTEM_RECORD",
 };
 /**
 * Type of track feature
@@ -323,6 +325,19 @@ export enum VesselDomainEnum {
     /** Vessel domain not determined or not applicable */
     unknown = "unknown",
 };
+
+
+/**
+ * Abstract base for all GeoJSON feature properties classes. Provides shared attributes inherited by every concrete properties type.
+ */
+export interface BaseFeatureProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Free-text labels assigned to this feature by the analyst */
+    tags?: string[],
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
+}
 
 
 /**
@@ -653,7 +668,7 @@ export interface TUAData {
 /**
  * Properties for a TrackFeature
  */
-export interface TrackProperties {
+export interface TrackProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Platform/vessel identifier */
@@ -686,8 +701,6 @@ export interface TrackProperties {
     sensors?: SensorData[],
     /** Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions. */
     tuas?: TUAData[],
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -722,7 +735,7 @@ export interface PointMetadataEntry {
 /**
  * Properties for a ReferenceLocation
  */
-export interface ReferenceLocationProperties {
+export interface ReferenceLocationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Reference location name */
@@ -741,8 +754,6 @@ export interface ReferenceLocationProperties {
     valid_until?: string,
     /** Per-point metadata array, parallel to MultiPoint coordinates. Each entry contains at minimum an index and name. Downstream tools extend entries with zone/color fields. */
     point_metadata?: PointMetadataEntry[],
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -804,7 +815,7 @@ export interface SystemState {
 /**
  * Properties for a MultiPointFeature (multi-point tool results)
  */
-export interface MultiPointFeatureProperties {
+export interface MultiPointFeatureProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Human-readable result label */
@@ -817,8 +828,6 @@ export interface MultiPointFeatureProperties {
     source_features?: string[],
     /** Additional description or notes */
     description?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -842,7 +851,7 @@ export interface MultiPointFeature {
 /**
  * Properties for a MultiPolygonFeature (multi-polygon tool results)
  */
-export interface MultiPolygonFeatureProperties {
+export interface MultiPolygonFeatureProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Human-readable result label */
@@ -855,8 +864,6 @@ export interface MultiPolygonFeatureProperties {
     source_features?: string[],
     /** Additional description or notes */
     description?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -963,7 +970,7 @@ export interface TuneAnnotation {
 /**
  * Properties for a NarrativeEntry annotation
  */
-export interface NarrativeEntryProperties {
+export interface NarrativeEntryProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Narrative timestamp (ISO8601) */
@@ -978,8 +985,6 @@ export interface NarrativeEntryProperties {
     style: PointProperties,
     /** Original source file path */
     source_file?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1001,7 +1006,7 @@ export interface NarrativeEntry {
 /**
  * Properties for a CircleAnnotation
  */
-export interface CircleAnnotationProperties {
+export interface CircleAnnotationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Circle center as [longitude, latitude] for precise reconstruction */
@@ -1016,8 +1021,6 @@ export interface CircleAnnotationProperties {
     style: PolygonProperties,
     /** Original source file path */
     source_file?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1039,7 +1042,7 @@ export interface CircleAnnotation {
 /**
  * Properties for a RectangleAnnotation
  */
-export interface RectangleAnnotationProperties {
+export interface RectangleAnnotationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Annotation label text */
@@ -1050,8 +1053,6 @@ export interface RectangleAnnotationProperties {
     style: PolygonProperties,
     /** Original source file path */
     source_file?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1073,7 +1074,7 @@ export interface RectangleAnnotation {
 /**
  * Properties for a LineAnnotation
  */
-export interface LineAnnotationProperties {
+export interface LineAnnotationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Annotation label text */
@@ -1084,8 +1085,6 @@ export interface LineAnnotationProperties {
     style: LineProperties,
     /** Original source file path */
     source_file?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1107,7 +1106,7 @@ export interface LineAnnotation {
 /**
  * Properties for a TextAnnotation
  */
-export interface TextAnnotationProperties {
+export interface TextAnnotationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Text content to display */
@@ -1118,8 +1117,6 @@ export interface TextAnnotationProperties {
     style: PointProperties,
     /** Original source file path */
     source_file?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1141,7 +1138,7 @@ export interface TextAnnotation {
 /**
  * Properties for a VectorAnnotation
  */
-export interface VectorAnnotationProperties {
+export interface VectorAnnotationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Vector origin as [longitude, latitude] for precise reconstruction */
@@ -1158,8 +1155,6 @@ export interface VectorAnnotationProperties {
     style: LineProperties,
     /** Original source file path */
     source_file?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1181,7 +1176,7 @@ export interface VectorAnnotation {
 /**
  * Properties for a PolyAnnotation
  */
-export interface PolyAnnotationProperties {
+export interface PolyAnnotationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Number of unique vertices (excluding ring closure point) */
@@ -1196,8 +1191,6 @@ export interface PolyAnnotationProperties {
     source_file?: string,
     /** Source line number for debugging */
     line_number?: number,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1268,11 +1261,11 @@ export interface ToolParameter {
 
 
 /**
- * Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with featureType "system" and Point geometry with empty coordinates.
+ * Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with kind SYSTEM_RECORD and Point geometry with empty coordinates.
  */
 export interface SystemRecordProperties {
-    /** Discriminator, always "system". */
-    feature_type: string,
+    /** Feature type discriminator */
+    kind: string,
     /** Doubly-linked snapshot chain. Null when no snapshots exist. */
     snapshot_links?: SnapshotLinks,
     /** Branch records. Empty array when no branches exist. */

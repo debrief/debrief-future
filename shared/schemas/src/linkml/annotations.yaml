@@ -26,6 +26,7 @@ imports:
 
 classes:
   NarrativeEntryProperties:
+    is_a: BaseFeatureProperties
     description: Properties for a NarrativeEntry annotation
     attributes:
       kind:
@@ -50,11 +51,6 @@ classes:
         required: true
       source_file:
         description: Original source file path
-      provenance:
-        description: PROV-aligned provenance records (append-only log of tool operations)
-        range: LogEntry
-        multivalued: true
-        inlined_as_list: true
 
   NarrativeEntry:
     description: >-
@@ -84,6 +80,7 @@ classes:
 # ============================================================================
 
   CircleAnnotationProperties:
+    is_a: BaseFeatureProperties
     description: Properties for a CircleAnnotation
     attributes:
       kind:
@@ -113,11 +110,6 @@ classes:
         required: true
       source_file:
         description: Original source file path
-      provenance:
-        description: PROV-aligned provenance records (append-only log of tool operations)
-        range: LogEntry
-        multivalued: true
-        inlined_as_list: true
 
   CircleAnnotation:
     description: >-
@@ -147,6 +139,7 @@ classes:
 # ============================================================================
 
   RectangleAnnotationProperties:
+    is_a: BaseFeatureProperties
     description: Properties for a RectangleAnnotation
     attributes:
       kind:
@@ -164,11 +157,6 @@ classes:
         required: true
       source_file:
         description: Original source file path
-      provenance:
-        description: PROV-aligned provenance records (append-only log of tool operations)
-        range: LogEntry
-        multivalued: true
-        inlined_as_list: true
 
   RectangleAnnotation:
     description: >-
@@ -197,6 +185,7 @@ classes:
 # ============================================================================
 
   LineAnnotationProperties:
+    is_a: BaseFeatureProperties
     description: Properties for a LineAnnotation
     attributes:
       kind:
@@ -214,11 +203,6 @@ classes:
         required: true
       source_file:
         description: Original source file path
-      provenance:
-        description: PROV-aligned provenance records (append-only log of tool operations)
-        range: LogEntry
-        multivalued: true
-        inlined_as_list: true
 
   LineAnnotation:
     description: >-
@@ -247,6 +231,7 @@ classes:
 # ============================================================================
 
   TextAnnotationProperties:
+    is_a: BaseFeatureProperties
     description: Properties for a TextAnnotation
     attributes:
       kind:
@@ -265,11 +250,6 @@ classes:
         required: true
       source_file:
         description: Original source file path
-      provenance:
-        description: PROV-aligned provenance records (append-only log of tool operations)
-        range: LogEntry
-        multivalued: true
-        inlined_as_list: true
 
   TextAnnotation:
     description: >-
@@ -298,6 +278,7 @@ classes:
 # ============================================================================
 
   VectorAnnotationProperties:
+    is_a: BaseFeatureProperties
     description: Properties for a VectorAnnotation
     attributes:
       kind:
@@ -333,11 +314,6 @@ classes:
         required: true
       source_file:
         description: Original source file path
-      provenance:
-        description: PROV-aligned provenance records (append-only log of tool operations)
-        range: LogEntry
-        multivalued: true
-        inlined_as_list: true
 
   VectorAnnotation:
     description: >-
@@ -367,6 +343,7 @@ classes:
 # ============================================================================
 
   PolyAnnotationProperties:
+    is_a: BaseFeatureProperties
     description: Properties for a PolyAnnotation
     attributes:
       kind:
@@ -392,11 +369,6 @@ classes:
       line_number:
         description: Source line number for debugging
         range: integer
-      provenance:
-        description: PROV-aligned provenance records (append-only log of tool operations)
-        range: LogEntry
-        multivalued: true
-        inlined_as_list: true
 
   PolyAnnotation:
     description: >-
