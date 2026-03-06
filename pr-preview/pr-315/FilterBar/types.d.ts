@@ -64,5 +64,6 @@ export interface FilterBarProps {
     readonly taxonomy: readonly VesselTaxonomyNode[];
     readonly onFilteredItems: (items: StacBrowserItem[]) => void;
     readonly onExpressionChange?: (expression: FilterExpression) => void;
+    readonly initialFilterState?: FilterBarState;
 }
 //# sourceMappingURL=types.d.ts.map

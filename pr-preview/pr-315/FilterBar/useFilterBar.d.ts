@@ -16,5 +16,5 @@ export interface UseFilterBarReturn {
     readonly moveToContainer: (lozengeId: string, containerId: string) => void;
     readonly moveToTopLevel: (lozengeId: string, fromContainerId: string) => void;
 }
-export declare function useFilterBar(): UseFilterBarReturn;
+export declare function useFilterBar(initialState?: FilterBarState): UseFilterBarReturn;
 //# sourceMappingURL=useFilterBar.d.ts.map
