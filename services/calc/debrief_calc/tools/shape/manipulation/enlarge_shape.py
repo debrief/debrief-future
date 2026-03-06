@@ -27,6 +27,9 @@ def compute_centroid(geometry: dict[str, Any]) -> list[float]:
     geo_type = geometry.get("type")
     coords = geometry.get("coordinates")
 
+    if coords is None:
+        return [0.0, 0.0]
+
     if geo_type == "Point":
         return list(coords)
 
