@@ -138,6 +138,7 @@ Large features broken down into multiple backlog items.
 | ~~E05~~ | ~~Shape Drawing Tools~~ | ~~Add shape drawing tools to map via Geoman (point, rectangle, polygon, polyline) with '+' toolbar dropdown~~ | ~~complete~~ | ~~#091, #092, #093, #094, #095, #096~~ |
 | E06 | Architectural Consistency | [Fix implementation drift and constitutional violations from six-axis review](docs/architectural-consistency-review.md) | approved | #102, #103, #104, #105, #106, #107, #108, #109, #110, #111, #112 |
 | E07 | Sensor Data Pipeline | [Port legacy sensor capabilities in 7 phases: schema, import, rendering, array offsets, residuals, TMA, interactive drag](docs/ideas/E07-sensor-data-pipeline.md) | proposed | #116, #117, #118, #119, #120, #121, #122 |
+| E08 | STAC Stack Browser Discovery UI | [Analyst-facing discovery interface: filter bar, list/map/timeline views, vessel taxonomy, colour schemes](docs/stac-browser-srd.md) | proposed | #125, #126, #127, #128, #129, #130, #131, #132, #133, #134 |
 
 ## Items
 
@@ -155,6 +156,16 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
+| 125 | Infrastructure | [[E08] STAC Extension spec + mock data fixtures](docs/ideas/125-stac-extension-mock-data.md) — define extension namespace, property names for vessel class/tags/author/tracks/nationalities; create fixture item.json set; document mock data contract | - | - | - | - | Medium | proposed |
+| 126 | Infrastructure | [[E08] Client-side CQL2 filter engine](docs/ideas/126-cql2-filter-engine.md) — reference implementation of CQL2 AND/OR filter logic operating on mock data array; validates query model without backend (requires #125) | - | - | - | - | Medium | proposed |
+| 127 | Feature | [[E08] Filter bar with lozenge UI and AND/OR logic](docs/ideas/127-filter-bar-lozenge-ui.md) — persistent filter bar with add/edit/remove lozenges, all filter types, OR container with drag support, CQL2 serialisation (requires #125, #126) | - | - | - | - | Medium | proposed |
+| 128 | Feature | [[E08] Saved filter configurations](docs/ideas/128-saved-filter-configurations.md) — save/load/delete named filter sets as CQL2 JSON; historic filters dropdown (requires #127) | - | - | - | - | Low | proposed |
+| 129 | Feature | [[E08] List view with spatial thumbnails](docs/ideas/129-list-view-thumbnails.md) — scrollable exercise list with metadata summary, spatial thumbnail, flexible sorting, recent-work resumption (requires #125) | - | - | - | - | Medium | proposed |
+| 130 | Feature | [[E08] Map view with live spatial filtering](docs/ideas/130-map-view-spatial-filtering.md) — spatial footprints on map, pan/zoom as live spatial filter (requires #125) | - | - | - | - | Medium | proposed |
+| 131 | Feature | [[E08] Timeline/Gantt view with temporal filtering](docs/ideas/131-timeline-gantt-view.md) — temporal extent bars, time range adjustment as live temporal filter (requires #125) | - | - | - | - | Medium | proposed |
+| 132 | Infrastructure | [[E08] Three-view synchronization and filter state](docs/ideas/132-three-view-synchronization.md) — shared filter state coordinating filter bar + list + map + timeline; dynamic updates; zero-results handling (requires #127, #129, #130, #131) | - | - | - | - | High | proposed |
+| 133 | Feature | [[E08] Vessel taxonomy and hierarchical filtering](docs/ideas/133-vessel-taxonomy.md) — hierarchical vessel classification tree, subtree filtering in filter bar dropdown (requires #125, #127) | - | - | - | - | Medium | proposed |
+| 134 | Feature | [[E08] Colour scheme engine with legend](docs/ideas/134-colour-scheme-engine.md) — configurable colour dimension (age/vessel class/tag), shared legend for map and timeline views (requires #130, #131) | - | - | - | - | Low | proposed |
 | 102 | Bug | [Add feature-level provenance to TS tool executor](docs/architectural-consistency-review.md#f-15-web-shell-provenance-on-tool-results-art-iii1) [E06] — TS toolService lacks W3C PROV LogEntry attachment; constitutional violation Art. III.1 (Blocking) | 5 | 3 | 4 | 12 | Medium | approved |
 | 103 | Bug | [Canonicalize `kind` attribute values in LinkML schema](docs/architectural-consistency-review.md#f-22-kind-attribute-values-diverge) [E06] — Python/TS produce different kind values; define in LinkML and propagate constants (Blocking) | 5 | 3 | 4 | 12 | Medium | approved |
 | 104 | Bug | [Align range-bearing tool: selection requirements + GeoJSON output](docs/architectural-consistency-review.md#f-24-range-bearing-selection-requirements-diverge) [E06] — Python accepts TRACK+SHAPE and returns non-GeoJSON; TS requires 2 TRACK and returns GeoJSON; align both (F-2.4, F-2.5) | 4 | 3 | 4 | 11 | Medium | approved |
