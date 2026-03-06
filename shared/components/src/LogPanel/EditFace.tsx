@@ -17,6 +17,7 @@ import { DisableToggle } from './DisableToggle';
 import { DeleteConfirmation } from './DeleteConfirmation';
 import { RationaleField } from './RationaleField';
 import { LOG_PANEL_STRINGS } from './strings';
+import { resolveParamType } from '../ToolMatch/paramTypeResolver';
 
 import './EditFace.css';
 
@@ -86,8 +87,15 @@ function renderParameterControl(
     );
   }
 
-  // Enum → dropdown
-  if (param.type === 'enum' || (param.choices && param.choices.length > 0)) {
+  // Enum → dropdown (explicit choices, or resolved from paramType)
+  const resolvedChoices: ReadonlyArray<unknown> | null =
+    (param.choices && param.choices.length > 0)
+      ? param.choices
+      : param.paramType
+        ? (resolveParamType(param.paramType)?.map((item) => item.id) ?? null)
+        : null;
+
+  if (param.type === 'enum' || (resolvedChoices && resolvedChoices.length > 0)) {
     return (
       <select
         key={param.name}
@@ -98,7 +106,7 @@ function renderParameterControl(
         data-testid={`param-select-${param.name}`}
         aria-label={param.name}
       >
-        {(param.choices ?? []).map((choice) => (
+        {(resolvedChoices ?? []).map((choice) => (
           <option key={String(choice)} value={String(choice)}>
             {String(choice)}
           </option>
@@ -250,8 +258,9 @@ export function EditFace({
                       <span
                         className="log-panel__edit-face-param-desc"
                         title={param.description}
+                        aria-label="Parameter info"
                       >
-                        {' '}?
+                        {' '}&#x24D8;
                       </span>
                     )}
                   </label>
