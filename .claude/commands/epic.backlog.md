@@ -8,7 +8,7 @@ description: Show epic progress dashboard and identify the next item to work on.
 $ARGUMENTS
 ```
 
-You **MUST** have an epic ID provided (e.g., `E01`, `E02`, `e03`, or just `01`).
+If the user input above is not empty, use it as the epic ID (e.g., `E01`, `E02`, `e03`, or just `01`). If it is empty, **ask the user** for an epic ID before proceeding — do NOT stop the session.
 
 ## Purpose
 
@@ -26,8 +26,7 @@ Extract the epic ID from `$ARGUMENTS`:
 
 - Accept formats: `E01`, `e01`, `01`, `1`, `E1`
 - Normalize to uppercase with zero-padding: `E01`, `E02`, etc.
-- ERROR if no ID provided:
-  > "Please provide an epic ID, e.g., `/epic.backlog E02`"
+- If no ID provided, ask the user for one — do not stop the session
 
 ### Step 2: Read BACKLOG.md — Find Epic
 

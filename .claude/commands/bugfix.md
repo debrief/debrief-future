@@ -13,7 +13,7 @@ handoffs:
 $ARGUMENTS
 ```
 
-You **MUST** have a backlog item ID provided (e.g., `007`, `13`, or `077`).
+If the user input above is not empty, use it as the backlog item ID (e.g., `007`, `13`, or `077`). If it is empty, **ask the user** for a backlog item ID before proceeding — do NOT stop the session.
 
 ## Purpose
 

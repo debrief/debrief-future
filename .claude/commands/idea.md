@@ -8,7 +8,7 @@ description: Submit an idea to the opportunity-scout for evaluation and capture 
 $ARGUMENTS
 ```
 
-You **MUST** have an idea description provided.
+If the user input above is not empty, use it as the idea description. If it is empty, **ask the user** for an idea description before proceeding — do NOT stop the session.
 
 ## Agent References
 
