@@ -4,7 +4,7 @@
 
 import * as vscode from 'vscode';
 import { access, readFile } from 'fs/promises';
-import { loadSession, createLogService, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
+import { loadSession, createLogService, createSnapshotService, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { CalcService } from '../services/calcService';
@@ -391,6 +391,33 @@ export function createOpenPlotCommand(
           }
         })();
       });
+
+      // Wire SnapshotService for action bar snapshot button (Feature: 074)
+      const snapshotService = createSnapshotService({
+        loadGeoJson: async (sp: string, ip: string) => {
+          const fc = await stacService.loadGeoJsonForItem(sp, ip);
+          return fc as unknown as Awaited<ReturnType<typeof stacService.loadGeoJsonForItem>>;
+        },
+        writeSnapshotAsset: (sp, ip, fn, data) =>
+          stacService.writeSnapshotAsset(sp, ip, fn, data),
+        loadSnapshotGeoJson: async (sp, ip, assetFilename) => {
+          const fc = await stacService.loadSnapshotGeoJson(sp, ip, assetFilename);
+          return fc as unknown as Awaited<ReturnType<typeof stacService.loadSnapshotGeoJson>>;
+        },
+        writeGeoJson: async (sp, ip, fc) => {
+          await stacService.writeGeoJson(
+            sp, ip,
+            fc as unknown as Parameters<typeof stacService.writeGeoJson>[2]
+          );
+        },
+        markDirty: () => {
+          const activeSession = sessionManager.getActiveSession();
+          if (activeSession) {
+            activeSession.getState().markDirty();
+          }
+        },
+      });
+      logPanelProvider.setSnapshotService(snapshotService);
 
       console.log('[debrief] LogPanel: logService + path resolvers wired for', plot.title);
     } else {
