@@ -11,6 +11,7 @@
 ### Session 2026-03-06
 
 - Q: Should VS Code E2E tests be restored (existing `tests/e2e/`), written from scratch, or replaced with webview-only approach? → A: Restore existing `tests/e2e/` skipped tests (unskip, fix selectors, sideload VSIX)
+- Q: How should missing/incomplete features discovered during VS Code E2E test restoration be recorded? → A: Use Playwright `test.fixme()` annotation in the test + create a backlog item with cross-reference
 
 ## Context
 
@@ -99,6 +100,7 @@ As a developer, I need automated tests that verify feature selection, time contr
 - **FR-008**: The test environment MUST work offline without requiring external network access
 - **FR-009**: Developers MUST be able to run the same tests locally with a single command
 - **FR-010**: Tests MUST cover temporal interaction (time controller) and drawing tools as cross-cutting infrastructure
+- **FR-011**: When a VS Code E2E test reveals a missing or incomplete feature, the test MUST be annotated with Playwright `test.fixme()` (not `.skip()`) and a corresponding backlog item MUST be created with a cross-reference between the test and backlog entry
 
 ### Key Entities
 
