@@ -1,5 +1,7 @@
 """Golden example tests for enlarge-shape tool (057)."""
 
+from __future__ import annotations
+
 import copy
 import json
 from pathlib import Path
@@ -125,7 +127,7 @@ TEXT_FEATURE = {
 class TestComputeCentroid:
     """Tests for centroid computation."""
 
-    def test_polygon_centroid(self):
+    def test_polygon_centroid(self) -> None:
         """Compute centroid of a rectangle. Verify arithmetic mean of 4 unique vertices."""
         geometry = {
             "type": "Polygon",
@@ -135,14 +137,14 @@ class TestComputeCentroid:
         assert centroid[0] == pytest.approx(-0.75)
         assert centroid[1] == pytest.approx(51.25)
 
-    def test_linestring_centroid(self):
+    def test_linestring_centroid(self) -> None:
         """Compute centroid of a line. Verify midpoint."""
         geometry = {"type": "LineString", "coordinates": [[0.0, 50.0], [0.1, 50.1]]}
         centroid = compute_centroid(geometry)
         assert centroid[0] == pytest.approx(0.05)
         assert centroid[1] == pytest.approx(50.05)
 
-    def test_point_centroid(self):
+    def test_point_centroid(self) -> None:
         """Compute centroid of a point. Should return the point itself."""
         geometry = {"type": "Point", "coordinates": [1.0, 2.0]}
         centroid = compute_centroid(geometry)
@@ -152,25 +154,25 @@ class TestComputeCentroid:
 class TestScaleCoordinate:
     """Tests for the scale_coordinate utility function."""
 
-    def test_scale_from_origin(self):
+    def test_scale_from_origin(self) -> None:
         """Scale coordinate by factor 3 from origin [-0.75, 51.25]."""
         result = scale_coordinate([-1.0, 51.0], [-0.75, 51.25], 3.0)
         assert result[0] == pytest.approx(-1.5)
         assert result[1] == pytest.approx(50.5)
 
-    def test_identity_scale(self):
+    def test_identity_scale(self) -> None:
         """Scale by factor 1. Verify coordinate unchanged."""
         result = scale_coordinate([1.0, 2.0], [0.0, 0.0], 1.0)
         assert result[0] == pytest.approx(1.0)
         assert result[1] == pytest.approx(2.0)
 
-    def test_zero_scale(self):
+    def test_zero_scale(self) -> None:
         """Scale by factor 0. Verify coordinate collapses to origin."""
         result = scale_coordinate([5.0, 10.0], [1.0, 2.0], 0.0)
         assert result[0] == pytest.approx(1.0)
         assert result[1] == pytest.approx(2.0)
 
-    def test_latitude_clamping(self):
+    def test_latitude_clamping(self) -> None:
         """Scale near pole. Verify latitude clamped to 90."""
         result = scale_coordinate([0.0, 89.0], [0.0, 80.0], 5.0)
         assert result[1] == 90.0  # Clamped
@@ -180,16 +182,16 @@ class TestEnlargeShapeGoldenBasicPolygon:
     """Golden example tests: basic-polygon (US1, scale 3.0 from centroid)."""
 
     @pytest.fixture
-    def golden_input(self):
+    def golden_input(self) -> dict:
         with open(GOLDEN_DIR / "enlarge-shape.basic-polygon.input.json") as f:
             return json.load(f)
 
     @pytest.fixture
-    def golden_output(self):
+    def golden_output(self) -> dict:
         with open(GOLDEN_DIR / "enlarge-shape.basic-polygon.output.json") as f:
             return json.load(f)
 
-    def test_basic_polygon_matches_golden(self, golden_input, golden_output):
+    def test_basic_polygon_matches_golden(self, golden_input: dict, golden_output: dict) -> None:
         """Scale rectangle 3x from centroid. Verify output matches golden example."""
         features = golden_input["features"]
         params = golden_input["parameters"]
@@ -206,7 +208,7 @@ class TestEnlargeShapeGoldenBasicPolygon:
             assert res_pt[0] == pytest.approx(exp_pt[0], abs=1e-9)
             assert res_pt[1] == pytest.approx(exp_pt[1], abs=1e-9)
 
-    def test_basic_polygon_centroid_preserved(self, golden_input):
+    def test_basic_polygon_centroid_preserved(self, golden_input: dict) -> None:
         """Scale 3x from centroid. Verify centroid of output matches centroid of input."""
         features = golden_input["features"]
         params = golden_input["parameters"]
@@ -224,16 +226,16 @@ class TestEnlargeShapeGoldenCustomOrigin:
     """Golden example tests: custom-origin (US2, scale 2.0 from vertex)."""
 
     @pytest.fixture
-    def golden_input(self):
+    def golden_input(self) -> dict:
         with open(GOLDEN_DIR / "enlarge-shape.custom-origin.input.json") as f:
             return json.load(f)
 
     @pytest.fixture
-    def golden_output(self):
+    def golden_output(self) -> dict:
         with open(GOLDEN_DIR / "enlarge-shape.custom-origin.output.json") as f:
             return json.load(f)
 
-    def test_custom_origin_matches_golden(self, golden_input, golden_output):
+    def test_custom_origin_matches_golden(self, golden_input: dict, golden_output: dict) -> None:
         """Scale rectangle 2x from vertex. Verify output matches golden example."""
         features = golden_input["features"]
         params = golden_input["parameters"]
@@ -250,7 +252,7 @@ class TestEnlargeShapeGoldenCustomOrigin:
             assert res_pt[0] == pytest.approx(exp_pt[0], abs=1e-9)
             assert res_pt[1] == pytest.approx(exp_pt[1], abs=1e-9)
 
-    def test_origin_vertex_fixed(self, golden_input):
+    def test_origin_vertex_fixed(self, golden_input: dict) -> None:
         """Scale 2x from vertex [-1.0, 51.0]. Verify that vertex is unchanged."""
         features = golden_input["features"]
         params = golden_input["parameters"]
@@ -269,16 +271,16 @@ class TestEnlargeShapeGoldenNoop:
     """Golden example tests: noop (US3, scale 1.0 identity)."""
 
     @pytest.fixture
-    def golden_input(self):
+    def golden_input(self) -> dict:
         with open(GOLDEN_DIR / "enlarge-shape.noop.input.json") as f:
             return json.load(f)
 
     @pytest.fixture
-    def golden_output(self):
+    def golden_output(self) -> dict:
         with open(GOLDEN_DIR / "enlarge-shape.noop.output.json") as f:
             return json.load(f)
 
-    def test_noop_matches_golden(self, golden_input, golden_output):
+    def test_noop_matches_golden(self, golden_input: dict, golden_output: dict) -> None:
         """Scale circle 1.0x (noop). Verify output matches golden example."""
         features = golden_input["features"]
         params = golden_input["parameters"]
@@ -296,7 +298,7 @@ class TestEnlargeShapeGoldenNoop:
             assert res_pt[0] == exp_pt[0]
             assert res_pt[1] == exp_pt[1]
 
-    def test_noop_center_preserved(self, golden_input):
+    def test_noop_center_preserved(self, golden_input: dict) -> None:
         """Scale circle 1.0x. Verify center property unchanged."""
         features = golden_input["features"]
         params = golden_input["parameters"]
@@ -311,7 +313,7 @@ class TestEnlargeShapeGoldenNoop:
 class TestEnlargeShapePerKind:
     """Tests for per-kind annotation handling."""
 
-    def test_circle_center_scaled(self):
+    def test_circle_center_scaled(self) -> None:
         """Scale circle. Verify center property is scaled."""
         feature = copy.deepcopy(CIRCLE_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -327,7 +329,7 @@ class TestEnlargeShapePerKind:
         assert result_center[0] == pytest.approx(original_center[0], abs=0.001)
         assert result_center[1] == pytest.approx(original_center[1], abs=0.001)
 
-    def test_vector_origin_scaled(self):
+    def test_vector_origin_scaled(self) -> None:
         """Scale vector. Verify origin property scaled, range and bearing preserved."""
         feature = copy.deepcopy(VECTOR_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -340,7 +342,7 @@ class TestEnlargeShapePerKind:
         assert result[0]["properties"]["range"] == VECTOR_FEATURE["properties"]["range"]
         assert result[0]["properties"]["bearing"] == VECTOR_FEATURE["properties"]["bearing"]
 
-    def test_line_coords_scaled(self):
+    def test_line_coords_scaled(self) -> None:
         """Scale line by factor 3. Verify coordinates change."""
         feature = copy.deepcopy(LINE_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -354,7 +356,7 @@ class TestEnlargeShapePerKind:
         # Verify coordinates have changed
         assert result_coords[0] != orig_coords[0] or result_coords[1] != orig_coords[1]
 
-    def test_text_point_scaled(self):
+    def test_text_point_scaled(self) -> None:
         """Scale text point by factor 2 from explicit origin. Verify position changes."""
         feature = copy.deepcopy(TEXT_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -373,7 +375,7 @@ class TestEnlargeShapePerKind:
 class TestEnlargeShapeEdgeCases:
     """Edge case tests for enlarge-shape tool."""
 
-    def test_zero_scale_collapses_to_origin(self):
+    def test_zero_scale_collapses_to_origin(self) -> None:
         """Scale by factor 0. All vertices collapse to centroid."""
         feature = copy.deepcopy(RECTANGLE_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -388,7 +390,7 @@ class TestEnlargeShapeEdgeCases:
             assert pt[0] == pytest.approx(-0.75, abs=1e-9)
             assert pt[1] == pytest.approx(51.25, abs=1e-9)
 
-    def test_negative_scale_error(self):
+    def test_negative_scale_error(self) -> None:
         """Scale with negative factor. Verify ValueError raised."""
         feature = copy.deepcopy(RECTANGLE_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])
@@ -397,7 +399,7 @@ class TestEnlargeShapeEdgeCases:
         with pytest.raises(ValueError, match="scale_factor must be >= 0"):
             enlarge_shape(context, params)
 
-    def test_empty_features_error(self):
+    def test_empty_features_error(self) -> None:
         """Scale with empty feature list. Verify ValueError raised."""
         context = SelectionContext(type=ContextType.NONE, features=[])
         params = {"scale_factor": 2.0}
@@ -405,7 +407,7 @@ class TestEnlargeShapeEdgeCases:
         with pytest.raises(ValueError, match="No annotation features found"):
             enlarge_shape(context, params)
 
-    def test_non_annotation_skipped(self):
+    def test_non_annotation_skipped(self) -> None:
         """Scale with TRACK feature and annotation. Verify only annotation returned."""
         track = {
             "type": "Feature",
@@ -422,7 +424,7 @@ class TestEnlargeShapeEdgeCases:
         assert len(result) == 1
         assert result[0]["id"] == "text-001"
 
-    def test_default_params(self):
+    def test_default_params(self) -> None:
         """Scale without explicit params. Verify defaults used (scale_factor=3.0)."""
         feature = copy.deepcopy(RECTANGLE_FEATURE)
         context = SelectionContext(type=ContextType.SINGLE, features=[feature])

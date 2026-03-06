@@ -92,7 +92,9 @@ function computeCentroid(geometry: { type: string; coordinates: unknown }): numb
   }
 
   const n = vertices.length;
-  if (n === 0) return [0, 0];
+  if (n === 0) {
+    return [0, 0];
+  }
 
   let sumLon = 0;
   let sumLat = 0;
@@ -172,7 +174,7 @@ export function execute(
       geometry.coordinates = polyCoords.map((ring) =>
         scaleCoordsList(ring, scalingOrigin, scaleFactor),
       );
-      if (kind === 'CIRCLE' && props.center) {
+      if (kind === 'CIRCLE' && props.center != null) {
         props.center = scaleCoordinate(props.center as number[], scalingOrigin, scaleFactor);
       }
     } else if (kind === 'LINE') {
@@ -181,7 +183,7 @@ export function execute(
       geometry.coordinates = scaleCoordinate(coords as number[], scalingOrigin, scaleFactor);
     } else if (kind === 'VECTOR') {
       geometry.coordinates = scaleCoordsList(coords as number[][], scalingOrigin, scaleFactor);
-      if (props.origin) {
+      if (props.origin != null) {
         props.origin = scaleCoordinate(props.origin as number[], scalingOrigin, scaleFactor);
       }
     }
