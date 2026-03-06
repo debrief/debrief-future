@@ -14,7 +14,7 @@ import type {
   OrContainerItem,
 } from './types';
 
-const initialState: FilterBarState = { items: [] };
+const emptyState: FilterBarState = { items: [] };
 
 function createLozenge(filterType: FilterType, value: string): LozengeItem {
   return {
@@ -189,8 +189,8 @@ export interface UseFilterBarReturn {
   readonly moveToTopLevel: (lozengeId: string, fromContainerId: string) => void;
 }
 
-export function useFilterBar(): UseFilterBarReturn {
-  const [state, dispatch] = useReducer(reducer, initialState);
+export function useFilterBar(initialState?: FilterBarState): UseFilterBarReturn {
+  const [state, dispatch] = useReducer(reducer, initialState ?? emptyState);
 
   const expression = useMemo(() => toFilterExpression(state), [state]);
 

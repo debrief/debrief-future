@@ -33,6 +33,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   taxonomy,
   onFilteredItems,
   onExpressionChange,
+  initialFilterState,
 }) => {
   const {
     state,
@@ -45,7 +46,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     addChildLozenge,
     moveToContainer,
     moveToTopLevel,
-  } = useFilterBar();
+  } = useFilterBar(initialFilterState);
 
   const distinctValues = useDistinctValues(items);
   const [editingId, setEditingId] = useState<string | null>(null);

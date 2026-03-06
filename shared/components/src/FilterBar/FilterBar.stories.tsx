@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import { FilterBar } from './FilterBar';
 import { ThemeProvider } from '../ThemeProvider';
 import type { StacBrowserItem, VesselTaxonomyNode } from '../filter-engine';
+import type { FilterBarState } from './types';
 
 // --- Mock Data ---
 
@@ -131,7 +132,15 @@ const MOCK_TAXONOMY: VesselTaxonomyNode[] = [
 
 // --- Wrapper for interactive state ---
 
-function FilterBarWrapper({ items, taxonomy }: { items: StacBrowserItem[]; taxonomy: VesselTaxonomyNode[] }) {
+function FilterBarWrapper({
+  items,
+  taxonomy,
+  initialFilterState,
+}: {
+  items: StacBrowserItem[];
+  taxonomy: VesselTaxonomyNode[];
+  initialFilterState?: FilterBarState;
+}) {
   const [filteredCount, setFilteredCount] = useState(items.length);
 
   const handleFiltered = useCallback((filtered: StacBrowserItem[]) => {
@@ -144,6 +153,7 @@ function FilterBarWrapper({ items, taxonomy }: { items: StacBrowserItem[]; taxon
         items={items}
         taxonomy={taxonomy}
         onFilteredItems={handleFiltered}
+        initialFilterState={initialFilterState}
       />
       <div style={{ padding: '8px 12px', fontSize: '12px', color: 'var(--vscode-descriptionForeground, #666)' }}>
         Showing {filteredCount} of {items.length} exercises
@@ -151,6 +161,53 @@ function FilterBarWrapper({ items, taxonomy }: { items: StacBrowserItem[]; taxon
     </div>
   );
 }
+
+// --- Pre-populated filter states for stories ---
+
+const SINGLE_FILTER_STATE: FilterBarState = {
+  items: [
+    { kind: 'lozenge', id: 'story-1', filterType: 'nationality', value: 'French' },
+  ],
+};
+
+const MULTIPLE_AND_STATE: FilterBarState = {
+  items: [
+    { kind: 'lozenge', id: 'story-1', filterType: 'nationality', value: 'French' },
+    { kind: 'lozenge', id: 'story-2', filterType: 'plot-tag', value: 'asw' },
+  ],
+};
+
+const OR_GROUP_STATE: FilterBarState = {
+  items: [
+    {
+      kind: 'or-container',
+      id: 'story-or-1',
+      children: [
+        { kind: 'lozenge', id: 'story-or-c1', filterType: 'nationality', value: 'French' },
+        { kind: 'lozenge', id: 'story-or-c2', filterType: 'nationality', value: 'British' },
+      ],
+    },
+    { kind: 'lozenge', id: 'story-3', filterType: 'plot-tag', value: 'convoy' },
+  ],
+};
+
+const ALL_TYPES_STATE: FilterBarState = {
+  items: [
+    { kind: 'lozenge', id: 'story-t1', filterType: 'vessel-class', value: 'surface/warship/frigate/type23' },
+    { kind: 'lozenge', id: 'story-t2', filterType: 'plot-tag', value: 'asw' },
+    { kind: 'lozenge', id: 'story-t3', filterType: 'author', value: 'CDR Smith' },
+    { kind: 'lozenge', id: 'story-t4', filterType: 'nationality', value: 'French' },
+    { kind: 'lozenge', id: 'story-t5', filterType: 'duration', value: '<24H' },
+    { kind: 'lozenge', id: 'story-t6', filterType: 'title', value: 'CASEX' },
+  ],
+};
+
+const ZERO_RESULTS_STATE: FilterBarState = {
+  items: [
+    { kind: 'lozenge', id: 'story-z1', filterType: 'nationality', value: 'German' },
+    { kind: 'lozenge', id: 'story-z2', filterType: 'author', value: 'CDR Smith' },
+  ],
+};
 
 // --- Storybook Meta ---
 
@@ -189,7 +246,7 @@ export const Empty: Story = {
 export const SingleFilter: Story = {
   name: 'Single Filter',
   render: () => (
-    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} />
+    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} initialFilterState={SINGLE_FILTER_STATE} />
   ),
   parameters: {
     docs: {
@@ -203,7 +260,7 @@ export const SingleFilter: Story = {
 export const MultipleAND: Story = {
   name: 'Multiple AND Filters',
   render: () => (
-    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} />
+    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} initialFilterState={MULTIPLE_AND_STATE} />
   ),
   parameters: {
     docs: {
@@ -217,7 +274,7 @@ export const MultipleAND: Story = {
 export const OrGroup: Story = {
   name: 'OR Group',
   render: () => (
-    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} />
+    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} initialFilterState={OR_GROUP_STATE} />
   ),
   parameters: {
     docs: {
@@ -245,7 +302,7 @@ export const Interactive: Story = {
 export const AllFilterTypes: Story = {
   name: 'All Filter Types',
   render: () => (
-    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} />
+    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} initialFilterState={ALL_TYPES_STATE} />
   ),
   parameters: {
     docs: {
@@ -259,7 +316,7 @@ export const AllFilterTypes: Story = {
 export const ZeroResults: Story = {
   name: 'Zero Results',
   render: () => (
-    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} />
+    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} initialFilterState={ZERO_RESULTS_STATE} />
   ),
   parameters: {
     docs: {
