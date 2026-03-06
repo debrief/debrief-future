@@ -199,6 +199,175 @@ export class DebriefWebview {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // Selection Sync (T201)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /** The feature list container. */
+  get featureList(): Locator {
+    return this.frame.locator('.debrief-feature-list');
+  }
+
+  /** All feature rows in the list. */
+  get featureRows(): Locator {
+    return this.frame.locator('.debrief-feature-row');
+  }
+
+  /** Selected feature row. */
+  get selectedFeatureRow(): Locator {
+    return this.frame.locator('.debrief-feature-row--selected');
+  }
+
+  /**
+   * Get the count of feature rows in the list.
+   */
+  async getFeatureRowCount(): Promise<number> {
+    return await this.featureRows.count();
+  }
+
+  /**
+   * Click a feature row by index to select it.
+   */
+  async selectFeatureRow(index: number): Promise<void> {
+    await this.featureRows.nth(index).click();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Time Controller (T202)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /** The time controller root container. */
+  get timeController(): Locator {
+    return this.frame.locator('.debrief-time-controller');
+  }
+
+  /** The time scrubber. */
+  get timeScrubber(): Locator {
+    return this.frame.locator('.debrief-time-scrubber');
+  }
+
+  /** The play/pause button. */
+  get playPauseButton(): Locator {
+    return this.frame.locator('[data-testid="play-pause"]');
+  }
+
+  /** The display mode toggle (full/trail). */
+  get displayModeToggle(): Locator {
+    return this.frame.locator('.debrief-display-mode-toggle');
+  }
+
+  /**
+   * Check if the time controller is visible and ready.
+   */
+  async isTimeControllerReady(): Promise<boolean> {
+    return await this.timeController.isVisible();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Drawing Tools (T203)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /** The drawing trigger button. */
+  get drawTrigger(): Locator {
+    return this.frame.locator('[data-testid="draw-trigger"]');
+  }
+
+  /** The shape palette (opens on draw trigger click). */
+  get shapePalette(): Locator {
+    return this.frame.locator('[data-testid="shape-palette"]');
+  }
+
+  /** Rectangle draw button in shape palette. */
+  get shapeRectangle(): Locator {
+    return this.frame.locator('[data-testid="shape-rectangle"]');
+  }
+
+  /** Point draw button in shape palette. */
+  get shapePoint(): Locator {
+    return this.frame.locator('[data-testid="shape-point"]');
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Tools Panel (extends existing tool UI)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /** All tool items in the tools panel. */
+  get toolItems(): Locator {
+    return this.frame.locator('.debrief-tools-panel__item');
+  }
+
+  /** Active (enabled) tools. */
+  get activeTools(): Locator {
+    return this.frame.locator('.debrief-tools-panel__item--active');
+  }
+
+  /** Inactive (disabled) tools. */
+  get inactiveTools(): Locator {
+    return this.frame.locator('.debrief-tools-panel__item--inactive');
+  }
+
+  /** The tool result toast message. */
+  get toolMessage(): Locator {
+    return this.frame.locator('.web-shell__tool-message');
+  }
+
+  /** Context menu (parameter collector). */
+  get contextMenu(): Locator {
+    return this.frame.locator('.debrief-context-menu');
+  }
+
+  /**
+   * Get count of active tools.
+   */
+  async getActiveToolCount(): Promise<number> {
+    return await this.activeTools.count();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Edit Face / Flip Card (log editing)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /** Edit icon button on log entries. */
+  get editIcons(): Locator {
+    return this.frame.locator('[data-testid^="edit-icon-"]');
+  }
+
+  /** The edit face (back of flip card). */
+  get editFace(): Locator {
+    return this.frame.locator('[data-testid="edit-face"]');
+  }
+
+  /** Edit face parameters panel. */
+  get editFaceParams(): Locator {
+    return this.frame.locator('[data-testid="edit-face-params"]');
+  }
+
+  /** Edit face done button. */
+  get editFaceDone(): Locator {
+    return this.frame.locator('[data-testid="edit-face-done"]');
+  }
+
+  /** Skeleton loader (loading state). */
+  get skeletonLoader(): Locator {
+    return this.frame.locator('[data-testid="skeleton-loader"]');
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // GoldenLayout Tabs (Activity / Log panel switching)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /** The activity panel container. */
+  get activityPanel(): Locator {
+    return this.frame.locator('.debrief-activity-panel');
+  }
+
+  /**
+   * Switch to a GoldenLayout tab by label text.
+   */
+  async switchToTab(label: string): Promise<void> {
+    await this.frame.locator(`.lm_tab:has-text("${label}")`).click();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // Tool UI
   // ─────────────────────────────────────────────────────────────────────────────
 

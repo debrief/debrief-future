@@ -99,12 +99,12 @@
 
 ### VS Code E2E Restoration
 
-- [ ] T101 [US1] Remove `.skip()` from test-load-display.spec.ts, fix selectors to match current extension output `tests/e2e/test-load-display.spec.ts`
-- [ ] T102 [P][US1] Remove `.skip()` from test-analysis-tool.spec.ts, fix selectors to match current extension output `tests/e2e/test-analysis-tool.spec.ts`
-- [ ] T103 [P][US1] Remove `.skip()` from test-error-feedback.spec.ts, fix selectors to match current extension output `tests/e2e/test-error-feedback.spec.ts`
-- [ ] T104 [P][US1] Remove `.skip()` from test-tune-prov.spec.ts, fix selectors to match current extension output `tests/e2e/test-tune-prov.spec.ts`
+- [x] T101 [US1] Remove `.skip()` from test-load-display.spec.ts, fix selectors to match current extension output `tests/e2e/test-load-display.spec.ts`
+- [x] T102 [P][US1] Remove `.skip()` from test-analysis-tool.spec.ts, fix selectors to match current extension output `tests/e2e/test-analysis-tool.spec.ts`
+- [x] T103 [P][US1] Remove `.skip()` from test-error-feedback.spec.ts, fix selectors to match current extension output `tests/e2e/test-error-feedback.spec.ts`
+- [x] T104 [P][US1] Remove `.skip()` from test-tune-prov.spec.ts, fix selectors to match current extension output `tests/e2e/test-tune-prov.spec.ts`
 - [ ] T105 [US1] Verify real Python services (debrief-io, debrief-stac, debrief-calc) are reachable from Docker container — test REP file parsing produces real GeoJSON `docker/code-server/Dockerfile`
-- [ ] T106 [US1] Convert tests that reveal missing features to `test.fixme()` with backlog cross-references (FR-011) `tests/e2e/`
+- [x] T106 [US1] Convert tests that reveal missing features to `test.fixme()` with backlog cross-references (FR-011) `tests/e2e/`
 - [ ] T107 [US1] Run restored tests against Docker environment and verify pass/fixme status `tests/e2e/`
 
 **Checkpoint**: The original 4 skipped spec files are now active (passing or fixme'd). Real Python services parse real REP files end-to-end.
@@ -119,24 +119,24 @@
 
 ### Page Object Updates
 
-- [ ] T201 [US2] Add selection-sync selectors and methods to DebriefWebview page object `tests/e2e/models/debrief-webview.ts`
-- [ ] T202 [P][US2] Add time-controller selectors and methods to DebriefWebview page object `tests/e2e/models/debrief-webview.ts`
-- [ ] T203 [P][US2] Add drawing-tools selectors and methods to DebriefWebview page object `tests/e2e/models/debrief-webview.ts`
-- [ ] T204 [P][US2] Add log-panel selectors and methods to DebriefWebview page object `tests/e2e/models/debrief-webview.ts`
+- [x] T201 [US2] Add selection-sync selectors and methods to DebriefWebview page object `tests/e2e/models/debrief-webview.ts`
+- [x] T202 [P][US2] Add time-controller selectors and methods to DebriefWebview page object `tests/e2e/models/debrief-webview.ts`
+- [x] T203 [P][US2] Add drawing-tools selectors and methods to DebriefWebview page object `tests/e2e/models/debrief-webview.ts`
+- [x] T204 [P][US2] Add log-panel selectors and methods to DebriefWebview page object `tests/e2e/models/debrief-webview.ts`
 
 ### New Spec Files (matching web-shell categories)
 
-- [ ] T205 [US2] Create selection-sync spec (adapt from `apps/web-shell/playwright/tests/selection-sync.spec.ts`) `tests/e2e/test-selection-sync.spec.ts`
-- [ ] T206 [P][US2] Create time-controller spec (adapt from `apps/web-shell/playwright/tests/time-controller.spec.ts`) `tests/e2e/test-time-controller.spec.ts`
-- [ ] T207 [P][US2] Create drawing spec (adapt from `apps/web-shell/playwright/tests/drawing.spec.ts`) `tests/e2e/test-drawing.spec.ts`
-- [ ] T208 [P][US2] Create catalog-browse spec (adapt from `apps/web-shell/playwright/tests/catalog-browse.spec.ts`) `tests/e2e/test-catalog-browse.spec.ts`
-- [ ] T209 [US2] Create log-panel spec (adapt from `apps/web-shell/playwright/tests/log-panel.spec.ts`) `tests/e2e/test-log-panel.spec.ts`
-- [ ] T210 [P][US2] Create log-edit-face spec (adapt from `apps/web-shell/playwright/tests/log-edit-face.spec.ts`) `tests/e2e/test-log-edit-face.spec.ts`
-- [ ] T211 [P][US2] Create event-log-propagation spec (adapt from `apps/web-shell/playwright/tests/event-log-propagation.spec.ts`) `tests/e2e/test-event-log-propagation.spec.ts`
-- [ ] T212 [P][US2] Create styling-tools spec (adapt from `apps/web-shell/playwright/tests/styling-tools.spec.ts`) `tests/e2e/test-styling-tools.spec.ts`
-- [ ] T213 [P][US2] Create undo-redo-split spec (adapt from `apps/web-shell/playwright/tests/undo-redo-split.spec.ts`) `tests/e2e/test-undo-redo-split.spec.ts`
-- [ ] T214 [P][US2] Create capture-log-evidence spec (adapt from `apps/web-shell/playwright/tests/capture-log-evidence.spec.ts`) `tests/e2e/test-capture-log-evidence.spec.ts`
-- [ ] T215 [US2] Convert tests that reveal missing features to `test.fixme()` with backlog cross-references (FR-011) `tests/e2e/`
+- [x] T205 [US2] Create selection-sync spec (adapt from `apps/web-shell/playwright/tests/selection-sync.spec.ts`) `tests/e2e/test-selection-sync.spec.ts`
+- [x] T206 [P][US2] Create time-controller spec (adapt from `apps/web-shell/playwright/tests/time-controller.spec.ts`) `tests/e2e/test-time-controller.spec.ts`
+- [x] T207 [P][US2] Create drawing spec (adapt from `apps/web-shell/playwright/tests/drawing.spec.ts`) `tests/e2e/test-drawing.spec.ts`
+- [x] T208 [P][US2] Create catalog-browse spec (adapt from `apps/web-shell/playwright/tests/catalog-browse.spec.ts`) `tests/e2e/test-catalog-browse.spec.ts`
+- [x] T209 [US2] Create log-panel spec (adapt from `apps/web-shell/playwright/tests/log-panel.spec.ts`) `tests/e2e/test-log-panel.spec.ts`
+- [x] T210 [P][US2] Create log-edit-face spec (adapt from `apps/web-shell/playwright/tests/log-edit-face.spec.ts`) `tests/e2e/test-log-edit-face.spec.ts`
+- [x] T211 [P][US2] Create event-log-propagation spec (adapt from `apps/web-shell/playwright/tests/event-log-propagation.spec.ts`) `tests/e2e/test-event-log-propagation.spec.ts`
+- [x] T212 [P][US2] Create styling-tools spec (adapt from `apps/web-shell/playwright/tests/styling-tools.spec.ts`) `tests/e2e/test-styling-tools.spec.ts`
+- [x] T213 [P][US2] Create undo-redo-split spec (adapt from `apps/web-shell/playwright/tests/undo-redo-split.spec.ts`) `tests/e2e/test-undo-redo-split.spec.ts`
+- [x] T214 [P][US2] Create capture-log-evidence spec (adapt from `apps/web-shell/playwright/tests/capture-log-evidence.spec.ts`) `tests/e2e/test-capture-log-evidence.spec.ts`
+- [x] T215 [US2] Convert tests that reveal missing features to `test.fixme()` with backlog cross-references (FR-011) `tests/e2e/`
 - [ ] T216 [US2] Run full expanded suite and verify 13+ spec files pass or fixme `tests/e2e/`
 
 **Checkpoint**: VS Code E2E suite now covers all 13 web-shell spec categories. Tests pass or are annotated with `test.fixme()` with corresponding backlog items.

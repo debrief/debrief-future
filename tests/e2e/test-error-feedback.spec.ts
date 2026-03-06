@@ -5,30 +5,32 @@
  * user-visible feedback in the VS Code interface. Error handling across
  * service boundaries is where silent failures are most likely.
  *
- * STATUS: Commented out — requires Debrief VS Code extension with error
- * handling wired up. See docs/e2e-test-restoration-requirements.md for prerequisites.
+ * RESTORED: 2026-03-06 — Tests now active with real Python services.
+ * Error notification tests verify VS Code surfaces parse/tool errors.
  *
  * @see specs/005-e2e-workflow-tests/spec.md — User Story 3
  */
-import { test } from './fixtures/base';
+import { test, expect } from './fixtures/base';
 
-// All tests in this file require:
-//   - Debrief VS Code extension installed and activated
-//   - debrief-io service with error reporting
-//   - Extension error notification display
-//   - Extension commands: 'Debrief: Run Incompatible Tool'
-//
-// These tests are commented out until the extension error handling is wired up.
+const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 
-test.describe.skip('US3: Error Feedback Workflow', () => {
+test.describe('US3: Error Feedback Workflow', () => {
   test('T022: open malformed REP file shows error notification, no corrupt data', async ({
     codeServerPage,
   }) => {
-    const frame = await codeServerPage.getWebviewFrame();
     await codeServerPage.openFile('samples/malformed.rep');
+    // Wait for error notification from the io service parse failure
     await codeServerPage.waitForNotification('error', 10_000).catch(() => {});
     const notifications = await codeServerPage.getNotifications();
-    // expect(hasErrorNotification || hasWebviewError).toBe(true);
+    const hasErrorNotification = notifications.some(
+      (n) => n.toLowerCase().includes('error') || n.toLowerCase().includes('parse')
+    );
+    // Also check webview for error display
+    const frame = await codeServerPage.getWebviewFrame().catch(() => null);
+    const hasWebviewError = frame
+      ? await frame.locator('.error-notification').isVisible().catch(() => false)
+      : false;
+    expect(hasErrorNotification || hasWebviewError).toBe(true);
   });
 
   test('T023: run incompatible tool shows clear mismatch message', async ({
@@ -45,7 +47,15 @@ test.describe.skip('US3: Error Feedback Workflow', () => {
     await codeServerPage
       .waitForNotification('incompatible', 10_000)
       .catch(() => {});
-    // expect(hasMismatchError || hasWebviewError).toBe(true);
+    const notifications = await codeServerPage.getNotifications();
+    const hasMismatchError = notifications.some(
+      (n) => n.toLowerCase().includes('incompatible') || n.toLowerCase().includes('mismatch')
+    );
+    const hasWebviewError = await frame
+      .locator('.error-notification')
+      .isVisible()
+      .catch(() => false);
+    expect(hasMismatchError || hasWebviewError).toBe(true);
   });
 
   test('T024: capture evidence screenshot of error notification', async ({
@@ -54,6 +64,9 @@ test.describe.skip('US3: Error Feedback Workflow', () => {
   }) => {
     await codeServerPage.openFile('samples/malformed.rep');
     await codeServerPage.waitForNotification('error', 10_000).catch(() => {});
-    // await page.screenshot({ path: ..., fullPage: false });
+    await page.screenshot({
+      path: `${EVIDENCE_DIR}/vscode-error.png`,
+      fullPage: false,
+    });
   });
 });

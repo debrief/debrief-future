@@ -8,25 +8,15 @@
  * This exercises the full LogService.tuneEntry -> replayEngine -> STAC persist
  * round-trip through the extension UI.
  *
- * STATUS: Skipped — requires Debrief VS Code extension with analysis tools
- * and LogService registered. See docs/e2e-test-restoration-requirements.md
- * for prerequisites.
+ * RESTORED: 2026-03-06 — Tests now active with real Python services.
+ * The tuning workflow requires LogService + replay engine + move-shape tool.
+ * Tests that exercise features not yet available use test.fixme().
  *
  * @see specs/076-replay-tune/spec.md
  */
 import { test, expect } from './fixtures/base';
 
-// All tests in this file require:
-//   - Debrief VS Code extension installed and activated
-//   - debrief-calc Python service running (move-shape tool)
-//   - debrief-stac Python service running (catalog operations)
-//   - LogService with replay engine enabled
-//   - Log Panel webview registered
-//   - Extension command: 'Debrief: Run Move Shape' (or equivalent tool invocation)
-//
-// These tests are skipped until the full service stack is available.
-
-test.describe.skip('US-Tune: PROV Tuning Workflow', () => {
+test.describe('US-Tune: PROV Tuning Workflow', () => {
   test('T-TUNE-01: run move-shape on annotation, log entry appears with tunable parameters', async ({
     codeServerPage,
     debriefWebview,
