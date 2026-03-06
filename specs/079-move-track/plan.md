@@ -1,178 +1,103 @@
-# Implementation Plan: [FEATURE]
+# Implementation Plan: Move Track Tool
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Branch**: `079-move-track` | **Date**: 2026-03-06 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `/specs/079-move-track/spec.md`
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Implement a move-track tool that offsets track features by compass bearing and distance using the Vincenty destination formula. The tool accepts `direction` (degrees) and `range_nm` (nautical miles), translates all coordinates in LineString/MultiLineString geometries, and returns mutated features with provenance. This is step 2 of the E03 Buffer Zone Analysis Demo cascade. Python and TypeScript implementations follow the established `@tool` decorator and `toolDefinition` patterns respectively.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: Python 3.11 (service), TypeScript 5.x (VS Code + web-shell frontends)
+**Primary Dependencies**: debrief-calc (Python tool framework), VS Code Extension API (TypeScript)
+**Storage**: N/A — tool is stateless; PROV system handles persistence via STAC
+**Testing**: pytest (Python), vitest (TypeScript)
+**Target Platform**: Cross-platform (offline-capable)
+**Project Type**: Multi-workspace (services + apps)
+**Performance Goals**: < 1 second for tracks up to 1,000 positions
+**Constraints**: Offline-capable, deterministic output, great-circle accuracy
+**Scale/Scope**: Single tool with Python + TypeScript dual implementation + tool spec
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+| Article | Gate | Status |
+|---------|------|--------|
+| I.1 Offline by default | Tool uses local math only, no network | PASS |
+| I.4 Reproducibility | Vincenty formula is deterministic | PASS |
+| II.1 Single source of truth | Tool spec in `shared/tools/` is the source; Python/TS implement it | PASS |
+| III.1 Provenance always | Executor auto-attaches LogEntry with parameters and input_state | PASS |
+| IV.1 Services never touch UI | Tool returns data only; map drag is frontend concern | PASS |
+| IV.3 Zero MCP dependency | Tool logic is pure Python; MCP wrapper is separate layer | PASS |
+| VI.2 Services require unit tests | Tests planned for both Python and TypeScript | PASS |
+| VII.1 Tests before implementation | Golden examples define expected behaviour | PASS |
+| VIII.1 Specs before code | Tool spec (move-track.1.0.md) written first | PASS |
+| XIII.1 Atomic commits | One logical change per commit | PASS |
+| XV.1 Explicit types everywhere | Full type annotations in both languages | PASS |
+| XV.2 Any prohibited | No Any/any in production code | PASS |
+
+**Post-design re-check**: All gates still pass. No violations to justify.
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/[###-feature]/
-├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
-├── data-model.md        # Phase 1 output (/speckit.plan command)
-├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+specs/079-move-track/
+├── spec.md              # Feature specification
+├── plan.md              # This file
+├── research.md          # Phase 0 research decisions
+├── data-model.md        # Entity and algorithm design
+├── quickstart.md        # Usage examples
+├── checklists/
+│   └── requirements.md  # Spec quality checklist
+└── media/
+    ├── planning-post.md
+    └── linkedin-planning.md
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+# Python tool implementation
+services/calc/debrief_calc/tools/track/manipulation/
+├── __init__.py          # UPDATE: add move_track import
+└── move_track.py        # NEW: @tool handler + translate_point
 
-tests/
-├── contract/
-├── integration/
-└── unit/
+services/calc/tests/tools/track/manipulation/
+└── test_move_track.py   # NEW: unit tests
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
+# TypeScript tool implementation (VS Code)
+apps/vscode/src/tools/track/manipulation/
+└── moveTrack.ts         # NEW: toolDefinition + execute
 
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
+# TypeScript tool implementation (web-shell)
+apps/web-shell/src/tools/track/manipulation/
+└── moveTrack.ts         # NEW: toolDefinition + execute
 
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+# Tool specification (language-neutral)
+shared/tools/track/manipulation/
+├── move-track.1.0.md              # NEW: 9-section tool spec
+├── move-track.basic.input.json    # NEW: golden example input
+└── move-track.basic.output.json   # NEW: golden example output
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Follows established dual-implementation pattern. Python in `services/calc/`, TypeScript mirrored in both `apps/vscode/` and `apps/web-shell/`. Tool spec in `shared/tools/` is the language-neutral source of truth.
 
 ## Media Components
 
-*Identify Storybook stories to bundle for blog post demos. This section is optional - skip if the feature has no visual components.*
-
-| Component | Story Source | Bundle Name | Purpose |
-|-----------|--------------|-------------|---------|
-| [Name] | `path/to/Story.stories.tsx` | `component-name.js` | [What it demonstrates] |
-
-**Inclusion Criteria Applied**:
-- [ ] New visual component
-- [ ] Significant visual change
-- [ ] Interactive demo adds narrative value
-
-**Bundleability Verified**:
-- [ ] Stories exist in Storybook
-- [ ] Components render standalone (no app context required)
-- [ ] Reasonable bundle size expected (< 500KB)
-
-**Storybook Link**: `https://debrief.github.io/debrief-future/storybook/?path=/story/[story-id]`
-
-*If no components identified, write "None - backend/infrastructure feature"*
+None — backend/infrastructure feature. The move-track tool has no visual components. Map drag interaction is a frontend concern handled by #084 (E03 end-to-end wiring).
 
 ## Storybook E2E Testing
 
-*Identify which Storybook stories require automated Playwright tests. Skip if feature has no visual components.*
-
-> **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT omit E2E tests because you think browsers can't be installed. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Full details: `docs/project_notes/playwright-installation-research.md`
-
-| Story | Test Coverage | Theme Variants | Interactions |
-|-------|--------------|----------------|--------------|
-| `ComponentName.stories.tsx` | Rendering, accessibility | light, dark, vscode | [click, fill, hover, etc.] |
-
-**Testing Strategy**:
-- [ ] Component renders correctly in all theme variants
-- [ ] Interactive elements respond to user input
-- [ ] Accessibility attributes present (data-testid, aria-*)
-- [ ] Screenshots captured for evidence
-
-**Test File Location**: `shared/components/e2e/{ComponentName}.spec.ts`
-
-**Theme Variant URLs** (for Storybook):
-```
-/iframe.html?id=category-component--story-name&globals=theme:light
-/iframe.html?id=category-component--story-name&globals=theme:dark
-/iframe.html?id=category-component--story-name&globals=theme:vscode
-```
-
-*If no e2e tests needed, write "None - no interactive UI components"*
+None — no interactive UI components.
 
 ## VS Code Webview E2E Testing
 
-*Identify extension workflows that require end-to-end testing through code-server. Skip if feature has no VS Code extension changes.*
-
-> **Reference**: `docs/e2e-testing-guide.md` — full guide to the webview E2E architecture, patches, and patterns.
-
-| Workflow | Panels Involved | Key Selectors | Interactions |
-|----------|----------------|---------------|--------------|
-| [e.g., Open REP file] | Map Panel, Activity Panel | `.leaflet-container`, `.catalog-overview` | open file, verify tracks render |
-
-**Testing Strategy**:
-- [ ] Extension workflow works end-to-end in code-server
-- [ ] Webview content accessible via `frameLocator` chaining
-- [ ] Page objects updated for new selectors
-- [ ] Screenshots captured for evidence
-
-**Test File Location**: `tests/e2e/test-{workflow}.spec.ts`
-
-**Infrastructure**:
-- Patches applied by `tests/e2e/scripts/patch-webview.sh`
-- Content injection via `tests/e2e/helpers/webview-injector.ts`
-- Headed Chromium required: `xvfb-run --auto-servernum npx playwright test ...`
-
-*If no webview E2E tests needed, write "None - no extension workflow changes"*
+None — no extension workflow changes. The tool is invoked via existing tool execution infrastructure; no new UI panels or webview changes.
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
-
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+No violations to justify. All constitution gates pass.
