@@ -88,7 +88,7 @@ The SRD identifies duration as a filter dimension but leaves open whether durati
 - **FR-001**: The extension specification MUST define a namespace prefix for all custom properties (e.g., `debrief:` prefix), consistent with existing `debrief:toolId` and `debrief:sourceFeatures` usage in STAC assets.
 - **FR-002**: The extension specification MUST define property names, types, and constraints for: vessel class, plot-level tags, feature-level tags, author, track names, nationalities, and duration representation.
 - **FR-003**: Each extension property MUST document whether it is required or optional, and its default value when optional.
-- **FR-004**: The extension MUST define a hierarchical vessel classification structure with at least 3 levels (e.g., category > class > specific type).
+- **FR-004**: The extension MUST define a hierarchical vessel classification structure with at least 4 levels (domain > role > class > type).
 - **FR-005**: The fixture set MUST contain exactly 100 valid STAC item.json files, each conforming to STAC 1.0.0 and the extension specification.
 - **FR-006**: Fixtures MUST include realistic geographic extents (bbox and geometry) spanning multiple ocean regions, not placeholder coordinates.
 - **FR-007**: Fixtures MUST include realistic temporal ranges spanning multiple years, with durations distributed across all SRD filter buckets (`<6H`, `<24H`, `<72H`, `<10D`, `>10D`).
@@ -117,7 +117,7 @@ The SRD identifies duration as a filter dimension but leaves open whether durati
 - **SC-003**: Filtering the 100 fixtures by any single extension property (vessel class, tag, author, nationality, duration bucket, track name) returns a non-empty result set containing between 5% and 80% of items (demonstrating realistic selectivity, not trivial all-or-nothing).
 - **SC-004**: The LinkML schema module generates valid Pydantic and TypeScript models on first attempt, and all 100 fixtures validate against the generated Pydantic model.
 - **SC-005**: Existing schema tests continue to pass after the new LinkML module is added to the root schema.
-- **SC-006**: The vessel taxonomy hierarchy contains at least 3 levels and 15 leaf-node vessel types, sufficient for meaningful hierarchical filtering in the Discovery UI.
+- **SC-006**: The vessel taxonomy hierarchy contains at least 4 levels and 20 leaf-node vessel types (19 + unknown), sufficient for meaningful hierarchical filtering in the Discovery UI.
 
 ## Assumptions
 

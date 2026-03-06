@@ -14,14 +14,14 @@ Properties added to `item.properties` under the `debrief:` namespace.
 | `debrief:feature_tags` | `string[]` | No | `[]` | Union of all per-feature tags. Trimmed non-empty strings. No duplicates. |
 | `debrief:author` | `string` | No | `null` | Free text. Represents the analyst who created/last modified the plot. |
 | `debrief:track_names` | `string[]` | No | `[]` | Names of all tracks in the plot's GeoJSON FeatureCollection. |
-| `debrief:nationalities` | `string[]` | No | `[]` | ISO 3166-1 alpha-2 country codes or common name strings (e.g., `"GB"`, `"US"`, `"FR"`). |
+| `debrief:nationalities` | `string[]` | No | `[]` | ISO 3166-1 alpha-2 country codes only (e.g., `"GB"`, `"US"`, `"FR"`). Pattern: `^[A-Z]{2}$`. |
 
 ### Validation Rules
 
 1. All arrays MUST NOT contain empty strings
 2. All arrays MUST NOT contain duplicates
 3. `debrief:vessel_classes` paths MUST contain only lowercase alphanumeric characters, hyphens, and forward slashes
-4. `debrief:vessel_classes` paths MUST have 1-3 slash-separated segments
+4. `debrief:vessel_classes` paths MUST have 1-4 slash-separated segments (domain/role/class/type)
 5. If `start_datetime` and `end_datetime` are both present, `end_datetime` >= `start_datetime`
 
 ### Relationships
@@ -83,9 +83,10 @@ subsurface/
     │   └── vanguard       → "Vanguard-class SSBN"
     └── ssk/
         └── gotland        → "Gotland-class SSK"
+unknown/                    → "Unknown/Unclassified"
 ```
 
-**Total**: 2 categories, 7 classes, 19 leaf types
+**Total**: 3 domains (surface, subsurface, unknown), 8 roles, 20 leaf types (including `unknown`)
 
 ## Entity: MockFixtureItem
 

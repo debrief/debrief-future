@@ -63,7 +63,7 @@ Duration is **computed at query/filter time** from `start_datetime` and `end_dat
 ## R4: Vessel Taxonomy Structure
 
 ### Decision
-Three-level hierarchy: **category > class > type**. Stored as slash-separated path strings in `debrief:vessel_classes` array.
+Four-level hierarchy: **domain > role > class > type**. Stored as slash-separated path strings in `debrief:vessel_classes` array.
 
 Starter taxonomy for mock data:
 
@@ -82,14 +82,14 @@ subsurface/
 ```
 
 ### Rationale
-- Three levels provide meaningful grouping without excessive depth
+- Four levels provide meaningful grouping without excessive depth
 - Slash-separated paths enable prefix matching: searching `surface/warship` returns all warships
 - 15+ leaf types provide variety for realistic mock data
 - Taxonomy contents are development team's responsibility pre-v4.0.0 (SRD Open Item #3)
 
 ### Alternatives Considered
 1. **Enum-based flat list** — rejected because no hierarchy support for subtree filtering
-2. **4+ level hierarchy** — rejected as unnecessary complexity for current needs
+2. **5+ level hierarchy** — rejected as unnecessary complexity for current needs
 3. **NATO STANAG vessel codes** — deferred; could be added as an alias mapping later
 
 ## R5: Fixture Generation Strategy
