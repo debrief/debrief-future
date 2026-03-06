@@ -123,11 +123,9 @@ function ensureDebriefConfig(): void {
 }
 
 async function globalSetup(): Promise<void> {
-  // Ensure the test STAC store is registered for locally-started servers.
-  // Docker environments are pre-seeded via the Dockerfile.
-  if (!process.env.CODE_SERVER_URL) {
-    ensureDebriefConfig();
-  }
+  // Ensure the test STAC store is registered.
+  // This is idempotent — only writes if config.json doesn't exist yet.
+  ensureDebriefConfig();
 
   // If CODE_SERVER_URL is explicitly set, assume external management (Docker)
   if (process.env.CODE_SERVER_URL) {
@@ -157,10 +155,10 @@ async function globalSetup(): Promise<void> {
         '--port',
         DEFAULT_PORT,
         '--without-connection-token',
-        '--disable-telemetry',
+        '--telemetry-level',
+        'off',
         '--user-data-dir',
         dataDir,
-        WORKSPACE_PATH,
       ],
       { stdio: 'pipe', detached: true }
     );

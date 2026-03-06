@@ -24,8 +24,12 @@ export class CodeServerPage {
    * Waits for the workbench to render and extensions to activate.
    */
   async waitForReady(): Promise<void> {
-    // Navigate to code-server
-    await this.page.goto('/');
+    // Navigate to the VS Code server.
+    // openvscode-server opens a workspace folder via ?folder= query param
+    // (it doesn't accept a positional folder arg like code-server does).
+    const workspaceFolder = process.env.E2E_WORKSPACE_FOLDER;
+    const url = workspaceFolder ? `/?folder=${encodeURIComponent(workspaceFolder)}` : '/';
+    await this.page.goto(url);
 
     // Wait for the VS Code workbench to render
     await this.page.waitForSelector('.monaco-workbench', {
