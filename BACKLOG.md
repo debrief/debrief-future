@@ -207,7 +207,7 @@ Description formats:
 | 027 | Infrastructure | [Add automated screenshot capture for Storybook stories](docs/ideas/027-automated-screenshots.md) | 3 | 4 | 4 | 11 | Medium | approved |
 | ~~088~~ | ~~Feature~~ | ~~[Custom editor provider for result datasets](docs/ideas/E04-results-visualization.md) [E04] — opens results as editor tabs, supports drag-to-float via auxiliary windows (requires #085)~~ | ~~3~~ | ~~4~~ | ~~4~~ | ~~11~~ | ~~Medium~~ | ~~complete~~ |
 | 115 | Tech Debt | [Enforce schema-validated tool inputs and outputs (ADR-008)](docs/project_notes/decisions.md#adr-008-schema-validated-tool-inputs-and-outputs-2026-02-27) — all 12 calc tools bypass generated Pydantic models, working with raw `dict[str, Any]`; add `debrief_schemas` dependency, validate at service boundary, replace hardcoded enums with schema imports | 4 | 2 | 4 | 10 | High | approved |
-| 005 | Tech Debt | Add cross-service end-to-end workflow tests (io -> stac -> calc) | 4 | 2 | 5 | 11 | Low | approved |
+| 005 | Tech Debt | [Add cross-service end-to-end workflow tests (io -> stac -> calc)](specs/005-e2e-workflow-tests/spec.md) | 4 | 2 | 5 | 11 | Low | specified |
 | 057 | Feature | [Add enlarge shape tool spec](docs/ideas/057-enlarge-shape.md) (requires #049) | 3 | 3 | 5 | 11 | Low | approved |
 | 078 | Feature | [Implement generate-reference-points tool](specs/078-generate-reference-points/spec.md) [E03] — creates grid/scatter of reference points on plot (requires #049) | 3 | 3 | 5 | 11 | Low | specified |
 | 008 | Feature | Design and implement extension discovery mechanism for contrib packages | 4 | 3 | 3 | 10 | High | approved |
