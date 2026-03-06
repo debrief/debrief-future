@@ -1,0 +1,99 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-dynamic-mongoose",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -29.4295,
+          71.3734
+        ],
+        [
+          -28.9669,
+          71.3734
+        ],
+        [
+          -28.9669,
+          71.836
+        ],
+        [
+          -29.4295,
+          71.836
+        ],
+        [
+          -29.4295,
+          71.3734
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -29.4295,
+    71.3734,
+    -28.9669,
+    71.836
+  ],
+  "properties": {
+    "title": "Exercise Dynamic Mongoose",
+    "description": "Dynamic Mongoose \u2014 Arctic exercise. 2 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2020-03-01T15:00:00Z",
+    "end_datetime": "2020-03-03T01:25:30Z",
+    "debrief:vessel_classes": [
+      "unknown",
+      "surface/warship/corvette/visby"
+    ],
+    "debrief:tags": [
+      "transit",
+      "certification",
+      "MCM",
+      "EW",
+      "gunnery"
+    ],
+    "debrief:feature_tags": [
+      "prosecution",
+      "minefield",
+      "depth-charge"
+    ],
+    "debrief:track_names": [
+      "USS Fridtjof Nansen",
+      "FS Sachsen"
+    ],
+    "debrief:nationalities": [
+      "US",
+      "FR"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-dynamic-mongoose.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

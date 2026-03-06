@@ -1,0 +1,93 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-single-point-001",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -14.2218,
+          50.0506
+        ],
+        [
+          -13.6406,
+          50.0506
+        ],
+        [
+          -13.6406,
+          50.6318
+        ],
+        [
+          -14.2218,
+          50.6318
+        ],
+        [
+          -14.2218,
+          50.0506
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -14.2218,
+    50.0506,
+    -13.6406,
+    50.6318
+  ],
+  "properties": {
+    "title": "Exercise Single Point 001",
+    "description": "Single Point 001 \u2014 North Atlantic exercise. 1 track(s), 2 nation(s). Single-point observation, no time range.",
+    "datetime": "2024-05-15T03:00:00Z",
+    "debrief:vessel_classes": [
+      "unknown"
+    ],
+    "debrief:tags": [
+      "SAR",
+      "missile-firing",
+      "amphibious",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "active-search"
+    ],
+    "debrief:track_names": [
+      "FS Cole"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "CA"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-single-point-001.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

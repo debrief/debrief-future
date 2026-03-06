@@ -1,5 +1,5 @@
 {
-  "featureType": "system",
+  "kind": "SYSTEM_RECORD",
   "snapshotLinks": null,
   "branches": [],
   "branchOrigin": {

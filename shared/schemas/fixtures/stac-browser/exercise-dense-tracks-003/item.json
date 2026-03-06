@@ -1,0 +1,100 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-dense-tracks-003",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          19.3853,
+          39.1079
+        ],
+        [
+          21.4606,
+          39.1079
+        ],
+        [
+          21.4606,
+          41.1832
+        ],
+        [
+          19.3853,
+          41.1832
+        ],
+        [
+          19.3853,
+          39.1079
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    19.3853,
+    39.1079,
+    21.4606,
+    41.1832
+  ],
+  "properties": {
+    "title": "Exercise Dense Tracks 003",
+    "description": "Dense Tracks 003 \u2014 Mediterranean exercise. 5 track(s), 2 nation(s). Dense track exercise with many participants.",
+    "datetime": null,
+    "start_datetime": "2024-06-28T20:00:00Z",
+    "end_datetime": "2024-06-30T11:10:28Z",
+    "debrief:vessel_classes": [
+      "surface/warship/patrol/river",
+      "surface/warship/frigate/type26"
+    ],
+    "debrief:tags": [
+      "MCM",
+      "multi-national",
+      "boarding",
+      "force-protection",
+      "training"
+    ],
+    "debrief:feature_tags": [
+      "prosecution"
+    ],
+    "debrief:track_names": [
+      "USS Laboon",
+      "HMS Roosevelt",
+      "USS Kent",
+      "HMS Nykoping",
+      "USS Lancaster"
+    ],
+    "debrief:nationalities": [
+      "US",
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-dense-tracks-003.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

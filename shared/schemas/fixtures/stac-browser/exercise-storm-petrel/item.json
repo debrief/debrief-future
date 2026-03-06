@@ -1,0 +1,91 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-storm-petrel",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -16.7898,
+          72.5183
+        ],
+        [
+          -14.5603,
+          72.5183
+        ],
+        [
+          -14.5603,
+          74.7478
+        ],
+        [
+          -16.7898,
+          74.7478
+        ],
+        [
+          -16.7898,
+          72.5183
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -16.7898,
+    72.5183,
+    -14.5603,
+    74.7478
+  ],
+  "properties": {
+    "title": "Exercise Storm Petrel",
+    "description": "Storm Petrel \u2014 Arctic exercise. 0 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2022-11-23T05:00:00Z",
+    "end_datetime": "2022-11-24T20:02:13Z",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "SAR",
+      "ASW"
+    ],
+    "debrief:feature_tags": [
+      "prosecution",
+      "sonar-contact",
+      "depth-charge",
+      "minefield"
+    ],
+    "debrief:track_names": [],
+    "debrief:nationalities": [
+      "GB",
+      "SE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-storm-petrel.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

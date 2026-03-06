@@ -1,0 +1,16 @@
+{
+  "vessel_classes": [
+    "surface/warship",
+    "unknown"
+  ],
+  "tags": [
+    "escort"
+  ],
+  "feature_tags": [],
+  "track_names": [
+    "UNKNOWN VESSEL"
+  ],
+  "nationalities": [
+    "FR"
+  ]
+}

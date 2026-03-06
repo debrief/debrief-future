@@ -1,0 +1,109 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-multi-nation-004",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -28.9741,
+          52.8716
+        ],
+        [
+          -27.8985,
+          52.8716
+        ],
+        [
+          -27.8985,
+          53.9471
+        ],
+        [
+          -28.9741,
+          53.9471
+        ],
+        [
+          -28.9741,
+          52.8716
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -28.9741,
+    52.8716,
+    -27.8985,
+    53.9471
+  ],
+  "properties": {
+    "title": "Exercise Multi Nation 004",
+    "description": "Multi Nation 004 \u2014 North Atlantic exercise. 8 track(s), 6 nation(s). Multi-national exercise with 4+ participant nations.",
+    "datetime": null,
+    "start_datetime": "2023-04-12T08:00:00Z",
+    "end_datetime": "2023-04-12T20:07:33Z",
+    "debrief:vessel_classes": [
+      "surface/warship/frigate/type26"
+    ],
+    "debrief:tags": [
+      "multi-national",
+      "transit",
+      "AAW",
+      "escort",
+      "ASW"
+    ],
+    "debrief:feature_tags": [
+      "depth-charge",
+      "helicopter-ops",
+      "passive-search",
+      "sprint-and-drift"
+    ],
+    "debrief:track_names": [
+      "HDMS De Zeven Provincien",
+      "HMS Provence",
+      "INS Hamburg",
+      "FGS Roald Amundsen",
+      "USS Mahan",
+      "HMAS Bergamini",
+      "HDMS Sachsen",
+      "HMS Nykoping"
+    ],
+    "debrief:nationalities": [
+      "DK",
+      "GB",
+      "IN",
+      "DE",
+      "US",
+      "AU"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-multi-nation-004.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

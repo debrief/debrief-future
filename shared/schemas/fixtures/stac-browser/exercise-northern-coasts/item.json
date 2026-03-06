@@ -1,0 +1,98 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-northern-coasts",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          12.0683,
+          33.7511
+        ],
+        [
+          12.4648,
+          33.7511
+        ],
+        [
+          12.4648,
+          34.1475
+        ],
+        [
+          12.0683,
+          34.1475
+        ],
+        [
+          12.0683,
+          33.7511
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    12.0683,
+    33.7511,
+    12.4648,
+    34.1475
+  ],
+  "properties": {
+    "title": "Exercise Northern Coasts",
+    "description": "Northern Coasts \u2014 Mediterranean exercise. 4 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2024-09-17T13:00:00Z",
+    "end_datetime": "2024-09-18T17:57:29Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssbn/vanguard",
+      "subsurface/submarine/ssn/virginia"
+    ],
+    "debrief:tags": [
+      "surveillance",
+      "EW",
+      "training",
+      "force-protection"
+    ],
+    "debrief:feature_tags": [
+      "zig-zag",
+      "radar-detection"
+    ],
+    "debrief:track_names": [
+      "JS Roald Amundsen",
+      "JS Mahan",
+      "JS Otto Sverdrup",
+      "JS Nordrhein-Westfalen"
+    ],
+    "debrief:nationalities": [
+      "JP"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-northern-coasts.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

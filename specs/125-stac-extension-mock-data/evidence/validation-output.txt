@@ -1,0 +1,31 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /home/user/debrief-future/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/user/debrief-future/shared/schemas
+configfile: pyproject.toml
+plugins: anyio-4.12.1, cov-7.0.0
+collecting ... collected 21 items
+
+shared/schemas/tests/test_stac_extension.py::TestValidFixtures::test_valid_fixtures_pass_validation[extension-basic.json] PASSED [  4%]
+shared/schemas/tests/test_stac_extension.py::TestValidFixtures::test_valid_fixtures_pass_validation[extension-empty-arrays.json] PASSED [  9%]
+shared/schemas/tests/test_stac_extension.py::TestValidFixtures::test_valid_fixtures_pass_validation[extension-partial-path.json] PASSED [ 14%]
+shared/schemas/tests/test_stac_extension.py::TestInvalidFixtures::test_invalid_fixtures_fail_validation[invalid-nationality-name.json] PASSED [ 19%]
+shared/schemas/tests/test_stac_extension.py::TestInvalidFixtures::test_invalid_fixtures_fail_validation[invalid-uppercase-vessel.json] PASSED [ 23%]
+shared/schemas/tests/test_stac_extension.py::TestInvalidFixtures::test_uppercase_vessel_path_fails PASSED [ 28%]
+shared/schemas/tests/test_stac_extension.py::TestInvalidFixtures::test_non_alpha2_nationality_fails PASSED [ 33%]
+shared/schemas/tests/test_stac_extension.py::TestExerciseFixtureCount::test_fixture_count PASSED [ 38%]
+shared/schemas/tests/test_stac_extension.py::TestExerciseValidation::test_all_fixtures_valid PASSED [ 42%]
+shared/schemas/tests/test_stac_extension.py::TestExerciseDiversity::test_vessel_class_diversity PASSED [ 47%]
+shared/schemas/tests/test_stac_extension.py::TestExerciseDiversity::test_nationality_diversity PASSED [ 52%]
+shared/schemas/tests/test_stac_extension.py::TestExerciseDiversity::test_author_diversity PASSED [ 57%]
+shared/schemas/tests/test_stac_extension.py::TestExerciseDiversity::test_geographic_distribution PASSED [ 61%]
+shared/schemas/tests/test_stac_extension.py::TestExerciseDiversity::test_duration_buckets PASSED [ 66%]
+shared/schemas/tests/test_stac_extension.py::TestExerciseDiversity::test_filter_selectivity PASSED [ 71%]
+shared/schemas/tests/test_stac_extension.py::TestExerciseEdgeCases::test_edge_cases_zero_tracks PASSED [ 76%]
+shared/schemas/tests/test_stac_extension.py::TestExerciseEdgeCases::test_edge_cases_dense_tracks PASSED [ 80%]
+shared/schemas/tests/test_stac_extension.py::TestExerciseEdgeCases::test_edge_cases_single_timestamp PASSED [ 85%]
+shared/schemas/tests/test_stac_extension.py::TestRoundTrip::test_round_trip PASSED [ 90%]
+shared/schemas/tests/test_stac_extension.py::TestRoundTrip::test_round_trip_empty PASSED [ 95%]
+shared/schemas/tests/test_stac_extension.py::TestRoundTrip::test_round_trip_from_fixture PASSED [100%]
+
+============================== 21 passed in 0.65s ==============================
