@@ -201,5 +201,3 @@ Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during 
 ## Recent Changes
 - 126-cql2-filter-engine: Added TypeScript 5.x + `cql2-filters-parser` (CQL2 parsing/serialisation, zero-dep ES module)
 - 125-stac-extension-mock-data: Added Python 3.11 (fixture generator, schema, tests), LinkML >= 1.7.0 (schema source) + LinkML (schema), Pydantic v2 (validation), jsonschema (fixture validation)
-- 079-move-track: Added Python 3.11 (service), TypeScript 5.x (VS Code + web-shell frontends) + debrief-calc (Python tool framework), VS Code Extension API (TypeScript)
-- 115-schema-validated-tool-io: Added Python 3.11 (services, schemas), TypeScript 5.x (VS Code, shared components, web-shell) + Pydantic v2 (validation), LinkML >= 1.7.0 (schema source), `debrief-schemas` (generated models)
