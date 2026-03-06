@@ -29,7 +29,11 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "electron"
+      "electron",
+      "esbuild",
+      "@esbuild/linux-x64",
+      "keytar",
+      "@vscode/vsce-sign"
     ]
   }
 }
