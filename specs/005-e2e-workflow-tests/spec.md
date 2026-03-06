@@ -14,6 +14,7 @@
 - Q: How should missing/incomplete features discovered during VS Code E2E test restoration be recorded? → A: Use Playwright `test.fixme()` annotation in the test + create a backlog item with cross-reference
 - Q: Should VS Code E2E suite be expanded to match web-shell coverage or stay focused on extension-specific concerns? → A: Expand VS Code E2E to match web-shell coverage (all 13 spec categories)
 - Q: How should both E2E suites be integrated into CI? → A: Separate CI job for E2E tests, running in parallel with unit tests
+- Q: How should test data be provided in the VS Code E2E environment? → A: Use real sample REP files + real Python services (true end-to-end, highest fidelity)
 
 ## Context
 
@@ -94,7 +95,7 @@ As a developer, I need automated tests that verify feature selection, time contr
 
 - **FR-001**: E2E tests MUST exercise the user workflow across both the web-shell and the VS Code extension (via openvscode-server with sideloaded VSIX)
 - **FR-002**: Automated tests MUST interact with real UI components — map panel, feature list, tools panel, time controller, and catalog overview
-- **FR-003**: The test environment MUST include sample data files available as pre-loaded STAC catalog entries
+- **FR-003**: The web-shell test environment MUST include mock STAC catalog entries; the VS Code E2E environment MUST use real sample REP files parsed by real Python services (debrief-io, debrief-stac, debrief-calc) for true end-to-end fidelity
 - **FR-004**: Tests MUST exercise the complete file-loading workflow: select catalog item → load plot → display tracks on map
 - **FR-005**: Tests MUST exercise the complete analysis workflow: select features → invoke calc tool → display results
 - **FR-006**: Tests MUST verify that selection state propagates correctly between components (feature list, tools panel, map)
@@ -131,6 +132,8 @@ As a developer, I need automated tests that verify feature selection, time contr
 - Playwright with headless Chromium can interact with all web-shell components, including Leaflet map elements and custom React components.
 - The mock STAC data and mock calc service in the web-shell produce outputs structurally equivalent to the real Python services.
 - The `run-playwright.mjs` script handles Chromium extraction in both local and CI/cloud environments.
+- The VS Code E2E environment can start and reach the real Python services (debrief-io, debrief-stac, debrief-calc) within the CI job. Sample REP files are available in the repository for the io service to parse during test runs.
+- The real Python service outputs may differ from mock fixtures; test assertions in the VS Code E2E suite must accommodate real data characteristics (variable track counts, real coordinate values).
 
 ## Dependencies
 
