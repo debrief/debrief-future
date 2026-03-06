@@ -18,8 +18,11 @@ import {
   type LogEntry,
   type ReplayResult,
   type ResultIdRegistry,
+  type SnapshotService,
 } from '@debrief/session-state';
 import type { SessionManager } from '../services/sessionManager';
+import type { CalcService } from '../services/calcService';
+import type { ToolParameter } from '../types/tool';
 
 // Locally-defined types matching @debrief/components LogPanel types.
 // Defined here to avoid ESM-from-CJS import issues with @debrief/components.
@@ -45,6 +48,20 @@ interface TimelineEntry {
   disabled?: boolean;
   rationale?: string | null;
   tuneAnnotation?: { parameter: string; previousValue: unknown; newValue: unknown } | null;
+}
+
+// Locally-defined ParameterSchemaEntry matching @debrief/components LogPanel types.
+interface ParameterSchemaEntry {
+  name: string;
+  type: 'number' | 'string' | 'boolean' | 'enum' | 'object' | 'array';
+  description: string | null;
+  tunable: boolean;
+  defaultValue: unknown;
+  minimum: number | null;
+  maximum: number | null;
+  step: number | null;
+  choices: ReadonlyArray<unknown> | null;
+  paramType: string | null;
 }
 
 // Webview → Extension messages
@@ -169,11 +186,6 @@ function toTimelineEntry(entry: LogEntry): TimelineEntry {
   };
 }
 
-// Action availability messages (snapshot and rationale remain stubs)
-const STUB_ACTION_MESSAGES: Record<string, string> = {
-  snapshot: 'Snapshot creation — use the Snapshot Service directly.',
-  rationale: 'Rationale annotations are planned for a future phase.',
-};
 
 export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'debrief.logPanel';
@@ -204,6 +216,12 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
 
   // Callback to refresh MapPanel features after replay (Feature: 076)
   private _onFeaturesChanged?: () => void;
+
+  // CalcService for resolving tool parameter schemas
+  private _calcService?: CalcService;
+
+  // SnapshotService for creating snapshot checkpoints (Feature: 074)
+  private _snapshotService?: SnapshotService;
 
   constructor(
     extensionUri: vscode.Uri,
@@ -237,6 +255,20 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
    */
   public setOnFeaturesChanged(callback: () => void): void {
     this._onFeaturesChanged = callback;
+  }
+
+  /**
+   * Set the CalcService for resolving tool parameter schemas in flip-card edit mode.
+   */
+  public setCalcService(calcService: CalcService): void {
+    this._calcService = calcService;
+  }
+
+  /**
+   * Set the SnapshotService for creating snapshot checkpoints from the action bar.
+   */
+  public setSnapshotService(snapshotService: SnapshotService): void {
+    this._snapshotService = snapshotService;
   }
 
   /**
@@ -414,13 +446,10 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
           break;
 
         case 'action:invoke':
-          // Phase 6 actions are wired via dedicated message types.
-          // action:invoke now only handles stubs (snapshot, rationale).
           {
             const actionType = message.payload.actionType;
             if (actionType === 'tune' || actionType === 'revertTo' || actionType === 'revertThis') {
               // These are handled via dedicated Phase 6 messages from the webview.
-              // If the webview sends action:invoke for them, it's the old path — inform it.
               this._postMessage({
                 type: 'action:result',
                 payload: {
@@ -429,16 +458,17 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
                   message: 'Use the inline parameter editor or revert buttons.',
                 },
               });
+            } else if (actionType === 'snapshot') {
+              void this._handleSnapshotAction();
             } else {
-              const actionMsg =
-                STUB_ACTION_MESSAGES[actionType] ??
-                'This action is not yet available.';
+              // rationale is handled via flip-card rationale:update message;
+              // any unknown action type gets a clear message.
               this._postMessage({
                 type: 'action:result',
                 payload: {
                   actionType,
                   available: false,
-                  message: actionMsg,
+                  message: `Action "${actionType}" is not supported from the action bar.`,
                 },
               });
             }
@@ -650,6 +680,49 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
     });
   }
 
+  // ─── Snapshot action (Feature: 074) ─────────────────────────────────
+
+  private async _handleSnapshotAction(): Promise<void> {
+    if (!this._snapshotService) {
+      this._postMessage({
+        type: 'action:result',
+        payload: {
+          actionType: 'snapshot',
+          available: false,
+          message: 'Snapshot service not connected. Please reopen the plot.',
+        },
+      });
+      return;
+    }
+
+    if (!this._assertLogServiceReady('snapshot')) { return; }
+    const storePath = this._getStorePath!();
+    const itemPath = this._getItemPath!();
+    if (!storePath || !itemPath) { return; }
+
+    try {
+      const result = await this._snapshotService.createSnapshot(storePath, itemPath);
+      this._postMessage({
+        type: 'action:result',
+        payload: {
+          actionType: 'snapshot',
+          available: false,
+          message: `Snapshot created: ${result.snapshotAsset} (${result.entriesCaptured} entries captured).`,
+        },
+      });
+      await this._sendTimelineUpdate();
+    } catch (err) {
+      this._postMessage({
+        type: 'action:result',
+        payload: {
+          actionType: 'snapshot',
+          available: false,
+          message: `Snapshot failed: ${err instanceof Error ? err.message : String(err)}`,
+        },
+      });
+    }
+  }
+
   // ─── End Phase 6 handlers ────────────────────────────────────────
 
   // ─── Feature 113: Flip-card edit handlers ──────────────────────────
@@ -707,15 +780,45 @@ export class LogPanelViewProvider implements vscode.WebviewViewProvider {
   private _handleSchemaRequest(payload: {
     toolId: string;
   }): void {
-    // TODO: Wire to actual tool schema registry when available.
-    // For now, return an empty schema array (no type-aware controls, fallback only).
+    if (!this._calcService) {
+      // No CalcService — return empty schema (fallback to text inputs)
+      this._postMessage({
+        type: 'schema:response',
+        payload: { toolId: payload.toolId, schema: [], error: null },
+      });
+      return;
+    }
+
+    // Build schema from cached tool list (no async fetch — uses already-cached tools)
+    const tools = this._calcService.getCurrentTools?.() ?? [];
+    const tool = tools.find((t) => t.id === payload.toolId || t.name === payload.toolId);
+
+    if (!tool || !tool.parameters || tool.parameters.length === 0) {
+      this._postMessage({
+        type: 'schema:response',
+        payload: { toolId: payload.toolId, schema: [], error: null },
+      });
+      return;
+    }
+
+    const schema: ParameterSchemaEntry[] = tool.parameters.map(
+      (p: ToolParameter): ParameterSchemaEntry => ({
+        name: p.name,
+        type: p.valueType === 'enum' ? 'enum' : p.valueType,
+        description: p.description ?? null,
+        tunable: true,
+        defaultValue: p.defaultValue ?? null,
+        minimum: null,
+        maximum: null,
+        step: null,
+        choices: p.choices ?? null,
+        paramType: p.paramType ?? null,
+      })
+    );
+
     this._postMessage({
       type: 'schema:response',
-      payload: {
-        toolId: payload.toolId,
-        schema: [],
-        error: null,
-      },
+      payload: { toolId: payload.toolId, schema, error: null },
     });
   }
 

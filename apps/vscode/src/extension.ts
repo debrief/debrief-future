@@ -129,6 +129,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     sessionManager
   );
   logPanelProvider.setResultIdRegistry(resultIdRegistry);
+  logPanelProvider.setCalcService(calcService);
 
   // Register all view providers — this is what makes views appear in the UI
   context.subscriptions.push(
