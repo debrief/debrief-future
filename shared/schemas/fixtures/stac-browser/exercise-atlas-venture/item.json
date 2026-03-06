@@ -1,0 +1,97 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-atlas-venture",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -20.4996,
+          48.4948
+        ],
+        [
+          -19.4894,
+          48.4948
+        ],
+        [
+          -19.4894,
+          49.5051
+        ],
+        [
+          -20.4996,
+          49.5051
+        ],
+        [
+          -20.4996,
+          48.4948
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -20.4996,
+    48.4948,
+    -19.4894,
+    49.5051
+  ],
+  "properties": {
+    "title": "Exercise Atlas Venture",
+    "description": "Atlas Venture \u2014 North Atlantic exercise. 2 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-12-22T06:00:00Z",
+    "end_datetime": "2021-12-24T05:57:07Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssbn/vanguard"
+    ],
+    "debrief:tags": [
+      "mine-clearance",
+      "training",
+      "certification",
+      "gunnery"
+    ],
+    "debrief:feature_tags": [
+      "sprint-and-drift",
+      "track-merge",
+      "towed-array"
+    ],
+    "debrief:author": "Lt Cdr C. O'Brien RN",
+    "debrief:track_names": [
+      "HDMS Lancaster",
+      "HDMS Caio Duilio"
+    ],
+    "debrief:nationalities": [
+      "DK"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-atlas-venture.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-falcon-reach",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          65.8711,
+          -4.4529
+        ],
+        [
+          66.9091,
+          -4.4529
+        ],
+        [
+          66.9091,
+          -3.4148
+        ],
+        [
+          65.8711,
+          -3.4148
+        ],
+        [
+          65.8711,
+          -4.4529
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    65.8711,
+    -4.4529,
+    66.9091,
+    -3.4148
+  ],
+  "properties": {
+    "title": "Exercise Falcon Reach",
+    "description": "Falcon Reach \u2014 Indian Ocean exercise. 4 track(s), 3 nation(s).",
+    "datetime": null,
+    "start_datetime": "2025-04-15T02:00:00Z",
+    "end_datetime": "2025-04-15T04:15:01Z",
+    "debrief:vessel_classes": [
+      "surface/warship/frigate/type26"
+    ],
+    "debrief:tags": [
+      "mine-clearance",
+      "multi-national",
+      "training",
+      "MCM",
+      "SAR"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "Lt Cdr S. Eriksson SwN",
+    "debrief:track_names": [
+      "HNoMS Ramage",
+      "HNLMS Portland",
+      "SPS Defender",
+      "HNoMS Truxtun"
+    ],
+    "debrief:nationalities": [
+      "NO",
+      "NL",
+      "ES"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-falcon-reach.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

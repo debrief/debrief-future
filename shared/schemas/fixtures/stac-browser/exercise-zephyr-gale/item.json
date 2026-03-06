@@ -1,0 +1,103 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-zephyr-gale",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          109.7094,
+          6.772
+        ],
+        [
+          111.0009,
+          6.772
+        ],
+        [
+          111.0009,
+          8.0634
+        ],
+        [
+          109.7094,
+          8.0634
+        ],
+        [
+          109.7094,
+          6.772
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    109.7094,
+    6.772,
+    111.0009,
+    8.0634
+  ],
+  "properties": {
+    "title": "Exercise Zephyr Gale",
+    "description": "Zephyr Gale \u2014 Indo-Pacific exercise. 7 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2020-10-16T22:00:00Z",
+    "end_datetime": "2020-10-17T10:38:03Z",
+    "debrief:vessel_classes": [
+      "surface/merchant/cargo/bulk",
+      "surface/merchant/passenger/ferry"
+    ],
+    "debrief:tags": [
+      "AAW",
+      "gunnery"
+    ],
+    "debrief:feature_tags": [
+      "datum",
+      "radar-detection",
+      "active-search",
+      "prosecution"
+    ],
+    "debrief:author": "Lt Cdr D. Kowalski",
+    "debrief:track_names": [
+      "USS Andrea Doria",
+      "JS Evertsen",
+      "USS Kent",
+      "JS Caio Duilio",
+      "USS Harnosand",
+      "JS Fridtjof Nansen",
+      "USS Helge Ingstad"
+    ],
+    "debrief:nationalities": [
+      "US",
+      "JP"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-zephyr-gale.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

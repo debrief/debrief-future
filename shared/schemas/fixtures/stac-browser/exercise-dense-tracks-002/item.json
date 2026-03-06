@@ -1,0 +1,100 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-dense-tracks-002",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          22.718,
+          36.1901
+        ],
+        [
+          23.3275,
+          36.1901
+        ],
+        [
+          23.3275,
+          36.7996
+        ],
+        [
+          22.718,
+          36.7996
+        ],
+        [
+          22.718,
+          36.1901
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    22.718,
+    36.1901,
+    23.3275,
+    36.7996
+  ],
+  "properties": {
+    "title": "Exercise Dense Tracks 002",
+    "description": "Dense Tracks 002 \u2014 Mediterranean exercise. 5 track(s), 2 nation(s). Dense track exercise with many participants.",
+    "datetime": null,
+    "start_datetime": "2024-09-27T21:00:00Z",
+    "end_datetime": "2024-09-28T02:01:51Z",
+    "debrief:vessel_classes": [
+      "unknown",
+      "surface/warship/corvette/visby"
+    ],
+    "debrief:tags": [
+      "amphibious",
+      "surveillance",
+      "SAR"
+    ],
+    "debrief:feature_tags": [
+      "prosecution",
+      "visual-sighting"
+    ],
+    "debrief:author": "Lt K. Yamamoto JMSDF",
+    "debrief:track_names": [
+      "HNLMS Aquitaine",
+      "HNoMS Sutherland",
+      "HNLMS Bainbridge",
+      "HNoMS Defender",
+      "HNLMS Helsingborg"
+    ],
+    "debrief:nationalities": [
+      "NL",
+      "NO"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-dense-tracks-002.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-talisman-sabre",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -28.5226,
+          -36.0435
+        ],
+        [
+          -26.4745,
+          -36.0435
+        ],
+        [
+          -26.4745,
+          -33.9955
+        ],
+        [
+          -28.5226,
+          -33.9955
+        ],
+        [
+          -28.5226,
+          -36.0435
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -28.5226,
+    -36.0435,
+    -26.4745,
+    -33.9955
+  ],
+  "properties": {
+    "title": "Exercise Talisman Sabre",
+    "description": "Talisman Sabre \u2014 South Atlantic exercise. 5 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2022-06-20T20:00:00Z",
+    "end_datetime": "2022-06-24T00:04:00Z",
+    "debrief:vessel_classes": [
+      "surface/auxiliary/supply/fort-victoria"
+    ],
+    "debrief:tags": [
+      "escort",
+      "training",
+      "AAW",
+      "MCM",
+      "gunnery"
+    ],
+    "debrief:feature_tags": [
+      "passive-search"
+    ],
+    "debrief:author": "Cdr F. Rossi MMI",
+    "debrief:track_names": [
+      "HMS Lancaster",
+      "INS Somerset",
+      "HMS Tromp",
+      "INS Westminster",
+      "HMS Mahan"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "IN"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-talisman-sabre.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

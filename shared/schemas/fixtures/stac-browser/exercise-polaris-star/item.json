@@ -1,0 +1,103 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-polaris-star",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -2.0471,
+          34.5764
+        ],
+        [
+          -0.2968,
+          34.5764
+        ],
+        [
+          -0.2968,
+          36.3266
+        ],
+        [
+          -2.0471,
+          36.3266
+        ],
+        [
+          -2.0471,
+          34.5764
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -2.0471,
+    34.5764,
+    -0.2968,
+    36.3266
+  ],
+  "properties": {
+    "title": "Exercise Polaris Star",
+    "description": "Polaris Star \u2014 Mediterranean exercise. 4 track(s), 3 nation(s).",
+    "datetime": null,
+    "start_datetime": "2022-08-06T15:00:00Z",
+    "end_datetime": "2022-08-06T20:07:42Z",
+    "debrief:vessel_classes": [
+      "surface/merchant/cargo/bulk",
+      "surface/merchant/tanker/vlcc"
+    ],
+    "debrief:tags": [
+      "NGFS",
+      "EW",
+      "surveillance",
+      "MCM",
+      "amphibious"
+    ],
+    "debrief:feature_tags": [
+      "minefield",
+      "active-search",
+      "depth-charge"
+    ],
+    "debrief:author": "Cdr A. Brown RN",
+    "debrief:track_names": [
+      "HMS Nykoping",
+      "HNoMS Visby",
+      "JS Argyll",
+      "HMS Harnosand"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "NO",
+      "JP"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-polaris-star.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-obangame-express",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -36.8906,
+          48.0288
+        ],
+        [
+          -36.7722,
+          48.0288
+        ],
+        [
+          -36.7722,
+          48.1472
+        ],
+        [
+          -36.8906,
+          48.1472
+        ],
+        [
+          -36.8906,
+          48.0288
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -36.8906,
+    48.0288,
+    -36.7722,
+    48.1472
+  ],
+  "properties": {
+    "title": "Exercise Obangame Express",
+    "description": "Obangame Express \u2014 North Atlantic exercise. 1 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2025-10-10T13:00:00Z",
+    "end_datetime": "2025-10-18T09:30:30Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "EW"
+    ],
+    "debrief:feature_tags": [
+      "minefield",
+      "towed-array",
+      "track-merge"
+    ],
+    "debrief:author": "Lt Cdr C. O'Brien RN",
+    "debrief:track_names": [
+      "HNoMS Diamond"
+    ],
+    "debrief:nationalities": [
+      "NO",
+      "CA"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-obangame-express.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

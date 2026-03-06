@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-eagle-resolve",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -39.761,
+          46.7938
+        ],
+        [
+          -37.9848,
+          46.7938
+        ],
+        [
+          -37.9848,
+          48.57
+        ],
+        [
+          -39.761,
+          48.57
+        ],
+        [
+          -39.761,
+          46.7938
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -39.761,
+    46.7938,
+    -37.9848,
+    48.57
+  ],
+  "properties": {
+    "title": "Exercise Eagle Resolve",
+    "description": "Eagle Resolve \u2014 North Atlantic exercise. 1 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2025-04-23T10:00:00Z",
+    "end_datetime": "2025-04-25T05:37:28Z",
+    "debrief:vessel_classes": [
+      "unknown"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "missile-firing",
+      "NGFS",
+      "multi-national"
+    ],
+    "debrief:feature_tags": [
+      "datum"
+    ],
+    "debrief:author": "Lt Cdr D. Kowalski",
+    "debrief:track_names": [
+      "JS Roald Amundsen"
+    ],
+    "debrief:nationalities": [
+      "JP"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-eagle-resolve.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

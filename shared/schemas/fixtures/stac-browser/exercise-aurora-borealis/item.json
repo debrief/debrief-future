@@ -1,0 +1,92 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-aurora-borealis",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          19.9201,
+          35.9313
+        ],
+        [
+          21.5555,
+          35.9313
+        ],
+        [
+          21.5555,
+          37.5668
+        ],
+        [
+          19.9201,
+          37.5668
+        ],
+        [
+          19.9201,
+          35.9313
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    19.9201,
+    35.9313,
+    21.5555,
+    37.5668
+  ],
+  "properties": {
+    "title": "Exercise Aurora Borealis",
+    "description": "Aurora Borealis \u2014 Mediterranean exercise. 3 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-02-01T23:00:00Z",
+    "end_datetime": "2021-02-03T07:55:49Z",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/type45"
+    ],
+    "debrief:tags": [
+      "harbour-ops",
+      "NGFS"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "Cdr A. Brown RN",
+    "debrief:track_names": [
+      "HMS Kent",
+      "HMS Auvergne",
+      "HMS Diamond"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-aurora-borealis.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

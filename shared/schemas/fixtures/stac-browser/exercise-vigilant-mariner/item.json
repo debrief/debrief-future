@@ -1,0 +1,95 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-vigilant-mariner",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -24.7468,
+          51.3459
+        ],
+        [
+          -23.588,
+          51.3459
+        ],
+        [
+          -23.588,
+          52.5046
+        ],
+        [
+          -24.7468,
+          52.5046
+        ],
+        [
+          -24.7468,
+          51.3459
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -24.7468,
+    51.3459,
+    -23.588,
+    52.5046
+  ],
+  "properties": {
+    "title": "Exercise Vigilant Mariner",
+    "description": "Vigilant Mariner \u2014 North Atlantic exercise. 4 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2024-03-19T21:00:00Z",
+    "end_datetime": "2024-03-20T07:06:51Z",
+    "debrief:vessel_classes": [
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/corvette/visby"
+    ],
+    "debrief:tags": [
+      "harbour-ops",
+      "surveillance",
+      "force-protection"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "Cdr A. Brown RN",
+    "debrief:track_names": [
+      "HMS Hamburg",
+      "HMS Northumberland",
+      "HMS Harnosand",
+      "HMS Nordrhein-Westfalen"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-vigilant-mariner.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

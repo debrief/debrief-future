@@ -311,6 +311,18 @@ export enum FileProvDirectionEnum {
     /** This file is the target of the branch */
     target = "target",
 };
+/**
+* Top-level vessel domain classification
+*/
+export enum VesselDomainEnum {
+    
+    /** Surface vessels (warships, auxiliaries, merchant) */
+    surface = "surface",
+    /** Subsurface vessels (submarines) */
+    subsurface = "subsurface",
+    /** Vessel domain not determined or not applicable */
+    unknown = "unknown",
+};
 
 
 /**
@@ -885,6 +897,12 @@ export interface LogEntry {
     generated_result_id?: string,
     /** Parameter tuning record. Null until a tuning operation modifies this entry. */
     tune?: TuneAnnotation,
+    /** Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools. */
+    input_state?: InputFeatureState[],
+    /** Whether this entry is skipped during replay. Toggled via the flip-card edit face. */
+    disabled?: boolean,
+    /** Free-text analyst annotation explaining the reasoning for this operation. */
+    rationale?: string,
 }
 
 
@@ -911,6 +929,19 @@ export interface ParameterValue {
     default?: boolean,
     /** Whether this parameter can be modified during replay. */
     tunable?: boolean,
+}
+
+
+/**
+ * Pre-operation state of a feature captured before a coordinate-mutating tool executes. Enables correct replay by providing the original geometry as the anchor for re-computation with modified parameters.
+ */
+export interface InputFeatureState {
+    /** ID of the feature whose pre-operation state is captured. */
+    feature_id: string,
+    /** Full GeoJSON geometry object (type + coordinates) as it was immediately before the operation. Stored as a JSON object. */
+    geometry: string,
+    /** Kind-specific spatial properties captured before the operation. Excludes provenance (which is append-only). Null if no spatial properties need capturing. */
+    properties?: string,
 }
 
 
@@ -1321,6 +1352,32 @@ export interface FileProvEntry {
     branch_id?: string,
     /** 'source' or 'target' (for branch events). */
     direction?: string,
+}
+
+
+/**
+ * Extension properties added to STAC item.properties under the debrief: namespace. All properties are optional — existing items without extension properties remain valid. These properties enable filtering, searching, and colour-coding in the Discovery UI.
+
+ */
+export interface StacExtensionProperties {
+    /** Hierarchical vessel classification paths using slash-separated notation. Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23). Partial paths allowed for imprecise classification (e.g., surface/warship).
+ */
+    vessel_classes?: string[],
+    /** Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
+ */
+    tags?: string[],
+    /** Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
+ */
+    feature_tags?: string[],
+    /** Analyst who created or last modified the plot. Free-text identifier.
+ */
+    author?: string,
+    /** Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.
+ */
+    track_names?: string[],
+    /** Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.
+ */
+    nationalities?: string[],
 }
 
 

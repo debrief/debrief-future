@@ -1,0 +1,98 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-ursus-patrol",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -17.8606,
+          49.9855
+        ],
+        [
+          -16.7641,
+          49.9855
+        ],
+        [
+          -16.7641,
+          51.082
+        ],
+        [
+          -17.8606,
+          51.082
+        ],
+        [
+          -17.8606,
+          49.9855
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -17.8606,
+    49.9855,
+    -16.7641,
+    51.082
+  ],
+  "properties": {
+    "title": "Exercise Ursus Patrol",
+    "description": "Ursus Patrol \u2014 North Atlantic exercise. 6 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2025-05-20T20:00:00Z",
+    "end_datetime": "2025-05-22T14:58:54Z",
+    "debrief:vessel_classes": [
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/destroyer/type45"
+    ],
+    "debrief:tags": [
+      "amphibious",
+      "transit",
+      "multi-national",
+      "ASW"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "Cdr F. Rossi MMI",
+    "debrief:track_names": [
+      "HMS Tromp",
+      "HMS Bergamini",
+      "HMS Evertsen",
+      "HMS Lancaster",
+      "HMS Duncan",
+      "HMS Defender"
+    ],
+    "debrief:nationalities": [
+      "SE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-ursus-patrol.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

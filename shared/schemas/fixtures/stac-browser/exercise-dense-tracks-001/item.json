@@ -1,0 +1,99 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-dense-tracks-001",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          135.8612,
+          -6.6182
+        ],
+        [
+          136.6116,
+          -6.6182
+        ],
+        [
+          136.6116,
+          -5.8679
+        ],
+        [
+          135.8612,
+          -5.8679
+        ],
+        [
+          135.8612,
+          -6.6182
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    135.8612,
+    -6.6182,
+    136.6116,
+    -5.8679
+  ],
+  "properties": {
+    "title": "Exercise Dense Tracks 001",
+    "description": "Dense Tracks 001 \u2014 Indo-Pacific exercise. 6 track(s), 1 nation(s). Dense track exercise with many participants.",
+    "datetime": null,
+    "start_datetime": "2022-02-25T08:00:00Z",
+    "end_datetime": "2022-02-27T11:33:24Z",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/arleigh-burke",
+      "surface/warship/patrol/river"
+    ],
+    "debrief:tags": [
+      "amphibious",
+      "multi-national"
+    ],
+    "debrief:feature_tags": [
+      "track-merge",
+      "sonar-contact"
+    ],
+    "debrief:author": "Lt K. Yamamoto JMSDF",
+    "debrief:track_names": [
+      "USS Otto Sverdrup",
+      "USS Andrea Doria",
+      "USS Aquitaine",
+      "USS Kent",
+      "USS Iron Duke",
+      "USS Harnosand"
+    ],
+    "debrief:nationalities": [
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-dense-tracks-001.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

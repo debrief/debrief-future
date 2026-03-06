@@ -1,0 +1,102 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-raptor-chase",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -26.9322,
+          72.366
+        ],
+        [
+          -24.6694,
+          72.366
+        ],
+        [
+          -24.6694,
+          74.6289
+        ],
+        [
+          -26.9322,
+          74.6289
+        ],
+        [
+          -26.9322,
+          72.366
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -26.9322,
+    72.366,
+    -24.6694,
+    74.6289
+  ],
+  "properties": {
+    "title": "Exercise Raptor Chase",
+    "description": "Raptor Chase \u2014 Arctic exercise. 5 track(s), 3 nation(s).",
+    "datetime": null,
+    "start_datetime": "2022-12-03T17:00:00Z",
+    "end_datetime": "2022-12-03T22:58:14Z",
+    "debrief:vessel_classes": [
+      "surface/warship/corvette/visby",
+      "surface/warship/frigate/type26",
+      "surface/warship/destroyer/type45"
+    ],
+    "debrief:tags": [
+      "NGFS",
+      "EW"
+    ],
+    "debrief:feature_tags": [
+      "depth-charge",
+      "visual-sighting",
+      "sonar-contact"
+    ],
+    "debrief:author": "Cdr F. Rossi MMI",
+    "debrief:track_names": [
+      "FS Lancaster",
+      "HNLMS Caio Duilio",
+      "INS Andrea Doria",
+      "FS Fridtjof Nansen",
+      "HNLMS Northumberland"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "NL",
+      "IN"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-raptor-chase.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

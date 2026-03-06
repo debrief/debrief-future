@@ -1,0 +1,93 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-single-point-001",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -13.1286,
+          53.6885
+        ],
+        [
+          -10.73,
+          53.6885
+        ],
+        [
+          -10.73,
+          56.0871
+        ],
+        [
+          -13.1286,
+          56.0871
+        ],
+        [
+          -13.1286,
+          53.6885
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -13.1286,
+    53.6885,
+    -10.73,
+    56.0871
+  ],
+  "properties": {
+    "title": "Exercise Single Point 001",
+    "description": "Single Point 001 \u2014 North Atlantic exercise. 1 track(s), 1 nation(s). Single-point observation, no time range.",
+    "datetime": "2022-08-04T14:00:00Z",
+    "debrief:vessel_classes": [
+      "unknown"
+    ],
+    "debrief:tags": [
+      "SAR",
+      "missile-firing",
+      "amphibious",
+      "transit"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "active-search"
+    ],
+    "debrief:author": "Lt Cdr C. O'Brien RN",
+    "debrief:track_names": [
+      "INS Cole"
+    ],
+    "debrief:nationalities": [
+      "IN"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-single-point-001.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

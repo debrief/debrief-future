@@ -1,0 +1,100 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-steadfast-defender",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -32.2024,
+          -46.2298
+        ],
+        [
+          -31.4352,
+          -46.2298
+        ],
+        [
+          -31.4352,
+          -45.4627
+        ],
+        [
+          -32.2024,
+          -45.4627
+        ],
+        [
+          -32.2024,
+          -46.2298
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -32.2024,
+    -46.2298,
+    -31.4352,
+    -45.4627
+  ],
+  "properties": {
+    "title": "Exercise Steadfast Defender",
+    "description": "Steadfast Defender \u2014 South Atlantic exercise. 7 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-12-14T06:00:00Z",
+    "end_datetime": "2021-12-19T21:05:21Z",
+    "debrief:vessel_classes": [
+      "surface/warship/patrol/river",
+      "surface/warship/destroyer/arleigh-burke"
+    ],
+    "debrief:tags": [
+      "replenishment"
+    ],
+    "debrief:feature_tags": [
+      "helicopter-ops",
+      "datum",
+      "torpedo-run"
+    ],
+    "debrief:author": "Lt Cdr J. Smith RN",
+    "debrief:track_names": [
+      "USS Bretagne",
+      "USS De Zeven Provincien",
+      "USS Dragon",
+      "USS Harnosand",
+      "USS Gonzalez",
+      "USS Carney",
+      "USS Tromp"
+    ],
+    "debrief:nationalities": [
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-steadfast-defender.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

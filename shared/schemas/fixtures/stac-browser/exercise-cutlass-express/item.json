@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-cutlass-express",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -15.3088,
+          -31.9567
+        ],
+        [
+          -13.7365,
+          -31.9567
+        ],
+        [
+          -13.7365,
+          -30.3844
+        ],
+        [
+          -15.3088,
+          -30.3844
+        ],
+        [
+          -15.3088,
+          -31.9567
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -15.3088,
+    -31.9567,
+    -13.7365,
+    -30.3844
+  ],
+  "properties": {
+    "title": "Exercise Cutlass Express",
+    "description": "Cutlass Express \u2014 South Atlantic exercise. 3 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2024-01-22T10:00:00Z",
+    "end_datetime": "2024-01-31T13:14:02Z",
+    "debrief:vessel_classes": [
+      "surface/auxiliary/tanker/tide",
+      "surface/auxiliary/supply/fort-victoria"
+    ],
+    "debrief:tags": [
+      "ASW",
+      "training"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "Lt Cdr C. O'Brien RN",
+    "debrief:track_names": [
+      "HMS Helsingborg",
+      "HDMS Roosevelt",
+      "HMS Tromp"
+    ],
+    "debrief:nationalities": [
+      "SE",
+      "DK"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-cutlass-express.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

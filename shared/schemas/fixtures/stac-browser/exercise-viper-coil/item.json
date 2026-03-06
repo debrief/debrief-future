@@ -1,0 +1,95 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-viper-coil",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          1.7173,
+          33.2141
+        ],
+        [
+          2.3963,
+          33.2141
+        ],
+        [
+          2.3963,
+          33.8932
+        ],
+        [
+          1.7173,
+          33.8932
+        ],
+        [
+          1.7173,
+          33.2141
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    1.7173,
+    33.2141,
+    2.3963,
+    33.8932
+  ],
+  "properties": {
+    "title": "Exercise Viper Coil",
+    "description": "Viper Coil \u2014 Mediterranean exercise. 4 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2022-02-16T03:00:00Z",
+    "end_datetime": "2022-02-17T17:48:03Z",
+    "debrief:vessel_classes": [
+      "surface/merchant/passenger/ferry",
+      "surface/merchant/tanker/vlcc"
+    ],
+    "debrief:tags": [
+      "amphibious",
+      "NGFS",
+      "replenishment"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "Lt Cdr C. O'Brien RN",
+    "debrief:track_names": [
+      "USS Portland",
+      "USS Cole",
+      "USS Auvergne",
+      "USS Bretagne"
+    ],
+    "debrief:nationalities": [
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-viper-coil.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

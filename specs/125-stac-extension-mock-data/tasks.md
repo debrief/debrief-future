@@ -42,8 +42,8 @@
 
 **Purpose**: Create directories and initialize project structure
 
-- [ ] T001 Create fixture directory structure `shared/schemas/fixtures/stac-browser/`
-- [ ] T002 [P] Create evidence directory `specs/125-stac-extension-mock-data/evidence/`
+- [x] T001 Create fixture directory structure `shared/schemas/fixtures/stac-browser/`
+- [x] T002 [P] Create evidence directory `specs/125-stac-extension-mock-data/evidence/`
 
 ---
 
@@ -53,7 +53,7 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 [US-ALL] Create LinkML schema module `shared/schemas/src/linkml/stac-extension.yaml`
+- [x] T003 [US-ALL] Create LinkML schema module `shared/schemas/src/linkml/stac-extension.yaml`
   - Define `StacExtensionProperties` class with 6 properties under `debrief:` namespace
   - `debrief:vessel_classes`: string[] with pattern `^[a-z0-9-]+(/[a-z0-9-]+){0,3}$` (4 levels per review issue 11A)
   - `debrief:tags`: string[] (trimmed, no duplicates)
@@ -64,8 +64,8 @@
   - All properties optional
   - Use `slot_uri: debrief:propertyname` per existing tool-result.yaml pattern
   - Use prefix `debrief: https://debrief.info/schemas/` (NOT `https://debrief.com/` — see review domain mismatch note)
-- [ ] T004 [US-ALL] Add stac-extension import to root schema `shared/schemas/src/linkml/debrief.yaml`
-- [ ] T005 [US-ALL] Run schema generation and verify output `shared/schemas/scripts/generate.py`
+- [x] T004 [US-ALL] Add stac-extension import to root schema `shared/schemas/src/linkml/debrief.yaml`
+- [x] T005 [US-ALL] Run schema generation and verify output `shared/schemas/scripts/generate.py`
   - Pydantic model generates with correct types (no `Any`)
   - TypeScript types generate with correct property names
   - JSON Schema generates with regex patterns
@@ -83,11 +83,11 @@
 
 ### Tests for User Story 1
 
-- [ ] T006 [test] [US1] Write golden fixture validation tests `shared/schemas/tests/test_stac_extension.py`
+- [x] T006 [test] [US1] Write golden fixture validation tests `shared/schemas/tests/test_stac_extension.py`
   - Test valid fixture passes Pydantic model validation
   - Test all 6 extension properties are correctly typed
   - Test no conflict with existing STAC core properties
-- [ ] T007 [P][test] [US1] Write invalid fixture tests `shared/schemas/tests/test_stac_extension.py`
+- [x] T007 [P][test] [US1] Write invalid fixture tests `shared/schemas/tests/test_stac_extension.py`
   - Test uppercase vessel_classes path fails (e.g., `SURFACE/WARSHIP`)
   - Test non-alpha-2 nationality fails (e.g., `Great Britain`)
   - Test duplicate tags fail (`["ASW", "ASW"]`)
@@ -96,17 +96,17 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Create valid golden fixture file `shared/schemas/fixtures/stac-browser/valid/extension-basic.json`
+- [x] T008 [US1] Create valid golden fixture file `shared/schemas/fixtures/stac-browser/valid/extension-basic.json`
   - Complete STAC item with all 6 extension properties populated
   - Use the example-item.json from contracts/ as starting point
   - Add `stac_extensions` array with extension URI
-- [ ] T009 [P] [US1] Create invalid golden fixture files `shared/schemas/fixtures/stac-browser/invalid/`
+- [x] T009 [P] [US1] Create invalid golden fixture files `shared/schemas/fixtures/stac-browser/invalid/`
   - `invalid-uppercase-vessel.json` — uppercase vessel_classes path
   - `invalid-nationality-name.json` — non-alpha-2 nationality
   - `invalid-duplicate-tags.json` — duplicate entries in tags array
   - `invalid-empty-string.json` — empty string in array
-- [ ] T010 [US1] Run tests and verify valid passes, invalid fails
-- [ ] T011 [US1] Delete hand-written JSON Schema (per review issue 1A) — remove `specs/125-stac-extension-mock-data/contracts/stac-extension-schema.json`
+- [x] T010 [US1] Run tests and verify valid passes, invalid fails
+- [x] T011 [US1] Delete hand-written JSON Schema (per review issue 1A) — remove `specs/125-stac-extension-mock-data/contracts/stac-extension-schema.json`
 
 **Checkpoint**: Extension contract is machine-enforceable via LinkML-generated schema. Valid fixtures pass, invalid fixtures fail.
 
@@ -120,7 +120,7 @@
 
 ### Tests for User Story 2
 
-- [ ] T012 [test] [US2] Write fixture distribution tests `shared/schemas/tests/test_stac_extension.py`
+- [x] T012 [test] [US2] Write fixture distribution tests `shared/schemas/tests/test_stac_extension.py`
   - Test exactly 100 items load successfully
   - Test all items validate against Pydantic model
   - Test at least 5 distinct vessel classes represented
@@ -134,12 +134,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Create vessel taxonomy reference file `shared/schemas/fixtures/stac-browser/vessel-taxonomy.json`
+- [x] T013 [US2] Create vessel taxonomy reference file `shared/schemas/fixtures/stac-browser/vessel-taxonomy.json`
   - 4-level hierarchy: domain > role > class > type (per review issue 11A)
   - Add `unknown` root node (per review issue 7A)
   - 2 domains (surface, subsurface) + unknown
   - 19 leaf types + unknown = 20 total
-- [ ] T014 [US2] Write deterministic fixture generator script `shared/schemas/scripts/generate-stac-fixtures.py`
+- [x] T014 [US2] Write deterministic fixture generator script `shared/schemas/scripts/generate-stac-fixtures.py`
   - Seeded RNG for reproducibility (Constitution Article I.4)
   - Read vessel taxonomy from vessel-taxonomy.json
   - Generate 100 items with distributions from data-model.md:
@@ -154,11 +154,11 @@
   - Generate realistic exercise names, descriptions, coordinates
   - Set `stac_extensions` to include extension URI
   - Include valid `links` (root, parent, self) and `assets` (data GeoJSON reference)
-- [ ] T015 [US2] Create root STAC catalog `shared/schemas/fixtures/stac-browser/catalog.json`
+- [x] T015 [US2] Create root STAC catalog `shared/schemas/fixtures/stac-browser/catalog.json`
   - Links to all 100 exercise item.json files
   - Valid STAC 1.0.0 catalog structure
-- [ ] T016 [US2] Run generator and commit output fixtures
-- [ ] T017 [US2] Run distribution tests — verify all acceptance criteria pass
+- [x] T016 [US2] Run generator and commit output fixtures
+- [x] T017 [US2] Run distribution tests — verify all acceptance criteria pass
 
 **Checkpoint**: 100 fixture items committed, all validate, distribution tests pass. Ready for Storybook consumption.
 
@@ -172,24 +172,24 @@
 
 ### Tests for User Story 3
 
-- [ ] T018 [test] [US3] Write round-trip test for extension properties `shared/schemas/tests/test_stac_extension.py`
+- [x] T018 [test] [US3] Write round-trip test for extension properties `shared/schemas/tests/test_stac_extension.py`
   - Serialize fixture extension properties to JSON via Pydantic
   - Deserialize back to Pydantic model
   - Assert equality (field-by-field comparison)
-- [ ] T019 [P][test] [US3] Write schema comparison test `shared/schemas/tests/test_stac_extension.py`
+- [x] T019 [P][test] [US3] Write schema comparison test `shared/schemas/tests/test_stac_extension.py`
   - Verify generated JSON Schema includes all 6 extension properties
   - Verify regex patterns match specification
   - Verify existing schema tests still pass after import
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Validate all 100 fixtures against generated Pydantic model `shared/schemas/tests/test_stac_extension.py`
+- [x] T020 [US3] Validate all 100 fixtures against generated Pydantic model `shared/schemas/tests/test_stac_extension.py`
   - Parametrized test: load each fixture, extract extension properties, validate
   - Report any fixtures that fail with specific error
-- [ ] T021 [US3] Verify TypeScript types include extension properties
+- [x] T021 [US3] Verify TypeScript types include extension properties
   - Check generated `types.ts` contains `StacExtensionProperties` type
   - All 6 properties present with correct types
-- [ ] T022 [US3] Run full test suite to confirm no regressions
+- [x] T022 [US3] Run full test suite to confirm no regressions
   - `uv run pytest` in shared/schemas
   - `pnpm -r typecheck` for TypeScript
 
@@ -205,11 +205,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T023 [US4] Verify duration decision is documented in research.md R3
+- [x] T023 [US4] Verify duration decision is documented in research.md R3
   - Confirm decision: computed from `start_datetime` and `end_datetime` at query time
   - Confirm rationale is clear (avoids redundancy, avoids staleness)
   - Confirm fixture items do NOT include a stored duration property
-- [ ] T024 [US4] Verify fixtures with single-timestamp items handle duration correctly
+- [x] T024 [US4] Verify fixtures with single-timestamp items handle duration correctly
   - Items with only `datetime` (no start/end) → duration is zero/undefined
   - At least 3 such fixtures exist (from edge case requirements)
 
@@ -223,17 +223,17 @@
 
 ### Review Finding Corrections
 
-- [ ] T025 Update spec.md: change "3 levels" to "4 levels" throughout `specs/125-stac-extension-mock-data/spec.md`
+- [x] T025 Update spec.md: change "3 levels" to "4 levels" throughout `specs/125-stac-extension-mock-data/spec.md`
   - FR-004: "at least 4 levels (domain > role > class > type)"
   - SC-006: "at least 4 levels and 20 leaf-node vessel types" (19 + unknown)
-- [ ] T026 [P] Update research.md R4: change "Three-level hierarchy" to "Four-level hierarchy" `specs/125-stac-extension-mock-data/research.md`
-- [ ] T027 [P] Update data-model.md: fix taxonomy description and add `unknown` node `specs/125-stac-extension-mock-data/data-model.md`
+- [x] T026 [P] Update research.md R4: change "Three-level hierarchy" to "Four-level hierarchy" `specs/125-stac-extension-mock-data/research.md`
+- [x] T027 [P] Update data-model.md: fix taxonomy description and add `unknown` node `specs/125-stac-extension-mock-data/data-model.md`
   - Change "3 levels" to "4 levels: domain > role > class > type"
   - Add `unknown` root node to taxonomy tree
   - Update total: "3 domains, 8 roles, 20 leaf types"
   - Update regex from `{0,2}` to `{0,3}`
-- [ ] T028 [P] Update plan.md: fix "19-type" references to "20-type" `specs/125-stac-extension-mock-data/plan.md`
-- [ ] T029 Add backlog entry for plot-save extension property population `BACKLOG.md`
+- [x] T028 [P] Update plan.md: fix "19-type" references to "20-type" `specs/125-stac-extension-mock-data/plan.md`
+- [x] T029 Add backlog entry for plot-save extension property population `BACKLOG.md`
   - Description: "Update plot-save to populate STAC extension properties (debrief:vessel_classes, tags, author, track_names, nationalities) in item.json on save"
   - Depends on: #125
   - Category: Enhancement
@@ -241,29 +241,29 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T030 Capture test summary using template `specs/125-stac-extension-mock-data/evidence/test-summary.md`
+- [x] T030 Capture test summary using template `specs/125-stac-extension-mock-data/evidence/test-summary.md`
   - Use `.specify/templates/evidence/test-summary-template.md`
   - Include YAML front matter with git_sha, captured_at, test counts
-- [ ] T031 Create usage demonstration `specs/125-stac-extension-mock-data/evidence/usage-example.md`
+- [x] T031 Create usage demonstration `specs/125-stac-extension-mock-data/evidence/usage-example.md`
   - Python: load fixture, validate with Pydantic, filter by vessel class
   - TypeScript: load fixture, access typed properties
-- [ ] T032 [P] Capture round-trip proof `specs/125-stac-extension-mock-data/evidence/round-trip-evidence.md`
+- [x] T032 [P] Capture round-trip proof `specs/125-stac-extension-mock-data/evidence/round-trip-evidence.md`
   - Python Pydantic → JSON → Python Pydantic round-trip for extension properties
-- [ ] T033 [P] Capture validation output `specs/125-stac-extension-mock-data/evidence/validation-output.txt`
+- [x] T033 [P] Capture validation output `specs/125-stac-extension-mock-data/evidence/validation-output.txt`
   - Full pytest output showing all 100 fixtures validate
 
 ### Media Content
 
-- [ ] T034 Create shipped blog post `specs/125-stac-extension-mock-data/media/shipped-post.md`
-- [ ] T035 [P] Create LinkedIn shipped summary `specs/125-stac-extension-mock-data/media/linkedin-shipped.md`
+- [x] T034 Create shipped blog post `specs/125-stac-extension-mock-data/media/shipped-post.md`
+- [x] T035 [P] Create LinkedIn shipped summary `specs/125-stac-extension-mock-data/media/linkedin-shipped.md`
 
 ### Quickstart Validation
 
-- [ ] T036 Validate quickstart.md code examples still work `specs/125-stac-extension-mock-data/quickstart.md`
+- [x] T036 Validate quickstart.md code examples still work `specs/125-stac-extension-mock-data/quickstart.md`
 
 ### PR Creation
 
-- [ ] T037 Create PR and publish blog: run /speckit.pr
+- [x] T037 Create PR and publish blog: run /speckit.pr
 
 **Task T037 must run last. It depends on all evidence and media tasks being complete.**
 

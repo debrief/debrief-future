@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-single-point-003",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          104.4922,
+          14.7611
+        ],
+        [
+          104.8092,
+          14.7611
+        ],
+        [
+          104.8092,
+          15.0781
+        ],
+        [
+          104.4922,
+          15.0781
+        ],
+        [
+          104.4922,
+          14.7611
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    104.4922,
+    14.7611,
+    104.8092,
+    15.0781
+  ],
+  "properties": {
+    "title": "Exercise Single Point 003",
+    "description": "Single Point 003 \u2014 Indo-Pacific exercise. 1 track(s), 2 nation(s). Single-point observation, no time range.",
+    "datetime": "2024-12-13T20:00:00Z",
+    "debrief:vessel_classes": [
+      "surface/merchant/tanker/vlcc"
+    ],
+    "debrief:tags": [
+      "replenishment",
+      "multi-national",
+      "missile-firing"
+    ],
+    "debrief:feature_tags": [
+      "active-search",
+      "datum",
+      "track-merge"
+    ],
+    "debrief:author": "Lt Cdr S. Eriksson SwN",
+    "debrief:track_names": [
+      "HNoMS Dauntless"
+    ],
+    "debrief:nationalities": [
+      "NO",
+      "SE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-single-point-003.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

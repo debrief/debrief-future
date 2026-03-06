@@ -91,7 +91,8 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
                  'annotations',
                  'tool',
                  'log-entry',
-                 'system-record'],
+                 'system-record',
+                 'stac-extension'],
      'name': 'debrief',
      'prefixes': {'debrief': {'prefix_prefix': 'debrief',
                               'prefix_reference': 'https://debrief.info/schemas/'},
@@ -609,6 +610,24 @@ class FileProvDirectionEnum(str, Enum):
     target = "target"
     """
     This file is the target of the branch
+    """
+
+
+class VesselDomainEnum(str, Enum):
+    """
+    Top-level vessel domain classification
+    """
+    surface = "surface"
+    """
+    Surface vessels (warships, auxiliaries, merchant)
+    """
+    subsurface = "subsurface"
+    """
+    Subsurface vessels (submarines)
+    """
+    unknown = "unknown"
+    """
+    Vessel domain not determined or not applicable
     """
 
 
@@ -1275,6 +1294,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1287,6 +1307,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1436,6 +1457,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1448,6 +1470,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1548,6 +1571,7 @@ class SystemState(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1560,6 +1584,7 @@ class SystemState(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1692,6 +1717,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1704,6 +1730,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1827,6 +1854,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1839,6 +1867,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1866,6 +1895,9 @@ class LogEntry(ConfiguredBaseModel):
     execution_duration: str = Field(default=..., description="""Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
     generated_result_id: Optional[str] = Field(default=None, description="""Stable logical identity for artifact-producing tools. Null for non-artifact tools.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
     tune: Optional[TuneAnnotation] = Field(default=None, description="""Parameter tuning record. Null until a tuning operation modifies this entry.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
+    input_state: Optional[list[InputFeatureState]] = Field(default=[], description="""Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
+    disabled: Optional[bool] = Field(default=False, description="""Whether this entry is skipped during replay. Toggled via the flip-card edit face.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry'], 'ifabsent': 'false'} })
+    rationale: Optional[str] = Field(default=None, description="""Free-text analyst annotation explaining the reasoning for this operation.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
 
     @field_validator('execution_duration')
     def pattern_execution_duration(cls, v):
@@ -1901,6 +1933,47 @@ class ParameterValue(ConfiguredBaseModel):
     value: str = Field(default=..., description="""The parameter value (any JSON type).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue']} })
     default: Optional[bool] = Field(default=False, description="""Whether this is the default value.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue'], 'ifabsent': 'false'} })
     tunable: Optional[bool] = Field(default=True, description="""Whether this parameter can be modified during replay.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue'], 'ifabsent': 'true'} })
+
+
+class InputFeatureState(ConfiguredBaseModel):
+    """
+    Pre-operation state of a feature captured before a coordinate-mutating tool executes. Enables correct replay by providing the original geometry as the anchor for re-computation with modified parameters.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/log-entry'})
+
+    feature_id: str = Field(default=..., description="""ID of the feature whose pre-operation state is captured.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InputFeatureState']} })
+    geometry: str = Field(default=..., description="""Full GeoJSON geometry object (type + coordinates) as it was immediately before the operation. Stored as a JSON object.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'InputFeatureState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation'],
+         'notes': ['Typed as string in LinkML but serialized as a JSON object in '
+                   'practice. GeoJSON geometry is polymorphic (Point, Polygon, '
+                   'LineString, etc.) and LinkML does not have a native geometry '
+                   'type.']} })
+    properties: Optional[str] = Field(default=None, description="""Kind-specific spatial properties captured before the operation. Excludes provenance (which is append-only). Null if no spatial properties need capturing.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'InputFeatureState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation'],
+         'notes': ['Typed as string in LinkML but serialized as a JSON object in '
+                   'practice. Contains keys like "center", "origin", "radius_km" etc.']} })
 
 
 class TuneAnnotation(ConfiguredBaseModel):
@@ -2032,6 +2105,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2044,6 +2118,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2176,6 +2251,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2188,6 +2264,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2318,6 +2395,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2330,6 +2408,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2460,6 +2539,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2472,6 +2552,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2593,6 +2674,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2605,6 +2687,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2738,6 +2821,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2750,6 +2834,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2882,6 +2967,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2894,6 +2980,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -3109,6 +3196,53 @@ class FileProvEntry(ConfiguredBaseModel):
     direction: Optional[FileProvDirectionEnum] = Field(default=None, description="""'source' or 'target' (for branch events).""", json_schema_extra = { "linkml_meta": {'domain_of': ['FileProvEntry']} })
 
 
+class StacExtensionProperties(ConfiguredBaseModel):
+    """
+    Extension properties added to STAC item.properties under the debrief: namespace. All properties are optional — existing items without extension properties remain valid. These properties enable filtering, searching, and colour-coding in the Discovery UI.
+
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac-extension'})
+
+    vessel_classes: Optional[list[str]] = Field(default=[], description="""Hierarchical vessel classification paths using slash-separated notation. Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23). Partial paths allowed for imprecise classification (e.g., surface/warship).
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:vessel_classes'} })
+    tags: Optional[list[str]] = Field(default=[], description="""Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:tags'} })
+    feature_tags: Optional[list[str]] = Field(default=[], description="""Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:feature_tags'} })
+    author: Optional[str] = Field(default=None, description="""Analyst who created or last modified the plot. Free-text identifier.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:author'} })
+    track_names: Optional[list[str]] = Field(default=[], description="""Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:track_names'} })
+    nationalities: Optional[list[str]] = Field(default=[], description="""Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:nationalities'} })
+
+    @field_validator('vessel_classes')
+    def pattern_vessel_classes(cls, v):
+        pattern=re.compile(r"^[a-z0-9-]+(/[a-z0-9-]+){0,3}$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid vessel_classes format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid vessel_classes format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+    @field_validator('nationalities')
+    def pattern_nationalities(cls, v):
+        pattern=re.compile(r"^[A-Z]{2}$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid nationalities format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid nationalities format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+
 # Model rebuild
 # see https://pydantic-docs.helpmanual.io/usage/models/#rebuilding-a-model
 TimestampedPosition.model_rebuild()
@@ -3144,6 +3278,7 @@ MultiPolygonFeature.model_rebuild()
 LogEntry.model_rebuild()
 WasGeneratedBy.model_rebuild()
 ParameterValue.model_rebuild()
+InputFeatureState.model_rebuild()
 TuneAnnotation.model_rebuild()
 NarrativeEntryProperties.model_rebuild()
 NarrativeEntry.model_rebuild()
@@ -3168,3 +3303,4 @@ SnapshotRef.model_rebuild()
 BranchRecord.model_rebuild()
 BranchOrigin.model_rebuild()
 FileProvEntry.model_rebuild()
+StacExtensionProperties.model_rebuild()

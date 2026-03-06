@@ -1,0 +1,100 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-yeoman-guard",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -28.9842,
+          -32.7688
+        ],
+        [
+          -27.9916,
+          -32.7688
+        ],
+        [
+          -27.9916,
+          -31.7762
+        ],
+        [
+          -28.9842,
+          -31.7762
+        ],
+        [
+          -28.9842,
+          -32.7688
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -28.9842,
+    -32.7688,
+    -27.9916,
+    -31.7762
+  ],
+  "properties": {
+    "title": "Exercise Yeoman Guard",
+    "description": "Yeoman Guard \u2014 South Atlantic exercise. 3 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2020-02-22T10:00:00Z",
+    "end_datetime": "2020-02-22T12:42:24Z",
+    "debrief:vessel_classes": [
+      "surface/merchant/cargo/container",
+      "surface/merchant/cargo/bulk"
+    ],
+    "debrief:tags": [
+      "transit",
+      "missile-firing",
+      "training",
+      "AAW",
+      "multi-national"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting",
+      "zig-zag"
+    ],
+    "debrief:author": "Cdr A. Brown RN",
+    "debrief:track_names": [
+      "HMS Fridtjof Nansen",
+      "INS Truxtun",
+      "HMS Bretagne"
+    ],
+    "debrief:nationalities": [
+      "GB",
+      "IN"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-yeoman-guard.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

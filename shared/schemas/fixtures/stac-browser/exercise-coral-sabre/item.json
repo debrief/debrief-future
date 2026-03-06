@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-coral-sabre",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -23.037,
+          57.6191
+        ],
+        [
+          -22.1171,
+          57.6191
+        ],
+        [
+          -22.1171,
+          58.5389
+        ],
+        [
+          -23.037,
+          58.5389
+        ],
+        [
+          -23.037,
+          57.6191
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -23.037,
+    57.6191,
+    -22.1171,
+    58.5389
+  ],
+  "properties": {
+    "title": "Exercise Coral Sabre",
+    "description": "Coral Sabre \u2014 North Atlantic exercise. 1 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2024-04-25T08:00:00Z",
+    "end_datetime": "2024-04-27T23:54:42Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "gunnery",
+      "escort",
+      "transit",
+      "SAR"
+    ],
+    "debrief:feature_tags": [
+      "track-merge"
+    ],
+    "debrief:author": "Lt Cdr S. Eriksson SwN",
+    "debrief:track_names": [
+      "USS Argyll"
+    ],
+    "debrief:nationalities": [
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-coral-sabre.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

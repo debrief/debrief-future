@@ -1,0 +1,97 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-halcyon-dawn",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          69.6097,
+          6.4259
+        ],
+        [
+          72.291,
+          6.4259
+        ],
+        [
+          72.291,
+          9.1072
+        ],
+        [
+          69.6097,
+          9.1072
+        ],
+        [
+          69.6097,
+          6.4259
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    69.6097,
+    6.4259,
+    72.291,
+    9.1072
+  ],
+  "properties": {
+    "title": "Exercise Halcyon Dawn",
+    "description": "Halcyon Dawn \u2014 Indian Ocean exercise. 2 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2023-06-12T01:00:00Z",
+    "end_datetime": "2023-06-14T16:11:46Z",
+    "debrief:vessel_classes": [
+      "surface/warship/corvette/visby",
+      "surface/warship/carrier/queen-elizabeth"
+    ],
+    "debrief:tags": [
+      "harbour-ops",
+      "EW",
+      "amphibious",
+      "force-protection"
+    ],
+    "debrief:feature_tags": [
+      "depth-charge",
+      "helicopter-ops"
+    ],
+    "debrief:author": "Lt R. Hughes USN",
+    "debrief:track_names": [
+      "USS Harnosand",
+      "USS Roosevelt"
+    ],
+    "debrief:nationalities": [
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-halcyon-dawn.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-multi-nation-002",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          101.5084,
+          -5.2952
+        ],
+        [
+          102.7192,
+          -5.2952
+        ],
+        [
+          102.7192,
+          -4.0844
+        ],
+        [
+          101.5084,
+          -4.0844
+        ],
+        [
+          101.5084,
+          -5.2952
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    101.5084,
+    -5.2952,
+    102.7192,
+    -4.0844
+  ],
+  "properties": {
+    "title": "Exercise Multi Nation 002",
+    "description": "Multi Nation 002 \u2014 Indo-Pacific exercise. 3 track(s), 4 nation(s). Multi-national exercise with 4+ participant nations.",
+    "datetime": null,
+    "start_datetime": "2023-07-11T17:00:00Z",
+    "end_datetime": "2023-07-13T15:21:51Z",
+    "debrief:vessel_classes": [
+      "surface/warship/frigate/type26",
+      "surface/warship/destroyer/arleigh-burke"
+    ],
+    "debrief:tags": [
+      "boarding"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "Cdr P. Andersen RNoN",
+    "debrief:track_names": [
+      "FGS Evertsen",
+      "ROKS Helge Ingstad",
+      "ITS Bergamini"
+    ],
+    "debrief:nationalities": [
+      "DE",
+      "KR",
+      "IT",
+      "JP"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-multi-nation-002.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

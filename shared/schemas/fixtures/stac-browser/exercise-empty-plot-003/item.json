@@ -1,0 +1,87 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-empty-plot-003",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -29.7526,
+          -21.8848
+        ],
+        [
+          -28.475,
+          -21.8848
+        ],
+        [
+          -28.475,
+          -20.6072
+        ],
+        [
+          -29.7526,
+          -20.6072
+        ],
+        [
+          -29.7526,
+          -21.8848
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -29.7526,
+    -21.8848,
+    -28.475,
+    -20.6072
+  ],
+  "properties": {
+    "title": "Exercise Empty Plot 003",
+    "description": "Empty Plot 003 \u2014 South Atlantic exercise. 0 track(s), 0 nation(s). Empty plot with no track data.",
+    "datetime": null,
+    "start_datetime": "2021-07-26T18:00:00Z",
+    "end_datetime": "2021-07-26T22:01:59Z",
+    "debrief:vessel_classes": [],
+    "debrief:tags": [
+      "replenishment",
+      "mine-clearance",
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "active-search"
+    ],
+    "debrief:author": "Lt Cdr C. O'Brien RN",
+    "debrief:track_names": [],
+    "debrief:nationalities": []
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-empty-plot-003.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

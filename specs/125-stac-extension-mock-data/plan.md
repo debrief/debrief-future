@@ -17,7 +17,7 @@ Define the `debrief:` STAC extension namespace with properties for vessel classi
 **Project Type**: Schema module + data generation script (single project within `shared/schemas/`)
 **Performance Goals**: N/A (development/build-time tooling)
 **Constraints**: Offline-capable (no network dependencies), deterministic output (seeded RNG)
-**Scale/Scope**: 100 fixture items, 19-type vessel taxonomy, 6 extension properties
+**Scale/Scope**: 100 fixture items, 20-type vessel taxonomy (including `unknown`), 6 extension properties
 
 ## Constitution Check
 

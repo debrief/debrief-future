@@ -1,0 +1,100 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-rimpac-echo",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -20.4108,
+          47.4801
+        ],
+        [
+          -19.9844,
+          47.4801
+        ],
+        [
+          -19.9844,
+          47.9064
+        ],
+        [
+          -20.4108,
+          47.9064
+        ],
+        [
+          -20.4108,
+          47.4801
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -20.4108,
+    47.4801,
+    -19.9844,
+    47.9064
+  ],
+  "properties": {
+    "title": "Exercise RIMPAC Echo",
+    "description": "RIMPAC Echo \u2014 North Atlantic exercise. 8 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2024-02-04T18:00:00Z",
+    "end_datetime": "2024-02-05T14:01:54Z",
+    "debrief:vessel_classes": [
+      "surface/merchant/cargo/bulk",
+      "surface/merchant/passenger/ferry"
+    ],
+    "debrief:tags": [
+      "replenishment",
+      "NGFS",
+      "force-protection"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "Cdr N. Petrov",
+    "debrief:track_names": [
+      "USS Visby",
+      "HMCS Caio Duilio",
+      "USS Bergamini",
+      "HMCS Aquitaine",
+      "USS Portland",
+      "HMCS De Zeven Provincien",
+      "USS Truxtun",
+      "HMCS Mahan"
+    ],
+    "debrief:nationalities": [
+      "US",
+      "CA"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-rimpac-echo.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

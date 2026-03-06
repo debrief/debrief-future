@@ -1,0 +1,128 @@
+{
+  "version": "1.0.0",
+  "description": "Debrief vessel classification taxonomy. Four levels: domain > role > class > type.",
+  "taxonomy": {
+    "surface": {
+      "label": "Surface Vessel",
+      "children": {
+        "warship": {
+          "label": "Warship",
+          "children": {
+            "frigate": {
+              "label": "Frigate",
+              "children": {
+                "type23": { "label": "Type 23 Frigate" },
+                "type26": { "label": "Type 26 Frigate" }
+              }
+            },
+            "destroyer": {
+              "label": "Destroyer",
+              "children": {
+                "type45": { "label": "Type 45 Destroyer" },
+                "arleigh-burke": { "label": "Arleigh Burke Destroyer" }
+              }
+            },
+            "carrier": {
+              "label": "Aircraft Carrier",
+              "children": {
+                "queen-elizabeth": { "label": "Queen Elizabeth Carrier" }
+              }
+            },
+            "corvette": {
+              "label": "Corvette",
+              "children": {
+                "visby": { "label": "Visby Corvette" }
+              }
+            },
+            "patrol": {
+              "label": "Patrol Vessel",
+              "children": {
+                "river": { "label": "River-class OPV" }
+              }
+            }
+          }
+        },
+        "auxiliary": {
+          "label": "Auxiliary",
+          "children": {
+            "tanker": {
+              "label": "Tanker",
+              "children": {
+                "tide": { "label": "Tide-class Tanker" }
+              }
+            },
+            "supply": {
+              "label": "Supply Ship",
+              "children": {
+                "fort-victoria": { "label": "Fort Victoria Supply" }
+              }
+            },
+            "survey": {
+              "label": "Survey Vessel",
+              "children": {
+                "echo": { "label": "Echo-class Survey" }
+              }
+            }
+          }
+        },
+        "merchant": {
+          "label": "Merchant Vessel",
+          "children": {
+            "cargo": {
+              "label": "Cargo Ship",
+              "children": {
+                "container": { "label": "Container Ship" },
+                "bulk": { "label": "Bulk Carrier" }
+              }
+            },
+            "tanker": {
+              "label": "Merchant Tanker",
+              "children": {
+                "vlcc": { "label": "VLCC Tanker" }
+              }
+            },
+            "passenger": {
+              "label": "Passenger Vessel",
+              "children": {
+                "ferry": { "label": "Passenger Ferry" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "subsurface": {
+      "label": "Subsurface Vessel",
+      "children": {
+        "submarine": {
+          "label": "Submarine",
+          "children": {
+            "ssn": {
+              "label": "Nuclear Attack Submarine",
+              "children": {
+                "astute": { "label": "Astute-class SSN" },
+                "virginia": { "label": "Virginia-class SSN" }
+              }
+            },
+            "ssbn": {
+              "label": "Ballistic Missile Submarine",
+              "children": {
+                "vanguard": { "label": "Vanguard-class SSBN" }
+              }
+            },
+            "ssk": {
+              "label": "Diesel-Electric Submarine",
+              "children": {
+                "gotland": { "label": "Gotland-class SSK" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "unknown": {
+      "label": "Unknown/Unclassified",
+      "children": {}
+    }
+  }
+}

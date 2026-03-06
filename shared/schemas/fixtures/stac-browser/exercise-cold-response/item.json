@@ -1,0 +1,96 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-cold-response",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          10.2341,
+          33.3036
+        ],
+        [
+          10.9292,
+          33.3036
+        ],
+        [
+          10.9292,
+          33.9986
+        ],
+        [
+          10.2341,
+          33.9986
+        ],
+        [
+          10.2341,
+          33.3036
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    10.2341,
+    33.3036,
+    10.9292,
+    33.9986
+  ],
+  "properties": {
+    "title": "Exercise Cold Response",
+    "description": "Cold Response \u2014 Mediterranean exercise. 3 track(s), 3 nation(s).",
+    "datetime": null,
+    "start_datetime": "2026-09-04T00:00:00Z",
+    "end_datetime": "2026-09-20T05:16:15Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "surveillance",
+      "transit",
+      "MCM",
+      "replenishment"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:author": "Lt K. Yamamoto JMSDF",
+    "debrief:track_names": [
+      "HNoMS Dragon",
+      "ITS Roosevelt",
+      "FGS Carney"
+    ],
+    "debrief:nationalities": [
+      "NO",
+      "IT",
+      "DE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-cold-response.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

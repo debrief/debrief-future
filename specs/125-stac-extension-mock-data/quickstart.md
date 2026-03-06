@@ -8,7 +8,7 @@
 2. **LinkML Schema Module** — `stac-extension.yaml` in `shared/schemas/src/linkml/` generating Pydantic + TypeScript types
 3. **100 Fixture Items** — realistic STAC item.json files in `shared/schemas/fixtures/stac-browser/`
 4. **Fixture Generator** — deterministic Python script for regeneration if schema changes
-5. **Vessel Taxonomy** — starter 3-level taxonomy (19 leaf types) as a JSON reference file
+5. **Vessel Taxonomy** — starter 4-level taxonomy (20 types including `unknown`) as a JSON reference file
 
 ## File Locations After Implementation
 
@@ -54,7 +54,7 @@ const frigateItems = items.filter(item => {
 ### Validating a fixture (Python)
 
 ```python
-from debrief_schemas.stac_extension import StacExtensionProperties
+from debrief_schemas import StacExtensionProperties
 
 # Pydantic model validates extension properties
 props = StacExtensionProperties.model_validate(item["properties"])

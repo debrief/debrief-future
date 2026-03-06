@@ -1,0 +1,100 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-dagger-point",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -1.2605,
+          33.6564
+        ],
+        [
+          -0.2316,
+          33.6564
+        ],
+        [
+          -0.2316,
+          34.6853
+        ],
+        [
+          -1.2605,
+          34.6853
+        ],
+        [
+          -1.2605,
+          33.6564
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -1.2605,
+    33.6564,
+    -0.2316,
+    34.6853
+  ],
+  "properties": {
+    "title": "Exercise Dagger Point",
+    "description": "Dagger Point \u2014 Mediterranean exercise. 6 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2026-09-18T00:00:00Z",
+    "end_datetime": "2026-09-25T09:19:29Z",
+    "debrief:vessel_classes": [
+      "surface/warship/frigate/type26"
+    ],
+    "debrief:tags": [
+      "surveillance"
+    ],
+    "debrief:feature_tags": [
+      "zig-zag",
+      "torpedo-run",
+      "passive-search",
+      "datum"
+    ],
+    "debrief:author": "KptLt H. Weber",
+    "debrief:track_names": [
+      "FS Lancaster",
+      "HMS Kent",
+      "FS Westminster",
+      "HMS Diamond",
+      "FS Cole",
+      "HMS Roald Amundsen"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-dagger-point.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

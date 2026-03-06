@@ -1,0 +1,95 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-dynamic-mongoose",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          7.5493,
+          70.5438
+        ],
+        [
+          8.4222,
+          70.5438
+        ],
+        [
+          8.4222,
+          71.4167
+        ],
+        [
+          7.5493,
+          71.4167
+        ],
+        [
+          7.5493,
+          70.5438
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    7.5493,
+    70.5438,
+    8.4222,
+    71.4167
+  ],
+  "properties": {
+    "title": "Exercise Dynamic Mongoose",
+    "description": "Dynamic Mongoose \u2014 Arctic exercise. 1 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-04-27T08:00:00Z",
+    "end_datetime": "2021-04-29T23:13:40Z",
+    "debrief:vessel_classes": [
+      "surface/warship/corvette/visby"
+    ],
+    "debrief:tags": [
+      "missile-firing",
+      "ASW",
+      "force-protection",
+      "certification"
+    ],
+    "debrief:feature_tags": [
+      "torpedo-run"
+    ],
+    "debrief:author": "Lt Cdr J. Smith RN",
+    "debrief:track_names": [
+      "FGS Sachsen"
+    ],
+    "debrief:nationalities": [
+      "DE",
+      "NO"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-dynamic-mongoose.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

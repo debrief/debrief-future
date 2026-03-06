@@ -1,0 +1,97 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-sceptre-tide",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          19.9323,
+          35.193
+        ],
+        [
+          22.7917,
+          35.193
+        ],
+        [
+          22.7917,
+          38.0525
+        ],
+        [
+          19.9323,
+          38.0525
+        ],
+        [
+          19.9323,
+          35.193
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    19.9323,
+    35.193,
+    22.7917,
+    38.0525
+  ],
+  "properties": {
+    "title": "Exercise Sceptre Tide",
+    "description": "Sceptre Tide \u2014 Mediterranean exercise. 4 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-02-10T19:00:00Z",
+    "end_datetime": "2021-02-22T04:30:29Z",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/type45",
+      "surface/warship/patrol/river",
+      "surface/warship/carrier/queen-elizabeth"
+    ],
+    "debrief:tags": [
+      "replenishment",
+      "gunnery"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting"
+    ],
+    "debrief:author": "Lt Cdr C. O'Brien RN",
+    "debrief:track_names": [
+      "HMS Mahan",
+      "HMS Dauntless",
+      "HMS Margottini",
+      "HMS Nykoping"
+    ],
+    "debrief:nationalities": [
+      "GB"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-sceptre-tide.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}
