@@ -136,6 +136,20 @@ class TestClassifyBasic:
         assert md[0]["zone"] == "75%"
         assert md[0]["color"] == "#9C27B0"
 
+    def test_classified_feature_has_unique_id(self) -> None:
+        """Classified output must have a distinct ID from the input feature."""
+        from debrief_calc.tools.reference.classification import point_in_zone_classifier
+
+        ref = _make_ref_feature([[0, 0]], feature_id="my-ref")
+        zone = _make_zone_feature(_SIMPLE_ZONES)
+        ctx = _make_context(ref, zone)
+        result = point_in_zone_classifier(ctx, {})
+
+        classified = result[0]
+        assert classified["id"] == "my-ref-classified"
+        assert classified["id"] != ref["id"]
+        assert "(classified)" in classified["properties"]["name"]
+
     def test_point_in_middle_zone(self) -> None:
         """Point at (1.5, 0) should be in middle zone (outside inner, inside middle)."""
         from debrief_calc.tools.reference.classification import point_in_zone_classifier

@@ -4,7 +4,7 @@
       "type": "resource",
       "uri": "feature://ref-scatter",
       "mimeType": "application/geo+json",
-      "text": "{\"type\":\"Feature\",\"id\":\"ref-scatter\",\"geometry\":{\"type\":\"MultiPoint\",\"coordinates\":[[10.0,60.0],[11.0,61.0],[12.0,62.0],[13.0,63.0]]},\"properties\":{\"kind\":\"POINT\",\"locationType\":\"REFERENCE\",\"name\":\"Reference Points (scatter 4)\",\"style\":{\"shape\":\"square\",\"color\":\"#666666\",\"radius\":5},\"pointMetadata\":[{\"index\":0,\"name\":\"Ref 1\",\"zone\":\"none\",\"color\":\"#666666\"},{\"index\":1,\"name\":\"Ref 2\",\"zone\":\"none\",\"color\":\"#666666\"},{\"index\":2,\"name\":\"Ref 3\",\"zone\":\"none\",\"color\":\"#666666\"},{\"index\":3,\"name\":\"Ref 4\",\"zone\":\"none\",\"color\":\"#666666\"}],\"pointColors\":[\"#666666\",\"#666666\",\"#666666\",\"#666666\"]}}",
+      "text": "{\"type\":\"Feature\",\"id\":\"ref-scatter-classified\",\"geometry\":{\"type\":\"MultiPoint\",\"coordinates\":[[10.0,60.0],[11.0,61.0],[12.0,62.0],[13.0,63.0]]},\"properties\":{\"kind\":\"POINT\",\"locationType\":\"REFERENCE\",\"name\":\"Reference Points (scatter 4) (classified)\",\"style\":{\"shape\":\"square\",\"color\":\"#666666\",\"radius\":5},\"pointMetadata\":[{\"index\":0,\"name\":\"Ref 1\",\"zone\":\"none\",\"color\":\"#666666\"},{\"index\":1,\"name\":\"Ref 2\",\"zone\":\"none\",\"color\":\"#666666\"},{\"index\":2,\"name\":\"Ref 3\",\"zone\":\"none\",\"color\":\"#666666\"},{\"index\":3,\"name\":\"Ref 4\",\"zone\":\"none\",\"color\":\"#666666\"}],\"pointColors\":[\"#666666\",\"#666666\",\"#666666\",\"#666666\"]}}",
       "annotations": {
         "debrief:resultType": "mutation/reference/classified_points",
         "debrief:sourceFeatures": ["ref-scatter", "zone-002"],

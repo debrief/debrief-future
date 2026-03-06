@@ -149,4 +149,11 @@ def point_in_zone_classifier(
     classified["properties"]["pointMetadata"] = new_metadata
     classified["properties"]["pointColors"] = point_colors
 
+    # Assign a new unique ID so the classified result doesn't collide with the
+    # original reference-points layer in the feature list / visibility toggle.
+    base_id = ref_feature.get("id", "ref-points")
+    classified["id"] = f"{base_id}-classified"
+    original_name = classified["properties"].get("name", "Reference Points")
+    classified["properties"]["name"] = f"{original_name} (classified)"
+
     return [classified]

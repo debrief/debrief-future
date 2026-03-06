@@ -176,5 +176,11 @@ export function execute(
   classified.properties.pointMetadata = newMetadata;
   classified.properties.pointColors = pointColors;
 
+  // Assign a new unique ID so the classified result doesn't collide with the
+  // original reference-points layer in the feature list / visibility toggle.
+  const baseId = String(refFeature.id ?? 'ref-points');
+  classified.id = `${baseId}-classified`;
+  classified.properties.name = `${String(classified.properties.name ?? 'Reference Points')} (classified)`;
+
   return [classified];
 }

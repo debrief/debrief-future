@@ -407,14 +407,36 @@ export function MapView({
   }, [onSelect, selectedIds]);
 
   // pointToLayer callback — renders Point and MultiPoint geometries as circle markers
+  // For classified MultiPoint features, uses per-point colors from pointColors array.
   const pointToLayer = useMemo(() => {
     return (feature: GeoJSON.Feature, latlng: L.LatLng): L.Layer => {
       const debriefFeature = feature as unknown as DebriefFeature;
       const isSelected = selectedIds.has(debriefFeature.id);
       const props = debriefFeature.properties as unknown as Record<string, unknown>;
       const featureStyle = props.style as Record<string, unknown> | undefined;
-      const color = (featureStyle?.color as string) ?? getFeatureColor(debriefFeature);
-      const fillColor = (featureStyle?.fill_color as string) ?? color;
+      const defaultColor = (featureStyle?.color as string) ?? getFeatureColor(debriefFeature);
+      const defaultFill = (featureStyle?.fill_color as string) ?? defaultColor;
+
+      // Per-point color lookup for classified MultiPoint features:
+      // Match latlng back to coordinate index to look up pointColors[i].
+      let fillColor = defaultFill;
+      let color = defaultColor;
+      // eslint-disable-next-line react/prop-types -- dynamic GeoJSON property, not a React prop
+      const pointColors = props.pointColors as string[] | undefined;
+      if (pointColors && feature.geometry?.type === 'MultiPoint') {
+        const coords = (feature.geometry as GeoJSON.MultiPoint).coordinates;
+        for (let i = 0; i < coords.length; i++) {
+          // Leaflet swaps lon/lat to lat/lng — match with tolerance
+          if (
+            Math.abs(coords[i]![1]! - latlng.lat) < 1e-9 &&
+            Math.abs(coords[i]![0]! - latlng.lng) < 1e-9
+          ) {
+            fillColor = pointColors[i] ?? defaultFill;
+            color = pointColors[i] ?? defaultColor;
+            break;
+          }
+        }
+      }
 
       const baseRadius = (featureStyle?.radius as number) ?? 6;
       return L.circleMarker(latlng, {
