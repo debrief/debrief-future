@@ -6,17 +6,28 @@
 **Status**: Revised — reflects implemented state
 **Input**: User description: "Add cross-service end-to-end workflow tests (io -> stac -> calc)"
 
+## Clarifications
+
+### Session 2026-03-06
+
+- Q: Should VS Code E2E tests be restored (existing `tests/e2e/`), written from scratch, or replaced with webview-only approach? → A: Restore existing `tests/e2e/` skipped tests (unskip, fix selectors, sideload VSIX)
+
 ## Context
 
 The Debrief platform orchestrates three core Python services (io, stac, calc) into user-facing workflows. While each service has comprehensive unit tests, no test originally exercised the complete user journey — opening a file, seeing tracks on the map, running an analysis tool, and verifying results.
 
-The web-shell (`apps/web-shell`) provides a browser-accessible React application that replicates the VS Code extension's orchestration layer. Playwright tests against the web-shell exercise the same cross-service workflows that users perform, without depending on VS Code internals or code-server Docker infrastructure.
+E2E coverage spans **two complementary test surfaces**:
+
+1. **Web-shell** (`apps/web-shell`) — a browser-accessible React application that replicates the VS Code extension's orchestration layer. Playwright tests against the web-shell exercise cross-service workflows without depending on VS Code internals.
+2. **VS Code extension** (`tests/e2e/`) — Playwright tests driving openvscode-server with the Debrief extension sideloaded. These tests validate the real extension host environment, including VSIX packaging, extension activation, and command registration.
+
+Testing both surfaces provides higher confidence: the web-shell catches orchestration regressions quickly and cheaply, while the VS Code E2E tests catch extension-specific issues (activation, command palette, webview lifecycle) that the web-shell cannot reach.
 
 ### Current State (March 2026)
 
 The web-shell Playwright test suite contains **81 tests across 13 spec files**, all active (none skipped). These tests cover the full io → stac → calc pipeline through browser automation, running in both local development and CI environments.
 
-An earlier approach using code-server Docker containers (`tests/e2e/`) was built but never activated — all 11 tests remain `.skip()`'d. The web-shell approach superseded it by providing a lighter-weight, more reliable testing surface.
+The VS Code extension E2E suite (`tests/e2e/`) contains **11 tests across 3 spec files**, all currently `.skip()`'d. The scaffolding (page objects, global setup, Chromium extraction) is verified working. Restoration requires: building the VSIX, sideloading into openvscode-server, fixing DOM selectors to match current extension output, and ensuring Python services are reachable. See `docs/e2e-test-restoration-requirements.md` for the documented restoration path. Where test flow reveals missing or incomplete features, these MUST be captured as new backlog items rather than blocking the E2E test PR.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -78,7 +89,7 @@ As a developer, I need automated tests that verify feature selection, time contr
 
 ### Functional Requirements
 
-- **FR-001**: The system MUST provide a browser-accessible environment (web-shell) that exercises the same orchestration logic as the VS Code extension
+- **FR-001**: E2E tests MUST exercise the user workflow across both the web-shell and the VS Code extension (via openvscode-server with sideloaded VSIX)
 - **FR-002**: Automated tests MUST interact with real UI components — map panel, feature list, tools panel, time controller, and catalog overview
 - **FR-003**: The test environment MUST include sample data files available as pre-loaded STAC catalog entries
 - **FR-004**: Tests MUST exercise the complete file-loading workflow: select catalog item → load plot → display tracks on map
@@ -104,8 +115,9 @@ As a developer, I need automated tests that verify feature selection, time contr
 - **SC-002**: A breaking change in any component's output causes at least one E2E test to fail, proving the tests catch cross-component regressions
 - **SC-003**: The full E2E test suite completes within 5 minutes in CI
 - **SC-004**: Developers can run the same tests locally with a single command (`node run-playwright.mjs` or `pnpm test`)
-- **SC-005**: All 13 test spec files pass with zero skipped tests
-- **SC-006**: The test suite covers at least the three core workflows: catalog browse, plot load/display, and tool execution
+- **SC-005**: All web-shell test spec files (13) pass with zero skipped tests
+- **SC-006**: VS Code E2E tests (`tests/e2e/`) are unskipped and passing for at least the P1 Load and Display workflow; any tests that reveal missing features are documented as backlog items (not skipped silently)
+- **SC-007**: The test suite covers at least the three core workflows across both platforms: catalog browse, plot load/display, and tool execution
 
 ## Assumptions
 
@@ -121,7 +133,21 @@ As a developer, I need automated tests that verify feature selection, time contr
 - **Schema types** (`@debrief/schemas`) — generated TypeScript types for GeoJSON features
 - **Playwright** — browser automation framework
 - **`@sparticuz/chromium`** — headless Chromium for sandboxed environments (CI, cloud)
+- **openvscode-server** — VS Code in-browser host for extension E2E tests
+- **VSIX build pipeline** — extension must be packaged and sideloaded for VS Code E2E
+- **Python services** (debrief-io, debrief-stac, debrief-calc) — must be reachable from openvscode-server environment for VS Code E2E
 
-## Superseded Infrastructure
+## Dual-Platform Test Strategy
 
-The original code-server-based approach (`tests/e2e/`, `docker/code-server/`) is superseded by the web-shell Playwright tests. The code-server infrastructure remains in the repository but all 11 tests are `.skip()`'d. Consider removing the `tests/e2e/` directory and `docker/code-server/` as cleanup.
+The web-shell and VS Code E2E suites are **complementary**, not redundant:
+
+| Concern | Web-Shell Tests | VS Code E2E Tests |
+|---------|----------------|-------------------|
+| Orchestration logic (io → stac → calc) | Yes | Yes |
+| Extension activation & commands | No | Yes |
+| VSIX packaging correctness | No | Yes |
+| Webview lifecycle (dispose, restore) | No | Yes |
+| Shared component rendering | Yes | Yes |
+| CI speed (lightweight) | Fast | Slower (openvscode-server) |
+
+Both suites use Playwright with headless Chromium. The VS Code E2E tests (`tests/e2e/`) will be restored from their current `.skip()`'d state as part of this feature.
