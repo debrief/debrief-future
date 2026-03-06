@@ -683,8 +683,6 @@ export interface TrackProperties extends BaseFeatureProperties {
     end_time: string,
     /** Array of timestamped positions */
     positions: TimestampedPosition[],
-    /** Original source file path */
-    source_file?: string,
     /** Composite styling for track line and position markers */
     style: TrackStyle,
     /** Default styling applied to all positions */
@@ -983,8 +981,6 @@ export interface NarrativeEntryProperties extends BaseFeatureProperties {
     symbol?: string,
     /** Point styling properties for display position */
     style: PointProperties,
-    /** Original source file path */
-    source_file?: string,
 }
 
 
@@ -1019,8 +1015,6 @@ export interface CircleAnnotationProperties extends BaseFeatureProperties {
     symbol?: string,
     /** Polygon styling properties for the circle area */
     style: PolygonProperties,
-    /** Original source file path */
-    source_file?: string,
 }
 
 
@@ -1051,8 +1045,6 @@ export interface RectangleAnnotationProperties extends BaseFeatureProperties {
     symbol?: string,
     /** Polygon styling properties for the rectangle area */
     style: PolygonProperties,
-    /** Original source file path */
-    source_file?: string,
 }
 
 
@@ -1083,8 +1075,6 @@ export interface LineAnnotationProperties extends BaseFeatureProperties {
     symbol?: string,
     /** Line styling properties for the line segment */
     style: LineProperties,
-    /** Original source file path */
-    source_file?: string,
 }
 
 
@@ -1115,8 +1105,6 @@ export interface TextAnnotationProperties extends BaseFeatureProperties {
     symbol?: string,
     /** Point styling properties for the text position marker */
     style: PointProperties,
-    /** Original source file path */
-    source_file?: string,
 }
 
 
@@ -1153,8 +1141,6 @@ export interface VectorAnnotationProperties extends BaseFeatureProperties {
     symbol?: string,
     /** Line styling properties for the vector */
     style: LineProperties,
-    /** Original source file path */
-    source_file?: string,
 }
 
 
@@ -1187,8 +1173,6 @@ export interface PolyAnnotationProperties extends BaseFeatureProperties {
     symbol?: string,
     /** Polygon styling properties for the polygon area */
     style: PolygonProperties,
-    /** Original source file path */
-    source_file?: string,
     /** Source line number for debugging */
     line_number?: number,
 }

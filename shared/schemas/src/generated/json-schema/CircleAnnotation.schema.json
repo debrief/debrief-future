@@ -71,13 +71,6 @@
           "minimum": 0,
           "type": "number"
         },
-        "source_file": {
-          "description": "Original source file path",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "style": {
           "$ref": "#/$defs/PolygonProperties",
           "description": "Polygon styling properties for the circle area"

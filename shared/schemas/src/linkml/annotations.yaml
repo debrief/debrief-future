@@ -49,8 +49,6 @@ classes:
         description: Point styling properties for display position
         range: PointProperties
         required: true
-      source_file:
-        description: Original source file path
 
   NarrativeEntry:
     description: >-
@@ -108,8 +106,6 @@ classes:
         description: Polygon styling properties for the circle area
         range: PolygonProperties
         required: true
-      source_file:
-        description: Original source file path
 
   CircleAnnotation:
     description: >-
@@ -155,8 +151,6 @@ classes:
         description: Polygon styling properties for the rectangle area
         range: PolygonProperties
         required: true
-      source_file:
-        description: Original source file path
 
   RectangleAnnotation:
     description: >-
@@ -201,8 +195,6 @@ classes:
         description: Line styling properties for the line segment
         range: LineProperties
         required: true
-      source_file:
-        description: Original source file path
 
   LineAnnotation:
     description: >-
@@ -248,8 +240,6 @@ classes:
         description: Point styling properties for the text position marker
         range: PointProperties
         required: true
-      source_file:
-        description: Original source file path
 
   TextAnnotation:
     description: >-
@@ -312,8 +302,6 @@ classes:
         description: Line styling properties for the vector
         range: LineProperties
         required: true
-      source_file:
-        description: Original source file path
 
   VectorAnnotation:
     description: >-
@@ -364,8 +352,6 @@ classes:
         description: Polygon styling properties for the polygon area
         range: PolygonProperties
         required: true
-      source_file:
-        description: Original source file path
       line_number:
         description: Source line number for debugging
         range: integer

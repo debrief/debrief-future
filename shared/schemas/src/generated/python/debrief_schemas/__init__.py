@@ -100,7 +100,7 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
                               'prefix_reference': 'https://purl.org/geojson/vocab#'},
                   'linkml': {'prefix_prefix': 'linkml',
                              'prefix_reference': 'https://w3id.org/linkml/'}},
-     'source_file': '/Users/ian/git/debrief-future/shared/schemas/src/linkml/debrief.yaml',
+     'source_file': '/home/user/debrief-future/shared/schemas/src/linkml/debrief.yaml',
      'title': 'Debrief Maritime Analysis Schemas'} )
 
 class FeatureKindEnum(str, Enum):
@@ -1211,14 +1211,6 @@ class TrackProperties(BaseFeatureProperties):
     start_time: datetime  = Field(default=..., description="""Track start time (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
     end_time: datetime  = Field(default=..., description="""Track end time (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
     positions: list[TimestampedPosition] = Field(default=..., description="""Array of timestamped positions""", min_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
     style: TrackStyle = Field(default=..., description="""Composite styling for track line and position markers""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -2033,14 +2025,6 @@ class NarrativeEntryProperties(BaseFeatureProperties):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
@@ -2165,14 +2149,6 @@ class CircleAnnotationProperties(BaseFeatureProperties):
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -2309,14 +2285,6 @@ class RectangleAnnotationProperties(BaseFeatureProperties):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
@@ -2446,14 +2414,6 @@ class LineAnnotationProperties(BaseFeatureProperties):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
@@ -2567,14 +2527,6 @@ class TextAnnotationProperties(BaseFeatureProperties):
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',
@@ -2714,14 +2666,6 @@ class VectorAnnotationProperties(BaseFeatureProperties):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
     tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
     provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
@@ -2845,14 +2789,6 @@ class PolyAnnotationProperties(BaseFeatureProperties):
                        'ReferenceLocationProperties',
                        'MultiPointFeatureProperties',
                        'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
                        'NarrativeEntryProperties',
                        'CircleAnnotationProperties',
                        'RectangleAnnotationProperties',

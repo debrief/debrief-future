@@ -198,7 +198,6 @@ class TrackBuilder:
                 "start_time": start_time.isoformat(),
                 "end_time": end_time.isoformat(),
                 "positions": positions_data,
-                "source_file": source_file,
                 "default_position_style": {
                     "show_symbol": False,
                     "symbol": "circle",

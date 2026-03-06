@@ -352,8 +352,6 @@ classes:
         multivalued: true
         required: true
         minimum_cardinality: 2
-      source_file:
-        description: Original source file path
       style:
         description: Composite styling for track line and position markers
         range: TrackStyle

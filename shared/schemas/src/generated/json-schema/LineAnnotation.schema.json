@@ -128,13 +128,6 @@
             "null"
           ]
         },
-        "source_file": {
-          "description": "Original source file path",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "style": {
           "$ref": "#/$defs/LineProperties",
           "description": "Line styling properties for the line segment"
