@@ -1,0 +1,17 @@
+{
+  "vessel_classes": [
+    "surface/warship",
+    "unknown"
+  ],
+  "tags": [
+    "escort"
+  ],
+  "feature_tags": [],
+  "author": "Cdr A. Brown",
+  "track_names": [
+    "UNKNOWN VESSEL"
+  ],
+  "nationalities": [
+    "FR"
+  ]
+}

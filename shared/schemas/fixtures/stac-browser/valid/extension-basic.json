@@ -1,0 +1,25 @@
+{
+  "vessel_classes": [
+    "surface/warship/frigate/type23",
+    "subsurface/submarine/ssn/astute"
+  ],
+  "tags": [
+    "ASW",
+    "multi-national",
+    "training"
+  ],
+  "feature_tags": [
+    "sonar-contact",
+    "datum",
+    "prosecution"
+  ],
+  "author": "Lt Cdr J. Smith",
+  "track_names": [
+    "HMS Argyll",
+    "SUBMERGED CONTACT 01"
+  ],
+  "nationalities": [
+    "GB",
+    "US"
+  ]
+}
