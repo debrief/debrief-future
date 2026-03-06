@@ -1,0 +1,100 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-iron-resolve",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -30.6902,
+          56.3659
+        ],
+        [
+          -30.0081,
+          56.3659
+        ],
+        [
+          -30.0081,
+          57.0479
+        ],
+        [
+          -30.6902,
+          57.0479
+        ],
+        [
+          -30.6902,
+          56.3659
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -30.6902,
+    56.3659,
+    -30.0081,
+    57.0479
+  ],
+  "properties": {
+    "title": "Exercise Iron Resolve",
+    "description": "Iron Resolve \u2014 North Atlantic exercise. 4 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2023-11-01T02:00:00Z",
+    "end_datetime": "2023-11-01T14:59:44Z",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/type45",
+      "surface/warship/carrier/queen-elizabeth",
+      "surface/warship/patrol/river"
+    ],
+    "debrief:tags": [
+      "transit",
+      "multi-national"
+    ],
+    "debrief:feature_tags": [
+      "visual-sighting",
+      "towed-array",
+      "zig-zag",
+      "prosecution"
+    ],
+    "debrief:track_names": [
+      "USS Fridtjof Nansen",
+      "HMCS Lancaster",
+      "USS Diamond",
+      "HMCS Dragon"
+    ],
+    "debrief:nationalities": [
+      "US",
+      "CA"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-iron-resolve.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

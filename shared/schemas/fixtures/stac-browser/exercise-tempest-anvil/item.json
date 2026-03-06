@@ -1,0 +1,97 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-tempest-anvil",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.2382,
+          49.3201
+        ],
+        [
+          -19.9389,
+          49.3201
+        ],
+        [
+          -19.9389,
+          50.6194
+        ],
+        [
+          -21.2382,
+          50.6194
+        ],
+        [
+          -21.2382,
+          49.3201
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.2382,
+    49.3201,
+    -19.9389,
+    50.6194
+  ],
+  "properties": {
+    "title": "Exercise Tempest Anvil",
+    "description": "Tempest Anvil \u2014 North Atlantic exercise. 3 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2024-12-06T20:00:00Z",
+    "end_datetime": "2024-12-14T14:01:48Z",
+    "debrief:vessel_classes": [
+      "surface/warship/corvette/visby",
+      "surface/warship/destroyer/type45"
+    ],
+    "debrief:tags": [
+      "certification",
+      "NGFS",
+      "AAW"
+    ],
+    "debrief:feature_tags": [
+      "track-merge",
+      "zig-zag",
+      "intercept"
+    ],
+    "debrief:track_names": [
+      "USS De Ruyter",
+      "USS Fridtjof Nansen",
+      "USS Sachsen"
+    ],
+    "debrief:nationalities": [
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-tempest-anvil.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

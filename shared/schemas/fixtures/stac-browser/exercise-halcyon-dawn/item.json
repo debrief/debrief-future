@@ -1,0 +1,91 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-halcyon-dawn",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          62.5182,
+          1.6438
+        ],
+        [
+          64.7974,
+          1.6438
+        ],
+        [
+          64.7974,
+          3.923
+        ],
+        [
+          62.5182,
+          3.923
+        ],
+        [
+          62.5182,
+          1.6438
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    62.5182,
+    1.6438,
+    64.7974,
+    3.923
+  ],
+  "properties": {
+    "title": "Exercise Halcyon Dawn",
+    "description": "Halcyon Dawn \u2014 Indian Ocean exercise. 1 track(s), 1 nation(s).",
+    "datetime": null,
+    "start_datetime": "2022-01-17T07:00:00Z",
+    "end_datetime": "2022-01-19T09:25:25Z",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/arleigh-burke"
+    ],
+    "debrief:tags": [
+      "escort",
+      "force-protection"
+    ],
+    "debrief:feature_tags": [
+      "passive-search"
+    ],
+    "debrief:track_names": [
+      "USS Hamburg"
+    ],
+    "debrief:nationalities": [
+      "US"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-halcyon-dawn.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

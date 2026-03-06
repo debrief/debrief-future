@@ -1,0 +1,96 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-barracuda-surge",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          105.0587,
+          7.9745
+        ],
+        [
+          106.7869,
+          7.9745
+        ],
+        [
+          106.7869,
+          9.7028
+        ],
+        [
+          105.0587,
+          9.7028
+        ],
+        [
+          105.0587,
+          7.9745
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    105.0587,
+    7.9745,
+    106.7869,
+    9.7028
+  ],
+  "properties": {
+    "title": "Exercise Barracuda Surge",
+    "description": "Barracuda Surge \u2014 Indo-Pacific exercise. 2 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2025-02-16T02:00:00Z",
+    "end_datetime": "2025-03-04T19:24:58Z",
+    "debrief:vessel_classes": [
+      "surface/warship/frigate/type26",
+      "surface/warship/destroyer/arleigh-burke"
+    ],
+    "debrief:tags": [
+      "NGFS",
+      "escort"
+    ],
+    "debrief:feature_tags": [
+      "depth-charge",
+      "towed-array",
+      "sonar-contact"
+    ],
+    "debrief:track_names": [
+      "HNoMS Caio Duilio",
+      "ITS Northumberland"
+    ],
+    "debrief:nationalities": [
+      "NO",
+      "IT"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-barracuda-surge.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

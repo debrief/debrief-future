@@ -1,0 +1,100 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-single-point-002",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          12.3457,
+          79.1572
+        ],
+        [
+          12.7979,
+          79.1572
+        ],
+        [
+          12.7979,
+          79.6093
+        ],
+        [
+          12.3457,
+          79.6093
+        ],
+        [
+          12.3457,
+          79.1572
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    12.3457,
+    79.1572,
+    12.7979,
+    79.6093
+  ],
+  "properties": {
+    "title": "Exercise Single Point 002",
+    "description": "Single Point 002 \u2014 Arctic exercise. 4 track(s), 3 nation(s). Single-point observation, no time range.",
+    "datetime": "2021-12-06T09:00:00Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/virginia"
+    ],
+    "debrief:tags": [
+      "surveillance",
+      "training",
+      "escort",
+      "replenishment",
+      "boarding"
+    ],
+    "debrief:feature_tags": [
+      "passive-search",
+      "sonar-contact",
+      "intercept",
+      "prosecution"
+    ],
+    "debrief:track_names": [
+      "FS Margottini",
+      "HMS Carney",
+      "SPS Provence",
+      "FS Sachsen"
+    ],
+    "debrief:nationalities": [
+      "FR",
+      "SE",
+      "ES"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-single-point-002.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}
