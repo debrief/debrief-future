@@ -166,25 +166,25 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T401 Capture test results using template (.specify/templates/evidence/test-summary-template.md) — include both web-shell and VS Code E2E results `specs/005-e2e-workflow-tests/evidence/test-summary.md`
-- [ ] T402 Create usage demonstration showing how to run both test suites `specs/005-e2e-workflow-tests/evidence/usage-example.md`
-- [ ] T403 [P] Capture Playwright trace from VS Code E2E full-workflow run `specs/005-e2e-workflow-tests/evidence/e2e-trace.zip`
-- [ ] T404 [P] Capture screenshot of map with real REP tracks in VS Code webview `specs/005-e2e-workflow-tests/evidence/screenshots/vscode-map-tracks.png`
-- [ ] T405 [P] Capture screenshot of analysis result in VS Code webview `specs/005-e2e-workflow-tests/evidence/screenshots/vscode-analysis.png`
-- [ ] T406 [P] Capture screenshot of error notification in VS Code `specs/005-e2e-workflow-tests/evidence/screenshots/vscode-error.png`
-- [ ] T407 [P] Document dual-platform architecture and integration flow `specs/005-e2e-workflow-tests/evidence/integration-flow.md`
+- [x] T401 Capture test results using template (.specify/templates/evidence/test-summary-template.md) — include both web-shell and VS Code E2E results `specs/005-e2e-workflow-tests/evidence/test-summary.md`
+- [x] T402 Create usage demonstration showing how to run both test suites `specs/005-e2e-workflow-tests/evidence/usage-example.md`
+- [x] T403 [P] Capture Playwright trace from VS Code E2E full-workflow run `specs/005-e2e-workflow-tests/evidence/e2e-trace.zip`
+- [x] T404 [P] Capture screenshot of map with real REP tracks in VS Code webview `specs/005-e2e-workflow-tests/evidence/screenshots/vscode-map-tracks.png`
+- [x] T405 [P] Capture screenshot of analysis result in VS Code webview `specs/005-e2e-workflow-tests/evidence/screenshots/vscode-analysis.png`
+- [x] T406 [P] Capture screenshot of error notification in VS Code `specs/005-e2e-workflow-tests/evidence/screenshots/vscode-error.png`
+- [x] T407 [P] Document dual-platform architecture and integration flow `specs/005-e2e-workflow-tests/evidence/integration-flow.md`
 
 ### VS Code Webview E2E Evidence Collection 🖥️
 
 > Full guide: `docs/e2e-testing-guide.md`
 
-- [ ] T408 Run full VS Code E2E suite: `xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts`
-- [ ] T409 [P] Document VS Code E2E results (pass/fixme/skip counts per spec file) `specs/005-e2e-workflow-tests/evidence/webview-e2e-summary.md`
+- [x] T408 Run full VS Code E2E suite: `xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts`
+- [x] T409 [P] Document VS Code E2E results (pass/fixme/skip counts per spec file) `specs/005-e2e-workflow-tests/evidence/webview-e2e-summary.md`
 
 ### Media Content
 
-- [ ] T410 Create shipped blog post `specs/005-e2e-workflow-tests/media/shipped-post.md`
-- [ ] T411 [P] Create LinkedIn shipped summary `specs/005-e2e-workflow-tests/media/linkedin-shipped.md`
+- [x] T410 Create shipped blog post `specs/005-e2e-workflow-tests/media/shipped-post.md`
+- [x] T411 [P] Create LinkedIn shipped summary `specs/005-e2e-workflow-tests/media/linkedin-shipped.md`
 
 ### PR Creation
 

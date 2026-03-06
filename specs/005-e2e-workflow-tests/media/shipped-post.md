@@ -1,96 +1,89 @@
 ---
 layout: future-post
-title: "Shipped: VS Code E2E Tests in a Sandboxed Environment"
-date: 2026-02-07
+title: "Shipped: Dual-Platform E2E Tests — 18 Spec Files With Real Services"
+date: 2026-03-06
 track: [credibility]
 author: Ian
 reading_time: 5
-tags: [tracer-bullet, testing, e2e, playwright, infrastructure, sandbox]
-excerpt: "Playwright driving a full VS Code workbench inside Claude Code's sandbox, after four dead ends."
+tags: [tracer-bullet, testing, e2e, playwright, vscode, web-shell]
+excerpt: "VS Code E2E suite expanded from 8 skipped specs to 18 active files, driven by real Python services parsing real REP data."
 ---
 
 ## What We Built
 
-Running Playwright against a full VS Code workbench is straightforward on a developer laptop. Running it inside Claude Code's sandboxed environment -- where CDN downloads return 403, snap packages fail, and multi-process Chromium crashes mid-render -- took a week of dead ends before anything worked.
+A month ago, the VS Code E2E test suite had 8 spec files -- all skipped. The web-shell had 81 tests across 13 categories, all passing, but those tests exercised orchestration through mock data. Nothing verified that a scientist could open a real REP file in the real extension, see real tracks parsed by real Python services, select features, and run analysis tools end-to-end.
 
-The result is an `ensure-chromium.sh` script, a set of Chromium flags, and a switch from code-server to openvscode-server. Together they let us drive VS Code through its command palette, Quick Open dialog, and file navigation from within the sandbox. Four screenshots prove it.
+Now the VS Code E2E suite has 18 active spec files. Four previously-skipped specs have been restored with live assertions. Ten new spec files cover selection sync, time controller, drawing tools, catalog browsing, log panel, edit face, event propagation, styling tools, undo/redo, and evidence capture. The `DebriefWebview` page object gained 40+ new selectors and methods to support all of this.
 
-![VS Code command palette running in Claude Code's sandbox](../evidence/screenshots/02-command-palette.png)
-*Command palette (F1) responding to keyboard input inside the sandboxed browser. This was the moment we knew the infrastructure worked.*
+Both suites run in parallel CI. The web-shell tests (~30 seconds, mock data, 13 specs) catch orchestration regressions fast. The VS Code E2E tests (~3 minutes, real services, 18 specs) catch the integration problems that only surface when debrief-io parses an actual REP file and debrief-stac stores actual STAC Items.
 
-## Four Dead Ends
+## How It Works
 
-Each approach seemed reasonable in isolation. Each failed for a different reason.
-
-**1. Standard Playwright install.** `npx playwright install chromium` downloads from `cdn.playwright.dev`. The sandbox returns `403 Forbidden - host_not_allowed`. Every Playwright CDN mirror we tried hit the same firewall. Non-starter.
-
-**2. @sparticuz/chromium.** This npm package bundles a minimal Chromium binary designed for AWS Lambda. It extracts to `/tmp/chromium` and works for simple pages -- we had it rendering HTML and running DOM tests within an hour. But the VS Code workbench is not a simple page. The minimal build crashed consistently when rendering VS Code's complex DOM. The workbench never got past the initial paint.
-
-**3. code-server with Playwright.** code-server wraps VS Code as a web application and seemed like the natural host. But its WebSocket authentication depends on `vsda`, a proprietary WASM module that isn't open source. In our environment, the connection handshake failed silently. We spent a day tracing WebSocket frames before finding the dependency.
-
-**4. Multi-process Chromium.** Even after solving the browser and server problems, Chromium's default multi-process architecture caused renderer crashes in the container. Taking screenshots -- the thing we needed most for evidence -- would kill the renderer process. The workbench would load, we'd call `page.screenshot()`, and the browser would crash.
-
-## What Actually Worked
-
-**GitHub Release browser hosting.** Instead of fighting CDN restrictions, we uploaded a full Chromium build (matching Playwright's expected version) as a GitHub Release asset under the tag `playwright-browsers-v1`. The `ensure-chromium.sh` script tries the standard Playwright install first. When that fails, it downloads from the GH release, places the binary where Playwright expects it, and writes a `.chromium-path` file that `playwright.config.ts` picks up. The script is idempotent -- run it twice, it skips the download.
-
-```bash
-# Resolution order in ensure-chromium.sh:
-# 1. Already installed? → done
-# 2. npx playwright install chromium → try CDN
-# 3. CDN blocked? → download from GH release
-```
-
-**openvscode-server.** Gitpod's open-source VS Code server, without the vsda dependency. The global setup script checks for it first, falls back to code-server if needed. No authentication tokens, no proprietary modules. It just starts and serves the workbench.
-
-**Single-process Chromium.** The flags `--single-process --no-zygote --disable-software-rasterizer` collapse Chromium's process tree into one process. This prevents the renderer crashes that plagued multi-process mode in the container. The trade-off is that a crash in any component takes down the whole browser, but for testing that's acceptable -- a crash is a test failure either way.
+The VS Code E2E tests drive openvscode-server with the Debrief extension sideloaded. Behind the scenes, three Python services -- debrief-io, debrief-stac, and debrief-calc -- are running and reachable. When a test opens a REP file, the extension calls debrief-io to parse it, debrief-stac to catalogue it, and debrief-calc to run analysis. The test then inspects the webview DOM to verify tracks rendered and results appeared.
 
 ```typescript
-// playwright.config.ts -- sandboxed launch options
-args: [
-  '--no-sandbox',
-  '--disable-setuid-sandbox',
-  '--disable-gpu',
-  '--disable-dev-shm-usage',
-  '--disable-software-rasterizer',
-  '--single-process',
-  '--no-zygote',
-]
+test('loads REP file and shows tracks', async ({ codeServerPage }) => {
+  await codeServerPage.openFile('samples/boat1.rep');
+
+  const frame = await codeServerPage.getWebviewFrame();
+  await frame.locator('.leaflet-container').waitFor({ state: 'visible' });
+
+  const trackCount = await frame.locator('.leaflet-interactive').count();
+  expect(trackCount).toBeGreaterThan(0);
+});
 ```
 
-**Welcome tab workaround.** VS Code's Getting Started tab renders inside an iframe that captures keyboard focus. The command palette (Ctrl+Shift+P) and Quick Open (Ctrl+P) won't respond because keystrokes go to the iframe instead of the main window. The fix is two-part: machine-level settings to disable the Welcome tab (`workbench.startupEditor: none`), and a `Ctrl+W` keystroke on load to close it if it appears anyway, followed by clicking the title bar to return focus to the main window.
+That last assertion -- `toBeGreaterThan(0)` rather than `toEqual(3)` -- is deliberate. Real service output varies. Structural assertions ("at least one track exists") are resilient to changes in sample data or parsing improvements. Value-exact assertions against real data break constantly for the wrong reasons.
 
-## Evidence
+## By the Numbers
 
-Four screenshots taken during a test run inside the sandbox, each proving a different layer works.
+| | |
+|---|---|
+| VS Code E2E spec files | 18 |
+| VS Code E2E active tests | ~25 |
+| VS Code E2E fixme tests | ~28 |
+| Web-shell spec files | 13 |
+| Web-shell active tests | 81+ |
+| New page object methods | 40+ |
+| Platforms tested in parallel | 2 |
 
-![Workbench loaded](../evidence/screenshots/01-workbench-loaded.png)
-*The full VS Code workbench rendered inside headless Chromium. Activity bar, editor area, status bar all present.*
+## The test.fixme() Strategy
 
-![Command palette](../evidence/screenshots/02-command-palette.png)
-*F1 opens the command palette and it responds to typed input. This requires keyboard focus to be on the main window, not trapped in an iframe.*
+Of the 18 VS Code E2E spec files, 10 contain tests marked `test.fixme()`. These cover features that don't yet exist in the extension -- time controller, drawing tools, styling, undo/redo, and others. The tests are written. The assertions are specified. The features aren't implemented yet.
 
-![Quick Open search](../evidence/screenshots/03-quick-open-search.png)
-*Ctrl+P opens Quick Open with file search suggestions. The workbench's keyboard shortcut handling is fully functional.*
+```typescript
+test.fixme('time scrubber updates map display', async ({ codeServerPage }) => {
+  // Time controller not yet implemented in VS Code extension
+  // See backlog: time-controller feature
+});
+```
 
-![File search](../evidence/screenshots/04-file-opened.png)
-*Typing a filename into Quick Open. The search executes against the workspace. File navigation works end-to-end.*
+We chose `test.fixme()` over `.skip()` for a specific reason: fixme tests appear in Playwright reports as known gaps. They're visible. They cross-reference backlog items. When someone implements the time controller feature, the test is already waiting -- remove the `.fixme()` wrapper and it either passes or tells you what's broken. With `.skip()`, these tests would vanish from reports entirely, and the gaps they represent would be invisible.
 
-## What We Learned
+This turned the E2E expansion into a feature-completeness audit. Writing 28 fixme tests documented exactly what the extension doesn't do yet, in executable form.
 
-**The research note saved days.** Early in the project we documented every Playwright installation approach we tried in `docs/project_notes/playwright-installation-research.md`. That note ruled out three dead ends immediately when we circled back to E2E testing. Writing down what doesn't work is as valuable as writing down what does.
+## Page Object Architecture
 
-**@sparticuz/chromium is for simple pages.** It's optimized for Lambda functions that render PDFs or take screenshots of single-page apps. VS Code's workbench -- with its nested iframes, service workers, and complex layout engine -- overwhelms the minimal build. The right tool for the wrong job.
+Two page objects handle the VS Code E2E environment:
 
-**Single-process mode contradicts most advice.** Chromium documentation and StackOverflow answers consistently warn against `--single-process`. For production browsers, they're right. For headless testing in containers, it's the only configuration that doesn't crash. Context matters more than best practices.
+- **CodeServerPage** manages VS Code chrome -- command palette, Quick Open, file navigation, the Welcome tab focus trap, keyboard shortcuts
+- **DebriefWebview** manages the extension's webview -- iframe traversal, Leaflet map interactions, feature list, tools panel, selection state
 
-**The Welcome tab is a focus trap.** This cost half a day. Everything looked correct -- the workbench loaded, the browser was stable, screenshots worked -- but keyboard shortcuts did nothing. No error messages, no visible problem. The Getting Started tab's iframe was silently eating every keystroke.
+This separation matters because VS Code's webview sits inside nested iframes. The test code that opens a file through Quick Open is fundamentally different from the code that clicks a track on the map. Mixing them makes tests fragile. Keeping them in separate page objects makes the iframe boundary explicit.
+
+## Lessons Learned
+
+**Structural assertions save maintenance time.** Early drafts of the restored specs used exact value checks against real REP file output. Those broke immediately when we updated a sample file. Switching to existence-based assertions ("at least one track", "tool result contains measurement text") made the tests resilient without sacrificing confidence. If zero tracks render, the test still fails.
+
+**Writing tests for unimplemented features is useful work.** The 28 fixme tests forced us to think through what each feature's testable behaviour should look like, before writing any implementation code. Several of those tests revealed UX questions we hadn't considered -- what should the time controller's DOM look like? How should drawing tool state be inspectable from Playwright? Those questions are now documented in the test files themselves.
+
+**Dual-platform testing catches different bugs.** During development, the web-shell tests passed consistently while a VS Code E2E test failed on catalog browsing. The issue was an extension-specific activation timing problem that the web-shell's simpler lifecycle couldn't reproduce. Two test surfaces, two classes of bugs caught.
 
 ## What's Next
 
-The infrastructure is ready for real test content. When specs 043 (file loading) and 001 (tool execution) ship their TypeScript implementations, we can write tests that exercise the full analyst workflow: open a REP file, see tracks on the map, run analysis, check results. The page object models (`CodeServerPage` for VS Code chrome, `DebriefWebview` for Debrief components) are waiting.
+The 28 fixme tests are now a prioritised implementation queue. As each extension feature ships -- time controller, drawing tools, styling panel -- the corresponding fixme tests activate and immediately verify the feature works end-to-end with real services.
 
-More immediately, any feature branch can now run `bash tests/e2e/scripts/ensure-chromium.sh` and have a working Playwright environment in seconds, even inside Claude Code.
+The CI pipeline runs both suites in parallel, so new features get validated against mock data in 30 seconds and against real services in 3 minutes, without blocking each other.
 
-→ [See the infrastructure code](https://github.com/debrief/debrief-future/tree/claude/speckit-specify-005-zJrC6/tests/e2e)
-→ [View the spec](https://github.com/debrief/debrief-future/tree/claude/speckit-specify-005-zJrC6/specs/005-e2e-workflow-tests)
+-> [See the spec](https://github.com/debrief/debrief-future/tree/main/specs/005-e2e-workflow-tests)
+-> [View the evidence](https://github.com/debrief/debrief-future/tree/main/specs/005-e2e-workflow-tests/evidence)
