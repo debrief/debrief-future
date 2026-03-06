@@ -841,7 +841,7 @@ class GeoJSONLineString(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'LineString'} })
-    coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -878,7 +878,7 @@ class GeoJSONPolygon(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Polygon'} })
-    coordinates: list[float] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[list[float]]] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -915,7 +915,7 @@ class GeoJSONMultiPoint(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'MultiPoint'} })
-    coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -952,7 +952,7 @@ class GeoJSONMultiLineString(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'MultiLineString'} })
-    coordinates: list[float] = Field(default=..., description="""Array of LineString coordinate arrays""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[list[float]]] = Field(default=..., description="""Array of LineString coordinate arrays""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -989,7 +989,7 @@ class GeoJSONMultiPolygon(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'MultiPolygon'} })
-    coordinates: list[float] = Field(default=..., description="""Array of polygon coordinate arrays (each an array of linear rings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[list[list[float]]]] = Field(default=..., description="""Array of polygon coordinate arrays (each an array of linear rings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -1182,7 +1182,7 @@ class TrackProperties(ConfiguredBaseModel):
     default_position_style: PositionStyle = Field(default=..., description="""Default styling applied to all positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     symbol_interval: Optional[str] = Field(default=None, description="""ISO 8601 duration for interval-based symbol display. E.g., \"PT5M\" = every 5 minutes, \"PT1H\" = every hour. Null means no interval-based symbols.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     label_interval: Optional[str] = Field(default=None, description="""ISO 8601 duration for interval-based label display. Null means no interval-based labels.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
-    position_style_overrides: Optional[list[PositionStyleOverride]] = Field(default=[], description="""Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
+    position_style_overrides: Optional[list[Optional[PositionStyleOverride]]] = Field(default=[], description="""Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     segments: Optional[list[SegmentMetadata]] = Field(default=[], description="""Per-segment metadata for compound tracks. When present, geometry MUST be MultiLineString and segments[i] describes coordinates[i]. When absent, geometry is LineString and the flat positions array is used.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     sensors: Optional[list[SensorData]] = Field(default=[], description="""Embedded sensor data associated with this track. Each sensor contains named metadata and an array of contact measurements.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     tuas: Optional[list[TUAData]] = Field(default=[], description="""Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
@@ -1275,6 +1275,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1287,6 +1288,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1294,7 +1296,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation']} })
-    bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+    bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature']} })
@@ -1436,6 +1438,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1448,6 +1451,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1548,6 +1552,7 @@ class SystemState(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1560,6 +1565,7 @@ class SystemState(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1692,6 +1698,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1704,6 +1711,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1711,7 +1719,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation']} })
-    bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+    bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature']} })
@@ -1827,6 +1835,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1839,6 +1848,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1846,7 +1856,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation']} })
-    bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+    bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature']} })
@@ -1866,6 +1876,9 @@ class LogEntry(ConfiguredBaseModel):
     execution_duration: str = Field(default=..., description="""Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
     generated_result_id: Optional[str] = Field(default=None, description="""Stable logical identity for artifact-producing tools. Null for non-artifact tools.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
     tune: Optional[TuneAnnotation] = Field(default=None, description="""Parameter tuning record. Null until a tuning operation modifies this entry.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
+    input_state: Optional[list[InputFeatureState]] = Field(default=[], description="""Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
+    disabled: Optional[bool] = Field(default=False, description="""Whether this entry is skipped during replay. Toggled via the flip-card edit face.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry'], 'ifabsent': 'false'} })
+    rationale: Optional[str] = Field(default=None, description="""Free-text analyst annotation explaining the reasoning for this operation.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
 
     @field_validator('execution_duration')
     def pattern_execution_duration(cls, v):
@@ -1901,6 +1914,47 @@ class ParameterValue(ConfiguredBaseModel):
     value: str = Field(default=..., description="""The parameter value (any JSON type).""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue']} })
     default: Optional[bool] = Field(default=False, description="""Whether this is the default value.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue'], 'ifabsent': 'false'} })
     tunable: Optional[bool] = Field(default=True, description="""Whether this parameter can be modified during replay.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue'], 'ifabsent': 'true'} })
+
+
+class InputFeatureState(ConfiguredBaseModel):
+    """
+    Pre-operation state of a feature captured before a coordinate-mutating tool executes. Enables correct replay by providing the original geometry as the anchor for re-computation with modified parameters.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/log-entry'})
+
+    feature_id: str = Field(default=..., description="""ID of the feature whose pre-operation state is captured.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InputFeatureState']} })
+    geometry: str = Field(default=..., description="""Full GeoJSON geometry object (type + coordinates) as it was immediately before the operation. Stored as a JSON object.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'InputFeatureState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation'],
+         'notes': ['Typed as string in LinkML but serialized as a JSON object in '
+                   'practice. GeoJSON geometry is polymorphic (Point, Polygon, '
+                   'LineString, etc.) and LinkML does not have a native geometry '
+                   'type.']} })
+    properties: Optional[str] = Field(default=None, description="""Kind-specific spatial properties captured before the operation. Excludes provenance (which is append-only). Null if no spatial properties need capturing.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'InputFeatureState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation'],
+         'notes': ['Typed as string in LinkML but serialized as a JSON object in '
+                   'practice. Contains keys like "center", "origin", "radius_km" etc.']} })
 
 
 class TuneAnnotation(ConfiguredBaseModel):
@@ -2032,6 +2086,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2044,6 +2099,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2176,6 +2232,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2188,6 +2245,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2318,6 +2376,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2330,6 +2389,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2460,6 +2520,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2472,6 +2533,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2593,6 +2655,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2605,6 +2668,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2738,6 +2802,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2750,6 +2815,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2882,6 +2948,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2894,6 +2961,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -3144,6 +3212,7 @@ MultiPolygonFeature.model_rebuild()
 LogEntry.model_rebuild()
 WasGeneratedBy.model_rebuild()
 ParameterValue.model_rebuild()
+InputFeatureState.model_rebuild()
 TuneAnnotation.model_rebuild()
 NarrativeEntryProperties.model_rebuild()
 NarrativeEntry.model_rebuild()

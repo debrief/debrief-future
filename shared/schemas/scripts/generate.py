@@ -77,6 +77,52 @@ def generate_pydantic() -> bool:
             "from typing import (\n",
         )
 
+        # Post-process: Fix GeoJSON coordinate types. LinkML generates flat
+        # list[float] for all coordinate arrays, but GeoJSON requires nested
+        # arrays whose depth varies by geometry type.
+        _pydantic_coord_fixes = {
+            # LineString: [[lon, lat], ...] → list of position pairs
+            "GeoJSONLineString": ("coordinates: list[float]", "coordinates: list[list[float]]"),
+            # Polygon: [[[lon, lat], ...], ...] → list of linear rings
+            "GeoJSONPolygon": ("coordinates: list[float]", "coordinates: list[list[list[float]]]"),
+            # MultiPoint: [[lon, lat], ...] → list of position pairs
+            "GeoJSONMultiPoint": ("coordinates: list[float]", "coordinates: list[list[float]]"),
+            # MultiLineString: [[[lon, lat], ...], ...] → list of LineStrings
+            "GeoJSONMultiLineString": ("coordinates: list[float]", "coordinates: list[list[list[float]]]"),
+            # MultiPolygon: [[[[lon, lat], ...], ...], ...] → list of Polygons
+            "GeoJSONMultiPolygon": ("coordinates: list[float]", "coordinates: list[list[list[list[float]]]]"),
+        }
+        for class_name, (old_type, new_type) in _pydantic_coord_fixes.items():
+            class_marker = f"class {class_name}("
+            if class_marker in content:
+                idx = content.index(class_marker)
+                # Find next class definition or end of file
+                next_class = content.find("\nclass ", idx + 1)
+                block_end = next_class if next_class != -1 else len(content)
+                block = content[idx:block_end]
+                fixed_block = block.replace(old_type, new_type, 1)
+                content = content[:idx] + fixed_block + content[block_end:]
+
+        # Post-process: Fix nullable array items. LinkML generates
+        # list[PositionStyleOverride] but the GeoJSON data uses null entries
+        # for positions without custom styling.
+        content = content.replace(
+            "Optional[list[PositionStyleOverride]]",
+            "Optional[list[Optional[PositionStyleOverride]]]",
+        )
+
+        # Post-process: Fix Optional list fields with min_length constraints.
+        # gen-pydantic emits default=[] for optional multivalued fields, which
+        # conflicts with min_length constraints (e.g., bbox with min_length=4).
+        # Change default=[] to default=None for Optional fields with min_length.
+        import re
+        content = re.sub(
+            r'(Optional\[list\[[^\]]+\]\])\s*=\s*Field\(default=\[\],'
+            r'\s*(description="""[^"]*"""),\s*(min_length=\d+)',
+            r'\1 = Field(default=None, \2, \3',
+            content,
+        )
+
         output_file.write_text(content)
         print(f"  [OK] Generated: {output_file}")
         return True
@@ -86,6 +132,96 @@ def generate_pydantic() -> bool:
     except FileNotFoundError:
         print("  [FAIL] gen-pydantic not found. Install with: pip install linkml")
         return False
+
+
+# GeoJSON coordinate schema definitions per geometry type.
+# LinkML generates flat {"items": {"type": "number"}} for all coordinate
+# arrays, but GeoJSON requires nested arrays whose depth varies by type.
+_GEOJSON_COORDINATE_SCHEMAS: dict[str, dict[str, object]] = {
+    # Point: [lon, lat] — flat array of numbers (already correct, listed for completeness)
+    "GeoJSONPoint": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2},
+    # EmptyPoint: [] — empty array
+    "GeoJSONEmptyPoint": {"type": "array", "items": {"type": "number"}, "maxItems": 0},
+    # LineString: [[lon, lat], ...]
+    "GeoJSONLineString": {
+        "type": "array",
+        "items": {"type": "array", "items": {"type": "number"}, "minItems": 2},
+    },
+    # Polygon: [[[lon, lat], ...], ...]
+    "GeoJSONPolygon": {
+        "type": "array",
+        "items": {
+            "type": "array",
+            "items": {"type": "array", "items": {"type": "number"}, "minItems": 2},
+        },
+    },
+    # MultiPoint: [[lon, lat], ...]
+    "GeoJSONMultiPoint": {
+        "type": "array",
+        "items": {"type": "array", "items": {"type": "number"}, "minItems": 2},
+    },
+    # MultiLineString: [[[lon, lat], ...], ...]
+    "GeoJSONMultiLineString": {
+        "type": "array",
+        "items": {
+            "type": "array",
+            "items": {"type": "array", "items": {"type": "number"}, "minItems": 2},
+        },
+    },
+    # MultiPolygon: [[[[lon, lat], ...], ...], ...]
+    "GeoJSONMultiPolygon": {
+        "type": "array",
+        "items": {
+            "type": "array",
+            "items": {
+                "type": "array",
+                "items": {"type": "array", "items": {"type": "number"}, "minItems": 2},
+            },
+        },
+    },
+}
+
+
+def _fix_geojson_coordinates(schema: dict[str, object]) -> None:
+    """Patch GeoJSON coordinate definitions in a full JSON Schema.
+
+    Replaces the flat ``{"items": {"type": "number"}}`` emitted by LinkML's
+    gen-json-schema with properly nested array schemas that match the GeoJSON
+    specification (RFC 7946).
+
+    Also fixes nullable array items for ``position_style_overrides`` where
+    LinkML doesn't support nullable items in arrays.
+    """
+    defs = schema.get("$defs", {})
+    if not isinstance(defs, dict):
+        return
+
+    for geom_name, coord_schema in _GEOJSON_COORDINATE_SCHEMAS.items():
+        geom_def = defs.get(geom_name)
+        if not isinstance(geom_def, dict):
+            continue
+        props = geom_def.get("properties", {})
+        if not isinstance(props, dict):
+            continue
+        if "coordinates" in props:
+            # Preserve the description from the original schema
+            desc = props["coordinates"].get("description", "")
+            props["coordinates"] = {**coord_schema, "description": desc}
+
+    # Fix nullable array items: position_style_overrides can contain null entries
+    track_props = defs.get("TrackProperties")
+    if isinstance(track_props, dict):
+        props = track_props.get("properties", {})
+        if isinstance(props, dict) and "position_style_overrides" in props:
+            pso = props["position_style_overrides"]
+            if isinstance(pso, dict) and "$ref" in pso.get("items", {}):
+                ref_val = pso["items"]["$ref"]
+                pso["items"] = {
+                    "anyOf": [
+                        {"$ref": ref_val},
+                        {"type": "null"},
+                    ]
+                }
 
 
 def _strip_type_from_anyof(obj: object) -> None:
@@ -130,6 +266,7 @@ def generate_jsonschema() -> bool:
         # be removed so AJV validates against the anyOf alternatives instead.
         full_schema = json.loads(result.stdout)
         _strip_type_from_anyof(full_schema)
+        _fix_geojson_coordinates(full_schema)
 
         output_file.write_text(json.dumps(full_schema, indent=2))
         print(f"  [OK] Generated: {output_file}")

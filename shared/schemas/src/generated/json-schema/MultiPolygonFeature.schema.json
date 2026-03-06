@@ -321,12 +321,12 @@
       "description": "GeoJSON Point geometry with empty coordinates (for non-spatial features)",
       "properties": {
         "coordinates": {
-          "description": "Empty array for non-spatial features",
+          "type": "array",
           "items": {
             "type": "number"
           },
           "maxItems": 0,
-          "type": "array"
+          "description": "Empty array for non-spatial features"
         },
         "type": {
           "const": "Point",
@@ -346,11 +346,15 @@
       "description": "GeoJSON LineString geometry",
       "properties": {
         "coordinates": {
-          "description": "Array of [longitude, latitude] pairs",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2
           },
-          "type": "array"
+          "description": "Array of [longitude, latitude] pairs"
         },
         "type": {
           "const": "LineString",
@@ -370,11 +374,18 @@
       "description": "GeoJSON MultiLineString geometry for compound tracks",
       "properties": {
         "coordinates": {
-          "description": "Array of LineString coordinate arrays",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2
+            }
           },
-          "type": "array"
+          "description": "Array of LineString coordinate arrays"
         },
         "type": {
           "const": "MultiLineString",
@@ -394,11 +405,15 @@
       "description": "GeoJSON MultiPoint geometry for reference point sets",
       "properties": {
         "coordinates": {
-          "description": "Array of [longitude, latitude] pairs",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2
           },
-          "type": "array"
+          "description": "Array of [longitude, latitude] pairs"
         },
         "type": {
           "const": "MultiPoint",
@@ -418,11 +433,21 @@
       "description": "GeoJSON MultiPolygon geometry for multi-polygon tool results",
       "properties": {
         "coordinates": {
-          "description": "Array of polygon coordinate arrays (each an array of linear rings)",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2
+              }
+            }
           },
-          "type": "array"
+          "description": "Array of polygon coordinate arrays (each an array of linear rings)"
         },
         "type": {
           "const": "MultiPolygon",
@@ -442,13 +467,13 @@
       "description": "GeoJSON Point geometry",
       "properties": {
         "coordinates": {
-          "description": "[longitude, latitude] in degrees",
+          "type": "array",
           "items": {
             "type": "number"
           },
-          "maxItems": 2,
           "minItems": 2,
-          "type": "array"
+          "maxItems": 2,
+          "description": "[longitude, latitude] in degrees"
         },
         "type": {
           "const": "Point",
@@ -468,11 +493,18 @@
       "description": "GeoJSON Polygon geometry",
       "properties": {
         "coordinates": {
-          "description": "Array of linear rings (arrays of [lon, lat] pairs)",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2
+            }
           },
-          "type": "array"
+          "description": "Array of linear rings (arrays of [lon, lat] pairs)"
         },
         "type": {
           "const": "Polygon",
@@ -485,6 +517,33 @@
         "coordinates"
       ],
       "title": "GeoJSONPolygon",
+      "type": "object"
+    },
+    "InputFeatureState": {
+      "additionalProperties": false,
+      "description": "Pre-operation state of a feature captured before a coordinate-mutating tool executes. Enables correct replay by providing the original geometry as the anchor for re-computation with modified parameters.",
+      "properties": {
+        "feature_id": {
+          "description": "ID of the feature whose pre-operation state is captured.",
+          "type": "string"
+        },
+        "geometry": {
+          "description": "Full GeoJSON geometry object (type + coordinates) as it was immediately before the operation. Stored as a JSON object.",
+          "type": "string"
+        },
+        "properties": {
+          "description": "Kind-specific spatial properties captured before the operation. Excludes provenance (which is append-only). Null if no spatial properties need capturing.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "feature_id",
+        "geometry"
+      ],
+      "title": "InputFeatureState",
       "type": "object"
     },
     "LineAnnotation": {
@@ -666,6 +725,13 @@
           "description": "Unique operation identifier (UUID v4). Shared across features in multi-feature operations.",
           "type": "string"
         },
+        "disabled": {
+          "description": "Whether this entry is skipped during replay. Toggled via the flip-card edit face.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
         "execution_duration": {
           "description": "Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S).",
           "pattern": "^PT[0-9]+(\\.[0-9]+)?S$",
@@ -680,6 +746,23 @@
         },
         "generated_result_id": {
           "description": "Stable logical identity for artifact-producing tools. Null for non-artifact tools.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "input_state": {
+          "description": "Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools.",
+          "items": {
+            "$ref": "#/$defs/InputFeatureState"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "rationale": {
+          "description": "Free-text analyst annotation explaining the reasoning for this operation.",
           "type": [
             "string",
             "null"
@@ -2626,7 +2709,14 @@
         "position_style_overrides": {
           "description": "Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling.",
           "items": {
-            "$ref": "#/$defs/PositionStyleOverride"
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PositionStyleOverride"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": [
             "array",
