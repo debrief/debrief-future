@@ -83,6 +83,12 @@ export type MatcherFn = (
   descendantMap: DescendantMap,
 ) => boolean;
 
+/** Match plot contents with case-insensitive substring */
+function matchPlotContents(item: StacBrowserItem, value: string): boolean {
+  if (!item.title) return false;
+  return item.title.toLowerCase().includes(value.toLowerCase());
+}
+
 /** Registry of matchers by filter type */
 const MATCHERS: Record<FilterType, MatcherFn> = {
   "vessel-class": matchVesselClass,
@@ -92,6 +98,7 @@ const MATCHERS: Record<FilterType, MatcherFn> = {
   author: (item, value) => matchAuthor(item, value),
   duration: (item, value) => matchDuration(item, value),
   title: (item, value) => matchTitle(item, value),
+  "plot-contents": (item, value) => matchPlotContents(item, value),
   "track-name": (item, value) =>
     arrayContainsCaseInsensitive(item.trackNames, value),
   nationality: (item, value) =>

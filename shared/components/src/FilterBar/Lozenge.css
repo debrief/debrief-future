@@ -1,0 +1,77 @@
+.debrief-lozenge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--vscode-badge-background, #e0e0e0);
+  color: var(--vscode-badge-foreground, #333);
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 2px 4px 2px 10px;
+  cursor: grab;
+  position: relative;
+  user-select: none;
+  transition: opacity 0.15s ease;
+}
+
+.debrief-lozenge--dragging {
+  opacity: 0.4;
+}
+
+.debrief-lozenge__body {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 999px;
+}
+
+.debrief-lozenge__body:hover {
+  background: var(--vscode-list-hoverBackground, rgba(0, 0, 0, 0.05));
+}
+
+.debrief-lozenge__type {
+  font-weight: 600;
+  color: var(--vscode-descriptionForeground, #666);
+}
+
+.debrief-lozenge__separator {
+  color: var(--vscode-descriptionForeground, #999);
+}
+
+.debrief-lozenge__value {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.debrief-lozenge__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  color: var(--vscode-descriptionForeground, #999);
+  cursor: pointer;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  margin-left: 2px;
+}
+
+.debrief-lozenge__remove:hover {
+  background: var(--vscode-list-hoverBackground, rgba(0, 0, 0, 0.1));
+  color: var(--vscode-errorForeground, #d32f2f);
+}
+
+.debrief-lozenge__editor {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  margin-top: 4px;
+}

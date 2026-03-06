@@ -14,6 +14,7 @@ const PROPERTY_MAP: Record<FilterType, string> = {
   author: "debrief:author",
   duration: "duration",
   title: "title",
+  "plot-contents": "debrief:plot_contents",
   "track-name": "debrief:track_names",
   nationality: "debrief:nationalities",
   collection: "collection",
@@ -32,8 +33,8 @@ const ARRAY_TYPES: ReadonlySet<FilterType> = new Set([
 function predicateToCql2(predicate: Predicate): Record<string, unknown> {
   const property = PROPERTY_MAP[predicate.type];
 
-  // Title uses LIKE with wildcards
-  if (predicate.type === "title") {
+  // Title and plot-contents use LIKE with wildcards (free-text substring match)
+  if (predicate.type === "title" || predicate.type === "plot-contents") {
     return {
       op: "like",
       args: [{ property }, `%${predicate.value}%`],
