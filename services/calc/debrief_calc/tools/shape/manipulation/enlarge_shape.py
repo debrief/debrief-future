@@ -33,10 +33,7 @@ def compute_centroid(geometry: dict[str, Any]) -> list[float]:
     if geo_type == "Polygon":
         ring = coords[0]
         # Exclude closing vertex if first == last
-        if len(ring) > 1 and ring[0] == ring[-1]:
-            vertices = ring[:-1]
-        else:
-            vertices = ring
+        vertices = ring[:-1] if len(ring) > 1 and ring[0] == ring[-1] else ring
     elif geo_type == "LineString":
         vertices = coords
     else:
