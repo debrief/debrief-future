@@ -216,9 +216,9 @@ interface ValidationError {
 
 function validateToolOutput(
   features: GeoJSONFeature[],
-  expectedKind: string,
+  _expectedKind: string,
   toolName: string,
-  skipKindCheck = false,
+  _skipKindCheck = false,
 ): void {
   const errors: ValidationError[] = [];
 
@@ -238,12 +238,11 @@ function validateToolOutput(
       continue;
     }
 
-    // Check kind attribute — skip for mutation tools which preserve original kind
+    // Check kind attribute — must be present; may differ from expectedKind
+    // when the tool sets a domain-specific kind (e.g. "ZONE", "POINT")
     const kind = feature.properties.kind;
     if (kind === undefined || kind === null) {
       errors.push({ featureIndex: i, error: 'Feature.properties.kind is required' });
-    } else if (!skipKindCheck && kind !== expectedKind) {
-      errors.push({ featureIndex: i, error: `Expected kind '${expectedKind}', got '${String(kind)}'` });
     }
 
     // Check provenance (PROV-aligned array format)
@@ -497,10 +496,12 @@ export function executeTool(
 
     for (const feature of modifiedFeatures) {
       if (!feature.properties) feature.properties = {};
-      // Only set output kind for additive tools that create new features.
+      // Only set output kind for additive tools that create new features
+      // AND only if the tool did not already assign a domain-specific kind
+      // (e.g. buffer_zone_generator → "ZONE", reference_points → "POINT").
       // Mutation tools preserve the original kind (e.g. 'TRACK') so that
       // type guards like isTrackFeature() continue to work after mutation.
-      if (resultCategory !== 'mutation') {
+      if (resultCategory !== 'mutation' && !feature.properties.kind) {
         feature.properties.kind = outputKind;
       }
 

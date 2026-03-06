@@ -297,12 +297,13 @@ class TestSetOutputKind:
 
         assert feature["properties"]["kind"] == "result"
 
-    def test_set_kind_overwrites_existing(self) -> None:
-        feature = {"type": "Feature", "properties": {"kind": "old"}, "geometry": None}
+    def test_set_kind_preserves_existing(self) -> None:
+        """Tool-assigned kind should be preserved, not overwritten by output_kind."""
+        feature = {"type": "Feature", "properties": {"kind": "ZONE"}, "geometry": None}
 
-        set_output_kind(feature, "new")
+        set_output_kind(feature, "addition/feature")
 
-        assert feature["properties"]["kind"] == "new"
+        assert feature["properties"]["kind"] == "ZONE"
 
 
 class TestInputFeatureState:
