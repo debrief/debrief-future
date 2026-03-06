@@ -13,6 +13,7 @@
 - Q: Should VS Code E2E tests be restored (existing `tests/e2e/`), written from scratch, or replaced with webview-only approach? → A: Restore existing `tests/e2e/` skipped tests (unskip, fix selectors, sideload VSIX)
 - Q: How should missing/incomplete features discovered during VS Code E2E test restoration be recorded? → A: Use Playwright `test.fixme()` annotation in the test + create a backlog item with cross-reference
 - Q: Should VS Code E2E suite be expanded to match web-shell coverage or stay focused on extension-specific concerns? → A: Expand VS Code E2E to match web-shell coverage (all 13 spec categories)
+- Q: How should both E2E suites be integrated into CI? → A: Separate CI job for E2E tests, running in parallel with unit tests
 
 ## Context
 
@@ -102,6 +103,7 @@ As a developer, I need automated tests that verify feature selection, time contr
 - **FR-009**: Developers MUST be able to run the same tests locally with a single command
 - **FR-010**: Tests MUST cover temporal interaction (time controller) and drawing tools as cross-cutting infrastructure
 - **FR-011**: When a VS Code E2E test reveals a missing or incomplete feature, the test MUST be annotated with Playwright `test.fixme()` (not `.skip()`) and a corresponding backlog item MUST be created with a cross-reference between the test and backlog entry
+- **FR-012**: E2E tests (web-shell + VS Code) MUST run in a separate CI job that executes in parallel with the unit test job, so that E2E failures do not block fast unit test feedback
 
 ### Key Entities
 
@@ -118,7 +120,7 @@ As a developer, I need automated tests that verify feature selection, time contr
 - **SC-001**: The automated test suite exercises the complete user workflow (browse catalog → open plot → view on map → run tool → verify results) without manual intervention
 - **SC-002**: A breaking change in any component's output causes at least one E2E test to fail, proving the tests catch cross-component regressions
 - **SC-003**: The full E2E test suite (web-shell + VS Code) completes within 10 minutes in CI
-- **SC-004**: Developers can run the same tests locally with a single command (`node run-playwright.mjs` or `pnpm test`)
+- **SC-004**: Developers can run E2E tests locally with a single command (`node run-playwright.mjs` or equivalent); CI runs them in a dedicated parallel job separate from unit tests
 - **SC-005**: All web-shell test spec files (13) pass with zero skipped tests
 - **SC-006**: VS Code E2E tests (`tests/e2e/`) are expanded to cover all 13 web-shell spec categories; tests pass or are annotated with `test.fixme()` with corresponding backlog items for any missing features discovered
 - **SC-007**: The test suite covers at least the three core workflows across both platforms: catalog browse, plot load/display, and tool execution
