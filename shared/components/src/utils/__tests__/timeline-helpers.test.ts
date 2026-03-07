@@ -16,14 +16,14 @@ import {
   itemOverlapsFilter,
 } from '../timeline-helpers';
 import type { TimeSpan } from '../temporal-types';
-import type { CatalogOverviewItem, StacBrowserItem } from '../../filter-engine/types';
+import type { StacBrowserItem } from '../../filter-engine/types';
 import type { TemporalFilter } from '../../TimelineView/types';
 
 // ============================================================================
 // Fixtures
 // ============================================================================
 
-function makeItem(overrides: Partial<CatalogOverviewItem>): CatalogOverviewItem {
+function makeItem(overrides: Partial<StacBrowserItem>): StacBrowserItem {
   return {
     id: 'test',
     title: 'Test',
@@ -32,6 +32,14 @@ function makeItem(overrides: Partial<CatalogOverviewItem>): CatalogOverviewItem 
     datetime: null,
     startDatetime: null,
     endDatetime: null,
+    vesselClasses: [],
+    tags: [],
+    featureTags: [],
+    author: null,
+    trackNames: [],
+    nationalities: [],
+    collection: null,
+    modified: null,
     ...overrides,
   };
 }

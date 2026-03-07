@@ -77,6 +77,9 @@ export function createMockExerciseItem(index: number): ExerciseListItem {
     author: AUTHORS[index % AUTHORS.length] ?? null,
     nationalities: pickRandom(NATIONALITIES, numNations),
     trackNames: Array.from({ length: numTracks }, (_, i) => `Track ${i + 1}`),
+    featureTags: [],
+    collection: null,
+    modified: null,
     trackDataHref: `exercises/${name.toLowerCase()}/data.geojson`,
   };
 }

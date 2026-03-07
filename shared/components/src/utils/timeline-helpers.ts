@@ -4,7 +4,7 @@
  * Shared by StacBrowser and TimelineView.
  */
 
-import type { CatalogOverviewItem, StacBrowserItem } from '../filter-engine/types';
+import type { StacBrowserItem } from '../filter-engine/types';
 import type { TimeSpan } from './temporal-types';
 import type { TemporalFilter } from '../TimelineView/types';
 
@@ -24,7 +24,7 @@ export function parseTime(s: string | null): number | null {
  * Returns null when no items have temporal data.
  * Pads by ±1 hour when all items share the same timestamp.
  */
-export function computeTimeRange(items: readonly CatalogOverviewItem[]): TimeSpan | null {
+export function computeTimeRange(items: readonly StacBrowserItem[]): TimeSpan | null {
   let min = Infinity;
   let max = -Infinity;
   for (const item of items) {

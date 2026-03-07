@@ -7,8 +7,9 @@
  */
 
 /**
- * Minimal filter expression type compatible with the CQL2 filter engine (#126).
- * Defined locally to avoid cross-package dependency on @debrief/components.
+ * Filter expression shape — mirrors FilterExpression from @debrief/components filter-engine.
+ * Defined locally because session-state should not depend on the UI component package.
+ * If the canonical type changes, update this to match.
  */
 export interface FilterExpression {
   readonly predicates: readonly { readonly type: string; readonly value: string; readonly negated?: boolean }[];

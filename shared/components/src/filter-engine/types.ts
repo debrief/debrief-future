@@ -3,30 +3,7 @@
  *
  * Defines the filter expression model, STAC browser item type,
  * and vessel taxonomy structure.
- *
- * CatalogOverviewItem moved here from CatalogOverview/types.ts (#132).
  */
-
-/**
- * A single item in a STAC catalog overview.
- * Formerly in CatalogOverview/types.ts, moved here as the canonical location (#132).
- */
-export interface CatalogOverviewItem {
-  /** STAC Item ID */
-  id: string;
-  /** Item title */
-  title: string;
-  /** Path to item.json relative to store root */
-  itemPath: string;
-  /** Bounding box [west, south, east, north] */
-  bbox: [number, number, number, number] | null;
-  /** Single datetime (ISO 8601) — fallback when start/end not available */
-  datetime: string | null;
-  /** Range start datetime (ISO 8601) */
-  startDatetime: string | null;
-  /** Range end datetime (ISO 8601) */
-  endDatetime: string | null;
-}
 
 /** All supported metadata filter types from SRD Section 4.4 */
 export type FilterType =
@@ -66,16 +43,39 @@ export interface FilterExpression {
 }
 
 /**
- * Extended STAC item with Debrief extension properties for filtering.
- * Extends CatalogOverviewItem with the properties defined by #125.
+ * STAC catalog exercise item — the canonical data type for exercises (#132).
+ *
+ * Combines core STAC fields with Debrief extension properties (#125).
+ * Used by FilterBar, ExerciseListView, MapView, TimelineView.
  */
-export interface StacBrowserItem extends CatalogOverviewItem {
+export interface StacBrowserItem {
+  /** STAC Item ID */
+  readonly id: string;
+  /** Item title */
+  readonly title: string;
+  /** Path to item.json relative to store root */
+  readonly itemPath: string;
+  /** Bounding box [west, south, east, north] */
+  readonly bbox: [number, number, number, number] | null;
+  /** Single datetime (ISO 8601) — fallback when start/end not available */
+  readonly datetime: string | null;
+  /** Range start datetime (ISO 8601) */
+  readonly startDatetime: string | null;
+  /** Range end datetime (ISO 8601) */
+  readonly endDatetime: string | null;
+  /** Vessel taxonomy paths from debrief:vessel_classes */
   readonly vesselClasses: readonly string[];
+  /** Plot-level tags from debrief:tags */
   readonly tags: readonly string[];
+  /** Feature-level tags from debrief:feature_tags */
   readonly featureTags: readonly string[];
+  /** Exercise author from debrief:author */
   readonly author: string | null;
+  /** Track platform names from debrief:track_names */
   readonly trackNames: readonly string[];
+  /** ISO 3166-1 nationality codes from debrief:nationalities */
   readonly nationalities: readonly string[];
+  /** STAC collection ID */
   readonly collection: string | null;
   /** ISO 8601 datetime when the item was last modified */
   readonly modified: string | null;

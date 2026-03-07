@@ -2,8 +2,8 @@
 export { StacBrowser } from './StacBrowser';
 export type { StacBrowserProps, BrowserFilterResult } from './StacBrowser';
 
-// CatalogOverviewItem and StacBrowserItem — canonical location is filter-engine/types (#132)
-export type { CatalogOverviewItem, StacBrowserItem } from './filter-engine/types';
+// StacBrowserItem — canonical exercise data type (#132)
+export type { StacBrowserItem } from './filter-engine/types';
 
 export { TimelineView } from './TimelineView';
 export type { TimelineViewProps, TimelineBarData, ColourFn, TemporalFilter } from './TimelineView';

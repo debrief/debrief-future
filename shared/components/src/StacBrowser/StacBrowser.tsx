@@ -57,12 +57,12 @@ export function StacBrowser({
     }
   }, [items.length]);
 
-  // Convert StacBrowserItem to ExerciseListItem (they share the same fields)
+  // Convert StacBrowserItem to ExerciseListItem (adds trackDataHref)
   const listItems = useMemo<ExerciseListItem[]>(() => {
     return filteredItems.map(item => ({
       ...item,
       trackDataHref: null,
-    })) as unknown as ExerciseListItem[];
+    }));
   }, [filteredItems]);
 
   const rootClassName = ['stac-browser', className].filter(Boolean).join(' ');

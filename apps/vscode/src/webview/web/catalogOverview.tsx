@@ -11,7 +11,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import type { StacBrowserItem } from '@debrief/components';
 import { createRoot } from 'react-dom/client';
 import { StacBrowser } from '@debrief/components';
-import type { CatalogOverviewItem } from '@debrief/components';
 
 // VS Code API
 declare function acquireVsCodeApi(): {
@@ -26,7 +25,7 @@ interface CatalogData {
   id: string;
   title: string;
   storePath: string;
-  items: CatalogOverviewItem[];
+  items: StacBrowserItem[];
 }
 
 function CatalogOverviewApp(): React.ReactElement {
@@ -68,7 +67,7 @@ function CatalogOverviewApp(): React.ReactElement {
 
   return (
     <StacBrowser
-      items={catalogData.items as unknown as StacBrowserItem[]}
+      items={catalogData.items}
       taxonomy={[]}
       onItemSelect={handleItemSelect}
     />
