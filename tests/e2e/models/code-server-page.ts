@@ -43,17 +43,21 @@ export class CodeServerPage {
       timeout: 30_000,
     });
 
-    // Brief pause for extensions to activate
-    await this.page.waitForTimeout(2_000);
+    // Wait for extensions to activate — poll for the activity bar to have
+    // custom viewlet icons (indicates extensions contributed views).
+    await this.page
+      .locator('.activitybar .action-item')
+      .nth(2)
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .catch(() => {});
 
     // Close the Welcome tab if open — it captures keyboard focus into an
     // iframe, preventing command palette and Quick Open from working.
     await this.page.keyboard.press('Control+KeyW');
-    await this.page.waitForTimeout(500);
+    await this.page.waitForTimeout(200);
 
     // Click the title bar to ensure main window has focus (not an iframe)
     await this.page.locator('.part.titlebar').click().catch(() => {});
-    await this.page.waitForTimeout(300);
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -102,8 +106,12 @@ export class CodeServerPage {
     await this.commandInput.fill(relativePath);
     await this.page.keyboard.press('Enter');
 
-    // Wait for editor to open the file
-    await this.page.waitForTimeout(1_000);
+    // Wait for an editor tab to appear with the filename
+    const basename = relativePath.split('/').pop() ?? relativePath;
+    await this.page
+      .locator(`.tab:has-text("${basename}")`)
+      .waitFor({ state: 'visible', timeout: 5_000 })
+      .catch(() => {});
   }
 
   /**
@@ -119,7 +127,7 @@ export class CodeServerPage {
     await this.focusStacView();
 
     // Wait for extension to finish activating
-    await this.waitForExtensionReady(20_000);
+    await this.waitForExtensionReady(10_000);
 
     // Ensure the STAC STORES pane is expanded
     await this.ensureStacPaneExpanded();
@@ -127,7 +135,7 @@ export class CodeServerPage {
     // Wait for tree to populate with a store row
     const storeRow = page.locator('.monaco-list-row:has-text("STAC:")').first();
     let storeRowVisible = await storeRow
-      .waitFor({ state: 'visible', timeout: 15_000 })
+      .waitFor({ state: 'visible', timeout: 10_000 })
       .then(() => true)
       .catch(() => false);
 
@@ -137,11 +145,11 @@ export class CodeServerPage {
 
       // Retry: focus STAC view, wait for extension, expand pane
       await this.focusStacView();
-      await this.waitForExtensionReady(20_000);
+      await this.waitForExtensionReady(10_000);
       await this.ensureStacPaneExpanded();
 
       storeRowVisible = await storeRow
-        .waitFor({ state: 'visible', timeout: 15_000 })
+        .waitFor({ state: 'visible', timeout: 10_000 })
         .then(() => true)
         .catch(() => false);
       if (!storeRowVisible) {
@@ -158,7 +166,6 @@ export class CodeServerPage {
     if (storeCollapsed) {
       await storeTwistie.click();
     }
-    await page.waitForTimeout(2_000);
 
     // Wait for tree children — plot node may be directly visible if VS Code
     // auto-expanded, or we may need to expand the catalog node first
@@ -166,8 +173,8 @@ export class CodeServerPage {
     const catalogNode = page.locator('.monaco-list-row:has-text("plots")').first();
 
     const firstVisible = await Promise.race([
-      catalogNode.waitFor({ state: 'visible', timeout: 20_000 }).then(() => 'catalog' as const),
-      plotNode.waitFor({ state: 'visible', timeout: 20_000 }).then(() => 'plot' as const),
+      catalogNode.waitFor({ state: 'visible', timeout: 10_000 }).then(() => 'catalog' as const),
+      plotNode.waitFor({ state: 'visible', timeout: 10_000 }).then(() => 'plot' as const),
     ]).catch(async () => {
       const allRows = await page.locator('.monaco-list-row').allTextContents();
       await page.screenshot({ path: 'tests/e2e/evidence/debug-no-catalog-row.png' });
@@ -184,21 +191,26 @@ export class CodeServerPage {
       if (catalogCollapsed) {
         await catalogTwistie.click();
       }
-      await page.waitForTimeout(2_000);
+      // Wait for the plot node to appear after expanding
+      await plotNode.waitFor({ state: 'visible', timeout: 5_000 });
     }
 
     // Click the plot node to open it (triggers debrief.openPlot → MapPanel)
-    await plotNode.waitFor({ state: 'visible', timeout: 10_000 });
+    await plotNode.waitFor({ state: 'visible', timeout: 5_000 });
     await plotNode.click();
 
     // Wait for the webview iframe to appear
     await page
       .locator('iframe.webview')
       .first()
-      .waitFor({ state: 'attached', timeout: 30_000 });
+      .waitFor({ state: 'attached', timeout: 15_000 });
 
-    // Wait briefly for webview content to load
-    await page.waitForTimeout(3_000);
+    // Wait for the webview to become ready (has .ready class)
+    await page
+      .locator('iframe.webview.ready')
+      .first()
+      .waitFor({ state: 'attached', timeout: 10_000 })
+      .catch(() => {});
   }
 
   /**
@@ -212,7 +224,9 @@ export class CodeServerPage {
     await this.commandInput.fill(command);
 
     // Wait for suggestions to appear, then select the first match
-    await this.page.waitForTimeout(500);
+    await this.page.locator('.quick-input-list .monaco-list-row').first()
+      .waitFor({ state: 'visible', timeout: 3_000 })
+      .catch(() => {});
     await this.page.keyboard.press('Enter');
   }
 
@@ -300,7 +314,11 @@ export class CodeServerPage {
       ].join(', ')
     ).first();
     await debriefIcon.click();
-    await this.page.waitForTimeout(2_000);
+    // Wait for the sidebar content to render
+    await this.page.locator('.composite.viewlet').waitFor({
+      state: 'visible',
+      timeout: 5_000,
+    }).catch(() => {});
   }
 
   /**
@@ -314,11 +332,10 @@ export class CodeServerPage {
   async getActivityPanelFrame(): Promise<FrameLocator> {
     // Ensure the Debrief sidebar is open
     await this.openDebriefSidebar();
-    await this.page.waitForTimeout(2_000);
 
     // Find the Activity Panel webview by probing frame content.
     // The Activity Panel renders .debrief-activity-panel as its root element.
-    return this.findWebviewFrameByContent('.debrief-activity-panel', 20_000);
+    return this.findWebviewFrameByContent('.debrief-activity-panel', 15_000);
   }
 
   /**
@@ -335,15 +352,13 @@ export class CodeServerPage {
 
     // Try to focus the Log Panel view via command palette
     await this.page.keyboard.press('Control+Shift+P');
-    await this.page.waitForTimeout(500);
-    await this.page.keyboard.type('Debrief Log: Focus on Debrief Log View', { delay: 20 });
-    await this.page.waitForTimeout(1_000);
+    await this.commandInput.waitFor({ state: 'visible', timeout: 3_000 });
+    await this.commandInput.fill('Debrief Log: Focus on Debrief Log View');
     await this.page.keyboard.press('Enter');
-    await this.page.waitForTimeout(2_000);
 
     // Find the Log Panel webview by probing frame content.
     // The Log Panel renders [data-testid="log-panel"] as its root element.
-    return this.findWebviewFrameByContent('[data-testid="log-panel"]', 20_000);
+    return this.findWebviewFrameByContent('[data-testid="log-panel"]', 15_000);
   }
 
   /**
@@ -383,7 +398,7 @@ export class CodeServerPage {
           }
         }
       }
-      await this.page.waitForTimeout(1_000);
+      await this.page.waitForTimeout(500);
     }
     throw new Error(`Webview frame with content "${selector}" not found after ${timeoutMs}ms`);
   }
@@ -402,11 +417,13 @@ export class CodeServerPage {
   /** Focus the STAC Stores view via command palette. */
   private async focusStacView(): Promise<void> {
     await this.page.keyboard.press('Control+Shift+P');
-    await this.page.waitForTimeout(500);
-    await this.page.keyboard.type('View: Focus on STAC Stores View', { delay: 20 });
-    await this.page.waitForTimeout(1_000);
+    await this.commandInput.waitFor({ state: 'visible', timeout: 3_000 });
+    await this.commandInput.fill('View: Focus on STAC Stores View');
     await this.page.keyboard.press('Enter');
-    await this.page.waitForTimeout(2_000);
+    // Wait for the STAC pane header to appear (confirms view focused)
+    await this.page.locator('.pane-header:has-text("STAC STORES")')
+      .waitFor({ state: 'visible', timeout: 5_000 })
+      .catch(() => {});
   }
 
   /** Poll until the extension finishes loading stores. */
@@ -418,7 +435,7 @@ export class CodeServerPage {
         .isVisible()
         .catch(() => false);
       if (!loadingVisible) return true;
-      await this.page.waitForTimeout(2_000);
+      await this.page.waitForTimeout(500);
     }
     return false;
   }
@@ -426,23 +443,29 @@ export class CodeServerPage {
   /** Ensure the STAC STORES pane is expanded (not collapsed). */
   private async ensureStacPaneExpanded(): Promise<void> {
     const stacHeader = this.page.locator('.pane-header:has-text("STAC STORES")');
-    await stacHeader.waitFor({ state: 'visible', timeout: 30_000 }).catch(async () => {
+    await stacHeader.waitFor({ state: 'visible', timeout: 10_000 }).catch(async () => {
       await this.page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-pane.png' });
-      throw new Error('STAC STORES pane header not visible after 30s');
+      throw new Error('STAC STORES pane header not visible after 10s');
     });
 
     const expanded = await stacHeader.getAttribute('aria-expanded');
     if (expanded === 'false') {
       await stacHeader.click();
-      await this.page.waitForTimeout(1_500);
+      // Wait for list rows to appear (confirms pane expanded)
+      await this.page.locator('.monaco-list-row').first()
+        .waitFor({ state: 'visible', timeout: 3_000 })
+        .catch(() => {});
     } else if (expanded === null) {
       await stacHeader.click();
-      await this.page.waitForTimeout(1_500);
-      const hasRows = await this.page.locator('.monaco-list-row').count();
-      if (hasRows === 0) {
-        await stacHeader.click();
-        await this.page.waitForTimeout(1_500);
-      }
+      await this.page.locator('.monaco-list-row').first()
+        .waitFor({ state: 'visible', timeout: 3_000 })
+        .catch(async () => {
+          // Toggle again — may have collapsed
+          await stacHeader.click();
+          await this.page.locator('.monaco-list-row').first()
+            .waitFor({ state: 'visible', timeout: 3_000 })
+            .catch(() => {});
+        });
     }
   }
 
@@ -452,7 +475,10 @@ export class CodeServerPage {
 
     // Open terminal
     await page.keyboard.press('Control+Backquote');
-    await page.waitForTimeout(2_000);
+    await page.locator('.terminal-widget').waitFor({
+      state: 'visible',
+      timeout: 5_000,
+    }).catch(() => {});
 
     // Detect workspace path from the terminal's current directory.
     // code-server opens in the workspace root; openvscode-server may differ.
@@ -464,19 +490,20 @@ export class CodeServerPage {
       '> ~/.config/debrief/config.json';
     await page.keyboard.type(configCmd, { delay: 5 });
     await page.keyboard.press('Enter');
-    await page.waitForTimeout(2_000);
+    await page.waitForTimeout(1_000);
     await page.keyboard.press('Control+Backquote'); // close terminal
 
     // Reload window
     await page.keyboard.press('Control+Shift+P');
-    await page.waitForTimeout(500);
-    await page.keyboard.type('Developer: Reload Window', { delay: 20 });
-    await page.waitForTimeout(1_000);
+    await this.commandInput.waitFor({ state: 'visible', timeout: 3_000 });
+    await this.commandInput.fill('Developer: Reload Window');
     await page.keyboard.press('Enter');
 
-    // Wait for reload
-    await page.waitForTimeout(5_000);
+    // Wait for reload — workbench disappears and reappears
     await page.locator('.monaco-workbench').waitFor({ state: 'visible', timeout: 30_000 });
-    await page.waitForTimeout(3_000);
+    await page.waitForSelector('.editor-group-container', {
+      state: 'visible',
+      timeout: 30_000,
+    });
   }
 }

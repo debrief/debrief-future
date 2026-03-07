@@ -78,7 +78,7 @@ export default defineConfig({
   testMatch: '*.spec.ts',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: 1,
+  retries: process.env.CI ? 0 : 1,
   workers: 1,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {

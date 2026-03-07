@@ -68,7 +68,7 @@ jobs:
   vscode:
     name: VS Code E2E
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     steps:
       - uses: actions/checkout@v4
@@ -119,6 +119,15 @@ jobs:
           curl -fsSL "$OVS_URL" | tar xz -C /tmp
           sudo mv "/tmp/openvscode-server-v${OVS_VERSION}-linux-x64" /opt/openvscode-server
           sudo ln -sf /opt/openvscode-server/bin/openvscode-server /usr/local/bin/openvscode-server
+
+      # Patch openvscode-server webview files for E2E testing.
+      # Without these patches, webview iframes appear but #active-frame
+      # (where React/Leaflet renders) is never created because:
+      #   1. Service worker blocks workerReady
+      #   2. CSP hash mismatch prevents modified script execution
+      #   3. Origin hash guard silently drops webview-ready messages
+      - name: Patch webview for E2E
+        run: bash tests/e2e/scripts/patch-webview.sh /opt/openvscode-server
 
       # Install extension into openvscode-server
       # Use the same user-data-dir that the server will use so it finds the extension
