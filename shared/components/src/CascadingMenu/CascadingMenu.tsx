@@ -16,6 +16,8 @@ export interface CascadingMenuProps {
   readonly items: readonly CascadingMenuItem[];
   readonly anchorPosition: { x: number; y: number };
   readonly header?: string;
+  /** When true, branch nodes (items with submenu) are clickable/selectable too */
+  readonly selectableBranches?: boolean;
   readonly onSelect: (itemId: string) => void;
   readonly onDismiss: () => void;
 }
@@ -30,6 +32,7 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
   items,
   anchorPosition,
   header,
+  selectableBranches,
   onSelect,
   onDismiss,
 }) => {
@@ -139,7 +142,7 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
           e.preventDefault();
           const item = items[highlightedIndex];
           if (item && !item.disabled) {
-            if (item.submenu) {
+            if (item.submenu && !selectableBranches) {
               const itemElement = menuRef.current?.querySelector(
                 `[data-item-index="${highlightedIndex}"]`
               ) as HTMLElement;
@@ -167,7 +170,7 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [highlightedIndex, items, enabledItems, onSelect, onDismiss]);
+  }, [highlightedIndex, items, enabledItems, onSelect, onDismiss, selectableBranches]);
 
   const handleMouseEnter = useCallback((index: number, item: CascadingMenuItem) => {
     if (item.disabled) return;
@@ -210,14 +213,14 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
     (item: CascadingMenuItem) => {
       if (item.disabled) return;
 
-      if (item.submenu) {
+      if (item.submenu && !selectableBranches) {
         // Submenu handled by hover
         return;
       }
 
       onSelect(item.id);
     },
-    [onSelect]
+    [onSelect, selectableBranches]
   );
 
   const handleSubmenuSelect = useCallback(
@@ -275,6 +278,7 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
         <SubmenuPanel
           items={submenu.items}
           anchorRect={submenu.anchorRect}
+          selectableBranches={selectableBranches}
           onSelect={handleSubmenuSelect}
           onDismiss={() => setSubmenu(null)}
         />
@@ -286,11 +290,12 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
 interface SubmenuPanelProps {
   readonly items: readonly CascadingMenuItem[];
   readonly anchorRect: DOMRect;
+  readonly selectableBranches?: boolean;
   readonly onSelect: (itemId: string) => void;
   readonly onDismiss: () => void;
 }
 
-const SubmenuPanel: React.FC<SubmenuPanelProps> = ({ items, anchorRect, onSelect, onDismiss }) => {
+const SubmenuPanel: React.FC<SubmenuPanelProps> = ({ items, anchorRect, selectableBranches, onSelect, onDismiss }) => {
   const submenuRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ left: 0, top: 0 });
   const [highlightedIndex, setHighlightedIndex] = useState(0);
@@ -383,7 +388,7 @@ const SubmenuPanel: React.FC<SubmenuPanelProps> = ({ items, anchorRect, onSelect
           e.preventDefault();
           const item = items[highlightedIndex];
           if (item && !item.disabled) {
-            if (item.submenu) {
+            if (item.submenu && !selectableBranches) {
               const itemElement = submenuRef.current?.querySelector(
                 `[data-item-index="${highlightedIndex}"]`
               ) as HTMLElement;
@@ -411,7 +416,7 @@ const SubmenuPanel: React.FC<SubmenuPanelProps> = ({ items, anchorRect, onSelect
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [highlightedIndex, items, enabledItems, onSelect, onDismiss]);
+  }, [highlightedIndex, items, enabledItems, onSelect, onDismiss, selectableBranches]);
 
   const handleMouseEnter = useCallback((index: number, item: CascadingMenuItem) => {
     if (item.disabled) return;
@@ -453,13 +458,13 @@ const SubmenuPanel: React.FC<SubmenuPanelProps> = ({ items, anchorRect, onSelect
     (item: CascadingMenuItem) => {
       if (item.disabled) return;
 
-      if (item.submenu) {
+      if (item.submenu && !selectableBranches) {
         return;
       }
 
       onSelect(item.id);
     },
-    [onSelect]
+    [onSelect, selectableBranches]
   );
 
   return (
@@ -509,6 +514,7 @@ const SubmenuPanel: React.FC<SubmenuPanelProps> = ({ items, anchorRect, onSelect
         <SubmenuPanel
           items={nestedSubmenu.items}
           anchorRect={nestedSubmenu.anchorRect}
+          selectableBranches={selectableBranches}
           onSelect={onSelect}
           onDismiss={() => setNestedSubmenu(null)}
         />

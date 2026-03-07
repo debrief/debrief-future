@@ -47,6 +47,7 @@ function makeItem(overrides: Partial<StacBrowserItem> = {}): StacBrowserItem {
     trackNames: ["HMS Argyll", "USS Porter"],
     nationalities: ["GB", "US"],
     collection: "exercises-2025",
+    modified: "2025-06-01T10:00:00Z",
     ...overrides,
   };
 }
@@ -79,32 +80,24 @@ describe("vessel-class matcher", () => {
   });
 });
 
-describe("plot-tag matcher", () => {
-  const match = getMatcher("plot-tag");
+describe("tag matcher (merged plot-tag + feature-tag)", () => {
+  const match = getMatcher("tag");
 
-  it("matches exact tag (case-insensitive)", () => {
+  it("matches plot tag (case-insensitive)", () => {
     expect(match(makeItem(), "asw", DESC_MAP)).toBe(true);
     expect(match(makeItem(), "ASW", DESC_MAP)).toBe(true);
+  });
+
+  it("matches feature tag (case-insensitive)", () => {
+    expect(match(makeItem(), "Sonar-Contact", DESC_MAP)).toBe(true);
   });
 
   it("does not match absent tag", () => {
     expect(match(makeItem(), "convoy", DESC_MAP)).toBe(false);
   });
 
-  it("returns false for empty tags", () => {
-    expect(match(makeItem({ tags: [] }), "ASW", DESC_MAP)).toBe(false);
-  });
-});
-
-describe("feature-tag matcher", () => {
-  const match = getMatcher("feature-tag");
-
-  it("matches case-insensitively", () => {
-    expect(match(makeItem(), "Sonar-Contact", DESC_MAP)).toBe(true);
-  });
-
-  it("does not match absent tag", () => {
-    expect(match(makeItem(), "torpedo", DESC_MAP)).toBe(false);
+  it("returns false for empty tags and featureTags", () => {
+    expect(match(makeItem({ tags: [], featureTags: [] }), "ASW", DESC_MAP)).toBe(false);
   });
 });
 
@@ -203,6 +196,33 @@ describe("nationality matcher", () => {
 
   it("does not match absent nationality", () => {
     expect(match(makeItem(), "FR", DESC_MAP)).toBe(false);
+  });
+});
+
+describe("modified matcher", () => {
+  const match = getMatcher("modified");
+
+  it("matches recently modified item with <7D", () => {
+    const recentItem = makeItem({ modified: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() });
+    expect(match(recentItem, "<7D", DESC_MAP)).toBe(true);
+  });
+
+  it("does not match old item with <6H", () => {
+    const oldItem = makeItem({ modified: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString() });
+    expect(match(oldItem, "<6H", DESC_MAP)).toBe(false);
+  });
+
+  it("matches old item with >1M", () => {
+    const oldItem = makeItem({ modified: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString() });
+    expect(match(oldItem, ">1M", DESC_MAP)).toBe(true);
+  });
+
+  it("returns false for null modified", () => {
+    expect(match(makeItem({ modified: null }), "<7D", DESC_MAP)).toBe(false);
+  });
+
+  it("returns false for unknown bucket", () => {
+    expect(match(makeItem(), "INVALID", DESC_MAP)).toBe(false);
   });
 });
 

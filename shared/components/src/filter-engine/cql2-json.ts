@@ -9,11 +9,12 @@ import type { FilterExpression, FilterType, Predicate } from "./types";
 /** CQL2 property name mapping for each filter type */
 const PROPERTY_MAP: Record<FilterType, string> = {
   "vessel-class": "debrief:vessel_classes",
-  "plot-tag": "debrief:tags",
-  "feature-tag": "debrief:feature_tags",
+  tag: "debrief:tags",
   author: "debrief:author",
   duration: "duration",
+  modified: "updated",
   title: "title",
+  "plot-contents": "debrief:plot_contents",
   "track-name": "debrief:track_names",
   nationality: "debrief:nationalities",
   collection: "collection",
@@ -22,8 +23,7 @@ const PROPERTY_MAP: Record<FilterType, string> = {
 /** Array-valued filter types that use a_containedBy operator */
 const ARRAY_TYPES: ReadonlySet<FilterType> = new Set([
   "vessel-class",
-  "plot-tag",
-  "feature-tag",
+  "tag",
   "track-name",
   "nationality",
 ]);
@@ -32,27 +32,33 @@ const ARRAY_TYPES: ReadonlySet<FilterType> = new Set([
 function predicateToCql2(predicate: Predicate): Record<string, unknown> {
   const property = PROPERTY_MAP[predicate.type];
 
-  // Title uses LIKE with wildcards
-  if (predicate.type === "title") {
-    return {
+  let expr: Record<string, unknown>;
+
+  // Title and plot-contents use LIKE with wildcards (free-text substring match)
+  if (predicate.type === "title" || predicate.type === "plot-contents") {
+    expr = {
       op: "like",
       args: [{ property }, `%${predicate.value}%`],
     };
-  }
-
-  // Array-valued properties use a_containedBy
-  if (ARRAY_TYPES.has(predicate.type)) {
-    return {
+  } else if (ARRAY_TYPES.has(predicate.type)) {
+    // Array-valued properties use a_containedBy
+    expr = {
       op: "a_containedBy",
       args: [[predicate.value], { property }],
     };
+  } else {
+    // Scalar properties use equality
+    expr = {
+      op: "=",
+      args: [{ property }, predicate.value],
+    };
   }
 
-  // Scalar properties use equality
-  return {
-    op: "=",
-    args: [{ property }, predicate.value],
-  };
+  // Wrap in NOT if negated
+  if (predicate.negated) {
+    return { op: "not", args: [expr] };
+  }
+  return expr;
 }
 
 /**

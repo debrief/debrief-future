@@ -48,6 +48,7 @@ function makeItem(
     trackNames: [],
     nationalities: [],
     collection: null,
+    modified: null,
     ...overrides,
   };
 }
@@ -153,7 +154,7 @@ describe("OR logic", () => {
 
   it("AND'd top-level predicates with OR group", () => {
     const expr: FilterExpression = {
-      predicates: [{ type: "plot-tag", value: "ASW" }],
+      predicates: [{ type: "tag", value: "ASW" }],
       orGroups: [
         {
           predicates: [
@@ -174,7 +175,7 @@ describe("OR logic", () => {
       predicates: [{ type: "nationality", value: "GB" }],
       orGroups: [
         {
-          predicates: [{ type: "plot-tag", value: "ASW" }],
+          predicates: [{ type: "tag", value: "ASW" }],
         },
       ],
     };
@@ -219,5 +220,34 @@ describe("OR logic", () => {
       ],
     };
     expect(engine.filter(ITEMS, expr)).toHaveLength(0);
+  });
+
+  it("negated predicate excludes matching items", () => {
+    const expr: FilterExpression = {
+      predicates: [{ type: "nationality", value: "GB", negated: true }],
+      orGroups: [],
+    };
+    // Items 1, 3 have GB — negated excludes them; items 2 (US) and 4 (FR) remain
+    const result = engine.filter(ITEMS, expr);
+    expect(result).toHaveLength(2);
+    expect(result.map((i) => i.id)).toEqual(["2", "4"]);
+  });
+
+  it("negated predicate in OR group inverts match", () => {
+    const expr: FilterExpression = {
+      predicates: [],
+      orGroups: [
+        {
+          predicates: [
+            { type: "nationality", value: "FR" },
+            { type: "nationality", value: "US", negated: true },
+          ],
+        },
+      ],
+    };
+    // FR matches item 4; NOT US matches items 1, 3, 4 → union = items 1, 3, 4
+    const result = engine.filter(ITEMS, expr);
+    expect(result).toHaveLength(3);
+    expect(result.map((i) => i.id)).toEqual(["1", "3", "4"]);
   });
 });

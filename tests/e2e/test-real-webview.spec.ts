@@ -14,7 +14,7 @@ import {
 } from './helpers/webview-injector';
 
 test.describe('Real Webview Screenshot', () => {
-  test.setTimeout(120_000);
+  test.setTimeout(60_000);
 
   test('map panel + activity panel combined', async ({ codeServerPage }) => {
     const page = codeServerPage.page;

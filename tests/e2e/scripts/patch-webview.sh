@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Patch code-server's webview files for E2E testing.
+# Patch VS Code server's webview files for E2E testing.
 #
 # Two patches are applied:
 #
@@ -13,21 +13,27 @@
 # These patches enable Playwright to interact with webview content via the
 # MessagePort-based content injection pattern.
 #
-# Usage:
-#   bash tests/e2e/scripts/patch-webview.sh [CODE_SERVER_DIR]
+# Works with both code-server and openvscode-server:
+#   code-server:        .../lib/vscode/out/vs/...
+#   openvscode-server:  .../out/vs/...
 #
-# CODE_SERVER_DIR defaults to /opt/code-server
+# Usage:
+#   bash tests/e2e/scripts/patch-webview.sh [SERVER_DIR]
+#
+# SERVER_DIR defaults to /opt/openvscode-server
 #
 # See docs/project_notes/webview-e2e-research.md for full analysis.
 
 set -euo pipefail
 
-CODE_SERVER_DIR="${1:-/opt/code-server}"
+SERVER_DIR="${1:-/opt/openvscode-server}"
 
-# Find the VS Code installation directory
-VSCODE_DIR=$(find "$CODE_SERVER_DIR" -path "*/lib/vscode/out/vs/workbench/contrib/webview/browser/pre" -type d 2>/dev/null | head -1)
+# Find the webview pre directory — try both code-server and openvscode-server layouts
+VSCODE_DIR=$(find "$SERVER_DIR" -path "*/vs/workbench/contrib/webview/browser/pre" -type d 2>/dev/null | head -1)
 if [ -z "$VSCODE_DIR" ]; then
-  echo "ERROR: Could not find VS Code webview directory in $CODE_SERVER_DIR" >&2
+  echo "ERROR: Could not find VS Code webview directory in $SERVER_DIR" >&2
+  echo "  Searched for: */vs/workbench/contrib/webview/browser/pre" >&2
+  find "$SERVER_DIR" -name "pre" -type d 2>/dev/null | head -5 >&2
   exit 1
 fi
 
@@ -56,20 +62,21 @@ else
 fi
 
 # Patch 2: workbench.js — remove origin hash guard
-WORKBENCH_DIR=$(find "$CODE_SERVER_DIR" -path "*/lib/vscode/out/vs/code/browser/workbench" -type d 2>/dev/null | head -1)
-if [ -z "$WORKBENCH_DIR" ]; then
-  echo "WARNING: Could not find workbench.js directory" >&2
+# Search broadly for any workbench.js under the server directory
+WORKBENCH_JS=$(find "$SERVER_DIR" -path "*/vs/code/browser/workbench/workbench.js" -type f 2>/dev/null | head -1)
+if [ -z "$WORKBENCH_JS" ]; then
+  echo "WARNING: Could not find workbench.js" >&2
+  echo "  Searched for: */vs/code/browser/workbench/workbench.js" >&2
+  find "$SERVER_DIR" -name "workbench.js" -type f 2>/dev/null | head -5 >&2
 else
-  WORKBENCH_JS="$WORKBENCH_DIR/workbench.js"
-  if [ -f "$WORKBENCH_JS" ]; then
-    echo "Patching $WORKBENCH_JS..."
-    cp "$WORKBENCH_JS" "${WORKBENCH_JS}.bak" 2>/dev/null || true
+  echo "Patching $WORKBENCH_JS..."
+  cp "$WORKBENCH_JS" "${WORKBENCH_JS}.bak" 2>/dev/null || true
 
-    # Remove the this.g guard: change
-    #   if(!(!this.g||i?.data?.target!==this.a)){if(i.origin!==this.nb(this.g)){
-    # to:
-    #   if(i?.data?.target===this.a){if(this.g&&i.origin!==this.nb(this.g)){
-    python3 -c "
+  # Remove the this.g guard: change
+  #   if(!(!this.g||i?.data?.target!==this.a)){if(i.origin!==this.nb(this.g)){
+  # to:
+  #   if(i?.data?.target===this.a){if(this.g&&i.origin!==this.nb(this.g)){
+  python3 -c "
 import sys
 with open('$WORKBENCH_JS', 'r') as f:
     content = f.read()
@@ -83,7 +90,6 @@ if old in content:
 else:
     print('  - Origin hash guard already patched or not found')
 "
-  fi
 fi
 
 echo "Webview patches complete."
