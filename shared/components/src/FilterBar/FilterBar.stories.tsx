@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { useState, useCallback } from 'react';
 import { FilterBar } from './FilterBar';
 import { ThemeProvider } from '../ThemeProvider';
+import { InMemoryStorage } from './savedFiltersStorage';
 import type { StacBrowserItem, VesselTaxonomyNode } from '../filter-engine';
 import type { FilterBarState } from './types';
 
@@ -323,6 +324,42 @@ export const ZeroResults: Story = {
     docs: {
       description: {
         story: 'Add incompatible filters (e.g., Nationality: German + Author: CDR Smith) to see the "0 of 5" state.',
+      },
+    },
+  },
+};
+
+export const WithSavedFilters: Story = {
+  name: 'With Saved Filters',
+  render: () => {
+    const storage = new InMemoryStorage({
+      version: 1,
+      configurations: [
+        {
+          id: 'demo-saved-1',
+          name: 'French Exercises',
+          filterBarState: SINGLE_FILTER_STATE,
+          cql2Json: {},
+          createdAt: '2026-03-01T10:00:00.000Z',
+          updatedAt: '2026-03-01T10:00:00.000Z',
+        },
+      ],
+    });
+    return (
+      <div>
+        <FilterBar
+          items={MOCK_ITEMS}
+          taxonomy={MOCK_TAXONOMY}
+          onFilteredItems={() => {}}
+          savedFiltersStorage={storage}
+        />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'FilterBar with saved filters integration. Use Save to persist and Historic Filters to restore.',
       },
     },
   },
