@@ -119,3 +119,59 @@ export function isPointInBounds(lon: number, lat: number, bounds: Bounds): boole
   const [minLon, minLat, maxLon, maxLat] = bounds;
   return lon >= minLon && lon <= maxLon && lat >= minLat && lat <= maxLat;
 }
+
+/**
+ * Check whether two axis-aligned bounding boxes overlap.
+ * Handles antimeridian crossing: when west > east the bbox is split
+ * into two halves for testing. west === east is treated as a zero-width
+ * bbox (degenerate point), NOT as an antimeridian crossing.
+ *
+ * @param itemBbox  - Item bounding box [west, south, east, north]
+ * @param viewportBbox - Viewport bounding box [west, south, east, north]
+ * @returns true if the two boxes overlap (including edge-touching)
+ */
+export function bboxOverlapsViewport(itemBbox: Bounds, viewportBbox: Bounds): boolean {
+  const [iW, iS, iE, iN] = itemBbox;
+  const [vW, vS, vE, vN] = viewportBbox;
+
+  // Latitude check — independent of antimeridian
+  if (iN < vS || iS > vN) return false;
+
+  const itemCrosses = iW > iE;
+  const vpCrosses = vW > vE;
+
+  if (!itemCrosses && !vpCrosses) {
+    // Standard AABB overlap on longitude
+    return !(iE < vW || iW > vE);
+  }
+
+  if (itemCrosses && !vpCrosses) {
+    // Item crosses antimeridian → split item into [iW, 180] and [-180, iE]
+    return !(vE < iW && vW > iE);
+  }
+
+  if (!itemCrosses && vpCrosses) {
+    // Viewport crosses antimeridian → split viewport
+    return !(iE < vW && iW > vE);
+  }
+
+  // Both cross antimeridian — they always overlap longitudinally
+  return true;
+}
+
+/**
+ * Filter items to those whose bbox overlaps the given viewport.
+ * Items without a bbox are excluded.
+ *
+ * @param items - Array of items with an optional bbox property
+ * @param viewportBbox - Current viewport bounds
+ * @returns Filtered array of items whose bbox overlaps the viewport
+ */
+export function filterBySpatialExtent<T extends { bbox: Bounds | null }>(
+  items: readonly T[],
+  viewportBbox: Bounds,
+): T[] {
+  return items.filter(
+    (item): item is T => item.bbox !== null && bboxOverlapsViewport(item.bbox, viewportBbox),
+  );
+}

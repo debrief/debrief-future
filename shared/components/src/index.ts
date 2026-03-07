@@ -59,7 +59,7 @@ export { useTheme } from './hooks/useTheme';
 export { useTemporalTrack } from './MapView/useTemporalTrack';
 
 // Types
-export type { DebriefFeature, DebriefFeatureCollection, AnnotationFeature, TrackFeature, ReferenceLocation } from './utils/types';
+export type { DebriefFeature, DebriefFeatureCollection, AnnotationFeature, TrackFeature, ReferenceLocation, Bounds } from './utils/types';
 export {
   isTrackFeature,
   isReferenceLocation,
@@ -70,7 +70,7 @@ export {
 } from './utils/types';
 
 // Utilities
-export { calculateBounds } from './utils/bounds';
+export { calculateBounds, bboxOverlapsViewport, filterBySpatialExtent } from './utils/bounds';
 export {
   calculateTimeExtent,
   parseDuration,
