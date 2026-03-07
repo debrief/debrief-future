@@ -59,10 +59,10 @@
 
 **Purpose**: Project structure, shared types, and configuration
 
-- [ ] T001 Create TimelineView component directory `shared/components/src/TimelineView/`
-- [ ] T002 [P] Create shared temporal types (TimeSpan, extract TimeFilter/TimeInstant) `shared/components/src/utils/temporal-types.ts`
-- [ ] T003 [P] Create TimelineView barrel export `shared/components/src/TimelineView/index.ts`
-- [ ] T004 Add TimelineView export to package index `shared/components/src/index.ts`
+- [x] T001 Create TimelineView component directory `shared/components/src/TimelineView/`
+- [x] T002 [P] Create shared temporal types (TimeSpan, extract TimeFilter/TimeInstant) `shared/components/src/utils/temporal-types.ts`
+- [x] T003 [P] Create TimelineView barrel export `shared/components/src/TimelineView/index.ts`
+- [x] T004 Add TimelineView export to package index `shared/components/src/index.ts`
 
 ---
 
@@ -76,22 +76,22 @@
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation (Art. VII)
 
-- [ ] T005 [P] Write unit tests for `computeTimeRange` (empty, single item, range, same-datetime padding) `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
-- [ ] T006 [P] Write unit tests for `computeBarX` and `computeBarWidth` (positioning math, min-width 4px) `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
-- [ ] T007 [P] Write unit tests for `formatTimeByRange` (5 granularity tiers: <24h, <7d, <90d, <2y, >=2y) `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
-- [ ] T008 [P] Write unit tests for `formatDateRange` (range, single datetime, missing data) `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
-- [ ] T009 [P] Write unit tests for `itemOverlapsFilter` (overlap, no overlap, no-time-data excluded) `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
+- [x] T005 [P] Write unit tests for `computeTimeRange` (empty, single item, range, same-datetime padding) `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
+- [x] T006 [P] Write unit tests for `computeBarX` and `computeBarWidth` (positioning math, min-width 4px) `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
+- [x] T007 [P] Write unit tests for `formatTimeByRange` (5 granularity tiers: <24h, <7d, <90d, <2y, >=2y) `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
+- [x] T008 [P] Write unit tests for `formatDateRange` (range, single datetime, missing data) `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
+- [x] T009 [P] Write unit tests for `itemOverlapsFilter` (overlap, no overlap, no-time-data excluded) `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
 
 ### Implementation
 
-- [ ] T010 Implement `computeTimeRange(items: CatalogOverviewItem[]): TimeSpan | null` with ±1h padding for same-datetime `shared/components/src/utils/timeline-helpers.ts`
-- [ ] T011 [P] Implement `computeBarX` and `computeBarWidth` (reuse math from Timeline/canvas/TimeAxis.ts `timeToX`) `shared/components/src/utils/timeline-helpers.ts`
-- [ ] T012 [P] Implement `formatTimeByRange(epoch: number, rangeSpan: number): string` using Intl.DateTimeFormat `shared/components/src/utils/timeline-helpers.ts`
-- [ ] T013 [P] Implement `formatDateRange(start, end, datetime): string` `shared/components/src/utils/timeline-helpers.ts`
-- [ ] T014 [P] Implement `itemOverlapsFilter(item: StacBrowserItem, filter: TimeFilter): boolean` `shared/components/src/utils/timeline-helpers.ts`
-- [ ] T015 Update CatalogOverview to import `computeTimeRange` and `formatDateRange` from utils `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T016 Update CatalogOverview tests to import from utils (remove local copies of parseTime/computeTimeRange) `shared/components/src/CatalogOverview/__tests__/timeline.test.ts`
-- [ ] T017 **GATE**: Verify CatalogOverview tests still pass after import refactoring: `pnpm --filter @debrief/components test`
+- [x] T010 Implement `computeTimeRange(items: CatalogOverviewItem[]): TimeSpan | null` with ±1h padding for same-datetime `shared/components/src/utils/timeline-helpers.ts`
+- [x] T011 [P] Implement `computeBarX` and `computeBarWidth` (reuse math from Timeline/canvas/TimeAxis.ts `timeToX`) `shared/components/src/utils/timeline-helpers.ts`
+- [x] T012 [P] Implement `formatTimeByRange(epoch: number, rangeSpan: number): string` using Intl.DateTimeFormat `shared/components/src/utils/timeline-helpers.ts`
+- [x] T013 [P] Implement `formatDateRange(start, end, datetime): string` `shared/components/src/utils/timeline-helpers.ts`
+- [x] T014 [P] Implement `itemOverlapsFilter(item: StacBrowserItem, filter: TimeFilter): boolean` `shared/components/src/utils/timeline-helpers.ts`
+- [x] T015 Update CatalogOverview to import `computeTimeRange` and `formatDateRange` from utils `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T016 Update CatalogOverview tests to import from utils (remove local copies of parseTime/computeTimeRange) `shared/components/src/CatalogOverview/__tests__/timeline.test.ts`
+- [x] T017 **GATE**: Verify CatalogOverview tests still pass after import refactoring: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: All timeline utilities in `utils/`, CatalogOverview uses them, all tests pass.
 
@@ -107,30 +107,30 @@
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation (Art. VII)
 
-- [ ] T018 [P] [US1] Write component test: renders bars for items with start/end datetimes `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
-- [ ] T019 [P] [US1] Write component test: renders point markers for single-datetime items `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
-- [ ] T020 [P] [US1] Write component test: displays "No matches" empty state `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
-- [ ] T021 [P] [US1] Write component test: displays "no time data" label for items without temporal metadata `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
-- [ ] T022 [P] [US1] Write component test: tooltip shows title and date range on hover `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
-- [ ] T023 [P] [US1] Write component test: time axis labels have correct granularity for range `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
-- [ ] T024 [US1] Write scroll component test: 100 items render, bar area has overflow-y, axis is fixed (SC-003, review 7A) `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T018 [P] [US1] Write component test: renders bars for items with start/end datetimes `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T019 [P] [US1] Write component test: renders point markers for single-datetime items `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T020 [P] [US1] Write component test: displays "No matches" empty state `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T021 [P] [US1] Write component test: displays "no time data" label for items without temporal metadata `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T022 [P] [US1] Write component test: tooltip shows title and date range on hover `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T023 [P] [US1] Write component test: time axis labels have correct granularity for range `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T024 [US1] Write scroll component test: 100 items render, bar area has overflow-y, axis is fixed (SC-003, review 7A) `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
 
 ### Implementation
 
-- [ ] T025 [US1] Create component types (TimelineViewProps, TimelineBarData, ColourFn) using TimeSpan and TimeFilter from shared types `shared/components/src/TimelineView/types.ts`
-- [ ] T026 [US1] Implement TimelineView component: SVG bars, time axis, row labels, empty state, tooltips, vertical scroll with fixed axis `shared/components/src/TimelineView/TimelineView.tsx`
-- [ ] T027 [US1] Create component CSS (bar styles, axis, scroll container, empty state, tooltips) `shared/components/src/TimelineView/TimelineView.css`
-- [ ] T028 [US1] Create Storybook stories: Default (10 items), Empty, SingleDatetime, ManyItems (100+), MixedMetadata `shared/components/src/TimelineView/TimelineView.stories.tsx`
-- [ ] T029 [US1] Run tests and verify all US1 tests pass: `pnpm --filter @debrief/components test`
+- [x] T025 [US1] Create component types (TimelineViewProps, TimelineBarData, ColourFn) using TimeSpan and TimeFilter from shared types `shared/components/src/TimelineView/types.ts`
+- [x] T026 [US1] Implement TimelineView component: SVG bars, time axis, row labels, empty state, tooltips, vertical scroll with fixed axis `shared/components/src/TimelineView/TimelineView.tsx`
+- [x] T027 [US1] Create component CSS (bar styles, axis, scroll container, empty state, tooltips) `shared/components/src/TimelineView/TimelineView.css`
+- [x] T028 [US1] Create Storybook stories: Default (10 items), Empty, SingleDatetime, ManyItems (100+), MixedMetadata `shared/components/src/TimelineView/TimelineView.stories.tsx`
+- [x] T029 [US1] Run tests and verify all US1 tests pass: `pnpm --filter @debrief/components test`
 
 ### E2E Tests for User Story 1 🎭
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T030 [P] [US1] Create Playwright test for Default story (bar rendering, axis labels) `shared/components/e2e/TimelineView.spec.ts`
-- [ ] T031 [P] [US1] Add theme variant tests (light, dark, vscode) `shared/components/e2e/TimelineView.spec.ts`
-- [ ] T032 [P] [US1] Add tooltip hover interaction test `shared/components/e2e/TimelineView.spec.ts`
-- [ ] T033 [US1] Run E2E tests: `pnpm --filter @debrief/components test:e2e TimelineView`
+- [x] T030 [P] [US1] Create Playwright test for Default story (bar rendering, axis labels) `shared/components/e2e/TimelineView.spec.ts`
+- [x] T031 [P] [US1] Add theme variant tests (light, dark, vscode) `shared/components/e2e/TimelineView.spec.ts`
+- [x] T032 [P] [US1] Add tooltip hover interaction test `shared/components/e2e/TimelineView.spec.ts`
+- [x] T033 [US1] Run E2E tests: `pnpm --filter @debrief/components test:e2e TimelineView`
 
 **Checkpoint**: Timeline renders bars, points, axis, tooltips, empty/no-data states. All US1 tests pass.
 
@@ -146,24 +146,24 @@
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation (Art. VII)
 
-- [ ] T034 [P] [US2] Write component test: TimeBrush left handle drag emits updated filter `shared/components/src/TimelineView/__tests__/TimeBrush.test.tsx`
-- [ ] T035 [P] [US2] Write component test: TimeBrush right handle drag emits updated filter `shared/components/src/TimelineView/__tests__/TimeBrush.test.tsx`
-- [ ] T036 [P] [US2] Write component test: TimeBrush body drag pans the filter window `shared/components/src/TimelineView/__tests__/TimeBrush.test.tsx`
-- [ ] T037 [P] [US2] Write component test: handles cannot cross (no inverted range, FR-013) `shared/components/src/TimelineView/__tests__/TimeBrush.test.tsx`
-- [ ] T038 [P] [US2] Write component test: clearing brush emits null filter `shared/components/src/TimelineView/__tests__/TimeBrush.test.tsx`
-- [ ] T039 [US2] Write integration test: render 5 items, simulate brush drag, verify onTemporalFilterChange called with correct range (review 9A) `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T034 [P] [US2] Write component test: TimeBrush left handle drag emits updated filter `shared/components/src/TimelineView/__tests__/TimeBrush.test.tsx`
+- [x] T035 [P] [US2] Write component test: TimeBrush right handle drag emits updated filter `shared/components/src/TimelineView/__tests__/TimeBrush.test.tsx`
+- [x] T036 [P] [US2] Write component test: TimeBrush body drag pans the filter window `shared/components/src/TimelineView/__tests__/TimeBrush.test.tsx`
+- [x] T037 [P] [US2] Write component test: handles cannot cross (no inverted range, FR-013) `shared/components/src/TimelineView/__tests__/TimeBrush.test.tsx`
+- [x] T038 [P] [US2] Write component test: clearing brush emits null filter `shared/components/src/TimelineView/__tests__/TimeBrush.test.tsx`
+- [x] T039 [US2] Write integration test: render 5 items, simulate brush drag, verify onTemporalFilterChange called with correct range (review 9A) `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
 
 ### Implementation
 
-- [ ] T040 [US2] Implement TimeBrush component: SVG overlay with draggable left/right handles, brush body pan, handle clamping `shared/components/src/TimelineView/TimeBrush.tsx`
-- [ ] T041 [US2] Integrate TimeBrush into TimelineView: wire onTemporalFilterChange callback with throttle doc note (review 10A) `shared/components/src/TimelineView/TimelineView.tsx`
-- [ ] T042 [US2] Add Storybook story: WithBrush (demonstrating filter interaction) `shared/components/src/TimelineView/TimelineView.stories.tsx`
-- [ ] T043 [US2] Run tests and verify all US2 tests pass: `pnpm --filter @debrief/components test`
+- [x] T040 [US2] Implement TimeBrush component: SVG overlay with draggable left/right handles, brush body pan, handle clamping `shared/components/src/TimelineView/TimeBrush.tsx`
+- [x] T041 [US2] Integrate TimeBrush into TimelineView: wire onTemporalFilterChange callback with throttle doc note (review 10A) `shared/components/src/TimelineView/TimelineView.tsx`
+- [x] T042 [US2] Add Storybook story: WithBrush (demonstrating filter interaction) `shared/components/src/TimelineView/TimelineView.stories.tsx`
+- [x] T043 [US2] Run tests and verify all US2 tests pass: `pnpm --filter @debrief/components test`
 
 ### E2E Tests for User Story 2 🎭
 
-- [ ] T044 [P] [US2] Create Playwright test for WithBrush story (drag handle, drag brush body, reset) `shared/components/e2e/TimelineView.spec.ts`
-- [ ] T045 [US2] Run E2E tests: `pnpm --filter @debrief/components test:e2e TimelineView`
+- [x] T044 [P] [US2] Create Playwright test for WithBrush story (drag handle, drag brush body, reset) `shared/components/e2e/TimelineView.spec.ts`
+- [x] T045 [US2] Run E2E tests: `pnpm --filter @debrief/components test:e2e TimelineView`
 
 **Checkpoint**: Brush handles work, filter emits correctly, handles can't cross, integration test passes.
 
@@ -177,13 +177,13 @@
 
 ### Tests
 
-- [ ] T046 [P] [US3] Write component test: double-click bar calls onItemSelect with correct itemPath `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
-- [ ] T047 [P] [US3] Write component test: double-click point marker calls onItemSelect `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T046 [P] [US3] Write component test: double-click bar calls onItemSelect with correct itemPath `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T047 [P] [US3] Write component test: double-click point marker calls onItemSelect `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
 
 ### Implementation
 
-- [ ] T048 [US3] Add double-click handler to TimelineView bars and point markers `shared/components/src/TimelineView/TimelineView.tsx`
-- [ ] T049 [US3] Run tests and verify all US3 tests pass: `pnpm --filter @debrief/components test`
+- [x] T048 [US3] Add double-click handler to TimelineView bars and point markers `shared/components/src/TimelineView/TimelineView.tsx`
+- [x] T049 [US3] Run tests and verify all US3 tests pass: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: Double-click triggers selection. All US1–US3 tests pass.
 
@@ -197,16 +197,16 @@
 
 ### Tests
 
-- [ ] T050 [P] [US4] Write component test: bars use colourFn return value for fill colour `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
-- [ ] T051 [P] [US4] Write component test: colourFn returning null falls back to default colour `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
-- [ ] T052 [P] [US4] Write component test: no colourFn prop → all bars use default colour `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
-- [ ] T053 [US4] Write component test: colourFn that throws → bars fall back to default colour (Art. V.1) `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T050 [P] [US4] Write component test: bars use colourFn return value for fill colour `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T051 [P] [US4] Write component test: colourFn returning null falls back to default colour `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T052 [P] [US4] Write component test: no colourFn prop → all bars use default colour `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
+- [x] T053 [US4] Write component test: colourFn that throws → bars fall back to default colour (Art. V.1) `shared/components/src/TimelineView/__tests__/TimelineView.test.tsx`
 
 ### Implementation
 
-- [ ] T054 [US4] Add colourFn integration to TimelineView with try/catch fallback `shared/components/src/TimelineView/TimelineView.tsx`
-- [ ] T055 [US4] Add Storybook story: WithColourScheme (colour function active) `shared/components/src/TimelineView/TimelineView.stories.tsx`
-- [ ] T056 [US4] Run tests and verify all US4 tests pass: `pnpm --filter @debrief/components test`
+- [x] T054 [US4] Add colourFn integration to TimelineView with try/catch fallback `shared/components/src/TimelineView/TimelineView.tsx`
+- [x] T055 [US4] Add Storybook story: WithColourScheme (colour function active) `shared/components/src/TimelineView/TimelineView.stories.tsx`
+- [x] T056 [US4] Run tests and verify all US4 tests pass: `pnpm --filter @debrief/components test`
 
 **Checkpoint**: Colour scheme integration works. All US1–US4 tests pass. colourFn errors handled gracefully.
 
@@ -218,35 +218,35 @@
 
 ### CI Verification
 
-- [ ] T057 Run full lint check: `task lint` (or `uv run ruff check . && pnpm lint`)
-- [ ] T058 Run full type check: `task typecheck` (or `uv run pyright && pnpm -r typecheck`)
-- [ ] T059 Run full test suite: `task test` (or `uv run pytest && pnpm --filter '!@debrief/web-shell' test`)
-- [ ] T060 Run Playwright E2E tests: `cd apps/web-shell && node run-playwright.mjs && cd ../..`
+- [x] T057 Run full lint check: `task lint` (or `uv run ruff check . && pnpm lint`)
+- [x] T058 Run full type check: `task typecheck` (or `uv run pyright && pnpm -r typecheck`)
+- [x] T059 Run full test suite: `task test` (or `uv run pytest && pnpm --filter '!@debrief/web-shell' test`)
+- [x] T060 Run Playwright E2E tests: `cd apps/web-shell && node run-playwright.mjs && cd ../..`
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T061 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/131-timeline-gantt-view/evidence/test-summary.md`
-- [ ] T062 Create usage demonstration `specs/131-timeline-gantt-view/evidence/usage-example.md`
-- [ ] T063 [P] Capture light theme screenshot `specs/131-timeline-gantt-view/evidence/screenshots/component-light.png`
-- [ ] T064 [P] Capture dark theme screenshot `specs/131-timeline-gantt-view/evidence/screenshots/component-dark.png`
-- [ ] T065 [P] Capture VS Code theme screenshot `specs/131-timeline-gantt-view/evidence/screenshots/component-vscode.png`
-- [ ] T066 Capture interaction GIF showing brush drag user flow `specs/131-timeline-gantt-view/evidence/screenshots/interaction.gif`
+- [x] T061 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/131-timeline-gantt-view/evidence/test-summary.md`
+- [x] T062 Create usage demonstration `specs/131-timeline-gantt-view/evidence/usage-example.md`
+- [x] T063 [P] Capture light theme screenshot `specs/131-timeline-gantt-view/evidence/screenshots/component-light.png`
+- [x] T064 [P] Capture dark theme screenshot `specs/131-timeline-gantt-view/evidence/screenshots/component-dark.png`
+- [x] T065 [P] Capture VS Code theme screenshot `specs/131-timeline-gantt-view/evidence/screenshots/component-vscode.png`
+- [x] T066 Capture interaction GIF showing brush drag user flow `specs/131-timeline-gantt-view/evidence/screenshots/interaction.gif`
 
 ### E2E Evidence Collection 🎭
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T067 Run full E2E suite: `pnpm --filter @debrief/components test:e2e`
-- [ ] T068 [P] Document E2E results `specs/131-timeline-gantt-view/evidence/e2e-summary.md`
+- [x] T067 Run full E2E suite: `pnpm --filter @debrief/components test:e2e`
+- [x] T068 [P] Document E2E results `specs/131-timeline-gantt-view/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T069 Create shipped blog post `specs/131-timeline-gantt-view/media/shipped-post.md`
-- [ ] T070 [P] Create LinkedIn shipped summary `specs/131-timeline-gantt-view/media/linkedin-shipped.md`
+- [x] T069 Create shipped blog post `specs/131-timeline-gantt-view/media/shipped-post.md`
+- [x] T070 [P] Create LinkedIn shipped summary `specs/131-timeline-gantt-view/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T071 Create PR and publish blog: run /speckit.pr
+- [x] T071 Create PR and publish blog: run /speckit.pr
 
 **Task T071 must run last. It depends on all evidence and media tasks being complete.**
 

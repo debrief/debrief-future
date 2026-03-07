@@ -2,6 +2,28 @@
 export { CatalogOverview } from './CatalogOverview';
 export type { CatalogOverviewProps, CatalogOverviewItem } from './CatalogOverview';
 
+export { TimelineView } from './TimelineView';
+export type { TimelineViewProps, TimelineBarData, ColourFn, TemporalFilter } from './TimelineView';
+
+export { ExerciseListView } from './ExerciseListView';
+export type {
+  ExerciseListViewProps,
+  ExerciseListItem,
+  ExerciseListItemRowProps,
+  SpatialThumbnailProps,
+  RecentlyOpenedEntry,
+  SortConfiguration,
+  SortDimension,
+  SortDirection,
+} from './ExerciseListView';
+export {
+  computeDuration,
+  formatDuration,
+  formatDateRange,
+  formatRelativeTime,
+  sortComparators,
+} from './ExerciseListView';
+
 export { StacFileTree } from './StacFileTree';
 export type {
   StacFileTreeProps,
@@ -59,7 +81,7 @@ export { useTheme } from './hooks/useTheme';
 export { useTemporalTrack } from './MapView/useTemporalTrack';
 
 // Types
-export type { DebriefFeature, DebriefFeatureCollection, AnnotationFeature, TrackFeature, ReferenceLocation } from './utils/types';
+export type { DebriefFeature, DebriefFeatureCollection, AnnotationFeature, TrackFeature, ReferenceLocation, Bounds } from './utils/types';
 export {
   isTrackFeature,
   isReferenceLocation,
@@ -70,7 +92,7 @@ export {
 } from './utils/types';
 
 // Utilities
-export { calculateBounds } from './utils/bounds';
+export { calculateBounds, bboxOverlapsViewport, filterBySpatialExtent } from './utils/bounds';
 export {
   calculateTimeExtent,
   parseDuration,

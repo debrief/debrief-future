@@ -1,50 +1,17 @@
 /**
- * Unit tests for timeline layout logic in CatalogOverview.
+ * Unit tests for timeline layout logic used by CatalogOverview.
  *
- * Tests the time axis scale computation and bar positioning helpers
- * that are used internally by the component.
+ * Now imports from shared utils/timeline-helpers.ts (#131 extraction).
  */
 
 import { describe, it, expect } from 'vitest';
 import type { CatalogOverviewItem } from '../types';
-
-// Re-implement the helpers from the component for unit testing
-// (These mirror the internal functions in CatalogOverview.tsx)
-
-function parseTime(s: string | null): number | null {
-  if (!s) return null;
-  const t = new Date(s).getTime();
-  return isNaN(t) ? null : t;
-}
-
-interface TimeRange {
-  min: number;
-  max: number;
-}
-
-function computeTimeRange(items: CatalogOverviewItem[]): TimeRange | null {
-  let min = Infinity, max = -Infinity;
-  for (const item of items) {
-    const start = parseTime(item.startDatetime) ?? parseTime(item.datetime);
-    const end = parseTime(item.endDatetime) ?? parseTime(item.datetime);
-    if (start !== null) min = Math.min(min, start);
-    if (end !== null) max = Math.max(max, end);
-  }
-  if (min === Infinity) return null;
-  if (min === max) {
-    min -= 3600000;
-    max += 3600000;
-  }
-  return { min, max };
-}
-
-function computeBarX(epoch: number, range: TimeRange, chartWidth: number): number {
-  return ((epoch - range.min) / (range.max - range.min)) * chartWidth;
-}
-
-function computeBarWidth(start: number, end: number, range: TimeRange, chartWidth: number): number {
-  return Math.max(4, ((end - start) / (range.max - range.min)) * chartWidth);
-}
+import {
+  computeTimeRange,
+  computeBarX,
+  computeBarWidth,
+} from '../../utils/timeline-helpers';
+import type { TimeSpan } from '../../utils/temporal-types';
 
 // Fixtures
 function makeItem(overrides: Partial<CatalogOverviewItem>): CatalogOverviewItem {
@@ -86,7 +53,6 @@ describe('Timeline time range computation', () => {
     ];
     const range = computeTimeRange(items)!;
     const expected = new Date('2024-06-15T12:00:00Z').getTime();
-    // Should expand by 1 hour in each direction for single-point
     expect(range.min).toBe(expected - 3600000);
     expect(range.max).toBe(expected + 3600000);
   });
@@ -94,7 +60,7 @@ describe('Timeline time range computation', () => {
   it('handles mixed items (some with time, some without)', () => {
     const items = [
       makeItem({ startDatetime: '2024-03-01T00:00:00Z', endDatetime: '2024-03-10T00:00:00Z' }),
-      makeItem({}), // no temporal data
+      makeItem({}),
     ];
     const range = computeTimeRange(items)!;
     expect(range.min).toBe(new Date('2024-03-01T00:00:00Z').getTime());
@@ -103,7 +69,7 @@ describe('Timeline time range computation', () => {
 });
 
 describe('Timeline bar positioning', () => {
-  const range: TimeRange = {
+  const range: TimeSpan = {
     min: new Date('2024-01-01T00:00:00Z').getTime(),
     max: new Date('2024-01-31T00:00:00Z').getTime(),
   };

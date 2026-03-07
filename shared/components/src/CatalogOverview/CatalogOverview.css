@@ -125,3 +125,20 @@
   opacity: 0.6;
   font-style: italic;
 }
+
+/* Map empty state overlay — positioned inside the map region, transparent to pointer events */
+.catalog-overview__overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--co-fg);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-style: italic;
+  pointer-events: none;
+  z-index: 1000;
+  white-space: nowrap;
+}
