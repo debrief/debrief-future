@@ -108,21 +108,21 @@ Unify `TimeFilter` to use plain epoch numbers instead of `TimeInstant`. This tou
 
 Remove CatalogOverview and update all 24 references. StacBrowser replaces it as the top-level orchestrator.
 
-- [ ] T036 Remove CatalogOverview component directory `shared/components/src/CatalogOverview/`
-- [ ] T037 Update shared/components barrel export — replace CatalogOverview with StacBrowser `shared/components/src/index.ts`
-- [ ] T038 Migrate CatalogOverviewItem type to a shared location (used by ExerciseListView, filter-engine) `shared/components/src/filter-engine/types.ts`
-- [ ] T039 Update ExerciseListView types import path `shared/components/src/ExerciseListView/types.ts`
-- [ ] T040 Update timeline-helpers import path `shared/components/src/utils/timeline-helpers.ts`
-- [ ] T041 [P] Update timeline-helpers test imports `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
-- [ ] T042 Update VS Code catalogOverviewPanel to use StacBrowser `apps/vscode/src/panels/catalogOverviewPanel.ts`
-- [ ] T043 [P] Update VS Code webview catalogOverview entry point `apps/vscode/src/webview/web/catalogOverview.tsx`
-- [ ] T044 [P] Update VS Code commands referencing CatalogOverview `apps/vscode/src/commands/openCatalogOverview.ts`
-- [ ] T045 [P] Update VS Code commands index `apps/vscode/src/commands/index.ts`
-- [ ] T046 [P] Update VS Code stacTreeProvider reference `apps/vscode/src/providers/stacTreeProvider.ts`
-- [ ] T047 Update web-shell App.tsx to use StacBrowser `apps/web-shell/src/App.tsx`
-- [ ] T048 [P] Update web-shell mock service `apps/web-shell/src/mocks/stacService.ts`
-- [ ] T049 [P] Update web-shell Playwright page objects `apps/web-shell/playwright/pages/CatalogPage.ts`
-- [ ] T050 [test] Verify all existing tests pass after CatalogOverview removal
+- [x] T036 Remove CatalogOverview component directory `shared/components/src/CatalogOverview/`
+- [x] T037 Update shared/components barrel export — replace CatalogOverview with StacBrowser `shared/components/src/index.ts`
+- [x] T038 Migrate CatalogOverviewItem type to a shared location (used by ExerciseListView, filter-engine) `shared/components/src/filter-engine/types.ts`
+- [x] T039 Update ExerciseListView types import path `shared/components/src/ExerciseListView/types.ts`
+- [x] T040 Update timeline-helpers import path `shared/components/src/utils/timeline-helpers.ts`
+- [x] T041 [P] Update timeline-helpers test imports `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
+- [x] T042 Update VS Code catalogOverviewPanel to use StacBrowser `apps/vscode/src/panels/catalogOverviewPanel.ts`
+- [x] T043 [P] Update VS Code webview catalogOverview entry point `apps/vscode/src/webview/web/catalogOverview.tsx`
+- [x] T044 [P] Update VS Code commands referencing CatalogOverview `apps/vscode/src/commands/openCatalogOverview.ts`
+- [x] T045 [P] Update VS Code commands index `apps/vscode/src/commands/index.ts`
+- [x] T046 [P] Update VS Code stacTreeProvider reference `apps/vscode/src/providers/stacTreeProvider.ts`
+- [x] T047 Update web-shell App.tsx to use StacBrowser `apps/web-shell/src/App.tsx`
+- [x] T048 [P] Update web-shell mock service `apps/web-shell/src/mocks/stacService.ts`
+- [x] T049 [P] Update web-shell Playwright page objects `apps/web-shell/playwright/pages/CatalogPage.ts`
+- [x] T050 [test] Verify all existing tests pass after CatalogOverview removal
 
 **Checkpoint**: Foundation ready — TimeFilter refactored, store slice created, CatalogOverview removed, all tests green
 

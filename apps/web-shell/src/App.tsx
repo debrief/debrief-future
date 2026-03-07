@@ -18,7 +18,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef, createElement } from 'react';
 import type { Feature, FeatureCollection } from 'geojson';
 import {
-  CatalogOverview,
+  StacBrowser,
   MapView,
   ActivityPanel,
   LogPanel,
@@ -37,7 +37,7 @@ import {
 } from '@debrief/components';
 import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance } from '@debrief/components';
 import type {
-  CatalogOverviewItem,
+  StacBrowserItem,
   ToolsPanelItem,
   ActivityPanelMessage,
   DebriefFeature,
@@ -174,7 +174,7 @@ export default function App() {
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
 
   // Catalog items
-  const catalogItems = useMemo<CatalogOverviewItem[]>(() => {
+  const catalogItems = useMemo<StacBrowserItem[]>(() => {
     return stacService.getItems();
   }, []);
 
@@ -1171,8 +1171,9 @@ export default function App() {
           </div>
         </header>
         <main className="web-shell__main">
-          <CatalogOverview
+          <StacBrowser
             items={catalogItems}
+            taxonomy={[]}
             onItemSelect={handlePlotSelect}
             className="web-shell__catalog"
           />

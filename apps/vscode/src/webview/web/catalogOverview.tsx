@@ -8,9 +8,10 @@
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
+import type { StacBrowserItem } from '@debrief/components';
 import { createRoot } from 'react-dom/client';
-import { CatalogOverview } from '@debrief/components';
-import type { CatalogOverviewItem, Bounds } from '@debrief/components';
+import { StacBrowser } from '@debrief/components';
+import type { CatalogOverviewItem } from '@debrief/components';
 
 // VS Code API
 declare function acquireVsCodeApi(): {
@@ -30,15 +31,6 @@ interface CatalogData {
 
 function CatalogOverviewApp(): React.ReactElement {
   const [catalogData, setCatalogData] = useState<CatalogData | null>(null);
-  const [splitRatio, setSplitRatio] = useState<number>(0.6);
-
-  // Restore persisted state
-  useEffect(() => {
-    const saved = vscode.getState();
-    if (saved?.splitRatio !== undefined) {
-      setSplitRatio(saved.splitRatio as number);
-    }
-  }, []);
 
   // Listen for messages from extension
   useEffect(() => {
@@ -48,9 +40,6 @@ function CatalogOverviewApp(): React.ReactElement {
       switch (message.type) {
         case 'loadCatalogOverview':
           setCatalogData(message.catalog);
-          break;
-        case 'setSplitRatio':
-          setSplitRatio(message.ratio);
           break;
       }
     };
@@ -69,21 +58,6 @@ function CatalogOverviewApp(): React.ReactElement {
     });
   }, [catalogData]);
 
-  // Handle split ratio change
-  const handleSplitRatioChange = useCallback((ratio: number) => {
-    setSplitRatio(ratio);
-    const currentState = vscode.getState() ?? {};
-    vscode.setState({ ...currentState, splitRatio: ratio });
-  }, []);
-
-  // Handle viewport change — post to extension host (Feature: 130-map-spatial-filtering)
-  const handleViewportChange = useCallback((bounds: Bounds | null) => {
-    vscode.postMessage({
-      type: 'overviewViewportChanged',
-      bounds,
-    });
-  }, []);
-
   if (!catalogData) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--vscode-editor-foreground, #ccc)' }}>
@@ -93,12 +67,10 @@ function CatalogOverviewApp(): React.ReactElement {
   }
 
   return (
-    <CatalogOverview
-      items={catalogData.items}
+    <StacBrowser
+      items={catalogData.items as unknown as StacBrowserItem[]}
+      taxonomy={[]}
       onItemSelect={handleItemSelect}
-      initialSplitRatio={splitRatio}
-      onSplitRatioChange={handleSplitRatioChange}
-      onViewportChange={handleViewportChange}
     />
   );
 }

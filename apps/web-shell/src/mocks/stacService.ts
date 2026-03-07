@@ -3,7 +3,7 @@
  * Loads fixture data from @test-data alias to simulate STAC catalog operations.
  */
 
-import type { CatalogOverviewItem } from '@debrief/components';
+import type { StacBrowserItem } from '@debrief/components';
 import type { FeatureCollection } from 'geojson';
 
 // Import fixture data via Vite's JSON import
@@ -48,9 +48,9 @@ function getItemPaths(): string[] {
 }
 
 /**
- * Convert a STAC item to CatalogOverviewItem format.
+ * Convert a STAC item to StacBrowserItem format (#132).
  */
-function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
+function toBrowserItem(itemPath: string, item: StacItem): StacBrowserItem {
   return {
     id: item.id,
     title: item.properties.title ?? item.id,
@@ -59,6 +59,14 @@ function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
     datetime: item.properties.datetime ?? null,
     startDatetime: item.properties.start_datetime ?? null,
     endDatetime: item.properties.end_datetime ?? null,
+    vesselClasses: [],
+    tags: [],
+    featureTags: [],
+    author: null,
+    trackNames: [],
+    nationalities: [],
+    collection: null,
+    modified: null,
   };
 }
 
@@ -67,7 +75,7 @@ function toOverviewItem(itemPath: string, item: StacItem): CatalogOverviewItem {
  */
 export interface MockStacService {
   /** Get all items in the catalog */
-  getItems(): CatalogOverviewItem[];
+  getItems(): StacBrowserItem[];
 
   /** Get plot data (GeoJSON FeatureCollection) for an item */
   getPlotData(itemPath: string): FeatureCollection;
@@ -81,15 +89,15 @@ export interface MockStacService {
  */
 export function createMockStacService(): MockStacService {
   return {
-    getItems(): CatalogOverviewItem[] {
+    getItems(): StacBrowserItem[] {
       const paths = getItemPaths();
       return paths
         .map(path => {
           const entry = itemDataMap[path];
           if (!entry) return null;
-          return toOverviewItem(path, entry.item);
+          return toBrowserItem(path, entry.item);
         })
-        .filter((item): item is CatalogOverviewItem => item !== null);
+        .filter((item): item is StacBrowserItem => item !== null);
     },
 
     getPlotData(itemPath: string): FeatureCollection {
