@@ -4,7 +4,11 @@ STAC Catalog operations for debrief-stac.
 This module provides functions for creating and managing local STAC catalogs.
 """
 
+import contextlib
 import json
+import os
+import sys
+import tempfile
 from datetime import datetime
 from pathlib import Path
 
@@ -110,10 +114,41 @@ def open_catalog(path: CatalogPath) -> STACCatalog:
     return catalog_data
 
 
-def _save_catalog(path: CatalogPath, catalog_data: STACCatalog) -> None:
-    """Save catalog data back to disk.
+def _lock_file(f: object) -> None:
+    """Acquire an exclusive lock on a file.
 
-    Internal function used after modifying catalog links.
+    Cross-platform: uses fcntl.flock on Unix, msvcrt.locking on Windows.
+    """
+    if sys.platform == "win32":
+        import msvcrt
+
+        msvcrt.locking(f.fileno(), msvcrt.LK_LOCK, 1)  # type: ignore[union-attr]
+    else:
+        import fcntl
+
+        fcntl.flock(f.fileno(), fcntl.LOCK_EX)  # type: ignore[union-attr]
+
+
+def _unlock_file(f: object) -> None:
+    """Release an exclusive lock on a file.
+
+    Cross-platform: uses fcntl.flock on Unix, msvcrt.locking on Windows.
+    """
+    if sys.platform == "win32":
+        import msvcrt
+
+        msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)  # type: ignore[union-attr]
+    else:
+        import fcntl
+
+        fcntl.flock(f.fileno(), fcntl.LOCK_UN)  # type: ignore[union-attr]
+
+
+def _save_catalog(path: CatalogPath, catalog_data: STACCatalog) -> None:
+    """Save catalog data back to disk with atomic write and file locking.
+
+    Uses a temp file + os.replace for atomic writes and file-based locking
+    for concurrent access protection (Review 3B, 4B).
 
     Args:
         path: Path to the catalog directory
@@ -121,9 +156,24 @@ def _save_catalog(path: CatalogPath, catalog_data: STACCatalog) -> None:
     """
     catalog_path = Path(path)
     catalog_json_path = catalog_path / "catalog.json"
+    lock_path = catalog_path / ".catalog.lock"
 
-    with open(catalog_json_path, "w") as f:
-        json.dump(catalog_data, f, indent=2)
+    with open(lock_path, "w") as lock_f:
+        _lock_file(lock_f)
+        try:
+            fd, tmp_path = tempfile.mkstemp(
+                dir=str(catalog_path), suffix=".json.tmp"
+            )
+            try:
+                with os.fdopen(fd, "w") as f:
+                    json.dump(catalog_data, f, indent=2)
+                os.replace(tmp_path, str(catalog_json_path))
+            except BaseException:
+                with contextlib.suppress(OSError):
+                    os.unlink(tmp_path)
+                raise
+        finally:
+            _unlock_file(lock_f)
 
 
 def _add_item_link(catalog_data: STACCatalog, item_id: str, item_href: str) -> None:
