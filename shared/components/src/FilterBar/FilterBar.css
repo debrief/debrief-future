@@ -7,8 +7,6 @@
 }
 
 .debrief-filter-bar__toolbar {
-  position: relative;
-  z-index: 10;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -230,7 +228,7 @@
   position: absolute;
   top: 100%;
   right: 0;
-  z-index: 200;
+  z-index: 9999;
   margin-top: 4px;
   background: var(--vscode-editorWidget-background, #fff);
   border: 1px solid var(--vscode-widget-border, #ddd);
@@ -331,7 +329,7 @@
   position: absolute;
   top: 100%;
   right: 0;
-  z-index: 200;
+  z-index: 9999;
   margin-top: 4px;
   background: var(--vscode-editorWidget-background, #fff);
   border: 1px solid var(--vscode-widget-border, #ddd);
