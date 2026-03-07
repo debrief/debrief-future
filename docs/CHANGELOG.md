@@ -3,6 +3,8 @@
 ## [2026-03-07]
 
 ### Added
+- **Vessel Taxonomy and Hierarchical Filtering** — Human-readable labels, in-menu type-ahead search, per-node match counts, and current-selection marking for the vessel class filter dropdown.
+  - Tests: 944/944 passing (72 new)
 - **Saved Filter Configurations** — Save/load/delete named filter sets as CQL2 JSON; historic filters dropdown for the STAC Browser filter bar.
   - Tests: 120/120 passing (47 new)
   - Evidence: test-summary.md, usage-example.md

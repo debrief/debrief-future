@@ -8,4 +8,5 @@ Tracks evidence artifacts captured for each feature. Used to assess coverage and
 | 005-e2e-workflow-tests | 8 | md, png | 2026-03-06 | current | [#300](https://github.com/debrief/debrief-future/pull/300) |
 | 126-cql2-filter-engine | 3 | md, json | 2026-03-06 | current | — |
 | 127-filter-bar-lozenge-ui | 3 | md | 2026-03-06 | current | — |
+| 133-vessel-taxonomy | 2 | md | 2026-03-07 | current | — |
 | 128-saved-filter-configurations | 2 | md | 2026-03-07 | current | — |

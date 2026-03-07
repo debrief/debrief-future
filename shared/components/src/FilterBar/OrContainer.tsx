@@ -25,6 +25,8 @@ export interface OrContainerProps {
   readonly onToggleNegate: (id: string) => void;
   readonly availableValues: Readonly<Record<FilterType, readonly string[]>>;
   readonly taxonomy: readonly VesselTaxonomyNode[];
+  readonly labelMap?: ReadonlyMap<string, string>;
+  readonly taxonomyCounts?: ReadonlyMap<string, number>;
 }
 
 export const OrContainer: React.FC<OrContainerProps> = ({
@@ -39,6 +41,8 @@ export const OrContainer: React.FC<OrContainerProps> = ({
   onToggleNegate,
   availableValues,
   taxonomy,
+  labelMap,
+  taxonomyCounts,
 }) => {
   const { isOver, setNodeRef } = useDroppable({
     id: item.id,
@@ -69,6 +73,8 @@ export const OrContainer: React.FC<OrContainerProps> = ({
               onToggleNegate={onToggleNegate}
               availableValues={availableValues}
               taxonomy={taxonomy}
+              labelMap={labelMap}
+              taxonomyCounts={taxonomyCounts}
             />
           </React.Fragment>
         ))}

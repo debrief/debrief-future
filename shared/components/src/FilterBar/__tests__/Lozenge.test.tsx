@@ -98,4 +98,32 @@ describe('Lozenge', () => {
     // @dnd-kit adds role and tabIndex attributes for draggable elements
     expect(el).toBeInTheDocument();
   });
+
+  describe('vessel-class label resolution', () => {
+    const vesselClassItem: LozengeItem = {
+      kind: 'lozenge',
+      id: 'vc-1',
+      filterType: 'vessel-class',
+      value: 'surface/warship/frigate/type23',
+    };
+
+    it('displays resolved label from labelMap for vessel-class', () => {
+      const labelMap = new Map([
+        ['surface/warship/frigate/type23', 'Type 23 Frigate'],
+      ]);
+      renderLozenge({ item: vesselClassItem, labelMap });
+      expect(screen.getByText('Type 23 Frigate')).toBeInTheDocument();
+    });
+
+    it('displays raw value when labelMap is not provided', () => {
+      renderLozenge({ item: vesselClassItem });
+      expect(screen.getByText('surface/warship/frigate/type23')).toBeInTheDocument();
+    });
+
+    it('displays raw value for unknown vessel-class path', () => {
+      const labelMap = new Map<string, string>();
+      renderLozenge({ item: vesselClassItem, labelMap });
+      expect(screen.getByText('surface/warship/frigate/type23')).toBeInTheDocument();
+    });
+  });
 });

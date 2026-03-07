@@ -5,8 +5,8 @@
  */
 
 export { createFilterEngine } from "./engine";
-export { parseTaxonomy, buildDescendantMap } from "./taxonomy";
-export type { RawTaxonomy, RawTaxonomyNode, DescendantMap } from "./taxonomy";
+export { parseTaxonomy, buildDescendantMap, buildTaxonomyLabelMap, resolveTaxonomyLabel } from "./taxonomy";
+export type { RawTaxonomy, RawTaxonomyNode, DescendantMap, TaxonomyLabelMap } from "./taxonomy";
 export type {
   FilterType,
   DurationBucket,

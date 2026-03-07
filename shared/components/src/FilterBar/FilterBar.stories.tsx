@@ -329,6 +329,76 @@ export const ZeroResults: Story = {
   },
 };
 
+// --- Vessel Taxonomy Stories (#133) ---
+
+const VESSEL_CLASS_SELECTED_STATE: FilterBarState = {
+  items: [
+    { kind: 'lozenge', id: 'vc-1', filterType: 'vessel-class', value: 'surface/warship/frigate/type23' },
+  ],
+};
+
+const BRANCH_SELECTED_STATE: FilterBarState = {
+  items: [
+    { kind: 'lozenge', id: 'vc-branch', filterType: 'vessel-class', value: 'surface/warship' },
+  ],
+};
+
+export const VesselTaxonomyNavigation: Story = {
+  name: 'Vessel Taxonomy Navigation',
+  render: () => (
+    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} initialFilterState={VESSEL_CLASS_SELECTED_STATE} />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Vessel class lozenge displays human-readable label "Type 23" (not raw path). Click the lozenge to re-edit — the current selection is marked with ✓ in the dropdown.',
+      },
+    },
+  },
+};
+
+export const VesselTaxonomySearch: Story = {
+  name: 'Vessel Taxonomy Search',
+  render: () => (
+    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Click (+) → Vessel Class to open the dropdown. A search input appears above the tree. Type to filter — e.g., "type 23" shows only matching nodes with ancestor paths preserved.',
+      },
+    },
+  },
+};
+
+export const VesselTaxonomyCounts: Story = {
+  name: 'Vessel Taxonomy Counts',
+  render: () => (
+    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Click (+) → Vessel Class. Each node shows a count badge (e.g., "Surface (4)"). Nodes with zero matches are dimmed and disabled. Counts update as other filters narrow the data set.',
+      },
+    },
+  },
+};
+
+export const VesselTaxonomyBranchSelection: Story = {
+  name: 'Vessel Taxonomy Branch Selection',
+  render: () => (
+    <FilterBarWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} initialFilterState={BRANCH_SELECTED_STATE} />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Branch node "Warship" selected — lozenge shows "Vessel Class: Warship". Filtering matches all warship subtypes (frigates, destroyers). Click the lozenge to see "Warship" marked as current.',
+      },
+    },
+  },
+};
+
 export const WithSavedFilters: Story = {
   name: 'With Saved Filters',
   render: () => {

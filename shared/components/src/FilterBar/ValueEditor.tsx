@@ -10,8 +10,9 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { FilterType, VesselTaxonomyNode } from '../filter-engine';
-import { CascadingMenu } from '../CascadingMenu';
+import { SearchableCascadingMenu } from '../CascadingMenu';
 import { taxonomyToCascadingItems } from './taxonomyAdapter';
+import type { TaxonomyAdapterOptions } from './taxonomyAdapter';
 import { FILTER_TYPE_OPTIONS, DURATION_BUCKETS, DURATION_BUCKET_LABELS, MODIFIED_BUCKETS, MODIFIED_BUCKET_LABELS } from './constants';
 
 export interface ValueEditorProps {
@@ -21,6 +22,7 @@ export interface ValueEditorProps {
   readonly onClose: () => void;
   readonly availableValues: readonly string[];
   readonly taxonomy?: readonly VesselTaxonomyNode[];
+  readonly taxonomyCounts?: ReadonlyMap<string, number>;
 }
 
 export const ValueEditor: React.FC<ValueEditorProps> = ({
@@ -30,6 +32,7 @@ export const ValueEditor: React.FC<ValueEditorProps> = ({
   onClose,
   availableValues,
   taxonomy,
+  taxonomyCounts,
 }) => {
   const option = FILTER_TYPE_OPTIONS.find((o) => o.type === filterType);
   const inputMethod = option?.inputMethod ?? 'flat-dropdown';
@@ -54,19 +57,27 @@ export const ValueEditor: React.FC<ValueEditorProps> = ({
   }, [onClose]);
 
   switch (inputMethod) {
-    case 'hierarchical':
+    case 'hierarchical': {
+      const adapterOptions: TaxonomyAdapterOptions = {
+        currentValue: value || undefined,
+        counts: taxonomyCounts,
+        disableEmpty: !!taxonomyCounts,
+      };
       return (
         <div ref={containerRef} data-testid="value-editor-hierarchical">
-          <CascadingMenu
-            items={taxonomy ? taxonomyToCascadingItems(taxonomy) : []}
+          <SearchableCascadingMenu
+            items={taxonomy ? taxonomyToCascadingItems(taxonomy, adapterOptions) : []}
             anchorPosition={{ x: 0, y: 0 }}
             header="Vessel Class"
             selectableBranches
+            searchable
+            searchPlaceholder="Search vessel types..."
             onSelect={(id) => onSelect(id)}
             onDismiss={onClose}
           />
         </div>
       );
+    }
 
     case 'bucket': {
       const buckets = filterType === 'modified' ? MODIFIED_BUCKETS : DURATION_BUCKETS;
