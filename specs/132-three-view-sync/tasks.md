@@ -96,13 +96,13 @@ Unify `TimeFilter` to use plain epoch numbers instead of `TimeInstant`. This tou
 
 ### Store Slice and Spatial Utility
 
-- [ ] T029 Add `viewportToBounds(viewport: ViewportPolygon): Bounds` to existing bounds utility `shared/components/src/utils/bounds.ts`
-- [ ] T030 [test] Add viewportToBounds tests including degenerate polygon edge case `shared/components/src/utils/bounds.test.ts`
-- [ ] T031 Create BrowserFilterSlice Zustand slice implementation `services/session-state/src/store/slices/browser-filter.ts`
-- [ ] T032 Export new slice from slices barrel `services/session-state/src/store/slices/index.ts`
-- [ ] T033 Register BrowserFilterSlice in session store creation `services/session-state/src/store/createStore.ts`
-- [ ] T034 Export BrowserFilterSlice types from session-state package `services/session-state/src/types/index.ts`
-- [ ] T035 [test] Write BrowserFilterSlice unit tests (all actions + defaults + clearAll) `services/session-state/tests/unit/slices/browser-filter.test.ts`
+- [x] T029 Add `viewportToBounds(viewport: ViewportPolygon): Bounds` to existing bounds utility `shared/components/src/utils/bounds.ts`
+- [x] T030 [test] Add viewportToBounds tests including degenerate polygon edge case `shared/components/src/utils/bounds.test.ts`
+- [x] T031 Create BrowserFilterSlice Zustand slice implementation `services/session-state/src/store/slices/browser-filter.ts`
+- [x] T032 Export new slice from slices barrel `services/session-state/src/store/slices/index.ts`
+- [x] T033 Register BrowserFilterSlice in session store creation `services/session-state/src/store/createStore.ts`
+- [x] T034 Export BrowserFilterSlice types from session-state package `services/session-state/src/types/index.ts`
+- [x] T035 [test] Write BrowserFilterSlice unit tests (all actions + defaults + clearAll) `services/session-state/tests/unit/slices/browser-filter.test.ts`
 
 ### CatalogOverview Removal (Review Decision 6A)
 

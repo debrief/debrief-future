@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { bboxOverlapsViewport, filterBySpatialExtent } from './bounds';
+import { bboxOverlapsViewport, filterBySpatialExtent, viewportToBounds } from './bounds';
 import type { Bounds } from './types';
 
 // ============================================================================
@@ -161,5 +161,61 @@ describe('filterBySpatialExtent', () => {
   it('returns empty array for empty input', () => {
     const result = filterBySpatialExtent([], viewport);
     expect(result).toHaveLength(0);
+  });
+});
+
+// ============================================================================
+// viewportToBounds (#132, T029-T030)
+// ============================================================================
+
+describe('viewportToBounds', () => {
+  it('converts 4-corner viewport to axis-aligned bounds', () => {
+    const coords: [[number, number], [number, number], [number, number], [number, number]] = [
+      [-5, 55],  // NW
+      [5, 55],   // NE
+      [5, 50],   // SE
+      [-5, 50],  // SW
+    ];
+    expect(viewportToBounds(coords)).toEqual([-5, 50, 5, 55]);
+  });
+
+  it('handles coordinates in any order', () => {
+    const coords: [[number, number], [number, number], [number, number], [number, number]] = [
+      [5, 50],   // SE
+      [-5, 55],  // NW
+      [-5, 50],  // SW
+      [5, 55],   // NE
+    ];
+    expect(viewportToBounds(coords)).toEqual([-5, 50, 5, 55]);
+  });
+
+  it('returns null for degenerate viewport (zero width)', () => {
+    const coords: [[number, number], [number, number], [number, number], [number, number]] = [
+      [5, 55],
+      [5, 55],
+      [5, 50],
+      [5, 50],
+    ];
+    expect(viewportToBounds(coords)).toBeNull();
+  });
+
+  it('returns null for degenerate viewport (zero height)', () => {
+    const coords: [[number, number], [number, number], [number, number], [number, number]] = [
+      [-5, 50],
+      [5, 50],
+      [5, 50],
+      [-5, 50],
+    ];
+    expect(viewportToBounds(coords)).toBeNull();
+  });
+
+  it('handles negative coordinates', () => {
+    const coords: [[number, number], [number, number], [number, number], [number, number]] = [
+      [-10, -20],
+      [10, -20],
+      [10, -30],
+      [-10, -30],
+    ];
+    expect(viewportToBounds(coords)).toEqual([-10, -30, 10, -20]);
   });
 });

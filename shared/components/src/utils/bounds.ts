@@ -1,6 +1,39 @@
 import type { DebriefFeature, DebriefFeatureCollection, Bounds } from './types';
 
 /**
+ * Viewport polygon — 4 corners as [lon, lat] pairs.
+ * Compatible with session-state's ViewportPolygon.coordinates.
+ */
+type ViewportCoordinates = [[number, number], [number, number], [number, number], [number, number]];
+
+/**
+ * Convert a 4-corner viewport polygon to an axis-aligned bounding box.
+ * Returns [minLon, minLat, maxLon, maxLat].
+ *
+ * Degenerate viewports (zero-area) return null (#132, Review Decision 7D).
+ */
+export function viewportToBounds(coordinates: ViewportCoordinates): Bounds | null {
+  let minLon = Infinity;
+  let minLat = Infinity;
+  let maxLon = -Infinity;
+  let maxLat = -Infinity;
+
+  for (const [lon, lat] of coordinates) {
+    if (lon < minLon) minLon = lon;
+    if (lon > maxLon) maxLon = lon;
+    if (lat < minLat) minLat = lat;
+    if (lat > maxLat) maxLat = lat;
+  }
+
+  // Degenerate: zero area
+  if (minLon === maxLon || minLat === maxLat) {
+    return null;
+  }
+
+  return [minLon, minLat, maxLon, maxLat];
+}
+
+/**
  * Recursively extract all coordinates from a GeoJSON geometry coordinates array.
  * Works for Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon.
  */
