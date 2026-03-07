@@ -44,6 +44,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     addOrContainer,
     removeOrContainer,
     addChildLozenge,
+    toggleNegate,
     moveToContainer,
     moveToTopLevel,
   } = useFilterBar(initialFilterState);
@@ -187,6 +188,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   onRemove={removeLozenge}
                   onValueChange={editLozenge}
                   onEditClose={() => setEditingId(null)}
+                  onToggleNegate={toggleNegate}
                   availableValues={distinctValues}
                   taxonomy={taxonomy}
                 />
@@ -204,6 +206,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   onRemoveLozenge={removeLozenge}
                   onValueChange={editLozenge}
                   onEditClose={() => setEditingId(null)}
+                  onToggleNegate={toggleNegate}
                   availableValues={distinctValues}
                   taxonomy={taxonomy}
                 />

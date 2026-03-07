@@ -35,6 +35,7 @@ function renderLozenge(props: Partial<React.ComponentProps<typeof Lozenge>> = {}
         onRemove={vi.fn()}
         onValueChange={vi.fn()}
         onEditClose={vi.fn()}
+        onToggleNegate={vi.fn()}
         availableValues={mockAvailableValues}
         taxonomy={[]}
         {...props}
@@ -74,6 +75,21 @@ describe('Lozenge', () => {
     fireEvent.click(screen.getByTestId('lozenge-remove-test-1'));
     expect(onRemove).toHaveBeenCalledWith('test-1');
     expect(onEdit).not.toHaveBeenCalled();
+  });
+
+  it('clicking negate fires onToggleNegate', () => {
+    const onToggleNegate = vi.fn();
+    renderLozenge({ onToggleNegate });
+
+    fireEvent.click(screen.getByTestId('lozenge-negate-test-1'));
+    expect(onToggleNegate).toHaveBeenCalledWith('test-1');
+  });
+
+  it('shows NOT badge when negated', () => {
+    const negatedItem: LozengeItem = { ...mockItem, negated: true };
+    renderLozenge({ item: negatedItem });
+
+    expect(screen.getByText('NOT')).toBeInTheDocument();
   });
 
   it('has draggable attributes', () => {

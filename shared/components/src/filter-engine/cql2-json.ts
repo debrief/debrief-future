@@ -32,27 +32,33 @@ const ARRAY_TYPES: ReadonlySet<FilterType> = new Set([
 function predicateToCql2(predicate: Predicate): Record<string, unknown> {
   const property = PROPERTY_MAP[predicate.type];
 
+  let expr: Record<string, unknown>;
+
   // Title and plot-contents use LIKE with wildcards (free-text substring match)
   if (predicate.type === "title" || predicate.type === "plot-contents") {
-    return {
+    expr = {
       op: "like",
       args: [{ property }, `%${predicate.value}%`],
     };
-  }
-
-  // Array-valued properties use a_containedBy
-  if (ARRAY_TYPES.has(predicate.type)) {
-    return {
+  } else if (ARRAY_TYPES.has(predicate.type)) {
+    // Array-valued properties use a_containedBy
+    expr = {
       op: "a_containedBy",
       args: [[predicate.value], { property }],
     };
+  } else {
+    // Scalar properties use equality
+    expr = {
+      op: "=",
+      args: [{ property }, predicate.value],
+    };
   }
 
-  // Scalar properties use equality
-  return {
-    op: "=",
-    args: [{ property }, predicate.value],
-  };
+  // Wrap in NOT if negated
+  if (predicate.negated) {
+    return { op: "not", args: [expr] };
+  }
+  return expr;
 }
 
 /**

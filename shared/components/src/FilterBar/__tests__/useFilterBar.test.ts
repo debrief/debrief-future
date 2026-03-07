@@ -143,6 +143,56 @@ describe('useFilterBar', () => {
     });
   });
 
+  describe('toggle negate', () => {
+    it('toggles negated on a top-level lozenge', () => {
+      const { result } = renderHook(() => useFilterBar());
+      act(() => result.current.addLozenge('nationality', 'French'));
+
+      const id = result.current.state.items[0]!.id;
+      act(() => result.current.toggleNegate(id));
+
+      const item = result.current.state.items[0]!;
+      if (item.kind === 'lozenge') {
+        expect(item.negated).toBe(true);
+      }
+    });
+
+    it('toggles negated back to false', () => {
+      const { result } = renderHook(() => useFilterBar());
+      act(() => result.current.addLozenge('nationality', 'French'));
+
+      const id = result.current.state.items[0]!.id;
+      act(() => result.current.toggleNegate(id));
+      act(() => result.current.toggleNegate(id));
+
+      const item = result.current.state.items[0]!;
+      if (item.kind === 'lozenge') {
+        expect(item.negated).toBe(false);
+      }
+    });
+
+    it('toggles negated on a child lozenge inside OR container', () => {
+      const { result } = renderHook(() => useFilterBar());
+      act(() => {
+        result.current.addOrContainer();
+      });
+
+      const containerId = result.current.state.items[0]!.id;
+      act(() => result.current.addChildLozenge(containerId, 'nationality', 'French'));
+
+      const container = result.current.state.items[0]!;
+      if (container.kind === 'or-container') {
+        const childId = container.children[0]!.id;
+        act(() => result.current.toggleNegate(childId));
+
+        const updated = result.current.state.items[0]!;
+        if (updated.kind === 'or-container') {
+          expect(updated.children[0]!.negated).toBe(true);
+        }
+      }
+    });
+  });
+
   describe('move to container', () => {
     it('moves a top-level lozenge into an OR container', () => {
       const { result } = renderHook(() => useFilterBar());

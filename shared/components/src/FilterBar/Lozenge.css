@@ -17,6 +17,40 @@
   opacity: 0.4;
 }
 
+.debrief-lozenge--negated {
+  background: var(--vscode-inputValidation-errorBackground, #fdd);
+  border: 1px solid var(--vscode-inputValidation-errorBorder, #f44);
+}
+
+.debrief-lozenge__not {
+  font-weight: 700;
+  font-size: 10px;
+  color: var(--vscode-errorForeground, #d32f2f);
+  text-transform: uppercase;
+  margin-right: 2px;
+}
+
+.debrief-lozenge__negate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  color: var(--vscode-descriptionForeground, #999);
+  cursor: pointer;
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+  margin-left: 2px;
+}
+
+.debrief-lozenge__negate:hover {
+  background: var(--vscode-list-hoverBackground, rgba(0, 0, 0, 0.1));
+}
+
 .debrief-lozenge__body {
   display: inline-flex;
   align-items: center;

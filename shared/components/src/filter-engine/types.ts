@@ -30,6 +30,7 @@ export type ModifiedBucket = "<6H" | "<24H" | "<7D" | "<1M" | ">1M";
 export interface Predicate {
   readonly type: FilterType;
   readonly value: string;
+  readonly negated?: boolean;
 }
 
 /** A group of predicates combined with OR logic */

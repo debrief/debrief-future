@@ -20,6 +20,7 @@ export interface LozengeProps {
   readonly onRemove: (id: string) => void;
   readonly onValueChange: (id: string, newValue: string) => void;
   readonly onEditClose: () => void;
+  readonly onToggleNegate: (id: string) => void;
   readonly availableValues: Readonly<Record<FilterType, readonly string[]>>;
   readonly taxonomy: readonly VesselTaxonomyNode[];
 }
@@ -31,6 +32,7 @@ export const Lozenge: React.FC<LozengeProps> = ({
   onRemove,
   onValueChange,
   onEditClose,
+  onToggleNegate,
   availableValues,
   taxonomy,
 }) => {
@@ -45,7 +47,7 @@ export const Lozenge: React.FC<LozengeProps> = ({
   return (
     <div
       ref={setNodeRef}
-      className={`debrief-lozenge ${isDragging ? 'debrief-lozenge--dragging' : ''}`}
+      className={`debrief-lozenge ${isDragging ? 'debrief-lozenge--dragging' : ''} ${item.negated ? 'debrief-lozenge--negated' : ''}`}
       data-testid={`lozenge-${item.id}`}
       {...attributes}
       {...listeners}
@@ -58,10 +60,20 @@ export const Lozenge: React.FC<LozengeProps> = ({
         tabIndex={0}
         onKeyDown={(e) => { if (e.key === 'Enter') onEdit(item.id); }}
       >
+        {item.negated && <span className="debrief-lozenge__not">NOT</span>}
         <span className="debrief-lozenge__type">{typeLabel}</span>
         <span className="debrief-lozenge__separator">:</span>
         <span className="debrief-lozenge__value">{item.value}</span>
       </span>
+      <button
+        className="debrief-lozenge__negate"
+        onClick={(e) => { e.stopPropagation(); onToggleNegate(item.id); }}
+        data-testid={`lozenge-negate-${item.id}`}
+        aria-label={item.negated ? `Include ${typeLabel}: ${item.value}` : `Exclude ${typeLabel}: ${item.value}`}
+        title={item.negated ? 'Include (remove NOT)' : 'Exclude (add NOT)'}
+      >
+        {item.negated ? '≠' : '='}
+      </button>
       <button
         className="debrief-lozenge__remove"
         onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}

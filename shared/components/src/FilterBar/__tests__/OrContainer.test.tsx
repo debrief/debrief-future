@@ -45,6 +45,7 @@ function renderOrContainer(item: OrContainerItem, props: Partial<React.Component
         onRemoveLozenge={vi.fn()}
         onValueChange={vi.fn()}
         onEditClose={vi.fn()}
+        onToggleNegate={vi.fn()}
         availableValues={emptyValues}
         taxonomy={[]}
         {...props}

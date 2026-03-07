@@ -127,6 +127,24 @@ function reducer(state: FilterBarState, action: FilterBarAction): FilterBarState
       return { items };
     }
 
+    case 'TOGGLE_NEGATE': {
+      const items = state.items.map((item) => {
+        if (item.kind === 'lozenge' && item.id === action.id) {
+          return { ...item, negated: !item.negated };
+        }
+        if (item.kind === 'or-container') {
+          return {
+            ...item,
+            children: item.children.map((c) =>
+              c.id === action.id ? { ...c, negated: !c.negated } : c,
+            ),
+          };
+        }
+        return item;
+      });
+      return { items };
+    }
+
     case 'MOVE_TO_TOP_LEVEL': {
       let movedLozenge: LozengeItem | undefined;
       const items = state.items.map((item) => {
@@ -154,12 +172,12 @@ function reducer(state: FilterBarState, action: FilterBarAction): FilterBarState
 
 /** Convert filter bar state to a FilterExpression for the engine */
 export function toFilterExpression(state: FilterBarState): FilterExpression {
-  const predicates: { type: FilterType; value: string }[] = [];
-  const orGroups: { predicates: { type: FilterType; value: string }[] }[] = [];
+  const predicates: { type: FilterType; value: string; negated?: boolean }[] = [];
+  const orGroups: { predicates: { type: FilterType; value: string; negated?: boolean }[] }[] = [];
 
   for (const item of state.items) {
     if (item.kind === 'lozenge') {
-      predicates.push({ type: item.filterType, value: item.value });
+      predicates.push({ type: item.filterType, value: item.value, negated: item.negated });
     } else if (item.kind === 'or-container') {
       // Skip empty OR containers (review decision #4)
       if (item.children.length === 0) continue;
@@ -167,6 +185,7 @@ export function toFilterExpression(state: FilterBarState): FilterExpression {
         predicates: item.children.map((c) => ({
           type: c.filterType,
           value: c.value,
+          negated: c.negated,
         })),
       });
     }
@@ -185,6 +204,7 @@ export interface UseFilterBarReturn {
   readonly addOrContainer: () => void;
   readonly removeOrContainer: (id: string) => void;
   readonly addChildLozenge: (containerId: string, filterType: FilterType, value: string) => void;
+  readonly toggleNegate: (id: string) => void;
   readonly moveToContainer: (lozengeId: string, containerId: string) => void;
   readonly moveToTopLevel: (lozengeId: string, fromContainerId: string) => void;
 }
@@ -226,6 +246,11 @@ export function useFilterBar(initialState?: FilterBarState): UseFilterBarReturn 
     [],
   );
 
+  const toggleNegate = useCallback(
+    (id: string) => dispatch({ type: 'TOGGLE_NEGATE', id }),
+    [],
+  );
+
   const moveToContainer = useCallback(
     (lozengeId: string, containerId: string) =>
       dispatch({ type: 'MOVE_TO_CONTAINER', lozengeId, containerId }),
@@ -248,6 +273,7 @@ export function useFilterBar(initialState?: FilterBarState): UseFilterBarReturn 
     addOrContainer,
     removeOrContainer,
     addChildLozenge,
+    toggleNegate,
     moveToContainer,
     moveToTopLevel,
   };

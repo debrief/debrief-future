@@ -20,6 +20,7 @@ export interface LozengeItem {
   readonly id: string;
   readonly filterType: FilterType;
   readonly value: string;
+  readonly negated?: boolean;
 }
 
 /** An OR container grouping child lozenges with OR logic */
@@ -46,7 +47,8 @@ export type FilterBarAction =
   | { type: 'REMOVE_OR_CONTAINER'; id: string }
   | { type: 'ADD_CHILD_LOZENGE'; containerId: string; filterType: FilterType; value: string }
   | { type: 'MOVE_TO_CONTAINER'; lozengeId: string; containerId: string }
-  | { type: 'MOVE_TO_TOP_LEVEL'; lozengeId: string; fromContainerId: string };
+  | { type: 'MOVE_TO_TOP_LEVEL'; lozengeId: string; fromContainerId: string }
+  | { type: 'TOGGLE_NEGATE'; id: string };
 
 /** Props for the FilterBar component */
 export interface FilterBarProps {
