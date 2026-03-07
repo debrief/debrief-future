@@ -7,5 +7,9 @@ export { FilterBar } from './FilterBar';
 export { useFilterBar } from './useFilterBar';
 export { useDistinctValues } from './useDistinctValues';
 export { taxonomyToCascadingItems } from './taxonomyAdapter';
-export type { FilterBarState, FilterBarItem, LozengeItem, OrContainerItem, FilterTypeOption, InputMethod, } from './types';
+export { SaveFilterButton } from './SaveFilterButton';
+export { HistoricFiltersDropdown } from './HistoricFiltersDropdown';
+export { useSavedFilters } from './useSavedFilters';
+export { InMemoryStorage, LocalStorageSavedFilters } from './savedFiltersStorage';
+export type { FilterBarState, FilterBarItem, LozengeItem, OrContainerItem, FilterTypeOption, InputMethod, SavedFilterConfiguration, SavedFiltersCollection, SavedFiltersStorage, } from './types';
 //# sourceMappingURL=index.d.ts.map
