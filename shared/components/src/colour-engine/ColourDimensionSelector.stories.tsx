@@ -30,7 +30,7 @@ const meta: Meta<typeof ColourDimensionSelector> = {
     docs: {
       description: {
         component:
-          'ColourDimensionSelector provides a dropdown to choose the active colour dimension (Age, Vessel Class, Tag) or reset to none.',
+          'ColourDimensionSelector provides a dropdown to choose the active colour dimension (Age, Tag) or reset to none.',
       },
     },
   },
@@ -52,7 +52,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Interactive selector with all three built-in dimensions. Select a dimension or choose "None" to reset.',
+        story: 'Interactive selector with built-in dimensions. Select a dimension or choose "None" to reset.',
       },
     },
   },
@@ -61,13 +61,13 @@ export const Default: Story = {
 export const WithPreselection: Story = {
   args: {
     dimensions: builtInDimensions,
-    activeDimensionId: 'vessel-class',
+    activeDimensionId: 'tag',
     onDimensionChange: () => {},
   },
   parameters: {
     docs: {
       description: {
-        story: 'Selector with "Vessel Class" pre-selected.',
+        story: 'Selector with "Tag" pre-selected.',
       },
     },
   },

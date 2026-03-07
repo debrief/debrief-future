@@ -7,12 +7,10 @@
 
 import type { ColourDimension } from './types';
 import { ageDimension } from './dimensions/age';
-import { vesselClassDimension } from './dimensions/vessel-class';
 import { tagDimension } from './dimensions/tag';
 
-/** The built-in colour dimensions (Age, Vessel Class, Tag). */
+/** The built-in colour dimensions (Age, Tag). */
 export const builtInDimensions: readonly ColourDimension[] = [
   ageDimension,
-  vesselClassDimension,
   tagDimension,
 ];

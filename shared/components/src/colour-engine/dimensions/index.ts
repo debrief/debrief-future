@@ -3,5 +3,4 @@
  */
 
 export { ageDimension } from './age';
-export { vesselClassDimension } from './vessel-class';
 export { tagDimension } from './tag';

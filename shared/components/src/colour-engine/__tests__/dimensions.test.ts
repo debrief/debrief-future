@@ -4,7 +4,6 @@
 
 import { describe, it, expect } from 'vitest';
 import { ageDimension } from '../dimensions/age';
-import { vesselClassDimension } from '../dimensions/vessel-class';
 import { tagDimension } from '../dimensions/tag';
 import type { StacBrowserItem } from '../../filter-engine/types';
 
@@ -60,28 +59,6 @@ describe('ageDimension', () => {
 
   it('returns null when no date is available', () => {
     expect(ageDimension.resolve(makeItem())).toBeNull();
-  });
-});
-
-describe('vesselClassDimension', () => {
-  it('has correct metadata', () => {
-    expect(vesselClassDimension.id).toBe('vessel-class');
-    expect(vesselClassDimension.label).toBe('Vessel Class');
-    expect(vesselClassDimension.type).toBe('categorical');
-  });
-
-  it('resolves leaf segment of first vessel class', () => {
-    const item = makeItem({ vesselClasses: ['surface/warship/frigate/type23'] });
-    expect(vesselClassDimension.resolve(item)).toBe('type23');
-  });
-
-  it('handles single-segment paths', () => {
-    const item = makeItem({ vesselClasses: ['submarine'] });
-    expect(vesselClassDimension.resolve(item)).toBe('submarine');
-  });
-
-  it('returns null for empty vessel classes', () => {
-    expect(vesselClassDimension.resolve(makeItem())).toBeNull();
   });
 });
 

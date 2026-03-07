@@ -6,7 +6,6 @@ import { describe, it, expect } from 'vitest';
 import { computeColourAssignment, getDefaultColourAssignment } from '../engine';
 import { defaultPalette } from '../palette';
 import { ageDimension } from '../dimensions/age';
-import { vesselClassDimension } from '../dimensions/vessel-class';
 import { tagDimension } from '../dimensions/tag';
 import type { StacBrowserItem } from '../../filter-engine/types';
 import type { ColourDimension } from '../types';
@@ -34,27 +33,27 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
 
 describe('computeColourAssignment', () => {
   describe('categorical dimensions', () => {
-    it('assigns one colour per unique vessel class', () => {
+    it('assigns one colour per unique tag', () => {
       const items: StacBrowserItem[] = [
-        makeItem('a', { vesselClasses: ['surface/warship/frigate'] }),
-        makeItem('b', { vesselClasses: ['surface/warship/destroyer'] }),
-        makeItem('c', { vesselClasses: ['surface/warship/frigate'] }),
+        makeItem('a', { tags: ['alpha'] }),
+        makeItem('b', { tags: ['bravo'] }),
+        makeItem('c', { tags: ['alpha'] }),
       ];
 
-      const result = computeColourAssignment(items, vesselClassDimension, defaultPalette);
+      const result = computeColourAssignment(items, tagDimension, defaultPalette);
 
-      // Frigates share one colour, destroyer gets another
+      // Items with same tag share one colour
       expect(result.colorMap.get('a')).toBe(result.colorMap.get('c'));
       expect(result.colorMap.get('a')).not.toBe(result.colorMap.get('b'));
     });
 
     it('assigns unclassified colour to items without metadata', () => {
       const items: StacBrowserItem[] = [
-        makeItem('a', { vesselClasses: ['surface/warship/frigate'] }),
-        makeItem('b', { vesselClasses: [] }),
+        makeItem('a', { tags: ['alpha'] }),
+        makeItem('b', { tags: [] }),
       ];
 
-      const result = computeColourAssignment(items, vesselClassDimension, defaultPalette);
+      const result = computeColourAssignment(items, tagDimension, defaultPalette);
 
       expect(result.colorMap.get('b')).toBe(defaultPalette.unclassifiedColour);
       expect(result.legend!.hasUnclassified).toBe(true);
@@ -77,11 +76,11 @@ describe('computeColourAssignment', () => {
 
     it('produces matching colourFn and colorMap outputs', () => {
       const items: StacBrowserItem[] = [
-        makeItem('a', { vesselClasses: ['surface/warship/frigate'] }),
-        makeItem('b', { vesselClasses: ['surface/warship/destroyer'] }),
+        makeItem('a', { tags: ['alpha'] }),
+        makeItem('b', { tags: ['bravo'] }),
       ];
 
-      const result = computeColourAssignment(items, vesselClassDimension, defaultPalette);
+      const result = computeColourAssignment(items, tagDimension, defaultPalette);
 
       for (const item of items) {
         const mapColour = result.colorMap.get(item.id);
@@ -91,7 +90,7 @@ describe('computeColourAssignment', () => {
     });
 
     it('handles empty items array', () => {
-      const result = computeColourAssignment([], vesselClassDimension, defaultPalette);
+      const result = computeColourAssignment([], tagDimension, defaultPalette);
       expect(result.colorMap.size).toBe(0);
       expect(result.legend!.entries).toHaveLength(0);
     });

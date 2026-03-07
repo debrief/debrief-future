@@ -4,8 +4,8 @@ import { ThemeProvider } from '../ThemeProvider';
 import type { LegendModel, ColourDimension } from './types';
 
 const categoricalDimension: ColourDimension = {
-  id: 'vessel-class',
-  label: 'Vessel Class',
+  id: 'tag',
+  label: 'Tag',
   type: 'categorical',
   resolve: () => null,
 };
@@ -50,7 +50,7 @@ const meta: Meta<typeof ColourLegend> = {
     docs: {
       description: {
         component:
-          'ColourLegend renders a gradient bar for continuous dimensions (Age) and discrete colour swatches for categorical dimensions (Vessel Class, Tag).',
+          'ColourLegend renders a gradient bar for continuous dimensions (Age) and discrete colour swatches for categorical dimensions (Tag).',
       },
     },
   },
@@ -77,7 +77,7 @@ export const Categorical: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Categorical legend with discrete colour swatches, one per vessel class. Includes an "Unclassified" entry for items without metadata.',
+        story: 'Categorical legend with discrete colour swatches. Includes an "Unclassified" entry for items without metadata.',
       },
     },
   },

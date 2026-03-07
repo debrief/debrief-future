@@ -18,25 +18,24 @@ describe('ColourDimensionSelector', () => {
     );
 
     const select = screen.getByTestId('colour-dimension-select') as HTMLSelectElement;
-    // "None" + 3 built-in dimensions
-    expect(select.options).toHaveLength(4);
+    // "None" + 2 built-in dimensions
+    expect(select.options).toHaveLength(3);
     expect(select.options[0].text).toBe('None');
     expect(select.options[1].text).toBe('Age');
-    expect(select.options[2].text).toBe('Vessel Class');
-    expect(select.options[3].text).toBe('Tag');
+    expect(select.options[2].text).toBe('Tag');
   });
 
   it('shows active dimension as selected', () => {
     render(
       <ColourDimensionSelector
         dimensions={builtInDimensions}
-        activeDimensionId="vessel-class"
+        activeDimensionId="tag"
         onDimensionChange={() => {}}
       />
     );
 
     const select = screen.getByTestId('colour-dimension-select') as HTMLSelectElement;
-    expect(select.value).toBe('vessel-class');
+    expect(select.value).toBe('tag');
   });
 
   it('calls onDimensionChange with dimension id on selection', () => {
