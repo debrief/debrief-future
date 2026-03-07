@@ -8,7 +8,6 @@ export { computeColourAssignment, getDefaultColourAssignment } from './engine';
 export { defaultPalette, interpolateColour, getCategoricalColour, AGE_GRADIENT } from './palette';
 export { builtInDimensions } from './registry';
 export { ageDimension } from './dimensions/age';
-export { vesselClassDimension } from './dimensions/vessel-class';
 export { tagDimension } from './dimensions/tag';
 export { ColourLegend } from './ColourLegend';
 export { ColourDimensionSelector } from './ColourDimensionSelector';

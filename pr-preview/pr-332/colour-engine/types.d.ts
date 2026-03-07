@@ -75,7 +75,7 @@ export interface ColourAssignment {
     readonly legend: LegendModel | null;
 }
 /** Built-in dimension IDs (for type-safe references). */
-export type BuiltInDimensionId = 'age' | 'vessel-class' | 'tag';
+export type BuiltInDimensionId = 'age' | 'tag';
 /** Props for the ColourDimensionSelector component. */
 export interface ColourDimensionSelectorProps {
     /** Available dimensions to choose from */
