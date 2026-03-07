@@ -4,6 +4,7 @@
 
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { TimelineView } from './TimelineView';
 import type { StacBrowserItem } from '../filter-engine/types';
 import type { TemporalFilter } from './types';
@@ -12,6 +13,10 @@ const meta: Meta<typeof TimelineView> = {
   title: 'Browser/TimelineView',
   component: TimelineView,
   tags: ['autodocs'],
+  args: {
+    onTemporalFilterChange: fn(),
+    onItemSelect: fn(),
+  },
   decorators: [
     (Story) => (
       <div style={{ width: '100%', height: '400px', background: 'var(--vscode-editor-background, #1e1e1e)' }}>
