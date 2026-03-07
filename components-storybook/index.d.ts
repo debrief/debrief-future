@@ -1,5 +1,8 @@
 export { CatalogOverview } from './CatalogOverview';
 export type { CatalogOverviewProps, CatalogOverviewItem } from './CatalogOverview';
+export { ExerciseListView } from './ExerciseListView';
+export type { ExerciseListViewProps, ExerciseListItem, ExerciseListItemRowProps, SpatialThumbnailProps, RecentlyOpenedEntry, SortConfiguration, SortDimension, SortDirection, } from './ExerciseListView';
+export { computeDuration, formatDuration, formatDateRange, formatRelativeTime, sortComparators, } from './ExerciseListView';
 export { StacFileTree } from './StacFileTree';
 export type { StacFileTreeProps, FilesystemAdapter, DirectoryEntry, FileStat, TreeNodeData, NodeType, } from './StacFileTree';
 export { MapView } from './MapView';
