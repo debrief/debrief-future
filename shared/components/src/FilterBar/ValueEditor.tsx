@@ -61,6 +61,7 @@ export const ValueEditor: React.FC<ValueEditorProps> = ({
             items={taxonomy ? taxonomyToCascadingItems(taxonomy) : []}
             anchorPosition={{ x: 0, y: 0 }}
             header="Vessel Class"
+            selectableBranches
             onSelect={(id) => onSelect(id)}
             onDismiss={onClose}
           />

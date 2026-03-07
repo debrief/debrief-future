@@ -200,5 +200,35 @@ describe('ValueEditor', () => {
 
       expect(screen.getByTestId('value-editor-hierarchical')).toBeInTheDocument();
     });
+
+    it('selecting a branch node (not just leaf) fires onSelect', () => {
+      const onSelect = vi.fn();
+      render(
+        <ValueEditor
+          filterType="vessel-class"
+          value=""
+          onSelect={onSelect}
+          onClose={vi.fn()}
+          availableValues={[]}
+          taxonomy={[
+            {
+              id: 'surface',
+              label: 'Surface',
+              children: [
+                {
+                  id: 'warship',
+                  label: 'Warship',
+                  children: [{ id: 'frigate', label: 'Frigate' }],
+                },
+              ],
+            },
+          ]}
+        />
+      );
+
+      // Click "Surface" which is a branch node with children
+      fireEvent.click(screen.getByTestId('menu-item-surface'));
+      expect(onSelect).toHaveBeenCalledWith('surface');
+    });
   });
 });
