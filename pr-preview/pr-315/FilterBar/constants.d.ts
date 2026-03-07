@@ -1,5 +1,5 @@
 import { FilterTypeOption } from './types';
-import { DurationBucket } from '../filter-engine';
+import { DurationBucket, ModifiedBucket } from '../filter-engine';
 
 /** All 10 filter types with labels and input methods */
 export declare const FILTER_TYPE_OPTIONS: readonly FilterTypeOption[];
@@ -7,6 +7,10 @@ export declare const FILTER_TYPE_OPTIONS: readonly FilterTypeOption[];
 export declare const DURATION_BUCKETS: readonly DurationBucket[];
 /** Duration bucket display labels */
 export declare const DURATION_BUCKET_LABELS: Record<DurationBucket, string>;
+/** Modified-recency bucket options */
+export declare const MODIFIED_BUCKETS: readonly ModifiedBucket[];
+/** Modified-recency bucket display labels */
+export declare const MODIFIED_BUCKET_LABELS: Record<ModifiedBucket, string>;
 /** Empty state hint text */
 export declare const EMPTY_STATE_HINT = "Add filters to narrow results";
 /** No matches message */

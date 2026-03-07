@@ -6,5 +6,5 @@
 export { createFilterEngine } from './engine';
 export { parseTaxonomy, buildDescendantMap } from './taxonomy';
 export type { RawTaxonomy, RawTaxonomyNode, DescendantMap } from './taxonomy';
-export type { FilterType, DurationBucket, Predicate, OrGroup, FilterExpression, StacBrowserItem, VesselTaxonomyNode, FilterEngineConfig, FilterEngine, } from './types';
+export type { FilterType, DurationBucket, ModifiedBucket, Predicate, OrGroup, FilterExpression, StacBrowserItem, VesselTaxonomyNode, FilterEngineConfig, FilterEngine, } from './types';
 //# sourceMappingURL=index.d.ts.map
