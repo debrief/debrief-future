@@ -8,6 +8,10 @@ export { FilterBar } from './FilterBar';
 export { useFilterBar } from './useFilterBar';
 export { useDistinctValues } from './useDistinctValues';
 export { taxonomyToCascadingItems } from './taxonomyAdapter';
+export { SaveFilterButton } from './SaveFilterButton';
+export { HistoricFiltersDropdown } from './HistoricFiltersDropdown';
+export { useSavedFilters } from './useSavedFilters';
+export { InMemoryStorage, LocalStorageSavedFilters } from './savedFiltersStorage';
 export type {
   FilterBarState,
   FilterBarItem,
@@ -15,4 +19,7 @@ export type {
   OrContainerItem,
   FilterTypeOption,
   InputMethod,
+  SavedFilterConfiguration,
+  SavedFiltersCollection,
+  SavedFiltersStorage,
 } from './types';

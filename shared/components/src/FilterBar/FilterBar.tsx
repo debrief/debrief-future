@@ -24,9 +24,15 @@ import { Lozenge } from './Lozenge';
 import { OrContainer } from './OrContainer';
 import { FilterTypeMenu } from './FilterTypeMenu';
 import { ValueEditor } from './ValueEditor';
+import { SaveFilterButton } from './SaveFilterButton';
+import { HistoricFiltersDropdown } from './HistoricFiltersDropdown';
+import { useSavedFilters } from './useSavedFilters';
+import { InMemoryStorage } from './savedFiltersStorage';
 import { EMPTY_STATE_HINT, FILTER_ERROR_MESSAGE } from './constants';
-import type { FilterBarProps, LozengeItem } from './types';
+import type { FilterBarProps, LozengeItem, SavedFilterConfiguration } from './types';
 import './FilterBar.css';
+
+const fallbackStorage = new InMemoryStorage();
 
 export const FilterBar: React.FC<FilterBarProps> = ({
   items,
@@ -34,6 +40,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onFilteredItems,
   onExpressionChange,
   initialFilterState,
+  savedFiltersStorage,
 }) => {
   const {
     state,
@@ -47,7 +54,17 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     toggleNegate,
     moveToContainer,
     moveToTopLevel,
+    setState: setFilterBarState,
   } = useFilterBar(initialFilterState);
+
+  const savedFilters = useSavedFilters(savedFiltersStorage ?? fallbackStorage);
+
+  const handleRestore = useCallback(
+    (config: SavedFilterConfiguration) => {
+      setFilterBarState(config.filterBarState);
+    },
+    [setFilterBarState],
+  );
 
   const distinctValues = useDistinctValues(items);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -59,6 +76,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   const engine = useMemo(
     () => createFilterEngine({ taxonomy }),
     [taxonomy],
+  );
+
+  const cql2Json = useMemo(
+    () => engine.toCql2Json(expression),
+    [engine, expression],
   );
 
   // Filter items whenever expression changes
@@ -225,6 +247,23 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             onSelectType={handleSelectType}
             onSelectOrGroup={handleSelectOrGroup}
           />
+
+          {savedFiltersStorage && (
+            <>
+              <SaveFilterButton
+                currentFilterBarState={state}
+                currentCql2Json={cql2Json}
+                hasActiveFilters={!isEmpty}
+                nameExists={savedFilters.nameExists}
+                onSave={savedFilters.saveConfiguration}
+              />
+              <HistoricFiltersDropdown
+                configurations={savedFilters.configurations}
+                onRestore={handleRestore}
+                onDelete={savedFilters.deleteConfiguration}
+              />
+            </>
+          )}
         </div>
 
         {/* Value editor popover for adding new filter */}

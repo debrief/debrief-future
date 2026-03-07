@@ -188,3 +188,213 @@
 .debrief-value-editor__input:focus {
   border-color: var(--vscode-focusBorder, #0078d4);
 }
+
+/* SaveFilterButton styles (#128) */
+.debrief-save-filter {
+  position: relative;
+  display: inline-flex;
+}
+
+.debrief-save-filter__button {
+  border: 1px solid var(--vscode-button-border, var(--vscode-widget-border, #ccc));
+  background: var(--vscode-button-secondaryBackground, #e8e8e8);
+  color: var(--vscode-button-secondaryForeground, #333);
+  padding: 2px 8px;
+  font-size: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.debrief-save-filter__button:hover:not(:disabled) {
+  background: var(--vscode-button-secondaryHoverBackground, #ddd);
+}
+
+.debrief-save-filter__button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.debrief-save-filter__popover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 200;
+  margin-top: 4px;
+  background: var(--vscode-editorWidget-background, #fff);
+  border: 1px solid var(--vscode-widget-border, #ddd);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  min-width: 220px;
+}
+
+.debrief-save-filter__input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--vscode-input-border, #ccc);
+  background: var(--vscode-input-background, #fff);
+  color: var(--vscode-input-foreground, #333);
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 3px;
+  outline: none;
+  margin-bottom: 6px;
+}
+
+.debrief-save-filter__input:focus {
+  border-color: var(--vscode-focusBorder, #0078d4);
+}
+
+.debrief-save-filter__overwrite {
+  color: var(--vscode-editorWarning-foreground, #bf8803);
+  font-size: 11px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.debrief-save-filter__overwrite-confirm {
+  border: none;
+  background: var(--vscode-button-background, #0078d4);
+  color: var(--vscode-button-foreground, #fff);
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.debrief-save-filter__actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.debrief-save-filter__save {
+  border: none;
+  background: var(--vscode-button-background, #0078d4);
+  color: var(--vscode-button-foreground, #fff);
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.debrief-save-filter__save:hover {
+  background: var(--vscode-button-hoverBackground, #005a9e);
+}
+
+.debrief-save-filter__cancel {
+  border: 1px solid var(--vscode-widget-border, #ccc);
+  background: transparent;
+  color: var(--vscode-foreground, #333);
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* HistoricFiltersDropdown styles (#128) */
+.debrief-historic-filters {
+  position: relative;
+  display: inline-flex;
+}
+
+.debrief-historic-filters__trigger {
+  border: 1px solid var(--vscode-button-border, var(--vscode-widget-border, #ccc));
+  background: var(--vscode-button-secondaryBackground, #e8e8e8);
+  color: var(--vscode-button-secondaryForeground, #333);
+  padding: 2px 8px;
+  font-size: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.debrief-historic-filters__trigger:hover {
+  background: var(--vscode-button-secondaryHoverBackground, #ddd);
+}
+
+.debrief-historic-filters__dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 200;
+  margin-top: 4px;
+  background: var(--vscode-editorWidget-background, #fff);
+  border: 1px solid var(--vscode-widget-border, #ddd);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  min-width: 220px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.debrief-historic-filters__empty {
+  color: var(--vscode-descriptionForeground, #999);
+  padding: 12px;
+  font-size: 12px;
+  font-style: italic;
+  text-align: center;
+}
+
+.debrief-historic-filters__list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.debrief-historic-filters__item {
+  display: flex;
+  align-items: center;
+  padding: 0 4px 0 0;
+}
+
+.debrief-historic-filters__restore {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: none;
+  background: transparent;
+  color: var(--vscode-foreground, #333);
+  padding: 6px 12px;
+  text-align: left;
+  font-size: 12px;
+  cursor: pointer;
+  gap: 8px;
+}
+
+.debrief-historic-filters__restore:hover {
+  background: var(--vscode-list-hoverBackground, #f0f0f0);
+}
+
+.debrief-historic-filters__name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.debrief-historic-filters__date {
+  color: var(--vscode-descriptionForeground, #999);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.debrief-historic-filters__delete {
+  border: none;
+  background: transparent;
+  color: var(--vscode-descriptionForeground, #999);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 6px;
+  line-height: 1;
+  border-radius: 3px;
+}
+
+.debrief-historic-filters__delete:hover {
+  color: var(--vscode-errorForeground, #d32f2f);
+  background: var(--vscode-list-hoverBackground, #f0f0f0);
+}
