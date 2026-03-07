@@ -144,11 +144,34 @@
 }
 
 .debrief-value-editor__free-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   background: var(--vscode-editorWidget-background, #fff);
   border: 1px solid var(--vscode-widget-border, #ddd);
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   padding: 6px;
+}
+
+.debrief-value-editor__apply {
+  border: none;
+  background: var(--vscode-button-background, #0078d4);
+  color: var(--vscode-button-foreground, #fff);
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.debrief-value-editor__apply:hover {
+  background: var(--vscode-button-hoverBackground, #005a9e);
+}
+
+.debrief-value-editor__apply:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .debrief-value-editor__input {

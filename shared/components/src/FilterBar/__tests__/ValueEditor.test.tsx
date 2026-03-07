@@ -132,6 +132,55 @@ describe('ValueEditor', () => {
       fireEvent.keyDown(input, { key: 'Enter' });
       expect(onSelect).toHaveBeenCalledWith('test query');
     });
+
+    it('fires onSelect on Apply button click', () => {
+      const onSelect = vi.fn();
+      render(
+        <ValueEditor
+          filterType="title"
+          value=""
+          onSelect={onSelect}
+          onClose={vi.fn()}
+          availableValues={[]}
+        />
+      );
+
+      const input = screen.getByTestId('value-editor-text-input');
+      fireEvent.change(input, { target: { value: 'search term' } });
+      fireEvent.click(screen.getByTestId('value-editor-apply'));
+      expect(onSelect).toHaveBeenCalledWith('search term');
+    });
+
+    it('disables Apply button when input is empty', () => {
+      render(
+        <ValueEditor
+          filterType="title"
+          value=""
+          onSelect={vi.fn()}
+          onClose={vi.fn()}
+          availableValues={[]}
+        />
+      );
+
+      expect(screen.getByTestId('value-editor-apply')).toBeDisabled();
+    });
+
+    it('does not fire onSelect while typing', () => {
+      const onSelect = vi.fn();
+      render(
+        <ValueEditor
+          filterType="title"
+          value=""
+          onSelect={onSelect}
+          onClose={vi.fn()}
+          availableValues={[]}
+        />
+      );
+
+      const input = screen.getByTestId('value-editor-text-input');
+      fireEvent.change(input, { target: { value: 'partial' } });
+      expect(onSelect).not.toHaveBeenCalled();
+    });
   });
 
   describe('hierarchical (vessel-class)', () => {

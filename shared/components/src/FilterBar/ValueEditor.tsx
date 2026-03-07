@@ -12,7 +12,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { FilterType, VesselTaxonomyNode } from '../filter-engine';
 import { CascadingMenu } from '../CascadingMenu';
 import { taxonomyToCascadingItems } from './taxonomyAdapter';
-import { FILTER_TYPE_OPTIONS, DURATION_BUCKETS, DURATION_BUCKET_LABELS, FREE_TEXT_DEBOUNCE_MS } from './constants';
+import { FILTER_TYPE_OPTIONS, DURATION_BUCKETS, DURATION_BUCKET_LABELS } from './constants';
 
 export interface ValueEditorProps {
   readonly filterType: FilterType;
@@ -116,7 +116,6 @@ interface FreeTextInputProps {
 
 const FreeTextInput: React.FC<FreeTextInputProps> = ({ value, onSelect, onClose }) => {
   const [text, setText] = useState(value);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -124,34 +123,21 @@ const FreeTextInput: React.FC<FreeTextInputProps> = ({ value, onSelect, onClose 
     inputRef.current?.select();
   }, []);
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setText(newValue);
-
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      if (newValue.trim()) {
-        onSelect(newValue.trim());
-      }
-    }, FREE_TEXT_DEBOUNCE_MS);
-  }, [onSelect]);
+  const handleApply = useCallback(() => {
+    if (text.trim()) {
+      onSelect(text.trim());
+    }
+  }, [text, onSelect]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && text.trim()) {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      onSelect(text.trim());
+    if (e.key === 'Enter') {
+      handleApply();
     }
     if (e.key === 'Escape') {
       e.stopPropagation();
       onClose();
     }
-  }, [text, onSelect, onClose]);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
+  }, [handleApply, onClose]);
 
   return (
     <div className="debrief-value-editor__free-text" data-testid="value-editor-free-text">
@@ -160,11 +146,19 @@ const FreeTextInput: React.FC<FreeTextInputProps> = ({ value, onSelect, onClose 
         type="text"
         className="debrief-value-editor__input"
         value={text}
-        onChange={handleChange}
+        onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type to search..."
         data-testid="value-editor-text-input"
       />
+      <button
+        className="debrief-value-editor__apply"
+        data-testid="value-editor-apply"
+        disabled={!text.trim()}
+        onClick={handleApply}
+      >
+        Apply
+      </button>
     </div>
   );
 };

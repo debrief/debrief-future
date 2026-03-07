@@ -48,9 +48,6 @@ export const NO_MATCHES_MESSAGE = 'No matches';
 /** Error banner message */
 export const FILTER_ERROR_MESSAGE = 'Filter could not be applied';
 
-/** Free-text input debounce delay in ms */
-export const FREE_TEXT_DEBOUNCE_MS = 150;
-
 /** OR group option label */
 export const OR_GROUP_LABEL = 'OR group';
 
