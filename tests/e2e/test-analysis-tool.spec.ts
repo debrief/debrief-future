@@ -14,7 +14,7 @@ import { test, expect } from './fixtures/base';
 const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 
 test.describe('US2: Analysis Tool Execution Workflow', () => {
-  test.setTimeout(120_000);
+  test.setTimeout(60_000);
 
   // Skip: Log Panel webview doesn't load in openvscode-server (backlog #124)
   test.skip('T018: select track, run single-track tool, log entry appears', async ({

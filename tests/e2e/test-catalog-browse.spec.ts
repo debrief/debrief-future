@@ -12,7 +12,7 @@
 import { test, expect } from './fixtures/base';
 
 test.describe('Catalog Browse', () => {
-  test.setTimeout(120_000);
+  test.setTimeout(60_000);
 
   test('catalog overview is visible after opening it', async ({
     codeServerPage,

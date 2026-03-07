@@ -15,7 +15,7 @@ import { test, expect } from './fixtures/base';
 const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 
 test.describe('US1: Load and Display Workflow', () => {
-  test.setTimeout(120_000);
+  test.setTimeout(60_000);
 
   test('T014: open plot via STAC tree shows track lines on map', async ({
     codeServerPage,

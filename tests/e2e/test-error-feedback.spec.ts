@@ -12,7 +12,7 @@ import { test, expect } from './fixtures/base';
 const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 
 test.describe('US3: Error Feedback Workflow', () => {
-  test.setTimeout(120_000);
+  test.setTimeout(60_000);
 
   test('T022: open malformed REP file shows error notification, no corrupt data', async ({
     codeServerPage,
