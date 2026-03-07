@@ -13,8 +13,6 @@ export declare const EMPTY_STATE_HINT = "Add filters to narrow results";
 export declare const NO_MATCHES_MESSAGE = "No matches";
 /** Error banner message */
 export declare const FILTER_ERROR_MESSAGE = "Filter could not be applied";
-/** Free-text input debounce delay in ms */
-export declare const FREE_TEXT_DEBOUNCE_MS = 150;
 /** OR group option label */
 export declare const OR_GROUP_LABEL = "OR group";
 /** Get the label for a filter type */
