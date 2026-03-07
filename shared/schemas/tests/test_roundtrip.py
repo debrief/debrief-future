@@ -16,25 +16,49 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "generated" / "python"))
 from debrief_schemas import (
+    CircleAnnotation,
+    LineAnnotation,
     LineProperties,
+    MultiPointFeature,
+    MultiPolygonFeature,
+    NarrativeEntry,
     PointProperties,
+    PolyAnnotation,
     PolygonProperties,
+    RectangleAnnotation,
     ReferenceLocation,
+    SystemState,
+    TextAnnotation,
+    TrackFeature,
     TrackStyle,
+    VectorAnnotation,
 )
 
 FIXTURES_DIR = Path(__file__).parent.parent / "src" / "fixtures"
 VALID_DIR = FIXTURES_DIR / "valid"
 
-# Entity types that don't have the nested array limitation (tracer bullet: reference-location only)
-# TrackFeature excluded due to LinkML nested array limitation with GeoJSON coordinates
 ROUNDTRIP_ENTITY_MAP = {
+    # Core types
+    "track-feature": TrackFeature,
     "reference-location": ReferenceLocation,
-    # Styling types (no geometry - safe for round-trip)
+    # System state types
+    "system-state": SystemState,
+    # Annotation types
+    "narrative-entry": NarrativeEntry,
+    "circle-annotation": CircleAnnotation,
+    "rectangle-annotation": RectangleAnnotation,
+    "line-annotation": LineAnnotation,
+    "text-annotation": TextAnnotation,
+    "vector-annotation": VectorAnnotation,
+    "poly-annotation": PolyAnnotation,
+    # Styling types
     "point-properties": PointProperties,
     "line-properties": LineProperties,
     "polygon-properties": PolygonProperties,
     "track-style": TrackStyle,
+    # Multi-geometry tool result types
+    "multi-point-feature": MultiPointFeature,
+    "multi-polygon-feature": MultiPolygonFeature,
 }
 
 
@@ -47,7 +71,7 @@ def get_entity_type(filename: str) -> str | None:
 
 
 def get_roundtrip_fixtures() -> list[tuple[str, Path]]:
-    """Get fixtures that can be round-tripped (excludes track-feature due to nested array limitation)."""
+    """Get all valid fixtures for round-trip testing."""
     fixtures = []
     if VALID_DIR.exists():
         for f in sorted(VALID_DIR.glob("*.json")):
