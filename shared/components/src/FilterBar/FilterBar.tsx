@@ -16,10 +16,11 @@ import {
   closestCenter,
 } from '@dnd-kit/core';
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
-import { createFilterEngine } from '../filter-engine';
-import type { FilterType, FilterExpression } from '../filter-engine';
+import { createFilterEngine, buildTaxonomyLabelMap, resolveTaxonomyLabel } from '../filter-engine';
+import type { FilterType, FilterExpression, StacBrowserItem } from '../filter-engine';
 import { useFilterBar } from './useFilterBar';
 import { useDistinctValues } from './useDistinctValues';
+import { useTaxonomyMatchCounts } from './useTaxonomyMatchCounts';
 import { Lozenge } from './Lozenge';
 import { OrContainer } from './OrContainer';
 import { FilterTypeMenu } from './FilterTypeMenu';
@@ -72,16 +73,25 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   const [addingForContainer, setAddingForContainer] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  const [filteredItems, setFilteredItems] = useState<readonly StacBrowserItem[]>(items);
 
   const engine = useMemo(
     () => createFilterEngine({ taxonomy }),
     [taxonomy],
   );
 
+  const labelMap = useMemo(
+    () => buildTaxonomyLabelMap(taxonomy),
+    [taxonomy],
+  );
+
+  const taxonomyCounts = useTaxonomyMatchCounts(filteredItems, taxonomy);
+
   const cql2Json = useMemo(
     () => engine.toCql2Json(expression),
     [engine, expression],
   );
+
 
   // Filter items whenever expression changes
   const prevExpressionRef = useRef<FilterExpression | null>(null);
@@ -92,6 +102,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
     try {
       const filtered = engine.filter(items, expression);
+      setFilteredItems(filtered);
       onFilteredItems(filtered);
       onExpressionChange?.(expression);
       setError(null);
@@ -230,6 +241,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   onToggleNegate={toggleNegate}
                   availableValues={distinctValues}
                   taxonomy={taxonomy}
+                  labelMap={labelMap}
+                  taxonomyCounts={taxonomyCounts}
                 />
               );
             }
@@ -248,6 +261,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   onToggleNegate={toggleNegate}
                   availableValues={distinctValues}
                   taxonomy={taxonomy}
+                  labelMap={labelMap}
+                  taxonomyCounts={taxonomyCounts}
                 />
               );
             }
@@ -276,6 +291,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               onClose={handleValueClose}
               availableValues={distinctValues[addingType] ?? []}
               taxonomy={taxonomy}
+              taxonomyCounts={taxonomyCounts}
             />
           </div>
         )}
@@ -290,6 +306,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               onClose={handleValueClose}
               availableValues={distinctValues[addingType] ?? []}
               taxonomy={taxonomy}
+              taxonomyCounts={taxonomyCounts}
             />
           </div>
         )}
@@ -301,7 +318,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <span className="debrief-lozenge__body">
               <span className="debrief-lozenge__type">{activeDragItem.filterType}</span>
               <span className="debrief-lozenge__separator">:</span>
-              <span className="debrief-lozenge__value">{activeDragItem.value}</span>
+              <span className="debrief-lozenge__value">
+                {activeDragItem.filterType === 'vessel-class'
+                  ? resolveTaxonomyLabel(activeDragItem.value, labelMap)
+                  : activeDragItem.value}
+              </span>
             </span>
           </div>
         )}

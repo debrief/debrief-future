@@ -47,8 +47,8 @@
 
 **Purpose**: Ensure project structure and test infrastructure are ready
 
-- [ ] T001 Create `CascadingMenu/__tests__/` directory `shared/components/src/CascadingMenu/__tests__/`
-- [ ] T002 [P] Create evidence directory structure `specs/133-vessel-taxonomy/evidence/screenshots/`
+- [x] T001 Create `CascadingMenu/__tests__/` directory `shared/components/src/CascadingMenu/__tests__/`
+- [x] T002 [P] Create evidence directory structure `specs/133-vessel-taxonomy/evidence/screenshots/`
 
 ---
 
@@ -62,16 +62,16 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T003 [test] Write unit tests for `buildTaxonomyLabelMap()` — full-path keys, tanker ambiguity, unknown path fallback `shared/components/src/filter-engine/__tests__/taxonomy.test.ts`
-- [ ] T004 [P][test] Write unit tests for `filterCascadingItems()` — substring match, ancestor chain, empty query, no matches, special characters `shared/components/src/CascadingMenu/__tests__/filterCascadingItems.test.ts`
+- [x] T003 [test] Write unit tests for `buildTaxonomyLabelMap()` — full-path keys, tanker ambiguity, unknown path fallback `shared/components/src/filter-engine/__tests__/taxonomy.test.ts`
+- [x] T004 [P][test] Write unit tests for `filterCascadingItems()` — substring match, ancestor chain, empty query, no matches, special characters `shared/components/src/CascadingMenu/__tests__/filterCascadingItems.test.ts`
 
 ### Implementation for Foundation
 
-- [ ] T005 Add `buildTaxonomyLabelMap()` and `resolveTaxonomyLabel()` to existing taxonomy module (full-path keys, O(n) tree walk) `shared/components/src/filter-engine/taxonomy.ts`
-- [ ] T006 [P] Add `badge` prop to `CascadingMenuItem` interface and render badge element in CascadingMenu `shared/components/src/CascadingMenu/CascadingMenu.tsx`
-- [ ] T007 [P] Add badge + search input CSS styling `shared/components/src/CascadingMenu/CascadingMenu.css`
-- [ ] T008 [P] Create `filterCascadingItems()` utility — recursive tree filter using `String.toLowerCase().includes()` `shared/components/src/CascadingMenu/filterCascadingItems.ts`
-- [ ] T009 Export `buildTaxonomyLabelMap`, `resolveTaxonomyLabel` from filter-engine index `shared/components/src/filter-engine/index.ts`
+- [x] T005 Add `buildTaxonomyLabelMap()` and `resolveTaxonomyLabel()` to existing taxonomy module (full-path keys, O(n) tree walk) `shared/components/src/filter-engine/taxonomy.ts`
+- [x] T006 [P] Add `badge` prop to `CascadingMenuItem` interface and render badge element in CascadingMenu `shared/components/src/CascadingMenu/CascadingMenu.tsx`
+- [x] T007 [P] Add badge + search input CSS styling `shared/components/src/CascadingMenu/CascadingMenu.css`
+- [x] T008 [P] Create `filterCascadingItems()` utility — recursive tree filter using `String.toLowerCase().includes()` `shared/components/src/CascadingMenu/filterCascadingItems.ts`
+- [x] T009 Export `buildTaxonomyLabelMap`, `resolveTaxonomyLabel` from filter-engine index `shared/components/src/filter-engine/index.ts`
 
 **Checkpoint**: Foundation ready — label resolution, badge rendering, and tree filtering all work. User story implementation can begin.
 
@@ -87,17 +87,17 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [test] [US1] Write unit test for Lozenge vessel-class label resolution via `labelMap` prop `shared/components/src/FilterBar/__tests__/Lozenge.test.tsx`
-- [ ] T011 [P][test] [US1] Write unit test for OrContainer forwarding `labelMap` to child Lozenges `shared/components/src/FilterBar/__tests__/OrContainer.test.tsx`
-- [ ] T012 [P][test] [US1] Write unit test for `taxonomyToCascadingItems()` with `currentValue` option — verify `current: true` on matching node `shared/components/src/FilterBar/__tests__/taxonomyAdapter.test.ts`
+- [x] T010 [test] [US1] Write unit test for Lozenge vessel-class label resolution via `labelMap` prop `shared/components/src/FilterBar/__tests__/Lozenge.test.tsx`
+- [x] T011 [P][test] [US1] Write unit test for OrContainer forwarding `labelMap` to child Lozenges `shared/components/src/FilterBar/__tests__/OrContainer.test.tsx`
+- [x] T012 [P][test] [US1] Write unit test for `taxonomyToCascadingItems()` with `currentValue` option — verify `current: true` on matching node `shared/components/src/FilterBar/__tests__/taxonomyAdapter.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T013 Modify `taxonomyToCascadingItems()` to accept `currentValue` option and set `current: true` on matching item `shared/components/src/FilterBar/taxonomyAdapter.ts`
-- [ ] T014 Modify Lozenge to accept `labelMap` prop and resolve vessel-class values via `resolveTaxonomyLabel()` `shared/components/src/FilterBar/Lozenge.tsx`
-- [ ] T015 Modify OrContainer to forward `labelMap` prop to child Lozenges `shared/components/src/FilterBar/OrContainer.tsx`
-- [ ] T016 Modify FilterBar to build label map (memoized), pass to Lozenges, and resolve DragOverlay labels for vessel-class items `shared/components/src/FilterBar/FilterBar.tsx`
-- [ ] T017 Modify ValueEditor to pass `currentValue` to `taxonomyToCascadingItems()` when rendering vessel-class editor `shared/components/src/FilterBar/ValueEditor.tsx`
+- [x] T013 Modify `taxonomyToCascadingItems()` to accept `currentValue` option and set `current: true` on matching item `shared/components/src/FilterBar/taxonomyAdapter.ts`
+- [x] T014 Modify Lozenge to accept `labelMap` prop and resolve vessel-class values via `resolveTaxonomyLabel()` `shared/components/src/FilterBar/Lozenge.tsx`
+- [x] T015 Modify OrContainer to forward `labelMap` prop to child Lozenges `shared/components/src/FilterBar/OrContainer.tsx`
+- [x] T016 Modify FilterBar to build label map (memoized), pass to Lozenges, and resolve DragOverlay labels for vessel-class items `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T017 Modify ValueEditor to pass `currentValue` to `taxonomyToCascadingItems()` when rendering vessel-class editor `shared/components/src/FilterBar/ValueEditor.tsx`
 
 **Checkpoint**: Vessel class lozenges show human-readable labels. Re-opening the dropdown highlights the current selection. DragOverlay shows correct labels.
 
@@ -113,13 +113,13 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T018 [test] [US2] Write unit tests for SearchableCascadingMenu — search input rendering, filtering, clear on dismiss, no-matches message `shared/components/src/CascadingMenu/__tests__/SearchableCascadingMenu.test.tsx`
+- [x] T018 [test] [US2] Write unit tests for SearchableCascadingMenu — search input rendering, filtering, clear on dismiss, no-matches message `shared/components/src/CascadingMenu/__tests__/SearchableCascadingMenu.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] Create SearchableCascadingMenu wrapper — owns container layout, search input + CascadingMenu positioned relatively within it `shared/components/src/CascadingMenu/SearchableCascadingMenu.tsx`
-- [ ] T020 [US2] Export SearchableCascadingMenu from CascadingMenu index `shared/components/src/CascadingMenu/index.ts`
-- [ ] T021 [US2] Modify ValueEditor to use SearchableCascadingMenu (with `searchable={true}`) for vessel-class filter type `shared/components/src/FilterBar/ValueEditor.tsx`
+- [x] T019 [US2] Create SearchableCascadingMenu wrapper — owns container layout, search input + CascadingMenu positioned relatively within it `shared/components/src/CascadingMenu/SearchableCascadingMenu.tsx`
+- [x] T020 [US2] Export SearchableCascadingMenu from CascadingMenu index `shared/components/src/CascadingMenu/index.ts`
+- [x] T021 [US2] Modify ValueEditor to use SearchableCascadingMenu (with `searchable={true}`) for vessel-class filter type `shared/components/src/FilterBar/ValueEditor.tsx`
 
 **Checkpoint**: Typing in the search box filters the taxonomy tree. Selecting from filtered results works. Search clears on dismiss.
 
@@ -135,14 +135,14 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T022 [test] [US3] Write unit tests for `useTaxonomyMatchCounts` hook — count computation, descendantMap memoization on taxonomy ref, updates on filtered items change `shared/components/src/FilterBar/__tests__/useTaxonomyMatchCounts.test.ts`
-- [ ] T023 [P][test] [US3] Write unit test for `taxonomyToCascadingItems()` with `counts` option — verify badge strings and `disabled: true` on zero-count nodes `shared/components/src/FilterBar/__tests__/taxonomyAdapter.test.ts`
+- [x] T022 [test] [US3] Write unit tests for `useTaxonomyMatchCounts` hook — count computation, descendantMap memoization on taxonomy ref, updates on filtered items change `shared/components/src/FilterBar/__tests__/useTaxonomyMatchCounts.test.ts`
+- [x] T023 [P][test] [US3] Write unit test for `taxonomyToCascadingItems()` with `counts` option — verify badge strings and `disabled: true` on zero-count nodes `shared/components/src/FilterBar/__tests__/taxonomyAdapter.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Create `useTaxonomyMatchCounts` hook — computes per-node counts from filtered items using memoized `buildDescendantMap()` `shared/components/src/FilterBar/useTaxonomyMatchCounts.ts`
-- [ ] T025 [US3] Modify `taxonomyToCascadingItems()` to accept `counts` option — set `badge` string and `disabled: true` on zero-count nodes `shared/components/src/FilterBar/taxonomyAdapter.ts`
-- [ ] T026 [US3] Integrate counts in FilterBar — call `useTaxonomyMatchCounts`, pass counts through to `taxonomyToCascadingItems()` and ValueEditor `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T024 [US3] Create `useTaxonomyMatchCounts` hook — computes per-node counts from filtered items using memoized `buildDescendantMap()` `shared/components/src/FilterBar/useTaxonomyMatchCounts.ts`
+- [x] T025 [US3] Modify `taxonomyToCascadingItems()` to accept `counts` option — set `badge` string and `disabled: true` on zero-count nodes `shared/components/src/FilterBar/taxonomyAdapter.ts`
+- [x] T026 [US3] Integrate counts in FilterBar — call `useTaxonomyMatchCounts`, pass counts through to `taxonomyToCascadingItems()` and ValueEditor `shared/components/src/FilterBar/FilterBar.tsx`
 
 **Checkpoint**: Taxonomy dropdown shows count badges. Zero-count nodes are dimmed and not selectable. Counts update when other filters change.
 
@@ -156,7 +156,7 @@
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T027 [test] [US4] Write extensibility test — load modified taxonomy with new node, verify label map includes it, tree renders it, search finds it `shared/components/src/filter-engine/__tests__/taxonomy.test.ts`
+- [x] T027 [test] [US4] Write extensibility test — load modified taxonomy with new node, verify label map includes it, tree renders it, search finds it `shared/components/src/filter-engine/__tests__/taxonomy.test.ts`
 
 ### Implementation for User Story 4
 
@@ -174,20 +174,20 @@ No code changes needed — extensibility is inherent in the data-driven approach
 
 ### Implementation for User Story 5
 
-- [ ] T028 [US5] Add "Vessel Taxonomy Navigation" story — full tree with labels and current-selection marking `shared/components/src/FilterBar/FilterBar.stories.tsx`
-- [ ] T029 [P] [US5] Add "Vessel Taxonomy Search" story — search input with pre-filled query showing filtered tree `shared/components/src/FilterBar/FilterBar.stories.tsx`
-- [ ] T030 [P] [US5] Add "Vessel Taxonomy Counts" story — match counts with mock data, including zero-count dimmed nodes `shared/components/src/FilterBar/FilterBar.stories.tsx`
-- [ ] T031 [P] [US5] Add "Vessel Taxonomy Branch Selection" story — branch node selected, showing subtree filtering behavior `shared/components/src/FilterBar/FilterBar.stories.tsx`
+- [x] T028 [US5] Add "Vessel Taxonomy Navigation" story — full tree with labels and current-selection marking `shared/components/src/FilterBar/FilterBar.stories.tsx`
+- [x] T029 [P] [US5] Add "Vessel Taxonomy Search" story — search input with pre-filled query showing filtered tree `shared/components/src/FilterBar/FilterBar.stories.tsx`
+- [x] T030 [P] [US5] Add "Vessel Taxonomy Counts" story — match counts with mock data, including zero-count dimmed nodes `shared/components/src/FilterBar/FilterBar.stories.tsx`
+- [x] T031 [P] [US5] Add "Vessel Taxonomy Branch Selection" story — branch node selected, showing subtree filtering behavior `shared/components/src/FilterBar/FilterBar.stories.tsx`
 
 ### Storybook E2E Tests for User Story 5 🎭
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip these tests because you think browsers can't be installed. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T032 [US5] Add Playwright E2E tests for taxonomy navigation — open dropdown, navigate tree, select leaf, verify lozenge label `shared/components/e2e/FilterBar.spec.ts`
-- [ ] T033 [P] [US5] Add Playwright E2E tests for taxonomy search — type search text, verify filtered tree, clear search, verify full tree restored `shared/components/e2e/FilterBar.spec.ts`
-- [ ] T034 [P] [US5] Add Playwright E2E tests for taxonomy counts — verify count badges, verify disabled zero-count nodes `shared/components/e2e/FilterBar.spec.ts`
-- [ ] T035 [P] [US5] Add theme variant tests (light, dark, vscode) for taxonomy stories `shared/components/e2e/FilterBar.spec.ts`
-- [ ] T036 [US5] Run full E2E suite: `pnpm --filter @debrief/components test:e2e`
+- [x] T032 [US5] Add Playwright E2E tests for taxonomy navigation — open dropdown, navigate tree, select leaf, verify lozenge label `shared/components/e2e/FilterBar.spec.ts`
+- [x] T033 [P] [US5] Add Playwright E2E tests for taxonomy search — type search text, verify filtered tree, clear search, verify full tree restored `shared/components/e2e/FilterBar.spec.ts`
+- [x] T034 [P] [US5] Add Playwright E2E tests for taxonomy counts — verify count badges, verify disabled zero-count nodes `shared/components/e2e/FilterBar.spec.ts`
+- [x] T035 [P] [US5] Add theme variant tests (light, dark, vscode) for taxonomy stories `shared/components/e2e/FilterBar.spec.ts`
+- [x] T036 [US5] Run full E2E suite: `pnpm --filter @debrief/components test:e2e`
 
 **Checkpoint**: All Storybook stories render correctly across themes. E2E tests pass for navigation, search, counts, and theme variants.
 
@@ -199,33 +199,33 @@ No code changes needed — extensibility is inherent in the data-driven approach
 
 ### Verification
 
-- [ ] T037 Run `task verify` (lint + typecheck + test) and fix any failures
-- [ ] T038 Run quickstart.md validation — follow steps in `specs/133-vessel-taxonomy/quickstart.md`
+- [x] T037 Run `task verify` (lint + typecheck + test) and fix any failures
+- [x] T038 Run quickstart.md validation — follow steps in `specs/133-vessel-taxonomy/quickstart.md`
 
 ### Evidence Collection (REQUIRED)
 
 > **Purpose**: Capture artifacts for PR description and documentation
 
-- [ ] T039 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/133-vessel-taxonomy/evidence/test-summary.md`
-- [ ] T040 Create usage demonstration in `specs/133-vessel-taxonomy/evidence/usage-example.md`
-- [ ] T041 [P] Capture theme screenshots (light/dark/vscode) to `specs/133-vessel-taxonomy/evidence/screenshots/`
-- [ ] T042 Capture interaction GIF showing taxonomy tree navigation + search + selection to `specs/133-vessel-taxonomy/evidence/screenshots/interaction.gif`
+- [x] T039 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/133-vessel-taxonomy/evidence/test-summary.md`
+- [x] T040 Create usage demonstration in `specs/133-vessel-taxonomy/evidence/usage-example.md`
+- [x] T041 [P] Capture theme screenshots (light/dark/vscode) to `specs/133-vessel-taxonomy/evidence/screenshots/`
+- [x] T042 Capture interaction GIF showing taxonomy tree navigation + search + selection to `specs/133-vessel-taxonomy/evidence/screenshots/interaction.gif`
 
 ### E2E Evidence Collection 🎭
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip these tests because you think browsers can't be installed. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T043 Run full E2E suite: `pnpm --filter @debrief/components test:e2e`
-- [ ] T044 [P] Document E2E results in `specs/133-vessel-taxonomy/evidence/e2e-summary.md`
+- [x] T043 Run full E2E suite: `pnpm --filter @debrief/components test:e2e`
+- [x] T044 [P] Document E2E results in `specs/133-vessel-taxonomy/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T045 Create shipped blog post in `specs/133-vessel-taxonomy/media/shipped-post.md`
-- [ ] T046 [P] Create LinkedIn shipped summary in `specs/133-vessel-taxonomy/media/linkedin-shipped.md`
+- [x] T045 Create shipped blog post in `specs/133-vessel-taxonomy/media/shipped-post.md`
+- [x] T046 [P] Create LinkedIn shipped summary in `specs/133-vessel-taxonomy/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T047 Create PR and publish blog: run /speckit.pr
+- [x] T047 Create PR and publish blog: run /speckit.pr
 
 **Task T047 must run last. It depends on all evidence and media tasks being complete.**
 

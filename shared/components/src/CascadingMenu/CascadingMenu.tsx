@@ -10,6 +10,7 @@ export interface CascadingMenuItem {
   readonly disabledReason?: string;
   readonly submenu?: readonly CascadingMenuItem[];
   readonly current?: boolean;
+  readonly badge?: string;
 }
 
 export interface CascadingMenuProps {
@@ -20,6 +21,10 @@ export interface CascadingMenuProps {
   readonly selectableBranches?: boolean;
   readonly onSelect: (itemId: string) => void;
   readonly onDismiss: () => void;
+  /** Optional React node rendered between header and items (used for search input) */
+  readonly beforeItems?: React.ReactNode;
+  /** Optional React node rendered after items (used for no-matches message) */
+  readonly afterItems?: React.ReactNode;
 }
 
 interface SubmenuState {
@@ -35,6 +40,8 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
   selectableBranches,
   onSelect,
   onDismiss,
+  beforeItems,
+  afterItems,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ left: anchorPosition.x, top: anchorPosition.y });
@@ -240,6 +247,7 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
         data-testid="cascading-menu"
       >
         {header && <div className="debrief-cascading-menu__header">{header}</div>}
+        {beforeItems}
         <div className="debrief-cascading-menu__items">
           {items.map((item, index) => (
             <div
@@ -267,11 +275,13 @@ export const CascadingMenu: React.FC<CascadingMenuProps> = ({
                 />
               )}
               <span className="debrief-cascading-menu__label">{item.label}</span>
+              {item.badge && <span className="debrief-cascading-menu__badge">{item.badge}</span>}
               {item.current && <span className="debrief-cascading-menu__check">✓</span>}
               {item.submenu && <span className="debrief-cascading-menu__arrow">›</span>}
             </div>
           ))}
         </div>
+        {afterItems}
       </div>
 
       {submenu && (
@@ -503,6 +513,7 @@ const SubmenuPanel: React.FC<SubmenuPanelProps> = ({ items, anchorRect, selectab
                 />
               )}
               <span className="debrief-cascading-menu__label">{item.label}</span>
+              {item.badge && <span className="debrief-cascading-menu__badge">{item.badge}</span>}
               {item.current && <span className="debrief-cascading-menu__check">✓</span>}
               {item.submenu && <span className="debrief-cascading-menu__arrow">›</span>}
             </div>
