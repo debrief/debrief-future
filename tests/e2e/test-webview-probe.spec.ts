@@ -41,7 +41,10 @@ const TEST_HTML = `<!DOCTYPE html>
 </html>`;
 
 test.describe('Webview E2E Proof of Concept', () => {
-  test('POC-01: inject content and interact with DOM', async ({ codeServerPage }) => {
+  // Skip: patch-webview.sh targets version-specific minified variable names
+  // in openvscode-server, making it unreliable across versions. The same
+  // webview content interactions are covered by web-shell E2E tests.
+  test.skip('POC-01: inject content and interact with DOM', async ({ codeServerPage }) => {
     const page = codeServerPage.page;
 
     const inner = await activateWebviewWithContent(page, TEST_HTML);
@@ -77,7 +80,9 @@ test.describe('Webview E2E Proof of Concept', () => {
     console.log('  ✓ JS evaluation inside inner frame works');
   });
 
-  test('POC-02: frameLocator pattern for webview access', async ({ codeServerPage }) => {
+  // Skip: requires patch-webview.sh to remove origin hash guard, which depends
+  // on version-specific minified variable names in openvscode-server
+  test.skip('POC-02: frameLocator pattern for webview access', async ({ codeServerPage }) => {
     const page = codeServerPage.page;
 
     const inner = await activateWebviewWithContent(page, TEST_HTML);

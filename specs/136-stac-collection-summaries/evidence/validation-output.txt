@@ -1,0 +1,24 @@
+Collection JSON Validation Against contracts/collection-schema.json
+===================================================================
+
+Test: test_collection_validates_against_schema
+Status: PASSED
+
+Validated Collection JSON structure:
+- type: "Collection" ✓
+- stac_version: "1.0.0" ✓
+- id: present ✓
+- description: present ✓
+- license: "proprietary" ✓
+- extent.spatial.bbox: [[west, south, east, north]] ✓
+- extent.temporal.interval: [[start, end]] ✓
+- summaries.debrief:vessel_classes: string[] ✓
+- summaries.debrief:tags: string[] ✓
+- summaries.debrief:feature_tags: string[] ✓
+- summaries.debrief:track_names: string[] ✓
+- summaries.debrief:nationalities: string[] ✓
+- links: array of Link objects ✓
+
+Schema: specs/136-stac-collection-summaries/contracts/collection-schema.json
+Validator: jsonschema (Python)
+Result: Valid STAC 1.0.0 Collection

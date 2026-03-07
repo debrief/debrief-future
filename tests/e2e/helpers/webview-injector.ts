@@ -63,6 +63,16 @@ export async function installWebviewInterceptor(
                 confirmBeforeClose: 'keyboardOnly',
               },
             });
+            // Block subsequent 'content' messages on this port to prevent the
+            // VS Code workbench from overwriting our injected test content when
+            // the extension resolves its webview.
+            const origPostMessage = port.postMessage.bind(port);
+            port.postMessage = function (msg: any, ...rest: any[]) {
+              if (msg?.channel === 'content') {
+                return;
+              }
+              return origPostMessage(msg, ...rest);
+            };
             (window as any).__webviewContentSent = true;
           }
         },

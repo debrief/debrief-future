@@ -134,6 +134,51 @@ export interface StacCatalog {
 }
 
 /**
+ * Spatial and temporal extent of a STAC Collection
+ */
+export interface StacExtent {
+  spatial: {
+    /** Bounding boxes as [[west, south, east, north]] */
+    bbox: [number, number, number, number][];
+  };
+  temporal: {
+    /** Temporal intervals as [[start, end]] (ISO 8601 strings or null) */
+    interval: [string | null, string | null][];
+  };
+}
+
+/**
+ * Pre-aggregated summaries of extension properties across all items
+ */
+export interface StacSummaries {
+  'debrief:vessel_classes'?: string[];
+  'debrief:tags'?: string[];
+  'debrief:feature_tags'?: string[];
+  'debrief:track_names'?: string[];
+  'debrief:nationalities'?: string[];
+}
+
+/**
+ * STAC Collection JSON structure (extends Catalog with extent, summaries, license)
+ */
+export interface StacCollection {
+  type: 'Collection';
+  stac_version: string;
+  id: string;
+  title?: string;
+  description: string;
+  license: string;
+  extent: StacExtent;
+  summaries?: StacSummaries;
+  links: StacLink[];
+}
+
+/**
+ * Union type for catalog.json which may be either a Catalog or a promoted Collection
+ */
+export type StacCatalogOrCollection = StacCatalog | StacCollection;
+
+/**
  * Create a new store with default values
  */
 export function createStore(path: string, displayName?: string): StacStore {

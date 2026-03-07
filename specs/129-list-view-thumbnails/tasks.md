@@ -61,10 +61,10 @@
 
 **Purpose**: Create component directory structure and configuration files
 
-- [ ] T001 Create ExerciseListView directory and index `shared/components/src/ExerciseListView/index.ts`
-- [ ] T002 [P] Create component types extending CatalogOverviewItem (review 5A) `shared/components/src/ExerciseListView/types.ts`
-- [ ] T003 [P] Create component CSS with VS Code custom properties `shared/components/src/ExerciseListView/ExerciseListView.css`
-- [ ] T004 Add ExerciseListView export to shared components barrel `shared/components/src/index.ts`
+- [x] T001 Create ExerciseListView directory and index `shared/components/src/ExerciseListView/index.ts`
+- [x] T002 [P] Create component types extending CatalogOverviewItem (review 5A) `shared/components/src/ExerciseListView/types.ts`
+- [x] T003 [P] Create component CSS with VS Code custom properties `shared/components/src/ExerciseListView/ExerciseListView.css`
+- [x] T004 Add ExerciseListView export to shared components barrel `shared/components/src/index.ts`
 
 ---
 
@@ -74,12 +74,12 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Implement duration computation and locale-aware formatting with Intl APIs (review 7A) `shared/components/src/ExerciseListView/utils.ts`
-- [ ] T006 [P] Implement sort comparators (recency, title, duration) with null handling `shared/components/src/ExerciseListView/utils.ts`
-- [ ] T007 [P] Implement relative time formatting using Intl.RelativeTimeFormat (review 7A) `shared/components/src/ExerciseListView/utils.ts`
-- [ ] T008 [P] Implement line simplification utility for SVG thumbnail rendering (review 12B) `shared/components/src/ExerciseListView/utils.ts`
-- [ ] T009 [test] Write unit tests for utility functions (duration, sort, relative time, simplification) `shared/components/src/ExerciseListView/utils.test.ts`
-- [ ] T010 Create mock fixture data factory for 100+ ExerciseListItem instances `shared/components/src/ExerciseListView/__fixtures__/mockData.ts`
+- [x] T005 Implement duration computation and locale-aware formatting with Intl APIs (review 7A) `shared/components/src/ExerciseListView/utils.ts`
+- [x] T006 [P] Implement sort comparators (recency, title, duration) with null handling `shared/components/src/ExerciseListView/utils.ts`
+- [x] T007 [P] Implement relative time formatting using Intl.RelativeTimeFormat (review 7A) `shared/components/src/ExerciseListView/utils.ts`
+- [x] T008 [P] Implement line simplification utility for SVG thumbnail rendering (review 12B) `shared/components/src/ExerciseListView/utils.ts`
+- [x] T009 [test] Write unit tests for utility functions (duration, sort, relative time, simplification) `shared/components/src/ExerciseListView/utils.test.ts`
+- [x] T010 Create mock fixture data factory for 100+ ExerciseListItem instances `shared/components/src/ExerciseListView/__fixtures__/mockData.ts`
 
 **Checkpoint**: Foundation ready — utility functions tested, mock data available
 
@@ -95,20 +95,20 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T011 [P] [US1] [test] Unit test: ExerciseListView renders all items with virtualisation `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T012 [P] [US1] [test] Unit test: ExerciseListItemRow displays title, metadata summary, date, thumbnail `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T013 [P] [US1] [test] Unit test: metadata truncation with "+N more" for long arrays `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T014 [P] [US1] [test] Unit test: long title truncation with aria-label for tooltip `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T015 [P] [US1] [test] Unit test: empty state renders "No exercises found" message `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T011 [P] [US1] [test] Unit test: ExerciseListView renders all items with virtualisation `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T012 [P] [US1] [test] Unit test: ExerciseListItemRow displays title, metadata summary, date, thumbnail `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T013 [P] [US1] [test] Unit test: metadata truncation with "+N more" for long arrays `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T014 [P] [US1] [test] Unit test: long title truncation with aria-label for tooltip `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T015 [P] [US1] [test] Unit test: empty state renders "No exercises found" message `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Implement SpatialThumbnail — props-driven SVG renderer with loading/error states (review 6A), line simplification (review 12B) `shared/components/src/ExerciseListView/SpatialThumbnail.tsx`
-- [ ] T017 [US1] [test] Unit test: SpatialThumbnail renders tracks from GeoJSON, shows placeholder when trackData is null, shows loading state, shows error fallback (review 10A) `shared/components/src/ExerciseListView/SpatialThumbnail.test.tsx`
-- [ ] T018 [US1] Implement ExerciseListItemRow — row layout with metadata, date, thumbnail `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
-- [ ] T019 [US1] Implement ExerciseListView — main container with virtualised scrolling, empty state, inline sort control (review 4B), inline recently opened section (review 4B) `shared/components/src/ExerciseListView/ExerciseListView.tsx`
-- [ ] T020 [US1] Add GeoJSON lazy-loading hook with AbortController cleanup (review 3B, 11A) `shared/components/src/ExerciseListView/ExerciseListView.tsx`
-- [ ] T021 [US1] [test] Unit test: lazy GeoJSON loading request/response round-trip (review 8A) `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T016 [US1] Implement SpatialThumbnail — props-driven SVG renderer with loading/error states (review 6A), line simplification (review 12B) `shared/components/src/ExerciseListView/SpatialThumbnail.tsx`
+- [x] T017 [US1] [test] Unit test: SpatialThumbnail renders tracks from GeoJSON, shows placeholder when trackData is null, shows loading state, shows error fallback (review 10A) `shared/components/src/ExerciseListView/SpatialThumbnail.test.tsx`
+- [x] T018 [US1] Implement ExerciseListItemRow — row layout with metadata, date, thumbnail `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
+- [x] T019 [US1] Implement ExerciseListView — main container with virtualised scrolling, empty state, inline sort control (review 4B), inline recently opened section (review 4B) `shared/components/src/ExerciseListView/ExerciseListView.tsx`
+- [x] T020 [US1] Add GeoJSON lazy-loading hook with AbortController cleanup (review 3B, 11A) `shared/components/src/ExerciseListView/ExerciseListView.tsx`
+- [x] T021 [US1] [test] Unit test: lazy GeoJSON loading request/response round-trip (review 8A) `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
 
 **Checkpoint**: Scrollable list renders 100 items with metadata and spatial thumbnails
 
@@ -124,15 +124,15 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T022 [P] [US2] [test] Unit test: recently opened section renders at top with relative timestamps `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T023 [P] [US2] [test] Unit test: recently opened section hidden when no recent items `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T024 [P] [US2] [test] Unit test: clicking recent item calls onItemSelect with URI `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T025 [P] [US2] [test] Unit test: recent items render independently of main exercise list (stale items) (review 9A) `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T022 [P] [US2] [test] Unit test: recently opened section renders at top with relative timestamps `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T023 [P] [US2] [test] Unit test: recently opened section hidden when no recent items `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T024 [P] [US2] [test] Unit test: clicking recent item calls onItemSelect with URI `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T025 [P] [US2] [test] Unit test: recent items render independently of main exercise list (stale items) (review 9A) `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T026 [US2] Implement recently opened section inline in ExerciseListView (review 4B) — items from props, relative time display, click handler `shared/components/src/ExerciseListView/ExerciseListView.tsx`
-- [ ] T027 [US2] Style recently opened section with visual prominence (border, icon, spacing) `shared/components/src/ExerciseListView/ExerciseListView.css`
+- [x] T026 [US2] Implement recently opened section inline in ExerciseListView (review 4B) — items from props, relative time display, click handler `shared/components/src/ExerciseListView/ExerciseListView.tsx`
+- [x] T027 [US2] Style recently opened section with visual prominence (border, icon, spacing) `shared/components/src/ExerciseListView/ExerciseListView.css`
 
 **Checkpoint**: Recently opened section visible at top with relative timestamps, click opens exercise
 
@@ -148,16 +148,16 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T028 [P] [US3] [test] Unit test: sort by recency orders items by date descending `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T029 [P] [US3] [test] Unit test: sort by title orders items alphabetically `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T030 [P] [US3] [test] Unit test: sort by duration orders by longest first `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T031 [P] [US3] [test] Unit test: clicking same sort toggles direction `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T032 [P] [US3] [test] Unit test: null dates/durations sort to end `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T028 [P] [US3] [test] Unit test: sort by recency orders items by date descending `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T029 [P] [US3] [test] Unit test: sort by title orders items alphabetically `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T030 [P] [US3] [test] Unit test: sort by duration orders by longest first `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T031 [P] [US3] [test] Unit test: clicking same sort toggles direction `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T032 [P] [US3] [test] Unit test: null dates/durations sort to end `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
 
 ### Implementation for User Story 3
 
-- [ ] T033 [US3] Implement inline sort control in ExerciseListView (review 4B) — dimension selector, direction toggle, memoised sorting `shared/components/src/ExerciseListView/ExerciseListView.tsx`
-- [ ] T034 [US3] Style sort control with VS Code custom properties `shared/components/src/ExerciseListView/ExerciseListView.css`
+- [x] T033 [US3] Implement inline sort control in ExerciseListView (review 4B) — dimension selector, direction toggle, memoised sorting `shared/components/src/ExerciseListView/ExerciseListView.tsx`
+- [x] T034 [US3] Style sort control with VS Code custom properties `shared/components/src/ExerciseListView/ExerciseListView.css`
 
 **Checkpoint**: Sort control functional with 3 dimensions and direction toggle
 
@@ -171,13 +171,13 @@
 
 ### Tests for User Story 4
 
-- [ ] T035 [P] [US4] [test] Unit test: clicking exercise row calls onItemSelect with itemPath `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
-- [ ] T036 [P] [US4] [test] Unit test: list retains sort state after item selection `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T035 [P] [US4] [test] Unit test: clicking exercise row calls onItemSelect with itemPath `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
+- [x] T036 [P] [US4] [test] Unit test: list retains sort state after item selection `shared/components/src/ExerciseListView/ExerciseListView.test.tsx`
 
 ### Implementation for User Story 4
 
-- [ ] T037 [US4] Add click handler to ExerciseListItemRow with keyboard accessibility (Enter/Space) `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
-- [ ] T038 [US4] Add data-testid and aria-* attributes for accessibility and testing `shared/components/src/ExerciseListView/ExerciseListView.tsx`
+- [x] T037 [US4] Add click handler to ExerciseListItemRow with keyboard accessibility (Enter/Space) `shared/components/src/ExerciseListView/ExerciseListItemRow.tsx`
+- [x] T038 [US4] Add data-testid and aria-* attributes for accessibility and testing `shared/components/src/ExerciseListView/ExerciseListView.tsx`
 
 **Checkpoint**: Exercise selection works via click and keyboard, state preserved
 
@@ -189,16 +189,16 @@
 
 ### Storybook Stories
 
-- [ ] T039 Create Storybook stories: Default (100 items), WithRecentItems, EmptyState, NoMatches, SortByTitle, SortByDuration, FewItems, LightTheme `shared/components/src/ExerciseListView/ExerciseListView.stories.tsx`
+- [x] T039 Create Storybook stories: Default (100 items), WithRecentItems, EmptyState, NoMatches, SortByTitle, SortByDuration, FewItems, LightTheme `shared/components/src/ExerciseListView/ExerciseListView.stories.tsx`
 
 ### E2E Tests 🎭
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip these tests because you think browsers can't be installed. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T040 [P] Create Playwright E2E test for ExerciseListView stories `shared/components/e2e/ExerciseListView.spec.ts`
-- [ ] T041 [P] Add theme variant tests (light, dark, vscode) with screenshot capture `shared/components/e2e/ExerciseListView.spec.ts`
-- [ ] T042 [P] Add interaction tests: scroll, click item, sort change `shared/components/e2e/ExerciseListView.spec.ts`
-- [ ] T043 Run E2E tests: `pnpm --filter @debrief/components test:e2e ExerciseListView`
+- [x] T040 [P] Create Playwright E2E test for ExerciseListView stories `shared/components/e2e/ExerciseListView.spec.ts`
+- [x] T041 [P] Add theme variant tests (light, dark, vscode) with screenshot capture `shared/components/e2e/ExerciseListView.spec.ts`
+- [x] T042 [P] Add interaction tests: scroll, click item, sort change `shared/components/e2e/ExerciseListView.spec.ts`
+- [x] T043 Run E2E tests: `pnpm --filter @debrief/components test:e2e ExerciseListView`
 
 **Checkpoint**: All stories render in 3 themes, interactions verified
 
@@ -208,9 +208,9 @@
 
 **Purpose**: Wire ExerciseListView into the VS Code webview message protocol
 
-- [ ] T044 Add list-view message types to webview messages following existing discriminated union pattern `apps/vscode/src/webview/messages.ts`
-- [ ] T045 [P] Add GeoJSON request/response message types for lazy loading (review 3B) `apps/vscode/src/webview/messages.ts`
-- [ ] T046 [test] Unit test: message type discrimination and serialisation `apps/vscode/src/webview/messages.test.ts`
+- [x] T044 Add list-view message types to webview messages following existing discriminated union pattern `apps/vscode/src/webview/messages.ts`
+- [x] T045 [P] Add GeoJSON request/response message types for lazy loading (review 3B) `apps/vscode/src/webview/messages.ts`
+- [x] T046 [test] Unit test: message type discrimination and serialisation `apps/vscode/src/webview/messages.test.ts`
 
 **Checkpoint**: Message protocol extended and typed for list view
 
@@ -222,33 +222,33 @@
 
 ### Quality Checks
 
-- [ ] T047 Run full CI verification: `task verify` (lint + typecheck + test)
-- [ ] T048 Verify ExerciseListView exports correctly from @debrief/components package
+- [x] T047 Run full CI verification: `task verify` (lint + typecheck + test)
+- [x] T048 Verify ExerciseListView exports correctly from @debrief/components package
 
 ### Evidence Collection (REQUIRED)
 
 > **Purpose**: Capture artifacts for PR description and future documentation
 
-- [ ] T049 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/129-list-view-thumbnails/evidence/test-summary.md`
-- [ ] T050 Create usage demonstration `specs/129-list-view-thumbnails/evidence/usage-example.md`
+- [x] T049 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/129-list-view-thumbnails/evidence/test-summary.md`
+- [x] T050 Create usage demonstration `specs/129-list-view-thumbnails/evidence/usage-example.md`
 
 ### E2E Evidence Collection (REQUIRED for UI components) 🎭
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — See `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T051 Run full E2E suite: `pnpm --filter @debrief/components test:e2e`
-- [ ] T052 [P] Capture theme screenshots (light/dark/vscode) `specs/129-list-view-thumbnails/evidence/screenshots/`
-- [ ] T053 Capture interaction GIF showing scroll + sort + click flow `specs/129-list-view-thumbnails/evidence/screenshots/interaction.gif`
-- [ ] T054 Document E2E results `specs/129-list-view-thumbnails/evidence/e2e-summary.md`
+- [x] T051 Run full E2E suite: `pnpm --filter @debrief/components test:e2e`
+- [x] T052 [P] Capture theme screenshots (light/dark/vscode) `specs/129-list-view-thumbnails/evidence/screenshots/`
+- [x] T053 Capture interaction GIF showing scroll + sort + click flow `specs/129-list-view-thumbnails/evidence/screenshots/interaction.gif`
+- [x] T054 Document E2E results `specs/129-list-view-thumbnails/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T055 Create shipped blog post `specs/129-list-view-thumbnails/media/shipped-post.md`
-- [ ] T056 [P] Create LinkedIn shipped summary `specs/129-list-view-thumbnails/media/linkedin-shipped.md`
+- [x] T055 Create shipped blog post `specs/129-list-view-thumbnails/media/shipped-post.md`
+- [x] T056 [P] Create LinkedIn shipped summary `specs/129-list-view-thumbnails/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T057 Create PR and publish blog: run /speckit.pr
+- [x] T057 Create PR and publish blog: run /speckit.pr
 
 **Task T057 must run last. It depends on all evidence and media tasks being complete.**
 

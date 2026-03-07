@@ -2,6 +2,8 @@
  * Type definitions for the CatalogOverview component.
  */
 
+import type { Bounds } from '../utils/types';
+
 /**
  * A single item in a STAC catalog overview.
  */
@@ -46,4 +48,10 @@ export interface CatalogOverviewProps {
 
   /** Additional CSS class name */
   className?: string;
+
+  /** Callback when map viewport changes (debounced). Null if map not yet initialised. */
+  onViewportChange?: (bounds: Bounds | null) => void;
+
+  /** Map from item ID to CSS colour string. Items not in the map use default accent colour. */
+  colorMap?: ReadonlyMap<string, string>;
 }

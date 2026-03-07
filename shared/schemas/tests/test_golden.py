@@ -4,19 +4,12 @@ Golden fixture validation tests using Pydantic models.
 Tests that:
 - All valid fixtures pass Pydantic validation
 - All invalid fixtures fail with expected ValidationErrors
-
-NOTE: LinkML has a known limitation with nested array types. GeoJSON
-coordinates should be arrays of position arrays (e.g., [[lon, lat], ...]),
-but LinkML generates models expecting flat number arrays. Track feature
-fixtures with proper GeoJSON coordinates will show validation errors here
-but represent correct GeoJSON data.
 """
 
 import json
 
 # Import generated models
 import sys
-import warnings
 from pathlib import Path
 
 import pytest
@@ -102,38 +95,6 @@ def get_invalid_fixtures() -> list[tuple[str, Path]]:
     return fixtures
 
 
-def is_known_geometry_limitation(entity_type: str, error: ValidationError) -> bool:
-    """Check if validation error is due to known LinkML nested array limitation."""
-    # Types with nested coordinate arrays that trigger LinkML limitation
-    nested_coord_types = {
-        "track-feature",
-        "rectangle-annotation",
-        "line-annotation",
-        "circle-annotation",
-        "vector-annotation",
-        "poly-annotation",
-        "multi-point-feature",
-        "multi-polygon-feature",
-    }
-    if entity_type not in nested_coord_types:
-        return False
-    for err in error.errors():
-        loc = err.get("loc", ())
-        # Check if error is in geometry.coordinates path
-        # Direct: geometry -> coordinates (pre-union)
-        if len(loc) >= 2 and loc[0] == "geometry" and loc[1] == "coordinates":
-            return True
-        # Union variant: geometry -> GeoJSONLineString/GeoJSONMultiLineString -> coordinates/type
-        if (
-            len(loc) >= 2
-            and loc[0] == "geometry"
-            and isinstance(loc[1], str)
-            and loc[1].startswith("GeoJSON")
-        ):
-            return True
-    return False
-
-
 class TestValidFixtures:
     """Test that all valid fixtures pass Pydantic validation."""
 
@@ -143,24 +104,13 @@ class TestValidFixtures:
         model_class = ENTITY_MAP[entity_type]
         data = json.loads(fixture_path.read_text())
 
-        try:
-            # Should not raise ValidationError
-            instance = model_class(**data)
+        # Should not raise ValidationError
+        instance = model_class(**data)
 
-            # Verify basic properties
-            assert instance is not None
-            if hasattr(instance, "id"):
-                assert instance.id is not None
-        except ValidationError as e:
-            # Check if this is a known limitation
-            if is_known_geometry_limitation(entity_type, e):
-                warnings.warn(
-                    f"{fixture_path.name}: Validation failed due to LinkML "
-                    "nested array limitation (known issue with GeoJSON coordinates)",
-                    stacklevel=2,
-                )
-            else:
-                raise
+        # Verify basic properties
+        assert instance is not None
+        if hasattr(instance, "id"):
+            assert instance.id is not None
 
 
 class TestInvalidFixtures:

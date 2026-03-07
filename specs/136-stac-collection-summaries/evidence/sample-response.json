@@ -1,0 +1,18 @@
+{
+  "promoted": true,
+  "extent": {
+    "spatial": {
+      "bbox": [[-5.5, 49.0, 2.0, 58.5]]
+    },
+    "temporal": {
+      "interval": [["2024-01-15T08:00:00Z", "2024-03-20T16:30:00Z"]]
+    }
+  },
+  "summaries": {
+    "vessel_classes": ["subsurface/submarine/ssn/astute", "surface/warship/frigate/type23"],
+    "tags": ["atlantic", "exercise", "training"],
+    "feature_tags": ["checkpoint-alpha", "patrol-zone"],
+    "track_names": ["HMS Astute", "HMS Defender"],
+    "nationalities": ["GB", "US"]
+  }
+}

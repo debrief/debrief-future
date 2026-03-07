@@ -1,12 +1,18 @@
 /**
  * CatalogOverview component — displays a map of bounding boxes
  * and a timeline of temporal ranges for all items in a STAC catalog.
+ *
+ * The map always shows ALL items with bounding boxes; the timeline
+ * filters internally to show only items overlapping the current map
+ * viewport (items without bbox are always shown in the timeline).
  */
 
 import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react';
-import { MapContainer, Rectangle, TileLayer, Tooltip, useMap } from 'react-leaflet';
+import { MapContainer, Rectangle, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import type { LatLngBoundsExpression, LeafletMouseEvent } from 'leaflet';
 import type { CatalogOverviewProps, CatalogOverviewItem } from './types';
+import type { Bounds } from '../utils/types';
+import { bboxOverlapsViewport } from '../utils/bounds';
 import './CatalogOverview.css';
 
 // ============================================================================
@@ -46,52 +52,67 @@ function FitBounds({ bounds }: { bounds: LatLngBoundsExpression | null }): null 
 }
 
 // ============================================================================
-// Timeline helpers
+// Viewport change handler (fires debounced moveend)
 // ============================================================================
 
-function parseTime(s: string | null): number | null {
-  if (!s) return null;
-  const t = new Date(s).getTime();
-  return isNaN(t) ? null : t;
+const DEBOUNCE_MS = 150;
+
+function ViewportTracker({
+  onViewportChange,
+  onInternalViewportChange,
+}: {
+  onViewportChange?: (bounds: Bounds | null) => void;
+  onInternalViewportChange: (bounds: Bounds | null) => void;
+}): null {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const emitViewport = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    try {
+      const b = map.getBounds();
+      if (!b || !b.isValid()) return;
+      const sw = b.getSouthWest();
+      const ne = b.getNorthEast();
+      const viewport: Bounds = [sw.lng, sw.lat, ne.lng, ne.lat];
+      onInternalViewportChange(viewport);
+      onViewportChange?.(viewport);
+    } catch {
+      // Map not fully initialised yet
+    }
+  }, [onViewportChange, onInternalViewportChange]);
+
+  // useMapEvents gives us the map instance
+  const mapRef = useRef<L.Map | null>(null);
+  const map = useMapEvents({
+    moveend: () => {
+      if (timerRef.current !== null) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(emitViewport, DEBOUNCE_MS);
+    },
+  });
+  mapRef.current = map;
+
+  // Emit initial viewport after map is ready
+  useEffect(() => {
+    // Slight delay to allow map to fully initialise
+    timerRef.current = setTimeout(emitViewport, 50);
+    return () => {
+      if (timerRef.current !== null) clearTimeout(timerRef.current);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return null;
 }
 
-interface TimeRange {
-  min: number;
-  max: number;
-}
+// ============================================================================
+// Timeline helpers (extracted to utils/timeline-helpers.ts for shared use)
+// ============================================================================
 
-function computeTimeRange(items: CatalogOverviewItem[]): TimeRange | null {
-  let min = Infinity, max = -Infinity;
-  for (const item of items) {
-    const start = parseTime(item.startDatetime) ?? parseTime(item.datetime);
-    const end = parseTime(item.endDatetime) ?? parseTime(item.datetime);
-    if (start !== null) min = Math.min(min, start);
-    if (end !== null) max = Math.max(max, end);
-  }
-  if (min === Infinity) return null;
-  // Ensure range is non-zero
-  if (min === max) {
-    min -= 3600000; // 1 hour
-    max += 3600000;
-  }
-  return { min, max };
-}
+import { parseTime, computeTimeRange, formatDateRange } from '../utils/timeline-helpers';
 
 function formatDate(epoch: number): string {
   const d = new Date(epoch);
   return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-function formatDateRange(start: string | null, end: string | null, datetime: string | null): string {
-  const s = start ?? datetime;
-  const e = end ?? datetime;
-  if (s && e && s !== e) {
-    return `${new Date(s).toLocaleDateString()} – ${new Date(e).toLocaleDateString()}`;
-  }
-  if (s) {
-    return new Date(s).toLocaleDateString();
-  }
-  return 'No time data';
 }
 
 // ============================================================================
@@ -114,16 +135,49 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
   initialSplitRatio = 0.6,
   onSplitRatioChange,
   className,
+  onViewportChange,
+  colorMap,
 }) => {
   const [splitRatio, setSplitRatio] = useState(initialSplitRatio);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+  const [viewportBounds, setViewportBounds] = useState<Bounds | null>(null);
 
-  // Items with bbox for map
+  // Items with bbox for map (map always shows ALL items)
   const mapItems = useMemo(() => items.filter((i) => i.bbox !== null), [items]);
   const bounds = useMemo(() => combinedBounds(mapItems), [mapItems]);
-  const timeRange = useMemo(() => computeTimeRange(items), [items]);
+
+  // Memoize Rectangle rendering list with colorMap (T011)
+  const rectangles = useMemo(() => mapItems.map((item) => {
+    const colour = colorMap?.get(item.id) ?? 'var(--co-accent, #007fd4)';
+    return {
+      id: item.id,
+      bounds: bboxToBounds(item.bbox!),
+      colour,
+      itemPath: item.itemPath,
+      title: item.title,
+      startDatetime: item.startDatetime,
+      endDatetime: item.endDatetime,
+      datetime: item.datetime,
+    };
+  }), [mapItems, colorMap]);
+
+  // Timeline items: filter to viewport-overlapping items (T020)
+  // Items without bbox are always included in the timeline (FR-005)
+  const timelineItems = useMemo(() => {
+    if (!viewportBounds) return items;
+    return items.filter((item) => {
+      if (item.bbox === null) return true;
+      return bboxOverlapsViewport(item.bbox, viewportBounds);
+    });
+  }, [items, viewportBounds]);
+
+  const timeRange = useMemo(() => computeTimeRange(timelineItems), [timelineItems]);
+
+  // Determine empty state for map overlay (T021)
+  const hasSpatialData = mapItems.length > 0;
+  const viewportHasItems = viewportBounds === null || timelineItems.some((i) => i.bbox !== null);
 
   // Drag bar handlers
   const handleDragStart = useCallback((e: React.PointerEvent) => {
@@ -157,10 +211,14 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
     onItemSelect?.(itemPath);
   }, [onItemSelect]);
 
+  const handleInternalViewportChange = useCallback((bounds: Bounds | null) => {
+    setViewportBounds(bounds);
+  }, []);
+
   if (items.length === 0) {
     return (
       <div className={`catalog-overview ${className ?? ''}`}>
-        <div className="catalog-overview__empty">No items in this catalog</div>
+        <div className="catalog-overview__empty" data-testid="no-items-message">No items in this catalog</div>
       </div>
     );
   }
@@ -171,7 +229,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
   const CHART_LEFT = LABEL_WIDTH + 8;
   const CHART_RIGHT = 16;
   const AXIS_HEIGHT = 20;
-  const svgHeight = items.length * ROW_HEIGHT + AXIS_HEIGHT + 4;
+  const svgHeight = timelineItems.length * ROW_HEIGHT + AXIS_HEIGHT + 4;
 
   return (
     <div
@@ -196,28 +254,44 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {bounds && <FitBounds bounds={bounds} />}
-          {mapItems.map((item) => (
+          <ViewportTracker
+            onViewportChange={onViewportChange}
+            onInternalViewportChange={handleInternalViewportChange}
+          />
+          {rectangles.map((r) => (
             <Rectangle
-              key={item.id}
-              bounds={bboxToBounds(item.bbox!)}
-              pathOptions={{ color: 'var(--co-accent, #007fd4)', weight: 2, fillOpacity: 0.15 }}
+              key={r.id}
+              bounds={r.bounds}
+              pathOptions={{ color: r.colour, weight: 2, fillOpacity: 0.15 }}
               eventHandlers={{
                 dblclick: (e: LeafletMouseEvent) => {
                   // Stop Leaflet from zooming on double-click
                   e.originalEvent.preventDefault();
                   e.originalEvent.stopPropagation();
-                  handleItemDblClick(item.itemPath);
+                  handleItemDblClick(r.itemPath);
                 },
               }}
             >
               <Tooltip>
-                <strong>{item.title}</strong>
+                <strong>{r.title}</strong>
                 <br />
-                {formatDateRange(item.startDatetime, item.endDatetime, item.datetime)}
+                {formatDateRange(r.startDatetime, r.endDatetime, r.datetime)}
               </Tooltip>
             </Rectangle>
           ))}
         </MapContainer>
+
+        {/* Empty state overlays (T021) */}
+        {!hasSpatialData && (
+          <div className="catalog-overview__overlay" data-testid="no-spatial-data-overlay">
+            No spatial data available
+          </div>
+        )}
+        {hasSpatialData && !viewportHasItems && (
+          <div className="catalog-overview__overlay" data-testid="no-matches-overlay">
+            No exercises in this area
+          </div>
+        )}
       </div>
 
       {/* Drag bar */}
@@ -266,7 +340,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
           )}
 
           {/* Item rows */}
-          {items.map((item, i) => {
+          {timelineItems.map((item, i) => {
             const y = i * ROW_HEIGHT + 4;
             const barY = y + 4;
             const barHeight = ROW_HEIGHT - 8;
