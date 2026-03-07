@@ -93,4 +93,27 @@ describe('OrContainer', () => {
     renderOrContainer(emptyContainer);
     expect(screen.getByTestId('or-container-or-2')).toBeInTheDocument();
   });
+
+  describe('label map forwarding', () => {
+    const vesselChild: LozengeItem = {
+      kind: 'lozenge',
+      id: 'vc-1',
+      filterType: 'vessel-class',
+      value: 'surface/warship/frigate/type23',
+    };
+
+    const containerWithVessel: OrContainerItem = {
+      kind: 'or-container',
+      id: 'or-v',
+      children: [vesselChild],
+    };
+
+    it('forwards labelMap to child Lozenges', () => {
+      const labelMap = new Map([
+        ['surface/warship/frigate/type23', 'Type 23 Frigate'],
+      ]);
+      renderOrContainer(containerWithVessel, { labelMap });
+      expect(screen.getByText('Type 23 Frigate')).toBeInTheDocument();
+    });
+  });
 });

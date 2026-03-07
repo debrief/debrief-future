@@ -9,6 +9,7 @@ import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import type { LozengeItem } from './types';
 import type { FilterType, VesselTaxonomyNode } from '../filter-engine';
+import { resolveTaxonomyLabel } from '../filter-engine';
 import { getFilterTypeLabel } from './constants';
 import { ValueEditor } from './ValueEditor';
 import './Lozenge.css';
@@ -23,6 +24,8 @@ export interface LozengeProps {
   readonly onToggleNegate: (id: string) => void;
   readonly availableValues: Readonly<Record<FilterType, readonly string[]>>;
   readonly taxonomy: readonly VesselTaxonomyNode[];
+  readonly labelMap?: ReadonlyMap<string, string>;
+  readonly taxonomyCounts?: ReadonlyMap<string, number>;
 }
 
 export const Lozenge: React.FC<LozengeProps> = ({
@@ -35,6 +38,8 @@ export const Lozenge: React.FC<LozengeProps> = ({
   onToggleNegate,
   availableValues,
   taxonomy,
+  labelMap,
+  taxonomyCounts,
 }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: item.id,
@@ -43,6 +48,9 @@ export const Lozenge: React.FC<LozengeProps> = ({
 
   const typeLabel = getFilterTypeLabel(item.filterType);
   const valuesForType = availableValues[item.filterType] ?? [];
+  const displayValue = item.filterType === 'vessel-class' && labelMap
+    ? resolveTaxonomyLabel(item.value, labelMap)
+    : item.value;
 
   return (
     <div
@@ -63,7 +71,7 @@ export const Lozenge: React.FC<LozengeProps> = ({
         {item.negated && <span className="debrief-lozenge__not">NOT</span>}
         <span className="debrief-lozenge__type">{typeLabel}</span>
         <span className="debrief-lozenge__separator">:</span>
-        <span className="debrief-lozenge__value">{item.value}</span>
+        <span className="debrief-lozenge__value">{displayValue}</span>
       </span>
       <button
         className="debrief-lozenge__negate"
@@ -92,6 +100,7 @@ export const Lozenge: React.FC<LozengeProps> = ({
             onClose={onEditClose}
             availableValues={valuesForType}
             taxonomy={taxonomy}
+            taxonomyCounts={taxonomyCounts}
           />
         </div>
       )}

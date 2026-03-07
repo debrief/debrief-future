@@ -92,6 +92,49 @@
   font-weight: bold;
 }
 
+/* Badge (count display) */
+.debrief-cascading-menu__badge {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--debrief-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Search input */
+.debrief-cascading-menu__search {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--debrief-border-color);
+}
+
+.debrief-cascading-menu__search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 6px;
+  border: 1px solid var(--debrief-border-color);
+  border-radius: 3px;
+  background: var(--debrief-bg-primary);
+  color: var(--debrief-text-primary);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+}
+
+.debrief-cascading-menu__search-input:focus {
+  border-color: var(--debrief-color-primary, #007acc);
+}
+
+.debrief-cascading-menu__search-input::placeholder {
+  color: var(--debrief-text-muted);
+}
+
+/* No matches message */
+.debrief-cascading-menu__no-matches {
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--debrief-text-muted);
+  font-style: italic;
+}
+
 /* Arrow for submenu indicator */
 .debrief-cascading-menu__arrow {
   flex-shrink: 0;

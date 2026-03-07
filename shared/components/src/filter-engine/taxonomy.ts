@@ -90,3 +90,48 @@ export function buildDescendantMap(
 
   return map;
 }
+
+/** Map from full taxonomy path to human-readable label */
+export type TaxonomyLabelMap = ReadonlyMap<string, string>;
+
+/**
+ * Build a map from full taxonomy path to human-readable label.
+ * Uses full paths as keys to avoid ambiguity (e.g., "auxiliary/tanker" vs "merchant/tanker").
+ *
+ * @example
+ * "surface/warship/frigate/type23" → "Type 23 Frigate"
+ * "surface/warship" → "Warship"
+ */
+export function buildTaxonomyLabelMap(
+  taxonomy: readonly VesselTaxonomyNode[],
+): TaxonomyLabelMap {
+  const map = new Map<string, string>();
+
+  function walk(node: VesselTaxonomyNode, parentPath: string): void {
+    const fullPath = parentPath ? `${parentPath}/${node.id}` : node.id;
+    map.set(fullPath, node.label);
+
+    if (node.children) {
+      for (const child of node.children) {
+        walk(child, fullPath);
+      }
+    }
+  }
+
+  for (const root of taxonomy) {
+    walk(root, "");
+  }
+
+  return map;
+}
+
+/**
+ * Resolve a taxonomy path to its human-readable label.
+ * Returns the raw value as fallback for unknown paths (graceful degradation).
+ */
+export function resolveTaxonomyLabel(
+  value: string,
+  labelMap: ReadonlyMap<string, string>,
+): string {
+  return labelMap.get(value) ?? value;
+}
