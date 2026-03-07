@@ -227,3 +227,21 @@ export {
 export type {
   FilterState as LogFilterState,
 } from './LogPanel';
+
+// Colour Engine (Feature: 134-colour-scheme-engine)
+export { ColourLegend } from './colour-engine';
+export { ColourDimensionSelector } from './colour-engine';
+export { computeColourAssignment, getDefaultColourAssignment } from './colour-engine';
+export { defaultPalette, builtInDimensions } from './colour-engine';
+export type {
+  ColourDimension,
+  ColourPalette,
+  ColourAssignment,
+  LegendModel,
+  LegendEntry,
+  GradientSpec,
+  DimensionType,
+  BuiltInDimensionId,
+  ColourDimensionSelectorProps,
+  ColourLegendProps,
+} from './colour-engine';

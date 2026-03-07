@@ -43,6 +43,10 @@
     "./FilterBar": {
       "types": "./dist/FilterBar/index.d.ts",
       "import": "./dist/FilterBar/index.js"
+    },
+    "./colour-engine": {
+      "types": "./dist/colour-engine/index.d.ts",
+      "import": "./dist/colour-engine/index.js"
     }
   },
   "sideEffects": [
