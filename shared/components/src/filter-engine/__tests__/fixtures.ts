@@ -50,6 +50,7 @@ function stacJsonToItem(json: StacItemJson, itemPath: string): StacBrowserItem {
     trackNames: props["debrief:track_names"] ?? [],
     nationalities: props["debrief:nationalities"] ?? [],
     collection: json.collection ?? null,
+    modified: null,
   };
 }
 

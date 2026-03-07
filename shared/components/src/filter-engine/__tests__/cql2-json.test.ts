@@ -139,8 +139,7 @@ describe("CQL2 JSON serialisation", () => {
   it("serialises all array-valued filter types", () => {
     const arrayTypes = [
       { type: "vessel-class" as const, prop: "debrief:vessel_classes" },
-      { type: "plot-tag" as const, prop: "debrief:tags" },
-      { type: "feature-tag" as const, prop: "debrief:feature_tags" },
+      { type: "tag" as const, prop: "debrief:tags" },
       { type: "track-name" as const, prop: "debrief:track_names" },
       { type: "nationality" as const, prop: "debrief:nationalities" },
     ];
