@@ -38,67 +38,67 @@ function renderDropdown(overrides: Partial<React.ComponentProps<typeof HistoricF
   return { ...render(<HistoricFiltersDropdown {...defaultProps} />), props: defaultProps };
 }
 
-describe('HistoricFiltersDropdown', () => {
+describe('SavedFiltersDropdown', () => {
   it('renders the trigger button', () => {
     renderDropdown();
-    expect(screen.getByTestId('historic-filters-trigger')).toBeInTheDocument();
-    expect(screen.getByTestId('historic-filters-trigger')).toHaveTextContent('Historic Filters');
+    expect(screen.getByTestId('saved-filters-trigger')).toBeInTheDocument();
+    expect(screen.getByTestId('saved-filters-trigger')).toHaveTextContent('Saved Filters');
   });
 
   it('shows dropdown on click', () => {
     renderDropdown();
-    fireEvent.click(screen.getByTestId('historic-filters-trigger'));
-    expect(screen.getByTestId('historic-filters-dropdown')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('saved-filters-trigger'));
+    expect(screen.getByTestId('saved-filters-dropdown')).toBeInTheDocument();
   });
 
   it('closes dropdown on second click', () => {
     renderDropdown();
-    fireEvent.click(screen.getByTestId('historic-filters-trigger'));
-    fireEvent.click(screen.getByTestId('historic-filters-trigger'));
-    expect(screen.queryByTestId('historic-filters-dropdown')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('saved-filters-trigger'));
+    fireEvent.click(screen.getByTestId('saved-filters-trigger'));
+    expect(screen.queryByTestId('saved-filters-dropdown')).not.toBeInTheDocument();
   });
 
   it('shows empty message when no configurations', () => {
     renderDropdown({ configurations: [] });
-    fireEvent.click(screen.getByTestId('historic-filters-trigger'));
-    expect(screen.getByTestId('historic-filters-empty')).toHaveTextContent('No saved filters');
+    fireEvent.click(screen.getByTestId('saved-filters-trigger'));
+    expect(screen.getByTestId('saved-filters-empty')).toHaveTextContent('No saved filters');
   });
 
   it('displays saved configurations', () => {
     renderDropdown();
-    fireEvent.click(screen.getByTestId('historic-filters-trigger'));
+    fireEvent.click(screen.getByTestId('saved-filters-trigger'));
     expect(screen.getByText('UK Submarines')).toBeInTheDocument();
     expect(screen.getByText('French ASW')).toBeInTheDocument();
   });
 
   it('calls onRestore when clicking a configuration', () => {
     const { props } = renderDropdown();
-    fireEvent.click(screen.getByTestId('historic-filters-trigger'));
-    fireEvent.click(screen.getByTestId('historic-filter-restore-c1'));
+    fireEvent.click(screen.getByTestId('saved-filters-trigger'));
+    fireEvent.click(screen.getByTestId('saved-filter-restore-c1'));
 
     expect(props.onRestore).toHaveBeenCalledWith(SAMPLE_CONFIGS[0]);
   });
 
   it('closes dropdown after restoring', () => {
     renderDropdown();
-    fireEvent.click(screen.getByTestId('historic-filters-trigger'));
-    fireEvent.click(screen.getByTestId('historic-filter-restore-c1'));
+    fireEvent.click(screen.getByTestId('saved-filters-trigger'));
+    fireEvent.click(screen.getByTestId('saved-filter-restore-c1'));
 
-    expect(screen.queryByTestId('historic-filters-dropdown')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('saved-filters-dropdown')).not.toBeInTheDocument();
   });
 
   it('calls onDelete when clicking delete button', () => {
     const { props } = renderDropdown();
-    fireEvent.click(screen.getByTestId('historic-filters-trigger'));
-    fireEvent.click(screen.getByTestId('historic-filter-delete-c2'));
+    fireEvent.click(screen.getByTestId('saved-filters-trigger'));
+    fireEvent.click(screen.getByTestId('saved-filter-delete-c2'));
 
     expect(props.onDelete).toHaveBeenCalledWith('c2');
   });
 
   it('does not trigger restore when clicking delete', () => {
     const { props } = renderDropdown();
-    fireEvent.click(screen.getByTestId('historic-filters-trigger'));
-    fireEvent.click(screen.getByTestId('historic-filter-delete-c1'));
+    fireEvent.click(screen.getByTestId('saved-filters-trigger'));
+    fireEvent.click(screen.getByTestId('saved-filter-delete-c1'));
 
     expect(props.onRestore).not.toHaveBeenCalled();
     expect(props.onDelete).toHaveBeenCalledWith('c1');
@@ -114,12 +114,12 @@ describe('HistoricFiltersDropdown', () => {
           onDelete={onDelete}
         />,
       );
-      fireEvent.click(screen.getByTestId('historic-filters-trigger'));
+      fireEvent.click(screen.getByTestId('saved-filters-trigger'));
       expect(screen.getByText('UK Submarines')).toBeInTheDocument();
       expect(screen.getByText('French ASW')).toBeInTheDocument();
 
       // Simulate parent removing the deleted config
-      fireEvent.click(screen.getByTestId('historic-filter-delete-c1'));
+      fireEvent.click(screen.getByTestId('saved-filter-delete-c1'));
       const remaining = SAMPLE_CONFIGS.filter((c) => c.id !== 'c1');
       rerender(
         <HistoricFiltersDropdown
@@ -143,8 +143,8 @@ describe('HistoricFiltersDropdown', () => {
           onDelete={onDelete}
         />,
       );
-      fireEvent.click(screen.getByTestId('historic-filters-trigger'));
-      fireEvent.click(screen.getByTestId('historic-filter-delete-c1'));
+      fireEvent.click(screen.getByTestId('saved-filters-trigger'));
+      fireEvent.click(screen.getByTestId('saved-filter-delete-c1'));
 
       rerender(
         <HistoricFiltersDropdown
@@ -154,15 +154,15 @@ describe('HistoricFiltersDropdown', () => {
         />,
       );
 
-      expect(screen.getByTestId('historic-filters-empty')).toHaveTextContent('No saved filters');
+      expect(screen.getByTestId('saved-filters-empty')).toHaveTextContent('No saved filters');
     });
 
     it('dropdown stays open after deleting an entry', () => {
       renderDropdown();
-      fireEvent.click(screen.getByTestId('historic-filters-trigger'));
-      fireEvent.click(screen.getByTestId('historic-filter-delete-c1'));
+      fireEvent.click(screen.getByTestId('saved-filters-trigger'));
+      fireEvent.click(screen.getByTestId('saved-filter-delete-c1'));
 
-      expect(screen.getByTestId('historic-filters-dropdown')).toBeInTheDocument();
+      expect(screen.getByTestId('saved-filters-dropdown')).toBeInTheDocument();
     });
   });
 });

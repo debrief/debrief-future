@@ -192,6 +192,23 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       onDragEnd={handleDragEnd}
     >
       <div className="debrief-filter-bar" data-testid="filter-bar">
+        {savedFiltersStorage && (
+          <div className="debrief-filter-bar__toolbar" data-testid="filter-bar-toolbar">
+            <SaveFilterButton
+              currentFilterBarState={state}
+              currentCql2Json={cql2Json}
+              hasActiveFilters={!isEmpty}
+              nameExists={savedFilters.nameExists}
+              onSave={savedFilters.saveConfiguration}
+            />
+            <HistoricFiltersDropdown
+              configurations={savedFilters.configurations}
+              onRestore={handleRestore}
+              onDelete={savedFilters.deleteConfiguration}
+            />
+          </div>
+        )}
+
         {error && (
           <div className="debrief-filter-bar__error" data-testid="filter-bar-error" role="alert">
             {error}
@@ -247,23 +264,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             onSelectType={handleSelectType}
             onSelectOrGroup={handleSelectOrGroup}
           />
-
-          {savedFiltersStorage && (
-            <>
-              <SaveFilterButton
-                currentFilterBarState={state}
-                currentCql2Json={cql2Json}
-                hasActiveFilters={!isEmpty}
-                nameExists={savedFilters.nameExists}
-                onSave={savedFilters.saveConfiguration}
-              />
-              <HistoricFiltersDropdown
-                configurations={savedFilters.configurations}
-                onRestore={handleRestore}
-                onDelete={savedFilters.deleteConfiguration}
-              />
-            </>
-          )}
         </div>
 
         {/* Value editor popover for adding new filter */}

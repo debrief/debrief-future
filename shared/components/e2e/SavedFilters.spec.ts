@@ -28,7 +28,7 @@ test.describe('Saved Filters — Theme Variants', () => {
     await page.waitForSelector('[data-testid="filter-bar"]');
 
     await expect(page.locator('[data-testid="save-filter-trigger"]')).toBeVisible();
-    await expect(page.locator('[data-testid="historic-filters-trigger"]')).toBeVisible();
+    await expect(page.locator('[data-testid="saved-filters-trigger"]')).toBeVisible();
 
     await page.screenshot({
       path: `${EVIDENCE_DIR}/component-light.png`,
@@ -68,9 +68,9 @@ test.describe('Saved Filters — Empty State', () => {
     await page.goto(withTheme(STORIES.empty, 'light'));
     await page.waitForSelector('[data-testid="filter-bar"]');
 
-    await page.click('[data-testid="historic-filters-trigger"]');
-    await expect(page.locator('[data-testid="historic-filters-empty"]')).toBeVisible();
-    await expect(page.locator('[data-testid="historic-filters-empty"]')).toHaveText('No saved filters');
+    await page.click('[data-testid="saved-filters-trigger"]');
+    await expect(page.locator('[data-testid="saved-filters-empty"]')).toBeVisible();
+    await expect(page.locator('[data-testid="saved-filters-empty"]')).toHaveText('No saved filters');
   });
 
   test('save button is disabled when no active filters', async ({ page }) => {
@@ -102,7 +102,7 @@ test.describe('Saved Filters — Save Flow', () => {
     await expect(page.locator('[data-testid="save-filter-popover"]')).not.toBeVisible();
 
     // Verify it appears in the dropdown
-    await page.click('[data-testid="historic-filters-trigger"]');
+    await page.click('[data-testid="saved-filters-trigger"]');
     await expect(page.locator('text=My Test Filter')).toBeVisible();
   });
 });
@@ -113,18 +113,18 @@ test.describe('Saved Filters — Restore Flow', () => {
     await page.waitForSelector('[data-testid="filter-bar"]');
 
     // Open dropdown
-    await page.click('[data-testid="historic-filters-trigger"]');
-    await expect(page.locator('[data-testid="historic-filters-dropdown"]')).toBeVisible();
+    await page.click('[data-testid="saved-filters-trigger"]');
+    await expect(page.locator('[data-testid="saved-filters-dropdown"]')).toBeVisible();
 
     // Verify saved configs are listed
     await expect(page.locator('text=French Exercises')).toBeVisible();
     await expect(page.locator('text=ASW Convoy')).toBeVisible();
 
     // Click to restore
-    await page.click('[data-testid="historic-filter-restore-saved-1"]');
+    await page.click('[data-testid="saved-filter-restore-saved-1"]');
 
     // Dropdown should close
-    await expect(page.locator('[data-testid="historic-filters-dropdown"]')).not.toBeVisible();
+    await expect(page.locator('[data-testid="saved-filters-dropdown"]')).not.toBeVisible();
   });
 });
 
@@ -134,11 +134,11 @@ test.describe('Saved Filters — Delete Flow', () => {
     await page.waitForSelector('[data-testid="filter-bar"]');
 
     // Open dropdown
-    await page.click('[data-testid="historic-filters-trigger"]');
+    await page.click('[data-testid="saved-filters-trigger"]');
     await expect(page.locator('text=French Exercises')).toBeVisible();
 
     // Delete an entry
-    await page.click('[data-testid="historic-filter-delete-saved-1"]');
+    await page.click('[data-testid="saved-filter-delete-saved-1"]');
 
     // Verify entry removed
     await expect(page.locator('text=French Exercises')).not.toBeVisible();
@@ -155,8 +155,8 @@ test.describe('Saved Filters — Screenshots', () => {
     await page.waitForSelector('[data-testid="filter-bar"]');
 
     // Open dropdown for screenshot
-    await page.click('[data-testid="historic-filters-trigger"]');
-    await expect(page.locator('[data-testid="historic-filters-dropdown"]')).toBeVisible();
+    await page.click('[data-testid="saved-filters-trigger"]');
+    await expect(page.locator('[data-testid="saved-filters-dropdown"]')).toBeVisible();
 
     await page.screenshot({
       path: `${EVIDENCE_DIR}/with-saved-dropdown.png`,

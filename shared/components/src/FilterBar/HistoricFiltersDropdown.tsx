@@ -1,5 +1,5 @@
 /**
- * HistoricFiltersDropdown — dropdown list of saved filter configurations (#128).
+ * SavedFiltersDropdown — dropdown list of saved filter configurations (#128).
  *
  * Shows saved configurations ordered newest first. Each entry can be
  * restored (click name) or deleted (click delete button).
@@ -7,9 +7,9 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  HISTORIC_FILTERS_LABEL,
-  HISTORIC_FILTERS_EMPTY,
-  HISTORIC_FILTERS_DELETE_TOOLTIP,
+  SAVED_FILTERS_LABEL,
+  SAVED_FILTERS_EMPTY,
+  SAVED_FILTERS_DELETE_TOOLTIP,
 } from './constants';
 import type { SavedFilterConfiguration } from './types';
 
@@ -56,43 +56,43 @@ export const HistoricFiltersDropdown: React.FC<HistoricFiltersDropdownProps> = (
   );
 
   return (
-    <div className="debrief-historic-filters" ref={dropdownRef} data-testid="historic-filters">
+    <div className="debrief-saved-filters" ref={dropdownRef} data-testid="saved-filters">
       <button
-        className="debrief-historic-filters__trigger"
+        className="debrief-saved-filters__trigger"
         onClick={() => setIsOpen(!isOpen)}
-        data-testid="historic-filters-trigger"
+        data-testid="saved-filters-trigger"
       >
-        {HISTORIC_FILTERS_LABEL}
+        {SAVED_FILTERS_LABEL}
       </button>
 
       {isOpen && (
-        <div className="debrief-historic-filters__dropdown" data-testid="historic-filters-dropdown">
+        <div className="debrief-saved-filters__dropdown" data-testid="saved-filters-dropdown">
           {configurations.length === 0 ? (
             <div
-              className="debrief-historic-filters__empty"
-              data-testid="historic-filters-empty"
+              className="debrief-saved-filters__empty"
+              data-testid="saved-filters-empty"
             >
-              {HISTORIC_FILTERS_EMPTY}
+              {SAVED_FILTERS_EMPTY}
             </div>
           ) : (
-            <ul className="debrief-historic-filters__list" data-testid="historic-filters-list">
+            <ul className="debrief-saved-filters__list" data-testid="saved-filters-list">
               {configurations.map((config) => (
-                <li key={config.id} className="debrief-historic-filters__item">
+                <li key={config.id} className="debrief-saved-filters__item">
                   <button
-                    className="debrief-historic-filters__restore"
+                    className="debrief-saved-filters__restore"
                     onClick={() => handleRestore(config)}
-                    data-testid={`historic-filter-restore-${config.id}`}
+                    data-testid={`saved-filter-restore-${config.id}`}
                   >
-                    <span className="debrief-historic-filters__name">{config.name}</span>
-                    <span className="debrief-historic-filters__date">
+                    <span className="debrief-saved-filters__name">{config.name}</span>
+                    <span className="debrief-saved-filters__date">
                       {new Date(config.updatedAt).toLocaleDateString()}
                     </span>
                   </button>
                   <button
-                    className="debrief-historic-filters__delete"
+                    className="debrief-saved-filters__delete"
                     onClick={(e) => handleDelete(e, config.id)}
-                    title={HISTORIC_FILTERS_DELETE_TOOLTIP}
-                    data-testid={`historic-filter-delete-${config.id}`}
+                    title={SAVED_FILTERS_DELETE_TOOLTIP}
+                    data-testid={`saved-filter-delete-${config.id}`}
                   >
                     ×
                   </button>

@@ -6,6 +6,15 @@
   min-height: 36px;
 }
 
+.debrief-filter-bar__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--vscode-widget-border, #ddd);
+}
+
 .debrief-filter-bar__items {
   display: flex;
   flex-wrap: wrap;
@@ -295,13 +304,13 @@
   cursor: pointer;
 }
 
-/* HistoricFiltersDropdown styles (#128) */
-.debrief-historic-filters {
+/* SavedFiltersDropdown styles (#128) */
+.debrief-saved-filters {
   position: relative;
   display: inline-flex;
 }
 
-.debrief-historic-filters__trigger {
+.debrief-saved-filters__trigger {
   border: 1px solid var(--vscode-button-border, var(--vscode-widget-border, #ccc));
   background: var(--vscode-button-secondaryBackground, #e8e8e8);
   color: var(--vscode-button-secondaryForeground, #333);
@@ -312,11 +321,11 @@
   white-space: nowrap;
 }
 
-.debrief-historic-filters__trigger:hover {
+.debrief-saved-filters__trigger:hover {
   background: var(--vscode-button-secondaryHoverBackground, #ddd);
 }
 
-.debrief-historic-filters__dropdown {
+.debrief-saved-filters__dropdown {
   position: absolute;
   top: 100%;
   right: 0;
@@ -331,7 +340,7 @@
   overflow-y: auto;
 }
 
-.debrief-historic-filters__empty {
+.debrief-saved-filters__empty {
   color: var(--vscode-descriptionForeground, #999);
   padding: 12px;
   font-size: 12px;
@@ -339,19 +348,19 @@
   text-align: center;
 }
 
-.debrief-historic-filters__list {
+.debrief-saved-filters__list {
   list-style: none;
   margin: 0;
   padding: 4px 0;
 }
 
-.debrief-historic-filters__item {
+.debrief-saved-filters__item {
   display: flex;
   align-items: center;
   padding: 0 4px 0 0;
 }
 
-.debrief-historic-filters__restore {
+.debrief-saved-filters__restore {
   flex: 1;
   display: flex;
   justify-content: space-between;
@@ -366,24 +375,24 @@
   gap: 8px;
 }
 
-.debrief-historic-filters__restore:hover {
+.debrief-saved-filters__restore:hover {
   background: var(--vscode-list-hoverBackground, #f0f0f0);
 }
 
-.debrief-historic-filters__name {
+.debrief-saved-filters__name {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.debrief-historic-filters__date {
+.debrief-saved-filters__date {
   color: var(--vscode-descriptionForeground, #999);
   font-size: 11px;
   white-space: nowrap;
 }
 
-.debrief-historic-filters__delete {
+.debrief-saved-filters__delete {
   border: none;
   background: transparent;
   color: var(--vscode-descriptionForeground, #999);
@@ -394,7 +403,7 @@
   border-radius: 3px;
 }
 
-.debrief-historic-filters__delete:hover {
+.debrief-saved-filters__delete:hover {
   color: var(--vscode-errorForeground, #d32f2f);
   background: var(--vscode-list-hoverBackground, #f0f0f0);
 }
