@@ -18,6 +18,8 @@ export interface OrContainerProps {
     readonly onToggleNegate: (id: string) => void;
     readonly availableValues: Readonly<Record<FilterType, readonly string[]>>;
     readonly taxonomy: readonly VesselTaxonomyNode[];
+    readonly labelMap?: ReadonlyMap<string, string>;
+    readonly taxonomyCounts?: ReadonlyMap<string, number>;
 }
 export declare const OrContainer: React.FC<OrContainerProps>;
 //# sourceMappingURL=OrContainer.d.ts.map

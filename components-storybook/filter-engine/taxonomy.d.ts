@@ -32,4 +32,20 @@ export type DescendantMap = ReadonlyMap<string, ReadonlySet<string>>;
  *   "type23"   → {"surface/warship/frigate/type23"}
  */
 export declare function buildDescendantMap(nodes: readonly VesselTaxonomyNode[]): DescendantMap;
+/** Map from full taxonomy path to human-readable label */
+export type TaxonomyLabelMap = ReadonlyMap<string, string>;
+/**
+ * Build a map from full taxonomy path to human-readable label.
+ * Uses full paths as keys to avoid ambiguity (e.g., "auxiliary/tanker" vs "merchant/tanker").
+ *
+ * @example
+ * "surface/warship/frigate/type23" → "Type 23 Frigate"
+ * "surface/warship" → "Warship"
+ */
+export declare function buildTaxonomyLabelMap(taxonomy: readonly VesselTaxonomyNode[]): TaxonomyLabelMap;
+/**
+ * Resolve a taxonomy path to its human-readable label.
+ * Returns the raw value as fallback for unknown paths (graceful degradation).
+ */
+export declare function resolveTaxonomyLabel(value: string, labelMap: ReadonlyMap<string, string>): string;
 //# sourceMappingURL=taxonomy.d.ts.map
