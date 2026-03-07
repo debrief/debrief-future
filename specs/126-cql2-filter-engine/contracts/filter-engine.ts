@@ -15,6 +15,7 @@ export type FilterType =
   | "author"
   | "duration"
   | "title"
+  | "plot-contents"
   | "track-name"
   | "nationality"
   | "collection";

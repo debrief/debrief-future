@@ -10,6 +10,7 @@ export type { RawTaxonomy, RawTaxonomyNode, DescendantMap } from "./taxonomy";
 export type {
   FilterType,
   DurationBucket,
+  ModifiedBucket,
   Predicate,
   OrGroup,
   FilterExpression,
