@@ -12,7 +12,7 @@ export declare class PanelErrorBoundary extends Component<Props, State> {
     state: State;
     static getDerivedStateFromError(error: Error): State;
     componentDidCatch(error: Error, info: ErrorInfo): void;
-    render(): string | number | boolean | import("react/jsx-runtime").JSX.Element | Iterable<ReactNode> | null | undefined;
+    render(): string | number | boolean | Iterable<ReactNode> | import("react/jsx-runtime").JSX.Element | null | undefined;
 }
 export {};
 //# sourceMappingURL=PanelErrorBoundary.d.ts.map

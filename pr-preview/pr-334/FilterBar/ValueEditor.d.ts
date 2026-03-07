@@ -8,6 +8,7 @@ export interface ValueEditorProps {
     readonly onClose: () => void;
     readonly availableValues: readonly string[];
     readonly taxonomy?: readonly VesselTaxonomyNode[];
+    readonly taxonomyCounts?: ReadonlyMap<string, number>;
 }
 export declare const ValueEditor: React.FC<ValueEditorProps>;
 //# sourceMappingURL=ValueEditor.d.ts.map

@@ -12,6 +12,8 @@ export interface LozengeProps {
     readonly onToggleNegate: (id: string) => void;
     readonly availableValues: Readonly<Record<FilterType, readonly string[]>>;
     readonly taxonomy: readonly VesselTaxonomyNode[];
+    readonly labelMap?: ReadonlyMap<string, string>;
+    readonly taxonomyCounts?: ReadonlyMap<string, number>;
 }
 export declare const Lozenge: React.FC<LozengeProps>;
 //# sourceMappingURL=Lozenge.d.ts.map
