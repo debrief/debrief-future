@@ -161,9 +161,7 @@ def _save_catalog(path: CatalogPath, catalog_data: STACCatalog) -> None:
     with open(lock_path, "w") as lock_f:
         _lock_file(lock_f)
         try:
-            fd, tmp_path = tempfile.mkstemp(
-                dir=str(catalog_path), suffix=".json.tmp"
-            )
+            fd, tmp_path = tempfile.mkstemp(dir=str(catalog_path), suffix=".json.tmp")
             try:
                 with os.fdopen(fd, "w") as f:
                     json.dump(catalog_data, f, indent=2)

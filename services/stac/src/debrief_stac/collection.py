@@ -215,12 +215,8 @@ def update_collection_summaries(
     bbox, start_dt, end_dt = _extract_item_extent(item_data)
     item_sums = _extract_item_summaries(item_data)
 
-    catalog_data["extent"] = _merge_extent(
-        catalog_data.get("extent"), bbox, start_dt, end_dt
-    )
-    catalog_data["summaries"] = _merge_summaries(
-        catalog_data.get("summaries"), item_sums
-    )
+    catalog_data["extent"] = _merge_extent(catalog_data.get("extent"), bbox, start_dt, end_dt)
+    catalog_data["summaries"] = _merge_summaries(catalog_data.get("summaries"), item_sums)
 
 
 def rebuild_collection_summaries(

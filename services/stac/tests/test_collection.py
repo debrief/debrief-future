@@ -8,6 +8,7 @@ Covers:
 """
 
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -130,7 +131,9 @@ class TestMergeExtent:
     """Tests for _merge_extent helper."""
 
     def test_first_item_sets_extent(self) -> None:
-        result = _merge_extent(None, (-5.0, 49.0, 2.0, 58.5), "2024-01-01T00:00:00Z", "2024-06-30T00:00:00Z")
+        result = _merge_extent(
+            None, (-5.0, 49.0, 2.0, 58.5), "2024-01-01T00:00:00Z", "2024-06-30T00:00:00Z"
+        )
         assert result["spatial"]["bbox"] == [[-5.0, 49.0, 2.0, 58.5]]
         assert result["temporal"]["interval"] == [["2024-01-01T00:00:00Z", "2024-06-30T00:00:00Z"]]
 
@@ -199,7 +202,7 @@ class TestCollectionPromotionUS1:
         # Create item 1 with features to set bbox and datetime
         plot1 = create_plot(
             catalog_path,
-            PlotMetadata(title="Plot 1", datetime="2024-01-15T08:00:00Z"),
+            PlotMetadata(title="Plot 1", datetime=datetime(2024, 1, 15, 8, 0, 0, tzinfo=UTC)),
             plot_id="plot-1",
         )
         # Manually set extension properties on item
@@ -213,7 +216,7 @@ class TestCollectionPromotionUS1:
         # Create item 2 with different properties
         plot2 = create_plot(
             catalog_path,
-            PlotMetadata(title="Plot 2", datetime="2025-03-20T16:30:00Z"),
+            PlotMetadata(title="Plot 2", datetime=datetime(2025, 3, 20, 16, 30, 0, tzinfo=UTC)),
             plot_id="plot-2",
         )
         item2 = read_plot(catalog_path, plot2)
@@ -283,8 +286,13 @@ class TestCollectionPromotionUS1:
 
         catalog = open_catalog(catalog_path)
         # Summaries should have empty arrays
-        for key in ["debrief:vessel_classes", "debrief:tags", "debrief:feature_tags",
-                     "debrief:track_names", "debrief:nationalities"]:
+        for key in [
+            "debrief:vessel_classes",
+            "debrief:tags",
+            "debrief:feature_tags",
+            "debrief:track_names",
+            "debrief:nationalities",
+        ]:
             assert catalog["summaries"][key] == []
 
     def test_summaries_sorted_alphabetically(self, tmp_path: Path) -> None:
@@ -312,7 +320,13 @@ class TestCollectionPromotionUS1:
         import jsonschema
 
         # Load the contract schema
-        schema_path = Path(__file__).parent.parent.parent.parent / "specs" / "136-stac-collection-summaries" / "contracts" / "collection-schema.json"
+        schema_path = (
+            Path(__file__).parent.parent.parent.parent
+            / "specs"
+            / "136-stac-collection-summaries"
+            / "contracts"
+            / "collection-schema.json"
+        )
         if not schema_path.exists():
             pytest.skip("Contract schema not found")
 
@@ -322,18 +336,22 @@ class TestCollectionPromotionUS1:
         catalog_path = create_catalog(tmp_path / "catalog")
         create_plot(
             catalog_path,
-            PlotMetadata(title="Plot 1", datetime="2024-01-15T08:00:00Z"),
+            PlotMetadata(title="Plot 1", datetime=datetime(2024, 1, 15, 8, 0, 0, tzinfo=UTC)),
             plot_id="plot-1",
         )
 
         # Add features to get a valid bbox
-        add_features(catalog_path, "plot-1", [
-            {
-                "type": "Feature",
-                "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
-                "properties": {"name": "Point A"},
-            },
-        ])
+        add_features(
+            catalog_path,
+            "plot-1",
+            [
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
+                    "properties": {"name": "Point A"},
+                },
+            ],
+        )
 
         catalog = open_catalog(catalog_path)
         jsonschema.validate(instance=catalog, schema=schema)
@@ -408,17 +426,21 @@ class TestReadSummariesUS3:
         catalog_path = create_catalog(tmp_path / "catalog")
         plot_id = create_plot(
             catalog_path,
-            PlotMetadata(title="Plot", datetime="2024-06-15T12:00:00Z"),
+            PlotMetadata(title="Plot", datetime=datetime(2024, 6, 15, 12, 0, 0, tzinfo=UTC)),
             plot_id="plot-1",
         )
 
-        add_features(catalog_path, plot_id, [
-            {
-                "type": "Feature",
-                "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
-                "properties": {"name": "A"},
-            },
-        ])
+        add_features(
+            catalog_path,
+            plot_id,
+            [
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Point", "coordinates": [-5.0, 50.0]},
+                    "properties": {"name": "A"},
+                },
+            ],
+        )
 
         result = read_collection_summaries(catalog_path)
         assert result is not None
@@ -441,7 +463,7 @@ class TestReadSummariesUS3:
         catalog_path = create_catalog(tmp_path / "catalog")
         create_plot(
             catalog_path,
-            PlotMetadata(title="Plot", datetime="2024-06-15T12:00:00Z"),
+            PlotMetadata(title="Plot", datetime=datetime(2024, 6, 15, 12, 0, 0, tzinfo=UTC)),
             plot_id="plot-1",
         )
 
@@ -471,30 +493,34 @@ class TestDeletionRebuildUS4:
         # Create 3 plots with different dates
         p1 = create_plot(
             catalog_path,
-            PlotMetadata(title="Early", datetime="2024-01-01T00:00:00Z"),
+            PlotMetadata(title="Early", datetime=datetime(2024, 1, 1, tzinfo=UTC)),
             plot_id="early",
         )
         p2 = create_plot(
             catalog_path,
-            PlotMetadata(title="Mid", datetime="2024-06-15T00:00:00Z"),
+            PlotMetadata(title="Mid", datetime=datetime(2024, 6, 15, tzinfo=UTC)),
             plot_id="mid",
         )
         p3 = create_plot(
             catalog_path,
-            PlotMetadata(title="Late", datetime="2025-12-31T00:00:00Z"),
+            PlotMetadata(title="Late", datetime=datetime(2025, 12, 31, tzinfo=UTC)),
             plot_id="late",
         )
 
         # Add features to give them bboxes and trigger promotion
         for pid in [p1, p2, p3]:
-            add_features(catalog_path, pid, [
-                {
-                    "type": "Feature",
-                    "id": f"{pid}-feat-1",
-                    "geometry": {"type": "Point", "coordinates": [0, 0]},
-                    "properties": {"name": f"{pid} feature"},
-                },
-            ])
+            add_features(
+                catalog_path,
+                pid,
+                [
+                    {
+                        "type": "Feature",
+                        "id": f"{pid}-feat-1",
+                        "geometry": {"type": "Point", "coordinates": [0, 0]},
+                        "properties": {"name": f"{pid} feature"},
+                    },
+                ],
+            )
 
         catalog = open_catalog(catalog_path)
         # PlotMetadata stores datetime with timezone, which Python serialises as +00:00
@@ -512,7 +538,8 @@ class TestDeletionRebuildUS4:
 
         # Remove the "late" item link
         catalog_data["links"] = [
-            link for link in catalog_data["links"]
+            link
+            for link in catalog_data["links"]
             if not (link.get("rel") == "item" and "late" in link.get("href", ""))
         ]
         rebuild_collection_summaries(catalog_data, catalog_path)
@@ -549,7 +576,8 @@ class TestDeletionRebuildUS4:
         # Remove p2 link and rebuild
         catalog_data = open_catalog(catalog_path)
         catalog_data["links"] = [
-            link for link in catalog_data["links"]
+            link
+            for link in catalog_data["links"]
             if not (link.get("rel") == "item" and "p2" in link.get("href", ""))
         ]
         rebuild_collection_summaries(catalog_data, catalog_path)
@@ -570,17 +598,20 @@ class TestDeletionRebuildUS4:
         assert catalog["type"] == "Collection"
 
         # Remove all item links and rebuild
-        catalog["links"] = [
-            link for link in catalog["links"] if link.get("rel") != "item"
-        ]
+        catalog["links"] = [link for link in catalog["links"] if link.get("rel") != "item"]
         rebuild_collection_summaries(catalog, catalog_path)
         _save_catalog(catalog_path, catalog)
 
         catalog = open_catalog(catalog_path)
         assert catalog["type"] == "Collection"
         assert catalog["extent"]["temporal"]["interval"] == [[None, None]]
-        for key in ["debrief:vessel_classes", "debrief:tags", "debrief:feature_tags",
-                     "debrief:track_names", "debrief:nationalities"]:
+        for key in [
+            "debrief:vessel_classes",
+            "debrief:tags",
+            "debrief:feature_tags",
+            "debrief:track_names",
+            "debrief:nationalities",
+        ]:
             assert catalog["summaries"][key] == []
 
     def test_dangling_link_raises_plot_not_found(self, tmp_path: Path) -> None:
