@@ -81,18 +81,18 @@ describe("integration: nationality", () => {
   });
 });
 
-describe("integration: plot-tag", () => {
-  it("filters by ASW tag", () => {
+describe("integration: tag", () => {
+  it("filters by ASW tag (matches tags or featureTags)", () => {
     const expr: FilterExpression = {
-      predicates: [{ type: "plot-tag", value: "ASW" }],
+      predicates: [{ type: "tag", value: "ASW" }],
       orGroups: [],
     };
     const result = engine.filter(items, expr);
     expect(result.length).toBeGreaterThan(0);
     for (const item of result) {
-      expect(
-        item.tags.some((t) => t.toLowerCase() === "asw"),
-      ).toBe(true);
+      const hasTag = item.tags.some((t) => t.toLowerCase() === "asw") ||
+        item.featureTags.some((t) => t.toLowerCase() === "asw");
+      expect(hasTag).toBe(true);
     }
   });
 });

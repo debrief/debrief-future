@@ -57,10 +57,10 @@
 
 **Purpose**: Project scaffolding, dependencies, module skeleton
 
-- [ ] T001 Create FilterBar module directory and index.ts `shared/components/src/FilterBar/index.ts`
-- [ ] T002 [P] Add `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` to `@debrief/components` dependencies `shared/components/package.json`
-- [ ] T003 [P] Add `plot-contents` to #126 `FilterType` union and update `Predicate` handling `specs/126-cql2-filter-engine/contracts/filter-engine.ts`
-- [ ] T004 [P] Add subpath export `./FilterBar` to package.json exports map `shared/components/package.json`
+- [x] T001 Create FilterBar module directory and index.ts `shared/components/src/FilterBar/index.ts`
+- [x] T002 [P] Add `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` to `@debrief/components` dependencies `shared/components/package.json`
+- [x] T003 [P] Add `plot-contents` to #126 `FilterType` union and update `Predicate` handling `specs/126-cql2-filter-engine/contracts/filter-engine.ts`
+- [x] T004 [P] Add subpath export `./FilterBar` to package.json exports map `shared/components/package.json`
 
 **Checkpoint**: Module skeleton exists, dependencies installed, #126 contract updated
 
@@ -72,14 +72,14 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Create `types.ts` with `FilterBarState`, `FilterBarItem` (discriminated union), `FilterTypeOption`, `InputMethod` types `shared/components/src/FilterBar/types.ts`
-- [ ] T006 [P] Create `constants.ts` with `FILTER_TYPE_OPTIONS` array (all 10 types + labels + input methods), duration bucket values, and all user-facing string constants `shared/components/src/FilterBar/constants.ts`
-- [ ] T007 Create `useFilterBar.ts` reducer hook: actions for add/remove/edit/move lozenge, add/remove OR container, `toFilterExpression()` conversion (skip empty OR containers per review decision #4). Use `crypto.randomUUID()` for IDs `shared/components/src/FilterBar/useFilterBar.ts`
-- [ ] T008 [test] Write `useFilterBar.test.ts`: reducer state transitions (add, remove, edit, move to OR, move from OR), `toFilterExpression` output including empty OR skip, CQL2 round-trip via #126 engine `shared/components/src/FilterBar/__tests__/useFilterBar.test.ts`
-- [ ] T009 Create `useDistinctValues.ts` useMemo hook: extract distinct sorted values from `StacBrowserItem[]` for all dropdown filter types `shared/components/src/FilterBar/useDistinctValues.ts`
-- [ ] T010 [test] Write `useDistinctValues.test.ts`: deduplication, alphabetical sorting, handling null/empty fields, flat array extraction from nested arrays `shared/components/src/FilterBar/__tests__/useDistinctValues.test.ts`
-- [ ] T011 Create CascadingMenu taxonomy adapter: pure function mapping `VesselTaxonomyNode[]` → `CascadingMenuItem[]` for vessel class hierarchical dropdown `shared/components/src/FilterBar/taxonomyAdapter.ts`
-- [ ] T012 [test] Write taxonomy adapter test: correct mapping, nested children, empty tree, leaf nodes `shared/components/src/FilterBar/__tests__/taxonomyAdapter.test.ts`
+- [x] T005 Create `types.ts` with `FilterBarState`, `FilterBarItem` (discriminated union), `FilterTypeOption`, `InputMethod` types `shared/components/src/FilterBar/types.ts`
+- [x] T006 [P] Create `constants.ts` with `FILTER_TYPE_OPTIONS` array (all 10 types + labels + input methods), duration bucket values, and all user-facing string constants `shared/components/src/FilterBar/constants.ts`
+- [x] T007 Create `useFilterBar.ts` reducer hook: actions for add/remove/edit/move lozenge, add/remove OR container, `toFilterExpression()` conversion (skip empty OR containers per review decision #4). Use `crypto.randomUUID()` for IDs `shared/components/src/FilterBar/useFilterBar.ts`
+- [x] T008 [test] Write `useFilterBar.test.ts`: reducer state transitions (add, remove, edit, move to OR, move from OR), `toFilterExpression` output including empty OR skip, CQL2 round-trip via #126 engine `shared/components/src/FilterBar/__tests__/useFilterBar.test.ts`
+- [x] T009 Create `useDistinctValues.ts` useMemo hook: extract distinct sorted values from `StacBrowserItem[]` for all dropdown filter types `shared/components/src/FilterBar/useDistinctValues.ts`
+- [x] T010 [test] Write `useDistinctValues.test.ts`: deduplication, alphabetical sorting, handling null/empty fields, flat array extraction from nested arrays `shared/components/src/FilterBar/__tests__/useDistinctValues.test.ts`
+- [x] T011 Create CascadingMenu taxonomy adapter: pure function mapping `VesselTaxonomyNode[]` → `CascadingMenuItem[]` for vessel class hierarchical dropdown `shared/components/src/FilterBar/taxonomyAdapter.ts`
+- [x] T012 [test] Write taxonomy adapter test: correct mapping, nested children, empty tree, leaf nodes `shared/components/src/FilterBar/__tests__/taxonomyAdapter.test.ts`
 
 **Checkpoint**: Foundation ready — state management, type system, and data utilities complete. User story implementation can begin.
 
@@ -93,18 +93,18 @@
 
 ### Tests for User Story 1
 
-- [ ] T013 [test] Write `Lozenge.test.tsx`: renders type label + value, click body fires onEdit, click remove fires onRemove, draggable attributes present `shared/components/src/FilterBar/__tests__/Lozenge.test.tsx`
-- [ ] T014 [P][test] Write `ValueEditor.test.tsx`: dispatches to correct input control per filter type, fires onSelect with value, closes on Escape/click-outside `shared/components/src/FilterBar/__tests__/ValueEditor.test.tsx`
+- [x] T013 [test] Write `Lozenge.test.tsx`: renders type label + value, click body fires onEdit, click remove fires onRemove, draggable attributes present `shared/components/src/FilterBar/__tests__/Lozenge.test.tsx`
+- [x] T014 [P][test] Write `ValueEditor.test.tsx`: dispatches to correct input control per filter type, fires onSelect with value, closes on Escape/click-outside `shared/components/src/FilterBar/__tests__/ValueEditor.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T015 Create `Lozenge.tsx`: pill-shaped component with type label, value label, remove button (vscrui Icon), click-to-edit handler, `useDraggable` from @dnd-kit. Uses `Record<FilterType, readonly string[]>` for availableValues (review decision #6) `shared/components/src/FilterBar/Lozenge.tsx`
-- [ ] T016 [P] Create `Lozenge.css`: pill shape, hover/active states, drag-active opacity, theme tokens `shared/components/src/FilterBar/Lozenge.css`
-- [ ] T017 Create `FilterTypeMenu.tsx`: dropdown opened by (+) button listing all 10 filter types + "OR group" option. `isAddMenuOpen` is local state (review decision #5). Uses `FILTER_TYPE_OPTIONS` from constants `shared/components/src/FilterBar/FilterTypeMenu.tsx`
-- [ ] T018 Create `ValueEditor.tsx`: polymorphic popover dispatching to flat dropdown (vscrui Dropdown), free-text (vscrui TextField with 150ms debounce per review decision #8), bucket dropdown (fixed options), or CascadingMenu (via taxonomy adapter). Closes on Escape/click-outside `shared/components/src/FilterBar/ValueEditor.tsx`
-- [ ] T019 Create `FilterBar.tsx`: main container wrapping `DndContext`, renders filter bar with lozenges, (+) button, empty state hint text "Add filters to narrow results", error banner for failed filter evaluation. Wires `useFilterBar` + `useDistinctValues` + `FilterEngine.filter()`. Passes filtered items via `onFilteredItems` callback `shared/components/src/FilterBar/FilterBar.tsx`
-- [ ] T020 [P] Create `FilterBar.css`: bar layout (horizontal flex, wrap), empty state styling, error banner, loading indicator, theme tokens `shared/components/src/FilterBar/FilterBar.css`
-- [ ] T021 [test] Write `FilterBar.test.tsx` integration test for P1: add filter flow (click +, select type, select value, verify lozenge renders), remove filter flow (click x, verify lozenge removed), verify `onFilteredItems` called with correct subset `shared/components/src/FilterBar/__tests__/FilterBar.test.tsx`
+- [x] T015 Create `Lozenge.tsx`: pill-shaped component with type label, value label, remove button (vscrui Icon), click-to-edit handler, `useDraggable` from @dnd-kit. Uses `Record<FilterType, readonly string[]>` for availableValues (review decision #6) `shared/components/src/FilterBar/Lozenge.tsx`
+- [x] T016 [P] Create `Lozenge.css`: pill shape, hover/active states, drag-active opacity, theme tokens `shared/components/src/FilterBar/Lozenge.css`
+- [x] T017 Create `FilterTypeMenu.tsx`: dropdown opened by (+) button listing all 10 filter types + "OR group" option. `isAddMenuOpen` is local state (review decision #5). Uses `FILTER_TYPE_OPTIONS` from constants `shared/components/src/FilterBar/FilterTypeMenu.tsx`
+- [x] T018 Create `ValueEditor.tsx`: polymorphic popover dispatching to flat dropdown (vscrui Dropdown), free-text (vscrui TextField with 150ms debounce per review decision #8), bucket dropdown (fixed options), or CascadingMenu (via taxonomy adapter). Closes on Escape/click-outside `shared/components/src/FilterBar/ValueEditor.tsx`
+- [x] T019 Create `FilterBar.tsx`: main container wrapping `DndContext`, renders filter bar with lozenges, (+) button, empty state hint text "Add filters to narrow results", error banner for failed filter evaluation. Wires `useFilterBar` + `useDistinctValues` + `FilterEngine.filter()`. Passes filtered items via `onFilteredItems` callback `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T020 [P] Create `FilterBar.css`: bar layout (horizontal flex, wrap), empty state styling, error banner, loading indicator, theme tokens `shared/components/src/FilterBar/FilterBar.css`
+- [x] T021 [test] Write `FilterBar.test.tsx` integration test for P1: add filter flow (click +, select type, select value, verify lozenge renders), remove filter flow (click x, verify lozenge removed), verify `onFilteredItems` called with correct subset `shared/components/src/FilterBar/__tests__/FilterBar.test.tsx`
 
 **Checkpoint**: P1 complete — analyst can add and remove single metadata filters with results updating
 
@@ -118,8 +118,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T022 [US2] Add edit interaction to `FilterBar.tsx`: click lozenge body sets `editingId`, renders `ValueEditor` popover positioned relative to lozenge, Escape/click-outside clears `editingId` `shared/components/src/FilterBar/FilterBar.tsx`
-- [ ] T023 [US2][test] Extend `FilterBar.test.tsx` with P2 scenarios: click lozenge opens editor, change value updates lozenge label, Escape closes editor without change `shared/components/src/FilterBar/__tests__/FilterBar.test.tsx`
+- [x] T022 [US2] Add edit interaction to `FilterBar.tsx`: click lozenge body sets `editingId`, renders `ValueEditor` popover positioned relative to lozenge, Escape/click-outside clears `editingId` `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T023 [US2][test] Extend `FilterBar.test.tsx` with P2 scenarios: click lozenge opens editor, change value updates lozenge label, Escape closes editor without change `shared/components/src/FilterBar/__tests__/FilterBar.test.tsx`
 
 **Checkpoint**: P1 + P2 complete — add, remove, and edit filters all working
 
@@ -133,8 +133,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3][test] Extend `FilterBar.test.tsx` with P3 scenarios: two filters produce intersection, three filters narrow further, removing one expands results, incompatible filters show "No matches" `shared/components/src/FilterBar/__tests__/FilterBar.test.tsx`
-- [ ] T025 [US3] Verify AND conjunction: ensure `toFilterExpression` produces correct `predicates` array and `FilterEngine.filter()` returns intersection. If "No matches", render empty-state message in parent callback `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T024 [US3][test] Extend `FilterBar.test.tsx` with P3 scenarios: two filters produce intersection, three filters narrow further, removing one expands results, incompatible filters show "No matches" `shared/components/src/FilterBar/__tests__/FilterBar.test.tsx`
+- [x] T025 [US3] Verify AND conjunction: ensure `toFilterExpression` produces correct `predicates` array and `FilterEngine.filter()` returns intersection. If "No matches", render empty-state message in parent callback `shared/components/src/FilterBar/FilterBar.tsx`
 
 **Checkpoint**: P1–P3 complete — add, remove, edit, and AND combination all working
 
@@ -148,14 +148,14 @@
 
 ### Tests for User Story 4
 
-- [ ] T026 [test] Write `OrContainer.test.tsx`: renders child lozenges, mini (+) button fires onAddChild, remove button fires onRemove, `useDroppable` accepts lozenge drops, rejects OR container drops (no nesting) `shared/components/src/FilterBar/__tests__/OrContainer.test.tsx`
+- [x] T026 [test] Write `OrContainer.test.tsx`: renders child lozenges, mini (+) button fires onAddChild, remove button fires onRemove, `useDroppable` accepts lozenge drops, rejects OR container drops (no nesting) `shared/components/src/FilterBar/__tests__/OrContainer.test.tsx`
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Create `OrContainer.tsx`: wrapper with OR label, child lozenge rendering, mini (+) button for adding filters inside, remove container button. `useDroppable` from @dnd-kit accepts lozenges only (rejects OR containers). Uses `Record<FilterType, readonly string[]>` for availableValues `shared/components/src/FilterBar/OrContainer.tsx`
-- [ ] T028 [P][US4] Create `OrContainer.css`: visual container styling (border/background grouping), child lozenge layout, mini (+) button, drag-over highlight `shared/components/src/FilterBar/OrContainer.css`
-- [ ] T029 [US4] Add DnD integration to `FilterBar.tsx`: `DragOverlay` for drag preview, `onDragEnd` handler dispatching move-to-container and move-to-top-level actions, collision detection with `closestCenter`, `KeyboardSensor` + `PointerSensor` `shared/components/src/FilterBar/FilterBar.tsx`
-- [ ] T030 [US4][test] Extend `FilterBar.test.tsx` with P4 scenarios: create OR group, drag lozenge into container, add via mini (+), drag out of container, verify (A OR B) AND C produces correct results `shared/components/src/FilterBar/__tests__/FilterBar.test.tsx`
+- [x] T027 [US4] Create `OrContainer.tsx`: wrapper with OR label, child lozenge rendering, mini (+) button for adding filters inside, remove container button. `useDroppable` from @dnd-kit accepts lozenges only (rejects OR containers). Uses `Record<FilterType, readonly string[]>` for availableValues `shared/components/src/FilterBar/OrContainer.tsx`
+- [x] T028 [P][US4] Create `OrContainer.css`: visual container styling (border/background grouping), child lozenge layout, mini (+) button, drag-over highlight `shared/components/src/FilterBar/OrContainer.css`
+- [x] T029 [US4] Add DnD integration to `FilterBar.tsx`: `DragOverlay` for drag preview, `onDragEnd` handler dispatching move-to-container and move-to-top-level actions, collision detection with `closestCenter`, `KeyboardSensor` + `PointerSensor` `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T030 [US4][test] Extend `FilterBar.test.tsx` with P4 scenarios: create OR group, drag lozenge into container, add via mini (+), drag out of container, verify (A OR B) AND C produces correct results `shared/components/src/FilterBar/__tests__/FilterBar.test.tsx`
 
 **Checkpoint**: P1–P4 complete — full filter bar with AND/OR logic and drag-to-group
 
@@ -169,8 +169,8 @@
 
 ### Implementation for User Story 5
 
-- [ ] T031 [US5] Verify all 10 filter types in `constants.ts`: vessel-class (hierarchical), plot-tag/feature-tag/author/track-name/nationality/collection (flat-dropdown), duration (bucket), title/plot-contents (free-text). Ensure `ValueEditor` dispatches correctly for each `shared/components/src/FilterBar/constants.ts`
-- [ ] T032 [US5][test] Extend `ValueEditor.test.tsx` with all 10 filter types: hierarchical shows CascadingMenu with taxonomy, flat-dropdown shows vscrui Dropdown with distinct values, bucket shows fixed duration options, free-text shows TextField `shared/components/src/FilterBar/__tests__/ValueEditor.test.tsx`
+- [x] T031 [US5] Verify all 10 filter types in `constants.ts`: vessel-class (hierarchical), plot-tag/feature-tag/author/track-name/nationality/collection (flat-dropdown), duration (bucket), title/plot-contents (free-text). Ensure `ValueEditor` dispatches correctly for each `shared/components/src/FilterBar/constants.ts`
+- [x] T032 [US5][test] Extend `ValueEditor.test.tsx` with all 10 filter types: hierarchical shows CascadingMenu with taxonomy, flat-dropdown shows vscrui Dropdown with distinct values, bucket shows fixed duration options, free-text shows TextField `shared/components/src/FilterBar/__tests__/ValueEditor.test.tsx`
 
 **Checkpoint**: P1–P5 complete — all filter types working with appropriate input methods
 
@@ -184,8 +184,8 @@
 
 ### Implementation for User Story 6
 
-- [ ] T033 [US6] Wire `onExpressionChange` callback in `FilterBar.tsx`: on every filter state change, call `toFilterExpression()` then pass to parent via callback. Parent can call `engine.toCql2Json()` for serialisation `shared/components/src/FilterBar/FilterBar.tsx`
-- [ ] T034 [US6][test] Extend `useFilterBar.test.ts` with CQL2 scenarios: two AND predicates → `{"and": [...]}`, AND + OR → nested `{"and": [..., {"or": [...]}]}`, empty → match-all expression `shared/components/src/FilterBar/__tests__/useFilterBar.test.ts`
+- [x] T033 [US6] Wire `onExpressionChange` callback in `FilterBar.tsx`: on every filter state change, call `toFilterExpression()` then pass to parent via callback. Parent can call `engine.toCql2Json()` for serialisation `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T034 [US6][test] Extend `useFilterBar.test.ts` with CQL2 scenarios: two AND predicates → `{"and": [...]}`, AND + OR → nested `{"and": [..., {"or": [...]}]}`, empty → match-all expression `shared/components/src/FilterBar/__tests__/useFilterBar.test.ts`
 
 **Checkpoint**: P1–P6 complete — full feature implemented
 
@@ -195,7 +195,7 @@
 
 **Purpose**: Visual demonstrations for all filter bar states (SC-008)
 
-- [ ] T035 Create `FilterBar.stories.tsx` with stories: Empty, SingleFilter, MultipleAND, OrGroup, Interactive (full workflow), AllFilterTypes, ZeroResults. Use mock STAC items from #125 fixtures. ThemeProvider decorator for light/dark/vscode `shared/components/src/FilterBar/FilterBar.stories.tsx`
+- [x] T035 Create `FilterBar.stories.tsx` with stories: Empty, SingleFilter, MultipleAND, OrGroup, Interactive (full workflow), AllFilterTypes, ZeroResults. Use mock STAC items from #125 fixtures. ThemeProvider decorator for light/dark/vscode `shared/components/src/FilterBar/FilterBar.stories.tsx`
 
 **Checkpoint**: All stories render correctly in Storybook
 
@@ -205,8 +205,8 @@
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip Playwright E2E tests. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T036 Create Playwright E2E test `shared/components/e2e/FilterBar.spec.ts`: empty state renders, add filter flow, edit filter, remove filter, drag to OR container, theme variants (light/dark/vscode) `shared/components/e2e/FilterBar.spec.ts`
-- [ ] T037 Run E2E tests: `pnpm --filter @debrief/components test:e2e FilterBar`
+- [x] T036 Create Playwright E2E test `shared/components/e2e/FilterBar.spec.ts`: empty state renders, add filter flow, edit filter, remove filter, drag to OR container, theme variants (light/dark/vscode) `shared/components/e2e/FilterBar.spec.ts`
+- [x] T037 Run E2E tests: `pnpm --filter @debrief/components test:e2e FilterBar`
 
 **Checkpoint**: E2E tests pass with visual verification across themes
 
@@ -218,23 +218,23 @@
 
 ### CI Verification
 
-- [ ] T038 Run full CI check: `task verify` (lint + typecheck + test). Fix any failures.
+- [x] T038 Run full CI check: `task verify` (lint + typecheck + test). Fix any failures.
 
 ### Evidence Collection
 
-- [ ] T039 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/127-filter-bar-lozenge-ui/evidence/test-summary.md`
-- [ ] T040 Create usage demonstration `specs/127-filter-bar-lozenge-ui/evidence/usage-example.md`
-- [ ] T041 [P] Capture theme screenshots (light/dark/vscode) `specs/127-filter-bar-lozenge-ui/evidence/screenshots/`
-- [ ] T042 Capture interaction GIF showing add filter → drag to OR → remove flow `specs/127-filter-bar-lozenge-ui/evidence/screenshots/interaction.gif`
+- [x] T039 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) `specs/127-filter-bar-lozenge-ui/evidence/test-summary.md`
+- [x] T040 Create usage demonstration `specs/127-filter-bar-lozenge-ui/evidence/usage-example.md`
+- [x] T041 [P] Capture theme screenshots (light/dark/vscode) `specs/127-filter-bar-lozenge-ui/evidence/screenshots/`
+- [x] T042 Capture interaction GIF showing add filter → drag to OR → remove flow `specs/127-filter-bar-lozenge-ui/evidence/screenshots/interaction.gif`
 
 ### Media Content
 
-- [ ] T043 Create shipped blog post `specs/127-filter-bar-lozenge-ui/media/shipped-post.md`
-- [ ] T044 [P] Create LinkedIn shipped summary `specs/127-filter-bar-lozenge-ui/media/linkedin-shipped.md`
+- [x] T043 Create shipped blog post `specs/127-filter-bar-lozenge-ui/media/shipped-post.md`
+- [x] T044 [P] Create LinkedIn shipped summary `specs/127-filter-bar-lozenge-ui/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T045 Create PR and publish blog: run /speckit.pr
+- [x] T045 Create PR and publish blog: run /speckit.pr
 
 **Task T045 must run last. It depends on all evidence and media tasks being complete.**
 
