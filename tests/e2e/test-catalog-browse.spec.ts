@@ -19,7 +19,7 @@ test.describe('Catalog Browse', () => {
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await codeServerPage.executeCommand('Debrief: Open Catalog Overview');
-    await codeServerPage.page.waitForTimeout(3_000);
+    await codeServerPage.page.waitForTimeout(2_000);
 
     // The catalog overview opens as a webview panel
     const allFrames = codeServerPage.page.frames();
@@ -39,7 +39,7 @@ test.describe('Catalog Browse', () => {
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await codeServerPage.executeCommand('Debrief: Open Catalog Overview');
-    await codeServerPage.page.waitForTimeout(3_000);
+    await codeServerPage.page.waitForTimeout(2_000);
 
     // Find the catalog overview webview frame
     const allFrames = codeServerPage.page.frames();
@@ -61,7 +61,7 @@ test.describe('Catalog Browse', () => {
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
     await codeServerPage.executeCommand('Debrief: Open Catalog Overview');
-    await codeServerPage.page.waitForTimeout(3_000);
+    await codeServerPage.page.waitForTimeout(2_000);
 
     const allFrames = codeServerPage.page.frames();
     let timelineVisible = false;
