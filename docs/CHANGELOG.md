@@ -1,5 +1,12 @@
 # Changelog
 
+## [2026-03-07]
+
+### Added
+- **Vessel Taxonomy and Hierarchical Filtering** — Human-readable labels, in-menu type-ahead search, per-node match counts, and current-selection marking for the vessel class filter dropdown.
+  - Tests: 944/944 passing (72 new)
+  - Evidence: test-summary.md, usage-example.md
+
 ## [2026-03-06]
 
 ### Added
