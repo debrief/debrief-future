@@ -1,0 +1,9 @@
+{
+  "method": "tools/call",
+  "params": {
+    "name": "read_collection_summaries",
+    "arguments": {
+      "catalog_path": "/data/analysis"
+    }
+  }
+}
