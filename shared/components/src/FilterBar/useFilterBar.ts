@@ -165,6 +165,9 @@ function reducer(state: FilterBarState, action: FilterBarAction): FilterBarState
       return { items: [...items, movedLozenge] };
     }
 
+    case 'SET_STATE':
+      return action.state;
+
     default:
       return state;
   }
@@ -207,6 +210,7 @@ export interface UseFilterBarReturn {
   readonly toggleNegate: (id: string) => void;
   readonly moveToContainer: (lozengeId: string, containerId: string) => void;
   readonly moveToTopLevel: (lozengeId: string, fromContainerId: string) => void;
+  readonly setState: (state: FilterBarState) => void;
 }
 
 export function useFilterBar(initialState?: FilterBarState): UseFilterBarReturn {
@@ -263,6 +267,11 @@ export function useFilterBar(initialState?: FilterBarState): UseFilterBarReturn 
     [],
   );
 
+  const setState = useCallback(
+    (newState: FilterBarState) => dispatch({ type: 'SET_STATE', state: newState }),
+    [],
+  );
+
   return {
     state,
     dispatch,
@@ -276,5 +285,6 @@ export function useFilterBar(initialState?: FilterBarState): UseFilterBarReturn 
     toggleNegate,
     moveToContainer,
     moveToTopLevel,
+    setState,
   };
 }
