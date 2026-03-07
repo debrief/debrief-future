@@ -92,15 +92,25 @@ function applySessionState(
   // Reset store and apply loaded state
   store.getState().reset();
 
-  // Apply temporal state
-  if (temporal.currentTime) {
-    store.getState().setCurrentTime(temporal.currentTime as never);
+  // Apply temporal state (handles both legacy TimeInstant objects and epoch numbers)
+  if (temporal.currentTime != null) {
+    const ct = temporal.currentTime;
+    const epoch = typeof ct === 'number' ? ct : (ct as { epoch: number }).epoch;
+    store.getState().setCurrentTime(epoch);
   }
   if (temporal.timeRange) {
-    store.getState().setTimeRange(temporal.timeRange as never);
+    const tr = temporal.timeRange as { start: number | { epoch: number }; end: number | { epoch: number } };
+    store.getState().setTimeRange({
+      start: typeof tr.start === 'number' ? tr.start : tr.start.epoch,
+      end: typeof tr.end === 'number' ? tr.end : tr.end.epoch,
+    });
   }
   if (temporal.timeFilter) {
-    store.getState().setTimeFilter(temporal.timeFilter as never);
+    const tf = temporal.timeFilter as { start: number | { epoch: number } | null; end: number | { epoch: number } | null };
+    store.getState().setTimeFilter({
+      start: tf.start == null ? null : (typeof tf.start === 'number' ? tf.start : tf.start.epoch),
+      end: tf.end == null ? null : (typeof tf.end === 'number' ? tf.end : tf.end.epoch),
+    });
   }
   if (temporal.stepSize) {
     store.getState().setStepSize(temporal.stepSize as never);

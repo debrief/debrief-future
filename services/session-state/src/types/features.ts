@@ -6,6 +6,9 @@
 import type { TimeInstant } from './temporal.js';
 import { createTimeInstant } from './temporal.js';
 
+// Note: FeatureSelection.timestamp still uses TimeInstant for backward
+// compatibility — it is NOT part of the temporal filter/range refactor (#132).
+
 /**
  * Set of selected feature identifiers with metadata (FR-017).
  *

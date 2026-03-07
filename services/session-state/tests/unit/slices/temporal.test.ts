@@ -1,11 +1,11 @@
 /**
  * Unit tests for temporal state slice.
  * Feature: 024-document-session-state
+ * Updated: 132-three-view-sync (epoch refactor)
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createSessionStore, type SessionStoreApi } from '../../../src/store/index.js';
-import { createTimeInstant } from '../../../src/types/index.js';
 
 describe('Temporal Slice', () => {
   let store: SessionStoreApi;
@@ -47,49 +47,39 @@ describe('Temporal Slice', () => {
   });
 
   describe('setCurrentTime', () => {
-    it('should set current time', () => {
-      const time = createTimeInstant(1706097600000);
-      store.getState().setCurrentTime(time);
-      expect(store.getState().currentTime).toEqual(time);
+    it('should set current time as epoch number', () => {
+      const epoch = 1706097600000;
+      store.getState().setCurrentTime(epoch);
+      expect(store.getState().currentTime).toBe(epoch);
     });
 
     it('should allow setting null', () => {
-      const time = createTimeInstant(1706097600000);
-      store.getState().setCurrentTime(time);
+      store.getState().setCurrentTime(1706097600000);
       store.getState().setCurrentTime(null);
       expect(store.getState().currentTime).toBeNull();
     });
   });
 
   describe('setTimeRange', () => {
-    it('should set time range', () => {
-      const range = {
-        start: createTimeInstant(1706000000000),
-        end: createTimeInstant(1706100000000),
-      };
+    it('should set time range with epoch numbers', () => {
+      const range = { start: 1706000000000, end: 1706100000000 };
       store.getState().setTimeRange(range);
       expect(store.getState().timeRange).toEqual(range);
     });
   });
 
   describe('setTimeFilter', () => {
-    it('should set time filter', () => {
-      const filter = {
-        start: createTimeInstant(1706050000000),
-        end: createTimeInstant(1706090000000),
-      };
+    it('should set time filter with epoch numbers', () => {
+      const filter = { start: 1706050000000, end: 1706090000000 };
       store.getState().setTimeFilter(filter);
       expect(store.getState().timeFilter).toEqual(filter);
     });
 
     it('should allow partial filter with null start', () => {
-      const filter = {
-        start: null,
-        end: createTimeInstant(1706090000000),
-      };
+      const filter = { start: null, end: 1706090000000 };
       store.getState().setTimeFilter(filter);
       expect(store.getState().timeFilter?.start).toBeNull();
-      expect(store.getState().timeFilter?.end).not.toBeNull();
+      expect(store.getState().timeFilter?.end).toBe(1706090000000);
     });
   });
 
@@ -158,27 +148,23 @@ describe('Temporal Slice', () => {
 
   describe('stepForward', () => {
     it('should step forward by stepSize', () => {
-      const initialTime = createTimeInstant(1706097600000);
-      store.getState().setCurrentTime(initialTime);
+      const initialEpoch = 1706097600000;
+      store.getState().setCurrentTime(initialEpoch);
       store.getState().setStepSize({ value: 1, unit: 'minute' });
       store.getState().stepForward();
 
-      const newTime = store.getState().currentTime;
-      expect(newTime?.epoch).toBe(initialTime.epoch + 60000);
+      expect(store.getState().currentTime).toBe(initialEpoch + 60000);
     });
 
     it('should clamp to time range end', () => {
-      const time = createTimeInstant(1706097600000);
-      const range = {
-        start: createTimeInstant(1706000000000),
-        end: createTimeInstant(1706097600000 + 30000), // 30 seconds ahead
-      };
-      store.getState().setCurrentTime(time);
+      const epoch = 1706097600000;
+      const range = { start: 1706000000000, end: epoch + 30000 };
+      store.getState().setCurrentTime(epoch);
       store.getState().setTimeRange(range);
       store.getState().setStepSize({ value: 1, unit: 'minute' });
       store.getState().stepForward();
 
-      expect(store.getState().currentTime?.epoch).toBe(range.end.epoch);
+      expect(store.getState().currentTime).toBe(range.end);
     });
 
     it('should do nothing if currentTime is null', () => {
@@ -189,27 +175,23 @@ describe('Temporal Slice', () => {
 
   describe('stepBackward', () => {
     it('should step backward by stepSize', () => {
-      const initialTime = createTimeInstant(1706097600000);
-      store.getState().setCurrentTime(initialTime);
+      const initialEpoch = 1706097600000;
+      store.getState().setCurrentTime(initialEpoch);
       store.getState().setStepSize({ value: 1, unit: 'minute' });
       store.getState().stepBackward();
 
-      const newTime = store.getState().currentTime;
-      expect(newTime?.epoch).toBe(initialTime.epoch - 60000);
+      expect(store.getState().currentTime).toBe(initialEpoch - 60000);
     });
 
     it('should clamp to time range start', () => {
-      const time = createTimeInstant(1706097600000);
-      const range = {
-        start: createTimeInstant(1706097600000 - 30000), // 30 seconds before
-        end: createTimeInstant(1706200000000),
-      };
-      store.getState().setCurrentTime(time);
+      const epoch = 1706097600000;
+      const range = { start: epoch - 30000, end: 1706200000000 };
+      store.getState().setCurrentTime(epoch);
       store.getState().setTimeRange(range);
       store.getState().setStepSize({ value: 1, unit: 'minute' });
       store.getState().stepBackward();
 
-      expect(store.getState().currentTime?.epoch).toBe(range.start.epoch);
+      expect(store.getState().currentTime).toBe(range.start);
     });
   });
 });

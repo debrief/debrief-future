@@ -76,15 +76,15 @@ describe('MCP Integration', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
-      expect(response.body.currentTime.epoch).toBe(epoch);
-      expect(response.body.currentTime.iso).toBeDefined();
+      expect(response.body.currentTime).toBe(epoch);
 
       // Verify store was updated
-      expect(store.getState().currentTime?.epoch).toBe(epoch);
+      expect(store.getState().currentTime).toBe(epoch);
     });
 
     it('should set time with ISO string', async () => {
       const iso = '2024-01-24T12:00:00.000Z';
+      const expectedEpoch = new Date(iso).getTime();
 
       const response = await request(app)
         .post('/mcp')
@@ -92,7 +92,7 @@ describe('MCP Integration', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
-      expect(response.body.currentTime.iso).toBe(iso);
+      expect(response.body.currentTime).toBe(expectedEpoch);
     });
 
     it('should fail without epoch or iso', async () => {

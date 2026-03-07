@@ -50,10 +50,10 @@
 
 **Purpose**: Project scaffolding and directory structure for new components
 
-- [ ] T001 Create StacBrowser component directory and barrel export `shared/components/src/StacBrowser/index.ts`
-- [ ] T002 [P] Create StacBrowser prop types from contract `shared/components/src/StacBrowser/types.ts`
-- [ ] T003 [P] Create BrowserFilterSlice types from contract `services/session-state/src/types/browser-filter.ts`
-- [ ] T004 [P] Create StacBrowser CSS layout skeleton `shared/components/src/StacBrowser/StacBrowser.css`
+- [x] T001 Create StacBrowser component directory and barrel export `shared/components/src/StacBrowser/index.ts`
+- [x] T002 [P] Create StacBrowser prop types from contract `shared/components/src/StacBrowser/types.ts`
+- [x] T003 [P] Create BrowserFilterSlice types from contract `services/session-state/src/types/browser-filter.ts`
+- [x] T004 [P] Create StacBrowser CSS layout skeleton `shared/components/src/StacBrowser/StacBrowser.css`
 
 ---
 
@@ -67,30 +67,30 @@
 
 Unify `TimeFilter` to use plain epoch numbers instead of `TimeInstant`. This touches 38 files across the codebase.
 
-- [ ] T005 Refactor `TimeFilter` to use epoch numbers: `{ start: number | null; end: number | null }` `services/session-state/src/types/temporal.ts`
-- [ ] T006 Update `TimeRange` to use epoch numbers: `{ start: number; end: number }` `services/session-state/src/types/temporal.ts`
-- [ ] T007 Keep `TimeInstant` as a utility type but remove from `TimeFilter`/`TimeRange`/`TemporalSlice` interfaces `services/session-state/src/types/temporal.ts`
-- [ ] T008 Update `TemporalSlice` to use epoch `currentTime: number | null` `services/session-state/src/types/temporal.ts`
-- [ ] T009 Update `TemporalActions` signatures to match new types `services/session-state/src/types/temporal.ts`
-- [ ] T010 Update `createTemporalSlice` implementation for epoch-based types `services/session-state/src/store/slices/temporal.ts`
-- [ ] T011 [test] Fix temporal slice tests for new epoch types `services/session-state/tests/unit/slices/temporal.test.ts`
-- [ ] T012 [P] Update session-state persistence layer for epoch types `services/session-state/src/persistence/load.ts`
-- [ ] T013 [P] Update session-state subscriptions for epoch types `services/session-state/src/store/subscriptions.ts`
-- [ ] T014 [P] Update MCP tool `setCurrentTime` for epoch types `services/session-state/src/server/tools/setCurrentTime.ts`
-- [ ] T015 [P] Update session-state performance and selective tests `services/session-state/tests/unit/performance.test.ts`
-- [ ] T016 [P] Update session-state subscription tests `services/session-state/tests/unit/subscriptions.test.ts`
-- [ ] T017 Update VS Code extension temporal consumers (timeRangeView, mapPanel, sessionManager, openPlot) `apps/vscode/src/views/timeRangeView.ts`
-- [ ] T018 [P] Update VS Code webview messages for epoch types `apps/vscode/src/webview/messages.ts`
-- [ ] T019 Update web-shell App.tsx for epoch types `apps/web-shell/src/App.tsx`
-- [ ] T020 Update TimeController component for epoch types `shared/components/src/TimeController/timeUtils.ts`
-- [ ] T021 [P] Update TimeController tests `shared/components/src/TimeController/timeUtils.test.ts`
-- [ ] T022 [P] Update Timeline component for epoch types `shared/components/src/Timeline/Timeline.tsx`
-- [ ] T023 [P] Update Timeline tests `shared/components/src/Timeline/Timeline.test.tsx`
-- [ ] T024 Update TimelineView component — unify `TemporalFilter` with `TimeFilter` (both now epoch) `shared/components/src/TimelineView/types.ts`
-- [ ] T025 [P] Update TimelineView implementation for unified filter type `shared/components/src/TimelineView/TimelineView.tsx`
-- [ ] T026 [P] Update timeline-helpers `itemOverlapsFilter` to accept `TimeFilter` directly `shared/components/src/utils/timeline-helpers.ts`
-- [ ] T027 [test] Update timeline-helpers tests for new `TimeFilter` shape `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
-- [ ] T028 [test] Run full test suite to verify no regressions from TimeFilter refactor
+- [x] T005 Refactor `TimeFilter` to use epoch numbers: `{ start: number | null; end: number | null }` `services/session-state/src/types/temporal.ts`
+- [x] T006 Update `TimeRange` to use epoch numbers: `{ start: number; end: number }` `services/session-state/src/types/temporal.ts`
+- [x] T007 Keep `TimeInstant` as a utility type but remove from `TimeFilter`/`TimeRange`/`TemporalSlice` interfaces `services/session-state/src/types/temporal.ts`
+- [x] T008 Update `TemporalSlice` to use epoch `currentTime: number | null` `services/session-state/src/types/temporal.ts`
+- [x] T009 Update `TemporalActions` signatures to match new types `services/session-state/src/types/temporal.ts`
+- [x] T010 Update `createTemporalSlice` implementation for epoch-based types `services/session-state/src/store/slices/temporal.ts`
+- [x] T011 [test] Fix temporal slice tests for new epoch types `services/session-state/tests/unit/slices/temporal.test.ts`
+- [x] T012 [P] Update session-state persistence layer for epoch types `services/session-state/src/persistence/load.ts`
+- [x] T013 [P] Update session-state subscriptions for epoch types `services/session-state/src/store/subscriptions.ts`
+- [x] T014 [P] Update MCP tool `setCurrentTime` for epoch types `services/session-state/src/server/tools/setCurrentTime.ts`
+- [x] T015 [P] Update session-state performance and selective tests `services/session-state/tests/unit/performance.test.ts`
+- [x] T016 [P] Update session-state subscription tests `services/session-state/tests/unit/subscriptions.test.ts`
+- [x] T017 Update VS Code extension temporal consumers (timeRangeView, mapPanel, sessionManager, openPlot) `apps/vscode/src/views/timeRangeView.ts`
+- [x] T018 [P] Update VS Code webview messages for epoch types `apps/vscode/src/webview/messages.ts`
+- [x] T019 Update web-shell App.tsx for epoch types `apps/web-shell/src/App.tsx`
+- [x] T020 Update TimeController component for epoch types `shared/components/src/TimeController/timeUtils.ts`
+- [x] T021 [P] Update TimeController tests `shared/components/src/TimeController/timeUtils.test.ts`
+- [x] T022 [P] Update Timeline component for epoch types `shared/components/src/Timeline/Timeline.tsx`
+- [x] T023 [P] Update Timeline tests `shared/components/src/Timeline/Timeline.test.tsx`
+- [x] T024 Update TimelineView component — unify `TemporalFilter` with `TimeFilter` (both now epoch) `shared/components/src/TimelineView/types.ts`
+- [x] T025 [P] Update TimelineView implementation for unified filter type `shared/components/src/TimelineView/TimelineView.tsx`
+- [x] T026 [P] Update timeline-helpers `itemOverlapsFilter` to accept `TimeFilter` directly `shared/components/src/utils/timeline-helpers.ts`
+- [x] T027 [test] Update timeline-helpers tests for new `TimeFilter` shape `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
+- [x] T028 [test] Run full test suite to verify no regressions from TimeFilter refactor
 
 **Checkpoint**: TimeFilter refactor complete — all temporal types use epoch numbers
 

@@ -1,11 +1,11 @@
 /**
  * MCP tool: session.setCurrentTime
  * Feature: 024-document-session-state
+ * Updated: 132-three-view-sync (epoch refactor)
  */
 
 import type { SessionStoreApi } from '../../store/index.js';
-import type { TimeInstant } from '../../types/index.js';
-import { createTimeInstant, createTimeInstantFromISO } from '../../types/index.js';
+import { isoToEpoch } from '../../types/index.js';
 
 export interface SetCurrentTimeInput {
   epoch?: number;
@@ -14,7 +14,7 @@ export interface SetCurrentTimeInput {
 
 export interface SetCurrentTimeOutput {
   success: boolean;
-  currentTime?: TimeInstant;
+  currentTime?: number;
   error?: string;
 }
 
@@ -26,12 +26,18 @@ export function setCurrentTime(
   input: SetCurrentTimeInput
 ): SetCurrentTimeOutput {
   try {
-    let time: TimeInstant;
+    let epoch: number;
 
     if (input.epoch !== undefined) {
-      time = createTimeInstant(input.epoch);
+      epoch = input.epoch;
     } else if (input.iso !== undefined) {
-      time = createTimeInstantFromISO(input.iso);
+      epoch = isoToEpoch(input.iso);
+      if (isNaN(epoch)) {
+        return {
+          success: false,
+          error: `Invalid ISO string: ${input.iso}`,
+        };
+      }
     } else {
       return {
         success: false,
@@ -39,11 +45,11 @@ export function setCurrentTime(
       };
     }
 
-    store.getState().setCurrentTime(time);
+    store.getState().setCurrentTime(epoch);
 
     return {
       success: true,
-      currentTime: time,
+      currentTime: epoch,
     };
   } catch (err) {
     return {

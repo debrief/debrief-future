@@ -17,7 +17,6 @@ import {
   subscribeToSelection,
   subscribeToDirty,
   selectors,
-  createTimeInstant,
   type ViewportPolygon,
 } from '../../src/index.js';
 
@@ -33,7 +32,7 @@ describe('Reactive Subscriptions (FR-003)', () => {
       const listener = vi.fn();
       subscribeToSlice(store, selectors.currentTime, listener);
 
-      const time = createTimeInstant(1706097600000);
+      const time = 1706097600000;
       store.getState().setCurrentTime(time);
 
       expect(listener).toHaveBeenCalledTimes(1);
@@ -57,13 +56,13 @@ describe('Reactive Subscriptions (FR-003)', () => {
       const listener = vi.fn();
       const unsubscribe = subscribeToSlice(store, selectors.currentTime, listener);
 
-      const time1 = createTimeInstant(1706097600000);
+      const time1 = 1706097600000;
       store.getState().setCurrentTime(time1);
       expect(listener).toHaveBeenCalledTimes(1);
 
       unsubscribe();
 
-      const time2 = createTimeInstant(1706097700000);
+      const time2 = 1706097700000;
       store.getState().setCurrentTime(time2);
       expect(listener).toHaveBeenCalledTimes(1); // Still 1, not called again
     });
@@ -74,7 +73,7 @@ describe('Reactive Subscriptions (FR-003)', () => {
       const alwaysEqual = () => true;
       subscribeToSlice(store, selectors.currentTime, listener, alwaysEqual);
 
-      const time = createTimeInstant(1706097600000);
+      const time = 1706097600000;
       store.getState().setCurrentTime(time);
 
       expect(listener).not.toHaveBeenCalled();
@@ -86,7 +85,7 @@ describe('Reactive Subscriptions (FR-003)', () => {
       const listener = vi.fn();
       subscribeToTemporal(store, listener);
 
-      const time = createTimeInstant(1706097600000);
+      const time = 1706097600000;
       store.getState().setCurrentTime(time);
 
       expect(listener).toHaveBeenCalled();
@@ -139,7 +138,7 @@ describe('Reactive Subscriptions (FR-003)', () => {
       const listener = vi.fn();
       subscribeToCurrentTime(store, listener);
 
-      const time = createTimeInstant(1706097600000);
+      const time = 1706097600000;
       store.getState().setCurrentTime(time);
 
       expect(listener).toHaveBeenCalledWith(time, null);
@@ -192,7 +191,7 @@ describe('Reactive Subscriptions (FR-003)', () => {
       subscribeToCurrentTime(store, timeListener);
       subscribeToViewport(store, viewportListener);
 
-      const time = createTimeInstant(1706097600000);
+      const time = 1706097600000;
       store.getState().setCurrentTime(time);
 
       expect(timeListener).toHaveBeenCalledTimes(1);

@@ -1,13 +1,13 @@
 /**
  * Temporal state slice implementation.
  * Feature: 024-document-session-state
+ * Updated: 132-three-view-sync (epoch refactor)
  */
 
 import type { StateCreator } from 'zustand';
 import type {
   TemporalSlice,
   TemporalActions,
-  TimeInstant,
   TimeRange,
   TimeFilter,
   TimeStep,
@@ -18,7 +18,6 @@ import type {
 import {
   DEFAULT_TEMPORAL_SLICE,
   validatePlaybackRate,
-  createTimeInstant,
 } from '../../types/index.js';
 
 export type TemporalSliceWithActions = TemporalSlice & TemporalActions;
@@ -34,7 +33,7 @@ export const createTemporalSlice: StateCreator<
 > = (set, get) => ({
   ...DEFAULT_TEMPORAL_SLICE,
 
-  setCurrentTime: (time: TimeInstant | null) => {
+  setCurrentTime: (time: number | null) => {
     set({ currentTime: time });
   },
 
@@ -67,30 +66,30 @@ export const createTemporalSlice: StateCreator<
 
   stepForward: () => {
     const { currentTime, stepSize, timeRange } = get();
-    if (!currentTime) return;
+    if (currentTime === null) return;
 
     const stepMs = getStepMilliseconds(stepSize);
-    const newEpoch = currentTime.epoch + stepMs;
+    const newEpoch = currentTime + stepMs;
 
     // Clamp to time range if set
-    const maxEpoch = timeRange?.end.epoch ?? Infinity;
+    const maxEpoch = timeRange?.end ?? Infinity;
     const clampedEpoch = Math.min(newEpoch, maxEpoch);
 
-    set({ currentTime: createTimeInstant(clampedEpoch) });
+    set({ currentTime: clampedEpoch });
   },
 
   stepBackward: () => {
     const { currentTime, stepSize, timeRange } = get();
-    if (!currentTime) return;
+    if (currentTime === null) return;
 
     const stepMs = getStepMilliseconds(stepSize);
-    const newEpoch = currentTime.epoch - stepMs;
+    const newEpoch = currentTime - stepMs;
 
     // Clamp to time range if set
-    const minEpoch = timeRange?.start.epoch ?? -Infinity;
+    const minEpoch = timeRange?.start ?? -Infinity;
     const clampedEpoch = Math.max(newEpoch, minEpoch);
 
-    set({ currentTime: createTimeInstant(clampedEpoch) });
+    set({ currentTime: clampedEpoch });
   },
 });
 

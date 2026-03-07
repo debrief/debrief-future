@@ -1,0 +1,88 @@
+/**
+ * StacBrowser layout styles (#132).
+ *
+ * Four-panel layout: FilterBar on top, then list + map + timeline below.
+ */
+
+.stac-browser {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.stac-browser__filter-bar {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--debrief-border, #e0e0e0);
+}
+
+.stac-browser__content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.stac-browser__list {
+  flex: 0 0 300px;
+  min-width: 200px;
+  overflow-y: auto;
+  border-right: 1px solid var(--debrief-border, #e0e0e0);
+}
+
+.stac-browser__views {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.stac-browser__map {
+  flex: 1;
+  min-height: 200px;
+}
+
+.stac-browser__timeline {
+  flex: 0 0 200px;
+  min-height: 120px;
+  border-top: 1px solid var(--debrief-border, #e0e0e0);
+}
+
+.stac-browser__zero-results {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 24px;
+  text-align: center;
+  color: var(--debrief-text-secondary, #666);
+}
+
+.stac-browser__zero-results-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.stac-browser__zero-results-message {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.stac-browser__zero-results-clear {
+  padding: 6px 16px;
+  border: 1px solid var(--debrief-border, #e0e0e0);
+  border-radius: 4px;
+  background: var(--debrief-bg-secondary, #f5f5f5);
+  color: var(--debrief-text-primary, #333);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.stac-browser__zero-results-clear:hover {
+  background: var(--debrief-accent, #0066cc);
+  color: #fff;
+  border-color: var(--debrief-accent, #0066cc);
+}

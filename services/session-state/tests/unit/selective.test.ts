@@ -13,7 +13,6 @@ import {
   subscribeToViewport,
   subscribeToSelection,
   subscribeToDirty,
-  createTimeInstant,
   type ViewportPolygon,
 } from '../../src/index.js';
 
@@ -37,7 +36,7 @@ describe('Selective Subscriptions (SC-006)', () => {
       subscribeToDirty(store, dirtyListener);
 
       // Change only currentTime
-      store.getState().setCurrentTime(createTimeInstant(Date.now()));
+      store.getState().setCurrentTime(Date.now());
 
       expect(timeListener).toHaveBeenCalledTimes(1);
       expect(viewportListener).not.toHaveBeenCalled();
@@ -121,9 +120,9 @@ describe('Selective Subscriptions (SC-006)', () => {
       subscribeToViewport(store, viewportListener);
 
       // Multiple changes in sequence
-      store.getState().setCurrentTime(createTimeInstant(1000));
-      store.getState().setCurrentTime(createTimeInstant(2000));
-      store.getState().setCurrentTime(createTimeInstant(3000));
+      store.getState().setCurrentTime(1000);
+      store.getState().setCurrentTime(2000);
+      store.getState().setCurrentTime(3000);
 
       // Each change should trigger the listener
       expect(timeListener).toHaveBeenCalledTimes(3);
@@ -133,7 +132,7 @@ describe('Selective Subscriptions (SC-006)', () => {
 
   describe('no unnecessary re-renders', () => {
     it('should not notify when value is set to same value', () => {
-      const time = createTimeInstant(1706097600000);
+      const time = 1706097600000;
       store.getState().setCurrentTime(time);
 
       const listener = vi.fn();

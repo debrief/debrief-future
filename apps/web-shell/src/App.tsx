@@ -58,7 +58,6 @@ import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
 import {
   getSessionStore,
   resetSessionStore,
-  createTimeInstant,
   type DisplayMode as StoreDisplayMode,
   type GeoJSONFeature,
 } from '@debrief/session-state';
@@ -216,7 +215,7 @@ export default function App() {
   const playback = useTimePlayback({
     timeExtent,
     onTimeChange: useCallback((time: number) => {
-      store.getState().setCurrentTime(createTimeInstant(time));
+      store.getState().setCurrentTime(time);
     }, [store]),
   });
 
@@ -280,10 +279,10 @@ export default function App() {
       const extent = calculateTimeExtent(features);
       if (extent) {
         freshStore.getState().setTimeRange({
-          start: createTimeInstant(extent[0]),
-          end: createTimeInstant(extent[1]),
+          start: extent[0],
+          end: extent[1],
         });
-        freshStore.getState().setCurrentTime(createTimeInstant(extent[0]));
+        freshStore.getState().setCurrentTime(extent[0]);
       }
 
       // Clear undo history — initialization isn't a user action
