@@ -1,7 +1,7 @@
 ---
 feature: "136-stac-collection-summaries"
 captured_at: "2026-03-07T12:00:00Z"
-git_sha: "03d8a65"
+git_sha: "e3f1b69"
 tests_passed: 137
 tests_failed: 0
 tests_skipped: 7
