@@ -137,6 +137,7 @@ Only updated when a feature introduces a technology not already listed here.
 - Python 3.11 (service), TypeScript 5.x (VS Code + web-shell frontends) + debrief-calc (Python tool framework), VS Code Extension API (TypeScript) (079-move-track)
 - TypeScript 5.x + `cql2-filters-parser` (CQL2 parsing/serialisation, zero-dep ES module) (126-cql2-filter-engine)
 - Python 3.11 (fixture generator, schema, tests), LinkML >= 1.7.0 (schema source) + LinkML (schema), Pydantic v2 (validation), jsonschema (fixture validation) (125-stac-extension-mock-data)
+- TypeScript 5.x + `@dnd-kit/core` + `@dnd-kit/sortable` (drag-to-group), `@debrief/components` filter-engine (#126), `vscrui` (VS Code icons), `nanoid` (unique IDs) (127-filter-bar-lozenge-ui)
 
 - Python 3.11 (services, schemas, calc tools)
 - TypeScript 5.x (VS Code extension, webview, shared components, session-state)
@@ -199,5 +200,6 @@ cd apps/web-shell && node run-playwright.mjs && cd ../..
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 127-filter-bar-lozenge-ui: Added TypeScript 5.x + `@dnd-kit/core` + `@dnd-kit/sortable` (drag-to-group), `@debrief/components` filter-engine (#126), `vscrui` (VS Code icons), `nanoid` (unique IDs)
 - 126-cql2-filter-engine: Added TypeScript 5.x + `cql2-filters-parser` (CQL2 parsing/serialisation, zero-dep ES module)
 - 125-stac-extension-mock-data: Added Python 3.11 (fixture generator, schema, tests), LinkML >= 1.7.0 (schema source) + LinkML (schema), Pydantic v2 (validation), jsonschema (fixture validation)

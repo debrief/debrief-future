@@ -156,7 +156,7 @@ Description formats:
 
 | ID | Category | Description | V | M | A | Total | Complexity | Status |
 |----|----------|-------------|---|---|---|-------|------------|--------|
-| 127 | Feature | [[E08] Filter bar with lozenge UI and AND/OR logic](docs/ideas/127-filter-bar-lozenge-ui.md) — persistent filter bar with add/edit/remove lozenges, all filter types, OR container with drag support, CQL2 serialisation (requires #125, #126) | 5 | 5 | 3 | 13 | Medium | approved |
+| 127 | Feature | [[E08] Filter bar with lozenge UI and AND/OR logic](specs/127-filter-bar-lozenge-ui/spec.md) — persistent filter bar with add/edit/remove lozenges, all filter types, OR container with drag support, CQL2 serialisation (requires #125, #126) | 5 | 5 | 3 | 13 | Medium | specified |
 | 130 | Feature | [[E08] Map view with live spatial filtering](specs/130-map-spatial-filtering/spec.md) — spatial footprints on map, pan/zoom as live spatial filter (requires #125) | 5 | 5 | 3 | 13 | Medium | specified |
 | 132 | Infrastructure | [[E08] Three-view synchronization and filter state](docs/ideas/132-three-view-synchronization.md) — shared filter state coordinating filter bar + list + map + timeline; dynamic updates; zero-results handling (requires #127, #129, #130, #131) | 5 | 4 | 3 | 12 | High | approved |
 | 126 | Infrastructure | [[E08] Client-side CQL2 filter engine](specs/126-cql2-filter-engine/spec.md) — reference implementation of CQL2 AND/OR filter logic operating on mock data array; validates query model without backend (requires #125) | 4 | 3 | 4 | 11 | Medium | specified |
