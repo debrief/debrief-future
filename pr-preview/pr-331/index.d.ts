@@ -82,4 +82,9 @@ export { LogPanel } from './LogPanel';
 export type { LogPanelProps, LogEntryProps, LogTimelineProps, LogByFeatureProps, LogFilterRowProps, LogActionBarProps, SnapshotBoundaryProps, TimelineEntry, InputFeatureState, OperationCategory, PresentationMode, ViewMode, ParameterValue as LogParameterValue, FeatureDisplayInfo, ActionType, LogPanelMessage, ExtensionToWebviewMessage, TimelineUpdatePayload, SessionChangePayload, SelectionUpdatePayload, ActionResultPayload, ModeInitPayload, ParameterSchemaEntry, CardReplayStatus, } from './LogPanel';
 export { DEFAULT_FILTER_STATE as LOG_DEFAULT_FILTER_STATE, } from './LogPanel';
 export type { FilterState as LogFilterState, } from './LogPanel';
+export { ColourLegend } from './colour-engine';
+export { ColourDimensionSelector } from './colour-engine';
+export { computeColourAssignment, getDefaultColourAssignment } from './colour-engine';
+export { defaultPalette, builtInDimensions } from './colour-engine';
+export type { ColourDimension, ColourPalette, ColourAssignment, LegendModel, LegendEntry, GradientSpec, DimensionType, BuiltInDimensionId, ColourDimensionSelectorProps, ColourLegendProps, } from './colour-engine';
 //# sourceMappingURL=index.d.ts.map

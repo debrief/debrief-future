@@ -61,7 +61,29 @@ export type FilterBarAction = {
 } | {
     type: 'TOGGLE_NEGATE';
     id: string;
+} | {
+    type: 'SET_STATE';
+    state: FilterBarState;
 };
+/** A named, persisted filter configuration (#128) */
+export interface SavedFilterConfiguration {
+    readonly id: string;
+    readonly name: string;
+    readonly filterBarState: FilterBarState;
+    readonly cql2Json: Record<string, unknown>;
+    readonly createdAt: string;
+    readonly updatedAt: string;
+}
+/** The persisted collection of saved filter configurations (#128) */
+export interface SavedFiltersCollection {
+    readonly version: number;
+    readonly configurations: readonly SavedFilterConfiguration[];
+}
+/** Platform-agnostic persistence interface for saved filters (#128) */
+export interface SavedFiltersStorage {
+    load(): SavedFiltersCollection;
+    save(collection: SavedFiltersCollection): void;
+}
 /** Props for the FilterBar component */
 export interface FilterBarProps {
     readonly items: readonly StacBrowserItem[];
@@ -69,5 +91,6 @@ export interface FilterBarProps {
     readonly onFilteredItems: (items: StacBrowserItem[]) => void;
     readonly onExpressionChange?: (expression: FilterExpression) => void;
     readonly initialFilterState?: FilterBarState;
+    readonly savedFiltersStorage?: SavedFiltersStorage;
 }
 //# sourceMappingURL=types.d.ts.map
