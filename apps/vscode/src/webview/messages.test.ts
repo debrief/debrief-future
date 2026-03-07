@@ -36,7 +36,7 @@ describe('Exercise List View Messages', () => {
     };
     expect(msg.type).toBe('loadExerciseList');
     expect(msg.items).toHaveLength(1);
-    expect(msg.items[0].title).toBe('Exercise Alpha');
+    expect(msg.items[0]!.title).toBe('Exercise Alpha');
   });
 
   it('LoadRecentPlotsMessage discriminates by type', () => {
