@@ -17,6 +17,8 @@ export interface CascadingMenuProps {
         y: number;
     };
     readonly header?: string;
+    /** When true, branch nodes (items with submenu) are clickable/selectable too */
+    readonly selectableBranches?: boolean;
     readonly onSelect: (itemId: string) => void;
     readonly onDismiss: () => void;
 }
