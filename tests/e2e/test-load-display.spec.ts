@@ -52,7 +52,8 @@ test.describe('US1: Load and Display Workflow', () => {
     expect(found).toBe(true);
   });
 
-  test('T016: select track on map highlights it in feature list', async ({
+  // Skip: Activity Panel sidebar webview doesn't load in openvscode-server (#124)
+  test.skip('T016: select track on map highlights it in feature list', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');

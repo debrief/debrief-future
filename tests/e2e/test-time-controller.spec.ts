@@ -8,7 +8,9 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe('Time Controller', () => {
+// Skip: Activity Panel sidebar webview doesn't load in openvscode-server —
+// getActivityPanelFrame() never finds .debrief-activity-panel (same issue as Log Panel #124).
+test.describe.skip('Time Controller', () => {
   test('time controller is visible after loading a plot', async ({
     codeServerPage,
   }) => {
