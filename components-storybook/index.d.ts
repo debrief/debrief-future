@@ -1,5 +1,7 @@
 export { CatalogOverview } from './CatalogOverview';
 export type { CatalogOverviewProps, CatalogOverviewItem } from './CatalogOverview';
+export { TimelineView } from './TimelineView';
+export type { TimelineViewProps, TimelineBarData, ColourFn, TemporalFilter } from './TimelineView';
 export { ExerciseListView } from './ExerciseListView';
 export type { ExerciseListViewProps, ExerciseListItem, ExerciseListItemRowProps, SpatialThumbnailProps, RecentlyOpenedEntry, SortConfiguration, SortDimension, SortDirection, } from './ExerciseListView';
 export { computeDuration, formatDuration, formatDateRange, formatRelativeTime, sortComparators, } from './ExerciseListView';
