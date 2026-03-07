@@ -360,6 +360,74 @@ export type WebviewToExtensionMessage =
   | DrawingModeChangedMessage;
 
 // ============================================================================
+// Exercise List View Messages (#129)
+// ============================================================================
+
+/** Sent when the exercise list webview is ready; provides the full exercise list. */
+export interface LoadExerciseListMessage {
+  readonly type: 'loadExerciseList';
+  readonly items: ExerciseListItemMessage[];
+}
+
+/** Exercise data for list view display. */
+export interface ExerciseListItemMessage {
+  readonly id: string;
+  readonly title: string;
+  readonly itemPath: string;
+  readonly bbox: readonly [number, number, number, number] | null;
+  readonly datetime: string | null;
+  readonly startDatetime: string | null;
+  readonly endDatetime: string | null;
+  readonly vesselClasses: readonly string[];
+  readonly tags: readonly string[];
+  readonly author: string | null;
+  readonly nationalities: readonly string[];
+  readonly trackNames: readonly string[];
+  readonly trackDataHref: string | null;
+}
+
+/** Sent on initial load and after any exercise is opened; provides recent items. */
+export interface LoadRecentPlotsMessage {
+  readonly type: 'loadRecentPlots';
+  readonly recentPlots: RecentlyOpenedEntryMessage[];
+}
+
+/** Recently opened exercise entry. */
+export interface RecentlyOpenedEntryMessage {
+  readonly plotId: string;
+  readonly title: string;
+  readonly storeId: string;
+  readonly lastOpened: string;
+  readonly uri: string;
+}
+
+/** Request GeoJSON track data for a specific item (webview → extension). */
+export interface RequestTrackDataMessage {
+  readonly type: 'requestTrackData';
+  readonly itemId: string;
+  readonly trackDataHref: string;
+}
+
+/** Response with GeoJSON track data (extension → webview). */
+export interface TrackDataResponseMessage {
+  readonly type: 'trackDataResponse';
+  readonly itemId: string;
+  readonly trackData: unknown; // GeoJSON FeatureCollection
+  readonly error?: string;
+}
+
+/** Sent when the analyst clicks an exercise to open it (webview → extension). */
+export interface OpenExerciseMessage {
+  readonly type: 'openExercise';
+  readonly itemPath: string;
+}
+
+/** Sent when the exercise list webview has finished initialising (webview → extension). */
+export interface ExerciseListReadyMessage {
+  readonly type: 'exerciseListReady';
+}
+
+// ============================================================================
 // Re-exports for webview
 // ============================================================================
 

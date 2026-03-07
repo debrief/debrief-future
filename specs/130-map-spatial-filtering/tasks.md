@@ -45,7 +45,7 @@
 
 **Purpose**: No new project scaffolding needed — all changes extend existing `shared/components` and `apps/vscode` packages. This phase verifies the starting point.
 
-- [ ] T001 Verify existing CatalogOverview component renders and existing tests pass `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T001 Verify existing CatalogOverview component renders and existing tests pass `shared/components/src/CatalogOverview/CatalogOverview.tsx`
 
 **Checkpoint**: Existing code is confirmed working — safe to extend.
 
@@ -61,17 +61,17 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T002 [test] Write unit tests for bboxOverlapsViewport: standard overlap, no overlap, partial overlap, containment, item larger than viewport `shared/components/src/utils/bounds.test.ts`
-- [ ] T003 [P][test] Write unit tests for bboxOverlapsViewport antimeridian cases: west > east crossing, viewport crossing, both crossing, zero-width bbox edge case `shared/components/src/utils/bounds.test.ts`
-- [ ] T004 [P][test] Write unit tests for filterBySpatialExtent: filters to overlapping items, excludes items without bbox, preserves generic type parameter `shared/components/src/utils/bounds.test.ts`
+- [x] T002 [test] Write unit tests for bboxOverlapsViewport: standard overlap, no overlap, partial overlap, containment, item larger than viewport `shared/components/src/utils/bounds.test.ts`
+- [x] T003 [P][test] Write unit tests for bboxOverlapsViewport antimeridian cases: west > east crossing, viewport crossing, both crossing, zero-width bbox edge case `shared/components/src/utils/bounds.test.ts`
+- [x] T004 [P][test] Write unit tests for filterBySpatialExtent: filters to overlapping items, excludes items without bbox, preserves generic type parameter `shared/components/src/utils/bounds.test.ts`
 
 ### Implementation for Foundation
 
-- [ ] T005 Add `bboxOverlapsViewport(itemBbox: Bounds, viewportBbox: Bounds): boolean` to bounds.ts — AABB overlap test with antimeridian handling (split when west > east, but NOT when west === east) `shared/components/src/utils/bounds.ts`
-- [ ] T006 [P] Add `filterBySpatialExtent<T extends CatalogOverviewItem>(items: readonly T[], viewportBbox: Bounds): T[]` to bounds.ts `shared/components/src/utils/bounds.ts`
-- [ ] T007 [P] Extend CatalogOverviewProps in types.ts with `onViewportChange?: (bounds: Bounds | null) => void` and `colorMap?: ReadonlyMap<string, string>` — import existing Bounds type from utils/types.ts `shared/components/src/CatalogOverview/types.ts`
-- [ ] T008 Export new spatial utilities from shared/components index `shared/components/src/index.ts`
-- [ ] T009 Run foundation tests: confirm T002–T004 pass `shared/components/src/utils/bounds.test.ts`
+- [x] T005 Add `bboxOverlapsViewport(itemBbox: Bounds, viewportBbox: Bounds): boolean` to bounds.ts — AABB overlap test with antimeridian handling (split when west > east, but NOT when west === east) `shared/components/src/utils/bounds.ts`
+- [x] T006 [P] Add `filterBySpatialExtent<T extends CatalogOverviewItem>(items: readonly T[], viewportBbox: Bounds): T[]` to bounds.ts `shared/components/src/utils/bounds.ts`
+- [x] T007 [P] Extend CatalogOverviewProps in types.ts with `onViewportChange?: (bounds: Bounds | null) => void` and `colorMap?: ReadonlyMap<string, string>` — import existing Bounds type from utils/types.ts `shared/components/src/CatalogOverview/types.ts`
+- [x] T008 Export new spatial utilities from shared/components index `shared/components/src/index.ts`
+- [x] T009 Run foundation tests: confirm T002–T004 pass `shared/components/src/utils/bounds.test.ts`
 
 **Checkpoint**: Spatial utilities tested and exported. Type extensions in place. User story implementation can begin.
 
@@ -85,12 +85,12 @@
 
 ### Tests for User Story 1
 
-- [ ] T010 [test] Write unit tests for CatalogOverview: items with bbox render as Rectangles, items without bbox are omitted from map, auto-fit bounds computed correctly `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
+- [x] T010 [test] Write unit tests for CatalogOverview: items with bbox render as Rectangles, items without bbox are omitted from map, auto-fit bounds computed correctly `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Memoize Rectangle rendering list with useMemo keyed on items and colorMap to prevent unnecessary React reconciliation at 200 items `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T012 [US1] Run US1 tests: verify items render correctly and memoization works `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
+- [x] T011 [US1] Memoize Rectangle rendering list with useMemo keyed on items and colorMap to prevent unnecessary React reconciliation at 200 items `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T012 [US1] Run US1 tests: verify items render correctly and memoization works `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
 
 **Checkpoint**: Footprints render correctly on map. Items without bbox excluded. Auto-fit works. This is the foundational visual layer.
 
@@ -104,21 +104,21 @@
 
 ### Tests for User Story 2
 
-- [ ] T013 [test] Write unit tests for viewport change callback: moveend triggers debounced onViewportChange with correct Bounds, null emitted before map init `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
-- [ ] T014 [P][test] Write unit tests for internal timeline filtering: timeline shows only viewport-overlapping items, items without bbox always shown in timeline (FR-005) `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
-- [ ] T015 [P][test] Write unit tests for empty state overlays: "No items" when items=[], "No spatial data" when no items have bbox, "No exercises in this area" when viewport has no overlapping items `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
-- [ ] T016 [P][test] Write unit test for debounce cleanup on component unmount — no setState-on-unmounted warning `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
+- [x] T013 [test] Write unit tests for viewport change callback: moveend triggers debounced onViewportChange with correct Bounds, null emitted before map init `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
+- [x] T014 [P][test] Write unit tests for internal timeline filtering: timeline shows only viewport-overlapping items, items without bbox always shown in timeline (FR-005) `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
+- [x] T015 [P][test] Write unit tests for empty state overlays: "No items" when items=[], "No spatial data" when no items have bbox, "No exercises in this area" when viewport has no overlapping items `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
+- [x] T016 [P][test] Write unit test for debounce cleanup on component unmount — no setState-on-unmounted warning `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Add internal viewport state (useState<Bounds | null>) and moveend event handler with useMap() hook — guard against uninitialised map (check getBounds() returns valid data before extracting coordinates) `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T018 [US2] Add inline debounce using useRef + setTimeout pattern (150ms) matching FilterDropdown.tsx convention — clear timer on unmount in useEffect cleanup `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T019 [US2] Add onViewportChange callback invocation from debounced moveend handler `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T020 [US2] Filter timeline items internally using bboxOverlapsViewport against current viewport state — items without bbox always included (FR-005), items with bbox outside viewport hidden `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T021 [US2] Add three-state empty overlay: "No items in this catalog" (items=[]), "No spatial data available" (no items have bbox), "No exercises in this area" (viewport has no overlapping items) `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T022 [P][US2] Add CSS styles for empty state overlay: semi-transparent, positioned inside Leaflet container, pointer-events:none so map remains pannable `shared/components/src/CatalogOverview/CatalogOverview.css`
-- [ ] T023 [US2] Add Storybook story: SpatialFilter — exercises spread across regions, interactive pan/zoom updates timeline `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx`
-- [ ] T024 [US2] Run US2 tests: confirm T013–T016 pass
+- [x] T017 [US2] Add internal viewport state (useState<Bounds | null>) and moveend event handler with useMap() hook — guard against uninitialised map (check getBounds() returns valid data before extracting coordinates) `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T018 [US2] Add inline debounce using useRef + setTimeout pattern (150ms) matching FilterDropdown.tsx convention — clear timer on unmount in useEffect cleanup `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T019 [US2] Add onViewportChange callback invocation from debounced moveend handler `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T020 [US2] Filter timeline items internally using bboxOverlapsViewport against current viewport state — items without bbox always included (FR-005), items with bbox outside viewport hidden `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T021 [US2] Add three-state empty overlay: "No items in this catalog" (items=[]), "No spatial data available" (no items have bbox), "No exercises in this area" (viewport has no overlapping items) `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T022 [P][US2] Add CSS styles for empty state overlay: semi-transparent, positioned inside Leaflet container, pointer-events:none so map remains pannable `shared/components/src/CatalogOverview/CatalogOverview.css`
+- [x] T023 [US2] Add Storybook story: SpatialFilter — exercises spread across regions, interactive pan/zoom updates timeline `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx`
+- [x] T024 [US2] Run US2 tests: confirm T013–T016 pass
 
 **Checkpoint**: Pan/zoom filtering works. Timeline updates dynamically. Empty states display correctly. Core spatial filtering feature is functional.
 
@@ -132,13 +132,13 @@
 
 ### Tests for User Story 3
 
-- [ ] T025 [test] Write unit tests for colorMap: items use assigned colour from colorMap, items not in colorMap use default accent colour, renders correctly without colorMap prop `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
+- [x] T025 [test] Write unit tests for colorMap: items use assigned colour from colorMap, items not in colorMap use default accent colour, renders correctly without colorMap prop `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Update Rectangle pathOptions to look up colour from colorMap prop — fall back to `var(--co-accent, #007fd4)` when colorMap absent or item ID not found `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T027 [P][US3] Add Storybook story: ColourScheme — exercises with distinct colours in colorMap `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx`
-- [ ] T028 [US3] Run US3 tests: confirm T025 passes
+- [x] T026 [US3] Update Rectangle pathOptions to look up colour from colorMap prop — fall back to `var(--co-accent, #007fd4)` when colorMap absent or item ID not found `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T027 [P][US3] Add Storybook story: ColourScheme — exercises with distinct colours in colorMap `shared/components/src/CatalogOverview/CatalogOverview.stories.tsx`
+- [x] T028 [US3] Run US3 tests: confirm T025 passes
 
 **Checkpoint**: Colour-coded footprints render correctly. Consistent with future #134 colour scheme engine integration.
 
@@ -152,13 +152,13 @@
 
 ### Tests for User Story 5
 
-- [ ] T029 [test] Write unit test for VS Code webview wrapper: onViewportChange triggers postMessage with `{ type: 'overviewViewportChanged', bounds }` `apps/vscode/src/webview/web/catalogOverview.test.tsx`
+- [x] T029 [test] Write unit test for VS Code webview wrapper: onViewportChange triggers postMessage with `{ type: 'overviewViewportChanged', bounds }` `apps/vscode/src/webview/web/catalogOverview.test.tsx`
 
 ### Implementation for User Story 5
 
-- [ ] T030 [US5] Wire onViewportChange in VS Code webview wrapper to post `ViewportChangedMessage` to extension host `apps/vscode/src/webview/web/catalogOverview.tsx`
-- [ ] T031 [US5] Handle `overviewViewportChanged` message in catalogOverviewPanel.ts — store viewport bounds and optionally pass to session-state store `apps/vscode/src/panels/catalogOverviewPanel.ts`
-- [ ] T032 [US5] Run US5 tests: confirm T029 passes
+- [x] T030 [US5] Wire onViewportChange in VS Code webview wrapper to post `ViewportChangedMessage` to extension host `apps/vscode/src/webview/web/catalogOverview.tsx`
+- [x] T031 [US5] Handle `overviewViewportChanged` message in catalogOverviewPanel.ts — store viewport bounds and optionally pass to session-state store `apps/vscode/src/panels/catalogOverviewPanel.ts`
+- [x] T032 [US5] Run US5 tests: confirm T029 passes
 
 **Checkpoint**: Viewport changes propagate through webview → extension host. Cross-view sync infrastructure ready for #132 (three-view synchronization).
 
@@ -174,12 +174,12 @@
 
 ### Tests for User Story 4
 
-- [ ] T033 [test] Write unit tests verifying existing double-click triggers onItemSelect and tooltip shows title + date range `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
+- [x] T033 [test] Write unit tests verifying existing double-click triggers onItemSelect and tooltip shows title + date range `shared/components/src/CatalogOverview/CatalogOverview.test.tsx`
 
 ### Implementation for User Story 4
 
-- [ ] T034 [US4] Verify existing double-click and tooltip behaviour works with colorMap and viewport filtering changes — fix if broken `shared/components/src/CatalogOverview/CatalogOverview.tsx`
-- [ ] T035 [US4] Run US4 tests: confirm T033 passes
+- [x] T034 [US4] Verify existing double-click and tooltip behaviour works with colorMap and viewport filtering changes — fix if broken `shared/components/src/CatalogOverview/CatalogOverview.tsx`
+- [x] T035 [US4] Run US4 tests: confirm T033 passes
 
 **Checkpoint**: Selection and tooltips work correctly alongside new spatial filtering. All user stories functional.
 
@@ -193,16 +193,16 @@
 
 ### Storybook E2E Tests 🎭
 
-- [ ] T036 [P] Create Playwright test for SpatialFilter story: rendering, viewport callback, empty state `shared/components/e2e/CatalogOverview.spec.ts`
-- [ ] T037 [P] Add theme variant tests (light, dark, vscode) for SpatialFilter story `shared/components/e2e/CatalogOverview.spec.ts`
-- [ ] T038 [P] Add interaction tests: pan map triggers timeline filter, zoom updates viewport `shared/components/e2e/CatalogOverview.spec.ts`
-- [ ] T039 Run Storybook e2e tests: `pnpm --filter @debrief/components test:e2e CatalogOverview`
+- [x] T036 [P] Create Playwright test for SpatialFilter story: rendering, viewport callback, empty state `shared/components/e2e/CatalogOverview.spec.ts`
+- [x] T037 [P] Add theme variant tests (light, dark, vscode) for SpatialFilter story `shared/components/e2e/CatalogOverview.spec.ts`
+- [x] T038 [P] Add interaction tests: pan map triggers timeline filter, zoom updates viewport `shared/components/e2e/CatalogOverview.spec.ts`
+- [x] T039 Run Storybook e2e tests: `pnpm --filter @debrief/components test:e2e CatalogOverview`
 
 ### VS Code Webview E2E Tests 🖥️
 
-- [ ] T040 [P] Update page objects in `tests/e2e/models/` with CatalogOverview spatial filter selectors
-- [ ] T041 [P] Create Playwright test for pan-to-filter workflow `tests/e2e/test-catalog-spatial-filter.spec.ts`
-- [ ] T042 Run webview e2e tests: `xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts test-catalog-spatial-filter`
+- [x] T040 [P] Update page objects in `tests/e2e/models/` with CatalogOverview spatial filter selectors
+- [x] T041 [P] Create Playwright test for pan-to-filter workflow `tests/e2e/test-catalog-spatial-filter.spec.ts`
+- [x] T042 Run webview e2e tests: `xvfb-run --auto-servernum npx playwright test --config tests/e2e/playwright.config.ts test-catalog-spatial-filter`
 
 **Checkpoint**: All E2E tests pass. Visual evidence captured.
 
@@ -214,32 +214,32 @@
 
 ### Verification
 
-- [ ] T043 Run quickstart.md validation — verify import paths and code examples are accurate `specs/130-map-spatial-filtering/quickstart.md`
-- [ ] T044 Run full CI check: `task verify` (lint + typecheck + test)
+- [x] T043 Run quickstart.md validation — verify import paths and code examples are accurate `specs/130-map-spatial-filtering/quickstart.md`
+- [x] T044 Run full CI check: `task verify` (lint + typecheck + test)
 
 ### Evidence Collection (REQUIRED)
 
 > **Purpose**: Capture artifacts for PR description and future documentation
 
-- [ ] T045 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/130-map-spatial-filtering/evidence/test-summary.md`
-- [ ] T046 Create usage demonstration showing CatalogOverview with onViewportChange and colorMap `specs/130-map-spatial-filtering/evidence/usage-example.md`
+- [x] T045 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/130-map-spatial-filtering/evidence/test-summary.md`
+- [x] T046 Create usage demonstration showing CatalogOverview with onViewportChange and colorMap `specs/130-map-spatial-filtering/evidence/usage-example.md`
 
 ### E2E Evidence Collection (REQUIRED for UI components) 🎭
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — see Phase 8 note.
 
-- [ ] T047 [P] Capture theme variant screenshots to `specs/130-map-spatial-filtering/evidence/screenshots/`
-- [ ] T048 Capture interaction GIF showing pan/zoom spatial filtering `specs/130-map-spatial-filtering/evidence/screenshots/interaction.gif`
-- [ ] T049 Document e2e results `specs/130-map-spatial-filtering/evidence/e2e-summary.md`
+- [x] T047 [P] Capture theme variant screenshots to `specs/130-map-spatial-filtering/evidence/screenshots/`
+- [x] T048 Capture interaction GIF showing pan/zoom spatial filtering `specs/130-map-spatial-filtering/evidence/screenshots/interaction.gif`
+- [x] T049 Document e2e results `specs/130-map-spatial-filtering/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T050 Create shipped blog post `specs/130-map-spatial-filtering/media/shipped-post.md`
-- [ ] T051 [P] Create LinkedIn shipped summary `specs/130-map-spatial-filtering/media/linkedin-shipped.md`
+- [x] T050 Create shipped blog post `specs/130-map-spatial-filtering/media/shipped-post.md`
+- [x] T051 [P] Create LinkedIn shipped summary `specs/130-map-spatial-filtering/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T052 Create PR and publish blog: run /speckit.pr
+- [x] T052 Create PR and publish blog: run /speckit.pr
 
 **Task T052 must run last. It depends on all evidence and media tasks being complete.**
 

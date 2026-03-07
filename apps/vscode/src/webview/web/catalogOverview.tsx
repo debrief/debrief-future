@@ -10,7 +10,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import { CatalogOverview } from '@debrief/components';
-import type { CatalogOverviewItem } from '@debrief/components';
+import type { CatalogOverviewItem, Bounds } from '@debrief/components';
 
 // VS Code API
 declare function acquireVsCodeApi(): {
@@ -76,6 +76,14 @@ function CatalogOverviewApp(): React.ReactElement {
     vscode.setState({ ...currentState, splitRatio: ratio });
   }, []);
 
+  // Handle viewport change — post to extension host (Feature: 130-map-spatial-filtering)
+  const handleViewportChange = useCallback((bounds: Bounds | null) => {
+    vscode.postMessage({
+      type: 'overviewViewportChanged',
+      bounds,
+    });
+  }, []);
+
   if (!catalogData) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--vscode-editor-foreground, #ccc)' }}>
@@ -90,6 +98,7 @@ function CatalogOverviewApp(): React.ReactElement {
       onItemSelect={handleItemSelect}
       initialSplitRatio={splitRatio}
       onSplitRatioChange={handleSplitRatioChange}
+      onViewportChange={handleViewportChange}
     />
   );
 }
