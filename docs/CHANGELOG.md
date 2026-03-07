@@ -1,5 +1,12 @@
 # Changelog
 
+## [2026-03-07]
+
+### Added
+- **Saved Filter Configurations** — Save/load/delete named filter sets as CQL2 JSON; historic filters dropdown for the STAC Browser filter bar.
+  - Tests: 120/120 passing (47 new)
+  - Evidence: test-summary.md, usage-example.md
+
 ## [2026-03-06]
 
 ### Added
