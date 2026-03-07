@@ -79,6 +79,40 @@ const MIXED_ITEMS: StacBrowserItem[] = [
 ];
 
 // ============================================================================
+// Time period panel component for stories
+// ============================================================================
+
+function TimePeriodPanel({ filter }: { readonly filter: TemporalFilter | null }) {
+  return (
+    <div
+      data-testid="time-period-panel"
+      style={{
+        padding: '8px 12px',
+        fontSize: '12px',
+        fontFamily: 'var(--vscode-font-family, monospace)',
+        color: '#ccc',
+        background: '#252526',
+        borderTop: '1px solid #333',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+      }}
+    >
+      <span style={{ color: '#888', fontWeight: 500 }}>Visible range:</span>
+      {filter ? (
+        <span>
+          {new Date(filter.start).toISOString().replace('T', ' ').slice(0, 19)}
+          {' \u2013 '}
+          {new Date(filter.end).toISOString().replace('T', ' ').slice(0, 19)}
+        </span>
+      ) : (
+        <span style={{ color: '#666', fontStyle: 'italic' }}>Full extent (scroll to zoom, drag to pan)</span>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
 // Stories
 // ============================================================================
 
@@ -89,8 +123,8 @@ export const Default: Story = {
   },
 };
 
-/** Interactive story with filter state display */
-export const WithBrush: Story = {
+/** Interactive story with zoom/pan and time period panel */
+export const WithZoomPan: Story = {
   render: () => {
     const [filter, setFilter] = useState<TemporalFilter | null>(null);
     return (
@@ -102,11 +136,7 @@ export const WithBrush: Story = {
             onItemSelect={(path) => console.log('Selected:', path)}
           />
         </div>
-        <div style={{ padding: '8px', fontSize: '12px', color: '#ccc', background: '#252526', borderTop: '1px solid #333' }}>
-          {filter
-            ? `Filter: ${new Date(filter.start).toISOString()} – ${new Date(filter.end).toISOString()}`
-            : 'No temporal filter active (drag handles to filter)'}
-        </div>
+        <TimePeriodPanel filter={filter} />
       </div>
     );
   },

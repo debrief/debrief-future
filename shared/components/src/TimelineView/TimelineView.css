@@ -103,33 +103,38 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Brush overlay */
-.timeline-view__brush-overlay {
-  fill: var(--co-accent, #007fd4);
-  opacity: 0.15;
-  cursor: grab;
+/* Axis row: axis + reset button */
+.timeline-view__axis-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.timeline-view__brush-overlay:active {
-  cursor: grabbing;
+.timeline-view__axis-svg {
+  flex: 1;
+  min-width: 0;
 }
 
-/* Brush handles */
-.timeline-view__brush-handle {
-  fill: var(--co-accent, #007fd4);
-  opacity: 0.6;
-  cursor: ew-resize;
+/* Reset / zoom-to-fit button */
+.timeline-view__reset-btn {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--vscode-widget-border, rgba(0, 0, 0, 0.2));
+  border-radius: 3px;
+  background: var(--vscode-button-secondaryBackground, #3a3d41);
+  color: var(--vscode-button-secondaryForeground, #ccc);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
 }
 
-.timeline-view__brush-handle:hover {
-  opacity: 0.9;
-}
-
-/* Brush dimmed regions */
-.timeline-view__brush-dim {
-  fill: var(--vscode-editor-background, #fff);
-  opacity: 0.6;
-  pointer-events: none;
+.timeline-view__reset-btn:hover {
+  background: var(--vscode-button-secondaryHoverBackground, #505357);
 }
 
 /* Row hover highlight */
