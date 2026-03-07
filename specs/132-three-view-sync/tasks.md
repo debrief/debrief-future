@@ -254,9 +254,9 @@ Remove CatalogOverview and update all 24 references. StacBrowser replaces it as 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip or omit Playwright E2E tasks because you think browsers can't be installed. The project uses `@sparticuz/chromium` which bundles a Linux Chromium binary via npm. Standard browser CDN downloads are blocked (403), but this bundled binary works fully. Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
 - [x] T088 Create Playwright E2E test for StacBrowser — rendering, theme variants (light/dark/vscode) `shared/components/e2e/StacBrowser.spec.ts`
-- [ ] T089 [P] Add E2E interaction test — add metadata filter, verify sync across views `shared/components/e2e/StacBrowser.spec.ts`
-- [ ] T090 [P] Add E2E test — zero results state rendering `shared/components/e2e/StacBrowser.spec.ts`
-- [ ] T091 Run full E2E suite: `pnpm --filter @debrief/components test:e2e StacBrowser`
+- [x] T089 [P] Add E2E interaction test — add metadata filter, verify sync across views `shared/components/e2e/StacBrowser.spec.ts`
+- [x] T090 [P] Add E2E test — zero results state rendering `shared/components/e2e/StacBrowser.spec.ts`
+- [x] T091 Run full E2E suite: `pnpm --filter @debrief/components test:e2e StacBrowser`
 
 ### Cross-Cutting
 
@@ -267,8 +267,8 @@ Remove CatalogOverview and update all 24 references. StacBrowser replaces it as 
 
 - [x] T094 Capture test results using template (.specify/templates/evidence/test-summary-template.md) in `specs/132-three-view-sync/evidence/test-summary.md`
 - [x] T095 Create usage demonstration — filter-narrow-discover workflow walkthrough `specs/132-three-view-sync/evidence/usage-example.md`
-- [ ] T096 [P] Capture theme screenshots (light/dark/vscode) to `specs/132-three-view-sync/evidence/screenshots/`
-- [ ] T097 Capture interaction GIF showing filter sync (add filter → views update) to `specs/132-three-view-sync/evidence/screenshots/interaction.gif`
+- [x] T096 [P] Capture theme screenshots (light/dark/vscode) to `specs/132-three-view-sync/evidence/screenshots/`
+- [x] T097 Capture interaction GIF showing filter sync (add filter → views update) to `specs/132-three-view-sync/evidence/screenshots/interaction.gif`
 
 ### Media Content
 
