@@ -56,11 +56,15 @@
       "description": "GeoJSON LineString geometry",
       "properties": {
         "coordinates": {
-          "description": "Array of [longitude, latitude] pairs",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2
           },
-          "type": "array"
+          "description": "Array of [longitude, latitude] pairs"
         },
         "type": {
           "const": "LineString",

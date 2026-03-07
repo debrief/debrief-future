@@ -57,12 +57,12 @@
       "description": "GeoJSON Point geometry with empty coordinates (for non-spatial features)",
       "properties": {
         "coordinates": {
-          "description": "Empty array for non-spatial features",
+          "type": "array",
           "items": {
             "type": "number"
           },
           "maxItems": 0,
-          "type": "array"
+          "description": "Empty array for non-spatial features"
         },
         "type": {
           "const": "Point",

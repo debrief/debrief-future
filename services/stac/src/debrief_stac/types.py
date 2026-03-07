@@ -15,6 +15,7 @@ AssetPath: TypeAlias = Path | str
 
 # STAC structure types (JSON-compatible dicts)
 STACCatalog: TypeAlias = dict[str, Any]
+STACCollection: TypeAlias = dict[str, Any]
 STACItem: TypeAlias = dict[str, Any]
 STACAsset: TypeAlias = dict[str, Any]
 STACLink: TypeAlias = dict[str, str]
