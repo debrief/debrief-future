@@ -136,44 +136,54 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     return labels;
   }, [effectiveView, chartWidth]);
 
-  // --- Zoom via mouse wheel ---
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    if (!effectiveView || !fullRange) return;
+  // --- Zoom via mouse wheel (native listener to allow preventDefault) ---
+  // Store latest values in refs so the native listener always sees current state
+  const effectiveViewRef = useRef(effectiveView);
+  effectiveViewRef.current = effectiveView;
+  const fullRangeRef = useRef(fullRange);
+  fullRangeRef.current = fullRange;
 
+  useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
 
-    // Get cursor position relative to chart area
-    const rect = svg.getBoundingClientRect();
-    const svgX = ((e.clientX - rect.left) / rect.width) * SVG_WIDTH;
-    const chartX = svgX - CHART_LEFT;
-    const ratio = Math.max(0, Math.min(1, chartX / chartWidth));
+    function onWheel(e: WheelEvent) {
+      const view = effectiveViewRef.current;
+      const full = fullRangeRef.current;
+      if (!view || !full) return;
 
-    // Cursor position in time
-    const cursorTime = effectiveView.min + ratio * (effectiveView.max - effectiveView.min);
+      e.preventDefault();
 
-    const direction = e.deltaY > 0 ? 1 : -1; // positive = zoom out
-    const factor = 1 + direction * ZOOM_FACTOR;
+      const rect = svg!.getBoundingClientRect();
+      const svgX = ((e.clientX - rect.left) / rect.width) * SVG_WIDTH;
+      const chartX = svgX - CHART_LEFT;
+      const ratio = Math.max(0, Math.min(1, chartX / chartWidth));
 
-    const newSpan = Math.max(MIN_RANGE_MS, (effectiveView.max - effectiveView.min) * factor);
+      const cursorTime = view.min + ratio * (view.max - view.min);
 
-    // Keep cursor position anchored
-    let newMin = cursorTime - ratio * newSpan;
-    let newMax = cursorTime + (1 - ratio) * newSpan;
+      const direction = e.deltaY > 0 ? 1 : -1;
+      const factor = 1 + direction * ZOOM_FACTOR;
 
-    // Clamp to full data range
-    if (newMin < fullRange.min) {
-      newMin = fullRange.min;
-      newMax = Math.min(fullRange.max, newMin + newSpan);
+      const newSpan = Math.max(MIN_RANGE_MS, (view.max - view.min) * factor);
+
+      let newMin = cursorTime - ratio * newSpan;
+      let newMax = cursorTime + (1 - ratio) * newSpan;
+
+      if (newMin < full.min) {
+        newMin = full.min;
+        newMax = Math.min(full.max, newMin + newSpan);
+      }
+      if (newMax > full.max) {
+        newMax = full.max;
+        newMin = Math.max(full.min, newMax - newSpan);
+      }
+
+      setViewRange({ min: newMin, max: newMax });
     }
-    if (newMax > fullRange.max) {
-      newMax = fullRange.max;
-      newMin = Math.max(fullRange.min, newMax - newSpan);
-    }
 
-    setViewRange({ min: newMin, max: newMax });
-  }, [effectiveView, fullRange, chartWidth]);
+    svg.addEventListener('wheel', onWheel, { passive: false });
+    return () => svg.removeEventListener('wheel', onWheel);
+  }, [chartWidth]);
 
   // --- Pan via mouse drag ---
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
@@ -284,7 +294,6 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           viewBox={`0 0 ${SVG_WIDTH} ${barsHeight}`}
           preserveAspectRatio="xMidYMid meet"
           data-testid="timeline-bars-svg"
-          onWheel={handleWheel}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
