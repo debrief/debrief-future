@@ -75,11 +75,15 @@
       "description": "GeoJSON LineString geometry",
       "properties": {
         "coordinates": {
-          "description": "Array of [longitude, latitude] pairs",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2
           },
-          "type": "array"
+          "description": "Array of [longitude, latitude] pairs"
         },
         "type": {
           "const": "LineString",
@@ -99,11 +103,18 @@
       "description": "GeoJSON MultiLineString geometry for compound tracks",
       "properties": {
         "coordinates": {
-          "description": "Array of LineString coordinate arrays",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2
+            }
           },
-          "type": "array"
+          "description": "Array of LineString coordinate arrays"
         },
         "type": {
           "const": "MultiLineString",
@@ -936,7 +947,14 @@
         "position_style_overrides": {
           "description": "Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling.",
           "items": {
-            "$ref": "#/$defs/PositionStyleOverride"
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PositionStyleOverride"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": [
             "array",

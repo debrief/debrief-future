@@ -56,11 +56,18 @@
       "description": "GeoJSON Polygon geometry",
       "properties": {
         "coordinates": {
-          "description": "Array of linear rings (arrays of [lon, lat] pairs)",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2
+            }
           },
-          "type": "array"
+          "description": "Array of linear rings (arrays of [lon, lat] pairs)"
         },
         "type": {
           "const": "Polygon",

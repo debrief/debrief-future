@@ -5,12 +5,6 @@
  * Tests that:
  * - Valid fixtures pass validation
  * - Invalid fixtures fail with expected errors
- *
- * NOTE: LinkML has a known limitation with nested array types. GeoJSON
- * coordinates should be arrays of position arrays (e.g., [[lon, lat], ...]),
- * but LinkML generates schemas expecting flat number arrays. Track features
- * with proper GeoJSON coordinates will show validation errors here but will
- * validate correctly with Pydantic models.
  */
 
 import Ajv2019 from "ajv/dist/2019.js";
@@ -121,34 +115,12 @@ function validateFixtures(validators, fixturesPath, expectValid) {
     const fixture = JSON.parse(readFileSync(filePath, "utf-8"));
     const valid = validator(fixture);
 
-    // Check if this is a known limitation of LinkML's JSON Schema generator.
-    // Two known issues:
-    // 1. GeoJSON nested arrays: LinkML generates "items": {"type": "number"}
-    //    for coordinate arrays but GeoJSON uses nested arrays ([[lon, lat], ...])
-    // 2. Nullable array items: LinkML doesn't support nullable items in arrays
-    //    (e.g., position_style_overrides can contain null entries)
-    // For anyOf geometries (e.g., TrackFeature), AJV also emits rollup errors
-    // for const mismatches and the anyOf itself.
-    const isKnownLimitation = !valid &&
-      validator.errors?.length > 0 &&
-      validator.errors?.every(e =>
-        // Coordinate array type errors (nested arrays flattened)
-        (e.instancePath?.includes("/geometry/coordinates") && e.keyword === "type") ||
-        // anyOf/const rollup errors from geometry union validation
-        (e.instancePath?.includes("/geometry") && (e.keyword === "anyOf" || e.keyword === "const")) ||
-        // Nullable array item errors (null in arrays of objects)
-        (e.keyword === "type" && e.params?.type === "object" && /\/\d+$/.test(e.instancePath ?? ""))
-      );
-
     if (expectValid && valid) {
       console.log(`  ✓ ${file}: valid (expected)`);
       results.passed++;
     } else if (!expectValid && !valid) {
       console.log(`  ✓ ${file}: invalid (expected)`);
       results.passed++;
-    } else if (expectValid && !valid && isKnownLimitation) {
-      console.log(`  ⚠ ${file}: invalid due to LinkML nested array limitation (known issue)`);
-      results.passed++; // Count as passed since this is a documented limitation
     } else if (expectValid && !valid) {
       console.log(`  ✗ ${file}: invalid (expected valid)`);
       console.log(`    Errors: ${JSON.stringify(validator.errors, null, 2)}`);

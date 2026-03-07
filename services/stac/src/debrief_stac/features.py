@@ -98,6 +98,14 @@ def add_features(
     # Save updated item
     _save_plot(catalog_path, plot_id, item)
 
+    # Update Collection summaries
+    from debrief_stac.catalog import _save_catalog, open_catalog
+    from debrief_stac.collection import update_collection_summaries
+
+    catalog_data = open_catalog(catalog_path)
+    update_collection_summaries(catalog_data, item, "update", catalog_path=catalog_path)
+    _save_catalog(catalog_path, catalog_data)
+
     return len(fc["features"])
 
 
@@ -161,6 +169,15 @@ def update_features(
         item["geometry"] = _bbox_to_polygon(bbox)
 
     _save_plot(catalog_path, plot_id, item)
+
+    # Update Collection summaries
+    from debrief_stac.catalog import _save_catalog, open_catalog
+    from debrief_stac.collection import update_collection_summaries
+
+    catalog_data = open_catalog(catalog_path)
+    update_collection_summaries(catalog_data, item, "update", catalog_path=catalog_path)
+    _save_catalog(catalog_path, catalog_data)
+
     return updated_count
 
 
@@ -218,6 +235,16 @@ def delete_features(
         item["geometry"] = None
 
     _save_plot(catalog_path, plot_id, item)
+
+    # Rebuild Collection summaries (deletions require full recomputation)
+    from debrief_stac.catalog import _save_catalog, open_catalog
+    from debrief_stac.collection import rebuild_collection_summaries
+
+    catalog_data = open_catalog(catalog_path)
+    if catalog_data.get("type") == "Collection":
+        rebuild_collection_summaries(catalog_data, catalog_path)
+        _save_catalog(catalog_path, catalog_data)
+
     return removed_count
 
 
