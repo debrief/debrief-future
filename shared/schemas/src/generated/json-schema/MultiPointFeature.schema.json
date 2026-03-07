@@ -68,11 +68,15 @@
       "description": "GeoJSON MultiPoint geometry for reference point sets",
       "properties": {
         "coordinates": {
-          "description": "Array of [longitude, latitude] pairs",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2
           },
-          "type": "array"
+          "description": "Array of [longitude, latitude] pairs"
         },
         "type": {
           "const": "MultiPoint",

@@ -68,11 +68,21 @@
       "description": "GeoJSON MultiPolygon geometry for multi-polygon tool results",
       "properties": {
         "coordinates": {
-          "description": "Array of polygon coordinate arrays (each an array of linear rings)",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2
+              }
+            }
           },
-          "type": "array"
+          "description": "Array of polygon coordinate arrays (each an array of linear rings)"
         },
         "type": {
           "const": "MultiPolygon",

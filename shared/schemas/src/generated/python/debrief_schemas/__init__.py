@@ -891,7 +891,7 @@ class GeoJSONLineString(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'LineString'} })
-    coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -928,7 +928,7 @@ class GeoJSONPolygon(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Polygon'} })
-    coordinates: list[float] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[list[float]]] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -965,7 +965,7 @@ class GeoJSONMultiPoint(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'MultiPoint'} })
-    coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -1002,7 +1002,7 @@ class GeoJSONMultiLineString(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'MultiLineString'} })
-    coordinates: list[float] = Field(default=..., description="""Array of LineString coordinate arrays""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[list[float]]] = Field(default=..., description="""Array of LineString coordinate arrays""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -1039,7 +1039,7 @@ class GeoJSONMultiPolygon(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'MultiPolygon'} })
-    coordinates: list[float] = Field(default=..., description="""Array of polygon coordinate arrays (each an array of linear rings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[list[list[float]]]] = Field(default=..., description="""Array of polygon coordinate arrays (each an array of linear rings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -1226,7 +1226,7 @@ class TrackProperties(BaseFeatureProperties):
     default_position_style: PositionStyle = Field(default=..., description="""Default styling applied to all positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     symbol_interval: Optional[str] = Field(default=None, description="""ISO 8601 duration for interval-based symbol display. E.g., \"PT5M\" = every 5 minutes, \"PT1H\" = every hour. Null means no interval-based symbols.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     label_interval: Optional[str] = Field(default=None, description="""ISO 8601 duration for interval-based label display. Null means no interval-based labels.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
-    position_style_overrides: Optional[list[PositionStyleOverride]] = Field(default=[], description="""Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
+    position_style_overrides: Optional[list[Optional[PositionStyleOverride]]] = Field(default=[], description="""Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     segments: Optional[list[SegmentMetadata]] = Field(default=[], description="""Per-segment metadata for compound tracks. When present, geometry MUST be MultiLineString and segments[i] describes coordinates[i]. When absent, geometry is LineString and the flat positions array is used.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     sensors: Optional[list[SensorData]] = Field(default=[], description="""Embedded sensor data associated with this track. Each sensor contains named metadata and an array of contact measurements.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     tuas: Optional[list[TUAData]] = Field(default=[], description="""Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
@@ -1331,7 +1331,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation']} })
-    bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+    bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature']} })
@@ -1732,7 +1732,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation']} })
-    bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+    bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature']} })
@@ -1862,7 +1862,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation']} })
-    bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+    bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature']} })

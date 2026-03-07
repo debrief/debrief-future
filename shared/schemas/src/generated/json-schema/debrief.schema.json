@@ -282,12 +282,12 @@
       "description": "GeoJSON Point geometry with empty coordinates (for non-spatial features)",
       "properties": {
         "coordinates": {
-          "description": "Empty array for non-spatial features",
+          "type": "array",
           "items": {
             "type": "number"
           },
           "maxItems": 0,
-          "type": "array"
+          "description": "Empty array for non-spatial features"
         },
         "type": {
           "const": "Point",
@@ -307,11 +307,15 @@
       "description": "GeoJSON LineString geometry",
       "properties": {
         "coordinates": {
-          "description": "Array of [longitude, latitude] pairs",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2
           },
-          "type": "array"
+          "description": "Array of [longitude, latitude] pairs"
         },
         "type": {
           "const": "LineString",
@@ -331,11 +335,18 @@
       "description": "GeoJSON MultiLineString geometry for compound tracks",
       "properties": {
         "coordinates": {
-          "description": "Array of LineString coordinate arrays",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2
+            }
           },
-          "type": "array"
+          "description": "Array of LineString coordinate arrays"
         },
         "type": {
           "const": "MultiLineString",
@@ -355,11 +366,15 @@
       "description": "GeoJSON MultiPoint geometry for reference point sets",
       "properties": {
         "coordinates": {
-          "description": "Array of [longitude, latitude] pairs",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2
           },
-          "type": "array"
+          "description": "Array of [longitude, latitude] pairs"
         },
         "type": {
           "const": "MultiPoint",
@@ -379,11 +394,21 @@
       "description": "GeoJSON MultiPolygon geometry for multi-polygon tool results",
       "properties": {
         "coordinates": {
-          "description": "Array of polygon coordinate arrays (each an array of linear rings)",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2
+              }
+            }
           },
-          "type": "array"
+          "description": "Array of polygon coordinate arrays (each an array of linear rings)"
         },
         "type": {
           "const": "MultiPolygon",
@@ -403,13 +428,13 @@
       "description": "GeoJSON Point geometry",
       "properties": {
         "coordinates": {
-          "description": "[longitude, latitude] in degrees",
+          "type": "array",
           "items": {
             "type": "number"
           },
-          "maxItems": 2,
           "minItems": 2,
-          "type": "array"
+          "maxItems": 2,
+          "description": "[longitude, latitude] in degrees"
         },
         "type": {
           "const": "Point",
@@ -429,11 +454,18 @@
       "description": "GeoJSON Polygon geometry",
       "properties": {
         "coordinates": {
-          "description": "Array of linear rings (arrays of [lon, lat] pairs)",
+          "type": "array",
           "items": {
-            "type": "number"
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2
+            }
           },
-          "type": "array"
+          "description": "Array of linear rings (arrays of [lon, lat] pairs)"
         },
         "type": {
           "const": "Polygon",
@@ -2743,7 +2775,14 @@
         "position_style_overrides": {
           "description": "Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling.",
           "items": {
-            "$ref": "#/$defs/PositionStyleOverride"
+            "anyOf": [
+              {
+                "$ref": "#/$defs/PositionStyleOverride"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": [
             "array",
