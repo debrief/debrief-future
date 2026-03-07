@@ -45,9 +45,9 @@
 
 **Purpose**: Project scaffolding and type definitions
 
-- [ ] T001 Add SavedFilterConfiguration and SavedFiltersCollection types to existing types file `shared/components/src/FilterBar/types.ts`
-- [ ] T002 [P] Add user-facing strings for saved filters to constants `shared/components/src/FilterBar/constants.ts`
-- [ ] T003 [P] Create storage interface and implementations `shared/components/src/FilterBar/savedFiltersStorage.ts`
+- [x] T001 Add SavedFilterConfiguration and SavedFiltersCollection types to existing types file `shared/components/src/FilterBar/types.ts`
+- [x] T002 [P] Add user-facing strings for saved filters to constants `shared/components/src/FilterBar/constants.ts`
+- [x] T003 [P] Create storage interface and implementations `shared/components/src/FilterBar/savedFiltersStorage.ts`
 
 **Checkpoint**: Types, constants, and storage abstraction in place
 
@@ -59,8 +59,8 @@
 
 **⚠️ CRITICAL**: No UI component work can begin until this phase is complete
 
-- [ ] T004 Implement useSavedFilters hook with save/load/delete/overwrite operations `shared/components/src/FilterBar/useSavedFilters.ts`
-- [ ] T005 [test] Write unit tests for useSavedFilters hook `shared/components/src/FilterBar/__tests__/useSavedFilters.test.ts`
+- [x] T004 Implement useSavedFilters hook with save/load/delete/overwrite operations `shared/components/src/FilterBar/useSavedFilters.ts`
+- [x] T005 [test] Write unit tests for useSavedFilters hook `shared/components/src/FilterBar/__tests__/useSavedFilters.test.ts`
 
 **Checkpoint**: Hook fully functional and tested — UI component implementation can begin
 
@@ -74,8 +74,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] Create SaveFilterButton component with name prompt popover `shared/components/src/FilterBar/SaveFilterButton.tsx`
-- [ ] T007 [US1] [test] Write unit tests for SaveFilterButton `shared/components/src/FilterBar/__tests__/SaveFilterButton.test.tsx`
+- [x] T006 [US1] Create SaveFilterButton component with name prompt popover `shared/components/src/FilterBar/SaveFilterButton.tsx`
+- [x] T007 [US1] [test] Write unit tests for SaveFilterButton `shared/components/src/FilterBar/__tests__/SaveFilterButton.test.tsx`
 
 **Checkpoint**: Save flow works — analyst can name and persist filter configurations
 
@@ -89,8 +89,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T008 [US2] Create HistoricFiltersDropdown component with restore and delete controls `shared/components/src/FilterBar/HistoricFiltersDropdown.tsx`
-- [ ] T009 [US2] [test] Write unit tests for HistoricFiltersDropdown `shared/components/src/FilterBar/__tests__/HistoricFiltersDropdown.test.tsx`
+- [x] T008 [US2] Create HistoricFiltersDropdown component with restore and delete controls `shared/components/src/FilterBar/HistoricFiltersDropdown.tsx`
+- [x] T009 [US2] [test] Write unit tests for HistoricFiltersDropdown `shared/components/src/FilterBar/__tests__/HistoricFiltersDropdown.test.tsx`
 
 **Checkpoint**: Restore flow works — analyst can browse saved configurations and apply them
 
@@ -106,7 +106,7 @@
 
 > Delete functionality is implemented within HistoricFiltersDropdown (Phase 4). This phase covers integration and the delete-specific edge cases.
 
-- [ ] T010 [US3] [test] Add delete-specific test cases (confirm removal, re-render after delete) `shared/components/src/FilterBar/__tests__/HistoricFiltersDropdown.test.tsx`
+- [x] T010 [US3] [test] Add delete-specific test cases (confirm removal, re-render after delete) `shared/components/src/FilterBar/__tests__/HistoricFiltersDropdown.test.tsx`
 
 **Checkpoint**: Delete flow tested — full CRUD lifecycle operational
 
@@ -120,7 +120,7 @@
 
 ### Implementation for User Story 4
 
-- [ ] T011 [US4] [test] Write persistence round-trip tests (save → serialise → deserialise → load) `shared/components/src/FilterBar/__tests__/savedFiltersStorage.test.ts`
+- [x] T011 [US4] [test] Write persistence round-trip tests (save → serialise → deserialise → load) `shared/components/src/FilterBar/__tests__/savedFiltersStorage.test.ts`
 
 **Checkpoint**: Persistence verified — saved filters survive session boundaries
 
@@ -130,10 +130,10 @@
 
 **Purpose**: Wire SaveFilterButton and HistoricFiltersDropdown into existing FilterBar; create Storybook stories
 
-- [ ] T012 Integrate SaveFilterButton and HistoricFiltersDropdown into FilterBar component `shared/components/src/FilterBar/FilterBar.tsx`
-- [ ] T013 [P] Update FilterBar index exports `shared/components/src/FilterBar/index.ts`
-- [ ] T014 Create Storybook stories (Empty, WithSaved, SaveFlow) `shared/components/src/FilterBar/SavedFilters.stories.tsx`
-- [ ] T015 Update existing FilterBar stories to include saved filters integration `shared/components/src/FilterBar/FilterBar.stories.tsx`
+- [x] T012 Integrate SaveFilterButton and HistoricFiltersDropdown into FilterBar component `shared/components/src/FilterBar/FilterBar.tsx`
+- [x] T013 [P] Update FilterBar index exports `shared/components/src/FilterBar/index.ts`
+- [x] T014 Create Storybook stories (Empty, WithSaved, SaveFlow) `shared/components/src/FilterBar/SavedFilters.stories.tsx`
+- [x] T015 Update existing FilterBar stories to include saved filters integration `shared/components/src/FilterBar/FilterBar.stories.tsx`
 
 **Checkpoint**: Components integrated and visible in Storybook
 
@@ -143,10 +143,10 @@
 
 > **⚠️ PLAYWRIGHT WORKS IN CLOUD SESSIONS** — Do NOT skip Playwright E2E tasks. The project uses `@sparticuz/chromium` (bundled Linux Chromium via npm). Run `node apps/web-shell/run-playwright.mjs` to extract and configure. Full details: `docs/project_notes/playwright-installation-research.md`
 
-- [ ] T016 Create Playwright E2E tests for SavedFilters stories `shared/components/e2e/SavedFilters.spec.ts`
-- [ ] T017 [P] Add theme variant tests (light, dark, vscode) `shared/components/e2e/SavedFilters.spec.ts`
-- [ ] T018 [P] Add interaction tests (save flow, restore, delete) `shared/components/e2e/SavedFilters.spec.ts`
-- [ ] T019 Run E2E suite: `pnpm --filter @debrief/components test:e2e SavedFilters`
+- [x] T016 Create Playwright E2E tests for SavedFilters stories `shared/components/e2e/SavedFilters.spec.ts`
+- [x] T017 [P] Add theme variant tests (light, dark, vscode) `shared/components/e2e/SavedFilters.spec.ts`
+- [x] T018 [P] Add interaction tests (save flow, restore, delete) `shared/components/e2e/SavedFilters.spec.ts`
+- [x] T019 Run E2E suite: `pnpm --filter @debrief/components test:e2e SavedFilters`
 
 **Checkpoint**: All E2E tests pass across theme variants
 
@@ -158,20 +158,20 @@
 
 ### Evidence Collection (REQUIRED)
 
-- [ ] T020 Capture test results using template (.specify/templates/evidence/test-summary-template.md) in `specs/128-saved-filter-configurations/evidence/test-summary.md`
-- [ ] T021 Create usage demonstration in `specs/128-saved-filter-configurations/evidence/usage-example.md`
-- [ ] T022 [P] Capture theme screenshots (light/dark/vscode) to `specs/128-saved-filter-configurations/evidence/screenshots/`
-- [ ] T023 Capture interaction GIF showing save → restore → delete flow to `specs/128-saved-filter-configurations/evidence/screenshots/interaction.gif`
+- [x] T020 Capture test results using template (.specify/templates/evidence/test-summary-template.md) in `specs/128-saved-filter-configurations/evidence/test-summary.md`
+- [x] T021 Create usage demonstration in `specs/128-saved-filter-configurations/evidence/usage-example.md`
+- [x] T022 [P] Capture theme screenshots (light/dark/vscode) to `specs/128-saved-filter-configurations/evidence/screenshots/`
+- [x] T023 Capture interaction GIF showing save → restore → delete flow to `specs/128-saved-filter-configurations/evidence/screenshots/interaction.gif`
 
 ### E2E Evidence Collection (REQUIRED) 🎭
 
-- [ ] T024 Run full E2E suite: `pnpm --filter @debrief/components test:e2e`
-- [ ] T025 Document E2E results in `specs/128-saved-filter-configurations/evidence/e2e-summary.md`
+- [x] T024 Run full E2E suite: `pnpm --filter @debrief/components test:e2e`
+- [x] T025 Document E2E results in `specs/128-saved-filter-configurations/evidence/e2e-summary.md`
 
 ### Media Content
 
-- [ ] T026 Create shipped blog post in `specs/128-saved-filter-configurations/media/shipped-post.md`
-- [ ] T027 [P] Create LinkedIn shipped summary in `specs/128-saved-filter-configurations/media/linkedin-shipped.md`
+- [x] T026 Create shipped blog post in `specs/128-saved-filter-configurations/media/shipped-post.md`
+- [x] T027 [P] Create LinkedIn shipped summary in `specs/128-saved-filter-configurations/media/linkedin-shipped.md`
 
 ### PR Creation
 

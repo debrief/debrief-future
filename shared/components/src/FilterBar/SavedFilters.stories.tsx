@@ -1,0 +1,227 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { useState, useCallback } from 'react';
+import { FilterBar } from './FilterBar';
+import { ThemeProvider } from '../ThemeProvider';
+import { InMemoryStorage } from './savedFiltersStorage';
+import type { StacBrowserItem, VesselTaxonomyNode } from '../filter-engine';
+import type { FilterBarState, SavedFiltersCollection } from './types';
+
+// --- Mock Data (reused from FilterBar.stories) ---
+
+function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBrowserItem {
+  return {
+    id,
+    title: `Exercise ${id}`,
+    itemPath: `/catalog/${id}/item.json`,
+    bbox: null,
+    datetime: null,
+    startDatetime: '2025-06-01T00:00:00Z',
+    endDatetime: '2025-06-01T12:00:00Z',
+    vesselClasses: [],
+    tags: [],
+    featureTags: [],
+    author: null,
+    trackNames: [],
+    nationalities: [],
+    collection: null,
+    modified: null,
+    ...overrides,
+  };
+}
+
+const MOCK_ITEMS: StacBrowserItem[] = [
+  makeItem('ex-001', {
+    title: 'CASEX Alpha',
+    nationalities: ['French'],
+    tags: ['convoy', 'blue-water'],
+    vesselClasses: ['surface/warship/frigate/type23'],
+    author: 'CDR Smith',
+    startDatetime: '2025-06-01T00:00:00Z',
+    endDatetime: '2025-06-01T04:00:00Z',
+  }),
+  makeItem('ex-002', {
+    title: 'CASEX Bravo',
+    nationalities: ['British'],
+    tags: ['asw', 'shallow-water'],
+    vesselClasses: ['surface/warship/destroyer/type45'],
+    author: 'CDR Jones',
+    startDatetime: '2025-06-01T00:00:00Z',
+    endDatetime: '2025-06-02T12:00:00Z',
+  }),
+  makeItem('ex-003', {
+    title: 'GROUPEX Charlie',
+    nationalities: ['French', 'British'],
+    tags: ['convoy', 'asw'],
+    vesselClasses: ['surface/warship/frigate/type23', 'surface/warship/destroyer/type45'],
+    author: 'CDR Smith',
+    startDatetime: '2025-06-01T00:00:00Z',
+    endDatetime: '2025-06-04T00:00:00Z',
+  }),
+];
+
+const MOCK_TAXONOMY: VesselTaxonomyNode[] = [
+  {
+    id: 'surface',
+    label: 'Surface',
+    children: [
+      {
+        id: 'warship',
+        label: 'Warship',
+        children: [
+          {
+            id: 'frigate',
+            label: 'Frigate',
+            children: [
+              { id: 'type23', label: 'Type 23' },
+              { id: 'type26', label: 'Type 26' },
+            ],
+          },
+          {
+            id: 'destroyer',
+            label: 'Destroyer',
+            children: [
+              { id: 'type45', label: 'Type 45' },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+];
+
+// --- Pre-populated saved filters ---
+
+const SAVED_COLLECTION: SavedFiltersCollection = {
+  version: 1,
+  configurations: [
+    {
+      id: 'saved-1',
+      name: 'French Exercises',
+      filterBarState: {
+        items: [
+          { kind: 'lozenge', id: 's1-l1', filterType: 'nationality', value: 'French' },
+        ],
+      },
+      cql2Json: { op: 'eq', args: [{ property: 'nationality' }, 'French'] },
+      createdAt: '2026-03-01T10:00:00.000Z',
+      updatedAt: '2026-03-01T10:00:00.000Z',
+    },
+    {
+      id: 'saved-2',
+      name: 'ASW Convoy',
+      filterBarState: {
+        items: [
+          { kind: 'lozenge', id: 's2-l1', filterType: 'tag', value: 'asw' },
+          { kind: 'lozenge', id: 's2-l2', filterType: 'tag', value: 'convoy' },
+        ],
+      },
+      cql2Json: { op: 'and', args: [] },
+      createdAt: '2026-02-15T08:00:00.000Z',
+      updatedAt: '2026-02-15T08:00:00.000Z',
+    },
+  ],
+};
+
+// --- Wrapper with saved filters storage ---
+
+function SavedFiltersWrapper({
+  items,
+  taxonomy,
+  initialFilterState,
+  initialSaved,
+}: {
+  items: StacBrowserItem[];
+  taxonomy: VesselTaxonomyNode[];
+  initialFilterState?: FilterBarState;
+  initialSaved?: SavedFiltersCollection;
+}) {
+  const [storage] = useState(() => new InMemoryStorage(initialSaved));
+  const [filteredCount, setFilteredCount] = useState(items.length);
+
+  const handleFiltered = useCallback((filtered: StacBrowserItem[]) => {
+    setFilteredCount(filtered.length);
+  }, []);
+
+  return (
+    <div>
+      <FilterBar
+        items={items}
+        taxonomy={taxonomy}
+        onFilteredItems={handleFiltered}
+        initialFilterState={initialFilterState}
+        savedFiltersStorage={storage}
+      />
+      <div style={{ padding: '8px 12px', fontSize: '12px', color: 'var(--vscode-descriptionForeground, #666)' }}>
+        Showing {filteredCount} of {items.length} exercises
+      </div>
+    </div>
+  );
+}
+
+// --- Storybook Meta ---
+
+const meta: Meta = {
+  title: 'FilterBar/Saved Filters',
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        component: 'Save, restore, and delete named filter configurations. Saved filters persist via platform-native storage.',
+      },
+    },
+  },
+  tags: ['autodocs'],
+  decorators: [
+    (Story) => (
+      <ThemeProvider>
+        <Story />
+      </ThemeProvider>
+    ),
+  ],
+};
+
+export default meta;
+type Story = StoryObj;
+
+// --- Stories ---
+
+export const Empty: Story = {
+  name: 'Empty (No Saved Filters)',
+  render: () => (
+    <SavedFiltersWrapper items={MOCK_ITEMS} taxonomy={MOCK_TAXONOMY} />
+  ),
+};
+
+export const WithSaved: Story = {
+  name: 'With Saved Filters',
+  render: () => (
+    <SavedFiltersWrapper
+      items={MOCK_ITEMS}
+      taxonomy={MOCK_TAXONOMY}
+      initialSaved={SAVED_COLLECTION}
+    />
+  ),
+};
+
+export const SaveFlow: Story = {
+  name: 'Save Flow',
+  render: () => (
+    <SavedFiltersWrapper
+      items={MOCK_ITEMS}
+      taxonomy={MOCK_TAXONOMY}
+      initialFilterState={{
+        items: [
+          { kind: 'lozenge', id: 'demo-1', filterType: 'nationality', value: 'French' },
+          { kind: 'lozenge', id: 'demo-2', filterType: 'tag', value: 'convoy' },
+        ],
+      }}
+    />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Filter bar pre-populated with active filters. Click Save to name and persist the current configuration.',
+      },
+    },
+  },
+};
