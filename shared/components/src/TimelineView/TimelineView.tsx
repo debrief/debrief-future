@@ -300,6 +300,13 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           className={isPanning.current ? 'timeline-view__svg--panning' : ''}
           style={{ cursor: isZoomed ? 'grab' : 'default' }}
         >
+          {/* Clip path for the chart area — bars/points must not overflow into labels or beyond right edge */}
+          <defs>
+            <clipPath id="chart-clip">
+              <rect x={CHART_LEFT} y={0} width={chartWidth} height={barsHeight} />
+            </clipPath>
+          </defs>
+
           {/* Row backgrounds */}
           {bars.map((bar) => (
             <rect
@@ -315,16 +322,13 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           {/* Item rows */}
           {bars.map((bar) => {
             const labelY = bar.y + ROW_HEIGHT / 2;
-            const barY = bar.y + 4;
-            const barHeight = ROW_HEIGHT - 8;
-            const fillColour = bar.colour ?? DEFAULT_BAR_COLOUR;
             const truncTitle = bar.item.title.length > MIN_BAR_LABEL_CHARS
               ? bar.item.title.slice(0, MIN_BAR_LABEL_CHARS - 1) + '\u2026'
               : bar.item.title;
 
             return (
               <g key={bar.item.id}>
-                {/* Label */}
+                {/* Label (outside clip — always visible) */}
                 <text
                   x={4}
                   y={labelY}
@@ -333,40 +337,22 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                 >
                   {truncTitle}
                 </text>
+              </g>
+            );
+          })}
 
-                {bar.hasTime && effectiveView ? (
-                  bar.isPoint ? (
-                    /* Point marker for single-datetime items */
-                    <circle
-                      cx={CHART_LEFT + bar.x}
-                      cy={labelY}
-                      r={POINT_RADIUS}
-                      fill={fillColour}
-                      className="timeline-view__point"
-                      data-testid={`timeline-point-${bar.item.id}`}
-                      onMouseEnter={(e) => handleMouseEnter(bar.item, e)}
-                      onMouseLeave={handleMouseLeave}
-                      onDoubleClick={() => handleItemDblClick(bar.item.itemPath)}
-                    />
-                  ) : (
-                    /* Bar for range items */
-                    <rect
-                      x={CHART_LEFT + bar.x}
-                      y={barY}
-                      width={bar.width}
-                      height={barHeight}
-                      rx={2}
-                      fill={fillColour}
-                      className="timeline-view__bar"
-                      data-testid={`timeline-bar-${bar.item.id}`}
-                      onMouseEnter={(e) => handleMouseEnter(bar.item, e)}
-                      onMouseLeave={handleMouseLeave}
-                      onDoubleClick={() => handleItemDblClick(bar.item.itemPath)}
-                    />
-                  )
-                ) : (
-                  /* No time data */
+          {/* Clipped chart content — bars and points constrained to chart area */}
+          <g clipPath="url(#chart-clip)">
+            {bars.map((bar) => {
+              const labelY = bar.y + ROW_HEIGHT / 2;
+              const barY = bar.y + 4;
+              const barHeight = ROW_HEIGHT - 8;
+              const fillColour = bar.colour ?? DEFAULT_BAR_COLOUR;
+
+              if (!bar.hasTime || !effectiveView) {
+                return (
                   <text
+                    key={bar.item.id}
                     x={CHART_LEFT}
                     y={labelY}
                     className="timeline-view__no-data"
@@ -374,10 +360,40 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                   >
                     no time data
                   </text>
-                )}
-              </g>
-            );
-          })}
+                );
+              }
+
+              return bar.isPoint ? (
+                <circle
+                  key={bar.item.id}
+                  cx={CHART_LEFT + bar.x}
+                  cy={labelY}
+                  r={POINT_RADIUS}
+                  fill={fillColour}
+                  className="timeline-view__point"
+                  data-testid={`timeline-point-${bar.item.id}`}
+                  onMouseEnter={(e) => handleMouseEnter(bar.item, e)}
+                  onMouseLeave={handleMouseLeave}
+                  onDoubleClick={() => handleItemDblClick(bar.item.itemPath)}
+                />
+              ) : (
+                <rect
+                  key={bar.item.id}
+                  x={CHART_LEFT + bar.x}
+                  y={barY}
+                  width={bar.width}
+                  height={barHeight}
+                  rx={2}
+                  fill={fillColour}
+                  className="timeline-view__bar"
+                  data-testid={`timeline-bar-${bar.item.id}`}
+                  onMouseEnter={(e) => handleMouseEnter(bar.item, e)}
+                  onMouseLeave={handleMouseLeave}
+                  onDoubleClick={() => handleItemDblClick(bar.item.itemPath)}
+                />
+              );
+            })}
+          </g>
 
           {/* Full-height zoom indicator lines at viewport edges when zoomed */}
           {isZoomed && effectiveView && fullRange && (
