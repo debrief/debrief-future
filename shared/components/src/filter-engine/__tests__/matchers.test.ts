@@ -79,32 +79,24 @@ describe("vessel-class matcher", () => {
   });
 });
 
-describe("plot-tag matcher", () => {
-  const match = getMatcher("plot-tag");
+describe("tag matcher (merged plot-tag + feature-tag)", () => {
+  const match = getMatcher("tag");
 
-  it("matches exact tag (case-insensitive)", () => {
+  it("matches plot tag (case-insensitive)", () => {
     expect(match(makeItem(), "asw", DESC_MAP)).toBe(true);
     expect(match(makeItem(), "ASW", DESC_MAP)).toBe(true);
+  });
+
+  it("matches feature tag (case-insensitive)", () => {
+    expect(match(makeItem(), "Sonar-Contact", DESC_MAP)).toBe(true);
   });
 
   it("does not match absent tag", () => {
     expect(match(makeItem(), "convoy", DESC_MAP)).toBe(false);
   });
 
-  it("returns false for empty tags", () => {
-    expect(match(makeItem({ tags: [] }), "ASW", DESC_MAP)).toBe(false);
-  });
-});
-
-describe("feature-tag matcher", () => {
-  const match = getMatcher("feature-tag");
-
-  it("matches case-insensitively", () => {
-    expect(match(makeItem(), "Sonar-Contact", DESC_MAP)).toBe(true);
-  });
-
-  it("does not match absent tag", () => {
-    expect(match(makeItem(), "torpedo", DESC_MAP)).toBe(false);
+  it("returns false for empty tags and featureTags", () => {
+    expect(match(makeItem({ tags: [], featureTags: [] }), "ASW", DESC_MAP)).toBe(false);
   });
 });
 

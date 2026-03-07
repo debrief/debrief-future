@@ -7,8 +7,7 @@ import type { FilterType } from '../../filter-engine';
 
 const emptyValues: Record<FilterType, readonly string[]> = {
   'vessel-class': [],
-  'plot-tag': [],
-  'feature-tag': [],
+  'tag': [],
   'author': [],
   'duration': [],
   'title': [],

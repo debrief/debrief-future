@@ -34,8 +34,7 @@ export type DistinctValuesMap = Readonly<Record<FilterType, readonly string[]>>;
 export function computeDistinctValues(items: readonly StacBrowserItem[]): DistinctValuesMap {
   return {
     'vessel-class': flatDistinct(items, (i) => i.vesselClasses),
-    'plot-tag': flatDistinct(items, (i) => i.tags),
-    'feature-tag': flatDistinct(items, (i) => i.featureTags),
+    'tag': flatDistinct(items, (i) => [...i.tags, ...i.featureTags]),
     'author': distinctSorted(items.map((i) => i.author)),
     'duration': [], // Duration uses fixed buckets, not distinct values
     'title': [], // Title uses free-text input

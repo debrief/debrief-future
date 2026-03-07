@@ -26,7 +26,7 @@ describe('computeDistinctValues', () => {
   it('returns empty arrays for empty items', () => {
     const result = computeDistinctValues([]);
     expect(result['nationality']).toEqual([]);
-    expect(result['plot-tag']).toEqual([]);
+    expect(result['tag']).toEqual([]);
     expect(result['author']).toEqual([]);
   });
 
@@ -58,13 +58,13 @@ describe('computeDistinctValues', () => {
     expect(result['author']).toEqual(['Alice', 'Bob']);
   });
 
-  it('extracts flat array values from nested arrays (tags)', () => {
+  it('merges tags and featureTags into tag', () => {
     const items = [
-      makeItem('1', { tags: ['alpha', 'beta'] }),
-      makeItem('2', { tags: ['beta', 'gamma'] }),
+      makeItem('1', { tags: ['alpha', 'beta'], featureTags: ['delta'] }),
+      makeItem('2', { tags: ['beta', 'gamma'], featureTags: ['alpha'] }),
     ];
     const result = computeDistinctValues(items);
-    expect(result['plot-tag']).toEqual(['alpha', 'beta', 'gamma']);
+    expect(result['tag']).toEqual(['alpha', 'beta', 'delta', 'gamma']);
   });
 
   it('extracts vessel classes', () => {
@@ -106,12 +106,12 @@ describe('computeDistinctValues', () => {
     expect(result['track-name']).toEqual(['HMS Bar', 'HMS Baz', 'HMS Foo']);
   });
 
-  it('extracts feature tags', () => {
+  it('includes featureTags in tag values', () => {
     const items = [
       makeItem('1', { featureTags: ['tag-a', 'tag-b'] }),
       makeItem('2', { featureTags: ['tag-b', 'tag-c'] }),
     ];
     const result = computeDistinctValues(items);
-    expect(result['feature-tag']).toEqual(['tag-a', 'tag-b', 'tag-c']);
+    expect(result['tag']).toEqual(['tag-a', 'tag-b', 'tag-c']);
   });
 });

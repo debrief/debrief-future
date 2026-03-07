@@ -173,7 +173,7 @@ const SINGLE_FILTER_STATE: FilterBarState = {
 const MULTIPLE_AND_STATE: FilterBarState = {
   items: [
     { kind: 'lozenge', id: 'story-1', filterType: 'nationality', value: 'French' },
-    { kind: 'lozenge', id: 'story-2', filterType: 'plot-tag', value: 'asw' },
+    { kind: 'lozenge', id: 'story-2', filterType: 'tag', value: 'asw' },
   ],
 };
 
@@ -187,14 +187,14 @@ const OR_GROUP_STATE: FilterBarState = {
         { kind: 'lozenge', id: 'story-or-c2', filterType: 'nationality', value: 'British' },
       ],
     },
-    { kind: 'lozenge', id: 'story-3', filterType: 'plot-tag', value: 'convoy' },
+    { kind: 'lozenge', id: 'story-3', filterType: 'tag', value: 'convoy' },
   ],
 };
 
 const ALL_TYPES_STATE: FilterBarState = {
   items: [
     { kind: 'lozenge', id: 'story-t1', filterType: 'vessel-class', value: 'surface/warship/frigate/type23' },
-    { kind: 'lozenge', id: 'story-t2', filterType: 'plot-tag', value: 'asw' },
+    { kind: 'lozenge', id: 'story-t2', filterType: 'tag', value: 'asw' },
     { kind: 'lozenge', id: 'story-t3', filterType: 'author', value: 'CDR Smith' },
     { kind: 'lozenge', id: 'story-t4', filterType: 'nationality', value: 'French' },
     { kind: 'lozenge', id: 'story-t5', filterType: 'duration', value: '<24H' },

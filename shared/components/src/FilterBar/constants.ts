@@ -10,8 +10,7 @@ import type { DurationBucket } from '../filter-engine';
 /** All 10 filter types with labels and input methods */
 export const FILTER_TYPE_OPTIONS: readonly FilterTypeOption[] = [
   { type: 'vessel-class', label: 'Vessel Class', inputMethod: 'hierarchical' },
-  { type: 'plot-tag', label: 'Plot Tag', inputMethod: 'flat-dropdown' },
-  { type: 'feature-tag', label: 'Feature Tag', inputMethod: 'flat-dropdown' },
+  { type: 'tag', label: 'Tag', inputMethod: 'flat-dropdown' },
   { type: 'author', label: 'Author', inputMethod: 'flat-dropdown' },
   { type: 'duration', label: 'Duration', inputMethod: 'bucket' },
   { type: 'title', label: 'Title', inputMethod: 'free-text' },

@@ -9,8 +9,7 @@ import type { FilterExpression, FilterType, Predicate } from "./types";
 /** CQL2 property name mapping for each filter type */
 const PROPERTY_MAP: Record<FilterType, string> = {
   "vessel-class": "debrief:vessel_classes",
-  "plot-tag": "debrief:tags",
-  "feature-tag": "debrief:feature_tags",
+  tag: "debrief:tags",
   author: "debrief:author",
   duration: "duration",
   title: "title",
@@ -23,8 +22,7 @@ const PROPERTY_MAP: Record<FilterType, string> = {
 /** Array-valued filter types that use a_containedBy operator */
 const ARRAY_TYPES: ReadonlySet<FilterType> = new Set([
   "vessel-class",
-  "plot-tag",
-  "feature-tag",
+  "tag",
   "track-name",
   "nationality",
 ]);

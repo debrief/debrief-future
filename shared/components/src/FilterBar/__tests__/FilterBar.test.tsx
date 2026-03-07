@@ -84,12 +84,12 @@ describe('FilterBar', () => {
       expect(screen.getByTestId('filter-type-dropdown')).toBeInTheDocument();
     });
 
-    it('shows all 10 filter types in dropdown', () => {
+    it('shows all filter types in dropdown', () => {
       renderFilterBar();
       fireEvent.click(screen.getByTestId('filter-add-button'));
       expect(screen.getByTestId('filter-type-nationality')).toBeInTheDocument();
       expect(screen.getByTestId('filter-type-vessel-class')).toBeInTheDocument();
-      expect(screen.getByTestId('filter-type-plot-tag')).toBeInTheDocument();
+      expect(screen.getByTestId('filter-type-tag')).toBeInTheDocument();
       expect(screen.getByTestId('filter-type-duration')).toBeInTheDocument();
       expect(screen.getByTestId('filter-type-title')).toBeInTheDocument();
       expect(screen.getByTestId('filter-type-plot-contents')).toBeInTheDocument();

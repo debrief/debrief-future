@@ -92,8 +92,8 @@ function matchPlotContents(item: StacBrowserItem, value: string): boolean {
 /** Registry of matchers by filter type */
 const MATCHERS: Record<FilterType, MatcherFn> = {
   "vessel-class": matchVesselClass,
-  "plot-tag": (item, value) => arrayContainsCaseInsensitive(item.tags, value),
-  "feature-tag": (item, value) =>
+  tag: (item, value) =>
+    arrayContainsCaseInsensitive(item.tags, value) ||
     arrayContainsCaseInsensitive(item.featureTags, value),
   author: (item, value) => matchAuthor(item, value),
   duration: (item, value) => matchDuration(item, value),

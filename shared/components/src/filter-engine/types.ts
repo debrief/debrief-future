@@ -10,8 +10,7 @@ import type { CatalogOverviewItem } from "../CatalogOverview/types";
 /** All supported metadata filter types from SRD Section 4.4 */
 export type FilterType =
   | "vessel-class"
-  | "plot-tag"
-  | "feature-tag"
+  | "tag"
   | "author"
   | "duration"
   | "title"

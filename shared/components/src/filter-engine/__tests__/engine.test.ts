@@ -153,7 +153,7 @@ describe("OR logic", () => {
 
   it("AND'd top-level predicates with OR group", () => {
     const expr: FilterExpression = {
-      predicates: [{ type: "plot-tag", value: "ASW" }],
+      predicates: [{ type: "tag", value: "ASW" }],
       orGroups: [
         {
           predicates: [
@@ -174,7 +174,7 @@ describe("OR logic", () => {
       predicates: [{ type: "nationality", value: "GB" }],
       orGroups: [
         {
-          predicates: [{ type: "plot-tag", value: "ASW" }],
+          predicates: [{ type: "tag", value: "ASW" }],
         },
       ],
     };
