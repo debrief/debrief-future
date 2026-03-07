@@ -2,10 +2,11 @@
  * Storybook stories for CatalogOverview component.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { CatalogOverview } from './CatalogOverview';
 import type { CatalogOverviewItem } from './types';
+import type { Bounds } from '../utils/types';
 
 const meta: Meta<typeof CatalogOverview> = {
   title: 'Components/CatalogOverview',
@@ -279,6 +280,91 @@ export const DarkTheme: Story = {
     <CatalogOverview
       items={FIXTURE_ITEMS}
       onItemSelect={handleSelect}
+    />
+  ),
+};
+
+// ============================================================================
+// Spatial filtering stories (Feature: 130-map-spatial-filtering)
+// ============================================================================
+
+/** Exercises spread across regions — pan/zoom to see timeline filter dynamically */
+const SPATIAL_FILTER_ITEMS: CatalogOverviewItem[] = [
+  {
+    id: 'north-atlantic',
+    title: 'North Atlantic Patrol',
+    itemPath: 'exercises/north-atlantic/item.json',
+    bbox: [-40, 45, -20, 55],
+    datetime: '2024-01-15T00:00:00Z',
+    startDatetime: '2024-01-15T00:00:00Z',
+    endDatetime: '2024-01-25T00:00:00Z',
+  },
+  {
+    id: 'english-channel',
+    title: 'English Channel Exercise',
+    itemPath: 'exercises/english-channel/item.json',
+    bbox: [-5, 49, 2, 52],
+    datetime: '2024-02-01T00:00:00Z',
+    startDatetime: '2024-02-01T00:00:00Z',
+    endDatetime: '2024-02-10T00:00:00Z',
+  },
+  {
+    id: 'mediterranean',
+    title: 'Mediterranean Op',
+    itemPath: 'exercises/mediterranean/item.json',
+    bbox: [5, 35, 20, 42],
+    datetime: '2024-03-01T00:00:00Z',
+    startDatetime: '2024-03-01T00:00:00Z',
+    endDatetime: '2024-03-15T00:00:00Z',
+  },
+  {
+    id: 'north-sea',
+    title: 'North Sea Patrol',
+    itemPath: 'exercises/north-sea/item.json',
+    bbox: [0, 52, 8, 58],
+    datetime: '2024-04-01T00:00:00Z',
+    startDatetime: '2024-04-01T00:00:00Z',
+    endDatetime: '2024-04-12T00:00:00Z',
+  },
+  {
+    id: 'no-location',
+    title: 'Shore-Based Training',
+    itemPath: 'exercises/shore/item.json',
+    bbox: null,
+    datetime: '2024-05-01T00:00:00Z',
+    startDatetime: '2024-05-01T00:00:00Z',
+    endDatetime: '2024-05-03T00:00:00Z',
+  },
+];
+
+export const SpatialFilter: Story = {
+  render: () => {
+    const handleViewportChange = useCallback((bounds: Bounds | null) => {
+      console.log('Viewport changed:', bounds);
+    }, []);
+    return (
+      <CatalogOverview
+        items={SPATIAL_FILTER_ITEMS}
+        onItemSelect={handleSelect}
+        onViewportChange={handleViewportChange}
+      />
+    );
+  },
+};
+
+/** Exercises with distinct colours via colorMap */
+const COLOUR_MAP = new Map<string, string>([
+  ['exercise-alpha', '#e74c3c'],
+  ['exercise-bravo', '#2ecc71'],
+  ['patrol-charlie', '#3498db'],
+]);
+
+export const ColourScheme: Story = {
+  render: () => (
+    <CatalogOverview
+      items={FIXTURE_ITEMS}
+      onItemSelect={handleSelect}
+      colorMap={COLOUR_MAP}
     />
   ),
 };
