@@ -105,52 +105,14 @@ function ViewportTracker({
 }
 
 // ============================================================================
-// Timeline helpers
+// Timeline helpers (extracted to utils/timeline-helpers.ts for shared use)
 // ============================================================================
 
-function parseTime(s: string | null): number | null {
-  if (!s) return null;
-  const t = new Date(s).getTime();
-  return isNaN(t) ? null : t;
-}
-
-interface TimeRange {
-  min: number;
-  max: number;
-}
-
-function computeTimeRange(items: CatalogOverviewItem[]): TimeRange | null {
-  let min = Infinity, max = -Infinity;
-  for (const item of items) {
-    const start = parseTime(item.startDatetime) ?? parseTime(item.datetime);
-    const end = parseTime(item.endDatetime) ?? parseTime(item.datetime);
-    if (start !== null) min = Math.min(min, start);
-    if (end !== null) max = Math.max(max, end);
-  }
-  if (min === Infinity) return null;
-  // Ensure range is non-zero
-  if (min === max) {
-    min -= 3600000; // 1 hour
-    max += 3600000;
-  }
-  return { min, max };
-}
+import { parseTime, computeTimeRange, formatDateRange } from '../utils/timeline-helpers';
 
 function formatDate(epoch: number): string {
   const d = new Date(epoch);
   return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-function formatDateRange(start: string | null, end: string | null, datetime: string | null): string {
-  const s = start ?? datetime;
-  const e = end ?? datetime;
-  if (s && e && s !== e) {
-    return `${new Date(s).toLocaleDateString()} – ${new Date(e).toLocaleDateString()}`;
-  }
-  if (s) {
-    return new Date(s).toLocaleDateString();
-  }
-  return 'No time data';
 }
 
 // ============================================================================
