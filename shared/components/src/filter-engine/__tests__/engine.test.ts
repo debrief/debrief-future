@@ -48,6 +48,7 @@ function makeItem(
     trackNames: [],
     nationalities: [],
     collection: null,
+    modified: null,
     ...overrides,
   };
 }

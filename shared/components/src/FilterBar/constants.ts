@@ -5,7 +5,7 @@
  */
 
 import type { FilterTypeOption } from './types';
-import type { DurationBucket } from '../filter-engine';
+import type { DurationBucket, ModifiedBucket } from '../filter-engine';
 
 /** All 10 filter types with labels and input methods */
 export const FILTER_TYPE_OPTIONS: readonly FilterTypeOption[] = [
@@ -13,6 +13,7 @@ export const FILTER_TYPE_OPTIONS: readonly FilterTypeOption[] = [
   { type: 'tag', label: 'Tag', inputMethod: 'flat-dropdown' },
   { type: 'author', label: 'Author', inputMethod: 'flat-dropdown' },
   { type: 'duration', label: 'Duration', inputMethod: 'bucket' },
+  { type: 'modified', label: 'Modified', inputMethod: 'bucket' },
   { type: 'title', label: 'Title', inputMethod: 'free-text' },
   { type: 'plot-contents', label: 'Plot Contents', inputMethod: 'free-text' },
   { type: 'track-name', label: 'Track Name', inputMethod: 'flat-dropdown' },
@@ -36,6 +37,24 @@ export const DURATION_BUCKET_LABELS: Record<DurationBucket, string> = {
   '<72H': 'Under 72 hours',
   '<10D': 'Under 10 days',
   '>10D': 'Over 10 days',
+};
+
+/** Modified-recency bucket options */
+export const MODIFIED_BUCKETS: readonly ModifiedBucket[] = [
+  '<6H',
+  '<24H',
+  '<7D',
+  '<1M',
+  '>1M',
+] as const;
+
+/** Modified-recency bucket display labels */
+export const MODIFIED_BUCKET_LABELS: Record<ModifiedBucket, string> = {
+  '<6H': 'Last 6 hours',
+  '<24H': 'Last 24 hours',
+  '<7D': 'Last 7 days',
+  '<1M': 'Last month',
+  '>1M': 'Over a month ago',
 };
 
 /** Empty state hint text */

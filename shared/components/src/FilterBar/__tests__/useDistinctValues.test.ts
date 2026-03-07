@@ -18,6 +18,7 @@ function makeItem(id: string, overrides: Partial<StacBrowserItem> = {}): StacBro
     trackNames: [],
     nationalities: [],
     collection: null,
+    modified: null,
     ...overrides,
   };
 }

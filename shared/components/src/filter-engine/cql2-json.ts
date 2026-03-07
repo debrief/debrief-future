@@ -12,6 +12,7 @@ const PROPERTY_MAP: Record<FilterType, string> = {
   tag: "debrief:tags",
   author: "debrief:author",
   duration: "duration",
+  modified: "updated",
   title: "title",
   "plot-contents": "debrief:plot_contents",
   "track-name": "debrief:track_names",

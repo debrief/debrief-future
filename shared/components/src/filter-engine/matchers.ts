@@ -5,7 +5,7 @@
  * returning true if the item matches the predicate.
  */
 
-import type { DurationBucket, FilterType, StacBrowserItem } from "./types";
+import type { DurationBucket, ModifiedBucket, FilterType, StacBrowserItem } from "./types";
 import type { DescendantMap } from "./taxonomy";
 
 /** Duration bucket thresholds in milliseconds */
@@ -59,6 +59,26 @@ function matchDuration(item: StacBrowserItem, value: string): boolean {
   return bucket.op === "lt" ? duration < bucket.ms : duration >= bucket.ms;
 }
 
+/** Modified-recency bucket thresholds in milliseconds */
+const MODIFIED_THRESHOLDS: Record<ModifiedBucket, { op: "lt" | "gte"; ms: number }> = {
+  "<6H": { op: "lt", ms: 6 * 60 * 60 * 1000 },
+  "<24H": { op: "lt", ms: 24 * 60 * 60 * 1000 },
+  "<7D": { op: "lt", ms: 7 * 24 * 60 * 60 * 1000 },
+  "<1M": { op: "lt", ms: 30 * 24 * 60 * 60 * 1000 },
+  ">1M": { op: "gte", ms: 30 * 24 * 60 * 60 * 1000 },
+};
+
+/** Match modified date against a recency bucket (time since modified) */
+function matchModified(item: StacBrowserItem, value: string): boolean {
+  if (!item.modified) return false;
+  const bucket = MODIFIED_THRESHOLDS[value as ModifiedBucket];
+  if (!bucket) return false;
+  const modifiedTime = new Date(item.modified).getTime();
+  if (isNaN(modifiedTime)) return false;
+  const age = Date.now() - modifiedTime;
+  return bucket.op === "lt" ? age < bucket.ms : age >= bucket.ms;
+}
+
 /** Match title with case-insensitive substring */
 function matchTitle(item: StacBrowserItem, value: string): boolean {
   if (!item.title) return false;
@@ -97,6 +117,7 @@ const MATCHERS: Record<FilterType, MatcherFn> = {
     arrayContainsCaseInsensitive(item.featureTags, value),
   author: (item, value) => matchAuthor(item, value),
   duration: (item, value) => matchDuration(item, value),
+  modified: (item, value) => matchModified(item, value),
   title: (item, value) => matchTitle(item, value),
   "plot-contents": (item, value) => matchPlotContents(item, value),
   "track-name": (item, value) =>

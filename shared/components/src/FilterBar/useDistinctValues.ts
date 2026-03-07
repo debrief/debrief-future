@@ -37,6 +37,7 @@ export function computeDistinctValues(items: readonly StacBrowserItem[]): Distin
     'tag': flatDistinct(items, (i) => [...i.tags, ...i.featureTags]),
     'author': distinctSorted(items.map((i) => i.author)),
     'duration': [], // Duration uses fixed buckets, not distinct values
+    'modified': [], // Modified uses fixed recency buckets
     'title': [], // Title uses free-text input
     'plot-contents': [], // Plot contents uses free-text input
     'track-name': flatDistinct(items, (i) => i.trackNames),

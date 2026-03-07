@@ -12,7 +12,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { FilterType, VesselTaxonomyNode } from '../filter-engine';
 import { CascadingMenu } from '../CascadingMenu';
 import { taxonomyToCascadingItems } from './taxonomyAdapter';
-import { FILTER_TYPE_OPTIONS, DURATION_BUCKETS, DURATION_BUCKET_LABELS } from './constants';
+import { FILTER_TYPE_OPTIONS, DURATION_BUCKETS, DURATION_BUCKET_LABELS, MODIFIED_BUCKETS, MODIFIED_BUCKET_LABELS } from './constants';
 
 export interface ValueEditorProps {
   readonly filterType: FilterType;
@@ -67,21 +67,24 @@ export const ValueEditor: React.FC<ValueEditorProps> = ({
         </div>
       );
 
-    case 'bucket':
+    case 'bucket': {
+      const buckets = filterType === 'modified' ? MODIFIED_BUCKETS : DURATION_BUCKETS;
+      const labels = filterType === 'modified' ? MODIFIED_BUCKET_LABELS : DURATION_BUCKET_LABELS;
       return (
         <div ref={containerRef} className="debrief-value-editor__dropdown" data-testid="value-editor-bucket">
-          {DURATION_BUCKETS.map((bucket) => (
+          {buckets.map((bucket) => (
             <button
               key={bucket}
               className={`debrief-value-editor__option ${bucket === value ? 'debrief-value-editor__option--selected' : ''}`}
               data-testid={`value-option-${bucket}`}
               onClick={() => onSelect(bucket)}
             >
-              {DURATION_BUCKET_LABELS[bucket]}
+              {labels[bucket as keyof typeof labels]}
             </button>
           ))}
         </div>
       );
+    }
 
     case 'free-text':
       return <FreeTextInput value={value} onSelect={onSelect} onClose={onClose} />;

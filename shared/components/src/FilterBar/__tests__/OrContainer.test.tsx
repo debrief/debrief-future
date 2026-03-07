@@ -10,6 +10,7 @@ const emptyValues: Record<FilterType, readonly string[]> = {
   'tag': [],
   'author': [],
   'duration': [],
+  'modified': [],
   'title': [],
   'plot-contents': [],
   'track-name': [],

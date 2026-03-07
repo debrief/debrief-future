@@ -13,6 +13,7 @@ export type FilterType =
   | "tag"
   | "author"
   | "duration"
+  | "modified"
   | "title"
   | "plot-contents"
   | "track-name"
@@ -21,6 +22,9 @@ export type FilterType =
 
 /** Valid duration bucket values */
 export type DurationBucket = "<6H" | "<24H" | "<72H" | "<10D" | ">10D";
+
+/** Valid modified-recency bucket values */
+export type ModifiedBucket = "<6H" | "<24H" | "<7D" | "<1M" | ">1M";
 
 /** A single filter condition */
 export interface Predicate {
@@ -51,6 +55,8 @@ export interface StacBrowserItem extends CatalogOverviewItem {
   readonly trackNames: readonly string[];
   readonly nationalities: readonly string[];
   readonly collection: string | null;
+  /** ISO 8601 datetime when the item was last modified */
+  readonly modified: string | null;
 }
 
 /** A node in the hierarchical vessel classification tree */
