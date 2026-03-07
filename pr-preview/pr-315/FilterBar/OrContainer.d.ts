@@ -15,6 +15,7 @@ export interface OrContainerProps {
     readonly onRemoveLozenge: (id: string) => void;
     readonly onValueChange: (id: string, newValue: string) => void;
     readonly onEditClose: () => void;
+    readonly onToggleNegate: (id: string) => void;
     readonly availableValues: Readonly<Record<FilterType, readonly string[]>>;
     readonly taxonomy: readonly VesselTaxonomyNode[];
 }

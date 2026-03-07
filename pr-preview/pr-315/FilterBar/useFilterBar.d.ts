@@ -13,6 +13,7 @@ export interface UseFilterBarReturn {
     readonly addOrContainer: () => void;
     readonly removeOrContainer: (id: string) => void;
     readonly addChildLozenge: (containerId: string, filterType: FilterType, value: string) => void;
+    readonly toggleNegate: (id: string) => void;
     readonly moveToContainer: (lozengeId: string, containerId: string) => void;
     readonly moveToTopLevel: (lozengeId: string, fromContainerId: string) => void;
 }
