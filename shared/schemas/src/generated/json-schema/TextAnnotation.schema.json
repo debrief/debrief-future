@@ -56,13 +56,13 @@
       "description": "GeoJSON Point geometry",
       "properties": {
         "coordinates": {
-          "description": "[longitude, latitude] in degrees",
+          "type": "array",
           "items": {
             "type": "number"
           },
-          "maxItems": 2,
           "minItems": 2,
-          "type": "array"
+          "maxItems": 2,
+          "description": "[longitude, latitude] in degrees"
         },
         "type": {
           "const": "Point",

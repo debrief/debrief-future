@@ -91,6 +91,12 @@ def create_plot(
     # Update catalog links
     item_href = f"./{plot_id}/item.json"
     _add_item_link(catalog_data, plot_id, item_href)
+
+    # Update Collection summaries (promotes Catalog→Collection if needed)
+    from debrief_stac.collection import update_collection_summaries
+
+    update_collection_summaries(catalog_data, item_data, "add", catalog_path=catalog_path)
+
     _save_catalog(catalog_path, catalog_data)
 
     return plot_id

@@ -34,6 +34,7 @@ TOOL_NAMES = [
     "add_features",
     "add_asset",
     "list_plots",
+    "read_collection_summaries",
 ]
 
 # Create FastMCP server
@@ -313,6 +314,58 @@ def list_plots_tool(catalog_path: str) -> dict[str, Any]:
         Dictionary with list of plot summaries sorted by datetime (newest first)
     """
     return mcp_list_plots(catalog_path)
+
+
+def mcp_read_collection_summaries(catalog_path: str) -> dict[str, Any]:
+    """Read Collection summaries without loading individual items.
+
+    Args:
+        catalog_path: Path to the catalog directory
+
+    Returns:
+        Dictionary with 'extent' and 'summaries' on success, 'error' on failure.
+        Returns null extent/summaries if catalog hasn't been promoted.
+    """
+    try:
+        from debrief_stac.collection import read_collection_summaries
+
+        result = read_collection_summaries(catalog_path)
+        if result is None:
+            return {
+                "extent": None,
+                "summaries": None,
+                "promoted": False,
+            }
+        extent, summaries = result
+        return {
+            "extent": {
+                "spatial": {
+                    "bbox": [list(extent.bbox)] if extent.bbox else [[-180, -90, 180, 90]],
+                },
+                "temporal": {
+                    "interval": [[extent.temporal_start, extent.temporal_end]],
+                },
+            },
+            "summaries": summaries.model_dump(),
+            "promoted": True,
+        }
+    except CatalogNotFoundError as e:
+        return {"error": f"Catalog not found at {e.path}"}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@mcp.tool()
+def read_collection_summaries_tool(catalog_path: str) -> dict[str, Any]:
+    """Read Collection summaries (extent + property enumerations) without loading items.
+
+    Args:
+        catalog_path: Path to the catalog directory
+
+    Returns:
+        Dictionary with extent, summaries, and promoted flag on success
+    """
+    return mcp_read_collection_summaries(catalog_path)
 
 
 def main() -> None:
