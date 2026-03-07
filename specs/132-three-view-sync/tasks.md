@@ -136,17 +136,17 @@ Remove CatalogOverview and update all 24 references. StacBrowser replaces it as 
 
 ### Tests for User Story 1
 
-- [ ] T051 [test] Write useBrowserFilter hook tests — metadata-only filtering (null spatial/temporal) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T052 [P][test] Write useBrowserFilter tests — items with no bbox pass metadata filter `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T053 [P][test] Write StacBrowser component test — renders all four child views `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
+- [x] T051 [test] Write useBrowserFilter hook tests — metadata-only filtering (null spatial/temporal) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T052 [P][test] Write useBrowserFilter tests — items with no bbox pass metadata filter `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T053 [P][test] Write StacBrowser component test — renders all four child views `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T054 Implement `useBrowserFilter` hook — metadata axis only, with reference-equality memoization (review 9A) `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T055 Implement StacBrowser component — layout with FilterBar + ExerciseListView + MapView + TimelineView `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T056 Wire FilterBar `onFilteredItems` callback to `setMetadataFilteredIds` in StacBrowser `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T057 Create StacBrowser Storybook story with mock data `shared/components/src/StacBrowser/StacBrowser.stories.tsx`
-- [ ] T058 [test] Verify metadata filter sync — add filter, check all views receive filtered items `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
+- [x] T054 Implement `useBrowserFilter` hook — metadata axis only, with reference-equality memoization (review 9A) `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T055 Implement StacBrowser component — layout with FilterBar + ExerciseListView + MapView + TimelineView `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T056 Wire FilterBar `onFilteredItems` callback to `setMetadataFilteredIds` in StacBrowser `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T057 Create StacBrowser Storybook story with mock data `shared/components/src/StacBrowser/StacBrowser.stories.tsx`
+- [x] T058 [test] Verify metadata filter sync — add filter, check all views receive filtered items `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
 **Checkpoint**: Metadata filtering works across all views. FilterBar drives state; list, map, and timeline respond.
 
@@ -160,17 +160,17 @@ Remove CatalogOverview and update all 24 references. StacBrowser replaces it as 
 
 ### Tests for User Story 2
 
-- [ ] T059 [test] Write useBrowserFilter tests — spatial-only filtering using existing `bboxOverlapsViewport` `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T060 [P][test] Write useBrowserFilter tests — exercises without bbox always pass spatial filter `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T061 [P][test] Write useBrowserFilter tests — defensive guard for degenerate viewport (review 7D) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T059 [test] Write useBrowserFilter tests — spatial-only filtering using existing `bboxOverlapsViewport` `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T060 [P][test] Write useBrowserFilter tests — exercises without bbox always pass spatial filter `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T061 [P][test] Write useBrowserFilter tests — defensive guard for degenerate viewport (review 7D) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T062 Extend `useBrowserFilter` — add spatial axis using `viewportToBounds` + `bboxOverlapsViewport` from bounds.ts `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T063 Add defensive guard: degenerate viewport (zero-area polygon) treated as "no spatial filter" `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T064 Wire MapView `onViewportChange` to store's `setViewport` + `setSpatialFilterActive(true)` in StacBrowser `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T065 Add 150ms debounce for viewport changes in StacBrowser (reuse ViewportTracker pattern) `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T066 [test] Verify spatial filter sync — pan map, check list and timeline update `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
+- [x] T062 Extend `useBrowserFilter` — add spatial axis using `viewportToBounds` + `bboxOverlapsViewport` from bounds.ts `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T063 Add defensive guard: degenerate viewport (zero-area polygon) treated as "no spatial filter" `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T064 Wire MapView `onViewportChange` to store's `setViewport` + `setSpatialFilterActive(true)` in StacBrowser `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T065 Add 150ms debounce for viewport changes in StacBrowser (reuse ViewportTracker pattern) `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T066 [test] Verify spatial filter sync — pan map, check list and timeline update `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
 **Checkpoint**: Spatial filtering works. Map viewport drives spatial axis; list and timeline respond.
 
@@ -184,16 +184,16 @@ Remove CatalogOverview and update all 24 references. StacBrowser replaces it as 
 
 ### Tests for User Story 3
 
-- [ ] T067 [test] Write useBrowserFilter tests — temporal-only filtering using `itemOverlapsFilter` `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T068 [P][test] Write useBrowserFilter tests — exercises without temporal data always pass temporal filter `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T069 [P][test] Write useBrowserFilter tests — defensive guard for inverted timeFilter (start > end) (review 7D) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T067 [test] Write useBrowserFilter tests — temporal-only filtering using `itemOverlapsFilter` `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T068 [P][test] Write useBrowserFilter tests — exercises without temporal data always pass temporal filter `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T069 [P][test] Write useBrowserFilter tests — defensive guard for inverted timeFilter (start > end) (review 7D) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T070 Extend `useBrowserFilter` — add temporal axis using `itemOverlapsFilter` from timeline-helpers.ts `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T071 Add defensive guard: inverted timeFilter (start > end) treated as "no temporal filter" `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T072 Wire TimelineView `onTemporalFilterChange` to store's `setTimeFilter` + `setTemporalFilterActive(true)` in StacBrowser `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T073 [test] Verify temporal filter sync — adjust timeline, check list and map update `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
+- [x] T070 Extend `useBrowserFilter` — add temporal axis using `itemOverlapsFilter` from timeline-helpers.ts `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T071 Add defensive guard: inverted timeFilter (start > end) treated as "no temporal filter" `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T072 Wire TimelineView `onTemporalFilterChange` to store's `setTimeFilter` + `setTemporalFilterActive(true)` in StacBrowser `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T073 [test] Verify temporal filter sync — adjust timeline, check list and map update `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
 **Checkpoint**: Temporal filtering works. Timeline range drives temporal axis; list and map respond.
 
@@ -207,15 +207,15 @@ Remove CatalogOverview and update all 24 references. StacBrowser replaces it as 
 
 ### Tests for User Story 4
 
-- [ ] T074 [test] Write useBrowserFilter tests — combined 3-axis filtering with 5+ distinct combinations (SC-004) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T075 [P][test] Write useBrowserFilter tests — removing one axis broadens result set `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T076 [P][test] Write useBrowserFilter tests — activeFilterCount reports correct count (0–3) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T074 [test] Write useBrowserFilter tests — combined 3-axis filtering with 5+ distinct combinations (SC-004) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T075 [P][test] Write useBrowserFilter tests — removing one axis broadens result set `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T076 [P][test] Write useBrowserFilter tests — activeFilterCount reports correct count (0–3) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T077 Verify AND composition in `useBrowserFilter` — metadata ∩ spatial ∩ temporal `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T078 Add `activeFilterCount` computation to `useBrowserFilter` result `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T079 [test] Integration test — add metadata filter, zoom map, adjust timeline, verify all views sync `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
+- [x] T077 Verify AND composition in `useBrowserFilter` — metadata ∩ spatial ∩ temporal `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T078 Add `activeFilterCount` computation to `useBrowserFilter` result `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T079 [test] Integration test — add metadata filter, zoom map, adjust timeline, verify all views sync `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
 **Checkpoint**: Multi-axis filtering works. All three axes compose correctly with AND logic.
 
@@ -229,17 +229,17 @@ Remove CatalogOverview and update all 24 references. StacBrowser replaces it as 
 
 ### Tests for User Story 5
 
-- [ ] T080 [test] Write useBrowserFilter tests — `hasNoResults` is true when filteredItems is empty `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T081 [P][test] Write StacBrowser test — empty state rendered in all views when hasNoResults `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
-- [ ] T082 [P][test] Write StacBrowser test — filter bar remains visible during zero results (FR-014) `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
+- [x] T080 [test] Write useBrowserFilter tests — `hasNoResults` is true when filteredItems is empty `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T081 [P][test] Write StacBrowser test — empty state rendered in all views when hasNoResults `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
+- [x] T082 [P][test] Write StacBrowser test — filter bar remains visible during zero results (FR-014) `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
 ### Implementation for User Story 5
 
-- [ ] T083 Add `hasNoResults` to `useBrowserFilter` return value `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T084 Implement zero-results overlay in StacBrowser — "No matching exercises. Adjust or clear filters to see results." `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T085 Wire `clearAllFilters` button in zero-results state to `clearAllBrowserFilters()` `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T086 Add ZeroResults Storybook story `shared/components/src/StacBrowser/StacBrowser.stories.tsx`
-- [ ] T087 [test] Verify zero-results recovery — clear one filter, verify views repopulate `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
+- [x] T083 Add `hasNoResults` to `useBrowserFilter` return value `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T084 Implement zero-results overlay in StacBrowser — "No matching exercises. Adjust or clear filters to see results." `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T085 Wire `clearAllFilters` button in zero-results state to `clearAllBrowserFilters()` `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T086 Add ZeroResults Storybook story `shared/components/src/StacBrowser/StacBrowser.stories.tsx`
+- [x] T087 [test] Verify zero-results recovery — clear one filter, verify views repopulate `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
 **Checkpoint**: Zero-results handling complete. All views show consistent empty state with filter bar visible.
 

@@ -93,9 +93,9 @@ describe('SessionManager', () => {
       const state = session.getState();
 
       expect(state.timeRange).not.toBeNull();
-      // ISO format may or may not include milliseconds
-      expect(state.timeRange?.start.iso).toMatch(/^2024-01-15T10:00:00/);
-      expect(state.timeRange?.end.iso).toMatch(/^2024-01-15T12:00:00/);
+      // TimeFilter uses epoch numbers after #132 refactor
+      expect(state.timeRange?.start).toBe(new Date('2024-01-15T10:00:00Z').getTime());
+      expect(state.timeRange?.end).toBe(new Date('2024-01-15T12:00:00Z').getTime());
     });
 
     it('should set current time to start of range', () => {
@@ -106,8 +106,8 @@ describe('SessionManager', () => {
       const state = session.getState();
 
       expect(state.currentTime).not.toBeNull();
-      // ISO format may or may not include milliseconds
-      expect(state.currentTime?.iso).toMatch(/^2024-01-15T10:00:00/);
+      // currentTime is epoch number after #132 refactor
+      expect(state.currentTime).toBe(new Date('2024-01-15T10:00:00Z').getTime());
     });
 
     it('should set feature collection URI', () => {

@@ -27,7 +27,7 @@ export function StacBrowser({
   taxonomy,
   onItemSelect,
   className,
-  colorMap: _colorMap,
+  // colorMap will be wired to colour scheme engine in a future phase
 }: StacBrowserProps): JSX.Element {
   // Metadata filter state (local — drives BrowserFilterSlice in real usage)
   const [metadataFilteredIds, setMetadataFilteredIds] = useState<ReadonlySet<string> | null>(null);
