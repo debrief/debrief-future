@@ -138,6 +138,8 @@ Only updated when a feature introduces a technology not already listed here.
 - TypeScript 5.x + `cql2-filters-parser` (CQL2 parsing/serialisation, zero-dep ES module) (126-cql2-filter-engine)
 - Python 3.11 (fixture generator, schema, tests), LinkML >= 1.7.0 (schema source) + LinkML (schema), Pydantic v2 (validation), jsonschema (fixture validation) (125-stac-extension-mock-data)
 - Python 3.11 (service), TypeScript 5.x (VS Code extension consumer) + Pydantic v2 (models), existing `debrief-stac` service module, `mcp.server.fastmcp` (MCP exposure) (136-stac-collection-summaries)
+- TypeScript 5.x (React 18.x component) + React 18.x, react-leaflet 4.2 (peer — not directly used), vitest (testing), Storybook (visual dev) (131-timeline-gantt-view)
+- TypeScript 5.x + `@dnd-kit/core` + `@dnd-kit/sortable` (drag-to-group), `@debrief/components` filter-engine (#126), `vscrui` (VS Code icons), `nanoid` (unique IDs) (127-filter-bar-lozenge-ui)
 
 - Python 3.11 (services, schemas, calc tools)
 - TypeScript 5.x (VS Code extension, webview, shared components, session-state)
@@ -201,5 +203,7 @@ Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during 
 
 ## Recent Changes
 - 136-stac-collection-summaries: Added Python 3.11 (service), TypeScript 5.x (VS Code extension consumer) + Pydantic v2 (models), existing `debrief-stac` service module, `mcp.server.fastmcp` (MCP exposure)
+- 131-timeline-gantt-view: Added TypeScript 5.x (React 18.x component) + React 18.x, react-leaflet 4.2 (peer — not directly used), vitest (testing), Storybook (visual dev)
+- 127-filter-bar-lozenge-ui: Added TypeScript 5.x + `@dnd-kit/core` + `@dnd-kit/sortable` (drag-to-group), `@debrief/components` filter-engine (#126), `vscrui` (VS Code icons), `nanoid` (unique IDs)
 - 126-cql2-filter-engine: Added TypeScript 5.x + `cql2-filters-parser` (CQL2 parsing/serialisation, zero-dep ES module)
 - 125-stac-extension-mock-data: Added Python 3.11 (fixture generator, schema, tests), LinkML >= 1.7.0 (schema source) + LinkML (schema), Pydantic v2 (validation), jsonschema (fixture validation)
