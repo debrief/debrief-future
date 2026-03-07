@@ -39,7 +39,8 @@ export function createFilterEngine(config: FilterEngineConfig): FilterEngine {
     // All top-level predicates must match (AND)
     for (const predicate of expression.predicates) {
       const matcher = getMatcher(predicate.type);
-      if (!matcher(item, predicate.value, descendantMap)) {
+      const result = matcher(item, predicate.value, descendantMap);
+      if (predicate.negated ? result : !result) {
         return false;
       }
     }
@@ -48,7 +49,8 @@ export function createFilterEngine(config: FilterEngineConfig): FilterEngine {
     for (const group of expression.orGroups) {
       const groupMatch = group.predicates.some((predicate) => {
         const matcher = getMatcher(predicate.type);
-        return matcher(item, predicate.value, descendantMap);
+        const result = matcher(item, predicate.value, descendantMap);
+        return predicate.negated ? !result : result;
       });
       if (!groupMatch) {
         return false;
