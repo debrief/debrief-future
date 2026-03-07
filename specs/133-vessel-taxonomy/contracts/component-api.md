@@ -18,10 +18,12 @@ interface SearchableCascadingMenuProps extends CascadingMenuProps {
 **Behavior**:
 - When `searchable` is falsy, renders CascadingMenu unchanged (backwards compatible)
 - When `searchable` is true, renders a text input above the menu items
-- Search filters items by case-insensitive substring match on `label`
+- Search filters items by case-insensitive substring match on `label` using `String.includes()` (not regex — avoids special-character exceptions)
 - Matching nodes retain their ancestor chain (parents shown even if they don't match)
 - Empty search text shows the full tree
 - Search clears when menu is dismissed
+
+**Layout**: SearchableCascadingMenu owns its container positioning. It receives `anchorPosition` and manages layout internally (search input + menu as a single positioned container). The inner CascadingMenu is positioned relatively within the wrapper's container, not via absolute `anchorPosition`.
 
 ## taxonomyToCascadingItems (enhanced)
 
@@ -68,7 +70,7 @@ function useTaxonomyMatchCounts(
 
 ## buildTaxonomyLabelMap
 
-**File**: `shared/components/src/FilterBar/labelResolver.ts`
+**File**: `shared/components/src/filter-engine/taxonomy.ts` (alongside existing `buildDescendantMap`)
 
 ```typescript
 function buildTaxonomyLabelMap(
@@ -77,12 +79,15 @@ function buildTaxonomyLabelMap(
 ```
 
 **Behavior**:
-- Returns a map from node ID to human-readable label
+- Returns a map from **full taxonomy path** to human-readable label
+- Keys are slash-separated paths (e.g., `"surface/warship/frigate/type23"` → `"Type 23 Frigate"`)
+- Full paths used as keys to avoid ambiguity — `"auxiliary/tanker"` → `"Tanker"` vs `"merchant/tanker"` → `"Merchant Tanker"`
 - O(n) tree walk, called once and memoized
+- Lives in taxonomy.ts alongside `parseTaxonomy` and `buildDescendantMap` to share tree-walking patterns (DRY)
 
 ## resolveTaxonomyLabel
 
-**File**: `shared/components/src/FilterBar/labelResolver.ts`
+**File**: `shared/components/src/filter-engine/taxonomy.ts`
 
 ```typescript
 function resolveTaxonomyLabel(
@@ -92,9 +97,9 @@ function resolveTaxonomyLabel(
 ```
 
 **Behavior**:
-- For a simple ID (e.g., `"type23"`): returns `labelMap.get(value)` or the raw value as fallback
-- For a path (e.g., `"surface/warship/frigate/type23"`): extracts last segment, looks up label
-- O(1) lookup
+- Looks up `value` directly in the label map (values are already full paths)
+- Returns `labelMap.get(value)` or the raw value as fallback (graceful degradation for unknown paths)
+- O(1) lookup — no path-segment extraction needed since map keys are full paths
 
 ## filterCascadingItems (pure utility)
 
@@ -108,7 +113,7 @@ function filterCascadingItems(
 ```
 
 **Behavior**:
-- Recursively filters items by case-insensitive substring match on label
+- Recursively filters items by case-insensitive substring match on label using `String.toLowerCase().includes()` (not regex)
 - Preserves ancestor chain: if a child matches, all ancestors are included
 - Returns empty array if no matches
 - Expands matching branch nodes automatically (flattens submenu path to match)

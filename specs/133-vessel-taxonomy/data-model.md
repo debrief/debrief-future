@@ -39,20 +39,32 @@ interface CascadingMenuItem {
 
 ### TaxonomyLabelMap (new type alias)
 
+Defined in `shared/components/src/filter-engine/taxonomy.ts` (alongside existing `buildDescendantMap`):
+
 ```typescript
 type TaxonomyLabelMap = ReadonlyMap<string, string>;
-// Maps: nodeId → human-readable label
-// e.g., "type23" → "Type 23 Frigate"
-//        "warship" → "Warship"
+// Maps: full taxonomy path → human-readable label
+// e.g., "surface/warship/frigate/type23" → "Type 23 Frigate"
+//        "surface/warship" → "Warship"
+//        "auxiliary/tanker" → "Tanker"
+//        "merchant/tanker" → "Merchant Tanker"   ← distinct from auxiliary/tanker
 ```
+
+**Key design decision**: Uses full slash-separated paths as keys (not bare node IDs) because
+node IDs are only unique within sibling sets. The taxonomy has `tanker` under both `auxiliary`
+and `merchant` branches with different labels. Full paths eliminate ambiguity.
 
 ### TaxonomyMatchCounts (new type alias)
 
 ```typescript
 type TaxonomyMatchCounts = ReadonlyMap<string, number>;
-// Maps: nodeId → count of matching items in current filtered set
-// e.g., "warship" → 26, "type23" → 12, "unknown" → 0
+// Maps: full taxonomy path → count of matching items in current filtered set
+// e.g., "surface/warship" → 26, "surface/warship/frigate/type23" → 12
 ```
+
+**Count semantics**: Counts are computed against the already-filtered item set (reflecting all
+active filters, including any active vessel-class filter). The `buildDescendantMap()` result is
+memoized on the taxonomy reference since the taxonomy never changes at runtime.
 
 ## Relationships
 
@@ -61,9 +73,9 @@ vessel-taxonomy.json
     │
     ├──[parseTaxonomy()]──→ VesselTaxonomyNode[]
     │                            │
-    │                            ├──[buildTaxonomyLabelMap()]──→ TaxonomyLabelMap
+    │                            ├──[buildTaxonomyLabelMap()]──→ TaxonomyLabelMap  (in taxonomy.ts, full-path keys)
     │                            │
-    │                            ├──[buildDescendantMap()]──→ DescendantMap
+    │                            ├──[buildDescendantMap()]──→ DescendantMap  (memoized on taxonomy ref)
     │                            │                               │
     │                            │                               └──[useTaxonomyMatchCounts()]──→ TaxonomyMatchCounts
     │                            │
@@ -77,11 +89,13 @@ vessel-taxonomy.json
 ## Data Flow (runtime)
 
 1. **App startup**: `vessel-taxonomy.json` → `parseTaxonomy()` → `VesselTaxonomyNode[]` (memoized)
-2. **FilterBar mount**: taxonomy → `buildTaxonomyLabelMap()` → `TaxonomyLabelMap` (memoized)
-3. **FilterBar mount**: (items, taxonomy) → `useTaxonomyMatchCounts()` → `TaxonomyMatchCounts` (re-computed when items or active filters change)
+2. **FilterBar mount**: taxonomy → `buildTaxonomyLabelMap()` → `TaxonomyLabelMap` (memoized, full-path keys, lives in taxonomy.ts)
+3. **FilterBar mount**: (filteredItems, taxonomy) → `useTaxonomyMatchCounts()` → `TaxonomyMatchCounts` (re-computed when filtered items change; descendantMap memoized on taxonomy ref)
 4. **Dropdown open**: (taxonomy, counts, currentValue) → `taxonomyToCascadingItems()` → `CascadingMenuItem[]` with badges and current marker
 5. **Selection**: CascadingMenu → `onSelect(nodeId)` → lozenge created with `value = nodeId`
-6. **Lozenge display**: `resolveTaxonomyLabel(value, labelMap)` → human-readable label
+6. **Lozenge display**: `resolveTaxonomyLabel(value, labelMap)` → human-readable label (labelMap uses full paths)
+7. **DragOverlay**: FilterBar.tsx DragOverlay calls `resolveTaxonomyLabel()` for vessel-class items
+8. **OrContainer children**: OrContainer forwards `labelMap` and `counts` to child Lozenges
 
 ## Validation Rules
 

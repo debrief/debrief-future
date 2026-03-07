@@ -17,6 +17,8 @@
 - New file: `shared/components/src/CascadingMenu/SearchableCascadingMenu.tsx`
 - Wraps CascadingMenu with an optional search input above the menu
 - Uses a pure utility function `filterCascadingItems(items, query)` to recursively filter the tree while preserving ancestor chains
+- `filterCascadingItems` uses `String.toLowerCase().includes()` for matching (not regex — avoids exceptions from special characters like `.`, `*`, `(`)
+- SearchableCascadingMenu owns its container layout/positioning; inner CascadingMenu positioned relatively within the wrapper
 - Exports the wrapper alongside the existing CascadingMenu (no breaking changes)
 - Search clears when menu is dismissed and re-opened
 
@@ -42,20 +44,23 @@
 
 ## R3: Human-Readable Label Resolution
 
-**Decision**: Create a utility module `labelResolver.ts` with a `buildTaxonomyLabelMap()` function and a `resolveTaxonomyLabel()` lookup.
+**Decision**: Add `buildTaxonomyLabelMap()` and `resolveTaxonomyLabel()` to the existing `taxonomy.ts` module (alongside `parseTaxonomy` and `buildDescendantMap`). Use full taxonomy paths as map keys.
 
-**Rationale**: Labels need resolving in multiple places (Lozenge display, CascadingMenu current-selection marking, future tooltip text). A standalone utility is reusable and testable without component coupling.
+**Rationale**: Labels need resolving in multiple places (Lozenge display, DragOverlay, OrContainer children, future tooltip text). Placing the functions in `taxonomy.ts` alongside existing tree-walking utilities avoids DRY violations — `parseTaxonomy`, `buildDescendantMap`, and `buildTaxonomyLabelMap` all walk the same tree structure.
 
 **Alternatives considered**:
+- **Separate `labelResolver.ts` in FilterBar**: Originally planned, rejected during review because it duplicates tree-walking logic already in taxonomy.ts (DRY violation, Article IX).
 - **Resolve in Lozenge component** (tree traversal at render time): Rejected because it triggers traversal on every render and adds tree-walking logic to a display component.
 - **Resolve in adapter** (extend `taxonomyToCascadingItems()`): Considered but insufficient — the adapter converts *to* menu items, but label resolution is needed *from* a stored value (path or ID) back to human-readable text.
 
+**Path key decision** (from review): Node IDs are only unique within sibling sets. The taxonomy has `tanker` under both `auxiliary` and `merchant` with different labels ("Tanker" vs "Merchant Tanker"). Using last-segment extraction would be ambiguous. Full paths as map keys (`"auxiliary/tanker"` → `"Tanker"`, `"merchant/tanker"` → `"Merchant Tanker"`) eliminate this entirely and match how `debrief:vessel_classes` stores values.
+
 **Implementation**:
-- New file: `shared/components/src/FilterBar/labelResolver.ts`
-- `buildTaxonomyLabelMap(taxonomy)`: Pre-computes `Map<string, string>` (nodeId → label) with O(n) tree walk
+- Modified file: `shared/components/src/filter-engine/taxonomy.ts`
+- `buildTaxonomyLabelMap(taxonomy)`: Pre-computes `Map<string, string>` (fullPath → label) with O(n) tree walk
 - `resolveTaxonomyLabel(value, labelMap)`: O(1) lookup, returns label or falls back to raw value
-- For path values like `surface/warship/frigate/type23`: extract the last path segment as the lookup key
-- Called once in FilterBar (memoized), label map passed as prop to Lozenge
+- No path-segment extraction needed — values are already stored as full paths
+- Called once in FilterBar (memoized), label map passed as prop to Lozenge, OrContainer, and used in DragOverlay
 
 **Current state**: Lozenges display raw path IDs (e.g., `surface/warship/frigate/type23`). After this change, they display the leaf node label (e.g., "Type 23 Frigate").
 

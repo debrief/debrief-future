@@ -5,7 +5,7 @@
 
 ## Summary
 
-Enhance the vessel class filter in the FilterBar with human-readable labels, in-menu search, per-node match counts, and current-selection marking. This builds on existing infrastructure from #125 (taxonomy data, STAC extension) and #127 (CascadingMenu, FilterBar, taxonomyAdapter). The approach creates focused utilities (label resolver, match count hook, tree filter) and a SearchableCascadingMenu wrapper — no changes to the core CascadingMenu component.
+Enhance the vessel class filter in the FilterBar with human-readable labels, in-menu search, per-node match counts, and current-selection marking. This builds on existing infrastructure from #125 (taxonomy data, STAC extension) and #127 (CascadingMenu, FilterBar, taxonomyAdapter). The approach adds `buildTaxonomyLabelMap()` to the existing taxonomy module, creates a match count hook and tree filter utility, and wraps CascadingMenu with a searchable variant. Changes to core CascadingMenu are limited to an additive `badge` prop on the shared `CascadingMenuItem` interface.
 
 ## Technical Context
 
@@ -17,7 +17,7 @@ Enhance the vessel class filter in the FilterBar with human-readable labels, in-
 **Project Type**: Shared component library (`shared/components/`)
 **Performance Goals**: Search filtering < 100ms for full taxonomy; count computation < 50ms for 100 items
 **Constraints**: Offline-capable (all client-side); no new external dependencies
-**Scale/Scope**: ~20 leaf taxonomy nodes, ~100 mock STAC items, 6 new/modified source files
+**Scale/Scope**: ~20 leaf taxonomy nodes, ~100 mock STAC items, 3 new + 10 modified source files
 
 ## Constitution Check
 
@@ -29,7 +29,7 @@ Enhance the vessel class filter in the FilterBar with human-readable labels, in-
 | II.1 Single source of truth | Schema-first data structures | PASS | Taxonomy defined in vessel-taxonomy.json; VesselTaxonomyNode type derived from #125 |
 | IV.1 Services never touch UI | Python services return data only | PASS | No Python services — this is purely frontend |
 | V.3 No vendor lock-in | No proprietary dependencies | PASS | No new dependencies added |
-| VI.2 Services require unit tests | Tests for all new code | PASS | Unit tests for each new module (labelResolver, useTaxonomyMatchCounts, filterCascadingItems, SearchableCascadingMenu) |
+| VI.2 Services require unit tests | Tests for all new code | PASS | Unit tests for each new module (taxonomy label map, useTaxonomyMatchCounts, filterCascadingItems, SearchableCascadingMenu) + DragOverlay and OrContainer label tests |
 | VII.1 Tests before implementation | Test-first approach | PASS | Tests written before implementation per TDD |
 | VIII.1 Specs before code | Written specification exists | PASS | spec.md created |
 | IX.1 Minimal dependencies | No unnecessary dependencies | PASS | Zero new npm packages |
@@ -59,36 +59,50 @@ specs/133-vessel-taxonomy/
 ```text
 shared/components/src/
 ├── CascadingMenu/
-│   ├── CascadingMenu.tsx              # MODIFY: add badge prop to CascadingMenuItem
-│   ├── CascadingMenu.css              # MODIFY: add badge styling
-│   ├── SearchableCascadingMenu.tsx     # NEW: search wrapper component
-│   ├── filterCascadingItems.ts         # NEW: recursive tree filtering utility
+│   ├── CascadingMenu.tsx              # MODIFY: add badge prop to CascadingMenuItem (shared interface)
+│   ├── CascadingMenu.css              # MODIFY: add badge + search input styling
+│   ├── SearchableCascadingMenu.tsx     # NEW: search wrapper (owns container layout)
+│   ├── filterCascadingItems.ts         # NEW: recursive tree filtering (String.includes, not regex)
 │   └── index.ts                        # MODIFY: re-export new components
 ├── FilterBar/
-│   ├── labelResolver.ts                # NEW: taxonomy label lookup utility
-│   ├── useTaxonomyMatchCounts.ts       # NEW: per-node count hook
+│   ├── useTaxonomyMatchCounts.ts       # NEW: per-node count hook (memoizes descendantMap)
 │   ├── taxonomyAdapter.ts              # MODIFY: accept counts + currentValue options
 │   ├── ValueEditor.tsx                 # MODIFY: use SearchableCascadingMenu, pass counts
-│   ├── Lozenge.tsx                     # MODIFY: resolve vessel-class labels
-│   ├── FilterBar.tsx                   # MODIFY: compute counts, build label map
+│   ├── Lozenge.tsx                     # MODIFY: resolve vessel-class labels via labelMap prop
+│   ├── OrContainer.tsx                 # MODIFY: forward labelMap + counts to child Lozenges
+│   ├── FilterBar.tsx                   # MODIFY: compute counts, build label map, resolve DragOverlay labels
 │   └── FilterBar.stories.tsx           # MODIFY: add taxonomy-specific stories
 └── filter-engine/
-    └── (no changes — existing buildDescendantMap() reused)
+    ├── taxonomy.ts                     # MODIFY: add buildTaxonomyLabelMap() (full-path keys)
+    └── (existing buildDescendantMap() reused)
 
-shared/components/__tests__/
-├── FilterBar/
-│   ├── labelResolver.test.ts           # NEW
-│   ├── useTaxonomyMatchCounts.test.ts  # NEW
-│   └── taxonomyAdapter.test.ts         # MODIFY: add tests for counts/current
-└── CascadingMenu/
-    ├── filterCascadingItems.test.ts    # NEW
-    └── SearchableCascadingMenu.test.tsx # NEW
+shared/components/src/FilterBar/__tests__/
+├── useTaxonomyMatchCounts.test.ts     # NEW
+├── taxonomyAdapter.test.ts            # MODIFY: add tests for counts/current
+├── Lozenge.test.tsx                   # MODIFY: add vessel-class label resolution test
+└── OrContainer.test.tsx               # MODIFY: add child label forwarding test
+
+shared/components/src/CascadingMenu/__tests__/  # NEW directory
+├── filterCascadingItems.test.ts       # NEW
+└── SearchableCascadingMenu.test.tsx   # NEW
 
 shared/components/e2e/
-└── FilterBar.spec.ts                   # MODIFY: add taxonomy interaction tests
+└── FilterBar.spec.ts                  # MODIFY: add taxonomy interaction tests
 ```
 
 **Structure Decision**: All changes are within the existing `shared/components` package. No new packages or projects needed. This is a frontend-only enhancement to existing components.
+
+**Review amendments applied** (from `/speckit.review`):
+1. `labelResolver.ts` eliminated — `buildTaxonomyLabelMap()` merged into existing `taxonomy.ts` (DRY)
+2. Label map uses **full taxonomy paths** as keys (not node IDs) to avoid ambiguity (e.g., `tanker` exists under both `auxiliary` and `merchant`)
+3. `OrContainer.tsx` added to modify list — must forward `labelMap` and `counts` props to child Lozenges
+4. `FilterBar.tsx` DragOverlay (line ~265) must call `resolveTaxonomyLabel()` for vessel-class drag ghosts
+5. `SearchableCascadingMenu` owns its container layout; inner CascadingMenu positioned relatively within it
+6. `filterCascadingItems` uses `String.includes()` (not regex) to avoid special-character exceptions
+7. `useTaxonomyMatchCounts` memoizes `buildDescendantMap()` on taxonomy reference
+8. `CascadingMenu/__tests__/` directory created for new component tests
+9. `badge` prop on `CascadingMenuItem` is a shared interface addition — CSS in shared CascadingMenu.css
+10. Match counts computed against already-filtered items (1A decision) — no shadow expression needed
 
 ## Media Components
 
