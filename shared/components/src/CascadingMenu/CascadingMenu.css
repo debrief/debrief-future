@@ -96,7 +96,7 @@
 .debrief-cascading-menu__badge {
   flex-shrink: 0;
   font-size: 11px;
-  color: var(--debrief-text-muted);
+  color: var(--debrief-text-secondary, rgba(0, 0, 0, 0.6));
   font-variant-numeric: tabular-nums;
 }
 
