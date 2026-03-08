@@ -23,4 +23,26 @@ export declare function expandBounds(bounds: Bounds, paddingPercent?: number): B
  * Check if a point is within bounds.
  */
 export declare function isPointInBounds(lon: number, lat: number, bounds: Bounds): boolean;
+/**
+ * Check whether two axis-aligned bounding boxes overlap.
+ * Handles antimeridian crossing: when west > east the bbox is split
+ * into two halves for testing. west === east is treated as a zero-width
+ * bbox (degenerate point), NOT as an antimeridian crossing.
+ *
+ * @param itemBbox  - Item bounding box [west, south, east, north]
+ * @param viewportBbox - Viewport bounding box [west, south, east, north]
+ * @returns true if the two boxes overlap (including edge-touching)
+ */
+export declare function bboxOverlapsViewport(itemBbox: Bounds, viewportBbox: Bounds): boolean;
+/**
+ * Filter items to those whose bbox overlaps the given viewport.
+ * Items without a bbox are excluded.
+ *
+ * @param items - Array of items with an optional bbox property
+ * @param viewportBbox - Current viewport bounds
+ * @returns Filtered array of items whose bbox overlaps the viewport
+ */
+export declare function filterBySpatialExtent<T extends {
+    bbox: Bounds | null;
+}>(items: readonly T[], viewportBbox: Bounds): T[];
 //# sourceMappingURL=bounds.d.ts.map
