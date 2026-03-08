@@ -69,7 +69,12 @@ class TestPlatformPaths:
         assert result.is_dir()
 
     def test_config_file_in_config_dir(self) -> None:
-        """Config file should be inside config directory."""
-        config_dir = get_config_dir()
-        config_file = get_config_file()
+        """Config file should be inside config directory.
+
+        Calls through the module to get consistent (possibly patched) values,
+        since autouse isolated_config patches debrief_config.paths attributes.
+        """
+        import debrief_config.paths as paths_mod
+        config_dir = paths_mod.get_config_dir()
+        config_file = paths_mod.get_config_file()
         assert config_file.parent == config_dir

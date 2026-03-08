@@ -52,11 +52,11 @@ tasks:
       - pnpm install
 
   test:
-    desc: "Run all tests (Python + TypeScript)"
+    desc: "Run all tests (Python + TypeScript + Playwright E2E)"
     deps: [install]
     cmds:
       - uv run pytest
-      - pnpm test
+      - pnpm --filter '!@debrief/web-shell' test
 
   build:
     desc: "Build all artifacts (Python wheels + TypeScript bundles)"

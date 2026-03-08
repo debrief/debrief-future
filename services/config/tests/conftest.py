@@ -10,20 +10,36 @@ import pytest
 def isolated_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Isolate config to a temp directory for all tests.
 
-    Uses XDG_CONFIG_HOME environment variable which platformdirs respects.
+    Monkeypatches get_config_dir/get_config_file/get_lock_file everywhere
+    they're imported so that all config operations use a temp directory.
+    (macOS ignores XDG_CONFIG_HOME via platformdirs, so env var alone
+    doesn't work.)
     """
-    config_base = tmp_path / "config"
-    config_base.mkdir(parents=True, exist_ok=True)
-    monkeypatch.setenv("XDG_CONFIG_HOME", str(config_base))
+    config_dir = tmp_path / "config" / "debrief"
+    config_dir.mkdir(parents=True, exist_ok=True)
 
-    # Force reimport of paths module to pick up new env var
-    import importlib
+    config_file = config_dir / "config.json"
+    lock_file = config_file.with_suffix(".lock")
 
+    # Patch the canonical definitions in paths module.
+    # Note: test_paths.py tests that do `from .paths import get_config_dir`
+    # bind at import time, so they may see original or patched depending on
+    # import order. This is fine — the critical isolation is for storage.py.
     import debrief_config.paths
+    monkeypatch.setattr(debrief_config.paths, "get_config_dir", lambda ensure_exists=True: config_dir)
+    monkeypatch.setattr(debrief_config.paths, "get_config_file", lambda ensure_dir_exists=True: config_file)
+    monkeypatch.setattr(debrief_config.paths, "get_lock_file", lambda: lock_file)
 
-    importlib.reload(debrief_config.paths)
+    # Patch the bound references in modules that do `from .paths import ...`
+    import debrief_config
+    monkeypatch.setattr(debrief_config, "get_config_dir", lambda ensure_exists=True: config_dir)
+    monkeypatch.setattr(debrief_config, "get_config_file", lambda ensure_dir_exists=True: config_file)
 
-    return config_base / "debrief"
+    import debrief_config.storage
+    monkeypatch.setattr(debrief_config.storage, "get_config_file", lambda ensure_dir_exists=True: config_file)
+    monkeypatch.setattr(debrief_config.storage, "get_lock_file", lambda: lock_file)
+
+    return config_dir
 
 
 @pytest.fixture
