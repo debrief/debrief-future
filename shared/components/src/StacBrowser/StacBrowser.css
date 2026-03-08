@@ -1,7 +1,7 @@
 /**
  * StacBrowser layout styles (#132).
  *
- * Four-panel layout: FilterBar on top, then list + map + timeline below.
+ * FilterBar on top, GoldenLayout workspace fills remaining space.
  */
 
 .stac-browser {
@@ -17,61 +17,26 @@
   border-bottom: 1px solid var(--debrief-border, #e0e0e0);
 }
 
-.stac-browser__content {
-  display: flex;
+.stac-browser__workspace {
   flex: 1;
   min-height: 0;
+  position: relative;
   overflow: hidden;
 }
 
-.stac-browser__list {
-  flex: 0 0 300px;
-  min-width: 200px;
-  overflow-y: auto;
-  border-right: 1px solid var(--debrief-border, #e0e0e0);
-}
-
-.stac-browser__views {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-}
-
-.stac-browser__map {
-  flex: 1;
-  min-height: 200px;
-}
-
-.stac-browser__timeline {
-  flex: 0 0 200px;
-  min-height: 120px;
-  border-top: 1px solid var(--debrief-border, #e0e0e0);
-}
-
-.stac-browser__zero-results {
+.stac-browser__no-results {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
-  padding: 24px;
-  text-align: center;
-  color: var(--debrief-text-secondary, #666);
-}
-
-.stac-browser__zero-results-content {
-  display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 12px;
+  background: var(--debrief-bg-primary, #fff);
+  z-index: 10;
 }
 
-.stac-browser__zero-results-message {
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.stac-browser__zero-results-clear {
+.stac-browser__no-results button {
   padding: 6px 16px;
   border: 1px solid var(--debrief-border, #e0e0e0);
   border-radius: 4px;
@@ -81,7 +46,7 @@
   font-size: 13px;
 }
 
-.stac-browser__zero-results-clear:hover {
+.stac-browser__no-results button:hover {
   background: var(--debrief-accent, #0066cc);
   color: #fff;
   border-color: var(--debrief-accent, #0066cc);

@@ -1,6 +1,8 @@
 /**
  * Storybook stories for StacBrowser component (#132).
- * Tasks: T057, T086
+ *
+ * StacBrowser uses GoldenLayout for draggable/resizable panels:
+ * Exercises list, Map view, and Timeline view.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -136,7 +138,7 @@ const meta: Meta<typeof StacBrowser> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Three-view synchronized browser: FilterBar + ExerciseList + MapView + TimelineView with shared filter state across metadata, spatial, and temporal axes.',
+        component: 'Three-view synchronized browser with GoldenLayout panels: ExerciseList + MapView + TimelineView. Panels are draggable, resizable, and tabbable.',
       },
     },
   },
@@ -168,7 +170,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Default StacBrowser with 5 exercises. Use the FilterBar to add metadata filters and watch all views update.',
+        story: 'Default StacBrowser with 5 exercises. Drag panel tabs to rearrange, resize by dragging splitters.',
       },
     },
   },
@@ -179,13 +181,6 @@ export const Empty: Story = {
   render: () => (
     <StacBrowser items={[]} taxonomy={MOCK_TAXONOMY} />
   ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'StacBrowser with no exercise data loaded.',
-      },
-    },
-  },
 };
 
 export const WithCustomClass: Story = {

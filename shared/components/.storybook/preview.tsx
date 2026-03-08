@@ -1,8 +1,10 @@
 import type { Preview, Decorator } from '@storybook/react';
 import React from 'react';
 import 'leaflet/dist/leaflet.css';
+import 'golden-layout/dist/css/goldenlayout-base.css';
 import 'vscrui/dist/codicon.css';
 import '../src/styles/tokens.css';
+import '../src/PanelWorkspace/PanelWorkspace.css';
 import { ThemeProvider } from '../src/ThemeProvider';
 import type { ThemeVariant } from '../src/ThemeProvider/ThemeContext';
 
