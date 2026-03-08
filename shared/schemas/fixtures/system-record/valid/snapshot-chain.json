@@ -1,7 +1,7 @@
 [
   {
     "_comment": "Snapshot A (earliest — chain head)",
-    "featureType": "system",
+    "kind": "SYSTEM_RECORD",
     "snapshotLinks": {
       "prev": null,
       "next": {
@@ -24,7 +24,7 @@
   },
   {
     "_comment": "Snapshot B (middle)",
-    "featureType": "system",
+    "kind": "SYSTEM_RECORD",
     "snapshotLinks": {
       "prev": {
         "asset": "plot-snap-2026-02-09T12-00-00.geojson",
@@ -50,7 +50,7 @@
   },
   {
     "_comment": "Working File (current — chain tail)",
-    "featureType": "system",
+    "kind": "SYSTEM_RECORD",
     "snapshotLinks": {
       "prev": {
         "asset": "plot-snap-2026-02-09T14-00-00.geojson",

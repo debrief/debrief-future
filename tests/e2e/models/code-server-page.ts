@@ -24,8 +24,12 @@ export class CodeServerPage {
    * Waits for the workbench to render and extensions to activate.
    */
   async waitForReady(): Promise<void> {
-    // Navigate to code-server
-    await this.page.goto('/');
+    // Navigate to the VS Code server.
+    // openvscode-server opens a workspace folder via ?folder= query param
+    // (it doesn't accept a positional folder arg like code-server does).
+    const workspaceFolder = process.env.E2E_WORKSPACE_FOLDER;
+    const url = workspaceFolder ? `/?folder=${encodeURIComponent(workspaceFolder)}` : '/';
+    await this.page.goto(url);
 
     // Wait for the VS Code workbench to render
     await this.page.waitForSelector('.monaco-workbench', {
@@ -39,17 +43,21 @@ export class CodeServerPage {
       timeout: 30_000,
     });
 
-    // Brief pause for extensions to activate
-    await this.page.waitForTimeout(2_000);
+    // Wait for extensions to activate — poll for the activity bar to have
+    // custom viewlet icons (indicates extensions contributed views).
+    await this.page
+      .locator('.activitybar .action-item')
+      .nth(2)
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .catch(() => {});
 
     // Close the Welcome tab if open — it captures keyboard focus into an
     // iframe, preventing command palette and Quick Open from working.
     await this.page.keyboard.press('Control+KeyW');
-    await this.page.waitForTimeout(500);
+    await this.page.waitForTimeout(200);
 
     // Click the title bar to ensure main window has focus (not an iframe)
     await this.page.locator('.part.titlebar').click().catch(() => {});
-    await this.page.waitForTimeout(300);
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -87,6 +95,8 @@ export class CodeServerPage {
 
   /**
    * Open a file via the VS Code command palette (Quick Open).
+   * NOTE: This opens the file as plain text. It does NOT trigger the Debrief
+   * extension's webview. Use openPlotViaStacTree() for that.
    * @param relativePath - Path relative to the workspace root
    */
   async openFile(relativePath: string): Promise<void> {
@@ -96,8 +106,111 @@ export class CodeServerPage {
     await this.commandInput.fill(relativePath);
     await this.page.keyboard.press('Enter');
 
-    // Wait for editor to open the file
-    await this.page.waitForTimeout(1_000);
+    // Wait for an editor tab to appear with the filename
+    const basename = relativePath.split('/').pop() ?? relativePath;
+    await this.page
+      .locator(`.tab:has-text("${basename}")`)
+      .waitFor({ state: 'visible', timeout: 5_000 })
+      .catch(() => {});
+  }
+
+  /**
+   * Open a plot via the STAC tree view, which triggers the Debrief extension's
+   * webview (MapPanel). This is the correct way to open a plot in E2E tests.
+   *
+   * @param plotName - Display name of the plot in the STAC tree (e.g. "Exercise Alpha")
+   */
+  async openPlotViaStacTree(plotName: string): Promise<void> {
+    const page = this.page;
+
+    // Focus the STAC Stores view — gives it screen space and scrolls into view
+    await this.focusStacView();
+
+    // Wait for extension to finish activating
+    await this.waitForExtensionReady(10_000);
+
+    // Ensure the STAC STORES pane is expanded
+    await this.ensureStacPaneExpanded();
+
+    // Wait for tree to populate with a store row
+    const storeRow = page.locator('.monaco-list-row:has-text("STAC:")').first();
+    let storeRowVisible = await storeRow
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!storeRowVisible) {
+      // Config may be missing — seed it via terminal and reload
+      await this.seedConfigAndReload();
+
+      // Retry: focus STAC view, wait for extension, expand pane
+      await this.focusStacView();
+      await this.waitForExtensionReady(10_000);
+      await this.ensureStacPaneExpanded();
+
+      storeRowVisible = await storeRow
+        .waitFor({ state: 'visible', timeout: 10_000 })
+        .then(() => true)
+        .catch(() => false);
+      if (!storeRowVisible) {
+        await page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-row.png' });
+        throw new Error('STAC store tree row not visible even after seeding config');
+      }
+    }
+
+    // Expand the store row if collapsed
+    const storeTwistie = storeRow.locator('.monaco-tl-twistie');
+    const storeCollapsed = await storeTwistie
+      .evaluate((el) => el.classList.contains('collapsed'))
+      .catch(() => true);
+    if (storeCollapsed) {
+      await storeTwistie.click();
+    }
+
+    // Wait for tree children — plot node may be directly visible if VS Code
+    // auto-expanded, or we may need to expand the catalog node first
+    const plotNode = page.locator(`.monaco-list-row:has-text("${plotName}")`).first();
+    const catalogNode = page.locator('.monaco-list-row:has-text("plots")').first();
+
+    const firstVisible = await Promise.race([
+      catalogNode.waitFor({ state: 'visible', timeout: 10_000 }).then(() => 'catalog' as const),
+      plotNode.waitFor({ state: 'visible', timeout: 10_000 }).then(() => 'plot' as const),
+    ]).catch(async () => {
+      const allRows = await page.locator('.monaco-list-row').allTextContents();
+      await page.screenshot({ path: 'tests/e2e/evidence/debug-no-catalog-row.png' });
+      throw new Error(
+        `Neither catalog nor plot "${plotName}" visible. Rows: ${JSON.stringify(allRows.slice(0, 15))}`
+      );
+    });
+
+    if (firstVisible === 'catalog') {
+      const catalogTwistie = catalogNode.locator('.monaco-tl-twistie');
+      const catalogCollapsed = await catalogTwistie
+        .evaluate((el) => el.classList.contains('collapsed'))
+        .catch(() => true);
+      if (catalogCollapsed) {
+        await catalogTwistie.click();
+      }
+      // Wait for the plot node to appear after expanding
+      await plotNode.waitFor({ state: 'visible', timeout: 5_000 });
+    }
+
+    // Click the plot node to open it (triggers debrief.openPlot → MapPanel)
+    await plotNode.waitFor({ state: 'visible', timeout: 5_000 });
+    await plotNode.click();
+
+    // Wait for the webview iframe to appear
+    await page
+      .locator('iframe.webview')
+      .first()
+      .waitFor({ state: 'attached', timeout: 15_000 });
+
+    // Wait for the webview to become ready (has .ready class)
+    await page
+      .locator('iframe.webview.ready')
+      .first()
+      .waitFor({ state: 'attached', timeout: 10_000 })
+      .catch(() => {});
   }
 
   /**
@@ -111,7 +224,9 @@ export class CodeServerPage {
     await this.commandInput.fill(command);
 
     // Wait for suggestions to appear, then select the first match
-    await this.page.waitForTimeout(500);
+    await this.page.locator('.quick-input-list .monaco-list-row').first()
+      .waitFor({ state: 'visible', timeout: 3_000 })
+      .catch(() => {});
     await this.page.keyboard.press('Enter');
   }
 
@@ -184,5 +299,211 @@ export class CodeServerPage {
   async openExplorer(): Promise<void> {
     await this.page.keyboard.press('Control+Shift+KeyE');
     await this.fileExplorer.waitFor({ state: 'visible', timeout: 5_000 });
+  }
+
+  /**
+   * Open the Debrief sidebar (Activity Panel + Log Panel views).
+   * Clicks the Debrief icon in the activity bar to reveal the sidebar container.
+   */
+  async openDebriefSidebar(): Promise<void> {
+    const debriefIcon = this.page.locator(
+      [
+        '.action-item a[aria-label="Debrief"]',
+        '[role="tab"][aria-label*="Debrief"]',
+        '.activitybar [aria-label*="Debrief" i]',
+      ].join(', ')
+    ).first();
+    await debriefIcon.click();
+    // Wait for the sidebar content to render
+    await this.page.locator('.composite.viewlet').waitFor({
+      state: 'visible',
+      timeout: 5_000,
+    }).catch(() => {});
+  }
+
+  /**
+   * Access the Activity Panel webview frame (sidebar — FeatureList, ToolsPanel, TimeController).
+   *
+   * The Activity Panel lives in the Debrief sidebar container as a webview view.
+   * It uses the same two-level iframe nesting as editor webviews.
+   *
+   * @returns FrameLocator pointing to the innermost Activity Panel content
+   */
+  async getActivityPanelFrame(): Promise<FrameLocator> {
+    // Ensure the Debrief sidebar is open
+    await this.openDebriefSidebar();
+
+    // Find the Activity Panel webview by probing frame content.
+    // The Activity Panel renders .debrief-activity-panel as its root element.
+    return this.findWebviewFrameByContent('.debrief-activity-panel', 15_000);
+  }
+
+  /**
+   * Access the Log Panel webview frame (sidebar — LogPanel with entries and edit face).
+   *
+   * The Log Panel lives alongside the Activity Panel in the Debrief sidebar.
+   * It may need to be scrolled into view or its tab clicked.
+   *
+   * @returns FrameLocator pointing to the innermost Log Panel content
+   */
+  async getLogPanelFrame(): Promise<FrameLocator> {
+    // Ensure the Debrief sidebar is open
+    await this.openDebriefSidebar();
+
+    // Try to focus the Log Panel view via command palette
+    await this.page.keyboard.press('Control+Shift+P');
+    await this.commandInput.waitFor({ state: 'visible', timeout: 3_000 });
+    await this.commandInput.fill('Debrief Log: Focus on Debrief Log View');
+    await this.page.keyboard.press('Enter');
+
+    // Find the Log Panel webview by probing frame content.
+    // The Log Panel renders [data-testid="log-panel"] as its root element.
+    return this.findWebviewFrameByContent('[data-testid="log-panel"]', 15_000);
+  }
+
+  /**
+   * Find a specific webview frame by probing for a CSS selector in its content.
+   *
+   * Iterates all webview host frames and checks each inner frame for the
+   * given selector. Returns a FrameLocator for the matching inner frame.
+   *
+   * @param selector - CSS selector to probe for inside the webview
+   * @param timeoutMs - Maximum time to wait for the frame to appear
+   */
+  private async findWebviewFrameByContent(
+    selector: string,
+    timeoutMs: number
+  ): Promise<FrameLocator> {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      const frames = this.page.frames();
+      for (const frame of frames) {
+        if (!frame.url().includes('webview')) continue;
+        const children = frame.childFrames();
+        for (const child of children) {
+          const hasContent = await child
+            .locator(selector)
+            .first()
+            .isVisible()
+            .catch(() => false);
+          if (hasContent) {
+            // Found it — return a FrameLocator chain for stable access
+            // We need to identify which outer iframe this is.
+            // Use the frame's URL to create a specific FrameLocator.
+            const outerUrl = frame.url();
+            const outerLocator = this.page.frameLocator(
+              `iframe.webview[src*="${this.extractFrameId(outerUrl)}"]`
+            );
+            return outerLocator.frameLocator('#active-frame');
+          }
+        }
+      }
+      await this.page.waitForTimeout(500);
+    }
+    throw new Error(`Webview frame with content "${selector}" not found after ${timeoutMs}ms`);
+  }
+
+  /** Extract a unique identifier from a webview frame URL for locator targeting. */
+  private extractFrameId(url: string): string {
+    // Webview URLs contain a unique ID. Extract a substring for matching.
+    const match = url.match(/vscode-webview:\/\/([^/]+)/);
+    return match ? match[1].substring(0, 20) : '';
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // STAC Tree Helpers (private)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /** Focus the STAC Stores view via command palette. */
+  private async focusStacView(): Promise<void> {
+    await this.page.keyboard.press('Control+Shift+P');
+    await this.commandInput.waitFor({ state: 'visible', timeout: 3_000 });
+    await this.commandInput.fill('View: Focus on STAC Stores View');
+    await this.page.keyboard.press('Enter');
+    // Wait for the STAC pane header to appear (confirms view focused)
+    await this.page.locator('.pane-header:has-text("STAC STORES")')
+      .waitFor({ state: 'visible', timeout: 5_000 })
+      .catch(() => {});
+  }
+
+  /** Poll until the extension finishes loading stores. */
+  private async waitForExtensionReady(timeoutMs: number): Promise<boolean> {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      const loadingVisible = await this.page
+        .getByText('Loading stores')
+        .isVisible()
+        .catch(() => false);
+      if (!loadingVisible) return true;
+      await this.page.waitForTimeout(500);
+    }
+    return false;
+  }
+
+  /** Ensure the STAC STORES pane is expanded (not collapsed). */
+  private async ensureStacPaneExpanded(): Promise<void> {
+    const stacHeader = this.page.locator('.pane-header:has-text("STAC STORES")');
+    await stacHeader.waitFor({ state: 'visible', timeout: 10_000 }).catch(async () => {
+      await this.page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-pane.png' });
+      throw new Error('STAC STORES pane header not visible after 10s');
+    });
+
+    const expanded = await stacHeader.getAttribute('aria-expanded');
+    if (expanded === 'false') {
+      await stacHeader.click();
+      // Wait for list rows to appear (confirms pane expanded)
+      await this.page.locator('.monaco-list-row').first()
+        .waitFor({ state: 'visible', timeout: 3_000 })
+        .catch(() => {});
+    } else if (expanded === null) {
+      await stacHeader.click();
+      await this.page.locator('.monaco-list-row').first()
+        .waitFor({ state: 'visible', timeout: 3_000 })
+        .catch(async () => {
+          // Toggle again — may have collapsed
+          await stacHeader.click();
+          await this.page.locator('.monaco-list-row').first()
+            .waitFor({ state: 'visible', timeout: 3_000 })
+            .catch(() => {});
+        });
+    }
+  }
+
+  /** Seed Debrief config via terminal and reload the window. */
+  private async seedConfigAndReload(): Promise<void> {
+    const page = this.page;
+
+    // Open terminal
+    await page.keyboard.press('Control+Backquote');
+    await page.locator('.terminal-widget').waitFor({
+      state: 'visible',
+      timeout: 5_000,
+    }).catch(() => {});
+
+    // Detect workspace path from the terminal's current directory.
+    // code-server opens in the workspace root; openvscode-server may differ.
+    // Use a relative path from wherever the workspace is mounted.
+    const configCmd =
+      'mkdir -p ~/.config/debrief && ' +
+      'echo \'{"stores":[{"id":"local-store","path":"\'$(pwd)\'/local-store",' +
+      '"displayName":"Test Maritime Data","status":"available"}],"preferences":{}}\' ' +
+      '> ~/.config/debrief/config.json';
+    await page.keyboard.type(configCmd, { delay: 5 });
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(1_000);
+    await page.keyboard.press('Control+Backquote'); // close terminal
+
+    // Reload window
+    await page.keyboard.press('Control+Shift+P');
+    await this.commandInput.waitFor({ state: 'visible', timeout: 3_000 });
+    await this.commandInput.fill('Developer: Reload Window');
+    await page.keyboard.press('Enter');
+
+    // Wait for reload — workbench disappears and reappears
+    await page.locator('.monaco-workbench').waitFor({ state: 'visible', timeout: 30_000 });
+    await page.waitForSelector('.editor-group-container', {
+      state: 'visible',
+      timeout: 30_000,
+    });
   }
 }

@@ -135,6 +135,12 @@ Only updated when a feature introduces a technology not already listed here.
 - N/A — configuration and code quality feature (098-strict-type-checking)
 - Python 3.11 (services, schemas), TypeScript 5.x (VS Code, shared components, web-shell) + Pydantic v2 (validation), LinkML >= 1.7.0 (schema source), `debrief-schemas` (generated models) (115-schema-validated-tool-io)
 - Python 3.11 (service), TypeScript 5.x (VS Code + web-shell frontends) + debrief-calc (Python tool framework), VS Code Extension API (TypeScript) (079-move-track)
+- TypeScript 5.x + `cql2-filters-parser` (CQL2 parsing/serialisation, zero-dep ES module) (126-cql2-filter-engine)
+- Python 3.11 (fixture generator, schema, tests), LinkML >= 1.7.0 (schema source) + LinkML (schema), Pydantic v2 (validation), jsonschema (fixture validation) (125-stac-extension-mock-data)
+- Python 3.11 (service), TypeScript 5.x (VS Code extension consumer) + Pydantic v2 (models), existing `debrief-stac` service module, `mcp.server.fastmcp` (MCP exposure) (136-stac-collection-summaries)
+- TypeScript 5.x (React 18.x component) + React 18.x, react-leaflet 4.2 (peer — not directly used), vitest (testing), Storybook (visual dev) (131-timeline-gantt-view)
+- TypeScript 5.x + `@dnd-kit/core` + `@dnd-kit/sortable` (drag-to-group), `@debrief/components` filter-engine (#126), `vscrui` (VS Code icons), `nanoid` (unique IDs) (127-filter-bar-lozenge-ui)
+- TypeScript 5.x (React 18.x components, Zustand store) + Zustand ^5.0.0, React 18.x, react-leaflet 4.2, `@debrief/components` (FilterBar, CQL2 filter engine), `@debrief/session-state` (132-three-view-sync)
 
 - Python 3.11 (services, schemas, calc tools)
 - TypeScript 5.x (VS Code extension, webview, shared components, session-state)
@@ -197,6 +203,6 @@ cd apps/web-shell && node run-playwright.mjs && cd ../..
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
-- 079-move-track: Added Python 3.11 (service), TypeScript 5.x (VS Code + web-shell frontends) + debrief-calc (Python tool framework), VS Code Extension API (TypeScript)
-- 115-schema-validated-tool-io: Added Python 3.11 (services, schemas), TypeScript 5.x (VS Code, shared components, web-shell) + Pydantic v2 (validation), LinkML >= 1.7.0 (schema source), `debrief-schemas` (generated models)
-- 100-unify-feature-pipeline: Added TypeScript 5.x (VS Code extension + shared components) + `@debrief/schemas` (generated types), `@debrief/components` (MapView), VS Code Extension API ^1.85.0
+- 132-three-view-sync: Added TypeScript 5.x (React 18.x components, Zustand store) + Zustand ^5.0.0, React 18.x, react-leaflet 4.2, `@debrief/components` (FilterBar, CQL2 filter engine), `@debrief/session-state`
+- 136-stac-collection-summaries: Added Python 3.11 (service), TypeScript 5.x (VS Code extension consumer) + Pydantic v2 (models), existing `debrief-stac` service module, `mcp.server.fastmcp` (MCP exposure)
+- 131-timeline-gantt-view: Added TypeScript 5.x (React 18.x component) + React 18.x, react-leaflet 4.2 (peer — not directly used), vitest (testing), Storybook (visual dev)

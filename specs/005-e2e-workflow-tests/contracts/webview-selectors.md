@@ -1,12 +1,18 @@
 # Contract: Webview Selectors for E2E Tests
 
+**Revised**: 2026-03-06 — Updated for dual-platform strategy
+
 ## Purpose
 
-Defines the DOM selectors that e2e tests use to interact with Debrief webview components. These selectors are the contract between the test suite and the webview implementation — if a selector changes, the tests must be updated.
+Defines the DOM selectors that E2E tests use to interact with Debrief components. Both test surfaces (web-shell and VS Code E2E) target the same underlying React/Leaflet components, but the VS Code E2E tests must navigate through VS Code's iframe hierarchy to reach them.
 
-## VS Code Chrome Selectors (code-server managed)
+## Web-Shell Selectors (direct access)
 
-These selectors target VS Code's own UI and may change between code-server versions. Keep interactions minimal.
+Web-shell tests access Debrief components directly via standard Playwright locators. The "Debrief Webview Selectors" below apply without iframe traversal.
+
+## VS Code Chrome Selectors (openvscode-server / code-server managed)
+
+These selectors target VS Code's own UI and may change between server versions. Keep interactions minimal.
 
 | Element | Selector | Used For |
 |---------|----------|----------|

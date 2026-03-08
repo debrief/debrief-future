@@ -40,7 +40,13 @@ interface OverviewWebviewReadyMessage {
   type: 'overviewWebviewReady';
 }
 
-type OverviewToExtensionMessage = OverviewItemSelectedMessage | OverviewWebviewReadyMessage;
+/** Message sent from webview when map viewport changes (Feature: 130-map-spatial-filtering) */
+interface OverviewViewportChangedMessage {
+  type: 'overviewViewportChanged';
+  bounds: [number, number, number, number] | null;
+}
+
+type OverviewToExtensionMessage = OverviewItemSelectedMessage | OverviewWebviewReadyMessage | OverviewViewportChangedMessage;
 
 export class CatalogOverviewPanel {
   public static readonly viewType = 'debrief.catalogOverview';
@@ -55,6 +61,7 @@ export class CatalogOverviewPanel {
   private pendingMessages: ExtensionToOverviewMessage[] = [];
   private catalogId = '';
   private storeId = '';
+  private viewportBounds: [number, number, number, number] | null = null;
 
   private constructor(
     panel: vscode.WebviewPanel,
@@ -193,7 +200,17 @@ export class CatalogOverviewPanel {
           uri: `stac://${this.storeId}/${message.itemPath}`,
         });
         break;
+
+      case 'overviewViewportChanged':
+        // Store viewport bounds for cross-view synchronisation (Feature: 130)
+        this.viewportBounds = message.bounds;
+        break;
     }
+  }
+
+  /** Get the current map viewport bounds, or null if not yet initialised. */
+  public getViewportBounds(): [number, number, number, number] | null {
+    return this.viewportBounds;
   }
 
   public dispose(): void {

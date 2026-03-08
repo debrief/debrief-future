@@ -60,6 +60,42 @@ class PlotSummary(BaseModel):
     model_config = {"populate_by_name": True}
 
 
+class CollectionExtent(BaseModel):
+    """Spatial and temporal extent of a STAC Collection.
+
+    Attributes:
+        bbox: Bounding box as (west, south, east, north), or None if no spatial data
+        temporal_start: Earliest start datetime ISO string, or None
+        temporal_end: Latest end datetime ISO string, or None
+    """
+
+    bbox: tuple[float, float, float, float] | None = Field(
+        default=None, description="Bounding box [west, south, east, north]"
+    )
+    temporal_start: str | None = Field(default=None, description="Earliest start datetime")
+    temporal_end: str | None = Field(default=None, description="Latest end datetime")
+
+
+class CollectionSummaries(BaseModel):
+    """Pre-aggregated distinct values for extension properties.
+
+    Each array contains the sorted, deduplicated values across all items.
+
+    Attributes:
+        vessel_classes: Distinct vessel class paths
+        tags: Distinct plot-level tags
+        feature_tags: Distinct feature-level tags
+        track_names: Distinct track names
+        nationalities: Distinct nationality codes (ISO 3166-1 alpha-2)
+    """
+
+    vessel_classes: list[str] = Field(default_factory=list, description="Distinct vessel classes")
+    tags: list[str] = Field(default_factory=list, description="Distinct plot-level tags")
+    feature_tags: list[str] = Field(default_factory=list, description="Distinct feature-level tags")
+    track_names: list[str] = Field(default_factory=list, description="Distinct track names")
+    nationalities: list[str] = Field(default_factory=list, description="Distinct nationality codes")
+
+
 class AssetProvenance(BaseModel):
     """Provenance metadata for source file assets.
 

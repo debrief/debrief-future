@@ -66,23 +66,27 @@ function whichSync(cmd: string): string | null {
  * Write machine-level settings to disable the Welcome tab and workspace trust.
  * The Welcome tab captures keyboard focus into an iframe, breaking shortcuts.
  * Workspace trust must be disabled so extensions activate without user interaction.
+ *
+ * NOTE: openvscode-server auto-appends a /data subdirectory to --user-data-dir
+ * (see https://github.com/gitpod-io/openvscode-server/issues/512), so we write
+ * settings to BOTH paths as belt-and-suspenders.
  */
 function writeVSCodeSettings(dataDir: string): void {
-  const settingsDir = join(dataDir, 'User');
-  mkdirSync(settingsDir, { recursive: true });
-  writeFileSync(
-    join(settingsDir, 'settings.json'),
-    JSON.stringify(
-      {
-        'security.workspace.trust.enabled': false,
-        'workbench.startupEditor': 'none',
-        'workbench.welcomePage.walkthroughs.openOnInstall': false,
-        'workbench.tips.enabled': false,
-      },
-      null,
-      2
-    )
+  const settings = JSON.stringify(
+    {
+      'security.workspace.trust.enabled': false,
+      'workbench.startupEditor': 'none',
+      'workbench.welcomePage.walkthroughs.openOnInstall': false,
+      'workbench.tips.enabled': false,
+    },
+    null,
+    2
   );
+  for (const base of [dataDir, join(dataDir, 'data')]) {
+    const settingsDir = join(base, 'User');
+    mkdirSync(settingsDir, { recursive: true });
+    writeFileSync(join(settingsDir, 'settings.json'), settings);
+  }
 }
 
 /**
@@ -123,11 +127,9 @@ function ensureDebriefConfig(): void {
 }
 
 async function globalSetup(): Promise<void> {
-  // Ensure the test STAC store is registered for locally-started servers.
-  // Docker environments are pre-seeded via the Dockerfile.
-  if (!process.env.CODE_SERVER_URL) {
-    ensureDebriefConfig();
-  }
+  // Ensure the test STAC store is registered.
+  // This is idempotent — only writes if config.json doesn't exist yet.
+  ensureDebriefConfig();
 
   // If CODE_SERVER_URL is explicitly set, assume external management (Docker)
   if (process.env.CODE_SERVER_URL) {
@@ -157,9 +159,12 @@ async function globalSetup(): Promise<void> {
         '--port',
         DEFAULT_PORT,
         '--without-connection-token',
-        '--disable-telemetry',
+        '--telemetry-level',
+        'off',
+        '--disable-workspace-trust',
         '--user-data-dir',
         dataDir,
+        '--default-folder',
         WORKSPACE_PATH,
       ],
       { stdio: 'pipe', detached: true }

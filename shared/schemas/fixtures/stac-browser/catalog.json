@@ -1,0 +1,519 @@
+{
+  "type": "Catalog",
+  "id": "debrief-exercises",
+  "stac_version": "1.0.0",
+  "description": "Debrief maritime exercise catalog \u2014 100 deterministic fixtures for testing.",
+  "title": "Debrief Exercise Catalog",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-empty-plot-001/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-empty-plot-002/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-empty-plot-003/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-multi-nation-001/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-multi-nation-002/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-multi-nation-003/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-multi-nation-004/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-multi-nation-005/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-single-point-001/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-single-point-002/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-single-point-003/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-long-duration-001/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-long-duration-002/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-long-duration-003/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-dense-tracks-001/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-dense-tracks-002/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-dense-tracks-003/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-cutlass-express/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-griffin-strike/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-zenith-wave/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-aurora-borealis/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-kestrel-eye/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-phoenix-express/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-thunder-forge/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-silent-resolve/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-bersama-lima/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-raptor-chase/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-tempest-anvil/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-harrier-sprint/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-vanguard-horizon/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-xerxes-march/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-northern-coasts/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-sierra-storm/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-nomad-venture/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-neptune-strike/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-osprey-watch/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-argonaut-dawn/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-dragon-hammer/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-aegis-lance/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-bastion-wall/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-wolf-pack-alpha/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-saxon-warrior/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-poseidon-guard/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-viper-coil/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-rimpac-echo/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-formidable-shield/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-barracuda-surge/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-cerberus-gate/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-coral-sabre/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-kakadu-sun/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-halcyon-dawn/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-boreas-shield/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-archipelago-sentinel/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-dagger-point/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-citadel-peak/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-sceptre-tide/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-sea-breeze/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-ocean-shield/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-eagle-resolve/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-talon-strike/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-atlas-venture/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-vigilant-mariner/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-ursus-patrol/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-javelin-thrust/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-dynamic-mongoose/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-meridian-watch/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-pitch-black/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-polaris-star/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-talisman-sabre/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-iron-resolve/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-puma-prowl/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-falcon-reach/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-bright-star/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-yeoman-guard/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-cold-response/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-joint-warrior/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-cobra-warrior/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-zephyr-gale/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-triton-sweep/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-storm-petrel/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-condor-flight/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-trident-juncture/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-obangame-express/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-steadfast-defender/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-malabar-horizon/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-baltic-shield/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-lancer-sweep/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-087/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-088/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-089/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-090/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-091/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-092/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-093/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-094/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-095/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-096/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-097/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-098/item.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./exercise-exercise-alpha-099/item.json",
+      "type": "application/json"
+    }
+  ]
+}

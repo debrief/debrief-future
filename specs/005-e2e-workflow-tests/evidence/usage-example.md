@@ -1,68 +1,85 @@
-# Usage Example: Running E2E Tests
+# Usage Example: Running Dual-Platform E2E Tests
 
-## Local Quickstart (5 steps)
+## Quick Reference
+
+| Suite | Command | Speed | Data |
+|-------|---------|-------|------|
+| Web-shell | `pnpm --filter @debrief/web-shell test` | ~30s | Mock |
+| VS Code E2E | `npx playwright test --config tests/e2e/playwright.config.ts` | ~3min | Real |
+
+## Web-Shell Tests (Fast, Mock Data)
 
 ```bash
-# 1. Install project dependencies
-task install
+# Run all 13 web-shell spec categories
+pnpm --filter @debrief/web-shell test
 
-# 2. Build the VS Code extension
-pnpm run build --filter @debrief/vscode
-
-# 3. Package as .vsix
-cd apps/vscode && pnpm run package && cd ../..
-
-# 4. Install extension in code-server and start it
-code-server --install-extension apps/vscode/debrief-*.vsix
-code-server --auth none --port 8080 tests/e2e/test-workspace/
-
-# 5. In another terminal, run the tests
-npx playwright test --config tests/e2e/playwright.config.ts
+# Run a single category
+pnpm --filter @debrief/web-shell test -- --grep "selection"
 ```
 
-## Docker Quickstart (2 steps)
+## VS Code E2E Tests (Real Services)
+
+### Option 1: Docker (Recommended)
 
 ```bash
-# 1. Build the Docker image (includes code-server + services + extension)
+# Build Docker image with code-server + Python services + extension
 docker compose -f docker/code-server/docker-compose.yml build
 
-# 2. Start code-server and run tests
+# Start code-server container
 docker compose -f docker/code-server/docker-compose.yml up -d
-npx playwright test --config tests/e2e/playwright.config.ts
+
+# Wait for readiness, then run tests
+CODE_SERVER_URL=http://localhost:8080 \
+  npx playwright test --config tests/e2e/playwright.config.ts
+
+# Cleanup
 docker compose -f docker/code-server/docker-compose.yml down
 ```
 
-## Running Individual Test Suites
+### Option 2: Local Development
 
 ```bash
-# P1: File loading workflow
-npx playwright test --config tests/e2e/playwright.config.ts test-load-display
+# 1. Build and package extension
+pnpm --filter @debrief/vscode build
+cd apps/vscode && pnpm run package && cd ../..
 
-# P2: Analysis tool workflow
-npx playwright test --config tests/e2e/playwright.config.ts test-analysis-tool
+# 2. Install in code-server and start
+code-server --install-extension apps/vscode/debrief-*.vsix
+code-server --auth none --port 8080 tests/e2e/test-workspace/
 
-# P3: Error feedback workflow
-npx playwright test --config tests/e2e/playwright.config.ts test-error-feedback
+# 3. Run tests (separate terminal)
+CODE_SERVER_URL=http://localhost:8080 \
+  npx playwright test --config tests/e2e/playwright.config.ts
 ```
 
-## Debugging
+### Option 3: Cloud (Claude Code)
 
 ```bash
-# Run with Playwright UI (headed mode)
-npx playwright test --config tests/e2e/playwright.config.ts --ui
+# Uses @sparticuz/chromium bundled binary
+CLAUDE_CODE=1 npx playwright test --config tests/e2e/playwright.config.ts
+```
 
-# Run with trace recording
-npx playwright test --config tests/e2e/playwright.config.ts --trace on
+## Running Specific Test Categories
 
-# View last test report
-npx playwright show-report
+```bash
+# Restored specs (Phase 7)
+npx playwright test --config tests/e2e/playwright.config.ts test-load-display
+npx playwright test --config tests/e2e/playwright.config.ts test-analysis-tool
+npx playwright test --config tests/e2e/playwright.config.ts test-error-feedback
+npx playwright test --config tests/e2e/playwright.config.ts test-tune-prov
+
+# New specs (Phase 8)
+npx playwright test --config tests/e2e/playwright.config.ts test-selection-sync
+npx playwright test --config tests/e2e/playwright.config.ts test-catalog-browse
+
+# All VS Code E2E (excluding Heroku smoke)
+npx playwright test --config tests/e2e/playwright.config.ts --grep-invert "Heroku"
 ```
 
 ## Key Pattern: Accessing Webview Content
 
 ```typescript
-import { test } from './fixtures/base';
-import { DebriefWebview } from './models/debrief-webview';
+import { test, expect } from './fixtures/base';
 
 test('loads REP file and shows tracks', async ({ codeServerPage }) => {
   // Open file via VS Code Quick Open
@@ -70,39 +87,33 @@ test('loads REP file and shows tracks', async ({ codeServerPage }) => {
 
   // Drill into VS Code's nested webview iframes
   const frame = await codeServerPage.getWebviewFrame();
-  const debrief = new DebriefWebview(frame);
 
-  // Interact with Debrief components inside the webview
-  await debrief.waitForMapReady();
-  const trackCount = await debrief.getTrackCount();
+  // Wait for map and verify tracks rendered
+  await frame.locator('.leaflet-container').waitFor({ state: 'visible' });
+  const trackCount = await frame.locator('.leaflet-interactive').count();
   expect(trackCount).toBeGreaterThan(0);
 });
+```
+
+## Debugging
+
+```bash
+# Playwright UI mode
+npx playwright test --config tests/e2e/playwright.config.ts --ui
+
+# Trace recording
+npx playwright test --config tests/e2e/playwright.config.ts --trace on
+
+# View HTML report
+npx playwright show-report
 ```
 
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CODE_SERVER_URL` | `http://localhost:8080` | Base URL for code-server |
-| `CODE_SERVER_AUTH` | `none` | Authentication mode |
-| `CLAUDE_CODE` | unset | Set to `1` to use @sparticuz/chromium |
-| `CHROMIUM_PATH` | unset | Explicit path to chromium binary |
-
-## File Structure
-
-```
-tests/e2e/
-├── playwright.config.ts          # Config (baseURL, timeouts, retries)
-├── global-setup.ts               # Starts code-server before all tests
-├── global-teardown.ts            # Stops code-server after all tests
-├── fixtures/base.ts              # Custom fixture: codeServerPage
-├── models/
-│   ├── code-server-page.ts       # VS Code chrome interactions
-│   └── debrief-webview.ts        # Debrief component interactions
-├── test-workspace/               # Pre-configured workspace for tests
-│   ├── samples/                  # Symlinked REP fixtures
-│   └── .vscode/settings.json    # Extension config
-├── test-load-display.spec.ts     # P1: File loading workflow
-├── test-analysis-tool.spec.ts    # P2: Tool execution workflow
-└── test-error-feedback.spec.ts   # P3: Error handling workflow
-```
+| `CODE_SERVER_URL` | `http://localhost:8080` | code-server base URL |
+| `CLAUDE_CODE` | unset | Set to `1` for @sparticuz/chromium |
+| `CHROMIUM_PATH` | unset | Explicit chromium binary path |
+| `E2E_HEADED` | unset | Set to `1` for headed mode |
+| `CI` | unset | Set in CI — enables `forbidOnly` |

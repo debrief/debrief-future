@@ -1,0 +1,110 @@
+{
+  "description": "Sample filter inputs and expected result counts against 100 mock STAC items",
+  "samples": [
+    {
+      "name": "Empty filter (match all)",
+      "expression": { "predicates": [], "orGroups": [] },
+      "expectedBehaviour": "Returns all 100 items"
+    },
+    {
+      "name": "Single nationality filter (GB)",
+      "expression": {
+        "predicates": [{ "type": "nationality", "value": "GB" }],
+        "orGroups": []
+      },
+      "expectedBehaviour": "Returns items where nationalities includes GB"
+    },
+    {
+      "name": "Hierarchical vessel-class (warship)",
+      "expression": {
+        "predicates": [{ "type": "vessel-class", "value": "warship" }],
+        "orGroups": []
+      },
+      "expectedBehaviour": "Returns items with any warship descendant (frigate, destroyer, carrier, corvette, patrol)"
+    },
+    {
+      "name": "AND: nationality + vessel-class",
+      "expression": {
+        "predicates": [
+          { "type": "nationality", "value": "GB" },
+          { "type": "vessel-class", "value": "frigate" }
+        ],
+        "orGroups": []
+      },
+      "expectedBehaviour": "Returns only GB items with frigate-descendant vessel classes"
+    },
+    {
+      "name": "OR group: type23 OR type45",
+      "expression": {
+        "predicates": [],
+        "orGroups": [
+          {
+            "predicates": [
+              { "type": "vessel-class", "value": "type23" },
+              { "type": "vessel-class", "value": "type45" }
+            ]
+          }
+        ]
+      },
+      "expectedBehaviour": "Returns items with Type 23 OR Type 45 vessel class"
+    },
+    {
+      "name": "Mixed AND + OR",
+      "expression": {
+        "predicates": [{ "type": "nationality", "value": "GB" }],
+        "orGroups": [
+          {
+            "predicates": [
+              { "type": "vessel-class", "value": "frigate" },
+              { "type": "vessel-class", "value": "destroyer" }
+            ]
+          }
+        ]
+      },
+      "expectedBehaviour": "Returns GB items with frigate OR destroyer vessel classes"
+    },
+    {
+      "name": "Duration bucket (<6H)",
+      "expression": {
+        "predicates": [{ "type": "duration", "value": "<6H" }],
+        "orGroups": []
+      },
+      "expectedBehaviour": "Returns items with duration under 6 hours"
+    },
+    {
+      "name": "Title substring search",
+      "expression": {
+        "predicates": [{ "type": "title", "value": "exercise" }],
+        "orGroups": []
+      },
+      "expectedBehaviour": "Returns all 100 items (all titles contain 'Exercise')"
+    },
+    {
+      "name": "CQL2 JSON output for mixed AND+OR",
+      "input": {
+        "predicates": [{ "type": "nationality", "value": "GB" }],
+        "orGroups": [
+          {
+            "predicates": [
+              { "type": "vessel-class", "value": "type23" },
+              { "type": "vessel-class", "value": "type45" }
+            ]
+          }
+        ]
+      },
+      "cql2Json": {
+        "op": "and",
+        "args": [
+          { "op": "a_containedBy", "args": [["GB"], { "property": "debrief:nationalities" }] },
+          {
+            "op": "or",
+            "args": [
+              { "op": "a_containedBy", "args": [["type23"], { "property": "debrief:vessel_classes" }] },
+              { "op": "a_containedBy", "args": [["type45"], { "property": "debrief:vessel_classes" }] }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

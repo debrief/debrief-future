@@ -1,0 +1,99 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-multi-nation-003",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0.992,
+          33.1696
+        ],
+        [
+          1.6701,
+          33.1696
+        ],
+        [
+          1.6701,
+          33.8477
+        ],
+        [
+          0.992,
+          33.8477
+        ],
+        [
+          0.992,
+          33.1696
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0.992,
+    33.1696,
+    1.6701,
+    33.8477
+  ],
+  "properties": {
+    "title": "Exercise Multi Nation 003",
+    "description": "Multi Nation 003 \u2014 Mediterranean exercise. 3 track(s), 5 nation(s). Multi-national exercise with 4+ participant nations.",
+    "datetime": null,
+    "start_datetime": "2021-08-22T03:00:00Z",
+    "end_datetime": "2021-08-22T19:09:05Z",
+    "debrief:vessel_classes": [
+      "surface/warship/destroyer/arleigh-burke",
+      "surface/warship/patrol/river"
+    ],
+    "debrief:tags": [
+      "amphibious"
+    ],
+    "debrief:feature_tags": [
+      "helicopter-ops",
+      "zig-zag",
+      "active-search"
+    ],
+    "debrief:track_names": [
+      "HNLMS Visby",
+      "HMAS Evertsen",
+      "HNoMS Tromp"
+    ],
+    "debrief:nationalities": [
+      "NL",
+      "AU",
+      "NO",
+      "SE",
+      "FR"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-multi-nation-003.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

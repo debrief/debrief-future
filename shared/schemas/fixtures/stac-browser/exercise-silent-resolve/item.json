@@ -1,0 +1,99 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-silent-resolve",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          7.5157,
+          73.0662
+        ],
+        [
+          8.4503,
+          73.0662
+        ],
+        [
+          8.4503,
+          74.0008
+        ],
+        [
+          7.5157,
+          74.0008
+        ],
+        [
+          7.5157,
+          73.0662
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    7.5157,
+    73.0662,
+    8.4503,
+    74.0008
+  ],
+  "properties": {
+    "title": "Exercise Silent Resolve",
+    "description": "Silent Resolve \u2014 Arctic exercise. 7 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2023-06-25T04:00:00Z",
+    "end_datetime": "2023-06-30T04:47:45Z",
+    "debrief:vessel_classes": [
+      "subsurface/submarine/ssn/astute"
+    ],
+    "debrief:tags": [
+      "gunnery",
+      "replenishment",
+      "amphibious"
+    ],
+    "debrief:feature_tags": [
+      "sonar-contact"
+    ],
+    "debrief:track_names": [
+      "FGS Richmond",
+      "FS Helsingborg",
+      "FGS Tromp",
+      "FS Helge Ingstad",
+      "FGS Mahan",
+      "FS Margottini",
+      "FGS Westminster"
+    ],
+    "debrief:nationalities": [
+      "DE",
+      "FR"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-silent-resolve.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

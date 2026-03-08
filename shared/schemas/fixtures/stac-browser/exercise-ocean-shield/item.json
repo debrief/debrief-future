@@ -1,0 +1,98 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-ocean-shield",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          105.2291,
+          6.0707
+        ],
+        [
+          105.9961,
+          6.0707
+        ],
+        [
+          105.9961,
+          6.8377
+        ],
+        [
+          105.2291,
+          6.8377
+        ],
+        [
+          105.2291,
+          6.0707
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    105.2291,
+    6.0707,
+    105.9961,
+    6.8377
+  ],
+  "properties": {
+    "title": "Exercise Ocean Shield",
+    "description": "Ocean Shield \u2014 Indo-Pacific exercise. 6 track(s), 3 nation(s).",
+    "datetime": null,
+    "start_datetime": "2021-03-06T11:00:00Z",
+    "end_datetime": "2021-03-13T16:08:21Z",
+    "debrief:vessel_classes": [
+      "surface/warship/frigate/type26",
+      "surface/warship/frigate/type23",
+      "surface/warship/destroyer/arleigh-burke"
+    ],
+    "debrief:tags": [
+      "mine-clearance",
+      "boarding"
+    ],
+    "debrief:feature_tags": [],
+    "debrief:track_names": [
+      "HNoMS Portland",
+      "HMS Northumberland",
+      "FGS Otto Sverdrup",
+      "HNoMS Helge Ingstad",
+      "HMS Defender",
+      "FGS De Ruyter"
+    ],
+    "debrief:nationalities": [
+      "NO",
+      "GB",
+      "DE"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-ocean-shield.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

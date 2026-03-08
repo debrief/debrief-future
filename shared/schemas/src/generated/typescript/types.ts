@@ -28,6 +28,8 @@ export enum FeatureKindEnum {
     MULTI_POINT = "MULTI_POINT",
     /** Multi-polygon tool result (MultiPolygon geometry) */
     MULTI_POLYGON = "MULTI_POLYGON",
+    /** Plot-level system record (snapshot chain, branches) */
+    SYSTEM_RECORD = "SYSTEM_RECORD",
 };
 /**
 * Type of track feature
@@ -311,6 +313,31 @@ export enum FileProvDirectionEnum {
     /** This file is the target of the branch */
     target = "target",
 };
+/**
+* Top-level vessel domain classification
+*/
+export enum VesselDomainEnum {
+    
+    /** Surface vessels (warships, auxiliaries, merchant) */
+    surface = "surface",
+    /** Subsurface vessels (submarines) */
+    subsurface = "subsurface",
+    /** Vessel domain not determined or not applicable */
+    unknown = "unknown",
+};
+
+
+/**
+ * Abstract base for all GeoJSON feature properties classes. Provides shared attributes inherited by every concrete properties type.
+ */
+export interface BaseFeatureProperties {
+    /** Feature type discriminator */
+    kind: string,
+    /** Free-text labels assigned to this feature by the analyst */
+    tags?: string[],
+    /** PROV-aligned provenance records (append-only log of tool operations) */
+    provenance?: LogEntry[],
+}
 
 
 /**
@@ -641,7 +668,7 @@ export interface TUAData {
 /**
  * Properties for a TrackFeature
  */
-export interface TrackProperties {
+export interface TrackProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Platform/vessel identifier */
@@ -656,8 +683,6 @@ export interface TrackProperties {
     end_time: string,
     /** Array of timestamped positions */
     positions: TimestampedPosition[],
-    /** Original source file path */
-    source_file?: string,
     /** Composite styling for track line and position markers */
     style: TrackStyle,
     /** Default styling applied to all positions */
@@ -674,8 +699,6 @@ export interface TrackProperties {
     sensors?: SensorData[],
     /** Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions. */
     tuas?: TUAData[],
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -710,7 +733,7 @@ export interface PointMetadataEntry {
 /**
  * Properties for a ReferenceLocation
  */
-export interface ReferenceLocationProperties {
+export interface ReferenceLocationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Reference location name */
@@ -729,8 +752,6 @@ export interface ReferenceLocationProperties {
     valid_until?: string,
     /** Per-point metadata array, parallel to MultiPoint coordinates. Each entry contains at minimum an index and name. Downstream tools extend entries with zone/color fields. */
     point_metadata?: PointMetadataEntry[],
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -792,7 +813,7 @@ export interface SystemState {
 /**
  * Properties for a MultiPointFeature (multi-point tool results)
  */
-export interface MultiPointFeatureProperties {
+export interface MultiPointFeatureProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Human-readable result label */
@@ -805,8 +826,6 @@ export interface MultiPointFeatureProperties {
     source_features?: string[],
     /** Additional description or notes */
     description?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -830,7 +849,7 @@ export interface MultiPointFeature {
 /**
  * Properties for a MultiPolygonFeature (multi-polygon tool results)
  */
-export interface MultiPolygonFeatureProperties {
+export interface MultiPolygonFeatureProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Human-readable result label */
@@ -843,8 +862,6 @@ export interface MultiPolygonFeatureProperties {
     source_features?: string[],
     /** Additional description or notes */
     description?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -885,6 +902,12 @@ export interface LogEntry {
     generated_result_id?: string,
     /** Parameter tuning record. Null until a tuning operation modifies this entry. */
     tune?: TuneAnnotation,
+    /** Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools. */
+    input_state?: InputFeatureState[],
+    /** Whether this entry is skipped during replay. Toggled via the flip-card edit face. */
+    disabled?: boolean,
+    /** Free-text analyst annotation explaining the reasoning for this operation. */
+    rationale?: string,
 }
 
 
@@ -915,6 +938,19 @@ export interface ParameterValue {
 
 
 /**
+ * Pre-operation state of a feature captured before a coordinate-mutating tool executes. Enables correct replay by providing the original geometry as the anchor for re-computation with modified parameters.
+ */
+export interface InputFeatureState {
+    /** ID of the feature whose pre-operation state is captured. */
+    feature_id: string,
+    /** Full GeoJSON geometry object (type + coordinates) as it was immediately before the operation. Stored as a JSON object. */
+    geometry: string,
+    /** Kind-specific spatial properties captured before the operation. Excludes provenance (which is append-only). Null if no spatial properties need capturing. */
+    properties?: string,
+}
+
+
+/**
  * Records a parameter modification (appended, not replacing original).
  */
 export interface TuneAnnotation {
@@ -932,7 +968,7 @@ export interface TuneAnnotation {
 /**
  * Properties for a NarrativeEntry annotation
  */
-export interface NarrativeEntryProperties {
+export interface NarrativeEntryProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Narrative timestamp (ISO8601) */
@@ -945,10 +981,6 @@ export interface NarrativeEntryProperties {
     symbol?: string,
     /** Point styling properties for display position */
     style: PointProperties,
-    /** Original source file path */
-    source_file?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -970,7 +1002,7 @@ export interface NarrativeEntry {
 /**
  * Properties for a CircleAnnotation
  */
-export interface CircleAnnotationProperties {
+export interface CircleAnnotationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Circle center as [longitude, latitude] for precise reconstruction */
@@ -983,10 +1015,6 @@ export interface CircleAnnotationProperties {
     symbol?: string,
     /** Polygon styling properties for the circle area */
     style: PolygonProperties,
-    /** Original source file path */
-    source_file?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1008,7 +1036,7 @@ export interface CircleAnnotation {
 /**
  * Properties for a RectangleAnnotation
  */
-export interface RectangleAnnotationProperties {
+export interface RectangleAnnotationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Annotation label text */
@@ -1017,10 +1045,6 @@ export interface RectangleAnnotationProperties {
     symbol?: string,
     /** Polygon styling properties for the rectangle area */
     style: PolygonProperties,
-    /** Original source file path */
-    source_file?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1042,7 +1066,7 @@ export interface RectangleAnnotation {
 /**
  * Properties for a LineAnnotation
  */
-export interface LineAnnotationProperties {
+export interface LineAnnotationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Annotation label text */
@@ -1051,10 +1075,6 @@ export interface LineAnnotationProperties {
     symbol?: string,
     /** Line styling properties for the line segment */
     style: LineProperties,
-    /** Original source file path */
-    source_file?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1076,7 +1096,7 @@ export interface LineAnnotation {
 /**
  * Properties for a TextAnnotation
  */
-export interface TextAnnotationProperties {
+export interface TextAnnotationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Text content to display */
@@ -1085,10 +1105,6 @@ export interface TextAnnotationProperties {
     symbol?: string,
     /** Point styling properties for the text position marker */
     style: PointProperties,
-    /** Original source file path */
-    source_file?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1110,7 +1126,7 @@ export interface TextAnnotation {
 /**
  * Properties for a VectorAnnotation
  */
-export interface VectorAnnotationProperties {
+export interface VectorAnnotationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Vector origin as [longitude, latitude] for precise reconstruction */
@@ -1125,10 +1141,6 @@ export interface VectorAnnotationProperties {
     symbol?: string,
     /** Line styling properties for the vector */
     style: LineProperties,
-    /** Original source file path */
-    source_file?: string,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1150,7 +1162,7 @@ export interface VectorAnnotation {
 /**
  * Properties for a PolyAnnotation
  */
-export interface PolyAnnotationProperties {
+export interface PolyAnnotationProperties extends BaseFeatureProperties {
     /** Feature type discriminator */
     kind: string,
     /** Number of unique vertices (excluding ring closure point) */
@@ -1161,12 +1173,8 @@ export interface PolyAnnotationProperties {
     symbol?: string,
     /** Polygon styling properties for the polygon area */
     style: PolygonProperties,
-    /** Original source file path */
-    source_file?: string,
     /** Source line number for debugging */
     line_number?: number,
-    /** PROV-aligned provenance records (append-only log of tool operations) */
-    provenance?: LogEntry[],
 }
 
 
@@ -1237,11 +1245,11 @@ export interface ToolParameter {
 
 
 /**
- * Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with featureType "system" and Point geometry with empty coordinates.
+ * Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with kind SYSTEM_RECORD and Point geometry with empty coordinates.
  */
 export interface SystemRecordProperties {
-    /** Discriminator, always "system". */
-    feature_type: string,
+    /** Feature type discriminator */
+    kind: string,
     /** Doubly-linked snapshot chain. Null when no snapshots exist. */
     snapshot_links?: SnapshotLinks,
     /** Branch records. Empty array when no branches exist. */
@@ -1321,6 +1329,29 @@ export interface FileProvEntry {
     branch_id?: string,
     /** 'source' or 'target' (for branch events). */
     direction?: string,
+}
+
+
+/**
+ * Extension properties added to STAC item.properties under the debrief: namespace. All properties are optional — existing items without extension properties remain valid. These properties enable filtering, searching, and colour-coding in the Discovery UI.
+
+ */
+export interface StacExtensionProperties {
+    /** Hierarchical vessel classification paths using slash-separated notation. Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23). Partial paths allowed for imprecise classification (e.g., surface/warship).
+ */
+    vessel_classes?: string[],
+    /** Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
+ */
+    tags?: string[],
+    /** Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
+ */
+    feature_tags?: string[],
+    /** Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.
+ */
+    track_names?: string[],
+    /** Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.
+ */
+    nationalities?: string[],
 }
 
 

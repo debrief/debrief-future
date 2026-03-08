@@ -91,7 +91,8 @@ linkml_meta = LinkMLMeta({'default_prefix': 'debrief',
                  'annotations',
                  'tool',
                  'log-entry',
-                 'system-record'],
+                 'system-record',
+                 'stac-extension'],
      'name': 'debrief',
      'prefixes': {'debrief': {'prefix_prefix': 'debrief',
                               'prefix_reference': 'https://debrief.info/schemas/'},
@@ -153,6 +154,10 @@ class FeatureKindEnum(str, Enum):
     MULTI_POLYGON = "MULTI_POLYGON"
     """
     Multi-polygon tool result (MultiPolygon geometry)
+    """
+    SYSTEM_RECORD = "SYSTEM_RECORD"
+    """
+    Plot-level system record (snapshot chain, branches)
     """
 
 
@@ -612,6 +617,51 @@ class FileProvDirectionEnum(str, Enum):
     """
 
 
+class VesselDomainEnum(str, Enum):
+    """
+    Top-level vessel domain classification
+    """
+    surface = "surface"
+    """
+    Surface vessels (warships, auxiliaries, merchant)
+    """
+    subsurface = "subsurface"
+    """
+    Subsurface vessels (submarines)
+    """
+    unknown = "unknown"
+    """
+    Vessel domain not determined or not applicable
+    """
+
+
+
+class BaseFeatureProperties(ConfiguredBaseModel):
+    """
+    Abstract base for all GeoJSON feature properties classes. Provides shared attributes inherited by every concrete properties type.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'abstract': True, 'from_schema': 'https://debrief.info/schemas/common'})
+
+    kind: FeatureKindEnum = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
+                       'ReferenceLocationProperties',
+                       'SystemStateProperties',
+                       'MultiPointFeatureProperties',
+                       'MultiPolygonFeatureProperties',
+                       'NarrativeEntryProperties',
+                       'CircleAnnotationProperties',
+                       'RectangleAnnotationProperties',
+                       'LineAnnotationProperties',
+                       'TextAnnotationProperties',
+                       'VectorAnnotationProperties',
+                       'PolyAnnotationProperties',
+                       'SelectionRequirement',
+                       'SystemRecordProperties']} })
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'SystemStateProperties',
+                       'SystemRecordProperties']} })
+
 
 class TimestampedPosition(ConfiguredBaseModel):
     """
@@ -841,7 +891,7 @@ class GeoJSONLineString(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'LineString'} })
-    coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -878,7 +928,7 @@ class GeoJSONPolygon(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'Polygon'} })
-    coordinates: list[float] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[list[float]]] = Field(default=..., description="""Array of linear rings (arrays of [lon, lat] pairs)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -915,7 +965,7 @@ class GeoJSONMultiPoint(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'MultiPoint'} })
-    coordinates: list[float] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[float]] = Field(default=..., description="""Array of [longitude, latitude] pairs""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -952,7 +1002,7 @@ class GeoJSONMultiLineString(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'MultiLineString'} })
-    coordinates: list[float] = Field(default=..., description="""Array of LineString coordinate arrays""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[list[float]]] = Field(default=..., description="""Array of LineString coordinate arrays""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -989,7 +1039,7 @@ class GeoJSONMultiPolygon(ConfiguredBaseModel):
                        'ToolParameter',
                        'FileProvEntry'],
          'equals_string': 'MultiPolygon'} })
-    coordinates: list[float] = Field(default=..., description="""Array of polygon coordinate arrays (each an array of linear rings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
+    coordinates: list[list[list[list[float]]]] = Field(default=..., description="""Array of polygon coordinate arrays (each an array of linear rings)""", json_schema_extra = { "linkml_meta": {'domain_of': ['GeoJSONPoint',
                        'GeoJSONEmptyPoint',
                        'GeoJSONLineString',
                        'GeoJSONPolygon',
@@ -1133,13 +1183,14 @@ class TUAData(ConfiguredBaseModel):
     solutions: list[TUASolution] = Field(default=..., description="""Array of TUA estimates""", json_schema_extra = { "linkml_meta": {'domain_of': ['TUAData']} })
 
 
-class TrackProperties(ConfiguredBaseModel):
+class TrackProperties(BaseFeatureProperties):
     """
     Properties for a TrackFeature
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
-    kind: Literal["TRACK"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["TRACK"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -1151,7 +1202,8 @@ class TrackProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement'],
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
          'equals_string': 'TRACK'} })
     platform_id: str = Field(default=..., description="""Platform/vessel identifier""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     platform_name: Optional[str] = Field(default=None, description="""Human-readable platform name""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
@@ -1159,14 +1211,6 @@ class TrackProperties(ConfiguredBaseModel):
     start_time: datetime  = Field(default=..., description="""Track start time (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
     end_time: datetime  = Field(default=..., description="""Track end time (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
     positions: list[TimestampedPosition] = Field(default=..., description="""Array of timestamped positions""", min_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
     style: TrackStyle = Field(default=..., description="""Composite styling for track line and position markers""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'TrackProperties',
                        'ReferenceLocationProperties',
@@ -1182,22 +1226,13 @@ class TrackProperties(ConfiguredBaseModel):
     default_position_style: PositionStyle = Field(default=..., description="""Default styling applied to all positions""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     symbol_interval: Optional[str] = Field(default=None, description="""ISO 8601 duration for interval-based symbol display. E.g., \"PT5M\" = every 5 minutes, \"PT1H\" = every hour. Null means no interval-based symbols.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     label_interval: Optional[str] = Field(default=None, description="""ISO 8601 duration for interval-based label display. Null means no interval-based labels.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
-    position_style_overrides: Optional[list[PositionStyleOverride]] = Field(default=[], description="""Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
+    position_style_overrides: Optional[list[Optional[PositionStyleOverride]]] = Field(default=[], description="""Parallel array of per-position style overrides. Same length as positions array. Use null entries for positions without custom styling.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     segments: Optional[list[SegmentMetadata]] = Field(default=[], description="""Per-segment metadata for compound tracks. When present, geometry MUST be MultiLineString and segments[i] describes coordinates[i]. When absent, geometry is LineString and the flat positions array is used.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     sensors: Optional[list[SensorData]] = Field(default=[], description="""Embedded sensor data associated with this track. Each sensor contains named metadata and an array of contact measurements.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
     tuas: Optional[list[TUAData]] = Field(default=[], description="""Embedded Target Uncertainty Area data associated with this track. Each TUA entry is a named collection of time-indexed solutions.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties']} })
-    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'ReferenceLocationProperties',
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
-                       'MultiPointFeatureProperties',
-                       'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties',
                        'SystemRecordProperties']} })
 
     @field_validator('symbol_interval')
@@ -1275,6 +1310,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1287,6 +1323,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1294,7 +1331,7 @@ class TrackFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation']} })
-    bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+    bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature']} })
@@ -1316,13 +1353,14 @@ class PointMetadataEntry(ConfiguredBaseModel):
                        'ToolParameter']} })
 
 
-class ReferenceLocationProperties(ConfiguredBaseModel):
+class ReferenceLocationProperties(BaseFeatureProperties):
     """
     Properties for a ReferenceLocation
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
-    kind: Literal["POINT"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["POINT"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -1334,7 +1372,8 @@ class ReferenceLocationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement'],
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
          'equals_string': 'POINT'} })
     name: str = Field(default=..., description="""Reference location name""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata',
                        'SensorData',
@@ -1374,18 +1413,9 @@ class ReferenceLocationProperties(ConfiguredBaseModel):
     valid_from: Optional[datetime ] = Field(default=None, description="""Start of validity period""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
     valid_until: Optional[datetime ] = Field(default=None, description="""End of validity period""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
     point_metadata: Optional[list[PointMetadataEntry]] = Field(default=[], description="""Per-point metadata array, parallel to MultiPoint coordinates. Each entry contains at minimum an index and name. Downstream tools extend entries with zone/color fields.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ReferenceLocationProperties']} })
-    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'ReferenceLocationProperties',
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
-                       'MultiPointFeatureProperties',
-                       'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties',
                        'SystemRecordProperties']} })
 
 
@@ -1436,6 +1466,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1448,6 +1479,7 @@ class ReferenceLocation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1463,7 +1495,8 @@ class SystemStateProperties(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
-    kind: Literal["SYSTEM"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["SYSTEM"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -1475,7 +1508,8 @@ class SystemStateProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement'],
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
          'equals_string': 'SYSTEM'} })
     state_type: SystemStateTypeEnum = Field(default=..., description="""Discriminator for state variant (temporal, spatial, selection)""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
     start_time: Optional[datetime ] = Field(default=None, description="""Viewport start time (ISO8601) - for temporal state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'TrackProperties', 'SystemStateProperties']} })
@@ -1487,18 +1521,8 @@ class SystemStateProperties(ConfiguredBaseModel):
     zoom: Optional[float] = Field(default=None, description="""Map zoom level - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
     center: Optional[list[float]] = Field(default=[], description="""Map center [longitude, latitude] - for spatial state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'CircleAnnotationProperties']} })
     selected_ids: Optional[list[str]] = Field(default=[], description="""Array of selected feature IDs - for selection state""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties']} })
-    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'ReferenceLocationProperties',
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
-                       'MultiPointFeatureProperties',
-                       'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties',
                        'SystemRecordProperties']} })
 
 
@@ -1548,6 +1572,7 @@ class SystemState(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1560,6 +1585,7 @@ class SystemState(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1582,13 +1608,14 @@ class SystemState(ConfiguredBaseModel):
         return v
 
 
-class MultiPointFeatureProperties(ConfiguredBaseModel):
+class MultiPointFeatureProperties(BaseFeatureProperties):
     """
     Properties for a MultiPointFeature (multi-point tool results)
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
-    kind: Literal["MULTI_POINT"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["MULTI_POINT"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -1600,7 +1627,8 @@ class MultiPointFeatureProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement'],
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
          'equals_string': 'MULTI_POINT'} })
     label: str = Field(default=..., description="""Human-readable result label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
                        'SensorContact',
@@ -1631,18 +1659,9 @@ class MultiPointFeatureProperties(ConfiguredBaseModel):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter']} })
-    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'ReferenceLocationProperties',
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
-                       'MultiPointFeatureProperties',
-                       'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties',
                        'SystemRecordProperties']} })
 
 
@@ -1692,6 +1711,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1704,6 +1724,7 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1711,19 +1732,20 @@ class MultiPointFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation']} })
-    bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+    bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature']} })
 
 
-class MultiPolygonFeatureProperties(ConfiguredBaseModel):
+class MultiPolygonFeatureProperties(BaseFeatureProperties):
     """
     Properties for a MultiPolygonFeature (multi-polygon tool results)
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/geojson'})
 
-    kind: Literal["MULTI_POLYGON"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["MULTI_POLYGON"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -1735,7 +1757,8 @@ class MultiPolygonFeatureProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement'],
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
          'equals_string': 'MULTI_POLYGON'} })
     label: str = Field(default=..., description="""Human-readable result label""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
                        'SensorContact',
@@ -1766,18 +1789,9 @@ class MultiPolygonFeatureProperties(ConfiguredBaseModel):
                        'MultiPolygonFeatureProperties',
                        'Tool',
                        'ToolParameter']} })
-    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'ReferenceLocationProperties',
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
-                       'MultiPointFeatureProperties',
-                       'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties',
                        'SystemRecordProperties']} })
 
 
@@ -1827,6 +1841,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1839,6 +1854,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -1846,7 +1862,7 @@ class MultiPolygonFeature(ConfiguredBaseModel):
                        'TextAnnotation',
                        'VectorAnnotation',
                        'PolyAnnotation']} })
-    bbox: Optional[list[float]] = Field(default=[], description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+    bbox: Optional[list[float]] = Field(default=None, description="""Bounding box [minLon, minLat, maxLon, maxLat]""", min_length=4, max_length=4, json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
                        'SystemStateProperties',
                        'MultiPointFeature',
                        'MultiPolygonFeature']} })
@@ -1866,6 +1882,9 @@ class LogEntry(ConfiguredBaseModel):
     execution_duration: str = Field(default=..., description="""Wall-clock execution time in ISO 8601 duration format (e.g., PT0.3S).""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
     generated_result_id: Optional[str] = Field(default=None, description="""Stable logical identity for artifact-producing tools. Null for non-artifact tools.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
     tune: Optional[TuneAnnotation] = Field(default=None, description="""Parameter tuning record. Null until a tuning operation modifies this entry.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
+    input_state: Optional[list[InputFeatureState]] = Field(default=[], description="""Pre-operation feature states for coordinate-mutating tools. Captures geometry and spatial properties as they were immediately before the operation, enabling correct replay with modified parameters. Null for non-mutation tools.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
+    disabled: Optional[bool] = Field(default=False, description="""Whether this entry is skipped during replay. Toggled via the flip-card edit face.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry'], 'ifabsent': 'false'} })
+    rationale: Optional[str] = Field(default=None, description="""Free-text analyst annotation explaining the reasoning for this operation.""", json_schema_extra = { "linkml_meta": {'domain_of': ['LogEntry']} })
 
     @field_validator('execution_duration')
     def pattern_execution_duration(cls, v):
@@ -1903,6 +1922,47 @@ class ParameterValue(ConfiguredBaseModel):
     tunable: Optional[bool] = Field(default=True, description="""Whether this parameter can be modified during replay.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ParameterValue'], 'ifabsent': 'true'} })
 
 
+class InputFeatureState(ConfiguredBaseModel):
+    """
+    Pre-operation state of a feature captured before a coordinate-mutating tool executes. Enables correct replay by providing the original geometry as the anchor for re-computation with modified parameters.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/log-entry'})
+
+    feature_id: str = Field(default=..., description="""ID of the feature whose pre-operation state is captured.""", json_schema_extra = { "linkml_meta": {'domain_of': ['InputFeatureState']} })
+    geometry: str = Field(default=..., description="""Full GeoJSON geometry object (type + coordinates) as it was immediately before the operation. Stored as a JSON object.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'InputFeatureState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation'],
+         'notes': ['Typed as string in LinkML but serialized as a JSON object in '
+                   'practice. GeoJSON geometry is polymorphic (Point, Polygon, '
+                   'LineString, etc.) and LinkML does not have a native geometry '
+                   'type.']} })
+    properties: Optional[str] = Field(default=None, description="""Kind-specific spatial properties captured before the operation. Excludes provenance (which is append-only). Null if no spatial properties need capturing.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackFeature',
+                       'ReferenceLocation',
+                       'SystemState',
+                       'MultiPointFeature',
+                       'MultiPolygonFeature',
+                       'InputFeatureState',
+                       'NarrativeEntry',
+                       'CircleAnnotation',
+                       'RectangleAnnotation',
+                       'LineAnnotation',
+                       'TextAnnotation',
+                       'VectorAnnotation',
+                       'PolyAnnotation'],
+         'notes': ['Typed as string in LinkML but serialized as a JSON object in '
+                   'practice. Contains keys like "center", "origin", "radius_km" etc.']} })
+
+
 class TuneAnnotation(ConfiguredBaseModel):
     """
     Records a parameter modification (appended, not replacing original).
@@ -1915,13 +1975,14 @@ class TuneAnnotation(ConfiguredBaseModel):
     new_value: str = Field(default=..., description="""Value after tuning.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TuneAnnotation']} })
 
 
-class NarrativeEntryProperties(ConfiguredBaseModel):
+class NarrativeEntryProperties(BaseFeatureProperties):
     """
     Properties for a NarrativeEntry annotation
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
-    kind: Literal["NARRATIVE"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["NARRATIVE"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -1933,7 +1994,8 @@ class NarrativeEntryProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement'],
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
          'equals_string': 'NARRATIVE'} })
     time: datetime  = Field(default=..., description="""Narrative timestamp (ISO8601)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TimestampedPosition',
                        'SensorContact',
@@ -1963,26 +2025,9 @@ class NarrativeEntryProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'ReferenceLocationProperties',
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
-                       'MultiPointFeatureProperties',
-                       'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties',
                        'SystemRecordProperties']} })
 
 
@@ -2032,6 +2077,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2044,6 +2090,7 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2053,13 +2100,14 @@ class NarrativeEntry(ConfiguredBaseModel):
                        'PolyAnnotation']} })
 
 
-class CircleAnnotationProperties(ConfiguredBaseModel):
+class CircleAnnotationProperties(BaseFeatureProperties):
     """
     Properties for a CircleAnnotation
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
-    kind: Literal["CIRCLE"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["CIRCLE"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -2071,7 +2119,8 @@ class CircleAnnotationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement'],
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
          'equals_string': 'CIRCLE'} })
     center: list[float] = Field(default=..., description="""Circle center as [longitude, latitude] for precise reconstruction""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['SystemStateProperties', 'CircleAnnotationProperties']} })
     radius: float = Field(default=..., description="""Circle radius in meters for precise reconstruction""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['PointProperties', 'CircleAnnotationProperties']} })
@@ -2107,26 +2156,9 @@ class CircleAnnotationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'ReferenceLocationProperties',
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
-                       'MultiPointFeatureProperties',
-                       'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties',
                        'SystemRecordProperties']} })
 
 
@@ -2176,6 +2208,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2188,6 +2221,7 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2197,13 +2231,14 @@ class CircleAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation']} })
 
 
-class RectangleAnnotationProperties(ConfiguredBaseModel):
+class RectangleAnnotationProperties(BaseFeatureProperties):
     """
     Properties for a RectangleAnnotation
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
-    kind: Literal["RECTANGLE"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["RECTANGLE"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -2215,7 +2250,8 @@ class RectangleAnnotationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement'],
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
          'equals_string': 'RECTANGLE'} })
     label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
                        'SensorContact',
@@ -2249,26 +2285,9 @@ class RectangleAnnotationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'ReferenceLocationProperties',
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
-                       'MultiPointFeatureProperties',
-                       'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties',
                        'SystemRecordProperties']} })
 
 
@@ -2318,6 +2337,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2330,6 +2350,7 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2339,13 +2360,14 @@ class RectangleAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation']} })
 
 
-class LineAnnotationProperties(ConfiguredBaseModel):
+class LineAnnotationProperties(BaseFeatureProperties):
     """
     Properties for a LineAnnotation
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
-    kind: Literal["LINE"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["LINE"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -2357,7 +2379,8 @@ class LineAnnotationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement'],
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
          'equals_string': 'LINE'} })
     label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
                        'SensorContact',
@@ -2391,26 +2414,9 @@ class LineAnnotationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'ReferenceLocationProperties',
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
-                       'MultiPointFeatureProperties',
-                       'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties',
                        'SystemRecordProperties']} })
 
 
@@ -2460,6 +2466,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2472,6 +2479,7 @@ class LineAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2481,13 +2489,14 @@ class LineAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation']} })
 
 
-class TextAnnotationProperties(ConfiguredBaseModel):
+class TextAnnotationProperties(BaseFeatureProperties):
     """
     Properties for a TextAnnotation
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
-    kind: Literal["TEXT"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["TEXT"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -2499,7 +2508,8 @@ class TextAnnotationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement'],
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
          'equals_string': 'TEXT'} })
     text: str = Field(default=..., description="""Text content to display""", json_schema_extra = { "linkml_meta": {'domain_of': ['NarrativeEntryProperties', 'TextAnnotationProperties']} })
     symbol: Optional[str] = Field(default=None, description="""Display symbol code from REP file""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyle',
@@ -2524,26 +2534,9 @@ class TextAnnotationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'ReferenceLocationProperties',
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
-                       'MultiPointFeatureProperties',
-                       'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties',
                        'SystemRecordProperties']} })
 
 
@@ -2593,6 +2586,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2605,6 +2599,7 @@ class TextAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2614,13 +2609,14 @@ class TextAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation']} })
 
 
-class VectorAnnotationProperties(ConfiguredBaseModel):
+class VectorAnnotationProperties(BaseFeatureProperties):
     """
     Properties for a VectorAnnotation
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
-    kind: Literal["VECTOR"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["VECTOR"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -2632,7 +2628,8 @@ class VectorAnnotationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement'],
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
          'equals_string': 'VECTOR'} })
     origin: list[float] = Field(default=..., description="""Vector origin as [longitude, latitude] for precise reconstruction""", min_length=2, max_length=2, json_schema_extra = { "linkml_meta": {'domain_of': ['VectorAnnotationProperties']} })
     range: float = Field(default=..., description="""Vector length/range in meters for precise reconstruction""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SensorContact', 'TUASolution', 'VectorAnnotationProperties']} })
@@ -2669,26 +2666,9 @@ class VectorAnnotationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
-    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'ReferenceLocationProperties',
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
-                       'MultiPointFeatureProperties',
-                       'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties',
                        'SystemRecordProperties']} })
 
 
@@ -2738,6 +2718,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2750,6 +2731,7 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2759,13 +2741,14 @@ class VectorAnnotation(ConfiguredBaseModel):
                        'PolyAnnotation']} })
 
 
-class PolyAnnotationProperties(ConfiguredBaseModel):
+class PolyAnnotationProperties(BaseFeatureProperties):
     """
     Properties for a PolyAnnotation
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/annotations'})
 
-    kind: Literal["POLY"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["POLY"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -2777,7 +2760,8 @@ class PolyAnnotationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement'],
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
          'equals_string': 'POLY'} })
     vertex_count: int = Field(default=..., description="""Number of unique vertices (excluding ring closure point)""", ge=3, json_schema_extra = { "linkml_meta": {'domain_of': ['PolyAnnotationProperties']} })
     label: Optional[str] = Field(default=None, description="""Annotation label text""", json_schema_extra = { "linkml_meta": {'domain_of': ['PositionStyleOverride',
@@ -2812,27 +2796,10 @@ class PolyAnnotationProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties']} })
-    source_file: Optional[str] = Field(default=None, description="""Original source file path""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties']} })
     line_number: Optional[int] = Field(default=None, description="""Source line number for debugging""", json_schema_extra = { "linkml_meta": {'domain_of': ['PolyAnnotationProperties']} })
-    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
-                       'ReferenceLocationProperties',
+    tags: Optional[list[str]] = Field(default=[], description="""Free-text labels assigned to this feature by the analyst""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties']} })
+    provenance: Optional[list[LogEntry]] = Field(default=[], description="""PROV-aligned provenance records (append-only log of tool operations)""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
                        'SystemStateProperties',
-                       'MultiPointFeatureProperties',
-                       'MultiPolygonFeatureProperties',
-                       'NarrativeEntryProperties',
-                       'CircleAnnotationProperties',
-                       'RectangleAnnotationProperties',
-                       'LineAnnotationProperties',
-                       'TextAnnotationProperties',
-                       'VectorAnnotationProperties',
-                       'PolyAnnotationProperties',
                        'SystemRecordProperties']} })
 
 
@@ -2882,6 +2849,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2894,6 +2862,7 @@ class PolyAnnotation(ConfiguredBaseModel):
                        'SystemState',
                        'MultiPointFeature',
                        'MultiPolygonFeature',
+                       'InputFeatureState',
                        'NarrativeEntry',
                        'CircleAnnotation',
                        'RectangleAnnotation',
@@ -2909,7 +2878,8 @@ class SelectionRequirement(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/tool'})
 
-    kind: str = Field(default=..., description="""The feature kind this requirement applies to. Supports flat values (e.g., \"TRACK\", \"POINT\") matching the 'kind' property of GeoJSON features, and dot-delimited hierarchical paths (e.g., \"TRACK.SENSOR\", \"TRACK.SEGMENT\") for targeting embedded children within compound features.""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: str = Field(default=..., description="""The feature kind this requirement applies to. Supports flat values (e.g., \"TRACK\", \"POINT\") matching the 'kind' property of GeoJSON features, and dot-delimited hierarchical paths (e.g., \"TRACK.SENSOR\", \"TRACK.SEGMENT\") for targeting embedded children within compound features.""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -2921,7 +2891,8 @@ class SelectionRequirement(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
-                       'SelectionRequirement']} })
+                       'SelectionRequirement',
+                       'SystemRecordProperties']} })
     segment_type: Optional[SegmentTypeEnum] = Field(default=None, description="""Optional filter for segment type when kind targets TRACK.SEGMENT. Must be a valid SegmentTypeEnum value (e.g., \"ABSOLUTE_TMA\"). Only meaningful when kind is \"TRACK.SEGMENT\".""", json_schema_extra = { "linkml_meta": {'domain_of': ['SegmentMetadata', 'SelectionRequirement']} })
     min: Optional[int] = Field(default=None, description="""Minimum number of features of this kind required. Must be >= 0. Defaults to 0 if not specified.""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SelectionRequirement']} })
     max: Optional[int] = Field(default=None, description="""Maximum number of features of this kind allowed. Must be >= min if both specified. Null means no upper limit.""", ge=0, json_schema_extra = { "linkml_meta": {'domain_of': ['SelectionRequirement']} })
@@ -3008,15 +2979,12 @@ class ToolParameter(ConfiguredBaseModel):
 
 class SystemRecordProperties(ConfiguredBaseModel):
     """
-    Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with featureType \"system\" and Point geometry with empty coordinates.
+    Properties for the non-spatial system record feature. A system record is a GeoJSON Feature with kind SYSTEM_RECORD and Point geometry with empty coordinates.
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/system-record'})
 
-    feature_type: Literal["system"] = Field(default=..., description="""Discriminator, always \"system\".""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemRecordProperties'], 'equals_string': 'system'} })
-    snapshot_links: Optional[SnapshotLinks] = Field(default=None, description="""Doubly-linked snapshot chain. Null when no snapshots exist.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemRecordProperties']} })
-    branches: Optional[list[BranchRecord]] = Field(default=[], description="""Branch records. Empty array when no branches exist.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemRecordProperties']} })
-    branch_origin: Optional[BranchOrigin] = Field(default=None, description="""Reverse link to source plot (set when this plot is a branch).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemRecordProperties']} })
-    provenance: Optional[list[FileProvEntry]] = Field(default=[], description="""File-level provenance events (snapshot and branch creation).""", json_schema_extra = { "linkml_meta": {'domain_of': ['TrackProperties',
+    kind: Literal["SYSTEM_RECORD"] = Field(default=..., description="""Feature type discriminator""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'TrackProperties',
                        'ReferenceLocationProperties',
                        'SystemStateProperties',
                        'MultiPointFeatureProperties',
@@ -3028,6 +2996,14 @@ class SystemRecordProperties(ConfiguredBaseModel):
                        'TextAnnotationProperties',
                        'VectorAnnotationProperties',
                        'PolyAnnotationProperties',
+                       'SelectionRequirement',
+                       'SystemRecordProperties'],
+         'equals_string': 'SYSTEM_RECORD'} })
+    snapshot_links: Optional[SnapshotLinks] = Field(default=None, description="""Doubly-linked snapshot chain. Null when no snapshots exist.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemRecordProperties']} })
+    branches: Optional[list[BranchRecord]] = Field(default=[], description="""Branch records. Empty array when no branches exist.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemRecordProperties']} })
+    branch_origin: Optional[BranchOrigin] = Field(default=None, description="""Reverse link to source plot (set when this plot is a branch).""", json_schema_extra = { "linkml_meta": {'domain_of': ['SystemRecordProperties']} })
+    provenance: Optional[list[FileProvEntry]] = Field(default=[], description="""File-level provenance events (snapshot and branch creation).""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties',
+                       'SystemStateProperties',
                        'SystemRecordProperties']} })
 
 
@@ -3109,8 +3085,55 @@ class FileProvEntry(ConfiguredBaseModel):
     direction: Optional[FileProvDirectionEnum] = Field(default=None, description="""'source' or 'target' (for branch events).""", json_schema_extra = { "linkml_meta": {'domain_of': ['FileProvEntry']} })
 
 
+class StacExtensionProperties(ConfiguredBaseModel):
+    """
+    Extension properties added to STAC item.properties under the debrief: namespace. All properties are optional — existing items without extension properties remain valid. These properties enable filtering, searching, and colour-coding in the Discovery UI.
+
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://debrief.info/schemas/stac-extension'})
+
+    vessel_classes: Optional[list[str]] = Field(default=[], description="""Hierarchical vessel classification paths using slash-separated notation. Four levels: domain/role/class/type (e.g., surface/warship/frigate/type23). Partial paths allowed for imprecise classification (e.g., surface/warship).
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:vessel_classes'} })
+    tags: Optional[list[str]] = Field(default=[], description="""Plot-level tags — free-text labels applied to the entire plot by the analyst. Trimmed non-empty strings with no duplicates.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['BaseFeatureProperties', 'StacExtensionProperties'],
+         'slot_uri': 'debrief:tags'} })
+    feature_tags: Optional[list[str]] = Field(default=[], description="""Union of all feature-level tags from the plot's GeoJSON features. Aggregated at item level for discoverability. Authoritative per-feature tags remain in each GeoJSON feature's properties.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:feature_tags'} })
+    track_names: Optional[list[str]] = Field(default=[], description="""Names of all tracks in the plot's GeoJSON FeatureCollection. Corresponds to track features where properties.kind == TRACK.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:track_names'} })
+    nationalities: Optional[list[str]] = Field(default=[], description="""Distinct nationalities of vessels in the plot, as ISO 3166-1 alpha-2 country codes (e.g., GB, US, FR). Uppercase two-letter codes only.
+""", json_schema_extra = { "linkml_meta": {'domain_of': ['StacExtensionProperties'], 'slot_uri': 'debrief:nationalities'} })
+
+    @field_validator('vessel_classes')
+    def pattern_vessel_classes(cls, v):
+        pattern=re.compile(r"^[a-z0-9-]+(/[a-z0-9-]+){0,3}$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid vessel_classes format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid vessel_classes format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+    @field_validator('nationalities')
+    def pattern_nationalities(cls, v):
+        pattern=re.compile(r"^[A-Z]{2}$")
+        if isinstance(v, list):
+            for element in v:
+                if isinstance(element, str) and not pattern.match(element):
+                    err_msg = f"Invalid nationalities format: {element}"
+                    raise ValueError(err_msg)
+        elif isinstance(v, str) and not pattern.match(v):
+            err_msg = f"Invalid nationalities format: {v}"
+            raise ValueError(err_msg)
+        return v
+
+
 # Model rebuild
 # see https://pydantic-docs.helpmanual.io/usage/models/#rebuilding-a-model
+BaseFeatureProperties.model_rebuild()
 TimestampedPosition.model_rebuild()
 PointProperties.model_rebuild()
 LineProperties.model_rebuild()
@@ -3144,6 +3167,7 @@ MultiPolygonFeature.model_rebuild()
 LogEntry.model_rebuild()
 WasGeneratedBy.model_rebuild()
 ParameterValue.model_rebuild()
+InputFeatureState.model_rebuild()
 TuneAnnotation.model_rebuild()
 NarrativeEntryProperties.model_rebuild()
 NarrativeEntry.model_rebuild()
@@ -3168,3 +3192,4 @@ SnapshotRef.model_rebuild()
 BranchRecord.model_rebuild()
 BranchOrigin.model_rebuild()
 FileProvEntry.model_rebuild()
+StacExtensionProperties.model_rebuild()

@@ -1,9 +1,9 @@
-How do you test a VS Code extension's complete user workflow -- not just the services behind it, but the actual UI a person interacts with?
+How do you test a maritime analysis workflow that spans three Python services, a TypeScript orchestration layer, and a VS Code extension -- without mocking away the parts that actually break?
 
-Future Debrief has three Python services and a TypeScript extension that wires them together. Unit tests cover each piece in isolation. But the workflow that matters to an analyst -- open a track file, see it on the map, run an analysis tool, check the results -- crosses every service boundary through the extension's orchestration layer. No existing test exercises that path.
+We're planning dual-platform E2E tests for Future Debrief. The web-shell suite (81 tests, 13 spec files) already catches orchestration regressions with mock data. Now we're expanding the VS Code E2E suite to match -- same 13 workflow categories, but driving openvscode-server with real Python services parsing real REP files. When a test reveals a missing feature, it gets `test.fixme()` with a backlog cross-reference instead of quietly disappearing into a skip count.
 
-We are planning end-to-end tests that host VS Code in a browser via code-server and drive it with Playwright. Real extension, real services, real DOM interactions. The same Playwright infrastructure the project already uses, pointed at a higher-fidelity target.
+The interesting tension: real services give higher confidence but slower, more sensitive tests. We're treating the expansion partly as a feature-completeness audit.
 
-Planning post with the technical decisions: [link]
+Planning post with the full technical decisions: [link]
 
 #FutureDebrief #MaritimeAnalysis #OpenSource

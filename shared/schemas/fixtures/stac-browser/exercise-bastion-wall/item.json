@@ -1,0 +1,97 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://debrief.info/stac-extensions/debrief/v1.0.0/schema.json"
+  ],
+  "id": "exercise-bastion-wall",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -18.8729,
+          45.0207
+        ],
+        [
+          -16.015,
+          45.0207
+        ],
+        [
+          -16.015,
+          47.8785
+        ],
+        [
+          -18.8729,
+          47.8785
+        ],
+        [
+          -18.8729,
+          45.0207
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -18.8729,
+    45.0207,
+    -16.015,
+    47.8785
+  ],
+  "properties": {
+    "title": "Exercise Bastion Wall",
+    "description": "Bastion Wall \u2014 North Atlantic exercise. 5 track(s), 2 nation(s).",
+    "datetime": null,
+    "start_datetime": "2026-12-24T09:00:00Z",
+    "end_datetime": "2027-01-05T10:53:43Z",
+    "debrief:vessel_classes": [
+      "surface/merchant/tanker/vlcc"
+    ],
+    "debrief:tags": [
+      "MCM",
+      "EW"
+    ],
+    "debrief:feature_tags": [
+      "zig-zag",
+      "torpedo-run"
+    ],
+    "debrief:track_names": [
+      "FGS Bretagne",
+      "ITS Tromp",
+      "FGS Lancaster",
+      "ITS Helge Ingstad",
+      "FGS Richmond"
+    ],
+    "debrief:nationalities": [
+      "DE",
+      "IT"
+    ]
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "./exercise-bastion-wall.geojson",
+      "type": "application/geo+json",
+      "title": "Track and Location Data",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}
