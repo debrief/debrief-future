@@ -23,7 +23,6 @@ import {
 import type { SessionManager } from '../services/sessionManager';
 import type { ResultLayer } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
-import { isTrackFeature, isReferenceLocation } from '@debrief/components';
 
 // ---------------------------------------------------------------------------
 // Local type helpers — @debrief/components dist may not exist at lint time,
@@ -67,14 +66,14 @@ interface RefLocLike extends FeatureBase {
  * resolves as `any`.
  */
 function isTrack(feature: FeatureBase): feature is TrackLike {
-  return (isTrackFeature as (f: FeatureBase) => boolean)(feature);
+  return feature.properties.kind === 'TRACK';
 }
 
 /**
  * Typed wrapper for isReferenceLocation.
  */
 function isRefLoc(feature: FeatureBase): feature is RefLocLike {
-  return (isReferenceLocation as (f: FeatureBase) => boolean)(feature);
+  return feature.properties.kind === 'POINT';
 }
 
 export type LayerItem =
