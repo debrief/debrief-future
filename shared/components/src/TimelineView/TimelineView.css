@@ -118,9 +118,15 @@
   min-width: 0;
 }
 
-/* Reset / zoom-to-fit button */
-.timeline-view__reset-btn {
+/* Permanent zoom controls */
+.timeline-view__controls {
   flex-shrink: 0;
+  display: flex;
+  gap: 2px;
+  margin-right: 4px;
+}
+
+.timeline-view__ctrl-btn {
   width: 24px;
   height: 24px;
   border: 1px solid var(--vscode-widget-border, rgba(0, 0, 0, 0.2));
@@ -133,11 +139,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 4px;
 }
 
-.timeline-view__reset-btn:hover {
+.timeline-view__ctrl-btn:hover:not(:disabled) {
   background: var(--vscode-button-secondaryHoverBackground, #505357);
+}
+
+.timeline-view__ctrl-btn--disabled,
+.timeline-view__ctrl-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 /* Row hover highlight */

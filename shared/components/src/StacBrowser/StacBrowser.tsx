@@ -59,11 +59,15 @@ function combinedBounds(items: StacBrowserItem[]): LatLngBoundsExpression | null
   return [[minLat, minLng], [maxLat, maxLng]];
 }
 
-/** Auto-fit map to bounds on mount. */
+/** Auto-fit map to bounds once on initial mount only. */
 function FitBounds({ bounds }: { bounds: LatLngBoundsExpression | null }): null {
   const map = useMap();
+  const fittedRef = useRef(false);
   useEffect(() => {
-    if (bounds) map.fitBounds(bounds as L.LatLngBoundsExpression, { padding: [20, 20] });
+    if (bounds && !fittedRef.current) {
+      fittedRef.current = true;
+      map.fitBounds(bounds as L.LatLngBoundsExpression, { padding: [20, 20] });
+    }
   }, [map, bounds]);
   return null;
 }
@@ -516,24 +520,24 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
             </button>
           </div>
         )}
-      </div>
 
-      {/* Zero-results overlay */}
-      {hasNoResults && (
-        <div className="stac-browser__no-results" data-testid="stac-browser-no-results">
-          <div className="stac-browser__no-results-message">
-            No matching exercises. Adjust or clear filters to see results.
+        {/* Zero-results overlay — inside panels so filter bar stays accessible */}
+        {hasNoResults && (
+          <div className="stac-browser__no-results" data-testid="stac-browser-no-results">
+            <div className="stac-browser__no-results-message">
+              No matching exercises. Adjust or clear filters to see results.
+            </div>
+            <button
+              type="button"
+              className="stac-browser__clear-filters-btn"
+              onClick={clearAllFilters}
+              data-testid="stac-browser-clear-filters"
+            >
+              Clear All Filters
+            </button>
           </div>
-          <button
-            type="button"
-            className="stac-browser__clear-filters-btn"
-            onClick={clearAllFilters}
-            data-testid="stac-browser-clear-filters"
-          >
-            Clear All Filters
-          </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
