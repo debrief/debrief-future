@@ -9,7 +9,7 @@
 
 import { useMemo, useRef } from 'react';
 import type { StacBrowserItem } from '../filter-engine/types';
-import type { ViewportPolygon, TimeFilter } from '@debrief/session-state';
+import type { ViewportPolygon, TimeFilter } from '../utils/spatial-types';
 import { viewportToBounds, bboxOverlapsViewport } from '../utils/bounds';
 import { itemOverlapsFilter } from '../utils/timeline-helpers';
 import type { TemporalFilter } from '../TimelineView/types';

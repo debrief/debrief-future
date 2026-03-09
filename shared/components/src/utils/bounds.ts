@@ -1,5 +1,5 @@
 import type { DebriefFeature, DebriefFeatureCollection, Bounds } from './types';
-import type { ViewportPolygon } from '@debrief/session-state';
+import type { ViewportPolygon } from './spatial-types';
 
 /**
  * Recursively extract all coordinates from a GeoJSON geometry coordinates array.

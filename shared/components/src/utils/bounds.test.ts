@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { bboxOverlapsViewport, filterBySpatialExtent, viewportToBounds } from './bounds';
 import type { Bounds } from './types';
-import type { ViewportPolygon } from '@debrief/session-state';
+import type { ViewportPolygon } from './spatial-types';
 
 // ============================================================================
 // T030: viewportToBounds — convert ViewportPolygon to Bounds

@@ -9,7 +9,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useBrowserFilter } from '../useBrowserFilter';
 import type { StacBrowserItem } from '../../filter-engine/types';
-import type { ViewportPolygon } from '@debrief/session-state';
+import type { ViewportPolygon } from '../../utils/spatial-types';
 
 // ─── Test fixtures ───────────────────────────────────────────────────────────
 

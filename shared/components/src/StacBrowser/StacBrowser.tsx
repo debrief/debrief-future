@@ -21,7 +21,7 @@ import { createRoot, type Root } from 'react-dom/client';
 
 import type { StacBrowserProps } from './types';
 import type { StacBrowserItem } from '../filter-engine/types';
-import type { ViewportPolygon } from '@debrief/session-state';
+import type { ViewportPolygon } from '../utils/spatial-types';
 import type { TemporalFilter } from '../TimelineView/types';
 import { useBrowserFilter } from './useBrowserFilter';
 import { FilterBar } from '../FilterBar';
