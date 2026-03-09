@@ -30,6 +30,8 @@ import type { ExerciseListItem } from '../ExerciseListView/types';
 import { TimelineView } from '../TimelineView';
 import { CatalogOverview } from '../CatalogOverview';
 import type { Bounds } from '../utils/types';
+import 'golden-layout/dist/css/goldenlayout-base.css';
+import 'golden-layout/dist/css/themes/goldenlayout-light-theme.css';
 import './StacBrowser.css';
 
 // ─── GoldenLayout panel type constants ────────────────────────────────────────
