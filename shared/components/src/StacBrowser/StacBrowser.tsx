@@ -18,6 +18,8 @@ import {
   type ComponentContainer,
 } from 'golden-layout';
 import { createRoot, type Root } from 'react-dom/client';
+import { MapContainer, Rectangle, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
+import type { LatLngBoundsExpression, LeafletMouseEvent } from 'leaflet';
 
 import type { StacBrowserProps } from './types';
 import type { StacBrowserItem } from '../filter-engine/types';
@@ -28,11 +30,78 @@ import { FilterBar } from '../FilterBar';
 import { ExerciseListView } from '../ExerciseListView';
 import type { ExerciseListItem } from '../ExerciseListView/types';
 import { TimelineView } from '../TimelineView';
-import { CatalogOverview } from '../CatalogOverview';
+import { formatDateRange } from '../utils/timeline-helpers';
 import type { Bounds } from '../utils/types';
 import 'golden-layout/dist/css/goldenlayout-base.css';
 import 'golden-layout/dist/css/themes/goldenlayout-light-theme.css';
 import './StacBrowser.css';
+
+// ─── Map helpers ──────────────────────────────────────────────────────────────
+
+/** Convert [west, south, east, north] to Leaflet bounds. */
+function bboxToBounds(bbox: [number, number, number, number]): LatLngBoundsExpression {
+  const [west, south, east, north] = bbox;
+  return [[south, west], [north, east]];
+}
+
+/** Compute combined Leaflet bounds for items with bbox. */
+function combinedBounds(items: StacBrowserItem[]): LatLngBoundsExpression | null {
+  let minLat = Infinity, minLng = Infinity, maxLat = -Infinity, maxLng = -Infinity;
+  for (const item of items) {
+    if (!item.bbox) continue;
+    const [west, south, east, north] = item.bbox;
+    minLng = Math.min(minLng, west);
+    minLat = Math.min(minLat, south);
+    maxLng = Math.max(maxLng, east);
+    maxLat = Math.max(maxLat, north);
+  }
+  if (minLat === Infinity) return null;
+  return [[minLat, minLng], [maxLat, maxLng]];
+}
+
+/** Auto-fit map to bounds on mount. */
+function FitBounds({ bounds }: { bounds: LatLngBoundsExpression | null }): null {
+  const map = useMap();
+  useEffect(() => {
+    if (bounds) map.fitBounds(bounds as L.LatLngBoundsExpression, { padding: [20, 20] });
+  }, [map, bounds]);
+  return null;
+}
+
+/** Debounced viewport change tracker. */
+const VIEWPORT_DEBOUNCE_MS = 150;
+
+function ViewportTracker({ onViewportChange }: { onViewportChange: (bounds: Bounds | null) => void }): null {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+
+  const emitViewport = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    try {
+      const b = map.getBounds();
+      if (!b || !b.isValid()) return;
+      const sw = b.getSouthWest();
+      const ne = b.getNorthEast();
+      onViewportChange([sw.lng, sw.lat, ne.lng, ne.lat]);
+    } catch { /* map not ready */ }
+  }, [onViewportChange]);
+
+  const map = useMapEvents({
+    moveend: () => {
+      if (timerRef.current !== null) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(emitViewport, VIEWPORT_DEBOUNCE_MS);
+    },
+  });
+  mapRef.current = map;
+
+  useEffect(() => {
+    timerRef.current = setTimeout(emitViewport, 50);
+    return () => { if (timerRef.current !== null) clearTimeout(timerRef.current); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return null;
+}
 
 // ─── GoldenLayout panel type constants ────────────────────────────────────────
 const PANEL_LIST = 'browser-list';
@@ -164,18 +233,59 @@ function renderPanel(type: string): React.ReactElement {
           />
         </div>
       );
-    case PANEL_MAP:
+    case PANEL_MAP: {
+      const mapItems = (ctx.filteredItems as StacBrowserItem[]).filter(i => i.bbox !== null);
+      const bounds = combinedBounds(mapItems);
+      const rectangles = mapItems.map(item => ({
+        id: item.id,
+        bounds: bboxToBounds(item.bbox!),
+        colour: ctx.colorMap?.get(item.id) ?? 'var(--co-accent, #007fd4)',
+        itemPath: item.itemPath,
+        title: item.title,
+        startDatetime: item.startDatetime,
+        endDatetime: item.endDatetime,
+        datetime: item.datetime,
+      }));
+
       return (
         <div style={{ height: '100%', overflow: 'hidden' }} data-testid="stac-browser-map">
-          <CatalogOverview
-            items={ctx.filteredItems as StacBrowserItem[]}
-            onItemSelect={ctx.onItemSelect}
-            onViewportChange={ctx.onViewportChange}
-            colorMap={ctx.colorMap}
-            hideTimeline
-          />
+          <MapContainer
+            center={[0, 0]}
+            zoom={2}
+            scrollWheelZoom={true}
+            doubleClickZoom={false}
+            style={{ width: '100%', height: '100%' }}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            {bounds && <FitBounds bounds={bounds} />}
+            <ViewportTracker onViewportChange={ctx.onViewportChange} />
+            {rectangles.map(r => (
+              <Rectangle
+                key={r.id}
+                bounds={r.bounds}
+                pathOptions={{ color: r.colour, weight: 2, fillOpacity: 0.15 }}
+                eventHandlers={{
+                  dblclick: (e: LeafletMouseEvent) => {
+                    e.originalEvent.preventDefault();
+                    e.originalEvent.stopPropagation();
+                    ctx.onItemSelect?.(r.itemPath);
+                  },
+                }}
+              >
+                <Tooltip>
+                  <strong>{r.title}</strong>
+                  <br />
+                  {formatDateRange(r.startDatetime, r.endDatetime, r.datetime)}
+                </Tooltip>
+              </Rectangle>
+            ))}
+          </MapContainer>
         </div>
       );
+    }
     default:
       return <div style={{ padding: 16 }}>Unknown panel: {type}</div>;
   }

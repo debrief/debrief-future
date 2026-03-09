@@ -1,6 +1,4 @@
-// Components
-export { CatalogOverview } from './CatalogOverview';
-export type { CatalogOverviewProps } from './CatalogOverview';
+// Types (canonical home: filter-engine/types.ts)
 export type { CatalogOverviewItem, StacBrowserItem, VesselTaxonomyNode } from './filter-engine/types';
 
 // StacBrowser (Feature: 132-three-view-sync)
