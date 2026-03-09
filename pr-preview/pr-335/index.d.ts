@@ -1,5 +1,3 @@
-export { CatalogOverview } from './CatalogOverview';
-export type { CatalogOverviewProps } from './CatalogOverview';
 export type { CatalogOverviewItem, StacBrowserItem, VesselTaxonomyNode } from './filter-engine/types';
 export { StacBrowser } from './StacBrowser';
 export type { StacBrowserProps, BrowserFilterResult } from './StacBrowser';
