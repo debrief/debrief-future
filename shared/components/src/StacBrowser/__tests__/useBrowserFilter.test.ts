@@ -325,31 +325,31 @@ describe('useBrowserFilter — combined 3-axis (US4)', () => {
     expect(r2.current.filteredItems.length).toBeGreaterThanOrEqual(count3);
   });
 
-  it('T076: activeFilterCount reports correct count (0–3)', () => {
+  it('T076: activeFilterCount reports correct count (spatial is implicit, not counted)', () => {
     // 0 filters
     const { result: r0 } = renderHook(() => useBrowserFilter(defaultArgs()));
     expect(r0.current.activeFilterCount).toBe(0);
 
-    // 1 filter
+    // 1 filter (metadata)
     const args1 = defaultArgs();
     args1.metadataFilteredIds = new Set(['ex-1']);
     const { result: r1 } = renderHook(() => useBrowserFilter(args1));
     expect(r1.current.activeFilterCount).toBe(1);
 
-    // 2 filters
+    // spatial filter does not increment count (it's implicit via map viewport)
     const args2 = defaultArgs();
     args2.metadataFilteredIds = new Set(['ex-1']);
     args2.spatialFilterActive = true;
     const { result: r2 } = renderHook(() => useBrowserFilter(args2));
-    expect(r2.current.activeFilterCount).toBe(2);
+    expect(r2.current.activeFilterCount).toBe(1);
 
-    // 3 filters
+    // 2 filters (metadata + temporal)
     const args3 = defaultArgs();
     args3.metadataFilteredIds = new Set(['ex-1']);
     args3.spatialFilterActive = true;
     args3.temporalFilterActive = true;
     const { result: r3 } = renderHook(() => useBrowserFilter(args3));
-    expect(r3.current.activeFilterCount).toBe(3);
+    expect(r3.current.activeFilterCount).toBe(2);
   });
 });
 

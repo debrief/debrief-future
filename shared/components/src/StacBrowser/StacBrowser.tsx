@@ -230,7 +230,7 @@ function renderPanel(type: string): React.ReactElement {
       return (
         <div style={{ height: '100%', overflow: 'hidden' }} data-testid="stac-browser-timeline">
           <TimelineView
-            items={ctx.filteredItems as StacBrowserItem[]}
+            items={ctx.allItems as StacBrowserItem[]}
             onTemporalFilterChange={ctx.onTemporalFilterChange}
             onItemSelect={ctx.onItemSelect}
             colourFn={ctx.colourFn}

@@ -139,10 +139,10 @@ export function useBrowserFilter({
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (metadataFilteredIds !== null) count++;
-    if (spatialFilterActive) count++;
+    // Spatial filter is implicit (map viewport) — don't count it as a user-applied filter
     if (temporalFilterActive) count++;
     return count;
-  }, [metadataFilteredIds, spatialFilterActive, temporalFilterActive]);
+  }, [metadataFilteredIds, temporalFilterActive]);
 
   const hasNoResults = filteredItems.length === 0 && activeFilterCount > 0;
 
