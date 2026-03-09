@@ -21,9 +21,12 @@ test.describe('Catalog Browse', () => {
   });
 
   test('displays item titles in catalog', async ({ page }) => {
-    // Check for known test data items in exercise list
-    await expect(page.getByText('Exercise Alpha')).toBeVisible();
-    await expect(page.getByText('Training Run 1')).toBeVisible();
+    // Wait for exercise list items to render inside GoldenLayout panel
+    await expect(page.locator('[data-testid="exercise-list-item-row"]').first()).toBeVisible();
+
+    // Check for known test data items via specific title testid
+    await expect(page.locator('[data-testid="exercise-item-title"]', { hasText: 'Exercise Alpha' })).toBeVisible();
+    await expect(page.locator('[data-testid="exercise-item-title"]', { hasText: 'Training Run 1' })).toBeVisible();
   });
 
   test('shows filter bar', async ({ page }) => {

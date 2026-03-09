@@ -29,8 +29,10 @@ test.describe('Time Controller', () => {
     });
 
     test('shows Exercise Alpha in catalog', async ({ page }) => {
+      // Wait for exercise list items to render inside GoldenLayout panel
+      await expect(page.locator('[data-testid="exercise-list-item-row"]').first()).toBeVisible();
       // Exercise Alpha should be visible in the catalog
-      await expect(page.getByText('Exercise Alpha')).toBeVisible();
+      await expect(page.locator('[data-testid="exercise-item-title"]', { hasText: 'Exercise Alpha' })).toBeVisible();
     });
   });
 
@@ -46,12 +48,7 @@ test.describe('Time Controller', () => {
     });
 
     test('opening Exercise Alpha loads time data', async ({ page }) => {
-      // Find and open Exercise Alpha
-      // The item might be in the timeline - we need to find it
-      const items = catalogPage.timelineItems;
-      const itemCount = await items.count();
-
-      // Double-click the first item (which should be Exercise Alpha based on sort order)
+      // Open the first exercise item (should be Exercise Alpha based on sort order)
       const analysisPage = await catalogPage.openFirstItem();
 
       // Verify the analysis page loaded

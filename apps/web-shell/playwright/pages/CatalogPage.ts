@@ -9,14 +9,6 @@ import type { Page, Locator } from '@playwright/test';
 import { AnalysisPage } from './AnalysisPage';
 
 /**
- * Represents a catalog item in the timeline.
- */
-export interface CatalogItem {
-  title: string;
-  element: Locator;
-}
-
-/**
  * Page object for the Catalog (welcome) view.
  *
  * The catalog view shows:
@@ -90,24 +82,10 @@ export class CatalogPage {
   }
 
   /**
-   * The timeline within the stac browser.
+   * All exercise list item rows.
    */
-  get timeline(): Locator {
-    return this.page.locator('.stac-browser__timeline');
-  }
-
-  /**
-   * All timeline items (bars or points).
-   */
-  get timelineItems(): Locator {
-    return this.page.locator('.stac-browser__timeline-bar, .stac-browser__timeline-point');
-  }
-
-  /**
-   * The tooltip shown on hover.
-   */
-  get tooltip(): Locator {
-    return this.page.locator('.stac-browser__tooltip');
+  get exerciseItems(): Locator {
+    return this.page.locator('[data-testid="exercise-list-item-row"]');
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -132,7 +110,7 @@ export class CatalogPage {
    * Get the number of items in the catalog.
    */
   async getItemCount(): Promise<number> {
-    return await this.timelineItems.count();
+    return await this.exerciseItems.count();
   }
 
   /**
@@ -141,19 +119,14 @@ export class CatalogPage {
    * @param title - The title to search for (partial match)
    */
   getItemByTitle(title: string): Locator {
-    // Items have data-title attribute or we can find by aria-label
-    return this.page.locator(
-      `.stac-browser__timeline-bar[data-title*="${title}"], ` +
-      `.stac-browser__timeline-point[data-title*="${title}"], ` +
-      `.stac-browser [aria-label*="${title}"]`
-    );
+    return this.page.locator(`[data-testid="exercise-list-item-row"][aria-label*="${title}"]`);
   }
 
   /**
    * Get an item by index.
    */
   getItemByIndex(index: number): Locator {
-    return this.timelineItems.nth(index);
+    return this.exerciseItems.nth(index);
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -161,26 +134,18 @@ export class CatalogPage {
   // ─────────────────────────────────────────────────────────────────────────────
 
   /**
-   * Hover over a timeline item to show its tooltip.
-   */
-  async hoverItem(item: Locator): Promise<void> {
-    await item.hover();
-    await this.tooltip.waitFor({ state: 'visible', timeout: 5000 });
-  }
-
-  /**
-   * Click on a timeline item (single click - may select).
+   * Click on an exercise item (single click to open).
    */
   async clickItem(item: Locator): Promise<void> {
     await item.click();
   }
 
   /**
-   * Double-click on a timeline item to open it.
+   * Open an exercise item by clicking it.
    * Returns an AnalysisPage for the opened plot.
    */
   async openItem(item: Locator): Promise<AnalysisPage> {
-    await item.dblclick();
+    await item.click();
     const analysisPage = new AnalysisPage(this.page);
     await analysisPage.waitForLoad();
     return analysisPage;
@@ -191,27 +156,7 @@ export class CatalogPage {
    * Returns an AnalysisPage for the opened plot.
    */
   async openItemByTitle(title: string): Promise<AnalysisPage> {
-    // First try to find by data-title
-    let item = this.getItemByTitle(title);
-    if (await item.count() === 0) {
-      // Fall back to finding the text in the labels area
-      const label = this.page.getByText(title, { exact: false });
-      // The label might be next to the bar, so we click the bar in the same row
-      // For now, let's find the item by hovering over bars until we find the right title
-      const items = this.timelineItems;
-      const count = await items.count();
-      for (let i = 0; i < count; i++) {
-        const candidate = items.nth(i);
-        await candidate.hover();
-        // Wait briefly for tooltip
-        await this.page.waitForTimeout(100);
-        const tooltipText = await this.tooltip.textContent();
-        if (tooltipText?.includes(title)) {
-          item = candidate;
-          break;
-        }
-      }
-    }
+    const item = this.getItemByTitle(title);
     return await this.openItem(item.first());
   }
 
@@ -219,7 +164,7 @@ export class CatalogPage {
    * Open the first item in the catalog.
    */
   async openFirstItem(): Promise<AnalysisPage> {
-    const firstItem = this.timelineItems.first();
+    const firstItem = this.exerciseItems.first();
     return await this.openItem(firstItem);
   }
 
