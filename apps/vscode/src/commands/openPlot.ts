@@ -130,7 +130,7 @@ export function createOpenPlotCommand(
 
     // Load plot data
     const plotData = await stacService.loadPlotData(store, itemPath);
-    if (!plotData) {
+    if (plotData === null || plotData === undefined) {
       void vscode.window.showErrorMessage('Failed to load plot data');
       return;
     }
@@ -295,12 +295,12 @@ export function createOpenPlotCommand(
         const stampProvenance = (f: Record<string, unknown>): void => {
           if (!activityId) { return; }
           const props = f.properties as Record<string, unknown> | null;
-          if (!props?.provenance || !Array.isArray(props.provenance)) { return; }
+          if (props?.provenance === undefined || props.provenance === null || !Array.isArray(props.provenance)) { return; }
           for (const prov of props.provenance as Array<Record<string, unknown>>) {
-            if (prov.activityId) {
+            if (prov.activityId !== undefined && prov.activityId !== null) {
               prov.activityId = activityId;
             }
-            if (timestamp && prov.timestamp) {
+            if (timestamp !== undefined && prov.timestamp !== undefined && prov.timestamp !== null) {
               prov.timestamp = timestamp;
             }
           }
@@ -374,7 +374,7 @@ export function createOpenPlotCommand(
       logPanelProvider.setOnFeaturesChanged(() => {
         void (async () => {
           const updatedData = await stacService.loadPlotData(store, itemPath);
-          if (updatedData && panel) {
+          if (updatedData !== null && updatedData !== undefined && panel !== undefined) {
             panel.loadPlot(plot, updatedData.features);
             layersTreeProvider.setFeatures(updatedData.features);
             activityPanelProvider.setFeatures(updatedData.features);
@@ -419,7 +419,7 @@ export function createOpenPlotCommand(
       });
       logPanelProvider.setSnapshotService(snapshotService);
 
-      console.log('[debrief] LogPanel: logService + path resolvers wired for', plot.title);
+      console.warn('[debrief] LogPanel: logService + path resolvers wired for', plot.title);
     } else {
       console.warn('[debrief] LogPanel: logPanelProvider not provided — provenance display will not work');
     }

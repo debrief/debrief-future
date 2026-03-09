@@ -37,7 +37,6 @@ export interface AssociatedFile {
 import type { Plot } from '../types/plot';
 import type {
   DebriefFeature,
-  DebriefFeatureCollection,
 } from '@debrief/components';
 
 // Type-safe properties to avoid any from geojson
@@ -305,7 +304,7 @@ export class StacService {
   async loadPlotData(
     store: StacStore,
     itemPath: string
-  ): Promise<DebriefFeatureCollection | null> {
+  ): Promise<{ type: 'FeatureCollection'; features: DebriefFeature[] } | null> {
     try {
       const fullPath = path.join(store.path, itemPath);
       const item = await this.loadItem(fullPath);
@@ -344,11 +343,11 @@ export class StacService {
         const geom = feature.geometry;
 
         // Skip features with no geometry or empty coordinates
-        if (!geom || !geom.coordinates || (Array.isArray(geom.coordinates) && geom.coordinates.length === 0)) {
+        if (geom === null || geom === undefined || (Array.isArray(geom.coordinates) && geom.coordinates.length === 0)) {
           continue;
         }
 
-        if (geom.type === 'LineString' && props.times) {
+        if (geom.type === 'LineString' && props.times !== undefined && props.times !== null) {
           // Track: LineString with times array (epoch ms)
           const times = (props.times as number[]) ?? [];
           const lineCoords = geom.coordinates as number[][];
@@ -365,8 +364,8 @@ export class StacService {
               platform_id: id,
               platform_name: (props.platform_name as string) ?? (props.name as string) ?? `Track ${trackCount + 1}`,
               track_type: (props.track_type as string) ?? (props.platformType as string) ?? 'CONTACT',
-              start_time: times[0] ? new Date(times[0]).toISOString() : '',
-              end_time: times[times.length - 1] ? new Date(times[times.length - 1]!).toISOString() : '',
+              start_time: times[0] !== undefined && times[0] !== 0 ? new Date(times[0]).toISOString() : '',
+              end_time: times[times.length - 1] !== undefined && times[times.length - 1] !== 0 ? new Date(times[times.length - 1]!).toISOString() : '',
               positions,
               times,
               style: { line: { color: (props.color as string) ?? '#0066cc' } },
@@ -558,10 +557,6 @@ export class StacService {
    */
   getResultFilesFromItem(item: StacItem): AssociatedFile[] {
     const results: AssociatedFile[] = [];
-
-    if (!item.assets) {
-      return results;
-    }
 
     try {
       for (const [assetKey, asset] of Object.entries(item.assets)) {

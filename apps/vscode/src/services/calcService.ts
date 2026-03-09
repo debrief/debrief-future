@@ -31,6 +31,7 @@ import {
 } from '../types/tool';
 import { adaptMCPToolsForMatching } from './mcpToolAdapter';
 import type { MapPanel } from '../webview/mapPanel';
+import type { DebriefFeature } from '@debrief/components';
 
 const execFileAsync = promisify(execFile);
 
@@ -666,18 +667,18 @@ print(json.dumps(tools))
       throw new Error('No map panel available');
     }
 
-    const allFeatures = panel.getFeatures();
+    const allFeatures: DebriefFeature[] = panel.getFeatures();
     const resultLayers = panel.getResultLayers();
     const resolved: Array<{ type: 'Feature'; id?: string | number; geometry: unknown; properties: Record<string, unknown> }> = [];
 
     for (const id of featureIds) {
-      const feature = allFeatures.find((f) => String(f.id) === id);
-      if (feature) {
+      const feature: DebriefFeature | undefined = allFeatures.find((f: DebriefFeature) => String(f.id) === id);
+      if (feature !== undefined) {
         const props = feature.properties as Record<string, unknown>;
         resolved.push({
           type: 'Feature',
           id: feature.id,
-          geometry: feature.geometry,
+          geometry: feature.geometry as unknown,
           properties: {
             ...props,
             id: feature.id,
@@ -826,7 +827,7 @@ print(json.dumps(tools))
 
     for (const item of response.content) {
       // Grab annotations from first item
-      if (!resultType && item.annotations) {
+      if (!resultType && item.annotations !== undefined) {
         resultType = item.annotations['debrief:resultType'];
         label = item.annotations['debrief:label'];
         sourceFeatureIds = item.annotations['debrief:sourceFeatures'];

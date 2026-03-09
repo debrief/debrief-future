@@ -25,6 +25,58 @@ import type { ResultLayer } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
 import { isTrackFeature, isReferenceLocation } from '@debrief/components';
 
+// ---------------------------------------------------------------------------
+// Local type helpers — @debrief/components dist may not exist at lint time,
+// causing all imports to resolve as `any`. These interfaces provide the
+// concrete shapes ESLint needs for safe member access.
+// ---------------------------------------------------------------------------
+
+/** Minimal shape shared by every DebriefFeature variant. */
+interface FeatureBase {
+  type: string;
+  id: string;
+  geometry: { type: string; coordinates: unknown };
+  properties: Record<string, unknown>;
+}
+
+/** Properties present after the isTrackFeature type-guard narrows. */
+interface TrackLike extends FeatureBase {
+  properties: {
+    kind: 'TRACK';
+    platform_name?: string;
+    platform_id?: string;
+    track_type?: string;
+    style?: { line?: { color?: string } };
+    [key: string]: unknown;
+  };
+  geometry: { type: string; coordinates: number[][] };
+}
+
+/** Properties present after the isReferenceLocation type-guard narrows. */
+interface RefLocLike extends FeatureBase {
+  properties: {
+    kind: 'POINT';
+    name: string;
+    location_type?: string;
+    [key: string]: unknown;
+  };
+}
+
+/**
+ * Typed wrapper for isTrackFeature — avoids unsafe-call when the import
+ * resolves as `any`.
+ */
+function isTrack(feature: FeatureBase): feature is TrackLike {
+  return (isTrackFeature as (f: FeatureBase) => boolean)(feature);
+}
+
+/**
+ * Typed wrapper for isReferenceLocation.
+ */
+function isRefLoc(feature: FeatureBase): feature is RefLocLike {
+  return (isReferenceLocation as (f: FeatureBase) => boolean)(feature);
+}
+
 export type LayerItem =
   | { type: 'header'; label: string; id: string }
   | { type: 'feature'; feature: DebriefFeature }
@@ -36,7 +88,7 @@ export type LayerItem =
 export function getFeatureId(item: LayerItem): string | undefined {
   switch (item.type) {
     case 'feature':
-      return String(item.feature.id);
+      return String((item.feature as FeatureBase).id);
     case 'result':
       return item.layer.id;
     default:
@@ -247,8 +299,8 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
     if (element.type === 'header') {
       if (element.id === 'source') {
         return Promise.resolve(
-          this.features.map(
-            (feature): LayerItem => ({ type: 'feature', feature })
+          (this.features as unknown as FeatureBase[]).map(
+            (feature): LayerItem => ({ type: 'feature', feature: feature as DebriefFeature })
           )
         );
       }
@@ -297,23 +349,24 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
   }
 
   private createFeatureItem(feature: DebriefFeature): vscode.TreeItem {
-    const props = feature.properties as Record<string, unknown>;
+    const f = feature as unknown as FeatureBase;
+    const props = f.properties;
     const kind = (props.kind as string) ?? 'UNKNOWN';
-    const featureId = String(feature.id);
+    const featureId = String(f.id);
     const isSelected = this._isFeatureSelected(featureId);
 
-    if (isTrackFeature(feature)) {
-      const name = feature.properties.platform_name ?? feature.properties.platform_id;
-      const trackType = feature.properties.track_type ?? '';
+    if (isTrack(f)) {
+      const name: string = f.properties.platform_name ?? f.properties.platform_id ?? 'Unknown';
+      const trackType: string = f.properties.track_type ?? '';
       const item = new vscode.TreeItem(name, vscode.TreeItemCollapsibleState.None);
       item.contextValue = 'track';
       item.description = trackType;
-      const geom = feature.geometry as unknown as { coordinates: number[][] };
+      const geom = f.geometry;
       item.tooltip = `${name}\nPlatform: ${trackType || 'Unknown'}\nPoints: ${geom.coordinates.length}`;
       item.iconPath = new vscode.ThemeIcon(isSelected ? 'check' : 'circle-outline');
 
       // Color indicator
-      const style = feature.properties.style as { line?: { color?: string } } | undefined;
+      const style = f.properties.style;
       const color = style?.line?.color;
       if (color) {
         item.resourceUri = vscode.Uri.parse(`color:${color}`);
@@ -322,9 +375,9 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
       return item;
     }
 
-    if (isReferenceLocation(feature)) {
-      const name = feature.properties.name;
-      const locType = feature.properties.location_type ?? '';
+    if (isRefLoc(f)) {
+      const name: string = f.properties.name;
+      const locType: string = f.properties.location_type ?? '';
       const item = new vscode.TreeItem(name, vscode.TreeItemCollapsibleState.None);
       item.contextValue = 'location';
       item.description = locType;
@@ -338,7 +391,7 @@ export class LayersTreeProvider implements vscode.TreeDataProvider<LayerItem> {
     const item = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.None);
     item.contextValue = 'shape';
     item.description = kind.toLowerCase();
-    const geomType = (feature.geometry as { type: string }).type;
+    const geomType: string = f.geometry.type;
     item.tooltip = `${label}\nType: ${kind}\nGeometry: ${geomType}`;
     item.iconPath = new vscode.ThemeIcon(isSelected ? 'check' : 'circle-outline');
     return item;
