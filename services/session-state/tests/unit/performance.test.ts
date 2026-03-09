@@ -10,7 +10,6 @@ import {
   createSessionStore,
   type SessionStoreApi,
   subscribeToCurrentTime,
-  createTimeInstant,
 } from '../../src/index.js';
 
 describe('Performance Requirements (SC-001)', () => {
@@ -31,8 +30,7 @@ describe('Performance Requirements (SC-001)', () => {
       });
 
       const startTime = performance.now();
-      const time = createTimeInstant(Date.now());
-      store.getState().setCurrentTime(time);
+      store.getState().setCurrentTime(Date.now());
       const endTime = notificationTime ?? performance.now();
 
       const latency = endTime - startTime;
@@ -48,8 +46,7 @@ describe('Performance Requirements (SC-001)', () => {
 
       // Simulate rapid updates (100 changes)
       for (let i = 0; i < 100; i++) {
-        const time = createTimeInstant(Date.now() + i * 1000);
-        store.getState().setCurrentTime(time);
+        store.getState().setCurrentTime(Date.now() + i * 1000);
       }
 
       const endTime = performance.now();
@@ -68,8 +65,7 @@ describe('Performance Requirements (SC-001)', () => {
       });
 
       const startTime = performance.now();
-      const time = createTimeInstant(Date.now());
-      store.getState().setCurrentTime(time);
+      store.getState().setCurrentTime(Date.now());
       const endTime = performance.now();
 
       const latency = endTime - startTime;
@@ -96,8 +92,7 @@ describe('Performance Requirements (SC-001)', () => {
       );
 
       const startTime = performance.now();
-      const time = createTimeInstant(Date.now());
-      store.getState().setCurrentTime(time);
+      store.getState().setCurrentTime(Date.now());
       const endTime = performance.now();
 
       const latency = endTime - startTime;
@@ -107,14 +102,11 @@ describe('Performance Requirements (SC-001)', () => {
 
   describe('synchronous updates', () => {
     it('should update state synchronously', () => {
-      const time1 = createTimeInstant(1000);
-      const time2 = createTimeInstant(2000);
+      store.getState().setCurrentTime(1000);
+      expect(store.getState().currentTime).toBe(1000);
 
-      store.getState().setCurrentTime(time1);
-      expect(store.getState().currentTime).toEqual(time1);
-
-      store.getState().setCurrentTime(time2);
-      expect(store.getState().currentTime).toEqual(time2);
+      store.getState().setCurrentTime(2000);
+      expect(store.getState().currentTime).toBe(2000);
     });
 
     it('should notify subscribers synchronously', () => {
@@ -125,7 +117,7 @@ describe('Performance Requirements (SC-001)', () => {
       });
 
       callOrder.push('before');
-      store.getState().setCurrentTime(createTimeInstant(Date.now()));
+      store.getState().setCurrentTime(Date.now());
       callOrder.push('after');
 
       // Subscriber should be called synchronously between before and after

@@ -1,6 +1,60 @@
 import { describe, it, expect } from 'vitest';
-import { bboxOverlapsViewport, filterBySpatialExtent } from './bounds';
+import { bboxOverlapsViewport, filterBySpatialExtent, viewportToBounds } from './bounds';
 import type { Bounds } from './types';
+import type { ViewportPolygon } from '@debrief/session-state';
+
+// ============================================================================
+// T030: viewportToBounds — convert ViewportPolygon to Bounds
+// ============================================================================
+
+describe('viewportToBounds', () => {
+  it('converts a non-rotated viewport to bounds', () => {
+    const viewport: ViewportPolygon = {
+      coordinates: [[-10, 55], [5, 55], [5, 45], [-10, 45]],
+    };
+    expect(viewportToBounds(viewport)).toEqual([-10, 45, 5, 55]);
+  });
+
+  it('handles a rotated viewport by computing enclosing AABB', () => {
+    const viewport: ViewportPolygon = {
+      coordinates: [[0, 10], [10, 0], [0, -10], [-10, 0]],
+    };
+    expect(viewportToBounds(viewport)).toEqual([-10, -10, 10, 10]);
+  });
+
+  it('returns null for degenerate polygon (all same point)', () => {
+    const viewport: ViewportPolygon = {
+      coordinates: [[5, 5], [5, 5], [5, 5], [5, 5]],
+    };
+    expect(viewportToBounds(viewport)).toBeNull();
+  });
+
+  it('returns null for degenerate polygon (zero-width line)', () => {
+    const viewport: ViewportPolygon = {
+      coordinates: [[5, 0], [5, 10], [5, 10], [5, 0]],
+    };
+    expect(viewportToBounds(viewport)).toBeNull();
+  });
+
+  it('returns null for degenerate polygon (zero-height line)', () => {
+    const viewport: ViewportPolygon = {
+      coordinates: [[0, 5], [10, 5], [10, 5], [0, 5]],
+    };
+    expect(viewportToBounds(viewport)).toBeNull();
+  });
+
+  it('preserves precision for small viewports', () => {
+    const viewport: ViewportPolygon = {
+      coordinates: [[-0.001, 51.501], [0.001, 51.501], [0.001, 51.499], [-0.001, 51.499]],
+    };
+    const bounds = viewportToBounds(viewport);
+    expect(bounds).not.toBeNull();
+    expect(bounds![0]).toBeCloseTo(-0.001, 5);
+    expect(bounds![1]).toBeCloseTo(51.499, 5);
+    expect(bounds![2]).toBeCloseTo(0.001, 5);
+    expect(bounds![3]).toBeCloseTo(51.501, 5);
+  });
+});
 
 // ============================================================================
 // T002: bboxOverlapsViewport — standard cases

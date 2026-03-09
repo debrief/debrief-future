@@ -1,34 +1,13 @@
 /**
  * Type definitions for the CatalogOverview component.
+ * CatalogOverviewItem is re-exported from filter-engine/types.ts (canonical home).
  */
 
 import type { Bounds } from '../utils/types';
+import type { CatalogOverviewItem } from '../filter-engine/types';
 
-/**
- * A single item in a STAC catalog overview.
- */
-export interface CatalogOverviewItem {
-  /** STAC Item ID */
-  id: string;
-
-  /** Item title */
-  title: string;
-
-  /** Path to item.json relative to store root */
-  itemPath: string;
-
-  /** Bounding box [west, south, east, north] */
-  bbox: [number, number, number, number] | null;
-
-  /** Single datetime (ISO 8601) — fallback when start/end not available */
-  datetime: string | null;
-
-  /** Range start datetime (ISO 8601) */
-  startDatetime: string | null;
-
-  /** Range end datetime (ISO 8601) */
-  endDatetime: string | null;
-}
+// Re-export from canonical location
+export type { CatalogOverviewItem } from '../filter-engine/types';
 
 /**
  * Props for the CatalogOverview component.

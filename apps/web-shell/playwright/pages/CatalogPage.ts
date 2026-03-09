@@ -21,7 +21,7 @@ export interface CatalogItem {
  *
  * The catalog view shows:
  * - Header with title "Debrief Web Shell"
- * - CatalogOverview component with timeline of available plots
+ * - StacBrowser component with timeline of available plots
  */
 export class CatalogPage {
   readonly page: Page;
@@ -47,7 +47,7 @@ export class CatalogPage {
    */
   async waitForLoad(): Promise<void> {
     await this.page.waitForSelector('.web-shell--welcome', { state: 'visible' });
-    await this.page.waitForSelector('.catalog-overview', { state: 'visible' });
+    await this.page.waitForSelector('.stac-browser', { state: 'visible' });
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -83,31 +83,31 @@ export class CatalogPage {
   }
 
   /**
-   * The catalog overview component.
+   * The stac browser component.
    */
   get catalogOverview(): Locator {
-    return this.page.locator('.catalog-overview');
+    return this.page.locator('.stac-browser');
   }
 
   /**
-   * The timeline within the catalog overview.
+   * The timeline within the stac browser.
    */
   get timeline(): Locator {
-    return this.page.locator('.catalog-overview__timeline');
+    return this.page.locator('.stac-browser__timeline');
   }
 
   /**
    * All timeline items (bars or points).
    */
   get timelineItems(): Locator {
-    return this.page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point');
+    return this.page.locator('.stac-browser__timeline-bar, .stac-browser__timeline-point');
   }
 
   /**
    * The tooltip shown on hover.
    */
   get tooltip(): Locator {
-    return this.page.locator('.catalog-overview__tooltip');
+    return this.page.locator('.stac-browser__tooltip');
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -143,9 +143,9 @@ export class CatalogPage {
   getItemByTitle(title: string): Locator {
     // Items have data-title attribute or we can find by aria-label
     return this.page.locator(
-      `.catalog-overview__timeline-bar[data-title*="${title}"], ` +
-      `.catalog-overview__timeline-point[data-title*="${title}"], ` +
-      `.catalog-overview [aria-label*="${title}"]`
+      `.stac-browser__timeline-bar[data-title*="${title}"], ` +
+      `.stac-browser__timeline-point[data-title*="${title}"], ` +
+      `.stac-browser [aria-label*="${title}"]`
     );
   }
 

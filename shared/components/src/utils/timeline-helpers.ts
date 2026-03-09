@@ -5,8 +5,7 @@
  * CatalogOverview and the new TimelineView component.
  */
 
-import type { CatalogOverviewItem } from '../CatalogOverview/types';
-import type { StacBrowserItem } from '../filter-engine/types';
+import type { CatalogOverviewItem, StacBrowserItem } from '../filter-engine/types';
 import type { TimeSpan } from './temporal-types';
 import type { TemporalFilter } from '../TimelineView/types';
 

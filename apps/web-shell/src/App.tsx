@@ -1,7 +1,7 @@
 /**
  * App shell with two-view architecture, backed by @debrief/session-state.
  *
- * - Welcome view: CatalogOverview showing available plots
+ * - Welcome view: StacBrowser showing available plots
  * - Analysis view: StacFileTree + Activity/Log tabs (left) + MapView (right)
  *
  * State flow:
@@ -18,7 +18,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef, createElement } from 'react';
 import type { Feature, FeatureCollection } from 'geojson';
 import {
-  CatalogOverview,
+  StacBrowser,
   MapView,
   ActivityPanel,
   LogPanel,
@@ -37,6 +37,7 @@ import {
 } from '@debrief/components';
 import type { DatasetEnvelope, DrawingMode, DrawnFeatureProvenance } from '@debrief/components';
 import type {
+  StacBrowserItem,
   CatalogOverviewItem,
   ToolsPanelItem,
   ActivityPanelMessage,
@@ -58,7 +59,6 @@ import { LOG_DEFAULT_FILTER_STATE } from '@debrief/components';
 import {
   getSessionStore,
   resetSessionStore,
-  createTimeInstant,
   type DisplayMode as StoreDisplayMode,
   type GeoJSONFeature,
 } from '@debrief/session-state';
@@ -174,9 +174,19 @@ export default function App() {
   const drawingMode = state.drawingMode;
   const [drawnFeatures, setDrawnFeatures] = useState<DebriefFeature[]>([]);
 
-  // Catalog items
-  const catalogItems = useMemo<CatalogOverviewItem[]>(() => {
-    return stacService.getItems();
+  // Catalog items — map to StacBrowserItem for StacBrowser component
+  const catalogItems = useMemo<StacBrowserItem[]>(() => {
+    return stacService.getItems().map((item: CatalogOverviewItem): StacBrowserItem => ({
+      ...item,
+      vesselClasses: [],
+      tags: [],
+      featureTags: [],
+      author: null,
+      trackNames: [],
+      nationalities: [],
+      collection: null,
+      modified: null,
+    }));
   }, []);
 
   // Extract features array from current plot
@@ -216,7 +226,7 @@ export default function App() {
   const playback = useTimePlayback({
     timeExtent,
     onTimeChange: useCallback((time: number) => {
-      store.getState().setCurrentTime(createTimeInstant(time));
+      store.getState().setCurrentTime(time);
     }, [store]),
   });
 
@@ -280,10 +290,10 @@ export default function App() {
       const extent = calculateTimeExtent(features);
       if (extent) {
         freshStore.getState().setTimeRange({
-          start: createTimeInstant(extent[0]),
-          end: createTimeInstant(extent[1]),
+          start: extent[0],
+          end: extent[1],
         });
-        freshStore.getState().setCurrentTime(createTimeInstant(extent[0]));
+        freshStore.getState().setCurrentTime(extent[0]);
       }
 
       // Clear undo history — initialization isn't a user action
@@ -1172,8 +1182,9 @@ export default function App() {
           </div>
         </header>
         <main className="web-shell__main">
-          <CatalogOverview
+          <StacBrowser
             items={catalogItems}
+            taxonomy={[]}
             onItemSelect={handlePlotSelect}
             className="web-shell__catalog"
           />

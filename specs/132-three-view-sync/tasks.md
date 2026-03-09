@@ -50,10 +50,10 @@
 
 **Purpose**: Project scaffolding and directory structure for new components
 
-- [ ] T001 Create StacBrowser component directory and barrel export `shared/components/src/StacBrowser/index.ts`
-- [ ] T002 [P] Create StacBrowser prop types from contract `shared/components/src/StacBrowser/types.ts`
-- [ ] T003 [P] Create BrowserFilterSlice types from contract `services/session-state/src/types/browser-filter.ts`
-- [ ] T004 [P] Create StacBrowser CSS layout skeleton `shared/components/src/StacBrowser/StacBrowser.css`
+- [x] T001 Create StacBrowser component directory and barrel export `shared/components/src/StacBrowser/index.ts`
+- [x] T002 [P] Create StacBrowser prop types from contract `shared/components/src/StacBrowser/types.ts`
+- [x] T003 [P] Create BrowserFilterSlice types from contract `services/session-state/src/types/browser-filter.ts`
+- [x] T004 [P] Create StacBrowser CSS layout skeleton `shared/components/src/StacBrowser/StacBrowser.css`
 
 ---
 
@@ -67,62 +67,62 @@
 
 Unify `TimeFilter` to use plain epoch numbers instead of `TimeInstant`. This touches 38 files across the codebase.
 
-- [ ] T005 Refactor `TimeFilter` to use epoch numbers: `{ start: number | null; end: number | null }` `services/session-state/src/types/temporal.ts`
-- [ ] T006 Update `TimeRange` to use epoch numbers: `{ start: number; end: number }` `services/session-state/src/types/temporal.ts`
-- [ ] T007 Keep `TimeInstant` as a utility type but remove from `TimeFilter`/`TimeRange`/`TemporalSlice` interfaces `services/session-state/src/types/temporal.ts`
-- [ ] T008 Update `TemporalSlice` to use epoch `currentTime: number | null` `services/session-state/src/types/temporal.ts`
-- [ ] T009 Update `TemporalActions` signatures to match new types `services/session-state/src/types/temporal.ts`
-- [ ] T010 Update `createTemporalSlice` implementation for epoch-based types `services/session-state/src/store/slices/temporal.ts`
-- [ ] T011 [test] Fix temporal slice tests for new epoch types `services/session-state/tests/unit/slices/temporal.test.ts`
-- [ ] T012 [P] Update session-state persistence layer for epoch types `services/session-state/src/persistence/load.ts`
-- [ ] T013 [P] Update session-state subscriptions for epoch types `services/session-state/src/store/subscriptions.ts`
-- [ ] T014 [P] Update MCP tool `setCurrentTime` for epoch types `services/session-state/src/server/tools/setCurrentTime.ts`
-- [ ] T015 [P] Update session-state performance and selective tests `services/session-state/tests/unit/performance.test.ts`
-- [ ] T016 [P] Update session-state subscription tests `services/session-state/tests/unit/subscriptions.test.ts`
-- [ ] T017 Update VS Code extension temporal consumers (timeRangeView, mapPanel, sessionManager, openPlot) `apps/vscode/src/views/timeRangeView.ts`
-- [ ] T018 [P] Update VS Code webview messages for epoch types `apps/vscode/src/webview/messages.ts`
-- [ ] T019 Update web-shell App.tsx for epoch types `apps/web-shell/src/App.tsx`
-- [ ] T020 Update TimeController component for epoch types `shared/components/src/TimeController/timeUtils.ts`
-- [ ] T021 [P] Update TimeController tests `shared/components/src/TimeController/timeUtils.test.ts`
-- [ ] T022 [P] Update Timeline component for epoch types `shared/components/src/Timeline/Timeline.tsx`
-- [ ] T023 [P] Update Timeline tests `shared/components/src/Timeline/Timeline.test.tsx`
-- [ ] T024 Update TimelineView component — unify `TemporalFilter` with `TimeFilter` (both now epoch) `shared/components/src/TimelineView/types.ts`
-- [ ] T025 [P] Update TimelineView implementation for unified filter type `shared/components/src/TimelineView/TimelineView.tsx`
-- [ ] T026 [P] Update timeline-helpers `itemOverlapsFilter` to accept `TimeFilter` directly `shared/components/src/utils/timeline-helpers.ts`
-- [ ] T027 [test] Update timeline-helpers tests for new `TimeFilter` shape `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
-- [ ] T028 [test] Run full test suite to verify no regressions from TimeFilter refactor
+- [x] T005 Refactor `TimeFilter` to use epoch numbers: `{ start: number | null; end: number | null }` `services/session-state/src/types/temporal.ts`
+- [x] T006 Update `TimeRange` to use epoch numbers: `{ start: number; end: number }` `services/session-state/src/types/temporal.ts`
+- [x] T007 Keep `TimeInstant` as a utility type but remove from `TimeFilter`/`TimeRange`/`TemporalSlice` interfaces `services/session-state/src/types/temporal.ts`
+- [x] T008 Update `TemporalSlice` to use epoch `currentTime: number | null` `services/session-state/src/types/temporal.ts`
+- [x] T009 Update `TemporalActions` signatures to match new types `services/session-state/src/types/temporal.ts`
+- [x] T010 Update `createTemporalSlice` implementation for epoch-based types `services/session-state/src/store/slices/temporal.ts`
+- [x] T011 [test] Fix temporal slice tests for new epoch types `services/session-state/tests/unit/slices/temporal.test.ts`
+- [x] T012 [P] Update session-state persistence layer for epoch types `services/session-state/src/persistence/load.ts`
+- [x] T013 [P] Update session-state subscriptions for epoch types `services/session-state/src/store/subscriptions.ts`
+- [x] T014 [P] Update MCP tool `setCurrentTime` for epoch types `services/session-state/src/server/tools/setCurrentTime.ts`
+- [x] T015 [P] Update session-state performance and selective tests `services/session-state/tests/unit/performance.test.ts`
+- [x] T016 [P] Update session-state subscription tests `services/session-state/tests/unit/subscriptions.test.ts`
+- [x] T017 Update VS Code extension temporal consumers (timeRangeView, mapPanel, sessionManager, openPlot) `apps/vscode/src/views/timeRangeView.ts`
+- [x] T018 [P] Update VS Code webview messages for epoch types `apps/vscode/src/webview/messages.ts`
+- [x] T019 Update web-shell App.tsx for epoch types `apps/web-shell/src/App.tsx`
+- [x] T020 Update TimeController component for epoch types `shared/components/src/TimeController/timeUtils.ts`
+- [x] T021 [P] Update TimeController tests `shared/components/src/TimeController/timeUtils.test.ts`
+- [x] T022 [P] Update Timeline component for epoch types `shared/components/src/Timeline/Timeline.tsx`
+- [x] T023 [P] Update Timeline tests `shared/components/src/Timeline/Timeline.test.tsx`
+- [x] T024 Update TimelineView component — unify `TemporalFilter` with `TimeFilter` (both now epoch) `shared/components/src/TimelineView/types.ts`
+- [x] T025 [P] Update TimelineView implementation for unified filter type `shared/components/src/TimelineView/TimelineView.tsx`
+- [x] T026 [P] Update timeline-helpers `itemOverlapsFilter` to accept `TimeFilter` directly `shared/components/src/utils/timeline-helpers.ts`
+- [x] T027 [test] Update timeline-helpers tests for new `TimeFilter` shape `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
+- [x] T028 [test] Run full test suite to verify no regressions from TimeFilter refactor
 
 **Checkpoint**: TimeFilter refactor complete — all temporal types use epoch numbers
 
 ### Store Slice and Spatial Utility
 
-- [ ] T029 Add `viewportToBounds(viewport: ViewportPolygon): Bounds` to existing bounds utility `shared/components/src/utils/bounds.ts`
-- [ ] T030 [test] Add viewportToBounds tests including degenerate polygon edge case `shared/components/src/utils/bounds.test.ts`
-- [ ] T031 Create BrowserFilterSlice Zustand slice implementation `services/session-state/src/store/slices/browser-filter.ts`
-- [ ] T032 Export new slice from slices barrel `services/session-state/src/store/slices/index.ts`
-- [ ] T033 Register BrowserFilterSlice in session store creation `services/session-state/src/store/createStore.ts`
-- [ ] T034 Export BrowserFilterSlice types from session-state package `services/session-state/src/types/index.ts`
-- [ ] T035 [test] Write BrowserFilterSlice unit tests (all actions + defaults + clearAll) `services/session-state/tests/unit/slices/browser-filter.test.ts`
+- [x] T029 Add `viewportToBounds(viewport: ViewportPolygon): Bounds` to existing bounds utility `shared/components/src/utils/bounds.ts`
+- [x] T030 [test] Add viewportToBounds tests including degenerate polygon edge case `shared/components/src/utils/bounds.test.ts`
+- [x] T031 Create BrowserFilterSlice Zustand slice implementation `services/session-state/src/store/slices/browser-filter.ts`
+- [x] T032 Export new slice from slices barrel `services/session-state/src/store/slices/index.ts`
+- [x] T033 Register BrowserFilterSlice in session store creation `services/session-state/src/store/createStore.ts`
+- [x] T034 Export BrowserFilterSlice types from session-state package `services/session-state/src/types/index.ts`
+- [x] T035 [test] Write BrowserFilterSlice unit tests (all actions + defaults + clearAll) `services/session-state/tests/unit/slices/browser-filter.test.ts`
 
 ### CatalogOverview Removal (Review Decision 6A)
 
 Remove CatalogOverview and update all 24 references. StacBrowser replaces it as the top-level orchestrator.
 
-- [ ] T036 Remove CatalogOverview component directory `shared/components/src/CatalogOverview/`
-- [ ] T037 Update shared/components barrel export — replace CatalogOverview with StacBrowser `shared/components/src/index.ts`
-- [ ] T038 Migrate CatalogOverviewItem type to a shared location (used by ExerciseListView, filter-engine) `shared/components/src/filter-engine/types.ts`
-- [ ] T039 Update ExerciseListView types import path `shared/components/src/ExerciseListView/types.ts`
-- [ ] T040 Update timeline-helpers import path `shared/components/src/utils/timeline-helpers.ts`
-- [ ] T041 [P] Update timeline-helpers test imports `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
-- [ ] T042 Update VS Code catalogOverviewPanel to use StacBrowser `apps/vscode/src/panels/catalogOverviewPanel.ts`
-- [ ] T043 [P] Update VS Code webview catalogOverview entry point `apps/vscode/src/webview/web/catalogOverview.tsx`
-- [ ] T044 [P] Update VS Code commands referencing CatalogOverview `apps/vscode/src/commands/openCatalogOverview.ts`
-- [ ] T045 [P] Update VS Code commands index `apps/vscode/src/commands/index.ts`
-- [ ] T046 [P] Update VS Code stacTreeProvider reference `apps/vscode/src/providers/stacTreeProvider.ts`
-- [ ] T047 Update web-shell App.tsx to use StacBrowser `apps/web-shell/src/App.tsx`
-- [ ] T048 [P] Update web-shell mock service `apps/web-shell/src/mocks/stacService.ts`
-- [ ] T049 [P] Update web-shell Playwright page objects `apps/web-shell/playwright/pages/CatalogPage.ts`
-- [ ] T050 [test] Verify all existing tests pass after CatalogOverview removal
+- [ ] T036 Remove CatalogOverview component directory `shared/components/src/CatalogOverview/` — DEFERRED: CatalogOverview retained as internal map panel component used by StacBrowser
+- [x] T037 Update shared/components barrel export — replace CatalogOverview with StacBrowser `shared/components/src/index.ts`
+- [x] T038 Migrate CatalogOverviewItem type to a shared location (used by ExerciseListView, filter-engine) `shared/components/src/filter-engine/types.ts`
+- [x] T039 Update ExerciseListView types import path `shared/components/src/ExerciseListView/types.ts`
+- [x] T040 Update timeline-helpers import path `shared/components/src/utils/timeline-helpers.ts`
+- [x] T041 [P] Update timeline-helpers test imports `shared/components/src/utils/__tests__/timeline-helpers.test.ts`
+- [ ] T042 Update VS Code catalogOverviewPanel to use StacBrowser `apps/vscode/src/panels/catalogOverviewPanel.ts` — DEFERRED: VS Code panel migration
+- [ ] T043 [P] Update VS Code webview catalogOverview entry point `apps/vscode/src/webview/web/catalogOverview.tsx` — DEFERRED
+- [ ] T044 [P] Update VS Code commands referencing CatalogOverview `apps/vscode/src/commands/openCatalogOverview.ts` — DEFERRED
+- [ ] T045 [P] Update VS Code commands index `apps/vscode/src/commands/index.ts` — DEFERRED
+- [ ] T046 [P] Update VS Code stacTreeProvider reference `apps/vscode/src/providers/stacTreeProvider.ts` — DEFERRED
+- [x] T047 Update web-shell App.tsx to use StacBrowser `apps/web-shell/src/App.tsx`
+- [ ] T048 [P] Update web-shell mock service `apps/web-shell/src/mocks/stacService.ts` — DEFERRED
+- [ ] T049 [P] Update web-shell Playwright page objects `apps/web-shell/playwright/pages/CatalogPage.ts` — DEFERRED
+- [x] T050 [test] Verify all existing tests pass after CatalogOverview removal
 
 **Checkpoint**: Foundation ready — TimeFilter refactored, store slice created, CatalogOverview removed, all tests green
 
@@ -136,15 +136,15 @@ Remove CatalogOverview and update all 24 references. StacBrowser replaces it as 
 
 ### Tests for User Story 1
 
-- [ ] T051 [test] Write useBrowserFilter hook tests — metadata-only filtering (null spatial/temporal) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T052 [P][test] Write useBrowserFilter tests — items with no bbox pass metadata filter `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T051 [test] Write useBrowserFilter hook tests — metadata-only filtering (null spatial/temporal) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T052 [P][test] Write useBrowserFilter tests — items with no bbox pass metadata filter `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
 - [ ] T053 [P][test] Write StacBrowser component test — renders all four child views `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T054 Implement `useBrowserFilter` hook — metadata axis only, with reference-equality memoization (review 9A) `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T055 Implement StacBrowser component — layout with FilterBar + ExerciseListView + MapView + TimelineView `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T056 Wire FilterBar `onFilteredItems` callback to `setMetadataFilteredIds` in StacBrowser `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T054 Implement `useBrowserFilter` hook — metadata axis only, with reference-equality memoization (review 9A) `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T055 Implement StacBrowser component — layout with FilterBar + ExerciseListView + MapView + TimelineView `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T056 Wire FilterBar `onFilteredItems` callback to `setMetadataFilteredIds` in StacBrowser `shared/components/src/StacBrowser/StacBrowser.tsx`
 - [ ] T057 Create StacBrowser Storybook story with mock data `shared/components/src/StacBrowser/StacBrowser.stories.tsx`
 - [ ] T058 [test] Verify metadata filter sync — add filter, check all views receive filtered items `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
@@ -160,15 +160,15 @@ Remove CatalogOverview and update all 24 references. StacBrowser replaces it as 
 
 ### Tests for User Story 2
 
-- [ ] T059 [test] Write useBrowserFilter tests — spatial-only filtering using existing `bboxOverlapsViewport` `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T060 [P][test] Write useBrowserFilter tests — exercises without bbox always pass spatial filter `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T061 [P][test] Write useBrowserFilter tests — defensive guard for degenerate viewport (review 7D) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T059 [test] Write useBrowserFilter tests — spatial-only filtering using existing `bboxOverlapsViewport` `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T060 [P][test] Write useBrowserFilter tests — exercises without bbox always pass spatial filter `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T061 [P][test] Write useBrowserFilter tests — defensive guard for degenerate viewport (review 7D) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T062 Extend `useBrowserFilter` — add spatial axis using `viewportToBounds` + `bboxOverlapsViewport` from bounds.ts `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T063 Add defensive guard: degenerate viewport (zero-area polygon) treated as "no spatial filter" `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T064 Wire MapView `onViewportChange` to store's `setViewport` + `setSpatialFilterActive(true)` in StacBrowser `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T062 Extend `useBrowserFilter` — add spatial axis using `viewportToBounds` + `bboxOverlapsViewport` from bounds.ts `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T063 Add defensive guard: degenerate viewport (zero-area polygon) treated as "no spatial filter" `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T064 Wire MapView `onViewportChange` to store's `setViewport` + `setSpatialFilterActive(true)` in StacBrowser `shared/components/src/StacBrowser/StacBrowser.tsx`
 - [ ] T065 Add 150ms debounce for viewport changes in StacBrowser (reuse ViewportTracker pattern) `shared/components/src/StacBrowser/StacBrowser.tsx`
 - [ ] T066 [test] Verify spatial filter sync — pan map, check list and timeline update `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
@@ -184,15 +184,15 @@ Remove CatalogOverview and update all 24 references. StacBrowser replaces it as 
 
 ### Tests for User Story 3
 
-- [ ] T067 [test] Write useBrowserFilter tests — temporal-only filtering using `itemOverlapsFilter` `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T068 [P][test] Write useBrowserFilter tests — exercises without temporal data always pass temporal filter `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T069 [P][test] Write useBrowserFilter tests — defensive guard for inverted timeFilter (start > end) (review 7D) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T067 [test] Write useBrowserFilter tests — temporal-only filtering using `itemOverlapsFilter` `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T068 [P][test] Write useBrowserFilter tests — exercises without temporal data always pass temporal filter `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T069 [P][test] Write useBrowserFilter tests — defensive guard for inverted timeFilter (start > end) (review 7D) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T070 Extend `useBrowserFilter` — add temporal axis using `itemOverlapsFilter` from timeline-helpers.ts `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T071 Add defensive guard: inverted timeFilter (start > end) treated as "no temporal filter" `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T072 Wire TimelineView `onTemporalFilterChange` to store's `setTimeFilter` + `setTemporalFilterActive(true)` in StacBrowser `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T070 Extend `useBrowserFilter` — add temporal axis using `itemOverlapsFilter` from timeline-helpers.ts `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T071 Add defensive guard: inverted timeFilter (start > end) treated as "no temporal filter" `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T072 Wire TimelineView `onTemporalFilterChange` to store's `setTimeFilter` + `setTemporalFilterActive(true)` in StacBrowser `shared/components/src/StacBrowser/StacBrowser.tsx`
 - [ ] T073 [test] Verify temporal filter sync — adjust timeline, check list and map update `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
 **Checkpoint**: Temporal filtering works. Timeline range drives temporal axis; list and map respond.
@@ -207,14 +207,14 @@ Remove CatalogOverview and update all 24 references. StacBrowser replaces it as 
 
 ### Tests for User Story 4
 
-- [ ] T074 [test] Write useBrowserFilter tests — combined 3-axis filtering with 5+ distinct combinations (SC-004) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T075 [P][test] Write useBrowserFilter tests — removing one axis broadens result set `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
-- [ ] T076 [P][test] Write useBrowserFilter tests — activeFilterCount reports correct count (0–3) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T074 [test] Write useBrowserFilter tests — combined 3-axis filtering with 5+ distinct combinations (SC-004) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T075 [P][test] Write useBrowserFilter tests — removing one axis broadens result set `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T076 [P][test] Write useBrowserFilter tests — activeFilterCount reports correct count (0–3) `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T077 Verify AND composition in `useBrowserFilter` — metadata ∩ spatial ∩ temporal `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T078 Add `activeFilterCount` computation to `useBrowserFilter` result `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T077 Verify AND composition in `useBrowserFilter` — metadata ∩ spatial ∩ temporal `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T078 Add `activeFilterCount` computation to `useBrowserFilter` result `shared/components/src/StacBrowser/useBrowserFilter.ts`
 - [ ] T079 [test] Integration test — add metadata filter, zoom map, adjust timeline, verify all views sync `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
 **Checkpoint**: Multi-axis filtering works. All three axes compose correctly with AND logic.
@@ -229,15 +229,15 @@ Remove CatalogOverview and update all 24 references. StacBrowser replaces it as 
 
 ### Tests for User Story 5
 
-- [ ] T080 [test] Write useBrowserFilter tests — `hasNoResults` is true when filteredItems is empty `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
+- [x] T080 [test] Write useBrowserFilter tests — `hasNoResults` is true when filteredItems is empty `shared/components/src/StacBrowser/__tests__/useBrowserFilter.test.ts`
 - [ ] T081 [P][test] Write StacBrowser test — empty state rendered in all views when hasNoResults `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 - [ ] T082 [P][test] Write StacBrowser test — filter bar remains visible during zero results (FR-014) `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 
 ### Implementation for User Story 5
 
-- [ ] T083 Add `hasNoResults` to `useBrowserFilter` return value `shared/components/src/StacBrowser/useBrowserFilter.ts`
-- [ ] T084 Implement zero-results overlay in StacBrowser — "No matching exercises. Adjust or clear filters to see results." `shared/components/src/StacBrowser/StacBrowser.tsx`
-- [ ] T085 Wire `clearAllFilters` button in zero-results state to `clearAllBrowserFilters()` `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T083 Add `hasNoResults` to `useBrowserFilter` return value `shared/components/src/StacBrowser/useBrowserFilter.ts`
+- [x] T084 Implement zero-results overlay in StacBrowser — "No matching exercises. Adjust or clear filters to see results." `shared/components/src/StacBrowser/StacBrowser.tsx`
+- [x] T085 Wire `clearAllFilters` button in zero-results state to `clearAllBrowserFilters()` `shared/components/src/StacBrowser/StacBrowser.tsx`
 - [ ] T086 Add ZeroResults Storybook story `shared/components/src/StacBrowser/StacBrowser.stories.tsx`
 - [ ] T087 [test] Verify zero-results recovery — clear one filter, verify views repopulate `shared/components/src/StacBrowser/__tests__/StacBrowser.test.tsx`
 

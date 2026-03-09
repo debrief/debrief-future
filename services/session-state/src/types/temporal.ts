@@ -1,10 +1,13 @@
 /**
  * Temporal state types for session state management.
  * Feature: 024-document-session-state
+ * Updated: 132-three-view-sync (epoch refactor — Review Decision 5C)
  */
 
 /**
  * A point in time with dual representations (FR-032, FR-033).
+ * Retained as a utility type for MCP tool I/O and persistence boundaries.
+ * No longer used in TemporalSlice, TimeRange, or TimeFilter interfaces.
  */
 export interface TimeInstant {
   /** Milliseconds since Unix epoch */
@@ -34,19 +37,36 @@ export function createTimeInstantFromISO(iso: string): TimeInstant {
 }
 
 /**
+ * Convert epoch milliseconds to ISO 8601 string.
+ */
+export function epochToISO(epoch: number): string {
+  return new Date(epoch).toISOString();
+}
+
+/**
+ * Convert ISO 8601 string to epoch milliseconds.
+ * Returns NaN for invalid input.
+ */
+export function isoToEpoch(iso: string): number {
+  return new Date(iso).getTime();
+}
+
+/**
  * A temporal interval with inclusive start and end.
+ * Uses plain epoch milliseconds (Review Decision 5C).
  */
 export interface TimeRange {
-  start: TimeInstant;
-  end: TimeInstant;
+  start: number;
+  end: number;
 }
 
 /**
  * Constraints on the visible time window.
+ * Uses plain epoch milliseconds (Review Decision 5C).
  */
 export interface TimeFilter {
-  start: TimeInstant | null;
-  end: TimeInstant | null;
+  start: number | null;
+  end: number | null;
 }
 
 /**
@@ -75,10 +95,11 @@ export type DisplayMode = 'normal' | 'snailTrail';
 
 /**
  * Temporal state slice (FR-005 through FR-011).
+ * Uses plain epoch milliseconds for currentTime (Review Decision 5C).
  */
 export interface TemporalSlice {
-  /** Current playback/display time (FR-005) */
-  currentTime: TimeInstant | null;
+  /** Current playback/display time as epoch milliseconds (FR-005) */
+  currentTime: number | null;
   /** Full temporal extent of loaded data (FR-006) */
   timeRange: TimeRange | null;
   /** Optional visible time window constraint (FR-007) */
@@ -108,9 +129,10 @@ export const DEFAULT_TEMPORAL_SLICE: TemporalSlice = {
 
 /**
  * Temporal slice actions for state updates.
+ * Uses plain epoch milliseconds (Review Decision 5C).
  */
 export interface TemporalActions {
-  setCurrentTime: (time: TimeInstant | null) => void;
+  setCurrentTime: (time: number | null) => void;
   setTimeRange: (range: TimeRange | null) => void;
   setTimeFilter: (filter: TimeFilter | null) => void;
   setStepSize: (step: TimeStep) => void;

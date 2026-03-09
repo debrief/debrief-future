@@ -315,6 +315,9 @@ importers:
       '@debrief/schemas':
         specifier: workspace:*
         version: link:../schemas
+      '@debrief/session-state':
+        specifier: workspace:*
+        version: link:../../services/session-state
       '@dnd-kit/core':
         specifier: ^6.1.0
         version: 6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

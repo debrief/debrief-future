@@ -1,16 +1,16 @@
 /**
  * Catalog Overview Webview Entry Point
  *
- * Thin React wrapper that bridges the CatalogOverview component
+ * Thin React wrapper that bridges the StacBrowser component
  * to the VS Code webview message protocol.
  *
- * Feature: 042-stac-catalog-overview-panel
+ * Feature: 042-stac-catalog-overview-panel, 132-three-view-sync
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
-import { CatalogOverview } from '@debrief/components';
-import type { CatalogOverviewItem, Bounds } from '@debrief/components';
+import { StacBrowser } from '@debrief/components';
+import type { CatalogOverviewItem, StacBrowserItem } from '@debrief/components';
 
 // VS Code API
 declare function acquireVsCodeApi(): {
@@ -28,17 +28,23 @@ interface CatalogData {
   items: CatalogOverviewItem[];
 }
 
+/** Map CatalogOverviewItem to StacBrowserItem by adding empty extension fields. */
+function toStacBrowserItem(item: CatalogOverviewItem): StacBrowserItem {
+  return {
+    ...item,
+    vesselClasses: [],
+    tags: [],
+    featureTags: [],
+    author: null,
+    trackNames: [],
+    nationalities: [],
+    collection: null,
+    modified: null,
+  };
+}
+
 function CatalogOverviewApp(): React.ReactElement {
   const [catalogData, setCatalogData] = useState<CatalogData | null>(null);
-  const [splitRatio, setSplitRatio] = useState<number>(0.6);
-
-  // Restore persisted state
-  useEffect(() => {
-    const saved = vscode.getState();
-    if (saved?.splitRatio !== undefined) {
-      setSplitRatio(saved.splitRatio as number);
-    }
-  }, []);
 
   // Listen for messages from extension
   useEffect(() => {
@@ -48,9 +54,6 @@ function CatalogOverviewApp(): React.ReactElement {
       switch (message.type) {
         case 'loadCatalogOverview':
           setCatalogData(message.catalog);
-          break;
-        case 'setSplitRatio':
-          setSplitRatio(message.ratio);
           break;
       }
     };
@@ -69,20 +72,11 @@ function CatalogOverviewApp(): React.ReactElement {
     });
   }, [catalogData]);
 
-  // Handle split ratio change
-  const handleSplitRatioChange = useCallback((ratio: number) => {
-    setSplitRatio(ratio);
-    const currentState = vscode.getState() ?? {};
-    vscode.setState({ ...currentState, splitRatio: ratio });
-  }, []);
-
-  // Handle viewport change — post to extension host (Feature: 130-map-spatial-filtering)
-  const handleViewportChange = useCallback((bounds: Bounds | null) => {
-    vscode.postMessage({
-      type: 'overviewViewportChanged',
-      bounds,
-    });
-  }, []);
+  // Map items to StacBrowserItem format
+  const browserItems = useMemo<StacBrowserItem[]>(() => {
+    if (!catalogData) return [];
+    return catalogData.items.map(toStacBrowserItem);
+  }, [catalogData]);
 
   if (!catalogData) {
     return (
@@ -93,12 +87,10 @@ function CatalogOverviewApp(): React.ReactElement {
   }
 
   return (
-    <CatalogOverview
-      items={catalogData.items}
+    <StacBrowser
+      items={browserItems}
+      taxonomy={[]}
       onItemSelect={handleItemSelect}
-      initialSplitRatio={splitRatio}
-      onSplitRatioChange={handleSplitRatioChange}
-      onViewportChange={handleViewportChange}
     />
   );
 }

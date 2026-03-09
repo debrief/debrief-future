@@ -93,14 +93,23 @@ function applySessionState(
   store.getState().reset();
 
   // Apply temporal state
-  if (temporal.currentTime) {
-    store.getState().setCurrentTime(temporal.currentTime as never);
+  // Backward compat: old format used { epoch, iso } objects; new format uses plain numbers.
+  if (temporal.currentTime != null) {
+    store.getState().setCurrentTime(coerceEpoch(temporal.currentTime) as number);
   }
   if (temporal.timeRange) {
-    store.getState().setTimeRange(temporal.timeRange as never);
+    const raw = temporal.timeRange as Record<string, unknown>;
+    store.getState().setTimeRange({
+      start: coerceEpoch(raw.start) as number,
+      end: coerceEpoch(raw.end) as number,
+    });
   }
   if (temporal.timeFilter) {
-    store.getState().setTimeFilter(temporal.timeFilter as never);
+    const raw = temporal.timeFilter as Record<string, unknown>;
+    store.getState().setTimeFilter({
+      start: raw.start != null ? coerceEpoch(raw.start) as number : null,
+      end: raw.end != null ? coerceEpoch(raw.end) as number : null,
+    });
   }
   if (temporal.stepSize) {
     store.getState().setStepSize(temporal.stepSize as never);
@@ -169,6 +178,18 @@ function applySessionState(
       lastToolExecution: state.lastToolExecution ?? null,
     },
   };
+}
+
+/**
+ * Coerce a temporal value to a plain epoch number.
+ * Handles both new format (number) and legacy format ({ epoch, iso }).
+ */
+function coerceEpoch(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (value != null && typeof value === 'object' && 'epoch' in value) {
+    return (value as { epoch: number }).epoch;
+  }
+  return null;
 }
 
 /**
