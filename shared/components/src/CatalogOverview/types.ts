@@ -33,4 +33,7 @@ export interface CatalogOverviewProps {
 
   /** Map from item ID to CSS colour string. Items not in the map use default accent colour. */
   colorMap?: ReadonlyMap<string, string>;
+
+  /** Hide the built-in timeline strip (use when an external timeline panel is provided). */
+  hideTimeline?: boolean;
 }

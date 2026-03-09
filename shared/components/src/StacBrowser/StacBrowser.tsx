@@ -172,6 +172,7 @@ function renderPanel(type: string): React.ReactElement {
             onItemSelect={ctx.onItemSelect}
             onViewportChange={ctx.onViewportChange}
             colorMap={ctx.colorMap}
+            hideTimeline
           />
         </div>
       );

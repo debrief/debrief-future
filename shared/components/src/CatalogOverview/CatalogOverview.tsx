@@ -137,6 +137,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
   className,
   onViewportChange,
   colorMap,
+  hideTimeline = false,
 }) => {
   const [splitRatio, setSplitRatio] = useState(initialSplitRatio);
   const [isDragging, setIsDragging] = useState(false);
@@ -236,8 +237,8 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
       ref={containerRef}
       className={`catalog-overview ${className ?? ''}`}
       style={{
-        '--co-map-flex': splitRatio * 10,
-        '--co-timeline-flex': (1 - splitRatio) * 10,
+        '--co-map-flex': hideTimeline ? 1 : splitRatio * 10,
+        '--co-timeline-flex': hideTimeline ? 0 : (1 - splitRatio) * 10,
       } as React.CSSProperties}
     >
       {/* Map region */}
@@ -294,16 +295,18 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
         )}
       </div>
 
-      {/* Drag bar */}
-      <div
-        className={`catalog-overview__dragbar ${isDragging ? 'catalog-overview__dragbar--active' : ''}`}
-        onPointerDown={handleDragStart}
-        onPointerMove={handleDragMove}
-        onPointerUp={handleDragEnd}
-      />
+      {/* Drag bar — hidden when timeline is suppressed */}
+      {!hideTimeline && (
+        <div
+          className={`catalog-overview__dragbar ${isDragging ? 'catalog-overview__dragbar--active' : ''}`}
+          onPointerDown={handleDragStart}
+          onPointerMove={handleDragMove}
+          onPointerUp={handleDragEnd}
+        />
+      )}
 
-      {/* Timeline region */}
-      <div className="catalog-overview__timeline">
+      {/* Timeline region — hidden when external timeline panel is provided */}
+      {!hideTimeline && <div className="catalog-overview__timeline">
         {tooltip && (
           <div className="catalog-overview__tooltip" style={{ left: tooltip.x + 12, top: tooltip.y - 20 }}>
             {tooltip.text}
@@ -402,7 +405,7 @@ export const CatalogOverview: React.FC<CatalogOverviewProps> = ({
             );
           })}
         </svg>
-      </div>
+      </div>}
     </div>
   );
 };
