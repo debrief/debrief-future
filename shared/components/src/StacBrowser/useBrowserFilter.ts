@@ -138,6 +138,8 @@ export function useBrowserFilter({
 
   // Items filtered by metadata + spatial only (no temporal).
   // Used by TimelineView to avoid circular dependency on its own temporal zoom.
+  // Preserves reference identity when content is unchanged to prevent cascading re-renders.
+  const prevSpatialRef = useRef<readonly StacBrowserItem[] | null>(null);
   const spatialFilteredItems = useMemo(() => {
     const isTemporalActive = temporalFilterActive && timeFilter !== null &&
       timeFilter.start !== null && timeFilter.end !== null &&
@@ -150,13 +152,21 @@ export function useBrowserFilter({
       : null;
     const effectiveSpatial = spatialFilterActive && viewportBounds !== null;
 
-    return items.filter((item) => {
+    const result = items.filter((item) => {
       if (metadataFilteredIds !== null && !metadataFilteredIds.has(item.id)) return false;
       if (effectiveSpatial && viewportBounds !== null && item.bbox !== null) {
         if (!bboxOverlapsViewport(item.bbox, viewportBounds)) return false;
       }
       return true;
     });
+
+    // Preserve reference identity if content is unchanged
+    const prev = prevSpatialRef.current;
+    if (prev && prev.length === result.length && result.every((item, i) => item === prev[i])) {
+      return prev;
+    }
+    prevSpatialRef.current = result;
+    return result;
   }, [items, metadataFilteredIds, viewport, spatialFilterActive, temporalFilterActive, timeFilter, filteredItems]);
 
   const activeFilterCount = useMemo(() => {

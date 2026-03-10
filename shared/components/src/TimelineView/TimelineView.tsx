@@ -77,9 +77,16 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   // Viewport: the currently visible time range (starts as full range)
   const [viewRange, setViewRange] = useState<TimeSpan | null>(null);
 
-  // Reset viewRange when fullRange changes (new data loaded)
+  // Reset viewRange only when fullRange values actually change (not just reference)
+  const prevFullRangeRef = useRef(fullRange);
   useEffect(() => {
-    setViewRange(fullRange);
+    const prev = prevFullRangeRef.current;
+    const changed = fullRange && (!prev || prev.min !== fullRange.min || prev.max !== fullRange.max);
+    const wasNull = !prev && fullRange;
+    if (changed || wasNull) {
+      setViewRange(fullRange);
+    }
+    prevFullRangeRef.current = fullRange;
   }, [fullRange]);
 
   const effectiveView = viewRange ?? fullRange;
