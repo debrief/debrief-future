@@ -4,7 +4,7 @@
 
 import * as vscode from 'vscode';
 import { access, readFile } from 'fs/promises';
-import { loadSession, createLogService, createSnapshotService, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
+import { loadSession, createLogService, createSnapshotService, createTimeInstant, type ResultIdRegistry, type StacAssetForHydration } from '@debrief/session-state';
 import type { ConfigService } from '../services/configService';
 import type { StacService } from '../services/stacService';
 import type { CalcService } from '../services/calcService';
@@ -14,7 +14,6 @@ import type { OpenPlotsService } from '../services/openPlotsService';
 import type { SessionManager } from '../services/sessionManager';
 import type { ToolsTreeProvider } from '../providers/toolsTreeProvider';
 import type { ToolMatchAdapter } from '../services/toolMatchAdapter';
-import { createTimeInstant } from '@debrief/session-state';
 import type { LayersTreeProvider } from '../providers/layersTreeProvider';
 import type { TimeRangeViewProvider } from '../views/timeRangeView';
 import type { ActivityPanelViewProvider } from '../views/activityPanelView';

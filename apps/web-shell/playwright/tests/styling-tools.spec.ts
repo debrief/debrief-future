@@ -33,11 +33,8 @@ async function selectTrackViaFeatureList(page: import('@playwright/test').Page) 
 test.describe('Styling Tools Integration', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // Open a plot via catalog timeline
-    await page
-      .locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point')
-      .first()
-      .dblclick();
+    // Open a plot via exercise list
+    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
     // Wait for map features to render
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({

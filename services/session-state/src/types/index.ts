@@ -9,6 +9,7 @@ export * from './spatial.js';
 export * from './features.js';
 export * from './document.js';
 export * from './results.js';
+export * from './browser-filter.js';
 
 // Import for composite types
 import type { TemporalSlice, TemporalActions } from './temporal.js';
@@ -16,6 +17,7 @@ import type { SpatialSlice, SpatialActions } from './spatial.js';
 import type { FeaturesSlice, FeaturesActions } from './features.js';
 import type { DocumentSlice, DocumentActions } from './document.js';
 import type { ResultsSlice, ResultsActions } from './results.js';
+import type { BrowserFilterSlice, BrowserFilterActions } from './browser-filter.js';
 
 /**
  * Schema version for persistence compatibility (FR-026).
@@ -31,11 +33,13 @@ export type SessionStore = TemporalSlice &
   FeaturesSlice &
   DocumentSlice &
   ResultsSlice &
+  BrowserFilterSlice &
   TemporalActions &
   SpatialActions &
   FeaturesActions &
   DocumentActions &
-  ResultsActions & {
+  ResultsActions &
+  BrowserFilterActions & {
     /** Reset all state to defaults */
     reset: () => void;
   };

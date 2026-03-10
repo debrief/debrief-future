@@ -15,7 +15,6 @@ import * as vscode from 'vscode';
 import {
   subscribeToTemporal,
   subscribeToSelection,
-  createTimeInstant,
   type SessionStoreApi,
   type SessionStoreWithUndo,
   type TemporalSlice,
@@ -163,9 +162,9 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
         this._postMessage({
           type: 'temporal:update',
           payload: {
-            startTime: state.timeRange.start.epoch,
-            endTime: state.timeRange.end.epoch,
-            currentTime: state.currentTime?.epoch,
+            startTime: state.timeRange.start,
+            endTime: state.timeRange.end,
+            currentTime: state.currentTime,
             displayMode: state.displayMode === 'snailTrail' ? 'trail' : 'full',
           },
         });
@@ -205,9 +204,9 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
     this._postMessage({
       type: 'temporal:update',
       payload: {
-        startTime: temporal.timeRange.start.epoch,
-        endTime: temporal.timeRange.end.epoch,
-        currentTime: temporal.currentTime?.epoch,
+        startTime: temporal.timeRange.start,
+        endTime: temporal.timeRange.end,
+        currentTime: temporal.currentTime,
         displayMode: temporal.displayMode === 'snailTrail' ? 'trail' : 'full',
       },
     });
@@ -387,9 +386,9 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
               this._postMessage({
                 type: 'temporal:update',
                 payload: {
-                  startTime: state.timeRange.start.epoch,
-                  endTime: state.timeRange.end.epoch,
-                  currentTime: state.currentTime?.epoch,
+                  startTime: state.timeRange.start,
+                  endTime: state.timeRange.end,
+                  currentTime: state.currentTime,
                   displayMode: state.displayMode === 'snailTrail' ? 'trail' : 'full',
                 },
               });
@@ -402,7 +401,7 @@ export class ActivityPanelViewProvider implements vscode.WebviewViewProvider {
         case 'temporal:seek':
           if (this._activeSession) {
             const state: SessionStoreWithUndo = this._activeSession.getState();
-            state.setCurrentTime(createTimeInstant(message.payload.time));
+            state.setCurrentTime(message.payload.time);
           }
           break;
 

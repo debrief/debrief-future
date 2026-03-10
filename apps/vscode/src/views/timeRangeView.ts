@@ -13,7 +13,6 @@
 import * as vscode from 'vscode';
 import {
   subscribeToTemporal,
-  createTimeInstant,
   type SessionStoreApi,
   type SessionStoreWithUndo,
   type TemporalSlice,
@@ -119,21 +118,21 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
       const state: SessionStoreWithUndo = session.getState();
       if (state.timeRange) {
         this._timeExtent = {
-          start: state.timeRange.start.epoch,
-          end: state.timeRange.end.epoch,
+          start: state.timeRange.start,
+          end: state.timeRange.end,
         };
         this._postMessage({
           type: 'updateTimeExtent',
-          start: state.timeRange.start.epoch,
-          end: state.timeRange.end.epoch,
-          dataStart: state.timeRange.start.epoch,
-          dataEnd: state.timeRange.end.epoch,
+          start: state.timeRange.start,
+          end: state.timeRange.end,
+          dataStart: state.timeRange.start,
+          dataEnd: state.timeRange.end,
         });
       }
       if (state.currentTime) {
         this._postMessage({
           type: 'setCurrentTime',
-          time: state.currentTime.epoch,
+          time: state.currentTime,
         });
       }
       this.setUIState('ready');
@@ -151,8 +150,8 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
     // Update time extent if changed
     if (temporal.timeRange) {
       const newExtent = {
-        start: temporal.timeRange.start.epoch,
-        end: temporal.timeRange.end.epoch,
+        start: temporal.timeRange.start,
+        end: temporal.timeRange.end,
       };
       if (
         !this._timeExtent ||
@@ -174,7 +173,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
     if (temporal.currentTime) {
       this._postMessage({
         type: 'setCurrentTime',
-        time: temporal.currentTime.epoch,
+        time: temporal.currentTime,
       });
     }
   }
@@ -223,7 +222,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
           // Update session state if available
           if (this._activeSession) {
             const state: SessionStoreWithUndo = this._activeSession.getState();
-            state.setCurrentTime(createTimeInstant(message.time));
+            state.setCurrentTime(message.time);
           }
           // Legacy callback
           if (this._onTimeChangeCallback) {
