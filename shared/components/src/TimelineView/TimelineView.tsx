@@ -20,10 +20,10 @@ import {
 import './TimelineView.css';
 
 // Layout constants
-const MAX_ROW_HEIGHT = 28;
+const MAX_ROW_HEIGHT = 48;
 const MIN_ROW_HEIGHT = 16;
 const MIN_FONT_SIZE = 9;
-const MAX_FONT_SIZE = 11;
+const MAX_FONT_SIZE = 13;
 const LABEL_WIDTH = 130;
 const CHART_LEFT = LABEL_WIDTH + 8;
 const CHART_RIGHT = 16;
@@ -353,7 +353,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           width="100%"
           height={barsHeight}
           viewBox={`0 0 ${SVG_WIDTH} ${barsHeight}`}
-          preserveAspectRatio="xMidYMid meet"
+          preserveAspectRatio="xMidYMin meet"
           data-testid="timeline-bars-svg"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
