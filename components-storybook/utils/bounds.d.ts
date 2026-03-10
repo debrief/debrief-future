@@ -1,4 +1,5 @@
 import { DebriefFeature, DebriefFeatureCollection, Bounds } from './types';
+import { ViewportPolygon } from './spatial-types';
 
 /**
  * Calculate the bounding box for a collection of features.
@@ -34,6 +35,18 @@ export declare function isPointInBounds(lon: number, lat: number, bounds: Bounds
  * @returns true if the two boxes overlap (including edge-touching)
  */
 export declare function bboxOverlapsViewport(itemBbox: Bounds, viewportBbox: Bounds): boolean;
+/**
+ * Convert a ViewportPolygon (4-corner [NW, NE, SE, SW]) to an axis-aligned Bounds.
+ * For non-rotated views, this extracts [minLon, minLat, maxLon, maxLat].
+ * For rotated views, this computes the enclosing AABB.
+ *
+ * Returns null for degenerate polygons (zero area).
+ * Feature: 132-three-view-sync
+ *
+ * @param viewport - 4-corner polygon [NW, NE, SE, SW]
+ * @returns Bounds tuple [minLon, minLat, maxLon, maxLat] or null if degenerate
+ */
+export declare function viewportToBounds(viewport: ViewportPolygon): Bounds | null;
 /**
  * Filter items to those whose bbox overlaps the given viewport.
  * Items without a bbox are excluded.

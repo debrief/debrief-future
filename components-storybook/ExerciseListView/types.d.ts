@@ -1,4 +1,4 @@
-import { CatalogOverviewItem } from '../CatalogOverview/types';
+import { CatalogOverviewItem } from '../filter-engine/types';
 
 /** Exercise data for list view display. Extends CatalogOverviewItem with STAC extension metadata. */
 export interface ExerciseListItem extends CatalogOverviewItem {
