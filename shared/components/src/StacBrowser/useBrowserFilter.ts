@@ -136,6 +136,29 @@ export function useBrowserFilter({
     return result;
   }, [items, metadataFilteredIds, viewport, spatialFilterActive, timeFilter, temporalFilterActive]);
 
+  // Items filtered by metadata + spatial only (no temporal).
+  // Used by TimelineView to avoid circular dependency on its own temporal zoom.
+  const spatialFilteredItems = useMemo(() => {
+    const isTemporalActive = temporalFilterActive && timeFilter !== null &&
+      timeFilter.start !== null && timeFilter.end !== null &&
+      timeFilter.start <= timeFilter.end;
+    if (!isTemporalActive) return filteredItems; // no temporal filter → same set
+
+    // Re-filter without the temporal axis
+    const viewportBounds = spatialFilterActive && viewport
+      ? viewportToBounds(viewport)
+      : null;
+    const effectiveSpatial = spatialFilterActive && viewportBounds !== null;
+
+    return items.filter((item) => {
+      if (metadataFilteredIds !== null && !metadataFilteredIds.has(item.id)) return false;
+      if (effectiveSpatial && viewportBounds !== null && item.bbox !== null) {
+        if (!bboxOverlapsViewport(item.bbox, viewportBounds)) return false;
+      }
+      return true;
+    });
+  }, [items, metadataFilteredIds, viewport, spatialFilterActive, temporalFilterActive, timeFilter, filteredItems]);
+
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (metadataFilteredIds !== null) count++;
@@ -148,8 +171,9 @@ export function useBrowserFilter({
 
   return useMemo(() => ({
     filteredItems,
+    spatialFilteredItems,
     activeFilterCount,
     hasNoResults,
     clearAllFilters,
-  }), [filteredItems, activeFilterCount, hasNoResults, clearAllFilters]);
+  }), [filteredItems, spatialFilteredItems, activeFilterCount, hasNoResults, clearAllFilters]);
 }

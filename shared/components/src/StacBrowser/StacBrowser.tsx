@@ -196,7 +196,7 @@ function clearBrowserLayout(): void {
 // ─── Context for passing props to panels ──────────────────────────────────────
 interface BrowserPanelContext {
   filteredItems: readonly StacBrowserItem[];
-  allItems: readonly StacBrowserItem[];
+  spatialFilteredItems: readonly StacBrowserItem[];
   onItemSelect?: (itemPath: string) => void;
   colorMap?: ReadonlyMap<string, string>;
   onViewportChange: (bounds: Bounds | null) => void;
@@ -230,7 +230,7 @@ function renderPanel(type: string): React.ReactElement {
       return (
         <div style={{ height: '100%', overflow: 'hidden' }} data-testid="stac-browser-timeline">
           <TimelineView
-            items={ctx.allItems as StacBrowserItem[]}
+            items={ctx.spatialFilteredItems as StacBrowserItem[]}
             onTemporalFilterChange={ctx.onTemporalFilterChange}
             onItemSelect={ctx.onItemSelect}
             colourFn={ctx.colourFn}
@@ -322,7 +322,7 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
     setTemporalFilterActive(false);
   }, []);
 
-  const { filteredItems, activeFilterCount, hasNoResults } = useBrowserFilter({
+  const { filteredItems, spatialFilteredItems, activeFilterCount, hasNoResults } = useBrowserFilter({
     items,
     metadataFilteredIds,
     viewport,
@@ -377,13 +377,13 @@ export const StacBrowser: React.FC<StacBrowserProps> = ({
   // ─── Update browser panel context ─────────────────────────────────────────
   const contextValue: BrowserPanelContext = useMemo(() => ({
     filteredItems,
-    allItems: items,
+    spatialFilteredItems,
     onItemSelect,
     colorMap,
     onViewportChange: handleViewportChange,
     onTemporalFilterChange: handleTemporalFilterChange,
     colourFn,
-  }), [filteredItems, items, onItemSelect, colorMap, handleViewportChange, handleTemporalFilterChange, colourFn]);
+  }), [filteredItems, spatialFilteredItems, onItemSelect, colorMap, handleViewportChange, handleTemporalFilterChange, colourFn]);
 
   // Update module-level context and re-render panels
   useEffect(() => {
