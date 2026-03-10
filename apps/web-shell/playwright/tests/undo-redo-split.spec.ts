@@ -29,11 +29,9 @@ async function loadPlot(page: import('@playwright/test').Page) {
   await page.goto('/');
   await expect(page.locator('.web-shell--welcome')).toBeVisible();
 
-  // Click the first timeline bar/point to open a plot
-  const timelineEntry = page.locator(
-    '.catalog-overview__timeline-bar, .catalog-overview__timeline-point'
-  ).first();
-  await timelineEntry.dblclick();
+  // Click the first exercise list item to open a plot
+  const exerciseRow = page.locator('[data-testid="exercise-list-item-row"]').first();
+  await exerciseRow.click();
 
   // Wait for analysis view
   await expect(page.locator('.web-shell--analysis')).toBeVisible({ timeout: 10000 });

@@ -9,8 +9,8 @@ import { test, expect } from '@playwright/test';
 test.describe('Drawing — Feature 094', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // Open the first plot by double-clicking timeline bar/point
-    await page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point').first().dblclick();
+    // Open the first plot by clicking exercise list item
+    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
     await expect(page.locator('.web-shell--analysis')).toBeVisible({ timeout: 10000 });
     // Wait for map to be ready (Leaflet interactive elements)
     await expect(page.locator('.leaflet-interactive').first()).toBeVisible({ timeout: 10000 });

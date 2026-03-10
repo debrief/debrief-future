@@ -1,4 +1,5 @@
 import type { DebriefFeature, DebriefFeatureCollection, Bounds } from './types';
+import type { ViewportPolygon } from './spatial-types';
 
 /**
  * Recursively extract all coordinates from a GeoJSON geometry coordinates array.
@@ -157,6 +158,35 @@ export function bboxOverlapsViewport(itemBbox: Bounds, viewportBbox: Bounds): bo
 
   // Both cross antimeridian — they always overlap longitudinally
   return true;
+}
+
+/**
+ * Convert a ViewportPolygon (4-corner [NW, NE, SE, SW]) to an axis-aligned Bounds.
+ * For non-rotated views, this extracts [minLon, minLat, maxLon, maxLat].
+ * For rotated views, this computes the enclosing AABB.
+ *
+ * Returns null for degenerate polygons (zero area).
+ * Feature: 132-three-view-sync
+ *
+ * @param viewport - 4-corner polygon [NW, NE, SE, SW]
+ * @returns Bounds tuple [minLon, minLat, maxLon, maxLat] or null if degenerate
+ */
+export function viewportToBounds(viewport: ViewportPolygon): Bounds | null {
+  const coords = viewport.coordinates;
+  const lons = coords.map((c: [number, number]) => c[0]);
+  const lats = coords.map((c: [number, number]) => c[1]);
+
+  const minLon = Math.min(...lons);
+  const maxLon = Math.max(...lons);
+  const minLat = Math.min(...lats);
+  const maxLat = Math.max(...lats);
+
+  // Degenerate polygon — zero area (all corners at same point or on a line)
+  if (minLon === maxLon || minLat === maxLat) {
+    return null;
+  }
+
+  return [minLon, minLat, maxLon, maxLat];
 }
 
 /**

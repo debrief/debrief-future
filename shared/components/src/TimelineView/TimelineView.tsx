@@ -20,12 +20,16 @@ import {
 import './TimelineView.css';
 
 // Layout constants
-const ROW_HEIGHT = 28;
+const MAX_ROW_HEIGHT = 48;
+const MIN_ROW_HEIGHT = 16;
+const MIN_FONT_SIZE = 9;
+const MAX_FONT_SIZE = 13;
 const LABEL_WIDTH = 130;
 const CHART_LEFT = LABEL_WIDTH + 8;
 const CHART_RIGHT = 16;
 const SVG_WIDTH = 800;
 const AXIS_HEIGHT = 24;
+const CONTROLS_HEIGHT = 28;
 const DEFAULT_BAR_COLOUR = 'var(--co-accent, #007fd4)';
 const POINT_RADIUS = 5;
 const MIN_BAR_LABEL_CHARS = 18;
@@ -51,6 +55,21 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerHeight, setContainerHeight] = useState(0);
+
+  // Measure available container height for adaptive row sizing
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerHeight(entry.contentRect.height);
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // Full data time range
   const fullRange = useMemo(() => computeTimeRange(items as StacBrowserItem[]), [items]);
@@ -58,14 +77,34 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   // Viewport: the currently visible time range (starts as full range)
   const [viewRange, setViewRange] = useState<TimeSpan | null>(null);
 
-  // Reset viewRange when fullRange changes (new data loaded)
+  // Reset viewRange only when fullRange values actually change (not just reference)
+  const prevFullRangeRef = useRef(fullRange);
   useEffect(() => {
-    setViewRange(fullRange);
+    const prev = prevFullRangeRef.current;
+    const changed = fullRange && (!prev || prev.min !== fullRange.min || prev.max !== fullRange.max);
+    const wasNull = !prev && fullRange;
+    if (changed || wasNull) {
+      setViewRange(fullRange);
+    }
+    prevFullRangeRef.current = fullRange;
   }, [fullRange]);
 
   const effectiveView = viewRange ?? fullRange;
 
   const chartWidth = SVG_WIDTH - CHART_LEFT - CHART_RIGHT;
+
+  // Adaptive row height: compress rows to fit available space, but keep labels legible
+  const rowHeight = useMemo(() => {
+    if (items.length === 0 || containerHeight === 0) return MAX_ROW_HEIGHT;
+    const availableHeight = containerHeight - AXIS_HEIGHT - CONTROLS_HEIGHT - 8;
+    const computed = Math.floor(availableHeight / items.length);
+    return Math.max(MIN_ROW_HEIGHT, Math.min(MAX_ROW_HEIGHT, computed));
+  }, [items.length, containerHeight]);
+
+  const labelFontSize = useMemo(() => {
+    const t = (rowHeight - MIN_ROW_HEIGHT) / (MAX_ROW_HEIGHT - MIN_ROW_HEIGHT);
+    return MIN_FONT_SIZE + t * (MAX_FONT_SIZE - MIN_FONT_SIZE);
+  }, [rowHeight]);
 
   // Check if we're zoomed in
   const isZoomed = useMemo(() => {
@@ -111,13 +150,13 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
         width: hasTime && !isPoint && effectiveView
           ? computeBarWidth(startEpoch!, endEpoch!, effectiveView, chartWidth)
           : 0,
-        y: i * ROW_HEIGHT,
+        y: i * rowHeight,
         isPoint: !!isPoint,
         colour,
         hasTime,
       };
     });
-  }, [items, effectiveView, chartWidth, colourFn]);
+  }, [items, effectiveView, chartWidth, colourFn, rowHeight]);
 
   // Generate axis tick labels from viewport
   const axisLabels = useMemo(() => {
@@ -235,6 +274,35 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     setViewRange(fullRange);
   }, [fullRange]);
 
+  // --- Programmatic zoom in/out (centered) ---
+  const handleZoomIn = useCallback(() => {
+    const view = effectiveView;
+    const full = fullRange;
+    if (!view || !full) return;
+    const span = view.max - view.min;
+    const newSpan = Math.max(MIN_RANGE_MS, span * (1 - ZOOM_FACTOR));
+    const center = (view.min + view.max) / 2;
+    let newMin = center - newSpan / 2;
+    let newMax = center + newSpan / 2;
+    if (newMin < full.min) { newMin = full.min; newMax = newMin + newSpan; }
+    if (newMax > full.max) { newMax = full.max; newMin = Math.max(full.min, newMax - newSpan); }
+    setViewRange({ min: newMin, max: newMax });
+  }, [effectiveView, fullRange]);
+
+  const handleZoomOut = useCallback(() => {
+    const view = effectiveView;
+    const full = fullRange;
+    if (!view || !full) return;
+    const span = view.max - view.min;
+    const newSpan = span * (1 + ZOOM_FACTOR);
+    const center = (view.min + view.max) / 2;
+    let newMin = center - newSpan / 2;
+    let newMax = center + newSpan / 2;
+    if (newMin < full.min) { newMin = full.min; newMax = Math.min(full.max, newMin + newSpan); }
+    if (newMax > full.max) { newMax = full.max; newMin = Math.max(full.min, newMax - newSpan); }
+    setViewRange({ min: newMin, max: newMax });
+  }, [effectiveView, fullRange]);
+
   const handleMouseEnter = useCallback((item: StacBrowserItem, e: React.MouseEvent) => {
     setTooltip({
       x: e.clientX,
@@ -263,10 +331,10 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     );
   }
 
-  const barsHeight = items.length * ROW_HEIGHT;
+  const barsHeight = items.length * rowHeight;
 
   return (
-    <div className={`timeline-view ${className ?? ''}`} data-testid="timeline-view">
+    <div ref={containerRef} className={`timeline-view ${className ?? ''}`} data-testid="timeline-view">
       {/* Tooltip */}
       {tooltip && (
         <div
@@ -292,7 +360,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           width="100%"
           height={barsHeight}
           viewBox={`0 0 ${SVG_WIDTH} ${barsHeight}`}
-          preserveAspectRatio="xMidYMid meet"
+          preserveAspectRatio="xMidYMin meet"
           data-testid="timeline-bars-svg"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -314,14 +382,14 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
               x={0}
               y={bar.y}
               width={SVG_WIDTH}
-              height={ROW_HEIGHT}
+              height={rowHeight}
               className="timeline-view__row-bg"
             />
           ))}
 
           {/* Item rows */}
           {bars.map((bar) => {
-            const labelY = bar.y + ROW_HEIGHT / 2;
+            const labelY = bar.y + rowHeight / 2;
             const truncTitle = bar.item.title.length > MIN_BAR_LABEL_CHARS
               ? bar.item.title.slice(0, MIN_BAR_LABEL_CHARS - 1) + '\u2026'
               : bar.item.title;
@@ -334,6 +402,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                   y={labelY}
                   className="timeline-view__label"
                   data-testid={`timeline-label-${bar.item.id}`}
+                  style={{ fontSize: `${labelFontSize}px` }}
                 >
                   {truncTitle}
                 </text>
@@ -344,9 +413,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           {/* Clipped chart content — bars and points constrained to chart area */}
           <g clipPath="url(#chart-clip)">
             {bars.map((bar) => {
-              const labelY = bar.y + ROW_HEIGHT / 2;
+              const labelY = bar.y + rowHeight / 2;
               const barY = bar.y + 4;
-              const barHeight = ROW_HEIGHT - 8;
+              const barHeight = rowHeight - 8;
               const fillColour = bar.colour ?? DEFAULT_BAR_COLOUR;
 
               if (!bar.hasTime || !effectiveView) {
@@ -415,7 +484,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
         </svg>
       </div>
 
-      {/* Fixed time axis + reset button */}
+      {/* Fixed time axis + permanent zoom controls */}
       <div className="timeline-view__axis" data-testid="timeline-axis">
         <div className="timeline-view__axis-row">
           <svg
@@ -453,18 +522,37 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
             ))}
           </svg>
 
-          {/* Reset / zoom-to-fit button */}
-          {isZoomed && (
+          {/* Permanent zoom controls */}
+          <div className="timeline-view__controls" data-testid="timeline-controls">
             <button
-              className="timeline-view__reset-btn"
+              className="timeline-view__ctrl-btn"
+              onClick={handleZoomIn}
+              title="Zoom in"
+              data-testid="timeline-zoom-in"
+              type="button"
+            >
+              +
+            </button>
+            <button
+              className="timeline-view__ctrl-btn"
+              onClick={handleZoomOut}
+              title="Zoom out"
+              data-testid="timeline-zoom-out"
+              type="button"
+            >
+              &minus;
+            </button>
+            <button
+              className={`timeline-view__ctrl-btn ${!isZoomed ? 'timeline-view__ctrl-btn--disabled' : ''}`}
               onClick={handleReset}
+              disabled={!isZoomed}
               title="Zoom to fit (show full time range)"
               data-testid="timeline-reset-btn"
               type="button"
             >
               &#x21A9;
             </button>
-          )}
+          </div>
         </div>
       </div>
     </div>

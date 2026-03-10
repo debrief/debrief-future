@@ -35,7 +35,7 @@ import {
   type SessionStoreApi,
   type SessionStoreWithUndo,
   type ServerOptions,
-  createTimeInstantFromISO,
+  isoToEpoch,
   type TimeRange,
 } from '@debrief/session-state';
 import type { Express } from 'express';
@@ -121,8 +121,8 @@ export class SessionManager implements vscode.Disposable {
     if (data.plot.timeExtent !== undefined && data.plot.timeExtent.length === 2) {
       const [startIso, endIso] = data.plot.timeExtent;
       const timeRange: TimeRange = {
-        start: createTimeInstantFromISO(startIso),
-        end: createTimeInstantFromISO(endIso),
+        start: isoToEpoch(startIso),
+        end: isoToEpoch(endIso),
       };
       state.setTimeRange(timeRange);
 

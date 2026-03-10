@@ -11,7 +11,6 @@ import type {
   SpatialSlice,
   FeaturesSlice,
   DocumentSlice,
-  TimeInstant,
   ViewportPolygon,
   FeatureSelection,
 } from '../types/index.js';
@@ -74,7 +73,7 @@ export const selectors = {
   }),
 
   // Individual fields
-  currentTime: (state: ReturnType<SessionStoreApi['getState']>): TimeInstant | null =>
+  currentTime: (state: ReturnType<SessionStoreApi['getState']>): number | null =>
     state.currentTime,
 
   viewport: (state: ReturnType<SessionStoreApi['getState']>): ViewportPolygon | null =>
@@ -141,7 +140,7 @@ export function subscribeToDocument(
  */
 export function subscribeToCurrentTime(
   store: SessionStoreApi,
-  listener: (time: TimeInstant | null, prev: TimeInstant | null) => void
+  listener: (time: number | null, prev: number | null) => void
 ): () => void {
   return subscribeToSlice(store, selectors.currentTime, listener);
 }
