@@ -1,5 +1,4 @@
-import { CatalogOverviewItem } from '../CatalogOverview/types';
-import { StacBrowserItem } from '../filter-engine/types';
+import { CatalogOverviewItem, StacBrowserItem } from '../filter-engine/types';
 import { TimeSpan } from './temporal-types';
 import { TemporalFilter } from '../TimelineView/types';
 

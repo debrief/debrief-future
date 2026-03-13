@@ -1,5 +1,6 @@
-export { CatalogOverview } from './CatalogOverview';
-export type { CatalogOverviewProps, CatalogOverviewItem } from './CatalogOverview';
+export type { CatalogOverviewItem, StacBrowserItem, VesselTaxonomyNode } from './filter-engine/types';
+export { StacBrowser } from './StacBrowser';
+export type { StacBrowserProps, BrowserFilterResult } from './StacBrowser';
 export { TimelineView } from './TimelineView';
 export type { TimelineViewProps, TimelineBarData, ColourFn, TemporalFilter } from './TimelineView';
 export { ExerciseListView } from './ExerciseListView';
@@ -33,7 +34,7 @@ export { useTheme } from './hooks/useTheme';
 export { useTemporalTrack } from './MapView/useTemporalTrack';
 export type { DebriefFeature, DebriefFeatureCollection, AnnotationFeature, TrackFeature, ReferenceLocation, Bounds } from './utils/types';
 export { isTrackFeature, isReferenceLocation, isMultiPointFeature, isMultiPolygonFeature, isAnnotationFeature, isExpandableFeature, } from './utils/types';
-export { calculateBounds, bboxOverlapsViewport, filterBySpatialExtent } from './utils/bounds';
+export { calculateBounds, bboxOverlapsViewport, filterBySpatialExtent, viewportToBounds } from './utils/bounds';
 export { calculateTimeExtent, parseDuration, findIntervalPositions, resolvePositionStyle, computeAllPositionStyles, } from './utils/time';
 export type { ResolvedPositionStyle } from './utils/time';
 export { getFeatureLabel, getFeatureIcon } from './utils/labels';
