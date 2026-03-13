@@ -1,6 +1,9 @@
-// Components
-export { CatalogOverview } from './CatalogOverview';
-export type { CatalogOverviewProps, CatalogOverviewItem } from './CatalogOverview';
+// Types (canonical home: filter-engine/types.ts)
+export type { CatalogOverviewItem, StacBrowserItem, VesselTaxonomyNode } from './filter-engine/types';
+
+// StacBrowser (Feature: 132-three-view-sync)
+export { StacBrowser } from './StacBrowser';
+export type { StacBrowserProps, BrowserFilterResult } from './StacBrowser';
 
 export { TimelineView } from './TimelineView';
 export type { TimelineViewProps, TimelineBarData, ColourFn, TemporalFilter } from './TimelineView';
@@ -92,7 +95,7 @@ export {
 } from './utils/types';
 
 // Utilities
-export { calculateBounds, bboxOverlapsViewport, filterBySpatialExtent } from './utils/bounds';
+export { calculateBounds, bboxOverlapsViewport, filterBySpatialExtent, viewportToBounds } from './utils/bounds';
 export {
   calculateTimeExtent,
   parseDuration,

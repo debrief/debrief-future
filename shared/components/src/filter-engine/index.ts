@@ -8,6 +8,7 @@ export { createFilterEngine } from "./engine";
 export { parseTaxonomy, buildDescendantMap, buildTaxonomyLabelMap, resolveTaxonomyLabel } from "./taxonomy";
 export type { RawTaxonomy, RawTaxonomyNode, DescendantMap, TaxonomyLabelMap } from "./taxonomy";
 export type {
+  CatalogOverviewItem,
   FilterType,
   DurationBucket,
   ModifiedBucket,

@@ -1,0 +1,181 @@
+/**
+ * StacBrowser layout styles.
+ * Feature: 132-three-view-sync
+ *
+ * Layout: FilterBar on top (fixed), toolbar below, GoldenLayout panels beneath.
+ * Default panel layout: exercise list (top), timeline (bottom-left), map (bottom-right).
+ * User can reconfigure via drag — layout persists to localStorage.
+ */
+
+.stac-browser {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.stac-browser__filter-bar {
+  flex: 0 0 auto;
+  border-bottom: 1px solid var(--vscode-panel-border, #e0e0e0);
+}
+
+.stac-browser__toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: var(--vscode-editor-background, #fff);
+  border-bottom: 1px solid var(--vscode-panel-border, #e0e0e0);
+  min-height: 28px;
+}
+
+.stac-browser__filter-count {
+  color: var(--vscode-descriptionForeground, #666);
+  font-size: 12px;
+}
+
+.stac-browser__reset-layout-btn {
+  background: none;
+  border: 1px solid var(--vscode-button-secondaryBackground, #ccc);
+  color: var(--vscode-button-secondaryForeground, #333);
+  padding: 2px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 11px;
+  margin-left: auto;
+}
+
+.stac-browser__reset-layout-btn:hover {
+  background: var(--vscode-button-secondaryHoverBackground, #e8e8e8);
+}
+
+/* GoldenLayout container — fills remaining space */
+.stac-browser__panels {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Empty workspace state (all panels closed) */
+.stac-browser__empty {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--vscode-descriptionForeground, #666);
+}
+
+.stac-browser__empty button {
+  background: var(--vscode-button-background, #007acc);
+  color: var(--vscode-button-foreground, #fff);
+  border: none;
+  padding: 6px 16px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+/* Zero-results overlay — sits on top of panels but below filter bar */
+.stac-browser__no-results {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--vscode-editor-background, rgba(255, 255, 255, 0.9));
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.stac-browser__no-results-message {
+  color: var(--vscode-descriptionForeground, #666);
+  font-size: 14px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.stac-browser__clear-filters-btn {
+  background: var(--vscode-button-background, #007acc);
+  color: var(--vscode-button-foreground, #fff);
+  border: none;
+  padding: 6px 16px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.stac-browser__clear-filters-btn:hover {
+  background: var(--vscode-button-hoverBackground, #0062a3);
+}
+
+/* ─── GoldenLayout header overrides (lighter panel headers) ────────────────── */
+.stac-browser .lm_header {
+  height: 28px !important;
+  background: var(--vscode-editorGroupHeader-tabsBackground, #f3f3f3);
+  border-bottom: 1px solid var(--vscode-panel-border, #e0e0e0);
+}
+
+.stac-browser .lm_header .lm_tab {
+  height: 26px !important;
+  line-height: 26px;
+  padding: 0 12px;
+  margin: 0;
+  background: transparent;
+  color: var(--vscode-tab-inactiveForeground, #666);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  border-bottom: 2px solid transparent;
+}
+
+.stac-browser .lm_header .lm_tab.lm_active {
+  background: var(--vscode-tab-activeBackground, #fff);
+  color: var(--vscode-tab-activeForeground, #333);
+  border-bottom-color: var(--vscode-focusBorder, #007fd4);
+}
+
+.stac-browser .lm_header .lm_tab:hover {
+  color: var(--vscode-foreground, #333);
+}
+
+.stac-browser .lm_header .lm_controls {
+  top: 5px;
+}
+
+.stac-browser .lm_header .lm_controls > li {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.stac-browser .lm_header .lm_controls > li:hover {
+  opacity: 1;
+}
+
+.stac-browser .lm_content {
+  background: var(--vscode-editor-background, #fff);
+}
+
+.stac-browser .lm_splitter {
+  background: var(--vscode-panel-border, #e0e0e0);
+}
+
+.stac-browser .lm_splitter:hover {
+  background: var(--vscode-focusBorder, #007fd4);
+}

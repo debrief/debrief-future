@@ -79,8 +79,8 @@ describe('MCP Integration', () => {
       expect(response.body.currentTime.epoch).toBe(epoch);
       expect(response.body.currentTime.iso).toBeDefined();
 
-      // Verify store was updated
-      expect(store.getState().currentTime?.epoch).toBe(epoch);
+      // Verify store was updated (currentTime is now a plain epoch number)
+      expect(store.getState().currentTime).toBe(epoch);
     });
 
     it('should set time with ISO string', async () => {

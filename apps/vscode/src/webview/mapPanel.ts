@@ -668,7 +668,7 @@ export class MapPanel {
       if (initialState.currentTime) {
         this.postMessage({
           type: 'setCurrentTime',
-          time: initialState.currentTime.epoch,
+          time: initialState.currentTime,
         });
       }
       {
@@ -684,7 +684,7 @@ export class MapPanel {
         if (temporal.currentTime) {
           this.postMessage({
             type: 'setCurrentTime',
-            time: temporal.currentTime.epoch,
+            time: temporal.currentTime,
           });
         }
         // Forward display mode to map webview
@@ -851,7 +851,7 @@ export class MapPanel {
           if (state.currentTime) {
             this.postMessage({
               type: 'setCurrentTime',
-              time: state.currentTime.epoch,
+              time: state.currentTime,
             });
           }
           const webviewMode = state.displayMode === 'snailTrail' ? 'trail' : 'full';

@@ -6,21 +6,21 @@ test.describe('Plot Load', () => {
     await page.goto('/');
   });
 
-  test('double-click opens analysis view', async ({ page }) => {
-    // Wait for catalog to load
-    await expect(page.locator('.catalog-overview')).toBeVisible();
+  test('clicking exercise opens analysis view', async ({ page }) => {
+    // Wait for StacBrowser to load
+    await expect(page.locator('[data-testid="stac-browser"]')).toBeVisible();
 
-    // Double-click on first timeline bar to open plot
-    const timelineBar = page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point').first();
-    await timelineBar.dblclick();
+    // Click on first exercise list item to open plot
+    const exerciseRow = page.locator('[data-testid="exercise-list-item-row"]').first();
+    await exerciseRow.click();
 
     // Should switch to analysis view
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
   });
 
   test('analysis view shows back button', async ({ page }) => {
-    // Navigate to analysis view via timeline bar
-    await page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point').first().dblclick();
+    // Navigate to analysis view via exercise list
+    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
 
     // Verify back button exists
     const backButton = page.locator('.web-shell__back-button[aria-label="Back to catalog"]');
@@ -29,24 +29,24 @@ test.describe('Plot Load', () => {
   });
 
   test('analysis view shows map', async ({ page }) => {
-    // Navigate to analysis view via timeline bar
-    await page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point').first().dblclick();
+    // Navigate to analysis view via exercise list
+    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
 
     // Leaflet container should be present (within GoldenLayout map panel)
     await expect(page.locator('.leaflet-container')).toBeVisible();
   });
 
   test('analysis view shows activity panel', async ({ page }) => {
-    // Navigate to analysis view via timeline bar
-    await page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point').first().dblclick();
+    // Navigate to analysis view via exercise list
+    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
 
     // Activity panel should be visible (within GoldenLayout)
     await expect(page.locator('.debrief-activity-panel')).toBeVisible();
   });
 
   test('map renders tracks from loaded plot', async ({ page }) => {
-    // Navigate to analysis view via timeline bar/point
-    await page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point').first().dblclick();
+    // Navigate to analysis view via exercise list
+    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
 
     // Wait for map to render
     await expect(page.locator('.leaflet-container')).toBeVisible();
@@ -56,8 +56,8 @@ test.describe('Plot Load', () => {
   });
 
   test('back button returns to catalog', async ({ page }) => {
-    // Navigate to analysis view via timeline bar
-    await page.locator('.catalog-overview__timeline-bar, .catalog-overview__timeline-point').first().dblclick();
+    // Navigate to analysis view via exercise list
+    await page.locator('[data-testid="exercise-list-item-row"]').first().click();
     await expect(page.locator('.web-shell--analysis')).toBeVisible();
 
     // Click back button
@@ -65,6 +65,6 @@ test.describe('Plot Load', () => {
 
     // Should return to welcome view
     await expect(page.locator('.web-shell--welcome')).toBeVisible();
-    await expect(page.locator('.catalog-overview')).toBeVisible();
+    await expect(page.locator('[data-testid="stac-browser"]')).toBeVisible();
   });
 });
