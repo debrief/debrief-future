@@ -1,0 +1,62 @@
+# Tool Contract: point-in-zone-classifier
+# Defines the MCP-compatible tool interface for both Python and TypeScript implementations.
+
+name: point-in-zone-classifier
+version: 1.0.0
+category: reference/classification
+status: draft
+
+context:
+  type: MULTI
+  input_kinds:
+    - POINT
+    - ZONE
+  description: >
+    Requires exactly two features: one MultiPoint reference feature (kind=POINT,
+    locationType=REFERENCE) and one MultiPolygon zone feature (kind=ZONE).
+
+parameters: {}
+  # No parameters — the tool operates on selected features directly.
+
+output:
+  kind: mutation/reference/classified_points
+  description: >
+    Returns the reference MultiPoint feature with updated pointMetadata
+    (zone and color fields added/updated) and a new pointColors array
+    parallel to coordinates.
+
+annotations:
+  debrief:resultType: mutation/reference/classified_points
+  debrief:sourceFeatures: "[<reference feature id>, <zone feature id>]"
+  debrief:label: "Classified {N} points: {n1} in {zone1}, {n2} in {zone2}, ... {nK} outside"
+
+errors:
+  - code: invalid_input
+    condition: No reference point feature found
+    message: "No reference point feature found in selection"
+  - code: invalid_input
+    condition: No zone feature found
+    message: "No zone feature found in selection"
+  - code: invalid_input
+    condition: Reference feature geometry is not MultiPoint
+    message: "Reference feature must have MultiPoint geometry"
+  - code: invalid_input
+    condition: Zone feature geometry is not MultiPolygon
+    message: "Zone feature must have MultiPolygon geometry"
+  - code: invalid_input
+    condition: pointMetadata array length mismatch
+    message: "pointMetadata length must match coordinates length"
+
+registration:
+  python:
+    module: debrief_calc.tools.reference.classification
+    function: point_in_zone_classifier
+    decorator: "@tool(name='point-in-zone-classifier', ...)"
+  typescript:
+    module: tools/reference/classification/pointInZoneClassifier.ts
+    exports:
+      - toolDefinition
+      - execute
+  web_shell:
+    registry: apps/web-shell/src/services/toolService.ts
+    entry: "[pointInZoneClassifierDef.name, { definition, execute }]"

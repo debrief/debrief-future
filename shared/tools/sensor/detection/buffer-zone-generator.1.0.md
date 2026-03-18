@@ -37,9 +37,18 @@ description: >
 
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| distance_1_nm | number | No | (from sensor model: 3.0) | Innermost buffer distance in nautical miles |
-| distance_2_nm | number | No | (from sensor model: 6.0) | Middle buffer distance in nautical miles |
-| distance_3_nm | number | No | (from sensor model: 12.0) | Outermost buffer distance in nautical miles |
+| interval | enum | No | large | Zone spacing preset: small (1/2/4 nm), medium (2/4/8 nm), large (3/6/12 nm) |
+| distance_1_nm | number | No | (from interval/sensor model) | Innermost buffer distance in nautical miles (overrides interval) |
+| distance_2_nm | number | No | (from interval/sensor model) | Middle buffer distance in nautical miles (overrides interval) |
+| distance_3_nm | number | No | (from interval/sensor model) | Outermost buffer distance in nautical miles (overrides interval) |
+
+### Interval Presets
+
+| Interval | distance_1 | distance_2 | distance_3 |
+|----------|-----------|-----------|-----------|
+| small    | 1 nm      | 2 nm      | 4 nm      |
+| medium   | 2 nm      | 4 nm      | 8 nm      |
+| large    | 3 nm      | 6 nm      | 12 nm     |
 
 ### Constraints
 
@@ -102,7 +111,11 @@ FUNCTION buffer_zone_generator(context, params, sensor_model=StubSensorModel):
   3. GET zone definitions from sensor_model.get_detection_zones(track)
      - Default stub returns: [{3nm, 75%, "75%"}, {6nm, 50%, "50%"}, {12nm, 25%, "25%"}]
 
-  4. IF any distance_*_nm parameter is set:
+  3b. IF interval parameter is set:
+     a. LOOKUP distances from INTERVAL_PRESETS[interval]
+     b. REPLACE zone distances with preset values (preserve likelihood/name)
+
+  4. IF any distance_*_nm parameter is set (overrides interval):
      a. Override corresponding zone distance (fallback to sensor model default)
      b. VALIDATE all distances > 0, else RAISE "All buffer distances must be positive"
      c. SORT distances ascending
@@ -197,6 +210,7 @@ result = buffer_zone_generator(context, {})
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1.0 | 2026-03-06 | Add `interval` parameter (small/medium/large zone spacing presets) |
 | 1.0.0 | 2026-02-12 | Initial release — stub sensor model, Vincenty offsetting, convex hull |
 
 ## 9. References

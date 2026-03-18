@@ -15,11 +15,12 @@ Built-in tools:
 - generate-reference-points: Generate grid/scatter reference points in a bounding box
 - generate-courses-speeds: Derive course and speed from consecutive positions
 - buffer-zone-generator: Generate detection likelihood buffer zones around a track
+- point-in-zone-classifier: Classify reference points by buffer zone membership
 """
 
 # Import tools to trigger registration via @tool decorator
 from debrief_calc.tools import area_summary, range_bearing, track_stats
-from debrief_calc.tools.reference import generation
+from debrief_calc.tools.reference import classification, generation
 from debrief_calc.tools.sensor import detection
 from debrief_calc.tools.shape import manipulation
 from debrief_calc.tools.track import styling
@@ -30,6 +31,7 @@ __all__ = [
     "area_summary",
     "styling",
     "manipulation",
+    "classification",
     "generation",
     "detection",
 ]

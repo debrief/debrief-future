@@ -203,6 +203,7 @@ interface SafeGeometry {
 // Self-contained feature type to avoid any from geojson Feature
 interface SafeFeature {
   type: 'Feature';
+  id?: string | number;
   geometry: SafeGeometry;
   properties: Record<string, unknown> | null;
 }
