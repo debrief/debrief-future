@@ -27,6 +27,14 @@ class PlotMetadata(BaseModel):
         description="Plot timestamp (ISO8601)",
         alias="datetime",
     )
+    start_datetime: dt | None = Field(
+        default=None,
+        description="Temporal extent start (earliest track timestamp)",
+    )
+    end_datetime: dt | None = Field(
+        default=None,
+        description="Temporal extent end (latest track timestamp)",
+    )
 
     model_config = {
         "populate_by_name": True,
@@ -94,6 +102,22 @@ class CollectionSummaries(BaseModel):
     feature_tags: list[str] = Field(default_factory=list, description="Distinct feature-level tags")
     track_names: list[str] = Field(default_factory=list, description="Distinct track names")
     nationalities: list[str] = Field(default_factory=list, description="Distinct nationality codes")
+
+
+class TemporalExtent(BaseModel):
+    """Computed temporal extent from track features.
+
+    Returned by update_temporal_metadata() when tracks with temporal data are found.
+
+    Attributes:
+        datetime: Exercise start time (earliest track timestamp)
+        start_datetime: Earliest timestamp across all tracks
+        end_datetime: Latest timestamp across all tracks
+    """
+
+    datetime: str = Field(..., description="Exercise start time (ISO 8601)")
+    start_datetime: str = Field(..., description="Earliest track timestamp (ISO 8601)")
+    end_datetime: str = Field(..., description="Latest track timestamp (ISO 8601)")
 
 
 class AssetProvenance(BaseModel):

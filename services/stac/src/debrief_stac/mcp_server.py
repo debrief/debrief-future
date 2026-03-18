@@ -24,7 +24,7 @@ from debrief_stac.exceptions import (
 )
 from debrief_stac.features import add_features
 from debrief_stac.models import PlotMetadata
-from debrief_stac.plot import create_plot, read_plot
+from debrief_stac.plot import create_plot, read_plot, update_temporal_metadata
 
 # Tool names for registration verification
 TOOL_NAMES = [
@@ -35,6 +35,7 @@ TOOL_NAMES = [
     "add_asset",
     "list_plots",
     "read_collection_summaries",
+    "update_temporal_metadata",
 ]
 
 # Create FastMCP server
@@ -366,6 +367,58 @@ def read_collection_summaries_tool(catalog_path: str) -> dict[str, Any]:
         Dictionary with extent, summaries, and promoted flag on success
     """
     return mcp_read_collection_summaries(catalog_path)
+
+
+def mcp_update_temporal_metadata(
+    catalog_path: str,
+    plot_id: str,
+) -> dict[str, Any]:
+    """Compute temporal extent from track features and update the STAC Item.
+
+    Args:
+        catalog_path: Path to the catalog directory
+        plot_id: ID of the plot to update
+
+    Returns:
+        Dictionary with temporal extent on success, message if no data, error on failure
+    """
+    try:
+        result = update_temporal_metadata(catalog_path, plot_id)
+        if result is None:
+            return {"message": "No temporal data found", "plot_id": plot_id}
+        return {
+            "datetime": result.datetime,
+            "start_datetime": result.start_datetime,
+            "end_datetime": result.end_datetime,
+            "plot_id": plot_id,
+        }
+    except PlotNotFoundError as e:
+        return {"error": f"Plot '{e.plot_id}' not found in catalog at {e.catalog_path}"}
+    except CatalogNotFoundError as e:
+        return {"error": f"Catalog not found at {e.path}"}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@mcp.tool()
+def update_temporal_metadata_tool(
+    catalog_path: str,
+    plot_id: str,
+) -> dict[str, Any]:
+    """Compute temporal extent from track features and update the STAC Item.
+
+    Scans the plot's GeoJSON features for TRACK features with start_time/end_time
+    properties, computes the global temporal extent, and writes datetime,
+    start_datetime, end_datetime to the item properties.
+
+    Args:
+        catalog_path: Path to the catalog directory
+        plot_id: ID of the plot to update
+
+    Returns:
+        Dictionary with temporal extent on success, or message if no temporal data found
+    """
+    return mcp_update_temporal_metadata(catalog_path, plot_id)
 
 
 def main() -> None:

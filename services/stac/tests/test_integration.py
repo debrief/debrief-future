@@ -188,6 +188,64 @@ class TestFullWorkflow:
         item = read_plot(catalog_path, plot_id)
         assert item["bbox"] == [0, 0, 2, 2]
 
+    def test_workflow_with_temporal_metadata(self, tmp_path: Path) -> None:
+        """Test full workflow including temporal metadata update (#137).
+
+        create catalog → create plot → add track features → update temporal metadata → verify.
+        """
+        from debrief_stac.catalog import create_catalog
+        from debrief_stac.features import add_features
+        from debrief_stac.models import PlotMetadata
+        from debrief_stac.plot import create_plot, read_plot, update_temporal_metadata
+
+        catalog_path = create_catalog(tmp_path / "temporal_test")
+        metadata = PlotMetadata(title="Exercise Alpha")
+        plot_id = create_plot(catalog_path, metadata, plot_id="exercise-alpha")
+
+        # Add track features with temporal data
+        tracks = [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[-5.0, 50.0], [-4.5, 50.2], [-4.0, 50.5]],
+                },
+                "properties": {
+                    "name": "Track Alpha",
+                    "kind": "TRACK",
+                    "start_time": "2022-08-27T09:00:00Z",
+                    "end_time": "2022-09-01T12:00:00Z",
+                },
+            },
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [[-3.0, 51.0], [-2.5, 51.2]],
+                },
+                "properties": {
+                    "name": "Track Bravo",
+                    "kind": "TRACK",
+                    "start_time": "2022-08-30T06:00:00Z",
+                    "end_time": "2022-09-10T16:44:49Z",
+                },
+            },
+        ]
+        add_features(catalog_path, plot_id, tracks)
+
+        # Update temporal metadata
+        result = update_temporal_metadata(catalog_path, plot_id)
+        assert result is not None
+        assert result.start_datetime == "2022-08-27T09:00:00Z"
+        assert result.end_datetime == "2022-09-10T16:44:49Z"
+        assert result.datetime == "2022-08-27T09:00:00Z"
+
+        # Verify persisted item
+        item = read_plot(catalog_path, plot_id)
+        assert item["properties"]["datetime"] == "2022-08-27T09:00:00Z"
+        assert item["properties"]["start_datetime"] == "2022-08-27T09:00:00Z"
+        assert item["properties"]["end_datetime"] == "2022-09-10T16:44:49Z"
+
     def test_workflow_catalog_integrity(self, tmp_path: Path) -> None:
         """Test that catalog maintains integrity through all operations."""
         from debrief_stac.catalog import create_catalog, open_catalog

@@ -45,8 +45,8 @@
 
 **Purpose**: Create evidence directory and verify existing infrastructure
 
-- [ ] T001 Create evidence directory `specs/137-rep-temporal-metadata/evidence/`
-- [ ] T002 Verify existing plot.py, models.py, mcp_server.py, and stacService.ts exist at expected paths
+- [x] T001 Create evidence directory `specs/137-rep-temporal-metadata/evidence/`
+- [x] T002 Verify existing plot.py, models.py, mcp_server.py, and stacService.ts exist at expected paths
 
 **Checkpoint**: Paths confirmed, ready for implementation
 
@@ -58,7 +58,7 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Extend PlotMetadata with start_datetime and end_datetime optional fields `services/stac/src/debrief_stac/models.py`
+- [x] T003 Extend PlotMetadata with start_datetime and end_datetime optional fields `services/stac/src/debrief_stac/models.py`
 
 **Checkpoint**: PlotMetadata model accepts temporal extent fields
 
@@ -74,15 +74,15 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T004 [test] Write test for multi-track temporal extent computation `services/stac/tests/test_plot.py`
-- [ ] T005 [P][test] Write test for single-track temporal extent `services/stac/tests/test_plot.py`
-- [ ] T006 [P][test] Write test for overlapping track time ranges `services/stac/tests/test_plot.py`
+- [x] T004 [test] Write test for multi-track temporal extent computation `services/stac/tests/test_plot.py`
+- [x] T005 [P][test] Write test for single-track temporal extent `services/stac/tests/test_plot.py`
+- [x] T006 [P][test] Write test for overlapping track time ranges `services/stac/tests/test_plot.py`
 
 ### Implementation for User Story 1
 
-- [ ] T007 Implement update_temporal_metadata() function in plot.py `services/stac/src/debrief_stac/plot.py`
-- [ ] T008 Wire update_temporal_metadata into create_plot or post-add workflow `services/stac/src/debrief_stac/plot.py`
-- [ ] T009 Verify US1 tests pass
+- [x] T007 Implement update_temporal_metadata() function in plot.py `services/stac/src/debrief_stac/plot.py`
+- [x] T008 Wire update_temporal_metadata into create_plot or post-add workflow `services/stac/src/debrief_stac/plot.py`
+- [x] T009 Verify US1 tests pass
 
 **Checkpoint**: Multi-track and single-track REP files produce correct start_datetime/end_datetime on their STAC Items
 
@@ -96,12 +96,12 @@
 
 ### Tests for User Story 2
 
-- [ ] T010 [test] Write test verifying datetime equals earliest track start_time `services/stac/tests/test_plot.py`
+- [x] T010 [test] Write test verifying datetime equals earliest track start_time `services/stac/tests/test_plot.py`
 
 ### Implementation for User Story 2
 
-- [ ] T011 [US2] Ensure update_temporal_metadata sets datetime to min(start_time) `services/stac/src/debrief_stac/plot.py`
-- [ ] T012 [US2] Verify US2 tests pass
+- [x] T011 [US2] Ensure update_temporal_metadata sets datetime to min(start_time) `services/stac/src/debrief_stac/plot.py`
+- [x] T012 [US2] Verify US2 tests pass
 
 **Checkpoint**: `datetime` reflects exercise start time, not file load time
 
@@ -115,14 +115,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T013 [test] Write test for no-track REP file (returns None, item unchanged) `services/stac/tests/test_plot.py`
-- [ ] T014 [P][test] Write test for single-position track (start == end) `services/stac/tests/test_plot.py`
-- [ ] T015 [P][test] Write test for tracks without temporal properties (skipped) `services/stac/tests/test_plot.py`
+- [x] T013 [test] Write test for no-track REP file (returns None, item unchanged) `services/stac/tests/test_plot.py`
+- [x] T014 [P][test] Write test for single-position track (start == end) `services/stac/tests/test_plot.py`
+- [x] T015 [P][test] Write test for tracks without temporal properties (skipped) `services/stac/tests/test_plot.py`
 
 ### Implementation for User Story 3
 
-- [ ] T016 [US3] Add edge case handling in update_temporal_metadata `services/stac/src/debrief_stac/plot.py`
-- [ ] T017 [US3] Verify US3 tests pass
+- [x] T016 [US3] Add edge case handling in update_temporal_metadata `services/stac/src/debrief_stac/plot.py`
+- [x] T017 [US3] Verify US3 tests pass
 
 **Checkpoint**: All edge cases handled gracefully, no regressions
 
@@ -132,10 +132,10 @@
 
 **Purpose**: Expose the Python function via MCP and delegate the existing TypeScript implementation to it
 
-- [ ] T018 Add update_temporal_metadata MCP tool wrapper `services/stac/src/debrief_stac/mcp_server.py`
-- [ ] T019 [test] Write integration test for full workflow (create → add features → update temporal) `services/stac/tests/test_integration.py`
-- [ ] T020 Replace stacService.ts updateTemporalMetadata body with MCP call `apps/vscode/src/services/stacService.ts`
-- [ ] T021 Verify integration test passes
+- [x] T018 Add update_temporal_metadata MCP tool wrapper `services/stac/src/debrief_stac/mcp_server.py`
+- [x] T019 [test] Write integration test for full workflow (create → add features → update temporal) `services/stac/tests/test_integration.py`
+- [x] T020 Replace stacService.ts updateTemporalMetadata body with MCP call `apps/vscode/src/services/stacService.ts`
+- [x] T021 Verify integration test passes
 
 **Checkpoint**: Full pipeline works end-to-end: Python computes temporal metadata, TypeScript delegates via MCP
 
@@ -147,15 +147,15 @@
 
 ### Evidence Collection
 
-- [ ] T022 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/137-rep-temporal-metadata/evidence/test-summary.md`
-- [ ] T023 Create usage demonstration `specs/137-rep-temporal-metadata/evidence/usage-example.md`
-- [ ] T024 [P] Capture sample MCP request JSON `specs/137-rep-temporal-metadata/evidence/sample-request.json`
-- [ ] T025 [P] Capture sample MCP response JSON `specs/137-rep-temporal-metadata/evidence/sample-response.json`
+- [x] T022 Capture test results using template (.specify/templates/evidence/test-summary-template.md) `specs/137-rep-temporal-metadata/evidence/test-summary.md`
+- [x] T023 Create usage demonstration `specs/137-rep-temporal-metadata/evidence/usage-example.md`
+- [x] T024 [P] Capture sample MCP request JSON `specs/137-rep-temporal-metadata/evidence/sample-request.json`
+- [x] T025 [P] Capture sample MCP response JSON `specs/137-rep-temporal-metadata/evidence/sample-response.json`
 
 ### Media Content
 
-- [ ] T026 Create shipped blog post `specs/137-rep-temporal-metadata/media/shipped-post.md`
-- [ ] T027 [P] Create LinkedIn shipped summary `specs/137-rep-temporal-metadata/media/linkedin-shipped.md`
+- [x] T026 Create shipped blog post `specs/137-rep-temporal-metadata/media/shipped-post.md`
+- [x] T027 [P] Create LinkedIn shipped summary `specs/137-rep-temporal-metadata/media/linkedin-shipped.md`
 
 ### PR Creation
 

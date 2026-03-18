@@ -1,0 +1,7 @@
+{
+  "tool": "update_temporal_metadata",
+  "arguments": {
+    "catalog_path": "/data/exercises",
+    "plot_id": "exercise-alpha"
+  }
+}
