@@ -950,6 +950,7 @@ export class StacService {
    * Update temporal metadata on a STAC item from its GeoJSON features.
    * Scans track features for time arrays and sets start_datetime/end_datetime.
    */
+  // TODO(#137): Delegate to Python MCP tool update_temporal_metadata when STAC MCP client is available
   async updateTemporalMetadata(
     storePath: string,
     itemPath: string
@@ -975,16 +976,33 @@ export class StacService {
 
     for (const feature of fc.features) {
       const props = feature.properties ?? {};
+
+      // Prefer start_time/end_time on TRACK features (REP handler output)
+      if (props.kind === 'TRACK') {
+        const startTime = props.start_time as string | undefined;
+        const endTime = props.end_time as string | undefined;
+        if (startTime && endTime) {
+          if (!earliest || startTime < earliest) {earliest = startTime;}
+          if (!latest || endTime > latest) {latest = endTime;}
+        }
+        continue;
+      }
+
+      // Fallback: extract from times array (millisecond timestamps)
       const times = props.times as number[] | undefined;
       if (times && times.length > 0) {
-        const first = new Date(times[0]!).toISOString();
-        const last = new Date(times[times.length - 1]!).toISOString();
-        if (!earliest || first < earliest) {earliest = first;}
-        if (!latest || last > latest) {latest = last;}
+        const sorted = [...times].sort((a, b) => a - b);
+        const first = sorted[0]!;
+        const last = sorted[sorted.length - 1]!;
+        const start = new Date(first).toISOString();
+        const end = new Date(last).toISOString();
+        if (!earliest || start < earliest) {earliest = start;}
+        if (!latest || end > latest) {latest = end;}
       }
     }
 
-    if (earliest || latest) {
+    if (earliest && latest) {
+      item.properties.datetime = earliest;
       item.properties.start_datetime = earliest;
       item.properties.end_datetime = latest;
       fs.writeFileSync(fullItemPath, JSON.stringify(item, null, 2));
