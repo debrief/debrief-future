@@ -3,6 +3,7 @@
  */
 
 import type { MapPanel } from '../webview/mapPanel';
+import type { DebriefFeature } from '@debrief/components';
 
 /**
  * Create the select all command
@@ -16,10 +17,10 @@ export function createSelectAllCommand(
       return;
     }
 
-    const features = panel.getFeatures();
+    const features: DebriefFeature[] = panel.getFeatures();
 
     // Select all features
-    const featureIds = features.map((f) => String(f.id));
+    const featureIds = features.map((f: DebriefFeature) => String(f.id));
     panel.setSelection(featureIds);
   };
 }

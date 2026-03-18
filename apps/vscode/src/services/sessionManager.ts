@@ -118,7 +118,7 @@ export class SessionManager implements vscode.Disposable {
     state.setFeatureCollectionUri(data.featureCollectionUri);
 
     // Derive time range from plot extent
-    if (data.plot.timeExtent && data.plot.timeExtent.length === 2) {
+    if (data.plot.timeExtent !== undefined && data.plot.timeExtent.length === 2) {
       const [startIso, endIso] = data.plot.timeExtent;
       const timeRange: TimeRange = {
         start: isoToEpoch(startIso),
@@ -387,7 +387,7 @@ export class SessionManager implements vscode.Disposable {
       };
 
       this.mcpServer = startServer(session, options);
-      console.log(`[SessionManager] MCP server started on port ${this.mcpPort}`);
+      console.warn(`[SessionManager] MCP server started on port ${this.mcpPort}`);
     } catch (error) {
       console.error('[SessionManager] Failed to start MCP server:', error);
       // Don't throw - MCP is optional functionality
@@ -401,7 +401,7 @@ export class SessionManager implements vscode.Disposable {
     if (this.mcpServer) {
       try {
         this.mcpServer.close();
-        console.log('[SessionManager] MCP server stopped');
+        console.warn('[SessionManager] MCP server stopped');
       } catch (error) {
         console.error('[SessionManager] Error stopping MCP server:', error);
       }

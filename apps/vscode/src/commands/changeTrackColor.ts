@@ -7,6 +7,7 @@ import type { StacService } from '../services/stacService';
 import type { ConfigService } from '../services/configService';
 import type { MapPanel } from '../webview/mapPanel';
 import { isTrackFeature } from '@debrief/components';
+import type { TrackFeature } from '@debrief/components';
 
 interface ChangeColorArgs {
   trackId: string;
@@ -31,9 +32,10 @@ export function createChangeTrackColorCommand(
     }
 
     const features = panel.getFeatures();
-    const track = features.filter(isTrackFeature).find((t) => t.id === args.trackId);
+    const trackFeatures: TrackFeature[] = features.filter(isTrackFeature);
+    const track: TrackFeature | undefined = trackFeatures.find((t) => t.id === args.trackId);
 
-    if (!track) {
+    if (track === undefined) {
       return;
     }
 

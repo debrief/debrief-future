@@ -9,7 +9,7 @@
  */
 
 import { fromMCPTool as sharedFromMCPTool } from '@debrief/components/ToolMatch';
-import type { MCPToolDefinition as SharedMCPToolDefinition } from '@debrief/components/ToolMatch';
+import type { MCPToolDefinition as SharedMCPToolDefinition, Tool as SharedTool } from '@debrief/components/ToolMatch';
 import type { MCPToolDefinition, Tool, ToolParameter } from '../types/tool';
 
 /** JSON Schema property shape inside inputSchema.properties.params.properties */
@@ -73,7 +73,7 @@ function extractPickerParameters(mcpTool: MCPToolDefinition): ToolParameter[] {
 export function adaptMCPToolsForMatching(mcpTools: MCPToolDefinition[]): Tool[] {
   return mcpTools.map((mcpTool) => {
     // Delegate core conversion to shared adapter
-    const baseTool = sharedFromMCPTool(mcpTool as SharedMCPToolDefinition);
+    const baseTool: SharedTool = (sharedFromMCPTool as (t: SharedMCPToolDefinition) => SharedTool)(mcpTool as unknown as SharedMCPToolDefinition);
 
     // Add VS Code-specific parameter extraction
     const parameters = extractPickerParameters(mcpTool);

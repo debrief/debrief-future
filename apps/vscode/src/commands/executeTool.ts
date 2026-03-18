@@ -18,6 +18,7 @@ import type { ActivityPanelViewProvider } from '../views/activityPanelView';
 import type { LogService, InputFeatureState, ResultIdRegistry } from '@debrief/session-state';
 import type { LogPanelViewProvider } from '../views/logPanelView';
 import type { ToolParameter } from '../types/tool';
+import type { DebriefFeature } from '@debrief/components';
 
 /**
  * Known parameter type → values map.
@@ -145,12 +146,12 @@ export function createExecuteToolCommand(
     // Capture pre-tool geometry for mutation tools (enables correct tune replay)
     let preToolInputState: InputFeatureState[] | undefined;
     const selectedIdSet = new Set(selectedFeatureIds);
-    const allFeatures = panel.getFeatures();
-    const preToolFeatures = allFeatures.filter(
-      (f) => selectedIdSet.has(String(f.id))
+    const allFeatures: DebriefFeature[] = panel.getFeatures();
+    const preToolFeatures: DebriefFeature[] = allFeatures.filter(
+      (f: DebriefFeature) => selectedIdSet.has(String(f.id))
     );
     if (preToolFeatures.length > 0) {
-      preToolInputState = preToolFeatures.map((f) => {
+      preToolInputState = preToolFeatures.map((f: DebriefFeature) => {
         const props = (f.properties ?? {}) as Record<string, unknown>;
         const { provenance: _p, ...restProps } = props;
         return {

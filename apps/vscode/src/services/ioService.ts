@@ -176,7 +176,7 @@ except Exception as e:
 
     try {
       const result = JSON.parse(output) as Record<string, unknown>;
-      if (result.error) {
+      if (result.error !== undefined && result.error !== null) {
         throw new Error(String(result.error));
       }
       return result;
