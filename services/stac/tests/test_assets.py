@@ -105,6 +105,41 @@ class TestAddAsset:
         item = read_plot(catalog_path, plot_id)
         assert "my-custom-source" in item["assets"]
 
+    def test_add_asset_creates_derived_from_link(
+        self, temp_dir: Path, sample_plot_metadata: PlotMetadata
+    ) -> None:
+        """add_asset adds a derived_from link to the source file (#138)."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, sample_plot_metadata)
+
+        source_file = temp_dir / "data.rep"
+        source_file.write_text("REP content")
+
+        add_asset(catalog_path, plot_id, source_file)
+
+        item = read_plot(catalog_path, plot_id)
+        derived_links = [link for link in item["links"] if link["rel"] == "derived_from"]
+        assert len(derived_links) == 1
+        assert derived_links[0]["href"] == source_file.absolute().as_uri()
+        assert derived_links[0]["title"] == "data.rep"
+
+    def test_add_asset_no_duplicate_derived_from(
+        self, temp_dir: Path, sample_plot_metadata: PlotMetadata
+    ) -> None:
+        """Adding the same source twice does not duplicate the derived_from link (#138)."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        plot_id = create_plot(catalog_path, sample_plot_metadata)
+
+        source_file = temp_dir / "data.rep"
+        source_file.write_text("REP content")
+
+        add_asset(catalog_path, plot_id, source_file, asset_key="source-1")
+        add_asset(catalog_path, plot_id, source_file, asset_key="source-2")
+
+        item = read_plot(catalog_path, plot_id)
+        derived_links = [link for link in item["links"] if link["rel"] == "derived_from"]
+        assert len(derived_links) == 1
+
     def test_add_multiple_assets(self, temp_dir: Path, sample_plot_metadata: PlotMetadata) -> None:
         """Multiple assets can be added to a plot."""
         catalog_path = create_catalog(temp_dir / "catalog")

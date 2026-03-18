@@ -8,6 +8,11 @@ description: >
   These properties enable discovery and filtering in the STAC Stack Browser UI.
   Author is derived from PROV lineage, not stored here (see R7).
 
+  ID Convention: STAC item IDs must use only lowercase letters, digits,
+  underscores, and hyphens (pattern: [a-z0-9_-]+). No uppercase letters,
+  spaces, or reserved URI characters (: / ? # @). UUIDs (auto-generated)
+  comply by definition. Custom IDs are validated at creation time.
+
 prefixes:
   linkml: https://w3id.org/linkml/
   debrief: https://debrief.info/schemas/

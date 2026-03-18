@@ -67,6 +67,32 @@ class TestCreatePlot:
         assert len(item_links) == 1
         assert plot_id in item_links[0]["href"]
 
+    def test_create_plot_item_link_uses_plot_title(self, temp_dir: Path) -> None:
+        """Item link in catalog carries human-readable plot title (#135)."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        metadata = PlotMetadata(title="Exercise Alpha 2024")
+
+        create_plot(catalog_path, metadata, plot_id="ex-alpha-2024")
+
+        catalog_data = open_catalog(catalog_path)
+        item_links = [link for link in catalog_data["links"] if link["rel"] == "item"]
+        assert len(item_links) == 1
+        assert item_links[0]["title"] == "Exercise Alpha 2024"
+
+    def test_create_plot_structural_links_have_titles(self, temp_dir: Path) -> None:
+        """Structural links (root, parent, self) in item.json carry titles (#135)."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        metadata = PlotMetadata(title="My Plot")
+
+        plot_id = create_plot(catalog_path, metadata, plot_id="my-plot")
+
+        item = read_plot(catalog_path, plot_id)
+        links_by_rel = {link["rel"]: link for link in item["links"]}
+
+        assert links_by_rel["root"]["title"] == "Root catalog"
+        assert links_by_rel["parent"]["title"] == "Parent catalog"
+        assert links_by_rel["self"]["title"] == "My Plot"
+
     def test_create_plot_with_title_and_description(self, temp_dir: Path) -> None:
         """T020: Given PlotMetadata with title and description,
         When plot is created, Then STAC Item properties include them.
@@ -95,6 +121,30 @@ class TestCreatePlot:
 
         assert plot_id == "my-custom-plot"
         assert (catalog_path / "my-custom-plot" / "item.json").exists()
+
+    def test_create_plot_rejects_invalid_custom_id(self, temp_dir: Path) -> None:
+        """Custom plot IDs must match [a-z0-9_-] (#139)."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        metadata = PlotMetadata(title="Bad ID Plot")
+
+        with pytest.raises(ValueError, match=r"\[a-z0-9_-\]"):
+            create_plot(catalog_path, metadata, plot_id="Bad ID!")
+
+    def test_create_plot_rejects_uppercase_id(self, temp_dir: Path) -> None:
+        """Uppercase letters in custom plot IDs are rejected (#139)."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        metadata = PlotMetadata(title="Upper")
+
+        with pytest.raises(ValueError):
+            create_plot(catalog_path, metadata, plot_id="MyPlot")
+
+    def test_create_plot_accepts_valid_custom_id(self, temp_dir: Path) -> None:
+        """Valid custom IDs with lowercase, digits, underscores, hyphens pass (#139)."""
+        catalog_path = create_catalog(temp_dir / "catalog")
+        metadata = PlotMetadata(title="Good ID")
+
+        plot_id = create_plot(catalog_path, metadata, plot_id="exercise-alpha_2024")
+        assert plot_id == "exercise-alpha_2024"
 
 
 class TestReadPlot:
