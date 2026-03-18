@@ -427,6 +427,43 @@ export class CodeServerPage {
   }
 
   /**
+   * Find a webview inner frame that contains a given CSS selector.
+   *
+   * Polls until a child frame of a webview host frame contains the selector.
+   * Returns the raw Frame object for direct locator access.
+   *
+   * @param selector - CSS selector to probe for inside the webview
+   * @param timeoutMs - Maximum time to wait
+   */
+  async findWebviewWithContent(
+    selector: string,
+    timeoutMs: number
+  ): Promise<import('@playwright/test').Frame> {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      const frames = this.page.frames();
+      for (const frame of frames) {
+        if (!frame.url().includes('webview')) continue;
+        const children = frame.childFrames();
+        for (const child of children) {
+          const hasContent = await child
+            .locator(selector)
+            .first()
+            .isVisible()
+            .catch(() => false);
+          if (hasContent) {
+            return child;
+          }
+        }
+      }
+      await this.page.waitForTimeout(500);
+    }
+    throw new Error(
+      `Webview frame with content "${selector}" not found after ${timeoutMs}ms`
+    );
+  }
+
+  /**
    * Find a specific webview frame by probing for a CSS selector in its content.
    *
    * Iterates all webview host frames and checks each inner frame for the
