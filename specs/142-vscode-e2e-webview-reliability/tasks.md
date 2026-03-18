@@ -52,10 +52,10 @@
 
 ### Implementation
 
-- [ ] T001 Add diagnostic console logging to extension activation in `tests/e2e/global-setup.ts`
-- [ ] T002 Test view reveal command (`workbench.view.extension.debrief-sidebar`) via Playwright in `tests/e2e/test-webview-probe.spec.ts`
-- [ ] T003 Inspect openvscode-server `workbench.js` for webview view resolution gate (visibility check)
-- [ ] T004 Document root cause findings in `specs/142-vscode-e2e-webview-reliability/evidence/root-cause-analysis.md`
+- [x] T001 Add diagnostic console logging to extension activation in `tests/e2e/global-setup.ts`
+- [x] T002 Test view reveal command (`workbench.view.extension.debrief-sidebar`) via Playwright in `tests/e2e/test-webview-probe.spec.ts`
+- [x] T003 Inspect openvscode-server `workbench.js` for webview view resolution gate (visibility check)
+- [x] T004 Document root cause findings in `specs/142-vscode-e2e-webview-reliability/evidence/root-cause-analysis.md`
 
 **Checkpoint**: Root cause identified with evidence — solution approach selected.
 
@@ -71,22 +71,22 @@
 
 ### Spike E — View Reveal Command
 
-- [ ] T005 Add `revealSidebar()` method to `tests/e2e/models/code-server-page.ts` that executes `workbench.view.extension.debrief-sidebar`
-- [ ] T006 Test sidebar reveal triggers `resolveWebviewView` in `tests/e2e/test-webview-probe.spec.ts`
+- [x] T005 Add `revealSidebar()` method to `tests/e2e/models/code-server-page.ts` that executes `workbench.view.extension.debrief-sidebar`
+- [x] T006 Test sidebar reveal triggers `resolveWebviewView` in `tests/e2e/test-webview-probe.spec.ts`
 
 ### Spike A — Patch workbench.js
 
-- [ ] T007 Identify visibility gate pattern in `workbench.js` using regex/structural matching
-- [ ] T008 Add blocker 4 patch to `tests/e2e/scripts/patch-webview.sh`
+- [x] T007 Identify visibility gate pattern in `workbench.js` using regex/structural matching
+- [x] T008 Add blocker 4 patch to `tests/e2e/scripts/patch-webview.sh`
 
 ### Spike B — Upgrade openvscode-server (if needed)
 
-- [ ] T009 Test latest stable openvscode-server with existing patches (skip if Spike E or A succeeds)
+- [x] T009 Test latest stable openvscode-server with existing patches (skipped — Spike A succeeded)
 
 ### Validation
 
-- [ ] T010 Unskip `tests/e2e/test-load-display.spec.ts` — remove skip annotations, verify real webview content renders
-- [ ] T011 Capture screenshot of real webview content as validation evidence
+- [x] T010 Unskip `tests/e2e/test-load-display.spec.ts` — remove skip annotations, verify real webview content renders
+- [x] T011 Capture screenshot of real webview content as validation evidence
 
 **Checkpoint**: One previously-skipped test passes with real extension content.
 
@@ -100,26 +100,26 @@
 
 ### Patch Hardening
 
-- [ ] T012 Add version guards to ALL existing patches in `tests/e2e/scripts/patch-webview.sh` — exit 1 if expected pattern not found
-- [ ] T013 Make all patches idempotent (running twice produces same result) in `tests/e2e/scripts/patch-webview.sh`
+- [x] T012 Add version guards to ALL existing patches in `tests/e2e/scripts/patch-webview.sh` — exit 1 if expected pattern not found
+- [x] T013 Make all patches idempotent (running twice produces same result) in `tests/e2e/scripts/patch-webview.sh`
 
 ### Test File Activation
 
-- [ ] T014 [P] Unskip `tests/e2e/test-analysis-tool.spec.ts` — remove skip, convert missing features to `test.fixme()` with backlog refs
-- [ ] T015 [P] Unskip `tests/e2e/test-error-feedback.spec.ts` — remove skip, convert missing features to `test.fixme()`
-- [ ] T016 [P] Unskip `tests/e2e/test-catalog-browse.spec.ts` — remove skip, convert missing features to `test.fixme()`
-- [ ] T017 [P] Unskip `tests/e2e/test-tune-prov.spec.ts` — remove skip, convert missing features to `test.fixme()`
-- [ ] T018 [P] Unskip additional test files as solution proves reliable
+- [x] T014 [P] Unskip `tests/e2e/test-analysis-tool.spec.ts` — remove skip, convert missing features to `test.fixme()` with backlog refs
+- [x] T015 [P] Unskip `tests/e2e/test-error-feedback.spec.ts` — remove skip, convert missing features to `test.fixme()`
+- [x] T016 [P] Unskip `tests/e2e/test-catalog-browse.spec.ts` — remove skip, convert missing features to `test.fixme()`
+- [x] T017 [P] Unskip `tests/e2e/test-tune-prov.spec.ts` — remove skip, convert missing features to `test.fixme()`
+- [x] T018 [P] Unskip additional test files as solution proves reliable
 
 ### Infrastructure Updates
 
-- [ ] T019 Clean up obsolete functions in `tests/e2e/helpers/webview-injector.ts` after fix validated
+- [x] T019 Clean up obsolete functions in `tests/e2e/helpers/webview-injector.ts` after fix validated
 - [ ] T020 Update skip conditions in `tests/e2e/models/debrief-webview.ts` to reflect new readiness model
-- [ ] T021 Add sidebar toggle test for webview disposal/re-creation in `tests/e2e/test-webview-probe.spec.ts`
+- [x] T021 Add sidebar toggle test for webview disposal/re-creation in `tests/e2e/test-webview-resolve.spec.ts`
 
 ### CI Workflow Updates
 
-- [ ] T022 Add CI smoke check in `.github/workflows/e2e.yml` — verify `patch-webview.sh` exits 0 and prints success markers
+- [x] T022 Add CI smoke check in `.github/workflows/e2e.yml` — verify `patch-webview.sh` exits 0 and prints success markers
 - [ ] T023 Verify both web-shell and VS Code E2E suites run as parallel CI jobs within 25-minute timeout
 
 **Checkpoint**: At least 5 previously-skipped test files now execute. CI workflow updated.
@@ -132,15 +132,15 @@
 
 ### Documentation
 
-- [ ] T024 Update `docs/project_notes/webview-e2e-research.md` with complete resolution findings, reproduction steps, and evidence
+- [x] T024 Update `docs/project_notes/webview-e2e-research.md` with complete resolution findings, reproduction steps, and evidence
 - [ ] T025 Update `specs/142-vscode-e2e-webview-reliability/quickstart.md` with validated reproduction steps
 
 ### Evidence Collection (REQUIRED)
 
 > **Purpose**: Capture artifacts for PR description and future documentation.
 
-- [ ] T026 Capture test summary using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/142-vscode-e2e-webview-reliability/evidence/test-summary.md`
-- [ ] T027 Create usage demonstration in `specs/142-vscode-e2e-webview-reliability/evidence/usage-example.md`
+- [x] T026 Capture test summary using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/142-vscode-e2e-webview-reliability/evidence/test-summary.md`
+- [x] T027 Create usage demonstration in `specs/142-vscode-e2e-webview-reliability/evidence/usage-example.md`
 - [ ] T028 [P] Capture patch configuration sample in `specs/142-vscode-e2e-webview-reliability/evidence/config-sample.sh`
 - [ ] T029 [P] Capture CI-like validation output in `specs/142-vscode-e2e-webview-reliability/evidence/validation-output.txt`
 
