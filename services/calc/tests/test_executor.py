@@ -4,6 +4,7 @@ import copy
 from collections.abc import Iterator
 
 import pytest
+
 from debrief_calc.executor import _capture_input_state, run
 from debrief_calc.models import ContextType, SelectionContext
 

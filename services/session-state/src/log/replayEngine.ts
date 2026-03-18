@@ -83,7 +83,7 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
       // Collect entries from startIndex onward, skipping deleted and disabled
       const entries: ReplayEntry[] = [];
       for (let i = startIndex; i < timeline.length; i++) {
-        const entry = timeline[i];
+        const entry = timeline[i]!;
         if (deletedSet.has(entry.activityId)) continue;
         if (entry.disabled === true) continue;
 
@@ -160,7 +160,7 @@ export function createReplayEngine(deps: ReplayEngineDeps): ReplayEngine {
           };
         }
 
-        const entry = plan.entries[i];
+        const entry = plan.entries[i]!;
 
         // Resolve installed tool version.
         // "0.0.0" is the fallback placeholder used when the recording side

@@ -4,6 +4,7 @@ import base64
 import json
 
 import pytest
+
 from debrief_calc.result_builder import (
     build_addition,
     build_artifact,

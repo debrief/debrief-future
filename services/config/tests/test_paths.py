@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 import pytest
+
 from debrief_config.paths import get_config_dir, get_config_file, get_lock_file
 
 

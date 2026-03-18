@@ -34,8 +34,8 @@ export const SCHEMA_VERSIONS = {
  */
 export function isVersionCompatible(version: string): boolean {
   // Parse major.minor.patch
-  const [major] = version.split('.').map(Number);
-  const [currentMajor] = SCHEMA_VERSION.split('.').map(Number);
+  const major = version.split('.').map(Number)[0]!;
+  const currentMajor = SCHEMA_VERSION.split('.').map(Number)[0]!;
 
   // Compatible if same major version
   return major === currentMajor;
@@ -52,8 +52,14 @@ export function requiresMigration(version: string): boolean {
  * Check if a version is from the future (incompatible).
  */
 export function isFutureVersion(version: string): boolean {
-  const [major, minor, patch] = version.split('.').map(Number);
-  const [currentMajor, currentMinor, currentPatch] = SCHEMA_VERSION.split('.').map(Number);
+  const vParts = version.split('.').map(Number);
+  const major = vParts[0]!;
+  const minor = vParts[1]!;
+  const patch = vParts[2]!;
+  const cParts = SCHEMA_VERSION.split('.').map(Number);
+  const currentMajor = cParts[0]!;
+  const currentMinor = cParts[1]!;
+  const currentPatch = cParts[2]!;
 
   if (major > currentMajor) return true;
   if (major === currentMajor && minor > currentMinor) return true;

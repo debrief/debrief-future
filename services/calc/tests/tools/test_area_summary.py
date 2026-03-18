@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.area_summary import _calculate_bbox_area_sq_nm, _point_in_bbox, area_summary
 

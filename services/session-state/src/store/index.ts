@@ -166,7 +166,7 @@ export function createSessionStore() {
           // Only push if different from last
           if (
             history.past.length === 0 ||
-            !snapshotsEqual(history.past[history.past.length - 1], snapshot)
+            !snapshotsEqual(history.past[history.past.length - 1]!, snapshot)
           ) {
             history.past.push(snapshot);
 

@@ -1,6 +1,7 @@
 """Tests for ResultTopType and ResultTypePath."""
 
 import pytest
+
 from debrief_calc.result_types import ResultTopType, ResultTypePath
 
 

@@ -5,11 +5,10 @@
  */
 
 import type { GeoJSONFeature } from '../types/import';
+import type { Bounds } from '@debrief/utils';
 
-/**
- * Bounds type: [minLon, minLat, maxLon, maxLat]
- */
-export type Bounds = [number, number, number, number];
+// Re-export — canonical definition in @debrief/utils (T08)
+export type { Bounds };
 
 /**
  * Calculate bounds from an array of GeoJSON features.

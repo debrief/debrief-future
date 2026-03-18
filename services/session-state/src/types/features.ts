@@ -43,7 +43,7 @@ export function createSelection(
 ): FeatureSelection {
   return {
     featureIds,
-    primary: primary ?? (featureIds.length > 0 ? featureIds[0] : null),
+    primary: primary ?? (featureIds.length > 0 ? featureIds[0]! : null),
     timestamp: createTimeInstant(Date.now()),
   };
 }

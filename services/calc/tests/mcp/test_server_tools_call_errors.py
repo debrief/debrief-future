@@ -1,6 +1,7 @@
 """Test error handling: invalid input returns ToolErrorResponse with category and message."""
 
 import pytest
+
 from debrief_calc.result_builder import build_error
 
 
