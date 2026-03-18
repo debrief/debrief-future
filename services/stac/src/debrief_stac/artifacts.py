@@ -64,18 +64,18 @@ def store_artifact(
     # Add STAC derived_from links for provenance (#138)
     if source_feature_ids:
         existing_hrefs = {
-            link.get("href")
-            for link in item["links"]
-            if link.get("rel") == "derived_from"
+            link.get("href") for link in item["links"] if link.get("rel") == "derived_from"
         }
         for feature_id in source_feature_ids:
             feature_uri = f"feature://{feature_id}"
             if feature_uri not in existing_hrefs:
-                item["links"].append({
-                    "rel": "derived_from",
-                    "href": feature_uri,
-                    "title": f"Source feature: {feature_id}",
-                })
+                item["links"].append(
+                    {
+                        "rel": "derived_from",
+                        "href": feature_uri,
+                        "title": f"Source feature: {feature_id}",
+                    }
+                )
 
     _save_plot(catalog_path, plot_id, item)
     return item

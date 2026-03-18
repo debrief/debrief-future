@@ -78,9 +78,24 @@ def create_plot(
             "datetime": metadata.timestamp.isoformat(),
         },
         "links": [
-            {"rel": "root", "href": "../catalog.json", "type": "application/json", "title": "Root catalog"},
-            {"rel": "parent", "href": "../catalog.json", "type": "application/json", "title": "Parent catalog"},
-            {"rel": "self", "href": "./item.json", "type": "application/geo+json", "title": metadata.title},
+            {
+                "rel": "root",
+                "href": "../catalog.json",
+                "type": "application/json",
+                "title": "Root catalog",
+            },
+            {
+                "rel": "parent",
+                "href": "../catalog.json",
+                "type": "application/json",
+                "title": "Parent catalog",
+            },
+            {
+                "rel": "self",
+                "href": "./item.json",
+                "type": "application/geo+json",
+                "title": metadata.title,
+            },
         ],
         "assets": {},
     }

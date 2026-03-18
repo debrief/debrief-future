@@ -122,7 +122,6 @@ class TestCreatePlot:
         assert plot_id == "my-custom-plot"
         assert (catalog_path / "my-custom-plot" / "item.json").exists()
 
-
     def test_create_plot_rejects_invalid_custom_id(self, temp_dir: Path) -> None:
         """Custom plot IDs must match [a-z0-9_-] (#139)."""
         catalog_path = create_catalog(temp_dir / "catalog")
