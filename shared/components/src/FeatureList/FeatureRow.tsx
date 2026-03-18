@@ -101,6 +101,14 @@ function getFeatureType(feature: DebriefFeature): string {
  * Get additional info for a feature.
  */
 function getFeatureInfo(feature: DebriefFeature): string | null {
+  const parts: string[] = [];
+
+  if (feature.id != null) {
+    const idStr = String(feature.id);
+    const shortId = idStr.length > 8 ? idStr.slice(0, 8) + '…' : idStr;
+    parts.push(shortId);
+  }
+
   if (isTrackFeature(feature)) {
     let start: string | undefined = feature.properties.start_time;
     let end: string | undefined = feature.properties.end_time;
@@ -123,10 +131,11 @@ function getFeatureInfo(feature: DebriefFeature): string | null {
     if (start && end) {
       const startDate = new Date(start);
       const endDate = new Date(end);
-      return `${startDate.toLocaleTimeString()} - ${endDate.toLocaleTimeString()}`;
+      parts.push(`${startDate.toLocaleTimeString()} - ${endDate.toLocaleTimeString()}`);
     }
   }
-  return null;
+
+  return parts.length > 0 ? parts.join(' · ') : null;
 }
 
 /**
@@ -337,7 +346,33 @@ export function FeatureRow({
           </svg>
         </span>
       )}
-      {!isHidden && info && <span className="debrief-feature-row__info">{info}</span>}
+      {!isHidden && info && feature && (
+        <span
+          className="debrief-feature-row__info"
+          role="button"
+          tabIndex={-1}
+          title="Click for feature details"
+          onClick={(e) => {
+            e.stopPropagation();
+            const props = feature.properties as unknown as Record<string, unknown>;
+            const lines = [`id: ${String(feature.id)}`];
+            for (const [k, v] of Object.entries(props)) {
+              if (k === 'style' || k === 'position_style_overrides' || k === 'times' || k === 'pointMetadata' || k === 'pointColors' || k === 'zones') {
+                lines.push(`${k}: [${Array.isArray(v) ? v.length + ' items' : 'object'}]`);
+              } else if (v !== null && v !== undefined && typeof v !== 'object') {
+                lines.push(`${k}: ${String(v)}`);
+              } else if (v !== null && v !== undefined) {
+                lines.push(`${k}: ${JSON.stringify(v)}`);
+              }
+            }
+            lines.push(`geometry.type: ${feature.geometry?.type ?? 'null'}`);
+            window.alert(lines.join('\n'));
+          }}
+        >
+          {info}
+        </span>
+      )}
+      {!isHidden && info && !feature && <span className="debrief-feature-row__info">{info}</span>}
     </div>
   );
 }

@@ -142,7 +142,6 @@ Only updated when a feature introduces a technology not already listed here.
 - TypeScript 5.x + `@dnd-kit/core` + `@dnd-kit/sortable` (drag-to-group), `@debrief/components` filter-engine (#126), `vscrui` (VS Code icons), `nanoid` (unique IDs) (127-filter-bar-lozenge-ui)
 - TypeScript 5.x (React 18.x components, Zustand store) + Zustand ^5.0.0, React 18.x, react-leaflet 4.2, `@debrief/components` (FilterBar, CQL2 filter engine), `@debrief/session-state` (132-three-view-sync)
 - TypeScript 5.x (test infrastructure), Bash (patching scripts) + @playwright/test ^1.57.0, openvscode-server (currently v1.109.5), @sparticuz/chromium (142-vscode-e2e-webview-reliability)
-
 - Python 3.11 (services, schemas, calc tools)
 - TypeScript 5.x (VS Code extension, webview, shared components, session-state)
 - React 18.x + react-leaflet 4.2
@@ -207,3 +206,4 @@ Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during 
 - 142-vscode-e2e-webview-reliability: Added TypeScript 5.x (test infrastructure), Bash (patching scripts) + @playwright/test ^1.57.0, openvscode-server (currently v1.109.5), @sparticuz/chromium
 - 132-three-view-sync: Added TypeScript 5.x (React 18.x components, Zustand store) + Zustand ^5.0.0, React 18.x, react-leaflet 4.2, `@debrief/components` (FilterBar, CQL2 filter engine), `@debrief/session-state`
 - 136-stac-collection-summaries: Added Python 3.11 (service), TypeScript 5.x (VS Code extension consumer) + Pydantic v2 (models), existing `debrief-stac` service module, `mcp.server.fastmcp` (MCP exposure)
+- 137-rep-temporal-metadata: Added 

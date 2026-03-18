@@ -29,6 +29,7 @@ vi.mock('react-leaflet', () => ({
           const layer = {
             on: vi.fn(),
             bindTooltip: vi.fn().mockReturnThis(),
+            bindPopup: vi.fn().mockReturnThis(),
           };
           onEachFeature?.(feature, layer);
 

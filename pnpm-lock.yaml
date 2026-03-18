@@ -138,6 +138,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
+      vscrui:
+        specifier: ^0.1.0
+        version: 0.1.0(@types/react@18.3.27)(react@18.3.1)
     devDependencies:
       '@types/express':
         specifier: ^4.17.21
