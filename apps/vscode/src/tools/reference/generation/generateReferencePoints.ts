@@ -247,7 +247,7 @@ export function execute(
   features: GeoJSONFeature[],
   params: GenerateReferencePointsParams,
 ): GeoJSONFeature[] {
-  if (!features || features.length === 0) {
+  if (features === undefined || features === null || features.length === 0) {
     throw new Error('Requires exactly one polygon feature');
   }
 

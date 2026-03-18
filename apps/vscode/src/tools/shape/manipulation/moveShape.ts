@@ -137,7 +137,7 @@ export function execute(features: GeoJSONFeature[], params: MoveShapeParams): Ge
       geometry.coordinates = polyCoords.map((ring) =>
         translateCoordsList(ring, direction, distanceKm),
       );
-      if (kind === 'CIRCLE' && props.center) {
+      if (kind === 'CIRCLE' && props.center !== undefined && props.center !== null) {
         props.center = translateCoordinate(props.center as number[], direction, distanceKm);
       }
     } else if (kind === 'LINE') {
@@ -146,7 +146,7 @@ export function execute(features: GeoJSONFeature[], params: MoveShapeParams): Ge
       geometry.coordinates = translateCoordinate(coords as number[], direction, distanceKm);
     } else if (kind === 'VECTOR') {
       geometry.coordinates = translateCoordsList(coords as number[][], direction, distanceKm);
-      if (props.origin) {
+      if (props.origin !== undefined && props.origin !== null) {
         props.origin = translateCoordinate(props.origin as number[], direction, distanceKm);
       }
     }

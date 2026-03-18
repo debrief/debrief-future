@@ -234,14 +234,14 @@ export class ConfigService {
 
   private loadConfig(): void {
     try {
-      console.log(`[ConfigService] config path: ${CONFIG_FILE}`);
+      console.warn(`[ConfigService] config path: ${CONFIG_FILE}`);
       if (fs.existsSync(CONFIG_FILE)) {
         const content = fs.readFileSync(CONFIG_FILE, 'utf-8');
         const rawConfig = JSON.parse(content) as DebriefConfig;
         this.config = this.migrateConfig(rawConfig);
-        console.log(`[ConfigService] loaded ${this.config.stores.length} store(s)`);
+        console.warn(`[ConfigService] loaded ${this.config.stores.length} store(s)`);
       } else {
-        console.log('[ConfigService] config file not found, using defaults');
+        console.warn('[ConfigService] config file not found, using defaults');
         this.config = { stores: [], preferences: {} };
       }
     } catch (err) {
@@ -257,21 +257,21 @@ export class ConfigService {
     let needsSave = false;
 
     // Ensure stores array exists
-    if (!config.stores) {
+    if (config.stores === undefined || config.stores === null) {
       config.stores = [];
     }
 
     // Migrate each store
     for (const store of config.stores) {
       // Add missing status field (old configs don't have it)
-      if (!store.status) {
+      if (store.status === undefined || store.status === null) {
         store.status = 'checking';
         needsSave = true;
       }
 
       // Migrate 'name' to 'displayName' (old format used 'name')
       const storeAny = store as unknown as Record<string, unknown>;
-      if (storeAny.name && !store.displayName) {
+      if (storeAny.name !== undefined && storeAny.name !== null && !store.displayName) {
         store.displayName = storeAny.name as string;
         delete storeAny.name;
         needsSave = true;
@@ -279,7 +279,7 @@ export class ConfigService {
     }
 
     // Ensure preferences exists
-    if (!config.preferences) {
+    if (config.preferences === undefined || config.preferences === null) {
       config.preferences = {};
     }
 

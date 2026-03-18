@@ -40,7 +40,7 @@ test.describe('US3: Error Feedback Workflow', () => {
     expect(hasErrorNotification).toBe(true);
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #124)
+  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
   test.skip('T023: run tool without selection shows requirement message', async ({
     codeServerPage,
   }) => {

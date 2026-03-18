@@ -31,7 +31,7 @@ let mapPanel: MapPanel | undefined;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   // Diagnostic: log to console so it's visible in browser Developer Tools (F12)
-  console.log('[Debrief] activate() called');
+  console.warn('[Debrief] activate() called');
 
   // Create shared output channel for cross-ecosystem diagnostics (ARCHITECTURE.md)
   const outputChannel = vscode.window.createOutputChannel('Debrief');
@@ -93,7 +93,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   calcService.setOutputChannel(outputChannel);
   ioService.setOutputChannel(outputChannel);
 
-  console.log('[Debrief] services initialized');
+  console.warn('[Debrief] services initialized');
   outputChannel.appendLine('[startup] services initialized');
 
   // ── Phase 2: Register view providers EARLY ─────────────────────────────
@@ -146,7 +146,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     )
   );
 
-  console.log('[Debrief] view providers registered');
+  console.warn('[Debrief] view providers registered');
   outputChannel.appendLine('[startup] view providers registered');
 
   // ── Phase 3: Activity bar, context, filesystem, commands ───────────────
@@ -384,7 +384,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     outputChannel.appendLine(`[startup] debrief-calc: check failed — ${err instanceof Error ? err.message : String(err)}`);
   });
 
-  console.log('[Debrief] activation complete');
+  console.warn('[Debrief] activation complete');
   outputChannel.appendLine('[startup] activation complete');
 }
 

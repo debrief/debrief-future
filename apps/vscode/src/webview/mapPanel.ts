@@ -37,8 +37,9 @@ import {
 } from '@debrief/session-state';
 import { DuplicateImportError, type GeoJSONFeature } from '../types/import';
 import { calculateBounds, mergeBounds } from '../utils/bounds';
-import type { DebriefFeature } from '@debrief/components';
+import type { DebriefFeature, DebriefFeatureCollection, TrackFeature } from '@debrief/components';
 import { isTrackFeature } from '@debrief/components';
+import type { TrackProperties } from '@debrief/schemas';
 
 export class MapPanel {
   public static currentPanel: MapPanel | undefined;
@@ -216,7 +217,9 @@ export class MapPanel {
 
     const idSet = new Set(ids);
 
-    this.currentFeatures = this.currentFeatures.filter((f) => !idSet.has(String(f.id)));
+    this.currentFeatures = this.currentFeatures.filter(
+      (f: DebriefFeature) => !idSet.has(String(f.id))
+    );
     this.resultLayers = this.resultLayers.filter((l) => !idSet.has(l.id));
 
     // Re-send full plot data so webview rebuilds from source of truth
@@ -275,13 +278,13 @@ export class MapPanel {
   public updatePlotFeatures(layer: ResultLayer): void {
     // Update in-memory currentFeatures so subsequent tool executions
     // (via getFeatures/resolveFeatures) see the mutated geometry.
-    const fid = (f: DebriefFeature | { id?: unknown; properties?: Record<string, unknown> | null }) =>
-      String((f as { id?: unknown }).id ?? (f.properties as Record<string, unknown> | null)?.id ?? '');
+    const fid = (f: { id?: string; properties?: { id?: string } | Record<string, unknown> | null }): string =>
+      String(f.id ?? (f.properties as Record<string, unknown> | null)?.['id'] ?? '');
     const updatedMap = new Map(
-      layer.features.features.map((f) => [fid(f), f as DebriefFeature])
+      layer.features.features.map((f) => [fid(f as { id?: string; properties?: Record<string, unknown> | null }), f as DebriefFeature])
     );
     this.currentFeatures = this.currentFeatures.map(
-      (f) => updatedMap.get(fid(f)) ?? f
+      (f: DebriefFeature) => updatedMap.get(fid(f as { id?: string; properties?: Record<string, unknown> | null })) ?? f
     );
 
     this.postMessage({
@@ -417,7 +420,7 @@ export class MapPanel {
     }
 
     const selectedFeatures = this.currentFeatures.filter(
-      (f) => selectedIds.has(String(f.id))
+      (f: DebriefFeature) => selectedIds.has(String(f.id))
     );
     if (selectedFeatures.length === 0) {
       return;
@@ -430,7 +433,7 @@ export class MapPanel {
     let maxLng = -Infinity;
 
     for (const feature of selectedFeatures) {
-      const geom = feature.geometry;
+      const geom = feature.geometry as { type: string; coordinates: unknown };
       const coords = geom.coordinates;
       if (geom.type === 'LineString') {
         for (const coord of coords as number[][]) {
@@ -560,8 +563,10 @@ export class MapPanel {
    * @returns The feature kind string or undefined
    */
   public getFeatureKind(featureId: string): string | undefined {
-    const feature = this.currentFeatures.find((f) => String(f.id) === featureId);
-    if (feature) {
+    const feature: DebriefFeature | undefined = this.currentFeatures.find(
+      (f: DebriefFeature) => String(f.id) === featureId
+    );
+    if (feature !== undefined) {
       return (feature.properties as Record<string, unknown>).kind as string;
     }
 
@@ -957,22 +962,23 @@ export class MapPanel {
     message: Extract<WebviewToExtensionMessage, { type: 'featureDrawn' }>
   ): Promise<void> {
     const { feature } = message;
-    console.log('[debrief] featureDrawn received:', feature.kind, feature.id);
+    console.warn('[debrief] featureDrawn received:', feature.kind, feature.id);
 
     // Add drawn feature to unified features list
-    const drawnFeature: DebriefFeature = {
-      type: 'Feature',
+    const drawnProps: Record<string, unknown> = {
+      ...feature.properties,
+      kind: feature.kind,
+      name: feature.name,
+      label: feature.label,
+    };
+    const drawnFeature = {
+      type: 'Feature' as const,
       id: feature.id,
       geometry: feature.geometry,
-      properties: {
-        ...feature.properties,
-        kind: feature.kind,
-        name: feature.name,
-        label: feature.label,
-      },
+      properties: drawnProps,
     } as DebriefFeature;
     this.currentFeatures = [...this.currentFeatures, drawnFeature];
-    console.log('[debrief] Added drawn feature, features count:', this.currentFeatures.length);
+    console.warn('[debrief] Added drawn feature, features count:', this.currentFeatures.length);
 
     // Increment drawing palette index in session state (#108)
     if (this.activeSession) {
@@ -1023,7 +1029,7 @@ export class MapPanel {
             store.path,
             plot.itemPath
           );
-          console.log('[debrief] Provenance recorded for drawn feature:', feature.id);
+          console.warn('[debrief] Provenance recorded for drawn feature:', feature.id);
         }
       } catch (err) {
         console.warn('[debrief] Failed to record drawn feature provenance:', err);
@@ -1042,8 +1048,12 @@ export class MapPanel {
     trackName: string
   ): Promise<void> {
     // Show color picker
-    const feature = this.currentFeatures.find((f) => String(f.id) === trackId);
-    const props = feature?.properties as Record<string, unknown> | undefined;
+    const feature: DebriefFeature | undefined = this.currentFeatures.find(
+      (f: DebriefFeature) => String(f.id) === trackId
+    );
+    const props = feature !== undefined
+      ? (feature.properties as Record<string, unknown>)
+      : undefined;
     const style = props?.style as Record<string, unknown> | undefined;
     const lineStyle = style?.line as Record<string, unknown> | undefined;
     const currentColor = (lineStyle?.color as string) ?? (style?.color as string) ?? '#377eb8';
@@ -1198,14 +1208,15 @@ export class MapPanel {
 
       // Reload plot data to get new tracks
       stacService.clearCache();
-      const updatedData = await stacService.loadPlotData(
+      const updatedData: DebriefFeatureCollection | null = await stacService.loadPlotData(
         currentStore,
         currentPlot.itemPath
       );
 
-      if (updatedData) {
+      if (updatedData !== null) {
         // Update internal state
-        this.currentFeatures = updatedData.features;
+        const updatedFeatures: DebriefFeature[] = updatedData.features;
+        this.currentFeatures = updatedFeatures;
 
         // Update webview with new features
         this.postMessage({
@@ -1213,15 +1224,15 @@ export class MapPanel {
           plot: {
             id: currentPlot.id,
             title: currentPlot.title,
-            features: updatedData.features,
+            features: updatedFeatures,
             bbox: mergedBounds ?? currentPlot.bbox,
             timeExtent: currentPlot.timeExtent,
           },
         });
 
         // Update layers and activity panels
-        this.layersTreeProvider?.setFeatures(updatedData.features);
-        this.activityPanelProvider?.setFeatures(updatedData.features);
+        this.layersTreeProvider?.setFeatures(updatedFeatures);
+        this.activityPanelProvider?.setFeatures(updatedFeatures);
       }
 
       // Send completion message
@@ -1261,9 +1272,11 @@ export class MapPanel {
     requestId: string,
     trackId: string
   ): void {
-    const feature = this.currentFeatures.find((f) => String(f.id) === trackId);
+    const feature: DebriefFeature | undefined = this.currentFeatures.find(
+      (f: DebriefFeature) => String(f.id) === trackId
+    );
 
-    if (!feature || !isTrackFeature(feature)) {
+    if (feature === undefined || !isTrackFeature(feature)) {
       void this.panel.webview.postMessage({
         type: 'requestTrackDetailsResponse',
         requestId,
@@ -1273,7 +1286,8 @@ export class MapPanel {
       return;
     }
 
-    const props = feature.properties;
+    const trackFeature: TrackFeature = feature;
+    const props: TrackProperties = trackFeature.properties;
     // Calculate duration
     const startDate = new Date(props.start_time);
     const endDate = new Date(props.end_time);
@@ -1283,6 +1297,7 @@ export class MapPanel {
     const duration =
       hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
 
+    const trackGeom = trackFeature.geometry as { coordinates: number[][] };
     void this.panel.webview.postMessage({
       type: 'requestTrackDetailsResponse',
       requestId,
@@ -1290,7 +1305,7 @@ export class MapPanel {
       details: {
         name: props.platform_name ?? props.platform_id,
         platformType: props.track_type ?? 'Unknown',
-        pointCount: (feature.geometry as unknown as { coordinates: number[][] }).coordinates.length,
+        pointCount: trackGeom.coordinates.length,
         startTime: props.start_time,
         endTime: props.end_time,
         duration,

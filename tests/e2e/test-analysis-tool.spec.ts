@@ -19,7 +19,7 @@ const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 test.describe('US2: Analysis Tool Execution Workflow', () => {
   test.setTimeout(60_000);
 
-  // Skip: Log Panel webview doesn't load in openvscode-server (backlog #124)
+  // Skip: Log Panel webview doesn't load in openvscode-server (backlog #142)
   test.skip('T018: select track, run single-track tool, log entry appears', async ({
     codeServerPage,
   }) => {
@@ -38,7 +38,7 @@ test.describe('US2: Analysis Tool Execution Workflow', () => {
     expect(await entries.count()).toBeGreaterThan(0);
   });
 
-  // Skip: Log Panel webview doesn't load in openvscode-server (backlog #124)
+  // Skip: Log Panel webview doesn't load in openvscode-server (backlog #142)
   test.skip('T019: select two tracks, run multi-track tool, log entry created', async ({
     codeServerPage,
   }) => {
@@ -61,7 +61,7 @@ test.describe('US2: Analysis Tool Execution Workflow', () => {
     expect(await entries.count()).toBeGreaterThan(0);
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #124)
+  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
   test.skip('T020: verify map feature count increases after tool execution', async ({
     codeServerPage,
   }) => {
@@ -79,7 +79,7 @@ test.describe('US2: Analysis Tool Execution Workflow', () => {
     expect(countAfter).toBeGreaterThanOrEqual(countBefore);
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #124)
+  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
   test.skip('T021: capture evidence screenshot of analysis results', async ({
     codeServerPage,
     page,
