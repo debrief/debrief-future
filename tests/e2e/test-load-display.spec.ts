@@ -8,11 +8,6 @@
  * It exercises the path from STAC catalog through map rendering via the
  * VS Code extension's orchestration layer.
  *
- * NOTE: Tests requiring webview content (map, catalog) are skipped in
- * openvscode-server because #active-frame is never created — see
- * docs/project_notes/webview-e2e-research.md. These tests pass in
- * the web-shell E2E suite (apps/web-shell/playwright/) which tests
- * the same React components directly without VS Code's iframe nesting.
  *
  * @see specs/005-e2e-workflow-tests/spec.md — User Story 1
  */
@@ -21,9 +16,7 @@ import { test, expect } from './fixtures/base';
 test.describe('US1: Load and Display Workflow', () => {
   test.setTimeout(60_000);
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
-  // Covered by web-shell E2E: apps/web-shell/playwright/tests/
-  test.skip('T014: open plot via STAC tree shows track lines on map', async ({
+  test('T014: open plot via STAC tree shows track lines on map', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
@@ -38,8 +31,7 @@ test.describe('US1: Load and Display Workflow', () => {
     expect(trackCount).toBeGreaterThan(0);
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
-  test.skip('T015: STAC catalog overview shows plot timeline after loading', async ({
+  test('T015: STAC catalog overview shows plot timeline after loading', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
@@ -58,8 +50,7 @@ test.describe('US1: Load and Display Workflow', () => {
     expect(found).toBe(true);
   });
 
-  // Skip: Activity Panel sidebar webview doesn't load in openvscode-server (#142)
-  test.skip('T016: select track on map highlights it in feature list', async ({
+  test('T016: select track on map highlights it in feature list', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
@@ -74,8 +65,7 @@ test.describe('US1: Load and Display Workflow', () => {
     expect(await selectedRow.count()).toBeGreaterThan(0);
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
-  test.skip('T017: capture evidence screenshot of map with tracks', async ({
+  test('T017: capture evidence screenshot of map with tracks', async ({
     codeServerPage,
     page,
   }) => {

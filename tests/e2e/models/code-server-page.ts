@@ -51,13 +51,36 @@ export class CodeServerPage {
       .waitFor({ state: 'visible', timeout: 10_000 })
       .catch(() => {});
 
+    // Dismiss the Workspace Trust dialog if it appears.
+    // Despite --disable-workspace-trust flag, the dialog may still show
+    // on first open with a new user-data-dir.
+    const trustButton = this.page.locator('text=Yes, I trust the authors');
+    const hasTrustDialog = await trustButton
+      .waitFor({ state: 'visible', timeout: 3_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (hasTrustDialog) {
+      await trustButton.click();
+      await this.page.waitForTimeout(500);
+    }
+
     // Close the Welcome tab if open — it captures keyboard focus into an
     // iframe, preventing command palette and Quick Open from working.
-    await this.page.keyboard.press('Control+KeyW');
-    await this.page.waitForTimeout(200);
-
-    // Click the title bar to ensure main window has focus (not an iframe)
+    // Click the title bar first to ensure main window gets focus.
     await this.page.locator('.part.titlebar').click().catch(() => {});
+    await this.page.waitForTimeout(300);
+
+    // Press Escape to dismiss any remaining dialogs/overlays, then close Welcome
+    await this.page.keyboard.press('Escape');
+    await this.page.waitForTimeout(200);
+    await this.page.keyboard.press('Control+KeyW');
+    await this.page.waitForTimeout(500);
+
+    // Click the title bar again to ensure focus is on main window
+    await this.page.locator('.part.titlebar').click().catch(() => {});
+
+    // Dismiss any notification toasts that may overlay the UI or capture focus
+    await this.dismissNotifications();
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -322,6 +345,48 @@ export class CodeServerPage {
   }
 
   /**
+   * Force the Debrief sidebar view to reveal, triggering resolveWebviewView.
+   *
+   * In openvscode-server, sidebar webview views are never automatically shown
+   * because isBodyVisible() returns false — the view is not expanded and not
+   * marked visible. This method uses the command palette to execute the view
+   * focus command, which calls openView() → setExpanded(true) + setVisible(true),
+   * triggering the webview view resolution lifecycle.
+   *
+   * Must be called AFTER the extension has activated (STAC tree populated).
+   *
+   * @see docs/project_notes/webview-e2e-research.md — Blocker 4 resolution
+   */
+  async revealSidebar(): Promise<void> {
+    // Try the view container command first (focuses the entire Debrief sidebar)
+    await this.page.keyboard.press('Control+Shift+KeyP');
+    await this.commandInput.waitFor({ state: 'visible', timeout: 5_000 });
+    await this.commandInput.fill('Debrief: Focus on Debrief View');
+    await this.page.keyboard.press('Enter');
+
+    // Wait for sidebar to render
+    await this.page.locator('.composite.viewlet').waitFor({
+      state: 'visible',
+      timeout: 10_000,
+    }).catch(() => {});
+
+    // Give the webview view resolution time to complete
+    await this.page.waitForTimeout(2_000);
+
+    // If the first command didn't work, try clicking the activity bar icon
+    const hasWebview = await this.page
+      .locator('iframe.webview')
+      .first()
+      .isVisible()
+      .catch(() => false);
+
+    if (!hasWebview) {
+      await this.openDebriefSidebar();
+      await this.page.waitForTimeout(2_000);
+    }
+  }
+
+  /**
    * Access the Activity Panel webview frame (sidebar — FeatureList, ToolsPanel, TimeController).
    *
    * The Activity Panel lives in the Debrief sidebar container as a webview view.
@@ -414,16 +479,46 @@ export class CodeServerPage {
   // STAC Tree Helpers (private)
   // ─────────────────────────────────────────────────────────────────────────────
 
-  /** Focus the STAC Stores view via command palette. */
+  /** Focus the STAC Stores view by clicking its pane header or via command palette. */
   private async focusStacView(): Promise<void> {
-    await this.page.keyboard.press('Control+Shift+P');
-    await this.commandInput.waitFor({ state: 'visible', timeout: 3_000 });
-    await this.commandInput.fill('View: Focus on STAC Stores View');
-    await this.page.keyboard.press('Enter');
-    // Wait for the STAC pane header to appear (confirms view focused)
-    await this.page.locator('.pane-header:has-text("STAC STORES")')
+    // First dismiss command palette if open (press Escape)
+    await this.page.keyboard.press('Escape');
+    await this.page.waitForTimeout(200);
+
+    // Close the Welcome tab if it somehow appeared despite settings
+    await this.page.keyboard.press('Control+KeyW');
+    await this.page.waitForTimeout(300);
+
+    // Click the title bar to ensure main window has focus
+    await this.page.locator('.part.titlebar').click().catch(() => {});
+
+    // Try to find the STAC STORES pane header directly
+    const stacHeader = this.page.locator('.pane-header:has-text("STAC STORES")');
+    const headerVisible = await stacHeader
       .waitFor({ state: 'visible', timeout: 5_000 })
-      .catch(() => {});
+      .then(() => true)
+      .catch(() => false);
+
+    if (headerVisible) {
+      // Click the header to expand the pane
+      await stacHeader.click();
+      return;
+    }
+
+    // Fallback: try clicking the Explorer view container in the activity bar
+    // which contains the STAC STORES tree view
+    const explorerIcon = this.page.locator(
+      '.activitybar .action-item a[aria-label="Explorer"]'
+    ).first();
+    const explorerVisible = await explorerIcon.isVisible().catch(() => false);
+    if (explorerVisible) {
+      await explorerIcon.click();
+      await this.page.waitForTimeout(500);
+      // Now look for the STAC pane
+      await stacHeader
+        .waitFor({ state: 'visible', timeout: 5_000 })
+        .catch(() => {});
+    }
   }
 
   /** Poll until the extension finishes loading stores. */
@@ -473,6 +568,10 @@ export class CodeServerPage {
   private async seedConfigAndReload(): Promise<void> {
     const page = this.page;
 
+    // Click title bar to ensure main window focus before keyboard shortcuts
+    await page.locator('.part.titlebar').click().catch(() => {});
+    await page.waitForTimeout(300);
+
     // Open terminal
     await page.keyboard.press('Control+Backquote');
     await page.locator('.terminal-widget').waitFor({
@@ -493,9 +592,13 @@ export class CodeServerPage {
     await page.waitForTimeout(1_000);
     await page.keyboard.press('Control+Backquote'); // close terminal
 
+    // Click title bar again to ensure focus before command palette
+    await page.locator('.part.titlebar').click().catch(() => {});
+    await page.waitForTimeout(300);
+
     // Reload window
     await page.keyboard.press('Control+Shift+P');
-    await this.commandInput.waitFor({ state: 'visible', timeout: 3_000 });
+    await this.commandInput.waitFor({ state: 'visible', timeout: 5_000 });
     await this.commandInput.fill('Developer: Reload Window');
     await page.keyboard.press('Enter');
 

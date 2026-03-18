@@ -1,15 +1,30 @@
 # Research: Enabling E2E Business-Flow Testing Through VS Code Webviews in code-server
 
 **Date:** 2026-02-22
-**Status:** VALIDATED — working solution with proof-of-concept tests passing
+**Updated:** 2026-03-18 — Blocker 4 resolved (resolveWebviewView now fires natively)
+**Status:** RESOLVED — all four blockers patched, real extension webview content renders
 
 ## Executive Summary
 
-**Experimentally validated** approach for E2E testing VS Code webview content in code-server using Playwright:
+**Four patches** to openvscode-server's VS Code installation (automated by `scripts/patch-webview.sh`) enable real extension webview content to render in headless Playwright:
 
-1. **Two file patches** to code-server's VS Code installation (automated by `scripts/patch-webview.sh`)
-2. **A test helper** (`helpers/webview-injector.ts`) that injects content via MessagePort interception
-3. **xvfb-run + headed Chromium** for reliable webview iframe access
+1. **Patch 1a**: Disable service worker in `pre/index.html`
+2. **Patch 1b**: Comment out CSP meta tag in `pre/index.html`
+3. **Patch 2**: Remove origin hash guard in `workbench.js`
+4. **Patch 3** (NEW): Remove `isBodyVisible()` gate in `workbench.js` — fixes `resolveWebviewView` never called
+
+With all four patches, `resolveWebviewView()` fires natively and the extension's real React/Leaflet content renders without needing the MessagePort injector.
+
+### Current results (2026-03-18):
+
+| Capability | Status |
+|-----------|--------|
+| `resolveWebviewView` fires in headless | ✓ Fixed (Patch 3) |
+| Webview `#active-frame` creation | ✓ Working |
+| Sidebar composite renders | ✓ Working |
+| Webview survives sidebar toggle | ✓ Working |
+| Playwright DOM read access | ✓ Working |
+| `frameLocator` chaining pattern | ✓ Working |
 
 ### Proof-of-concept results:
 

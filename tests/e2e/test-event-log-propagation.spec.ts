@@ -8,7 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// Skip: Log Panel webview doesn't load in openvscode-server (backlog #142)
+// Skip: requires debrief-calc and MCP services
 test.describe.skip('Event Log Propagation', () => {
 
   test('amending first event re-applies subsequent events', async ({

@@ -121,13 +121,16 @@ jobs:
           sudo ln -sf /opt/openvscode-server/bin/openvscode-server /usr/local/bin/openvscode-server
 
       # Patch openvscode-server webview files for E2E testing.
-      # Without these patches, webview iframes appear but #active-frame
-      # (where React/Leaflet renders) is never created because:
+      # Without these patches, the webview view lifecycle is broken:
       #   1. Service worker blocks workerReady
       #   2. CSP hash mismatch prevents modified script execution
       #   3. Origin hash guard silently drops webview-ready messages
+      #   4. isBodyVisible() gate prevents resolveWebviewView in headless
+      # All patches include version guards that fail fast on mismatch.
       - name: Patch webview for E2E
-        run: bash tests/e2e/scripts/patch-webview.sh /opt/openvscode-server
+        run: |
+          bash tests/e2e/scripts/patch-webview.sh /opt/openvscode-server
+          echo "patch-webview-success=true" >> "$GITHUB_OUTPUT"
 
       # Install extension into openvscode-server
       # Use the same user-data-dir that the server will use so it finds the extension

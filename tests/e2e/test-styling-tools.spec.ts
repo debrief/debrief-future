@@ -8,8 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// Skip: Activity Panel sidebar webview doesn't load in openvscode-server —
-// getActivityPanelFrame() never finds .debrief-activity-panel (same issue as Log Panel #142).
+// Skip: styling tools not yet implemented — backlog #081
 test.describe.skip('Styling Tools', () => {
   test('tools panel lists available tools', async ({ codeServerPage }) => {
     test.setTimeout(120_000);
