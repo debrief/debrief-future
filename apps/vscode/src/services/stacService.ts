@@ -976,12 +976,26 @@ export class StacService {
 
     for (const feature of fc.features) {
       const props = feature.properties ?? {};
-      if (props.kind !== 'TRACK') {continue;}
-      const startTime = props.start_time as string | undefined;
-      const endTime = props.end_time as string | undefined;
-      if (startTime && endTime) {
-        if (!earliest || startTime < earliest) {earliest = startTime;}
-        if (!latest || endTime > latest) {latest = endTime;}
+
+      // Prefer start_time/end_time on TRACK features (REP handler output)
+      if (props.kind === 'TRACK') {
+        const startTime = props.start_time as string | undefined;
+        const endTime = props.end_time as string | undefined;
+        if (startTime && endTime) {
+          if (!earliest || startTime < earliest) {earliest = startTime;}
+          if (!latest || endTime > latest) {latest = endTime;}
+        }
+        continue;
+      }
+
+      // Fallback: extract from times array (millisecond timestamps)
+      const times = props.times as number[] | undefined;
+      if (times && times.length > 0) {
+        const sorted = [...times].sort((a, b) => a - b);
+        const start = new Date(sorted[0]).toISOString();
+        const end = new Date(sorted[sorted.length - 1]).toISOString();
+        if (!earliest || start < earliest) {earliest = start;}
+        if (!latest || end > latest) {latest = end;}
       }
     }
 
