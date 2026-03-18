@@ -189,58 +189,386 @@ find apps/ -path '*/tools/*' -name '*.ts' | head -20
 
 ---
 
-## 4. Type Duplication and Schema Drift
+## 4. Type Duplication Outside the Schema Chain
+
+### The legitimate type chain
+
+This project uses a **schema-first** architecture where types flow:
+
+```
+LinkML (shared/schemas/src/) ──generates──▸ Pydantic (generated/python/)
+                             ──generates──▸ TypeScript (generated/typescript/)
+                             ──generates──▸ JSON Schema (generated/json-schema/)
+```
+
+Duplication **within** this chain is expected and correct. Duplication **outside** it — where
+a developer hand-writes an interface that should come from the schema — is debt that will
+cause parameter drift across Python and TypeScript as the schema evolves.
 
 ### What to look for
 
-When the same type is defined independently in multiple places, changes to one definition
-don't propagate. In a schema-first architecture, the generated types should be the single
-source of truth, and no hand-written duplicates should exist.
+1. **Shadow definitions** — types defined locally that duplicate or redefine a schema type
+2. **Parallel definitions** — the same concept typed independently in 2+ packages
+3. **Types that should be in the schema but aren't** — concepts used across both languages
+   that have no LinkML definition at all
+4. **Generated files edited by hand** — modifications that will be overwritten on next generation
 
 ### How to detect
 
 ```bash
-# Find duplicate type names across packages
-grep -rn 'interface MCPToolDefinition' --include='*.ts' .
-grep -rn 'interface SafeFeature' --include='*.ts' .
-grep -rn 'interface SafeGeometry' --include='*.ts' .
-grep -rn 'interface ToolDefinition' --include='*.ts' .
-grep -rn 'type DebriefFeature' --include='*.ts' .
+# Step 1: List all types the schema generates
+grep -n 'export interface\|export type' shared/schemas/src/generated/typescript/types.ts
 
-# Check for hand-edited generated files (should have auto-generated headers)
+# Step 2: Find every interface/type declaration outside the schema package
+grep -rn 'interface \|type ' --include='*.ts' --include='*.tsx' \
+  apps/ shared/components/ shared/utils/ shared/config-ts/ services/ \
+  | grep -v node_modules | grep -v '.test.' | grep -v '__tests__' | grep -v '.stories.'
+
+# Step 3: For each type name found in Step 2, check if it also exists in the schema
+# Example: if you find "interface TimeRange" in apps/vscode/src/types/plot.ts,
+# check whether TimeRange is already generated from LinkML
+
+# Step 4: Find same type name in multiple files
+grep -rn 'interface GeoJSONFeature\b' --include='*.ts' .
+grep -rn 'interface SafeFeature\b' --include='*.ts' .
+grep -rn 'interface MCPToolDefinition\b' --include='*.ts' .
+grep -rn 'interface TimeRange\b' --include='*.ts' .
+grep -rn 'type Bounds\b' --include='*.ts' .
+
+# Step 5: Check for hand-edited generated files (should have auto-generated headers)
 head -5 shared/schemas/src/generated/typescript/types.ts
 head -5 shared/schemas/src/generated/python/debrief_schemas/__init__.py
 
-# Count types.ts files (potential duplication hotspots)
-find . -name 'types.ts' -not -path '*/node_modules/*'
+# Step 6: Find Python classes that might shadow schema models
+grep -rn 'class.*BaseModel' --include='*.py' services/ | grep -v test | grep -v __pycache__
 ```
 
 ### Known signals in this codebase
 
-**`MCPToolDefinition` defined in 3 places:**
+#### Critical: GeoJSON types independently defined in 22+ files
 
-1. `shared/components/src/ToolMatch/mcpAdapter.ts` (line 14)
-2. `apps/vscode/src/types/tool.ts` (line 478)
+`GeoJSONFeature` is the worst offender. Instead of a single canonical definition, each
+package defines its own version with **structurally different shapes**:
+
+| Location | `geometry.coordinates` type | `id` type |
+|----------|---------------------------|-----------|
+| `shared/utils/src/types.ts` | `number[] \| number[][] \| number[][][]` | `string?` |
+| `services/session-state/src/types/results.ts` | `unknown` | `string \| number?` |
+| `shared/components/src/ExerciseListView/types.ts` | via `GeoJSONGeometry` | not present |
+| `apps/vscode/src/webview/messages.ts` | `unknown` | not present |
+
+These definitions have **already diverged**. A feature created by one package may not
+satisfy the type expectations of another.
+
+`GeoJSONFeatureCollection` follows the same pattern across 4+ files.
+
+#### Critical: SafeFeature / SafeGeometry / SafeFeatureCollection (4 copies)
+
+Created to "avoid `any` from the geojson package", but duplicated across 4 files in the
+same VS Code extension instead of being defined once:
+
+1. `apps/vscode/src/types/tool.ts:198-214`
+2. `apps/vscode/src/services/stacService.ts:46-56`
+3. `apps/vscode/src/services/calcService.ts:71-78`
+4. `apps/vscode/src/webview/messages.ts:15-29`
+
+All currently identical, but any future edit to one copy won't propagate to the others.
+
+#### Critical: TimeRange has conflicting definitions
+
+```typescript
+// apps/vscode/src/types/plot.ts:189 — uses ISO 8601 strings
+interface TimeRange {
+  start: string;    // ISO 8601
+  end: string;      // ISO 8601
+  dataStart: string;
+  dataEnd: string;
+}
+
+// services/session-state/src/types/temporal.ts:58 — uses epoch milliseconds
+interface TimeRange {
+  start: number;    // epoch ms
+  end: number;      // epoch ms
+}
+```
+
+These are **structurally incompatible**. Code using one definition will silently produce
+wrong results if given data shaped by the other.
+
+#### High: MCPToolDefinition defined in 3 places
+
+1. `shared/components/src/ToolMatch/mcpAdapter.ts:14`
+2. `apps/vscode/src/types/tool.ts:478`
 3. `apps/web-shell/` (inline in mock service)
 
-**`SafeFeature` / `SafeGeometry` / `SafeFeatureCollection` defined in 4 places:**
+#### High: Bounds type defined identically in 4 places
 
-1. `apps/vscode/src/services/calcService.ts` (lines 71-78)
-2. `apps/vscode/src/services/stacService.ts` (lines 46-56)
-3. `apps/vscode/src/types/tool.ts` (lines 198-215)
-4. `apps/web-shell/src/mocks/calcService.ts`
+`type Bounds = [number, number, number, number]` appears in:
+1. `shared/components/src/utils/types.ts:103`
+2. `shared/utils/src/types.ts:29`
+3. `apps/vscode/src/utils/bounds.ts:12`
+4. `specs/130-map-spatial-filtering/contracts/catalog-overview-props.ts:22`
 
-**Generated files lack auto-generated headers**, making it impossible to tell if they've
-been hand-edited.
+#### Medium: Schema types exist but are redefined locally
+
+These types exist in `@debrief/schemas` but are re-declared in app code instead of imported:
+- `TrackStyle`, `PointMetadataEntry`, `LogEntry`, `WasGeneratedBy`, `TuneAnnotation`,
+  `ToolParameter`, `ParameterValue`, `SystemRecordProperties`, `StylePropertyDescriptor`
+
+#### Medium: Python service models that may shadow schema
+
+Services define their own Pydantic models in `services/*/models.py`. Some may overlap with
+generated schema models:
+- `services/config/src/debrief_config/models.py` — `Config`, `StoreRegistration`
+- `services/stac/src/debrief_stac/models.py` — `PlotMetadata`, `CollectionSummaries`
+- `services/calc/debrief_calc/models.py` — `Tool`, `ToolParameter`, `ToolResult`
+
+#### Low: Generated files lack auto-generated headers
+
+Neither `types.ts` nor `__init__.py` in the generated directories contain
+"DO NOT EDIT" or "AUTO-GENERATED" markers. A developer could hand-edit a generated file
+without realising their changes will be overwritten on next schema generation.
 
 ### What to capture for resolution
 
-- **Type name** and every **file path + line number** where it's defined
-- **Structural diff** between the definitions (are they identical, or have they diverged?)
-- **Which definition is canonical** (generated schema, or a specific package)
-- **Consumers**: which files import from each definition? This determines migration scope
-- **Whether the type should be in `@debrief/schemas`** (generated from LinkML) or in a
-  shared utility package
+For each duplicated type, record:
+
+- **Type name** and every **file path + line number** where it's independently defined
+- **Structural diff**: are the definitions identical, compatible, or conflicting?
+  (Use `diff <(grep -A20 'interface Foo' file1.ts) <(grep -A20 'interface Foo' file2.ts)`)
+- **Which definition is canonical**: is this type in the schema? If so, all others are shadows.
+  If not, should it be added to LinkML?
+- **Consumers**: which files import from each definition? (determines migration blast radius)
+- **Cross-language presence**: does this type need to exist in both Python and TypeScript?
+  If yes, it belongs in LinkML. If TypeScript-only, it belongs in a shared TS package.
+- **Resolution action**: one of:
+  - **Add to LinkML** — type is cross-language; add to schema, generate, delete shadows
+  - **Consolidate to shared package** — type is TS-only; define once in `@debrief/utils` or
+    `@debrief/components`, delete shadows, update imports
+  - **Import from schema** — type already exists in `@debrief/schemas`; change local
+    definitions to imports
+
+---
+
+## 5. Weak Typing and Unvalidated Boundaries
+
+### Why this matters
+
+Strong typing is the mechanism that prevents parameter drift across Python and TypeScript.
+When data crosses a language boundary (Python service → MCP → TypeScript frontend), type
+safety is only as strong as the weakest point in the chain. Every `unknown`, `Any`,
+`Record<string, unknown>`, or unvalidated `JSON.parse()` is a place where a field rename,
+type change, or structural change in one language will silently corrupt data in the other.
+
+### What to look for
+
+**TypeScript weak typing patterns:**
+
+| Pattern | What it means | Risk |
+|---------|--------------|------|
+| `as any` | Bypass type system entirely | Field mismatches undetected |
+| `: any` in annotations | Parameter/return accepts anything | Callers can pass wrong shape |
+| `unknown` without narrowing | "I don't know the type" | Properties accessed unsafely |
+| `Record<string, unknown>` | Properties bag instead of interface | No field-level checking |
+| `JSON.parse()` without validation | Returns implicit `any` | Malformed data accepted silently |
+| `as SomeType` assertion | "Trust me, it's this shape" | Assertion not checked at runtime |
+| `Function` type | Loose callable | Parameter count/types unchecked |
+| `object` type | Anything non-primitive | No property access possible |
+
+**Python weak typing patterns:**
+
+| Pattern | What it means | Risk |
+|---------|--------------|------|
+| `Any` from typing | Bypass type checker | Pydantic won't validate the field |
+| Bare `dict` / `list` | Unparameterised container | Element types unknown |
+| `dict[str, Any]` | Values can be anything | JSON fields unvalidated |
+| `# type: ignore` | Silence the type checker | Real errors hidden |
+| `**kwargs` without TypedDict | Untyped keyword args | Callers can pass anything |
+| Missing return annotation | Return type unknown | Callers guess at shape |
+
+**Cross-boundary patterns (most dangerous):**
+
+| Pattern | Risk |
+|---------|------|
+| Python returns `dict[str, Any]`, TypeScript does `JSON.parse() as Type` | Shape mismatch undetected |
+| MCP tool receives `arguments: dict` without validation | Malformed input crashes at runtime |
+| Feature properties typed as `Record<string, unknown>` | Property names/types drift silently |
+
+### How to detect
+
+```bash
+# === TypeScript ===
+
+# Direct any usage
+grep -rn 'as any' --include='*.ts' --include='*.tsx' . | grep -v node_modules | grep -v '.d.ts'
+grep -rn ': any\b' --include='*.ts' --include='*.tsx' . | grep -v node_modules | grep -v '.d.ts'
+
+# Unknown without narrowing
+grep -rn ': unknown' --include='*.ts' --include='*.tsx' . | grep -v node_modules
+
+# Properties bags
+grep -rn 'Record<string, unknown>' --include='*.ts' --include='*.tsx' . | grep -v node_modules
+
+# Unvalidated JSON parsing
+grep -rn 'JSON\.parse(' --include='*.ts' --include='*.tsx' . | grep -v node_modules | grep -v test
+
+# Loose types
+grep -rn ': Function\b\|: object\b' --include='*.ts' --include='*.tsx' . | grep -v node_modules
+
+# === Python ===
+
+# Any usage
+grep -rn 'Any' --include='*.py' . | grep -v __pycache__ | grep -v node_modules
+
+# Bare containers
+grep -rn ': dict\b\|: list\b' --include='*.py' . | grep -v __pycache__ | grep -v test
+
+# Type ignore
+grep -rn 'type: ignore' --include='*.py' . | grep -v __pycache__
+
+# === Cross-boundary ===
+
+# MCP handlers receiving raw dicts
+grep -rn 'arguments\.get\|arguments\[' --include='*.py' services/
+
+# TypeScript consuming MCP responses without validation
+grep -rn 'JSON\.parse.*as ' --include='*.ts' apps/
+```
+
+### Known signals in this codebase
+
+#### Critical: 41 unvalidated `JSON.parse()` calls in production TypeScript
+
+Every place where TypeScript parses JSON from a Python service uses a bare type assertion
+(`as Type`) with no runtime validation. If a Python service changes a field name or type,
+TypeScript will silently accept the wrong shape.
+
+Key locations:
+- `apps/vscode/src/services/calcService.ts` — 5 `JSON.parse()` calls for tool responses
+- `apps/vscode/src/services/stacService.ts` — 5 `JSON.parse()` calls for STAC items
+- `services/session-state/src/persistence/load.ts` — 2 `JSON.parse()` calls for saved state
+- `shared/components/src/PanelWorkspace/layoutPersistence.ts` — layout state
+
+#### Critical: MCP boundary is type-unsafe in both directions
+
+**Python receiving MCP requests:**
+```python
+# services/calc/debrief_calc/mcp/server.py
+features = arguments.get("features", [])  # list[dict[str, Any]] — no validation
+params = arguments.get("params", {})       # dict[str, Any] — no validation
+```
+
+**TypeScript consuming MCP responses:**
+```typescript
+// apps/vscode/src/services/calcService.ts
+const response = JSON.parse(stdout) as MCPToolResponse;  // no validation
+```
+
+A schema change on either side will not be caught until runtime failure.
+
+#### Critical: MCP tool annotations use `dict[str, Any]` in Python, specific shape in TypeScript
+
+Python:
+```python
+annotations=mcp_def["annotations"]  # dict[str, Any]
+```
+
+TypeScript expects:
+```typescript
+annotations: {
+  'debrief:selectionRequirements': MCPSelectionRequirement[];
+  'debrief:category': string;
+  'debrief:version': string;
+  'debrief:outputKind': string;
+}
+```
+
+If a new annotation key is added in Python but not TypeScript (or vice versa), there is
+no compile-time or runtime error — the data silently mismatches.
+
+#### High: 226 instances of `unknown` as type annotation in TypeScript
+
+`unknown` is safer than `any` (which is good), but without type narrowing it provides no
+field-level safety. The most impactful instances are in geometry handling:
+
+- `coordinates: unknown` in SafeGeometry (4 definitions)
+- `geometry: unknown` in feature handling
+- `Record<string, unknown>` for feature properties throughout
+
+#### High: Python `Any` in tool parameter models
+
+```python
+# services/calc/debrief_calc/models.py
+class ParameterValue(BaseModel):
+    value: Any = Field(...)  # JSON-serializable value — no type constraint
+```
+
+This means tool parameters have no type validation. A tool expecting a number will
+accept a string without error from Pydantic.
+
+#### High: STAC items are type-aliased to raw dicts in Python
+
+```python
+# services/stac/src/debrief_stac/types.py
+STACItem: TypeAlias = dict[str, Any]
+STACCatalog: TypeAlias = dict[str, Any]
+```
+
+Despite having STAC-related Pydantic models in the schema, the STAC service treats items
+as untyped dictionaries. A STAC schema change won't surface type errors.
+
+#### Medium: Feature properties never typed beyond `Record<string, unknown>`
+
+Feature properties carry domain-specific fields (track name, color, sensor type, etc.)
+that differ by feature kind. These are defined in Pydantic models on the Python side but
+arrive in TypeScript as `Record<string, unknown>`. TypeScript code accesses properties
+with string keys and no type safety:
+
+```typescript
+const name = feature.properties?.['name'];  // could be string, number, or missing
+```
+
+#### Medium: Session state schema exists but isn't enforced at runtime
+
+LinkML defines `SessionState`, `TimeInstant`, `TimeRange`, `ViewportPolygon` etc., and
+Pydantic models are generated — but the TypeScript Zustand store doesn't use these types.
+State is stored as plain objects without schema validation.
+
+#### Low: 49 `type: ignore` directives in Python test code
+
+All in test files (primarily `test_stac_extension.py`). Acceptable for testing invalid
+inputs, but 24 instances in one file suggests the test approach should use typed fixtures
+instead of inline suppressions.
+
+### Boundary strength summary
+
+| Boundary | Python side | TypeScript side | Validated? | Drift risk |
+|----------|-----------|----------------|------------|------------|
+| Tool parameters | `ParameterValue(value: Any)` | `Record<string, unknown>` | No | **Critical** |
+| Tool results | `ToolResult` (Pydantic) | `JSON.parse() as MCPToolResponse` | No | **Critical** |
+| MCP annotations | `dict[str, Any]` | Specific interface shape | No | **Critical** |
+| STAC items | `dict[str, Any]` alias | Raw objects | Structural only | **High** |
+| GeoJSON features | Schema Pydantic models | `Record<string, unknown>` | Python-side only | **High** |
+| Session state | Schema exists (unused) | Zustand (untyped) | No | **High** |
+| Configuration | Pydantic models | VS Code API (no schema) | Independent | **Medium** |
+
+### What to capture for resolution
+
+For each weak typing instance, record:
+
+- **File path and line number**
+- **The weak pattern** (e.g., `JSON.parse() as Type`, `unknown`, `Any`, `dict[str, Any]`)
+- **What type should be used instead** — reference the schema type name if one exists
+- **Whether this is a boundary crossing** — data entering or leaving a language boundary
+  is higher priority than internal weak typing
+- **Validation approach needed**: one of:
+  - **Generate and import** — type exists in LinkML; use generated TypeScript/Pydantic type
+  - **Add runtime validation** — use Zod (TypeScript) or Pydantic (Python) to validate
+    at parse boundary
+  - **Narrow the type** — replace `unknown` with a type guard that checks the shape
+  - **Add to schema** — concept isn't in LinkML yet; add it so both languages share the type
+- **What breaks if this drifts** — describe the failure mode (silent data corruption,
+  runtime crash, wrong UI rendering, etc.)
 
 ---
 
