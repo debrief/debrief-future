@@ -15,7 +15,7 @@ import { test, expect } from './fixtures/base';
 test.describe('Catalog Browse', () => {
   test.setTimeout(60_000);
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #124)
+  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
   // Covered by web-shell E2E: apps/web-shell/playwright/tests/catalog-browse.spec.ts
   test.skip('catalog overview is visible after opening it', async ({
     codeServerPage,
@@ -36,7 +36,7 @@ test.describe('Catalog Browse', () => {
     expect(catalogVisible).toBe(true);
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #124)
+  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
   test.skip('catalog shows timeline bars from loaded file', async ({
     codeServerPage,
   }) => {
@@ -58,7 +58,7 @@ test.describe('Catalog Browse', () => {
     throw new Error('No catalog timeline bars found in any webview frame');
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #124)
+  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
   test.skip('catalog overview shows timeline metadata', async ({
     codeServerPage,
   }) => {

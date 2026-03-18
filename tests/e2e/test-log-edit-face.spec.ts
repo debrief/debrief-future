@@ -8,7 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// Skip: Log Panel webview doesn't load in openvscode-server (backlog #124)
+// Skip: Log Panel webview doesn't load in openvscode-server (backlog #142)
 test.describe.skip('Log Edit Face', () => {
 
   test('clicking edit icon shows the edit face', async ({

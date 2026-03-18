@@ -13,7 +13,7 @@
 import { test, expect } from './fixtures/base';
 
 test.describe('Drawing Tools', () => {
-  // Skip: webview #active-frame not created in openvscode-server (backlog #124)
+  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
   // Covered by web-shell E2E: apps/web-shell/playwright/tests/drawing.spec.ts
   test.skip('drawing toolbar trigger is present on the map', async ({
     codeServerPage,
@@ -27,7 +27,7 @@ test.describe('Drawing Tools', () => {
     await expect(drawTrigger).toBeVisible();
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #124)
+  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
   test.skip('clicking draw trigger opens the shape palette', async ({
     codeServerPage,
   }) => {
@@ -44,7 +44,7 @@ test.describe('Drawing Tools', () => {
     await expect(shapePalette).toBeVisible();
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #124)
+  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
   test.skip('drawing a rectangle appears in features', async ({
     codeServerPage,
   }) => {
