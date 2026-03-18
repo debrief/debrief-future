@@ -6,6 +6,7 @@ which are represented as STAC Items within a catalog.
 """
 
 import json
+import re
 import uuid
 from pathlib import Path
 
@@ -54,6 +55,11 @@ def create_plot(
     # Generate plot ID if not provided
     if plot_id is None:
         plot_id = str(uuid.uuid4())
+    elif not re.fullmatch(r"[a-z0-9_-]+", plot_id):
+        raise ValueError(
+            f"plot_id must contain only lowercase letters, digits, underscores, "
+            f"and hyphens ([a-z0-9_-]), got: {plot_id!r}"
+        )
 
     # Create plot directory
     plot_dir = catalog_path / plot_id
@@ -72,9 +78,9 @@ def create_plot(
             "datetime": metadata.timestamp.isoformat(),
         },
         "links": [
-            {"rel": "root", "href": "../catalog.json", "type": "application/json"},
-            {"rel": "parent", "href": "../catalog.json", "type": "application/json"},
-            {"rel": "self", "href": "./item.json", "type": "application/geo+json"},
+            {"rel": "root", "href": "../catalog.json", "type": "application/json", "title": "Root catalog"},
+            {"rel": "parent", "href": "../catalog.json", "type": "application/json", "title": "Parent catalog"},
+            {"rel": "self", "href": "./item.json", "type": "application/geo+json", "title": metadata.title},
         ],
         "assets": {},
     }
@@ -90,7 +96,7 @@ def create_plot(
 
     # Update catalog links
     item_href = f"./{plot_id}/item.json"
-    _add_item_link(catalog_data, plot_id, item_href)
+    _add_item_link(catalog_data, plot_id, item_href, title=metadata.title)
 
     # Update Collection summaries (promotes Catalog→Collection if needed)
     from debrief_stac.collection import update_collection_summaries

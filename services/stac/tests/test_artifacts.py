@@ -55,6 +55,38 @@ class TestStoreArtifact:
                 str(catalog_path), plot_id, b"data", "./data/file.txt", "text/plain", "Bad path"
             )
 
+    def test_store_artifact_with_source_features_adds_derived_from(
+        self, catalog_with_plot: tuple[Path, str]
+    ) -> None:
+        """store_artifact with source_feature_ids adds derived_from links (#138)."""
+        catalog_path, plot_id = catalog_with_plot
+        item = store_artifact(
+            str(catalog_path),
+            plot_id,
+            b"data",
+            "./results/output.json",
+            "application/json",
+            "Result",
+            source_feature_ids=["track-a", "track-b"],
+        )
+
+        derived_links = [link for link in item["links"] if link["rel"] == "derived_from"]
+        assert len(derived_links) == 2
+        hrefs = {link["href"] for link in derived_links}
+        assert "feature://track-a" in hrefs
+        assert "feature://track-b" in hrefs
+
+    def test_store_artifact_without_source_features_no_derived_from(
+        self, catalog_with_plot: tuple[Path, str]
+    ) -> None:
+        """store_artifact without source_feature_ids adds no derived_from links."""
+        catalog_path, plot_id = catalog_with_plot
+        item = store_artifact(
+            str(catalog_path), plot_id, b"data", "./results/out.txt", "text/plain", "Test"
+        )
+        derived_links = [link for link in item["links"] if link["rel"] == "derived_from"]
+        assert len(derived_links) == 0
+
     def test_persisted_to_item_json(self, catalog_with_plot: tuple[Path, str]) -> None:
         catalog_path, plot_id = catalog_with_plot
         store_artifact(
