@@ -120,7 +120,7 @@ Lists source and result assets for navigation:
 
 ### Provenance
 
-- **Location** — stored in feature `properties.prov` for portability
+- **Location** — stored in feature `properties.provenance` for portability
 - **Content** — links feature to source files, source features, tool, version, timestamp
 - **Format** — W3C PROV compliance (details deferred)
 

@@ -89,6 +89,20 @@ def add_asset(
         "debrief:provenance": provenance.model_dump(mode="json"),
     }
 
+    # Add STAC derived_from link for provenance (#138)
+    source_uri = source_path.absolute().as_uri()
+    derived_link = {
+        "rel": "derived_from",
+        "href": source_uri,
+        "title": source_path.name,
+    }
+    # Avoid duplicate derived_from links for the same source
+    if not any(
+        link.get("rel") == "derived_from" and link.get("href") == source_uri
+        for link in item["links"]
+    ):
+        item["links"].append(derived_link)
+
     # Save updated item
     _save_plot(catalog_path, plot_id, item)
 
