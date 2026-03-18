@@ -10,7 +10,7 @@ import { test, expect } from './fixtures/base';
 
 const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 
-// Skip: Log Panel webview doesn't load in openvscode-server (backlog #124)
+// Skip: Log Panel webview doesn't load in openvscode-server (backlog #142)
 test.describe.skip('Capture Log Evidence', () => {
 
   test('capture empty log panel screenshot', async ({

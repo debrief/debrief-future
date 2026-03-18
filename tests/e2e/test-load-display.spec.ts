@@ -21,7 +21,7 @@ import { test, expect } from './fixtures/base';
 test.describe('US1: Load and Display Workflow', () => {
   test.setTimeout(60_000);
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #124)
+  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
   // Covered by web-shell E2E: apps/web-shell/playwright/tests/
   test.skip('T014: open plot via STAC tree shows track lines on map', async ({
     codeServerPage,
@@ -38,7 +38,7 @@ test.describe('US1: Load and Display Workflow', () => {
     expect(trackCount).toBeGreaterThan(0);
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #124)
+  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
   test.skip('T015: STAC catalog overview shows plot timeline after loading', async ({
     codeServerPage,
   }) => {
@@ -58,7 +58,7 @@ test.describe('US1: Load and Display Workflow', () => {
     expect(found).toBe(true);
   });
 
-  // Skip: Activity Panel sidebar webview doesn't load in openvscode-server (#124)
+  // Skip: Activity Panel sidebar webview doesn't load in openvscode-server (#142)
   test.skip('T016: select track on map highlights it in feature list', async ({
     codeServerPage,
   }) => {
@@ -74,7 +74,7 @@ test.describe('US1: Load and Display Workflow', () => {
     expect(await selectedRow.count()).toBeGreaterThan(0);
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #124)
+  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
   test.skip('T017: capture evidence screenshot of map with tracks', async ({
     codeServerPage,
     page,
