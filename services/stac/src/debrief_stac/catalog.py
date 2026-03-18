@@ -178,7 +178,7 @@ def _add_item_link(
     catalog_data: STACCatalog,
     item_id: str,
     item_href: str,
-    title: str | None = None,
+    title: str,
 ) -> None:
     """Add a link to a STAC Item in the catalog.
 
@@ -188,7 +188,7 @@ def _add_item_link(
         catalog_data: Catalog data dictionary (modified in place)
         item_id: ID of the item being linked
         item_href: Relative path to the item
-        title: Human-readable title for the link (defaults to item_id)
+        title: Human-readable title for the link
     """
     # Check if link already exists
     for link in catalog_data["links"]:
@@ -196,7 +196,7 @@ def _add_item_link(
             return  # Already exists
 
     catalog_data["links"].append(
-        {"rel": "item", "href": item_href, "type": "application/geo+json", "title": title or item_id}
+        {"rel": "item", "href": item_href, "type": "application/geo+json", "title": title}
     )
 
 
