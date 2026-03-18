@@ -1,0 +1,139 @@
+{
+  "features": [
+    {
+      "type": "Feature",
+      "id": "ref-scatter",
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+          [10.0, 60.0],
+          [11.0, 61.0],
+          [12.0, 62.0],
+          [13.0, 63.0]
+        ]
+      },
+      "properties": {
+        "kind": "POINT",
+        "locationType": "REFERENCE",
+        "name": "Reference Points (scatter 4)",
+        "style": {
+          "shape": "square",
+          "color": "#666666",
+          "radius": 5
+        },
+        "pointMetadata": [
+          {"index": 0, "name": "Ref 1"},
+          {"index": 1, "name": "Ref 2"},
+          {"index": 2, "name": "Ref 3"},
+          {"index": 3, "name": "Ref 4"}
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "zone-002",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [-4.55, 50.15],
+              [-4.45, 50.15],
+              [-4.25, 50.2],
+              [-4.25, 50.3],
+              [-4.45, 50.35],
+              [-4.55, 50.35],
+              [-4.6, 50.25],
+              [-4.55, 50.15]
+            ]
+          ],
+          [
+            [
+              [-4.65, 50.1],
+              [-4.4, 50.1],
+              [-4.15, 50.15],
+              [-4.15, 50.35],
+              [-4.4, 50.4],
+              [-4.65, 50.4],
+              [-4.7, 50.25],
+              [-4.65, 50.1]
+            ]
+          ],
+          [
+            [
+              [-4.8, 50.0],
+              [-4.3, 50.0],
+              [-4.0, 50.1],
+              [-4.0, 50.4],
+              [-4.3, 50.5],
+              [-4.8, 50.5],
+              [-4.9, 50.25],
+              [-4.8, 50.0]
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "ZONE",
+        "name": "Detection Zones (75%, 50%, 25%)",
+        "style": {
+          "fill": true,
+          "fill_color": "#9C27B0",
+          "fill_opacity": 0.25,
+          "stroke": true,
+          "color": "#9C27B0",
+          "weight": 2,
+          "opacity": 1.0,
+          "dash_array": "6, 4"
+        },
+        "zones": [
+          {
+            "name": "75%",
+            "detection_likelihood_pct": 75,
+            "buffer_distance_nm": 3.0,
+            "style": {
+              "fill": true,
+              "fill_color": "#9C27B0",
+              "fill_opacity": 0.25,
+              "stroke": true,
+              "color": "#9C27B0",
+              "weight": 2,
+              "opacity": 1.0,
+              "dash_array": "6, 4"
+            }
+          },
+          {
+            "name": "50%",
+            "detection_likelihood_pct": 50,
+            "buffer_distance_nm": 6.0,
+            "style": {
+              "fill": true,
+              "fill_color": "#F44336",
+              "fill_opacity": 0.18,
+              "stroke": true,
+              "color": "#F44336",
+              "weight": 2,
+              "opacity": 1.0,
+              "dash_array": "6, 4"
+            }
+          },
+          {
+            "name": "25%",
+            "detection_likelihood_pct": 25,
+            "buffer_distance_nm": 12.0,
+            "style": {
+              "fill": true,
+              "fill_color": "#FF9800",
+              "fill_opacity": 0.12,
+              "stroke": true,
+              "color": "#FF9800",
+              "weight": 2,
+              "opacity": 1.0,
+              "dash_array": "6, 4"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

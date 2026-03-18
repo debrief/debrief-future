@@ -176,9 +176,9 @@ test.describe('Time Controller', () => {
         // Click first layer
         await analysisPage.selectLayer(layers.first());
 
-        // Wait for selection class (retrying assertion) before checking count
+        // Wait for selection (auto-retrying assertions)
         await expect(layers.first()).toHaveClass(/--selected/);
-        expect(await analysisPage.getSelectedLayerCount()).toBe(1);
+        await expect(analysisPage.selectedLayers).toHaveCount(1);
 
         // Second layer should not be selected
         await expect(layers.nth(1)).not.toHaveClass(/--selected/);
@@ -193,12 +193,12 @@ test.describe('Time Controller', () => {
         // Click first layer
         await analysisPage.selectLayer(layers.first());
         await expect(layers.first()).toHaveClass(/--selected/);
-        expect(await analysisPage.getSelectedLayerCount()).toBe(1);
+        await expect(analysisPage.selectedLayers).toHaveCount(1);
 
         // Click second layer
         await analysisPage.selectLayer(layers.nth(1));
         await expect(layers.nth(1)).toHaveClass(/--selected/);
-        expect(await analysisPage.getSelectedLayerCount()).toBe(1);
+        await expect(analysisPage.selectedLayers).toHaveCount(1);
         await expect(layers.first()).not.toHaveClass(/--selected/);
       }
     });

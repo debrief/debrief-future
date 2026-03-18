@@ -431,6 +431,61 @@ class TestBufferZoneGeneratorUS2:
 
 
 # ============================================================
+# PHASE 4b: Interval parameter tests
+# ============================================================
+
+
+class TestBufferZoneGeneratorInterval:
+    """Interval preset parameter tests."""
+
+    def test_interval_small(self) -> None:
+        """Small interval uses 1/2/4 nm distances."""
+        _, zones, _ = _run(params={"interval": "small"})
+        distances = [z["buffer_distance_nm"] for z in zones]
+        assert distances == [1.0, 2.0, 4.0]
+
+    def test_interval_medium(self) -> None:
+        """Medium interval uses 2/4/8 nm distances."""
+        _, zones, _ = _run(params={"interval": "medium"})
+        distances = [z["buffer_distance_nm"] for z in zones]
+        assert distances == [2.0, 4.0, 8.0]
+
+    def test_interval_large(self) -> None:
+        """Large interval uses 3/6/12 nm distances (same as default)."""
+        _, zones, _ = _run(params={"interval": "large"})
+        distances = [z["buffer_distance_nm"] for z in zones]
+        assert distances == [3.0, 6.0, 12.0]
+
+    def test_interval_preserves_likelihood_ordering(self) -> None:
+        """Interval presets preserve likelihood ordering."""
+        _, zones, _ = _run(params={"interval": "small"})
+        assert zones[0]["detection_likelihood_pct"] == 75
+        assert zones[1]["detection_likelihood_pct"] == 50
+        assert zones[2]["detection_likelihood_pct"] == 25
+
+    def test_custom_distance_overrides_interval(self) -> None:
+        """Explicit distance_*_nm overrides interval preset."""
+        _, zones, _ = _run(params={"interval": "small", "distance_1_nm": 5.0})
+        distances = [z["buffer_distance_nm"] for z in zones]
+        assert distances == [2.0, 4.0, 5.0]
+
+    def test_invalid_interval_raises(self) -> None:
+        """Unknown interval value raises ValueError."""
+        track = copy.deepcopy(SIMPLE_TRACK)
+        context = SelectionContext(type=ContextType.SINGLE, features=[track])
+        with pytest.raises(ValueError, match="Unknown interval"):
+            buffer_zone_generator(context, {"interval": "tiny"})
+
+    def test_default_without_interval_is_large(self) -> None:
+        """Omitting interval uses sensor model defaults (same as large)."""
+        _, zones_default, _ = _run(params={})
+        _, zones_large, _ = _run(params={"interval": "large"})
+        default_distances = [z["buffer_distance_nm"] for z in zones_default]
+        large_distances = [z["buffer_distance_nm"] for z in zones_large]
+        assert default_distances == large_distances
+
+
+# ============================================================
 # PHASE 5: US3 — Cascade integration tests
 # ============================================================
 

@@ -19,6 +19,13 @@ NM_TO_KM = 1.852
 NUM_BEARINGS = 36
 BEARING_STEP = 360.0 / NUM_BEARINGS
 
+# Zone interval presets: (distance_1_nm, distance_2_nm, distance_3_nm)
+INTERVAL_PRESETS: dict[str, tuple[float, float, float]] = {
+    "small": (1.0, 2.0, 4.0),
+    "medium": (2.0, 4.0, 8.0),
+    "large": (3.0, 6.0, 12.0),
+}
+
 
 # ============================================================
 # GEOMETRY HELPERS
@@ -260,23 +267,31 @@ ZONE_STYLES: list[dict[str, Any]] = [
     context_type=ContextType.SINGLE,
     parameters=[
         ToolParameter(
+            name="interval",
+            type="enum",
+            description="Zone spacing preset: small (1/2/4 nm), medium (2/4/8 nm), large (3/6/12 nm)",
+            required=False,
+            default="large",
+            choices=["small", "medium", "large"],
+        ),
+        ToolParameter(
             name="distance_1_nm",
             type="number",
-            description="Innermost buffer distance in nautical miles",
+            description="Innermost buffer distance in nautical miles (overrides interval)",
             required=False,
             default=None,
         ),
         ToolParameter(
             name="distance_2_nm",
             type="number",
-            description="Middle buffer distance in nautical miles",
+            description="Middle buffer distance in nautical miles (overrides interval)",
             required=False,
             default=None,
         ),
         ToolParameter(
             name="distance_3_nm",
             type="number",
-            description="Outermost buffer distance in nautical miles",
+            description="Outermost buffer distance in nautical miles (overrides interval)",
             required=False,
             default=None,
         ),
@@ -312,7 +327,18 @@ def buffer_zone_generator(
 
     zones = sensor_model.get_detection_zones(track)
 
-    # Check for custom distance overrides
+    # Resolve interval preset into base distances
+    interval = params.get("interval")
+    if interval is not None:
+        if interval not in INTERVAL_PRESETS:
+            raise ValueError(f"Unknown interval '{interval}', must be one of: small, medium, large")
+        preset = INTERVAL_PRESETS[interval]
+        zones = [
+            SensorModelZone(distance_nm=preset[i], likelihood_pct=z.likelihood_pct, name=z.name)
+            for i, z in enumerate(zones)
+        ]
+
+    # Check for custom distance overrides (take precedence over interval)
     d1 = params.get("distance_1_nm")
     d2 = params.get("distance_2_nm")
     d3 = params.get("distance_3_nm")

@@ -11,6 +11,7 @@ import type { MCPToolDefinition } from '../../../services/toolService';
 // ============================================================
 
 export interface BufferZoneParams {
+  interval?: 'small' | 'medium' | 'large';
   distance_1_nm?: number;
   distance_2_nm?: number;
   distance_3_nm?: number;
@@ -41,6 +42,13 @@ const EARTH_RADIUS_KM = 6371.0;
 const NM_TO_KM = 1.852;
 const NUM_BEARINGS = 36;
 const BEARING_STEP = 360.0 / NUM_BEARINGS;
+
+/** Zone interval presets: [distance_1_nm, distance_2_nm, distance_3_nm] */
+const INTERVAL_PRESETS: Record<string, [number, number, number]> = {
+  small: [1.0, 2.0, 4.0],
+  medium: [2.0, 4.0, 8.0],
+  large: [3.0, 6.0, 12.0],
+};
 
 // ============================================================
 // DEFAULT SENSOR MODEL
@@ -73,17 +81,23 @@ export const toolDefinition: MCPToolDefinition = {
       params: {
         type: 'object',
         properties: {
+          interval: {
+            type: 'string',
+            enum: ['small', 'medium', 'large'],
+            description:
+              'Zone spacing preset: small (1/2/4 nm), medium (2/4/8 nm), large (3/6/12 nm)',
+          },
           distance_1_nm: {
             type: 'number',
-            description: 'Innermost buffer distance in nautical miles',
+            description: 'Innermost buffer distance in nautical miles (overrides interval)',
           },
           distance_2_nm: {
             type: 'number',
-            description: 'Middle buffer distance in nautical miles',
+            description: 'Middle buffer distance in nautical miles (overrides interval)',
           },
           distance_3_nm: {
             type: 'number',
-            description: 'Outermost buffer distance in nautical miles',
+            description: 'Outermost buffer distance in nautical miles (overrides interval)',
           },
         },
       },
@@ -292,7 +306,21 @@ export function execute(
   const model = sensorModel ?? new DefaultSensorModel();
   let zones = model.getDetectionZones(track);
 
-  // Check for custom distance overrides
+  // Resolve interval preset into base distances
+  if (params.interval !== undefined) {
+    const preset = INTERVAL_PRESETS[params.interval];
+    if (!preset) {
+      throw new Error(
+        `Unknown interval '${params.interval}', must be one of: small, medium, large`,
+      );
+    }
+    zones = zones.map((z, i) => ({
+      ...z,
+      distance_nm: preset[i],
+    }));
+  }
+
+  // Check for custom distance overrides (take precedence over interval)
   const d1 = params.distance_1_nm;
   const d2 = params.distance_2_nm;
   const d3 = params.distance_3_nm;

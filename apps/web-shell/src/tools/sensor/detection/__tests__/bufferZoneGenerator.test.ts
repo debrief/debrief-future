@@ -217,6 +217,55 @@ describe('buffer-zone-generator custom distances (US2)', () => {
 });
 
 // ============================================================
+// Phase 2b: Interval parameter
+// ============================================================
+
+describe('buffer-zone-generator interval parameter', () => {
+  it('small interval uses 1/2/4 nm distances', () => {
+    const { zones } = run(SIMPLE_TRACK, { interval: 'small' });
+    const distances = zones.map((z) => z.buffer_distance_nm);
+    expect(distances).toEqual([1.0, 2.0, 4.0]);
+  });
+
+  it('medium interval uses 2/4/8 nm distances', () => {
+    const { zones } = run(SIMPLE_TRACK, { interval: 'medium' });
+    const distances = zones.map((z) => z.buffer_distance_nm);
+    expect(distances).toEqual([2.0, 4.0, 8.0]);
+  });
+
+  it('large interval uses 3/6/12 nm distances', () => {
+    const { zones } = run(SIMPLE_TRACK, { interval: 'large' });
+    const distances = zones.map((z) => z.buffer_distance_nm);
+    expect(distances).toEqual([3.0, 6.0, 12.0]);
+  });
+
+  it('preserves likelihood ordering with interval', () => {
+    const { zones } = run(SIMPLE_TRACK, { interval: 'small' });
+    expect(zones[0].detection_likelihood_pct).toBe(75);
+    expect(zones[1].detection_likelihood_pct).toBe(50);
+    expect(zones[2].detection_likelihood_pct).toBe(25);
+  });
+
+  it('explicit distance overrides interval', () => {
+    const { zones } = run(SIMPLE_TRACK, { interval: 'small', distance_1_nm: 5.0 });
+    const distances = zones.map((z) => z.buffer_distance_nm);
+    expect(distances).toEqual([2.0, 4.0, 5.0]);
+  });
+
+  it('invalid interval throws', () => {
+    expect(() => run(SIMPLE_TRACK, { interval: 'tiny' })).toThrow('Unknown interval');
+  });
+
+  it('omitting interval matches large preset', () => {
+    const { zones: defaultZones } = run(SIMPLE_TRACK, {});
+    const { zones: largeZones } = run(SIMPLE_TRACK, { interval: 'large' });
+    const defaultDist = defaultZones.map((z) => z.buffer_distance_nm);
+    const largeDist = largeZones.map((z) => z.buffer_distance_nm);
+    expect(defaultDist).toEqual(largeDist);
+  });
+});
+
+// ============================================================
 // Phase 3: Provenance and statelessness (US3)
 // ============================================================
 

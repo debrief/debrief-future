@@ -194,9 +194,15 @@ def set_output_kind(feature: dict[str, Any], kind: str) -> dict[str, Any]:
     """
     Set the kind attribute on a feature's properties.
 
+    Only sets ``kind`` if the feature does not already carry one — tools
+    that build their own features (e.g. buffer_zone_generator → "ZONE",
+    generate_reference_points → "POINT") should keep their domain-specific
+    kind rather than being overwritten with the generic ``output_kind``
+    result-type path.
+
     Args:
         feature: GeoJSON Feature dictionary
-        kind: The kind value to set
+        kind: The kind value to set (fallback when feature lacks one)
 
     Returns:
         The modified feature
@@ -204,5 +210,7 @@ def set_output_kind(feature: dict[str, Any], kind: str) -> dict[str, Any]:
     if "properties" not in feature:
         feature["properties"] = {}
 
-    feature["properties"]["kind"] = kind
+    # Preserve tool-assigned kind (e.g. "ZONE", "POINT")
+    if not feature["properties"].get("kind"):
+        feature["properties"]["kind"] = kind
     return feature

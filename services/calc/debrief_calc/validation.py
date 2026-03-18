@@ -118,15 +118,12 @@ def validate_tool_output(
 
         properties = feature.get("properties", {})
 
-        # Check kind attribute
+        # Check kind attribute — must be present; may differ from expected_kind
+        # when the tool sets a domain-specific kind (e.g. "ZONE", "POINT")
         kind = properties.get("kind")
         if kind is None:
             validation_errors.append(
                 {"feature_index": i, "error": "Feature.properties.kind is required"}
-            )
-        elif kind != expected_kind:
-            validation_errors.append(
-                {"feature_index": i, "error": f"Expected kind '{expected_kind}', got '{kind}'"}
             )
 
         # Check provenance (PROV-aligned array format)
