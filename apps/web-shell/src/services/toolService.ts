@@ -302,6 +302,9 @@ export function isMutationTool(toolId: string): boolean {
   return MUTATION_TOOL_IDS.has(toolId);
 }
 
+/** Valid top-level result type prefixes per TOOL-RESULTS.md. */
+const RESULT_TYPE_PREFIXES = ['mutation/', 'addition/', 'deletion/', 'artifact/'];
+
 function determineResultCategory(toolId: string, outputKind: string): string {
   if (MUTATION_TOOL_IDS.has(toolId)) return 'mutation';
 
@@ -310,6 +313,18 @@ function determineResultCategory(toolId: string, outputKind: string): string {
 
   // Default: new feature creation
   return 'addition';
+}
+
+/**
+ * Build the full `debrief:resultType` path. If the outputKind already
+ * starts with a valid top-level category prefix (e.g. "mutation/track/styled"),
+ * use it directly to avoid doubling the prefix.
+ */
+function buildResultType(resultCategory: string, outputKind: string): string {
+  if (RESULT_TYPE_PREFIXES.some(p => outputKind.startsWith(p))) {
+    return outputKind;
+  }
+  return `${resultCategory}/${outputKind}`;
 }
 
 /**
@@ -521,7 +536,7 @@ export function executeTool(
   };
 
   const annotations: DebriefAnnotations = {
-    'debrief:resultType': `${resultCategory}/${outputKind}`,
+    'debrief:resultType': buildResultType(resultCategory, outputKind),
     'debrief:sourceFeatures': sourceFeatureIds,
     'debrief:label': `${entry.definition.description} result`,
   };
