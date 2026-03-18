@@ -992,8 +992,10 @@ export class StacService {
       const times = props.times as number[] | undefined;
       if (times && times.length > 0) {
         const sorted = [...times].sort((a, b) => a - b);
-        const start = new Date(sorted[0]).toISOString();
-        const end = new Date(sorted[sorted.length - 1]).toISOString();
+        const first = sorted[0]!;
+        const last = sorted[sorted.length - 1]!;
+        const start = new Date(first).toISOString();
+        const end = new Date(last).toISOString();
         if (!earliest || start < earliest) {earliest = start;}
         if (!latest || end > latest) {latest = end;}
       }
