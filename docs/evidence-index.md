@@ -10,3 +10,4 @@ Tracks evidence artifacts captured for each feature. Used to assess coverage and
 | 127-filter-bar-lozenge-ui | 3 | md | 2026-03-06 | current | — |
 | 133-vessel-taxonomy | 2 | md | 2026-03-07 | current | — |
 | 128-saved-filter-configurations | 2 | md | 2026-03-07 | current | — |
+| 137-rep-temporal-metadata | 4 | md, json | 2026-03-18 | current | — |

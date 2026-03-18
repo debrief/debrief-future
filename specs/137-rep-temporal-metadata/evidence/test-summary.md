@@ -1,7 +1,7 @@
 ---
 feature: "137-rep-temporal-metadata"
 captured_at: "2026-03-18T12:00:00Z"
-git_sha: "8370c7c"
+git_sha: "85f0e80"
 tests_passed: 9
 tests_failed: 0
 tests_skipped: 0

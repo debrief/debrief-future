@@ -1,5 +1,12 @@
 # Changelog
 
+## [2026-03-18]
+
+### Added
+- **REP Loader Temporal Metadata** — Compute `start_datetime`/`end_datetime` from track position timestamps during REP file loading; enables accurate Timeline/Gantt view and Duration filter.
+  - Tests: 9/9 passing (9 new)
+  - Evidence: test-summary.md, usage-example.md, sample-request.json, sample-response.json
+
 ## [2026-03-07]
 
 ### Added
