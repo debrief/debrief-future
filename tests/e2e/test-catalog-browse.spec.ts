@@ -4,9 +4,6 @@
  * Adapted from web-shell test: apps/web-shell/playwright/tests/catalog-browse.spec.ts
  * Tests exercise the same workflows through VS Code's webview iframe hierarchy.
  *
- * NOTE: All tests skipped — webview #active-frame is not created in
- * openvscode-server, so catalog overview content is inaccessible.
- * These workflows are covered by the web-shell E2E suite.
  *
  * CREATED: 2026-03-06 — Dual-platform E2E expansion (SC-006)
  */
@@ -15,9 +12,7 @@ import { test, expect } from './fixtures/base';
 test.describe('Catalog Browse', () => {
   test.setTimeout(60_000);
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
-  // Covered by web-shell E2E: apps/web-shell/playwright/tests/catalog-browse.spec.ts
-  test.skip('catalog overview is visible after opening it', async ({
+  test('catalog overview is visible after opening it', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
@@ -36,8 +31,7 @@ test.describe('Catalog Browse', () => {
     expect(catalogVisible).toBe(true);
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
-  test.skip('catalog shows timeline bars from loaded file', async ({
+  test('catalog shows timeline bars from loaded file', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
@@ -58,8 +52,7 @@ test.describe('Catalog Browse', () => {
     throw new Error('No catalog timeline bars found in any webview frame');
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
-  test.skip('catalog overview shows timeline metadata', async ({
+  test('catalog overview shows timeline metadata', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');

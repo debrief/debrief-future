@@ -1,20 +1,23 @@
 /**
  * Webview Content Injector
  *
- * Works around a code-server bug where `resolveWebviewView` is never called
- * for sidebar webview views, preventing VS Code from sending the `content`
- * message that creates `#active-frame`.
+ * Injects custom HTML content into VS Code webview's #active-frame via
+ * MessagePort interception. This is used for proof-of-concept tests that
+ * inject test HTML, NOT for tests that exercise real extension content.
  *
- * Strategy:
- * 1. Install a message interceptor on the main window (capture phase)
- * 2. When `webview-ready` arrives from the webview iframe, capture the MessagePort
- * 3. Send a `content` message via the port with the desired HTML
- * 4. The webview host page's content handler processes it, creating `#active-frame`
+ * NOTE: With Patch 3 (isBodyVisible gate removal in workbench.js),
+ * resolveWebviewView now fires correctly in openvscode-server. Real
+ * extension tests no longer need this injector — they can use the
+ * standard CodeServerPage.openDebriefSidebar() flow.
+ *
+ * This injector remains useful for isolated DOM interaction tests
+ * that don't depend on the full extension content pipeline.
  *
  * Prerequisites (applied by scripts/patch-webview.sh):
  * - index.html: `disableServiceWorker = true` (bypasses SW requirement)
  * - index.html: CSP meta tag commented out (allows modified script)
  * - workbench.js: Origin hash guard removed (lets webview-ready be processed)
+ * - workbench.js: isBodyVisible gate removed (lets resolveWebviewView fire)
  *
  * @see docs/project_notes/webview-e2e-research.md
  */

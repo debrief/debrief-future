@@ -8,7 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// Skip: Log Panel webview doesn't load in openvscode-server (backlog #142)
+// Skip: requires debrief-calc service for log entries — backlog #142
 test.describe.skip('Log Panel', () => {
 
   test('log panel shows empty state when no tools have run', async ({

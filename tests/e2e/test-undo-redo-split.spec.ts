@@ -8,8 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// Skip: Activity Panel sidebar webview doesn't load in openvscode-server —
-// getActivityPanelFrame() never finds .debrief-activity-panel (same issue as Log Panel #142).
+// Skip: undo/redo not yet implemented — backlog #073
 test.describe.skip('Undo / Redo', () => {
   test.setTimeout(120_000);
 

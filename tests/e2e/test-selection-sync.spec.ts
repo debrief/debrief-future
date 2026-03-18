@@ -12,9 +12,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// Skip: Activity Panel sidebar webview doesn't load in openvscode-server —
-// getActivityPanelFrame() never finds .debrief-activity-panel (same issue as Log Panel #142).
-test.describe.skip('Selection Sync', () => {
+test.describe('Selection Sync', () => {
   test.setTimeout(120_000);
 
   test('clicking a track on the map selects it in the feature list', async ({ codeServerPage }) => {

@@ -1,279 +1,163 @@
-# Research: Enabling E2E Business-Flow Testing Through VS Code Webviews in code-server
+# Spike: VS Code Webview Content in Headless Playwright
 
-**Date:** 2026-02-22
-**Status:** VALIDATED — working solution with proof-of-concept tests passing
+**Date:** 2026-03-18
+**Goal:** Render real extension webview content (React components from `shared/components`) inside openvscode-server, driven by Playwright, with no network access.
 
-## Executive Summary
+## The Architecture
 
-**Experimentally validated** approach for E2E testing VS Code webview content in code-server using Playwright:
-
-1. **Two file patches** to code-server's VS Code installation (automated by `scripts/patch-webview.sh`)
-2. **A test helper** (`helpers/webview-injector.ts`) that injects content via MessagePort interception
-3. **xvfb-run + headed Chromium** for reliable webview iframe access
-
-### Proof-of-concept results:
-
-| Capability | Status |
-|-----------|--------|
-| Webview `#active-frame` creation | ✓ Working |
-| Playwright DOM read access | ✓ Working |
-| Button click interactions | ✓ Working |
-| Text input + echo | ✓ Working |
-| JS evaluation inside inner iframe | ✓ Working |
-| `frameLocator` chaining pattern | ✓ Working |
-
----
-
-## Root Cause Analysis (Experimentally Validated)
-
-### The Three Blockers
-
-Through systematic instrumentation of both `pre/index.html` and `workbench.js`, three distinct issues were identified:
-
-#### Blocker 1: Service Worker Conflict
-
-**File:** `pre/index.html` (line 36)
-
-code-server registers its own service worker at `/` (`/_static/out/browser/serviceWorker.js`). The webview host page (`pre/index.html`) checks `navigator.serviceWorker.controller` and finds the WRONG SW. The `workerReady` Promise never resolves because:
+VS Code renders extension webview content through a 3-layer iframe stack:
 
 ```
-webview host page:
-  "Found unexpected service worker controller.
-   Found: http://localhost:8080/_static/out/browser/serviceWorker.js.
-   Expected: service-worker.js?v=4&..."
+localhost:8080  (VS Code workbench)
+  └─ iframe.webview  src="https://<uuid>.vscode-cdn.net/.../pre/index.html"
+       └─ #active-frame  (created by pre/index.html after receiving 'content' message)
+            └─ Extension HTML  (<script src="activityPanel.js">)
 ```
 
-**Fix:** Set `disableServiceWorker = true` in the inline module script. This causes `workerReady` to resolve immediately (line 252-253).
+The extension's React app (`activityPanel.js`, `mapView.js`, etc.) is transpiled from `shared/components/` and bundled into `apps/vscode/dist/webview/`. The view provider's `_getHtmlContent()` generates HTML referencing these bundles via `webview.asWebviewUri()`.
 
-#### Blocker 2: CSP Hash Mismatch
+Two separate CDN domains are involved:
 
-**File:** `pre/index.html` (line 8)
+| Domain | Purpose | Content |
+|--------|---------|---------|
+| `<uuid>.vscode-cdn.net` | Webview host page | `pre/index.html` — creates `#active-frame`, manages MessageChannel |
+| `*.vscode-resource.vscode-cdn.net` | Extension static assets | `activityPanel.js`, CSS, images — the actual app |
 
-Modifying the inline `<script type="module">` content invalidates the SHA-256 hash in the Content-Security-Policy meta tag. The browser refuses to execute the modified script.
+The host page domain uses a **per-session random UUID subdomain** for cross-origin isolation between the workbench and each webview.
 
-**Fix:** Comment out the CSP meta tag entirely.
+## Five Blockers Found
 
-#### Blocker 3: Origin Hash Guard in webview-ready Handler
+Working inward through the iframe stack, five blockers prevent webview content from rendering in headless openvscode-server:
 
-**File:** `workbench.js` (minified VS Code bundle)
+| # | Layer | Problem | Fix | Status |
+|---|-------|---------|-----|--------|
+| 1a | `pre/index.html` | Service worker conflict — wrong SW found | `disableServiceWorker = true` | **Patched** |
+| 1b | `pre/index.html` | CSP hash mismatch after Patch 1a | Comment out CSP meta tag | **Patched** |
+| 2 | `workbench.js` | Origin hash guard drops `webview-ready` message | Remove `this.g` precondition | **Patched** |
+| 3 | `workbench.js` | `isBodyVisible()` gate prevents `resolveWebviewView` | Unconditionally call `this.pc()` | **Patched** |
+| 5 | Browser | `https://<uuid>.vscode-cdn.net` unreachable — no DNS, no TLS | **See below** | **Open** |
 
-VS Code's `WebviewElement.ib()` method has a guard:
+Patches 1-3 are automated by `tests/e2e/scripts/patch-webview.sh` and are idempotent with version guards against openvscode-server v1.109.5.
 
-```javascript
-if (!(!this.g || i?.data?.target !== this.a)) {
-```
+## Blocker 5: The CDN URL Problem
 
-This silently drops the `webview-ready` message if `this.g` (the origin hash computed by `fOt()`) hasn't resolved yet. In code-server on `http://localhost:8080`, this hash computation via `crypto.subtle.digest()` completes correctly, but the `webview-ready` message arrives before the hash is stored in `this.g`.
+### What Happens
 
-**Fix:** Remove the `this.g` guard, making the condition `if (i?.data?.target === this.a)`, and make the origin check conditional: `if (this.g && i.origin !== this.nb(this.g))`.
-
-#### Blocker 4: `resolveWebviewView` Never Called (code-server bug)
-
-Even with blockers 1-3 fixed, VS Code in code-server **never calls `resolveWebviewView()`** on the extension's `WebviewViewProvider`. The webview container is created, the iframe loads, `webview-ready` is processed (port stored), `styles` and `focus` messages are sent — but `setHtml()` / `fb("content")` is never called.
-
-The extension activates and registers the provider, but code-server never invokes the resolution callback. This appears to be a code-server-specific bug in the webview view lifecycle.
-
-**Workaround:** The test helper intercepts the `webview-ready` message in the capture phase and manually sends the `content` message via the transferred MessagePort, bypassing VS Code's broken resolution pipeline entirely.
-
-### VS Code Webview Architecture (3-layer iframe)
+After Patches 1-4, `resolveWebviewView` fires and VS Code creates an `iframe.webview` element. The iframe's `src` is:
 
 ```
-Page (VS Code workbench at http://localhost:8080)
-  └── iframe.webview (class="webview ready", same origin)
-        └── pre/index.html (module script, MessageChannel)
-              └── #active-frame (inner iframe, extension content)
-                    └── Extension HTML + React app
+https://a1b2c3d4e5f6.vscode-cdn.net/insider/ef65ac.../out/vs/workbench/contrib/webview/browser/pre/index.html
 ```
 
----
+The subdomain is a random UUID generated per webview instance. In our sandbox, this URL is unreachable:
+- No DNS entry for `*.vscode-cdn.net`
+- No TLS certificate for the domain
+- The file IS available locally at `/opt/openvscode-server/out/vs/workbench/contrib/webview/browser/pre/index.html`
 
-## The Solution
+### Why We Can't Just Use localhost
 
-### 1. Patch Script: `tests/e2e/scripts/patch-webview.sh`
+**Experimentally validated:** When we patch `workbench.js` to use `http://localhost:8080/static/.../pre/index.html`, VS Code **does not create the `iframe.webview` element at all**. Zero iframes in the DOM.
 
-Applies three patches to code-server's VS Code installation:
+VS Code's JavaScript requires the webview URL to be **cross-origin** from the workbench. This is application logic, not a browser feature — Chromium's `--disable-site-isolation-trials` flag has no effect.
 
-```bash
-bash tests/e2e/scripts/patch-webview.sh [CODE_SERVER_DIR]
-```
+### Where the URL Template Lives
 
-| File | Patch | Purpose |
-|------|-------|---------|
-| `pre/index.html` | `disableServiceWorker = true` | Bypasses SW that blocks `workerReady` |
-| `pre/index.html` | CSP meta tag commented out | Allows modified script to execute |
-| `workbench.js` | Origin hash guard removed | Prevents silent drop of `webview-ready` |
-
-### 2. Test Helper: `tests/e2e/helpers/webview-injector.ts`
-
-Provides `activateWebviewWithContent(page, html)` which:
-
-1. Installs a `message` event listener on the main window (capture phase)
-2. When `webview-ready` arrives with a MessagePort, sends a `content` message with the test HTML
-3. The host page's content handler processes it, creating `#active-frame`
-4. Returns the inner Frame object for Playwright interaction
-
-```typescript
-import { activateWebviewWithContent } from './helpers/webview-injector';
-
-test('webview interaction', async ({ codeServerPage }) => {
-  const page = codeServerPage.page;
-  const inner = await activateWebviewWithContent(page, MY_HTML);
-
-  // Now interact with content inside the webview
-  await expect(inner.locator('.my-element')).toHaveText('Expected');
-  await inner.locator('button').click();
-});
-```
-
-### 3. Runtime Requirements
-
-- **xvfb-run** for headed Chromium in CI: `xvfb-run --auto-servernum npx playwright test ...`
-- **E2E_HEADED=1** environment variable to enable headed mode
-- **Chromium** via `@sparticuz/chromium` (installed by `ensure-chromium.sh`)
-
----
-
-## What This Enables
-
-### Business Flows That Can Now Be Tested
-
-| Flow | How | Status |
-|------|-----|--------|
-| **Open files** | Click STAC tree → map panel with real Leaflet map | **Validated** |
-| **View layers** | Activity panel shows tracks, locations, with collapse/expand | **Validated** |
-| **View tools** | ToolsPanel shows 11 tools with selection requirements | **Validated** (requires debrief-calc installed) |
-| **Change time** | TimeController slider/buttons inside sidebar iframe | Ready to test |
-| **Run tools** | Select features → tools become active → click run | Ready to test |
-| **Inspect PROV LOG** | Execute tool → verify provenance entry recorded | Ready to test |
-
-### Real Extension Content (Validated)
-
-Both the **map panel** (editor webview) and **activity panel** (sidebar webview) have been validated
-running with real extension bundles in E2E tests. The approach:
-
-#### Map Panel (Editor Webview)
-- Opens automatically when a STAC plot is clicked in the tree view
-- Uses **route interception** for `vscode-resource.vscode-cdn.net` URLs (DNS unreachable in sandbox)
-- Playwright `page.route()` serves files from the local extension installation
-- Real Leaflet map renders with track symbols, time labels, shapes, reference areas
-
-#### Activity Panel (Sidebar Webview)
-- Uses **MessagePort injection** with the real `activityPanel.js` bundle inlined
-- `buildActivityPanelHtml()` reads the bundle from the installed extension and inlines it (avoids cross-origin issues in blob iframe)
-- Real React components render: TimeController, ToolsPanel, LayersToolbar + FeatureList
-- Collapsible sections work (click section headers via `frame.evaluate()`)
-
-#### debrief-calc Connection
-- **Architecture:** subprocess CLI, NOT an MCP server
-- Extension spawns `python -m debrief_calc.cli` with JSON on stdin, reads stdout
-- **Validation:** `calcService.checkAvailability()` checks: (1) Python interpreter accessible, (2) `import debrief_calc` succeeds
-- **Python path resolution:** Setting `debrief.calc.pythonPath` > workspace `.venv/bin/python` (walks up 5 dirs) > system `python`
-- **Circuit breaker:** 3 failures = skip for 30s
-- **In E2E env:** `pip install -e services/calc` + set `debrief.calc.pythonPath` in code-server User settings
-- When connected: 11 tools appear with selection requirements (e.g., "Need 1 TRACK, have 0")
-
-#### Route Interceptor Pattern
-```typescript
-await page.route('**/*.vscode-resource.vscode-cdn.net/**', async (route) => {
-  const url = route.request().url();
-  const pathMatch = url.match(/vscode-cdn\.net(\/.*)/);
-  const filePath = pathMatch ? decodeURIComponent(pathMatch[1]) : null;
-  if (filePath && existsSync(filePath)) {
-    const body = readFileSync(filePath);
-    await route.fulfill({ body, contentType: inferContentType(filePath) });
-  } else {
-    await route.continue();
-  }
-});
-```
-
-#### Finding the Correct Sidebar Frame
-The page may contain multiple webview host frames (map + sidebar). To find the sidebar:
-```typescript
-const hostFrames = page.frames().filter(f =>
-  f.url().includes('workbench/contrib/webview/browser/pre')
-);
-for (const host of hostFrames) {
-  const child = host.childFrames()[0];
-  const isActivityPanel = await child.evaluate(
-    () => !!document.querySelector('.debrief-activity-panel')
-  ).catch(() => false);
-  if (isActivityPanel) { sidebarFrame = child; break; }
-}
-```
-
-#### Interacting with React Components Inside Webview
-```typescript
-// Collapse a section by clicking its header button
-await sidebarFrame.evaluate(() => {
-  const buttons = document.querySelectorAll('.debrief-activity-panel__section-header');
-  const tcBtn = Array.from(buttons).find(b => b.textContent?.includes('Time Controller'));
-  if (tcBtn) (tcBtn as HTMLElement).click();
-});
-```
-
----
-
-## Strategies Evaluated and Tested
-
-| Strategy | Result |
+| Location | Effect |
 |----------|--------|
-| xvfb-run + headed mode | ✓ Works for smoke tests, but does NOT fix webview |
-| Headless mode | ✗ Same failure as headed (root cause is not rendering) |
-| Disable code-server SW | Necessary but not sufficient |
-| Patch CSP hash | Necessary but not sufficient |
-| Patch workbench.js origin guard | Necessary but not sufficient |
-| MessagePort content injection | ✓ **This is the solution** |
-| openvscode-server | Not tested (same VS Code webview arch) |
-| @vscode/test-web | Not suitable (no webview DOM access) |
-| WebdriverIO | Viable fallback (not tested) |
-| Jupyter test middleware | Good complement for state-only testing |
+| `product.json` → `webviewContentExternalBaseUrlTemplate` | **Read at build time only** — runtime changes ignored |
+| `workbench.js` (hardcoded) | `https://{{uuid}}.vscode-cdn.net/insider/<commit>/.../pre/` |
 
----
+The second copy in `workbench.js` also contains `https://{{uuid}}.vscode-cdn.net/{{quality}}/{{commit}}/.../pre/` with template variables — this is the generic fallback.
 
-## Experimental Timeline
+### What We Tried
 
-| Step | Finding |
-|------|---------|
-| 1. xvfb + headed mode | Works for smoke tests, but webview `#active-frame` NOT created |
-| 2. Disable SW in index.html | Script executes, `workerReady` resolves, `signalReady()` called |
-| 3. Comment out CSP | Module script now executes (was blocked by hash mismatch) |
-| 4. Trace message flow | `webview-ready` posted to parent with port, interceptor confirms receipt |
-| 5. Patch workbench.js | VS Code's handler now processes `webview-ready`, stores port, sends `styles`/`focus` |
-| 6. But no `content` message | `resolveWebviewView` never called — code-server lifecycle bug |
-| 7. MessagePort interception | Manually send `content` via captured port → `#active-frame` created! |
-| 8. Playwright DOM access | Full read/write/click/type access to inner iframe content ✓ |
+| Approach | Outcome |
+|----------|---------|
+| Patch `product.json` at runtime | No effect — template already baked into JS |
+| Patch `workbench.js` → `localhost:8080` (same origin) | Iframe not created — VS Code requires cross-origin |
+| Patch URL with `{{uuid}}` in path (still same origin) | Same — still no iframe |
+| `/etc/hosts` for `vscode-cdn.net` | Linux `/etc/hosts` doesn't support wildcards |
+| `dnsmasq` wildcard → 127.0.0.1 | DNS resolves, but `https://` fails (no TLS cert) |
 
----
+## Approaches to Evaluate
 
-## Files Created/Modified
+### A. HTTP scheme + browser-level DNS
 
-### New files:
-- `tests/e2e/scripts/patch-webview.sh` — Automated patching script
-- `tests/e2e/helpers/webview-injector.ts` — Test helper for content injection
-- `tests/e2e/test-webview-probe.spec.ts` — Proof-of-concept tests (injected HTML)
-- `tests/e2e/test-real-webview.spec.ts` — Real extension bundle tests (map + activity panel)
+Patch `workbench.js` to change `https://` → `http://` in the webview URL template. Then use one of:
 
-### Evidence screenshots:
-- `tests/e2e/evidence/real-webview-combined.png` — Map + activity panel, tools connected
-- `tests/e2e/evidence/real-webview-layers-focus.png` — TC+Tools collapsed, Layers expanded
+- **Chromium `--host-resolver-rules`**: Add `MAP *.vscode-cdn.net 127.0.0.1` to Playwright's browser args. No system DNS changes needed. If wildcards are supported, requests to `http://<uuid>.vscode-cdn.net:8080/.../pre/index.html` would resolve to localhost. Cross-origin is preserved (different subdomain).
+- **`dnsmasq`**: Already confirmed working for DNS resolution. Without HTTPS the TLS problem disappears.
 
-### Modified files:
-- `tests/e2e/playwright.config.ts` — Added `E2E_HEADED` env var support
+**Risk:** VS Code may enforce `https://` somewhere in the webview pipeline. The `pre/index.html` module script or the MessageChannel setup may check `location.protocol`.
 
-### Environment setup for debrief-calc:
-- `pip install -e services/calc` — Install debrief-calc in system Python
-- code-server User settings: `"debrief.calc.pythonPath": "/usr/local/bin/python"`
+**Effort:** Low — one `sed` patch + one Playwright config line.
 
-### Runtime patches (NOT in repo, applied by patch-webview.sh):
-- `<code-server>/lib/vscode/out/vs/workbench/contrib/webview/browser/pre/index.html`
-- `<code-server>/lib/vscode/out/vs/code/browser/workbench/workbench.js`
+### B. HTTPS with local wildcard TLS
 
----
+Full-fidelity approach: generate a wildcard TLS cert for `*.vscode-cdn.net` using `mkcert`, run a reverse proxy (`caddy` or `socat`) that terminates TLS and proxies to `localhost:8080/static/...`, plus `dnsmasq` for DNS.
 
-## Key References
+**Risk:** Low — preserves the exact URL VS Code expects. `mkcert` certs are trusted by the local CA.
 
-- [VS Code source: pre/index.html](https://github.com/microsoft/vscode/blob/main/src/vs/workbench/contrib/webview/browser/pre/index.html) — Webview host page
-- [code-server issue #2038](https://github.com/coder/code-server/issues/2038) — Service workers not enabled
-- [Playwright issue #36943](https://github.com/microsoft/playwright/issues/36943) — Nested iframes in CI
-- [vscode-jupyter Integration Tests Wiki](https://github.com/microsoft/vscode-jupyter/wiki/Integration-Tests) — Jupyter middleware pattern
+**Effort:** Medium — needs `mkcert`, proxy daemon, `dnsmasq`, and CA trust setup in Chromium (or `--ignore-certificate-errors`).
+
+### C. Playwright route interception on the CDN URL
+
+Playwright's `page.route()` can intercept requests by URL pattern before they reach the network. If the webview iframe is created (the DOM element exists), Playwright could intercept the `https://<uuid>.vscode-cdn.net/...` request and serve `pre/index.html` from the local filesystem.
+
+**Key question:** Does `page.route()` work for cross-origin iframe `src` loads? Playwright's interception operates at the browser network layer, so it should intercept regardless of origin — but this needs testing.
+
+```typescript
+await page.route('**/*.vscode-cdn.net/**/pre/index.html**', async (route) => {
+  const body = readFileSync('/opt/openvscode-server/out/vs/workbench/contrib/webview/browser/pre/index.html');
+  await route.fulfill({ body, contentType: 'text/html' });
+});
+```
+
+**Risk:** Route interception may not apply to iframe `src` navigation (as opposed to fetch/XHR). Also, HTTPS cert validation may fail before interception takes effect.
+
+**Effort:** Very low — a few lines in the test fixture.
+
+### D. Browser context with custom cert or `--ignore-certificate-errors`
+
+Launch Chromium with `--ignore-certificate-errors` and set up DNS resolution (approach A or `dnsmasq`). The `https://` URL resolves to localhost, TLS handshake fails, but the browser ignores the error.
+
+**Risk:** Chromium may still refuse to load the page in an iframe context even with this flag. Mixed content (http workbench + https iframe) may also be blocked.
+
+**Effort:** Low — one flag + DNS setup.
+
+### E. MessagePort injector with real bundles (proven fallback)
+
+The `webview-injector.ts` helper captures the MessagePort from the `webview-ready` event and sends `content` directly. This bypasses the broken iframe load entirely. The original research validated this with real extension bundles inlined.
+
+**Downside:** Conflicts with Patch 3 — now that `resolveWebviewView` fires, both the injector and the extension race to send `content`. The injector currently blocks subsequent `content` messages, but this means real extension content never loads.
+
+**To make this work with Patch 3:** Either (a) remove Patch 3 and rely entirely on the injector, or (b) update the injector to yield to the extension's `content` message instead of blocking it.
+
+**Effort:** Low — the injector already exists and was validated.
+
+### F. Real VS Code (Electron) in xvfb
+
+Electron-based VS Code serves webview content from the local filesystem — no CDN URLs at all. Running under `xvfb-run` with Playwright connected to the Electron window provides the highest fidelity.
+
+**Effort:** High — needs VS Code CLI install, extension sideloading, Playwright-Electron connection, CI runner changes.
+
+## Recommendation
+
+**Test C first** (Playwright route interception) — it's the lowest effort and most elegant. If `page.route()` can intercept iframe `src` navigation, the problem is solved with zero infrastructure changes.
+
+**Then A** (HTTP scheme + `--host-resolver-rules`) — simple Playwright config change plus one `workbench.js` patch.
+
+**Then E** (injector, updated to not conflict with Patch 3) — proven to work, just needs the race condition resolved.
+
+**Reserve B/F** for if we need production-grade reliability in CI.
+
+## Files
+
+| File | Role |
+|------|------|
+| `tests/e2e/scripts/patch-webview.sh` | Applies Patches 1a, 1b, 2, 3 |
+| `tests/e2e/helpers/webview-injector.ts` | MessagePort content injection |
+| `tests/e2e/test-webview-resolve.spec.ts` | Validates Patch 3 (iframe creation) |
+| `tests/e2e/playwright.config.ts` | Chromium launch args |
+| `/opt/openvscode-server/out/vs/workbench/contrib/webview/browser/pre/index.html` | Webview host page (patched at runtime) |
+| `/opt/openvscode-server/out/vs/code/browser/workbench/workbench.js` | VS Code bundle (patched at runtime) |
