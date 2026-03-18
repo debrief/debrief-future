@@ -36,10 +36,13 @@ Can we find #active-frame within timeout?
 After this feature, the pattern should be:
 
 ```
-Can we find #active-frame within timeout?
-  ├─ YES → Run test assertions against real content
-  └─ NO  → test.fail("Webview resolution failed — check patch-webview.sh")
+Skip annotations removed — tests run unconditionally.
+  ├─ #active-frame found within timeout → Run test assertions against real content
+  ├─ Feature not implemented → test.fixme("Feature X not yet implemented — backlog #NNN")
+  └─ #active-frame NOT found → Test times out and FAILS naturally
 ```
+
+Note: `test.fail()` is not a Playwright API. Tests fail naturally via timeout when `#active-frame` is not created — no explicit failure call is needed. Use `test.fixme()` (valid Playwright API) only for tests that exercise genuinely unimplemented extension features.
 
 ### Patch Version Compatibility
 

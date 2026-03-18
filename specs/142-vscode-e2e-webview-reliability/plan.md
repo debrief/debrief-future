@@ -68,14 +68,13 @@ specs/142-vscode-e2e-webview-reliability/
 # Existing files to modify
 tests/e2e/
 ├── scripts/
-│   └── patch-webview.sh          # Add blocker 4 fix
+│   └── patch-webview.sh          # Add version guards to ALL patches + blocker 4 fix
 ├── helpers/
-│   └── webview-injector.ts       # Update for real content (may replace injection)
-├── global-setup.ts               # Add view reveal trigger
+│   └── webview-injector.ts       # Clean up obsolete functions after fix validated
 ├── models/
-│   ├── code-server-page.ts       # Add reliable webview resolution helpers
+│   ├── code-server-page.ts       # Add revealSidebar() method for view reveal trigger
 │   └── debrief-webview.ts        # Update skip conditions
-├── test-load-display.spec.ts     # Unskip
+├── test-load-display.spec.ts     # Unskip (remove test.skip, natural failure on timeout)
 ├── test-analysis-tool.spec.ts    # Unskip
 ├── test-error-feedback.spec.ts   # Unskip
 ├── test-catalog-browse.spec.ts   # Unskip
@@ -83,13 +82,15 @@ tests/e2e/
 └── (other spec files)            # Unskip as solution proves reliable
 
 # Existing CI workflow to update
-.github/workflows/e2e.yml         # Update openvscode-server version, patches
+.github/workflows/e2e.yml         # Update patches + add smoke check for patch output
 
 # Documentation to update
 docs/project_notes/webview-e2e-research.md  # Add resolution findings
 ```
 
 **Structure Decision**: No new directories. All changes are modifications to existing `tests/e2e/` infrastructure and CI workflow. The solution extends the existing patching approach rather than introducing new architecture.
+
+**Note**: `global-setup.ts` is NOT modified — the view reveal trigger lives in `CodeServerPage.revealSidebar()` where webview interaction already happens (review decision #3).
 
 ## Implementation Phases
 
@@ -107,12 +108,15 @@ docs/project_notes/webview-e2e-research.md  # Add resolution findings
 
 **Goal**: Get one previously-skipped test passing with real extension content.
 
-Based on research priority order:
+**Strategy: Parallel spikes** (review decision #2). Quickly validate feasibility of approaches E, B, and A in parallel rather than committing to a sequential fallback chain. Each spike should determine viability within ~1 hour before committing to full implementation of the winner.
 
-1. **Approach E (view reveal command)**: Modify `CodeServerPage.openPlotViaStacTree()` to first execute the sidebar reveal command, then wait for webview resolution
-2. **Approach B (upgrade)**: If E alone is insufficient, upgrade openvscode-server and retest
-3. **Approach A (patch)**: If upgrade doesn't fix it, add a fourth patch to `patch-webview.sh` targeting the resolution gate
-4. **Approach D (xvfb + real VS Code)**: If patching is unreliable, set up real VS Code under xvfb
+**Spike E (view reveal command)**: Add `CodeServerPage.revealSidebar()` method (review decision #3) that executes `workbench.view.extension.debrief-sidebar` to force view container visibility, then waits for `#active-frame`.
+
+**Spike B (upgrade)**: Download latest stable openvscode-server, apply existing patches (may need adjustment), test whether `resolveWebviewView` fires without additional fixes.
+
+**Spike A (patch workbench.js)**: Search for the visibility gate in `workbench.js` using regex/structural matching (review decision #4) rather than exact minified variable names. Add a fourth patch targeting the resolution gate.
+
+**Fallback D (xvfb + real VS Code)**: Only if all three spikes fail. Set up real VS Code under xvfb — highest fidelity, most complex CI setup.
 
 Validation target: `test-load-display.spec.ts` passes with real extension MapView content visible.
 
@@ -120,10 +124,13 @@ Validation target: `test-load-display.spec.ts` passes with real extension MapVie
 
 **Goal**: Unskip at least 5 test files and update CI.
 
-1. Remove `test.skip()` annotations from validated test files
-2. Convert tests with legitimately missing features to `test.fixme()` with backlog references
-3. Update `e2e.yml` workflow with new openvscode-server version (if upgraded) and updated patches
-4. Verify full suite passes in CI-like conditions (headless, xvfb)
+1. Remove `test.skip()` and `test.describe.skip()` annotations from validated test files — tests naturally fail on timeout if webview resolution breaks (review decision #5)
+2. Convert tests with legitimately missing features to `test.fixme()` with backlog references (only for tests you touch, not a full audit)
+3. Add version guards to ALL existing patches in `patch-webview.sh` — exit 1 if expected pattern not found (review decision #1, Article I.3 — no silent failures)
+4. Add CI smoke check in `e2e.yml`: verify `patch-webview.sh` exits 0 and prints success markers (review decision #7)
+5. Clean up obsolete functions in `webview-injector.ts` after confirming fix works (review decision #6)
+6. Add one sidebar toggle test for webview disposal/re-creation (review decision #8)
+7. Verify full suite passes in CI-like conditions (headless, xvfb)
 
 ### Phase 4: Polish & Evidence
 
@@ -163,9 +170,25 @@ This feature IS the VS Code webview E2E testing infrastructure. The deliverable 
 **Test File Locations**: Existing files in `tests/e2e/test-*.spec.ts`
 
 **Infrastructure**:
-- Patches applied by `tests/e2e/scripts/patch-webview.sh` (to be extended)
-- Content injection via `tests/e2e/helpers/webview-injector.ts` (may be simplified if fix works)
+- Patches applied by `tests/e2e/scripts/patch-webview.sh` (extended with version guards + blocker 4 fix)
+- Content injection via `tests/e2e/helpers/webview-injector.ts` (obsolete functions cleaned up after fix)
+- View reveal via `CodeServerPage.revealSidebar()` (new method)
 - Headed Chromium required: `xvfb-run --auto-servernum npx playwright test ...`
+
+## Review Decisions
+
+Incorporated from `/speckit.review` session (2026-03-18):
+
+| # | Decision | Choice | Rationale |
+|---|----------|--------|-----------|
+| 1 | Patch version guards | Guard ALL patches — exit 1 on missing pattern | Article I.3 (no silent failures) + Patch Contract |
+| 2 | Phase 2 structure | Parallel spikes for approaches E, B, A | Research sprint — avoid sequential waste |
+| 3 | View reveal location | `CodeServerPage.revealSidebar()` | global-setup.ts runs before browser exists |
+| 4 | Patch matching strategy | Regex/structural matching for new patches | Minified var names change on upgrade |
+| 5 | Skip removal pattern | Remove skips, natural timeout failure | `test.fail()` is not a Playwright API |
+| 6 | webview-injector.ts | Clean up obsolete functions after validation | Minimal diff — don't touch until fix proven |
+| 7 | Patch CI verification | CI smoke check in e2e.yml | Catches guard bugs before test confusion |
+| 8 | Disposal/re-creation | Add one sidebar toggle test | Edge case from spec — low effort, good coverage |
 
 ## Complexity Tracking
 
