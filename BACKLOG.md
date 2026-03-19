@@ -34,7 +34,7 @@ This document is maintained by the `opportunity-scout` and `backlog-prioritizer`
 | **planned** | Implementation plan ready | `/speckit.plan` |
 | **tasked** | Tasks broken down | `/speckit.tasks` |
 | **implementing** | Active development | `/speckit.implement` or `/bugfix` |
-| **complete** | Done (row struck through) | `/speckit.pr` merged or `/bugfix` PR merged |
+| **complete** | Done (row struck through) | `/speckit.implement` completes or `/bugfix` PR merged |
 
 ### Backlog Flow
 
