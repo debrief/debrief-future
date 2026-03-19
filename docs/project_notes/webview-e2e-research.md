@@ -172,31 +172,57 @@ The host page domain uses a per-session random UUID subdomain for cross-origin i
 
 ### Candidate Solutions
 
-#### A. Playwright `page.route()` interception (RECOMMENDED FIRST)
+#### A. Playwright `page.route()` interception (EXPERIMENTALLY VALIDATED)
 
-Playwright can intercept network requests before they reach the browser. If this works for cross-origin iframe `src` loads, we can serve `pre/index.html` from the local filesystem:
+**Status: CDN interception works. Content delivery pipeline has remaining timing issues.**
+
+Playwright can intercept HTTPS cross-origin iframe `src` requests at the DevTools Protocol level, before TLS validation. Experimentally validated on 2026-03-19:
 
 ```typescript
-// In test fixture or beforeEach
 await page.route('**/*.vscode-cdn.net/**', async (route) => {
   const url = new URL(route.request().url());
-  const localPath = `/opt/openvscode-server${url.pathname.replace(/^\/insider\/[^/]+/, '')}`;
-  if (existsSync(localPath)) {
-    const body = readFileSync(localPath);
-    await route.fulfill({ body, contentType: guessContentType(localPath) });
+  const localPath = cdnUrlToLocalPath(url.href); // maps CDN path → local filesystem
+  if (localPath && existsSync(localPath)) {
+    await route.fulfill({ body: readFileSync(localPath), contentType: guessContentType(localPath) });
   } else {
-    await route.abort();
+    await route.abort('connectionfailed');
   }
 });
 ```
 
-**Why this should work**: Playwright's route interception operates at the browser DevTools Protocol level, intercepting *all* requests regardless of origin. The HTTPS handshake never happens because the request is fulfilled before reaching the network stack.
+**What works:**
+- `page.route()` intercepts HTTPS iframe `src` loads (no TLS error)
+- `pre/index.html` loads and executes (module script runs, perf marks confirm)
+- `isSecureContext: true` — crypto.subtle available
+- Origin hash validation passes (`hostnameMatchesHash: true`)
+- `signalReady()` sends `webview-ready` to parent with MessagePort
+- Parent receives `webview-ready` and adds `.ready` class to iframe
+- `fake.html` is also interceptable (inner iframe for content injection)
 
-**Risk**: Unclear whether Playwright interception fires before Chromium's TLS validation for `https://` URLs. The iframe `src` URL uses HTTPS, and Chromium may reject the connection before Playwright can intercept.
+**What doesn't work yet:**
+- `#active-frame` is never created despite all the plumbing succeeding
+- Root cause: timing mismatch in VS Code's webview lifecycle
 
-**Effort**: Very low — a few lines in the test fixture.
+**Timing analysis** (from workbench performance marks):
+```
+1371ms  set-content     (extension sets webview.html — content queued)
+1383ms  set-content     (second webview)
+...no mounted/set-src marks — iframe not in DOM yet...
+5059ms  mounted         (iframe created when sidebar clicked)
+5067ms  set-src         (iframe src set to CDN URL)
+5085ms  webview-ready   (CDN intercepted, pre/index.html loaded, ready signal sent)
+```
 
-**Mitigation if TLS blocks it**: Combine with `--host-resolver-rules` and `--ignore-certificate-errors` flags.
+The problem: `set-content` fires at 1.4s when `resolveWebviewView` sets `webview.html`. But the iframe isn't mounted until 5.0s (when the sidebar becomes visible). By then, the webview instance that received `set-content` may have been replaced by a new instance that has no content queued.
+
+The webview lifecycle has three states: Pending → Ready. Content set during Pending is flushed when `webview-ready` arrives. But if the webview instance is replaced between `set-content` and `webview-ready`, the pending content is lost.
+
+**Effort**: Low for interception itself. Medium to resolve the lifecycle timing.
+
+**Next steps for this approach:**
+1. Try Patch 5: patch `workbench.js` to re-send `set-content` when a new webview instance is mounted for an existing view
+2. Or: combine with MessagePort injector (Approach D) — intercept CDN so `pre/index.html` loads, then inject content via the established port
+3. Or: ensure the route handler is installed before `page.goto()` AND that the sidebar starts visible (via VS Code settings or command)
 
 #### B. HTTP scheme + Chromium `--host-resolver-rules`
 
@@ -254,11 +280,13 @@ The 40s timeout on failing tests is the biggest productivity drain. Even before 
 2. **Reduce action timeout** from 15s to 5s for client-side-only interactions (per user observation: nothing takes more than 5s)
 3. **Tag tests** with `@webview-content` vs `@workbench-chrome` so the two categories can be run independently
 
-### Short-term: Test Approach A (Playwright route interception)
+### Short-term: Complete Approach A (Playwright route interception)
 
-Lowest effort, most elegant. If `page.route()` can intercept iframe `src` navigation for HTTPS URLs before TLS validation, the entire CDN problem evaporates with zero infrastructure changes.
+CDN interception is validated — `page.route()` works for HTTPS cross-origin iframe loads. The remaining blocker is the content delivery timing: the extension's `resolveWebviewView` sets content on a webview instance that gets replaced before the iframe loads. Three paths forward:
 
-If TLS validation blocks it, combine with Approach B (`--host-resolver-rules` + HTTP scheme patch).
+1. **Patch 5** (new workbench.js patch): re-send pending `set-content` when a webview remounts
+2. **Hybrid A+D**: use CDN interception to load `pre/index.html`, then use the MessagePort injector to send content
+3. **Sidebar-first layout**: configure VS Code settings to start with the Debrief sidebar visible, so the webview mounts at the same time as `set-content`
 
 ### Medium-term: Approach D (injector update)
 
