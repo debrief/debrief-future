@@ -67,15 +67,8 @@ function spawnWithStdin(
   });
 }
 
-// Self-contained SafeFeatureCollection to avoid any from geojson
-interface SafeFeatureCollection {
-  type: 'FeatureCollection';
-  features: Array<{
-    type: 'Feature';
-    geometry: { type: string; coordinates: unknown };
-    properties: Record<string, unknown> | null;
-  }>;
-}
+// Canonical Safe GeoJSON types from @debrief/utils (T02)
+import type { SafeFeatureCollection } from '@debrief/utils';
 
 // MCP connection states
 type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
@@ -430,7 +423,7 @@ export class CalcService {
       toolId,
       toolName,
       executionId,
-      features: result.features as SafeFeatureCollection,
+      features: result.features,
       style: createDefaultResultStyle(toolName),
       visible: true,
       createdAt: new Date().toISOString(),

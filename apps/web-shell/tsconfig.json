@@ -12,6 +12,7 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "noUncheckedIndexedAccess": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
@@ -27,6 +28,9 @@
       ],
       "@debrief/session-state": [
         "./src/session-state-browser.ts"
+      ],
+      "@debrief/utils": [
+        "../../shared/utils/src/index.ts"
       ]
     },
     "baseUrl": "."
