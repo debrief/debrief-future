@@ -8,8 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// Skip: styling tools not yet implemented — backlog #081
-test.describe.skip('Styling Tools', () => {
+test.describe('Styling Tools', () => {
   test('tools panel lists available tools', async ({ codeServerPage }) => {
     test.setTimeout(120_000);
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');

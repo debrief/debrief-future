@@ -8,8 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// Skip: requires debrief-calc and MCP services
-test.describe.skip('Event Log Propagation', () => {
+test.describe('Event Log Propagation', () => {
 
   test('amending first event re-applies subsequent events', async ({
     codeServerPage,
