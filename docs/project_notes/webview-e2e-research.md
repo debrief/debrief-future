@@ -270,23 +270,60 @@ Run actual VS Code (Electron) under `xvfb-run`. Electron serves webview content 
 
 **Effort**: High — needs VS Code CLI install, extension sideloading, Playwright-Electron connection.
 
+## Solution: Hybrid A+D (VALIDATED 2026-03-20)
+
+### What works
+
+The **Hybrid A+D** approach successfully renders real extension React components in headless cloud E2E tests:
+
+1. **CDN interceptor** (`helpers/cdn-interceptor.ts`): intercepts `*.vscode-cdn.net` requests via `context.route()` and serves `pre/index.html` from the local openvscode-server install. This boots the webview iframe — service worker registers, `signalReady()` fires, `webview-ready` message reaches the host.
+
+2. **MessagePort injector** (`helpers/webview-injector.ts`): captures the `webview-ready` event's MessagePort and sends a `content` message containing the real extension HTML with bundled JS inlined. This creates `#active-frame` and renders the React components.
+
+3. **Extension content generator** (`helpers/extension-content.ts`): reads the extension's esbuild bundles (`dist/webview/*.js`) and generates HTML matching the extension's `_getHtmlContent()` template, with a mock `acquireVsCodeApi()`.
+
+### Why this is needed
+
+The VS Code host receives `webview-ready` but never sends `content` back. Root cause: Patch 3 (visibility gate removal) causes `resolveWebviewView` to fire before the iframe exists. The extension's content is queued in `pendingMessages`, but the webview is then released (dismounted) and re-created when the sidebar becomes visible. The new instance has an empty `pendingMessages` queue. The content stored in `this.s` is re-sent via `reload()` → `tb()` → `gb("content", ...)`, but by this time the webview state has been reset and the flush never reaches the new iframe.
+
+### Candidates evaluated
+
+| Candidate | Result | Notes |
+|-----------|--------|-------|
+| Sidebar-first layout | Dead end | No VS Code setting to auto-open sidebar |
+| B: HTTP + host-resolver-rules | Failed | Same timing issue — host never sends content |
+| **Hybrid A+D** | **Works** | Real React components render in #active-frame |
+| Patch 5: re-send on remount | Not needed | Hybrid A+D bypasses the broken pipeline |
+| E: Real VS Code in xvfb | Not tried | Hybrid A+D sufficient |
+
+### Integration
+
+The Hybrid A+D approach is integrated into `fixtures/base.ts`:
+- `codeServerPage` fixture installs both CDN interceptor and multi-webview MessagePort injector
+- Content queue: activity panel (first webview-ready), map view (second)
+- All tests using the `codeServerPage` fixture automatically get webview content injection
+
+### Limitations
+
+- Extension JS is **inlined** (~1.7MB per bundle) — adds memory overhead per test
+- Uses a **mock `acquireVsCodeApi()`** — extension ↔ host message passing won't work
+- Content is **static at injection time** — no live updates from the extension
+- Tests cannot verify extension → webview message flows (e.g., state changes from STAC tree selection)
+
+### What this enables vs what it doesn't
+
+**Can now validate:**
+- React component rendering (activity panel, map, catalog, etc.)
+- Component DOM structure and CSS styling
+- User interactions within webview content (clicks, scrolls)
+- Cross-webview frame navigation
+
+**Still cannot validate:**
+- Extension ↔ webview message passing (e.g., selection sync)
+- Live data loading from STAC stores into webview
+- Extension commands that update webview state
+
 ## Recommendation
-
-### Immediate: Reduce timeout waste
-
-The 40s timeout on failing tests is the biggest productivity drain. Even before solving Blocker 5:
-
-1. **Add `test.skip()` guards** for tests that depend on webview content when `WEBVIEW_CDN_AVAILABLE` env var is not set
-2. **Reduce action timeout** from 15s to 5s for client-side-only interactions (per user observation: nothing takes more than 5s)
-3. **Tag tests** with `@webview-content` vs `@workbench-chrome` so the two categories can be run independently
-
-### Short-term: Complete Approach A (Playwright route interception)
-
-CDN interception is validated — `page.route()` works for HTTPS cross-origin iframe loads. The remaining blocker is the content delivery timing: the extension's `resolveWebviewView` sets content on a webview instance that gets replaced before the iframe loads. Three paths forward:
-
-1. **Patch 5** (new workbench.js patch): re-send pending `set-content` when a webview remounts
-2. **Hybrid A+D**: use CDN interception to load `pre/index.html`, then use the MessagePort injector to send content
-3. **Sidebar-first layout**: configure VS Code settings to start with the Debrief sidebar visible, so the webview mounts at the same time as `set-content`
 
 ### Medium-term: Approach D (injector update)
 
@@ -313,8 +350,9 @@ Tests #1 and #3 already pass (6/6). The bulk of failing tests (catalog browse, d
 | `tests/e2e/scripts/patch-webview.sh` | Applies Patches 1, 2, 3 to openvscode-server |
 | `tests/e2e/scripts/cloud-e2e-setup.sh` | Full cloud setup pipeline (code-server path) |
 | `tests/e2e/helpers/cdn-interceptor.ts` | Playwright route handler for CDN request interception |
-| `tests/e2e/helpers/webview-injector.ts` | MessagePort content injection fallback |
-| `tests/e2e/fixtures/base.ts` | Custom Playwright fixtures (installs CDN interceptor) |
+| `tests/e2e/helpers/webview-injector.ts` | MessagePort content injection (Hybrid A+D) |
+| `tests/e2e/helpers/extension-content.ts` | Generates webview HTML with inlined extension JS |
+| `tests/e2e/fixtures/base.ts` | Custom Playwright fixtures (CDN interceptor + MessagePort injector) |
 | `tests/e2e/models/code-server-page.ts` | Page object for VS Code chrome interactions |
 | `tests/e2e/test-preview-smoke.spec.ts` | Smoke tests (4/4 passing) |
 | `tests/e2e/test-webview-resolve.spec.ts` | Webview resolution tests (2/2 passing) |

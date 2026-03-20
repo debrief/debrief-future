@@ -1,27 +1,20 @@
 /**
- * Webview Content Injector
+ * Webview Content Injector (Hybrid A+D)
  *
- * Injects custom HTML content into VS Code webview's #active-frame via
- * MessagePort interception. This is used for proof-of-concept tests that
- * inject test HTML, NOT for tests that exercise real extension content.
+ * Intercepts the MessagePort handshake between VS Code's webview iframe
+ * (pre/index.html) and the host, then injects extension content directly
+ * through the captured port. This bypasses the broken content delivery
+ * pipeline where VS Code's host never sends the 'content' message.
  *
- * NOTE: With Patch 3 (isBodyVisible gate removal in workbench.js),
- * resolveWebviewView now fires correctly in openvscode-server. Real
- * extension tests no longer need this injector — they can use the
- * standard CodeServerPage.openDebriefSidebar() flow.
- *
- * This injector remains useful for isolated DOM interaction tests
- * that don't depend on the full extension content pipeline.
+ * Used together with the CDN interceptor (cdn-interceptor.ts):
+ * - CDN interceptor: loads pre/index.html so the webview boots
+ * - This injector: sends 'content' via the MessagePort so #active-frame renders
  *
  * Prerequisites (applied by scripts/patch-webview.sh):
- * - index.html: CSP meta tag commented out (allows modified script)
- * - workbench.js: Origin hash guard removed (lets webview-ready be processed)
- * - workbench.js: isBodyVisible gate removed (lets resolveWebviewView fire)
+ * - index.html: CSP commented out, origin hash bypassed
+ * - workbench.js: Origin hash guard removed, visibility gate removed
  *
- * The service worker is intentionally left enabled — it handles
- * vscode-cdn.net request interception for local file serving.
- *
- * @see docs/project_notes/webview-e2e-research.md
+ * @see docs/project_notes/webview-e2e-research.md — Hybrid A+D
  */
 import type { Page, Frame } from '@playwright/test';
 
@@ -33,8 +26,11 @@ export interface WebviewContentOptions {
 }
 
 /**
- * Install the webview-ready interceptor on the page.
+ * Install a webview-ready interceptor that sends content for ALL webviews.
  * Must be called BEFORE the webview iframe loads (i.e., before clicking sidebar).
+ *
+ * Each webview-ready event receives the same HTML content. For tests that
+ * need different content per webview, call this multiple times with updated HTML.
  */
 export async function installWebviewInterceptor(
   page: Page,
@@ -47,6 +43,7 @@ export async function installWebviewInterceptor(
     (args: { html: string; allowScripts: boolean }) => {
       (window as any).__webviewInterceptorInstalled = true;
       (window as any).__webviewContentSent = false;
+      (window as any).__webviewContentCount = 0;
 
       window.addEventListener(
         'message',
@@ -57,7 +54,7 @@ export async function installWebviewInterceptor(
               channel: 'content',
               args: {
                 contents: args.html,
-                title: 'E2E Test Content',
+                title: 'E2E Webview Content',
                 options: {
                   allowScripts: args.allowScripts,
                   allowForms: args.allowScripts,
@@ -69,8 +66,7 @@ export async function installWebviewInterceptor(
               },
             });
             // Block subsequent 'content' messages on this port to prevent the
-            // VS Code workbench from overwriting our injected test content when
-            // the extension resolves its webview.
+            // VS Code workbench from overwriting our injected content.
             const origPostMessage = port.postMessage.bind(port);
             port.postMessage = function (msg: any, ...rest: any[]) {
               if (msg?.channel === 'content') {
@@ -79,6 +75,7 @@ export async function installWebviewInterceptor(
               return origPostMessage(msg, ...rest);
             };
             (window as any).__webviewContentSent = true;
+            (window as any).__webviewContentCount++;
           }
         },
         true
@@ -89,17 +86,62 @@ export async function installWebviewInterceptor(
 }
 
 /**
- * Remove the code-server service worker that interferes with webview loading.
+ * Install an interceptor that responds with different content per webview.
+ * Content is consumed in order: first webview-ready gets contentQueue[0], etc.
  */
-export async function removeCodeServerServiceWorker(page: Page): Promise<void> {
-  await page.evaluate(async () => {
-    const regs = await navigator.serviceWorker.getRegistrations();
-    for (const r of regs) {
-      if (r.active?.scriptURL?.includes('_static')) {
-        await r.unregister();
-      }
-    }
-  });
+export async function installMultiWebviewInterceptor(
+  page: Page,
+  contentQueue: WebviewContentOptions[]
+): Promise<void> {
+  const queue = contentQueue.map((opt) => ({
+    html: opt.html,
+    allowScripts: opt.allowScripts ?? true,
+  }));
+
+  await page.evaluate(
+    (args: { queue: Array<{ html: string; allowScripts: boolean }> }) => {
+      (window as any).__webviewInterceptorInstalled = true;
+      (window as any).__webviewContentSent = false;
+      (window as any).__webviewContentCount = 0;
+      let queueIndex = 0;
+
+      window.addEventListener(
+        'message',
+        (e: MessageEvent) => {
+          if (e.data?.channel === 'webview-ready' && e.ports?.length > 0) {
+            const content = args.queue[queueIndex] ?? args.queue[args.queue.length - 1];
+            if (queueIndex < args.queue.length) queueIndex++;
+
+            const port = e.ports[0];
+            port.postMessage({
+              channel: 'content',
+              args: {
+                contents: content.html,
+                title: 'E2E Webview Content',
+                options: {
+                  allowScripts: content.allowScripts,
+                  allowForms: content.allowScripts,
+                  allowMultipleAPIAcquire: false,
+                },
+                state: undefined,
+                cspSource: '',
+                confirmBeforeClose: 'keyboardOnly',
+              },
+            });
+            const origPostMessage = port.postMessage.bind(port);
+            port.postMessage = function (msg: any, ...rest: any[]) {
+              if (msg?.channel === 'content') return;
+              return origPostMessage(msg, ...rest);
+            };
+            (window as any).__webviewContentSent = true;
+            (window as any).__webviewContentCount++;
+          }
+        },
+        true
+      );
+    },
+    { queue }
+  );
 }
 
 /**
@@ -121,7 +163,6 @@ export async function waitForActiveFrame(
 ): Promise<Frame | null> {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
-    // Re-find the host frame each iteration (it may not exist yet)
     const hostFrame = getWebviewHostFrame(page);
     if (hostFrame) {
       const hasActive = await hostFrame.evaluate(
@@ -129,7 +170,6 @@ export async function waitForActiveFrame(
       ).catch(() => false);
 
       if (hasActive) {
-        // Return the first child frame (the active-frame iframe)
         const children = hostFrame.childFrames();
         if (children.length > 0) {
           return children[0];
@@ -150,7 +190,6 @@ export async function activateWebviewWithContent(
   sidebarSelector = '.action-item a[aria-label*="Debrief"], .action-item a[aria-label*="debrief"]'
 ): Promise<Frame | null> {
   await installWebviewInterceptor(page, { html });
-  await removeCodeServerServiceWorker(page);
 
   const icon = page.locator(sidebarSelector);
   await icon.first().click();
