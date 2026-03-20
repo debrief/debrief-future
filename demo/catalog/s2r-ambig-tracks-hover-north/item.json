@@ -2,46 +2,44 @@
   "type": "Feature",
   "stac_version": "1.0.0",
   "stac_extensions": [],
-  "id": "satc-test-dataset3",
+  "id": "s2r-ambig-tracks-hover-north",
   "geometry": {
     "type": "Polygon",
     "coordinates": [
       [
         [
-          0.0,
-          0.0
+          -0.01,
+          59.97403333333334
         ],
         [
-          0.0,
-          0.0
+          0.1938722222222222,
+          59.97403333333334
         ],
         [
-          0.0,
-          0.0
+          0.1938722222222222,
+          60.0
         ],
         [
-          0.0,
-          0.0
+          -0.01,
+          60.0
         ],
         [
-          0.0,
-          0.0
+          -0.01,
+          59.97403333333334
         ]
       ]
     ]
   },
   "bbox": [
-    0.0,
-    0.0,
-    0.0,
-    0.0
+    -0.01,
+    59.97403333333334,
+    0.1938722222222222,
+    60.0
   ],
   "properties": {
-    "title": "Dataset3 (satc-test)",
-    "datetime": "2016-10-10T12:00:00+00:00",
-    "description": "Imported from SATC_Test/Dataset3.rep",
-    "start_datetime": "2016-10-10T12:00:00+00:00",
-    "end_datetime": "2016-10-12T10:20:56+00:00"
+    "title": "Ambig_tracks_hover_north (s2r)",
+    "datetime": "2026-03-20T22:02:24.177326+00:00",
+    "description": "Imported from S2R/Ambig_tracks_hover_north.rep"
   },
   "links": [
     {
@@ -60,12 +58,12 @@
       "rel": "self",
       "href": "./item.json",
       "type": "application/geo+json",
-      "title": "Dataset3 (satc-test)"
+      "title": "Ambig_tracks_hover_north (s2r)"
     },
     {
       "rel": "derived_from",
-      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/Dataset3.rep",
-      "title": "Dataset3.rep"
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Ambig_tracks_hover_north.rep",
+      "title": "Ambig_tracks_hover_north.rep"
     }
   ],
   "assets": {
@@ -77,16 +75,16 @@
         "data"
       ]
     },
-    "source-Dataset3": {
-      "href": "./assets/Dataset3.rep",
+    "source-Ambig_tracks_hover_north": {
+      "href": "./assets/Ambig_tracks_hover_north.rep",
       "type": "application/vnd.businessobjects",
-      "title": "Dataset3.rep",
+      "title": "Ambig_tracks_hover_north.rep",
       "roles": [
         "source"
       ],
       "debrief:provenance": {
-        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC_Test/Dataset3.rep",
-        "load_timestamp": "2026-03-20T21:26:45.732361Z",
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Ambig_tracks_hover_north.rep",
+        "load_timestamp": "2026-03-20T22:02:24.182875Z",
         "tool_version": "0.1.0"
       }
     }

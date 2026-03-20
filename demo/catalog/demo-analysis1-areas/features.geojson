@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "90e19d2a-59db-418c-a2a3-7d04d2da3fd8",
+      "id": "5987c5bf-8d3f-46c9-8d55-8068aeb6af23",
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -43,13 +43,12 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 1
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "d2d5284c-031e-4df8-af67-cebb1341b304",
+      "id": "97b12a5d-5f49-4c15-a4d1-524452be0602",
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -89,13 +88,12 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 2
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "a5bee03a-1f3d-4c32-9a0a-21aeae42f019",
+      "id": "af366103-21cc-4707-8853-d5c383f2201f",
       "geometry": {
         "type": "Polygon",
         "coordinates": [
@@ -135,8 +133,7 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 3
+        }
       }
     }
   ]

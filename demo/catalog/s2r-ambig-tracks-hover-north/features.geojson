@@ -1,0 +1,2861 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "7491fb55-5a78-40fb-a3ce-d205261330ed",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -0.01,
+            60.0
+          ],
+          [
+            -0.01,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.7,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:00:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "82cd0052-f43e-4617-8504-359fc610d2df",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.71,
+        "range": 179.29,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:00:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8911ffda-d281-4c73-ab6f-3f340dc44f32",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -0.0035555555555555557,
+            60.0
+          ],
+          [
+            -0.0035555555555555557,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:02:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "57511712-8504-415b-924f-287b8e1bb32e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.59,
+        "range": 179.41,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:02:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f8146e17-c77d-4024-97bc-2f927c4a9abb",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.002888888888888889,
+            60.0
+          ],
+          [
+            0.002888888888888889,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:04:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4f69729e-7e91-49ee-a042-dc291a4c4dbb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.59,
+        "range": 179.41,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:04:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e9c682ca-469d-409f-a42f-db17a9f38a5a",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.009333333333333334,
+            60.0
+          ],
+          [
+            0.009333333333333334,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:06:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f5cb5212-59e5-407e-8096-77712fcc0b2c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 358.9,
+        "range": 179.41,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:06:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0e48d5db-b3d6-47db-a935-6e2647d8a577",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.015777777777777776,
+            60.0
+          ],
+          [
+            0.015777777777777776,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:08:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9914f571-9a90-4052-84f2-045d0aa3da66",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.58,
+        "range": 179.42,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:08:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "68ccccf0-665f-44a1-a909-1fb12301fd4e",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.022222222222222223,
+            60.0
+          ],
+          [
+            0.022222222222222223,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:10:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "95e43b15-e8b9-41d6-8a23-d43f20044ca2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.58,
+        "range": 179.42,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:10:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b0aad8f0-9361-44dd-8b81-d689e4aa28b1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.028666666666666667,
+            60.0
+          ],
+          [
+            0.028666666666666667,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:12:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d86740ed-94e1-40cd-8bde-6a724501476a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.58,
+        "range": 179.42,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:12:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5b78ddba-595c-4b8c-b8f4-a2eb4100fc29",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.035111111111111114,
+            60.0
+          ],
+          [
+            0.035111111111111114,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:14:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "78164704-e923-4090-afae-af811e4db7dc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.57,
+        "range": 179.43,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:14:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "081ad912-97c1-4d87-837d-1d386b9927e1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.041555555555555554,
+            60.0
+          ],
+          [
+            0.041555555555555554,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:16:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "447e13b5-817f-4e36-ab99-812984ea8f33",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.57,
+        "range": 179.43,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:16:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "45c30002-ef84-45a7-956f-1e8697eb9cf4",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.048,
+            60.0
+          ],
+          [
+            0.048,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:18:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8b17c2de-6a80-4324-9749-a8bf5cb1b8cb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.57,
+        "range": 179.43,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:18:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1ba81793-f57d-400a-947b-146dfecaf226",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.05444444444444445,
+            60.0
+          ],
+          [
+            0.05444444444444445,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:20:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b3c4acfd-7152-46c6-a7ff-9e76fb73d574",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 358.9,
+        "range": 179.44,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:20:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bffe672b-cfdb-40c0-969f-944b3498f0e1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.060888888888888895,
+            60.0
+          ],
+          [
+            0.060888888888888895,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:22:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a7714a39-cbcd-469f-a88c-b406120df4b1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 358.9,
+        "range": 179.44,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:22:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0e7cee59-9d74-4217-b131-2f0419862f00",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.06733333333333333,
+            60.0
+          ],
+          [
+            0.06733333333333333,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:24:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "294591b0-8ab1-4866-a2f2-cb29da47acff",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 358.9,
+        "range": 179.44,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:24:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "63266bb6-b00d-4ca7-8848-64f16ab76dbc",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.07377777777777778,
+            60.0
+          ],
+          [
+            0.07377777777777778,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:26:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "635ddf8f-3018-4b38-9ad4-d90e84ff001a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.55,
+        "range": 179.45,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:26:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9f02c357-a9fc-4e22-97e0-c26e2da0acca",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.08022222222222222,
+            60.0
+          ],
+          [
+            0.08022222222222222,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:28:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "98ffbafe-e418-4840-a78f-903cb9cb8b07",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.55,
+        "range": 179.45,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:28:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0c826ba4-c8e3-4075-a0b6-e7dfd9b76dd5",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.08666666666666666,
+            60.0
+          ],
+          [
+            0.08666666666666666,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:30:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "102b272b-7855-4bae-a169-5def19fcc8f9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.54,
+        "range": 179.46,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:30:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b27b7aaf-99bb-4f6b-83d9-11ad9e62ba66",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.0931111111111111,
+            60.0
+          ],
+          [
+            0.0931111111111111,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:32:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "65b5687d-7e45-4587-9b9e-f08cd3e8573a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.54,
+        "range": 179.46,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:32:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e7f1e6e6-36ec-4713-aa3b-0f07d7ee3b89",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.09955555555555555,
+            60.0
+          ],
+          [
+            0.09955555555555555,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:34:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5cf04243-01a7-47d8-b8b5-fd88a0551155",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.54,
+        "range": 179.46,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:34:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "20a265e0-004e-4871-b1ff-9063b93bf991",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.10600000000000001,
+            60.0
+          ],
+          [
+            0.10600000000000001,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:36:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "55ca4044-b753-44c7-9265-89003a329579",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.53,
+        "range": 179.47,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:36:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5b6f636c-c97d-4c60-b237-4c7f0cd252aa",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.11244444444444444,
+            60.0
+          ],
+          [
+            0.11244444444444444,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:38:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f1c7eff2-0299-4c38-9ce3-ca7718207cf4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.53,
+        "range": 179.47,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:38:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "59ff6d1e-435e-407a-94e2-c088bbd3ab00",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.11888888888888889,
+            60.0
+          ],
+          [
+            0.11888888888888889,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:40:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f0db652c-1674-4fe8-a6de-35c2925997a3",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 358.9,
+        "range": 179.47,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:40:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "69ba1804-30f3-448f-982d-3bc287ad86f6",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.12533333333333332,
+            60.0
+          ],
+          [
+            0.12533333333333332,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:42:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "869d459e-806b-460e-8641-654f2ddf465f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 358.9,
+        "range": 179.48,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:42:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cbc2801b-652f-4827-9a8c-f84560df7ec6",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.13177777777777777,
+            60.0
+          ],
+          [
+            0.13177777777777777,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:44:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0e78b214-810a-4b7a-9c22-7f45dc9dec54",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 358.9,
+        "range": 179.48,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:44:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d940a26b-76cf-4f95-9764-54ef86998343",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.13822222222222222,
+            60.0
+          ],
+          [
+            0.13822222222222222,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:46:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4ca7cc74-82d0-480f-b729-dd70ab7cb8c3",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.51,
+        "range": 179.49,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:46:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a0f3c7b0-27f9-47a2-aaeb-aa527ab20e3c",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.14466666666666667,
+            60.0
+          ],
+          [
+            0.14466666666666667,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:48:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cd3fdd17-f615-48a4-a39c-0485b039e06e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.51,
+        "range": 179.49,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:48:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "de13d610-4eb4-4539-b654-f4b7afb34690",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.1511111111111111,
+            60.0
+          ],
+          [
+            0.1511111111111111,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:50:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8da76b64-0fca-4d2f-a8c9-06dd3cd7b374",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.51,
+        "range": 179.49,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:50:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3fef1fc4-9755-4ff4-baef-087d5646655d",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.15755555555555556,
+            60.0
+          ],
+          [
+            0.15755555555555556,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.3,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:52:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dcef6a24-e4b3-46ba-8428-773463f98ba4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.26,
+        "range": 179.74,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:52:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7559e265-db64-4584-b39c-451c3772a52d",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.164,
+            60.0
+          ],
+          [
+            0.164,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 359.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:54:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "90e09d0d-0f07-4ba6-8a47-eff8faaf6539",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 359.58,
+        "range": 180.42,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:54:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6e3bc9ff-d562-42ff-864b-6144e9eb0e91",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.17044444444444443,
+            60.0
+          ],
+          [
+            0.17044444444444443,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 358.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:56:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f0027e9c-748d-451d-b1b1-4cd5f4ad85c5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 358.62,
+        "range": 181.38,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:56:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c176e9a3-3a99-4800-b164-88501f01d4a9",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.17688888888888887,
+            60.0
+          ],
+          [
+            0.17688888888888887,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 357.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T12:58:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "350e2248-8d41-4511-a8e5-c439e308b009",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 357.64,
+        "range": 182.36,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T12:58:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f9e160b1-db0a-4da9-91b3-284a08e04420",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.18333333333333332,
+            60.0
+          ],
+          [
+            0.18333333333333332,
+            60.0
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 356.7,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:00:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ddea742e-bfe0-4f16-804a-e578a2b6177c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 356.65,
+        "range": 183.35,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:00:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fe1e4642-8d37-4273-abd3-0f1014c2dffb",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.18940277777777775,
+            59.999066666666664
+          ],
+          [
+            0.18940277777777775,
+            59.999066666666664
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 355.7,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:02:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "03df09a9-a06c-42cb-993d-603281b0b5d0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 355.71,
+        "range": 252.67,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:02:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d5ffc494-b8d0-46cb-80c7-3a0ba8e6f55d",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.19337222222222222,
+            59.99658888888889
+          ],
+          [
+            0.19337222222222222,
+            59.99658888888889
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 355.0,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:04:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7bf5c252-db37-4f30-9253-86f636f70be4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 354.95,
+        "range": 321.81,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:04:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9bed6c6a-d608-4f91-a374-2dbf7f888068",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.1938722222222222,
+            59.993425
+          ],
+          [
+            0.1938722222222222,
+            59.993425
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 354.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:06:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2e593b0b-40f8-4b91-8c95-67753b277748",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 354.47,
+        "range": 30.68,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:06:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "57034f43-facb-4609-829f-fee26f89f642",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.19073055555555554,
+            59.99066666666667
+          ],
+          [
+            0.19073055555555554,
+            59.99066666666667
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 354.2,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:08:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "35a430fa-c3ed-4c1a-8be4-8e958773d5b9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 354.25,
+        "range": 99.28,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:08:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "aedfff71-f5c2-457c-89c1-f2dab4ccb13a",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.18503333333333333,
+            59.989266666666666
+          ],
+          [
+            0.18503333333333333,
+            59.989266666666666
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 354.3,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:10:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "48de3b3b-9a35-48a0-8b88-31ef29b87f8f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 354.3,
+        "range": 167.62,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:10:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ed4db7be-5b19-46d9-8655-b4f04ca55c6e",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.1786861111111111,
+            59.98961666666667
+          ],
+          [
+            0.1786861111111111,
+            59.98961666666667
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 354.7,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:12:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9b212faa-c26a-4373-8af3-8693359bf3bc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 354.74,
+        "range": 213.43,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:12:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c9b1cf5a-b121-4e91-8431-d2a86001c98f",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.17246666666666666,
+            59.990458333333336
+          ],
+          [
+            0.17246666666666666,
+            59.990458333333336
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 355.5,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:14:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e853aaeb-3ef2-4f3f-bcd7-ac839c502a32",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 355.53,
+        "range": 214.79,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:14:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d793ea00-82a5-43ef-8fb5-c99d6b7ecdb6",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.16625,
+            59.991302777777776
+          ],
+          [
+            0.16625,
+            59.991302777777776
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 356.4,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:16:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b6717b5d-d50d-42dd-936f-4eb0f9c55600",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 356.45,
+        "range": 213.88,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:16:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "460246a9-ca55-4007-9e48-741ad019c1d6",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.16003055555555554,
+            59.99214444444445
+          ],
+          [
+            0.16003055555555554,
+            59.99214444444445
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 357.4,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:18:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "22e4049a-2922-40b1-9ae0-e4c27c5c5600",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 357.37,
+        "range": 212.96,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:18:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f153b78b-15e7-4a7b-a5d1-be1b4f9c1c49",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.1538111111111111,
+            59.992986111111115
+          ],
+          [
+            0.1538111111111111,
+            59.992986111111115
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 358.3,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:20:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "83448dad-fc9e-45f7-8e2c-4b5fe5ca65ba",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 358.29,
+        "range": 212.03,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:20:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "330ed3a8-78cb-4bf2-a5af-f3f33ed49f4b",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.14759444444444444,
+            59.993830555555554
+          ],
+          [
+            0.14759444444444444,
+            59.993830555555554
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 359.2,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:22:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f8d8308c-f68d-4957-ba19-f018d2a96094",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 359.22,
+        "range": 211.1,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:22:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c24be480-a10e-4467-a50f-842f08c58d16",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.141375,
+            59.99467222222222
+          ],
+          [
+            0.141375,
+            59.99467222222222
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 0.2,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:24:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6a4b1a5c-68a5-4549-8191-407f4f2d581c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.16,
+        "range": 210.17,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:24:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dbd79b04-f796-4a02-8472-ca0fce526dab",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.13503055555555554,
+            59.99456666666667
+          ],
+          [
+            0.13503055555555554,
+            59.99456666666667
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 1.1,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:26:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3013cebe-015b-4627-b8e8-9a3f958d41ed",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 1.1,
+        "range": 140.84,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:26:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "32159fdf-5f31-48bd-90d8-957eec89ca9b",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.12990277777777778,
+            59.992694444444446
+          ],
+          [
+            0.12990277777777778,
+            59.992694444444446
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 1.9,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:28:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a7d98415-9bd4-407f-8f98-3ce133dac2cf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 1.95,
+        "range": 71.61,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:28:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3d43912c-1d98-4d15-b5bc-851001eb666d",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.1277638888888889,
+            59.98970555555556
+          ],
+          [
+            0.1277638888888889,
+            59.98970555555556
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 2.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:30:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d920b76e-2fbc-4067-a467-6c45432a76a9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 2.56,
+        "range": 2.61,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:30:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9ad902d6-61ae-41a1-aaec-332726a4006e",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.12884722222222222,
+            59.98654166666667
+          ],
+          [
+            0.12884722222222222,
+            59.98654166666667
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 2.9,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:32:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5d0c2130-798c-4e01-9033-1a905469edea",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 2.94,
+        "range": 330.06,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:32:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "769d5d28-9e6e-4299-a7c1-4d051146b7bd",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.13040277777777778,
+            59.98341388888889
+          ],
+          [
+            0.13040277777777778,
+            59.98341388888889
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 3.3,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:34:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d3f070b3-ad25-4234-a08b-859d6a78034c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 3.27,
+        "range": 328.79,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:34:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "251e5b09-5527-41b5-a19a-f9cc67cd27d9",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.13195833333333334,
+            59.98028888888889
+          ],
+          [
+            0.13195833333333334,
+            59.98028888888889
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 3.6,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:36:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "28948ed4-ac19-4c8d-b1d8-d67f38a4f8bf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 3.61,
+        "range": 328.46,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:36:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "48a46b87-4045-458f-aae0-e7fb033a9cf1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.1335111111111111,
+            59.977161111111116
+          ],
+          [
+            0.1335111111111111,
+            59.977161111111116
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 3.9,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:38:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ad2f1b23-754c-4347-b808-89ee856a99b9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 3.93,
+        "range": 328.13,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:38:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7d29e184-29b9-408c-b22a-dcd2fa1c96e2",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.13506666666666667,
+            59.97403333333334
+          ],
+          [
+            0.13506666666666667,
+            59.97403333333334
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "SENSOR",
+        "track_id": "SENSOR",
+        "bearing": 4.3,
+        "range": 0.0,
+        "sensor_type": "HM",
+        "timestamp": "2010-01-12T13:40:00+00:00",
+        "label": "SUBJECT held on HM",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4b11f80d-2193-4b15-94f6-e8121216ec12",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 4.25,
+        "range": 327.81,
+        "frequency": null,
+        "speed": null,
+        "sensor_type": "TA",
+        "timestamp": "2010-01-12T13:40:00+00:00",
+        "label": "SUBJECT held on TA",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        }
+      }
+    }
+  ]
+}

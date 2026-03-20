@@ -38,7 +38,7 @@
   ],
   "properties": {
     "title": "Analysis1_Areas (demo)",
-    "datetime": "2026-03-20T21:26:43.341164+00:00",
+    "datetime": "2026-03-20T22:02:23.348622+00:00",
     "description": "Imported from Demo/Analysis/Analysis1_Areas.rep"
   },
   "links": [
@@ -84,7 +84,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/Demo/Analysis/Analysis1_Areas.rep",
-        "load_timestamp": "2026-03-20T21:26:43.344996Z",
+        "load_timestamp": "2026-03-20T22:02:23.350208Z",
         "tool_version": "0.1.0"
       }
     }

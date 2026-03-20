@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "All Tracks (general)",
-    "datetime": "2026-03-20T21:26:47.051375+00:00",
+    "datetime": "2026-03-20T22:02:28.190093+00:00",
     "description": "Imported from other_formats/test_data/brt_import/All Tracks.rep"
   },
   "links": [
@@ -53,7 +53,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/test_data/brt_import/All Tracks.rep",
-        "load_timestamp": "2026-03-20T21:26:47.054647Z",
+        "load_timestamp": "2026-03-20T22:02:28.193194Z",
         "tool_version": "0.1.0"
       }
     }

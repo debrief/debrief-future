@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "L1_OwnshipSensor (satc)",
-    "datetime": "2026-03-20T21:26:44.442646+00:00",
+    "datetime": "2026-03-20T22:02:24.698125+00:00",
     "description": "Imported from SATC/L1_OwnshipSensor.dsf"
   },
   "links": [
@@ -53,7 +53,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/L1_OwnshipSensor.dsf",
-        "load_timestamp": "2026-03-20T21:26:44.444626Z",
+        "load_timestamp": "2026-03-20T22:02:24.700038Z",
         "tool_version": "0.1.0"
       }
     }

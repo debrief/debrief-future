@@ -38,7 +38,7 @@
   ],
   "properties": {
     "title": "Polyline_Measurement (s2r)",
-    "datetime": "2026-03-20T21:26:44.045972+00:00",
+    "datetime": "2026-03-20T22:02:24.197293+00:00",
     "description": "Imported from S2R/Polyline_Measurement.rep"
   },
   "links": [
@@ -84,7 +84,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Polyline_Measurement.rep",
-        "load_timestamp": "2026-03-20T21:26:44.048666Z",
+        "load_timestamp": "2026-03-20T22:02:24.200394Z",
         "tool_version": "0.1.0"
       }
     }

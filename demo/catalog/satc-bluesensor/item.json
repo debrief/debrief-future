@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "BlueSensor (satc)",
-    "datetime": "2026-03-20T21:26:44.340110+00:00",
+    "datetime": "2026-03-20T22:02:24.566676+00:00",
     "description": "Imported from SATC/BlueSensor.dsf"
   },
   "links": [
@@ -53,7 +53,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/BlueSensor.dsf",
-        "load_timestamp": "2026-03-20T21:26:44.346556Z",
+        "load_timestamp": "2026-03-20T22:02:24.574385Z",
         "tool_version": "0.1.0"
       }
     }

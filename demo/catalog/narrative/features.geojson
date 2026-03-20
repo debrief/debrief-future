@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "d1e17a4b-e517-4f78-b238-4a63c52672c5",
+      "id": "bdfb5b82-a6c4-43a6-8acc-6f0ee9f5e52c",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -13,12 +13,17 @@
         "time": "1995-12-12T05:00:00+00:00",
         "text": "COMEX SERIAL 16D",
         "track_id": "NELSON",
-        "line_number": 1
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "78011b45-74ce-42f4-9184-4eef315f6638",
+      "id": "e981e396-2493-4255-81c4-7a4bfe44722b",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -28,12 +33,17 @@
         "time": "1995-12-12T05:01:00.100000+00:00",
         "text": "INTEND WIDE AREA SEARCH AS PREVIOUS SERIAL",
         "track_id": "NELSON",
-        "line_number": 2
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "929861f6-3d9a-430c-9e3d-77d737fb6428",
+      "id": "f4420664-4624-4ab5-8833-b60cee1cd913",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -43,12 +53,17 @@
         "time": "1995-12-12T05:02:00+00:00",
         "text": "BRIEFING HINTED THAT TARGET TO SE",
         "track_id": "NELSON",
-        "line_number": 3
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "64f74b12-a085-445f-971e-2a19ee069419",
+      "id": "a6fd798b-5324-4319-8091-b773b2ed2e04",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -58,12 +73,17 @@
         "time": "1995-12-12T05:22:00+00:00",
         "text": "NO CONTACTS YET, SWITCHING TO SCALE 7",
         "track_id": "NELSON",
-        "line_number": 4
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "5425cdc9-6fa0-4931-b7a6-3f087e63ad90",
+      "id": "9456c320-a15a-46c2-9934-6158cabee77f",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -73,12 +93,17 @@
         "time": "1995-12-12T06:12:00+00:00",
         "text": "INVESTIGATING TRACK 14",
         "track_id": "NELSON",
-        "line_number": 5
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "bd55416d-945d-4d63-85e5-8a68a233b0f8",
+      "id": "dfee962c-f7a1-486c-8b4a-fe1872e6ac3f",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -88,12 +113,17 @@
         "time": "1995-12-12T06:22:00+00:00",
         "text": "POSSUB TRACK 14",
         "track_id": "NELSON",
-        "line_number": 6
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "0439e307-4ef1-4fa8-bc2c-ced234ba4049",
+      "id": "955a5e72-c7bb-4c8e-af87-641192173a6a",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -103,12 +133,17 @@
         "time": "1995-12-12T06:42:00+00:00",
         "text": "DROP TRACK 14 BIOLOGIC",
         "track_id": "NELSON",
-        "line_number": 7
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "149ba8c6-5063-4985-b5af-f5f91175e176",
+      "id": "7bccf48a-843e-4ba9-9a04-e8283e1ed56e",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -118,12 +153,17 @@
         "time": "1995-12-12T09:53:00+00:00",
         "text": "HEADING TO RV",
         "track_id": "NELSON",
-        "line_number": 8
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "8f1d6ec1-ff86-473d-93b7-1dcf9dc6019f",
+      "id": "4f8aedd0-b61e-4280-a428-ebc2acee4994",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -133,12 +173,17 @@
         "time": "1995-12-12T09:54:00+00:00",
         "text": "SUSPECT PLAYMATE NOT PRESENT",
         "track_id": "NELSON",
-        "line_number": 9
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "1a752143-8594-4cfb-b26c-cf972d11a6cc",
+      "id": "f389a8a8-0808-4eb8-8896-61d7abc571be",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -148,12 +193,17 @@
         "time": "1995-12-12T09:57:00+00:00",
         "text": "SUSPECTED DETECTION OF RED",
         "track_id": "COLLINGWOOD",
-        "line_number": 10
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "e8fc76c6-c927-4c54-b81a-d320054e066f",
+      "id": "3d992785-9927-429f-9fb5-9cedf561da32",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -163,12 +213,17 @@
         "time": "1995-12-12T10:03:00+00:00",
         "text": "CONFIRMED. OBTAIN SOLUTION",
         "track_id": "COLLINGWOOD",
-        "line_number": 11
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "675f7e31-204e-4239-a884-743164254403",
+      "id": "d3b72fcc-0871-446d-9654-a61310dacd72",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -178,12 +233,17 @@
         "time": "1995-12-12T10:13:00+00:00",
         "text": "SUSPECT TARGET ZIG",
         "track_id": "COLLINGWOOD",
-        "line_number": 12
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "12d8432d-3def-4146-b625-0c47fffb1af9",
+      "id": "7632bd21-0b12-45a5-8566-697ad85eaa82",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -193,12 +253,17 @@
         "time": "1995-12-12T10:14:00+00:00",
         "text": "PORT DETECTION, 16 HZ",
         "track_id": "NELSON",
-        "line_number": 13
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "367ecdd7-0187-4a72-ab66-b02b87f185cc",
+      "id": "fcd11a48-173c-4e12-8a0f-fe5e8a61de29",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -208,12 +273,17 @@
         "time": "1995-12-12T10:29:00+00:00",
         "text": "ENTER TRAIL",
         "track_id": "NELSON",
-        "line_number": 14
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "ece688c6-5870-44a4-818d-f3c58d81fe98",
+      "id": "e745e8e7-e984-4032-9006-0b4952d2d37f",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -223,12 +293,17 @@
         "time": "1995-12-12T10:37:00+00:00",
         "text": "TARGET ZIG DETECTED",
         "track_id": "NELSON",
-        "line_number": 15
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "a6bdc1ad-466e-472f-97d8-c86c16dcd8b2",
+      "id": "500bce8d-be24-4c06-9cf0-26c658caab8d",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -238,12 +313,17 @@
         "time": "1995-12-12T11:19:00+00:00",
         "text": "FINEX CALLED, ENTER TRANSITION",
         "track_id": "COLLINGWOOD",
-        "line_number": 16
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "6e26e8d0-fa54-4579-8e21-dfb407240aaf",
+      "id": "57bde24c-b0ec-4eb2-9ee9-a6f9929bc5da",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -253,12 +333,17 @@
         "time": "1995-12-12T11:20:00+00:00",
         "text": "ENTERING PLOT-LOCK TRANSITION",
         "track_id": "NELSON",
-        "line_number": 17
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "a1551d7e-802a-440b-99ec-09edcb30d687",
+      "id": "58bcacaf-60e8-472a-8a28-eab94bd085a0",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -268,12 +353,17 @@
         "time": "1995-12-12T11:37:00+00:00",
         "text": "ACTIVE PLOT-LOCK SUCCESSFUL",
         "track_id": "NELSON",
-        "line_number": 18
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "1db21da5-9172-443d-9981-fbfb072e50a8",
+      "id": "6a416229-74f2-4041-a076-e7bb5be6fcde",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -283,7 +373,12 @@
         "time": "1995-12-12T11:41:00+00:00",
         "text": "RX CONGRATS ON UWT",
         "track_id": "NELSON",
-        "line_number": 19
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     }
   ]

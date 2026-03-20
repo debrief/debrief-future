@@ -86,7 +86,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/Deb_North_Low_Bearing_Rate_s_turns.dpf",
-        "load_timestamp": "2026-03-20T21:26:44.402942Z",
+        "load_timestamp": "2026-03-20T22:02:24.648753Z",
         "tool_version": "0.1.0"
       }
     }

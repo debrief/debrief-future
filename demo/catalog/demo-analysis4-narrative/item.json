@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "Analysis4_Narrative (demo)",
-    "datetime": "2026-03-20T21:26:43.370264+00:00",
+    "datetime": "2026-03-20T22:02:23.376746+00:00",
     "description": "Imported from Demo/Analysis/Analysis4_Narrative.rep"
   },
   "links": [
@@ -28,7 +28,34 @@
       "href": "./item.json",
       "type": "application/geo+json",
       "title": "Analysis4_Narrative (demo)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/Demo/Analysis/Analysis4_Narrative.rep",
+      "title": "Analysis4_Narrative.rep"
     }
   ],
-  "assets": {}
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Analysis4_Narrative": {
+      "href": "./assets/Analysis4_Narrative.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Analysis4_Narrative.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/Demo/Analysis/Analysis4_Narrative.rep",
+        "load_timestamp": "2026-03-20T22:02:23.379312Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
 }

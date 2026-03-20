@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "ed52da37-1031-4e70-b5b9-2d45242b19ee",
+      "id": "e0495906-2ffe-4edf-bda4-7dc89a7aac1a",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -74,23 +74,6 @@
         "platform_id": "COLLINGWOOD",
         "platform_name": "COLLINGWOOD",
         "track_type": "CONTACT",
-        "times": [
-          818745540000,
-          818745600000,
-          818745660000,
-          818745720000,
-          818745780000,
-          818745840000,
-          818745960000,
-          818746020000,
-          818746080000,
-          818746140000,
-          818746200000,
-          818746260000,
-          818746320000,
-          818746380000,
-          818746440000
-        ],
         "start_time": "1995-12-12T05:19:00+00:00",
         "end_time": "1995-12-12T05:34:00+00:00",
         "positions": [
@@ -185,6 +168,17 @@
             "depth": 0.0
           }
         ],
+        "style": {
+          "line": {
+            "color": "#0000FF"
+          },
+          "point": {
+            "shape": "circle",
+            "radius": 3.0,
+            "fill_color": "#0000FF",
+            "color": "#0000FF"
+          }
+        },
         "default_position_style": {
           "show_symbol": false,
           "symbol": "circle",

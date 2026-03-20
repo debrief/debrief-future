@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "sen_ssk_freq (general)",
-    "datetime": "2026-03-20T21:26:47.751312+00:00",
+    "datetime": "2026-03-20T22:02:28.894846+00:00",
     "description": "Imported from sen_ssk_freq.dsf"
   },
   "links": [
@@ -53,7 +53,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_ssk_freq.dsf",
-        "load_timestamp": "2026-03-20T21:26:47.753317Z",
+        "load_timestamp": "2026-03-20T22:02:28.897108Z",
         "tool_version": "0.1.0"
       }
     }

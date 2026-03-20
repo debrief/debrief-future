@@ -160,6 +160,12 @@
     },
     {
       "rel": "item",
+      "href": "./s2r-ambig-tracks-hover-north/item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks_hover_north (s2r)"
+    },
+    {
+      "rel": "item",
       "href": "./s2r-ambig-tracks-hover-north-hm/item.json",
       "type": "application/geo+json",
       "title": "Ambig_tracks_hover_north_HM (s2r)"
@@ -274,6 +280,12 @@
     },
     {
       "rel": "item",
+      "href": "./satc-bluesensor-sparse/item.json",
+      "type": "application/geo+json",
+      "title": "BlueSensor_sparse (satc)"
+    },
+    {
+      "rel": "item",
       "href": "./satc-bluetrack/item.json",
       "type": "application/geo+json",
       "title": "BlueTrack (satc)"
@@ -361,12 +373,6 @@
       "href": "./satc-test-dataset2b/item.json",
       "type": "application/geo+json",
       "title": "Dataset2b (satc-test)"
-    },
-    {
-      "rel": "item",
-      "href": "./satc-test-dataset3/item.json",
-      "type": "application/geo+json",
-      "title": "Dataset3 (satc-test)"
     },
     {
       "rel": "item",
@@ -562,7 +568,7 @@
       "bbox": [
         [
           -87.662054,
-          -0.0951111,
+          -0.12067121288205127,
           52.06401944444444,
           60.7
         ]
@@ -572,7 +578,7 @@
       "interval": [
         [
           "1970-01-03T01:34:25+00:00",
-          "2026-03-20T21:26:47.809151+00:00"
+          "2026-03-20T22:02:28.970122+00:00"
         ]
       ]
     }

@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "bcad9edd-b300-495a-aa42-ccbec59c2ce4",
+      "id": "4f8fd195-83b5-45dd-9ad4-fc7a0e46d9f7",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -17,7 +17,7 @@
     },
     {
       "type": "Feature",
-      "id": "95029b09-745d-4255-9046-bd7948c71267",
+      "id": "15de8f4c-f51e-4470-b3aa-7248810264f9",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -31,7 +31,7 @@
     },
     {
       "type": "Feature",
-      "id": "3dfec8f5-17a3-4435-869d-f8a49c74ef19",
+      "id": "a01ea880-e841-4fce-b1da-b83e37902789",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -45,7 +45,7 @@
     },
     {
       "type": "Feature",
-      "id": "3a4f7a7b-3d14-412b-9329-3d5b081f7cae",
+      "id": "475aa343-05df-409e-b258-306e037f5f06",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -59,7 +59,7 @@
     },
     {
       "type": "Feature",
-      "id": "a01f17e1-0d2a-4c11-8cdf-1794613d55c9",
+      "id": "73c24b9e-5502-4a71-a3cd-feca43cf5237",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -73,7 +73,7 @@
     },
     {
       "type": "Feature",
-      "id": "be840e54-af3f-42a7-9679-9df052ce6d8b",
+      "id": "4615dead-9007-44d9-874a-3c10fe942e7c",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -87,7 +87,7 @@
     },
     {
       "type": "Feature",
-      "id": "31f477b5-cf83-41e3-a681-8feaedb8e56f",
+      "id": "8f2e4c88-9d40-40c0-955d-d8e48ed1310a",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -101,7 +101,7 @@
     },
     {
       "type": "Feature",
-      "id": "14817abb-fc9e-4901-84bc-93b40d7e8e0f",
+      "id": "fbe691c8-a9d5-40a6-9e58-bf1f9b0eeb28",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -115,7 +115,7 @@
     },
     {
       "type": "Feature",
-      "id": "a9ad128b-46f8-4b38-baec-c6f95dd436bb",
+      "id": "06361a1e-d292-47ee-8b89-29e18e229151",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -129,7 +129,7 @@
     },
     {
       "type": "Feature",
-      "id": "8de9ab48-ed18-49d9-9bab-0a502f13e7c8",
+      "id": "fe5fa20b-429e-4b13-8d56-7168a5e40d11",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -143,7 +143,7 @@
     },
     {
       "type": "Feature",
-      "id": "1d7318fa-ad49-4653-9f46-d341eee93e74",
+      "id": "2354fe7d-121d-4e10-a4e7-236c0496cb71",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -157,7 +157,7 @@
     },
     {
       "type": "Feature",
-      "id": "de9e99f6-62de-4fdb-8e25-6742de7bf036",
+      "id": "f2bd05f2-ec2b-417d-8df3-58732d6a5b55",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -171,7 +171,7 @@
     },
     {
       "type": "Feature",
-      "id": "b4309f33-2e11-419d-8796-aafae5f09c0c",
+      "id": "349f53ce-3de9-4959-b30b-2213becd211b",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -185,7 +185,7 @@
     },
     {
       "type": "Feature",
-      "id": "217fd26f-ced5-431e-9348-04c240bae389",
+      "id": "06f64930-55c6-4dff-bf02-27ace865253a",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -199,7 +199,7 @@
     },
     {
       "type": "Feature",
-      "id": "7df10997-72b5-4c13-b2cd-40c6a0cb1d27",
+      "id": "76e120dc-569f-4bab-8761-1ffe58bde650",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -213,7 +213,7 @@
     },
     {
       "type": "Feature",
-      "id": "8d69c425-7784-47c2-8d7f-13393a2d2eff",
+      "id": "6e4f1870-0bcd-4280-b5be-0d3ac71528a2",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -227,7 +227,7 @@
     },
     {
       "type": "Feature",
-      "id": "69b223d8-199d-45e8-9f50-783462c353c3",
+      "id": "fbe9d246-6480-4f01-9d97-ba893b2f5f4f",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -241,7 +241,7 @@
     },
     {
       "type": "Feature",
-      "id": "d13baa21-27ac-47e4-a1a0-1c0f4e78a422",
+      "id": "0542b264-e4e8-4269-8fd6-a16fdc3e4ae8",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -255,7 +255,7 @@
     },
     {
       "type": "Feature",
-      "id": "c4fba05e-0ab7-4600-9c41-d472b7e72fbb",
+      "id": "5c4820fe-a03c-4819-ab12-5b11ce498cda",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -269,7 +269,7 @@
     },
     {
       "type": "Feature",
-      "id": "36adb6f2-6312-4c12-9497-b08a65f6e331",
+      "id": "3539aca0-7880-4e42-a363-1ff1a6a99ba7",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -283,7 +283,7 @@
     },
     {
       "type": "Feature",
-      "id": "b745121a-33f6-4467-a4ce-537f0f4e94a4",
+      "id": "a2f28f9e-49bc-44da-b03c-30499b10bfc2",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -297,7 +297,7 @@
     },
     {
       "type": "Feature",
-      "id": "41a23ba8-6afe-4303-b856-801d3a04b4af",
+      "id": "a2580e3d-ab09-4876-b662-97dac6e9b8b5",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -311,7 +311,7 @@
     },
     {
       "type": "Feature",
-      "id": "94e97630-2cf3-49f3-8cd4-4f2f33313815",
+      "id": "4aecbf88-c90b-4ecd-a573-5608a39f8fe3",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -325,7 +325,7 @@
     },
     {
       "type": "Feature",
-      "id": "965ace1f-d74c-4201-8687-03f3258bdaf7",
+      "id": "e59a3342-eb23-4056-a649-19993da92406",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -339,7 +339,7 @@
     },
     {
       "type": "Feature",
-      "id": "4da15045-05b9-48e4-b449-2042f3cbc9db",
+      "id": "d4afdd5b-e199-4c50-80c6-d8e30c22b135",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -353,7 +353,7 @@
     },
     {
       "type": "Feature",
-      "id": "d7a11c6d-720d-4c19-b0f8-80ef8924bab9",
+      "id": "5b23effe-2c54-4ec4-ad9c-43ebaa18218f",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -367,7 +367,7 @@
     },
     {
       "type": "Feature",
-      "id": "08b179fb-bf36-4269-bc7d-a69e4d319abc",
+      "id": "32fc3259-ea2e-4e3e-ae7e-31e95dc20706",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -381,7 +381,7 @@
     },
     {
       "type": "Feature",
-      "id": "d5149a09-715c-4604-a267-da6ed96c8b4c",
+      "id": "d01e5621-8c57-431e-a029-2da210821118",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -395,7 +395,7 @@
     },
     {
       "type": "Feature",
-      "id": "845f9a1b-88b7-4e03-999b-0c04db299a82",
+      "id": "ebe85eee-5fc7-4c17-9cb8-0f883328401e",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -409,7 +409,7 @@
     },
     {
       "type": "Feature",
-      "id": "11f90061-61d9-43a9-8613-be27399671ff",
+      "id": "a1fcf2ba-9b54-4b81-bc2b-46a06a41470b",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -423,7 +423,7 @@
     },
     {
       "type": "Feature",
-      "id": "efe3991a-a4f6-4688-ae98-36ddfd281fb2",
+      "id": "e50ce2d4-843f-40c6-9678-f56d87db0a38",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -437,7 +437,7 @@
     },
     {
       "type": "Feature",
-      "id": "1f228817-3e59-4844-adc7-5ddb8c04f2cc",
+      "id": "bc9bcb7f-a19c-4289-a11b-e94c419436b7",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -451,7 +451,7 @@
     },
     {
       "type": "Feature",
-      "id": "53dc9062-2b27-4e96-aa37-556a7815e7f2",
+      "id": "223b0a14-f6b6-41e3-abff-3bc919018875",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -465,7 +465,7 @@
     },
     {
       "type": "Feature",
-      "id": "434937d0-13d6-4b88-8028-1e12882f842a",
+      "id": "ad678d89-381a-4c5a-af16-8a0a7588f11f",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -479,7 +479,7 @@
     },
     {
       "type": "Feature",
-      "id": "e68d9ae7-ba96-4935-8f2a-0c933fde9155",
+      "id": "63387fec-5775-4c42-9074-ef45e0148509",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -493,7 +493,7 @@
     },
     {
       "type": "Feature",
-      "id": "8b70c985-4757-48cd-a203-c8cd96a8fc79",
+      "id": "4256c79e-8cd1-44ca-a62d-227ad3ac6bbc",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -507,7 +507,7 @@
     },
     {
       "type": "Feature",
-      "id": "39ab72a0-cede-4eaf-815e-7118be201ad2",
+      "id": "75111152-5509-4efe-89cf-9be611ca7ef9",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -521,7 +521,7 @@
     },
     {
       "type": "Feature",
-      "id": "7699a4bc-d391-4c65-aaa1-41267db9cbed",
+      "id": "f5593ea0-d9a0-4a5e-88ab-fdecf1af4597",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -535,7 +535,7 @@
     },
     {
       "type": "Feature",
-      "id": "5a43a389-d29a-4898-aef1-b8d10c3b10d4",
+      "id": "cc02fecf-5f37-47f9-b9de-2308c5321f16",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -549,7 +549,7 @@
     },
     {
       "type": "Feature",
-      "id": "c911399b-c42d-4039-98e5-dcbe393f97d9",
+      "id": "ee2f4580-d2cd-44cb-8b59-d18eef76846a",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -563,7 +563,7 @@
     },
     {
       "type": "Feature",
-      "id": "93c625f5-c1a3-4f91-ade8-16d084e95eee",
+      "id": "f17de06f-122a-4194-887b-0a285c148188",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -577,7 +577,7 @@
     },
     {
       "type": "Feature",
-      "id": "9d9f7f9d-5b11-48e4-ae21-79c10f24fed8",
+      "id": "a24d9f98-5acc-4c8d-9e2e-5bb867f703e0",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -591,7 +591,7 @@
     },
     {
       "type": "Feature",
-      "id": "35516b54-d7d7-49d2-8cce-8fc74bb7e152",
+      "id": "bb6d6050-cfd4-4aca-8452-a5dcf4705a55",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -605,7 +605,7 @@
     },
     {
       "type": "Feature",
-      "id": "b5be83cd-9125-40bb-b896-63e4d65c6e1e",
+      "id": "6647c708-0f5e-4812-ab39-9df8c64d5cf4",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -619,7 +619,7 @@
     },
     {
       "type": "Feature",
-      "id": "343fbcbf-3820-4c09-a895-3d9ce6468a26",
+      "id": "b1e9c8ce-9217-4f27-b422-2c52372094ac",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -633,7 +633,7 @@
     },
     {
       "type": "Feature",
-      "id": "e4044b5d-13ff-4396-96b4-b1c7ffffa04c",
+      "id": "6dc0bb93-045f-4297-b52a-c6ebd539b7bd",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -647,7 +647,7 @@
     },
     {
       "type": "Feature",
-      "id": "d38a2829-d71b-4127-b538-01e122b2a453",
+      "id": "e13b56f4-0d22-435a-bc6c-4cfea0f71b40",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -661,7 +661,7 @@
     },
     {
       "type": "Feature",
-      "id": "a53894b4-f547-45e1-9c5e-01ab49508bfa",
+      "id": "6192dc71-5aa3-47b9-aadc-47c32fd5abf0",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -675,7 +675,7 @@
     },
     {
       "type": "Feature",
-      "id": "90ce4ac1-b054-4ca1-b14e-0b7f90135ca8",
+      "id": "9bed5c3b-3865-472a-83d4-6461e9f24b37",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -689,7 +689,7 @@
     },
     {
       "type": "Feature",
-      "id": "b22ee1b2-2069-4bbb-9a50-99949555c599",
+      "id": "236548a0-04d5-47c8-81d6-4c54a5737b15",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -703,7 +703,7 @@
     },
     {
       "type": "Feature",
-      "id": "963257ea-2437-42e9-ae48-b8e6638ddf0a",
+      "id": "a943c9ce-62c4-4226-b55b-51caf9fb8f3e",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -717,7 +717,7 @@
     },
     {
       "type": "Feature",
-      "id": "0da69a57-e7c3-43a2-accc-9379dd1aaccc",
+      "id": "5393968f-3c88-4876-bca9-a9a35d0065d8",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -731,7 +731,7 @@
     },
     {
       "type": "Feature",
-      "id": "984a7417-7d75-43d0-ae45-2144e8b63b17",
+      "id": "c6205817-1b95-482e-b5b1-6c396e4622ae",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -745,7 +745,7 @@
     },
     {
       "type": "Feature",
-      "id": "aab48d93-5863-4874-805a-b97b46f19c65",
+      "id": "fa24b6f8-f04f-4829-a890-21bccdff33bb",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -759,7 +759,7 @@
     },
     {
       "type": "Feature",
-      "id": "937645bd-2f6c-4736-97b3-2780b3977a41",
+      "id": "e2c811b2-0687-45ff-aa4e-bc906229de2b",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -773,7 +773,7 @@
     },
     {
       "type": "Feature",
-      "id": "27ae9421-8d89-4015-8400-e28fd9bea436",
+      "id": "b59dde4b-601b-4a29-a8cb-4c633d8cffab",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -787,7 +787,7 @@
     },
     {
       "type": "Feature",
-      "id": "fd67dee3-17d6-48fd-9d1f-4d869db62f8a",
+      "id": "da42530e-0f7e-44da-96f0-689a1410ed97",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -801,7 +801,7 @@
     },
     {
       "type": "Feature",
-      "id": "930f47a8-b019-4bf1-adae-55af1b86307c",
+      "id": "1f0cbb81-86f7-4b5d-8362-b73f647c041c",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -815,7 +815,7 @@
     },
     {
       "type": "Feature",
-      "id": "cb126126-0f9e-4e2a-99fa-31fa66c259c3",
+      "id": "c4bd68f0-84f5-47f1-a2a7-c11c5f58bf9b",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -829,7 +829,7 @@
     },
     {
       "type": "Feature",
-      "id": "4c9ca4cd-54f0-45bc-96fd-38e6228e93cc",
+      "id": "4d8393e8-1374-4438-91cd-e9a4f22bfa6f",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -843,7 +843,7 @@
     },
     {
       "type": "Feature",
-      "id": "3a2184a2-20ae-4223-86a8-49479722f78b",
+      "id": "ffb27584-4d49-4e72-a303-1c55a4a9d29d",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -857,7 +857,7 @@
     },
     {
       "type": "Feature",
-      "id": "f0ccb835-9d24-4cac-879d-8658209fd21d",
+      "id": "4d2c2570-650d-48cc-b18c-06e05518b6d4",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -871,7 +871,7 @@
     },
     {
       "type": "Feature",
-      "id": "190d93b7-f4ba-48e7-80e6-e74872be5e67",
+      "id": "057c1010-305e-45b0-920a-89ac553772f3",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -885,7 +885,7 @@
     },
     {
       "type": "Feature",
-      "id": "cd77fb75-f681-4efa-9878-8f0d3224a941",
+      "id": "ca210330-4f8f-45f2-950c-4b7b8408e12e",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -900,7 +900,7 @@
     },
     {
       "type": "Feature",
-      "id": "ab496631-fab3-4f68-a0c9-65f6a698c54d",
+      "id": "9771d27c-0812-4d59-bdc0-667688708b59",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -915,7 +915,7 @@
     },
     {
       "type": "Feature",
-      "id": "d6cf2c05-6f97-43e1-8f2c-2dfa1ce6bd38",
+      "id": "4b031290-6dfc-4e3a-b1e0-b616970b7cd3",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -930,7 +930,7 @@
     },
     {
       "type": "Feature",
-      "id": "d44ba429-1690-4fa2-b3b9-e3f745a71716",
+      "id": "81b83d97-9512-4fad-a267-c350e9b4c2ce",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -945,7 +945,7 @@
     },
     {
       "type": "Feature",
-      "id": "074ac286-753e-4ef1-85cb-3d40b729121b",
+      "id": "9b9b7008-efcb-415d-8fe9-903ef38223fc",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -960,7 +960,7 @@
     },
     {
       "type": "Feature",
-      "id": "a2b1a1a4-ead0-450b-b882-004977646fc9",
+      "id": "ddec75cd-255d-497d-878f-2e401120bff6",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -975,7 +975,7 @@
     },
     {
       "type": "Feature",
-      "id": "59afa8b8-848a-4430-b440-69211dcc443f",
+      "id": "bc4bc637-ca1d-45cb-9642-84ebbf33ebe5",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -990,7 +990,7 @@
     },
     {
       "type": "Feature",
-      "id": "23df8b54-8139-413e-9d8c-b72c56a79825",
+      "id": "7bbecc7a-bb40-4df3-9850-37298c9779d6",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1005,7 +1005,7 @@
     },
     {
       "type": "Feature",
-      "id": "eb943c41-2b01-49d1-b60a-80f7a4a46ad5",
+      "id": "fcb35361-5a8e-40bf-8c86-cb6a8f578546",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1020,7 +1020,7 @@
     },
     {
       "type": "Feature",
-      "id": "5402e6d7-009f-4110-b71a-983f75f94daa",
+      "id": "209cd5a5-da4e-4a95-a5be-649f764a8702",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1035,7 +1035,7 @@
     },
     {
       "type": "Feature",
-      "id": "ba8f58b6-77be-44fd-9641-dc81c9277905",
+      "id": "a4460cb9-7f98-4565-8c95-a69104c546f1",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1050,7 +1050,7 @@
     },
     {
       "type": "Feature",
-      "id": "249a314f-b978-49af-8e65-a4fb74754085",
+      "id": "d2e3881c-fc99-435a-9499-1e60723e6d3c",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1065,7 +1065,7 @@
     },
     {
       "type": "Feature",
-      "id": "bcdb0e1d-d566-4847-978f-eac8b76b258f",
+      "id": "0ad2d8b7-ff9b-4871-b34a-93edfda6bf9e",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1080,7 +1080,7 @@
     },
     {
       "type": "Feature",
-      "id": "4e8167e0-c0ea-4089-a63a-5a2149ceabb2",
+      "id": "6f1b65f5-cede-4ede-af5c-0214b747e88c",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1095,7 +1095,7 @@
     },
     {
       "type": "Feature",
-      "id": "f9690600-f219-4233-aca9-bbaa9df0b028",
+      "id": "44c92272-0918-4d33-9f60-fad69582da91",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1110,7 +1110,7 @@
     },
     {
       "type": "Feature",
-      "id": "b4a1ef07-cd67-40c1-adfa-e5899ea88ed4",
+      "id": "dffc4fe9-44d2-4ec3-98e3-f43c06bf3a90",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1125,7 +1125,7 @@
     },
     {
       "type": "Feature",
-      "id": "d9a15c97-56d2-4873-aebb-212a942325c2",
+      "id": "fd66660e-fb78-4976-8b79-29864d49b43f",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1141,7 +1141,7 @@
     },
     {
       "type": "Feature",
-      "id": "6423f900-d462-4692-bf51-fc3e15345a7b",
+      "id": "afeee8f6-1551-4d73-9402-4f01cca9dbf5",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1157,7 +1157,7 @@
     },
     {
       "type": "Feature",
-      "id": "7e04aaa0-de6d-400a-a4d4-559000064a93",
+      "id": "f7dc1997-e7df-4caa-a95a-1bd20e325545",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1173,7 +1173,7 @@
     },
     {
       "type": "Feature",
-      "id": "035c4724-57fe-468f-a862-cef277839143",
+      "id": "06ecb116-368f-4566-8abd-0b65f55ffc0f",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1189,7 +1189,7 @@
     },
     {
       "type": "Feature",
-      "id": "c4242543-1547-40c7-800b-4dd821d2fe12",
+      "id": "fc6556df-eef4-42f6-954d-150dde61d8cb",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1205,7 +1205,7 @@
     },
     {
       "type": "Feature",
-      "id": "0c9309a3-f0cf-4bf0-8552-543e08462b2c",
+      "id": "cf33d5b9-fe11-449b-ad22-86c9536f49c3",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1221,7 +1221,7 @@
     },
     {
       "type": "Feature",
-      "id": "90f0403d-5638-46bd-8420-fc8b3849deaa",
+      "id": "e339f814-fd34-4ad7-bbb2-ce11bef52933",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1237,7 +1237,7 @@
     },
     {
       "type": "Feature",
-      "id": "5d9cdfc8-1a5b-48df-937d-f76f98a7a193",
+      "id": "e86d25ea-0e04-4598-98da-e4755820b78e",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1253,7 +1253,7 @@
     },
     {
       "type": "Feature",
-      "id": "fcf2823e-7682-40fb-806c-62c871ac2b58",
+      "id": "2c5dbfb1-ce38-4390-995c-2f51a2bdb103",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1269,7 +1269,7 @@
     },
     {
       "type": "Feature",
-      "id": "8a43586f-9b2b-427a-ae9c-27d249517cf3",
+      "id": "07b2b760-39e5-40a9-a1ac-218d1a51be45",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1285,7 +1285,7 @@
     },
     {
       "type": "Feature",
-      "id": "cc8b3bcc-ba5a-4c00-822a-779b3a8b0162",
+      "id": "5968e182-9fb3-4734-afe1-160f733c8e9d",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1301,7 +1301,7 @@
     },
     {
       "type": "Feature",
-      "id": "aacb619e-8779-4ad9-b2eb-2268b8002e0d",
+      "id": "d2fe4fff-5e36-4c7c-8be9-4cde5eb2e048",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1317,7 +1317,7 @@
     },
     {
       "type": "Feature",
-      "id": "b0b7bb8c-3ba1-4b90-ad41-7213525e1aed",
+      "id": "e3f63729-a689-46dc-8fc4-c9ceb985b372",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1333,7 +1333,7 @@
     },
     {
       "type": "Feature",
-      "id": "7684f5af-0c16-4f56-8ad3-2c0ff8212b77",
+      "id": "74da5389-b03a-4ce3-b325-0edc68a481dd",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1348,7 +1348,7 @@
     },
     {
       "type": "Feature",
-      "id": "127db52e-ea58-40fe-9a14-4ee6bba15a09",
+      "id": "f780252c-b781-4397-b888-d3dc660d0565",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",
@@ -1364,7 +1364,7 @@
     },
     {
       "type": "Feature",
-      "id": "d401f0e9-9e7f-49f7-aac9-9c9b6325f13c",
+      "id": "185f3e8d-e548-48ee-9ae8-4184041fc561",
       "geometry": null,
       "properties": {
         "kind": "SENSOR_CONTACT",

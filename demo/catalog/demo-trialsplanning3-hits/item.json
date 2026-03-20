@@ -38,7 +38,7 @@
   ],
   "properties": {
     "title": "TrialsPlanning3_hits (demo)",
-    "datetime": "2026-03-20T21:26:43.392088+00:00",
+    "datetime": "2026-03-20T22:02:23.398805+00:00",
     "description": "Imported from Demo/TrialsPlanning/TrialsPlanning3_hits.rep"
   },
   "links": [
@@ -84,7 +84,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/Demo/TrialsPlanning/TrialsPlanning3_hits.rep",
-        "load_timestamp": "2026-03-20T21:26:43.393951Z",
+        "load_timestamp": "2026-03-20T22:02:23.400366Z",
         "tool_version": "0.1.0"
       }
     }

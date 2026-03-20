@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "All Tracks Use Current Heading (general)",
-    "datetime": "2026-03-20T21:26:47.046929+00:00",
+    "datetime": "2026-03-20T22:02:28.184304+00:00",
     "description": "Imported from other_formats/test_data/brt_import/All Tracks Use Current Heading.rep"
   },
   "links": [
@@ -53,7 +53,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/test_data/brt_import/All Tracks Use Current Heading.rep",
-        "load_timestamp": "2026-03-20T21:26:47.049832Z",
+        "load_timestamp": "2026-03-20T22:02:28.187995Z",
         "tool_version": "0.1.0"
       }
     }

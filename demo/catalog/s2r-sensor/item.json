@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "sensor (s2r)",
-    "datetime": "2026-03-20T21:26:44.247480+00:00",
+    "datetime": "2026-03-20T22:02:24.450487+00:00",
     "description": "Imported from S2R/sensor.dsf"
   },
   "links": [
@@ -53,7 +53,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/sensor.dsf",
-        "load_timestamp": "2026-03-20T21:26:44.250277Z",
+        "load_timestamp": "2026-03-20T22:02:24.453720Z",
         "tool_version": "0.1.0"
       }
     }

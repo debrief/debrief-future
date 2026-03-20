@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "narrative2 (general)",
-    "datetime": "2026-03-20T21:26:46.024370+00:00",
+    "datetime": "2026-03-20T22:02:26.586401+00:00",
     "description": "Imported from narrative2.rep"
   },
   "links": [
@@ -28,7 +28,34 @@
       "href": "./item.json",
       "type": "application/geo+json",
       "title": "narrative2 (general)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/narrative2.rep",
+      "title": "narrative2.rep"
     }
   ],
-  "assets": {}
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-narrative2": {
+      "href": "./assets/narrative2.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "narrative2.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/narrative2.rep",
+        "load_timestamp": "2026-03-20T22:02:26.590001Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
 }

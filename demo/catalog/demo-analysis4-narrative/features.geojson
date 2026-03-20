@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "8555bd7f-b7a3-4920-8dc0-2e4e739b6274",
+      "id": "d7c578e3-6214-4d87-b4c0-e506d147d212",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -13,12 +13,17 @@
         "time": "1995-12-12T05:00:00+00:00",
         "text": "ENDEX END OF SERIAL 12D",
         "track_id": "COLLINGWOOD",
-        "line_number": 1
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "86be9855-046c-455f-be2a-b4f8b2a78cf0",
+      "id": "f2ca15ac-6e82-4662-941b-9ae97ad86627",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -28,12 +33,17 @@
         "time": "1995-12-12T05:01:00+00:00",
         "text": "COMEX START OF SERIAL 12E",
         "track_id": "COLLINGWOOD",
-        "line_number": 2
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "79dd3784-5a38-451e-84f5-ec5f9c546c7e",
+      "id": "1bf279f3-e843-4243-8ff8-657ddcbe153c",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -43,12 +53,17 @@
         "time": "1995-12-12T05:01:00+00:00",
         "text": "COMEX COMEX SERIAL 12E",
         "track_id": "NELSON",
-        "line_number": 3
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "6be9f28e-fc35-403f-8a5c-58e3a24e1387",
+      "id": "30dd8a57-24c8-4800-a335-3203d7ce62d7",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -58,12 +73,17 @@
         "time": "1995-12-12T05:10:00+00:00",
         "text": "CMD_COMMENT STARTING ZULU SEARCH. DECISION BASED ON CLIMATOLOGY AND MET FORECAST FOR NEXT 48 HOURS",
         "track_id": "NELSON",
-        "line_number": 4
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "7bdcd9d5-6662-4ffd-aa2e-9f704d38f5a3",
+      "id": "8bd9163f-0c9b-474a-8e53-985b0cf0d766",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -73,12 +93,17 @@
         "time": "1995-12-12T06:24:00+00:00",
         "text": "NEW_CONTACT GAINED SUSPICIOUS CONTACT, WILL RANGE",
         "track_id": "NELSON",
-        "line_number": 5
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "63c1b2d6-1270-4d87-a7b8-d761837c5c20",
+      "id": "b1f5d46c-fdac-4ead-bedf-47fae09ce0d6",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -88,12 +113,17 @@
         "time": "1995-12-12T06:48:00+00:00",
         "text": "CONTACT_LOST IGNORE CONTACT, BIOLOGIC",
         "track_id": "NELSON",
-        "line_number": 6
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "53067077-604e-4963-834a-0dc0ca0b1231",
+      "id": "d2f609ba-aeaa-4ace-bd17-f613677a528b",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -103,12 +133,17 @@
         "time": "1995-12-12T06:59:00+00:00",
         "text": "CMD_COMMENT NO SIGN OF CONTACT. SAC THEN MOVE TO SECTOR VICTOR",
         "track_id": "NELSON",
-        "line_number": 7
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "4364884c-410b-47ee-8008-8816d36e1a01",
+      "id": "69593a63-91ed-4cac-9afb-8c751d7db8cf",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -118,12 +153,17 @@
         "time": "1995-12-12T07:15:00+00:00",
         "text": "CMD_COMMENT SAC SUCCESSFUL. CLEAR",
         "track_id": "NELSON",
-        "line_number": 8
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "8165d6e2-8451-46c9-9e9a-4417611afbfc",
+      "id": "63a0ea58-5895-4301-8da5-ebfad1a0e7c0",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -133,12 +173,17 @@
         "time": "1995-12-12T07:29:00+00:00",
         "text": "NEW_CONTACT NEW CONTACT, LOW BEARING RATE. TO INVESTIGATE",
         "track_id": "NELSON",
-        "line_number": 9
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "e9a78c8e-969d-4041-822d-f7ef18557f49",
+      "id": "35ee5be4-4819-4db5-a7f7-185f5a752a72",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -148,12 +193,17 @@
         "time": "1995-12-12T07:55:00+00:00",
         "text": "CMD_COMMENT FEAR CONTACT MAY HAVE RNG ADV, EVADE",
         "track_id": "NELSON",
-        "line_number": 10
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "15d86dfb-945c-4943-9607-6cf2c4fdabba",
+      "id": "b24bd675-4dbd-4df2-bf82-ab38545f72bc",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -163,12 +213,17 @@
         "time": "1995-12-12T10:09:00+00:00",
         "text": "NEW_CONTACT NEW CONTACT, SUSPECT EARLIER C132, WILL RANGE",
         "track_id": "NELSON",
-        "line_number": 11
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "20d668be-930c-4459-b716-3aef3a3e13eb",
+      "id": "cc000ff3-7075-47eb-b52a-e6be1f87b057",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -178,12 +233,17 @@
         "time": "1995-12-12T10:15:00+00:00",
         "text": "CONTACT_LOST CONTACT LOST, SUSPECT BIOLOGIC",
         "track_id": "NELSON",
-        "line_number": 12
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "e0585685-f53b-4192-bd7d-5ea6ad10d869",
+      "id": "7ebf937f-cdb9-4668-a765-73cb9224452c",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -193,12 +253,17 @@
         "time": "1995-12-12T10:18:00+00:00",
         "text": "NEW_CONTACT NEW CONTACT, SUSPECT PLAYMATE",
         "track_id": "COLLINGWOOD",
-        "line_number": 13
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "17deca46-a74f-4cce-bbc8-41c7d53d7f00",
+      "id": "52abf67f-37d1-4a07-9bd7-52c8b4697b88",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -208,12 +273,17 @@
         "time": "1995-12-12T10:21:00+00:00",
         "text": "WATERSHOT PLAYMATE CONFIRMED, LAUNCH WATERSHOT",
         "track_id": "COLLINGWOOD",
-        "line_number": 14
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "507baaef-a359-4d50-a665-9439a940acf4",
+      "id": "38bf0325-73bb-4031-8ac4-02ef4a03d4f4",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -223,12 +293,17 @@
         "time": "1995-12-12T10:22:00+00:00",
         "text": "CMD_COMMENT WATERSHOT HEARD, PREPARE FOR EVASIVE",
         "track_id": "NELSON",
-        "line_number": 15
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "8d946c35-6864-4c8d-9c90-14e9f0f2c324",
+      "id": "c2acfce4-2cdc-4c22-ace3-64e324aec3a3",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -238,12 +313,17 @@
         "time": "1995-12-12T10:22:39+00:00",
         "text": "CMD_COMMENT FAILURE ON CIRCUIT 12, DAMAGE PROCESS 4",
         "track_id": "NELSON",
-        "line_number": 16
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "641b564a-718a-45ef-b828-f9eef34b2fb0",
+      "id": "ca285d18-5080-4be9-9593-b777f5607bd4",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -253,12 +333,17 @@
         "time": "1995-12-12T10:29:00+00:00",
         "text": "CMD_COMMENT PROCESS 4 COMPLETE, START EVASIVE",
         "track_id": "NELSON",
-        "line_number": 17
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "05c22014-ca93-4403-b27f-b623256e5a7e",
+      "id": "5439989e-a2db-47dd-80a5-671da29e9ddd",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -268,12 +353,17 @@
         "time": "1995-12-12T10:29:00+00:00",
         "text": "NEW_CONTACT PLAYMATE FOUND, LAUNCH WATERSHOT, ENTER MELEE",
         "track_id": "NELSON",
-        "line_number": 18
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "e1d77d57-db57-47b8-84b5-0f591c8fbdd4",
+      "id": "d1794409-a31c-4996-9b3a-7f7b06ee6ae0",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -283,12 +373,17 @@
         "time": "1995-12-12T10:30:00+00:00",
         "text": "CMD_COMMENT WATERSHOT HEARD, EVASIVE MANOEUVRES",
         "track_id": "COLLINGWOOD",
-        "line_number": 19
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "1fdf2394-5ebb-4152-8c58-762931a6ac44",
+      "id": "a604ff79-104e-4c76-900d-d1861d839dd0",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -298,12 +393,17 @@
         "time": "1995-12-12T11:25:00+00:00",
         "text": "ENDEX FINEX HEARD, END OF SERIAL 12E",
         "track_id": "COLLINGWOOD",
-        "line_number": 20
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "7e0955ee-0a5f-4c7d-8f6e-10ffa41ab0e9",
+      "id": "8d12f70e-b175-4f37-8b51-4c388fef2b4d",
       "geometry": {
         "type": "Point",
         "coordinates": []
@@ -313,7 +413,12 @@
         "time": "1995-12-12T11:25:00+00:00",
         "text": "ENDEX FINEX HEARD, COMMENCE PLOT LOCK",
         "track_id": "NELSON",
-        "line_number": 21
+        "style": {
+          "shape": "circle",
+          "radius": 3.0,
+          "fill_color": "#808080",
+          "color": "#808080"
+        }
       }
     }
   ]

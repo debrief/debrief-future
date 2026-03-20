@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "BlueSensorBrg (s2r)",
-    "datetime": "2026-03-20T21:26:43.620720+00:00",
+    "datetime": "2026-03-20T22:02:23.656577+00:00",
     "description": "Imported from S2R/2553_missing_sensor_data/BlueSensorBrg.dsf"
   },
   "links": [
@@ -53,7 +53,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/2553_missing_sensor_data/BlueSensorBrg.dsf",
-        "load_timestamp": "2026-03-20T21:26:43.626105Z",
+        "load_timestamp": "2026-03-20T22:02:23.661740Z",
         "tool_version": "0.1.0"
       }
     }

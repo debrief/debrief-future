@@ -3,12 +3,45 @@
   "stac_version": "1.0.0",
   "stac_extensions": [],
   "id": "shapes",
-  "geometry": null,
-  "bbox": null,
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -22.3,
+          19.46
+        ],
+        [
+          -18.92,
+          19.46
+        ],
+        [
+          -18.92,
+          22.25
+        ],
+        [
+          -22.3,
+          22.25
+        ],
+        [
+          -22.3,
+          19.46
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -22.3,
+    19.46,
+    -18.92,
+    22.25
+  ],
   "properties": {
     "title": "shapes (general)",
-    "datetime": "2026-03-20T21:26:47.788666+00:00",
-    "description": "Imported from shapes.rep"
+    "datetime": "1995-12-12T05:00:00+00:00",
+    "description": "Imported from shapes.rep",
+    "start_datetime": "1995-12-12T05:00:00+00:00",
+    "end_datetime": "1995-12-12T07:16:00+00:00"
   },
   "links": [
     {
@@ -28,7 +61,34 @@
       "href": "./item.json",
       "type": "application/geo+json",
       "title": "shapes (general)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/shapes.rep",
+      "title": "shapes.rep"
     }
   ],
-  "assets": {}
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-shapes": {
+      "href": "./assets/shapes.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "shapes.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/shapes.rep",
+        "load_timestamp": "2026-03-20T22:02:28.956196Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
 }

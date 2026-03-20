@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "912a97d7-553d-46b8-b194-363ebd413ca6",
+      "id": "c789e69c-25fd-45b1-9431-a75ad6e8e1ae",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -21,13 +21,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 20
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "91086079-2a72-4590-ac0e-381b4ca34b21",
+      "id": "2f3dad27-191d-4585-b667-e6e361000d66",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -45,13 +44,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 36
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "32354d0b-2128-4305-a7f0-345bc9187e42",
+      "id": "9aad17a1-31ec-43cd-bdbd-6fa9897982cb",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -69,13 +67,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 52
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "940225c0-9f1d-4cf8-a6e1-f9e8098f790b",
+      "id": "35c34b78-0965-410c-a9df-3418ac62780e",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -93,13 +90,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 68
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "5bd6c3a5-59e5-4b32-bf1c-6e6abd393166",
+      "id": "d20d3090-5cfa-40da-aa50-e685fe209d2d",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -117,13 +113,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 83
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "7f627aa9-f72b-4b1a-a381-f6c0f360ec5e",
+      "id": "b0d00036-f4b6-4326-8c7a-3efe82a5bf5d",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -141,13 +136,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 99
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "b0ab7f58-7ce6-416f-a571-0ff7e20e148d",
+      "id": "cd1be04d-e3c9-419d-8969-684db3b81654",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -165,13 +159,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 115
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "8e662b0c-5e5c-4941-aaac-aaab6825c85b",
+      "id": "a99a5b7c-ec76-49a6-93da-ca0a0c0a71b4",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -189,13 +182,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 131
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "3e762270-cdc4-4490-b82c-12b06cef159f",
+      "id": "c1ff04a0-a3ad-4f88-a066-43cfba32fdc6",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -213,13 +205,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 147
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "591e296b-138e-4428-9a89-6a677fd51e38",
+      "id": "f05b8a7f-806c-4fe6-a139-3440d5c3485a",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -237,13 +228,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 162
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "1adf3c23-881a-433e-b4e0-3d39a4aee67c",
+      "id": "899cb1e6-b8fe-42d1-8738-093de6da51dc",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -261,13 +251,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 178
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "0b454d60-2ee7-4820-bfdf-8925ab117d42",
+      "id": "74f0c8a2-74de-4745-bc49-d2662be632cc",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -285,13 +274,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 194
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "db33ac06-ddda-40e3-8f40-2e90af09c627",
+      "id": "ec2670ec-b19d-4e61-8076-3788486d71d7",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -309,13 +297,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 254
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "963af7fe-d059-400f-a641-82a3ef39f0ed",
+      "id": "5b103445-a96b-4080-9cbe-0d69af64c793",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -333,13 +320,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 270
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "9eb77dd3-aea8-4a35-96b7-6793e6018c0a",
+      "id": "274ee10e-5a90-46bc-a881-224216d7fa56",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -357,13 +343,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 286
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "73d4fa36-395e-4c63-8e90-44cf50aaf190",
+      "id": "3821a31d-5e0e-48d9-9729-82c120ae9bda",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -381,13 +366,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 301
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "d21a4289-31d0-46f2-b6a6-2512de3c5241",
+      "id": "fe0489d7-c8c3-4ecb-b950-e2cf79a15042",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -405,13 +389,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 317
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "804000d8-3992-4823-842c-a61551d23e11",
+      "id": "90eb09c4-c154-4219-a6c9-91356fc52307",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -429,13 +412,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 333
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "eacba7de-b450-4b8e-aa40-5604aaf4f79e",
+      "id": "ffbebdac-8aa7-418c-8b0a-1939b27a246e",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -453,13 +435,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 349
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "c32b1eed-741e-450d-a5c8-fd1c78d57863",
+      "id": "98b23709-92b0-4925-8d95-11c7f19ee995",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -477,13 +458,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 364
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "bbab86d4-f95e-4613-8e5d-21ce6503fc2b",
+      "id": "f21d3566-fc56-48f1-9754-e9df24991223",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -501,13 +481,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 380
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "12f7c71c-290b-4c5e-8195-277e24d13a72",
+      "id": "1f157bb6-f676-4a2d-93a0-307d0d8a481d",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -525,13 +504,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 396
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "74d90e66-6e4c-4ef2-bf0f-0bf481d20c35",
+      "id": "ea5edee6-ced7-4476-85be-edaa1eeb7a81",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -549,13 +527,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 456
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "3ef953f8-ca42-403d-865e-e138e96f9b8d",
+      "id": "cf65fcd0-af32-41ab-8a65-5c7e386c6488",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -573,13 +550,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 516
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "eeaffd6b-18d8-41d0-a3b6-6fcc97f2a300",
+      "id": "065008a3-f415-4891-8396-f00454fd9cd6",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -597,13 +573,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 532
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "f8603409-2000-4df5-a8af-0825e39068de",
+      "id": "cc1fc4a3-cafe-4222-8802-e215a7b6efd1",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -621,13 +596,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 548
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "986235ac-0a3a-41e7-af10-cc3b8f0654d3",
+      "id": "29d18916-67be-40b1-8eca-ed6fc858cff3",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -645,13 +619,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 564
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "82fcdddc-271e-4558-9599-7d7fb0203893",
+      "id": "a59eaeb2-3166-49ba-bbf5-fa9eb5417b63",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -669,13 +642,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 579
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "2f81158d-34af-4306-b40f-26a29e182f13",
+      "id": "acedc2b1-790e-4ce9-ba6e-69b87991c1bb",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -693,13 +665,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 595
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "8e10796a-be46-4e40-b170-0f1a213b4e77",
+      "id": "82efaec2-9b2d-43eb-947e-50d3749ab923",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -717,13 +688,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 611
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "a997889e-2464-421b-91bb-1e29dd7fff59",
+      "id": "c803d5bb-5c90-4b90-ae2a-2085b4caf069",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -741,13 +711,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 627
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "b631f109-f1e3-40fb-8570-925c39c3fe2c",
+      "id": "ff94f79f-cad7-46c9-80df-50642e8eff9f",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -765,13 +734,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 642
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "a3460555-ee6c-403a-b992-d89f5a6e8604",
+      "id": "f7756851-0598-4d64-a15a-919a72247544",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -789,13 +757,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 658
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "184b0379-0a02-423a-8324-a65db7467374",
+      "id": "f63d3b33-fce6-4e1b-94a3-aea29a5db159",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -813,13 +780,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 674
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "91cccc72-8306-4ecb-b22e-6e1266067e33",
+      "id": "d0a936d6-01c9-44f4-8228-a27eecc3c562",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -837,13 +803,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 690
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "f82ef8e9-0c07-4c1f-b6d9-969aad45123c",
+      "id": "97250e17-082b-40d8-a350-ba2f0e568b7d",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -861,13 +826,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 706
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "fa0e45b3-c9fd-46ff-9e7d-0c28497d2f37",
+      "id": "4858440c-c095-47bb-91cf-a6ac5634448b",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -885,13 +849,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 721
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "1131cdd5-1252-4316-b692-46ac770c2154",
+      "id": "b242fc6e-fa6e-4baf-a62d-a4a7609ccbaf",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -909,13 +872,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 737
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "630ec66f-4383-4201-b43a-22c4ae4f5f0d",
+      "id": "f08df65f-7081-421d-8eec-951dc5c88c2f",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -933,13 +895,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 753
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "5a596560-764e-4fca-882c-2e00b84a7f58",
+      "id": "fd9ede88-fbee-4939-8e8d-7ccb2a854575",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -957,13 +918,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 769
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "08422e13-16a4-462a-b253-172b8eb27cd8",
+      "id": "04f90f3d-c03f-440f-9960-7841f5c29913",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -981,13 +941,12 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 784
+        }
       }
     },
     {
       "type": "Feature",
-      "id": "babf7384-6aef-4604-bc90-30962ee34bcd",
+      "id": "62d386a1-dec9-46e0-bbe6-529dff3e4c9d",
       "geometry": null,
       "properties": {
         "kind": "SENSOR2",
@@ -1005,8 +964,7 @@
           "color": "#0000FF",
           "weight": 1,
           "opacity": 1.0
-        },
-        "line_number": 800
+        }
       }
     }
   ]

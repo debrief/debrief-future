@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "Freq_BlueSensor_NoPos (general)",
-    "datetime": "2026-03-20T21:26:46.997972+00:00",
+    "datetime": "2026-03-20T22:02:28.125833+00:00",
     "description": "Imported from other_formats/TA_DUMMY_DATA/Freq_BlueSensor_NoPos.dsf"
   },
   "links": [
@@ -53,7 +53,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/TA_DUMMY_DATA/Freq_BlueSensor_NoPos.dsf",
-        "load_timestamp": "2026-03-20T21:26:47.005212Z",
+        "load_timestamp": "2026-03-20T22:02:28.133052Z",
         "tool_version": "0.1.0"
       }
     }

@@ -3,7 +3,7 @@
   "features": [
     {
       "type": "Feature",
-      "id": "1b9cd09c-b2fe-48c7-97cd-4dcbec404c5b",
+      "id": "bb170896-7f10-4670-8f61-d5020347a4b6",
       "geometry": {
         "type": "LineString",
         "coordinates": [
@@ -26,11 +26,6 @@
         "platform_id": "NELSON",
         "platform_name": "NELSON",
         "track_type": "CONTACT",
-        "times": [
-          818744400000,
-          818744460000,
-          818744520000
-        ],
         "start_time": "1995-12-12T05:00:00+00:00",
         "end_time": "1995-12-12T05:02:00+00:00",
         "positions": [
@@ -53,6 +48,17 @@
             "depth": 0.0
           }
         ],
+        "style": {
+          "line": {
+            "color": "#FF0000"
+          },
+          "point": {
+            "shape": "circle",
+            "radius": 3.0,
+            "fill_color": "#FF0000",
+            "color": "#FF0000"
+          }
+        },
         "default_position_style": {
           "show_symbol": false,
           "symbol": "circle",

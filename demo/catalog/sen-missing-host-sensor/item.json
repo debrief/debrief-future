@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "sen_missing_host_sensor (general)",
-    "datetime": "2026-03-20T21:26:47.746695+00:00",
+    "datetime": "2026-03-20T22:02:28.889593+00:00",
     "description": "Imported from sen_missing_host_sensor.dsf"
   },
   "links": [
@@ -53,7 +53,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_missing_host_sensor.dsf",
-        "load_timestamp": "2026-03-20T21:26:47.750699Z",
+        "load_timestamp": "2026-03-20T22:02:28.894166Z",
         "tool_version": "0.1.0"
       }
     }

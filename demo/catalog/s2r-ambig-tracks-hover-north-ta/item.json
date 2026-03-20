@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "Ambig_tracks_hover_north_TA (s2r)",
-    "datetime": "2026-03-20T21:26:44.041176+00:00",
+    "datetime": "2026-03-20T22:02:24.191833+00:00",
     "description": "Imported from S2R/Ambig_tracks_hover_north_TA.dsf"
   },
   "links": [
@@ -53,7 +53,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/Ambig_tracks_hover_north_TA.dsf",
-        "load_timestamp": "2026-03-20T21:26:44.045043Z",
+        "load_timestamp": "2026-03-20T22:02:24.196219Z",
         "tool_version": "0.1.0"
       }
     }

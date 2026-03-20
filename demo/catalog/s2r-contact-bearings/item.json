@@ -7,7 +7,7 @@
   "bbox": null,
   "properties": {
     "title": "Contact_bearings (s2r)",
-    "datetime": "2026-03-20T21:26:44.055731+00:00",
+    "datetime": "2026-03-20T22:02:24.207974+00:00",
     "description": "Imported from S2R/freq/Contact_bearings.dsf"
   },
   "links": [
@@ -53,7 +53,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/freq/Contact_bearings.dsf",
-        "load_timestamp": "2026-03-20T21:26:44.058427Z",
+        "load_timestamp": "2026-03-20T22:02:24.210865Z",
         "tool_version": "0.1.0"
       }
     }

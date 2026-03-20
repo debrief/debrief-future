@@ -86,7 +86,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/2553_missing_sensor_data/WorkingFreqPlot.dpf",
-        "load_timestamp": "2026-03-20T21:26:43.647286Z",
+        "load_timestamp": "2026-03-20T22:02:23.685079Z",
         "tool_version": "0.1.0"
       }
     }

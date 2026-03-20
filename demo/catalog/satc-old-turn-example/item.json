@@ -86,7 +86,7 @@
       ],
       "debrief:provenance": {
         "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/old_turn_example.dpf",
-        "load_timestamp": "2026-03-20T21:26:44.499030Z",
+        "load_timestamp": "2026-03-20T22:02:24.768188Z",
         "tool_version": "0.1.0"
       }
     }
