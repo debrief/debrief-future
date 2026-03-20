@@ -12,7 +12,7 @@
  *
  * 1. Import `toolDefinition` and `execute` from the tool module
  * 2. Add a `[toolDefinition.name, { definition, execute }]` entry to `toolRegistry`
- * 3. If the tool's GeoJSONFeature type differs, cast execute with `as unknown as ToolExecuteFn`
+ * 3. If the tool's SafeFeature type differs, cast execute with `as unknown as ToolExecuteFn`
  *
  * See also: `shared/tools/TEMPLATE.md` § Registration for the full checklist.
  *
@@ -55,6 +55,7 @@ import type {
   MCPToolResponse,
   MCPContentItem,
   DebriefAnnotations,
+  SafeFeature,
 } from '@debrief/utils';
 
 import {
@@ -120,15 +121,6 @@ import {
 // Re-export types for consumers
 export type { MCPToolDefinition, MCPToolResponse, MCPContentItem, DebriefAnnotations };
 
-/**
- * GeoJSON Feature interface for tool execute functions.
- */
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
-}
 
 // ---------------------------------------------------------------------------
 // Provenance helpers — mirrors Python's debrief_calc/provenance.py (#102)
@@ -192,7 +184,7 @@ function createLogEntry(
   };
 }
 
-function attachLogEntry(feature: GeoJSONFeature, logEntry: LogEntry): void {
+function attachLogEntry(feature: SafeFeature, logEntry: LogEntry): void {
   if (!feature.properties) feature.properties = {};
   const existing = feature.properties.provenance;
   if (existing === undefined || existing === null) {
@@ -215,7 +207,7 @@ interface ValidationError {
 }
 
 function validateToolOutput(
-  features: GeoJSONFeature[],
+  features: SafeFeature[],
   _expectedKind: string,
   toolName: string,
   _skipKindCheck = false,
@@ -332,7 +324,7 @@ function buildResultType(resultCategory: string, outputKind: string): string {
  * because each tool has its own specific parameter interface; validation
  * occurs inside the tool implementation.
  */
-type ToolExecuteFn = (features: GeoJSONFeature[], params: Record<string, unknown>) => GeoJSONFeature[];
+type ToolExecuteFn = (features: SafeFeature[], params: Record<string, unknown>) => SafeFeature[];
 
 /**
  * Internal registry entry mapping a tool definition to its execute function.
@@ -347,8 +339,11 @@ interface ToolRegistryEntry {
  * Each tool validates its own params internally, so widening the params type
  * to Record<string, unknown> is safe — the registry passes through params
  * without inspection, and each tool's implementation validates what it needs.
+ * The feature array type varies per tool (TrackFeature[], DebriefFeature[], etc.)
+ * so the cast bridges any structural differences.
  */
-function asToolFn<P>(fn: (features: GeoJSONFeature[], params: P) => GeoJSONFeature[]): ToolExecuteFn {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function asToolFn(fn: (features: any[], params: any) => any[]): ToolExecuteFn {
   return fn as unknown as ToolExecuteFn;
 }
 
@@ -405,9 +400,9 @@ const toolRegistry: Map<string, ToolRegistryEntry> = new Map([
       definition: generateCoursesSpeedsDef,
       // generate-courses-speeds ignores params; the wrapper drops the second
       // argument, and the cast bridges the structural difference between this
-      // module's GeoJSONFeature (coordinates: unknown) and the tool's internal
-      // GeoJSONFeature (coordinates: number[][]).
-      execute: asToolFn((features: GeoJSONFeature[], _params: Record<string, unknown>) =>
+      // module's SafeFeature (coordinates: unknown) and the tool's internal
+      // SafeFeature (coordinates: number[][]).
+      execute: asToolFn((features: SafeFeature[], _params: Record<string, unknown>) =>
         executeGenerateCourseSpeeds(features as unknown as Parameters<typeof executeGenerateCourseSpeeds>[0])),
     },
   ],
@@ -473,7 +468,7 @@ export function listTools(): MCPToolDefinition[] {
  */
 export function executeTool(
   toolId: string,
-  features: GeoJSONFeature[],
+  features: SafeFeature[],
   params: Record<string, unknown>,
 ): MCPToolResponse {
   const entry = toolRegistry.get(toolId);

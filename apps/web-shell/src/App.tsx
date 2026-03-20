@@ -60,8 +60,8 @@ import {
   getSessionStore,
   resetSessionStore,
   type DisplayMode as StoreDisplayMode,
-  type GeoJSONFeature,
 } from '@debrief/session-state';
+import type { GeoJSONFeature } from '@debrief/utils';
 import type { DisplayMode as ComponentDisplayMode } from '@debrief/components';
 
 // Map between session-state DisplayMode ('normal'|'snailTrail') and

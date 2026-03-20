@@ -5,18 +5,12 @@
  * point-in-polygon testing. Step 4 of the E03 buffer zone analysis chain.
  */
 
+import type { SafeFeature } from '@debrief/utils';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 /** Default color for points outside all zones. */
 const DEFAULT_COLOR = '#666666';
 const DEFAULT_ZONE = 'none';
-
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
-}
 
 interface PointMetadataEntry {
   index: number;
@@ -91,17 +85,20 @@ function getZoneColor(zoneInfo: ZoneMetadata): string {
 }
 
 export function execute(
-  features: GeoJSONFeature[],
+  features: SafeFeature[],
   _params: Record<string, unknown>,
-): GeoJSONFeature[] {
+): SafeFeature[] {
   // Find reference and zone features
-  let refFeature: GeoJSONFeature | null = null;
-  let zoneFeature: GeoJSONFeature | null = null;
+  let refFeature: SafeFeature | null = null;
+  let zoneFeature: SafeFeature | null = null;
 
   for (const feature of features) {
     const props = feature.properties;
-    const kind = props.kind as string | undefined;
-    if (kind === 'POINT' && props.locationType === 'REFERENCE' && !refFeature) {
+    if (!props) {
+      continue;
+    }
+    const kind = props['kind'] as string | undefined;
+    if (kind === 'POINT' && props['locationType'] === 'REFERENCE' && !refFeature) {
       refFeature = feature;
     } else if (kind === 'ZONE' && !zoneFeature) {
       zoneFeature = feature;
@@ -116,6 +113,13 @@ export function execute(
     throw new Error('No zone feature found');
   }
 
+  if (!refFeature.geometry) {
+    throw new Error('Reference feature has no geometry');
+  }
+  if (!zoneFeature.geometry) {
+    throw new Error('Zone feature has no geometry');
+  }
+
   if (refFeature.geometry.type !== 'MultiPoint') {
     throw new Error('Reference feature must have MultiPoint geometry');
   }
@@ -123,10 +127,17 @@ export function execute(
     throw new Error('Zone feature must have MultiPolygon geometry');
   }
 
+  if (!refFeature.properties) {
+    throw new Error('Reference feature has no properties');
+  }
+  if (!zoneFeature.properties) {
+    throw new Error('Zone feature has no properties');
+  }
+
   const coordinates = refFeature.geometry.coordinates as number[][];
-  const metadata = (refFeature.properties.pointMetadata ?? []) as PointMetadataEntry[];
+  const metadata = (refFeature.properties['pointMetadata'] ?? []) as PointMetadataEntry[];
   const zonePolygons = zoneFeature.geometry.coordinates as number[][][][];
-  const zoneInfoList = (zoneFeature.properties.zones ?? []) as ZoneMetadata[];
+  const zoneInfoList = (zoneFeature.properties['zones'] ?? []) as ZoneMetadata[];
 
   if (metadata.length !== coordinates.length) {
     throw new Error('pointMetadata length must match coordinates length');
@@ -134,9 +145,12 @@ export function execute(
 
   // Handle empty coordinates
   if (coordinates.length === 0) {
-    const classified = JSON.parse(JSON.stringify(refFeature)) as GeoJSONFeature;
-    classified.properties.pointMetadata = [];
-    classified.properties.pointColors = [];
+    const classified = JSON.parse(JSON.stringify(refFeature)) as SafeFeature;
+    if (!classified.properties) {
+      classified.properties = {};
+    }
+    classified.properties['pointMetadata'] = [];
+    classified.properties['pointColors'] = [];
     return [classified];
   }
 
@@ -172,15 +186,18 @@ export function execute(
   }
 
   // Build classified feature (deep copy of original with updated metadata)
-  const classified = JSON.parse(JSON.stringify(refFeature)) as GeoJSONFeature;
-  classified.properties.pointMetadata = newMetadata;
-  classified.properties.pointColors = pointColors;
+  const classified = JSON.parse(JSON.stringify(refFeature)) as SafeFeature;
+  if (!classified.properties) {
+    classified.properties = {};
+  }
+  classified.properties['pointMetadata'] = newMetadata;
+  classified.properties['pointColors'] = pointColors;
 
   // Assign a new unique ID so the classified result doesn't collide with the
   // original reference-points layer in the feature list / visibility toggle.
   const baseId = String(refFeature.id ?? 'ref-points');
   classified.id = `${baseId}-classified`;
-  classified.properties.name = `${String(classified.properties.name ?? 'Reference Points')} (classified)`;
+  classified.properties['name'] = `${String(classified.properties['name'] ?? 'Reference Points')} (classified)`;
 
   return [classified];
 }

@@ -17,6 +17,9 @@ importers:
 
   apps/loader:
     dependencies:
+      '@debrief/utils':
+        specifier: workspace:*
+        version: link:../../shared/utils
       i18next:
         specifier: ^23.7.0
         version: 23.16.8
@@ -34,22 +37,22 @@ importers:
         specifier: ^1.58.0
         version: 1.58.2
       '@storybook/addon-a11y':
-        specifier: ^8.0.0
+        specifier: ^8.4.0
         version: 8.6.15(storybook@8.6.15(prettier@3.8.0))
       '@storybook/addon-actions':
-        specifier: ^8.0.0
+        specifier: ^8.4.0
         version: 8.6.15(storybook@8.6.15(prettier@3.8.0))
       '@storybook/addon-controls':
-        specifier: ^8.0.0
+        specifier: ^8.4.0
         version: 8.6.15(storybook@8.6.15(prettier@3.8.0))
       '@storybook/addon-essentials':
-        specifier: ^8.0.0
+        specifier: ^8.4.0
         version: 8.6.14(@types/react@18.3.27)(storybook@8.6.15(prettier@3.8.0))
       '@storybook/react':
-        specifier: ^8.0.0
+        specifier: ^8.4.0
         version: 8.6.15(@storybook/test@8.6.15(storybook@8.6.15(prettier@3.8.0)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.6.15(prettier@3.8.0))(typescript@5.9.3)
       '@storybook/react-vite':
-        specifier: ^8.0.0
+        specifier: ^8.4.0
         version: 8.6.15(@storybook/test@8.6.15(storybook@8.6.15(prettier@3.8.0)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rollup@4.55.1)(storybook@8.6.15(prettier@3.8.0))(typescript@5.9.3)(vite@5.4.21(@types/node@20.19.30))
       '@types/node':
         specifier: ^20.10.0
@@ -61,10 +64,10 @@ importers:
         specifier: ^18.2.0
         version: 18.3.7(@types/react@18.3.27)
       '@typescript-eslint/eslint-plugin':
-        specifier: ^6.13.0
+        specifier: ^6.21.0
         version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/parser':
-        specifier: ^6.13.0
+        specifier: ^6.21.0
         version: 6.21.0(eslint@8.57.1)(typescript@5.9.3)
       '@vitejs/plugin-react':
         specifier: ^4.2.0
@@ -79,10 +82,10 @@ importers:
         specifier: ^24.9.0
         version: 24.13.3(electron-builder-squirrel-windows@24.13.3)
       eslint:
-        specifier: ^8.55.0
+        specifier: ^8.57.1
         version: 8.57.1
       eslint-plugin-react:
-        specifier: ^7.33.0
+        specifier: ^7.37.5
         version: 7.37.5(eslint@8.57.1)
       eslint-plugin-react-hooks:
         specifier: ^4.6.0
@@ -94,7 +97,7 @@ importers:
         specifier: ^3.1.0
         version: 3.8.0
       storybook:
-        specifier: ^8.0.0
+        specifier: ^8.4.0
         version: 8.6.15(prettier@3.8.0)
       typescript:
         specifier: ^5.3.0
@@ -161,10 +164,10 @@ importers:
         specifier: ^1.85.0
         version: 1.108.1
       '@typescript-eslint/eslint-plugin':
-        specifier: ^6.13.0
+        specifier: ^6.21.0
         version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/parser':
-        specifier: ^6.13.0
+        specifier: ^6.21.0
         version: 6.21.0(eslint@8.57.1)(typescript@5.9.3)
       '@vitest/coverage-v8':
         specifier: ^1.0.0
@@ -185,7 +188,7 @@ importers:
         specifier: ^0.19.8
         version: 0.19.12
       eslint:
-        specifier: ^8.55.0
+        specifier: ^8.57.1
         version: 8.57.1
       eslint-config-prettier:
         specifier: ^9.1.0
@@ -243,7 +246,7 @@ importers:
         specifier: ^7946.0.0
         version: 7946.0.16
       '@types/leaflet':
-        specifier: ^1.9.0
+        specifier: ^1.9.8
         version: 1.9.21
       '@types/react':
         specifier: ^18.2.0
@@ -251,9 +254,24 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.0
         version: 18.3.7(@types/react@18.3.27)
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^6.21.0
+        version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^6.21.0
+        version: 6.21.0(eslint@8.57.1)(typescript@5.9.3)
       '@vitejs/plugin-react':
         specifier: ^4.2.0
         version: 4.7.0(vite@5.4.21(@types/node@20.19.30))
+      eslint:
+        specifier: ^8.57.1
+        version: 8.57.1
+      eslint-plugin-react:
+        specifier: ^7.37.5
+        version: 7.37.5(eslint@8.57.1)
+      eslint-plugin-react-hooks:
+        specifier: ^4.6.2
+        version: 4.6.2(eslint@8.57.1)
       typescript:
         specifier: ^5.3.0
         version: 5.9.3
@@ -266,6 +284,9 @@ importers:
 
   services/session-state:
     dependencies:
+      '@debrief/utils':
+        specifier: workspace:*
+        version: link:../../shared/utils
       better-sse:
         specifier: ^0.13.0
         version: 0.13.0
@@ -297,6 +318,15 @@ importers:
       '@types/supertest':
         specifier: ^6.0.0
         version: 6.0.3
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^6.21.0
+        version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^6.21.0
+        version: 6.21.0(eslint@8.57.1)(typescript@5.9.3)
+      eslint:
+        specifier: ^8.57.1
+        version: 8.57.1
       playwright:
         specifier: ^1.58.0
         version: 1.58.0
@@ -401,7 +431,7 @@ importers:
         specifier: ^14.0.0
         version: 14.3.1(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/leaflet':
-        specifier: ^1.9.0
+        specifier: ^1.9.8
         version: 1.9.21
       '@types/react':
         specifier: ^18.2.0
@@ -473,6 +503,15 @@ importers:
       '@types/proper-lockfile':
         specifier: ^4.1.4
         version: 4.1.4
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^6.21.0
+        version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^6.21.0
+        version: 6.21.0(eslint@8.57.1)(typescript@5.9.3)
+      eslint:
+        specifier: ^8.57.1
+        version: 8.57.1
       typescript:
         specifier: ^5.3.0
         version: 5.9.3
@@ -500,6 +539,15 @@ importers:
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.30
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^6.21.0
+        version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^6.21.0
+        version: 6.21.0(eslint@8.57.1)(typescript@5.9.3)
+      eslint:
+        specifier: ^8.57.1
+        version: 8.57.1
       typescript:
         specifier: ^5.3.0
         version: 5.9.3

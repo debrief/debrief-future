@@ -5,6 +5,7 @@
  * within a bounding box. First step of the E03 buffer zone analysis chain.
  */
 
+import type { DebriefFeature } from '@debrief/schemas';
 import type { MCPToolDefinition } from '../../../types/tool';
 
 // LCG PRNG constants (Numerical Recipes) — identical in Python and TypeScript
@@ -21,13 +22,6 @@ export interface GenerateReferencePointsParams {
 interface PointMetadataEntry {
   index: number;
   name: string;
-}
-
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
 }
 
 /** Preset count values shown in the ParameterCollector UI. */
@@ -94,9 +88,10 @@ function normaliseLon(lon: number): number {
 }
 
 function extractBoundsFromPolygon(
-  feature: GeoJSONFeature,
+  feature: DebriefFeature,
 ): [number, number, number, number] {
-  const coords = (feature.geometry.coordinates as number[][][])[0];
+  const geo = feature.geometry as { type: string; coordinates: unknown } | undefined;
+  const coords = (geo?.coordinates as number[][][] | undefined)?.[0];
   if (!coords || coords.length === 0) {
     throw new Error('Polygon feature has no coordinates');
   }
@@ -130,7 +125,7 @@ function buildMultiPointFeature(
   coordinates: number[][],
   metadata: PointMetadataEntry[],
   name: string,
-): GeoJSONFeature {
+): DebriefFeature {
   return {
     type: 'Feature',
     id: featureId,
@@ -149,7 +144,7 @@ function buildMultiPointFeature(
       },
       pointMetadata: metadata,
     },
-  };
+  } as unknown as DebriefFeature;
 }
 
 /**
@@ -168,7 +163,7 @@ function generateGrid(
   east: number,
   north: number,
   count: number,
-): GeoJSONFeature {
+): DebriefFeature {
   const [rows, cols] = gridDimensions(count);
   const effectiveEast = west > east ? east + 360 : east;
 
@@ -213,7 +208,7 @@ function generateScatter(
   north: number,
   count: number,
   seed: number | undefined,
-): GeoJSONFeature {
+): DebriefFeature {
   const effectiveEast = west > east ? east + 360 : east;
 
   let state = seed !== undefined ? seed : (Date.now() % LCG_MODULUS) >>> 0;
@@ -244,9 +239,9 @@ function generateScatter(
 }
 
 export function execute(
-  features: GeoJSONFeature[],
+  features: DebriefFeature[],
   params: GenerateReferencePointsParams,
-): GeoJSONFeature[] {
+): DebriefFeature[] {
   if (features === undefined || features === null || features.length === 0) {
     throw new Error('Requires exactly one polygon feature');
   }

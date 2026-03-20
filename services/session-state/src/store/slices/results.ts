@@ -7,10 +7,10 @@ import type { StateCreator } from 'zustand';
 import type {
   ResultsSlice,
   ResultsActions,
-  GeoJSONFeature,
   LastToolExecution,
   SessionStore,
 } from '../../types/index.js';
+import type { GeoJSONFeature } from '@debrief/utils';
 import { DEFAULT_RESULTS_SLICE } from '../../types/index.js';
 
 export type ResultsSliceWithActions = ResultsSlice & ResultsActions;

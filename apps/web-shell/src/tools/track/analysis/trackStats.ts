@@ -5,13 +5,8 @@
  */
 
 import type { MCPToolDefinition } from '../../../services/toolService';
-
-interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: { type: string; coordinates: unknown };
-  properties: Record<string, unknown>;
-}
+import type { TrackFeature } from '@debrief/schemas';
+import type { GeoJSONFeature } from '@debrief/utils';
 
 const EARTH_RADIUS_NM = 3440.065;
 
@@ -93,7 +88,7 @@ function speedKey(unit: DistanceUnit): string {
 }
 
 export function execute(
-  features: GeoJSONFeature[],
+  features: TrackFeature[],
   params: Record<string, unknown>,
 ): GeoJSONFeature[] {
   const distanceUnit = ((params?.distance_unit as string) || 'nm') as DistanceUnit;
@@ -102,7 +97,7 @@ export function execute(
   }
 
   const track = features.find(
-    f => f.properties?.kind === 'TRACK' && f.geometry?.type === 'LineString',
+    f => f.properties.kind === 'TRACK' && f.geometry.type === 'LineString',
   );
   if (!track) throw new Error('No track feature found');
 
@@ -120,9 +115,10 @@ export function execute(
     );
   }
 
-  // Duration from properties.times (epoch ms array)
+  // Duration from properties.times (epoch ms array, legacy wire format)
+  const props = track.properties as unknown as Record<string, unknown>;
   let durationHours = 0;
-  const times = track.properties?.times as number[] | undefined;
+  const times = props.times as number[] | undefined;
   if (times && times.length >= 2) {
     durationHours = (times[times.length - 1] - times[0]) / (1000 * 60 * 60);
   }
@@ -137,7 +133,7 @@ export function execute(
   const centroidLon = coords.reduce((s, c) => s + c[0], 0) / coords.length;
   const centroidLat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
 
-  const trackName = (track.properties?.name ?? track.id ?? 'Unknown') as string;
+  const trackName = ((props.name ?? props.platform_name ?? track.id ?? 'Unknown') as string);
 
   return [{
     type: 'Feature',
