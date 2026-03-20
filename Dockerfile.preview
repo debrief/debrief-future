@@ -17,7 +17,7 @@ WORKDIR /build
 
 # Copy workspace config and all source upfront
 # (Heroku has no Docker layer cache, so separate COPY-for-cache is pointless)
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY shared/schemas/ ./shared/schemas/
 COPY shared/components/ ./shared/components/
 COPY shared/utils/ ./shared/utils/

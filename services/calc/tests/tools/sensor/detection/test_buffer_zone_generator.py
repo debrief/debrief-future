@@ -4,6 +4,7 @@ import copy
 from typing import Any
 
 import pytest
+
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.sensor.detection.buffer_zone_generator import (
     buffer_zone_generator,

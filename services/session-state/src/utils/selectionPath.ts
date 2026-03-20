@@ -108,7 +108,7 @@ export function parsePath(path: string): ParsedPath {
     }
   }
 
-  const root = segments[0];
+  const root = segments[0]!;
   const childSegments = segments.slice(1);
 
   // Child segments must come in pairs: levelName, address
@@ -119,8 +119,8 @@ export function parsePath(path: string): ParsedPath {
   const levels: PathLevel[] = [];
   for (let i = 0; i < childSegments.length; i += 2) {
     levels.push({
-      levelName: childSegments[i],
-      address: childSegments[i + 1],
+      levelName: childSegments[i]!,
+      address: childSegments[i + 1]!,
     });
   }
 

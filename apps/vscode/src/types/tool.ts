@@ -194,25 +194,8 @@ export class ToolMatchService {
   }
 }
 
-// Self-contained geometry type to avoid any
-interface SafeGeometry {
-  type: string;
-  coordinates: unknown;
-}
-
-// Self-contained feature type to avoid any from geojson Feature
-interface SafeFeature {
-  type: 'Feature';
-  id?: string | number;
-  geometry: SafeGeometry;
-  properties: Record<string, unknown> | null;
-}
-
-// Self-contained FeatureCollection type to avoid any from geojson
-interface SafeFeatureCollection {
-  type: 'FeatureCollection';
-  features: SafeFeature[];
-}
+// Canonical Safe GeoJSON types from @debrief/utils (T02)
+import type { SafeFeatureCollection } from '@debrief/utils';
 
 /**
  * Tool execution state

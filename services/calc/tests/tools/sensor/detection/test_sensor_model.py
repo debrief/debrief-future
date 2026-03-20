@@ -1,6 +1,7 @@
 """Tests for the sensor model interface and default implementation."""
 
 import pytest
+
 from debrief_calc.tools.sensor.detection.sensor_model import (
     DefaultSensorModel,
     SensorModel,

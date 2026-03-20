@@ -670,7 +670,7 @@ export class MapPanel {
 
       // Send initial temporal state (subscriptions only fire on changes)
       const initialState = session.getState();
-      if (initialState.currentTime) {
+      if (initialState.currentTime !== null) {
         this.postMessage({
           type: 'setCurrentTime',
           time: initialState.currentTime,
@@ -686,7 +686,7 @@ export class MapPanel {
 
       // Subscribe to temporal (time + displayMode) changes (Feature: 039)
       this.temporalUnsubscribe = subscribeToTemporal(session, (temporal) => {
-        if (temporal.currentTime) {
+        if (temporal.currentTime !== null) {
           this.postMessage({
             type: 'setCurrentTime',
             time: temporal.currentTime,
@@ -853,7 +853,7 @@ export class MapPanel {
         // (subscriptions only fire on changes, not initial state)
         if (this.activeSession) {
           const state = this.activeSession.getState();
-          if (state.currentTime) {
+          if (state.currentTime !== null) {
             this.postMessage({
               type: 'setCurrentTime',
               time: state.currentTime,

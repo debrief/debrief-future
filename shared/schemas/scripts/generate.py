@@ -130,6 +130,9 @@ def generate_pydantic() -> bool:
             content,
         )
 
+        # Prepend DO NOT EDIT header
+        content = "# AUTO-GENERATED — DO NOT EDIT\n" + content
+
         output_file.write_text(content)
         print(f"  [OK] Generated: {output_file}")
         return True
@@ -413,6 +416,9 @@ def generate_typescript() -> bool:
                     f"coordinates: {new_type}",
                 )
                 content = content[:idx] + fixed_block + content[brace_idx:]
+
+        # Prepend DO NOT EDIT header
+        content = "// AUTO-GENERATED — DO NOT EDIT\n" + content
 
         output_file.write_text(content)
         print(f"  [OK] Generated: {output_file}")

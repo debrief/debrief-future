@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
+
 from debrief_config.exceptions import InvalidCatalogError
 from debrief_config.validation import validate_stac_catalog
 

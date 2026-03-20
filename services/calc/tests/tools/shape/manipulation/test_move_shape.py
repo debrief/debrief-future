@@ -3,6 +3,7 @@
 import copy
 
 import pytest
+
 from debrief_calc.executor import run
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.shape.manipulation.move_shape import move_shape, translate_point

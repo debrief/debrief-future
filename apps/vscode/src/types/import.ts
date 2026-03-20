@@ -85,9 +85,8 @@ export interface ParseWarning {
   code: string;
 }
 
-/**
- * GeoJSON Feature type for parsed tracks
- */
+// GeoJSON types — structurally identical to @debrief/utils canonical definitions (T02)
+// Kept local to avoid ESLint no-unsafe-argument false positives with re-exports
 export interface GeoJSONFeature {
   type: 'Feature';
   id?: string;
@@ -98,9 +97,6 @@ export interface GeoJSONFeature {
   properties: Record<string, unknown> | null;
 }
 
-/**
- * GeoJSON FeatureCollection
- */
 export interface GeoJSONFeatureCollection {
   type: 'FeatureCollection';
   features: GeoJSONFeature[];

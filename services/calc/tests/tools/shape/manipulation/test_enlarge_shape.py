@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 
 import pytest
+
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.shape.manipulation.enlarge_shape import (
     compute_centroid,

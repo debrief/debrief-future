@@ -7,29 +7,7 @@
 
 import type { LayerStyle } from '../types/tool';
 import type { DebriefFeature } from '@debrief/components';
-
-// Type-safe properties to avoid any from geojson
-type SafeProperties = Record<string, unknown> | null;
-
-// Self-contained geometry type to avoid any
-interface SafeGeometry {
-  type: string;
-  coordinates: unknown;
-}
-
-// Self-contained feature type to avoid any from geojson Feature
-interface SafeFeature {
-  type: 'Feature';
-  id?: string | number;
-  geometry: SafeGeometry;
-  properties: SafeProperties;
-}
-
-// Self-contained FeatureCollection type to avoid any from geojson
-interface SafeFeatureCollection {
-  type: 'FeatureCollection';
-  features: SafeFeature[];
-}
+import type { SafeFeatureCollection } from '@debrief/utils';
 
 // ============================================================================
 // Base Types
@@ -55,17 +33,6 @@ interface ResponseMessage extends Message {
 // ============================================================================
 // Extension → Webview Messages
 // ============================================================================
-
-/** GeoJSON feature for fallback rendering */
-export interface GeoJSONFeature {
-  type: 'Feature';
-  id?: string;
-  geometry: {
-    type: string;
-    coordinates: unknown;
-  };
-  properties: Record<string, unknown> | null;
-}
 
 /** Load a plot into the webview */
 export interface LoadPlotMessage {

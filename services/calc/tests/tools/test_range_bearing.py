@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.range_bearing import (
     _calculate_bearing,

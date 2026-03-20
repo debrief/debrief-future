@@ -1,6 +1,7 @@
 """Tests for tool metadata completeness."""
 
 import pytest
+
 from debrief_calc import registry
 from debrief_calc.models import ContextType
 

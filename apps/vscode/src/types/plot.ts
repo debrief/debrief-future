@@ -184,9 +184,14 @@ export interface Selection {
 }
 
 /**
- * Time range for filtering
+ * Time range for plot-level filtering (ISO 8601 strings + data extent).
+ *
+ * Renamed from TimeRange to PlotTimeRange to avoid conflict with the
+ * canonical session-state TimeRange (epoch milliseconds, Review Decision 5C).
+ *
+ * @see {@link @debrief/session-state!TimeRange} for the canonical epoch-ms type
  */
-export interface TimeRange {
+export interface PlotTimeRange {
   /** Filter start time (ISO 8601) */
   start: string;
 
@@ -211,7 +216,7 @@ export interface MapViewState {
   zoom: number;
 
   /** Current time range filter */
-  timeRange: TimeRange;
+  timeRange: PlotTimeRange;
 
   /** Active selection */
   selection: Selection;

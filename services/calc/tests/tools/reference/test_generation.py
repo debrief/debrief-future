@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+
 from debrief_calc.models import ContextType, SelectionContext
 
 # Golden example paths
