@@ -129,7 +129,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
           dataEnd: state.timeRange.end,
         });
       }
-      if (state.currentTime) {
+      if (state.currentTime !== null) {
         this._postMessage({
           type: 'setCurrentTime',
           time: state.currentTime,
@@ -170,7 +170,7 @@ export class TimeRangeViewProvider implements vscode.WebviewViewProvider {
     }
 
     // Update current time if changed
-    if (temporal.currentTime) {
+    if (temporal.currentTime !== null) {
       this._postMessage({
         type: 'setCurrentTime',
         time: temporal.currentTime,
