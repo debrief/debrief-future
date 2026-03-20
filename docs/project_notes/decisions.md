@@ -257,3 +257,22 @@ Each decision should include:
 - ❌ All existing tools need migration (12 tools)
 - ❌ Slight performance cost for Pydantic validation on every tool invocation
 - ❌ Tools can no longer add ad-hoc properties without updating the schema first (this is intentional — specs before code)
+
+### ADR-009: TypeScript `module` Setting Rationale (2026-03-20)
+
+**Context:** Four `tsconfig.json` files use different `module` settings: `apps/vscode` uses `ES2022`, all others use `ESNext`. This was flagged as potential inconsistency during the March 2026 technical debt review (#172).
+
+**Decision:** Keep `ES2022` for `apps/vscode` and `ESNext` for all other packages. The difference is intentional:
+- **`apps/vscode`** targets the VS Code extension host, which runs in a Node.js environment with a specific ES module baseline. `ES2022` ensures compatibility with the extension host runtime.
+- **All other packages** (shared libraries, web-shell, session-state) are bundled by Vite/esbuild/tsup and can use `ESNext` safely since the bundler handles downleveling.
+
+**Alternatives Considered:**
+- Align all to `ESNext` → Rejected: may cause runtime issues in the VS Code extension host if top-level await or other later-stage features are emitted.
+- Align all to `ES2022` → Rejected: unnecessarily conservative for bundled packages.
+
+**Consequences:**
+- ✅ Each package targets the appropriate runtime
+- ✅ Documented rationale prevents future cleanup attempts
+- ❌ Minor inconsistency in tsconfig files (acceptable given different deployment targets)
+
+**Evidence:** `specs/172-review-technical-debt/evidence/`
