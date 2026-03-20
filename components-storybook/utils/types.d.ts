@@ -40,10 +40,7 @@ export interface DebriefFeatureCollection {
     type: 'FeatureCollection';
     features: DebriefFeature[];
 }
-/**
- * Bounds as [minLon, minLat, maxLon, maxLat]
- */
-export type Bounds = [number, number, number, number];
+export type { Bounds } from '@debrief/utils';
 /**
  * Time extent as [startTime, endTime] in milliseconds since epoch
  */
