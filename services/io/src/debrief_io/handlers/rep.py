@@ -86,24 +86,34 @@ def parse_timestamp(date_str: str, time_str: str) -> datetime:
     """Parse REP timestamp into datetime.
 
     Args:
-        date_str: Date in YYMMDD format
+        date_str: Date in YYMMDD or YYYYMMDD format
         time_str: Time in HHMMSS.SSS format
 
     Returns:
         datetime object in UTC timezone
     """
-    # Parse date
-    year = int(date_str[0:2])
-    month = int(date_str[2:4])
-    day = int(date_str[4:6])
-
-    # Convert 2-digit year (50+ = 1900s, <50 = 2000s)
-    if year >= 50:
-        year += 1900
+    # Parse date — support both 6-digit (YYMMDD) and 8-digit (YYYYMMDD)
+    if len(date_str) == 8:
+        year = int(date_str[0:4])
+        month = int(date_str[4:6])
+        day = int(date_str[6:8])
     else:
-        year += 2000
+        year = int(date_str[0:2])
+        month = int(date_str[2:4])
+        day = int(date_str[4:6])
+        # Convert 2-digit year (50+ = 1900s, <50 = 2000s)
+        if year >= 50:
+            year += 1900
+        else:
+            year += 2000
 
-    # Parse time
+    # Parse time — pad to 6 digits if only 5 (single-digit hour)
+    t = time_str.split(".")[0]
+    frac = time_str.split(".")[1] if "." in time_str else None
+    if len(t) == 5:
+        t = "0" + t
+    time_str = f"{t}.{frac}" if frac else t
+
     hour = int(time_str[0:2])
     minute = int(time_str[2:4])
     second_part = time_str[4:]
@@ -248,15 +258,15 @@ class REPHandler(BaseHandler):
     # Symbol formats: @A, @A@00, @BA10, BBA10, @C[SYMBOL=missile], @B[LAYER=LIGHT_TRACKS]
     POSITION_PATTERN = re.compile(
         r"^\s*"
-        r"(\d{6})\s+"  # Date YYMMDD
-        r"(\d{6}(?:\.\d+)?)\s+"  # Time HHMMSS.SSS
+        r"(\d{6,8})\s+"  # Date YYMMDD or YYYYMMDD
+        r"(\d{5,6}(?:\.\d+)?)\s+"  # Time HHMMSS.SSS (5-6 digits: H may be single)
         r'(?:"([^"]+)"|(\S+))\s+'  # Track name (quoted or unquoted)
-        r"(@?\w+(?:@@?\w+)?(?:\[[\w=,]+\])?)\s+"  # Symbol (various formats inc. @@)
-        r"(\d+)\s+(\d+)\s+([\d.]+)\s+([NS])\s+"  # Lat DMS
-        r"(\d+)\s+(\d+)\s+([\d.]+)\s+([EW])\s+"  # Lon DMS
-        r"([\d.]+)\s+"  # Course
-        r"([\d.]+)\s+"  # Speed
-        r"(\d+)"  # Depth
+        r"(@?\w+(?:@@?\w+)?(?:\[[\w=,.]+\])?)\s+"  # Symbol (@A, SC, VC, @A[LAYER=x])
+        r"(-?[\d.]+)\s+(\d+)\s+([\d.]+)\s+([NS])\s+"  # Lat DMS (degrees may be negative/fractional)
+        r"(-?[\d.]+)\s+(\d+)\s+([\d.]+)\s+([EW])\s+"  # Lon DMS (degrees may be negative/fractional)
+        r"(-?[\d.]+)\s+"  # Course (may be negative)
+        r"(-?[\d.]+)\s+"  # Speed (may be negative)
+        r"(-?[\d.]+)"  # Depth (may be negative or fractional)
         r"(?:\s+(.+))?"  # Optional label
         r"\s*$"
     )
