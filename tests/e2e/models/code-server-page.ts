@@ -141,47 +141,37 @@ export class CodeServerPage {
    * Open a plot via the STAC tree view, which triggers the Debrief extension's
    * webview (MapPanel). This is the correct way to open a plot in E2E tests.
    *
+   * Uses command-based focus (not CSS selectors) to reliably expand the STAC
+   * pane, and positive signal waits (tree rows appearing) instead of polling
+   * for loading-text absence.
+   *
    * @param plotName - Display name of the plot in the STAC tree (e.g. "Exercise Alpha")
    */
   async openPlotViaStacTree(plotName: string): Promise<void> {
     const page = this.page;
 
-    // Focus the STAC Stores view — gives it screen space and scrolls into view
-    await this.focusStacView();
+    // Step 1: Focus and expand the STAC Stores pane via command palette
+    await this.focusAndExpandStacPane();
 
-    // Wait for extension to finish activating
-    await this.waitForExtensionReady(10_000);
-
-    // Ensure the STAC STORES pane is expanded
-    await this.ensureStacPaneExpanded();
-
-    // Wait for tree to populate with a store row
-    const storeRow = page.locator('.monaco-list-row:has-text("STAC:")').first();
-    let storeRowVisible = await storeRow
-      .waitFor({ state: 'visible', timeout: 10_000 })
-      .then(() => true)
-      .catch(() => false);
-
-    if (!storeRowVisible) {
-      // Config may be missing — seed it via terminal and reload
-      await this.seedConfigAndReload();
-
-      // Retry: focus STAC view, wait for extension, expand pane
-      await this.focusStacView();
-      await this.waitForExtensionReady(10_000);
-      await this.ensureStacPaneExpanded();
-
-      storeRowVisible = await storeRow
-        .waitFor({ state: 'visible', timeout: 10_000 })
-        .then(() => true)
-        .catch(() => false);
-      if (!storeRowVisible) {
-        await page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-row.png' });
-        throw new Error('STAC store tree row not visible even after seeding config');
-      }
+    // Step 2: Wait for the tree to populate (positive signal)
+    const populated = await this.waitForTreePopulated(15_000);
+    if (!populated) {
+      await this.captureTreeDiagnostics('tree-not-populated');
+      throw new Error(
+        'STAC tree did not populate within 15s. ' +
+        'Ensure config.json is pre-seeded and the extension activated.'
+      );
     }
 
-    // Expand the store row if collapsed
+    // Step 3: Find and expand the store row
+    const storeRow = page.locator('.monaco-list-row:has-text("STAC:")').first();
+    await storeRow
+      .waitFor({ state: 'visible', timeout: 5_000 })
+      .catch(async () => {
+        await this.captureTreeDiagnostics('no-store-row');
+        throw new Error('STAC store row not found in tree. Config may be invalid.');
+      });
+
     const storeTwistie = storeRow.locator('.monaco-tl-twistie');
     const storeCollapsed = await storeTwistie
       .evaluate((el) => el.classList.contains('collapsed'))
@@ -190,19 +180,17 @@ export class CodeServerPage {
       await storeTwistie.click();
     }
 
-    // Wait for tree children — plot node may be directly visible if VS Code
-    // auto-expanded, or we may need to expand the catalog node first
+    // Step 4: Find the plot node — may be directly visible or under a catalog node
     const plotNode = page.locator(`.monaco-list-row:has-text("${plotName}")`).first();
     const catalogNode = page.locator('.monaco-list-row:has-text("plots")').first();
 
     const firstVisible = await Promise.race([
-      catalogNode.waitFor({ state: 'visible', timeout: 10_000 }).then(() => 'catalog' as const),
-      plotNode.waitFor({ state: 'visible', timeout: 10_000 }).then(() => 'plot' as const),
+      catalogNode.waitFor({ state: 'visible', timeout: 5_000 }).then(() => 'catalog' as const),
+      plotNode.waitFor({ state: 'visible', timeout: 5_000 }).then(() => 'plot' as const),
     ]).catch(async () => {
-      const allRows = await page.locator('.monaco-list-row').allTextContents();
-      await page.screenshot({ path: 'tests/e2e/evidence/debug-no-catalog-row.png' });
+      await this.captureTreeDiagnostics('no-catalog-or-plot');
       throw new Error(
-        `Neither catalog nor plot "${plotName}" visible. Rows: ${JSON.stringify(allRows.slice(0, 15))}`
+        `Neither catalog nor plot "${plotName}" visible after expanding store.`
       );
     });
 
@@ -214,21 +202,55 @@ export class CodeServerPage {
       if (catalogCollapsed) {
         await catalogTwistie.click();
       }
-      // Wait for the plot node to appear after expanding
       await plotNode.waitFor({ state: 'visible', timeout: 5_000 });
     }
 
-    // Click the plot node to open it (triggers debrief.openPlot → MapPanel)
-    await plotNode.waitFor({ state: 'visible', timeout: 5_000 });
+    // Step 5: Click the plot to open it (triggers debrief.openPlot → MapPanel)
     await plotNode.click();
 
-    // Wait for the webview iframe to appear
+    // Step 6: Wait for the webview iframe to appear and become ready
     await page
       .locator('iframe.webview')
       .first()
       .waitFor({ state: 'attached', timeout: 15_000 });
 
-    // Wait for the webview to become ready (has .ready class)
+    await page
+      .locator('iframe.webview.ready')
+      .first()
+      .waitFor({ state: 'attached', timeout: 10_000 })
+      .catch(() => {});
+  }
+
+  /**
+   * Open a plot via the command palette using the "Debrief: Open Plot" command.
+   * This is an alternative to `openPlotViaStacTree()` that bypasses tree UI
+   * navigation entirely — useful as a fallback if tree rendering is unreliable.
+   *
+   * @param plotName - Display name of the plot to open (e.g. "Exercise Alpha")
+   */
+  async openPlotViaCommand(plotName: string): Promise<void> {
+    const page = this.page;
+
+    // Invoke "Debrief: Open Plot" via command palette
+    await page.keyboard.press('Control+Shift+KeyP');
+    await this.commandInput.waitFor({ state: 'visible', timeout: 5_000 });
+    await this.commandInput.fill('Debrief: Open Plot');
+    await page.keyboard.press('Enter');
+
+    // Wait for the Quick Pick to show the plot list, then select the plot
+    const plotItem = page
+      .locator('.quick-input-list .monaco-list-row')
+      .filter({ hasText: plotName })
+      .first();
+    await plotItem.waitFor({ state: 'visible', timeout: 10_000 });
+    await plotItem.click();
+
+    // Wait for the webview iframe to appear and become ready
+    await page
+      .locator('iframe.webview')
+      .first()
+      .waitFor({ state: 'attached', timeout: 15_000 });
+
     await page
       .locator('iframe.webview.ready')
       .first()
@@ -516,134 +538,88 @@ export class CodeServerPage {
   // STAC Tree Helpers (private)
   // ─────────────────────────────────────────────────────────────────────────────
 
-  /** Focus the STAC Stores view by clicking its pane header or via command palette. */
-  private async focusStacView(): Promise<void> {
-    // First dismiss command palette if open (press Escape)
-    await this.page.keyboard.press('Escape');
-    await this.page.waitForTimeout(200);
+  /**
+   * Focus and expand the STAC Stores pane using a command palette focus command.
+   * Mirrors the proven `revealSidebar()` pattern: command-based focus is reliable
+   * in openvscode-server because it bypasses CSS-selector fragility.
+   *
+   * After focusing, waits for the first `.monaco-list-row` to appear as a
+   * positive signal that the tree has rendered.
+   */
+  private async focusAndExpandStacPane(): Promise<void> {
+    const page = this.page;
 
-    // Close the Welcome tab if it somehow appeared despite settings
-    await this.page.keyboard.press('Control+KeyW');
-    await this.page.waitForTimeout(300);
+    // Dismiss any open overlays
+    await page.keyboard.press('Escape');
 
-    // Click the title bar to ensure main window has focus
-    await this.page.locator('.part.titlebar').click().catch(() => {});
+    // Use command palette to focus the STAC Stores view.
+    // VS Code auto-generates a focus command for registered views:
+    // `debrief.stacExplorer.focus` → "STAC Stores: Focus on STAC Stores View"
+    await page.keyboard.press('Control+Shift+KeyP');
+    await this.commandInput.waitFor({ state: 'visible', timeout: 5_000 });
+    await this.commandInput.fill('Focus on STAC Stores');
+    await page.keyboard.press('Enter');
 
-    // Try to find the STAC STORES pane header directly
-    const stacHeader = this.page.locator('.pane-header:has-text("STAC STORES")');
-    const headerVisible = await stacHeader
-      .waitFor({ state: 'visible', timeout: 5_000 })
-      .then(() => true)
-      .catch(() => false);
-
-    if (headerVisible) {
-      // Click the header to expand the pane
-      await stacHeader.click();
-      return;
-    }
-
-    // Fallback: try clicking the Explorer view container in the activity bar
-    // which contains the STAC STORES tree view
-    const explorerIcon = this.page.locator(
-      '.activitybar .action-item a[aria-label="Explorer"]'
-    ).first();
-    const explorerVisible = await explorerIcon.isVisible().catch(() => false);
-    if (explorerVisible) {
-      await explorerIcon.click();
-      await this.page.waitForTimeout(500);
-      // Now look for the STAC pane
-      await stacHeader
-        .waitFor({ state: 'visible', timeout: 5_000 })
-        .catch(() => {});
-    }
-  }
-
-  /** Poll until the extension finishes loading stores. */
-  private async waitForExtensionReady(timeoutMs: number): Promise<boolean> {
-    const start = Date.now();
-    while (Date.now() - start < timeoutMs) {
-      const loadingVisible = await this.page
-        .getByText('Loading stores')
-        .isVisible()
-        .catch(() => false);
-      if (!loadingVisible) return true;
-      await this.page.waitForTimeout(500);
-    }
-    return false;
-  }
-
-  /** Ensure the STAC STORES pane is expanded (not collapsed). */
-  private async ensureStacPaneExpanded(): Promise<void> {
-    const stacHeader = this.page.locator('.pane-header:has-text("STAC STORES")');
-    await stacHeader.waitFor({ state: 'visible', timeout: 10_000 }).catch(async () => {
-      await this.page.screenshot({ path: 'tests/e2e/evidence/debug-no-stac-pane.png' });
-      throw new Error('STAC STORES pane header not visible after 10s');
+    // Wait for the pane header to be visible (case-insensitive match)
+    const stacHeader = page.locator('.pane-header').filter({
+      has: page.locator('h3', { hasText: /stac stores/i }),
     });
+    await stacHeader
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .catch(async () => {
+        // Fallback: try opening Explorer first, then re-focus
+        await page.keyboard.press('Control+Shift+KeyE');
+        await page.keyboard.press('Control+Shift+KeyP');
+        await this.commandInput.waitFor({ state: 'visible', timeout: 5_000 });
+        await this.commandInput.fill('Focus on STAC Stores');
+        await page.keyboard.press('Enter');
+        await stacHeader.waitFor({ state: 'visible', timeout: 5_000 }).catch(async () => {
+          await this.captureTreeDiagnostics('focus-stac-pane-failed');
+          throw new Error(
+            'STAC Stores pane header not visible after command-based focus. ' +
+            'Check that the Debrief extension is installed and activated.'
+          );
+        });
+      });
 
+    // Ensure pane is expanded (aria-expanded may be "false" if collapsed)
     const expanded = await stacHeader.getAttribute('aria-expanded');
     if (expanded === 'false') {
       await stacHeader.click();
-      // Wait for list rows to appear (confirms pane expanded)
-      await this.page.locator('.monaco-list-row').first()
-        .waitFor({ state: 'visible', timeout: 3_000 })
-        .catch(() => {});
-    } else if (expanded === null) {
-      await stacHeader.click();
-      await this.page.locator('.monaco-list-row').first()
-        .waitFor({ state: 'visible', timeout: 3_000 })
-        .catch(async () => {
-          // Toggle again — may have collapsed
-          await stacHeader.click();
-          await this.page.locator('.monaco-list-row').first()
-            .waitFor({ state: 'visible', timeout: 3_000 })
-            .catch(() => {});
-        });
     }
   }
 
-  /** Seed Debrief config via terminal and reload the window. */
-  private async seedConfigAndReload(): Promise<void> {
+  /**
+   * Wait for the STAC tree to populate by watching for the first tree row.
+   * This is a positive signal wait — we look for rows to appear rather than
+   * polling for "Loading stores" text to disappear (which fails when the
+   * pane isn't visible).
+   */
+  private async waitForTreePopulated(timeoutMs: number): Promise<boolean> {
+    const treeRow = this.page.locator('.monaco-list-row').first();
+    return treeRow
+      .waitFor({ state: 'visible', timeout: timeoutMs })
+      .then(() => true)
+      .catch(() => false);
+  }
+
+  /**
+   * Capture diagnostic screenshots and tree state for debugging failures.
+   * Dumps all visible tree row labels and takes a screenshot.
+   */
+  private async captureTreeDiagnostics(stage: string): Promise<void> {
     const page = this.page;
+    const screenshotPath = `tests/e2e/evidence/debug-${stage}.png`;
+    await page.screenshot({ path: screenshotPath }).catch(() => {});
 
-    // Click title bar to ensure main window focus before keyboard shortcuts
-    await page.locator('.part.titlebar').click().catch(() => {});
-    await page.waitForTimeout(300);
-
-    // Open terminal
-    await page.keyboard.press('Control+Backquote');
-    await page.locator('.terminal-widget').waitFor({
-      state: 'visible',
-      timeout: 5_000,
-    }).catch(() => {});
-
-    // Detect workspace path from the terminal's current directory.
-    // code-server opens in the workspace root; openvscode-server may differ.
-    // Use a relative path from wherever the workspace is mounted.
-    const configCmd =
-      'mkdir -p ~/.config/debrief && ' +
-      'echo \'{"stores":[{"id":"local-store","path":"\'$(pwd)\'/local-store",' +
-      '"displayName":"Test Maritime Data","status":"available"}],"preferences":{}}\' ' +
-      '> ~/.config/debrief/config.json';
-    await page.keyboard.type(configCmd, { delay: 5 });
-    await page.keyboard.press('Enter');
-    await page.waitForTimeout(1_000);
-    await page.keyboard.press('Control+Backquote'); // close terminal
-
-    // Click title bar again to ensure focus before command palette
-    await page.locator('.part.titlebar').click().catch(() => {});
-    await page.waitForTimeout(300);
-
-    // Reload window
-    await page.keyboard.press('Control+Shift+P');
-    await this.commandInput.waitFor({ state: 'visible', timeout: 5_000 });
-    await this.commandInput.fill('Developer: Reload Window');
-    await page.keyboard.press('Enter');
-
-    // Wait for reload — workbench disappears and reappears
-    await page.locator('.monaco-workbench').waitFor({ state: 'visible', timeout: 30_000 });
-    await page.waitForSelector('.editor-group-container', {
-      state: 'visible',
-      timeout: 30_000,
-    });
+    const rows = await page
+      .locator('.monaco-list-row')
+      .allTextContents()
+      .catch(() => [] as string[]);
+    if (rows.length > 0) {
+      console.log(`[diag:${stage}] Tree rows (${rows.length}): ${JSON.stringify(rows.slice(0, 20))}`);
+    } else {
+      console.log(`[diag:${stage}] No tree rows visible`);
+    }
   }
 }
