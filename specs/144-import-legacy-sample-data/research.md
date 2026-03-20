@@ -84,8 +84,8 @@ Key observations:
 
 ### Additional Format Details (from legacy Java source analysis)
 
-- **No DTD or XSD schema exists** — format defined implicitly by Java SAX handler classes
-- **No namespace** in most files (some use `xmlns="http://www.debrief.info/plot"` — parser handles both)
+- **Formal XSD exists**: [`org.mwc.debrief.core/schema/debrief_plot.xsd`](https://github.com/debrief/debrief/blob/develop/org.mwc.debrief.core/schema/debrief_plot.xsd) in the legacy repo defines the complete schema (1121 lines) with target namespace `http://www.debrief.info/plot`. Saved locally at `specs/144-import-legacy-sample-data/debrief_plot.xsd` for reference. Key types defined: `track`, `fix`, `sensor`, `sensor_contact`, `tma`, `tma_solution`, `narrative`, `narrative_entry`, `composite_track`, plus shape types (`line`, `circle`, `rectangle`, `ellipse`, `polygon`, `Arc`, `wheel`). Uses inheritance (`BaseTMASegment` → `RelativeTMASegment`/`AbsoluteTMASegment`/`DynamicInfillSegment`; `shape` → all shape types).
+- **No namespace** in most sample files (some use `xmlns="http://www.debrief.info/plot"` — parser handles both)
 - **TMA solutions** exist as `<tma>/<tma_solution>` with target state and uncertainty ellipses — extracted as features
 - **Composite/Planning tracks** use `<composite_track>` — treated as regular tracks for import
 - **Null timestamp sentinel**: `691231 235959.999` — skip these fixes
