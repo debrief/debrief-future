@@ -7,33 +7,9 @@
  */
 
 import type { Tool, SelectionRequirement, ToolParameter } from './types';
+import type { MCPToolDefinition, MCPSelectionRequirement } from '@debrief/utils';
 
-/**
- * MCP tool definition with Debrief-specific annotations.
- */
-export interface MCPToolDefinition {
-  name: string;
-  description: string;
-  inputSchema: {
-    type: 'object';
-    properties: Record<string, unknown>;
-  };
-  annotations: {
-    'debrief:selectionRequirements': MCPSelectionRequirement[];
-    'debrief:category': string;
-    'debrief:version': string;
-    'debrief:outputKind': string;
-  };
-}
-
-/**
- * Selection requirement in MCP annotation format.
- */
-export interface MCPSelectionRequirement {
-  kind: string;
-  min: number;
-  max?: number;
-}
+export type { MCPToolDefinition, MCPSelectionRequirement };
 
 /**
  * Convert a single MCP tool definition to ToolMatchService Tool format.

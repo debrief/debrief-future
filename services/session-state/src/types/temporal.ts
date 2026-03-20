@@ -149,3 +149,39 @@ export interface TemporalActions {
 export function validatePlaybackRate(rate: number): boolean {
   return rate >= 0.1 && rate <= 100.0;
 }
+
+// ---------------------------------------------------------------------------
+// TimeRange Converters (#172 — proactive per review decision)
+// ---------------------------------------------------------------------------
+
+/**
+ * Create a TimeRange from ISO 8601 strings.
+ * Returns NaN values for invalid input strings.
+ */
+export function timeRangeFromISO(startISO: string, endISO: string): TimeRange {
+  return {
+    start: new Date(startISO).getTime(),
+    end: new Date(endISO).getTime(),
+  };
+}
+
+/**
+ * Convert a TimeRange to ISO 8601 strings.
+ */
+export function timeRangeToISO(range: TimeRange): { start: string; end: string } {
+  return {
+    start: new Date(range.start).toISOString(),
+    end: new Date(range.end).toISOString(),
+  };
+}
+
+/**
+ * Create a TimeRange from min/max epoch millisecond values.
+ * Automatically orders start ≤ end.
+ */
+export function timeRangeFromMinMax(a: number, b: number): TimeRange {
+  return {
+    start: Math.min(a, b),
+    end: Math.max(a, b),
+  };
+}

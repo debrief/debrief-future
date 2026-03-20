@@ -55,7 +55,7 @@ import type {
   MCPToolResponse,
   MCPContentItem,
   DebriefAnnotations,
-} from '../../../vscode/src/types/tool';
+} from '@debrief/utils';
 
 import {
   toolDefinition as setTrackColorDef,
