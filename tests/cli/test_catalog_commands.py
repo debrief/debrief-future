@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
-from debrief_cli.main import cli
 
+from debrief_cli.main import cli
 from debrief_stac.catalog import create_catalog
 from debrief_stac.features import add_features
 from debrief_stac.models import PlotMetadata
