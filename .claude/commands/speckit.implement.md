@@ -24,11 +24,13 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Check that spec.md and plan.md exist for context
    - Verify we're on the correct feature branch
 
-3. **Load implementation context**:
+3. **Load implementation context and update backlog status**:
    - Read spec.md for feature goals and acceptance criteria
    - Read plan.md for technical approach and architecture
    - Read tasks.md for the task breakdown
    - Read BACKLOG.md to determine feature complexity and model selection
+   - Update the backlog row status to `implementing`
+   - Commit: `chore(backlog): mark item {ID} as implementing`
 
 3a. **Determine model for implementation**:
 
@@ -145,6 +147,15 @@ You **MUST** consider the user input before proceeding (if not empty).
       - Commit any uncommitted changes
       - Push to the feature branch
       - Execute the final PR creation task (if present in tasks.md)
+
+11. **Mark backlog item as complete**:
+    - Read BACKLOG.md and find the row matching the current feature (by ID or description link)
+    - Strike through the entire row by wrapping each cell value in `~~`:
+      ```markdown
+      Before: | 007 | Enhancement | [Title](specs/007-name/spec.md) | 4 | 4 | 4 | 12 | Medium | implementing |
+      After:  | ~~007~~ | ~~Enhancement~~ | ~~[Title](specs/007-name/spec.md)~~ | ~~4~~ | ~~4~~ | ~~4~~ | ~~12~~ | ~~Medium~~ | ~~complete~~ |
+      ```
+    - Commit: `chore(backlog): mark item {ID} as complete`
 
 ## Slash Command Task Execution
 
