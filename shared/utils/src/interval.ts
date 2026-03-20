@@ -38,11 +38,11 @@ export function findIntervalPositions(
     return result;
   }
 
-  const startTime = timestamps[0];
-  const endTime = timestamps[timestamps.length - 1];
+  const startTime = timestamps[0]!;
+  const endTime = timestamps[timestamps.length - 1]!;
 
   // Calculate each interval mark from start time
-  let intervalTime = startTime;
+  let intervalTime: number = startTime;
   while (intervalTime <= endTime) {
     // Find nearest position to this interval time
     const nearestIdx = findNearestPositionIndex(timestamps, intervalTime);
@@ -80,7 +80,7 @@ export function findNearestPositionIndex(
 
   while (low < high) {
     const mid = Math.floor((low + high) / 2);
-    if (timestamps[mid] < targetTime) {
+    if (timestamps[mid]! < targetTime) {
       low = mid + 1;
     } else {
       high = mid;
@@ -92,8 +92,8 @@ export function findNearestPositionIndex(
     return 0;
   }
 
-  const diffLow = Math.abs(timestamps[low] - targetTime);
-  const diffPrev = Math.abs(timestamps[low - 1] - targetTime);
+  const diffLow = Math.abs(timestamps[low]! - targetTime);
+  const diffPrev = Math.abs(timestamps[low - 1]! - targetTime);
 
   return diffPrev <= diffLow ? low - 1 : low;
 }

@@ -1,29 +1,49 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
-    "skipLibCheck": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "strict": true,
+    "noUncheckedIndexedAccess": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@debrief/components": ["../../shared/components/src/index.ts"],
-      "@debrief/schemas": ["../../shared/schemas/src/generated/typescript/types.ts"],
-      "@test-data/*": ["../vscode/test-data/*"],
-      "@debrief/session-state": ["./src/session-state-browser.ts"]
+      "@debrief/components": [
+        "../../shared/components/src/index.ts"
+      ],
+      "@debrief/schemas": [
+        "../../shared/schemas/src/generated/typescript/types.ts"
+      ],
+      "@test-data/*": [
+        "../vscode/test-data/*"
+      ],
+      "@debrief/session-state": [
+        "./src/session-state-browser.ts"
+      ],
+      "@debrief/utils": [
+        "../../shared/utils/src/index.ts"
+      ]
     },
     "baseUrl": "."
   },
-  "include": ["src"],
-  "exclude": ["src/**/*.stories.tsx"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "src/**/*.stories.tsx"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

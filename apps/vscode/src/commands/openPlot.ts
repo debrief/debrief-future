@@ -331,7 +331,7 @@ export function createOpenPlotCommand(
         } else {
           // Additive: append new features, stamping original activityId
           for (const f of result.features.features) {
-            stampProvenance(f as Record<string, unknown>);
+            stampProvenance(f as unknown as Record<string, unknown>);
             (fc.features as unknown[]).push(f);
           }
         }

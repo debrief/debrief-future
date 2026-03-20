@@ -1,6 +1,7 @@
 """Unit tests for debrief-calc exceptions."""
 
 import pytest
+
 from debrief_calc.exceptions import (
     DebriefCalcError,
     ExecutionError,

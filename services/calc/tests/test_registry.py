@@ -1,6 +1,7 @@
 """Unit tests for debrief-calc registry."""
 
 import pytest
+
 from debrief_calc.exceptions import ToolNotFoundError
 from debrief_calc.models import ContextType, SelectionContext, Tool, ToolParameter
 from debrief_calc.registry import ToolRegistry

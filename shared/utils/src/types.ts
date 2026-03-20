@@ -29,6 +29,34 @@ export interface GeoJSONFeatureCollection {
 export type Bounds = [number, number, number, number];
 
 /**
+ * Safe GeoJSON geometry — maximally permissive coordinates for cross-boundary use.
+ * Use this at service/MCP boundaries where coordinate shape is unknown.
+ */
+export interface SafeGeometry {
+  type: string;
+  coordinates: unknown;
+}
+
+/**
+ * Safe GeoJSON Feature — avoids `any` from the geojson package.
+ * Canonical definition for use at JSON.parse() boundaries and MCP calls.
+ */
+export interface SafeFeature {
+  type: 'Feature';
+  id?: string | number;
+  geometry: SafeGeometry | null;
+  properties: Record<string, unknown> | null;
+}
+
+/**
+ * Safe GeoJSON FeatureCollection — avoids `any` from the geojson package.
+ */
+export interface SafeFeatureCollection {
+  type: 'FeatureCollection';
+  features: SafeFeature[];
+}
+
+/**
  * Position style configuration (matches schema PositionStyle)
  */
 export interface PositionStyle {

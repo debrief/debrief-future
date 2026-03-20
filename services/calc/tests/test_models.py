@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from pydantic import ValidationError as PydanticValidationError
+
 from debrief_calc.models import (
     VALID_PARAM_TYPES,
     BranchRecord,
@@ -28,7 +30,6 @@ from debrief_calc.models import (
     ToolResult,
     WasGeneratedBy,
 )
-from pydantic import ValidationError as PydanticValidationError
 
 FIXTURES_ROOT = Path(__file__).resolve().parents[2] / ".." / "shared" / "schemas" / "fixtures"
 

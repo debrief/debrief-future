@@ -39,27 +39,8 @@ import type {
   DebriefFeature,
 } from '@debrief/components';
 
-// Type-safe properties to avoid any from geojson
-type SafeProperties = Record<string, unknown>;
-
-// Self-contained geometry type to avoid any
-interface SafeGeometry {
-  type: string;
-  coordinates: number[] | number[][] | number[][][];
-}
-
-// Self-contained feature type to avoid any from geojson Feature
-interface SafeFeature {
-  type: 'Feature';
-  geometry: SafeGeometry | null;
-  properties: SafeProperties | null;
-}
-
-// Self-contained FeatureCollection type to avoid any from geojson
-interface SafeFeatureCollection {
-  type: 'FeatureCollection';
-  features: SafeFeature[];
-}
+// Canonical Safe GeoJSON types from @debrief/utils (T02)
+import type { SafeFeature, SafeFeatureCollection, SafeGeometry } from '@debrief/utils';
 
 export class StacService {
   private catalogCache: Map<string, StacCatalog> = new Map();
@@ -1332,7 +1313,7 @@ export class StacService {
         }
       }
     } else if (geometry.type === 'Polygon') {
-      const rings = geometry.coordinates as unknown as number[][][];
+      const rings = geometry.coordinates as number[][][];
       for (const ring of rings) {
         for (const point of ring) {
           if (point.length >= 2 && typeof point[0] === 'number' && typeof point[1] === 'number') {

@@ -1,3 +1,4 @@
+// AUTO-GENERATED — DO NOT EDIT
 export type ToolId = string;
 /**
 * Discriminator for GeoJSON feature types

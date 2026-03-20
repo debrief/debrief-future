@@ -3,6 +3,7 @@
 import copy
 
 import pytest
+
 from debrief_calc.models import ContextType, SelectionContext
 from debrief_calc.tools.track.styling.set_track_color import set_track_color
 

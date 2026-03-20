@@ -1,6 +1,7 @@
 """Tests for the @tool_spec decorator."""
 
 import pytest
+
 from debrief_tools import tool_spec
 from debrief_tools.decorators import (
     ToolSpecError,

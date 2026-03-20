@@ -226,7 +226,7 @@ export function createExecuteToolCommand(
                 fc.features = fc.features.map((f) => {
                   const id = fid(f);
                   const updated = updatedMap.get(id);
-                  return updated ? (updated as typeof f) : f;
+                  return updated ?? f;
                 });
                 await stacService.writeGeoJson(store.path, plot.itemPath, fc);
               }
@@ -286,7 +286,7 @@ export function createExecuteToolCommand(
             await stacService.addFeatures(
               store.path,
               plot.itemPath,
-              layer.features.features as Parameters<typeof stacService.addFeatures>[2]
+              layer.features.features
             );
           }
         } catch (persistErr) {
