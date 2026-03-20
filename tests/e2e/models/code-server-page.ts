@@ -217,6 +217,78 @@ export class CodeServerPage {
   }
 
   /**
+   * Navigate the STAC tree to find a plot node, without opening it.
+   * Validates that the STAC Stores tree view loads, populates with store
+   * rows, and is navigable — independent of webview rendering.
+   *
+   * @param plotName - Display name of the plot (e.g. "Exercise Alpha")
+   * @returns Object with store and plot node labels for assertion
+   */
+  async navigateStacTree(plotName: string): Promise<{
+    storeLabel: string;
+    plotLabel: string;
+    treeRowCount: number;
+  }> {
+    const page = this.page;
+
+    // Step 1: Focus and expand the STAC Stores pane
+    await this.focusAndExpandStacPane();
+
+    // Step 2: Wait for a STAC store row to appear
+    const storeRow = page.locator('.monaco-list-row:has-text("STAC:")').first();
+    await storeRow
+      .waitFor({ state: 'visible', timeout: 20_000 })
+      .catch(async () => {
+        await this.captureTreeDiagnostics('navigate-no-store-row');
+        throw new Error(
+          'STAC store row not found in tree within 20s. ' +
+          'Ensure config.json is pre-seeded and the extension activated.'
+        );
+      });
+
+    const storeLabel = (await storeRow.textContent()) ?? '';
+
+    // Step 3: Expand the store node
+    const storeTwistie = storeRow.locator('.monaco-tl-twistie');
+    const storeCollapsed = await storeTwistie
+      .evaluate((el) => el.classList.contains('collapsed'))
+      .catch(() => true);
+    if (storeCollapsed) {
+      await storeTwistie.click();
+    }
+
+    // Step 4: Find the plot node
+    const plotNode = page.locator(`.monaco-list-row:has-text("${plotName}")`).first();
+    const catalogNode = page.locator('.monaco-list-row:has-text("plots")').first();
+
+    const firstVisible = await Promise.race([
+      catalogNode.waitFor({ state: 'visible', timeout: 5_000 }).then(() => 'catalog' as const),
+      plotNode.waitFor({ state: 'visible', timeout: 5_000 }).then(() => 'plot' as const),
+    ]).catch(async () => {
+      await this.captureTreeDiagnostics('navigate-no-catalog-or-plot');
+      throw new Error(
+        `Neither catalog nor plot "${plotName}" visible after expanding store.`
+      );
+    });
+
+    if (firstVisible === 'catalog') {
+      const catalogTwistie = catalogNode.locator('.monaco-tl-twistie');
+      const catalogCollapsed = await catalogTwistie
+        .evaluate((el) => el.classList.contains('collapsed'))
+        .catch(() => true);
+      if (catalogCollapsed) {
+        await catalogTwistie.click();
+      }
+      await plotNode.waitFor({ state: 'visible', timeout: 5_000 });
+    }
+
+    const plotLabel = (await plotNode.textContent()) ?? '';
+    const treeRowCount = await page.locator('.monaco-list-row').count();
+
+    return { storeLabel, plotLabel, treeRowCount };
+  }
+
+  /**
    * Open a plot via the command palette using the "Debrief: Open Plot" command.
    * This is an alternative to `openPlotViaStacTree()` that bypasses tree UI
    * navigation entirely — useful as a fallback if tree rendering is unreliable.
