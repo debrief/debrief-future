@@ -12,7 +12,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe('US-Tune: PROV Tuning Workflow', () => {
+test.describe.skip('US-Tune: PROV Tuning Workflow', () => { // blocked: webview iframe (#143)
 
   test('T-TUNE-01: run move-shape on annotation, log entry appears with tunable parameters', async ({
     codeServerPage,

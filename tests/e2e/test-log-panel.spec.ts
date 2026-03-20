@@ -8,7 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe('Log Panel', () => {
+test.describe.skip('Log Panel', () => { // blocked: webview iframe (#143)
 
   test('log panel shows empty state when no tools have run', async ({
     codeServerPage,

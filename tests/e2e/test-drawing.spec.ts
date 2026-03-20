@@ -9,7 +9,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe('Drawing Tools', () => {
+test.describe.skip('Drawing Tools', () => { // blocked: webview iframe (#143)
   test('drawing toolbar trigger is present on the map', async ({
     codeServerPage,
   }) => {

@@ -8,7 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe('Styling Tools', () => {
+test.describe.skip('Styling Tools', () => { // blocked: webview iframe (#143)
   test('tools panel lists available tools', async ({ codeServerPage }) => {
     test.setTimeout(120_000);
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
