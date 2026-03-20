@@ -46,12 +46,12 @@
 
 ### Implementation
 
-- [ ] T001 [US1] Merge `focusStacView()` + `ensureStacPaneExpanded()` into `focusAndExpandStacPane()` using command palette (e.g. "Focus on STAC Stores View") mirroring the `revealSidebar()` pattern `tests/e2e/models/code-server-page.ts`
-- [ ] T002 [US1] Rewrite `waitForExtensionReady()` to wait for positive signal (first `.monaco-list-row` inside STAC pane) instead of polling for "Loading stores" text absence `tests/e2e/models/code-server-page.ts`
-- [ ] T003 [US1] Remove `seedConfigAndReload()` method entirely — fail fast if config is missing `tests/e2e/models/code-server-page.ts`
-- [ ] T004 [US1] Rewrite `openPlotViaStacTree()` to use new `focusAndExpandStacPane()`, remove `seedConfigAndReload` fallback branch, use signal-based waits instead of `waitForTimeout()`, add diagnostic screenshots on each failure path with meaningful error messages `tests/e2e/models/code-server-page.ts`
-- [ ] T005 [US1] Add private `captureTreeDiagnostics(stage: string)` method that screenshots and dumps all `.monaco-list-row` text contents for debugging `tests/e2e/models/code-server-page.ts`
-- [ ] T006 [US1] Run typecheck on changed file: `pnpm -r typecheck` `tests/e2e/models/code-server-page.ts`
+- [x] T001 [US1] Merge `focusStacView()` + `ensureStacPaneExpanded()` into `focusAndExpandStacPane()` using command palette (e.g. "Focus on STAC Stores View") mirroring the `revealSidebar()` pattern `tests/e2e/models/code-server-page.ts`
+- [x] T002 [US1] Rewrite `waitForExtensionReady()` to wait for positive signal (first `.monaco-list-row` inside STAC pane) instead of polling for "Loading stores" text absence `tests/e2e/models/code-server-page.ts`
+- [x] T003 [US1] Remove `seedConfigAndReload()` method entirely — fail fast if config is missing `tests/e2e/models/code-server-page.ts`
+- [x] T004 [US1] Rewrite `openPlotViaStacTree()` to use new `focusAndExpandStacPane()`, remove `seedConfigAndReload` fallback branch, use signal-based waits instead of `waitForTimeout()`, add diagnostic screenshots on each failure path with meaningful error messages `tests/e2e/models/code-server-page.ts`
+- [x] T005 [US1] Add private `captureTreeDiagnostics(stage: string)` method that screenshots and dumps all `.monaco-list-row` text contents for debugging `tests/e2e/models/code-server-page.ts`
+- [x] T006 [US1] Run typecheck on changed file: `pnpm -r typecheck` `tests/e2e/models/code-server-page.ts`
 
 **Checkpoint**: Core page object rewritten. Tree navigation uses command-based focus and positive signals. No fragile terminal automation.
 
@@ -67,8 +67,8 @@
 
 ### Implementation
 
-- [ ] T007 [US3] Add `openPlotViaCommand(plotName: string)` method to `CodeServerPage` that invokes "Debrief: Open Plot" via command palette and selects the named plot `tests/e2e/models/code-server-page.ts`
-- [ ] T008 [US3] Run typecheck: `pnpm -r typecheck` `tests/e2e/models/code-server-page.ts`
+- [x] T007 [US3] Add `openPlotViaCommand(plotName: string)` method to `CodeServerPage` that invokes "Debrief: Open Plot" via command palette and selects the named plot `tests/e2e/models/code-server-page.ts`
+- [x] T008 [US3] Run typecheck: `pnpm -r typecheck` `tests/e2e/models/code-server-page.ts`
 
 **Checkpoint**: Both tree-based and command-based plot opening available. All 15 tests will use tree path (9A); command fallback exists for resilience.
 
@@ -84,16 +84,16 @@
 
 ### Implementation
 
-- [ ] T009 [P] [US1] Remove `.skip` from `test-load-display.spec.ts` `tests/e2e/test-load-display.spec.ts`
-- [ ] T010 [P] [US1] Remove `.skip` from `test-catalog-browse.spec.ts` `tests/e2e/test-catalog-browse.spec.ts`
-- [ ] T011 [P] [US1] Remove `.skip` from `test-drawing.spec.ts` `tests/e2e/test-drawing.spec.ts`
-- [ ] T012 [P] [US1] Remove `.skip` from `test-selection-sync.spec.ts` `tests/e2e/test-selection-sync.spec.ts`
-- [ ] T013 [P] [US1] Remove `.skip` from `test-analysis-tool.spec.ts` `tests/e2e/test-analysis-tool.spec.ts`
-- [ ] T014 [P] [US1] Remove `.skip` from `test-real-webview.spec.ts` `tests/e2e/test-real-webview.spec.ts`
-- [ ] T015 [P] [US1] Remove `.skip` from `test-time-controller.spec.ts` `tests/e2e/test-time-controller.spec.ts`
-- [ ] T016 [P] [US1] Remove `.skip` from `test-error-feedback.spec.ts` (single `test.skip`, not `describe.skip`) `tests/e2e/test-error-feedback.spec.ts`
-- [ ] T017 [US1] Run full CI verification: `task verify`
-- [ ] T018 [US1] Fix any secondary failures in batch 1 test files (stale selectors, changed APIs, etc.)
+- [x] T009 [P] [US1] Remove `.skip` from `test-load-display.spec.ts` `tests/e2e/test-load-display.spec.ts`
+- [x] T010 [P] [US1] Remove `.skip` from `test-catalog-browse.spec.ts` `tests/e2e/test-catalog-browse.spec.ts`
+- [x] T011 [P] [US1] Remove `.skip` from `test-drawing.spec.ts` `tests/e2e/test-drawing.spec.ts`
+- [x] T012 [P] [US1] Remove `.skip` from `test-selection-sync.spec.ts` `tests/e2e/test-selection-sync.spec.ts`
+- [x] T013 [P] [US1] Remove `.skip` from `test-analysis-tool.spec.ts` `tests/e2e/test-analysis-tool.spec.ts`
+- [x] T014 [P] [US1] Remove `.skip` from `test-real-webview.spec.ts` `tests/e2e/test-real-webview.spec.ts`
+- [x] T015 [P] [US1] Remove `.skip` from `test-time-controller.spec.ts` `tests/e2e/test-time-controller.spec.ts`
+- [x] T016 [P] [US1] Remove `.skip` from `test-error-feedback.spec.ts` (single `test.skip`, not `describe.skip`) `tests/e2e/test-error-feedback.spec.ts`
+- [x] T017 [US1] Run full CI verification: `task verify`
+- [x] T018 [US1] Fix any secondary failures in batch 1 test files (stale selectors, changed APIs, etc.)
 
 **Checkpoint**: 8 directly-blocked test suites re-enabled and passing.
 
@@ -107,15 +107,15 @@
 
 ### Implementation
 
-- [ ] T019 [P] [US1] Remove `.skip` from `test-tune-prov.spec.ts` `tests/e2e/test-tune-prov.spec.ts`
-- [ ] T020 [P] [US1] Remove `.skip` from `test-log-panel.spec.ts` `tests/e2e/test-log-panel.spec.ts`
-- [ ] T021 [P] [US1] Remove `.skip` from `test-capture-log-evidence.spec.ts` `tests/e2e/test-capture-log-evidence.spec.ts`
-- [ ] T022 [P] [US1] Remove `.skip` from `test-undo-redo-split.spec.ts` `tests/e2e/test-undo-redo-split.spec.ts`
-- [ ] T023 [P] [US1] Remove `.skip` from `test-styling-tools.spec.ts` `tests/e2e/test-styling-tools.spec.ts`
-- [ ] T024 [P] [US1] Remove `.skip` from `test-event-log-propagation.spec.ts` `tests/e2e/test-event-log-propagation.spec.ts`
-- [ ] T025 [P] [US1] Remove `.skip` from `test-log-edit-face.spec.ts` `tests/e2e/test-log-edit-face.spec.ts`
-- [ ] T026 [US1] Run full CI verification: `task verify`
-- [ ] T027 [US1] Fix any secondary failures in batch 2 test files
+- [x] T019 [P] [US1] Remove `.skip` from `test-tune-prov.spec.ts` `tests/e2e/test-tune-prov.spec.ts`
+- [x] T020 [P] [US1] Remove `.skip` from `test-log-panel.spec.ts` `tests/e2e/test-log-panel.spec.ts`
+- [x] T021 [P] [US1] Remove `.skip` from `test-capture-log-evidence.spec.ts` `tests/e2e/test-capture-log-evidence.spec.ts`
+- [x] T022 [P] [US1] Remove `.skip` from `test-undo-redo-split.spec.ts` `tests/e2e/test-undo-redo-split.spec.ts`
+- [x] T023 [P] [US1] Remove `.skip` from `test-styling-tools.spec.ts` `tests/e2e/test-styling-tools.spec.ts`
+- [x] T024 [P] [US1] Remove `.skip` from `test-event-log-propagation.spec.ts` `tests/e2e/test-event-log-propagation.spec.ts`
+- [x] T025 [P] [US1] Remove `.skip` from `test-log-edit-face.spec.ts` `tests/e2e/test-log-edit-face.spec.ts`
+- [x] T026 [US1] Run full CI verification: `task verify`
+- [x] T027 [US1] Fix any secondary failures in batch 2 test files
 
 **Checkpoint**: All 15 previously-skipped test suites re-enabled and passing. Zero `.skip` annotations related to STAC tree.
 
@@ -127,24 +127,24 @@
 
 ### Verification
 
-- [ ] T028 Run full CI verification with all tests enabled: `task verify`
-- [ ] T029 Update spec.md to correct "18 test suites" to "15 test files" and update FR-001 timeout target per review decision 11A (50s worst case, split tree-nav vs webview-load)
+- [x] T028 Run full CI verification with all tests enabled: `task verify`
+- [x] T029 Update spec.md to correct "18 test suites" to "15 test files" and update FR-001 timeout target per review decision 11A (50s worst case, split tree-nav vs webview-load)
 
 ### Evidence Collection
 
-- [ ] T030 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/143-fix-stac-tree/evidence/test-summary.md`
-- [ ] T031 Create usage demonstration showing before/after of `openPlotViaStacTree()` flow in `specs/143-fix-stac-tree/evidence/usage-example.md`
-- [ ] T032 [P] Capture CI config sample in `specs/143-fix-stac-tree/evidence/config-sample.json`
-- [ ] T033 [P] Capture CI E2E validation output in `specs/143-fix-stac-tree/evidence/validation-output.txt`
+- [x] T030 Capture test results using template (`.specify/templates/evidence/test-summary-template.md`) in `specs/143-fix-stac-tree/evidence/test-summary.md`
+- [x] T031 Create usage demonstration showing before/after of `openPlotViaStacTree()` flow in `specs/143-fix-stac-tree/evidence/usage-example.md`
+- [x] T032 [P] Capture CI config sample in `specs/143-fix-stac-tree/evidence/config-sample.json`
+- [x] T033 [P] Capture CI E2E validation output in `specs/143-fix-stac-tree/evidence/validation-output.txt`
 
 ### Media Content
 
-- [ ] T034 Create shipped blog post in `specs/143-fix-stac-tree/media/shipped-post.md`
-- [ ] T035 [P] Create LinkedIn shipped summary in `specs/143-fix-stac-tree/media/linkedin-shipped.md`
+- [x] T034 Create shipped blog post in `specs/143-fix-stac-tree/media/shipped-post.md`
+- [x] T035 [P] Create LinkedIn shipped summary in `specs/143-fix-stac-tree/media/linkedin-shipped.md`
 
 ### PR Creation
 
-- [ ] T036 Create PR and publish blog: run `/speckit.pr`
+- [x] T036 Create PR and publish blog: run `/speckit.pr`
 
 **Task T036 must run last. It depends on all evidence and media tasks being complete.**
 
