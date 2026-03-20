@@ -21,7 +21,7 @@
         "../../shared/components/src/index.ts"
       ],
       "@debrief/schemas": [
-        "../../shared/schemas/src/generated/typescript/types.ts"
+        "../../shared/schemas/src/generated/typescript/index.ts"
       ],
       "@test-data/*": [
         "../vscode/test-data/*"

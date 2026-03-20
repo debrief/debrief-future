@@ -197,7 +197,7 @@ export default function App() {
 
   // All features including result layers and drawn features
   const allFeatures = useMemo<DebriefFeature[]>(() => {
-    return [...plotFeatures, ...resultLayers as DebriefFeature[], ...drawnFeatures];
+    return [...plotFeatures, ...(resultLayers as unknown as DebriefFeature[]), ...drawnFeatures];
   }, [plotFeatures, resultLayers, drawnFeatures]);
 
   // Feature names map for LogPanel
