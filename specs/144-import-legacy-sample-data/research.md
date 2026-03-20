@@ -35,8 +35,11 @@ Parse DPF files using Python's `xml.etree.ElementTree` with namespace-aware pars
 ```
 
 Key observations:
-- Coordinates stored as **decimal degrees** (Lat/Long attributes on `<shortLocation>`)
-- Timestamps stored as `YYMMDD HHMMSS[.SSS]` in `Dtg` attribute (same format as REP)
+- Coordinates stored in two formats:
+  - `<shortLocation Lat="22.186" Long="-21.698" Depth="0.0"/>` — decimal degrees (preferred)
+  - `<longLocation LatDeg="12" LatMin="11" LatSec="10.63" LatHem="N" LongDeg="11" LongMin="41" LongSec="52.37" LongHem="W" Depth="0.0"/>` — DMS (legacy)
+  - Parser MUST handle both formats
+- Timestamps stored as `YYMMDD HHMMSS[.SSS]` or `YYYYMMDD HHMMSS[.SSS]` in `Dtg` attribute (UTC)
 - Course in degrees (0-360), Speed in knots, Depth in metres
 - Track name in `Name` attribute
 - Each track contains one or more `<TrackSegment>` elements
@@ -78,6 +81,15 @@ Key observations:
 | SAX parser | More complex for the small file sizes involved (~14.5 MB total) |
 | Parse full UI state | Out of scope — only spatial/temporal data needed |
 | Custom string parsing | XML structure is well-formed; stdlib parser is reliable |
+
+### Additional Format Details (from legacy Java source analysis)
+
+- **No DTD or XSD schema exists** — format defined implicitly by Java SAX handler classes
+- **No namespace** in most files (some use `xmlns="http://www.debrief.info/plot"` — parser handles both)
+- **TMA solutions** exist as `<tma>/<tma_solution>` with target state and uncertainty ellipses — extracted as features
+- **Composite/Planning tracks** use `<composite_track>` — treated as regular tracks for import
+- **Null timestamp sentinel**: `691231 235959.999` — skip these fixes
+- **Files are self-contained** — no external file references for plot data
 
 ---
 
