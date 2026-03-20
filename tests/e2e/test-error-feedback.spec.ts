@@ -5,10 +5,6 @@
  * user-visible feedback in the VS Code interface. Error handling across
  * service boundaries is where silent failures are most likely.
  *
- * NOTE: Tests requiring webview content are skipped — #active-frame not
- * created in openvscode-server. T022 is also skipped because the
- * "Import REP File" command relies on a file picker that doesn't work
- * in headless openvscode-server.
  *
  * @see specs/005-e2e-workflow-tests/spec.md — User Story 3
  */
@@ -19,11 +15,10 @@ const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 test.describe('US3: Error Feedback Workflow', () => {
   test.setTimeout(60_000);
 
-  // Skip: Import REP File command uses a file picker that doesn't work
-  // in headless openvscode-server
-  test.skip('T022: open malformed REP file shows error notification, no corrupt data', async ({
+  test('T022: open malformed REP file shows error notification, no corrupt data', async ({
     codeServerPage,
   }) => {
+    test.fixme('file picker not functional in headless openvscode-server');
     await codeServerPage.executeCommand('Debrief: Import REP File');
     await codeServerPage.page.waitForTimeout(1_000);
     const input = codeServerPage.page.locator('.quick-input-box input');
@@ -40,8 +35,7 @@ test.describe('US3: Error Feedback Workflow', () => {
     expect(hasErrorNotification).toBe(true);
   });
 
-  // Skip: webview #active-frame not created in openvscode-server (backlog #142)
-  test.skip('T023: run tool without selection shows requirement message', async ({
+  test('T023: run tool without selection shows requirement message', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');
