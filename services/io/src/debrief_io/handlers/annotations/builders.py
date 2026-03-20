@@ -1446,6 +1446,31 @@ def build_dynamic_poly(line: str, line_number: int, filename: str) -> dict[str, 
     }
 
 
+def _parse_sensor_type_and_label(text: str) -> tuple[str | None, str | None]:
+    """Parse sensor type and label from remaining SENSOR text.
+
+    Handles both quoted and unquoted sensor types:
+        ``"Plain Cookie" FisherOne held on Plain Cookie``
+        ``s2_cookie SUBJECT held on s2_cookie``
+    """
+    if not text:
+        return None, None
+    text = text.strip()
+    if text.startswith('"'):
+        # Quoted sensor type
+        end = text.find('"', 1)
+        if end == -1:
+            return text[1:], None
+        sensor_type = text[1:end]
+        rest = text[end + 1 :].strip()
+        return sensor_type, rest or None
+    # Unquoted: first token is sensor_type, rest is label
+    parts = text.split(None, 1)
+    sensor_type = parts[0]
+    label = parts[1] if len(parts) > 1 else None
+    return sensor_type, label
+
+
 def build_sensor(line: str, line_number: int, filename: str) -> dict[str, Any]:
     """
     Build SensorAnnotation feature from SENSOR line.
@@ -1456,7 +1481,14 @@ def build_sensor(line: str, line_number: int, filename: str) -> dict[str, Any]:
     """
     content = _extract_content_after_prefix(line)
 
-    if '"' in content:
+    # Check if the track name (3rd token) is quoted
+    all_tokens = content.split()
+    has_quoted_track = (
+        len(all_tokens) >= 3
+        and all_tokens[2].startswith('"')
+    )
+
+    if has_quoted_track:
         # Quoted track name: ;SENSOR: 951212 050200 "NELSON" @A ...
         before_quote = content.split('"')[0].strip()
         track_id = content.split('"')[1]
@@ -1491,9 +1523,9 @@ def build_sensor(line: str, line_number: int, filename: str) -> dict[str, Any]:
         track_id = all_parts[2]
         parts = all_parts[3:]
 
-    if len(parts) < 11:  # symbol + 8 coords + bearing + range = 11
+    if len(parts) < 2:
         raise AnnotationParseError(
-            "Incomplete SENSOR - expected symbol, coords, bearing, range",
+            "Incomplete SENSOR - expected at least symbol and bearing data",
             line_number=line_number,
             code=ErrorCode.PARSE_ERROR,
             filename=filename,
@@ -1503,6 +1535,54 @@ def build_sensor(line: str, line_number: int, filename: str) -> dict[str, Any]:
     # Parse symbol
     symbol_str = parts[0]
     symbol = parse_symbol(symbol_str, line_number)
+
+    # Check for NULL coordinates (bearing-only sensor, position from parent track)
+    if len(parts) >= 2 and parts[1].upper() == "NULL":
+        # Format: @A NULL BEARING RANGE SENSOR_TYPE LABEL
+        # or:     @A NULL BEARING RANGE "Quoted Sensor" LABEL
+        try:
+            bearing = float(parts[2])
+            range_m = float(parts[3])
+        except (ValueError, IndexError) as err:
+            raise AnnotationParseError(
+                "Invalid bearing or range in NULL-position SENSOR",
+                line_number=line_number,
+                code=ErrorCode.PARSE_ERROR,
+                filename=filename,
+                annotation_type="SENSOR",
+            ) from err
+
+        # Parse remaining content after bearing/range for sensor_type and label
+        # Rejoin and handle quoted sensor types
+        remaining = " ".join(parts[4:]) if len(parts) > 4 else ""
+        sensor_type, label = _parse_sensor_type_and_label(remaining)
+
+        return {
+            "type": "Feature",
+            "id": generate_feature_id(),
+            "geometry": None,
+            "properties": {
+                "kind": "SENSOR_CONTACT",
+                "track_id": track_id,
+                "bearing": bearing,
+                "range": range_m,
+                "sensor_type": sensor_type,
+                "timestamp": timestamp.iso_string if timestamp else None,
+                "label": label,
+                "symbol": symbol.color_code,
+                "style": _build_line_style(symbol),
+            },
+        }
+
+    # Full coordinates path: symbol + 8 coord parts + bearing + range = 11 minimum
+    if len(parts) < 11:
+        raise AnnotationParseError(
+            "Incomplete SENSOR - expected symbol, coords, bearing, range",
+            line_number=line_number,
+            code=ErrorCode.PARSE_ERROR,
+            filename=filename,
+            annotation_type="SENSOR",
+        )
 
     # Parse observer coordinates
     coord_text = " ".join(parts[1:])
@@ -1569,7 +1649,6 @@ def build_sensor(line: str, line_number: int, filename: str) -> dict[str, Any]:
             "label": label,
             "symbol": symbol.color_code,
             "style": _build_line_style(symbol),
-
         },
     }
 

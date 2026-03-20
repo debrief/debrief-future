@@ -230,7 +230,7 @@ def _resolve_symbol_color(symbol: str) -> str:
         if ch.isalpha() and ch.isupper():
             try:
                 return get_color(ch)
-            except KeyError:
+            except (KeyError, ValueError):
                 pass
     return _DEFAULT_COLOR
 
