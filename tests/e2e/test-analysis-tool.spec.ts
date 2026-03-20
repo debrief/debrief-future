@@ -11,7 +11,7 @@ import { test, expect } from './fixtures/base';
 
 const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 
-test.describe('US2: Analysis Tool Execution Workflow', () => {
+test.describe.skip('US2: Analysis Tool Execution Workflow — requires openPlotViaStacTree (#143)', () => {
   test.setTimeout(60_000);
 
   test('T018: select track, run single-track tool, log entry appears', async ({
