@@ -153,23 +153,18 @@ export class CodeServerPage {
     // Step 1: Focus and expand the STAC Stores pane via command palette
     await this.focusAndExpandStacPane();
 
-    // Step 2: Wait for the tree to populate (positive signal)
-    const populated = await this.waitForTreePopulated(15_000);
-    if (!populated) {
-      await this.captureTreeDiagnostics('tree-not-populated');
-      throw new Error(
-        'STAC tree did not populate within 15s. ' +
-        'Ensure config.json is pre-seeded and the extension activated.'
-      );
-    }
-
-    // Step 3: Find and expand the store row
+    // Step 2: Wait for a STAC store row to appear (positive signal).
+    // Must match STAC-specific rows — not file explorer rows which also
+    // use .monaco-list-row. Store nodes use "STAC: {displayName}" labels.
     const storeRow = page.locator('.monaco-list-row:has-text("STAC:")').first();
     await storeRow
-      .waitFor({ state: 'visible', timeout: 5_000 })
+      .waitFor({ state: 'visible', timeout: 20_000 })
       .catch(async () => {
         await this.captureTreeDiagnostics('no-store-row');
-        throw new Error('STAC store row not found in tree. Config may be invalid.');
+        throw new Error(
+          'STAC store row not found in tree within 20s. ' +
+          'Ensure config.json is pre-seeded and the extension activated.'
+        );
       });
 
     const storeTwistie = storeRow.locator('.monaco-tl-twistie');
@@ -549,12 +544,13 @@ export class CodeServerPage {
   private async focusAndExpandStacPane(): Promise<void> {
     const page = this.page;
 
-    // Dismiss any open overlays
+    // Dismiss any open overlays and notifications that may cover tree rows
     await page.keyboard.press('Escape');
+    await this.dismissNotifications();
 
     // Use command palette to focus the STAC Stores view.
     // VS Code auto-generates a focus command for registered views:
-    // `debrief.stacExplorer.focus` → "STAC Stores: Focus on STAC Stores View"
+    // `debrief.stacExplorer.focus` → "Explorer: Focus on STAC Stores View"
     await page.keyboard.press('Control+Shift+KeyP');
     await this.commandInput.waitFor({ state: 'visible', timeout: 5_000 });
     await this.commandInput.fill('Focus on STAC Stores');
@@ -587,20 +583,17 @@ export class CodeServerPage {
     if (expanded === 'false') {
       await stacHeader.click();
     }
-  }
 
-  /**
-   * Wait for the STAC tree to populate by watching for the first tree row.
-   * This is a positive signal wait — we look for rows to appear rather than
-   * polling for "Loading stores" text to disappear (which fails when the
-   * pane isn't visible).
-   */
-  private async waitForTreePopulated(timeoutMs: number): Promise<boolean> {
-    const treeRow = this.page.locator('.monaco-list-row').first();
-    return treeRow
-      .waitFor({ state: 'visible', timeout: timeoutMs })
-      .then(() => true)
-      .catch(() => false);
+    // Maximize the STAC pane by collapsing the file explorer section above it.
+    // Without this, the STAC pane has too little height for tree rows to render
+    // (VS Code tree views use virtual scrolling — no rows if container is tiny).
+    const fileExplorerHeader = page.locator('.pane-header').filter({
+      has: page.locator('h3', { hasText: /test-workspace/i }),
+    }).first();
+    const feExpanded = await fileExplorerHeader.getAttribute('aria-expanded').catch(() => null);
+    if (feExpanded === 'true') {
+      await fileExplorerHeader.click();
+    }
   }
 
   /**
