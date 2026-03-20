@@ -17,6 +17,7 @@
   "dependencies": {
     "@debrief/components": "workspace:*",
     "@debrief/session-state": "workspace:*",
+    "@debrief/utils": "workspace:*",
     "golden-layout": "^2.6.0",
     "leaflet": "^1.9.4",
     "memfs": "^4.0.0",

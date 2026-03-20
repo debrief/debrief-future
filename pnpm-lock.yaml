@@ -208,6 +208,9 @@ importers:
       '@debrief/session-state':
         specifier: workspace:*
         version: link:../../services/session-state
+      '@debrief/utils':
+        specifier: workspace:*
+        version: link:../../shared/utils
       golden-layout:
         specifier: ^2.6.0
         version: 2.6.0
