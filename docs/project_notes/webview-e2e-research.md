@@ -312,7 +312,9 @@ Tests #1 and #3 already pass (6/6). The bulk of failing tests (catalog browse, d
 | `tests/e2e/global-setup.ts` | Server lifecycle management |
 | `tests/e2e/scripts/patch-webview.sh` | Applies Patches 1, 2, 3 to openvscode-server |
 | `tests/e2e/scripts/cloud-e2e-setup.sh` | Full cloud setup pipeline (code-server path) |
+| `tests/e2e/helpers/cdn-interceptor.ts` | Playwright route handler for CDN request interception |
 | `tests/e2e/helpers/webview-injector.ts` | MessagePort content injection fallback |
+| `tests/e2e/fixtures/base.ts` | Custom Playwright fixtures (installs CDN interceptor) |
 | `tests/e2e/models/code-server-page.ts` | Page object for VS Code chrome interactions |
 | `tests/e2e/test-preview-smoke.spec.ts` | Smoke tests (4/4 passing) |
 | `tests/e2e/test-webview-resolve.spec.ts` | Webview resolution tests (2/2 passing) |
@@ -373,14 +375,27 @@ page.frameLocator("iframe.webview.ready")
 Their key config: `ignoreHTTPSErrors: true`, service worker **intact**, running over
 `localhost` (which browsers treat as a secure context).
 
-### Applied Fix (Fix A)
+### Applied Fix (Fix A + Fix C)
+
+Fix A alone was insufficient — the service worker never registers because it runs
+*inside* the CDN iframe, which can't load without DNS. Fix C (Playwright `context.route()`
+interception) was added to serve CDN files from the local filesystem:
 
 1. **Removed** Patch 1a from `patch-webview.sh` — service worker stays enabled
 2. **Added** `ignoreHTTPSErrors: true` to `tests/e2e/playwright.config.ts`
-3. **Retained** Patches 1 (CSP), 2 (origin hash guard), and 3 (visibility gate)
+3. **Added** `cdn-interceptor.ts` helper — `context.route()` intercepts `*.vscode-cdn.net`
+   requests and fulfills from `/opt/openvscode-server/.../pre/` directory
+4. **Integrated** interceptor into `fixtures/base.ts` — runs before `page.goto()`
+5. **Retained** Patches 1 (CSP), 2 (origin hash guard), and 3 (visibility gate)
 
-This aligns with the battle-tested code-server reference and restores the designed
-offline webview content delivery mechanism.
+**Validation results (2026-03-20):**
+- CDN requests intercepted → 200 response
+- `iframe.webview.ready` class applied (confirmed)
+- `#active-frame` created inside webview iframe (confirmed)
+- Smoke tests: 4/4 passing
+- Webview resolution tests: 2/2 passing
+- Content-dependent tests: still failing at STAC tree navigation (separate issue —
+  `openPlotViaStacTree` cannot find the plot node in headless mode)
 
 ### Alternate Fixes (if Fix A insufficient)
 
@@ -389,10 +404,11 @@ offline webview content delivery mechanism.
 - Sidesteps DNS entirely but loses cross-origin isolation
 - Acceptable for testing, changes runtime security model
 
-**Fix C: Playwright `context.route()` interception**
+**Fix C: Playwright `context.route()` interception (IMPLEMENTED)**
 - Intercepts `**/*vscode-cdn.net/**` at the network layer via `context.route()` (not `page.route()`)
 - Fulfills with local file content from the openvscode-server install directory
-- Most defensive approach, ~30 lines of helper code, but higher maintenance burden
+- ~80 lines of helper code in `tests/e2e/helpers/cdn-interceptor.ts`
+- Validated: `#active-frame` created, webview content lifecycle works end-to-end
 
 ### Industry Landscape (E2E Testing VS Code Extensions)
 

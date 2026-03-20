@@ -8,6 +8,7 @@
 import { test as base, expect } from '@playwright/test';
 import { CodeServerPage } from '../models/code-server-page';
 import { DebriefWebview } from '../models/debrief-webview';
+import { installCdnInterceptor } from '../helpers/cdn-interceptor';
 
 /**
  * Extended test fixtures for code-server E2E tests.
@@ -16,7 +17,10 @@ export const test = base.extend<{
   codeServerPage: CodeServerPage;
   debriefWebview: DebriefWebview;
 }>({
-  codeServerPage: async ({ page }, use) => {
+  codeServerPage: async ({ page, context }, use) => {
+    // Intercept vscode-cdn.net requests so webview iframes load from disk.
+    // Must be installed before page.goto() triggers webview iframe creation.
+    await installCdnInterceptor(context);
     const csPage = new CodeServerPage(page);
     await csPage.waitForReady();
     await use(csPage);
