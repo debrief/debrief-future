@@ -1,0 +1,61 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "s2r-bluesensorbrg",
+  "geometry": null,
+  "bbox": null,
+  "properties": {
+    "title": "BlueSensorBrg (s2r)",
+    "datetime": "2026-03-20T21:26:43.620720+00:00",
+    "description": "Imported from S2R/2553_missing_sensor_data/BlueSensorBrg.dsf"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "BlueSensorBrg (s2r)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/2553_missing_sensor_data/BlueSensorBrg.dsf",
+      "title": "BlueSensorBrg.dsf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-BlueSensorBrg": {
+      "href": "./assets/BlueSensorBrg.dsf",
+      "type": "application/octet-stream",
+      "title": "BlueSensorBrg.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/S2R/2553_missing_sensor_data/BlueSensorBrg.dsf",
+        "load_timestamp": "2026-03-20T21:26:43.626105Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

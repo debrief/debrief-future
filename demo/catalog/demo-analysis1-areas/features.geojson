@@ -1,0 +1,143 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "90e19d2a-59db-418c-a2a3-7d04d2da3fd8",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -21.721597222222222,
+              22.054258333333333
+            ],
+            [
+              -21.560805555555557,
+              22.054258333333333
+            ],
+            [
+              -21.560805555555557,
+              21.927283333333335
+            ],
+            [
+              -21.721597222222222,
+              21.927283333333335
+            ],
+            [
+              -21.721597222222222,
+              22.054258333333333
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "RECTANGLE",
+        "label": "RED SEARCH ALPHA",
+        "symbol": "C",
+        "style": {
+          "fill": false,
+          "fill_color": "#FF0000",
+          "fill_opacity": 0.0,
+          "stroke": true,
+          "color": "#FF0000",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d2d5284c-031e-4df8-af67-cebb1341b304",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -21.894402777777778,
+              22.054258333333333
+            ],
+            [
+              -21.743358333333333,
+              22.054258333333333
+            ],
+            [
+              -21.743358333333333,
+              21.927283333333335
+            ],
+            [
+              -21.894402777777778,
+              21.927283333333335
+            ],
+            [
+              -21.894402777777778,
+              22.054258333333333
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "RECTANGLE",
+        "label": "RED SEARCH BRAVO",
+        "symbol": "C",
+        "style": {
+          "fill": false,
+          "fill_color": "#FF0000",
+          "fill_opacity": 0.0,
+          "stroke": true,
+          "color": "#FF0000",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a5bee03a-1f3d-4c32-9a0a-21aeae42f019",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -21.93165,
+              22.20677222222222
+            ],
+            [
+              -21.471280555555555,
+              22.20677222222222
+            ],
+            [
+              -21.471280555555555,
+              21.864075
+            ],
+            [
+              -21.93165,
+              21.864075
+            ],
+            [
+              -21.93165,
+              22.20677222222222
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "RECTANGLE",
+        "label": "SERIAL 12E",
+        "symbol": "C",
+        "style": {
+          "fill": false,
+          "fill_color": "#FF0000",
+          "fill_opacity": 0.0,
+          "stroke": true,
+          "color": "#FF0000",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 3
+      }
+    }
+  ]
+}

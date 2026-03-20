@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "multi-static-vessel-with-sensor-offset",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.0342577,
+          60.0862845
+        ],
+        [
+          0.25,
+          60.0862845
+        ],
+        [
+          0.25,
+          60.3311742
+        ],
+        [
+          -0.0342577,
+          60.3311742
+        ],
+        [
+          -0.0342577,
+          60.0862845
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.0342577,
+    60.0862845,
+    0.25,
+    60.3311742
+  ],
+  "properties": {
+    "title": "Vessel_with_Sensor_Offset (multi-static)",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Imported from MultiStatics/Vessel_with_Sensor_Offset.rep",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T14:00:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Vessel_with_Sensor_Offset (multi-static)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/Vessel_with_Sensor_Offset.rep",
+      "title": "Vessel_with_Sensor_Offset.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Vessel_with_Sensor_Offset": {
+      "href": "./assets/Vessel_with_Sensor_Offset.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "Vessel_with_Sensor_Offset.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/Vessel_with_Sensor_Offset.rep",
+        "load_timestamp": "2026-03-20T21:26:43.592719Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

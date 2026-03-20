@@ -1,0 +1,3379 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "6095f2b4-ef1c-4572-a496-07d58d759f11",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:13:14+00:00",
+        "bearing": 2.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "06513067-cb22-4adf-aa19-7894bf446e1a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:13:29+00:00",
+        "bearing": 1.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a999ffbb-5452-4235-b7dd-a01daa685684",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:13:44+00:00",
+        "bearing": 1.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "302dc755-7060-41c1-be4b-55494709ae0a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:13:59+00:00",
+        "bearing": 1.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "47c10d1b-cde2-452c-9b6b-e547c86e4e34",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:14:14+00:00",
+        "bearing": 1.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "acdcb518-ae7b-4a38-92b4-a2190b1dce3f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:14:29+00:00",
+        "bearing": 1.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2e2e5307-9b7b-4da4-92fe-c2260ba3ee71",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:14:44+00:00",
+        "bearing": 1.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dcf848d8-6ca8-4fbd-8f76-a325dbd925a4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:14:59+00:00",
+        "bearing": 1.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3528b978-1cd8-44a7-aaed-77663e113928",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:15:14+00:00",
+        "bearing": 2.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dd6a3f51-abd9-480b-857d-f9dd351f7983",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:15:29+00:00",
+        "bearing": 2.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e8576d5d-f234-4d99-a7c7-92d440aa32bc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:15:44+00:00",
+        "bearing": 2.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a019acab-04e3-4694-aff8-1fb6d5da83b7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:15:59+00:00",
+        "bearing": 2.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8f52b6da-5b76-4a46-b5e8-bdd4e27f7023",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:16:14+00:00",
+        "bearing": 2.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "609c834e-df96-42de-9bbf-2bdd6269b462",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:16:29+00:00",
+        "bearing": 2.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "85ef01df-e26b-4cd6-a817-205254a56a42",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:16:44+00:00",
+        "bearing": 3.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "98e287a9-3b30-4b90-93d6-8b4a9468893e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:16:59+00:00",
+        "bearing": 3.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8a5017ae-4176-42ee-a641-e3bbe3e4f7c2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:17:14+00:00",
+        "bearing": 3.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4a515371-c7ac-46d9-a9a9-f7740b9ebfb6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:17:29+00:00",
+        "bearing": 3.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ae106d1e-63d5-4af1-ba01-39f8f5d255b2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:17:44+00:00",
+        "bearing": 3.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ee8a9ad2-751f-423c-a1b7-0ebaf89826e3",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:17:59+00:00",
+        "bearing": 4.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f4a76139-1d2e-4525-a792-47e2aa6fbe3a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:18:14+00:00",
+        "bearing": 4.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d651af6c-e334-4b94-8064-8528ef080f53",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:18:29+00:00",
+        "bearing": 4.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ccbb7236-d9dc-4127-9391-94f42f51643b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:18:44+00:00",
+        "bearing": 4.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3a8d3fc2-10e1-4ddb-8290-54311b9061de",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:18:59+00:00",
+        "bearing": 3.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "33be9e3e-e994-479f-aa86-7560ceda1c47",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:19:14+00:00",
+        "bearing": 3.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1ff85a15-3bc4-4bf6-a788-4ce56ffb974e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:19:29+00:00",
+        "bearing": 2.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7f6f66d2-c006-4798-89cd-6a7addf54f29",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:19:44+00:00",
+        "bearing": 2.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6177967c-8c32-4359-9ba8-403091cb4893",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:19:59+00:00",
+        "bearing": 2.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4c03523a-6364-4e5d-9c66-3e6606d27465",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:20:14+00:00",
+        "bearing": 1.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "091c5494-63b7-444a-807e-f17f43a4fb0b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:20:29+00:00",
+        "bearing": 0.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "eab996b4-ba88-49ee-924e-49d1f719db9b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:20:44+00:00",
+        "bearing": 0.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d4cdc53a-f6eb-4704-a20b-355a2c306a8b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:20:59+00:00",
+        "bearing": -0.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ae03324e-3fc3-455e-be62-a1fe372a9ca5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:21:14+00:00",
+        "bearing": -0.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e288abaf-06f0-4404-a5b0-475263b9698f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:21:29+00:00",
+        "bearing": -1.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ea54b0d6-8281-40f5-9a02-583141287479",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:21:44+00:00",
+        "bearing": -2.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d02169bb-7572-48ef-86b5-17ae2c62bf44",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:21:59+00:00",
+        "bearing": -2.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f076d4d9-5e73-4b99-b299-886dbdbb748a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:22:14+00:00",
+        "bearing": -3.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "59e33fc0-accc-4497-ae51-76eec3c3ee6b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:22:29+00:00",
+        "bearing": -3.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f895cb25-fb58-45d1-8eb9-af08788ccd48",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:22:44+00:00",
+        "bearing": -4.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2ec8f37c-e95a-4b7c-a080-67b5e1a4aadd",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:22:59+00:00",
+        "bearing": -5.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b85de0a5-f3d0-4a5f-a6c7-0220f639b142",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:23:14+00:00",
+        "bearing": -6.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3a88526b-87f1-44ec-9596-cc38f3da18cc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:23:29+00:00",
+        "bearing": -6.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fb1d93ff-72f2-4cb3-b41e-f6a2cf08f553",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:23:44+00:00",
+        "bearing": -7.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e8380453-fb29-46a2-b7f5-32de0d2bfa1f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:23:59+00:00",
+        "bearing": -8.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "34938ad9-3dbc-49a8-90d9-0604cbf1e823",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:24:14+00:00",
+        "bearing": -9.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0f11c235-986b-4a14-aacc-a8fbbe567f50",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:24:29+00:00",
+        "bearing": -10.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fcec0fed-521e-4d9c-9c05-bc2b97d73858",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:24:44+00:00",
+        "bearing": -11.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "519af65f-be49-44a5-8991-8c26d7ef4dca",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:24:59+00:00",
+        "bearing": -11.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8beaed7f-14de-470f-b559-4171505f4ef5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:25:14+00:00",
+        "bearing": -12.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ee0ee206-53ce-44ff-b303-f9c8fb44ad9d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:25:29+00:00",
+        "bearing": -13.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0f8d5291-0827-4036-a733-7e8dc933db19",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:25:44+00:00",
+        "bearing": -14.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "432f6776-0c02-4f2b-85d2-ce0d18f3f6db",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:25:59+00:00",
+        "bearing": -15.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6e88ffd0-f081-4afd-b248-761ddea4d5a2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:26:14+00:00",
+        "bearing": -17.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a9a8cb1f-b314-4bc9-9161-d4b62b814699",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:26:29+00:00",
+        "bearing": -18.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "78fa8276-81b4-4e53-8ad0-06a0f7dee82c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:26:44+00:00",
+        "bearing": -19.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "87cf1097-0158-46b9-9ed2-f4e1d99813c7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:26:59+00:00",
+        "bearing": -20.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "29e0a65d-d696-48a3-af65-1887556c2c8b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:27:14+00:00",
+        "bearing": -21.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c79fa5ca-710b-44ad-9c44-4a6a8d87de2a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:27:29+00:00",
+        "bearing": -22.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "480dd3c2-e20b-4ee2-bff4-e92bf5e58f60",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:27:44+00:00",
+        "bearing": -24.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1166a12b-94df-4442-8dbd-c904872234c4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:27:59+00:00",
+        "bearing": -25.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1ffdc371-1118-4d3f-b3ac-de6af6241812",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:28:14+00:00",
+        "bearing": -26.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "df21568c-88ac-49a1-8e56-bd7df086f492",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:28:29+00:00",
+        "bearing": -28.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2da811b1-4c7e-4831-be75-700ab7d90fa0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:28:44+00:00",
+        "bearing": -29.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6f11beb0-76db-4fd4-9ff2-f7d01c5dace1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:28:59+00:00",
+        "bearing": -30.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0b5f5053-9656-459c-af95-1d036bb40bd6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:29:14+00:00",
+        "bearing": -31.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5e4ccb0d-5a98-429a-bd5d-9b8723e7194d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:29:29+00:00",
+        "bearing": -32.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7c547e36-4755-47a8-9ba3-dcecb036c88c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:29:44+00:00",
+        "bearing": -33.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8e748ac5-f39d-4f2e-9870-48ceee646f5b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:29:59+00:00",
+        "bearing": -34.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ee0256b9-f871-4dea-92d4-96c5831d95ce",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:30:14+00:00",
+        "bearing": -35.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f74e9941-5132-44ac-8264-bb88edd4a754",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:30:29+00:00",
+        "bearing": -36.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f861d5f1-5c0f-4ca7-9045-5a1351ad6d8c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:30:44+00:00",
+        "bearing": -37.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "363ddd2b-c3fd-4c20-8fdb-9aedf1213d01",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:30:59+00:00",
+        "bearing": -38.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4852da86-5024-43d9-874c-634352abfa8f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:31:14+00:00",
+        "bearing": -39.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "38ba04c1-9a46-4767-8817-3ee7ed24a415",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:31:29+00:00",
+        "bearing": -40.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "887e65d5-6efa-44bf-8d25-4decdb6de98f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:31:44+00:00",
+        "bearing": -42.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "730571e6-d3ac-4004-9a3d-9ae00cbd159f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:31:59+00:00",
+        "bearing": -43.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7761f00a-f216-43dc-9139-685b60486fcb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:32:14+00:00",
+        "bearing": -44.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2e0e2c74-bf8a-4cdc-b1e9-25009d349e7e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:32:29+00:00",
+        "bearing": -46.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cec4d630-8480-4a44-9463-022693cbbdc3",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:32:44+00:00",
+        "bearing": -47.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "aa71dcb8-0f09-4424-bf79-62657a67f4bb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:32:59+00:00",
+        "bearing": -49.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4452d138-11cd-45f6-9721-b4d1feb05336",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:33:14+00:00",
+        "bearing": -51.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "16f2843e-b628-4b7d-9999-3e38c51a02ea",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:33:29+00:00",
+        "bearing": -53.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "33028a33-0000-4255-b374-cec55f329050",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:33:44+00:00",
+        "bearing": -55.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a015f558-e008-4ace-935a-3d88314711ff",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:33:59+00:00",
+        "bearing": -57.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8208a8b9-c821-418e-a2cf-7691dca4e245",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:34:14+00:00",
+        "bearing": -60.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9a7ddaff-90d8-46ee-b244-4ff656166a21",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:34:29+00:00",
+        "bearing": -62.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "80af1d30-ad92-4577-8984-65ba80db2f9b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:34:44+00:00",
+        "bearing": -65.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3497cf2e-39c8-412c-ac3a-9451ecf115e4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:34:59+00:00",
+        "bearing": -68.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "93a29778-bc7b-41ad-b79c-d4eadc5443fe",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:35:14+00:00",
+        "bearing": -71.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9231dd69-994b-4ab3-84cd-8a8a8779abbd",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:35:29+00:00",
+        "bearing": -73.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7e38cb2b-cda8-4d2a-bf6c-9ed7d76bc2ef",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:35:44+00:00",
+        "bearing": -74.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a582f313-0a17-4b2d-bdbc-ac88e6e71d72",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:35:59+00:00",
+        "bearing": -75.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8abe92cf-a50a-4523-bd72-5acfa4df947b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:36:14+00:00",
+        "bearing": -76.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "10ce2e75-062f-4b97-8bd9-7d0a6faaa54a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:36:29+00:00",
+        "bearing": -77.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5fef68cf-8151-4cc4-a07c-3d6286448a2c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:36:44+00:00",
+        "bearing": -78.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a96c7fe6-336f-4836-bf2d-7f73c85d0988",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:36:59+00:00",
+        "bearing": -79.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c31bd2d5-418b-4aa7-bd25-286169e06aad",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:37:14+00:00",
+        "bearing": -80.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e16ecfcc-a09d-4eb0-822b-ab65080cb42e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:37:29+00:00",
+        "bearing": -82.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ebd44809-16c2-4d53-b037-e08e0d0e7d29",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:37:44+00:00",
+        "bearing": -83.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7cd523a5-5b73-4299-bb7d-2947e57f3d2e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:37:59+00:00",
+        "bearing": -84.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "daa0ebfe-b162-488b-bc23-5f7b1d93b7dd",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:38:14+00:00",
+        "bearing": -86.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4ecb6d60-a697-4f45-9b22-c0940dfca519",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:38:29+00:00",
+        "bearing": -87.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "58b8bebb-4552-44e1-a210-9c556f30a7aa",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:38:44+00:00",
+        "bearing": -89.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3bfbf140-77a4-45e0-8575-907d8b662a1c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:38:59+00:00",
+        "bearing": -90.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "133c7b79-fd09-4eab-bcdc-bfea34f7dd6c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:39:14+00:00",
+        "bearing": -92.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "58d1850a-5c30-4198-9736-02a822aba2b8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:39:29+00:00",
+        "bearing": -94.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3d8974b5-9827-44f2-9752-510b71727983",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:39:44+00:00",
+        "bearing": -96.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7f8eee0c-b68c-4f6a-8f71-754de255b102",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:39:59+00:00",
+        "bearing": -98.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f4d09f49-6c48-4f72-9af4-8878ce4edfc1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:40:14+00:00",
+        "bearing": -100.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9d06676b-0312-44e6-9516-edee0d6ae192",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:40:29+00:00",
+        "bearing": -102.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "588c517b-7d0f-4a87-a01e-eb447c38475e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:40:44+00:00",
+        "bearing": -105.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d899b1d2-9767-45e4-b26d-97b7a99391f4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:40:59+00:00",
+        "bearing": -107.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c2bf211d-bb77-49d9-bbdb-efae977a1cbd",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:41:14+00:00",
+        "bearing": -110.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "27cfdad1-86ba-4cab-bc75-75eabbe9939f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:41:29+00:00",
+        "bearing": -112.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "73d96d05-cf9b-4724-a182-c6e88ba80a48",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:41:44+00:00",
+        "bearing": -115.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9ebad845-0b58-41f7-b14b-e138af0edd16",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:41:59+00:00",
+        "bearing": -118.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bd644ee0-4f5c-4e5e-a8ce-870aa20bfb93",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:42:14+00:00",
+        "bearing": -121.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b362ed64-5512-430a-b1cb-42fc4ff6bd66",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:42:29+00:00",
+        "bearing": -124.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "71b2ba48-05c7-4bf8-8eb4-9a8ee5dbeda2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:42:44+00:00",
+        "bearing": -127.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5754023b-0cff-41fa-a7c4-a01d4f8e7849",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:42:59+00:00",
+        "bearing": -130.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cd84a1bf-9420-43de-93f1-97d05e4dd5c2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:43:14+00:00",
+        "bearing": -133.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ddae1dc6-76cc-4f6c-af45-2d1904f093eb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:43:29+00:00",
+        "bearing": -135.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ec898ecc-7ba6-4cd8-a9b5-9fa3b88acc88",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:43:44+00:00",
+        "bearing": -138.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1310884e-9a01-45de-a1a7-ed54bfb02129",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:43:59+00:00",
+        "bearing": -141.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2a027bef-49ea-4e6d-9a68-de800ca47fcd",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:44:14+00:00",
+        "bearing": -144.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "14978e4a-238d-4d97-978f-92651b33a343",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:44:29+00:00",
+        "bearing": -147.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "db33d9d2-fab1-4725-818b-1520d017a598",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:44:44+00:00",
+        "bearing": -150.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d587cd77-68b4-44b6-a8db-d076c1237d4e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:44:59+00:00",
+        "bearing": -152.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c938e8a4-ffba-455e-b0c2-ea58d6c495af",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:45:14+00:00",
+        "bearing": -155.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "da561481-3461-4f46-b876-790c619c90b8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:45:29+00:00",
+        "bearing": -157.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a78ef28a-3a48-46fe-b59e-bbabbe6f3e7b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:45:44+00:00",
+        "bearing": -160.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9610bd95-881d-4288-9925-70d4077219e0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:45:59+00:00",
+        "bearing": -162.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c353e954-a889-4ae1-95ef-5f8e61983049",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:46:14+00:00",
+        "bearing": -164.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "37ae9a81-66d3-49cd-8e5d-a44fcb38a37d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:46:29+00:00",
+        "bearing": -166.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "316385b0-e097-4520-b344-c5998b939283",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:46:44+00:00",
+        "bearing": -168.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ffacebfe-5744-4a53-a87d-bc55ae908184",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:46:59+00:00",
+        "bearing": -170.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cf22f26b-67ad-4bdb-a1c9-ef418322e0a3",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:47:14+00:00",
+        "bearing": -172.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cdeb1874-5e60-4da2-aa47-d3c5839ae4d9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:47:29+00:00",
+        "bearing": -173.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8e7abe30-ae57-4832-a794-f5b05c9c7122",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:47:44+00:00",
+        "bearing": -175.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "40fce258-64d0-43d8-9af8-421dd91c516b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:47:59+00:00",
+        "bearing": -176.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "777803e5-a16a-4d41-81ba-265d74819d39",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:48:14+00:00",
+        "bearing": -176.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7ee9f28c-2a8e-4be5-9ccd-0069884fb081",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:48:29+00:00",
+        "bearing": -175.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e1be2849-06c2-4d72-9fa6-e2b23518a85b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:48:44+00:00",
+        "bearing": -173.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4c2e7237-1db6-470a-997b-bfcfe4b43ebc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:48:59+00:00",
+        "bearing": -171.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fa8c9a0a-c61d-46dc-9715-64d07ee2e5fc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:49:14+00:00",
+        "bearing": -170.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1812290b-fea8-46ed-a453-a86641ea58fb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:49:29+00:00",
+        "bearing": -168.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b32f99ff-8fca-45dd-a7a2-4b8a5776a5a9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:49:44+00:00",
+        "bearing": -165.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "099731da-b6c7-4271-95f6-82df1a20b470",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:49:59+00:00",
+        "bearing": -163.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3b436263-b6b6-41ef-8888-db51f1caeaf5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:50:14+00:00",
+        "bearing": -161.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8cbc1197-9a35-426a-912f-f623322c9d82",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:50:29+00:00",
+        "bearing": -159.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "31867db9-6ed1-4d1e-8750-fcee67ebc6e9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:50:44+00:00",
+        "bearing": -156.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "926849d8-a8c3-45cb-9883-c60102fa7767",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:50:59+00:00",
+        "bearing": -154.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e59dd332-ee73-43b1-b30d-0530c817eb67",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:51:14+00:00",
+        "bearing": -151.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "165c7d16-78d8-4932-a0f0-de3ab11cf1f9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:51:29+00:00",
+        "bearing": -149.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "25a28c7e-3fca-485a-a6cf-8cd87f6d3d7a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:51:44+00:00",
+        "bearing": -146.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "94728bb1-1aa6-4b5a-85a2-6f7417e7c668",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:51:59+00:00",
+        "bearing": -143.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7c465d8a-57c3-4478-8986-e04706893641",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:52:14+00:00",
+        "bearing": -141.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "94160a9d-8b61-4bf4-9b55-2ae3686b2d23",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:52:29+00:00",
+        "bearing": -138.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "45dcbd2d-0861-4358-98fc-b7c0d9852fd9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:52:44+00:00",
+        "bearing": -135.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "212acbac-4dba-43a7-a2ca-ec21bb4e661a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:52:59+00:00",
+        "bearing": -133.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f9e455fa-80ae-4e6a-b623-13d156c9782c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:53:14+00:00",
+        "bearing": -130.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ff609804-df6d-4f7c-915a-dcd88a39f45a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:53:29+00:00",
+        "bearing": -127.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1a4d0211-1947-4f04-88e2-2b7e40b21185",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:53:44+00:00",
+        "bearing": -125.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f430d26c-2e12-43aa-9a9f-30c29be14e6d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:53:59+00:00",
+        "bearing": -122.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "21627c36-480a-48b7-b3ce-d0ac3663534c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:54:14+00:00",
+        "bearing": -120.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ee8bf969-32ab-46a1-8ec8-8e4bb93a8a87",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:54:29+00:00",
+        "bearing": -117.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3747874e-5397-44b7-a698-1bffd7f082b9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:54:44+00:00",
+        "bearing": -115.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4e206f51-5db6-4fd8-90cb-153814202e55",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:54:59+00:00",
+        "bearing": -113.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b2b9deb5-2433-494d-9279-450d4959a1fc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:55:14+00:00",
+        "bearing": -111.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2beabe24-56c1-4f82-affe-1f1732d1e658",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:55:29+00:00",
+        "bearing": -109.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d549ec56-d590-406b-b550-6654e824d66c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:55:44+00:00",
+        "bearing": -107.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "17a21d2a-6835-4d1b-b4da-9b82f3494f9a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:55:59+00:00",
+        "bearing": -105.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fec7946b-716a-473f-b40d-524b4e5fb6e1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:56:14+00:00",
+        "bearing": -103.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c294a987-a602-4925-99e4-607937363398",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:56:29+00:00",
+        "bearing": -101.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5e1f91eb-78c7-4e6d-9bcb-241502fe6cd4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:56:44+00:00",
+        "bearing": -99.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ae9bd28c-e38e-4106-bf0a-afe08fc9d4c2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:56:59+00:00",
+        "bearing": -98.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8fb8cb31-5f3e-4909-8549-a3eae80d648e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:57:14+00:00",
+        "bearing": -96.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c31017b5-4f6e-433b-8679-dbb79a3d38a2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:57:29+00:00",
+        "bearing": -95.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "29e703cb-be91-4cdf-9d07-8ee864f9f86b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:57:44+00:00",
+        "bearing": -93.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3d4be673-2961-48d8-9978-47860087c463",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:57:59+00:00",
+        "bearing": -92.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d8ec55ba-1563-422d-bb8e-0a37681781ae",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:58:14+00:00",
+        "bearing": -91.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8c8217b8-f130-4f5a-8027-211779e16a63",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:58:29+00:00",
+        "bearing": -90.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9f884f4e-4561-4558-974f-701cef06674f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:58:44+00:00",
+        "bearing": -88.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "083018dc-8f58-4aa4-a0ae-a9549c8da7e8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:58:59+00:00",
+        "bearing": -87.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0eee1a0a-8aa4-4fca-95e5-60acbfee36d7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:59:14+00:00",
+        "bearing": -86.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b06bb583-5a19-43c6-ad0f-c2b3596dd017",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:59:29+00:00",
+        "bearing": -85.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1d72b9cb-41f9-4d4a-b88c-1bf66cf57296",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:59:44+00:00",
+        "bearing": -84.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "11b9e3b2-cb71-4716-91a8-61eea641a666",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:59:59+00:00",
+        "bearing": -83.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "81a3aa98-f12c-47a7-964d-11731eac2b29",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:00:14+00:00",
+        "bearing": -82.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "df54c762-0932-4e88-9646-9d8e6a40e834",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:00:29+00:00",
+        "bearing": -82.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f28fa63f-8d5f-400a-a48a-76e4f860476a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:00:44+00:00",
+        "bearing": -81.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a5946923-2e5b-4d87-bd38-79c9dee757e2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:00:59+00:00",
+        "bearing": -80.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ebf4e068-c7d9-4c20-bacb-8ecb531d3e0b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:01:14+00:00",
+        "bearing": -79.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fce98487-8654-41b1-96b9-b7da8b8edded",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:01:29+00:00",
+        "bearing": -79.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "56ccdd5d-edfa-4362-a069-52e729405312",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:01:44+00:00",
+        "bearing": -78.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8ea7c8fd-61c8-423e-b914-33372477eb03",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:01:59+00:00",
+        "bearing": -77.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fca1073d-a057-4daf-ab17-3a0283772b47",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:02:14+00:00",
+        "bearing": -77.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f71f440c-219e-4104-a810-df92e0d13e54",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:02:29+00:00",
+        "bearing": -76.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "81c47f2d-0223-43a1-bf63-1d54528562d5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:02:44+00:00",
+        "bearing": -75.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "99ef3042-048d-4b3b-9041-c4cddaf24236",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:02:59+00:00",
+        "bearing": -75.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e422de6f-5b38-47c8-b078-9f4bc568c9bf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:03:14+00:00",
+        "bearing": -74.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3f9cb3f4-fa94-4b00-9cb2-6823b0dc6822",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:03:29+00:00",
+        "bearing": -74.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f71643d9-8b05-49e4-a02c-1b4c2054af93",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:03:44+00:00",
+        "bearing": -73.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7e3bc91d-f71b-4519-b10f-7dc7d55a63a9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:03:59+00:00",
+        "bearing": -73.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f425492b-dc48-4ba7-ac29-ccc6103713d6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:04:14+00:00",
+        "bearing": -72.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "29bd0946-b8f7-47be-9052-230b8bc99d2b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:04:29+00:00",
+        "bearing": -72.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "90cf3877-6533-4191-b52e-5ebf660cee89",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:04:44+00:00",
+        "bearing": -71.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "18357a80-fa85-4eb6-b211-b14250ae67ab",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:04:59+00:00",
+        "bearing": -71.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3cd26771-5039-4e13-b14f-bae00062a7b0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:05:14+00:00",
+        "bearing": -71.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e0dff24e-a615-44f7-b3c4-fa3f60f0e12f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:05:29+00:00",
+        "bearing": -70.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5960bf66-416c-44d3-aedb-6f0567af493f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:05:44+00:00",
+        "bearing": -70.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "de475194-be88-435d-99b2-e82c524565cb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:05:59+00:00",
+        "bearing": -70.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ed3eef8e-c81a-4222-9011-e6f96150c12c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:06:14+00:00",
+        "bearing": -69.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2d160731-7697-4b2b-b7bd-b8a9f32f39d7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:06:29+00:00",
+        "bearing": -69.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3c3a51e8-5cef-4573-8e1a-23a732760400",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:06:44+00:00",
+        "bearing": -68.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f666f4c5-37a1-4fde-bef5-1bf6fb74c2db",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:06:59+00:00",
+        "bearing": -68.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b79056a1-dd6d-4456-9f27-902423d6f266",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:07:14+00:00",
+        "bearing": -68.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dcd59ba6-77e6-4281-b659-f1f4840d513a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:07:29+00:00",
+        "bearing": -68.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a93290fe-667d-4211-aad5-cfd0683324e0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:07:44+00:00",
+        "bearing": -67.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "21eaa708-86aa-4e40-90ad-4989138179b4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:07:59+00:00",
+        "bearing": -67.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e6fda15b-4535-433e-891a-4af592e93640",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:08:14+00:00",
+        "bearing": -67.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5a491e79-41bd-42a1-b448-e86d8a5a2b03",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:08:29+00:00",
+        "bearing": -66.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d4150d96-7df3-4f62-88d1-b5a8d665a175",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:08:44+00:00",
+        "bearing": -66.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "23603afc-01ba-44c9-930e-573ef4c94c23",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:08:59+00:00",
+        "bearing": -66.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0a1c89ab-eb2b-40d0-81b9-79459ead684e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:09:14+00:00",
+        "bearing": -66.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0512064f-872c-400d-ace5-09e7f50103d1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:09:29+00:00",
+        "bearing": -65.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "90a80a8b-73ee-4f57-a700-6183c144d5db",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:09:44+00:00",
+        "bearing": -65.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "14d8d33d-4121-4541-aceb-1f564124b448",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:09:59+00:00",
+        "bearing": -65.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b75daee4-bae0-45fc-a801-084014d8896f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:10:14+00:00",
+        "bearing": -65.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5890680d-203b-40a0-9aa4-d0726c141c6e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:10:29+00:00",
+        "bearing": -64.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c798793e-7478-4a71-99ac-ceec36cc3605",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:10:44+00:00",
+        "bearing": -64.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fc168ad7-6fa0-4d6b-a084-837919c52e36",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:10:59+00:00",
+        "bearing": -64.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "946d7ec6-2a0b-46de-a1e2-1440150605fc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:11:14+00:00",
+        "bearing": -64.3,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1b470014-67c4-4964-a9a8-f14358c07736",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:11:29+00:00",
+        "bearing": -64.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3b1a0441-b3fa-447f-97dd-501fc0a74afe",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:11:44+00:00",
+        "bearing": -63.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3c8c1347-2910-40ab-be4a-1ff8f021baad",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:11:59+00:00",
+        "bearing": -63.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b6d74ff9-2bb2-48fe-89ec-09d0b46377df",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:12:14+00:00",
+        "bearing": -63.5,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "56cb4135-8ffc-4e11-b0b3-783df5b8ea7f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:12:29+00:00",
+        "bearing": -63.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3435c318-9fb7-4f4e-96ac-bf6c3454b5bb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:12:44+00:00",
+        "bearing": -63.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2e382536-d573-4859-9309-ce2fcdc7ba79",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:12:59+00:00",
+        "bearing": -63.0,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c40e6513-5570-4a0e-adc3-f2e23341669e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:13:14+00:00",
+        "bearing": -62.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    }
+  ]
+}

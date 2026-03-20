@@ -1,0 +1,1381 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "14d93cd6-8f7d-42a6-b968-5d148d82c5bf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:31:25+00:00",
+        "bearing": 80.0,
+        "range": 12496.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4195012d-c104-4827-92bf-52cb4ce5b5c7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:32:25+00:00",
+        "bearing": 78.0,
+        "range": 11678.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "71a26036-e920-4328-b045-b50b349397f8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:33:25+00:00",
+        "bearing": 77.0,
+        "range": 10866.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7dad3c16-135c-4120-90e9-ca536b250408",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:34:25+00:00",
+        "bearing": 75.0,
+        "range": 10062.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "decfa14d-16d7-4714-b095-c65eaf511305",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:35:25+00:00",
+        "bearing": 73.0,
+        "range": 9265.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d4221792-1910-4415-baec-cefd5aa4cf9a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:36:25+00:00",
+        "bearing": 71.0,
+        "range": 8479.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c24abf58-0c59-4a86-9dcb-2a5ae7fe5e42",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:37:25+00:00",
+        "bearing": 69.0,
+        "range": 7704.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f1076938-bcbb-4624-84b6-c849f8f709dd",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:38:25+00:00",
+        "bearing": 66.0,
+        "range": 6943.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fc8bec93-dfd9-4cfb-8ca3-874dd7d29130",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:39:25+00:00",
+        "bearing": 63.0,
+        "range": 6198.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "164f65a1-b35e-4bda-885c-1615ffd50a16",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:40:25+00:00",
+        "bearing": 59.0,
+        "range": 5475.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bac6b2bb-0109-4f03-b927-e39a7dfea275",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:41:25+00:00",
+        "bearing": 55.0,
+        "range": 4777.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3e2ab102-44c5-4a4c-a6aa-b2323059e2c8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:42:25+00:00",
+        "bearing": 49.0,
+        "range": 4112.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cfbd2a95-b094-4deb-93c4-156b4d260931",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:43:25+00:00",
+        "bearing": 42.0,
+        "range": 3491.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fdae58fa-13d0-4782-ab6e-1171577536e7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:44:25+00:00",
+        "bearing": 33.0,
+        "range": 2934.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d06f299b-afbf-412a-aca9-72e274701d61",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:45:25+00:00",
+        "bearing": 21.0,
+        "range": 2458.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "891a500a-923a-4f1a-97d4-584ddfb0e317",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:46:25+00:00",
+        "bearing": 7.0,
+        "range": 2089.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5bd1157a-2b0b-430a-a276-208c0f1d5c28",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:47:25+00:00",
+        "bearing": -9.0,
+        "range": 1840.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3acaeb3d-bb67-4bfe-b85b-3e0751bde2c5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:48:25+00:00",
+        "bearing": -26.0,
+        "range": 1695.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "189f0fa1-2cae-420f-b2a6-2b4c4a492e97",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:49:25+00:00",
+        "bearing": -40.0,
+        "range": 1633.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0d3288d2-c54c-4dcb-8e8f-20c1bfd6d191",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:50:25+00:00",
+        "bearing": -50.0,
+        "range": 1607.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b745ce51-b94f-480e-8dcb-ce8ac085a867",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:51:25+00:00",
+        "bearing": -56.0,
+        "range": 1596.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6dd8eadd-c0c9-4fc3-bca8-a951c3627d2e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:52:25+00:00",
+        "bearing": -59.0,
+        "range": 1596.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1579642c-22b0-4983-8e14-bd4c78725224",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:53:25+00:00",
+        "bearing": -60.0,
+        "range": 1613.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3cba63fc-93dc-4746-be37-6d520d8fd915",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:54:25+00:00",
+        "bearing": -60.0,
+        "range": 1648.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1beda221-3326-4bfb-a1d8-8249e1379be6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:55:25+00:00",
+        "bearing": -60.0,
+        "range": 1701.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bbb2b9c7-e7be-4d2f-8b7d-33fa1103f358",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:56:25+00:00",
+        "bearing": -60.0,
+        "range": 1772.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fe88d69b-5da4-402f-89c6-171cbabe1dc6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:57:25+00:00",
+        "bearing": -60.0,
+        "range": 1859.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "94e22a3c-c467-4497-bd72-1ca5b9742aef",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:58:25+00:00",
+        "bearing": -60.0,
+        "range": 1945.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e3a4f643-c9b1-4ccc-821a-722f897ea5c3",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:59:25+00:00",
+        "bearing": -60.0,
+        "range": 2031.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c17416a1-c896-4e4e-a939-90addd3e64f8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:00:25+00:00",
+        "bearing": -60.0,
+        "range": 2117.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ac4491b1-9763-4e45-bd0f-2f86c176c73a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:01:25+00:00",
+        "bearing": -60.0,
+        "range": 2203.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4cccc8bd-b46c-4c6e-9dec-8f008b5b9188",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:02:25+00:00",
+        "bearing": -60.0,
+        "range": 2289.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "aadbedb5-55d4-4feb-ae9e-c4a731795c21",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:03:25+00:00",
+        "bearing": -60.0,
+        "range": 2375.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2834fe14-7c64-4585-bf13-bc14cda66255",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:04:25+00:00",
+        "bearing": -60.0,
+        "range": 2461.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fe19f001-543b-4be8-a944-a666d6415c8d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:05:25+00:00",
+        "bearing": -60.0,
+        "range": 2547.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4b7d19c2-17f4-4d5f-86c3-b57c444cce11",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:06:25+00:00",
+        "bearing": -60.0,
+        "range": 2633.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4bb703b6-23a2-42ec-a8e7-f6e0aa7d60e7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:07:25+00:00",
+        "bearing": -60.0,
+        "range": 2719.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "994caff5-c857-45ff-ae2c-9ebc2a5f92d7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:08:25+00:00",
+        "bearing": -60.0,
+        "range": 2805.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7312cbcb-9f00-451d-b6c3-7ad9b26fda8a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:09:25+00:00",
+        "bearing": -60.0,
+        "range": 2891.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e0f57269-8755-417c-9ff4-1ef8d8c3b329",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:10:25+00:00",
+        "bearing": -60.0,
+        "range": 2977.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c0a21bfa-98d3-452b-b4ae-8e60a597c7b6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:11:25+00:00",
+        "bearing": -60.0,
+        "range": 3063.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f46f64bc-98c0-4ea4-8392-a1713eb32337",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:12:25+00:00",
+        "bearing": -60.0,
+        "range": 3134.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7e93aea0-5766-4aaa-ad7b-d2307137d026",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:13:25+00:00",
+        "bearing": -60.0,
+        "range": 3189.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e310a276-8a1d-4d26-add3-268e46c6fe3b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:14:25+00:00",
+        "bearing": -60.0,
+        "range": 3226.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7f395e68-c8b9-4039-a28d-930e1a1192fc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:15:25+00:00",
+        "bearing": -60.0,
+        "range": 3245.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f773e550-641b-426e-b3e9-6cb60a42d2e7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:16:25+00:00",
+        "bearing": -60.0,
+        "range": 3245.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "09c09aa2-9fcd-4483-848c-b6ffd485bc64",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T04:17:25+00:00",
+        "bearing": -60.0,
+        "range": 3223.0,
+        "sensor_name": "Frigate_Optic",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "aef6cde6-3563-41c3-972a-b41a0e535c78",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:31:25+00:00",
+        "bearing": 80.0,
+        "speed": 12496.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f0924979-2d7d-4306-8dd5-dbb67268d79e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:32:25+00:00",
+        "bearing": 78.0,
+        "speed": 11678.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4e8d81cc-ee3e-4d01-9351-ae68cad62553",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:33:25+00:00",
+        "bearing": 77.0,
+        "speed": 10866.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9ee2b8e3-e3f1-4f06-a004-703398db8b87",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:34:25+00:00",
+        "bearing": 75.0,
+        "speed": 10062.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9966d99c-0b26-4b8b-b164-ff61d28388ce",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:35:25+00:00",
+        "bearing": 73.0,
+        "speed": 9265.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0dfac3e1-7305-4368-8592-24f0099de68d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:36:25+00:00",
+        "bearing": 71.0,
+        "speed": 8479.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f49c4416-fde4-47cf-8020-c47e7755bcff",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:37:25+00:00",
+        "bearing": 69.0,
+        "speed": 7704.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4dbd93ee-9f5f-476e-866c-e1c877dd355e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:38:25+00:00",
+        "bearing": 66.0,
+        "speed": 6943.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9d22456c-cb8c-4d24-835c-03d1d31b4811",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:39:25+00:00",
+        "bearing": 63.0,
+        "speed": 6198.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dbf6dbf1-e2d2-462d-9c29-5916b7d11cbf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:40:25+00:00",
+        "bearing": 59.0,
+        "speed": 5475.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d4022f11-3b4c-48d3-9a23-2eaa618f9756",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:41:25+00:00",
+        "bearing": 55.0,
+        "speed": 4777.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9639b048-9c22-4f72-a267-cb1acf4e3b35",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:42:25+00:00",
+        "bearing": 49.0,
+        "speed": 4112.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d2193a7c-775f-4eec-81e9-916dd01190e1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:43:25+00:00",
+        "bearing": 42.0,
+        "speed": 3491.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a2194f60-3823-4c61-a444-23ffec59ca7b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:44:25+00:00",
+        "bearing": 33.0,
+        "speed": 2934.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e58c78aa-c6df-46bd-86e6-c14a98dc7960",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:45:25+00:00",
+        "bearing": 21.0,
+        "speed": 2458.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c56bbba9-cc7a-47ae-b603-c9a447dd45ca",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:46:25+00:00",
+        "bearing": 7.0,
+        "speed": 2089.0,
+        "sensor_name": "Frigate_Optic2",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ea1bd788-5052-411b-a0be-66b2bc9b9735",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:31:25+00:00",
+        "bearing": 80.0,
+        "range": 160.0,
+        "speed": 12496.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "58542f95-9b95-41a9-89d7-a048cc7461a4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:32:25+00:00",
+        "bearing": 78.0,
+        "range": 160.0,
+        "speed": 11678.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "acece889-4046-481f-b507-254165b1f69f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:33:25+00:00",
+        "bearing": 77.0,
+        "range": 165.0,
+        "speed": 10866.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c7a8d940-7fcc-4c39-9ecb-83cedbe0e3b4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:34:25+00:00",
+        "bearing": 75.0,
+        "range": 165.0,
+        "speed": 10062.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "05fed68f-f70e-45ba-9da5-31c4de083c21",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:35:25+00:00",
+        "bearing": 73.0,
+        "range": 165.0,
+        "speed": 9265.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7afbf4bc-8e57-436f-8405-c565be480c23",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:36:25+00:00",
+        "bearing": 71.0,
+        "range": 165.0,
+        "speed": 8479.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2be006b9-37fe-465f-907f-4526de81ed57",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:37:25+00:00",
+        "bearing": 69.0,
+        "range": 180.0,
+        "speed": 7704.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "eb602860-1cbb-4fe9-8aeb-2d7d23006dce",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:38:25+00:00",
+        "bearing": 66.0,
+        "range": 180.0,
+        "speed": 6943.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8236ef3b-60ba-4941-875f-02667c4fe8d2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:39:25+00:00",
+        "bearing": 63.0,
+        "range": 180.0,
+        "speed": 6198.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "32943716-1bf8-4889-8247-13dbd19861b6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:40:25+00:00",
+        "bearing": 59.0,
+        "range": 170.0,
+        "speed": 5475.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "83f49f58-db20-40a8-ab7b-b484e4d132ce",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:41:25+00:00",
+        "bearing": 55.0,
+        "range": 170.0,
+        "speed": 4777.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "82ba8d61-0f44-478a-a3db-f28c0950e0c9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:42:25+00:00",
+        "bearing": 49.0,
+        "range": 170.0,
+        "speed": 4112.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2b8efb8b-fc19-437e-868a-d3f392648f65",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:43:25+00:00",
+        "bearing": 42.0,
+        "range": 200.0,
+        "speed": 3491.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "87bde63f-f9c4-4452-9d2c-0e8052782105",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:44:25+00:00",
+        "bearing": 33.0,
+        "range": 205.0,
+        "speed": 2934.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5fbb183f-40bd-41c4-a1d1-3add69554609",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:45:25+00:00",
+        "bearing": 21.0,
+        "range": 220.0,
+        "speed": 2458.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "74a629ca-bf10-4ead-8e73-dd6893fd9b89",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:46:25+00:00",
+        "bearing": 7.0,
+        "range": 230.0,
+        "speed": 2089.0,
+        "sensor_name": "Frigate_Optic3",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7d1f5353-0498-41cb-a8cd-61877a497629",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:31:25+00:00",
+        "bearing": 80.0,
+        "range": 160.0,
+        "frequency": 77.0,
+        "speed": 12496.0,
+        "sensor_name": "Frigate_Optic4",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bdec5117-9830-495f-a1b0-658102601bf8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:32:25+00:00",
+        "bearing": 78.0,
+        "range": 160.0,
+        "frequency": 77.0,
+        "speed": 11678.0,
+        "sensor_name": "Frigate_Optic4",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "58c0198b-3c6c-41a0-87eb-4f1ae6e410b4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:33:25+00:00",
+        "bearing": 77.0,
+        "range": 165.0,
+        "frequency": 78.0,
+        "speed": 10866.0,
+        "sensor_name": "Frigate_Optic4",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "273d0a68-8359-42ab-b31e-7713215531f2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:34:25+00:00",
+        "bearing": 75.0,
+        "range": 165.0,
+        "frequency": 79.0,
+        "speed": 10062.0,
+        "sensor_name": "Frigate_Optic4",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5d3d6930-9abd-42d5-a536-03fee8de6e93",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:35:25+00:00",
+        "bearing": 73.0,
+        "range": 165.0,
+        "frequency": 79.0,
+        "speed": 9265.0,
+        "sensor_name": "Frigate_Optic4",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ec1e283f-8820-4074-aa72-1926e8493c27",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:36:25+00:00",
+        "bearing": 71.0,
+        "range": 165.0,
+        "frequency": 79.0,
+        "speed": 8479.0,
+        "sensor_name": "Frigate_Optic4",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f6592ea9-5de6-440c-8f0f-ee340f34bdf8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:37:25+00:00",
+        "bearing": 69.0,
+        "range": 180.0,
+        "frequency": 80.0,
+        "speed": 7704.0,
+        "sensor_name": "Frigate_Optic4",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d4df0e68-2375-4887-b380-a07650f18365",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:38:25+00:00",
+        "bearing": 66.0,
+        "range": 180.0,
+        "frequency": 79.0,
+        "speed": 6943.0,
+        "sensor_name": "Frigate_Optic4",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e0fef99f-2377-4609-97fe-778eec07e6d7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:39:25+00:00",
+        "bearing": 63.0,
+        "range": 180.0,
+        "frequency": 79.0,
+        "speed": 6198.0,
+        "sensor_name": "Frigate_Optic4",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b117ee99-cd2c-4b70-be2f-9615df996db7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:40:25+00:00",
+        "bearing": 59.0,
+        "range": 170.0,
+        "frequency": 78.0,
+        "speed": 5475.0,
+        "sensor_name": "Frigate_Optic4",
+        "label": "some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b2af9091-0431-41f8-89a2-630b4b9ac209",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:41:25+00:00",
+        "bearing": 55.0,
+        "range": 170.0,
+        "frequency": 78.0,
+        "speed": 4777.0,
+        "sensor_name": "\"Frigate",
+        "label": "Optic5\" some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1e42530d-5d9c-477e-91d0-b169571f870f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:42:25+00:00",
+        "bearing": 49.0,
+        "range": 170.0,
+        "frequency": 77.0,
+        "speed": 4112.0,
+        "sensor_name": "\"Frigate",
+        "label": "Optic5\" some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fcdaac7f-aec2-4764-a4a5-e52690820bde",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:43:25+00:00",
+        "bearing": 42.0,
+        "range": 200.0,
+        "frequency": 77.0,
+        "speed": 3491.0,
+        "sensor_name": "\"Frigate",
+        "label": "Optic5\" some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8b630358-d9d3-45e5-a8fc-bccbb2b94ce8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:44:25+00:00",
+        "bearing": 33.0,
+        "range": 205.0,
+        "frequency": 76.0,
+        "speed": 2934.0,
+        "label": "Frigate Optic5\" some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2a2a062d-257d-4769-812d-30d8f14d49f2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:45:25+00:00",
+        "bearing": 21.0,
+        "range": 220.0,
+        "frequency": 76.0,
+        "speed": 2458.0,
+        "sensor_name": "\"Frigate",
+        "label": "Optic5\" some message"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "35934252-1216-4afe-aada-0feb0880f64b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "Frigate",
+        "time": "1970-01-03T03:46:25+00:00",
+        "bearing": 7.0,
+        "range": 230.0,
+        "frequency": 76.0,
+        "speed": 2089.0,
+        "label": "Frigate Optic5 \" some message"
+      }
+    }
+  ]
+}

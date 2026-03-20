@@ -1,0 +1,720 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "2fde9608-4698-43e1-b818-d6546d78a361",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -21.697777777777777,
+            22.183333333333334
+          ],
+          [
+            -21.731666666666666,
+            22.183333333333334
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "NELSON_A",
+        "platform_name": "NELSON_A",
+        "track_type": "CONTACT",
+        "times": [
+          818744400000,
+          818744700000
+        ],
+        "start_time": "1995-12-12T05:00:00+00:00",
+        "end_time": "1995-12-12T05:05:00+00:00",
+        "positions": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "course": 269.7,
+            "speed": 2.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1995-12-12T05:05:00+00:00",
+            "course": 269.4,
+            "speed": 2.0,
+            "depth": 0.0
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b5e9a4a1-b6f1-4f98-b27b-fc33391af4ea",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -21.697777777777777,
+            22.2
+          ],
+          [
+            -21.731666666666666,
+            22.2
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "NELSON_B",
+        "platform_name": "NELSON_B",
+        "track_type": "CONTACT",
+        "times": [
+          818744400000,
+          818744700000
+        ],
+        "start_time": "1995-12-12T05:00:00+00:00",
+        "end_time": "1995-12-12T05:05:00+00:00",
+        "positions": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "course": 269.7,
+            "speed": 2.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1995-12-12T05:05:00+00:00",
+            "course": 269.4,
+            "speed": 2.0,
+            "depth": 0.0
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "707bcce2-ef06-4fd3-baac-0e04e54581a6",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -21.697777777777777,
+            22.216666666666665
+          ],
+          [
+            -21.731666666666666,
+            22.216666666666665
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "NELSON_C",
+        "platform_name": "NELSON_C",
+        "track_type": "CONTACT",
+        "times": [
+          818744400000,
+          818744700000
+        ],
+        "start_time": "1995-12-12T05:00:00+00:00",
+        "end_time": "1995-12-12T05:05:00+00:00",
+        "positions": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "course": 269.7,
+            "speed": 2.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1995-12-12T05:05:00+00:00",
+            "course": 269.4,
+            "speed": 2.0,
+            "depth": 0.0
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b225888c-8c15-4d97-a7a8-4db1bc2d58be",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -21.697777777777777,
+            22.233333333333334
+          ],
+          [
+            -21.731666666666666,
+            22.233333333333334
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "NELSON_D",
+        "platform_name": "NELSON_D",
+        "track_type": "CONTACT",
+        "times": [
+          818744400000,
+          818744700000
+        ],
+        "start_time": "1995-12-12T05:00:00+00:00",
+        "end_time": "1995-12-12T05:05:00+00:00",
+        "positions": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "course": 269.7,
+            "speed": 2.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1995-12-12T05:05:00+00:00",
+            "course": 269.4,
+            "speed": 2.0,
+            "depth": 0.0
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b58771c5-8bf5-4104-8543-1123dca353b8",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -21.697777777777777,
+            22.25
+          ],
+          [
+            -21.731666666666666,
+            22.25
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "NELSON_E",
+        "platform_name": "NELSON_E",
+        "track_type": "CONTACT",
+        "times": [
+          818744400000,
+          818744700000
+        ],
+        "start_time": "1995-12-12T05:00:00+00:00",
+        "end_time": "1995-12-12T05:05:00+00:00",
+        "positions": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "course": 269.7,
+            "speed": 2.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1995-12-12T05:05:00+00:00",
+            "course": 269.4,
+            "speed": 2.0,
+            "depth": 0.0
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bbcd9e45-75f0-48c7-8ef6-d8babadfc0aa",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -21.697777777777777,
+            22.266666666666666
+          ],
+          [
+            -21.731666666666666,
+            22.266666666666666
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "NELSON_F",
+        "platform_name": "NELSON_F",
+        "track_type": "CONTACT",
+        "times": [
+          818744400000,
+          818744700000
+        ],
+        "start_time": "1995-12-12T05:00:00+00:00",
+        "end_time": "1995-12-12T05:05:00+00:00",
+        "positions": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "course": 269.7,
+            "speed": 2.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1995-12-12T05:05:00+00:00",
+            "course": 269.4,
+            "speed": 2.0,
+            "depth": 0.0
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2bc56fc4-e6e2-45ec-b1c8-478df3237532",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -21.697777777777777,
+            22.283333333333335
+          ],
+          [
+            -21.731666666666666,
+            22.283333333333335
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "NELSON_G",
+        "platform_name": "NELSON_G",
+        "track_type": "CONTACT",
+        "times": [
+          818744400000,
+          818744700000
+        ],
+        "start_time": "1995-12-12T05:00:00+00:00",
+        "end_time": "1995-12-12T05:05:00+00:00",
+        "positions": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "course": 269.7,
+            "speed": 2.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1995-12-12T05:05:00+00:00",
+            "course": 269.4,
+            "speed": 2.0,
+            "depth": 0.0
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f382c883-2df7-426a-a18f-1f6bcf84e6d9",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -21.697777777777777,
+            22.3
+          ],
+          [
+            -21.731666666666666,
+            22.3
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "NELSON_H",
+        "platform_name": "NELSON_H",
+        "track_type": "CONTACT",
+        "times": [
+          818744400000,
+          818744700000
+        ],
+        "start_time": "1995-12-12T05:00:00+00:00",
+        "end_time": "1995-12-12T05:05:00+00:00",
+        "positions": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "course": 269.7,
+            "speed": 2.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1995-12-12T05:05:00+00:00",
+            "course": 269.4,
+            "speed": 2.0,
+            "depth": 0.0
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5a72c71f-2baa-4323-a48c-1f7ea1370d99",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -21.697777777777777,
+            22.316666666666666
+          ],
+          [
+            -21.731666666666666,
+            22.316666666666666
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "NELSON_I",
+        "platform_name": "NELSON_I",
+        "track_type": "CONTACT",
+        "times": [
+          818744400000,
+          818744700000
+        ],
+        "start_time": "1995-12-12T05:00:00+00:00",
+        "end_time": "1995-12-12T05:05:00+00:00",
+        "positions": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "course": 269.7,
+            "speed": 2.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1995-12-12T05:05:00+00:00",
+            "course": 269.4,
+            "speed": 2.0,
+            "depth": 0.0
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "91ab19f4-86ec-4228-bbdb-6dd078aba915",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -21.697777777777777,
+            22.333333333333332
+          ],
+          [
+            -21.731666666666666,
+            22.333333333333332
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "NELSON_J",
+        "platform_name": "NELSON_J",
+        "track_type": "CONTACT",
+        "times": [
+          818744400000,
+          818744700000
+        ],
+        "start_time": "1995-12-12T05:00:00+00:00",
+        "end_time": "1995-12-12T05:05:00+00:00",
+        "positions": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "course": 269.7,
+            "speed": 2.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1995-12-12T05:05:00+00:00",
+            "course": 269.4,
+            "speed": 2.0,
+            "depth": 0.0
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8fef0bcb-f359-4086-bd2c-ad201b0a6780",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -21.697777777777777,
+            22.35
+          ],
+          [
+            -21.731666666666666,
+            22.35
+          ]
+        ]
+      },
+      "properties": {
+        "kind": "TRACK",
+        "platform_id": "NELSON_K",
+        "platform_name": "NELSON_K",
+        "track_type": "CONTACT",
+        "times": [
+          818744400000,
+          818744700000
+        ],
+        "start_time": "1995-12-12T05:00:00+00:00",
+        "end_time": "1995-12-12T05:05:00+00:00",
+        "positions": [
+          {
+            "time": "1995-12-12T05:00:00+00:00",
+            "course": 269.7,
+            "speed": 2.0,
+            "depth": 0.0
+          },
+          {
+            "time": "1995-12-12T05:05:00+00:00",
+            "course": 269.4,
+            "speed": 2.0,
+            "depth": 0.0
+          }
+        ],
+        "default_position_style": {
+          "show_symbol": false,
+          "symbol": "circle",
+          "show_label": false
+        },
+        "symbol_interval": "PT1M",
+        "label_interval": "PT5M"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bf494c87-88d9-4e27-b39b-9f5bf2f48788",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:00:00+00:00",
+        "text": "COMEX COMEX COLOR A",
+        "track_id": "NELSON_A",
+        "line_number": 24
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2de33d97-bcc5-4627-95eb-9cf3cb827e63",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:01:00+00:00",
+        "text": "COMEX COMEX COLOR B",
+        "track_id": "NELSON_B",
+        "line_number": 25
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fb6be731-ba2e-4ada-99da-bd6ab62cc799",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:02:00+00:00",
+        "text": "COMEX COMEX COLOR C",
+        "track_id": "NELSON_C",
+        "line_number": 26
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0abe88fa-f406-4c91-b5df-dabb2a78e303",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:03:00+00:00",
+        "text": "COMEX COMEX COLOR D",
+        "track_id": "NELSON_D",
+        "line_number": 27
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d601f4cf-5a14-48ab-9805-8081801a65dc",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:04:00+00:00",
+        "text": "COMEX COMEX COLOR E",
+        "track_id": "NELSON_E",
+        "line_number": 28
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "192bbc20-5a08-4584-a690-fda8e55798ed",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:05:00+00:00",
+        "text": "COMEX COMEX COLOR F",
+        "track_id": "NELSON_F",
+        "line_number": 29
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9dd7e278-fe11-405a-8a2d-7b256c77b1a9",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:06:00+00:00",
+        "text": "COMEX COMEX COLOR G",
+        "track_id": "NELSON_G",
+        "line_number": 30
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "68d9699f-8b8d-4e01-99d3-1f3a21f6e91a",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:07:00+00:00",
+        "text": "COMEX COMEX COLOR H",
+        "track_id": "NELSON_H",
+        "line_number": 31
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e57d193e-1ba7-44b3-b94d-7830ea4cd1d2",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:08:00+00:00",
+        "text": "COMEX COMEX COLOR I",
+        "track_id": "NELSON_I",
+        "line_number": 32
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "77dff171-c28d-4f25-8f06-74e153dd8132",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:09:00+00:00",
+        "text": "COMEX COMEX COLOR J",
+        "track_id": "NELSON_J",
+        "line_number": 33
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "45dc05b6-ed6e-45fb-8f33-f1cfd8abbe13",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:10:00+00:00",
+        "text": "COMEX COMEX COLOR K",
+        "track_id": "NELSON_K",
+        "line_number": 34
+      }
+    }
+  ]
+}

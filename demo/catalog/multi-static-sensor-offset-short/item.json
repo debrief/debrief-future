@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "multi-static-sensor-offset-short",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0.1572425,
+          60.1
+        ],
+        [
+          0.25,
+          60.1
+        ],
+        [
+          0.25,
+          60.18
+        ],
+        [
+          0.1572425,
+          60.18
+        ],
+        [
+          0.1572425,
+          60.1
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0.1572425,
+    60.1,
+    0.25,
+    60.18
+  ],
+  "properties": {
+    "title": "Sensor_Offset_short (multi-static)",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Imported from MultiStatics/Sensor_Offset_short.dpf",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T12:18:40+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Sensor_Offset_short (multi-static)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/Sensor_Offset_short.dpf",
+      "title": "Sensor_Offset_short.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Sensor_Offset_short": {
+      "href": "./assets/Sensor_Offset_short.dpf",
+      "type": "application/octet-stream",
+      "title": "Sensor_Offset_short.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiStatics/Sensor_Offset_short.dpf",
+        "load_timestamp": "2026-03-20T21:26:43.481557Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

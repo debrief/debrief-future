@@ -1,0 +1,587 @@
+{
+  "type": "Collection",
+  "stac_version": "1.0.0",
+  "id": "catalog",
+  "description": "Debrief analysis catalog",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "self",
+      "href": "./catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./colortest/item.json",
+      "type": "application/geo+json",
+      "title": "ColorTest (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-analysis1-areas/item.json",
+      "type": "application/geo+json",
+      "title": "Analysis1_Areas (demo)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-analysis2-track1/item.json",
+      "type": "application/geo+json",
+      "title": "Analysis2_Track1 (demo)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-analysis3-track2/item.json",
+      "type": "application/geo+json",
+      "title": "Analysis3_Track2 (demo)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-analysis4-narrative/item.json",
+      "type": "application/geo+json",
+      "title": "Analysis4_Narrative (demo)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-review1-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "Review1_Tracks (demo)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-review2-sensor1/item.json",
+      "type": "application/geo+json",
+      "title": "Review2_Sensor1 (demo)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-review3-sensor2/item.json",
+      "type": "application/geo+json",
+      "title": "Review3_Sensor2 (demo)"
+    },
+    {
+      "rel": "item",
+      "href": "./demo-trialsplanning3-hits/item.json",
+      "type": "application/geo+json",
+      "title": "TrialsPlanning3_hits (demo)"
+    },
+    {
+      "rel": "item",
+      "href": "./dynamicshapesettest/item.json",
+      "type": "application/geo+json",
+      "title": "DynamicShapeSetTest (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-path-gapstesttrack/item.json",
+      "type": "application/geo+json",
+      "title": "GapsTestTrack (multi-path)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static-blueparallelcourses/item.json",
+      "type": "application/geo+json",
+      "title": "BlueParallelCourses (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static-offsettracks/item.json",
+      "type": "application/geo+json",
+      "title": "OffsetTracks (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static-sensor-offset-short/item.json",
+      "type": "application/geo+json",
+      "title": "Sensor_Offset_short (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static-threebuoys/item.json",
+      "type": "application/geo+json",
+      "title": "ThreeBuoys (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static-vessel-with-sensor-offset/item.json",
+      "type": "application/geo+json",
+      "title": "Vessel_with_Sensor_Offset (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./multi-static-buoy-test-track/item.json",
+      "type": "application/geo+json",
+      "title": "buoy_test_track (multi-static)"
+    },
+    {
+      "rel": "item",
+      "href": "./plotwithgeotiff/item.json",
+      "type": "application/geo+json",
+      "title": "PlotWithGeoTiff (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-bluesensorbrg/item.json",
+      "type": "application/geo+json",
+      "title": "BlueSensorBrg (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-workingfreqplot/item.json",
+      "type": "application/geo+json",
+      "title": "WorkingFreqPlot (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-2648-tx-tma-to-dr/item.json",
+      "type": "application/geo+json",
+      "title": "2648_tx_TMA_to_DR (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-ambig-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-ambig-tracks2/item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks2 (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-ambig-tracks3/item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks3 (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-ambig-tracks-hover-north-hm/item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks_hover_north_HM (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-ambig-tracks-hover-north-ta/item.json",
+      "type": "application/geo+json",
+      "title": "Ambig_tracks_hover_north_TA (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-polyline-measurement/item.json",
+      "type": "application/geo+json",
+      "title": "Polyline_Measurement (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-dodgy-track/item.json",
+      "type": "application/geo+json",
+      "title": "dodgy_track (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-contact-bearings/item.json",
+      "type": "application/geo+json",
+      "title": "Contact_bearings (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-multitonalfreqplot/item.json",
+      "type": "application/geo+json",
+      "title": "MultiTonalFreqPlot (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-twin-cpa/item.json",
+      "type": "application/geo+json",
+      "title": "Twin_cpa (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-shorter-os/item.json",
+      "type": "application/geo+json",
+      "title": "shorter_os (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-mid-flow/item.json",
+      "type": "application/geo+json",
+      "title": "mid_flow (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-midflow2/item.json",
+      "type": "application/geo+json",
+      "title": "midflow2 (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-midflow2a/item.json",
+      "type": "application/geo+json",
+      "title": "midflow2a (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-midflow2b/item.json",
+      "type": "application/geo+json",
+      "title": "midflow2b (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-sensor/item.json",
+      "type": "application/geo+json",
+      "title": "sensor (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-third-party-track/item.json",
+      "type": "application/geo+json",
+      "title": "third_party_track (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-turn/item.json",
+      "type": "application/geo+json",
+      "title": "turn (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./s2r-twin-ownship-sensors/item.json",
+      "type": "application/geo+json",
+      "title": "twin_ownship_sensors (s2r)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-1936-verification/item.json",
+      "type": "application/geo+json",
+      "title": "1936_verification (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-b-rate-sensor/item.json",
+      "type": "application/geo+json",
+      "title": "B_Rate_Sensor (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-bluesensor/item.json",
+      "type": "application/geo+json",
+      "title": "BlueSensor (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-bluetrack/item.json",
+      "type": "application/geo+json",
+      "title": "BlueTrack (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-compositestraighttest/item.json",
+      "type": "application/geo+json",
+      "title": "CompositeStraightTest (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-deb-north-low-bearing-rate-s-turns/item.json",
+      "type": "application/geo+json",
+      "title": "Deb_North_Low_Bearing_Rate_s_turns (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-freqtracks/item.json",
+      "type": "application/geo+json",
+      "title": "FreqTracks (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-freqtracksquantized/item.json",
+      "type": "application/geo+json",
+      "title": "FreqTracksQuantized (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-l1-ownshipsensor/item.json",
+      "type": "application/geo+json",
+      "title": "L1_OwnshipSensor (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-l2-scenario/item.json",
+      "type": "application/geo+json",
+      "title": "L2_Scenario (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-mda-test/item.json",
+      "type": "application/geo+json",
+      "title": "MDA_Test (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-slicedemo/item.json",
+      "type": "application/geo+json",
+      "title": "SliceDemo (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-old-turn-example/item.json",
+      "type": "application/geo+json",
+      "title": "old_turn_example (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-thirty-min-earlier-first-turn/item.json",
+      "type": "application/geo+json",
+      "title": "thirty_min_earlier_first_turn (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-thirty-min-extra-leg/item.json",
+      "type": "application/geo+json",
+      "title": "thirty_min_extra_leg (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-thiry-min-one/item.json",
+      "type": "application/geo+json",
+      "title": "thiry_min_one (satc)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-test-dataset1/item.json",
+      "type": "application/geo+json",
+      "title": "Dataset1 (satc-test)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-test-dataset2b/item.json",
+      "type": "application/geo+json",
+      "title": "Dataset2b (satc-test)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-test-dataset3/item.json",
+      "type": "application/geo+json",
+      "title": "Dataset3 (satc-test)"
+    },
+    {
+      "rel": "item",
+      "href": "./satc-test-scenarioone-targetzig/item.json",
+      "type": "application/geo+json",
+      "title": "ScenarioOne_TargetZig (satc-test)"
+    },
+    {
+      "rel": "item",
+      "href": "./boat1/item.json",
+      "type": "application/geo+json",
+      "title": "boat1 (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./boat1t/item.json",
+      "type": "application/geo+json",
+      "title": "boat1t (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./boat2/item.json",
+      "type": "application/geo+json",
+      "title": "boat2 (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./boattest/item.json",
+      "type": "application/geo+json",
+      "title": "boattest (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./narrative/item.json",
+      "type": "application/geo+json",
+      "title": "narrative (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./narrative2/item.json",
+      "type": "application/geo+json",
+      "title": "narrative2 (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./narrative-bulk/item.json",
+      "type": "application/geo+json",
+      "title": "narrative_bulk (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./narrative-large/item.json",
+      "type": "application/geo+json",
+      "title": "narrative_large (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./offset-times/item.json",
+      "type": "application/geo+json",
+      "title": "offset_times (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./bad-boat2/item.json",
+      "type": "application/geo+json",
+      "title": "BAD_boat2 (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./freq-bluesensor/item.json",
+      "type": "application/geo+json",
+      "title": "Freq_BlueSensor (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./freq-bluesensor-nopos/item.json",
+      "type": "application/geo+json",
+      "title": "Freq_BlueSensor_NoPos (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./freq-bluetrack/item.json",
+      "type": "application/geo+json",
+      "title": "Freq_BlueTrack (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./lots-of-os-legs/item.json",
+      "type": "application/geo+json",
+      "title": "Lots_of_OS_Legs (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./all-tracks-use-current-heading/item.json",
+      "type": "application/geo+json",
+      "title": "All Tracks Use Current Heading (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./all-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "All Tracks (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./reverse-chrono/item.json",
+      "type": "application/geo+json",
+      "title": "reverse_chrono (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./sample/item.json",
+      "type": "application/geo+json",
+      "title": "sample (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./sample-lots-of-sensors/item.json",
+      "type": "application/geo+json",
+      "title": "sample_lots_of_sensors (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./samplescale/item.json",
+      "type": "application/geo+json",
+      "title": "samplescale (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./sen-frig-sensor/item.json",
+      "type": "application/geo+json",
+      "title": "sen_frig_sensor (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./sen-missing-host-sensor/item.json",
+      "type": "application/geo+json",
+      "title": "sen_missing_host_sensor (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./sen-ssk-freq/item.json",
+      "type": "application/geo+json",
+      "title": "sen_ssk_freq (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./sen-ssk-sensor/item.json",
+      "type": "application/geo+json",
+      "title": "sen_ssk_sensor (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./sen-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "sen_tracks (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./sen-tracks-with-narrative/item.json",
+      "type": "application/geo+json",
+      "title": "sen_tracks_with_narrative (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./shapes/item.json",
+      "type": "application/geo+json",
+      "title": "shapes (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./sparse-track/item.json",
+      "type": "application/geo+json",
+      "title": "sparse_track (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./sparse-track-self-split/item.json",
+      "type": "application/geo+json",
+      "title": "sparse_track_self_split (general)"
+    },
+    {
+      "rel": "item",
+      "href": "./split-sen-tracks/item.json",
+      "type": "application/geo+json",
+      "title": "split_sen_tracks (general)"
+    }
+  ],
+  "title": "Debrief Legacy Sample Data",
+  "license": "proprietary",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -87.662054,
+          -0.0951111,
+          52.06401944444444,
+          60.7
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "1970-01-03T01:34:25+00:00",
+          "2026-03-20T21:26:47.809151+00:00"
+        ]
+      ]
+    }
+  },
+  "summaries": {
+    "debrief:vessel_classes": [],
+    "debrief:tags": [],
+    "debrief:feature_tags": [],
+    "debrief:track_names": [],
+    "debrief:nationalities": []
+  }
+}

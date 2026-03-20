@@ -1,0 +1,1699 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "a2ac10b9-5dda-46ae-8431-aac1f32364e7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:00:00+00:00",
+        "bearing": 0.71,
+        "range": 179.29,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "71e11310-8a7b-4869-8293-b62549cedb64",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:02:00+00:00",
+        "bearing": 0.59,
+        "range": 179.41,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c07abe91-ca73-4aa0-b0b5-ebcef61478ed",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:04:00+00:00",
+        "bearing": 0.59,
+        "range": 179.41,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "84644b1c-f85d-49e3-aac8-f017619dfdc5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:06:00+00:00",
+        "bearing": 359.59,
+        "range": 179.41,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0d990f49-d448-4ab0-902b-2d96dc1b5a5a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:08:00+00:00",
+        "bearing": 0.58,
+        "range": 179.42,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e2f44c4a-f1b9-47d9-b921-3720fa2fed09",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:10:00+00:00",
+        "bearing": 0.58,
+        "range": 179.42,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2a71d71d-5eb9-4eea-b57b-e16d53269ee5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:12:00+00:00",
+        "bearing": 0.58,
+        "range": 179.42,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "da85a530-7e1b-49b7-ae2f-38c4c0f8fa91",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:14:00+00:00",
+        "bearing": 0.57,
+        "range": 179.43,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "af4acc18-aac2-4877-afe8-abcdb67342ea",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:16:00+00:00",
+        "bearing": 0.57,
+        "range": 179.43,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e5844b64-b180-4618-b652-c9acf98eedbc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:18:00+00:00",
+        "bearing": 0.57,
+        "range": 179.43,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ffb402a6-981a-4732-aa9a-aed2cef91ddf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:20:00+00:00",
+        "bearing": 0.56,
+        "range": 179.44,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9f6c79ee-7118-4e40-beeb-d672cc163081",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:22:00+00:00",
+        "bearing": 359.59,
+        "range": 179.44,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e862b38b-deb0-475e-b726-7f603cb4e9c8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:24:00+00:00",
+        "bearing": 358.59,
+        "range": 179.44,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "035fefce-7a80-4e85-ad09-42e4dd0e84e4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:26:00+00:00",
+        "bearing": 357.59,
+        "range": 179.45,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0ac74240-bf25-4911-b06f-d855128b1df0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:28:00+00:00",
+        "bearing": 0.55,
+        "range": 179.45,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "48249ea0-4d77-4341-ba70-3529b51446d1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:30:00+00:00",
+        "bearing": 0.54,
+        "range": 179.46,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "782f9b11-25ad-4cec-a631-26de50224636",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:32:00+00:00",
+        "bearing": 0.54,
+        "range": 179.46,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c64998ed-90a9-47ab-8230-be3cc18df31a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:34:00+00:00",
+        "bearing": 0.54,
+        "range": 179.46,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b5784343-c9bf-407f-9236-0bece0cabde6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:36:00+00:00",
+        "bearing": 357.59,
+        "range": 179.47,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c49ce4c7-ae7e-497b-83a8-4faf3c413d24",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:38:00+00:00",
+        "bearing": 358.59,
+        "range": 179.47,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8236a41e-7116-4147-9110-f456ef3da3e1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:40:00+00:00",
+        "bearing": 359.59,
+        "range": 179.47,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0c35a39d-4dc5-4560-a7dc-cbcee14d37cf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:42:00+00:00",
+        "bearing": 0.52,
+        "range": 179.48,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d4f02520-288e-4da6-aec9-25ae79d4c3bb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:44:00+00:00",
+        "bearing": 0.52,
+        "range": 179.48,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3e853a3a-28b2-4198-bc7a-6f4f8273a821",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:46:00+00:00",
+        "bearing": 0.51,
+        "range": 179.49,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c51d9af2-7803-4e9c-85a5-953c74ab28b5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:48:00+00:00",
+        "bearing": 0.51,
+        "range": 179.49,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "36bd50d2-01a5-4a38-830c-1ab696bbfe61",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:50:00+00:00",
+        "bearing": 0.51,
+        "range": 179.49,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d3adc1b6-8304-4e64-9ce5-8a552f0aeeab",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:52:00+00:00",
+        "bearing": 0.26,
+        "range": 179.74,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4353574b-1c9b-4553-9449-cacae962f45f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:54:00+00:00",
+        "bearing": 359.58,
+        "range": 180.42,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5b44190b-b3c5-4505-91c2-4ebe74225ba2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:56:00+00:00",
+        "bearing": 358.62,
+        "range": 181.38,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9a9b13fe-4453-493b-9153-f9dd7cdd2c14",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T12:58:00+00:00",
+        "bearing": 357.64,
+        "range": 182.36,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "26b8796f-2a17-4583-a5f1-02b2935d79fe",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:00:00+00:00",
+        "bearing": 356.65,
+        "range": 183.35,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ab1b3e64-6b91-4c5e-a30d-487ca70f1ba2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:02:00+00:00",
+        "bearing": 355.71,
+        "range": 252.67,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "88727551-d319-47a4-a2f4-7ccaa7410b04",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:04:00+00:00",
+        "bearing": 354.95,
+        "range": 321.81,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e6a26b62-c445-4908-a4ec-fe05ba9d24ac",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:06:00+00:00",
+        "bearing": 354.47,
+        "range": 30.68,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8f5ecd5b-58c0-4566-bc03-0aaf59e433ab",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:08:00+00:00",
+        "bearing": 354.25,
+        "range": 99.28,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3745f249-c495-423e-a1dc-5c0aef420e36",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:10:00+00:00",
+        "bearing": 354.3,
+        "range": 167.62,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a6b5b858-bc8f-473b-b874-31cb2d287f89",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:12:00+00:00",
+        "bearing": 354.74,
+        "range": 213.43,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d8288bdb-ec78-4ea6-92ac-9501d4bee34c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:14:00+00:00",
+        "bearing": 355.53,
+        "range": 214.79,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "efe0d2ba-4d58-460e-8397-13e154ab9d4b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:16:00+00:00",
+        "bearing": 356.45,
+        "range": 213.88,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f6457da5-4704-432f-b14b-65bd7db1fffb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:18:00+00:00",
+        "bearing": 357.37,
+        "range": 212.96,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ff653c61-9f14-4163-89d1-093ad6dcb19e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:20:00+00:00",
+        "bearing": 358.29,
+        "range": 212.03,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "317f848e-a786-4e99-8843-2df4ffc198d6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:22:00+00:00",
+        "bearing": 359.22,
+        "range": 211.1,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a8c0117a-f74f-4fab-8882-3dbd3b558478",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:24:00+00:00",
+        "bearing": 0.16,
+        "range": 210.17,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a925170b-cdd3-4701-b48b-cb3105696946",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:26:00+00:00",
+        "bearing": 1.1,
+        "range": 140.84,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f7091ace-81ae-488c-a53b-7900432addf9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:28:00+00:00",
+        "bearing": 1.95,
+        "range": 71.61,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "03dc739d-8f50-403a-aa39-e36fbd96dfac",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:30:00+00:00",
+        "bearing": 2.56,
+        "range": 2.61,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6a6a9661-90d8-4615-b489-4845c304fde7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:32:00+00:00",
+        "bearing": 2.94,
+        "range": 330.06,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cbb4ec8a-8265-497e-be6e-bf67194f5046",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:34:00+00:00",
+        "bearing": 3.27,
+        "range": 328.79,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f80dcf26-f28b-4741-8727-af93eee34429",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:36:00+00:00",
+        "bearing": 3.61,
+        "range": 328.46,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b5d60a04-5482-4975-8c14-4438994b65a4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:38:00+00:00",
+        "bearing": 3.93,
+        "range": 328.13,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7bd191a7-8fcc-47e9-b215-25799751a6c2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:40:00+00:00",
+        "bearing": 4.25,
+        "range": 327.81,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "75ee3f16-a467-4cf1-8a1a-f4c376a0d3d7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:42:00+00:00",
+        "bearing": 4.57,
+        "range": 327.5,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "af7a22dc-2b17-4783-8556-51d111a02b9d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:44:00+00:00",
+        "bearing": 4.88,
+        "range": 327.19,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "75144e41-8e7e-476d-9b07-9dfac785d590",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:46:00+00:00",
+        "bearing": 5.18,
+        "range": 326.88,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fba475c1-1ee8-47d9-947d-273f036249aa",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:48:00+00:00",
+        "bearing": 5.61,
+        "range": 34.84,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5f4ac165-4cc1-4937-a1a4-d36811e288e6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:50:00+00:00",
+        "bearing": 6.26,
+        "range": 102.57,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "652e8f31-47c2-47f0-ab0e-465485f17468",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:52:00+00:00",
+        "bearing": 7.07,
+        "range": 168.4,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "375956f3-f74a-4642-b159-19dee53af629",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:54:00+00:00",
+        "bearing": 7.89,
+        "range": 170.41,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9d845001-b45f-453a-af6c-75ab0426c302",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:56:00+00:00",
+        "bearing": 8.54,
+        "range": 169.77,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e4c08c33-f465-4ec8-bd3e-5bf1416f76ad",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T13:58:00+00:00",
+        "bearing": 9.16,
+        "range": 169.14,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1c218df9-0fe2-468c-bc95-f0a80e7c8e1c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:00:00+00:00",
+        "bearing": 9.79,
+        "range": 168.51,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "49f8c008-fd9b-4f43-82a7-e71bd1c2da52",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:02:00+00:00",
+        "bearing": 10.43,
+        "range": 167.87,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "feb704d3-cbe7-4352-abb3-a8a0401fbbc2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:04:00+00:00",
+        "bearing": 11.08,
+        "range": 167.22,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4baefe4a-625e-4255-b3d6-dc3821c43f82",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:06:00+00:00",
+        "bearing": 11.73,
+        "range": 166.57,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "014e8bf2-20c5-4516-9955-dd6579b49ec6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:08:00+00:00",
+        "bearing": 12.39,
+        "range": 165.91,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5ef16a52-047f-4881-8832-552b0b2b7064",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:10:00+00:00",
+        "bearing": 13.06,
+        "range": 165.25,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d55e29ec-884e-402c-9ead-fce0f1424031",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:12:00+00:00",
+        "bearing": 13.73,
+        "range": 164.57,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "13a19a0c-622d-4a71-aaf9-c50ffb404422",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:14:00+00:00",
+        "bearing": 14.35,
+        "range": 95.57,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "82147eb5-26df-4bc1-bae0-bcb602519597",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:16:00+00:00",
+        "bearing": 14.78,
+        "range": 26.76,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9e820b9e-0d1e-4f8b-9af3-4730835415f9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:18:00+00:00",
+        "bearing": 15.03,
+        "range": 10.98,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "48462a5d-f4e7-4a74-88b4-9b2afee7c859",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:20:00+00:00",
+        "bearing": 15.27,
+        "range": 10.51,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a4c9733b-8df6-48fd-b302-f1bf67814bc5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:22:00+00:00",
+        "bearing": 15.52,
+        "range": 10.27,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "771926e8-0c18-4212-82e2-83dcefe63f5f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:24:00+00:00",
+        "bearing": 15.76,
+        "range": 10.03,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "106bea89-57c8-4f68-922e-2969be2eea84",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:26:00+00:00",
+        "bearing": 16.0,
+        "range": 9.79,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e99305b8-1b8d-4bdc-ac42-50d25c4af659",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:28:00+00:00",
+        "bearing": 16.24,
+        "range": 9.55,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "73023ac2-2380-482f-b065-017f9078bd6a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:30:00+00:00",
+        "bearing": 16.48,
+        "range": 9.31,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4bbd2b0c-36ef-4e65-84f9-1fc599d7dd5c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:32:00+00:00",
+        "bearing": 16.72,
+        "range": 9.07,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8313e4a1-be2d-465a-9ac6-ee75f3e9ad48",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:34:00+00:00",
+        "bearing": 17.06,
+        "range": 42.94,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c1d6b239-ca81-465f-a976-161cff7ef8bd",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:36:00+00:00",
+        "bearing": 17.43,
+        "range": 43.48,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2e01fedc-6c44-4e83-9454-977efa1bf0be",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:38:00+00:00",
+        "bearing": 17.8,
+        "range": 43.11,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "86ba6c8b-c52d-41db-bb0c-9fd6c0fe0f45",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:40:00+00:00",
+        "bearing": 18.17,
+        "range": 42.74,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2c77ceeb-a36a-4845-89f3-0f2759c48481",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:42:00+00:00",
+        "bearing": 18.54,
+        "range": 42.37,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "956c9410-40d7-40ca-b0ab-a77959eecaa8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:44:00+00:00",
+        "bearing": 18.9,
+        "range": 42.01,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9a0edc53-28a7-4d35-b1ad-9aaad592a085",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:46:00+00:00",
+        "bearing": 19.27,
+        "range": 41.64,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "68cd3682-479f-455c-a2f4-92c0c7483eaa",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:48:00+00:00",
+        "bearing": 19.64,
+        "range": 41.27,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "eddef8ab-4909-47aa-b94d-6d80a1d3dd1f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:50:00+00:00",
+        "bearing": 20.0,
+        "range": 40.91,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "493152df-cd6a-4b67-a83b-144929e46e4a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:52:00+00:00",
+        "bearing": 20.36,
+        "range": 40.54,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b3cc76d3-1103-4705-bc89-ad6e3fa434c6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:54:00+00:00",
+        "bearing": 20.6,
+        "range": 331.93,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dbdb4817-c563-4602-83c6-8d793b7d54ef",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:56:00+00:00",
+        "bearing": 20.62,
+        "range": 289.73,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f962b9ba-ec05-46c9-8c4b-b418d24f5d1d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T14:58:00+00:00",
+        "bearing": 20.6,
+        "range": 287.39,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "55a54120-d4cd-4877-8d5a-f6a4a8002dab",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:00:00+00:00",
+        "bearing": 20.57,
+        "range": 287.41,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "05b20f99-3e20-4757-959d-217bd6873637",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:02:00+00:00",
+        "bearing": 20.55,
+        "range": 287.43,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d90a8e5f-7d9f-45ee-9887-75e4e4e31e22",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:04:00+00:00",
+        "bearing": 20.52,
+        "range": 287.46,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "795707aa-62fe-4292-b5c4-f16c5a56ee0f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:06:00+00:00",
+        "bearing": 20.5,
+        "range": 287.48,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "55909c2c-4b53-4b05-990c-379e1864aaf8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:08:00+00:00",
+        "bearing": 20.58,
+        "range": 355.78,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2ae0c0d6-019f-4ff4-93fc-b51f2933782d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:10:00+00:00",
+        "bearing": 20.89,
+        "range": 44.7,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8cf63136-af68-4aab-8465-5a2ded5d1a3d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:12:00+00:00",
+        "bearing": 21.28,
+        "range": 45.8,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3b9c60a2-8cc0-4ba9-a93e-84ddd8571828",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:14:00+00:00",
+        "bearing": 21.66,
+        "range": 45.42,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "588df54a-02b9-47ae-af3a-6c3d0623b576",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:16:00+00:00",
+        "bearing": 22.05,
+        "range": 45.04,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7d6435fd-a992-4d0b-aac8-91c35257d631",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:18:00+00:00",
+        "bearing": 22.43,
+        "range": 44.65,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4654cae2-5bc5-4164-91a2-b50b40a6daf2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:20:00+00:00",
+        "bearing": 22.81,
+        "range": 44.27,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a8584dbe-22fd-487a-b964-a9c2d30bf2f3",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:22:00+00:00",
+        "bearing": 23.19,
+        "range": 43.89,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e97a0ad4-2171-485d-9c76-2a8494f3370f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:24:00+00:00",
+        "bearing": 23.57,
+        "range": 43.52,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "14f7998b-f9b3-4e40-8aae-0583452f8dba",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:26:00+00:00",
+        "bearing": 23.94,
+        "range": 43.14,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "84aa8bc7-b65f-46b2-9c85-f89bc609b4b5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:28:00+00:00",
+        "bearing": 24.32,
+        "range": 42.76,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "98635d96-1882-4234-9de2-90aa5a51553d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:30:00+00:00",
+        "bearing": 24.69,
+        "range": 42.39,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1269fb77-1032-4239-bd2a-e094f43ff40c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:32:00+00:00",
+        "bearing": 25.07,
+        "range": 42.02,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dd144809-1f68-4a7f-a5ec-700d827bc385",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:34:00+00:00",
+        "bearing": 25.31,
+        "range": 333.39,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "48f512f5-c433-407a-ba30-8f36162bdde6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:36:00+00:00",
+        "bearing": 25.35,
+        "range": 287.64,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7e25c703-a7e1-4095-b3a6-c9a0249557a6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:38:00+00:00",
+        "bearing": 25.34,
+        "range": 285.89,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "422ca504-ea0f-4ad0-8f87-ebb2200900c0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:40:00+00:00",
+        "bearing": 25.32,
+        "range": 285.9,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "90d8bfc2-897a-43f2-aa4e-72c61149ad53",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:42:00+00:00",
+        "bearing": 25.31,
+        "range": 285.91,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "716281e8-c51b-483b-bcab-5861d700db6f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:44:00+00:00",
+        "bearing": 25.3,
+        "range": 285.93,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "44c51039-1089-4afc-8f04-220d23cd9d2f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:46:00+00:00",
+        "bearing": 25.29,
+        "range": 285.94,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d16cd129-90eb-4b9a-816b-25bb891db123",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:48:00+00:00",
+        "bearing": 25.28,
+        "range": 285.95,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "92cd856d-7ee4-4fdb-8083-ec6426070081",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:50:00+00:00",
+        "bearing": 25.26,
+        "range": 285.96,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7b8c8e3c-5f5f-40e1-8fde-8fb654805e2d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:52:00+00:00",
+        "bearing": 25.25,
+        "range": 285.97,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bb38daa4-a6a3-44b6-8af3-cd8852c309fc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:54:00+00:00",
+        "bearing": 25.34,
+        "range": 354.27,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e38d00b2-f632-4074-8cdd-3cce27fc5d34",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:56:00+00:00",
+        "bearing": 25.65,
+        "range": 46.91,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d79549f6-d459-4be1-b972-2aaf76cabbe4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T15:58:00+00:00",
+        "bearing": 26.06,
+        "range": 51.0,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "32cb76d5-0918-493d-a423-81d396ab9e5c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "SENSOR",
+        "time": "2010-01-12T16:00:00+00:00",
+        "bearing": 26.47,
+        "range": 50.63,
+        "sensor_name": "TA",
+        "label": "SUBJECT held on TA"
+      }
+    }
+  ]
+}

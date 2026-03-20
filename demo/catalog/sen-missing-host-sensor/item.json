@@ -1,0 +1,61 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "sen-missing-host-sensor",
+  "geometry": null,
+  "bbox": null,
+  "properties": {
+    "title": "sen_missing_host_sensor (general)",
+    "datetime": "2026-03-20T21:26:47.746695+00:00",
+    "description": "Imported from sen_missing_host_sensor.dsf"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "sen_missing_host_sensor (general)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_missing_host_sensor.dsf",
+      "title": "sen_missing_host_sensor.dsf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-sen_missing_host_sensor": {
+      "href": "./assets/sen_missing_host_sensor.dsf",
+      "type": "application/octet-stream",
+      "title": "sen_missing_host_sensor.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/sen_missing_host_sensor.dsf",
+        "load_timestamp": "2026-03-20T21:26:47.750699Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

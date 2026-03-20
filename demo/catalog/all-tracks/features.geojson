@@ -1,0 +1,749 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "6089609c-6c36-4c71-8588-42b9a4398170",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 0.0,
+        "range": 222.0,
+        "frequency": 100.03,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:00:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5dca55d3-bd59-4822-857a-6010c780dcc6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 348.89,
+        "range": 232.1,
+        "frequency": 100.018,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:04:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 10
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bf88781b-9ceb-4add-a6d9-d33c4b5acb05",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 346.7,
+        "range": 234.3,
+        "frequency": 100.015,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:08:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 15
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "075e60a4-a7c6-46d0-88c6-e77035a46b02",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 344.47,
+        "range": 236.53,
+        "frequency": 100.013,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:12:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 20
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c01997cc-3d7e-4194-87a0-d0d39c63f52c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 342.21,
+        "range": 238.03,
+        "frequency": 100.01,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:16:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 25
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e2c2634c-2830-41e2-ab0c-dd10d5eb34b0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 339.94,
+        "range": 240.06,
+        "frequency": 100.008,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:20:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 30
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "52608364-e665-4e40-a296-20b0dbc0e345",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 337.64,
+        "range": 242.36,
+        "frequency": 100.006,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:24:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 35
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "901530ea-a1c1-472c-a0c9-c3d8eb0d86a3",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 335.33,
+        "range": 244.67,
+        "frequency": 100.003,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:28:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 40
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2f91ec64-7739-4828-a77f-aa257740d63d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 333.01,
+        "range": 246.99,
+        "frequency": 100.0,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:32:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 45
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c7a80dc8-de3d-4a53-9406-63eafe692ff7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 330.68,
+        "range": 249.31,
+        "frequency": 99.998,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:36:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 50
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0696c0bf-8947-4995-8b7e-e24845c81005",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 328.37,
+        "range": 251.63,
+        "frequency": 99.995,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:40:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 55
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "10df78f8-7c50-4d74-91f9-f6e6938cbe15",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 326.07,
+        "range": 253.93,
+        "frequency": 99.993,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:44:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 60
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b8080137-6528-4e74-a2de-41250f95f848",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 323.79,
+        "range": 256.21,
+        "frequency": 99.99,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:48:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 65
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d06963b7-8462-4e1a-b2b7-0bf2f5743303",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 321.53,
+        "range": 258.46,
+        "frequency": 99.988,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:52:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 70
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2773835f-ad41-4a5e-88fb-508f6e5e8799",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 319.32,
+        "range": 260.68,
+        "frequency": 99.986,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T12:56:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 75
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "172ab9e8-95c5-4863-ac6d-2512c2b648c2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 317.14,
+        "range": 262.86,
+        "frequency": 99.983,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:00:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 80
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e978d3c1-2571-4b6c-82d4-5028cb7831e8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 315.01,
+        "range": 264.99,
+        "frequency": 99.981,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:04:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 85
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cc2b9dd2-bac4-4e35-9f1d-d90f12915688",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 312.92,
+        "range": 267.08,
+        "frequency": 99.979,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:08:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 90
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4e07bb14-8935-4023-ac3a-c136109b98cb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 310.87,
+        "range": 224.92,
+        "frequency": 99.933,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:12:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 95
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8aa36d9f-01d9-4344-9d9e-b0e39d871599",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 308.87,
+        "range": 182.7,
+        "frequency": 99.869,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:16:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 100
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4d2ccb63-9c1a-4df1-beb5-65c2882d27b3",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 306.94,
+        "range": 146.62,
+        "frequency": 99.824,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:20:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 105
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6174270a-d055-49d9-833f-f202e8cc7bbc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 305.74,
+        "range": 116.43,
+        "frequency": 99.823,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:24:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 110
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2d3e52f9-9262-46a9-b068-28c3d528e926",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 305.6,
+        "range": 71.24,
+        "frequency": 99.823,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:28:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 115
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d2863b33-d1a2-4fec-b9db-5be3d516e0bf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 305.42,
+        "range": 30.86,
+        "frequency": 99.823,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:32:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 120
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "05dbbc91-d65c-4b60-949c-440c0fbbd12a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 304.83,
+        "range": 22.0,
+        "frequency": 99.823,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:36:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 125
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4fc9698e-18ab-45a4-9d79-df699156ca2a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 304.23,
+        "range": 22.56,
+        "frequency": 99.822,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:40:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 130
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e6914fbc-9a3e-4309-979d-338fdb8188fc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 303.71,
+        "range": 23.08,
+        "frequency": 99.822,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:44:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 135
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1aaeef53-bd28-4335-8ef0-29c4ed8c11f1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 303.26,
+        "range": 23.53,
+        "frequency": 99.822,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:48:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 140
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5bfdc6d6-7ec4-4f9d-a178-f904e66d9636",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 302.87,
+        "range": 23.92,
+        "frequency": 99.822,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:52:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 145
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7dd21be9-c8c4-45e1-8b8a-e93073f8eae9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 302.52,
+        "range": 24.27,
+        "frequency": 99.822,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T13:56:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 150
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "958413a2-8046-4e7b-8416-db5bc5ad861c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR2",
+        "track_id": "SENSOR",
+        "bearing": 302.21,
+        "range": 24.58,
+        "frequency": 99.822,
+        "speed": null,
+        "sensor_type": "\"tail",
+        "timestamp": "2010-01-12T14:00:00+00:00",
+        "label": "sensor\" SUBJECT held on tail sensor",
+        "symbol": "A",
+        "style": {
+          "stroke": true,
+          "color": "#0000FF",
+          "weight": 1,
+          "opacity": 1.0
+        },
+        "line_number": 155
+      }
+    }
+  ]
+}

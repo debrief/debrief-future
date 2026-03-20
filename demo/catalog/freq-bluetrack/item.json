@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "freq-bluetrack",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.2472333,
+          60.0
+        ],
+        [
+          0.3601889,
+          60.0
+        ],
+        [
+          0.3601889,
+          60.2898583
+        ],
+        [
+          -0.2472333,
+          60.2898583
+        ],
+        [
+          -0.2472333,
+          60.0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.2472333,
+    60.0,
+    0.3601889,
+    60.2898583
+  ],
+  "properties": {
+    "title": "Freq_BlueTrack (general)",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Imported from other_formats/TA_DUMMY_DATA/Freq_BlueTrack.dpf",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T14:00:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Freq_BlueTrack (general)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/TA_DUMMY_DATA/Freq_BlueTrack.dpf",
+      "title": "Freq_BlueTrack.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Freq_BlueTrack": {
+      "href": "./assets/Freq_BlueTrack.dpf",
+      "type": "application/octet-stream",
+      "title": "Freq_BlueTrack.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/other_formats/TA_DUMMY_DATA/Freq_BlueTrack.dpf",
+        "load_timestamp": "2026-03-20T21:26:47.027147Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

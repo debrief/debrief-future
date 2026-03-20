@@ -1,0 +1,290 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "d1e17a4b-e517-4f78-b238-4a63c52672c5",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:00:00+00:00",
+        "text": "COMEX SERIAL 16D",
+        "track_id": "NELSON",
+        "line_number": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "78011b45-74ce-42f4-9184-4eef315f6638",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:01:00.100000+00:00",
+        "text": "INTEND WIDE AREA SEARCH AS PREVIOUS SERIAL",
+        "track_id": "NELSON",
+        "line_number": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "929861f6-3d9a-430c-9e3d-77d737fb6428",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:02:00+00:00",
+        "text": "BRIEFING HINTED THAT TARGET TO SE",
+        "track_id": "NELSON",
+        "line_number": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "64f74b12-a085-445f-971e-2a19ee069419",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T05:22:00+00:00",
+        "text": "NO CONTACTS YET, SWITCHING TO SCALE 7",
+        "track_id": "NELSON",
+        "line_number": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5425cdc9-6fa0-4931-b7a6-3f087e63ad90",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T06:12:00+00:00",
+        "text": "INVESTIGATING TRACK 14",
+        "track_id": "NELSON",
+        "line_number": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bd55416d-945d-4d63-85e5-8a68a233b0f8",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T06:22:00+00:00",
+        "text": "POSSUB TRACK 14",
+        "track_id": "NELSON",
+        "line_number": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0439e307-4ef1-4fa8-bc2c-ced234ba4049",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T06:42:00+00:00",
+        "text": "DROP TRACK 14 BIOLOGIC",
+        "track_id": "NELSON",
+        "line_number": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "149ba8c6-5063-4985-b5af-f5f91175e176",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T09:53:00+00:00",
+        "text": "HEADING TO RV",
+        "track_id": "NELSON",
+        "line_number": 8
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8f1d6ec1-ff86-473d-93b7-1dcf9dc6019f",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T09:54:00+00:00",
+        "text": "SUSPECT PLAYMATE NOT PRESENT",
+        "track_id": "NELSON",
+        "line_number": 9
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1a752143-8594-4cfb-b26c-cf972d11a6cc",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T09:57:00+00:00",
+        "text": "SUSPECTED DETECTION OF RED",
+        "track_id": "COLLINGWOOD",
+        "line_number": 10
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e8fc76c6-c927-4c54-b81a-d320054e066f",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T10:03:00+00:00",
+        "text": "CONFIRMED. OBTAIN SOLUTION",
+        "track_id": "COLLINGWOOD",
+        "line_number": 11
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "675f7e31-204e-4239-a884-743164254403",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T10:13:00+00:00",
+        "text": "SUSPECT TARGET ZIG",
+        "track_id": "COLLINGWOOD",
+        "line_number": 12
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "12d8432d-3def-4146-b625-0c47fffb1af9",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T10:14:00+00:00",
+        "text": "PORT DETECTION, 16 HZ",
+        "track_id": "NELSON",
+        "line_number": 13
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "367ecdd7-0187-4a72-ab66-b02b87f185cc",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T10:29:00+00:00",
+        "text": "ENTER TRAIL",
+        "track_id": "NELSON",
+        "line_number": 14
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ece688c6-5870-44a4-818d-f3c58d81fe98",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T10:37:00+00:00",
+        "text": "TARGET ZIG DETECTED",
+        "track_id": "NELSON",
+        "line_number": 15
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a6bdc1ad-466e-472f-97d8-c86c16dcd8b2",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T11:19:00+00:00",
+        "text": "FINEX CALLED, ENTER TRANSITION",
+        "track_id": "COLLINGWOOD",
+        "line_number": 16
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6e26e8d0-fa54-4579-8e21-dfb407240aaf",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T11:20:00+00:00",
+        "text": "ENTERING PLOT-LOCK TRANSITION",
+        "track_id": "NELSON",
+        "line_number": 17
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a1551d7e-802a-440b-99ec-09edcb30d687",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T11:37:00+00:00",
+        "text": "ACTIVE PLOT-LOCK SUCCESSFUL",
+        "track_id": "NELSON",
+        "line_number": 18
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1db21da5-9172-443d-9981-fbfb072e50a8",
+      "geometry": {
+        "type": "Point",
+        "coordinates": []
+      },
+      "properties": {
+        "kind": "NARRATIVE",
+        "time": "1995-12-12T11:41:00+00:00",
+        "text": "RX CONGRATS ON UWT",
+        "track_id": "NELSON",
+        "line_number": 19
+      }
+    }
+  ]
+}

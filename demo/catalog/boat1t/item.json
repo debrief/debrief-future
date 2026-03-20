@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "boat1t",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.8660806,
+          21.9470944
+        ],
+        [
+          -21.5797833,
+          21.9470944
+        ],
+        [
+          -21.5797833,
+          22.1862861
+        ],
+        [
+          -21.8660806,
+          22.1862861
+        ],
+        [
+          -21.8660806,
+          21.9470944
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.8660806,
+    21.9470944,
+    -21.5797833,
+    22.1862861
+  ],
+  "properties": {
+    "title": "boat1t (general)",
+    "datetime": "1995-12-12T05:00:00+00:00",
+    "description": "Imported from boat1t.dpf",
+    "start_datetime": "1995-12-12T05:00:00+00:00",
+    "end_datetime": "1995-12-12T11:41:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "boat1t (general)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/boat1t.dpf",
+      "title": "boat1t.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-boat1t": {
+      "href": "./assets/boat1t.dpf",
+      "type": "application/octet-stream",
+      "title": "boat1t.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/boat1t.dpf",
+        "load_timestamp": "2026-03-20T21:26:45.924838Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

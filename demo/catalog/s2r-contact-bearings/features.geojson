@@ -1,0 +1,800 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "d3223ebb-96a6-486f-a548-c2e761fc2cfb",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:14:34+00:00",
+        "bearing": 59.3,
+        "range": 300.8,
+        "frequency": 49.96,
+        "sensor_name": "Contact_bearings",
+        "label": "0414"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "51255dcb-ad9d-4623-a726-c925040a7ebe",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:15:22+00:00",
+        "bearing": 59.3,
+        "range": 300.8,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0415"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d7ccd86b-4936-449f-9577-97050f085ef6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:16:45+00:00",
+        "bearing": 59.3,
+        "range": 300.8,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0416"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6d37aaae-bc29-453f-8d04-d1c32b9d4b2b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:18:25+00:00",
+        "bearing": 59.5,
+        "range": 300.5,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0418"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8335a611-77b6-4549-b2a5-5fd14eb4f3aa",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:20:36+00:00",
+        "bearing": 60.0,
+        "range": 300.0,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0420"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "81276200-fa57-46dc-8ffc-e250276ad700",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:23:12+00:00",
+        "bearing": 60.8,
+        "range": 299.3,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0423"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "81211cc8-77fb-4769-b93e-b4f05967dfe4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:25:35+00:00",
+        "bearing": 61.3,
+        "range": 298.8,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0425"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fed1889d-3fc9-4677-bfcb-f137380e510e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:27:11+00:00",
+        "bearing": 61.3,
+        "range": 298.8,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0427"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "24cfd6a6-0bc9-4ade-b239-85cf08ae8e5b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:29:18+00:00",
+        "bearing": 61.8,
+        "range": 298.3,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0429"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d4e31983-33d8-4e77-9f1b-40e62e20757d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:31:34+00:00",
+        "bearing": 62.0,
+        "range": 298.0,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0431"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8c365b65-6204-4ea8-81ba-f9273cce08b5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:34:09+00:00",
+        "bearing": 62.3,
+        "range": 297.8,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0434"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "78bda985-e0e7-447a-b9f6-726628b84b76",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:35:57+00:00",
+        "bearing": 62.3,
+        "range": 297.8,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0435"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "39e32be3-5da7-458a-a283-c10a54917803",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:37:56+00:00",
+        "bearing": 62.5,
+        "range": 297.5,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0437"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ae0850e1-41d4-4340-b8af-23945119f0c0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:40:00+00:00",
+        "bearing": 63.0,
+        "range": 297.0,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0440"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "37255803-3888-419d-88c8-11f3fee47e47",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:41:27+00:00",
+        "bearing": 63.5,
+        "range": 296.5,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0441"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "25f23b5d-23ba-4c3a-8437-b7993bebb869",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:42:32+00:00",
+        "bearing": 63.6,
+        "range": 296.2,
+        "frequency": 49.96,
+        "sensor_name": "Contact_bearings",
+        "label": "0442"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fdc56092-9a66-4436-bc27-1dc26b995e26",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:43:12+00:00",
+        "bearing": 63.7,
+        "range": 295.8,
+        "frequency": 50.06,
+        "sensor_name": "Contact_bearings",
+        "label": "0443"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "eb33c8af-9bfb-485c-958c-10d3aef8cc28",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:43:19+00:00",
+        "bearing": 64.5,
+        "range": 295.5,
+        "frequency": 50.06,
+        "sensor_name": "Contact_bearings",
+        "label": "0443"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e3798197-12ca-4794-90b7-78dec7cbd64f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:44:56+00:00",
+        "bearing": 66.5,
+        "range": 293.5,
+        "frequency": 50.23,
+        "sensor_name": "Contact_bearings",
+        "label": "0444"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f58a9869-ad33-4bd4-9669-c57c7d5f3b59",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:45:44+00:00",
+        "bearing": 67.0,
+        "range": 293.0,
+        "frequency": 50.23,
+        "sensor_name": "Contact_bearings",
+        "label": "0445"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7bdd284b-4401-4ce9-bfbf-6bcb91935caf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:46:30+00:00",
+        "bearing": 67.3,
+        "range": 292.8,
+        "frequency": 50.16,
+        "sensor_name": "Contact_bearings",
+        "label": "0446"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "bc9f20db-7b1f-466c-b76e-d2a9bb1949d6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:48:18+00:00",
+        "bearing": 69.8,
+        "range": 290.3,
+        "frequency": 49.96,
+        "sensor_name": "Contact_bearings",
+        "label": "0448"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "61a3612a-0523-47ca-966a-87c501ed90d6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:49:37+00:00",
+        "bearing": 71.0,
+        "range": 289.0,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0449"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "aeeef84a-0c0b-4271-9a3b-d7873f1341ea",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:50:49+00:00",
+        "bearing": 71.8,
+        "range": 288.3,
+        "frequency": 49.96,
+        "sensor_name": "Contact_bearings",
+        "label": "0450"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "02300cad-3c7b-4a11-8af1-9f8ebfbce688",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:52:01+00:00",
+        "bearing": 72.0,
+        "range": 288.0,
+        "frequency": 49.92,
+        "sensor_name": "Contact_bearings",
+        "label": "0452"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "69c21e56-6477-4e4a-b5da-34fe0146376b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:53:13+00:00",
+        "bearing": 72.0,
+        "range": 288.0,
+        "frequency": 49.96,
+        "sensor_name": "Contact_bearings",
+        "label": "0453"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "06f31941-5a4e-4410-8538-c3d01e58b4a2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:54:44+00:00",
+        "bearing": 71.3,
+        "range": 288.8,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0454"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8214ffe3-cfc1-405d-bc89-d41eeecbb7df",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:55:56+00:00",
+        "bearing": 71.3,
+        "range": 288.8,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0455"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "317d82c5-e886-4893-93cb-41cb270b5729",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:57:04+00:00",
+        "bearing": 71.3,
+        "range": 288.8,
+        "frequency": 49.96,
+        "sensor_name": "Contact_bearings",
+        "label": "0457"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e5c41e53-f5d8-43d0-bc8a-80043994a9c0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:58:15+00:00",
+        "bearing": 70.3,
+        "range": 289.8,
+        "frequency": 49.96,
+        "sensor_name": "Contact_bearings",
+        "label": "0458"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9b724ebb-e86f-4fe8-8143-8f9de1ddd974",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:59:19+00:00",
+        "bearing": 70.3,
+        "range": 289.8,
+        "frequency": 49.96,
+        "sensor_name": "Contact_bearings",
+        "label": "0459"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "25906fd9-0ec2-4fbb-96c4-a143ac4572bc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:00:43+00:00",
+        "bearing": 69.0,
+        "range": 291.0,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0500"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "95fba56d-8fbd-4259-912a-9a6dde83e5c8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:02:11+00:00",
+        "bearing": 68.5,
+        "range": 291.5,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0502"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "50de9f9a-ae00-4cbd-b0c4-20c60ffe8084",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:03:26+00:00",
+        "bearing": 67.8,
+        "range": 292.3,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0503"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0eebd943-8e73-4537-a224-b69753645c40",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:04:34+00:00",
+        "bearing": 67.8,
+        "range": 292.3,
+        "frequency": 49.96,
+        "sensor_name": "Contact_bearings",
+        "label": "0504"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "15588e1f-38d2-4b9c-b814-f7c9ba77a1fe",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:06:02+00:00",
+        "bearing": 67.0,
+        "range": 293.0,
+        "frequency": 49.96,
+        "sensor_name": "Contact_bearings",
+        "label": "0506"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "808a6a32-f3ab-479f-953e-e33e3952594c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:07:57+00:00",
+        "bearing": 66.5,
+        "range": 293.5,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0507"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e80b2d46-bf99-4229-b1a8-442017c8961e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:09:13+00:00",
+        "bearing": 66.0,
+        "range": 294.0,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0509"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "182d903b-1bf3-47c7-b862-8450ce9ce59b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:10:44+00:00",
+        "bearing": 65.8,
+        "range": 294.3,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0510"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "83acb57f-5968-4c75-8382-67295e088fad",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:12:00+00:00",
+        "bearing": 65.3,
+        "range": 294.8,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0512"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6fc27b88-9655-4ad5-bd84-eac14ee07779",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:13:20+00:00",
+        "bearing": 65.3,
+        "range": 294.8,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0513"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b2de7bad-6ac8-42de-b8e4-c4854dfb4ab4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:14:04+00:00",
+        "bearing": 65.3,
+        "range": 294.8,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0514"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "934fe001-08d1-4c43-bc69-5caea01958a1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:15:35+00:00",
+        "bearing": 64.3,
+        "range": 295.8,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0515"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "59a23a7f-abfd-4d3d-a123-65198671bc3d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:16:39+00:00",
+        "bearing": 64.3,
+        "range": 295.8,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0516"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1e645ec2-b469-4a7f-b188-1b31fb416649",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:18:11+00:00",
+        "bearing": 64.3,
+        "range": 295.8,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0518"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "85f6c7b9-339d-4b13-a133-c141833e1b57",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:19:11+00:00",
+        "bearing": 63.5,
+        "range": 296.5,
+        "frequency": 49.96,
+        "sensor_name": "Contact_bearings",
+        "label": "0519"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "97a3628f-8fa7-4b05-a44c-c5cb0c1182c0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:20:30+00:00",
+        "bearing": 63.5,
+        "range": 296.5,
+        "frequency": 49.99,
+        "sensor_name": "Contact_bearings",
+        "label": "0520"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ca759730-9d6f-422a-9cf0-71eb9dfd25f6",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:21:30+00:00",
+        "bearing": 62.5,
+        "range": 297.5,
+        "frequency": 50.09,
+        "sensor_name": "Contact_bearings",
+        "label": "0521"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "965ba572-e5c8-461b-adac-428b99cdef21",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:22:22+00:00",
+        "bearing": 62.3,
+        "range": 297.8,
+        "frequency": 50.2,
+        "sensor_name": "Contact_bearings",
+        "label": "0522"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "851aa78b-209b-4082-833c-52ac4360f816",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:23:18+00:00",
+        "bearing": 61.8,
+        "range": 298.3,
+        "frequency": 50.2,
+        "sensor_name": "Contact_bearings",
+        "label": "0523"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6156b06a-eebe-49bf-9fd0-892592781fe7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:24:17+00:00",
+        "bearing": 61.0,
+        "range": 299.0,
+        "frequency": 50.2,
+        "sensor_name": "Contact_bearings",
+        "label": "0524"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dd2b405a-7cda-48bf-aca0-ce88322b996d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:25:05+00:00",
+        "bearing": 60.5,
+        "range": 299.5,
+        "frequency": 50.2,
+        "sensor_name": "Contact_bearings",
+        "label": "0525"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "65017889-8e52-4154-80c5-1d682a091289",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:25:49+00:00",
+        "bearing": 60.0,
+        "range": 300.0,
+        "frequency": 50.2,
+        "sensor_name": "Contact_bearings",
+        "label": "0525"
+      }
+    }
+  ]
+}

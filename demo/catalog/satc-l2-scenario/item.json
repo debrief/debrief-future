@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "satc-l2-scenario",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.2472333,
+          60.0
+        ],
+        [
+          0.0127889,
+          60.0
+        ],
+        [
+          0.0127889,
+          60.258975
+        ],
+        [
+          -0.2472333,
+          60.258975
+        ],
+        [
+          -0.2472333,
+          60.0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.2472333,
+    60.0,
+    0.0127889,
+    60.258975
+  ],
+  "properties": {
+    "title": "L2_Scenario (satc)",
+    "datetime": "2010-01-12T12:00:00+00:00",
+    "description": "Imported from SATC/L2_Scenario.dpf",
+    "start_datetime": "2010-01-12T12:00:00+00:00",
+    "end_datetime": "2010-01-12T14:00:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "L2_Scenario (satc)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/L2_Scenario.dpf",
+      "title": "L2_Scenario.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-L2_Scenario": {
+      "href": "./assets/L2_Scenario.dpf",
+      "type": "application/octet-stream",
+      "title": "L2_Scenario.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/SATC/L2_Scenario.dpf",
+        "load_timestamp": "2026-03-20T21:26:44.457355Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

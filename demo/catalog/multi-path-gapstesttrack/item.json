@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "multi-path-gapstesttrack",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          30.8919782,
+          5.1585009
+        ],
+        [
+          30.9332722,
+          5.1585009
+        ],
+        [
+          30.9332722,
+          5.1943915
+        ],
+        [
+          30.8919782,
+          5.1943915
+        ],
+        [
+          30.8919782,
+          5.1585009
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    30.8919782,
+    5.1585009,
+    30.9332722,
+    5.1943915
+  ],
+  "properties": {
+    "title": "GapsTestTrack (multi-path)",
+    "datetime": "2009-04-22T17:59:58.490000+00:00",
+    "description": "Imported from MultiPath/GapsTestTrack.dpf",
+    "start_datetime": "2009-04-22T17:59:58.490000+00:00",
+    "end_datetime": "2009-04-22T19:10:22.390000+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "GapsTestTrack (multi-path)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiPath/GapsTestTrack.dpf",
+      "title": "GapsTestTrack.dpf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-GapsTestTrack": {
+      "href": "./assets/GapsTestTrack.dpf",
+      "type": "application/octet-stream",
+      "title": "GapsTestTrack.dpf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/MultiPath/GapsTestTrack.dpf",
+        "load_timestamp": "2026-03-20T21:26:43.434994Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

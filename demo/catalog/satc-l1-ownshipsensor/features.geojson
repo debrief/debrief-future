@@ -1,0 +1,159 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "e2276635-895a-4c84-8ce9-d2a509b744b2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "OWNSHIP",
+        "time": "2010-01-12T12:13:14+00:00",
+        "bearing": 2.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b48af686-a064-4d0a-a636-7dba546f41a3",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "OWNSHIP",
+        "time": "2010-01-12T12:14:44+00:00",
+        "bearing": 1.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ffc8bde4-2827-4500-8013-0b971dfd60ae",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "OWNSHIP",
+        "time": "2010-01-12T12:16:14+00:00",
+        "bearing": 2.7,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ea96371d-af0d-44f8-8339-472cf2d15788",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "OWNSHIP",
+        "time": "2010-01-12T12:17:44+00:00",
+        "bearing": 3.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0cdcb4c4-4267-4261-8516-f84b3613f88c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "OWNSHIP",
+        "time": "2010-01-12T12:19:14+00:00",
+        "bearing": 3.4,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "660101b5-062d-4c5c-b4e8-56eba7af3e56",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "OWNSHIP",
+        "time": "2010-01-12T12:21:59+00:00",
+        "bearing": -2.6,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b546ff68-abab-4d5e-bd5f-fbfedb2a184c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "OWNSHIP",
+        "time": "2010-01-12T12:23:29+00:00",
+        "bearing": -6.8,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a8855f12-1b0c-457c-9cb0-f72fe84e6d42",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "OWNSHIP",
+        "time": "2010-01-12T12:24:59+00:00",
+        "bearing": -11.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2b4bd258-628e-491e-b301-937a84d36b94",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "OWNSHIP",
+        "time": "2010-01-12T12:26:29+00:00",
+        "bearing": -18.1,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9d6616fc-5376-4604-852a-23cd068ea9b9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "OWNSHIP",
+        "time": "2010-01-12T12:28:14+00:00",
+        "bearing": -26.9,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f2fd5960-0c6a-44e5-9b1d-44c90d56f6f8",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "OWNSHIP",
+        "time": "2010-01-12T12:29:59+00:00",
+        "bearing": -34.2,
+        "range": 12000.0,
+        "sensor_name": "Plain",
+        "label": "Cookie SUBJECT held on Plain Cookie"
+      }
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "demo-review3-sensor2",
+  "geometry": null,
+  "bbox": null,
+  "properties": {
+    "title": "Review3_Sensor2 (demo)",
+    "datetime": "2026-03-20T21:26:43.389039+00:00",
+    "description": "Imported from Demo/Review/Review3_Sensor2.dsf"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "Review3_Sensor2 (demo)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/Demo/Review/Review3_Sensor2.dsf",
+      "title": "Review3_Sensor2.dsf"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-Review3_Sensor2": {
+      "href": "./assets/Review3_Sensor2.dsf",
+      "type": "application/octet-stream",
+      "title": "Review3_Sensor2.dsf",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/Demo/Review/Review3_Sensor2.dsf",
+        "load_timestamp": "2026-03-20T21:26:43.390855Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

@@ -1,0 +1,785 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "3bad5028-2074-460c-be9f-0b7f23d9cb7a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:15:22+00:00",
+        "bearing": 59.3,
+        "range": 300.8,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0415"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "43c837d4-e3c2-40aa-96c6-e30fb5ef0d44",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:16:45+00:00",
+        "bearing": 59.3,
+        "range": 300.8,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0416"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e9aa8af2-ecda-49f8-88bf-cef0896c697e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:18:25+00:00",
+        "bearing": 59.5,
+        "range": 300.5,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0418"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fe85d9b1-af64-48f3-b980-df160754a1b1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:20:36+00:00",
+        "bearing": 60.0,
+        "range": 300.0,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0420"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7d95cd53-0826-48f4-ba01-a5fb3329aa32",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:23:12+00:00",
+        "bearing": 60.8,
+        "range": 299.3,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0423"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ff64f640-d43f-4de8-b966-8585f015194f",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:25:35+00:00",
+        "bearing": 61.3,
+        "range": 298.8,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0425"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b21a7da0-dec2-4b1d-9464-b049b1aae59e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:27:11+00:00",
+        "bearing": 61.3,
+        "range": 298.8,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0427"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cb23239e-bf08-4bbc-87ea-85dd5b0c1196",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:29:18+00:00",
+        "bearing": 61.8,
+        "range": 298.3,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0429"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "35f4add4-b4d4-4c18-a714-84283bb638d4",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:31:34+00:00",
+        "bearing": 62.0,
+        "range": 298.0,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0431"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "679aeba4-ce9e-45a5-8498-c8797673d697",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:34:09+00:00",
+        "bearing": 62.3,
+        "range": 297.8,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0434"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2ad0d258-1350-4684-bd35-eb7814394ab5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:35:57+00:00",
+        "bearing": 62.3,
+        "range": 297.8,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0435"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6f72766d-2432-4221-af4a-2cb90440d983",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:37:56+00:00",
+        "bearing": 62.5,
+        "range": 297.5,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0437"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cbfe1edf-3d05-4a10-bb38-256b03246902",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:40:00+00:00",
+        "bearing": 63.0,
+        "range": 297.0,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0440"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9a402058-51be-4ffb-a258-aac8a80048b9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:41:27+00:00",
+        "bearing": 63.5,
+        "range": 296.5,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0441"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f808c67f-1e60-4d37-a8f5-9ea10cdb89f9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:42:32+00:00",
+        "bearing": 63.6,
+        "range": 296.2,
+        "frequency": 49.96,
+        "sensor_name": "SENSOR_A",
+        "label": "0442"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "79fa519d-deae-4b1c-b56c-223cbc160cc0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:43:12+00:00",
+        "bearing": 63.7,
+        "range": 295.8,
+        "frequency": 50.06,
+        "sensor_name": "SENSOR_A",
+        "label": "0443"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "707a2f96-764c-4afb-9e93-4685b4c9f7d9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:43:19+00:00",
+        "bearing": 64.5,
+        "range": 295.5,
+        "frequency": 50.06,
+        "sensor_name": "SENSOR_A",
+        "label": "0443"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c2bbf00e-b499-4984-9815-901ac8406645",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:44:56+00:00",
+        "bearing": 66.5,
+        "range": 293.5,
+        "frequency": 50.23,
+        "sensor_name": "SENSOR_A",
+        "label": "0444"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "69dc5ea3-eca7-412d-8b74-2e550f92178e",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:45:44+00:00",
+        "bearing": 67.0,
+        "range": 293.0,
+        "frequency": 50.23,
+        "sensor_name": "SENSOR_A",
+        "label": "0445"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d531cfea-01e7-4bd8-9a35-d8c6fef5d76c",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:46:30+00:00",
+        "bearing": 67.3,
+        "range": 292.8,
+        "frequency": 50.16,
+        "sensor_name": "SENSOR_A",
+        "label": "0446"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b509a555-98ff-4b82-96da-9309af34f5f2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:48:18+00:00",
+        "bearing": 69.8,
+        "range": 290.3,
+        "frequency": 49.96,
+        "sensor_name": "SENSOR_A",
+        "label": "0448"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "56367abf-3dab-4259-b311-41834312dbe5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:49:37+00:00",
+        "bearing": 71.0,
+        "range": 289.0,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0449"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6b94c296-1909-492e-aab6-26a6746fb120",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:50:49+00:00",
+        "bearing": 71.8,
+        "range": 288.3,
+        "frequency": 49.96,
+        "sensor_name": "SENSOR_A",
+        "label": "0450"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4b78ff06-37b1-4d0d-83fb-c3da21a45bea",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:52:01+00:00",
+        "bearing": 72.0,
+        "range": 288.0,
+        "frequency": 49.92,
+        "sensor_name": "SENSOR_A",
+        "label": "0452"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f5149f7c-69bb-4a81-8d4d-0651ca61e596",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:53:13+00:00",
+        "bearing": 72.0,
+        "range": 288.0,
+        "frequency": 49.96,
+        "sensor_name": "SENSOR_A",
+        "label": "0453"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "666fd431-fd5e-4545-95ab-c2fd114817b2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:54:44+00:00",
+        "bearing": 71.3,
+        "range": 288.8,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0454"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b0f6db19-f449-4736-971d-9d2b84b7edf1",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:55:56+00:00",
+        "bearing": 71.3,
+        "range": 288.8,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0455"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "aec649b5-97c1-4d00-b0fb-ffc097517c4d",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:57:04+00:00",
+        "bearing": 71.3,
+        "range": 288.8,
+        "frequency": 49.96,
+        "sensor_name": "SENSOR_A",
+        "label": "0457"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b50671bd-7297-4995-9719-301e85db33d0",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:58:15+00:00",
+        "bearing": 70.3,
+        "range": 289.8,
+        "frequency": 49.96,
+        "sensor_name": "SENSOR_A",
+        "label": "0458"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d0a4436f-9bd5-48a7-bda6-d067680df166",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T04:59:19+00:00",
+        "bearing": 70.3,
+        "range": 289.8,
+        "frequency": 49.96,
+        "sensor_name": "SENSOR_A",
+        "label": "0459"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "05691b19-2ff3-4755-9759-4b23441f67d9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:00:43+00:00",
+        "bearing": 69.0,
+        "range": 291.0,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0500"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4901a53f-38f9-407d-a6f7-0767510cd3d7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:02:11+00:00",
+        "bearing": 68.5,
+        "range": 291.5,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0502"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5613b1df-b967-42a6-8e0d-96083fc828da",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:03:26+00:00",
+        "bearing": 67.8,
+        "range": 292.3,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0503"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "358478dd-3450-478f-94c7-8ee1ed469b30",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:04:34+00:00",
+        "bearing": 67.8,
+        "range": 292.3,
+        "frequency": 49.96,
+        "sensor_name": "SENSOR_A",
+        "label": "0504"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ff238a33-2838-40ce-b6c2-29ec5105cd01",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:06:02+00:00",
+        "bearing": 67.0,
+        "range": 293.0,
+        "frequency": 49.96,
+        "sensor_name": "SENSOR_A",
+        "label": "0506"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a5667d14-b97a-4a43-9ec0-3f3979c589e9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:07:57+00:00",
+        "bearing": 66.5,
+        "range": 293.5,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0507"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9dbe67b2-b043-4405-bb59-451d3e9eb3c9",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:09:13+00:00",
+        "bearing": 66.0,
+        "range": 294.0,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0509"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6f6bc473-f3eb-4c42-aec8-f2ed5380a2e2",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:10:44+00:00",
+        "bearing": 65.8,
+        "range": 294.3,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0510"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fd43abbb-dbae-40ec-85a5-479288b13292",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:12:00+00:00",
+        "bearing": 65.3,
+        "range": 294.8,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0512"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4a51e305-6424-4bb3-b8a0-07c7603753dc",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:13:20+00:00",
+        "bearing": 65.3,
+        "range": 294.8,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0513"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f56684a7-0d98-4e90-bf9e-9d4fd4589438",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:14:04+00:00",
+        "bearing": 65.3,
+        "range": 294.8,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0514"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "80083e3f-44da-44b8-8a9a-b8003ea2dc05",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:15:35+00:00",
+        "bearing": 64.3,
+        "range": 295.8,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0515"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8938a903-4844-4aaa-9c18-18bafd74a22a",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:16:39+00:00",
+        "bearing": 64.3,
+        "range": 295.8,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0516"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d5fac811-4f53-4f56-ad55-22ce2f21b197",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:18:11+00:00",
+        "bearing": 64.3,
+        "range": 295.8,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0518"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "eaf430f2-9514-4af8-82b0-5abcd225bc40",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:19:11+00:00",
+        "bearing": 63.5,
+        "range": 296.5,
+        "frequency": 49.96,
+        "sensor_name": "SENSOR_A",
+        "label": "0519"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ce10b3cb-130a-4c8c-a090-1906e929f72b",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:20:30+00:00",
+        "bearing": 63.5,
+        "range": 296.5,
+        "frequency": 49.99,
+        "sensor_name": "SENSOR_A",
+        "label": "0520"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ac23ea14-9def-48f3-8429-ce83e19cc2c7",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:21:30+00:00",
+        "bearing": 62.5,
+        "range": 297.5,
+        "frequency": 50.09,
+        "sensor_name": "SENSOR_A",
+        "label": "0521"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8b5607e4-bdd0-400d-b94e-71fb349dc1bf",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:22:22+00:00",
+        "bearing": 62.3,
+        "range": 297.8,
+        "frequency": 50.2,
+        "sensor_name": "SENSOR_A",
+        "label": "0522"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "137ccc77-e4dc-4c4c-b399-34b15f3e9c47",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:23:18+00:00",
+        "bearing": 61.8,
+        "range": 298.3,
+        "frequency": 50.2,
+        "sensor_name": "SENSOR_A",
+        "label": "0523"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "75420bc9-9309-4e1b-8c86-b0b6c0dce542",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:24:17+00:00",
+        "bearing": 61.0,
+        "range": 299.0,
+        "frequency": 50.2,
+        "sensor_name": "SENSOR_A",
+        "label": "0524"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8f5a3822-d13c-457f-8a57-ab16b807af34",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:25:05+00:00",
+        "bearing": 60.5,
+        "range": 299.5,
+        "frequency": 50.2,
+        "sensor_name": "SENSOR_A",
+        "label": "0525"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "10a7e60b-a0f9-4099-b4f9-40b168c7dbe5",
+      "geometry": null,
+      "properties": {
+        "kind": "SENSOR_CONTACT",
+        "parent_track": "NONSUCH",
+        "time": "2009-07-22T05:25:49+00:00",
+        "bearing": 60.0,
+        "range": 300.0,
+        "frequency": 50.2,
+        "sensor_name": "SENSOR_A",
+        "label": "0525"
+      }
+    }
+  ]
+}

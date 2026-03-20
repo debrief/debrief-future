@@ -1,0 +1,94 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "reverse-chrono",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -21.704113888888887,
+          22.186252777777778
+        ],
+        [
+          -21.697880555555557,
+          22.186252777777778
+        ],
+        [
+          -21.697880555555557,
+          22.186286111111112
+        ],
+        [
+          -21.704113888888887,
+          22.186286111111112
+        ],
+        [
+          -21.704113888888887,
+          22.186252777777778
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -21.704113888888887,
+    22.186252777777778,
+    -21.697880555555557,
+    22.186286111111112
+  ],
+  "properties": {
+    "title": "reverse_chrono (general)",
+    "datetime": "1995-12-12T05:00:00+00:00",
+    "description": "Imported from reverse_chrono.rep",
+    "start_datetime": "1995-12-12T05:00:00+00:00",
+    "end_datetime": "1995-12-12T05:02:00+00:00"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "reverse_chrono (general)"
+    },
+    {
+      "rel": "derived_from",
+      "href": "file:///tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/reverse_chrono.rep",
+      "title": "reverse_chrono.rep"
+    }
+  ],
+  "assets": {
+    "features": {
+      "href": "./features.geojson",
+      "type": "application/geo+json",
+      "title": "GeoJSON Features",
+      "roles": [
+        "data"
+      ]
+    },
+    "source-reverse_chrono": {
+      "href": "./assets/reverse_chrono.rep",
+      "type": "application/vnd.businessobjects",
+      "title": "reverse_chrono.rep",
+      "roles": [
+        "source"
+      ],
+      "debrief:provenance": {
+        "source_path": "/tmp/debrief-legacy/org.mwc.cmap.combined.feature/root_installs/sample_data/reverse_chrono.rep",
+        "load_timestamp": "2026-03-20T21:26:47.057255Z",
+        "tool_version": "0.1.0"
+      }
+    }
+  }
+}

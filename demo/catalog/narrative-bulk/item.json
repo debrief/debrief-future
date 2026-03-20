@@ -1,0 +1,34 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [],
+  "id": "narrative-bulk",
+  "geometry": null,
+  "bbox": null,
+  "properties": {
+    "title": "narrative_bulk (general)",
+    "datetime": "2026-03-20T21:26:46.163863+00:00",
+    "description": "Imported from narrative_bulk.rep"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Parent catalog"
+    },
+    {
+      "rel": "self",
+      "href": "./item.json",
+      "type": "application/geo+json",
+      "title": "narrative_bulk (general)"
+    }
+  ],
+  "assets": {}
+}
