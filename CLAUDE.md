@@ -159,6 +159,7 @@ Only updated when a feature introduces a technology not already listed here.
 - Playwright ^1.57.0 (E2E tests) (005-e2e-workflow-tests)
 - pytest / pytest-cov (Python tests)
 - Local filesystem STAC catalogs (JSON + GeoJSON storage)
+- Python 3.11 + xml.etree.ElementTree (stdlib), debrief-io, debrief-stac, Pydantic v2 (144-import-legacy-sample-data)
 
 ## Before Pushing
 
@@ -203,5 +204,6 @@ cd apps/web-shell && node run-playwright.mjs && cd ../..
 Note: `vitest` does not catch TypeScript type errors — only `tsc` (run during typecheck) does. The `pnpm build` step also runs `tsc`, but typecheck is the explicit CI gate.
 
 ## Recent Changes
+- 144-import-legacy-sample-data: Added Python 3.11 + xml.etree.ElementTree (stdlib), debrief-io, debrief-stac, Pydantic v2
 - 142-vscode-e2e-webview-reliability: Added TypeScript 5.x (test infrastructure), Bash (patching scripts) + @playwright/test ^1.57.0, openvscode-server (currently v1.109.5), @sparticuz/chromium
 - 132-three-view-sync: Added TypeScript 5.x (React 18.x components, Zustand store) + Zustand ^5.0.0, React 18.x, react-leaflet 4.2, `@debrief/components` (FilterBar, CQL2 filter engine), `@debrief/session-state`
