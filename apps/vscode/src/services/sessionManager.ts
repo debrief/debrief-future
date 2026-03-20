@@ -40,7 +40,7 @@ import {
 } from '@debrief/session-state';
 import type { Express } from 'express';
 import type { Plot } from '../types/plot';
-import type { TrackFeature, ReferenceLocation } from '@debrief/components';
+import type { TrackFeature, ReferenceLocation } from '@debrief/schemas';
 
 /**
  * Data needed to initialize a session with defaults derived from plot data.
