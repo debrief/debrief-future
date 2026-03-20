@@ -143,8 +143,8 @@ class TestDPFHandlerBasic:
 
         assert props["platform_name"] == "NELSON"
         assert props["track_type"] == "CONTACT"
-        assert len(props["times"]) == 3
         assert len(props["positions"]) == 3
+        assert "style" in props
         assert props["positions"][0]["course"] == 269.7
         assert props["positions"][0]["speed"] == 2.0
 

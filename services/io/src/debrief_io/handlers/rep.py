@@ -31,6 +31,10 @@ from typing import Any
 from debrief_io.handlers.annotations.parser import is_annotation_line, parse_annotations
 from debrief_io.handlers.base import BaseHandler
 from debrief_io.models import ParseResult, ParseWarning
+from debrief_io.symbology import get_color
+
+# Default CSS color when symbol parsing fails
+_DEFAULT_COLOR = "#808080"  # grey
 
 
 def calculate_position_style_intervals(duration_hours: float) -> tuple[str, str]:
@@ -160,9 +164,6 @@ class TrackBuilder:
         # Build coordinates array [lon, lat]
         coordinates = [[p.lon, p.lat] for p in self.positions]
 
-        # Build times array (epoch ms, parallel to coordinates)
-        times = [int(p.timestamp.timestamp() * 1000) for p in self.positions]
-
         # Build positions array with temporal/kinematic metadata only
         # Coordinates are NOT included - they live in geometry.coordinates[i]
         # Position at index i corresponds to coordinate at index i
@@ -182,6 +183,9 @@ class TrackBuilder:
         duration_hours = (end_time - start_time).total_seconds() / 3600
         symbol_interval, label_interval = calculate_position_style_intervals(duration_hours)
 
+        # Derive color from the first position's symbol code
+        css_color = _resolve_symbol_color(self.positions[0].symbol)
+
         return {
             "type": "Feature",
             "id": str(uuid.uuid4()),
@@ -193,11 +197,21 @@ class TrackBuilder:
                 "kind": "TRACK",
                 "platform_id": self.platform_id,
                 "platform_name": self.platform_id,
-                "track_type": "CONTACT",  # Default, can be overridden
-                "times": times,  # Required for track identification
+                "track_type": "CONTACT",
                 "start_time": start_time.isoformat(),
                 "end_time": end_time.isoformat(),
                 "positions": positions_data,
+                "style": {
+                    "line": {
+                        "color": css_color,
+                    },
+                    "point": {
+                        "shape": "circle",
+                        "radius": 3.0,
+                        "fill_color": css_color,
+                        "color": css_color,
+                    },
+                },
                 "default_position_style": {
                     "show_symbol": False,
                     "symbol": "circle",
@@ -207,6 +221,18 @@ class TrackBuilder:
                 "label_interval": label_interval,
             },
         }
+
+
+def _resolve_symbol_color(symbol: str) -> str:
+    """Extract CSS color from a REP symbol string like @A, @B, etc."""
+    # Symbol format: prefix + color code letter (e.g., @A, @B@00, BA10)
+    for ch in symbol:
+        if ch.isalpha() and ch.isupper():
+            try:
+                return get_color(ch)
+            except KeyError:
+                pass
+    return _DEFAULT_COLOR
 
 
 class REPHandler(BaseHandler):

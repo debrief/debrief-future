@@ -332,7 +332,9 @@ def _extract_coordinates(geometry: dict) -> list[tuple[float, float]]:
     coords = geometry.get("coordinates", [])
 
     if geom_type == "Point":
-        return [(coords[0], coords[1])]
+        if len(coords) >= 2:
+            return [(coords[0], coords[1])]
+        return []
 
     elif geom_type == "LineString":
         return [(c[0], c[1]) for c in coords]

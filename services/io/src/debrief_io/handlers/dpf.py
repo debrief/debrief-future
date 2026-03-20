@@ -251,6 +251,7 @@ class DPFHandler(BaseHandler):
         """
         features: list[dict[str, Any]] = []
         track_name = track_elem.get("Name", "Unknown")
+        track_color = track_elem.get("Color", "#808080")
 
         # Collect fixes from TrackSegment and SegmentList elements
         all_fixes: list[dict[str, Any]] = []
@@ -276,7 +277,6 @@ class DPFHandler(BaseHandler):
             all_fixes.sort(key=lambda f: f["timestamp"])
 
             coordinates = [[f["lon"], f["lat"]] for f in all_fixes]
-            times = [int(f["timestamp"].timestamp() * 1000) for f in all_fixes]
             positions_data = [
                 {
                     "time": f["timestamp"].isoformat(),
@@ -295,7 +295,6 @@ class DPFHandler(BaseHandler):
             # Single-point tracks need duplicate coordinate for valid LineString
             if len(coordinates) == 1:
                 coordinates.append(coordinates[0])
-                times.append(times[0])
                 positions_data.append(positions_data[0])
 
             features.append(
@@ -311,10 +310,18 @@ class DPFHandler(BaseHandler):
                         "platform_id": track_name,
                         "platform_name": track_name,
                         "track_type": "CONTACT",
-                        "times": times,
                         "start_time": start_time.isoformat(),
                         "end_time": end_time.isoformat(),
                         "positions": positions_data,
+                        "style": {
+                            "line": {"color": track_color},
+                            "point": {
+                                "shape": "circle",
+                                "radius": 3.0,
+                                "fill_color": track_color,
+                                "color": track_color,
+                            },
+                        },
                         "default_position_style": {
                             "show_symbol": False,
                             "symbol": "circle",
