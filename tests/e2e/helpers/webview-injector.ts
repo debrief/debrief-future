@@ -182,6 +182,25 @@ export async function waitForActiveFrame(
 }
 
 /**
+ * Unregister any service worker registered by code-server.
+ *
+ * code-server registers a service worker that can interfere with webview
+ * content delivery. In openvscode-server this is a harmless no-op.
+ */
+export async function removeCodeServerServiceWorker(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const reg of registrations) {
+        await reg.unregister();
+      }
+    }
+  }).catch(() => {
+    // Non-critical — may fail in restricted contexts
+  });
+}
+
+/**
  * High-level helper: activate a sidebar webview and return the inner frame.
  */
 export async function activateWebviewWithContent(
