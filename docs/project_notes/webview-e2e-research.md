@@ -310,7 +310,7 @@ Tests #1 and #3 already pass (6/6). The bulk of failing tests (catalog browse, d
 | `apps/web-shell/playwright/playwright.config.ts` | Web-shell Playwright config |
 | `tests/e2e/playwright.config.ts` | VS Code E2E Playwright config |
 | `tests/e2e/global-setup.ts` | Server lifecycle management |
-| `tests/e2e/scripts/patch-webview.sh` | Applies Patches 1a, 1b, 2, 3 to openvscode-server |
+| `tests/e2e/scripts/patch-webview.sh` | Applies Patches 1, 2, 3 to openvscode-server |
 | `tests/e2e/scripts/cloud-e2e-setup.sh` | Full cloud setup pipeline (code-server path) |
 | `tests/e2e/helpers/webview-injector.ts` | MessagePort content injection fallback |
 | `tests/e2e/models/code-server-page.ts` | Page object for VS Code chrome interactions |
@@ -346,3 +346,63 @@ Screenshot shows "Restricted Mode" with workspace trust dialog, extension not ac
 
 ### VS Code content tests: failing with 40s timeouts
 Tests that navigate iframe hierarchy to find `.leaflet-container`, `.catalog-overview`, etc. all timeout because `pre/index.html` never loads from the CDN URL.
+
+## Service Worker Research (2026-03-19)
+
+### Key Finding: Service Worker Must Remain Enabled
+
+The `vscode-resource.vscode-cdn.net` domain is **not a real CDN**. The VS Code service
+worker intercepts requests to it and transforms them into `postMessage('load-resource')`
+calls back to the VS Code main thread, which serves the files from the local filesystem.
+
+Patch 1a (`disableServiceWorker = true`) was actively breaking this mechanism: without the
+service worker, the browser attempted real DNS resolution on the CDN domain and failed.
+This was the root cause of `#active-frame` never being created — not the service worker
+itself.
+
+### Reference Implementation: code-server's Own Tests
+
+code-server's `test/e2e/webview.test.ts` successfully drills into webview content using:
+
+```typescript
+page.frameLocator("iframe.webview.ready")
+    .frameLocator("#active-frame")
+    .getByText("Hello world")
+```
+
+Their key config: `ignoreHTTPSErrors: true`, service worker **intact**, running over
+`localhost` (which browsers treat as a secure context).
+
+### Applied Fix (Fix A)
+
+1. **Removed** Patch 1a from `patch-webview.sh` — service worker stays enabled
+2. **Added** `ignoreHTTPSErrors: true` to `tests/e2e/playwright.config.ts`
+3. **Retained** Patches 1 (CSP), 2 (origin hash guard), and 3 (visibility gate)
+
+This aligns with the battle-tested code-server reference and restores the designed
+offline webview content delivery mechanism.
+
+### Alternate Fixes (if Fix A insufficient)
+
+**Fix B: Patch `product.json` to use localhost-relative URL template**
+- Rewrites `webviewContentExternalBaseUrlTemplate` to `http://{{authority}}/out/vs/...`
+- Sidesteps DNS entirely but loses cross-origin isolation
+- Acceptable for testing, changes runtime security model
+
+**Fix C: Playwright `context.route()` interception**
+- Intercepts `**/*vscode-cdn.net/**` at the network layer via `context.route()` (not `page.route()`)
+- Fulfills with local file content from the openvscode-server install directory
+- Most defensive approach, ~30 lines of helper code, but higher maintenance burden
+
+### Industry Landscape (E2E Testing VS Code Extensions)
+
+| Framework | Basis | Webview Support | Desktop | Web |
+|-----------|-------|----------------|---------|-----|
+| **wdio-vscode-service** | WebdriverIO | Built-in page objects | Yes | Yes |
+| **ExTester** | Selenium | DOM-level | Yes | No |
+| **Playwright + Electron** | `_electron` API | Manual | Yes | N/A |
+| **Playwright + openvscode-server** | Browser | Manual `frameLocator` | No | Yes |
+
+No dedicated Playwright framework exists for VS Code webview E2E. Playwright classified
+VS Code target support as P3 (Issue #22351). VS Code officially closed webview testing
+guidance requests without solutions (Issue #100952).

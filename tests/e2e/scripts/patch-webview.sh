@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 # Patch VS Code server's webview files for E2E testing.
 #
-# Four patches are applied:
+# Three patches are applied:
 #
-# 1a. index.html: Disables the service worker that blocks #active-frame creation
-# 1b. index.html: Comments out CSP to allow the modified script to execute
+# 1.  index.html: Comments out CSP to allow modified scripts to execute
 # 2.  workbench.js: Removes the origin-hash guard that silently drops webview-ready messages
 # 3.  workbench.js: Removes the isBodyVisible() gate on webview view resolution
 #                   (fixes Blocker 4: resolveWebviewView never called in headless)
+#
+# NOTE: The service worker is intentionally left enabled. It is the designed
+# mechanism for intercepting vscode-cdn.net requests and serving webview content
+# from local files via postMessage. Disabling it breaks offline webview loading
+# because the browser attempts real DNS resolution on the CDN domain.
+# See docs/project_notes/webview-e2e-research.md for full analysis.
 #
 # These patches enable Playwright to interact with real extension webview content
 # in headless openvscode-server.
@@ -22,8 +27,6 @@
 # SERVER_DIR defaults to /opt/openvscode-server
 #
 # Version: Tested against openvscode-server v1.109.5
-#
-# See docs/project_notes/webview-e2e-research.md for full analysis.
 
 set -euo pipefail
 
@@ -45,35 +48,21 @@ echo "Patching $INDEX_HTML..."
 # Backup (idempotent — only backup if .bak doesn't already exist)
 [ -f "${INDEX_HTML}.bak" ] || cp "$INDEX_HTML" "${INDEX_HTML}.bak"
 
-# ── Patch 1a: Disable service worker ──────────────────────────────────────────
-# Version guard: check that the expected pattern exists before patching
-if grep -q "const disableServiceWorker = true;" "$INDEX_HTML"; then
-  echo "  ✓ Patch 1a: Service worker already disabled"
-elif grep -q "searchParams.has('disableServiceWorker')" "$INDEX_HTML"; then
-  sed -i "s/const disableServiceWorker = searchParams.has('disableServiceWorker');/const disableServiceWorker = true; \/\/ Patched for E2E testing/" "$INDEX_HTML"
-  echo "  ✓ Patch 1a: Service worker disabled"
-else
-  echo "  ✗ Patch 1a FAILED: Expected pattern not found in index.html" >&2
-  echo "    Pattern: searchParams.has('disableServiceWorker')" >&2
-  echo "    This may indicate an openvscode-server version change." >&2
-  PATCH_FAILURES=$((PATCH_FAILURES + 1))
-fi
-
-# ── Patch 1b: Comment out CSP meta tag ────────────────────────────────────────
+# ── Patch 1: Comment out CSP meta tag ─────────────────────────────────────────
 if grep -q '<!--<meta http-equiv="Content-Security-Policy"' "$INDEX_HTML" || \
    grep -q '<!-- CSP disabled for E2E -->' "$INDEX_HTML"; then
-  echo "  ✓ Patch 1b: CSP already commented out"
+  echo "  ✓ Patch 1: CSP already commented out"
 elif grep -q '<meta http-equiv="Content-Security-Policy"' "$INDEX_HTML"; then
   sed -i 's|<meta http-equiv="Content-Security-Policy"|<!-- CSP disabled for E2E -->\n\t<!--<meta http-equiv="Content-Security-Policy"|' "$INDEX_HTML"
   sed -i '/<!--<meta http-equiv="Content-Security-Policy"/,/style-src/{s|>$|>-->|}' "$INDEX_HTML"
-  echo "  ✓ Patch 1b: CSP meta tag commented out"
+  echo "  ✓ Patch 1: CSP meta tag commented out"
 else
-  echo "  ✗ Patch 1b FAILED: Expected CSP meta tag not found in index.html" >&2
+  echo "  ✗ Patch 1 FAILED: Expected CSP meta tag not found in index.html" >&2
   echo "    This may indicate an openvscode-server version change." >&2
   PATCH_FAILURES=$((PATCH_FAILURES + 1))
 fi
 
-# ── Patches 2 & 3: workbench.js ──────────────────────────────────────────────
+# ── Patches 2 & 3: workbench.js ───────────────────────────────────────────────
 WORKBENCH_JS=$(find "$SERVER_DIR" -path "*/vs/code/browser/workbench/workbench.js" -type f 2>/dev/null | head -1)
 if [ -z "$WORKBENCH_JS" ]; then
   echo "✗ FAILED: Could not find workbench.js" >&2

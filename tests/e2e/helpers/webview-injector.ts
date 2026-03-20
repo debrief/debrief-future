@@ -14,10 +14,12 @@
  * that don't depend on the full extension content pipeline.
  *
  * Prerequisites (applied by scripts/patch-webview.sh):
- * - index.html: `disableServiceWorker = true` (bypasses SW requirement)
  * - index.html: CSP meta tag commented out (allows modified script)
  * - workbench.js: Origin hash guard removed (lets webview-ready be processed)
  * - workbench.js: isBodyVisible gate removed (lets resolveWebviewView fire)
+ *
+ * The service worker is intentionally left enabled — it handles
+ * vscode-cdn.net request interception for local file serving.
  *
  * @see docs/project_notes/webview-e2e-research.md
  */

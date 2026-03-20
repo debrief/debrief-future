@@ -86,6 +86,10 @@ export default defineConfig({
     trace: 'on-first-retry',
     viewport: { width: 1280, height: 720 },
     launchOptions,
+    // Required for webview service worker on localhost — matches code-server's
+    // own test setup. The SW intercepts vscode-cdn.net requests and serves
+    // local files; ignoreHTTPSErrors lets this work without TLS.
+    ignoreHTTPSErrors: true,
     // code-server pages can be slow to load
     actionTimeout: 15_000,
     navigationTimeout: 30_000,
