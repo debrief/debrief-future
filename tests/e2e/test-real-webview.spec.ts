@@ -13,7 +13,7 @@ import {
   removeCodeServerServiceWorker,
 } from './helpers/webview-injector';
 
-test.describe.skip('Real Webview Screenshot — requires openPlotViaStacTree (#143)', () => {
+test.describe('Real Webview Screenshot', () => {
   test.setTimeout(60_000);
 
   test('map panel + activity panel combined', async ({ codeServerPage }) => {

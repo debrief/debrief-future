@@ -9,7 +9,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe.skip('Drawing Tools — requires openPlotViaStacTree (#143)', () => {
+test.describe('Drawing Tools', () => {
   test('drawing toolbar trigger is present on the map', async ({
     codeServerPage,
   }) => {
