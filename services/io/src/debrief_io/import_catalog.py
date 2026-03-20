@@ -20,14 +20,25 @@ logger = logging.getLogger(__name__)
 # Supported extensions for import
 _SUPPORTED_EXTENSIONS = {".rep", ".dpf", ".dsf"}
 
-# Category mapping from legacy directory structure
-_CATEGORY_MAP: dict[str, str] = {
+# Domain tier mapping from legacy directory structure.
+# Keys are lowercased directory names; values are hierarchical domain paths
+# used as STAC collection prefixes (e.g. "s2r/freq/file-slug").
+_DOMAIN_MAP: dict[str, str] = {
+    # Core — basic tracks, narratives, shapes, colors (root-level files)
+    # (no entry needed; root-level files default to "core")
+    #
+    # Demo — tutorial walkthrough scenarios
     "demo": "demo",
-    "multipath": "multi-path",
-    "multistatics": "multi-static",
+    # S2R — sensor-to-range analysis
     "s2r": "s2r",
+    # SATC — semi-auto track construction
     "satc": "satc",
-    "satc_test": "satc-test",
+    "satc_test": "satc",
+    # Multi-static — multi-static sonar / multi-path scenarios
+    "multistatics": "multi-static",
+    "multipath": "multi-static",
+    # Other formats — edge cases, towed array, BRT import tests
+    "other_formats": "other-formats",
 }
 
 
@@ -38,19 +49,30 @@ def _slugify(name: str) -> str:
     return slug
 
 
-def _detect_category(file_path: Path, source_dir: Path) -> str:
-    """Detect scenario category from directory structure."""
+def _detect_domain(file_path: Path, source_dir: Path) -> str:
+    """Detect domain tier from directory structure.
+
+    Returns a hierarchical domain path (e.g. "s2r/freq", "demo/analysis").
+    Root-level files map to "core".
+    """
     try:
         relative = file_path.parent.relative_to(source_dir)
         parts = [p.lower() for p in relative.parts]
     except ValueError:
-        return "general"
+        return "core"
 
-    for part in parts:
-        if part in _CATEGORY_MAP:
-            return _CATEGORY_MAP[part]
+    if not parts:
+        return "core"
 
-    return "general"
+    # Map the top-level directory to a domain
+    domain = _DOMAIN_MAP.get(parts[0], "core")
+
+    # Preserve sub-directory structure as path segments
+    if len(parts) > 1:
+        sub_parts = [_slugify(p + ".x") for p in parts[1:]]  # slugify sub-dirs
+        return "/".join([domain, *sub_parts])
+
+    return domain
 
 
 def _count_feature_kinds(features: list[dict[str, Any]]) -> tuple[int, int, int]:
@@ -145,13 +167,15 @@ def import_legacy_data(
                 continue
 
             # Determine plot metadata
-            category = _detect_category(source_file, source_dir)
+            domain = _detect_domain(source_file, source_dir)
             slug = _slugify(source_file.name)
-            plot_id = f"{category}-{slug}" if category != "general" else slug
+            # Flatten domain path to hyphenated prefix for STAC plot ID
+            domain_prefix = domain.replace("/", "-")
+            plot_id = f"{domain_prefix}--{slug}"
 
             metadata = PlotMetadata(
-                title=f"{source_file.stem} ({category})",
-                description=f"Imported from {file_rel}",
+                title=f"{source_file.stem} ({domain})",
+                description=f"Domain: {domain}\nImported from {file_rel}",
             )
 
             # Create plot
