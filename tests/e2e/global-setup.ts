@@ -126,7 +126,50 @@ function ensureDebriefConfig(): void {
   console.log(`Pre-seeded Debrief config at ${configFile}`);
 }
 
+/**
+ * Install the Debrief VS Code extension into the given extensions directory.
+ * Looks for a pre-built VSIX in apps/vscode/ and extracts it.
+ */
+function installDebriefExtension(serverBin: string, extensionsDir: string): void {
+  const extDir = join(extensionsDir, 'debrief.debrief-vscode-0.1.0');
+  if (existsSync(join(extDir, 'package.json'))) {
+    console.log('Debrief extension already installed');
+    return;
+  }
+
+  // Find VSIX
+  const repoRoot = join(__dirname, '../..');
+  const vsixDir = join(repoRoot, 'apps/vscode');
+  let vsixPath: string | null = null;
+  try {
+    const files = execSync(`ls ${vsixDir}/*.vsix 2>/dev/null`, { stdio: 'pipe' })
+      .toString()
+      .trim()
+      .split('\n');
+    vsixPath = files[0] || null;
+  } catch {
+    // No VSIX found
+  }
+
+  if (!vsixPath) {
+    console.log('No VSIX found — Debrief extension will not be loaded');
+    return;
+  }
+
+  console.log(`Installing Debrief extension from ${vsixPath} to ${extensionsDir}...`);
+  try {
+    const result = execSync(
+      `"${serverBin}" --install-extension "${vsixPath}" --extensions-dir "${extensionsDir}" 2>&1`,
+      { stdio: 'pipe', timeout: 30_000 }
+    );
+    console.log(`Extension install output: ${result.toString().trim()}`);
+  } catch (err) {
+    console.log(`Failed to install Debrief extension: ${err}`);
+  }
+}
+
 async function globalSetup(): Promise<void> {
+  console.log('[global-setup] Starting (v2 with extension install)...');
   // Ensure the test STAC store is registered.
   // This is idempotent — only writes if config.json doesn't exist yet.
   ensureDebriefConfig();
@@ -151,6 +194,11 @@ async function globalSetup(): Promise<void> {
     const dataDir = join(__dirname, '.vscode-server-data');
     writeVSCodeSettings(dataDir);
 
+    // Install the Debrief extension if a VSIX is available
+    const extensionsDir = join(dataDir, 'extensions');
+    mkdirSync(extensionsDir, { recursive: true });
+    installDebriefExtension(ovsPath, extensionsDir);
+
     serverProcess = spawn(
       ovsPath,
       [
@@ -164,6 +212,8 @@ async function globalSetup(): Promise<void> {
         '--disable-workspace-trust',
         '--user-data-dir',
         dataDir,
+        '--extensions-dir',
+        extensionsDir,
         '--default-folder',
         WORKSPACE_PATH,
       ],

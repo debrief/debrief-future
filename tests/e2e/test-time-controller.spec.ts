@@ -8,7 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe('Time Controller', () => {
+test.describe.skip('Time Controller — requires openPlotViaStacTree (#143)', () => {
   test('time controller is visible after loading a plot', async ({
     codeServerPage,
   }) => {
