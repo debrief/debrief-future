@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plot Created="2024-03-01T08:00:00" Name="No Namespace Plot">
+  <session>
+    <layers>
+      <track Name="VESSEL_A" Symbol="Square" ColorMode="PerFix"
+             Visible="true" NameVisible="true" PositionsVisible="true"
+             LineThickness="1" SensorsVisible="true" SolutionsVisible="true">
+        <TrackSegment Name="Positions" PlotRelative="false" Visible="true">
+          <fix Course="45.000" Dtg="20240301 080000" Label="080000" Speed="10.000" Visible="true">
+            <centre>
+              <longLocation LatDeg="12" LatMin="11" LatSec="10.630" LatHem="N"
+                            LongDeg="11" LongMin="41" LongSec="52.370" LongHem="W" Depth="0.0"/>
+            </centre>
+          </fix>
+          <fix Course="46.000" Dtg="20240301 090000" Label="090000" Speed="10.500" Visible="true">
+            <centre>
+              <shortLocation Depth="0.000" Lat="12.2000000" Long="-11.7000000"/>
+            </centre>
+          </fix>
+        </TrackSegment>
+      </track>
+    </layers>
+  </session>
+</plot>
