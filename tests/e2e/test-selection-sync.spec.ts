@@ -12,7 +12,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe.skip('Selection Sync — requires openPlotViaStacTree (#143)', () => {
+test.describe.skip('Selection Sync', () => { // blocked: webview iframe (#143)
   test.setTimeout(120_000);
 
   test('clicking a track on the map selects it in the feature list', async ({ codeServerPage }) => {

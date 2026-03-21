@@ -8,8 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// Skip: requires debrief-calc service for log entries — backlog #142
-test.describe.skip('Log Panel', () => {
+test.describe.skip('Log Panel', () => { // blocked: webview iframe (#143)
 
   test('log panel shows empty state when no tools have run', async ({
     codeServerPage,

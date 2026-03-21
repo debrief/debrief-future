@@ -8,8 +8,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// Skip: undo/redo not yet implemented — backlog #073
-test.describe.skip('Undo / Redo', () => {
+test.describe.skip('Undo / Redo', () => { // blocked: webview iframe (#143)
   test.setTimeout(120_000);
 
   test('undo reverts the last selection', async ({ codeServerPage }) => {

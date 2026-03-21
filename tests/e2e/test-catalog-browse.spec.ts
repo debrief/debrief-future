@@ -9,7 +9,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe.skip('Catalog Browse — requires openPlotViaStacTree (#143)', () => {
+test.describe.skip('Catalog Browse', () => { // blocked: webview iframe (#143)
   test.setTimeout(60_000);
 
   test('catalog overview is visible after opening it', async ({
