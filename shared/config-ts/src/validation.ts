@@ -57,9 +57,9 @@ export function validateStacCatalog(path: string): void {
     throw new InvalidCatalogError(path, `Missing required fields: ${missing.join(', ')}`);
   }
 
-  // Check type is Catalog
-  if (obj.type !== 'Catalog') {
-    throw new InvalidCatalogError(path, `type must be 'Catalog', got '${obj.type}'`);
+  // Check type is Catalog or Collection (Collections are a valid superset of Catalogs)
+  if (obj.type !== 'Catalog' && obj.type !== 'Collection') {
+    throw new InvalidCatalogError(path, `type must be 'Catalog' or 'Collection', got '${obj.type}'`);
   }
 
   // Check links is an array

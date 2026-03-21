@@ -71,7 +71,7 @@ export class StacService {
         catalog === null ||
         typeof catalog !== 'object' ||
         !('type' in catalog) ||
-        catalog.type !== 'Catalog'
+        (catalog.type !== 'Catalog' && catalog.type !== 'Collection')
       ) {
         return Promise.resolve({
           valid: false,

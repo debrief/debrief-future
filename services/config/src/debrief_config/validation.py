@@ -51,9 +51,9 @@ def validate_stac_catalog(path: Path | str) -> None:
     if missing:
         raise InvalidCatalogError(str(path), f"Missing required fields: {missing}")
 
-    # Check type is Catalog
-    if data.get("type") != "Catalog":
-        raise InvalidCatalogError(str(path), f"type must be 'Catalog', got '{data.get('type')}'")
+    # Check type is Catalog or Collection (Collections are a valid superset of Catalogs)
+    if data.get("type") not in ("Catalog", "Collection"):
+        raise InvalidCatalogError(str(path), f"type must be 'Catalog' or 'Collection', got '{data.get('type')}'")
 
     # Check links is an array
     if not isinstance(data.get("links"), list):
