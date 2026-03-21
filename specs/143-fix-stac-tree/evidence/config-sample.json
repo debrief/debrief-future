@@ -1,0 +1,11 @@
+{
+  "stores": [
+    {
+      "id": "local-store",
+      "path": "/home/user/debrief-future/tests/e2e/test-workspace/local-store",
+      "displayName": "Test Maritime Data",
+      "status": "available"
+    }
+  ],
+  "preferences": {}
+}

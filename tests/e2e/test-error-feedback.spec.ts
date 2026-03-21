@@ -35,7 +35,7 @@ test.describe('US3: Error Feedback Workflow', () => {
     expect(hasErrorNotification).toBe(true);
   });
 
-  test.skip('T023: run tool without selection shows requirement message — requires openPlotViaStacTree (#143)', async ({
+  test.skip('T023: run tool without selection shows requirement message', async ({
     codeServerPage,
   }) => {
     await codeServerPage.openPlotViaStacTree('Exercise Alpha');

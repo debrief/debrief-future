@@ -12,8 +12,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-// Skip: requires debrief-calc service for tool execution — backlog #142
-test.describe.skip('US-Tune: PROV Tuning Workflow', () => {
+test.describe.skip('US-Tune: PROV Tuning Workflow', () => { // blocked: webview iframe (#143)
 
   test('T-TUNE-01: run move-shape on annotation, log entry appears with tunable parameters', async ({
     codeServerPage,

@@ -13,7 +13,7 @@
  */
 import { test, expect } from './fixtures/base';
 
-test.describe.skip('US1: Load and Display Workflow — requires openPlotViaStacTree (#143)', () => {
+test.describe.skip('US1: Load and Display Workflow', () => { // blocked: webview iframe (#143)
   test.setTimeout(60_000);
 
   test('T014: open plot via STAC tree shows track lines on map', async ({

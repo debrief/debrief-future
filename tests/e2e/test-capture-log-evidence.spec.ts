@@ -10,8 +10,7 @@ import { test, expect } from './fixtures/base';
 
 const EVIDENCE_DIR = 'specs/005-e2e-workflow-tests/evidence/screenshots';
 
-// Skip: requires debrief-calc service for log entries
-test.describe.skip('Capture Log Evidence', () => {
+test.describe.skip('Capture Log Evidence', () => { // blocked: webview iframe (#143)
 
   test('capture empty log panel screenshot', async ({
     codeServerPage,
