@@ -275,7 +275,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "339c51f4-2728-4bc3-b931-42a35215319a",
+            "timestamp": "2026-03-21T10:15:00.459020Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "33ad9bb4-4a8a-487b-8148-c55906c7c71e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -582,7 +598,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "339c51f4-2728-4bc3-b931-42a35215319a",
+            "timestamp": "2026-03-21T10:15:00.459020Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "38cc9e28-9bd4-4265-adeb-cdfd1017d570"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

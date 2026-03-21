@@ -8295,7 +8295,23 @@
           "show_label": false
         },
         "symbol_interval": "PT5M",
-        "label_interval": "PT15M"
+        "label_interval": "PT15M",
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "aff8f96c-fe34-4732-8f01-71b2c08de245"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8309,7 +8325,23 @@
         "bearing": 59.3,
         "time": "2009-07-22T04:14:34+00:00",
         "label": " 0414",
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "74e93b8e-7d5d-4067-9c12-06fcd9b6b907"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8323,7 +8355,23 @@
         "bearing": 300.8,
         "time": "2009-07-22T04:15:22+00:00",
         "label": " 0415",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "68f7c7a2-1b4b-4913-991c-f12715a2fe2d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8337,7 +8385,23 @@
         "bearing": 300.8,
         "time": "2009-07-22T04:16:45+00:00",
         "label": " 0416",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3214d2f8-0123-455c-b7e3-903f8d7b7b3a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8351,7 +8415,23 @@
         "bearing": 300.5,
         "time": "2009-07-22T04:18:25+00:00",
         "label": " 0418",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "78e3c89e-3e9e-4b47-a05f-9c4080c8210c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8365,7 +8445,23 @@
         "bearing": 300.0,
         "time": "2009-07-22T04:20:36+00:00",
         "label": " 0420",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7ffa808a-98c8-42c3-b666-e85074b076f6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8379,7 +8475,23 @@
         "bearing": 299.3,
         "time": "2009-07-22T04:23:12+00:00",
         "label": " 0423",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7838c98e-8396-4ba5-a73e-575450617078"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8393,7 +8505,23 @@
         "bearing": 298.8,
         "time": "2009-07-22T04:25:35+00:00",
         "label": " 0425",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ef196b93-b44f-46d5-a4f9-545f54cff907"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8407,7 +8535,23 @@
         "bearing": 298.8,
         "time": "2009-07-22T04:27:11+00:00",
         "label": " 0427",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ce5abf71-9797-49c9-a42f-1796d0d6db94"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8421,7 +8565,23 @@
         "bearing": 298.3,
         "time": "2009-07-22T04:29:18+00:00",
         "label": " 0429",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "378377df-bd0a-4a4a-a169-3eaa02a08cfa"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8435,7 +8595,23 @@
         "bearing": 298.0,
         "time": "2009-07-22T04:31:34+00:00",
         "label": " 0431",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "74154510-3690-41e9-9629-185ec0748ccf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8449,7 +8625,23 @@
         "bearing": 297.8,
         "time": "2009-07-22T04:34:09+00:00",
         "label": " 0434",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8106aa94-c6c8-424c-961e-609185c92fc1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8463,7 +8655,23 @@
         "bearing": 297.8,
         "time": "2009-07-22T04:35:57+00:00",
         "label": " 0435",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "aca0f3af-9d8f-424d-829a-fe8260ef8fbb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8477,7 +8685,23 @@
         "bearing": 297.5,
         "time": "2009-07-22T04:37:56+00:00",
         "label": " 0437",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bf61d78f-8061-44e1-bce1-b946dea22a3a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8491,7 +8715,23 @@
         "bearing": 297.0,
         "time": "2009-07-22T04:40:00+00:00",
         "label": " 0440",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2beb68b8-df43-4ae7-aa38-fdfc0ccdbe9d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8505,7 +8745,23 @@
         "bearing": 296.5,
         "time": "2009-07-22T04:41:27+00:00",
         "label": " 0441",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9bc12885-2140-4fcc-952b-aa24bf76ec9c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8519,7 +8775,23 @@
         "bearing": 296.2,
         "time": "2009-07-22T04:42:32+00:00",
         "label": " 0442",
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4be6ee24-3fc8-4e2a-86f7-546db7fe5a70"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8533,7 +8805,23 @@
         "bearing": 295.8,
         "time": "2009-07-22T04:43:12+00:00",
         "label": " 0443",
-        "frequency": 50.06
+        "frequency": 50.06,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fcd317ae-368b-4ee1-9624-5ea7c905ff9a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8547,7 +8835,23 @@
         "bearing": 295.5,
         "time": "2009-07-22T04:43:19+00:00",
         "label": " 0443",
-        "frequency": 50.06
+        "frequency": 50.06,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c7c92bce-82aa-4b3b-9a56-0761c0039d32"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8561,7 +8865,23 @@
         "bearing": 293.5,
         "time": "2009-07-22T04:44:56+00:00",
         "label": " 0444",
-        "frequency": 50.23
+        "frequency": 50.23,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9a6313d5-58fa-4e0f-979e-00b461c4805b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8575,7 +8895,23 @@
         "bearing": 293.0,
         "time": "2009-07-22T04:45:44+00:00",
         "label": " 0445",
-        "frequency": 50.23
+        "frequency": 50.23,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "37d20fa7-e6c1-47d8-824a-319f8dfdb2bd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8589,7 +8925,23 @@
         "bearing": 292.8,
         "time": "2009-07-22T04:46:30+00:00",
         "label": " 0446",
-        "frequency": 50.16
+        "frequency": 50.16,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "832bc6d2-444e-4e12-859b-2cb79a40bb06"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8603,7 +8955,23 @@
         "bearing": 290.3,
         "time": "2009-07-22T04:48:18+00:00",
         "label": " 0448",
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "33ac54e0-6171-4657-b37d-e439a935b52b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8617,7 +8985,23 @@
         "bearing": 289.0,
         "time": "2009-07-22T04:49:37+00:00",
         "label": " 0449",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c0706f54-a97e-4596-a85c-da2075e56559"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8631,7 +9015,23 @@
         "bearing": 288.3,
         "time": "2009-07-22T04:50:49+00:00",
         "label": " 0450",
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "08149ef1-b3e9-4b2c-9e96-4c40d0bae048"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8645,7 +9045,23 @@
         "bearing": 288.0,
         "time": "2009-07-22T04:52:01+00:00",
         "label": " 0452",
-        "frequency": 49.92
+        "frequency": 49.92,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1045a717-b567-4af5-9292-3b2547b75914"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8659,7 +9075,23 @@
         "bearing": 288.0,
         "time": "2009-07-22T04:53:13+00:00",
         "label": " 0453",
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f918a99e-5ac0-45ba-ba67-eaea3a60d43b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8673,7 +9105,23 @@
         "bearing": 288.8,
         "time": "2009-07-22T04:54:44+00:00",
         "label": " 0454",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dd119931-26d0-4d7d-9964-255876ef93f9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8687,7 +9135,23 @@
         "bearing": 288.8,
         "time": "2009-07-22T04:55:56+00:00",
         "label": " 0455",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4031ac79-d405-4ac5-949b-9fe0a62a0f4b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8701,7 +9165,23 @@
         "bearing": 288.8,
         "time": "2009-07-22T04:57:04+00:00",
         "label": " 0457",
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "851e5881-c0fb-448c-8f18-622258cc67db"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8715,7 +9195,23 @@
         "bearing": 289.8,
         "time": "2009-07-22T04:58:15+00:00",
         "label": " 0458",
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2cc167cc-6cf0-4de4-86c9-294be7bd4e5d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8729,7 +9225,23 @@
         "bearing": 289.8,
         "time": "2009-07-22T04:59:19+00:00",
         "label": " 0459",
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d6ab5382-d140-4965-a362-e8ac7bc46347"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8743,7 +9255,23 @@
         "bearing": 291.0,
         "time": "2009-07-22T05:00:43+00:00",
         "label": " 0500",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ffeac057-68c7-4191-8e35-2cfae3016a71"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8757,7 +9285,23 @@
         "bearing": 291.5,
         "time": "2009-07-22T05:02:11+00:00",
         "label": " 0502",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8928c535-cf62-436b-9bca-60310f0c50d0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8771,7 +9315,23 @@
         "bearing": 292.3,
         "time": "2009-07-22T05:03:26+00:00",
         "label": " 0503",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "647466b1-4388-475b-bf2b-5e5944255ad3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8785,7 +9345,23 @@
         "bearing": 292.3,
         "time": "2009-07-22T05:04:34+00:00",
         "label": " 0504",
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7feaa7dd-3356-498b-a65b-f3e67640ec06"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8799,7 +9375,23 @@
         "bearing": 293.0,
         "time": "2009-07-22T05:06:02+00:00",
         "label": " 0506",
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7cacfb10-4df8-4784-a6f2-568d128f17a7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8813,7 +9405,23 @@
         "bearing": 293.5,
         "time": "2009-07-22T05:07:57+00:00",
         "label": " 0507",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c2fbb126-9d68-4f1c-b488-cae0765676d0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8827,7 +9435,23 @@
         "bearing": 294.0,
         "time": "2009-07-22T05:09:13+00:00",
         "label": " 0509",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8266928b-21f0-4a2f-a8a3-d4dbdc54dfdc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8841,7 +9465,23 @@
         "bearing": 294.3,
         "time": "2009-07-22T05:10:44+00:00",
         "label": " 0510",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8673b9cc-0639-4fa1-9c3a-e19b0731c57b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8855,7 +9495,23 @@
         "bearing": 294.8,
         "time": "2009-07-22T05:12:00+00:00",
         "label": " 0512",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b3e0f9c1-8b99-47a0-bbba-69ca3154e94b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8869,7 +9525,23 @@
         "bearing": 294.8,
         "time": "2009-07-22T05:13:20+00:00",
         "label": " 0513",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2012ef94-aadb-4f9d-b714-9d20cd886159"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8883,7 +9555,23 @@
         "bearing": 294.8,
         "time": "2009-07-22T05:14:04+00:00",
         "label": " 0514",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7e398ffa-1201-4548-8413-517f59a5c8fa"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8897,7 +9585,23 @@
         "bearing": 295.8,
         "time": "2009-07-22T05:15:35+00:00",
         "label": " 0515",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8f90b0fb-a052-46b1-8ff6-e120c160f082"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8911,7 +9615,23 @@
         "bearing": 295.8,
         "time": "2009-07-22T05:16:39+00:00",
         "label": " 0516",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "066d6f68-77cb-430e-a626-b344f08d2474"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8925,7 +9645,23 @@
         "bearing": 295.8,
         "time": "2009-07-22T05:18:11+00:00",
         "label": " 0518",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bd757017-8e1a-4090-9afc-a43ca912d224"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8939,7 +9675,23 @@
         "bearing": 296.5,
         "time": "2009-07-22T05:19:11+00:00",
         "label": " 0519",
-        "frequency": 49.96
+        "frequency": 49.96,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "515a2ed7-6976-4312-a013-a9685e0dd559"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8953,7 +9705,23 @@
         "bearing": 296.5,
         "time": "2009-07-22T05:20:30+00:00",
         "label": " 0520",
-        "frequency": 49.99
+        "frequency": 49.99,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "09fe61a2-2cb8-4fc2-84c7-b3e3269e056d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8967,7 +9735,23 @@
         "bearing": 297.5,
         "time": "2009-07-22T05:21:30+00:00",
         "label": " 0521",
-        "frequency": 50.09
+        "frequency": 50.09,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7ac998d5-d959-4693-8a7a-8cea5418a83c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8981,7 +9765,23 @@
         "bearing": 297.8,
         "time": "2009-07-22T05:22:22+00:00",
         "label": " 0522",
-        "frequency": 50.2
+        "frequency": 50.2,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7664d54f-1354-472f-8822-664e1a855b2e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8995,7 +9795,23 @@
         "bearing": 298.3,
         "time": "2009-07-22T05:23:18+00:00",
         "label": " 0523",
-        "frequency": 50.2
+        "frequency": 50.2,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3f33bdf5-c0a9-48c4-ba5d-670c078e71fa"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9009,7 +9825,23 @@
         "bearing": 299.0,
         "time": "2009-07-22T05:24:17+00:00",
         "label": " 0524",
-        "frequency": 50.2
+        "frequency": 50.2,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "330f373b-057d-4408-a9b1-5340f22a11e8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9023,7 +9855,23 @@
         "bearing": 299.5,
         "time": "2009-07-22T05:25:05+00:00",
         "label": " 0525",
-        "frequency": 50.2
+        "frequency": 50.2,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "01ba6da1-9e03-487a-9689-c0242d079ea5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -9037,7 +9885,23 @@
         "bearing": 300.0,
         "time": "2009-07-22T05:25:49+00:00",
         "label": " 0525",
-        "frequency": 50.2
+        "frequency": 50.2,
+        "provenance": [
+          {
+            "activity_id": "84eced68-ec18-46bd-9e1a-dcfc2d51d09a",
+            "timestamp": "2026-03-21T10:15:01.671067Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c847c1d1-576d-4260-aeb5-f41357d270ef"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

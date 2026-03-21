@@ -4055,7 +4055,23 @@
           "show_label": false
         },
         "symbol_interval": "PT15M",
-        "label_interval": "PT1H"
+        "label_interval": "PT1H",
+        "provenance": [
+          {
+            "activity_id": "94b31513-240a-4935-b501-94bab2ae5cf3",
+            "timestamp": "2026-03-21T10:15:00.227961Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "81d3a14d-cb15-484f-b2d2-ef5083d44a9f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8122,7 +8138,23 @@
           "show_label": false
         },
         "symbol_interval": "PT15M",
-        "label_interval": "PT1H"
+        "label_interval": "PT1H",
+        "provenance": [
+          {
+            "activity_id": "94b31513-240a-4935-b501-94bab2ae5cf3",
+            "timestamp": "2026-03-21T10:15:00.227961Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "37f506f2-0040-463a-9dab-79d73d94a7a4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

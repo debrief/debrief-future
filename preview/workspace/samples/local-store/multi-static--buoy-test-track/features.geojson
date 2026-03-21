@@ -4065,7 +4065,23 @@
           "show_label": false
         },
         "symbol_interval": "PT15M",
-        "label_interval": "PT1H"
+        "label_interval": "PT1H",
+        "provenance": [
+          {
+            "activity_id": "c19ef103-8958-4980-b574-716489ad5e7e",
+            "timestamp": "2026-03-21T10:15:00.438517Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "20789cd9-9e3a-4f9d-9578-1431ef2068d9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4122,7 +4138,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "c19ef103-8958-4980-b574-716489ad5e7e",
+            "timestamp": "2026-03-21T10:15:00.438517Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7fa6a56f-8bbb-4552-a83f-db19eae3921f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4179,7 +4211,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "c19ef103-8958-4980-b574-716489ad5e7e",
+            "timestamp": "2026-03-21T10:15:00.438517Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "84955ab9-ac1c-4aba-a74b-6dee7c10331e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4236,7 +4284,23 @@
           "show_label": false
         },
         "symbol_interval": "PT1M",
-        "label_interval": "PT5M"
+        "label_interval": "PT5M",
+        "provenance": [
+          {
+            "activity_id": "c19ef103-8958-4980-b574-716489ad5e7e",
+            "timestamp": "2026-03-21T10:15:00.438517Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "36a8ecdd-a646-4c23-98c5-3fa520024292"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4263,7 +4327,23 @@
           "color": "#FF0000",
           "weight": 1,
           "opacity": 1.0
-        }
+        },
+        "provenance": [
+          {
+            "activity_id": "c19ef103-8958-4980-b574-716489ad5e7e",
+            "timestamp": "2026-03-21T10:15:00.438517Z",
+            "was_generated_by": {
+              "tool": "rep-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c7d72d96-ecd1-4bdf-8b46-8edbab22a614"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

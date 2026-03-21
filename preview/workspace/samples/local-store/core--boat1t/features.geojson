@@ -4055,7 +4055,23 @@
           "show_label": false
         },
         "symbol_interval": "PT15M",
-        "label_interval": "PT1H"
+        "label_interval": "PT1H",
+        "provenance": [
+          {
+            "activity_id": "ec524079-d3f2-4de5-9188-9df7d677f4ff",
+            "timestamp": "2026-03-21T10:15:04.199328Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5223eb47-f75f-4076-bc92-95d441abcdf0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

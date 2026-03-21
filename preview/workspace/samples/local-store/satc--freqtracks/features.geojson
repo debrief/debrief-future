@@ -1485,7 +1485,23 @@
           "show_label": false
         },
         "symbol_interval": "PT10M",
-        "label_interval": "PT30M"
+        "label_interval": "PT30M",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "76a75e23-220e-4491-a15e-e6b8934199c3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1498,7 +1514,23 @@
         "sensor_name": "NB_BRG",
         "bearing": 180.0,
         "time": "2010-01-12T12:00:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d32e0149-69cf-405b-b19e-47ec22646c3a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1511,7 +1543,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -179.5,
         "time": "2010-01-12T12:00:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "43b8d573-5849-4099-8650-b02a52b9fc1b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1524,7 +1572,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -179.0,
         "time": "2010-01-12T12:01:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9f3125e7-a885-4170-b9f4-1d9a2a46e09f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1537,7 +1601,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -178.4,
         "time": "2010-01-12T12:02:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "37121b84-d279-4c68-aa32-e96350b7a263"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1550,7 +1630,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -177.9,
         "time": "2010-01-12T12:03:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3dcad41b-53fd-4c9e-9b18-97d18f339e2d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1563,7 +1659,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -177.3,
         "time": "2010-01-12T12:04:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d6b57e7e-5be4-46b7-9308-df163ed1d8e7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1576,7 +1688,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -176.7,
         "time": "2010-01-12T12:05:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "348864ed-a45f-4dbe-9a0e-53abc149e5dc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1589,7 +1717,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -176.1,
         "time": "2010-01-12T12:05:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b5bbd719-0b76-4a89-a124-fa93955306c3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1602,7 +1746,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -175.5,
         "time": "2010-01-12T12:06:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "433d0e15-db5c-4d45-97db-a8a37d578ca4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1615,7 +1775,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -174.9,
         "time": "2010-01-12T12:07:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "73fcdf9d-9ed0-4a00-9930-8b1971728983"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1628,7 +1804,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -174.3,
         "time": "2010-01-12T12:08:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d864e0ff-c008-4bc4-8443-e76fbd96c7d4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1641,7 +1833,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -173.7,
         "time": "2010-01-12T12:09:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "123a7e5a-09c3-46d3-abc2-1bc96c3bfa35"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1654,7 +1862,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -173.1,
         "time": "2010-01-12T12:10:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "68e845ba-2cdb-4bbc-8865-c42c2674e665"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1667,7 +1891,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -172.5,
         "time": "2010-01-12T12:10:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d94d8d1d-7d77-401d-87c6-48639ab9e7f0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1680,7 +1920,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -171.9,
         "time": "2010-01-12T12:11:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e3e67cfa-3b67-4961-875d-c91f96891ff1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1693,7 +1949,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -171.4,
         "time": "2010-01-12T12:12:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "502e8bb5-c226-4967-9c4c-dc7160858a41"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1706,7 +1978,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -170.8,
         "time": "2010-01-12T12:13:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c3d9aeb9-1d4a-43c7-9a23-a739fd294be9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1719,7 +2007,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -170.3,
         "time": "2010-01-12T12:14:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "98f70f6d-ce01-478b-8c34-c083e42fe7dd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1732,7 +2036,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -169.8,
         "time": "2010-01-12T12:15:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "17996507-28c1-414a-81e4-ea266ba77695"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1745,7 +2065,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -169.3,
         "time": "2010-01-12T12:15:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0b715100-d679-4ec8-973f-8abb0f99ebfc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1758,7 +2094,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -168.8,
         "time": "2010-01-12T12:16:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3479f5f5-74b8-4705-b660-6fd46a0e0ccb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1771,7 +2123,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -168.3,
         "time": "2010-01-12T12:17:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ecea7a1f-e351-470f-aae1-f087f7c71145"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1784,7 +2152,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -167.8,
         "time": "2010-01-12T12:18:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6ac1e412-d4c3-463e-a50f-68a3c0a4959c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1797,7 +2181,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -167.3,
         "time": "2010-01-12T12:19:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fc65f1ee-08be-4695-85d4-b9cf3a29b66e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1810,7 +2210,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -166.8,
         "time": "2010-01-12T12:20:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "26e042e4-381b-49bd-96f6-1d5e7e0ce5d9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1823,7 +2239,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -166.2,
         "time": "2010-01-12T12:20:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "81304873-742e-4848-8a05-ed11ccd89030"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1836,7 +2268,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -165.6,
         "time": "2010-01-12T12:21:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8e09ac9b-1f8e-41dd-8aad-6c58e65c3ab5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1849,7 +2297,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -165.1,
         "time": "2010-01-12T12:22:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4dcc9b55-3fa3-414d-9060-e45b0c8c5b09"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1862,7 +2326,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -164.5,
         "time": "2010-01-12T12:23:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bb27bca9-01b6-47a2-bc66-c6000b09d761"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1875,7 +2355,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -163.9,
         "time": "2010-01-12T12:24:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d7b3fcf3-da32-4a81-b637-2649adc78975"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1888,7 +2384,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -163.2,
         "time": "2010-01-12T12:25:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fa9f6834-b0d4-4839-b0fd-4ade3484161e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1901,7 +2413,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -162.6,
         "time": "2010-01-12T12:25:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "934e5ec1-5009-422a-a63d-7673c2673096"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1914,7 +2442,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -162.0,
         "time": "2010-01-12T12:26:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "99d6eba1-d692-4a20-85c0-e1b8f55cbd80"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1927,7 +2471,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -161.3,
         "time": "2010-01-12T12:27:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "be779f4c-33e6-4f20-9c90-ce3ef2311d80"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1940,7 +2500,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -160.6,
         "time": "2010-01-12T12:28:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "745aaf55-f1cf-4059-8b44-0d1319d4a92c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1953,7 +2529,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -159.9,
         "time": "2010-01-12T12:29:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9ad2eb88-806f-4863-b6d8-217474d3aace"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1966,7 +2558,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -159.2,
         "time": "2010-01-12T12:30:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a72190fa-cbcc-49a3-8e0d-f72d2159c85f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1979,7 +2587,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -158.5,
         "time": "2010-01-12T12:30:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0847c201-2868-4c8b-864a-b0e3dc418246"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -1992,7 +2616,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -157.7,
         "time": "2010-01-12T12:31:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f514c542-a487-427e-911a-29f3f613ba47"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2005,7 +2645,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -157.0,
         "time": "2010-01-12T12:32:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "95faf6f2-1157-459f-b2e7-aae668cdf77d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2018,7 +2674,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -156.2,
         "time": "2010-01-12T12:33:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4538fdaf-220a-49d5-b417-f42a8f67d2f7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2031,7 +2703,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -155.4,
         "time": "2010-01-12T12:34:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "756f2d95-c148-4708-9431-09ba63986d72"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2044,7 +2732,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -154.6,
         "time": "2010-01-12T12:35:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1a37840e-d03f-40cc-a585-273c9ceaf989"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2057,7 +2761,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -153.7,
         "time": "2010-01-12T12:35:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bf3c8f16-d4d3-4e5b-be8b-b82dc85251b9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2070,7 +2790,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -152.9,
         "time": "2010-01-12T12:36:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cc06cd87-288f-4af5-9078-951a25a5af76"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2083,7 +2819,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -152.2,
         "time": "2010-01-12T12:37:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6c97e8bc-b624-4d05-a0ad-ee5a84f12a89"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2096,7 +2848,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -151.6,
         "time": "2010-01-12T12:38:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5eac0abd-ca07-42e0-a408-62bc48e079e0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2109,7 +2877,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -151.0,
         "time": "2010-01-12T12:39:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c589c574-3f3d-4bbe-a11e-84b68efdf309"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2122,7 +2906,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -150.3,
         "time": "2010-01-12T12:40:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6230af61-4414-40d4-a9ed-d8bd88e31b73"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2135,7 +2935,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -149.7,
         "time": "2010-01-12T12:40:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5c7c1929-1af8-445a-abd9-c4f77b395f65"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2148,7 +2964,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -149.0,
         "time": "2010-01-12T12:41:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fe911771-2cce-47e8-950b-d47a05cf60ef"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2161,7 +2993,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -148.3,
         "time": "2010-01-12T12:42:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "42678657-2c86-42f5-9036-b0c4e6c21e57"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2174,7 +3022,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -147.5,
         "time": "2010-01-12T12:43:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f90c3637-d81b-4b28-ae19-1a30c466ef0f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2187,7 +3051,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -146.8,
         "time": "2010-01-12T12:44:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9dd7c86b-df78-4373-b78c-ab34ad63a08e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2200,7 +3080,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -145.9,
         "time": "2010-01-12T12:45:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5f083bef-e3f1-4500-8816-b2cfe335ad32"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2213,7 +3109,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -145.1,
         "time": "2010-01-12T12:45:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "23ea7141-4dbf-4c09-b217-ecde28d07a9d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2226,7 +3138,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -144.2,
         "time": "2010-01-12T12:46:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c1d9b2c7-11e1-48ef-a604-39cbc367e30b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2239,7 +3167,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -143.3,
         "time": "2010-01-12T12:47:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3350c81b-46e6-4dc7-bef4-fe3caa5844be"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2252,7 +3196,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -142.4,
         "time": "2010-01-12T12:48:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "87443ed5-fe72-48f3-aeb6-569fdc212d8e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2265,7 +3225,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -141.4,
         "time": "2010-01-12T12:49:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2b4ec1c9-5162-4145-a9ad-e8297e95aeb7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2278,7 +3254,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -140.4,
         "time": "2010-01-12T12:50:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "71d003a8-44c0-498f-b3b5-34c9af880c72"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2291,7 +3283,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -139.3,
         "time": "2010-01-12T12:50:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ec8e7572-36a3-416a-a6c2-8bc660ae9f6d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2304,7 +3312,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -138.2,
         "time": "2010-01-12T12:51:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "70977636-e812-49b2-95d5-42e86e1dc13b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2317,7 +3341,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -137.1,
         "time": "2010-01-12T12:52:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6142b53b-0881-4edb-9a78-669ae825c519"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2330,7 +3370,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -135.9,
         "time": "2010-01-12T12:53:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "40963208-f900-4c83-8347-0e6ad70a9878"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2343,7 +3399,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -134.6,
         "time": "2010-01-12T12:54:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7d4765aa-3aaf-4ccd-b097-3a2140694d0d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2356,7 +3428,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -133.3,
         "time": "2010-01-12T12:55:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "24c8822b-f158-4c35-bfda-4020208a97b9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2369,7 +3457,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -131.9,
         "time": "2010-01-12T12:55:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1b6a74a5-ed29-49e2-b408-1d5c220e926e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2382,7 +3486,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -130.5,
         "time": "2010-01-12T12:56:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8a753354-327e-4395-afad-9681415df532"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2395,7 +3515,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -129.0,
         "time": "2010-01-12T12:57:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a60a2d96-96ee-4660-8db9-e82df93151cc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2408,7 +3544,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -127.5,
         "time": "2010-01-12T12:58:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c32d144d-7772-476a-a3c5-b4764354ed90"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2421,7 +3573,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -125.9,
         "time": "2010-01-12T12:59:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "69fc844f-62f1-493a-9292-3127d912b74d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2434,7 +3602,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -124.2,
         "time": "2010-01-12T13:00:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0b01c7e4-40c9-4e95-80b3-96f5cae18fcf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2447,7 +3631,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -122.5,
         "time": "2010-01-12T13:00:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2fc795f4-3d14-495c-af71-d0b31ef5bd37"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2460,7 +3660,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -120.7,
         "time": "2010-01-12T13:01:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2d901c7b-2ab0-49ef-a37b-347118b4efba"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2473,7 +3689,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -118.8,
         "time": "2010-01-12T13:02:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0e3fcb1d-7454-4489-be37-82c1d5c2351e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2486,7 +3718,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -116.9,
         "time": "2010-01-12T13:03:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "56afa95d-5bf8-46fd-969c-0be95b204535"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2499,7 +3747,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -114.9,
         "time": "2010-01-12T13:04:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f001ba02-71eb-4689-bfb1-fe9c60f8c02a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2512,7 +3776,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -112.9,
         "time": "2010-01-12T13:05:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d808a3c6-63c1-4ea2-841f-f94dc2d2916f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2525,7 +3805,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -110.8,
         "time": "2010-01-12T13:05:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "998afaaf-1fea-4a5e-a528-a7f14d06fb28"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2538,7 +3834,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -108.6,
         "time": "2010-01-12T13:06:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d755725f-9eba-40fe-9817-f34193830aea"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2551,7 +3863,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -106.4,
         "time": "2010-01-12T13:07:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "44e32cb6-1dae-4dce-8271-035f285c2874"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2564,7 +3892,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -104.1,
         "time": "2010-01-12T13:08:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a4a92cfe-9f94-4ba0-8284-7766b07befab"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2577,7 +3921,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -101.9,
         "time": "2010-01-12T13:09:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "228889ca-4d31-4da6-9cf2-b1c523912e11"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2590,7 +3950,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -99.5,
         "time": "2010-01-12T13:10:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "43b6cafa-f7ed-4adc-8051-446cf67b0b5e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2603,7 +3979,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -97.2,
         "time": "2010-01-12T13:10:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e341ec4c-4b4b-4412-8fe9-e8470b44d927"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2616,7 +4008,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -94.8,
         "time": "2010-01-12T13:11:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "070f7ce7-d85f-41cb-9179-47e1b79d7cb3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2629,7 +4037,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -92.4,
         "time": "2010-01-12T13:12:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8df602fe-bd82-40d0-883e-8dd67c429556"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2642,7 +4066,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -90.0,
         "time": "2010-01-12T13:13:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "73028015-71a6-404d-8441-51c6ff4051c9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2655,7 +4095,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -87.7,
         "time": "2010-01-12T13:14:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e0d2a4bc-40fa-4dc0-a953-0016b185cfed"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2668,7 +4124,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -85.3,
         "time": "2010-01-12T13:15:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8d88228d-c1f2-49c0-bc0e-0d47efa330d0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2681,7 +4153,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -83.0,
         "time": "2010-01-12T13:15:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a835f65a-9889-4f42-888b-643836c7aaea"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2694,7 +4182,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -80.6,
         "time": "2010-01-12T13:16:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f7314e9d-a119-40c0-af4a-0c3aece4d2c6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2707,7 +4211,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -78.4,
         "time": "2010-01-12T13:17:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7b8ee88c-c5ed-4ce6-89d3-b75e9cdbc809"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2720,7 +4240,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -76.1,
         "time": "2010-01-12T13:18:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "962bdbf1-9ac9-41e0-9f3e-fe0c87ca4b0c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2733,7 +4269,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -74.0,
         "time": "2010-01-12T13:19:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "25707486-0754-4654-b2b4-78c45d097cdd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2746,7 +4298,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -71.8,
         "time": "2010-01-12T13:20:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ddb7c0e1-a02a-4b4a-b75c-8428b6195397"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2759,7 +4327,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -69.7,
         "time": "2010-01-12T13:20:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3da0ad30-d910-4857-85f7-815619d69553"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2772,7 +4356,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -67.8,
         "time": "2010-01-12T13:21:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ccf362ce-1755-42db-aa4d-e45a04ad0442"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2785,7 +4385,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -65.8,
         "time": "2010-01-12T13:22:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0a7caf7f-49ba-4fc1-9a24-6ca8fab3a6a9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2798,7 +4414,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -64.0,
         "time": "2010-01-12T13:23:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3d32447f-1651-453c-8599-d4124550965d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2811,7 +4443,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -62.3,
         "time": "2010-01-12T13:24:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f24b30b7-de4a-4e20-ae73-bcf7d9d0e5d4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2824,7 +4472,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -60.7,
         "time": "2010-01-12T13:25:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "af2300cb-3583-4245-b591-7f15fbe71e58"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2837,7 +4501,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -59.1,
         "time": "2010-01-12T13:25:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1a7b3833-1ec4-4919-90f7-f22b3d96fd66"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2850,7 +4530,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -57.7,
         "time": "2010-01-12T13:26:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b8ab8ca2-6faf-406c-995b-30e5d34a118d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2863,7 +4559,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -56.4,
         "time": "2010-01-12T13:27:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c5da84d7-d9f5-4ce0-ba4e-2797f5679cb5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2876,7 +4588,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -55.1,
         "time": "2010-01-12T13:28:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "13096460-869c-4f87-b840-13268cd46d54"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2889,7 +4617,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -54.0,
         "time": "2010-01-12T13:29:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "20b1a590-174a-442a-946d-accd0a2570ad"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2902,7 +4646,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -53.0,
         "time": "2010-01-12T13:30:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d354ec99-2610-4a5a-9185-dac2ad2584f2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2915,7 +4675,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -52.0,
         "time": "2010-01-12T13:30:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "303a9508-db59-42b4-bdfd-a0cd689b6db9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2928,7 +4704,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -51.2,
         "time": "2010-01-12T13:31:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7f43c651-c309-4729-929d-f93867b7b9ca"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2941,7 +4733,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -50.4,
         "time": "2010-01-12T13:32:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7cd1a080-100d-4d1f-b28f-7fbeb3ef127d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2954,7 +4762,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -49.7,
         "time": "2010-01-12T13:33:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f3593a17-2899-483f-8be6-6b625cf33529"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2967,7 +4791,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -49.1,
         "time": "2010-01-12T13:34:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4858b93c-3955-42a6-9964-108e1a5b18d8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2980,7 +4820,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -48.4,
         "time": "2010-01-12T13:35:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4f803a18-91a4-415e-a464-2ff890d6cae0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2993,7 +4849,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -47.8,
         "time": "2010-01-12T13:35:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f03610b7-94f2-431c-8508-1f9c832143d3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3006,7 +4878,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -47.2,
         "time": "2010-01-12T13:36:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "081391e7-a032-49c5-a499-95a4ff3065bf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3019,7 +4907,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -46.6,
         "time": "2010-01-12T13:37:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "be267b32-fa27-4ca1-8b62-0d1283060bce"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3032,7 +4936,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -46.0,
         "time": "2010-01-12T13:38:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "26473335-62ef-49e2-bcda-50aacd376127"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3045,7 +4965,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -45.5,
         "time": "2010-01-12T13:39:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7c5fbfaf-8d94-4fc9-85d4-c3c370b11a20"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3058,7 +4994,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -44.9,
         "time": "2010-01-12T13:40:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0bf10c84-1f5f-48f2-b48e-6e240e89187c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3071,7 +5023,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -44.4,
         "time": "2010-01-12T13:40:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dc50e879-b51d-4ef7-baaa-d264ddf403e8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3084,7 +5052,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -44.2,
         "time": "2010-01-12T13:41:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "43d18ce2-2418-42f0-b834-3950f8b242e5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3097,7 +5081,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -44.6,
         "time": "2010-01-12T13:42:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9a271296-9e4e-43f8-b6c6-d1a57e97505f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3110,7 +5110,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -44.9,
         "time": "2010-01-12T13:43:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "db19cfad-7c4f-42e3-898b-91ad98c359ec"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3123,7 +5139,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -45.3,
         "time": "2010-01-12T13:44:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8ccbfc3f-74a1-4b7b-8c38-deed29859c87"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3136,7 +5168,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -45.6,
         "time": "2010-01-12T13:45:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "34659941-e874-435f-aa4b-e41d48fda031"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3149,7 +5197,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -45.9,
         "time": "2010-01-12T13:45:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8e682462-9798-4738-b8e5-08f6ab7233ae"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3162,7 +5226,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -46.2,
         "time": "2010-01-12T13:46:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6f0fab9e-9306-4c22-84f3-03806ced84c3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3175,7 +5255,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -46.5,
         "time": "2010-01-12T13:47:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a6ecea76-10bd-48b5-8c34-8061f06e0da6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3188,7 +5284,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -46.8,
         "time": "2010-01-12T13:48:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6dd52117-9311-4925-837c-f687e9484e70"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3201,7 +5313,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -47.1,
         "time": "2010-01-12T13:49:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3dd645a3-5ed4-4846-a079-fd31271201d0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3214,7 +5342,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -47.4,
         "time": "2010-01-12T13:50:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "84c7b309-eb81-4086-a877-eda077114892"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3227,7 +5371,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -47.6,
         "time": "2010-01-12T13:50:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c5446fde-e8f1-46f5-b2ba-e5c5f62defdf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3240,7 +5400,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -47.9,
         "time": "2010-01-12T13:51:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "feb10d17-1211-4bd9-992d-213fc2ad79e9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3253,7 +5429,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -48.1,
         "time": "2010-01-12T13:52:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "25691407-e35d-471a-98b1-142948a23fc6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3266,7 +5458,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -48.4,
         "time": "2010-01-12T13:53:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "42f3e2fb-69fa-4d5a-a1bc-4cb81d45b9df"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3279,7 +5487,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -48.6,
         "time": "2010-01-12T13:54:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "87b620ec-f5eb-4e34-9ba0-76914c070250"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3292,7 +5516,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -48.8,
         "time": "2010-01-12T13:55:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4767459c-a911-4004-b5c9-8a42a3003b50"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3305,7 +5545,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -49.1,
         "time": "2010-01-12T13:55:50+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2d92a128-3d89-4f92-bfe8-886bdd929c33"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3318,7 +5574,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -49.3,
         "time": "2010-01-12T13:56:40+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ff4d17c3-1f18-4ad6-bce8-93be564dd1c5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3331,7 +5603,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -49.5,
         "time": "2010-01-12T13:57:30+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1428252d-aded-4bb6-a24d-f42c420b0723"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3344,7 +5632,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -49.7,
         "time": "2010-01-12T13:58:20+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5f0e20e0-3e14-4c8b-a298-1bd87ee1b1cb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3357,7 +5661,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -49.9,
         "time": "2010-01-12T13:59:10+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9bc926e1-5a5f-4463-a918-050fa7ae44c6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3370,7 +5690,23 @@
         "sensor_name": "NB_BRG",
         "bearing": -50.1,
         "time": "2010-01-12T14:00:00+00:00",
-        "label": "SUBJECT held on NB_BRG"
+        "label": "SUBJECT held on NB_BRG",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "664da557-fca1-4b0e-a0c8-3011a7de0479"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3384,7 +5720,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:07:30+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.35
+        "frequency": 150.35,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bb7c4c6e-2d5e-4b58-a909-f4ecd4f5b8db"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3398,7 +5750,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:08:20+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.362
+        "frequency": 150.362,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e648dc5d-4ebb-49ee-890d-30fb81d591ae"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3412,7 +5780,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:09:10+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.372
+        "frequency": 150.372,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "881ad968-335c-4cfb-b871-f7164a48cd39"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3426,7 +5810,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:14:10+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.387
+        "frequency": 150.387,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "99498e4b-94e2-402c-8e48-37d1de1cb25b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3440,7 +5840,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:15:00+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.38
+        "frequency": 150.38,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ac6ba6bc-776c-42ef-bbe9-092ee0ef0214"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3454,7 +5870,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:15:50+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.377
+        "frequency": 150.377,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "adc6296d-4eb7-47e1-9040-341593277208"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3468,7 +5900,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:16:40+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.374
+        "frequency": 150.374,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e47883be-2e08-4b5d-8200-d7890d1f913c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3482,7 +5930,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:17:30+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.372
+        "frequency": 150.372,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "01a7dc07-f006-45a1-b00f-135214519302"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3496,7 +5960,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:18:20+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.369
+        "frequency": 150.369,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f433028f-ab9c-474a-b91b-d7f1d23d0696"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3510,7 +5990,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:19:10+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.366
+        "frequency": 150.366,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "68cf446b-3c56-4dd6-acb7-59f9f3ade607"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3524,7 +6020,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:35:50+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.285
+        "frequency": 150.285,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1b2cc76b-e72f-443f-9965-3266f7d7ac06"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3538,7 +6050,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:36:40+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.279
+        "frequency": 150.279,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bc1b8ff9-2881-4f39-ab4d-8cc395f4fae9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3552,7 +6080,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:37:30+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.448
+        "frequency": 150.448,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7b1de09f-3d96-46dd-8107-638a9b08b365"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3566,7 +6110,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:38:20+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.446
+        "frequency": 150.446,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0b94b2f4-9586-4250-91f3-302c53392a52"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3580,7 +6140,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:39:10+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.443
+        "frequency": 150.443,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fcbffda5-4874-421e-b445-483479525af2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3594,7 +6170,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:40:00+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.44
+        "frequency": 150.44,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "31cc0c56-b68d-489d-a3e8-be8b98e81796"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3608,7 +6200,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:40:50+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.437
+        "frequency": 150.437,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f317c6d7-8675-4661-b24b-711d4c013c6f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3622,7 +6230,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:41:40+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.433
+        "frequency": 150.433,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d1a22eaa-f90a-4edb-9de2-839112c5aa6e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3636,7 +6260,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:58:20+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.3
+        "frequency": 150.3,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5b09188d-3553-42aa-9a49-d56cc6c4ddbe"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3650,7 +6290,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T12:59:10+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.289
+        "frequency": 150.289,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a411397b-241a-4042-bed2-052320556975"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3664,7 +6320,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:00:00+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.276
+        "frequency": 150.276,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ec1e64b8-03b8-4dc5-b46c-e5a1ad745684"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3678,7 +6350,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:00:50+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 150.263
+        "frequency": 150.263,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a134a590-0c17-43e2-981c-3aed41e31816"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3692,7 +6380,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:14:10+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.963
+        "frequency": 149.963,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6666a0bd-46c2-48ef-a343-5833d0109e58"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3706,7 +6410,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:15:00+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.941
+        "frequency": 149.941,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "31e8f34e-da4e-4270-ae84-968eec27f709"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3720,7 +6440,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:15:50+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.921
+        "frequency": 149.921,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "96829ec8-fc55-4746-b4af-63bce5d95430"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3734,7 +6470,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:16:40+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.9
+        "frequency": 149.9,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "64f1fdff-e610-4b9a-a57a-23b5f468f208"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3748,7 +6500,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:17:30+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.88
+        "frequency": 149.88,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a0efc6ac-c4e4-4c3d-8741-6675f5d5599c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3762,7 +6530,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:18:20+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.861
+        "frequency": 149.861,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b9008299-1ed6-4f4b-9741-f70b8631e8ff"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3776,7 +6560,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:19:10+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.842
+        "frequency": 149.842,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c506cb29-8fbe-4592-b75c-e4e5c12c5fab"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3790,7 +6590,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:20:00+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.824
+        "frequency": 149.824,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e9b3d90f-897e-416a-b279-550adf803b23"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3804,7 +6620,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:20:50+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.825
+        "frequency": 149.825,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6abcbf31-efdc-47cc-991a-c3517806ff3a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3818,7 +6650,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:21:40+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.826
+        "frequency": 149.826,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cac3c60d-4255-47b4-9822-1c9833403f93"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3832,7 +6680,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:22:30+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.827
+        "frequency": 149.827,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "07ec8a4f-8a61-40b5-9f58-84177f887553"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3846,7 +6710,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:23:20+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.829
+        "frequency": 149.829,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "82a1eafe-9ef5-4bf7-9ea1-040d9c445349"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3860,7 +6740,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:33:20+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.763
+        "frequency": 149.763,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b392372c-6008-47eb-a9fa-9552b852470a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3874,7 +6770,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:34:10+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.761
+        "frequency": 149.761,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5d607326-01eb-44c0-ace2-2a5540aeebaa"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3888,7 +6800,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:35:00+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.759
+        "frequency": 149.759,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cf70bccc-573c-4cad-910d-d8bab42df266"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3902,7 +6830,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:35:50+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.757
+        "frequency": 149.757,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dac3b70d-dc7a-44e2-a120-91dcd859bfdc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3916,7 +6860,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:36:40+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.755
+        "frequency": 149.755,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9d95e1ce-8f92-4ccc-adf3-f7b228dcee31"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3930,7 +6890,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:37:30+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.753
+        "frequency": 149.753,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "45823303-3f34-4266-8d17-f2d4051aa186"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3944,7 +6920,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:38:20+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.752
+        "frequency": 149.752,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6782d470-a0cb-4a11-8508-605068850b1d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3958,7 +6950,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:40:50+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.747
+        "frequency": 149.747,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f5e76705-77bc-4f8b-9a41-a57af08b034e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3972,7 +6980,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:41:40+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.674
+        "frequency": 149.674,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e7abebb6-ac85-48c3-ae79-b452ac62b5cb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3986,7 +7010,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:42:30+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.675
+        "frequency": 149.675,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a0ae7684-d59d-4e05-ae99-95fef95d87cd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4000,7 +7040,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:43:20+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.675
+        "frequency": 149.675,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b33f41f7-e55b-4cff-8b1d-663ea085de63"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4014,7 +7070,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:44:10+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.674
+        "frequency": 149.674,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e8222217-6521-479b-adcd-910611986b83"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4028,7 +7100,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:45:00+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.673
+        "frequency": 149.673,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2aad9b9b-6402-4c8a-ba97-cbf91e202131"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4042,7 +7130,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:45:50+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.673
+        "frequency": 149.673,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c1d12ed0-a53f-4c88-8c6f-5df295b87fc6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4056,7 +7160,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:46:40+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.672
+        "frequency": 149.672,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e82a00da-8bb5-4dd7-ba27-085f1cf0d04e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4070,7 +7190,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:47:30+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.672
+        "frequency": 149.672,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7c47ed38-8f80-49d6-871b-62fc90ff2b85"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4084,7 +7220,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:48:20+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.671
+        "frequency": 149.671,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c6903e9e-11f4-4ba5-978f-815ff0b14988"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4098,7 +7250,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:49:10+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.671
+        "frequency": 149.671,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "78d9b6fa-5349-45b3-8d4b-b0d0fd60836e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4112,7 +7280,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:50:00+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.67
+        "frequency": 149.67,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c3538bbb-3576-4cab-9759-dd4b2edbf313"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4126,7 +7310,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:55:50+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.667
+        "frequency": 149.667,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "557bcb0f-6eb1-4159-aec9-0f5a82bad132"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4140,7 +7340,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:56:40+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.667
+        "frequency": 149.667,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b5b59e97-7529-40d6-bc7a-3b0fa058aee7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4154,7 +7370,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:57:30+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.667
+        "frequency": 149.667,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3325f1ae-1997-4388-b677-0dd25b86b37d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4168,7 +7400,23 @@
         "bearing": 0.0,
         "time": "2010-01-12T13:58:20+00:00",
         "label": "SUBJECT held on NB_FREQ",
-        "frequency": 149.666
+        "frequency": 149.666,
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "aa780fe6-4e2c-4521-8e5a-6418b9ac5a69"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5655,7 +8903,23 @@
           "show_label": false
         },
         "symbol_interval": "PT10M",
-        "label_interval": "PT30M"
+        "label_interval": "PT30M",
+        "provenance": [
+          {
+            "activity_id": "6df196da-af95-4c73-80f5-c80e89ced7d0",
+            "timestamp": "2026-03-21T10:15:02.037343Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "68a9df31-fbf1-4b4d-a89b-188300ca2365"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

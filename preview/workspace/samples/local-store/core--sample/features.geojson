@@ -4055,7 +4055,23 @@
           "show_label": false
         },
         "symbol_interval": "PT15M",
-        "label_interval": "PT1H"
+        "label_interval": "PT1H",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "18f4b48f-4e5b-4d0a-988b-89310d6d029b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8122,7 +8138,23 @@
           "show_label": false
         },
         "symbol_interval": "PT15M",
-        "label_interval": "PT1H"
+        "label_interval": "PT1H",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a8c85392-e3cf-4cfc-afb3-33ec8cadaeab"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8134,7 +8166,23 @@
         "track": "NELSON",
         "entry": "COMEX SERIAL 16D",
         "type": "COMEX",
-        "time": "1995-12-12T05:00:00+00:00"
+        "time": "1995-12-12T05:00:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "535e1fab-3369-459c-b651-a2dfaedf7124"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8146,7 +8194,23 @@
         "track": "NELSON",
         "entry": "INTEND WIDE AREA SEARCH AS PREVIOUS SERIAL",
         "type": "CMD_COMMENT",
-        "time": "1995-12-12T05:01:00.100000+00:00"
+        "time": "1995-12-12T05:01:00.100000+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c4b28a66-3d65-466b-b27f-cf52f92eed9e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8158,7 +8222,23 @@
         "track": "NELSON",
         "entry": "BRIEFING HINTED THAT TARGET TO SE",
         "type": "CMD_COMMENT",
-        "time": "1995-12-12T05:02:00+00:00"
+        "time": "1995-12-12T05:02:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "84c24da0-efcb-441b-9bfe-719e64c6d804"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8170,7 +8250,23 @@
         "track": "NELSON",
         "entry": "NO CONTACTS YET, SWITCHING TO SCALE 7",
         "type": "SONAR_COMMENT",
-        "time": "1995-12-12T05:22:00+00:00"
+        "time": "1995-12-12T05:22:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d7e0b1e7-7cc4-4fc2-b1c4-f71f0705a13e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8182,7 +8278,23 @@
         "track": "NELSON",
         "entry": "NEW_CONTACT INVESTIGATING TRACK 14",
         "type": "CMD_COMMENT",
-        "time": "1995-12-12T06:12:00+00:00"
+        "time": "1995-12-12T06:12:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "42834f63-91a4-42ee-ad3f-a2e5a539a75c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8194,7 +8306,23 @@
         "track": "NELSON",
         "entry": "POSSUB TRACK 14",
         "type": "NEW_CONTACT",
-        "time": "1995-12-12T06:22:00+00:00"
+        "time": "1995-12-12T06:22:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "94104414-8c47-492c-99f5-166a82ca755b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8206,7 +8334,23 @@
         "track": "NELSON",
         "entry": "DROP TRACK 14 BIOLOGIC",
         "type": "CONTACT_LOST",
-        "time": "1995-12-12T06:42:00+00:00"
+        "time": "1995-12-12T06:42:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2a2bcc44-ef44-4296-bb27-e466bdfc2b5b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8218,7 +8362,23 @@
         "track": "NELSON",
         "entry": "HEADING TO RV",
         "type": "CMD_COMMENT",
-        "time": "1995-12-12T09:53:00+00:00"
+        "time": "1995-12-12T09:53:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8b24bd9d-43a1-4553-8548-a231b097d477"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8230,7 +8390,23 @@
         "track": "NELSON",
         "entry": "SUSPECT PLAYMATE NOT PRESENT",
         "type": "CMD_COMMENT",
-        "time": "1995-12-12T09:54:00+00:00"
+        "time": "1995-12-12T09:54:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "294877c4-5f78-406c-89b6-ad38b70e8ba5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8242,7 +8418,23 @@
         "track": "COLLINGWOOD",
         "entry": "SUSPECTED DETECTION OF RED",
         "type": "NEW_CONTACT",
-        "time": "1995-12-12T09:57:00+00:00"
+        "time": "1995-12-12T09:57:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fbf24567-15b4-4d19-82fb-2f8cb1ce0c30"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8254,7 +8446,23 @@
         "track": "COLLINGWOOD",
         "entry": "CONFIRMED. OBTAIN SOLUTION",
         "type": "CMD_COMMENT",
-        "time": "1995-12-12T10:03:00+00:00"
+        "time": "1995-12-12T10:03:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7964388c-a367-4dcc-a25c-5c05be5b1b76"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8266,7 +8474,23 @@
         "track": "COLLINGWOOD",
         "entry": "SUSPECT TARGET ZIG",
         "type": "CMD_COMMENT",
-        "time": "1995-12-12T10:13:00+00:00"
+        "time": "1995-12-12T10:13:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c774635f-fee1-4a5e-abec-4712fa6c9a47"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8278,7 +8502,23 @@
         "track": "NELSON",
         "entry": "PORT DETECTION, 16 HZ",
         "type": "NEW_CONTACT",
-        "time": "1995-12-12T10:14:00+00:00"
+        "time": "1995-12-12T10:14:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "aad234bc-f5b7-489a-ab1b-94d43ec522ed"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8290,7 +8530,23 @@
         "track": "NELSON",
         "entry": "FOR DUPLICATE",
         "type": "CMD_COMMENT",
-        "time": "1995-12-12T10:29:00+00:00"
+        "time": "1995-12-12T10:29:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "001feb1a-1d8e-4e5d-a346-0692e65f0582"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8302,7 +8558,23 @@
         "track": "NELSON",
         "entry": "TARGET ZIG DETECTED",
         "type": "CMD_COMMENT",
-        "time": "1995-12-12T10:37:00+00:00"
+        "time": "1995-12-12T10:37:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7b7da9da-bb7b-4706-b80b-3c378a5dc9e9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8314,7 +8586,23 @@
         "track": "COLLINGWOOD",
         "entry": "FINEX CALLED, ENTER TRANSITION",
         "type": "SONAR_COMMENT",
-        "time": "1995-12-12T11:19:00+00:00"
+        "time": "1995-12-12T11:19:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "43cffd03-07f1-42ff-ab17-ab279a1163b7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8326,7 +8614,23 @@
         "track": "NELSON",
         "entry": "ENTERING PLOT-LOCK TRANSITION",
         "type": "NEW_CONTACT",
-        "time": "1995-12-12T11:20:00+00:00"
+        "time": "1995-12-12T11:20:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "07716c68-1777-4edd-9f34-4e30c88ac4c4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8338,7 +8642,23 @@
         "track": "NELSON",
         "entry": "ACTIVE PLOT-LOCK SUCCESSFUL",
         "type": "CMD_COMMENT",
-        "time": "1995-12-12T11:37:00+00:00"
+        "time": "1995-12-12T11:37:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8ddad25a-a54d-438c-84de-0827ffac6eed"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8350,7 +8670,23 @@
         "track": "NELSON",
         "entry": "RX CONGRATS ON UWT",
         "type": "SONAR_COMMENT",
-        "time": "1995-12-12T11:41:00+00:00"
+        "time": "1995-12-12T11:41:00+00:00",
+        "provenance": [
+          {
+            "activity_id": "a818a2e4-bab9-48ff-9523-7eb739b00c8f",
+            "timestamp": "2026-03-21T10:15:05.579685Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b2762287-a882-489f-89d0-4ea6ab2966d1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]

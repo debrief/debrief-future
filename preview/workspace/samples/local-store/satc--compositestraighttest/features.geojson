@@ -2445,7 +2445,23 @@
           "show_label": false
         },
         "symbol_interval": "PT5M",
-        "label_interval": "PT15M"
+        "label_interval": "PT15M",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "34e243b0-2619-461b-89f9-1f806a1f266a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2458,7 +2474,23 @@
         "sensor_name": "Sonar",
         "bearing": 2.4,
         "time": "2010-01-12T12:13:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f86d6143-511c-46f8-ada2-025d23e19d80"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2471,7 +2503,23 @@
         "sensor_name": "Sonar",
         "bearing": 1.5,
         "time": "2010-01-12T12:13:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "abcbadb0-f451-4625-b3d6-a6e95a658e93"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2484,7 +2532,23 @@
         "sensor_name": "Sonar",
         "bearing": 1.1,
         "time": "2010-01-12T12:13:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1c541a07-9c02-445c-827b-a66a88a8b4e0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2497,7 +2561,23 @@
         "sensor_name": "Sonar",
         "bearing": 1.1,
         "time": "2010-01-12T12:13:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "285e1f9c-678d-4f7b-aefa-7e5b8a01c660"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2510,7 +2590,23 @@
         "sensor_name": "Sonar",
         "bearing": 1.2,
         "time": "2010-01-12T12:14:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "474b3f62-8565-4edf-8d2c-fa5e22395c53"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2523,7 +2619,23 @@
         "sensor_name": "Sonar",
         "bearing": 1.4,
         "time": "2010-01-12T12:14:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2d5a7ec6-a340-4051-941d-f700b616537d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2536,7 +2648,23 @@
         "sensor_name": "Sonar",
         "bearing": 1.6,
         "time": "2010-01-12T12:14:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0f08d144-4cd7-4f7e-a08d-ee56deafde0d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2549,7 +2677,23 @@
         "sensor_name": "Sonar",
         "bearing": 1.8,
         "time": "2010-01-12T12:14:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "37f7e96f-ee0c-43da-862c-4c5b733bba1c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2562,7 +2706,23 @@
         "sensor_name": "Sonar",
         "bearing": 2.0,
         "time": "2010-01-12T12:15:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2133ac21-3fcf-4c03-a143-124280cbdb9e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2575,7 +2735,23 @@
         "sensor_name": "Sonar",
         "bearing": 2.2,
         "time": "2010-01-12T12:15:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c4080db6-9317-4c9f-878d-9d992f20a016"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2588,7 +2764,23 @@
         "sensor_name": "Sonar",
         "bearing": 2.3,
         "time": "2010-01-12T12:15:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "40a769e2-efeb-4b93-b0b7-51bd8462c9f5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2601,7 +2793,23 @@
         "sensor_name": "Sonar",
         "bearing": 2.5,
         "time": "2010-01-12T12:15:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f78cf92a-2f4b-452d-84b7-82c2ea848195"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2614,7 +2822,23 @@
         "sensor_name": "Sonar",
         "bearing": 2.7,
         "time": "2010-01-12T12:16:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a6b77b9d-9ea5-4a03-ad86-b913c5ea1e89"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2627,7 +2851,23 @@
         "sensor_name": "Sonar",
         "bearing": 2.9,
         "time": "2010-01-12T12:16:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c6dfcccd-baa9-4691-899e-5feb355ea141"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2640,7 +2880,23 @@
         "sensor_name": "Sonar",
         "bearing": 3.1,
         "time": "2010-01-12T12:16:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6b1ed333-2f8d-49b5-833a-dea1a79d4b09"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2653,7 +2909,23 @@
         "sensor_name": "Sonar",
         "bearing": 3.3,
         "time": "2010-01-12T12:16:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fc7c6c34-141a-4dab-92d1-74f559ad0103"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2666,7 +2938,23 @@
         "sensor_name": "Sonar",
         "bearing": 3.5,
         "time": "2010-01-12T12:17:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fcb608c6-d3d8-4287-9c46-b849e1ace347"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2679,7 +2967,23 @@
         "sensor_name": "Sonar",
         "bearing": 3.6,
         "time": "2010-01-12T12:17:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "05e4face-8143-4560-8205-22c338596c42"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2692,7 +2996,23 @@
         "sensor_name": "Sonar",
         "bearing": 3.8,
         "time": "2010-01-12T12:17:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f8c3fb72-aacb-4c9b-9762-863c5212316c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2705,7 +3025,23 @@
         "sensor_name": "Sonar",
         "bearing": 4.0,
         "time": "2010-01-12T12:17:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5d2af2e9-1b5c-4f74-abf7-3ccb432fe6f9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2718,7 +3054,23 @@
         "sensor_name": "Sonar",
         "bearing": 4.2,
         "time": "2010-01-12T12:18:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ef35a9f2-581a-4340-9251-d624cd79d435"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2731,7 +3083,23 @@
         "sensor_name": "Sonar",
         "bearing": 4.3,
         "time": "2010-01-12T12:18:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2eecd28f-11f8-455a-80c4-824a75caf3e5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2744,7 +3112,23 @@
         "sensor_name": "Sonar",
         "bearing": 4.3,
         "time": "2010-01-12T12:18:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "98befef9-4446-4a94-9d24-ada5db85ccd3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2757,7 +3141,23 @@
         "sensor_name": "Sonar",
         "bearing": 3.9,
         "time": "2010-01-12T12:18:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fb623bba-3ce6-4714-8d87-94a675cfa92b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2770,7 +3170,23 @@
         "sensor_name": "Sonar",
         "bearing": 3.4,
         "time": "2010-01-12T12:19:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bbb9cace-b161-41b2-9cbc-0700219bd800"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2783,7 +3199,23 @@
         "sensor_name": "Sonar",
         "bearing": 2.9,
         "time": "2010-01-12T12:19:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3c0ce5dd-dc6b-4bb8-a058-3a8f95abedfc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2796,7 +3228,23 @@
         "sensor_name": "Sonar",
         "bearing": 2.5,
         "time": "2010-01-12T12:19:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "763db7db-4a22-4788-99f9-52143ff3032b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2809,7 +3257,23 @@
         "sensor_name": "Sonar",
         "bearing": 2.0,
         "time": "2010-01-12T12:19:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1cf1c610-773a-47f6-81cf-c25a00757812"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2822,7 +3286,23 @@
         "sensor_name": "Sonar",
         "bearing": 1.4,
         "time": "2010-01-12T12:20:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a315954a-b7d1-4dfd-a435-581c5115207f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2835,7 +3315,23 @@
         "sensor_name": "Sonar",
         "bearing": 0.9,
         "time": "2010-01-12T12:20:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9d298c62-34b1-406d-913c-7312fac9bc5e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2848,7 +3344,23 @@
         "sensor_name": "Sonar",
         "bearing": 0.4,
         "time": "2010-01-12T12:20:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b12b048a-2e2b-489b-ba66-caa484653a20"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2861,7 +3373,23 @@
         "sensor_name": "Sonar",
         "bearing": -0.2,
         "time": "2010-01-12T12:20:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5f717d75-9d0e-4312-9614-69d66ad171ec"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2874,7 +3402,23 @@
         "sensor_name": "Sonar",
         "bearing": -0.8,
         "time": "2010-01-12T12:21:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e6f22c43-de8b-4e33-ad0b-1cfef865f2e6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2887,7 +3431,23 @@
         "sensor_name": "Sonar",
         "bearing": -1.4,
         "time": "2010-01-12T12:21:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3b15fc20-01d8-4424-a940-a28bfc71bd4f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2900,7 +3460,23 @@
         "sensor_name": "Sonar",
         "bearing": -2.0,
         "time": "2010-01-12T12:21:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fc2dd20c-b2ec-43bb-82b5-d3d1a533add9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2913,7 +3489,23 @@
         "sensor_name": "Sonar",
         "bearing": -2.6,
         "time": "2010-01-12T12:21:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d43dd4ab-1e75-4dc4-aea6-026ac95e0790"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2926,7 +3518,23 @@
         "sensor_name": "Sonar",
         "bearing": -3.3,
         "time": "2010-01-12T12:22:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "57bbe716-0f88-4e42-8eb8-120d412d5ae4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2939,7 +3547,23 @@
         "sensor_name": "Sonar",
         "bearing": -3.9,
         "time": "2010-01-12T12:22:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ef3ea428-ad07-4bc2-a033-b567040675a3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2952,7 +3576,23 @@
         "sensor_name": "Sonar",
         "bearing": -4.6,
         "time": "2010-01-12T12:22:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b0d55d96-ffe8-44f5-9c81-162ac118040b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2965,7 +3605,23 @@
         "sensor_name": "Sonar",
         "bearing": -5.3,
         "time": "2010-01-12T12:22:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e764ee14-46f3-4242-8835-61c72cad8da0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2978,7 +3634,23 @@
         "sensor_name": "Sonar",
         "bearing": -6.1,
         "time": "2010-01-12T12:23:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c6ff76af-a311-4a84-a57a-1277e88784e1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -2991,7 +3663,23 @@
         "sensor_name": "Sonar",
         "bearing": -6.8,
         "time": "2010-01-12T12:23:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d2c334bf-f5ef-49ef-ac13-681093d3630e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3004,7 +3692,23 @@
         "sensor_name": "Sonar",
         "bearing": -7.6,
         "time": "2010-01-12T12:23:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0a29c353-1f62-4169-806a-6166226e66d5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3017,7 +3721,23 @@
         "sensor_name": "Sonar",
         "bearing": -8.4,
         "time": "2010-01-12T12:23:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e2f496cf-08a7-45ce-a3f9-bdad5010f75b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3030,7 +3750,23 @@
         "sensor_name": "Sonar",
         "bearing": -9.3,
         "time": "2010-01-12T12:24:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bf26f7a9-bb37-48f1-b049-6292e43adc8d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3043,7 +3779,23 @@
         "sensor_name": "Sonar",
         "bearing": -10.1,
         "time": "2010-01-12T12:24:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "12842f82-7b8d-4b82-8950-d99b2ff9f7fd"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3056,7 +3808,23 @@
         "sensor_name": "Sonar",
         "bearing": -11.0,
         "time": "2010-01-12T12:24:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "01367d24-1818-4b51-ab71-b5afc02f6dad"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3069,7 +3837,23 @@
         "sensor_name": "Sonar",
         "bearing": -11.9,
         "time": "2010-01-12T12:24:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "91a1db25-8b76-43d9-bf5e-ca9b4c45fc7c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3082,7 +3866,23 @@
         "sensor_name": "Sonar",
         "bearing": -12.9,
         "time": "2010-01-12T12:25:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d034e87b-b55e-4ac5-b0b1-7ea197538735"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3095,7 +3895,23 @@
         "sensor_name": "Sonar",
         "bearing": -13.9,
         "time": "2010-01-12T12:25:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6e25dd1f-0853-49b2-bab8-4c2e63f4caf2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3108,7 +3924,23 @@
         "sensor_name": "Sonar",
         "bearing": -14.9,
         "time": "2010-01-12T12:25:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8a8fcc0d-aac0-4f15-9726-a7927c866323"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3121,7 +3953,23 @@
         "sensor_name": "Sonar",
         "bearing": -15.9,
         "time": "2010-01-12T12:25:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "64c97f22-9188-4d13-8f7a-28d33cefe9e6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3134,7 +3982,23 @@
         "sensor_name": "Sonar",
         "bearing": -17.0,
         "time": "2010-01-12T12:26:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "03d6f082-53d7-49ff-9035-183c1cce3c49"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3147,7 +4011,23 @@
         "sensor_name": "Sonar",
         "bearing": -18.1,
         "time": "2010-01-12T12:26:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "979cba62-9cbe-4534-91d3-b0a9bf5bee23"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3160,7 +4040,23 @@
         "sensor_name": "Sonar",
         "bearing": -19.3,
         "time": "2010-01-12T12:26:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a97b2f4d-5cce-4bd8-8cab-4d00c88dfcbb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3173,7 +4069,23 @@
         "sensor_name": "Sonar",
         "bearing": -20.4,
         "time": "2010-01-12T12:26:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c808a543-4127-455a-9da6-2b46103c3049"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3186,7 +4098,23 @@
         "sensor_name": "Sonar",
         "bearing": -21.7,
         "time": "2010-01-12T12:27:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cce352c9-6c37-4590-88d4-244f700ec580"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3199,7 +4127,23 @@
         "sensor_name": "Sonar",
         "bearing": -22.9,
         "time": "2010-01-12T12:27:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4d406882-67a4-4e57-883f-8bff17b07fb5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3212,7 +4156,23 @@
         "sensor_name": "Sonar",
         "bearing": -24.2,
         "time": "2010-01-12T12:27:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "abf554ae-66d9-4f4d-ad27-e1314b498a10"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3225,7 +4185,23 @@
         "sensor_name": "Sonar",
         "bearing": -25.5,
         "time": "2010-01-12T12:27:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b7a5f494-317a-4e37-b05c-40061b25427f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3238,7 +4214,23 @@
         "sensor_name": "Sonar",
         "bearing": -26.9,
         "time": "2010-01-12T12:28:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9f03473d-7551-4e19-a44f-20033cf7676a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3251,7 +4243,23 @@
         "sensor_name": "Sonar",
         "bearing": -28.3,
         "time": "2010-01-12T12:28:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9da917f4-8816-4446-a11c-90b54f12fdc0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3264,7 +4272,23 @@
         "sensor_name": "Sonar",
         "bearing": -29.4,
         "time": "2010-01-12T12:28:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3aeaf3d0-0ed2-4c5b-bf1b-1f4e8fe355ce"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3277,7 +4301,23 @@
         "sensor_name": "Sonar",
         "bearing": -30.3,
         "time": "2010-01-12T12:28:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fe97b3dd-8512-4000-b101-7b8955a635df"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3290,7 +4330,23 @@
         "sensor_name": "Sonar",
         "bearing": -31.2,
         "time": "2010-01-12T12:29:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "aad4bae5-4d7e-46c3-986a-d91bf992f6bb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3303,7 +4359,23 @@
         "sensor_name": "Sonar",
         "bearing": -32.2,
         "time": "2010-01-12T12:29:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "77a6ebea-0a84-43c8-b95e-ad32b59d5a5b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3316,7 +4388,23 @@
         "sensor_name": "Sonar",
         "bearing": -33.2,
         "time": "2010-01-12T12:29:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "842b9b27-2991-40ac-b4f2-a95d8ccd4dcc"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3329,7 +4417,23 @@
         "sensor_name": "Sonar",
         "bearing": -34.2,
         "time": "2010-01-12T12:29:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "79d43644-295a-4587-9184-357481c54bad"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3342,7 +4446,23 @@
         "sensor_name": "Sonar",
         "bearing": -35.2,
         "time": "2010-01-12T12:30:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "678c2df3-1403-471b-b249-4581a85a3046"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3355,7 +4475,23 @@
         "sensor_name": "Sonar",
         "bearing": -36.3,
         "time": "2010-01-12T12:30:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "eebf3ee8-337c-43bb-8462-e1232232f99b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3368,7 +4504,23 @@
         "sensor_name": "Sonar",
         "bearing": -37.4,
         "time": "2010-01-12T12:30:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f5c4c8f3-e344-41ea-a3ec-966886c086f7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3381,7 +4533,23 @@
         "sensor_name": "Sonar",
         "bearing": -38.5,
         "time": "2010-01-12T12:30:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cad097aa-804e-4be0-9307-4a4b7f519c00"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3394,7 +4562,23 @@
         "sensor_name": "Sonar",
         "bearing": -39.7,
         "time": "2010-01-12T12:31:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bbce1d25-f7b2-4672-89de-cb6b99be16d4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3407,7 +4591,23 @@
         "sensor_name": "Sonar",
         "bearing": -40.9,
         "time": "2010-01-12T12:31:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b57c410a-60ed-4921-99f7-37bb8de4191d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3420,7 +4620,23 @@
         "sensor_name": "Sonar",
         "bearing": -42.1,
         "time": "2010-01-12T12:31:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "72cf4722-f8cf-44bc-8620-1f3ee260be88"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3433,7 +4649,23 @@
         "sensor_name": "Sonar",
         "bearing": -43.4,
         "time": "2010-01-12T12:31:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "02309deb-e3b8-4017-ba06-9291cd9bd2c3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3446,7 +4678,23 @@
         "sensor_name": "Sonar",
         "bearing": -44.7,
         "time": "2010-01-12T12:32:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "88b22544-dc70-436c-9c8f-afe759e121b7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3459,7 +4707,23 @@
         "sensor_name": "Sonar",
         "bearing": -46.1,
         "time": "2010-01-12T12:32:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "09c64ac7-b531-4ac5-88c8-165bc11c841e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3472,7 +4736,23 @@
         "sensor_name": "Sonar",
         "bearing": -47.7,
         "time": "2010-01-12T12:32:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c730c37d-8840-4b61-9d3d-73c39779fe72"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3485,7 +4765,23 @@
         "sensor_name": "Sonar",
         "bearing": -49.5,
         "time": "2010-01-12T12:32:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "eb2ba145-99d5-4cf5-8724-c3094118e5ce"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3498,7 +4794,23 @@
         "sensor_name": "Sonar",
         "bearing": -51.4,
         "time": "2010-01-12T12:33:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "096559cb-76ca-4d79-b960-6ab55215d4c1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3511,7 +4823,23 @@
         "sensor_name": "Sonar",
         "bearing": -53.4,
         "time": "2010-01-12T12:33:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3b3c73e6-206e-4b48-a510-32e393a3f618"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3524,7 +4852,23 @@
         "sensor_name": "Sonar",
         "bearing": -55.6,
         "time": "2010-01-12T12:33:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fd4dfa2c-4d0b-4579-8c94-ca5854d49483"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3537,7 +4881,23 @@
         "sensor_name": "Sonar",
         "bearing": -57.9,
         "time": "2010-01-12T12:33:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ac715846-b3d6-4a09-bf1e-d6818da643be"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3550,7 +4910,23 @@
         "sensor_name": "Sonar",
         "bearing": -60.3,
         "time": "2010-01-12T12:34:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a10f4d9e-d99f-4658-ae84-d88f0e0ac231"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3563,7 +4939,23 @@
         "sensor_name": "Sonar",
         "bearing": -62.8,
         "time": "2010-01-12T12:34:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "84d06fde-cd49-4872-abe3-7575299bbd58"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3576,7 +4968,23 @@
         "sensor_name": "Sonar",
         "bearing": -65.4,
         "time": "2010-01-12T12:34:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bedb36dc-02ea-41de-989f-c59b4dab58cb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3589,7 +4997,23 @@
         "sensor_name": "Sonar",
         "bearing": -68.2,
         "time": "2010-01-12T12:34:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "13a7a71c-4de6-4823-9975-0c836e50dd0f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3602,7 +5026,23 @@
         "sensor_name": "Sonar",
         "bearing": -71.0,
         "time": "2010-01-12T12:35:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "248be3aa-2953-4217-88ce-3381d4b8d835"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3615,7 +5055,23 @@
         "sensor_name": "Sonar",
         "bearing": -73.4,
         "time": "2010-01-12T12:35:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "03114a4b-3d15-436a-8a2c-b96264a1bcfe"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3628,7 +5084,23 @@
         "sensor_name": "Sonar",
         "bearing": -74.6,
         "time": "2010-01-12T12:35:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "60f616ee-82a5-4002-b284-7598fce3060f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3641,7 +5113,23 @@
         "sensor_name": "Sonar",
         "bearing": -75.5,
         "time": "2010-01-12T12:35:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a3bcd6b0-ea1c-4105-90d5-ff5ccbaf233e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3654,7 +5142,23 @@
         "sensor_name": "Sonar",
         "bearing": -76.4,
         "time": "2010-01-12T12:36:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0811376c-9e7f-47e6-a386-5f3cbca1d479"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3667,7 +5171,23 @@
         "sensor_name": "Sonar",
         "bearing": -77.4,
         "time": "2010-01-12T12:36:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d5c6eaf2-bdfa-4535-9463-24e998cf02f1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3680,7 +5200,23 @@
         "sensor_name": "Sonar",
         "bearing": -78.5,
         "time": "2010-01-12T12:36:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "383e960a-6ea5-45d9-a7ab-de93afe8fd8a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3693,7 +5229,23 @@
         "sensor_name": "Sonar",
         "bearing": -79.6,
         "time": "2010-01-12T12:36:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f4baec78-b300-4b00-a598-4712a71a364f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3706,7 +5258,23 @@
         "sensor_name": "Sonar",
         "bearing": -80.8,
         "time": "2010-01-12T12:37:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c2dfdf25-b81c-41ab-9804-a1b2e67e41ab"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3719,7 +5287,23 @@
         "sensor_name": "Sonar",
         "bearing": -82.0,
         "time": "2010-01-12T12:37:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4e750c90-8d38-4cfd-a9ba-43925e8676d6"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3732,7 +5316,23 @@
         "sensor_name": "Sonar",
         "bearing": -83.3,
         "time": "2010-01-12T12:37:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "94b4c020-fd33-4561-b735-2819cf78d2e5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3745,7 +5345,23 @@
         "sensor_name": "Sonar",
         "bearing": -84.6,
         "time": "2010-01-12T12:37:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "52f25bb8-039b-44cd-b984-279af42853f5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3758,7 +5374,23 @@
         "sensor_name": "Sonar",
         "bearing": -86.0,
         "time": "2010-01-12T12:38:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d5e23055-71b0-48c1-934a-2b6b716eddce"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3771,7 +5403,23 @@
         "sensor_name": "Sonar",
         "bearing": -87.6,
         "time": "2010-01-12T12:38:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "adce12ff-b44a-44be-ae59-b07d4f313713"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3784,7 +5432,23 @@
         "sensor_name": "Sonar",
         "bearing": -89.1,
         "time": "2010-01-12T12:38:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "78443437-3f86-47e2-85b6-2c8beb5d2f93"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3797,7 +5461,23 @@
         "sensor_name": "Sonar",
         "bearing": -90.8,
         "time": "2010-01-12T12:38:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2b369875-1bac-4918-8b0e-00361caa5513"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3810,7 +5490,23 @@
         "sensor_name": "Sonar",
         "bearing": -92.6,
         "time": "2010-01-12T12:39:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2d3d186f-70fa-4197-8bb4-5a191554eb59"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3823,7 +5519,23 @@
         "sensor_name": "Sonar",
         "bearing": -94.4,
         "time": "2010-01-12T12:39:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a8f32059-7797-4761-a458-ff85125dc95a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3836,7 +5548,23 @@
         "sensor_name": "Sonar",
         "bearing": -96.4,
         "time": "2010-01-12T12:39:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b0a8535d-037e-444a-a827-21f834168260"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3849,7 +5577,23 @@
         "sensor_name": "Sonar",
         "bearing": -98.4,
         "time": "2010-01-12T12:39:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bbb05f53-9d13-4476-881e-47758a7f4f5c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3862,7 +5606,23 @@
         "sensor_name": "Sonar",
         "bearing": -100.6,
         "time": "2010-01-12T12:40:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a81e0f50-8243-439c-a9e5-eecb295539f4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3875,7 +5635,23 @@
         "sensor_name": "Sonar",
         "bearing": -102.8,
         "time": "2010-01-12T12:40:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6a175a01-5196-4bc0-9cd4-410d95663b20"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3888,7 +5664,23 @@
         "sensor_name": "Sonar",
         "bearing": -105.1,
         "time": "2010-01-12T12:40:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2db53f47-2108-4a2a-8cb6-480bbfd77701"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3901,7 +5693,23 @@
         "sensor_name": "Sonar",
         "bearing": -107.6,
         "time": "2010-01-12T12:40:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f32794f9-4e64-4002-9fa4-496fda2c2546"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3914,7 +5722,23 @@
         "sensor_name": "Sonar",
         "bearing": -110.1,
         "time": "2010-01-12T12:41:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a726ec80-d8bc-44b2-8cb1-9ee62cbebbb0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3927,7 +5751,23 @@
         "sensor_name": "Sonar",
         "bearing": -112.8,
         "time": "2010-01-12T12:41:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d922ae41-b53b-4ca1-90df-7b70f942ca20"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3940,7 +5780,23 @@
         "sensor_name": "Sonar",
         "bearing": -115.5,
         "time": "2010-01-12T12:41:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "745a2b29-3eda-4bc8-a058-2fa60b3d698c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3953,7 +5809,23 @@
         "sensor_name": "Sonar",
         "bearing": -118.3,
         "time": "2010-01-12T12:41:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ff3a4d8e-d290-471c-b9ea-d1d655d20165"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3966,7 +5838,23 @@
         "sensor_name": "Sonar",
         "bearing": -121.1,
         "time": "2010-01-12T12:42:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "47fd2cd6-c491-4827-af29-198c0503505b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3979,7 +5867,23 @@
         "sensor_name": "Sonar",
         "bearing": -124.0,
         "time": "2010-01-12T12:42:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0b72f29b-c7f7-4832-980a-fb014ee2463b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -3992,7 +5896,23 @@
         "sensor_name": "Sonar",
         "bearing": -127.0,
         "time": "2010-01-12T12:42:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a61340f7-329c-4126-8720-52836251166c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4005,7 +5925,23 @@
         "sensor_name": "Sonar",
         "bearing": -130.0,
         "time": "2010-01-12T12:42:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "306caaed-73f1-4f26-9eac-606c3aa95ee0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4018,7 +5954,23 @@
         "sensor_name": "Sonar",
         "bearing": -133.0,
         "time": "2010-01-12T12:43:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "805f2664-7a93-4cca-ab6e-a105895441d8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4031,7 +5983,23 @@
         "sensor_name": "Sonar",
         "bearing": -135.9,
         "time": "2010-01-12T12:43:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f6714235-8c48-4bb6-bc6a-431f6e94c7a2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4044,7 +6012,23 @@
         "sensor_name": "Sonar",
         "bearing": -138.9,
         "time": "2010-01-12T12:43:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7cd37a98-6a23-4338-bdeb-249b872d26f4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4057,7 +6041,23 @@
         "sensor_name": "Sonar",
         "bearing": -141.8,
         "time": "2010-01-12T12:43:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f9ac6b3e-623a-4c0e-8e90-0ccbc74d0061"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4070,7 +6070,23 @@
         "sensor_name": "Sonar",
         "bearing": -144.7,
         "time": "2010-01-12T12:44:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ed60e75f-dfdf-4f1f-8b9a-7380d28501db"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4083,7 +6099,23 @@
         "sensor_name": "Sonar",
         "bearing": -147.5,
         "time": "2010-01-12T12:44:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "84e80f68-ce53-49cb-b61d-1c32e07964db"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4096,7 +6128,23 @@
         "sensor_name": "Sonar",
         "bearing": -150.2,
         "time": "2010-01-12T12:44:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8061fc84-8912-4660-84eb-8b04f13f2dd3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4109,7 +6157,23 @@
         "sensor_name": "Sonar",
         "bearing": -152.8,
         "time": "2010-01-12T12:44:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c8d6e290-03dc-4e28-a5b9-82fe9bdc3e2d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4122,7 +6186,23 @@
         "sensor_name": "Sonar",
         "bearing": -155.4,
         "time": "2010-01-12T12:45:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "32ba213e-3ca2-456f-b845-32276fbd3a2b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4135,7 +6215,23 @@
         "sensor_name": "Sonar",
         "bearing": -157.8,
         "time": "2010-01-12T12:45:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c5ad4b17-9e9d-4aa3-9923-2a39a5f6ee4e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4148,7 +6244,23 @@
         "sensor_name": "Sonar",
         "bearing": -160.2,
         "time": "2010-01-12T12:45:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "bbb63da7-2a17-4d33-962f-fd7d11e3949e"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4161,7 +6273,23 @@
         "sensor_name": "Sonar",
         "bearing": -162.4,
         "time": "2010-01-12T12:45:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fcf1702c-dd56-4c0e-88d0-87045c5dfcc1"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4174,7 +6302,23 @@
         "sensor_name": "Sonar",
         "bearing": -164.6,
         "time": "2010-01-12T12:46:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "85670554-ef24-4ff0-963c-6cf61f49b565"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4187,7 +6331,23 @@
         "sensor_name": "Sonar",
         "bearing": -166.6,
         "time": "2010-01-12T12:46:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d628a862-f08e-41bb-8a4a-b44995f3cf11"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4200,7 +6360,23 @@
         "sensor_name": "Sonar",
         "bearing": -168.6,
         "time": "2010-01-12T12:46:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9c174a70-883a-4251-8e76-1f3d0fae720a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4213,7 +6389,23 @@
         "sensor_name": "Sonar",
         "bearing": -170.5,
         "time": "2010-01-12T12:46:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2f30e565-93ed-413e-8796-a246ab4b0e25"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4226,7 +6418,23 @@
         "sensor_name": "Sonar",
         "bearing": -172.2,
         "time": "2010-01-12T12:47:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b347a27a-90fe-4e7a-9fad-efce91abda3b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4239,7 +6447,23 @@
         "sensor_name": "Sonar",
         "bearing": -173.9,
         "time": "2010-01-12T12:47:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1fb1ec27-6e9a-4a13-95da-6cbdf9ce6676"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4252,7 +6476,23 @@
         "sensor_name": "Sonar",
         "bearing": -175.5,
         "time": "2010-01-12T12:47:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "14d6ee25-8d2f-4896-9055-51564bc4beb3"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4265,7 +6505,23 @@
         "sensor_name": "Sonar",
         "bearing": -176.8,
         "time": "2010-01-12T12:47:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a13568bd-4118-433f-a2ef-fc2a8223cac0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4278,7 +6534,23 @@
         "sensor_name": "Sonar",
         "bearing": -176.9,
         "time": "2010-01-12T12:48:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ec58d7a4-d81b-432d-9fa1-bfa8a210707a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4291,7 +6563,23 @@
         "sensor_name": "Sonar",
         "bearing": -175.5,
         "time": "2010-01-12T12:48:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "692c92d1-cab4-4bb3-a12f-e1c0e6fa80a9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4304,7 +6592,23 @@
         "sensor_name": "Sonar",
         "bearing": -173.8,
         "time": "2010-01-12T12:48:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c65a73c7-038a-4f1c-bbd2-89d5d1e1f2f7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4317,7 +6621,23 @@
         "sensor_name": "Sonar",
         "bearing": -171.9,
         "time": "2010-01-12T12:48:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0a6a3ee8-36a8-459c-9f06-71b0d042e008"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4330,7 +6650,23 @@
         "sensor_name": "Sonar",
         "bearing": -170.0,
         "time": "2010-01-12T12:49:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d49f6335-555f-49bd-ba88-5d8512ddcad9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4343,7 +6679,23 @@
         "sensor_name": "Sonar",
         "bearing": -168.0,
         "time": "2010-01-12T12:49:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "572ac3a6-679b-49e1-ab76-7abc4f1a0754"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4356,7 +6708,23 @@
         "sensor_name": "Sonar",
         "bearing": -165.9,
         "time": "2010-01-12T12:49:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7044ae0f-88c7-4f4b-8ad2-b9ba685dbbb8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4369,7 +6737,23 @@
         "sensor_name": "Sonar",
         "bearing": -163.7,
         "time": "2010-01-12T12:49:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b779783e-8abe-4999-bc65-1c17a67c1c9f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4382,7 +6766,23 @@
         "sensor_name": "Sonar",
         "bearing": -161.5,
         "time": "2010-01-12T12:50:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b44d72d1-5d77-4694-b9db-8d31e8e11a55"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4395,7 +6795,23 @@
         "sensor_name": "Sonar",
         "bearing": -159.2,
         "time": "2010-01-12T12:50:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "14249006-136b-488b-8309-e35bdc087d07"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4408,7 +6824,23 @@
         "sensor_name": "Sonar",
         "bearing": -156.8,
         "time": "2010-01-12T12:50:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2fe96ae1-7255-458a-ac18-63cf01c590a0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4421,7 +6853,23 @@
         "sensor_name": "Sonar",
         "bearing": -154.3,
         "time": "2010-01-12T12:50:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "11d5987f-a356-4058-b32a-30c9845df2c2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4434,7 +6882,23 @@
         "sensor_name": "Sonar",
         "bearing": -151.8,
         "time": "2010-01-12T12:51:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fcf08acb-6e46-448f-8c12-f3b6e4718432"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4447,7 +6911,23 @@
         "sensor_name": "Sonar",
         "bearing": -149.2,
         "time": "2010-01-12T12:51:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "12f88916-a03d-4a72-8a6d-e9b526642cbb"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4460,7 +6940,23 @@
         "sensor_name": "Sonar",
         "bearing": -146.5,
         "time": "2010-01-12T12:51:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5ff75c19-ae35-4522-b709-2e967847687f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4473,7 +6969,23 @@
         "sensor_name": "Sonar",
         "bearing": -143.9,
         "time": "2010-01-12T12:51:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "78b6250c-deb0-4798-83a0-a0632aa5536b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4486,7 +6998,23 @@
         "sensor_name": "Sonar",
         "bearing": -141.2,
         "time": "2010-01-12T12:52:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e9a807d9-01d2-4817-a71d-e5930c7ed8bf"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4499,7 +7027,23 @@
         "sensor_name": "Sonar",
         "bearing": -138.5,
         "time": "2010-01-12T12:52:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "253de07e-1797-4d29-b625-ef253e2583fe"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4512,7 +7056,23 @@
         "sensor_name": "Sonar",
         "bearing": -135.8,
         "time": "2010-01-12T12:52:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4e2fd87d-6a7e-441c-a15c-6993d96e3b98"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4525,7 +7085,23 @@
         "sensor_name": "Sonar",
         "bearing": -133.1,
         "time": "2010-01-12T12:52:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cfd70641-5245-489b-a55d-0d16a862ad13"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4538,7 +7114,23 @@
         "sensor_name": "Sonar",
         "bearing": -130.4,
         "time": "2010-01-12T12:53:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cb2b2da0-7e83-42dc-b54d-834405825942"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4551,7 +7143,23 @@
         "sensor_name": "Sonar",
         "bearing": -127.8,
         "time": "2010-01-12T12:53:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "31599eae-bd31-456d-964d-9a745d7cb023"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4564,7 +7172,23 @@
         "sensor_name": "Sonar",
         "bearing": -125.2,
         "time": "2010-01-12T12:53:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0d6074b0-7e5d-484b-a5e9-dc5920e1d2c7"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4577,7 +7201,23 @@
         "sensor_name": "Sonar",
         "bearing": -122.7,
         "time": "2010-01-12T12:53:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3d33b2c1-93bc-4f1a-af6c-740f24465738"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4590,7 +7230,23 @@
         "sensor_name": "Sonar",
         "bearing": -120.2,
         "time": "2010-01-12T12:54:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ae2fdacd-5132-4304-bf42-e7b7ce8b8e2d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4603,7 +7259,23 @@
         "sensor_name": "Sonar",
         "bearing": -117.8,
         "time": "2010-01-12T12:54:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cc2300e0-506c-4f61-9a40-b0c0a359c695"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4616,7 +7288,23 @@
         "sensor_name": "Sonar",
         "bearing": -115.5,
         "time": "2010-01-12T12:54:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3a764dc9-e683-42f5-b236-6c20d183af27"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4629,7 +7317,23 @@
         "sensor_name": "Sonar",
         "bearing": -113.3,
         "time": "2010-01-12T12:54:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2804da62-a1c6-447c-8297-4663a5cc8aa4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4642,7 +7346,23 @@
         "sensor_name": "Sonar",
         "bearing": -111.1,
         "time": "2010-01-12T12:55:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cf1509be-0cb8-44cf-b7f5-64ff2b86b081"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4655,7 +7375,23 @@
         "sensor_name": "Sonar",
         "bearing": -109.0,
         "time": "2010-01-12T12:55:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "838442e8-b1e6-4a3d-b192-634655c3220b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4668,7 +7404,23 @@
         "sensor_name": "Sonar",
         "bearing": -107.0,
         "time": "2010-01-12T12:55:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "692472c5-aee1-4a6b-9cb8-d9e605a6f86c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4681,7 +7433,23 @@
         "sensor_name": "Sonar",
         "bearing": -105.1,
         "time": "2010-01-12T12:55:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "399aa8c6-a65a-4c6b-a510-9089f24c594d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4694,7 +7462,23 @@
         "sensor_name": "Sonar",
         "bearing": -103.2,
         "time": "2010-01-12T12:56:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "efcddf4a-3c9e-494e-b42a-b1901528d195"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4707,7 +7491,23 @@
         "sensor_name": "Sonar",
         "bearing": -101.5,
         "time": "2010-01-12T12:56:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e6b747a5-a9f5-4ace-af4d-d0a0bb11b509"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4720,7 +7520,23 @@
         "sensor_name": "Sonar",
         "bearing": -99.8,
         "time": "2010-01-12T12:56:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a397b8e4-aad4-4175-bbf2-9a7b933891d9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4733,7 +7549,23 @@
         "sensor_name": "Sonar",
         "bearing": -98.2,
         "time": "2010-01-12T12:56:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f455b729-ca39-4c25-8cad-4b4ea834cb95"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4746,7 +7578,23 @@
         "sensor_name": "Sonar",
         "bearing": -96.7,
         "time": "2010-01-12T12:57:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "eb022cca-77d4-432f-98e0-83188210b7ec"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4759,7 +7607,23 @@
         "sensor_name": "Sonar",
         "bearing": -95.2,
         "time": "2010-01-12T12:57:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "70d5a777-addf-4273-91c1-348bea45a57d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4772,7 +7636,23 @@
         "sensor_name": "Sonar",
         "bearing": -93.8,
         "time": "2010-01-12T12:57:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b1fa3b8a-2dd3-48b4-892c-f76e3cfcaf5d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4785,7 +7665,23 @@
         "sensor_name": "Sonar",
         "bearing": -92.5,
         "time": "2010-01-12T12:57:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5fe66b24-173f-4563-9dc2-bd4eb69f456a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4798,7 +7694,23 @@
         "sensor_name": "Sonar",
         "bearing": -91.2,
         "time": "2010-01-12T12:58:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "43aebc3b-05d1-46dc-b50c-0d5edc637b74"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4811,7 +7723,23 @@
         "sensor_name": "Sonar",
         "bearing": -90.0,
         "time": "2010-01-12T12:58:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "75fe34f6-ca28-48a5-bb92-550c5cb6ac91"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4824,7 +7752,23 @@
         "sensor_name": "Sonar",
         "bearing": -88.8,
         "time": "2010-01-12T12:58:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1f2e1604-84ec-441d-a82a-b4645fdedf2c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4837,7 +7781,23 @@
         "sensor_name": "Sonar",
         "bearing": -87.7,
         "time": "2010-01-12T12:58:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8ec33072-85d5-4d43-a513-df7a30a5924d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4850,7 +7810,23 @@
         "sensor_name": "Sonar",
         "bearing": -86.7,
         "time": "2010-01-12T12:59:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1151be6c-1331-466d-8d9d-c4ce2555d51f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4863,7 +7839,23 @@
         "sensor_name": "Sonar",
         "bearing": -85.7,
         "time": "2010-01-12T12:59:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4eaa5c77-c7ad-4b47-8177-d94f0cc4eae4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4876,7 +7868,23 @@
         "sensor_name": "Sonar",
         "bearing": -84.7,
         "time": "2010-01-12T12:59:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "87519f46-14d9-4a2f-a904-2d83702f14b8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4889,7 +7897,23 @@
         "sensor_name": "Sonar",
         "bearing": -83.8,
         "time": "2010-01-12T12:59:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3d726c5a-536f-4d52-87ec-ef5a5e0092ff"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4902,7 +7926,23 @@
         "sensor_name": "Sonar",
         "bearing": -82.9,
         "time": "2010-01-12T13:00:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6e61e283-c392-43be-be79-b9b9eb0b2b14"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4915,7 +7955,23 @@
         "sensor_name": "Sonar",
         "bearing": -82.0,
         "time": "2010-01-12T13:00:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2c94c8f0-cf8a-43e8-8bf5-42bd490f1a03"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4928,7 +7984,23 @@
         "sensor_name": "Sonar",
         "bearing": -81.2,
         "time": "2010-01-12T13:00:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5165c3fe-09cb-43e8-b494-d4282b16c62b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4941,7 +8013,23 @@
         "sensor_name": "Sonar",
         "bearing": -80.5,
         "time": "2010-01-12T13:00:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b7202c59-d414-420f-9af7-c8081f6d9a79"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4954,7 +8042,23 @@
         "sensor_name": "Sonar",
         "bearing": -79.7,
         "time": "2010-01-12T13:01:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "2102e41c-e36e-4d55-8e3b-847f27ed6ba4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4967,7 +8071,23 @@
         "sensor_name": "Sonar",
         "bearing": -79.0,
         "time": "2010-01-12T13:01:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9ff9d164-41eb-4ac0-be4d-85f238e94711"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4980,7 +8100,23 @@
         "sensor_name": "Sonar",
         "bearing": -78.3,
         "time": "2010-01-12T13:01:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b56c765b-1375-4e1f-836c-05be4dad23aa"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -4993,7 +8129,23 @@
         "sensor_name": "Sonar",
         "bearing": -77.7,
         "time": "2010-01-12T13:01:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "1d45c340-f155-4b28-9079-e846b656166a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5006,7 +8158,23 @@
         "sensor_name": "Sonar",
         "bearing": -77.1,
         "time": "2010-01-12T13:02:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "69ea58f4-9e24-4dd9-a727-3acf92d5cc4d"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5019,7 +8187,23 @@
         "sensor_name": "Sonar",
         "bearing": -76.4,
         "time": "2010-01-12T13:02:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "13eb16f4-29a6-467e-bea6-cb933bafc1ab"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5032,7 +8216,23 @@
         "sensor_name": "Sonar",
         "bearing": -75.9,
         "time": "2010-01-12T13:02:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ce818d12-15f1-4fe4-a063-a806cddce5d0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5045,7 +8245,23 @@
         "sensor_name": "Sonar",
         "bearing": -75.3,
         "time": "2010-01-12T13:02:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "07755a06-107a-4621-af2c-c3e69270b183"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5058,7 +8274,23 @@
         "sensor_name": "Sonar",
         "bearing": -74.8,
         "time": "2010-01-12T13:03:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "3e8caf5d-edf5-46a6-b3db-7c68a997bc15"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5071,7 +8303,23 @@
         "sensor_name": "Sonar",
         "bearing": -74.2,
         "time": "2010-01-12T13:03:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d35c3669-20a7-4fb8-ac42-442ad8782e43"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5084,7 +8332,23 @@
         "sensor_name": "Sonar",
         "bearing": -73.7,
         "time": "2010-01-12T13:03:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8490b118-5cad-4de3-a4e4-c583cab2d57c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5097,7 +8361,23 @@
         "sensor_name": "Sonar",
         "bearing": -73.3,
         "time": "2010-01-12T13:03:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "c0d41635-dc11-45fb-b617-dc98436f10fa"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5110,7 +8390,23 @@
         "sensor_name": "Sonar",
         "bearing": -72.8,
         "time": "2010-01-12T13:04:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d6ab1cd1-3f76-4fbe-8225-5a00b5cdfbb4"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5123,7 +8419,23 @@
         "sensor_name": "Sonar",
         "bearing": -72.4,
         "time": "2010-01-12T13:04:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d9539915-b511-4a00-b968-9783bc929b1a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5136,7 +8448,23 @@
         "sensor_name": "Sonar",
         "bearing": -71.9,
         "time": "2010-01-12T13:04:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f57e1b6d-0693-404f-a111-5c4da47b23f9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5149,7 +8477,23 @@
         "sensor_name": "Sonar",
         "bearing": -71.5,
         "time": "2010-01-12T13:04:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "827ba997-2acb-487e-801a-a4a8d75a221f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5162,7 +8506,23 @@
         "sensor_name": "Sonar",
         "bearing": -71.1,
         "time": "2010-01-12T13:05:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "382cd0e3-7737-4e95-95fd-47bc965dafa5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5175,7 +8535,23 @@
         "sensor_name": "Sonar",
         "bearing": -70.7,
         "time": "2010-01-12T13:05:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "87e08fa3-f6bd-48c2-8a2b-fa506da4a0a0"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5188,7 +8564,23 @@
         "sensor_name": "Sonar",
         "bearing": -70.3,
         "time": "2010-01-12T13:05:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7b0ed559-6593-40f1-86cc-e1348b5a1933"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5201,7 +8593,23 @@
         "sensor_name": "Sonar",
         "bearing": -70.0,
         "time": "2010-01-12T13:05:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cda81bd2-4ec0-4e16-879f-a7edc8f7ba27"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5214,7 +8622,23 @@
         "sensor_name": "Sonar",
         "bearing": -69.6,
         "time": "2010-01-12T13:06:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "90b624fc-ebd6-4e2e-a2ed-8f38e9062271"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5227,7 +8651,23 @@
         "sensor_name": "Sonar",
         "bearing": -69.3,
         "time": "2010-01-12T13:06:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6844a97c-425a-4998-b6f4-396d693b3627"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5240,7 +8680,23 @@
         "sensor_name": "Sonar",
         "bearing": -68.9,
         "time": "2010-01-12T13:06:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8d90eb1d-2d2b-4a7b-8ab6-13f1f890b108"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5253,7 +8709,23 @@
         "sensor_name": "Sonar",
         "bearing": -68.6,
         "time": "2010-01-12T13:06:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "932fae60-f472-4b40-b6a3-549ee4c336e8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5266,7 +8738,23 @@
         "sensor_name": "Sonar",
         "bearing": -68.3,
         "time": "2010-01-12T13:07:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cb7f162d-bac1-4610-bfa5-85e0621a2804"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5279,7 +8767,23 @@
         "sensor_name": "Sonar",
         "bearing": -68.0,
         "time": "2010-01-12T13:07:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "6dc55a62-5cee-4b13-8653-c08d434a851b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5292,7 +8796,23 @@
         "sensor_name": "Sonar",
         "bearing": -67.7,
         "time": "2010-01-12T13:07:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "b96f49eb-140b-4fb0-8da7-46654ccf3ad2"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5305,7 +8825,23 @@
         "sensor_name": "Sonar",
         "bearing": -67.4,
         "time": "2010-01-12T13:07:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "9df850a2-759a-4a42-a307-6a57da67372c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5318,7 +8854,23 @@
         "sensor_name": "Sonar",
         "bearing": -67.1,
         "time": "2010-01-12T13:08:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "fb7f5712-e0fc-40a1-868c-ce87898ad6ca"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5331,7 +8883,23 @@
         "sensor_name": "Sonar",
         "bearing": -66.8,
         "time": "2010-01-12T13:08:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a760f052-fd42-47a3-afbc-c4fcb77fe286"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5344,7 +8912,23 @@
         "sensor_name": "Sonar",
         "bearing": -66.6,
         "time": "2010-01-12T13:08:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d0e8a916-d53f-48da-b9e8-9ae286edd93a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5357,7 +8941,23 @@
         "sensor_name": "Sonar",
         "bearing": -66.3,
         "time": "2010-01-12T13:08:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "dc350683-d537-4b6d-bb76-5bf54b1f44e8"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5370,7 +8970,23 @@
         "sensor_name": "Sonar",
         "bearing": -66.1,
         "time": "2010-01-12T13:09:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "4137b18b-0544-4da0-8e14-029e833a7f02"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5383,7 +8999,23 @@
         "sensor_name": "Sonar",
         "bearing": -65.8,
         "time": "2010-01-12T13:09:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8dd8c31b-b2c3-47e1-b475-95db04b08a5a"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5396,7 +9028,23 @@
         "sensor_name": "Sonar",
         "bearing": -65.6,
         "time": "2010-01-12T13:09:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "8e1d1df0-4d9a-460c-960d-c65f4691de7b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5409,7 +9057,23 @@
         "sensor_name": "Sonar",
         "bearing": -65.4,
         "time": "2010-01-12T13:09:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "41e0d000-743e-4407-a9c2-91925fd5ea92"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5422,7 +9086,23 @@
         "sensor_name": "Sonar",
         "bearing": -65.1,
         "time": "2010-01-12T13:10:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "d1d0f7b3-c870-4db4-861e-e231af354fe9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5435,7 +9115,23 @@
         "sensor_name": "Sonar",
         "bearing": -64.9,
         "time": "2010-01-12T13:10:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f52c8c01-8e77-48a9-8c57-3972b2cd6781"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5448,7 +9144,23 @@
         "sensor_name": "Sonar",
         "bearing": -64.7,
         "time": "2010-01-12T13:10:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "e918572f-951b-45e6-8d73-009179c0c066"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5461,7 +9173,23 @@
         "sensor_name": "Sonar",
         "bearing": -64.5,
         "time": "2010-01-12T13:10:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "cb9ef7b7-9656-459a-b5c8-7efaa43f8000"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5474,7 +9202,23 @@
         "sensor_name": "Sonar",
         "bearing": -64.3,
         "time": "2010-01-12T13:11:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "89a19ccd-0487-4208-8398-3f08601babe5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5487,7 +9231,23 @@
         "sensor_name": "Sonar",
         "bearing": -64.1,
         "time": "2010-01-12T13:11:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "ec973564-d206-46a9-8942-9f990fb52a3c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5500,7 +9260,23 @@
         "sensor_name": "Sonar",
         "bearing": -63.9,
         "time": "2010-01-12T13:11:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "463a8183-f02a-4890-9ed3-756c393eb3f9"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5513,7 +9289,23 @@
         "sensor_name": "Sonar",
         "bearing": -63.7,
         "time": "2010-01-12T13:11:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7125c40d-114b-4003-a4df-f72b95c87171"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5526,7 +9318,23 @@
         "sensor_name": "Sonar",
         "bearing": -63.5,
         "time": "2010-01-12T13:12:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "7ee6dd57-9659-4865-84a6-43633748457b"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5539,7 +9347,23 @@
         "sensor_name": "Sonar",
         "bearing": -63.4,
         "time": "2010-01-12T13:12:29+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "23461590-70e5-475b-aeb2-45b9be38e672"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5552,7 +9376,23 @@
         "sensor_name": "Sonar",
         "bearing": -63.2,
         "time": "2010-01-12T13:12:44+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "0fcfd387-cae1-4e9a-9d85-d1175f34f3e5"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5565,7 +9405,23 @@
         "sensor_name": "Sonar",
         "bearing": -63.0,
         "time": "2010-01-12T13:12:59+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "f8d01fd8-a605-41ba-ae31-4a994a9bf05c"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -5578,7 +9434,23 @@
         "sensor_name": "Sonar",
         "bearing": -62.8,
         "time": "2010-01-12T13:13:14+00:00",
-        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie"
+        "label": "Cookie\tSUBJECT\theld\ton\tPlain\tCookie",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "a7bc1975-9797-4af5-b611-be6db26a592f"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     },
     {
@@ -8025,7 +11897,23 @@
           "show_label": false
         },
         "symbol_interval": "PT5M",
-        "label_interval": "PT15M"
+        "label_interval": "PT15M",
+        "provenance": [
+          {
+            "activity_id": "d54651f6-ec0e-442b-a288-993af2d9c297",
+            "timestamp": "2026-03-21T10:15:02.005672Z",
+            "was_generated_by": {
+              "tool": "dpf-parser",
+              "tool_version": "1.0.0",
+              "parameters": []
+            },
+            "used": [],
+            "generated": [
+              "5b4ca8ee-44e2-40bf-850b-950094191758"
+            ],
+            "execution_duration": "PT0S"
+          }
+        ]
       }
     }
   ]
