@@ -1,5 +1,7 @@
 // Types (canonical home: filter-engine/types.ts)
 export type { CatalogOverviewItem, StacBrowserItem, VesselTaxonomyNode } from './filter-engine/types';
+export { parseTaxonomy } from './filter-engine/taxonomy';
+export type { RawTaxonomy } from './filter-engine/taxonomy';
 
 // StacBrowser (Feature: 132-three-view-sync)
 export { StacBrowser } from './StacBrowser';
